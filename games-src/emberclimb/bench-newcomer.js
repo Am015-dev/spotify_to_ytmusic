@@ -4,7 +4,7 @@
 // Run: node bench-newcomer.js [runs=300] [hero=w]   DIED=1 prints where runs ended.
 if (process.env.KE) global.EC_KE = JSON.parse(process.env.KE);
 const EC = require('./core.js'), E = EC.E, D = EC.D; const N = +process.argv[2] || 300, HERO = process.argv[3] || 'w';
-const BB = {}; let fullDeaths = 0, f1 = 0, boss = 0, beat = 0, stuck = 0; const died = {};
+const BB = {}, FL = { m: [], e: [], b: [] }; let hpB = 0; let fullDeaths = 0, f1 = 0, boss = 0, beat = 0, stuck = 0; const died = {};
 function hasOp(c, k) { return E.eff(c).ops.some(o => o[0] === k || (o[0] === 'roll' && JSON.stringify(o).indexOf('"' + k + '"') >= 0)); }
 function pick(G, r) {
   const vm = E.validMoves(); const R = a => a[Math.floor(r() * a.length)];
@@ -30,7 +30,8 @@ for (let i = 0; i < N; i++) {
   while (G.scr !== 'over' && !(G.won) && n++ < 8000) {
     if (G.b && G.b.ph === 'e') { E.settle(); continue; }
     if (G.b && G.b.kind === 'b' && G.scr === 'battle') reached = true;
-    if (G.b && G.b !== lastB) { lastB = G.b; lastKind = G.b.kind; fullAtStart = G.hs.every(h => h.hp >= h.mhp); }
+    if (G.b && G.b !== lastB) { if (lastB && FL[lastB.kind]) FL[lastB.kind].push(hpB - G.hs[0].hp); lastB = G.b; lastKind = G.b.kind; fullAtStart = G.hs.every(h => h.hp >= h.mhp); hpB = G.hs[0].hp; }
+    if (lastB && G.scr !== 'battle' && !lastB.done) { lastB.done = 1; FL[lastB.kind] && FL[lastB.kind].push(hpB - Math.max(0, G.hs[0].hp)); }
     const m = pick(G, r); if (!m || !E.performMove(m)) { const m2 = E.validMoves()[0]; if (!m2 || !E.performMove(m2)) { stuck++; break; } }
     if (G.b && G.b.ph === 'e') E.settle();
   }
@@ -40,3 +41,5 @@ for (let i = 0; i < N; i++) {
 }
 const pc = x => (100 * x / N).toFixed(0) + '%';
 console.log(`newcomer bench (${process.env.GENTLE ? 'Gentle' : 'Tabletop'}, ${HERO}, ${N} runs, Quick 1 act): survived floor 1 ${pc(f1)} | reached boss ${pc(boss)} | beat boss ${pc(beat)}${stuck ? ' | stuck ' + stuck : ''} | regular-foe deaths from full HP, floors 1-8: ${fullDeaths}`); if (process.env.DIED) console.log('boss [reached, beaten, foe HP left on loss]:', JSON.stringify(BB)); if (process.env.DIED) console.log('ended (room kind + floor):', JSON.stringify(died));
+// F2 tension: HP lost per fight by room kind (the newcomer should lose some HP in most fights)
+{ const st = a => { const n = a.length || 1, lost = a.filter(x => x > 0).length; return `${a.length} fights, avg ${(a.reduce((x, y) => x + y, 0) / n).toFixed(1)} HP lost, lost any ${(100 * lost / n).toFixed(0)}%`; }; console.log('per fight  monster: ' + st(FL.m) + ' | elite: ' + st(FL.e) + ' | boss: ' + st(FL.b)); }

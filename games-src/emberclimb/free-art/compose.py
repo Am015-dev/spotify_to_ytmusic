@@ -241,7 +241,11 @@ def background(stem):
     if stem == 'bg-defeat': out = ImageEnhance.Color(out).enhance(.5)
     return out
 EVENT = {'event-ember-shrine': (['altar_makhleb_flame_1', 'flame_0'], 'x'), 'event-wandering-tinker': (['deep_dwarf_artificer', 'shop_gadgets'], 'n'), 'event-whispering-well': (['blue_fountain', 'gold_pile'], 'a'),
-         'event-stranded-caravan': (['abandoned_shop', 'misc_box'], 'n'), 'event-mirror-pool': (['mirrored_wall', 'deep_water'], 'a'), 'event-back-alley-gambler': (['unique/crazy_yiuf', 'misc_deck'], 's')}
+         'event-stranded-caravan': (['abandoned_shop', 'misc_box'], 'n'), 'event-mirror-pool': (['mirrored_wall', 'deep_water'], 'a'), 'event-back-alley-gambler': (['unique/crazy_yiuf', 'misc_deck'], 's'),
+         # F3: every event has its own picture (first-ember, ash-library, cursed-chest, herb-witch, forge-spirit, golden-idol, kind-pilgrim used to share)
+         'event-first-ember': (['torch_1', 'fire_vortex_3'], 'w'), 'event-ash-library': (['book_orange', 'book_dog_eared'], 'm'), 'event-cursed-chest': (['chest_2_closed', 'ghost_new'], 'x'),
+         'event-herb-witch': (['deep_elf_priest', 'gold_pile_4'], 's'), 'event-forge-spirit': (['fire_elemental_new', 'torch_1'], 'w'), 'event-golden-idol': (['statue_archer', 'gold_pile_6'], 'n'),
+         'event-kind-pilgrim': (['deep_elf_high_priest', 'lantern'], 'm')}
 def event(stem):
     toks, h = EVENT[stem]; W, Hh = 512, 384; base = tile_bg(['floor/grass_0', 'floor/grass_1'] if h in 'ns' else WALL[h], W, Hh, 4, 7, .45)
     base.alpha_composite(glow(W, Hh, W // 2, Hh // 2, 170, TONE[h], 170)); put(base, spr(toks[1]), W // 2 + 130, Hh // 2 + 50, 5); put(base, spr(toks[0]), W // 2 - 40, Hh // 2, 8)

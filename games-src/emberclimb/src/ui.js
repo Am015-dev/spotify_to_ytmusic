@@ -102,6 +102,7 @@
         case 'dmg': var M = f.m || null, shr = M && M.m ? Math.min(1, M.r / M.m) : null; var bg = f.x !== 'blocked' && f.x !== 'poison' && (f.n >= 12 || shr >= .25);
           if (M) { ghostBar(el, M.hp, M.r, M.m); var cmb = []; if (M.p > M.b) cmb.push('Strength'); if (M.v) cmb.push('Vulnerable'); if (cmb.length && f.n > M.b) calloutAt(f.w, cmb.join(' + ') + ': ' + M.b + ' \u2192 ' + f.n + '!', 'combo'); } fxAt(f.w, f.x === 'poison' ? 'fx-poison-cloud' : 'fx-slash'); if (f.x === 'str') fxAt(f.w, 'fx-fire-burst'); SFX(f.x === 'blocked' ? 'block' : bg ? 'crit' : 'hit'); if (f.x === 'blocked') popAt(f.w, 'Blocked', 'dmg'); else numAt(f.w, f.n, f.x === 'poison' ? 'poison' : 'dmg', f.x === 'poison' ? 'poison' : M && M.r > 0 ? (M.hp > 0 ? Math.max(1, Math.round(100 * M.r / M.m)) + '% of its HP' : 'finishing blow') : (UI.lastName || ''), shr); if (bg) bigHit(el); shakeEl(el, bg ? 95 : 0); break;
         case 'hitme': var bh = f.x !== 'blocked' && (f.n >= 12 || bossF); if (f.x === 'burn' || f.x === 'str') fxAt(f.w, 'fx-fire-burst'); SFX(f.x === 'blocked' ? 'block' : bh ? 'crit' : 'hurt'); if (f.x === 'blocked') popAt(f.w, 'Blocked', 'dmg'); else numAt(f.w, f.n, 'dmg', f.x === 'spikes' ? 'spikes' : f.x === 'burn' ? 'burn' : ''); if (f.x === 'spikes') { toast('Spikes! Attacking it cost you ' + f.n + ' HP'); try { UI.coachReact && UI.coachReact('poor', 'spikes'); } catch (e) { } } if (bh) bigHit(el); shakeEl(el, bh ? 95 : 0); break;
+        case 'trig': { var nc = el && el.querySelector('.notechip'); if (nc) { nc.classList.remove('trig'); void nc.offsetWidth; nc.classList.add('trig'); setTimeout(function () { nc.classList.remove('trig'); }, 1100); } SFX('buff'); popAt(f.w, f.x, 'dmg'); break; }
         case 'hp': break;
         case 'blk': SFX('block'); fxAt(f.w, 'fx-block-burst'); numAt(f.w, f.n, 'blk', 'Block'); break;
         case 'heal': SFX('heal'); fxAt(f.w, 'fx-heal-sparkle'); numAt(f.w, f.n, 'heal', 'HP'); break;
@@ -110,7 +111,7 @@
           var d = h('div', 'ec-phase', null, [h('b', '', soon ? 'It splits!' : 'Slimes!'), h('span', '', soon ? ed.name + ' ' + (ed.splitSay || 'splits') + '. ' + n + ' slimes join at the start of next round. Finish your turn.' : n + ' slimes from the ' + ed.name + ' join the fight. Check their intents.')]);
           d.setAttribute('role', 'status'); document.body.appendChild(d); SFX('crit'); setTimeout(function () { if (d.parentNode) d.remove(); }, 3000); })(); break;
         case 'debuff': popAt(f.w, (f.x === 'poison' ? 'Poison' : f.x === 'vuln' ? 'Vulnerable' : 'Weak') + (f.n ? ' ' + f.n : ''), 'deb'); break;
-        case 'die': if (g.scr === 'event') break; if (window.ANIM) { var dfo = g.b ? g.b.en.filter(function (e) { return !e.dead && e.intent && e.intent.die; }).map(function (e) { return D.ENEMIES[e.id].name; }) : [], d = h('div', 'pop die', '🎲 ' + f.n); d.appendChild(h('small', 'w5dcap', dfo.length ? 'Round die: it picks the move of ' + dfo.join(' and ') : 'Round die: no foe uses it this round')); d.appendChild(A('die-' + f.n, '', { noph: 1, cls: 'dieart' })); d.style.left = '40%'; d.style.top = '36%'; document.body.appendChild(d); setTimeout(function () { d.remove(); }, 1000); } break;
+        case 'die': if (g.scr === 'event') break; if (window.ANIM) { var dfo = g.b ? g.b.en.filter(function (e) { return !e.dead && e.intent && e.intent.die; }).map(function (e) { return D.ENEMIES[e.id].name; }) : [], d = h('div', 'pop die big', null, [h('b', '', 'Rolled ' + f.n), h('small', 'w5dcap', dfo.length ? 'Round die: it picks the move of ' + dfo.join(' and ') : 'Round die: no foe uses it this round')]); d.insertBefore(A('die-' + f.n, '', { noph: 1, cls: 'dieart' }), d.firstChild); d.style.left = 'calc(50% - 80px)'; d.style.top = '30%'; document.body.appendChild(d); setTimeout(function () { d.remove(); }, 1600); } break;   // F3: a big centred die + 'Rolled N', held 1.5 s
         case 'act': if (f.x === 'atk' && el && window.ANIM) { el.classList.add('lunge'); setTimeout(function () { el.classList.remove('lunge'); }, 480); } break;
         case 'kill': calloutAt(f.w, 'Defeated!', 'kill'); SFX('crit'); bigHit(el); embers(16); break;
         case 'relic': calloutAt('p', 'New relic: ' + D.RELICS[f.x].name, 'relic'); break;
@@ -182,7 +183,7 @@
     el.appendChild(ct); el.appendChild(art);
     if (e.cost !== -1 && e.fl.indexOf('u') < 0) el.appendChild(h('div', 'cx', e.cost === 'X' ? 'X' : String(e.cost)));
     var kk = keyNum(e); if (kk) el.appendChild(h('div', 'ck k-' + kk[0], kk[1]));
-    var sb = o.str || 0, cb = h('div', 'cb'); E.lines(e, sb).forEach(function (l) { cb.appendChild(h('span', 'cl' + (sb && /^Deal \d/.test(l) ? ' stb' : ''), l)); }); el.appendChild(cb);
+    var sb = o.str || 0, cb = h('div', 'cb'), ln = E.lines(e, sb); ln.forEach(function (l) { cb.appendChild(h('span', 'cl' + (sb && /^Deal \d/.test(l) ? ' stb' : ''), l)); }); if (ln.length >= 4 || ln.join(' ').length > 52) el.classList.add('long'); el.appendChild(cb);   // F3: long rule text (die cards) gets a smaller lifted font so nothing is clipped
     // (the full-card gem/frame overlays are not drawn: they covered the card picture and its rule text)
     return el;
   }
@@ -210,6 +211,15 @@
     try { if (window.GXT && GXT.active()) { var tk = g.rw && g.rw.took || {}; GXT.act({ type: 'event', w: 'scr', scr: g.scr, ph: g.b && g.b.ph, pots: (g.pots || []).filter(Boolean).length, relic: !!tk.relic, took0: !!tk.c0, shopSel: UI.shopSel == null ? -1 : UI.shopSel, bought: !!(g.shop && g.shop.items.some(function (x) { return x.sold; })), evres: !!(g.evn && g.evn.res) }); } } catch (e) { }
   }
   UI.render = render;
+  // F2: long lists (shop, rewards, upgrade / remove pickers) show a "More below" pill while rows hide under the bottom bar; a tap scrolls
+  function moreCue() {
+    var box = null; document.querySelectorAll('.reward, .ov .grid').forEach(function (x) { if (x.offsetParent && x.scrollHeight > x.clientHeight + 8 && x.scrollTop + x.clientHeight < x.scrollHeight - 8) box = box || x; });
+    var pill = document.getElementById('w2more');
+    if (!box) { if (pill) pill.hidden = true; return; }
+    if (!pill) { pill = h('button', 'chip w2more', '\u25BE More below'); pill.id = 'w2more'; pill.type = 'button'; pill.addEventListener('click', function () { var b2 = pill.w2box; if (b2) b2.scrollBy({ top: b2.clientHeight * 0.7, behavior: 'smooth' }); }); document.body.appendChild(pill); }
+    pill.w2box = box; pill.hidden = false; var r = box.getBoundingClientRect(); pill.style.left = Math.round(r.left + r.width / 2 - pill.offsetWidth / 2) + 'px'; pill.style.top = Math.round(r.bottom - pill.offsetHeight - 8) + 'px';
+  }
+  setInterval(function () { try { moreCue(); } catch (e) { } }, 250);
   setInterval(function () { try { var fr = !!(UI.tutFree && UI.tutFree()); document.body.classList.toggle('ec-free', fr); var eb = document.getElementById('end'); if (fr && eb && eb.disabled) eb.disabled = false; if (UI.mode !== 'title') tutEvt(); } catch (e) { } }, 200);   // guide free-play steps hide the bubble (the dock line instructs)
   function tutOk(a) { try { if (UI.tutFree && UI.tutFree()) return true; var ok = !(window.GXT && GXT.active()) || GXT.act(a); if (!ok) { toast('Do the glowing step first'); var dm = document.getElementById('dockmsg'); if (dm) dm.textContent = 'Do the glowing step first.'; } return ok; } catch (e) { return true; } }
   function muteBtn() { var b = on(h('button', 'chip tap', SND.on ? '🔊' : '🔇'), function () { SND.toggle(); toast(SND.on ? 'Sound on' : 'Sound off'); render(); }); b.setAttribute('aria-label', SND.on ? 'Sound on: tap to mute' : 'Sound off: tap to unmute'); b.id = 'mute'; return b; }
@@ -250,7 +260,7 @@
   function quick() {
     var s = h('div', 'pick'); s.id = 'title';
     s.appendChild(BG('bg-title'));
-    var t = h('div', '', null, [h('h1', '', 'EMBERCLIMB'), h('p', 'sub', 'Climb the tower. Build your deck.')]); s.appendChild(t);
+    var t = h('div', '', null, [h('h1', '', 'EMBERCLIMB'), h('p', 'sub', 'Pick your hero. Each has its own cards.')]); s.appendChild(t);
     var hs = h('div', 'heroes');
     ['w', 's', 'a', 'm'].forEach(function (k) {
       var H = D.H[k], lk = !heroOpen(k), b = h('button', 'hero' + (UI.pick.indexOf(k) >= 0 ? ' sel' : '') + (lk ? ' locked' : ''), null, [A('hero-' + k, H.name.split(' ')[0], { ph: TONE[k] }), h('b', '', H.name.split(' ')[0]), h('i', '', lk ? '\uD83D\uDD12 Story' : H.role)]);
@@ -261,7 +271,7 @@
     var mid = h('div', '', null, [hs, h('div', 'refline' + (UI.heroNote ? ' w24note w24n' + ((UI.noteN || 0) % 2) : ''), UI.heroNote || D.H[UI.pick[UI.pick.length - 1]].mech)]); mid.style.cssText = 'display:flex;flex-direction:column;gap:8px;align-items:center;width:100%';
     s.appendChild(mid);
     // climb length: one act (default), all three acts, or three acts + the final act (Ember Tyrant)
-    var seg = h('div', 'seg'); seg.setAttribute('role', 'group'); seg.setAttribute('aria-label', 'Climb length'); UI.acts = UI.acts || 3;
+    var seg = h('div', 'seg'); seg.setAttribute('role', 'group'); seg.setAttribute('aria-label', 'Climb length'); UI.acts = UI.acts || 1;
     [[1, '1 act'], [3, '3 acts'], [4, '3 acts + finale']].forEach(function (o) { var b = on(h('button', UI.acts === o[0] ? 'on' : '', o[1]), function () { UI.acts = o[0]; render(); }); b.setAttribute('data-acts', o[0]); b.setAttribute('aria-pressed', String(UI.acts === o[0])); seg.appendChild(b); });
     // difficulty: Gentle (first climb, player-side numbers only) is the default until the first win or a pick; Tabletop = rulebook numbers
     UI.diff = UI.diff || diffDefault(); var dg = h('div', 'seg w8diff'); dg.setAttribute('role', 'group'); dg.setAttribute('aria-label', 'Difficulty');
@@ -304,12 +314,12 @@
   function dock(g) {
     var m = document.getElementById('dockmsg'), a = document.getElementById('dockact'), t = document.getElementById('dockt'); m.textContent = ''; a.innerHTML = ''; a.parentNode.querySelectorAll('.pcinfo').forEach(function (n) { n.remove(); });
     var txt = '', ttl = 'Your move';
-    if (g.scr === 'map') { txt = 'Pick a glowing room.'; ttl = 'Climb'; }
+    if (g.scr === 'map') { txt = 'Pick a glowing room. ' + aheadLine(g) + '.'; ttl = 'Climb'; }
     else if (g.scr === 'battle') {
       var b = g.b, ch = g.hs[b.cur >= 0 ? b.cur : 0]; ttl = b.ph === 'p' ? 'Your turn' : 'Enemy turn';
       var anyOk = b.ph === 'p' && ch.hand.some(function (c) { return E.canPlay(ch, c) && (E.cost(ch, c) <= ch.en || E.eff(c).cost === 'X'); });
       if (b.ph !== 'p') txt = UI.cap || 'The enemy is acting. Tap to speed up.';
-      else if (UI.sel >= 0 && needTarget()) txt = 'Now tap the glowing enemy to play ' + E.eff(ch.hand[UI.sel]).name + '.';
+      else if (UI.sel >= 0 && needTarget() && b.en.filter(function (e) { return !e.dead; }).length > 1) txt = 'Now tap the glowing enemy to play ' + E.eff(ch.hand[UI.sel]).name + '.';
       else if (UI.sel >= 0) txt = 'Tap ' + E.eff(ch.hand[UI.sel]).name + ' again to play it.';
       else if (anyOk) txt = planLine(ch) || ('Tap a glowing card to pick it. You have ' + ch.en + ' energy.');
       else txt = 'No more cards you can play. Tap End turn.';
@@ -333,7 +343,7 @@
   function mapScr() {
     var g = G(); hud();
     var m = h('div'); m.id = 'map'; m.setAttribute('data-board', '1'); var SGM = STAGE(), mroot = m;
-    if (SGM) { app.appendChild(relicBar(g)); var mi = h('div', 'w485mapin'); mi.style.height = Math.max(560, ((g.F || 9) + 2) * 86) + 'px'; m.appendChild(mi); m.appendChild(h('div', 'w485mapsp')); mroot = m; m = mi; }
+    if (SGM) { app.appendChild(relicBar(g)); app.appendChild(h('div', 'f4ahead', aheadLine(g))); var mi = h('div', 'w485mapin'); mi.style.height = Math.max(560, ((g.F || 9) + 2) * 86) + 'px'; m.appendChild(mi); m.appendChild(h('div', 'w485mapsp')); mroot = m; m = mi; }
     m.appendChild(BG('bg-map'));
     function pos(n) { return { x: (n.c + 0.5) / 4 * 100, y: 100 - (n.f - 0.5) / ((G().F || 9) + 1.5) * 100 }; }
     var NS = 'http://www.w3.org/2000/svg', svg = document.createElementNS(NS, 'svg'); svg.setAttribute('viewBox', '0 0 100 100'); svg.setAttribute('preserveAspectRatio', 'none');
@@ -351,7 +361,12 @@
     });
     var QI = (window.EC_STORY || {}).quick; if (QI && UI.hints && !UI.camp && g.at < 0 && !(window.GXT && GXT.active()) && UI.qIntro !== g.seed && UI.say) { UI.qIntro = g.seed; setTimeout(function () { UI.say(QI.intro[Math.abs(g.seed | 0) % QI.intro.length], 4200); }, 200); }
     app.appendChild(mroot);
-    if (SGM) { var fy = null; g.map.forEach(function (n) { if (rc.indexOf(n.id) >= 0) { var y = pos(n).y; fy = fy == null ? y : Math.max(fy, y); } }); var sy = UI.mapY != null && UI.mapAt === g.at ? UI.mapY : (fy == null ? 1e6 : m.offsetHeight * fy / 100 - mroot.clientHeight * .7); mroot.scrollTop = sy; mroot.addEventListener('scroll', function () { UI.mapY = mroot.scrollTop; UI.mapAt = g.at; }); }
+    if (SGM) { var fy = null; g.map.forEach(function (n) { if (rc.indexOf(n.id) >= 0) { var y = pos(n).y; fy = fy == null ? y : Math.max(fy, y); } }); var sy = UI.mapY != null && UI.mapAt === g.at ? UI.mapY : (fy == null ? 1e6 : m.offsetHeight * fy / 100 - mroot.clientHeight * .7); mroot.scrollTop = sy; mroot.addEventListener('scroll', function () { UI.mapY = mroot.scrollTop; UI.mapAt = g.at; });
+      // F4: glowing rooms are never under the bottom panel: pad the map by the panel height, then scroll the lowest glowing room into view
+      var fixView = function () { var dk = document.querySelector('.gx-dock'), sp = mroot.querySelector('.w485mapsp'); if (!dk || !mroot.isConnected) return; var lim = Math.min(innerHeight, dk.getBoundingClientRect().top > 0 ? dk.getBoundingClientRect().top : innerHeight), mr = mroot.getBoundingClientRect(); lim = Math.min(lim, mr.bottom); if (sp) sp.style.height = Math.max(0, mr.bottom - lim + 24) + 'px';
+        var low = -1e9, top0 = 1e9; mroot.querySelectorAll('.node.glow').forEach(function (n) { var q = n.getBoundingClientRect(); low = Math.max(low, q.bottom); top0 = Math.min(top0, q.top); });
+        if (low > lim - 10) mroot.scrollTop += low - lim + 22; UI.mapY = mroot.scrollTop; };
+      setTimeout(fixView, 30); setTimeout(fixView, 350); } 
   }
   var NODEL = { m: 'Fight', e: 'Elite', r: 'Rest', s: 'Shop', v: 'Event', t: 'Chest', b: 'Boss' };
   var NODEI = { m: '<path d="M3 19 15 7l1.6 1.6L4.6 20.6zM14 4.5l5.5-1-1 5.5-2.2-1.1zM21 19 9 7 7.4 8.6l12 12zM10 4.5 4.5 3.5l1 5.5 2.2-1.1z"/>',
@@ -390,9 +405,9 @@
     }
     if (it.blk) { var bk = it.blk * (it.blkH ? g.hs.length : 1); P.push({ k: 'blk', s: 'intent-defend', t: 'Block ' + bk, cap: 'raises ' + bk + ' Block', say: 'Block: +' + bk + (D.ENEMIES[e.id].keepBlk ? '. It keeps it. Break it to stop the next hit.' : '. Your hits do less.') }); }
     if (it.str) P.push({ k: 'str', s: 'intent-buff', t: 'Strength +' + it.str, cap: 'grows stronger (+' + it.str + ')', say: 'Buff: +' + it.str + ' Strength. Later hits grow.' });
-    if (it.weak) P.push({ k: 'weak', s: 'intent-weak', t: 'Weak ' + it.weak, cap: 'makes you Weak (' + it.weak + ')', say: 'Weak ' + it.weak + ': your next attack deals 8 less per hit. One Weak is used per attack (max 3).' });
+    if (it.weak) P.push({ k: 'weak', s: 'intent-weak', t: 'Weak ' + it.weak, cap: 'makes you Weak (' + it.weak + ')', say: 'Weak ' + it.weak + ': your next attack deals 1 less per hit. One Weak is used per attack (max 3).' });
     if (it.vuln) P.push({ k: 'vuln', s: 'intent-vuln', t: 'Vulnerable ' + it.vuln, cap: 'makes you Vulnerable (' + it.vuln + ')', say: 'Vulnerable ' + it.vuln + ': the next attack on you deals double. One is used per attack (max 3).' });
-    if (it.frail) P.push({ k: 'frail', s: 'intent-frail', t: 'Frail ' + it.frail, cap: 'makes you Frail', say: 'Frail: your Block is 25% weaker.' });
+    if (it.frail) P.push({ k: 'frail', s: 'intent-frail', t: 'Frail ' + it.frail, cap: 'makes you Frail', say: 'Frail: each Block card gives 1 less.' });
     if (it.poison) P.push({ k: 'poison', s: 'intent-poison', t: 'Poison ' + it.poison, cap: 'poisons you (+' + it.poison + ')', say: 'Poison +' + it.poison + ': you lose ' + D.SCALE + ' HP per Poison token at the end of each turn. Tokens stay.' });
     if (it.add) { var ck = CARDK[it.add[0]] || 'unk', cn = D.CARDS[it.add[0]] ? D.CARDS[it.add[0]].name : 'junk'; P.push({ k: ck, s: ck === 'unk' ? 'intent-debuff' : 'intent-' + ck, t: '+' + it.add[1] + ' ' + cn, cap: 'adds ' + it.add[1] + ' ' + cn + ' to your discard pile', say: 'Adds ' + it.add[1] + ' ' + cn + ' to your discard pile.' }); }
     if (it.spikes) P.push({ k: 'blk', s: 'intent-defend', t: 'Spikes ' + it.spikes, cap: 'grows spikes (' + it.spikes + ')', say: 'Spikes: attack it and take ' + it.spikes + '.' });
@@ -408,10 +423,10 @@
     on(b, function () { UI.explain(P); });
     return b;
   }
-  UI.explain = function (P) {
+  UI.explain = function (P, ttl) {
     document.querySelectorAll('.itip, .itip-scrim').forEach(function (n) { n.remove(); });
     // R24: a real popup: a see-through scrim under it closes it on any tap (or Esc), so it never sits over the controls you tap next
-    var sc = h('div', 'itip-scrim'), t = h('div', 'itip'); t.setAttribute('role', 'dialog'); t.setAttribute('aria-modal', 'true'); t.appendChild(h('b', '', P.some(function (p) { return /^relic-/.test(p.s || ''); }) ? 'Relic' : 'Enemy intent'));
+    var sc = h('div', 'itip-scrim'), t = h('div', 'itip'); t.setAttribute('role', 'dialog'); t.setAttribute('aria-modal', 'true'); t.appendChild(h('b', '', P.some(function (p) { return /^relic-/.test(p.s || ''); }) ? 'Relic' : (ttl || 'Enemy intent')));
     P.forEach(function (p) { var r = h('div', 'irow', null, [IA(p.s, p.k), h('span', '', p.say)]); t.appendChild(r); });
     t.appendChild(h('i', '', 'Tap to close')); var xb = h('button', 'itip-x', '\u2715'); xb.type = 'button'; xb.setAttribute('aria-label', 'Close'); t.appendChild(xb);
     function close() { t.remove(); sc.remove(); document.removeEventListener('keydown', esc); }
@@ -420,8 +435,10 @@
     document.body.appendChild(sc); document.body.appendChild(t); setTimeout(function () { if (t.parentNode) close(); }, 9000);
   };
   function stChips(o) {
-    var w = h('div', 'stc'); var SAY = { str: function (n) { return '+' + n * D.SCALE + ' per hit'; }, vuln: function () { return 'next attack x2, 1 used per attack'; }, weak: function () { return 'next attack ' + D.SCALE + ' less per hit, 1 used'; }, poison: function (n) { return 'loses ' + n * D.SCALE + ' HP at turn end (' + D.SCALE + ' per token)'; }, frail: function () { return 'Block 25% less'; } };
-    [['str', 'Strength'], ['vuln', 'Vulnerable'], ['weak', 'Weak'], ['poison', 'Poison'], ['frail', 'Frail']].forEach(function (p) { var n = o.st[p[0]]; if (n) { var sp = h('span', '', null, [A('st-' + p[0], '', { noph: 1 }), document.createTextNode(p[1] + ' ' + n + ': ' + SAY[p[0]](n))]); sp.title = p[1] + ' ' + n + ': ' + SAY[p[0]](n); w.appendChild(sp); } });
+    var w = h('div', 'stc'); var SAY = { str: function (n) { return '+' + n * D.SCALE + ' per hit'; }, vuln: function () { return 'next attack x2, 1 used per attack'; }, weak: function () { return 'next attack ' + D.SCALE + ' less per hit, 1 used'; }, poison: function (n) { return 'loses ' + n * D.SCALE + ' HP at turn end (' + D.SCALE + ' per token)'; }, frail: function () { return 'each Block card gives ' + D.SCALE + ' less'; } };
+    // F2: chips are a word and a number (they no longer cover the sprites); a tap explains (unless a card is lifted: then the tap targets the foe)
+    [['str', 'Strength'], ['vuln', 'Vulnerable'], ['weak', 'Weak'], ['poison', 'Poison'], ['frail', 'Frail']].forEach(function (p) { var n = o.st[p[0]]; if (n) { var say = p[1] + ' ' + n + ': ' + SAY[p[0]](n) + '.', sp = h('span', '', null, [A('st-' + p[0], '', { noph: 1 }), document.createTextNode(p[1] + ' ' + n)]); sp.title = say; sp.setAttribute('aria-label', say);
+      sp.addEventListener('click', function (ev) { if (UI.sel >= 0 || UI.busy || !UI.explain) return; ev.stopPropagation(); UI.explain([{ k: p[0], s: 'st-' + p[0], say: say }]); }); w.appendChild(sp); } });
     return w;
   }
   // W485 stage layout (phone): heroes left, foes right on one floor, fanned hand, orb / piles / End turn in the corners. ?stage=0 = the old layout
@@ -431,7 +448,7 @@
   var lsWas = null; window.addEventListener('resize', function () { var n = LSC(); if (n !== lsWas) { lsWas = n; try { var g = G(); if (g && g.scr === 'battle' && UI.mode === 'game' && !UI.busy && !UI.dragging) render(); } catch (e) { } } });   // R24: rotation flips the stage between portrait and the short-landscape layout
   function relicBar(g) {
     var r = h('div', 'w485top');
-    var rl = h('div', 'w485rel'); (g.relics || []).forEach(function (id) { var R = D.RELICS[id]; if (!R) return; var b = h('button', 'w485r', null, [A('relic-' + id, '✦', { ph: '#8a6a2a' })]); b.type = 'button'; b.setAttribute('aria-label', R.name + ': ' + R.t); on(b, function () { UI.explain([{ k: 'str', s: 'relic-' + id, say: R.name + ': ' + R.t }]); }); rl.appendChild(b); });
+    var rl = h('div', 'w485rel' + ((g.relics || []).length > 4 ? ' many' : '')); (g.relics || []).forEach(function (id) { var R = D.RELICS[id]; if (!R) return; var b = h('button', 'w485r', null, [A('relic-' + id, '✦', { ph: '#8a6a2a' })]); b.type = 'button'; b.setAttribute('aria-label', R.name + ': ' + R.t); on(b, function () { UI.explain([{ k: 'str', s: 'relic-' + id, say: R.name + ': ' + R.t }]); }); rl.appendChild(b); });
     if (!(g.relics || []).length) rl.appendChild(h('span', 'w485none', 'No relics yet'));
     r.appendChild(rl);
     r.appendChild(h('span', 'w485fl', (g.acts > 1 ? 'Act ' + g.act + ' · ' : '') + 'Floor ' + Math.max(1, g.floor || 0) + '/' + ((g.F || 9) + 1)));
@@ -488,7 +505,9 @@
       x.appendChild(h('div', 'nm', d.name));
       x.appendChild(h('div', 'bar', null, [h('i'), h('b', '', e.hp + '/' + e.mhp)])); x.querySelector('.bar i').style.width = (100 * e.hp / e.mhp) + '%';
       if (SG && e.blk) x.querySelector('.bar').appendChild(h('span', 'w485shield', String(e.blk)));
-      x.appendChild(stChips(e));
+      var scE = stChips(e), fn0 = D.foeNote && D.foeNote(e.id);
+      if (fn0 && !e.dead && !(d.keepBlk && e.mode) && !(d.sleep && !(e.asleep > 0))) { var ns = h('span', 'notechip', fn0.chip); ns.title = fn0.text; ns.setAttribute('role', 'button'); on(ns, function (ev) { if (ev && ev.stopPropagation) ev.stopPropagation(); UI.explain([{ k: 'unk', s: 'intent-unknown', t: '?', say: fn0.text }], d.name); }); scE.appendChild(ns); }
+      x.appendChild(scE);
       if (!e.dead) on(x, function () { onEnemy(i); });   // tap the enemy to play the lifted attack on it (restored: lost in the W420 rewrite; tools/tap-enemy.js guards it)
       var pv = PV && PV.en[i]; if (pv && !e.dead && (pv.dmg > 0 || pv.kill)) x.appendChild(h('div', 'w4pv' + (pv.kill ? ' kill' : ''), null, [h('b', '', (PV.rnd ? '~' : '') + '-' + (pv.kill ? pv.dmg : pv.hpLoss)), h('i', '', pv.kill ? 'kills' : pv.stripped ? pv.stripped + ' block off' : (whyMods(cur, cur.hand[UI.sel], e) || 'HP'))]));   // W420 value preview
       en.appendChild(x);
@@ -528,7 +547,8 @@
     st.appendChild(ctl);
     var hand = h('div', 'hand'), hc = b.ph === 'p' ? cur.hand : []; var nn = hc.length;
     if (SG && LSC()) { hand.classList.add('fan'); var cwl = Math.max(60, Math.min(78, Math.floor((document.documentElement.clientWidth - 300) / (1 + .7 * Math.max(0, nn - 1))))); hand.style.setProperty('--cw', cwl + 'px'); st.style.setProperty('--hh', Math.round(cwl * 0.95 + 10) + 'px'); st.classList.add('w24ls'); }   // R24: short landscape phone: a low hand that peeks up, controls in the bottom corners
-    else if (SG) { hand.classList.add('fan'); var ov0 = nn <= 5 ? .05 : .15, cw0 = Math.max(64, Math.min(112, Math.floor((document.documentElement.clientWidth - 16) / (1 + (1 - 2 * ov0) * Math.max(0, nn - 1))))); hand.style.setProperty('--cw', cw0 + 'px'); hand.style.setProperty('--ov', String(ov0)); st.style.setProperty('--hh', Math.round(Math.min(112, Math.floor((document.documentElement.clientWidth - 16) / 3.8)) * 1.5 + 26) + 'px'); } else if (nn > 5) { hand.classList.add('dense'); hand.style.setProperty('--cw', 'min(var(--hw),' + Math.floor((document.documentElement.clientWidth - 12) / (1 + .82 * (nn - 1))) + 'px)'); }
+    else if (SG) { hand.classList.add('fan'); if (nn >= 6) hand.classList.add('dense'); var ov0 = nn <= 5 ? .05 : .15, cw0 = Math.max(64, Math.min(112, Math.floor((document.documentElement.clientWidth - 16) / (1 + (1 - 2 * ov0) * Math.max(0, nn - 1))))); hand.style.setProperty('--cw', cw0 + 'px'); hand.style.setProperty('--ov', String(ov0)); st.style.setProperty('--hh', Math.round(Math.min(112, Math.floor((document.documentElement.clientWidth - 16) / 3.8)) * 1.5 + 26) + 'px'); } else if (nn > 5 && window.innerWidth >= 1024) { var bw = (document.querySelector('.gx-board') || document.documentElement).clientWidth; hand.style.setProperty('--cw', Math.max(80, Math.min(150, Math.floor((bw - 28) / nn) - 8)) + 'px'); }   // F4: PC hand: every card whole, side by side
+    else if (nn > 5) { hand.classList.add('dense'); hand.style.setProperty('--cw', 'min(var(--hw),' + Math.floor((document.documentElement.clientWidth - 12) / (1 + .82 * (nn - 1))) + 'px)'); }
     hc.forEach(function (c, i) {
       var ok = E.canPlay(cur, c) && (E.cost(cur, c) <= cur.en || E.eff(c).cost === 'X'), co = { str: E.eff(c).type === 'A' ? (cur.st.str || 0) * D.SCALE + (cur.stance === 'w' ? D.SCALE : 0) + (E.has('smoking-censer') ? D.SCALE : 0) : 0 }, el = cardEl(c, co); el.classList.add(ok ? 'ok' : 'no'); if (UI.sel === i) el.classList.add('sel');
       if (SG) { var off = i - (nn - 1) / 2; el.style.setProperty('--rot', (off * (nn > 6 ? 3.5 : 5)) + 'deg'); el.style.setProperty('--dy', Math.min(22, off * off * (nn > 6 ? 2 : 4)) + 'px'); el.style.zIndex = 10 + i; }
@@ -558,6 +578,13 @@
     if (PV && sl0()) { var bt = [], rr0 = sl0().getBoundingClientRect(), vw0 = document.documentElement.clientWidth; g.hs.forEach(function (x, k) { if (PV.blk[k] > 0) bt.push('+' + PV.blk[k] + ' block' + (g.hs.length > 1 ? ' ' + D.H[x.k].name.split(' ')[0] : '')); if (PV.heal[k] > 0) bt.push('+' + PV.heal[k] + ' HP'); });
       if (bt.length) { var fb = h('div', 'w4hbf', bt.join(', ')); st.appendChild(fb); var fw = fb.offsetWidth, rx = rr0.right + 8; if (rx + fw > vw0 - 8) rx = Math.max(8, rr0.left - 8 - fw); fb.style.left = rx + 'px'; fb.style.top = Math.max(8, rr0.top + 10) + 'px'; } }   // W420 block preview beside the lifted card
     function sl0() { return hand.querySelector('.card.sel'); }
+    if (b.ph === 'p' && UI.sel >= 0 && sl0() && !(window.GXT && GXT.active())) {   // F2: a lifted card can be put back (this chip, or a tap on empty table)
+      var cx0 = on(h('button', 'chip w2cancel', '\u2715 Put back'), function () { UI.sel = -1; render(); }); cx0.id = 'cancelsel'; cx0.setAttribute('aria-label', 'Put the card back in your hand'); st.appendChild(cx0);
+      var placeX = function () { var s0 = sl0(); if (!s0 || !cx0.isConnected) return; var rq = s0.getBoundingClientRect(), vwq = document.documentElement.clientWidth, cw0 = cx0.offsetWidth, lx = rq.left + rq.width / 2 - cw0 / 2;
+        cx0.style.left = Math.round(Math.max(6, Math.min(vwq - cw0 - 6, lx))) + 'px'; cx0.style.top = Math.round(Math.min(innerHeight - cx0.offsetHeight - 6, rq.bottom + 6)) + 'px'; };
+      cx0.style.left = '6px'; cx0.style.top = '-200px'; setTimeout(placeX, 0); setTimeout(placeX, 320);   // after the lifted card has moved to the centre
+    }
+    st.addEventListener('click', function (ev) { var t = ev.target; if (UI.sel < 0 || UI.busy || (window.GXT && GXT.active())) return; if (t.closest && t.closest('.card,.en,button,.chip,.pot,.ov,[role=dialog],a,input')) return; UI.sel = -1; render(); });
     if (SG && nn) {   // R7: the fanned hand always fits the screen (edge cards rotate outwards, so measure and shrink)
       for (var fit = 0; fit < 3; fit++) { var lo = 1e9, hi2 = -1e9, vwf = document.documentElement.clientWidth; hand.querySelectorAll('.card:not(.sel)').forEach(function (ce) { var q = ce.getBoundingClientRect(); lo = Math.min(lo, q.left); hi2 = Math.max(hi2, q.right); }); if (lo >= 3 && hi2 <= vwf - 3) break; var cwN = Math.floor(parseFloat(hand.style.getPropertyValue('--cw')) * (vwf - 8) / (hi2 - lo + 2)); hand.style.setProperty('--cw', Math.max(48, cwN) + 'px'); }
     }
@@ -642,7 +669,8 @@
     an.onfinish = end; setTimeout(end, wt(820) + 400);
   }
   function onCard(i) {
-    var g = G(); if (g.b.ph !== 'p' || UI.busy) return; var cur = g.hs[g.b.cur], c = cur.hand[i];
+    var g = G(); if (g.b.ph !== 'p' || UI.busy) return; if (Date.now() < (UI.handLock || 0)) return;   // F3: the hand closes up after a play (~250 ms): taps in that window are ignored, so they never hit the wrong card
+    var cur = g.hs[g.b.cur], c = cur.hand[i];
     if (!tutOk({ type: 'tap', w: 'card', id: c.id })) return;
     if (!(E.canPlay(cur, c) && (E.eff(c).cost === 'X' || E.cost(cur, c) <= cur.en))) { UI.sel = i; render(); toast(E.eff(c).fl.indexOf('u') >= 0 ? 'Cannot play' : 'Not enough energy'); UI.sel = -1; return; }
     if (UI.sel !== i) { UI.sel = i; render(); return; }
@@ -650,14 +678,14 @@
     if (E.eff(c).tgt && al.length > 1) { toast('Tap an enemy'); return; }
     playIt(i, E.eff(c).tgt ? al[0] : undefined);
   }
-  function onEnemy(i) { var g = G(); if (g.b.ph === 'p' && UI.sel >= 0 && needTarget()) playIt(UI.sel, i); }
+  function onEnemy(i) { var g = G(); if (g.b.ph === 'p' && UI.sel >= 0 && needTarget()) { var c0 = g.hs[g.b.cur].hand[UI.sel]; if (c0 && !tutOk({ type: 'tap', w: 'card', id: c0.id })) return; playIt(UI.sel, i); } }   // F2: tapping the glowing foe counts as the guide's second tap
   function playIt(ci, ti) {
     var g = G(), mv = { t: 'play', h: g.b.cur, c: ci }; if (ti != null) mv.e = ti;
     var hc0 = g.hs[g.b.cur], cc0 = hc0.hand[ci]; UI.lastName = whyOf(hc0, cc0, ti != null ? g.b.en[ti] : null); SFX('play'); UI.busy = true; flyCard(ci, ti, function () {
       UI.busy = false; UI.sel = -1; g = G(); if (!g || !g.b || g.scr !== 'battle') { render(); return; }   // R1: the fight can end while the card flies
       var tg = ti != null ? g.b.en[ti] : null, wasV = tg && tg.st.vuln > 0, wasD = tg && tg.dead;
       try { var pv = E.previewPlay && E.previewPlay(g.b.cur, ci, ti); if (pv && UI.fs) pv.en.forEach(function (x) { UI.fs.over += x ? x.over : 0; }); } catch (x) { }
-      E.performMove(mv); render(); UI.lastName = ''; afterMove();
+      E.performMove(mv); UI.handLock = Date.now() + 260; render(); UI.lastName = ''; afterMove();
       try { if (UI.coachReact && tg) { if (!wasD && tg.dead) UI.coachReact('good', 'kill'); else if (wasV) UI.coachReact('good', 'double'); } } catch (e) { }
     });
   }
@@ -727,14 +755,15 @@
     var rk = g.act + ':' + g.floor + ':' + g.at, wasB = g.map[g.at] && g.map[g.at].t === 'b';
     if (!r.treasure && UI.fanKey !== rk) { UI.fanKey = rk; fanfare(wasB); }
     if (!r.treasure && UI.fs && UI.fs.key === rk) s.appendChild(rateLine(g, UI.fs));   // W420 fight rating
+    if (!r.treasure && UI.fs && UI.fs.key === rk) s.appendChild(hpLine(g, UI.fs));   // F4: what the fight cost, and a tip when HP is low
     s.appendChild(h('div', 'chip', '● +' + r.gold + ' gold'));
     // R7: a taken potion / relic stays as a greyed "Taken" tile, so nothing below jumps under the next tap
-    if (r.pot) { var pb = on(h('button', 'item' + (r.took.pot ? ' taken' : ''), null, [A('pot-' + r.pot, D.POTIONS[r.pot].name, { ph: '#5a8a5a' }), h('span', '', (r.took.pot ? '\u2713 Taken: ' : '') + D.POTIONS[r.pot].name)]), function () { if (r.took.pot) return; E.performMove({ t: 'takepot' }); render(); }); if (r.took.pot) pb.disabled = true; pb.style.width = '140px'; s.appendChild(pb); }
-    if (r.relics) { var rl = h('div', 'picks'); r.relics.forEach(function (id, i) { if (!id) return; var tk = !!r.took['r' + i], gone = !tk && !!r.took.relic; var b = on(h('button', 'item' + (tk || gone ? ' taken' : ''), null, [A('relic-' + id, D.RELICS[id].name, { ph: '#8a6a2a' }), h('b', '', (tk ? '\u2713 ' : '') + D.RELICS[id].name), h('span', '', tk ? 'Taken: in your relic bar' : gone ? 'Not taken' : D.RELICS[id].t)]), function () { if (tk || gone) return; E.performMove({ t: 'relic', i: i }); render(); }); if (tk || gone) b.disabled = true; b.style.width = '130px'; rl.appendChild(b); }); s.appendChild(rl); }
+    if (r.pot) { var pb = on(h('button', 'item' + (r.took.pot ? ' taken' : ''), null, [A('pot-' + r.pot, D.POTIONS[r.pot].name, { ph: '#5a8a5a' }), h('span', '', (r.took.pot ? '\u2713 In your slots: ' : 'Tap to take: ') + D.POTIONS[r.pot].name)]), function () { if (r.took.pot) return; E.performMove({ t: 'takepot' }); render(); }); if (r.took.pot) pb.disabled = true; pb.style.width = '140px'; s.appendChild(pb); }
+    if (r.relics) { var rl = h('div', 'picks'); r.relics.forEach(function (id, i) { if (!id) return; var tk = !!r.took['r' + i], gone = !tk && !!r.took.relic; var b = on(h('button', 'item' + (tk || gone ? ' taken' : ''), null, [A('relic-' + id, D.RELICS[id].name, { ph: '#8a6a2a' }), h('b', '', (tk ? '\u2713 ' : '') + D.RELICS[id].name), h('span', '', tk ? 'Taken: in your relic bar' : gone ? 'Not taken' : (r.relics.filter(Boolean).length <= (r.nrel || 1) ? 'Tap to take. ' : '') + D.RELICS[id].t)]), function () { if (tk || gone) return; E.performMove({ t: 'relic', i: i }); render(); }); if (tk || gone) b.disabled = true; b.style.width = '130px'; rl.appendChild(b); }); s.appendChild(rl); }
     var act = h('div', 'rwact');   // R21: Skip + Continue in one row that sticks to the bottom of the reward, so it never falls below the fold
     Object.keys(r.cards).forEach(function (hi) {
       if (r.took['c' + hi]) { s.appendChild(h('div', 'sub w7done', (UI.rwNote && UI.rwNote[rk + ':' + hi]) || 'Card choice done.')); return; } if (g.hs.length > 1) s.appendChild(h('div', 'chip', D.H[g.hs[hi].k].name + ': pick a card'));
-      else s.appendChild(h('div', 'sub', 'Add one card to your deck'));
+      else s.appendChild(h('div', 'sub', 'Add one ' + D.H[g.hs[hi].k].role + ' card to your deck'));
       var pk = h('div', 'picks'); r.cards[hi].forEach(function (id, i) { var c = cardEl({ id: id, u: 0 }); c.setAttribute('data-pick', i); c.classList.add('w4rw'); (c.querySelector('.cart') || c).appendChild(h('span', 'w4vt', valTag(id))); var im5 = deckImpact(g.hs[hi], id); if (im5) c.appendChild(h('div', 'w5imp', null, [h('b', '', im5[0])].concat(im5[1] ? [h('i', '', im5[1])] : []))); on(c, function () { if (!tutOk({ type: 'tap', w: 'pick', i: i })) return; UI.rwNote = UI.rwNote || {}; UI.rwNote[rk + ':' + hi] = '\u2713 ' + D.CARDS[id].name + ' added to your deck.'; E.performMove({ t: 'pick', h: +hi, i: i }); render(); }); pk.appendChild(c); }); s.appendChild(pk);
       (g.hs.length === 1 ? act : s).appendChild(on(h('button', 'btn alt', 'Skip'), function () { UI.rwNote = UI.rwNote || {}; UI.rwNote[rk + ':' + hi] = 'Card skipped: your deck stays lean.'; E.performMove({ t: 'skip', h: +hi }); render(); }));
     });
@@ -771,6 +800,23 @@
       if (!pair && /"(poison|poisonAll|dblPoison)"/.test(ops)) pair = find(function (x) { return /"(poison|poisonAll|dblPoison)"/.test(x.o) && x.c.id !== id; });
       return main || pair ? [main || 'Adds a new trick to your deck', pair ? 'Pairs with ' + pair : ''] : null;
     } catch (e) { return null; }
+  }
+  function hpLine(g, f) {
+    var now = g.hs.reduce(function (a, x) { return a + Math.max(0, x.hp); }, 0), mx = g.hs.reduce(function (a, x) { return a + x.mhp; }, 0), lost = Math.max(0, f.hp0 - now);
+    var d = h('div', 'f4hp' + (now <= mx * .4 ? ' low' : ''), null, [h('b', '', (lost > 0 ? '-' + lost : '0') + ' HP this fight'), document.createTextNode(' (' + now + '/' + mx + ' left)')]);
+    if (now <= mx * .4) { var ahead = aheadCount(g); d.appendChild(h('span', 'f4tip', now <= mx * .25 ? 'HP is very low. ' + (ahead.r ? 'Rest at the next campfire.' : 'Block more, and use a potion early.') : (ahead.r ? 'HP is low. Rest at the next campfire.' : 'HP is low. Block more before big hits.'))); }
+    return d;
+  }
+  // F4: rooms still ahead of you on the map, by kind, so recovery is plannable
+  function aheadCount(g) {
+    var f0 = g.at >= 0 && g.map[g.at] ? g.map[g.at].f : 0, seen = {}, q = (g.at >= 0 && g.map[g.at] ? g.map[g.at].nx : g.map.filter(function (n) { return n.f === Math.min.apply(null, g.map.map(function (m) { return m.f; })); }).map(function (n) { return n.id; })).slice(), c = { r: 0, s: 0, e: 0, v: 0, t: 0, b: 0 }, minF = {};
+    while (q.length) { var k = q.pop(); if (seen[k] || !g.map[k]) continue; seen[k] = 1; var n = g.map[k]; if (n.f > f0) { c[n.t] = (c[n.t] || 0) + 1; } n.nx.forEach(function (j) { q.push(j); }); }
+    return c;
+  }
+  function aheadLine(g) {
+    var c = aheadCount(g), p = [];
+    if (c.r) p.push(c.r + (c.r > 1 ? ' campfires' : ' campfire')); if (c.s) p.push(c.s + (c.s > 1 ? ' shops' : ' shop')); if (c.e) p.push(c.e + (c.e > 1 ? ' elites' : ' elite'));
+    return p.length ? 'Ahead: ' + p.join(', ') : 'Ahead: the boss';
   }
   function valTag(id) {
     var e = E.eff({ id: id, u: 0 }), s = JSON.stringify(e.ops);
@@ -831,7 +877,7 @@
   function event() {
     var g = G(), ev = D.EVENTS[g.evn.id], s = h('div', 'reward'); s.appendChild(A('bg-event', '', { cls: 'bg', kind: 'bg' }));
     s.appendChild(h('h2', '', ev.name)); s.appendChild(host('cast-teller', ev.q)); s.appendChild(A(ev.img || 'event-' + g.evn.id, ev.name, { cls: 'evart', ph: '#4a3a5a', kind: 'card' }));
-    if (g.evn.res) { var rm5 = /^Rolled (\d)/.exec(g.evn.res), rs5 = h('div', 'sub w5res'); if (rm5) rs5.appendChild(A('die-' + rm5[1], '', { noph: 1, cls: 'dieart' })); rs5.appendChild(document.createTextNode(g.evn.res)); s.appendChild(rs5); var evl = on(h('button', 'btn', 'Continue'), function () { E.performMove({ t: 'leave' }); render(); }); evl.id = 'ev-leave'; s.appendChild(evl); }
+    if (g.evn.res) { var rm5 = /^Rolled (\d)/.exec(g.evn.res), rs5 = h('div', 'sub evres w5res'); if (rm5) rs5.appendChild(A('die-' + rm5[1], '', { noph: 1, cls: 'dieart' })); rs5.appendChild(document.createTextNode(g.evn.res)); s.appendChild(rs5); rs5.setAttribute('role', 'status'); var evl = on(h('button', 'btn', 'Continue'), function () { E.performMove({ t: 'leave' }); render(); }); evl.id = 'ev-leave'; s.appendChild(evl); }
     else {
       var o = h('div', 'opts');   // F5: the question already shows in the teller's bubble
       ev.o.forEach(function (x, i) { var b = on(h('button', 'btn alt', x.t), function () { E.performMove({ t: 'opt', i: i }); if (G().evn.pend) UI.ov = 'evpick'; render(); }); if (x.cost && g.gold < x.cost) b.disabled = true; o.appendChild(b); }); s.appendChild(o);
@@ -863,10 +909,10 @@
     }
     var dk = h('div', 'rsec'); dk.appendChild(h('b', '', 'Final deck (tap a card)'));
     var gr = h('div', 'rgrid'); g.hs.forEach(function (x) { var seen = {}, order = []; x.deck.forEach(function (c) { var k = c.id + (c.u ? '+' : ''); if (!seen[k]) { seen[k] = { c: c, n: 0 }; order.push(k); } seen[k].n++; }); order.forEach(function (k) { var o = seen[k], t = on(h('button', 'rcard t-' + E.eff(o.c).type, null, [A(o.c.id, '', { cls: 'rart', kind: 'card', noph: 1 }), h('span', '', E.eff(o.c).name), h('i', '', o.n > 1 ? '×' + o.n : '')]), function () { bigCard(o.c); }); t.setAttribute('aria-label', 'View ' + E.eff(o.c).name); gr.appendChild(t); }); });
-    dk.appendChild(gr); s.appendChild(dk);
-    var rl = h('div', 'rsec'); rl.appendChild(h('b', '', 'Relics (tap for text)'));
+    dk.appendChild(gr);
+    var rl = h('div', 'rsec'); rl.appendChild(h('b', '', 'Relics: ' + g.relics.length + ' (tap for text)'));
     var rr = h('div', 'rrow'); g.relics.forEach(function (id) { var t = on(h('button', 'rrel', null, [A('relic-' + id, '✦', { ph: '#8a6a2a' })]), function () { UI.explain([{ k: 'str', s: 'relic-' + id, say: D.RELICS[id].name + ': ' + D.RELICS[id].t }]); }); t.setAttribute('aria-label', D.RELICS[id].name + ': ' + D.RELICS[id].t); t.title = D.RELICS[id].name + ': ' + D.RELICS[id].t; rr.appendChild(t); });
-    rl.appendChild(rr); s.appendChild(rl);
+    rl.appendChild(rr); s.appendChild(rl); s.appendChild(dk);   // F2: relics above the deck, so every relic is in view
     var bt = h('div', 'rbtns');
     var again = on(h('button', 'btn', 'Play again'), function () { done('again'); }); again.id = 'again'; bt.appendChild(again);
     if (r) { var mp = on(h('button', 'btn alt', 'Story map'), function () { done('map'); }); mp.id = 'rmap'; bt.appendChild(mp); }

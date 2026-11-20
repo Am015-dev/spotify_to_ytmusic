@@ -32,9 +32,9 @@ rule(2, () => { const g = F(['w'], 2), h = g.hs[0]; h.hand = []; for (let i = 0;
 rule(3, () => { const g = F(['w'], 3), h = g.hs[0]; h.hand = []; h.draw = []; h.disc = []; for (let i = 0; i < 6; i++) h.disc.push(E.mk('w-strike')); play(g, 'w-second-wind'); return [{ hand: 2, draw: 4, disc: 1 }, { hand: h.hand.length, draw: h.draw.length, disc: h.disc.length }]; });
 rule(4, () => { const g = F(['w'], 4), h = g.hs[0]; h.hand = [E.mk('w-defend'), E.mk('w-strike')]; h.disc = []; E.performMove({ t: 'end' }); return [{ hand: 0, disc: 2 }, { hand: h.hand.length, disc: h.disc.length }]; });
 rule(5, () => { const g = F(['w'], 5), h = g.hs[0]; h.hand = [E.mk('dazed'), E.mk('w-defend')]; h.disc = []; h.exh = []; E.performMove({ t: 'end' }); return [{ exh: ['dazed'], disc: 1 }, { exh: h.exh.map(c => c.id), disc: h.disc.length }]; });
-rule(6, () => { let g = F(['w'], 6), h = g.hs[0]; h.hand = []; play(g, 'w-roar'); const a = h.exh.length; E.debug.win(); E.performMove({ t: 'leave' }); go1(); g = E.G(); h = g.hs[0]; return [{ afterPlay: 1, nextExh: 0, cards: h.deck.length }, { afterPlay: a, nextExh: h.exh.length, cards: h.hand.length + h.draw.length }]; });
+rule(6, () => { let g = F(['w'], 6), h = g.hs[0]; h.hand = []; play(g, 'w-roar'); const a = h.exh.length; E.debug.win(); E.performMove({ t: 'leave' }); { const ms = E.validMoves(), mm = ms.find(x => E.G().map[x.n] && E.G().map[x.n].t === 'm') || ms[0]; E.performMove({ t: 'go', n: mm.n }); } g = E.G(); h = g.hs[0]; return [{ afterPlay: 1, nextExh: 0, cards: h.deck.length }, { afterPlay: a, nextExh: h.exh.length, cards: h.hand.length + h.draw.length }]; });
 rule(7, () => { const g = F(['w'], 7), h = g.hs[0]; g.pots = ['energy-vial']; h.en = 5; E.performMove({ t: 'pot', p: 0 }); return [6, h.en]; });
-rule(8, () => { const g = F(['w'], 8), h = g.hs[0]; h.blk = 20 * SC - 2; play(g, 'w-defend'); return [20 * SC, h.blk]; });
+rule(8, () => { const g = F(['w'], 8), h = g.hs[0]; h.blk = 20 * SC; play(g, 'w-defend'); return [20 * SC, h.blk]; });
 rule(9, () => { const g = F(['w'], 9), h = g.hs[0], e = g.b.en[0]; e.id = 'mire-slug'; e.i = -1; e.blk = 10; h.hand = []; E.performMove({ t: 'end' }); const mid = e.blk; E.settle(); return [[10, 0], [mid, e.blk]]; });
 rule(10, () => { const g = F(['w'], 10), h = g.hs[0], e = g.b.en[0]; h.blk = 5; play(g, 'w-second-wind'); const a = [h.hp, h.blk]; h.hand = []; e.intent = { atk: 4, tg: 0 }; endAct(g); return [[999 - SC, 5, 999 - SC, 1], a.concat([h.hp, h.blk])]; });
 rule(11, () => { const g = F(['w'], 11), h = g.hs[0], e = g.b.en[0]; h.st.str = 3; play(g, 'w-strike', 0); const hp = e.hp; h.st.str = 7; play(g, 'w-kindle'); return [[200 - 4 * SC, 8], [hp, h.st.str]]; });
@@ -76,7 +76,7 @@ rule(32, () => { const g = F(['w'], 34, true), e0 = g.b.en[0]; g.b.en = [e0, clo
 rule(33, () => { let bad = 0, n = 0; [['w'], ['w', 'a']].forEach(hs => { for (let s = 1; s <= 30; s++) { E.newGame({ heroes: hs, seed: 400 + s }); go1(); n++; if (E.G().b.en.length !== hs.length) bad++; } }); return [{ wrongSize: 0, of: n }, { wrongSize: bad, of: n }]; });
 rule(34, () => { E.newGame({ heroes: ['w'], seed: 35 }); let g = E.G(); g.at = g.map.filter(n => n.f === g.F)[0].id; const bid = g.map[g.at].nx[0]; E.performMove({ t: 'go', n: bid }); g = E.G(); return [[1, g.boss, 'b'], [g.b.en.length, g.b.en[0].id, g.b.kind]]; });
 rule(35, () => { const chk = hs => { let bad = 0; for (let s = 0; s < 20; s++) { E.newGame({ heroes: hs, seed: 500 + s }); go1(); E.G().b.en.forEach(e => { const d = D.ENEMIES[e.id], r = d.hp, m = (d.elite || d.boss) && !d.flat ? hs.length : 1; if (e.pf ? e.mhp !== d.hpF : (e.mhp < r[0] * m || e.mhp > r[1] * m) && !(d.hpN && d.hpN[hs.length])) bad++; }); E.debug.boss(); const bb = E.G().b.en[0]; const bd = D.ENEMIES[bb.id], want = bd.hpN && bd.hpN[hs.length] ? Math.round(bd.hpN[hs.length] * D.SCALE / hs.length) * hs.length : bd.hp[0] * hs.length; if (bb.mhp !== want) bad++; } return bad; }; return [[0, 0], [chk(['w']), chk(['w', 'a'])]]; });
-rule(36, () => { E.newGame({ heroes: ['w', 's', 'a', 'm'].slice(0, 2), seed: 36 }); const hp = k => D.H[k].hp, st = k => D.H[k].start.length, rl = k => D.H[k].relic; return [['80/72/72/72', '10/12/10/10', 'ember-brand,whetstone-ring,spark-core,prayer-beads'], [['w', 's', 'a', 'm'].map(hp).join('/'), ['w', 's', 'a', 'm'].map(st).join('/'), ['w', 's', 'a', 'm'].map(rl).join(',')]]; });
+rule(36, () => { E.newGame({ heroes: ['w', 's', 'a', 'm'].slice(0, 2), seed: 36 }); const hp = k => D.H[k].hp, st = k => D.H[k].start.length, rl = k => D.H[k].relic; return [['10/9/9/9', '10/12/10/10', 'ember-brand,whetstone-ring,spark-core,prayer-beads'], [['w', 's', 'a', 'm'].map(hp).join('/'), ['w', 's', 'a', 'm'].map(st).join('/'), ['w', 's', 'a', 'm'].map(rl).join(',')]]; });
 rule(37, () => { const g = F(['w'], 37); g.hs[0].hp = 1; g.hs[0].hand = []; g.b.en[0].intent = { atk: 99, tg: 0 }; endAct(g); const a = [g.scr, g.won];
   const g2 = F(['w', 'a'], 38); g2.b.en.forEach((e, i) => { if (i) e.dead = 1; }); g2.b.en[0].intent = { atk: 99, tg: 1 }; g2.hs.forEach(x => { x.hand = []; x.hp = x.mhp = 50; }); E.performMove({ t: 'end' }); E.performMove({ t: 'end' }); acts(g2);
   return [['over', 0, 'over', 0], a.concat([g2.scr, g2.won])]; });
@@ -127,7 +127,7 @@ rule(63, () => { const ids = Object.keys(D.EVENTS).filter(k => !D.EVENTS[k].star
   return [[true, false, true], [ids.length >= 12, seen.has('first-ember'), seen.size >= 10]]; });
 rule(64, () => { E.newGame({ heroes: ['w'], seed: 64 }); const g = E.G(); g.gold = 100; g.pots = ['fire-flask', 'fire-flask']; g.scr = 'event'; g.evn = { id: 'herb-witch', res: null }; E.performMove({ t: 'opt', i: 0 }); return [[100 - 2 * SC, 3], [g.gold, g.pots.length]]; });
 rule(65, () => { E.newGame({ heroes: ['w'], seed: 65 }); const g = E.G(); g.scr = 'event'; g.evn = { id: 'forge-spirit', res: null }; E.performMove({ t: 'opt', i: 0 }); const pend = g.evn.pend, ms = E.validMoves(); E.performMove(ms[0]); return [['upg', true, 1], [pend, ms.every(m => m.t === 'evpick'), g.hs[0].deck[ms[0].c].u]]; });
-rule(66, () => { const u = fs.readFileSync(path.join(__dirname, 'src', 'ui.js'), 'utf8'); return [[true, true], [/UI\.acts = UI\.acts \|\| 3/.test(u), /bless: 1/.test(u)]]; });
+rule(66, () => { const u = fs.readFileSync(path.join(__dirname, 'src', 'ui.js'), 'utf8'); return [[true, true], [/UI\.acts = UI\.acts \|\| 1/.test(u), /bless: 1/.test(u)]]; });
 
 // ---------- G3 review fixes
 // Iron Bangle: the start-of-fight Block survives into round 1 and is cleared at the start of round 2
@@ -139,7 +139,7 @@ rule(68, () => { const g = F(['w'], 68); const h = g.hs[0]; h.hand.forEach(c => 
 
 // tabletop split: killing the act-1 boss does not end the fight; the dead boss takes no action; at the start of the next round its
 // listed slimes arrive in the hero's row with intents; the fight ends when they are all dead
-rule(69, () => { E.newGame({ heroes: ['w'], seed: 69 }); const g0 = E.G(); g0.boss = 'mire-behemoth'; E.debug.boss(); const g = E.G(), e = g.b.en[0]; g.hs[0].hp = g.hs[0].mhp = 999; e.blk = 0; e.st = {}; e.hp = 3;
+rule(69, () => { E.newGame({ heroes: ['w'], seed: 69 }); const g0 = E.G(); g0.boss = 'mire-behemoth'; E.debug.boss(); const g = E.G(), e = g.b.en[0]; g.hs[0].hp = g.hs[0].mhp = 999; e.blk = 0; e.st = {}; e.hp = SC;
   g.hs[0].hand.push(E.mk('w-strike')); g.hs[0].en = 3; E.performMove({ t: 'play', h: 0, c: g.hs[0].hand.length - 1, e: 0 }); const a = [e.dead, g.scr];
   E.performMove({ t: 'end' }); for (let k = 0; k < 20 && g.b && g.b.ph === 'e'; k++) E.step(); const sp = g.b.en.filter(x => x.spawn);
   const b = [sp.length, J(sp.map(x => x.id)) === J(D.ENEMIES['mire-behemoth'].split), sp.every(x => x.intent && x.row === 0), g.b.turn];
