@@ -13,7 +13,7 @@
   function value(G, p) {
     var P = G.pl[p], gl = FIXGL || gensLeft(G), v = 0;
     var sc = OH.score(p);
-    v += sc.tr * (6 + gl * 0.9);
+    v += sc.tr * (8 + gl * 0.9);
     v += (sc.total - sc.tr) * 6;
     for (var r in PV) { var cap = CAP[r], st = P[r]; if (r === 'heat' && G.temp >= OH.TEMP_MAX) cap = 0; v += P.prod[r] * PV[r] * Math.max(0, gl - 0.6) + (Math.min(st, cap) + 0.3 * Math.max(0, st - cap)) * RV[r]; }
     v += Math.min(P.hand.length, 12) * 1.6;
