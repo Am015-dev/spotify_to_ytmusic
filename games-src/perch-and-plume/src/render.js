@@ -57,7 +57,7 @@ function render() {
   $('#barstat').textContent = '';
   $$('#bd .firing,#bd .landed,#bd .pulse').forEach(function (e) { e.classList.remove('firing', 'landed', 'pulse'); });   // parts are kept when unchanged (setH): clear one-shot effects
   renderOpps(cur); renderMid(); renderMat(p, vs); renderDock(p, vs, cur); renderGoalbar(); fitMat();
-  glow(); try { markBest(); } catch (e) { } try { glowOne(); } catch (e) { } try { dockToActs(); } catch (e) { } try { bestInView(); } catch (e) { }
+  glow(); try { markBest(); } catch (e) { } try { glowOne(); } catch (e) { } try { glowNeed(); } catch (e) { } try { dockToActs(); } catch (e) { } try { bestInView(); } catch (e) { }
   if (UI.pend) [40, 160, 420].forEach(function (ms) { setTimeout(function () { try { if (UI.pend) dockToActs(); } catch (e) { } }, ms); });   // late layout (card art, the chosen card's scroll) must not push Play/Cancel out of the panel
   try { rateStart(); showRate(); } catch (e) { }
   try { if (window.GXH && GXH.phase) GXH.phase(helpPhase()); } catch (e) { }
@@ -236,6 +236,14 @@ function glowOne() {
   if (!G || !myTurn() || !bestOn() || UI.pend) return;
   var el = document.body.classList.contains('idle4') && !UI.pickBird ? $('.a4.best') : ($('.bestt') || $('#hand .bc.bestc'));
   if (el) el.classList.add('glow');
+}
+// F6: with Best off, the one tap the game is waiting for glows like the tutorial target (Play button / playable birds / the marked space)
+function glowNeed() {
+  $$('.need').forEach(function (e) { e.classList.remove('need'); });
+  if (!G || !myTurn() || bestOn() || UI.mode === 'tutorial' || UI.mode === 'tutfree' || G.q) return;
+  var els = UI.pend ? [$('[data-a="playgo"]')] : UI.sel != null ? $$('.slot.next[data-legal]') : UI.pickBird ? $$('#hand .bc[data-legal]') : [];
+  els = els.filter(Boolean); els.forEach(function (e) { e.classList.add('need'); });
+  if (els[0] && (UI.pickBird || UI.pend)) { try { els[0].scrollIntoView({ block: 'nearest', inline: 'nearest' }); } catch (e) { } }
 }
 var ROWMIN = 52;   // a habitat row never gets shorter than this on a phone (birds, egg chips and 44 px taps stay readable)
 function fitDock() {   // phones: the panel gets only the height the board leaves after 3 full rows; the panel scrolls instead of the rows shrinking

@@ -33,7 +33,7 @@ function eggRoom(p) { return PP.birds(p).reduce(function (a, x) { return a + Mat
 // cached per decision so the badge does not jump between renders
 var HINT = { k: null, m: null };
 function hintMove() {
-  if (!G || G.phase === 'over' || !hintsOn() || !myTurn() || (typeof coachOn === 'function' && coachOn()) || !window.PPAI || !PPAI.hint) return null;
+  if (!G || G.phase === 'over' || !(hintsOn() || earlyBest()) || !myTurn() || (typeof coachOn === 'function' && coachOn()) || !window.PPAI || !PPAI.hint) return null;
   var p = G.pl[UI.view], k = JSON.stringify([G.turn, G.round, G.q, p.cubes, p.hand, p.food, p.board.map(function (r) { return r.map(function (x) { return x.eggs; }); }), G.feeder, G.tray]);
   if (HINT.k !== k) { HINT.k = k; try { HINT.m = PPAI.hint(G, UI.view); } catch (e) { HINT.m = null; } }
   return HINT.m;
@@ -237,16 +237,18 @@ function tutPoint() { try { return coachOn() ? COACH.point || null : null; } cat
 // ---------------- Addendum 7: three modes. PLAY is clean (board, hand, tracker, one score line, a Goal card, short pops);
 // HINTS (top-bar toggle, on by default since R19) adds previews, Best badges, the turn rating, toasts and "What should I do?";
 // LEARN TO PLAY (tutfree) is the coached game and always shows them.
-function hintsPref() { try { return localStorage.getItem('pp-hints') !== '0'; } catch (e) { return true; } }   // on by default (R19): a newcomer sees Best; the bulb turns it off
+function hintsPref() { try { return localStorage.getItem('pp-hints') === '1'; } catch (e) { return false; } }   // on by default (R19): a newcomer sees Best; the bulb turns it off
 function hintsOn() { return !!(UI.mode === 'tutfree' || UI.hintPref); }
-function bestOn() { return !!(UI.hintPref && UI.mode !== 'tutfree'); }   // Best badges, the glow and move ratings: never in the guided game (Ottilie is its one helper)
+function earlyBest() { return !!(UI.first && G && G.round === 0 && G.pl[UI.view] && G.pl[UI.view].cubes >= G.cubes[0] - 1 && UI.mode !== 'tutfree' && UI.mode !== 'tutorial'); }   // F6: Best shows by itself on the first two turns of a first game; after that only when the bulb is on
+function bestOn() { return !!((UI.hintPref || earlyBest()) && UI.mode !== 'tutfree'); }   // Best badges, the glow and move ratings: never in the guided game (Ottilie is its one helper)
 UI.hintPref = hintsPref();
 function hintsBtn() { var b = $('#bulbbtn'); if (!b) return; var on = hintsOn(); b.setAttribute('aria-pressed', on ? 'true' : 'false'); b.setAttribute('aria-label', 'Hints: ' + (on ? 'on' : 'off')); b.classList.toggle('on', on); var t = b.querySelector('.hst'); if (t) t.textContent = on ? 'on' : 'off'; }
 document.addEventListener('click', function (e) {
   if (!e.target.closest('#bulbbtn')) return;
   if (UI.mode === 'tutfree') { toast('Learn to play always shows hints.', 0, 1); return; }
   UI.hintPref = !UI.hintPref; try { localStorage.setItem('pp-hints', UI.hintPref ? '1' : '0'); } catch (x) { }
-  render(); toast(UI.hintPref ? 'Hints on: previews, Best badges and a rating after each turn.' : 'Hints off.', 0, 1);
+  render(); var hm = UI.hintPref ? hintMove() : null, why = ''; try { why = hm ? ' Best: ' + PPAI.why(G, UI.view, hm) : ''; } catch (x) { }
+  toast(UI.hintPref ? 'Hints on.' + why : 'Hints off.', 0, 1);
 });
 // one compact score line: you vs the rival(s), leader starred; tap = the score drawer
 function scoreLineHTML() {

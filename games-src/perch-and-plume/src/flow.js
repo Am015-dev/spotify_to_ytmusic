@@ -167,7 +167,7 @@ function playFx(list, actor) {
   return chain;
 }
 // ---------------- the turn engine: computer moves, hot-seat hand-over, game over
-function aiDelay() { if (UI.fast) return 30; var sp = spd(); try { return Math.round((GX.aiDelay ? GX.aiDelay(850) : 850) / sp); } catch (e) { return 850; } }
+function aiDelay() { if (UI.fast) return 30; var sp = spd(); try { return Math.round((GX.aiDelay ? GX.aiDelay(650) : 650) / sp); } catch (e) { return 650; } }
 // one plain line saying what is happening now (rival steps), shown in the instruction bar and as a pill over the board
 function caption(t) { UI.cap = t; var p = $('#prompt'); if (p) p.textContent = t; if (!UI.fast) toast(t, Math.round(1700 / spd())); }
 function dropEl(x) { if (x && x.parentNode) x.parentNode.removeChild(x); }
@@ -177,12 +177,12 @@ function turnBanner(s) {
   var me = isHuman(s), solo = humans().length <= 1, nm = me ? (solo ? 'Your turn' : G.pl[s].name + "'s turn") : G.pl[s].name + "'s turn";
   $$('.turnban').forEach(dropEl);
   var d = document.createElement('div'); d.className = 'turnban ' + (me ? 'me' : 'rv'); d.setAttribute('data-volatile', ''); d.setAttribute('role', 'status');
-  d.innerHTML = '<b>' + esc(nm) + '</b><span>' + esc(me ? G.pl[s].cubes + (G.pl[s].cubes === 1 ? ' action' : ' actions') + ' left this round' : 'Watch each step. Tap to skip.') + '</span>';
+  d.innerHTML = '<b>' + esc(nm) + '</b><span>' + esc(me ? G.pl[s].cubes + (G.pl[s].cubes === 1 ? ' action' : ' actions') + ' left this round' : 'Watch each step. Tap to skip.') + '</span>' + (me ? '' : '<i class="wdots" aria-hidden="true"><u></u><u></u><u></u></i>');
   document.body.appendChild(d); UI.busy = true;
   UI.cap = me ? null : G.pl[s].name + ' is choosing an action.'; render();
   var done = false, fin = function () { if (done) return; done = true; dropEl(d); UI.busy = false; pump(); };
   d.addEventListener('click', fin);
-  var t = setTimeout(fin, aMs(me ? 600 : 800)); UI.timers.push(t);
+  var t = setTimeout(fin, aMs(me ? 600 : 650)); UI.timers.push(t);
 }
 // the rival's played bird is shown large for a moment, then shrinks away
 function reveal(id, label, seat) {
@@ -234,7 +234,7 @@ function startGame(o) {
   G = PP.newGame({ seats: o.seats, seed: o.seed, twist: o.twist, hands: o.hands, cubes: o.cubes, rounds: o.rounds, tutorial: o.tutorial, goals: o.goals, first: o.first });
   if (o.prep) o.prep(G);
   G.pl.forEach(function (p, i) { p.face = o.seats[i].face || (p.kind === 'human' ? 'you' : null); });
-  UI.mode = o.mode || 'vs'; UI.camp = o.camp || null; UI.sel = null; UI.pend = null; UI.gsDie = null; UI.view = Math.max(0, humans()[0] || 0); UI.started = Date.now();
+  UI.first = firstTime(); UI.mode = o.mode || 'vs'; UI.camp = o.camp || null; UI.sel = null; UI.pend = null; UI.gsDie = null; UI.view = Math.max(0, humans()[0] || 0); UI.started = Date.now();
   ['title', 'setup', 'result', 'pass'].forEach(function (id) { $('#' + id).hidden = true; });
   $('#pop').hidden = true;
   try { GX.close(); } catch (e) { }
