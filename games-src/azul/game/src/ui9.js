@@ -334,7 +334,7 @@ function bfSizes(){const I=phInsets();const V=vpDims(),W=V.w-I.l-I.r,H=V.h-I.t-I
 function bfRing(W,H,n){const cx=W/2,cy=H/2;let ks=Math.min(W,H)*(n<=5?.32:n<=7?.26:.22);ks=Math.max(44,Math.min(ks,W*(n<=5?.3:n<=7?.25:.21),H*(n<=5?.34:.28),Math.max(130,Math.min(W,H)*.3)));   // W466: big kilns on big screens
   const ax=Math.max(10,W/2-ks/2-12),ay=Math.max(10,H/2-ks/2-6);/* F1: 12px side margin keeps side kilns and their hit boxes inside the frame */const K=[];for(let i=0;i<n;i++){const a=-Math.PI/2+i*2*Math.PI/n;K.push({x:cx+Math.cos(a)*ax,y:cy+Math.sin(a)*ay})}
   return {ks,K,cx,cy,pw:Math.max(70,2*(ax-ks*.6)),ph:Math.max(54,2*(ay-ks*.6))}}
-function bfTableHTML(S,hp,o){const R=bfRing(BF.tw,BF.th-24,S.fac.length);const ts=R.ks*.33;const NN=S.ctr.length+(S.markerIn==='ctr'?1:0),PHH=NN>6?R.ph*1.45:R.ph,CY=R.cy+(PHH-R.ph)/2;const live=!BF.busy;const sel=live&&hp&&G.phase==='offer'?UI.sel:null;const can=live&&hp&&G.phase==='offer'&&!sel;
+function bfTableHTML(S,hp,o){const R=bfRing(BF.tw,BF.th-24,S.fac.length);const ts=R.ks*.33;const NN=S.ctr.length+(S.markerIn==='ctr'?1:0),PHH=R.ph,CY=R.cy;const live=!BF.busy;const sel=live&&hp&&G.phase==='offer'?UI.sel:null;const can=live&&hp&&G.phase==='offer'&&!sel;
   const am=can&&UI.coach&&UI.cmp&&BF.seen.took?bfAdvice(hp):null;const isAdv=(src,t)=>am&&am.act==='take'&&am.src===src&&(t===am.c);
   const nofit=new Set();if(can)for(let c=0;c<NC;c++){let ok=false;for(let r=0;r<5;r++)if(lineOk(G,hp,r,c))ok=true;if(!ok)nofit.add(c)}const nf=t=>nofit.has(t)?' nofit':'';
   let h=`<div class="bf-pool${can&&S.ctr.length?' can':''}" data-bfsrc="-1" style="left:${R.cx-R.pw/2}px;top:${CY-PHH/2}px;width:${R.pw}px;height:${PHH}px"></div>`;
