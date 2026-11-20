@@ -165,3 +165,5 @@ function tutLeave() {
   try { stgAbort(); } catch (e) { } try { GXH.hide(); } catch (e) { }
   document.documentElement.classList.remove('pulling'); $$('.boomfx,.bfchip,.dfly,#ghost').forEach(e => e.remove());
 }
+// F3 6: a coach portrait that cannot load (single-file copy, offline) is hidden: never a broken-image icon in the bubble
+document.addEventListener('error', function (e) { try { var t = e.target; if (t && t.tagName === 'IMG' && t.closest && t.closest('.gxh-bub,.gxt-bub,.gxh-av,.gxc-bub')) t.style.display = 'none'; } catch (x) { } }, true);

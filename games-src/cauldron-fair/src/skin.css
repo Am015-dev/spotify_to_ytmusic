@@ -281,6 +281,11 @@ body:has(#rs:not([hidden])) :is(#others,#acts,#qbox,#ratchip){visibility:hidden}
   body:has(#others > .th:only-child) #fortchip{top:8px;bottom:auto!important;left:4px;max-width:calc(50% - 64px);padding:0 8px}
   body:has(#others > .th:only-child) #fortchip .fk{display:none}
   body:has(#others > .th:only-child) #ratchip{top:8px;bottom:auto!important;right:4px}
+  /* F3 5: the rival card leaves the corners to the chips: nothing sits on top of anything */
+  body:has(#others > .th:only-child) #others{justify-content:flex-start;padding-left:calc(min(50% - 64px, 112px) + 8px)}
+  body:has(#others > .th:only-child):has(#ratchip) #others{padding-right:64px}
+  body:has(#others > .th:only-child) #others .th{min-width:0;max-width:100%;flex:1 1 auto}
+  body:has(#others > .th:only-child) #others .th .ti .ts{font-size:12px;-webkit-line-clamp:2}
 }
 /* F2: the rival's day in plain words; a tap during the pull gives a small cue */
 .th .ti .ts{white-space:normal;font-size:12px;line-height:1.15;max-width:230px;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
@@ -318,3 +323,40 @@ html.ph .th{max-width:min(96vw,370px)}html.ph .th .ti .ts{max-width:none}
 .sbc{min-width:44px;min-height:44px}
 @media (min-width:1000px){.stall .sth b{font-size:17px}.stall .sdo{font-size:15px}.mkt .sinfo{font-size:16px}.stall .tok .pc{font-size:14px}}
 html.ph #fortchip{max-width:62%}html.ph #fortchip .fcx i{display:none}
+/* F3 1: the points-or-shop choice row gives the buttons the room (labels never clip) */
+.ds.dq{grid-template-columns:72px 100px minmax(0,1fr);overflow:visible}
+.ds.dq .dout{position:absolute;top:2px;right:4px;flex-direction:row;pointer-events:none}
+.ds.dq .dout .dboom svg{width:22px;height:22px}
+.ds.dq .dtile{min-width:0}
+.ds.dq .dec-de{width:100%}
+.ds.dq .dpick{flex-wrap:wrap;align-content:center;gap:0 5px;padding:3px 6px;min-height:50px;font-size:22px;line-height:1.05;overflow:hidden}
+.ds.dq .dpick .dpl{flex:1 0 100%;text-align:center;white-space:normal;margin:0;font-size:13px;line-height:1.15}
+.ds.dq .dec .dechint{font-size:12px;margin:2px 0 0}
+/* F3 3: the rat head-start choice says what it is */
+#ratchip .ratrow{max-width:min(250px,70vw);box-sizing:border-box}
+#ratchip .ratq{margin:0 0 2px;font:700 13px/1.25 var(--font);color:var(--ink)}
+#ratchip .ratrow .btn{min-height:44px;font-size:14px}
+/* F3 4: chip choice buttons name the number and the power */
+.btn .mvt{display:flex;flex-direction:column;align-items:flex-start;text-align:left;min-width:0;gap:1px}
+.btn .mvt .mvd{font:600 12px/1.2 var(--font);opacity:.9;white-space:normal}
+/* F3 8: on the shortest phones every stall fits: a slimmer awning, tighter stall headers and rows (the pill stays as the fallback) */
+@media (orientation:portrait) and (max-height:620px){
+  html.ph .mkt .awn{height:28px!important;min-height:0}.mkt .awn .pur b{font-size:19px!important}.mkt .awn .pur svg{width:20px;height:20px}
+  html.ph .stall{padding:1px 4px 2px}.stall .sth{min-height:14px;font-size:13px}.stall .sth .si,.stall .sth i{width:26px;height:26px}
+  html.ph .stall .tok{min-height:40px}.stall .tok svg.chip{width:32px;height:32px}
+  html.ph .mkt{gap:3px}.mkt .stalls{gap:3px!important}
+  html.ph .sinfo{font-size:13px;line-height:1.2;padding:3px 8px}
+}
+/* F3 2: on a PC (>= 1000 px) the day count uses the width: one card per maker side by side, a big pot each, centred */
+@media (min-width:1000px) and (min-height:520px){
+  .stg-tally .rsbody{align-items:center;justify-content:center}
+  .stg .dtable,.stg-tally .dtable{display:grid;grid-auto-flow:column;grid-auto-columns:minmax(0,1fr);gap:16px;max-width:1240px;width:100%;margin:0 auto;flex:0 1 auto}
+  .stg .ds,.stg .ds.dq,.stg-tally .ds{display:grid;grid-template-columns:minmax(0,1fr);grid-template-rows:auto auto auto auto;justify-items:center;align-content:start;gap:10px;max-height:none;min-height:0;padding:14px 16px}
+  .stg .ds .dchip{flex-direction:row;gap:10px;align-items:center}.stg .ds .dchip .dav svg{width:44px;height:44px}
+  .stg .ds .dpot{width:min(230px,28vh);height:min(230px,28vh);flex:none}.stg .ds .dpot svg{display:block;width:100%;height:100%}
+  .stg .ds .dtile{width:100%;max-width:420px}
+  .stg .ds.dq .dout{position:absolute;top:8px;right:10px}
+  .stg .ds .dout{flex-direction:row;min-height:34px}
+  .stg .ds.dq .dpick{min-height:64px;font-size:26px}.stg .ds.dq .dpick .dpl{font-size:15px}
+  .stg .ds.dq .dec .dechint{font-size:14px}
+}

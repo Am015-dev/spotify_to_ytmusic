@@ -99,7 +99,8 @@ function best(S, depth) {
   return { v: Math.max(vs, vd), draw: vd > vs, vs, vd };
 }
 // level table (tests may add their own keys): depth = brew lookahead, margin = how much better drawing must look, shop = shop method, base = shop table level
-AI.levels = { easy: { depth: 0, margin: 0, shop: 'easy', base: 'easy', simple: true, noise: 0.25 }, normal: { depth: 1, margin: -0.3, shop: 'normal', base: 'normal' }, hard: { depth: 3, margin: -0.2, shop: 'hard', base: 'normal' } };
+// F3: Easy plays the normal game with a few slips (noise): a sensible newcomer beats it about 55-60% of the time (was 85%, simc1.js)
+AI.levels = { easy: { depth: 1, margin: -0.3, shop: 'normal', base: 'normal', noise: 0.15 }, normal: { depth: 1, margin: -0.3, shop: 'normal', base: 'normal' }, hard: { depth: 3, margin: -0.2, shop: 'hard', base: 'normal' } };
 
 // ---------- shop ----------
 // How good is each colour by book set (1 = average). Timing: purple late, 4-chips later, 1-chips early.

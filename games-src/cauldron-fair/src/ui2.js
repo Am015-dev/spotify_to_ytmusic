@@ -35,8 +35,10 @@ function qKeys(m, p) {   // chips to show on an option button
 }
 function moveBtn(m, p, cls) {
   const keys = qKeys(m, p);
-  return h('button.btn.alt' + (cls ? '.' + cls : ''), { 'data-a': 'mv', 'data-i': UI.legal[p.seat].indexOf(m), type: 'button' }, keys.length ? h('span.cb', keys.map(k => chipN(k, 26))) : null, m.label);
+  return h('button.btn.alt' + (cls ? '.' + cls : ''), { 'data-a': 'mv', 'data-i': UI.legal[p.seat].indexOf(m), type: 'button' }, keys.length ? h('span.cb', keys.map(k => chipN(k, 26))) : null, keys.length === 1 && /^[A-Z][0-9]$/.test(keys[0]) ? h('span.mvt', h('span', m.label), h('small.mvd', chipDo(keys[0], m.t === 'crow' || m.t === 'peek' || m.t === 'side'))) : m.label);
 }
+// what a chip is and does, so every number on a choice button is named: its number is how far it moves
+function chipDo(k, full) { const n = +k.slice(1), pw = full && typeof chipShort === 'function' ? chipShort(k) : ''; return 'Number ' + n + ': moves ' + n + ' space' + (n === 1 ? '' : 's') + (pw && k[0] !== 'O' ? '. ' + pw : '.'); }
 function waitingNames() { return G.players.filter(p => (G.phase === 'brew' ? p.st !== 'done' : !!p.q) && !isMine(p.seat)).map(p => p.name); }
 function promptInfo() {
   if (!G) return { text: '' };

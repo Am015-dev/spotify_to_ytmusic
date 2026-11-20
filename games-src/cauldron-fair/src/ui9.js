@@ -61,7 +61,7 @@ function stgPot(d, ring) {
 }
 function stgRow(d, v, anim) {
   const p = d.p, me = p.seat === v, q = !anim && me && p.q && p.q.h === 'de' ? p.q : null, lose = d.boom && !d.prot;
-  const row = h('div.ds' + (me ? '.me' : '') + (lose ? '.bm' : '') + (anim ? '.pre' : '.lit'), { 'data-seat': p.seat });
+  const row = h('div.ds' + (me ? '.me' : '') + (lose ? '.bm' : '') + (q ? '.dq' : '') + (anim ? '.pre' : '.lit'), { 'data-seat': p.seat });
   const tot = h('b.tn', anim ? d.start : d.after);
   row.appendChild(h('div.dchip', h('span.dav', { html: avHTML(p.seat, 42) }), h('b.dn', me ? 'You' : p.name), h('span.dtot', { html: ico('vp', 17) }, tot), h('span.drb', { html: ico('ruby', 14) }, h('b', p.rubies))));
   row.appendChild(h('div.dpot', { html: stgPot(d, !anim) }));
@@ -104,8 +104,9 @@ function stgCount(el, from, to, ms) {
 }
 function stgPlay(box, ds, R) {
   STG.run = true; STG.round = R.round; STG.tm = []; STG.iv = []; STG.dirty = false;
-  const rows = [...box.querySelectorAll('.ds')], n = rows.length, step = Math.max(260, Math.min(380, Math.round(1000 / Math.max(1, n))));
+  const rows = [...box.querySelectorAll('.ds')], n = rows.length, step = Math.max(200, Math.min(260, Math.round(800 / Math.max(1, n))));
   const at = (ms, fn) => STG.tm.push(setTimeout(() => { if (STG.run && STG.round === R.round) { try { fn(); } catch (e) { console.error(e); } } }, ms));
+  try { box.addEventListener('pointerdown', () => stgFinish(), { once: true }); } catch (e) { }   // F3: a tap skips the count
   const FACES = ['vp1', 'vp2', 'ruby', 'drop', 'orange', 'vp1'];
   let t = 200, last = 0;
   rows.forEach((row, i) => {
@@ -205,7 +206,7 @@ function marketEl(p, q) {
   wrap.appendChild(h('div.awn', h('span.pur', { html: ico('coin', 30) }, h('b', coins - cost))));
   const stalls = h('div.stalls' + (matchMedia('(orientation:landscape)').matches ? '' : '.tight'));   // R37: portrait is always the tight layout: it never flips under a tap
   const goodNow = UI.shopGoodNow = shopGood(p, q, sel);
-  for (const c of D.SHOP_COLORS) {
+  for (const c of D.SHOP_COLORS.slice().sort((a, b) => (CF.bookOut(G, b) ? 1 : 0) - (CF.bookOut(G, a) ? 1 : 0))) {   // F3: open stalls first, the ones that open later last, so a short screen never hides what you can buy
     const out = CF.bookOut(G, c), st = h('div.stall.c' + c + (out ? '' : '.locked'), { 'data-lp': 'chip:' + c + D.COLORS[c].vals[0] });
     const bk = c === 'O' ? D.BOOKS.O[0] : c === 'K' ? D.BOOKS.K[0] : D.BOOKS[c][G.sets[c]];
     st.appendChild(h('div.sth', h('b', D.COLORS[c].name), out ? null : h('span.slock', 'day ' + D.BOOK_ROUND[c]), h('button.sinfb', { 'data-a': 'shopinfo', 'data-c': c, type: 'button', 'aria-label': 'What ' + D.COLORS[c].name + ' does' }, 'i')));

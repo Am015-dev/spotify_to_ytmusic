@@ -143,10 +143,11 @@ function loadSave() {
 // F2: a fortune card says what it does the moment it appears (ignores taps, fades by itself)
 function fortBanner() {
   try {
-    if (UI.sim || !G || !G.fcard || !bfAnim()) return; const c = D.FORTUNE.find(x => x.id === G.fcard); if (!c) return;
+    if (UI.sim || !G || !G.fcard || !bfAnim()) return; { const vp = G.players[viewSeat()]; if (vp && vp.q) return; }   // F3: a fortune that asks a question is already on the choice card, the banner would sit on its buttons
+    const c = D.FORTUNE.find(x => x.id === G.fcard); if (!c) return;
     const old = $('#fbanner'); if (old) old.remove();
     const b = h('div#fbanner.' + c.kind, { 'aria-hidden': 'true' }, h('span.fk', c.kind === 'blue' ? 'ALL DAY' : 'NOW'), h('b', c.name), h('span', fortShort(c)));
     document.body.appendChild(b); const dk = $('#dock'), r = dk && dk.getBoundingClientRect(); if (r && r.width > innerWidth * .8) { b.style.top = 'auto'; b.style.bottom = Math.round(innerHeight - r.top + 6) + 'px'; } else if (r) { b.style.top = 'auto'; b.style.bottom = '24px'; b.style.left = Math.round(r.left / 2 + 125) + 'px'; }
-    setTimeout(() => b.classList.add('out'), 1800); setTimeout(() => b.remove(), 2200);
+    const gone = () => { b.classList.add('out'); setTimeout(() => b.remove(), 250); }; document.addEventListener('pointerdown', gone, { once: true, capture: true }); setTimeout(gone, 900);   // F3: about a second, a tap skips it
   } catch (e) { }
 }

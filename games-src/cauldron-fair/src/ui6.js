@@ -215,7 +215,7 @@ function renderRat(p, legal) {
   if (UI.ratDay !== G.round) { UI.ratDay = G.round; UI.ratOpen = false; }
   const bd = $('#bd'); if (!bd) return; if (!c) { c = h('div#ratchip'); bd.appendChild(c); }
   const k = p.rat - p.droplet, open = !!UI.ratOpen; c.innerHTML = '';
-  if (open) c.appendChild(h('div.ratrow', rat.map(x => h('button.btn.alt', { 'data-a': 'mv', 'data-i': legal.indexOf(x), type: 'button' }, x.n ? 'Only +' + x.n : 'None'))));
+  if (open) c.appendChild(h('div.ratrow', h('p.ratq', 'Rat stone head start: your droplet may begin +' + k + ' space' + (k === 1 ? '' : 's') + ' ahead. Close this to use all of it, or take less:'), rat.map(x => h('button.btn.alt', { 'data-a': 'mv', 'data-i': legal.indexOf(x), type: 'button' }, x.n ? 'Use only +' + x.n : 'Use none'))));
   c.appendChild(h('button.ratb' + (open ? '.on' : ''), { 'data-a': 'ratopen', type: 'button', 'aria-expanded': open ? 'true' : 'false', 'aria-label': 'Rat head start +' + k + ': tap to use less' }, h('span', { html: ico('rat', 26) }), '+' + k));
   try { if (typeof GXH !== 'undefined') setTimeout(() => GXH.relayout(), 0); } catch (e) { }   // a bubble placed before this pill appeared must move off it
 }

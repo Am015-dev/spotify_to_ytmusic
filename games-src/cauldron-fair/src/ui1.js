@@ -119,5 +119,13 @@ function dayWhy(p, round) {
   for (const l of G.log) if (l.round === round && !/rubies at 2 to 1/.test(l.t)) { const m = re.exec(l.t); if (m) out.push((m[1] === 'loses' ? '-' : '+') + m[2] + ' ' + short(m[3])); }
   return out;
 }
+// F3 9: one toast at a time, and never over the prompt or the action buttons: it sits just above whichever of them is highest
+function toastPlace(e) {
+  try {
+    e.style.top = 'auto'; e.style.bottom = '18px'; let top = innerHeight;
+    ['#instr', '#acts', '#qbox', '#prompt'].forEach(sel => { const x = document.querySelector(sel); if (!x || x.hidden) return; const r = x.getBoundingClientRect(); if (r.width > 40 && r.height > 8 && r.top > innerHeight * .3 && r.top < top) top = r.top; });
+    if (top < innerHeight) e.style.bottom = Math.round(innerHeight - top + 8) + 'px';
+  } catch (x) { }
+}
 const say = t => toast(t, 1);   // a direct answer to a tap always shows
-function toast(t, force) { const e = $('#toast'); if (!e || (typeof tutOn === 'function' && tutOn())) return; if (!force && typeof msgOK === 'function' && !msgOK()) return; e.textContent = t; e.classList.add('on'); clearTimeout(toast.t); const nw = String(t).trim().split(/\s+/).length; toast.t = setTimeout(() => e.classList.remove('on'), 4000 + 1000 * Math.ceil(nw / 10)); }
+function toast(t, force) { const e = $('#toast'); if (!e || (typeof tutOn === 'function' && tutOn())) return; if (!force && typeof msgOK === 'function' && !msgOK()) return; e.textContent = t; e.classList.add('on'); toastPlace(e); clearTimeout(toast.t); const nw = String(t).trim().split(/\s+/).length; toast.t = setTimeout(() => e.classList.remove('on'), 4000 + 1000 * Math.ceil(nw / 10)); }
