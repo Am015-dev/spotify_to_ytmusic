@@ -1,6 +1,9 @@
 // wiretips.js: instruction wording, tap a wire to read its clues, PC keys. No rules here.
 // (1) the instruction line: on your turn it names the crewmate whose wires to tap; a double match says which of YOUR wires
-(function(){const o=refresh;refresh=function(){o();try{f3Say()}catch(e){console.error(e)}}})();
+// F4: a reference drawer (gear, job card) opened while the crew played would hide the wires that glow when your turn starts: close it then
+let f4Turn=null;function f4Open(){if(!G||!UI.V||G.over||UI.brief||UI.tut||!UI.started)return;const V=UI.V;if(V.seat<0||!V.legal||decider()!==V.seat)return;const k=G.turn+':'+G.round;if(k===f4Turn)return;f4Turn=k;
+  const d=document.querySelector('.gx-drawer.on');const x=d&&d.querySelector('.gx-x');if(x)x.click()}
+(function(){const o=refresh;refresh=function(){o();try{f4Open();f3Say()}catch(e){console.error(e)}}})();
 function f3Say(){const el=document.getElementById('say');if(!el||!G||!UI.V||G.over||UI.brief||UI.tut)return;const V=UI.V,me=V.seat;if(me<0)return;
   let txt=null,mine=false;
   if(V.q&&V.q.who===me&&V.q.kind==='pickMatch'&&V.q.opts&&V.q.opts[0]&&V.q.opts[0].d){const u=V.q.opts[0].d.u;let v=null;

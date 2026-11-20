@@ -20,7 +20,8 @@ function scMyVals(V){const out=[];for(const S of V.stands)if(S.mine)for(const x 
 function scOdds(V,W,st,k,v){const kn=scKnown(V,st,k);if(kn!=null)return kn===v?1:0;const s=W&&W.slots.find(x=>x.st===st&&x.k===k);return s?(s.prob[VN(v)]||0):null}
 function scMoveText(V,m){if(!m)return '';if(m.a==='solo')return 'Solo cut the '+VN(m.v)+'s';
   if(m.a==='dual'){const ow=ownerOf(m.st);return 'Say '+VN(m.v)+' on '+(ow===V.seat?'your own':nm(ow)+"'s")+' wire'}if(m.a==='eq')return 'Use '+((EQUIP[m.id]||{}).n||'a gear card');return 'Play a card'}
-function scFuseLine(){if(G.dial==null)return 'a miss costs the crew';const l=G.dial-1;return l<=0?'a miss blows the fuse!':'a miss: fuse −1 ('+l+' left)'}
+function scFuseLine(){if(G.dial==null)return 'a miss costs the crew';let n=1;try{const me=UI.V.seat;if(G.tfx&&G.tfx.damper)n=0;else if(conFlag(me,'double'))n=2}catch(e){}
+  if(!n)return 'a miss: the Damper holds the fuse';const l=G.dial-n;return l<=0?'a miss blows the fuse!':'a miss: fuse −'+n+' ('+l+' left)'}
 // ---------- the move being built -> preview text and badges ----------
 function scPreview(V){const sel=UI.sel;if(!sel||sel.mode!=='dual'||sel.tool||sel.two)return null;
   if(sel.tg.length&&sel.v!=null){const t=sel.tg[0];const ow=ownerOf(t.st);

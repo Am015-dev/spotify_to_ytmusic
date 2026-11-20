@@ -28,7 +28,7 @@ const HLP_STEPS={
  number:{target:hfirst('#mine .tile.glow'),title:'Say a number',text:'Tap a glowing wire of yours to say its number.',pic:()=>HP.tile(7,'b')},
  wire:{target:hfirst('#crew .tile.glow'),title:'Point at a wire',text:'Tap the crew wire you think matches. A match cuts both.',pic:()=>HP.cut()},
  solo:{target:hfirst('#mine .tile.glow.g-solo','#mine .tile.glow'),title:'A free cut',text:'You hold all wires left of this number. Tap one: safe cut.',pic:()=>HP.check()},
- reveal:{target:hfirst('#mine .tile.glow.g-rev','#mine .tile.glow'),title:'Only red wires left',text:'Tap a red wire to show your reds. Nothing blows up.',pic:()=>HP.tile('R','r')},
+ reveal:{target:hfirst('#mine .tile.glow.g-rev','#mine .tile.glow'),title:'Only red wires left',text:'Your reds reveal themselves at the start of your turn. Nothing blows up.',pic:()=>HP.tile('R','r')},
  tag:{target:hfirst('#tb .tile.glow','#tb .plate.glow','#tray .chip.glow','#mine .chip.glow'),title:'Tag a wire',text:'Tap a glowing wire to give it an info token. Everyone then sees the number.',pic:()=>HP.token(3)},
  answer:{target:hfirst('#tb .tile.glow','#tb .plate.glow','#tray .chip.glow','#mine .chip.glow'),title:'Your choice',text:'Something is asked of you. Tap one of the glowing wires, players or buttons.',pic:()=>HP.tap()},
  gear:{target:hfirst('#tb .tile.glow','#tb .plate.glow','#tray .chip.glow','#mine .chip.glow'),title:'Finish the move',text:'Keep tapping the glowing wires, players or buttons. The cross button cancels.',pic:()=>HP.gear()},
@@ -54,13 +54,13 @@ const HLP_RULES=[
  {phase:'reveal',title:'Only red wires',text:'You hold nothing but red wires. Show them to the crew. You are done, and nothing blows up.',pic:()=>hpics([['tile','Red','R','r'],'>',['check','Done']])},
  {phase:'reveal',title:'Your crew goes on',text:'The rest of the crew keeps cutting. You still win or lose together.',pic:()=>hpics([['stand','Crew'],'>',['cut','Keep cutting']])},
  {phase:'tag',title:'A token on a wire',text:'A token goes in front of a wire. Everyone sees its number, and the sort order adds clues.',pic:()=>hpics([['tile','Wire',null,'back'],'>',['token','Token',4]])},
- {phase:'tag',title:'After a miss',text:'A wrong cut tags the wire that was pointed at. So the crew learns its true number.',pic:()=>hpics([['fuse','Miss',2],'>',['token','Tagged',4]])},
+ {phase:'tag',title:'After a miss',text:'A wrong cut tags the wire that was pointed at. So the crew learns its true number (or that it is yellow).',pic:()=>hpics([['fuse','Miss',2],'>',['token','Tagged',4]])},
  {phase:'answer',title:'Your choice',text:'The job asks you something. Tap one of the glowing wires, players or buttons to answer.',pic:()=>hpics([['tap','Tap a glow']])},
  {phase:'answer',title:'Not sure?',text:'The light bulb suggests a move and says why. You choose.',pic:()=>hpics([['star','Advisor'],'>',['tap','Your pick']])},
  {phase:'gear',title:'Equipment',text:'Gear unlocks when the crew cuts certain numbers. Tap a glowing card.',pic:()=>hpics([['lock','Locked'],'>',['gear','Ready']])},
  {phase:'gear',title:'Finish the move',text:'Keep tapping glowing wires, players or buttons until the move is done. The cross cancels it.',pic:()=>hpics([['tap','Tap'],'>',['check','Done']])},
  {phase:'claim',title:'Claim the turn',text:'In this job there is no fixed order. Tap Claim when you can make progress.',pic:()=>hpics([['turn','Turn'],'>',['tap','Claim']])},
- {phase:'claim',title:'One at a time',text:'If two players claim, the better placed one goes first. Your wires stay your own secret.',pic:()=>hpics([['stand','Crew'],'>',['turn','One turn']])}
+ {phase:'claim',title:'One at a time',text:'If two players claim, the next claimant clockwise from the last player goes first. Your wires stay your own secret.',pic:()=>hpics([['stand','Crew'],'>',['turn','One turn']])}
 ];
 // ---------------------------------------------------------------- phases
 const HLP_TAGQ=['tagPick','lackTag','infoNeg','infoFalse'];

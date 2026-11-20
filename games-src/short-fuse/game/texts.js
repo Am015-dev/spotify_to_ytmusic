@@ -135,7 +135,7 @@ const TUTORIAL=[
  {id:'value',t:'Say the number',p:'Now pick the number you think it is. You can only say numbers you hold yourself. Tokens and the sort order are your clues.'},
  {id:'confirm',t:'Snip!',p:'Tap your own wire with that number. The cut happens at once. Turn on Hints (the bulb) for a suggested move.'},
  {id:'hit',t:'Both wires are cut',p:'A hit cuts their wire. It also cuts your wire of the same value. A fully cut value gets a green check on the track.'},
- {id:'miss',t:'BUZZ: a miss',p:'A miss burns one step of the fuse. The crewmate puts a token before that wire. It shows the true number. Now everyone knows it.'},
+ {id:'miss',t:'BUZZ: a miss',p:'A miss burns one step of the fuse. The crewmate puts a token before that wire. It shows the true number, or a yellow token for a yellow wire. Now everyone knows it.'},
  {id:'solo',t:'A solo cut',p:'Do you hold <b>all</b> the wires still left of a value? That means all four, or the last two. Then you may cut them yourself. No pointing needed. A solo cut never fails. Look for the solo button.'},
  {id:'know',t:'What we know',p:'The bulb turns hints on or off. With hints on, "Show me" points at a good move.'}];
 // how to play: in the order a player meets things
@@ -152,7 +152,7 @@ const RULES_HTML=`
 <p>The track markers show which red and yellow values this job uses. "2 out of 3" means three values are marked. Only two wires are really there.</p>
 <h3>Dual cut</h3><p>Point at one uncut wire of a crewmate. Say a number you <b>hold yourself</b>. Or say "yellow" if you hold a yellow. Never say "red".</p><ul>
 <li><b>Hit:</b> their wire is turned face up and cut. You cut one of yours of the same value.</li>
-<li><b>Miss:</b> the fuse burns one step. The crewmate puts an info token in front of that wire. It shows the wire's true number. Your own wire stays hidden.</li>
+<li><b>Miss:</b> the fuse burns one step. The crewmate puts an info token in front of that wire. It shows the wire's true number (a yellow wire gets the yellow token). Your own wire stays hidden.</li>
 <li><b>Red:</b> if the wire you pointed at is red, boom.</li></ul>
 <h3>Solo cut</h3><p>Is <b>every</b> remaining uncut wire of a value in your hand? That means all four. Or the last two, after a pair was cut. Then you may cut them all at once. It never fails. You can never solo cut three.</p>
 <h3>Reveal reds</h3><p>If every wire you still hold is red, you reveal them. You do it at the start of your turn. The page does it for you.</p>

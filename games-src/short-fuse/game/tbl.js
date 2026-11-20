@@ -349,7 +349,7 @@ function tapTile(si,k){const V=UI.V;if(!V||V.seat<0||G.over||UI.brief)return;con
   if(own)onMine(si,k);else onTile(si,k)}
 function autoFire(){const sel=UI.sel,V=UI.V;if(!sel||sel.mode!=='dual'||!sel.tg.length||sel.v==null)return false;if(sel.two&&sel.v2==null)return false;const need=toolN(sel.tool);if(need!==99&&sel.tg.length<need)return false;
   const m=buildDual(sel);if(!m)return false;const err=legal(m,V.seat);if(err){toast(err);return false}if(UI.ghost&&UI.ghost.turn)ghostDone('turn');act(m,V.seat);return true}
-function redTip(u){const e=tileEl(u);if(e){e.classList.remove('buzz');void e.offsetWidth;e.classList.add('buzz');setTimeout(()=>e.classList.remove('buzz'),700)}sfx('select');toast('Red: never name it. It reveals itself last.')}
+function redTip(u){const e=tileEl(u);if(e){e.classList.remove('buzz');void e.offsetWidth;e.classList.add('buzz');setTimeout(()=>e.classList.remove('buzz'),700)}sfx('select');toast('Red: never name it. It reveals itself when it is all you hold.')}
 function onMine(si,k){const V=UI.V;const sl=G.st[si].w[k];const me=V.seat;
   if(V.q&&V.q.who===me&&V.q.opts){const i=V.q.opts.findIndex(o=>o.d&&(o.d.u===sl.u||(o.d.st===si&&o.d.k===k)));if(i>=0){answer(i);return}if(sl.c==='r'||(V.stands[si].slots[k]||{}).c==='r'){redTip(sl.u);return}toast('Tap a glowing wire');return}
   const sel=UI.sel;if(sel&&(sel.mode==='choose'||sel.mode==='multi'))return onTile(si,k);
