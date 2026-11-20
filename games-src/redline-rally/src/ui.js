@@ -129,7 +129,7 @@ function gearTrade(c) {
     var q = planSpeed(c, idx), sp = q.sp + adr, ks = cornersIn(G, c.pos, c.pos + sp), burn = 0, tight = 0; ks.forEach(function (k) { var b = Math.max(0, q.sp - k.limit - q.ul); burn += b; if (b) tight = tight ? Math.min(tight, k.limit) : k.limit; });
     var d = q.sp - base, risk = burn > c.eng - o.cost ? 'spin risk at corner ' + tight : burn ? burn + ' heat at corner ' + tight : 'safe';
     if (g <= 2 && c.hand.indexOf('H') >= 0 && risk === 'safe') risk = 'safe, cools heat';
-    out.push('Gear ' + g + ': ' + (d >= 0 ? '+' : '') + d + ' space' + (Math.abs(d) === 1 ? '' : 's') + ', ' + risk);
+    out.push('Gear ' + g + ': ' + (d ? (d > 0 ? '+' : '') + d + ' space' + (Math.abs(d) === 1 ? '' : 's') : 'same speed') + ', ' + risk);
   });
   return out.length ? '<span class="gtr">' + out.join(' · ') + '</span>' : '';
 }
@@ -162,7 +162,7 @@ function drawPlan() {
   c.hand.forEach(function (x, j) { var on = UI.sel.indexOf(j) >= 0; h += cardHtml(x, on, x === 'H' || (UI.swap && x === 'X'), j, x === 'H' ? '' : on ? '' : full ? 'dim' : tutOn() || sugShown() ? '' : 'glow'); });
   UI.boost = false;   /* boost is never planned: the toggle below is your answer to the boost question after the reveal (React step) */
   UI.boostWant = UI.boostWant || {}; var bw = !!UI.boostWant[c.i], bOk = c.eng - (Math.abs(UI.gear - c.gear) === 2 ? 1 : 0) >= 1; if (!bOk) bw = UI.boostWant[c.i] = false;
-  h += '</div>' + cardLegend(c.hand) + '<div class="heatl" id="heatl">' + heatLine(c) + gearTrade(c) + '</div><div id="acts">' + (hintsOn() ? '<button id="sugB">Suggest</button>' : '') + '<button class="bo' + (bw ? ' on' : '') + '" id="boostT" aria-pressed="' + bw + '"' + (bOk ? '' : ' disabled') + ' title="After the cards show: pay 1 heat, flip one more speed card. Skipped if it could spin you out. Key B">Boost ' + (bw ? 'on' : 'off') + '<small>-1 heat, +1-4</small></button><button class="go" id="goB" title="Key Enter">Go!</button></div>';
+  h += '</div>' + (UI.legH = cardLegend(c.hand)) + '<div class="heatl" id="heatl">' + heatLine(c) + (UI.legH ? '' : gearTrade(c)) + '</div><div id="acts">' + (hintsOn() ? '<button id="sugB">Suggest</button>' : '') + '<button class="bo' + (bw ? ' on' : '') + '" id="boostT" aria-pressed="' + bw + '"' + (bOk ? '' : ' disabled') + ' title="After the cards show: pay 1 heat, flip one more speed card. Skipped if it could spin you out. Key B">Boost ' + (bw ? 'on' : 'off') + '<small>-1 heat, +1-4</small></button><button class="go" id="goB" title="Key Enter">Go!</button></div>';
   var hh = c.hand.filter(function (x) { return x === 'H'; }).length, pips = ''; for (var q = 0; q < ENGINE0; q++) pips += '<i class="pip' + (q < c.eng ? ' on' : '') + '"></i>';
   if (false) h += '<div class="chips tray" id="tray"><span class="eng" title="Engine heat: your fuel. Corners burn it."><em>Engine heat</em><span class="pips">' + pips + '</span><b data-engine="G.cars[' + c.i + '].eng">' + c.eng + '</b></span><span title="Heat cards stuck in your hand. Gear 1 or 2 cools them back."><em>Dead heat in hand</em> <b>' + hh + '</b></span>' + '</div>';
   p.innerHTML = h; artApply(p);
