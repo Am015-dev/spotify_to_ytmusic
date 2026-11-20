@@ -16,7 +16,7 @@ Reviewer: R107 (20 Nov 2026, ~19:45 UTC). No game code was edited.
 | 7 | Feel | 7 |
 | 8 | Bugs | 8 |
 
-Cold play: see the section below.
+Cold play (as-is): playable on phone and PC, **fun 3/5**, would play again **"probably yes"**, lost both games (75-85 phone, 72-79 PC) and the tutorial (32-36). This is not a clear "playable and fun" verdict, so it does not meet the PASS bar.
 
 ## Gates (one run each, foreground, alone)
 - `VIS_SLUGS="," build-all.py --quick --out /tmp/x wildmark`: **PASS** (11/11 scenarios).
@@ -91,10 +91,41 @@ At every PC size: 0 dead clicks, 0 page errors, no page scroll, smallest text 14
 5. **375x553 market targets:** make tokens and tiles at least 44 px wide (the token can be the full column width).
 6. **Tie result:** say "Tied on points: you win on acorns (4 vs 2)". Replace "(you first)" with plain words.
 7. **Labels:** rename the toggle "Hints on/off" on the phone as well, and give the bulb a one-line caption the first time it is used.
+9. **Cold-tester confusions:** explain a falling total ("Bram took the biggest-forest bonus: -2"). Label or remove the "▼N" box. Reword the tutorial step "ringed bear tile". Give instant feedback on a confirming tap; ignore re-taps during the animation, but show that they were received.
 8. **Text fixes:** items 1-5 of the text list above (campaign.json:1014, ui.js:540, ui.js:567, campaign.json:740/920, score.js:182).
 
 ## Cold play (independent subagent, no history)
-Pending at the time of the first commit; appended below when it reports.
+The first attempt was refused by a safety check: it tried to keep one browser open between steps through a persistent driver process. It stopped and played nothing. The retry used ordinary one-shot scripts. It played by taps and clicks, choosing from what the screen showed: the biggest "up to +N" column and the biggest "+N" spot, with no turning and no acorns. Its report, quoted as-is:
+
+> - Could I play it? Phone: yes. Tutorial and a full 20-turn game, all by touch taps. PC: yes, a full 20-turn game by mouse clicks.
+> - Fun: 3/5. The tutorial is clear and short. Placing a tile and then an animal is satisfying, and the "up to +N" and "+N" labels tell you the payoff before you choose. In play, though, the rival always seemed to keep pace or pull ahead.
+> - Would I play again: probably yes. The picks are quick and easy to learn. But I could not tell what I should do differently, so I would only keep going if the rival felt beatable.
+> - Results: Tutorial: lost 32 to 36. The scripted turns end in a loss, which is a flat way to finish onboarding. Phone full game: me 75, rival 85. The rival is named Bram. PC full game: me 72, rival 79.
+>
+> What confused me:
+> - The tutorial text says "Tap the ringed bear tile", but the thing to tap is the ghost preview of my own new tile. Tapping the existing bear tile (160,393) or the "Place tile" button did nothing.
+> - A confirming tap gives no visible change for about 1.5 s, and re-tapping in that gap did nothing. It feels dead.
+> - Score dips with no explanation: on the phone I went from 36 to 29 on one turn, and 28 to 27 on another, right after my placement. The rival's turn banner says "+4 → 18 · you 16" but not why mine dropped. I assume the land-majority bonus changed hands.
+> - The small "▼3" or "▼4" box at the bottom-left of the board is never explained. It appears from turn 1 on both phone and PC.
+> - The goal card is a wall of text, though it does have a Start button.
+> - The rival's turn is understandable only at a glance. The banner reads "Meadow/Marsh + Hawk (ringed). +4 → 18 · you 16. Tap to go on", and the small valley inset shows the placement. The inset overlaps my board in the tutorial and hides tiles. On PC the season log lists what Bram placed, but without points.
+> - The final panel has a "Title" button whose purpose is unclear. When I took screenshots, the score-breakdown table was still empty on both phone and PC (the tutorial result did show it).
+>
+> Dead taps/clicks or covered things:
+> - In the tutorial, the "Place tile" button and the existing ringed tile did nothing (see above).
+> - The "+2 Elk line" popup covers the top animal counters. The rival inset covers part of the board.
+> - On the phone the board gets tiny late in the game: hexes are about 40 px and the "+1" badges about 20 px, so aiming a tap is fiddly.
+> - The "Back" and "Help me" buttons crowd the bottom-right, next to the Place and rotate buttons.
+> - PC layout is fine: the season log, market and board are all visible and uncovered.
+
+Reviewer notes on the cold report:
+- In my own 6 games the breakdown table was filled about 5 s after the end. The "empty table" is most likely a screenshot taken before the result had drawn. Not counted as a bug, but it is one more sign that the result should appear sooner (fix 4).
+- New items it found, added to the fix list as fix 9:
+  - The total drops when a land bonus changes hands, and nothing explains the drop.
+  - The "▼N" box on the board is never explained.
+  - The tutorial step "Tap the ringed bear tile" should say "Tap your new tile (ringed)".
+  - A confirming tap shows nothing for about 1.5 s; it needs instant feedback.
+- The second-tap-during-animation leftover is confirmed.
 
 Video: `games-src/reviews/R107-first-3-min-375x667.webm` (2.8 MB).
 Screenshots (local only, not committed): `/tmp/r107/shots/`.
