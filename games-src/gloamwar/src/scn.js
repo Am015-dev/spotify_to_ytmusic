@@ -3,7 +3,7 @@
   if (!window.GXS) return;
   var booted = function () { return typeof G !== 'undefined' && typeof startGame === 'function' && typeof MV !== 'undefined'; };
   function wait(ms) { return new Promise(function (r) { setTimeout(r, ms); }); }
-  function begin(o) { UI.fast = true; AIDELAY = 20; window.ANIM = false; startGame(o); clearTimeout(UI.timer); }
+  function begin(o) { o.noGoal = true; UI.fast = true; AIDELAY = 20; window.ANIM = false; startGame(o); clearTimeout(UI.timer); }
   function toAct(side) {   // run the computer until the human has a free die
     var k = 0; while (G && !G.win && k++ < 400) { if (G.phase === 'act' && sideToAct(G) === side && !G.pend) break; var m = AI.move(G, 'normal'); performMove(G, m); G.ev = []; }
     UI.hold = false; UI.die = null; render();

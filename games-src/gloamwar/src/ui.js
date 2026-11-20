@@ -29,7 +29,14 @@ function startGame(o) {
   ['title', 'res'].forEach(function (id) { $('#' + id).classList.remove('on'); }); document.body.classList.remove('scr-on'); closeSheet(); battleClose();
   ls('gw-side', UI.side);
   MV.fit(); MV.focus(UI.side === 'D' ? 'lanternvale' : 'blackgate', MV.k0, false);
-  render(); later(step, UI.fast ? 20 : 400);
+  render();
+  if (UI.mode !== 'tut' && !UI.fast && !o.noGoal) { goalCard(function () { later(step, 200); }); return; }
+  later(step, UI.fast ? 20 : 400);
+}
+function goalCard(done) {
+  var d = UI.side === 'D', el = $('#battle');
+  el.innerHTML = '<h3>' + (d ? 'You lead the Dawn League' : 'You command the Gloam') + '</h3><p class="bnote">' + (d ? 'Walk the lantern to the Kiln, the red mountain.' : 'Hunt the lantern until its taint reaches 12.') + '</p><p class="bnote">' + (d ? 'Or take 4 points of Gloam strongholds.' : 'Or take 10 points of Dawn cities and strongholds.') + '</p><p class="bnote">Each turn: tap a die, then pick an action.</p><div class="row" style="justify-content:center"><button class="btn pri big" type="button" id="goalGo">Start</button></div>';
+  el.classList.add('on'); $('#goalGo').onclick = function () { el.classList.remove('on'); done(); };
 }
 function later(f, ms) { clearTimeout(UI.timer); UI.timer = setTimeout(f, ms); }
 function human(s) { return s === UI.side; }
@@ -44,7 +51,7 @@ function step() {
   var ms = validMoves(G);
   if (ms.length === 1 && G.pend && ['damage', 'battle'].indexOf(G.pend.h) < 0) { apply(ms[0]); return; }
   render();
-  try { if (window.GXH) GXH.phase(phaseId()); } catch (e) { }
+  try { if (window.GXH && UI.mode !== 'tut' && !(window.GXT && GXT.active())) GXH.phase(phaseId()); } catch (e) { }
 }
 function aiStep() {
   if (!G || G.win) { step(); return; }
@@ -79,7 +86,7 @@ function playEvents(evs, byAI) {
       case 'pol': said = said || NATIONS[e.n].n + ': ' + polText(G, e.n); wait = Math.max(wait, 600); break;
       case 'company': MV.flash(e.rid); break;
       case 'death': toast(CHARS[e.c].short + ' falls', CHARS[e.c].side !== 'G'); wait = Math.max(wait, 1000); break;
-      case 'char': toast(CHARS[e.c].short + ' enters the war', CHARS[e.c].side === 'G'); MV.flash(e.rid); wait = Math.max(wait, 1100); break;
+      case 'char': toast(CHARS[e.c].short + ' joins the ' + (CHARS[e.c].side === 'G' ? 'Gloam' : 'Dawn') + ': +1 die', CHARS[e.c].side === 'G'); MV.flash(e.rid); wait = Math.max(wait, 1100); break;
       case 'rider': MV.flash(e.to); said = said || 'A Gloamrider flies to ' + rn(e.to); wait = Math.max(wait, 450); break;
       case 'road': toast('The Company reaches the Ashen Road', false); break;
       case 'roll': said = 'New dice rolled'; break;
@@ -106,7 +113,7 @@ $('#vD').textContent = vpOf(G, 'D') + '/' + VPWIN.D; $('#vG').textContent = vpOf
   else if (G.phase === 'hunt') msg = huntUI(ms, acts);
   else if (G.phase === 'act') msg = actUI(ms, hl, acts);
   if (G.win) msg = G.win.side === me ? 'Victory!' : 'Defeat';
-  $('#msg').innerHTML = '<span id="vturn">Turn ' + G.turn + '</span>' + msg;
+  $('#msg').innerHTML = '<span id="vturn">T' + G.turn + '</span>' + msg;
   renderDice(ms); renderActs(acts); renderTabs(ms);
   MV.render(G, hl, me);
   if (G.pend && G.pend.h === 'battle') battleRender(ms); else if (!UI.roundShow) battleClose();
@@ -139,12 +146,12 @@ function tutOk(a) { try { if (window.GXT && GXT.active()) return GXT.act(a); } c
 // ---------------------------------------------------------------- phase UIs (return the one-line message)
 function companyUI(ms, hl, acts) {
   var decl = ms.filter(function (m) { return m.t === 'declare'; });
-  decl.forEach(function (m) { hl.regions.push(m.to); }); hl.tokens.push('company');
+  decl.forEach(function (m) { hl.regions.push(m.to); });
   UI.tap = function (kind, rid) { var m = decl.filter(function (x) { return x.to === rid; })[0]; if (m) { if (!tutOk({ type: 'tap', what: 'declare', rid: rid })) return; apply(m); return true; } };
-  acts.push({ t: 'Keep moving', s: 'end the Company phase', cls: 'pri', key: 'cdone', f: function () { apply({ t: 'cdone' }); } });
+  acts.push({ t: 'Stay hidden', s: 'move it later with dice', cls: 'pri', key: 'cdone', f: function () { apply({ t: 'cdone' }); } });
   ms.filter(function (m) { return m.t === 'road'; }).forEach(function () { acts.push({ t: 'Ashen Road', s: 'start the last 5 steps', cls: 'red', key: 'road', f: function () { apply({ t: 'road' }); } }); });
   ms.filter(function (m) { return m.t === 'guide'; }).forEach(function (m) { acts.push({ t: CHARS[m.c].short + ' guides', s: 'change the guide', key: 'guide', f: function () { apply(m); } }); });
-  return decl.length ? 'Company phase: tap a glow to declare' : 'Company phase';
+  return decl.length ? 'Declare: tap a glow, or stay hidden' : 'Company phase';
 }
 function huntUI(ms, acts) {
   ms.forEach(function (m) { acts.push({ t: m.n + (m.n === 1 ? ' die' : ' dice'), s: m.n ? 'to the Hunt' : 'no hunt', cls: m.n === 2 ? 'pri' : '', key: 'hunt' + m.n, f: function () { apply(m); } }); });
@@ -170,7 +177,7 @@ function actUI(ms, hl, acts) {
     am.forEach(function (m) { hl.tokens.push(tokId(m.from)); hl.regions.push(m.from); });
     UI.tap = function (kind, rid) { var m = am.filter(function (x) { return x.from === rid; })[0]; if (m) { apply(m); return true; } };
     acts.push({ t: 'Back', key: 'back', f: function () { UI.src = null; render(); } });
-    return 'Tap the army that ' + (UI.src.a === 'lmove' ? 'marches' : 'attacks');
+    return 'Tap the ringed army';
   }
   // the Will of the Dawn: first pick which face it becomes (or a hero)
   if (f === 'W' && !UI.asFace) {
@@ -194,9 +201,9 @@ function actUI(ms, hl, acts) {
     var a = m.a;
     if (a === 'skip') { skip = m; return; }
     if (a === 'dip' || a === 'draw') { if (seen[a]) return; seen[a] = 1; var n = dms.filter(function (x) { return x.a === a; });
-      acts.push({ t: a === 'dip' ? 'Stir a nation' : 'Draw a card', s: a === 'dip' ? n.length + ' can step toward war' : 'from either deck', key: a, f: function () { if (n.length === 1) apply(n[0]); else { UI.sub = a; render(); } } }); return; }
+      acts.push({ t: a === 'dip' ? 'Stir a nation' : 'Draw a card', s: a === 'dip' ? n.length + ' nations' : 'either deck', key: a, f: function () { if (n.length === 1) apply(n[0]); else { UI.sub = a; render(); } } }); return; }
     if (a === 'minion' || a === 'hero') { acts.push({ t: CHARS[m.c].short, s: 'enters at ' + rn(m.to), cls: 'red', key: a + '-' + m.c, f: function () { apply(m); } }); return; }
-    if (a === 'card') { if (seen.card) return; seen.card = 1; acts.push({ t: 'Play card', s: dms.filter(function (x) { return x.a === 'card'; }).length + ' can be played', key: 'card', f: function () { openCards(); } }); return; }
+    if (a === 'card') { if (seen.card) return; seen.card = 1; acts.push({ t: 'Play card', s: dms.filter(function (x) { return x.a === 'card'; }).length + ' playable', key: 'card', f: function () { openCards(); } }); return; }
     if (seen[a]) return; seen[a] = 1;
     var lab = ACT_LABEL[a] || [a, '']; var sub = lab[1];
     if (a === 'cmove') sub = F.road >= 0 ? 'step on the Ashen Road' : 'hunt risk ' + Math.round(riskOfMove(G) * 100) + '%';
@@ -307,7 +314,7 @@ function effectUI(ms, hl, acts) {
     else if (m.t === 'ekill') acts.push({ t: CHARS[m.c].short, s: 'falls', cls: 'red', key: 'ekill', f: function () { apply(m); } });
     else if (m.t === 'esortie') acts.push({ t: 'Sally at ' + rn(m.r), key: 'esortie', f: function () { apply(m); } });
   });
-  return c.n + ': ' + (reg.length ? 'tap a glowing place' : 'choose');
+  return reg.length ? 'Tap a glowing place' : c.n + ': choose';
 }
 // ---------------------------------------------------------------- map taps
 function onMapTap(kind, rid, extra, ev, under) {
@@ -382,7 +389,7 @@ function boot() {
   $('#tCards').onclick = function () { openCards(); }; $('#tNat').onclick = openNations; $('#tComp').onclick = openCompany;
   $('#cT').onclick = openCompany; $('#msg').onclick = openLog;
   $('#zin').onclick = function () { MV.zoomBy(1.4); }; $('#zout').onclick = function () { MV.zoomBy(1 / 1.4); }; $('#cD').onclick = function () { openVP('D'); }; $('#cG').onclick = function () { openVP('G'); };
-  $('#scrim').onclick = closeSheet;
+  $('#scrim').onclick = function (e) { closeSheet(e); };
   document.addEventListener('keydown', function (e) { if (e.key === 'Escape') { closeSheet(); } });
   try { GXV.watch(function () { MV.fit(); if (G) render(); }); } catch (e) { addEventListener('resize', function () { MV.fit(); if (G) render(); }); }
   tutMenu();

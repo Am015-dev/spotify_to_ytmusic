@@ -89,7 +89,7 @@ function compass(x, y) {
   return g;
 }
 function setPos(r) { return [r.x, r.y - 6]; }
-function tokPos(rid) { var r = REG[rid]; return r.set ? [r.x, Math.max(52, r.y - 66)] : [r.x, Math.max(52, r.y - 22)]; }
+function tokPos(rid) { var r = REG[rid]; if (r.set && r.y < 118) return [r.x + (r.x > 500 ? -62 : 62), r.y + 4]; return r.set ? [r.x, r.y - 66] : [r.x, Math.max(52, r.y - 22)]; }
 // ---------------------------------------------------------------- dynamic layer
 function tokenSvg(G, rid, side, a, garrison) {
   var p = tokPos(rid); if (garrison) p = [REG[rid].x + 2, REG[rid].y - 4];

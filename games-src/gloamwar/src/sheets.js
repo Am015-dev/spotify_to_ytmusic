@@ -1,6 +1,6 @@
 /* Gloamwar drawers: cards, nations (political track), the Company and the Hunt, the log, region and character info. Menu and rules (gx-help). */
-function openSheet(kind, html) { UI.sheet = kind; var s = $('#sheet'); s.innerHTML = '<h2>' + html.title + '<button class="ib x" type="button" aria-label="Close" onclick="closeSheet()">✕</button></h2>' + html.body; s.classList.add('on'); $('#scrim').classList.add('on'); if (html.wire) html.wire(s); }
-function closeSheet() { UI.sheet = null; $('#sheet').classList.remove('on'); $('#scrim').classList.remove('on'); }
+function openSheet(kind, html) { UI.sheet = kind; UI.sheetAt = Date.now(); var s = $('#sheet'); s.innerHTML = '<h2>' + html.title + '<button class="ib x" type="button" aria-label="Close" onclick="closeSheet()">✕</button></h2>' + html.body; s.classList.add('on'); $('#scrim').classList.add('on'); var app = $('#app'); app.setAttribute('aria-hidden', 'true'); app.inert = true; if (html.wire) html.wire(s); }
+function closeSheet(ev) { if (ev && ev.type === 'click' && Date.now() - (UI.sheetAt || 0) < 450) return; UI.sheet = null; $('#sheet').classList.remove('on'); $('#scrim').classList.remove('on'); var app = $('#app'); app.removeAttribute('aria-hidden'); app.inert = false; }
 function refreshSheet() { var k = UI.sheet; if (k === 'cards') openCards(UI.discardMode); else if (k === 'nations') openNations(); else if (k === 'company') openCompany(); else if (k === 'log') openLog(); }
 var TYPE_NAME = { C: 'Character', A: 'Army', M: 'Muster' };
 var TYPE_ICON = { C: 'char', A: 'army', M: 'muster' };

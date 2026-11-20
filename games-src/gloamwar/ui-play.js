@@ -9,7 +9,7 @@ const VIDEO = process.env.VIDEO, SECS = +(process.env.SECS || 0), SLOW = !!proce
   const shot = async (k) => { if (!SHOTS || shotDone[k]) return; shotDone[k] = 1; await p.waitForTimeout(500); await p.screenshot({ path: path.join(SHOTS, (++shotN) + '-' + k + '.png') }); };
   const errs = []; p.on('pageerror', e => errs.push(e.message));
   await p.goto(SLOW ? url : url + (url.includes('?') ? '&' : '?') + 'fast=1'); await p.waitForTimeout(SLOW ? 2500 : 500); await shot('title');
-  await p.tap(side === 'D' ? '#playD' : '#playG'); await p.waitForTimeout(SLOW ? 2500 : 600); await shot('map');
+  await p.tap(side === 'D' ? '#playD' : '#playG'); await p.waitForTimeout(SLOW ? 2500 : 600); await shot('goal'); if (await p.$('#goalGo')) { await tapSel('#goalGo'); } await p.waitForTimeout(SLOW ? 1500 : 200); await shot('map');
   let gaps = [], taps = 0, moves = 0;
   const tapSel = async (sel) => { const e = await p.$(sel); if (!e) return false; await e.scrollIntoViewIfNeeded().catch(() => {}); const bb = await e.boundingBox(); if (!bb) return false; if (SLOW) await p.waitForTimeout(650); await p.touchscreen.tap(bb.x + bb.width / 2, bb.y + bb.height / 2); taps++; await p.waitForTimeout(SLOW ? 700 : 140); if (SLOW && /mydice/.test(sel)) await shot('die'); if (SLOW && /sheet/.test(sel) === false && /act\[data-key="card"\]/.test(sel)) await shot('cards'); return true; };
   const tapRegion = async (rid) => {   // tap the region polygon at a visible interior point (pan there first)

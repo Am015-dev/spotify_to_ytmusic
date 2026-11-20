@@ -20,7 +20,7 @@ const url = process.argv[2] || 'file://' + path.join(__dirname, 'gloamwar.html')
     if (tgt) { await p.touchscreen.tap(tgt.x, tgt.y); await p.waitForTimeout(900); } else await p.waitForTimeout(500);
     // free-play bits inside the tutorial (army move): finish them like a player would
     const pend = await p.evaluate(() => G && G.pend && sideToAct(G) === 'D' && !UI.hold ? G.pend.h : null);
-    if (pend === 'amove' || pend === 'recruit') { await p.evaluate(() => { const m = AI.move(G, 'normal'); apply(m); }); await p.waitForTimeout(600); }
+    if (pend === 'recruit') { await p.evaluate(() => { const m = AI.move(G, 'normal'); apply(m); }); await p.waitForTimeout(600); }
   }
   const done = await p.evaluate(() => !GXT.active());
   console.log('tutorial steps seen:', seen.join(' > '), '| finished:', done, '| errors:', errs.length ? errs.slice(0, 3).join(' | ') : 'none');
