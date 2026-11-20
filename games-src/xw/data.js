@@ -58,11 +58,13 @@ function randomSquad(f,limit,ex,r){r=r||(n=>Math.floor(Math.random()*n));const p
   for(const e of sq){const slots=PILOTS[e.p].u.slice();for(const s of slots){const ups=upgradesFor(e.p,ex).filter(k=>UPGRADES[k].slot===s&&!e.u.includes(k)&&!(UPGRADES[k].uniq&&used.has(uname(UPGRADES[k])))&&UPGRADES[k].pts+cost<=limit);if(ups.length&&r(3)){const u=ups[r(ups.length)];e.u.push(u);cost+=UPGRADES[u].pts;if(UPGRADES[u].uniq)used.add(uname(UPGRADES[u]));if(UPGRADES[u].addSlot)slots.push(UPGRADES[u].addSlot)}}}
   return sq}
 const CORE_DUEL=[[{p:'kael',u:['u_plasma','u_tinker']}],[{p:'knife',u:[]},{p:'slate',u:[]}]];// the core-set learning battle: one heavy fighter against two light fighters
-// the very first game a new player flies (bench-first.js): the core-set duel, one heavy fighter against two light fighters; no round limit (base rules: fight to destruction)
-const FIRST_GAME={sq:[[{p:'kael',u:['u_plasma']}],[{p:'knife',u:[]},{p:'nightjar',u:[]}]],ex:{}};
+// the quick game a new player flies (bench-first.js): an even 1-vs-1 duel by the points rules, 28 pts vs 28 pts (a hint-following
+// novice wins ~50% on Easy, n=400); no round limit (base rules: fight to destruction). The classic 1-vs-2 duel stays as a battle size.
+const FIRST_GAME={sq:[[{p:'kael',u:[]}],[{p:'varn',u:['u_will']}]],ex:{w1:1}};
 function defaultSquad(f){return f===0?CORE_DUEL[0]:CORE_DUEL[1]}
 const SIZES=[
-  {k:'core',n:'Core duel',d:'1 heavy fighter vs 2 light fighters',squad:(f,ex)=>f===0?CORE_DUEL[0].map(e=>({p:e.p,u:e.u.slice()})):f===1?CORE_DUEL[1].map(e=>({p:e.p,u:[]})):randomSquad(f,36,ex,n=>rnd(n))},
+  {k:'core',n:'Even duel',d:'1 ship each, equal points (28 vs 28)',squad:(f,ex)=>f===0?CORE_DUEL[0].map(e=>({p:e.p,u:e.u.slice()})):f===1?CORE_DUEL[1].map(e=>({p:e.p,u:[]})):randomSquad(f,36,ex,n=>rnd(n))},
+  {k:'classic',n:'Classic duel',d:'1 heavy fighter vs 2 light fighters',squad:(f,ex)=>f===0?CORE_DUEL[0].map(e=>({p:e.p,u:e.u.slice()})):f===1?CORE_DUEL[1].map(e=>({p:e.p,u:[]})):randomSquad(f,36,ex,n=>rnd(n))},
   {k:'sk60',n:'Skirmish 60',d:'random 60-point squadrons',squad:(f,ex)=>randomSquad(f,60,ex,n=>rnd(n))},
   {k:'std',n:'Standard 100',d:'random 100-point squadrons',squad:(f,ex)=>randomSquad(f,100,ex,n=>rnd(n))},
   {k:'custom',n:'Custom squads',d:'build both squadrons yourself (100 points)',squad:(f,ex)=>randomSquad(f,100,ex,n=>rnd(n))}];

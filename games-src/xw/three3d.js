@@ -416,7 +416,7 @@ function drainFx(){while(UI.fx.length){const f=UI.fx.shift();const m=V3.ships[f.
     else if(f.k==='hull'&&m){at(f.id,()=>{sparks(m.position,0xffb060,22);debris(m,5,.6);V3.shake=Math.max(V3.shake,.5);sfx('hull');pop(m,'-'+f.n,'hurt')})}
     else if(f.k==='crit'&&m){at(f.id,()=>{sparks(m.position,0xff4020,40);debris(m,9,.8);flash(m.position.clone().setY(3.6),0xff8040,9,.4);V3.shake=1;sfx('crit');pop(m,'CRIT!','crit')})}
     else if(f.k==='boom'&&m){const id=f.id;const t=Math.max(performance.now(),V3.hitAt[id]||0);V3.anim[id]={boom:true,t0:t,dur:1400};at(id,()=>{boom(m);sfx('boom')})}
-    else if(f.k==='miss'&&m){at(f.id,()=>{pop(m,'MISS','miss');sfx('miss')})}
+    else if(f.k==='miss'&&m){at(f.id,()=>{if(!document.documentElement.classList.contains('bf'))pop(m,'MISS','miss');sfx('miss')})}/* F2: board-first says MISS once, on the dice panel */
     else if(f.k==='token'&&m){pop(m,f.k2==='evade'?'EVADE':'FOCUS','tok');sfx('token')}
     else if(f.k==='lock'){sfx('lock');const d=V3.ships[f.to];if(d)pop(d,'LOCKED','lock')}
     else if(f.k==='stress'&&m){pop(m,'STRESS','hurt');sfx('stress')}
@@ -656,7 +656,16 @@ function loop3D(now){(PH?PH.raf:requestAnimationFrame)(loop3D);if(!V3.on)return;
   // name tags that would collide stack upwards instead of overlapping
   // tags never sit under the score strip / legend at the top of the board: one that would is moved just below them
   let SB=null;try{const cr=V3.r.domElement.getBoundingClientRect();const bt=[document.getElementById('bftop'),document.querySelector('#bf .bfleg')].filter(e=>e&&e.offsetHeight&&!e.hidden).map(e=>e.getBoundingClientRect());if(bt.length)SB={l:Math.min(...bt.map(r=>r.left))-cr.left,r:Math.max(...bt.map(r=>r.right))-cr.left,b:Math.max(...bt.map(r=>r.bottom))-cr.top}}catch(e){}
-  L.sort((a,b)=>b.y-a.y);const done=[];for(const t of L){for(let g=0;g<6;g++){const q=done.find(q=>Math.abs(t.x-q.x)<(t.w+q.w)/2+2&&t.y-t.h<q.y+2&&q.y-q.h<t.y+2);if(!q)break;t.y=q.y-q.h-2}t.y=Math.max(t.h,t.y);if(SB&&t.y-t.h<SB.b+2&&t.x+t.w/2>SB.l&&t.x-t.w/2<SB.r)t.y=SB.b+t.h+4;t.el.style.top=t.y+'px';done.push(t)}
+  // F2: board-first tags hang BELOW their anchor (translate(-50%,0)); elsewhere they sit above it. Each tag takes the first free spot (nearest offset first)
+  // clear of the tags already placed and of every OTHER ship's model, so name plates never stack on each other or on a ship.
+  const BFT=document.documentElement.classList.contains('bf');const top0=t=>BFT?t.y:t.y-t.h;
+  const SC=[];if(G&&typeof BF!=='undefined'&&BF.shipR)for(const s of G.ships){const m=V3.ships[s.id];if(!s.alive||!m)continue;try{const p=m.position.clone().project(V3.camera),c=V3.r.domElement;SC.push({id:s.id,x:(p.x+1)/2*c.clientWidth,y:(1-p.y)/2*c.clientHeight,r:BF.shipR(s)*.8})}catch(e){}}
+  if(G)for(const t of L){t.id=(G.ships.find(s=>V3.labels[s.id]===t.el)||{}).id}
+  const bad=(t,y)=>{const a=BFT?y:y-t.h,b=a+t.h;let v=0;for(const q of done){const qa=top0(q);if(Math.abs(t.x-q.x)<(t.w+q.w)/2+3&&a<qa+q.h+2&&qa<b+2)v+=100}
+    for(const c of SC){if(c.id===t.id)continue;const nx=Math.max(t.x-t.w/2,Math.min(t.x+t.w/2,c.x)),ny=Math.max(a,Math.min(b,c.y));const d=Math.hypot(c.x-nx,c.y-ny);if(d<c.r)v+=c.r-d}
+    if(SB&&a<SB.b+2&&t.x+t.w/2>SB.l&&t.x-t.w/2<SB.r)v+=50;if(a<0)v+=50;return v};
+  L.sort((a,b)=>a.y-b.y);const done=[];for(const t of L){const y0=t.y;let best=[bad(t,y0),y0];if(best[0]>0)for(let k=1;k<=14&&best[0]>0;k++)for(const sg of [1,-1]){const y=y0+sg*k*Math.max(8,t.h*.5);const v=bad(t,y);if(v<best[0])best=[v,y]}
+    t.y=best[1];if(!BFT)t.y=Math.max(t.h,t.y);t.el.style.top=t.y+'px';done.push(t)}
   const ct=document.getElementById('coachtag');if(ct&&ct._v)placeEl(ct,ct._v);
   document.querySelectorAll('#tags .pop').forEach(el=>el._v&&placeEl(el,el._v))}
 

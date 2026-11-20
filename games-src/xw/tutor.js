@@ -100,7 +100,7 @@ function drillStart(){const d=document.getElementById('na-coachend');if(d)d.remo
 function drillR3(){if(TUT.r3)return;TUT.r3=true;for(const s of G.ships){const to=DRILL_R3[s.side===0?'me':'foe'];const from={x:s.x,y:s.y,h:s.h};Object.assign(s,to);try{fx('move',{id:s.id,path:[from,{x:s.x,y:s.y,h:s.h}],dur:500})}catch(e){}}BF.key='';BF.fkey='';setTimeout(render,0)}
 function drillEnd(){if(document.getElementById('na-coachend'))return;NCH.on=false;NCH.finished=true;TUT.coach=false;clearTimeout(NCH.tm);const c=document.getElementById('na-coach');if(c)c.hidden=true;
   const d=document.createElement('div');d.id='na-coachend';d.className='gxt-end';d.setAttribute('data-help','');d.setAttribute('role','dialog');d.setAttribute('aria-modal','true');
-  d.innerHTML='<div class="gxt-endc"><div class="gxt-et">'+LORE.drillEnd.t+'</div><div class="gxt-ex">'+LORE.drillEnd.s+'</div>'+realGameHTML()
+  d.innerHTML='<div class="gxt-endc">'+'<button type="button" class="na-endx" data-na="endx" aria-label="Close and look at the board">\u2715</button>'+'<div class="gxt-et">'+LORE.drillEnd.t+'</div><div class="gxt-ex">'+LORE.drillEnd.s+'</div>'+realGameHTML()
     +'<div class="gxt-eb">'+(NCH.o&&NCH.first?'<button type="button" class="gxt-b pri" data-na="chapter">Start chapter 1</button>':'<button type="button" class="gxt-b pri" data-na="play">Play a real game</button><button type="button" class="gxt-b" data-na="story">Story mode</button>')+'</div></div>';
   document.body.appendChild(d)}
 // during the drill the off-mat moves carry a red cross, and the edge step points at one of them
@@ -173,16 +173,19 @@ function coachTick(){if(!NCH.on||!G||!G.tut)return;if(tutScripted()&&NCH.cur&&NC
 {const o=render;render=function(){const r=o.apply(this,arguments);try{coachTick()}catch(e){console.error(e)}return r}}
 document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest('[data-na]');if(!b)return;const k=b.dataset.na;
   if(k==='dismiss')coachHide();
+  else if(k==='endx'){const d=document.getElementById('na-coachend');if(d)d.remove();try{BF.key='';render()}catch(_){}}   // F2: the end card closes; Play again / Debrief on the board work
   else if(k==='drill')drillStart();
   else if(k==='leave'){tutLeave();lsPlayed();UI.info=true;render()}
   else if(k==='play'||k==='story'||k==='chapter'){const o=NCH.first;coachReset();tutLeave();lsPlayed();
     if(k==='chapter'&&o){GXC.play(o.id)}else if(k==='story'&&typeof GXC!=='undefined'){UI.info=true;render();GXC.open()}else{try{BF.seenBrief=null;PHN.briefSeen=null}catch(e){}startGame('solo')}}},true);
+// F2: Play again after the lesson's battle leaves the lesson first (nothing of it carries into the new game)
+document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest('[data-a="new"]');if(!b||!TUT.on||!G||!G.tut)return;const d=document.getElementById('na-coachend');if(d)d.remove();coachReset();tutLeave();lsPlayed()},true);
 // the duel's end: the real numbers walked through, then the flight drill
 function coachEnd(){if(document.getElementById('na-coachend')||!NCH.on)return;NCH.on=false;clearTimeout(NCH.tm);const c=document.getElementById('na-coach');if(c)c.hidden=true;NCH.finished=true;
   const mine=G.ships.filter(x=>x.side===0),foe=G.ships.filter(x=>x.side===1),won=G.winner==='P1';
   const hp=a=>a.filter(x=>x.alive).reduce((t,x)=>t+Math.max(0,x.hull-hullDmg(x))+x.sh,0);
   const d=document.createElement('div');d.id='na-coachend';d.className='gxt-end';d.setAttribute('data-help','');d.setAttribute('role','dialog');d.setAttribute('aria-modal','true');
-  d.innerHTML='<div class="gxt-endc"><div class="gxt-et">'+(won?LORE.coachEnd.win:LORE.coachEnd.lose)+'</div><div class="gxt-ex"><b>Your numbers</b><br>Your ships left: '+mine.filter(x=>x.alive).length+' (hull and shields '+hp(mine)+'). Rival ships left: '+foe.filter(x=>x.alive).length+'. Rounds: '+G.round+'.<br>'+esc(winLine())+'<br>A battle ends when one side has no ships left.</div>'
+  d.innerHTML='<div class="gxt-endc">'+'<button type="button" class="na-endx" data-na="endx" aria-label="Close and look at the board">\u2715</button>'+'<div class="gxt-et">'+(won?LORE.coachEnd.win:LORE.coachEnd.lose)+'</div><div class="gxt-ex"><b>Your numbers</b><br>Your ships left: '+mine.filter(x=>x.alive).length+' (hull and shields '+hp(mine)+'). Rival ships left: '+foe.filter(x=>x.alive).length+'. Rounds: '+G.round+'.<br>'+esc(winLine())+'<br>A battle ends when one side has no ships left.</div>'
     +realGameHTML()+'<div class="gxt-ex">'+LORE.drillNext+'</div>'
     +'<div class="gxt-eb"><button type="button" class="gxt-b pri" data-na="drill">Flight drill</button></div></div>';
   document.body.appendChild(d);TUT.coach=false}

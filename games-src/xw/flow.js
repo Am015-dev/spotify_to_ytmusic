@@ -69,6 +69,18 @@ function whyNot(s,e){if(s.flags.noAtk)return 'it is sitting on an asteroid, so i
   const r=arcReach(s,B(s),e,B(e),s.arc);if(!r){const rr=rangeOf(baseDist(s,B(s),e,B(e)));return rr<=3?`outside the firing arc (it is at range ${rr}, but not in front)`:'outside the firing arc and too far'}
   const rg=rangeOf(r.d);if(rg>3)return 'too far: range 4 or more (weapons reach range 1-3)';
   return 'protected: a guardian pilot next to it draws the fire'}
+// F2: the same reason in one short line for the board (8 words or so), for the nearest enemy
+function whyShort(s,e0){if(s.flags.noAtk)return 'It sits on an asteroid: no shooting this round.';const dc=s.dmg.find(x=>x.up&&DAMAGE[x.c].k==='noatk');if(dc)return 'A damage card jams its guns.';
+  const en=enemiesOf(s);if(!en.length)return 'No enemies left.';const e=e0||en.slice().sort((a,b)=>baseDist(s,B(s),a,B(a))-baseDist(s,B(s),b,B(b)))[0];const n=typeof shortName==='function'?shortName(e):e.name;
+  if(G.touch.some(p=>(p[0]===s.id&&p[1]===e.id)||(p[1]===s.id&&p[0]===e.id))&&!exTouchOK(s,e))return `Touching ${n}: touching ships can't shoot.`;
+  const r=arcReach(s,B(s),e,B(e),s.arc);if(!r){const rr=rangeOf(baseDist(s,B(s),e,B(e)));return rr<=3?`${n} is not in front of you (out of arc).`:`${n} is out of arc and out of range.`}
+  if(rangeOf(r.d)>3)return `${n} is out of range (range 4+).`;return `${n} is guarded: an escort draws the fire.`}
+// F2: what Auto picked, in a few words (same evaluation as the ★ suggestion)
+function autoWhy(s,i){const m0=dialOf(s)[i],b=B(s),p=finalPose(s,b,m0);const en=enemiesOf(s);const N=e=>typeof shortName==='function'?shortName(e):e.name;
+  if(offMat(s,m0))return 'the only move left';const mine=en.map(e=>{const r=arcReach(p,b,e,B(e),s.arc);return r&&rangeOf(r.d)<=3?{e,rg:rangeOf(r.d)}:null}).filter(Boolean).sort((x,y)=>x.rg-y.rg);
+  const theirs=en.filter(e=>{const q=arcReach(e,B(e),p,b,e.arc);return q&&rangeOf(q.d)<=3});const rk=rockHits(s,m0)?' (clips a rock)':'';
+  if(mine.length&&!theirs.length)return `${N(mine[0].e)} in your sights, you stay clear`+rk;if(mine.length)return `aims at ${N(mine[0].e)} at range ${mine[0].rg}`+rk;
+  if(!theirs.length)return 'stays out of their sights'+rk;return 'the best of a bad spot'+rk}
 function noShotText(s){const en=enemiesOf(s);const why=en.length?en.map(e=>`${nm(e)} is ${whyNot(s,e)}`).join('; '):'no enemies left';
   return `<b>${nm(s)}${youTag(s)} can't shoot this round.</b> ${s.flags.noAtk?'It is sitting on an asteroid, so it can\'t attack.':why.charAt(0).toUpperCase()+why.slice(1)+'.'}`}
 // combat skips ships without a target without a word: note them (and pause in guided mode) before the skip happens

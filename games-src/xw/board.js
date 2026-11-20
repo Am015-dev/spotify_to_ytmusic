@@ -42,7 +42,7 @@ function fit(pts,minW,side,topPad,botPad){if(!v3()||!pts.length)return;const C=V
 const XY=s=>({x:s.x,y:s.y});
 function around(s,r){r=r||B(s)*1.2;return [{x:s.x-r,y:s.y-r},{x:s.x+r,y:s.y+r}]}
 function framePts(k){const all=alive();const pts=[];const add=a=>{for(const p of a)pts.push(p)};
-  if(k==='plan'&&BF.sel){const s=ship(BF.sel);add(around(s,B(s)*.9));dialOf(s).forEach(m=>{const p=finalPose(s,B(s),m);add(around(p,B(s)*.75))});return dialOn()?{pts,min:200,sd:20,tp:60,bp:270}:{pts,min:200,sd:30,tp:104}}
+  if(k==='plan'&&BF.sel){const s=ship(BF.sel);add(around(s,B(s)*.9));dialOf(s).forEach(m=>{const p=finalPose(s,B(s),m);add(around(p,B(s)*.75))});return dialOn()?{pts,min:200,sd:20,tp:60,bp:dialRows(s).length*48+130}:{pts,min:200,sd:30,tp:104}}
   if(k==='action'||k==='sub'){const s=ship(G.cur);add(around(s,B(s)*1.6));if(k==='sub'&&BF.sub){if(BF.sub.opts)BF.sub.opts.forEach(o=>o.p&&add(around(o.p,B(s)*.8)));if(BF.sub.targets)BF.sub.targets.forEach(id=>add(around(ship(id))))}return {pts,min:400}}
   if(k==='target'){const s=ship(G.cur);add(around(s));for(const w of weaponsFor(s))for(const t of w.targets)add(around(ship(t.id)));return {pts,min:380}}
   if(k==='dice'&&G.atk){add(around(ship(G.atk.a),B(ship(G.atk.a))*1.3));add(around(ship(G.atk.d),B(ship(G.atk.d))*1.3));return {pts,min:240,tp:60,bp:Math.min(300,Math.round(innerHeight*.34))}}
@@ -83,6 +83,9 @@ function release(){const w=BF.wave;BF.wave=null;slowDown();if(!w)return;const id
   if(ids.length>1)banner('<b>Ships move</b><span>Lowest skill first</span>',reveal+tot*.6)}
 function maybeRelease(){if(!BF.wave)return;if(!stepTwo()||humanTurn()||performance.now()-BF.wave.t0>7000)release()}
 // ---- one-line text, banners, pops ----
+function nudge(t){if(!ov)return;let n=document.getElementById('bfnudge');if(!n){n=document.createElement('div');n.id='bfnudge';n.setAttribute('role','status');n.setAttribute('aria-live','assertive');ov.appendChild(n)}
+  n.textContent=t;n.style.bottom=((bar&&!bar.hidden?bar.offsetHeight:90)+8)+'px';n.hidden=false;n.classList.remove('go');void n.offsetWidth;n.classList.add('go');clearTimeout(BF.nudgeT);BF.nudgeT=setTimeout(()=>{n.hidden=true},1800)}
+BF.nudge=t=>nudge(t);
 function setHint(t){if(hint&&hint.innerHTML!==t)hint.innerHTML=t}
 // owner rule (8 Nov): a message stays at least 4 s plus 1 s per 10 words; one at a time; a newer one waits its turn (latest 2 kept)
 function readMs(h){const w=String(h).replace(/<[^>]+>/g,' ').trim().split(/\s+/).filter(Boolean).length;return 4000+w*100}
@@ -95,7 +98,7 @@ function placeBan(){if(!ban||ban.hidden||ban.querySelector('[data-keep]')){if(ba
   const m=8,bt=bar&&!bar.hidden?bar.getBoundingClientRect().top-o.top:Ht;ban.style.transition='none';ban.style.maxWidth=(Wd-2*m)+'px';ban.style.transform='none';ban.style.left='0px';const w=ban.offsetWidth,h=ban.offsetHeight;
   const rs=[];for(const s of alive()){try{const p=XY(s),q=px(p.x,p.y,1);rs.push([q[0]+dx,q[1]+dy,shipR(s)*1.15+4])}catch(e){}}
   const tg=[];document.querySelectorAll('#tags .tag').forEach(t=>{if(t.hidden||getComputedStyle(t).display==='none')return;const q=t.getBoundingClientRect();if(q.width)tg.push([q.left-o.left-4,q.top-o.top-4,q.right-o.left+4,q.bottom-o.top+4])});
-  const hd=[];document.querySelectorAll('#bfdice,.bftgt,.bftlab').forEach(t=>{if(t.hidden||t.closest('[hidden]')||getComputedStyle(t).display==='none')return;const q=t.getBoundingClientRect();if(q.width>2)hd.push([q.left-o.left-4,q.top-o.top-4,q.right-o.left+4,q.bottom-o.top+4])});
+  const hd=[];document.querySelectorAll('#bfdice,.bftgt,.bftlab,.bfact,#bfdial').forEach(t=>{if(t.hidden||t.closest('[hidden]')||getComputedStyle(t).display==='none')return;const q=t.getBoundingClientRect();if(q.width>2)hd.push([q.left-o.left-4,q.top-o.top-4,q.right-o.left+4,q.bottom-o.top+4])});
   const hardHit=(x,y)=>{let a=0;for(const q of hd){const ox=Math.min(x+w,q[2])-Math.max(x,q[0]),oy=Math.min(y+h,q[3])-Math.max(y,q[1]);if(ox>0&&oy>0)a+=(Math.min(ox,oy)+1)*40}return a};
   const hit=(x,y)=>{let a=hardHit(x,y);for(const r of rs){const nx=Math.max(x,Math.min(x+w,r[0])),ny=Math.max(y,Math.min(y+h,r[1])),d=Math.hypot(r[0]-nx,r[1]-ny);if(d<r[2])a+=r[2]-d}for(const q of tg){const ox=Math.min(x+w,q[2])-Math.max(x,q[0]),oy=Math.min(y+h,q[3])-Math.max(y,q[1]);if(ox>0&&oy>0)a+=Math.min(ox,oy)+1}return a};
   const left=Math.max(m,Math.min(Wd-w-m,(Wd-w)/2)),yB=Math.max(m,bt-h-6);let best=null;
@@ -111,7 +114,8 @@ BF.placeCoach=function(e){if(!e||e.hidden||!ov||!(typeof v3==='function'&&v3()&&
   const bt=bar&&!bar.hidden?bar.getBoundingClientRect().top:o.bottom,lo=Math.max(o.top+m,8),hi=Math.max(lo,bt-h-6),hi2=Math.max(hi,o.bottom-h-m);
   const rr=[];try{for(const c of BF.circ()){const R=c[2]*1.15+6;rr.push([c[0]-R,c[1]-R,c[0]+R,c[1]+R])}}catch(x){}
   document.querySelectorAll('#tags .tag').forEach(t=>{if(getComputedStyle(t).display==='none')return;const q=t.getBoundingClientRect();if(q.width)rr.push([q.left-4,q.top-4,q.right+4,q.bottom+4])});
-  document.querySelectorAll('.bfact,.bftgt,.bfm,[data-bf],#bffing').forEach(t=>{if(t.closest('#na-coach')||t.closest('[hidden]'))return;const q=t.getBoundingClientRect();if(q.width>4&&q.height>4&&q.width<o.width*.9)rr.push([q.left-2,q.top-2,q.right+2,q.bottom+2,.01])});
+  document.querySelectorAll('.bfact,.bftgt,.bfm,[data-bf],#bffing').forEach(t=>{if(t.closest('#na-coach')||t.closest('[hidden]'))return;const q=t.getBoundingClientRect();if(q.width>4&&q.height>4&&q.width<o.width*.9)rr.push([q.left-2,q.top-2,q.right+2,q.bottom+2,t.matches('.bfm,.bfact,.bftgt')?6:.01])});/* F2: never over the move or action chips */
+  document.querySelectorAll('#bfdice,#bfdial,#bfbar,#bfnudge').forEach(t=>{if(t.hidden||t.closest('[hidden]'))return;const q=t.getBoundingClientRect();if(q.width>4&&q.height>4)rr.push([q.left-4,q.top-4,q.right+4,q.bottom+4,6])});
   const l=e.getBoundingClientRect(),x0=l.left,x1=l.right;
   const area=y=>{let a=0;for(const q of rr){const ox=Math.min(x1,q[2])-Math.max(x0,q[0]),oy=Math.min(y+h,q[3])-Math.max(y,q[1]);if(ox>0&&oy>0)a+=ox*oy*(q[4]||1)}return a};
   const ys=[];for(let y=Math.min(Math.max(50,lo),hi);y<=hi;y+=8)ys.push(y);for(let y=Math.min(Math.max(50,lo),hi)-8;y>=lo;y-=8)ys.push(y);for(let y=hi+8;y<=hi2;y+=8)ys.push(y);
@@ -143,7 +147,7 @@ function bfRender(){const on=want();if(on!==BF.on){BF.on=on;R.classList.toggle('
   if(!play){R.classList.remove('bf-sheet');clear();BF.key='';bar.hidden=true;top.innerHTML='';top._h='';fing.hidden=true;return}bar.hidden=false;
   maybeRelease();
   // my ship had nobody to shoot: say so on the board, with the fix
-  {const N=(UI.notes&&UI.notes[G.round])||[];for(const n of N){if(n.kind==='noshot'&&!n.bf){n.bf=1;const s=ship(n.id);if(s&&mineS(s))banner(`<b>No enemy ahead</b><span>${esc(shortName(s))} only shoots ahead. Next time pick a 🎯 move.</span>`,1500);BF.noshotT=1}}}
+  {const N=(UI.notes&&UI.notes[G.round])||[];for(const n of N){if(n.kind==='noshot'&&!n.bf){n.bf=1;const s=ship(n.id);if(s&&mineS(s)){const w=whyShort(s);BF.lastNo={r:G.round,t:w};banner(`<b>${esc(shortName(s))} can't shoot</b><span>${esc(w)}</span>`,1500)}BF.noshotT=1}}}
   // the round summary between rounds is a board banner here, not a page of text
   if(sumPending()){UI.sumSeen=G.round-1;banner(`<b>Round ${G.round}</b>`,1100)}
   const k=ctx();if(BF.noshotT&&ban&&['dice','res','target','plan'].includes(k)&&performance.now()>=(BF.banUntil||0)){ban.hidden=true;BF.noshotT=0}
@@ -161,7 +165,7 @@ function bfRender(){const on=want();if(on!==BF.on){BF.on=on;R.classList.toggle('
   else if(k==='dice')diceUI();else if(k==='res')resUI();else if(k==='note')noteUI();else if(k==='over')overUI();else if(k==='ask')askUI();else if(k==='fly')setHint('');else watchUI(s);try{ghost3D()}catch(e){console.error(e)}}
 // "whose turn, doing what": one short banner each time the turn changes hands (the lesson has its own bubbles)
 function turnBanner(k){if(typeof tutOn==='function'&&tutOn())return;if(!G||G.winner||G.round<1||UI.hold||BF.wave)return;const s=G.cur&&ship(G.cur);let id='',h='';const T=LORE.turn;
-  if(k==='plan'){id='p'+G.round;h=`<b>${T.plan[0].replace('{r}',G.round)}</b><span>${T.plan[1]}</span>`}
+  if(k==='plan'){id='p'+G.round;const ln=BF.lastNo&&BF.lastNo.r===G.round-1?BF.lastNo.t:'';h=`<b>${T.plan[0].replace('{r}',G.round)}</b><span>${ln?`No shot last round: ${esc(ln)}`:T.plan[1]}</span>`}/* F2: the no-shot reason is repeated here, the round banner would otherwise replace it at once */
   else if((k==='action'||k==='sub')&&s){id='a'+G.round+G.cur;h=`<b>${T.mine}</b><span>${esc(shortName(s))} flew. Now pick an action.</span>`}
   else if(k==='target'&&s){id='t'+G.round+G.cur;h=`<b>${T.mine}: ${T.combat}</b><span>${esc(shortName(s))} can shoot. Pick a target.</span>`}
   else if(k==='watch'&&s&&!mineS(s)){id='w'+G.round+G.phase+G.cur;h=`<b>${T.rival}</b><span>${esc(shortName(s))} ${G.step===3?'takes aim':'moves'}</span>`}
@@ -206,15 +210,25 @@ function dialSpin(snap){const el=BF.dial,L=BF.dlist;if(!el||!L||!L.length)return
   el.querySelectorAll('.ditem').forEach(it=>{const a=+it.dataset.k*st+BF.drot;it.classList.toggle('on',+it.dataset.k===k)});
   el.querySelector('.dface').style.setProperty('--rot',BF.drot+'rad');
   const s=ship(BF.sel);if(!s)return;const o=L[k];if(UI.draft[s.id]!==o.i){UI.draft[s.id]=o.i;try{sfx('click');GX.buzz(8)}catch(e){}if(snap||true){BF.dkeep=1;render()}}}
+// F2: the dial is always drawn upright, like the printed dial: up = the ship's nose, rows = speed, columns = turn/bank/straight/bank/turn/K.
+// The ship's real facing on screen is shown apart (the 'nose' badge), and the board previews where the move ends, with any bump or rock.
+const DCOL=m=>m.t==='K'?6:m.t==='S'?3:m.t==='B'?(m.d<0?2:4):(m.d<0?1:5);
+function dialRows(s){return [...new Set(dialList(s).map(o=>o.m.s))].sort((a,b)=>b-a)}
+// a move whose end overlaps another ship's base right now: it may bump (the other ship can still move first) and loses its action
+function bumpWho(s,m){if(!m||m.s===0)return null;const b=B(s),p=finalPose(s,b,m);return alive().find(o=>o!==s&&polyOverlap(corners(p,b),corners(o,B(o))))||null}
+// the firing arc and range 1-3 drawn from where a move ends (faint), so the player sees what they could shoot from there
+function arcW(s,p){const b=B(s),f=fwd(p.h),F=add(p,mul(f,b/2)),l=leftOf(p.h),a0=Math.PI*40/180,R=RANGE*3;const pts=[add(F,mul(l,b/2))];
+  for(let j=0;j<=10;j++){const a=p.h+a0-(2*a0)*j/10;pts.push(add(F,V(Math.cos(a)*R,Math.sin(a)*R)))}pts.push(sub(F,mul(l,b/2)));pts.push(pts[0]);pathW(pts,'bfarc',.2)}
 function dialPlan(s,all){const b=B(s),L=dialList(s),pick0=UI.draft[s.id];let pick=pick0;const sug=suggestDial(s);
   if(pick==null||!L.some(o=>o.i===pick)){pick=sug>=0&&L.some(o=>o.i===sug)?sug:L[0].i;UI.draft[s.id]=pick}
-  const el=dialEl(),face=el.querySelector('.dface'),key=G.round+'|'+sug+'|'+s.id+':'+L.map(o=>o.i).join(',')+'@'+Math.round(shipDeg(s)/5);BF.dlist=L;BF.dstep=2*Math.PI/Math.max(L.length,8);
-  if(BF.dkey!==key){BF.dkey=key;face.innerHTML=L.map((o,k)=>{const c=exColor(s,o.m).c;const rk=rockHits(s,o.m)||offMat(s,o.m);return `<div class="ditem ${c}${rk?' danger':''}${o.i===sug?' sug':''}" data-k="${k}">${mvLabel(o.m,s)}</div>`}).join('');BF.drot=-L.findIndex(o=>o.i===pick)*BF.dstep}
+  const el=dialEl(),face=el.querySelector('.dface'),key=G.round+'|'+sug+'|'+s.id+':'+L.map(o=>o.i).join(',');BF.dlist=L;BF.dstep=2*Math.PI/Math.max(L.length,8);const rows=dialRows(s);
+  if(BF.dkey!==key){BF.dkey=key;face.innerHTML=L.map((o,k)=>{const c=exColor(s,o.m).c;const rk=rockHits(s,o.m)||offMat(s,o.m)||bumpWho(s,o.m);return `<div class="ditem ${c}${rk?' danger':''}${o.i===sug?' sug':''}" data-k="${k}" style="grid-row:${rows.indexOf(o.m.s)+1};grid-column:${DCOL(o.m)}" aria-label="${esc(mvWords(o.m))}">${mvLabel(o.m,s,0)}${o.i===sug?'<em class="st">★</em>':''}</div>`}).join('');BF.drot=-L.findIndex(o=>o.i===pick)*BF.dstep}
   if(pick0==null||!L.some(o=>o.i===pick0))BF.drot=-L.findIndex(o=>o.i===pick)*BF.dstep;/* a fresh dial opens ON the ★ move: the wheel's old rotation from last round must not pick for you */
   el.hidden=false;el.style.setProperty('--dbar',((bar?bar.offsetHeight:114)+8)+'px');dialSpin(false);
-  const m=dialOf(s)[pick],c=exColor(s,m).c,om=offMat(s,m),rk=om?0:rockHits(s,m);let aim=false;try{aim=!rk&&!om&&inArcOf(s,finalPose(s,b,m)).length>0}catch(e){}
-  el.querySelector('.dwin').innerHTML=`<span class="dmv ${c}">${mvLabel(m,s)}</span><span class="dwd">${esc(mvWords(m))}${om?' · <b class="rk om">off mat!</b>':rk?' · <b class="rk">rock!</b>':aim?' · 🎯':''}${m.c==='r'?' · <b class="r">stress</b>':''}</span>`;
-  pathW(tplPoints(s,b,m,4),'bfp on '+c);ghostW(s,m,c+' on',true);item('','bfring sel',{ship:s.id,ring:true,tag:'div'});
+  const m=dialOf(s)[pick],c=exColor(s,m).c,om=offMat(s,m),rk=om?0:rockHits(s,m),bw=om?null:bumpWho(s,m);let aim=[];try{aim=!rk&&!om?inArcOf(s,finalPose(s,b,m)):[]}catch(e){}
+  const warn=om?'<b class="rk om">Off the mat: ship lost!</b>':bw?`<b class="rk">May bump ${esc(shortName(bw))}: no action</b>`:rk===2?'<b class="rk">Lands on a rock: roll damage, no shot</b>':rk?'<b class="rk">Clips a rock: roll damage</b>':aim.length?`🎯 ${esc(shortName(aim[0].e))} in your sights, range ${aim[0].rg}`:'No enemy in your sights';
+  el.querySelector('.dwin').innerHTML=`<span class="dnose" title="Where your ship points on the board"><i style="transform:rotate(${shipDeg(s)}deg)">▲</i><small>nose</small></span><span class="dtx"><span class="dmv ${c}">${mvLabel(m,s,0)} <span class="dwd">${esc(mvWords(m))}${m.c==='r'?' · <b class="r">stress</b>':m.c==='g'?' · easy':''}</span></span><span class="dws">${warn}</span></span>`;
+  pathW(tplPoints(s,b,m,4),'bfp on '+c);const gp=ghostW(s,m,c+' on',true);if(!om)try{arcW(s,gp)}catch(e){}item('','bfring sel',{ship:s.id,ring:true,tag:'div'});
   setHint(`Tap a move for ${esc(shortName(s))}`);
   setBtns(`<button class="btn" data-bf="dclose" aria-label="Close the dial">✕</button><button class="btn primary big" data-bf="dlock">Lock move ✓</button>`);el.style.setProperty('--dbar',((bar?bar.offsetHeight:114)+8)+'px');finger(null)}
 function actionUI(s){if(!s)return;const acts=actionsFor(s);const rec=recAct(s);
@@ -236,15 +250,16 @@ function targetUI(s){if(!s)return;try{rangeBands(s)}catch(e){console.error(e)}co
   for(const o of opts){const j=per[o.d.id]=(per[o.d.id]||0)+1;const p=XY(o.d);const a0=shownXY(s);pathW([a0,p],'bfshot aim');
     const it=item(`<span>${o===best?'★':''}🎯</span><i>${o.n}<small>vs</small>${o.m}</i>${o.w.k!=='P'?`<em>${esc(o.w.n.split(' ')[0])}</em>`:''}`,'bftgt'+(o===best?' rec':''),{ship:o.d.id,dy:j>1?1.1*(j-1):0,data:{bfw:o.w.k,bft:o.d.id},label:`Shoot ${o.d.name}: ${o.n} attack dice against ${o.m} defence`});if(o===best)finger(it.el)}
   {const o=best;if(o){let rg='';try{const r=arcReach(s,B(s),o.d,B(o.d),s.arc);rg=r?rangeOf(r.d):''}catch(e){}item(esc(`Fire at ${shortName(o.d)}${rg?` · range ${rg}`:''} · ${o.n} dice vs ${o.m}`),'bftlab',{ship:o.d.id,dy:-1.9,tag:'div'})}}
-  setHint(opts.length?'Tap a glowing enemy to shoot':'No enemy in your arc');
+  for(const e of enemiesOf(s)){if(opts.some(o=>o.d.id===e.id))continue;const w=whyShort(s,e);const t=/out of arc and/.test(w)?'out of arc & range':/out of arc/.test(w)?'out of arc':/out of range/.test(w)?'out of range':/Touching/.test(w)?'touching':/guarded/.test(w)?'guarded':'';if(t)item(t,'bfwhy',{ship:e.id,dy:-1.15,tag:'div'})}
+  setHint(opts.length?'Tap a glowing enemy to shoot':esc(whyShort(s)));
   setBtns(`<button class="btn" data-act="fire" data-w="skip">Hold fire</button>`)}
 function diceBox(A,res){const a=ship(A.a),d=ship(A.d);const r=res?{hits:0,crits:0}:preview(A);const rolled=!!(A.def&&A.def.length)||A.step!=='amod';
   const dd=(A.def||[]).map(f=>die(f,'def')).join('');
   const nm2=x=>mineS(x)?'You':esc(shortName(x));
   let out='';if(res){const R=res;out=R.dead?`<b class="kill">${nm2(d)==='You'?'YOU ARE':esc(shortName(d))} DESTROYED!</b>`:R.dmg?`<b class="hit">−${R.dmg} ${mineS(d)?'to you':'to '+esc(shortName(d))}</b>`:`<b class="miss">${mineS(d)?'You dodged!':'Missed!'}</b>`}
   else out=`<b class="${r.hits+r.crits?'hit':'miss'}">${r.hits+r.crits} hit${r.hits+r.crits===1?'':'s'}</b><small>${A.step==='amod'?'before the dodge roll':'get through'}</small>`;
-  return `<div class="bfd-h"><span class="${mineS(a)?'y':'e'}">${nm2(a)}</span> <i>${mineS(a)?'shoot':'shoots'}</i> ➜ <span class="${mineS(d)?'y':'e'}">${nm2(d)}</span></div><div class="bfd-r atk"><span class="who">ATTACK</span><div class="dice">${(res?res.dice:A.dice).map(f=>die(f,'atk')).join('')}</div></div>
-  <div class="bfd-out">${out}</div>
+  return `${res?`<div class="bfd-out top">${out}</div>`:''}<div class="bfd-h"><span class="${mineS(a)?'y':'e'}">${nm2(a)}</span> <i>${mineS(a)?'shoot':'shoots'}</i> ➜ <span class="${mineS(d)?'y':'e'}">${nm2(d)}</span></div><div class="bfd-r atk"><span class="who">ATTACK</span><div class="dice">${(res?res.dice:A.dice).map(f=>die(f,'atk')).join('')}</div></div>
+  ${res?'':`<div class="bfd-out">${out}</div>`}
   <div class="bfd-r def"><span class="who">DODGE</span><div class="dice">${res?res.def.map(f=>die(f,'def')).join(''):dd||(rolled?'<i class="muted">no dice</i>':'<i class="muted">rolls next</i>')}</div></div>`}
 function shotLine(aId,dId){const a=ship(aId),d=ship(dId);if(!a||!d)return;pathW([shownXY(a),shownXY(d)],'bfshot fire',2.5)}
 function diceUI(){const A=G.atk;if(!A)return watchUI();if(BF.loose&&BF.looseK!==A.a+'>'+A.d+G.round)dropLoose();BF.looseK=A.a+'>'+A.d+G.round;const a=ship(A.a),d=ship(A.d);shotLine(A.a,A.d);dice.innerHTML=diceBox(A);dice.hidden=false;dice.className='';
@@ -277,7 +292,7 @@ function looseDice(R){if(BF.looseT===R.t)return;dropLoose();BF.looseT=R.t;BF.loo
 function critCards(R){if(!R.crits||!R.crits.length||BF.critT===R.t||typeof DAMAGE==='undefined')return;BF.critT=R.t;R.crits.forEach((c,i)=>{const D=DAMAGE[c];if(!D)return;
   const it=item(`<div class="in" style="animation-delay:${(.45+i*.5).toFixed(2)}s"><div class="cb">✦</div><div class="cf"><b>${esc(D.n)}</b><span>${esc(String(D.t).split('. ')[0].slice(0,70))}</span></div></div>`,'bfcard',{ship:R.d,dy:-1.9-i*1.2,tag:'div',tmp:true});
   setTimeout(()=>{it.el.remove();BF.items=BF.items.filter(x=>x!==it)},5200)})}
-function resUI(){const R=UI.hold.R;try{looseDice(R);critCards(R)}catch(e){console.error(e)}{const el=document.createElement('div');el.className='bfdmg '+(R.dmg?'hit':'miss');el.textContent=R.dead?'💥':R.dmg?'−'+R.dmg:'MISS';lay.appendChild(el);const it={el,ship:R.d,dy:-.6,tmp:true};BF.items.push(it);setTimeout(()=>{el.remove();BF.items=BF.items.filter(x=>x!==it)},2600)}shotLine(R.a,R.d);dice.innerHTML=diceBox({a:R.a,d:R.d,dice:R.dice,def:R.def,step:'done'},R);dice.hidden=false;dice.className='res';setHint('Tap to continue');setBtns('');
+function resUI(){const R=UI.hold.R;try{looseDice(R);critCards(R)}catch(e){console.error(e)}shotLine(R.a,R.d);dice.innerHTML=diceBox({a:R.a,d:R.d,dice:R.dice,def:R.def,step:'done'},R);dice.hidden=false;dice.className='res';setHint('Tap to continue');setBtns('');
   const d=ship(R.d);if(d&&R.dmg)sfx(R.dead?'boom':'hull')}
 function noteUI(){const n=UI.hold.n;const s=n&&ship(n.id);setHint(s?`${esc(shortName(s))}: ${n.kind==='noshot'?'no enemy to shoot':'…'}`:'');setBtns('')}
 function autoHold(k){if(BF.holdT)return;const ms=k==='res'?3200:1500;BF.holdT=setTimeout(()=>{BF.holdT=0;if(typeof tutHold==='function'&&tutHold(k))return;if(UI.hold&&BF.on)releaseHold()},ANIM?ms*(UI.speed==='slow'?1.5:UI.speed==='fast'?.6:1):0)}
@@ -287,10 +302,11 @@ function askUI(){const q=G.q;setHint(esc(q.title));let any=false;q.opts.forEach(
 function watchUI(s){const st=G.step;let t='';if(G.phase==='plan')t='Waiting for the other player…';else if(s&&!mineS(s))t=st===3?`⏳ Rival’s turn: ${esc(shortName(s))} takes aim`:`⏳ Rival’s turn: ${esc(shortName(s))} moves`;else if(st===3)t='Combat!';
   setHint(t);setBtns(UI.paused?`<button class="btn primary" data-a="pause">▶ Resume</button>`:'')}
 // ---- taps ----
-function onClick(e){if(e.target.closest('#bfdice')&&!e.target.closest('[data-bfq]')){if(G&&G.phase==='ask'&&G.q&&G.q.key==='dice'){const dd=[...dice.querySelectorAll('[data-bfq].pick')];const hit=dd.find(x=>{const r=x.getBoundingClientRect();return e.clientX>=r.left-10&&e.clientX<=r.right+10&&e.clientY>=r.top-10&&e.clientY<=r.bottom+10});if(hit){e.preventDefault();hit.click()}return}if(typeof tutOn==='function'&&tutOn()&&!tutGate({what:'dicebox'}))return;const b=btns.querySelector('.btn.primary')||btns.querySelector('.btn');if(b&&!b.disabled){e.preventDefault();b.click();return}if(UI.hold){if(BF.holdT){clearTimeout(BF.holdT);BF.holdT=0}releaseHold();return}}const t=e.target.closest('[data-bf],[data-bfm],[data-bfship],[data-bfa],[data-bfarg],[data-bfw],[data-bfq]');if(!t||t.disabled)return;const ds=t.dataset;if(typeof tutOn==='function'&&tutOn()){const ta=ds.bf?{what:ds.bf}:ds.bfship!=null?{what:'ship',id:ds.bfship}:ds.bfm!=null?{what:'dial',i:+ds.bfm}:ds.bfa!=null?{what:'action',a:ds.bfa}:ds.bfarg!=null?{what:'arg',v:ds.bfarg}:ds.bfw!=null?{what:'fire',w:ds.bfw,t:ds.bft}:{what:'ask',k:ds.bfq};if(!tutGate(ta)){e.preventDefault();e.stopPropagation();return}}if(typeof tutAllow==='function'&&!tutAllow(ds)){e.preventDefault();e.stopPropagation();try{GX.buzz(30)}catch(_){}if(BF.fing)BF.fing.classList.add('na-nudge');return}if(typeof tutStaged==='function'&&tutStaged()&&typeof NCH!=='undefined'&&NCH.cur)try{coachHide()}catch(_){}e.preventDefault();e.stopPropagation();BF.taps++;sfx('click');
+function onClick(e){if(e.target.closest('#bfdice')&&!e.target.closest('[data-bfq]')){if(G&&G.phase==='ask'&&G.q&&G.q.key==='dice'){const dd=[...dice.querySelectorAll('[data-bfq].pick')];const hit=dd.find(x=>{const r=x.getBoundingClientRect();return e.clientX>=r.left-10&&e.clientX<=r.right+10&&e.clientY>=r.top-10&&e.clientY<=r.bottom+10});if(hit){e.preventDefault();hit.click()}return}if(typeof tutOn==='function'&&tutOn()&&!tutGate({what:'dicebox'}))return;const b=btns.querySelector('.btn.primary')||btns.querySelector('.btn');if(b&&!b.disabled){e.preventDefault();b.click();return}if(UI.hold){if(BF.holdT){clearTimeout(BF.holdT);BF.holdT=0}releaseHold();return}}const t=e.target.closest('[data-bf],[data-bfm],[data-bfship],[data-bfa],[data-bfarg],[data-bfw],[data-bfq]');if(!t||t.disabled)return;const ds=t.dataset;if(typeof tutOn==='function'&&tutOn()){const ta=ds.bf?{what:ds.bf}:ds.bfship!=null?{what:'ship',id:ds.bfship}:ds.bfm!=null?{what:'dial',i:+ds.bfm}:ds.bfa!=null?{what:'action',a:ds.bfa}:ds.bfarg!=null?{what:'arg',v:ds.bfarg}:ds.bfw!=null?{what:'fire',w:ds.bfw,t:ds.bft}:{what:'ask',k:ds.bfq};if(!tutGate(ta)){e.preventDefault();e.stopPropagation();return}}if(typeof tutAllow==='function'&&!tutAllow(ds)){e.preventDefault();e.stopPropagation();try{GX.buzz(30)}catch(_){}if(BF.fing)BF.fing.classList.add('na-nudge');nudge(ds.bfa!=null?'Try the glowing action':'Try the glowing move');return}if(typeof tutStaged==='function'&&tutStaged()&&typeof NCH!=='undefined'&&NCH.cur)try{coachHide()}catch(_){}e.preventDefault();e.stopPropagation();BF.taps++;sfx('click');
   if(ds.bf==='brief'||ds.bf==='briefset'){BF.seenBrief=G.seed;PHN.briefSeen=G.seed;ban.hidden=true;if(ds.bf==='brief'&&G.round===0&&G.phase==='ask'&&humanTurn()){autoPlaceAll();bfRender()}else bfRender();return}
   if(ds.bf==='dlock'||ds.bf==='dclose'){BF.sel=null;if(BF.dial)BF.dial.hidden=true;sfx('token');try{GX.buzz(18)}catch(e){}render();return}
-  if(ds.bf==='auto'){alive().filter(s=>s.side===planSide()).forEach(s=>UI.draft[s.id]=suggestDial(s));BF.sel=null;render();return}
+  if(ds.bf==='auto'){const my=alive().filter(s=>s.side===planSide());const said=[];my.forEach(s=>{const i=suggestDial(s);UI.draft[s.id]=i;try{said.push([mvWords(dialOf(s)[i]),autoWhy(s,i),shortName(s)])}catch(e){}});BF.sel=null;render();
+    if(said.length)banner(said.length===1?`<b>Auto: ${esc(said[0][0])}</b><span>${esc(said[0][1].charAt(0).toUpperCase()+said[0][1].slice(1))}.</span>`:`<b>Auto picked</b>${said.map(x=>`<span>${esc(x[2])}: ${esc(x[0])}</span>`).join('')}`,2500);return}
   if(ds.bf==='fly'){const ps=planSide();if(ps<0)return;const my=alive().filter(s=>s.side===ps);if(!my.every(s=>UI.draft[s.id]!=null))return;BF.sel=null;speedUp();try{GX.buzz(18)}catch(e){}const b=document.querySelector('[data-a="lock"]');lockIn();return}
   if(ds.bf==='stats'){BF.wantStats=true;UI.stats=true;render();return}
   if(ds.bf==='back'){BF.sub=null;render();return}
@@ -306,7 +322,8 @@ function onClick(e){if(e.target.closest('#bfdice')&&!e.target.closest('[data-bfq
 function lockIn(){const ps=planSide();const dials={};alive().filter(s=>s.side===ps).forEach(s=>dials[s.id]=UI.draft[s.id]);UI.pass=null;sfx('token');uiAct({act:'dials',dials});if(G&&G.phase==='plan'&&planSide()>=0)UI.pass=ps;render()}
 function selShip(id){const s=ship(id);if(!s||!s.alive||G.phase!=='plan'||planSide()<0||s.side!==planSide())return;BF.selAt=performance.now();BF.sel=BF.sel===id&&UI.draft[id]!=null?null:id;UI.sel=id;sfx('click');render()}
 // a tap on the board itself (a ship, or empty space)
-PHN.tapBF=function(e){if(!BF.on||!G)return false;if(performance.now()-(BF.pdSup||0)<400)return true;if(typeof tutOn==='function'&&tutOn())return true;const r=V3.r.domElement.getBoundingClientRect();const x=e.clientX-r.left,y=e.clientY-r.top;
+PHN.tapBF=function(e){if(!BF.on||!G)return false;if(performance.now()-(BF.pdSup||0)<400)return true;if(typeof tutOn==='function'&&tutOn())return true;
+  if(BF.fing&&typeof TUT!=='undefined'&&TUT.coach&&typeof tutStaged==='function'&&tutStaged()&&!UI.hold&&!(typeof NCH!=='undefined'&&NCH.cur)&&ctx()==='plan'&&BF.sel){nudge('Try the glowing move');return true}const r=V3.r.domElement.getBoundingClientRect();const x=e.clientX-r.left,y=e.clientY-r.top;
   if(UI.hold){if(BF.holdT){clearTimeout(BF.holdT);BF.holdT=0}releaseHold();return true}
   let best=null,bd=1e9;for(const s of alive()){const p=px(s.x,s.y,1.2);const dd=Math.hypot(p[0]-x,p[1]-y);if(dd<Math.max(30,shipR(s)*1.4)&&dd<bd){bd=dd;best=s}}
   const k=ctx();
@@ -318,7 +335,8 @@ PHN.tapBF=function(e){if(!BF.on||!G)return false;if(performance.now()-(BF.pdSup|
   if(k==='plan'&&BF.sel){/* the camera eases after a pick: markers move, so a tap that just missed one must not drop the pick */if((typeof V3!=='undefined'&&V3.ez)||performance.now()-(BF.selAt||0)<650)return true;BF.sel=null;render();return true}
   return false};
 // ---- every frame: keep the overlay glued to the board as the camera and ships move ----
-function relaxItems(list,Wd,Ht){const top=document.querySelector('.bfleg')?104:70;for(let it=0;it<30;it++){for(const a of list){const m=a.hw||24;a.sx=Math.max(m,Math.min(Wd-m,a.sx));a.sy=Math.max(top,Math.min(Ht-(bar?bar.offsetHeight:90)-22,a.sy))}for(let i=0;i<list.length;i++)for(let j=i+1;j<list.length;j++){const a=list[i],b=list[j];let dx=b.sx-a.sx,dy=b.sy-a.sy;if(Math.hypot(dx,dy)<.5){dx=Math.cos(j*2.4);dy=Math.sin(j*2.4)}const d=Math.hypot(dx,dy);const min=(a.r+b.r)*.95;if(d<min){const p=(min-d)/2,ux=dx/d,uy=dy/d;a.sx-=ux*p;a.sy-=uy*p;b.sx+=ux*p;b.sy+=uy*p}}}}
+function relaxItems(list,Wd,Ht){const top=document.querySelector('.bfleg')?104:70;const ob=[];try{const o=ov.getBoundingClientRect();document.querySelectorAll('#tags .tag').forEach(t=>{if(t.style.display==='none')return;const q=t.getBoundingClientRect();if(q.width>2)ob.push([q.left-o.left-3,q.top-o.top-3,q.right-o.left+3,q.bottom-o.top+3])})}catch(e){}
+  for(let it=0;it<30;it++){for(const a of list){if(!a.r)continue;for(const q of ob){const nx=Math.max(q[0],Math.min(q[2],a.sx)),ny=Math.max(q[1],Math.min(q[3],a.sy));let dx=a.sx-nx,dy=a.sy-ny,d=Math.hypot(dx,dy);const rr=a.r*.9;if(d<rr){if(d<.5){const cy=(q[1]+q[3])/2;dx=0;dy=a.sy<cy?-1:1;d=1;a.sy=a.sy<cy?q[1]:q[3]}a.sx+=dx/d*(rr-Math.min(d,rr));a.sy+=dy/d*(rr-Math.min(d,rr))}}}for(const a of list){const m=a.hw||24;a.sx=Math.max(m,Math.min(Wd-m,a.sx));a.sy=Math.max(top,Math.min(Ht-(bar?bar.offsetHeight:90)-22,a.sy))}for(let i=0;i<list.length;i++)for(let j=i+1;j<list.length;j++){const a=list[i],b=list[j];let dx=b.sx-a.sx,dy=b.sy-a.sy;if(Math.hypot(dx,dy)<.5){dx=Math.cos(j*2.4);dy=Math.sin(j*2.4)}const d=Math.hypot(dx,dy);const min=(a.r+b.r)*.95;if(d<min){const p=(min-d)/2,ux=dx/d,uy=dy/d;a.sx-=ux*p;a.sy-=uy*p;b.sx+=ux*p;b.sy+=uy*p}}}}
 function loop(){requestAnimationFrame(loop);if(!BF.on||!ov||ov.hidden||!v3()||!G)return;if(typeof NCH!=='undefined'&&NCH.cur&&BF.fing&&BF.fing.offsetParent)(NCH.fs=NCH.fs||{})[NCH.cur]=1;V3.camera.updateMatrixWorld();const c=V3.r.domElement,Wd=c.clientWidth,Ht=c.clientHeight;
   // tappable chips sit where they will END from their first frame: projected with the camera's target (not the glide in progress) and the ship's real
   // pose (not the mesh still flying), so a quick tap never lands where a chip used to be. Paths and rings below still follow what is drawn.
@@ -326,7 +344,7 @@ function loop(){requestAnimationFrame(loop);if(!BF.on||!ov||ov.hidden||!v3()||!G
   if(BF.fitP){if(glide){cam.position.copy(sp0);cam.quaternion.copy(sq0);cam.updateMatrixWorld()}return}// the camera target is set next frame: keep new chips hidden until then
   const rel=[];for(const it of BF.items){let x,y,r=0;if(it.ship){const s=ship(it.ship);if(!s||!s.alive){it.el.style.display='none';continue}const p=it.ring?shownXY(s):XY(s);const q=px(p.x,p.y,1);r=shipR(s);x=q[0];y=q[1];
       if(it.ring){const d=Math.round(r*2.6);it.el.style.width=it.el.style.height=d+'px'}
-      if(it.arc){const n=it.arc.n,i=it.arc.i;const R0=Math.max(r*1.5+40,86);const base=y<Ht-230?Math.PI/2:-Math.PI/2;const span=Math.min(Math.PI*1.1,(n-1)*74/R0);const ang=base+(n>1?(i/(n-1)-.5)*span:0);x+=Math.cos(ang)*R0;y+=Math.sin(ang)*R0}
+      if(it.arc){const n=it.arc.n,i=it.arc.i;const R0=Math.max(r*1.5+40,86)+(y>Math.max(r*1.5+40,86)+110?0:34);const base=y>R0+110?-Math.PI/2:Math.PI/2;const span=Math.min(Math.PI*1.1,(n-1)*74/R0);const ang=base+(n>1?(i/(n-1)-.5)*span:0);x+=Math.cos(ang)*R0;y+=Math.sin(ang)*R0}
       if(it.dy)y+=it.dy*(r*1.3+26);
       else if(/\block\b/.test(it.el.className)&&G.cur&&G.cur!==it.ship){const m=ship(G.cur);if(m){const mq=px(XY(m).x,XY(m).y,1);y+=(y<=mq[1]?-1:1)*(r*1.3+26)*.6}}}   // the Lock chip sits on the far side of the enemy from your ship, clear of your name plate
     else{const q=px(it.x,it.y,.5);x=q[0];y=q[1]}
@@ -336,10 +354,15 @@ function loop(){requestAnimationFrame(loop);if(!BF.on||!ov||ov.hidden||!v3()||!G
   if(glide){cam.position.copy(sp0);cam.quaternion.copy(sq0);cam.updateMatrixWorld()}
   svg.setAttribute('viewBox',`0 0 ${Wd} ${Ht}`);for(const p of BF.paths){const d=p.pts.map((q,i)=>{const v=px(q.x,q.y,p.h);return (i?'L':'M')+v[0].toFixed(1)+' '+v[1].toFixed(1)}).join('');if(p.el._d!==d){p.el._d=d;p.el.setAttribute('d',d)}}
   // the dice sit in the half of the board away from the two ships
-  if(!dice.hidden&&G.atk||!dice.hidden&&UI.hold&&UI.hold.R){const A=G.atk||UI.hold.R;const a=ship(A.a),d=ship(A.d);if(a&&d){const ya=px(a.x,a.y)[1],yd=px(d.x,d.y)[1];const m=(ya+yd)/2;const want=m<Ht*.48?Math.min(Ht-dice.offsetHeight/2-110,Math.max(ya,yd)+dice.offsetHeight/2+40):Math.max(dice.offsetHeight/2+46,Math.min(ya,yd)-dice.offsetHeight/2-40);dice.style.top=Math.round(Math.max(dice.offsetHeight/2+40,Math.min(Ht-dice.offsetHeight/2-100,want)))+'px'}}
+  if(!dice.hidden&&G.atk||!dice.hidden&&UI.hold&&UI.hold.R){const A=G.atk||UI.hold.R;const a=ship(A.a),d=ship(A.d);if(a&&d){const ya=px(a.x,a.y)[1],yd=px(d.x,d.y)[1];const m=(ya+yd)/2;const want=m<Ht*.48?Math.min(Ht-dice.offsetHeight/2-110,Math.max(ya,yd)+dice.offsetHeight/2+40):Math.max(dice.offsetHeight/2+46,Math.min(ya,yd)-dice.offsetHeight/2-40);const bb=(bar&&!bar.hidden?bar.offsetHeight:90)+10;dice.style.top=Math.round(Math.max(dice.offsetHeight/2+40,Math.min(Ht-dice.offsetHeight/2-bb,want)))+'px'}}
+  // F2: ships close together shrink their (overhanging) models a little, so two miniatures never stack on each other
+  for(const s0 of alive()){const m=V3.ships[s0.id],U=m&&m.userData&&m.userData.mdl;if(!U)continue;if(U.userData.k0==null)U.userData.k0=U.scale.x;const p0=shownXY(s0);
+    const near=alive().some(o=>{if(o===s0)return false;const q=shownXY(o);return Math.hypot(q.x-p0.x,q.y-p0.y)<(B(s0)+B(o))*1.25});const k=U.userData.k0*(near?.68:1);if(Math.abs(U.scale.x-k)>1e-3)U.scale.setScalar(U.scale.x+(k-U.scale.x)*.2)}
   if(BF.fing&&document.body.contains(BF.fing)&&BF.fing.offsetParent&&!(window.GXH&&GXH.state().cur&&GXH.state().cur.kind==='bulb')){const b=BF.fing.getBoundingClientRect(),o=ov.getBoundingClientRect();fing.hidden=false;const low=b.top-o.top+b.height*.55>o.height-48;fing.textContent='👆';fing.style.transform=`translate(${(b.left-o.left+b.width*(low?.62:.5)-6).toFixed(0)}px,${(low?b.top-o.top+2:b.top-o.top+b.height*.55).toFixed(0)}px)`}else fing.hidden=true}
 // ---- hooks ----
 const _sync=sync3D;sync3D=function(){try{if(BF.on&&ANIM&&G&&stepTwo())capture();}catch(e){console.error(e)}const r=_sync.apply(this,arguments);try{maybeRelease()}catch(e){console.error(e)}return r};
+{const _as=actionStep;actionStep=function(s){try{if(BF.on&&s&&s.alive&&mineS(s)&&!s.flags.skipAct&&!(typeof tutOn==='function'&&tutOn())){const st=s.stress>0&&!exCanActStressed(s);const why=s.bumped?'It bumped a ship: no action this turn.':s.rockHit?'It hit an asteroid: no action this turn.':st?'Stressed (red move): no action this turn.':'';
+    if(why){const n=shortName(s);setTimeout(()=>{try{banner(`<b>${esc(n)} skips its action</b><span>${esc(why)}</span>`,1500)}catch(e){}},ANIM?1300:0)}}}catch(e){}return _as.apply(this,arguments)}}
 const _render=render;render=function(){_render();try{bfRender()}catch(e){console.error(e)}};
 const _tap=PHN.tap;PHN.tap=function(e){if(BF.on)return PHN.tapBF(e)||(G&&G.phase==='ask'&&G.q&&humanTurn()?false:_tap(e));return _tap(e)};
 // tap anywhere on a result to move on at once
@@ -347,7 +370,7 @@ document.addEventListener('pointerdown',e=>{if(!BF.on||!UI.hold||!G)return;if(ty
 const _rs=resize3D;resize3D=function(){const w=V3.w,h=V3.h;const r=_rs.apply(this,arguments);if(BF.on&&(V3.w!==w||V3.h!==h)){BF.fkey='';BF.key='';requestAnimationFrame(()=>{try{bfRender()}catch(e){}})}return r};
 const _cv=camView;camView=function(){const r=_cv.apply(this,arguments);if(BF.on){BF.fkey='';requestAnimationFrame(()=>{try{bfRender()}catch(e){}})}return r};
 {const _bfR=bfRender;bfRender=function(){const r=_bfR.apply(this,arguments);if(ban&&!ban.hidden)placeBan();return r}}// the dice panel or target chips can appear after the banner: move or drop it (also between renders, while dice roll in)
-setInterval(()=>{if(ban&&!ban.hidden&&((dice&&!dice.hidden)||document.querySelector('.bftgt')))placeBan()},250);
+setInterval(()=>{if(ban&&!ban.hidden)placeBan()},250);/* F2: always: the bottom bar can grow (two-line hint or buttons) after the banner was placed */
 BF.render=bfRender;BF.fit=fit;BF.release=release;BF.hideBan=()=>{if(ban){ban.hidden=true;BF.banUntil=0;BF.banQ=[]}};BF.px=px;BF.shipR=shipR;BF.shownXY=shownXY;
 })();
 // the open "More" menu sits on a dim backdrop: the page behind reads as covered, a tap on the backdrop closes the menu
