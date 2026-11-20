@@ -113,7 +113,7 @@ function tutSteps(){return tutStory([
    wait:{type:'tap',match:a=>a.what==='tile'&&!a.own&&a.id===64},ready:()=>tutMyTurn()&&!UI.sel&&G.dial===3},
  {id:'yellow2',title:'Say yellow',say:'Name your yellow wire. A yellow can only be matched with another yellow.',target:tutEl(0,59),
    wait:{type:'tap',match:a=>a.what==='tile'&&a.own&&a.id===59},ready:()=>tutMyTurn()&&tutSelTo(2,64)},
- {id:'red',title:'Red wires',say:'Tap your red: never say red or point at one.',target:tutEl(0,53),wait:{type:'tap',match:a=>a.what==='red'},ready:()=>tutMyTurn()&&!!G.st[2].w[tutIdx(2,64)].cut},
+ {id:'red',title:'Red wires',say:'Tap your red. Never say red or point at one. When only reds are left, they reveal themselves.',target:tutEl(0,53),wait:{type:'tap',match:a=>a.what==='red'},ready:()=>tutMyTurn()&&!!G.st[2].w[tutIdx(2,64)].cut},
  {id:'solo',title:'Solo cut',say:'You hold every 6 left, so cut them alone. Tap one: both are cut, with no risk.',target:()=>{const k=myTwoK();return k>=0?tileEl(G.st[0].w[k].u):null},
    wait:{type:'tap',match:a=>a.what==='tile'&&a.own&&cv(a.id)===6&&a.k===myTwoK()},ready:()=>tutMyTurn()},
  {id:'win',title:'Defused!',say:'Every wire is cut: defused! Your last red was revealed for you. Win together, or lose together.',target:tq('#cutc'),wait:null,wrong:'Tap Finish.',ready:()=>!!G&&!!G.over&&G.over.win}
@@ -133,7 +133,7 @@ function tutStart(o){if(typeof GXT==='undefined')return;const pro=!!(o&&o.prolog
     setup:tutNew,
     onDone:r=>{tutLeave();const c=r&&r.choice;
       if(c==='chapter'&&first){showStart();GXC.play(first.id)}
-      else if(c==='job1'){UI.setup=UI.setup||defaultSetup();startJob({job:1,np:3,seats:['human','ai','ai'],lv:'easy',names:DEFNAMES.slice(),chars:[],captain:0})}
+      else if(c==='job1'){UI.setup=UI.setup||defaultSetup();startJob({job:1,np:2,seats:['human','ai'],lv:'normal',names:DEFNAMES.slice(),chars:[],captain:0,warm:1})}
       else if(c==='story'&&typeof GXC!=='undefined'){showStart();GXC.open()}
       else showStart()},
     onExit:()=>{tutLeave();showStart();if(pro&&typeof GXC!=='undefined')GXC.open()}})}   // skipping the Story prologue opens the chapter map

@@ -20,7 +20,8 @@ function scMyVals(V){const out=[];for(const S of V.stands)if(S.mine)for(const x 
 function scOdds(V,W,st,k,v){const kn=scKnown(V,st,k);if(kn!=null)return kn===v?1:0;const s=W&&W.slots.find(x=>x.st===st&&x.k===k);return s?(s.prob[VN(v)]||0):null}
 function scMoveText(V,m){if(!m)return '';if(m.a==='solo')return 'Solo cut the '+VN(m.v)+'s';
   if(m.a==='dual'){const ow=ownerOf(m.st);return 'Say '+VN(m.v)+' on '+(ow===V.seat?'your own':nm(ow)+"'s")+' wire'}if(m.a==='eq')return 'Use '+((EQUIP[m.id]||{}).n||'a gear card');return 'Play a card'}
-function scFuseLine(){if(G.dial==null)return 'a miss costs the crew';const l=G.dial-1;return l<=0?'a miss blows the fuse!':'a miss: fuse −1 ('+l+' left)'}
+function scFuseLine(){if(G.dial==null)return 'a miss costs the crew';let n=1;try{const me=UI.V.seat;if(G.tfx&&G.tfx.damper)n=0;else if(conFlag(me,'double'))n=2}catch(e){}
+  if(!n)return 'a miss: the Blast Blanket holds the fuse';const l=G.dial-n;return l<=0?'a miss blows the fuse!':'a miss: fuse −'+n+' ('+l+' left)'}
 // ---------- the move being built -> preview text and badges ----------
 function scPreview(V){const sel=UI.sel;if(!sel||sel.mode!=='dual'||sel.tool||sel.two)return null;
   if(sel.tg.length&&sel.v!=null){const t=sel.tg[0];const ow=ownerOf(t.st);
@@ -66,9 +67,12 @@ function scShowCard(html,cls,ms){SC.card={h:html,cls:cls||''};clearTimeout(SC.ca
   try{if(r&&r.success!==false&&G&&(m.a==='dual'||m.a==='solo'||m.a==='eq'||m.a==='multi')){const dc=scCut()-c0,missed=G.dial!=null&&d0!=null&&G.dial<d0;SC.by[seat]=(SC.by[seat]||0)+dc;
       const who=scName(seat);let what;
       if(m.a==='solo')what=`cut ${dc} wire${dc===1?'':'s'} alone, no risk`;
+      else if(m.a==='dual'&&m.v!=null){let tg='';try{const ow=ownerOf(m.st);tg=' on '+(ow===plSeat()?'your':nm(ow)+"'s")+' wire'}catch(e){}   // F4: say what the computer did
+        const sd=VN(m.v)+(m.v2!=null?' or '+VN(m.v2):'');
+        if(dc>0)what=`said ${sd}${tg}: a match, ${dc} wire${dc===1?'':'s'} cut`;else what=`said ${sd}${tg}: a miss`+(missed?`, fuse −${d0-G.dial}`:'')}
       else if(dc>0)what=`guessed right, ${dc} wires cut`;
-      else if(missed)what=`guessed wrong, fuse −${d0-G.dial}`;
-      else what=m.a==='eq'?'used a gear card':'made a move';
+      else if(missed)what=`missed, fuse −${d0-G.dial}`;
+      else what=m.a==='eq'?'used a gear card':'played a card';
       const rate=null;   // per-move grades removed (not in the rules)
       const nextS=(()=>{try{return G.over?-1:decider()}catch(e){return -1}})();
       const nx=nextS>=0&&nextS!==seat?` Next: ${nextS===plSeat()?'you':nm(nextS)}.`:'';
@@ -99,7 +103,8 @@ function scPaint(){const sc=document.getElementById('sc'),pv=document.getElement
   else if(show&&!document.getElementById('coach')){if(SC.card){ph=SC.card.h;cls='card '+SC.card.cls}
     else{const pr=scPreview(V);if(pr){ph=pr.h;cls='pre '+pr.cls}
       else{const myTurn=!UI.sel&&V.legal&&decider()===V.seat&&!G.q&&G.phase==='turn';const b=myTurn&&UI.hints?scBest(V):null;
-        if(b&&b.m){ph=`<b>Hint</b> ${esc(scHint(V,b.m))} <button type="button" class="wsd" data-wsd>Show me</button>`;cls='pre mid'}
+        if(b&&b.m&&scShowOn())ph='';
+        else if(b&&b.m){ph=`<b>Hint</b> ${esc(scHint(V,b.m))} <button type="button" class="wsd" data-wsd>Show me</button>`;cls='pre mid'}
         else if(myTurn&&G.mission===1&&!UI.camp){ph='<b>Read the tokens:</b> a token shows a wire\'s number, and wires run <b>low to high</b>.';cls='pre mid'}}}}
   const hh=()=>(pv.hidden?0:pv.offsetHeight)+(sc.hidden?0:sc.offsetHeight);const h0=SC.h0==null?-1:SC.h0;pv.hidden=!ph;const sig=cls+'|'+ph;if(sig!==SC.pvh){SC.pvh=sig;pv.className=cls;pv.innerHTML=ph}
   const h1=hh();SC.h0=h1;if(h1!==h0&&!SC.relay){SC.relay=1;try{layoutTable()}catch(e){}SC.relay=0}}   // a strip (score or preview) took or gave back table height: size the stands again
@@ -107,12 +112,32 @@ function scEndCard(){if(!G||!G.over||UI.tut||SC.endShown===G.over)return;SC.endS
 (function(){const o=refresh;refresh=function(){o();try{if(!G||!UI.started)return;scEnsure();if(SC.g!==G)scReset();
   // a skipped turn has no move: say why the turn is over
   const sk=G.log.find(e=>e.i>(SC.skipI||0)&&/ skips: /.test(e.t));if(sk){SC.skipI=G.logN;if(hintsOn()||G.mission<=3)scShowCard(`<div class="ln"><b>Turn over:</b> ${esc(plain(sk.t))}</div>`,'',2800)}else SC.skipI=G.logN;
-  scPaint();if(UI.V)scBadges(UI.V)}catch(e){console.error(e)}}})();
+  scPaint();if(UI.V)scBadges(UI.V);scShowPaint()}catch(e){console.error(e)}}})();
 
 // ---------- modes: HINTS is the bulb in the top bar (off by default); every "why" opens on tap only ----------
 plBanner=function(){};   // the turn tracker says whose turn it is; the toast covered the Turn-over line
-function scBulb(){const b=document.getElementById('bulbbtn');if(!b)return;b.classList.toggle('hon',!!UI.hints);b.setAttribute('aria-pressed',UI.hints?'true':'false');const t=UI.hints?'Hints are on (tap to turn off)':'Hints are off (tap to turn on)';b.title=t;b.setAttribute('aria-label',t)}
-document.addEventListener('click',e=>{const w=e.target.closest&&e.target.closest('[data-wsd]');if(w){e.preventDefault();e.stopPropagation();SC.adv=true;const b=document.getElementById('bulbbtn');if(b)b.click();return}
-  const bb=e.target.closest&&e.target.closest('#bulbbtn');if(bb){if(SC.adv){SC.adv=false;return}e.stopImmediatePropagation();e.preventDefault();UI.hints=!UI.hints;lsSet('sf_hints',UI.hints?1:0);SC.card=null;SC.pvh='';scBulb();try{refresh()}catch(x){}return}
+function scBulb(){const b=document.getElementById('bulbbtn');if(!b)return;b.classList.toggle('hon',!!UI.hints);b.setAttribute('aria-pressed',UI.hints?'true':'false');const t=UI.hints?'Hints are on (tap to turn off)':'Hints are off (tap to turn on)';b.title=t;b.setAttribute('aria-label',t);let l=b.querySelector('.bl');if(!l){l=document.createElement('span');l.className='bl';b.appendChild(l)}const w=UI.hints?'Hints on':'Hints off';if(l.textContent!==w)l.textContent=w}
+// R95: "Show me" REPLACES the Hint line (one helper): the line goes, the stand with the move opens, and the wire to tap gets a ring and an arrow
+function scShowKey(){return G?G.logN+':'+G.turn+':'+(UI.sel?UI.sel.mode+(UI.sel.tg||[]).length+':'+UI.sel.v:''):''}
+function scShowOn(){return !!(SC.show&&SC.show.key===scShowKey()&&G&&!G.over)}
+function scShowClear(){SC.show=null;document.querySelectorAll('#tb .tile.hring').forEach(e=>e.classList.remove('hring'));const a=document.getElementById('hptr');if(a)a.remove()}
+function scShowPaint(){if(!scShowOn()){if(SC.show||document.getElementById('hptr'))scShowClear();return}
+  const el=document.querySelector('#tb .tile[data-u="'+SC.show.u+'"]');const tb=document.getElementById('tb');if(!el||!tb){return}
+  document.querySelectorAll('#tb .tile.hring').forEach(e=>{if(e!==el)e.classList.remove('hring')});el.classList.add('hring');
+  let a=document.getElementById('hptr');if(!a){a=document.createElement('div');a.id='hptr';a.setAttribute('aria-hidden','true');a.innerHTML='<span>Tap</span><i></i>';tb.appendChild(a)}
+  const r=el.getBoundingClientRect(),b=tb.getBoundingClientRect();const up=r.top-b.top<46;a.classList.toggle('up',up);
+  a.style.left=Math.max(26,Math.min(b.width-26,r.left-b.left+r.width/2))+'px';a.style.top=(up?r.bottom-b.top+2:r.top-b.top-2)+'px'}
+function scShowU(){const V=UI.V;try{const b=scBest(V);const m=b&&b.m;if(m&&(m.tool||m.two)){const p=hlpPlan();if(p&&p.to&&p.to.u!=null)return p.to.u}if(m){if(m.a==='dual'&&m.st!=null&&m.ks&&m.ks.length){const t=G.st[m.st].w[m.ks[0]];if(t)return t.u}
+    if(m.a==='solo'){const x=hlpMine(V,m.v);if(x)return x.u}}}catch(e){}
+  try{const p=hlpPlan();if(p&&p.to&&p.to.u!=null)return p.to.u}catch(e){}return null}
+function scShowMe(){const su=scShowU();const p=su!=null?{to:{u:su}}:null;if(!p){const b=document.getElementById('bulbbtn');if(b){SC.adv=true;b.click()}return}
+  const u=p.to.u;const seat=seatOfU(u);let st=null;for(const x of UI.V.stands)if(x.slots.some(y=>y.u===u))st=x.i;
+  if(TBL.zm&&seat!=null&&seat!==UI.V.seat){UI.zoom=seat;if(st!=null)UI.zst=st}
+  SC.show={u,key:scShowKey()};SC.pvh='';const c=document.getElementById('crew');if(c)c._s=null;try{refresh()}catch(e){}
+  const el=document.querySelector('#tb .tile[data-u="'+u+'"]');if(el&&el.scrollIntoView)try{el.scrollIntoView({block:'nearest'})}catch(e){}
+  scShowPaint();try{sfx('click')}catch(e){}}
+document.addEventListener('pointerdown',e=>{if(SC.show&&!(e.target.closest&&e.target.closest('[data-wsd]')))setTimeout(()=>{if(SC.show&&SC.show.key!==scShowKey())scShowClear()},0)},true);
+document.addEventListener('click',e=>{const w=e.target.closest&&e.target.closest('[data-wsd]');if(w){e.preventDefault();e.stopPropagation();scShowMe();return}
+  const bb=e.target.closest&&e.target.closest('#bulbbtn');if(bb){if(SC.adv){SC.adv=false;return}e.stopImmediatePropagation();e.preventDefault();UI.hints=!UI.hints;lsSet('sf_hints',UI.hints?1:0);SC.card=null;SC.pvh='';if(!UI.hints)scShowClear();scBulb();try{refresh()}catch(x){}try{if(G&&UI.started)toast(UI.hints?'Hints on':'Hints off')}catch(x){}return}
   const sc=e.target.closest&&e.target.closest('#sc,#pv');if(sc&&G&&UI.started&&!UI.coach){SC.why=!SC.why;SC.pvh='';scPaint()}},true);
 setTimeout(scBulb,0);setInterval(scBulb,1500);

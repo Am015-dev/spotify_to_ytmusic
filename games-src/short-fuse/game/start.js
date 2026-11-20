@@ -36,13 +36,13 @@ function startJob(s){if(isClient())return;
   try{scBulb()}catch(e){}}
   lsSet('sf_played',1);s=Object.assign({},s);s.names=(s.names||DEFNAMES).slice();let plan=null;
   if(isHost()){plan=netPlan(s);if(plan.err){NET.err=plan.err;UI.netOpen=true;netRender();return}NET.err='';s.np=plan.np;s.seats=plan.seats;s.names=plan.names;fixSetup(s)}
-  if(!plan&&!s.camp)lsSet('sf_setup',{job:s.job,np:s.np,seats:s.seats,lv:s.lv,chars:s.chars,names:s.names});UI.lastSetup=s.camp?UI.lastSetup:s;
+  if(!plan&&!s.camp&&!s.warm)lsSet('sf_setup',{job:s.job,np:s.np,seats:s.seats,lv:s.lv,chars:s.chars,names:s.names});UI.lastSetup=s.camp?UI.lastSetup:s;
   const seats=s.seats.slice(0,s.np);const chars={};let any=0;for(let i=0;i<s.np;i++)if(s.chars&&s.chars[i]){chars[i]=s.chars[i];any=1}
   UI.rt=realtimeJob(s.job);UI.started=false;clearTimeout(UI.aiT);UI.aiT=null;UI.sel=null;UI.prev=null;UI.holder=-1;UI.offSeat=null;UI.campDone=0;UI.campShown=0;UI.wwk=null;UI.pause=false;
   UI.camp=s.camp||null;UI.brief=(NET.on||isHost()||s.camp)?null:{n:s.job};UI.aiNotBefore=0;UI.lastPrompt=null;
   UI.ghost=lsGet('sf_ghost',{info:1,turn:1});if(s.camp&&s.camp.hints&&!lsGet('sf_ghost_'+s.camp.id,0)){lsSet('sf_ghost_'+s.camp.id,1);UI.ghost={info:1,turn:1}}if(s.camp&&!s.camp.hints)UI.ghost={info:0,turn:0};
   if(typeof GXH!=='undefined'){UI.ghost={info:0,turn:0};if(s.camp&&s.camp.hints)GXH.setEnabled(true)}
-  const o={np:s.np,mission:s.job,seats,level:s.lv,names:s.names.slice(0,s.np),realtime:UI.rt};if(any){try{const ch=[];for(let i=0;i<s.np;i++)ch[i]=chars[i]||null;o.chars=ch}catch(e){}}
+  const o={np:s.np,mission:s.job,seats,level:s.lv,names:s.names.slice(0,s.np),realtime:UI.rt,stall:!!UI.stall};if(any){try{const ch=[];for(let i=0;i<s.np;i++)ch[i]=chars[i]||null;o.chars=ch}catch(e){}}
   if(s.captain==null&&s.job===1&&!s.camp&&!NET.on&&seats.indexOf('human')>=0)s.captain=seats.indexOf('human');   // review R1: job 1, you are the foreman: you go first and hold the two labelled stands
   if(s.captain!=null&&s.captain<s.np)o.captain=s.captain;if(s.seed!=null)o.seed=s.seed;if(s.twist)o.twist=s.twist;if(s.lvs)o.lv=s.lvs;
   kitReset();UI.started=true;hideStart();NET.starting=true;try{try{newGame(o)}catch(e){try{delete o.chars;newGame(o)}catch(e2){console.error(e2);UI.started=false;showStart();return}}
@@ -69,10 +69,11 @@ document.addEventListener('click',e=>{const b=e.target.closest('[data-a]');if(!b
   case 'pause':togglePause();return;
   case 'xray':UI.xray=!UI.xray;refresh();return;
   case 'briefok':UI.brief=null;sfx('click');refresh();return;
-  case 'next':startJob(Object.assign({},UI.lastSetup,{job:G.mission+1,captain:(G.captain+1)%G.np}));return;
+  case 'next':{const L=UI.lastSetup||{};const w=L.warm?{np:3,seats:['human','ai','ai','ai','ai'],lv:'normal',warm:0}:{};startJob(Object.assign({},L,w,{job:G.mission+1,captain:(G.captain+1)%(w.np||G.np)}));return}   // after the 2-crew warm-up job 1, job 2 goes back to a crew of 3
   case 'again':if(UI.camp){return}startJob(Object.assign({},UI.lastSetup,{captain:(G.captain+1)%G.np}));return;
   case 'board':showStart();return;
   case 'snd':toggleSound();renderSettings();return;
+  case 'stall':UI.stall=!UI.stall;saveSettings();renderSettings();try{toast(UI.stall?'House rule on from the next job':'House rule off from the next job')}catch(e){}return;
   case 'mus':toggleMusic();renderSettings();return;
   case 'speed':UI.speed=+b.dataset.v;saveSettings();renderSettings();return;
   case 'newgame':GX.close();showStart();return;

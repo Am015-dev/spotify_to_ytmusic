@@ -103,7 +103,7 @@ R('Opening info: each player places exactly ONE token (a 2-stand player too) in 
     const x=t[0];exp(x.tok.map(k=>[k.t,k.v]),[['n',E.cv(x.id)]],'token shows the true value')}});
 R('The Captain role passes to the player on the left before every new mission and before a retry after a failure.',()=>{
   const src=require('fs').readFileSync(path.join(__dirname,'game','start.js'),'utf8');
-  const nxt=/case 'next':[^\n]*captain:\(G\.captain\+1\)%G\.np/.test(src);const again=/case 'again':[^\n]*captain:\(G\.captain\+1\)%G\.np/.test(src);
+  const nxt=/case 'next':[^\n]*captain:\(G\.captain\+1\)%\(w\.np\|\|G\.np\)/.test(src);const again=/case 'again':[^\n]*captain:\(G\.captain\+1\)%G\.np/.test(src);
   exp([nxt,again],[true,true],'[next mission rotates, retry rotates] (source check of the start screen: engine takes captain as an input)')},{how:'source check of game/start.js'});
 
 // =====================================================================================

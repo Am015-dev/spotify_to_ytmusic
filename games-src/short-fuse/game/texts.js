@@ -133,11 +133,11 @@ const TUTORIAL=[
  {id:'open',t:'The opening token',p:'Everyone starts by showing one wire to the crew. A token with its number goes in front of it. Pick one of yours.'},
  {id:'dual',t:'Your turn: a dual cut',p:'Tap a <b>glowing wire of a crewmate</b>. Then say a number <b>you hold</b>. Right: both wires are cut. Wrong: the fuse burns a step. Clues: the shown numbers. Every rack is sorted low to high.'},
  {id:'value',t:'Say the number',p:'Now pick the number you think it is. You can only say numbers you hold yourself. Tokens and the sort order are your clues.'},
- {id:'confirm',t:'Snip!',p:'Check the summary and press the big button. The "What we know" box suggests a move and says why.'},
+ {id:'confirm',t:'Snip!',p:'Tap your own wire with that number. The cut happens at once. Turn on Hints (the bulb) for a suggested move.'},
  {id:'hit',t:'Both wires are cut',p:'A hit cuts their wire. It also cuts your wire of the same value. A fully cut value gets a green check on the track.'},
- {id:'miss',t:'BUZZ: a miss',p:'A miss burns one step of the fuse. The crewmate puts a token before that wire. It shows the true number. Now everyone knows it.'},
+ {id:'miss',t:'BUZZ: a miss',p:'A miss burns one step of the fuse. The crewmate puts a token before that wire. It shows the true number, or a yellow token for a yellow wire. Now everyone knows it.'},
  {id:'solo',t:'A solo cut',p:'Do you hold <b>all</b> the wires still left of a value? That means all four, or the last two. Then you may cut them yourself. No pointing needed. A solo cut never fails. Look for the solo button.'},
- {id:'know',t:'What we know',p:'The bulb button opens a table of what every wire could be. Use it whenever you are unsure.'}];
+ {id:'know',t:'What we know',p:'The bulb turns hints on or off. With hints on, "Show me" points at a good move.'}];
 // how to play: in the order a player meets things
 const RULES_HTML=`
 <h3>The goal</h3><p>A villain has wired a bomb. Your crew of 2 to 5 defuses it <b>together</b>: you win when <b>every wire</b> on every stand is cut or revealed. You lose if the fuse burns down. You also lose if anyone points at a red wire. Or if the job's own special rule says so.</p>
@@ -152,7 +152,7 @@ const RULES_HTML=`
 <p>The track markers show which red and yellow values this job uses. "2 out of 3" means three values are marked. Only two wires are really there.</p>
 <h3>Dual cut</h3><p>Point at one uncut wire of a crewmate. Say a number you <b>hold yourself</b>. Or say "yellow" if you hold a yellow. Never say "red".</p><ul>
 <li><b>Hit:</b> their wire is turned face up and cut. You cut one of yours of the same value.</li>
-<li><b>Miss:</b> the fuse burns one step. The crewmate puts an info token in front of that wire. It shows the wire's true number. Your own wire stays hidden.</li>
+<li><b>Miss:</b> the fuse burns one step. The crewmate puts an info token in front of that wire. It shows the wire's true number (a yellow wire gets the yellow token). Your own wire stays hidden.</li>
 <li><b>Red:</b> if the wire you pointed at is red, boom.</li></ul>
 <h3>Solo cut</h3><p>Is <b>every</b> remaining uncut wire of a value in your hand? That means all four. Or the last two, after a pair was cut. Then you may cut them all at once. It never fails. You can never solo cut three.</p>
 <h3>Reveal reds</h3><p>If every wire you still hold is red, you reveal them. You do it at the start of your turn. The page does it for you.</p>
@@ -160,17 +160,17 @@ const RULES_HTML=`
 <li><b>Info tokens</b> show a wire's number. Some jobs use other tokens. Even/odd, counts ("x2 on this stand") or false ("NOT this").</li>
 <li><b>Validation tokens</b>: a value has all four wires cut. A green check goes on the track.</li>
 <li><b>Announcements.</b> Some gear makes the crew answer out loud. A Roll Call: "yes, I hold a 7". The dock and What we know show every announcement.</li></ul>
-<h3>House rules</h3><p>Two things are our own additions, not part of the tabletop game: a hand with no legal cut skips its turn, and after four rounds with no progress the bomb goes off, so a game cannot run forever. Only jobs 9, 16 and 36 blow the bomb on a skipped turn. Also: when only red wires remain, they are revealed for you, and earlier answers stay visible on the page.</p>
+<h3>House rules</h3><p>One thing is our own addition, not part of the tabletop game: a hand with no legal cut skips its turn. Only jobs 9, 16 and 36 blow the bomb on a skipped turn. If the whole crew is stuck in a row, the bomb goes off. <b>Optional house rule</b> (off unless you switch it on in Settings): four rounds with no progress set off the bomb. Also: when only red wires remain, they are revealed for you, and earlier answers stay visible on the page.</p>
 <h3>No free talk</h3><p>You may not tell crewmates what you hold. The page enforces that. You can share only through moves, tokens and required answers.</p>
 <h3>The fuse</h3><p>It starts with one step per player. Some jobs start lower. It can never go above 6. A miss burns one step. At zero the bomb explodes.</p>
 <h3>Equipment</h3><p>From job 3, the board holds one locked gear card per player. Each card unlocks when two wires of its number are cut. Double cards need all four. It then works once. "Any time" cards work even when it is not your turn. Never use one in the middle of a question. "Your turn" cards are part of your action. Open <b>Gear</b> to read them all.</p>
-<h3>Crew cards and personal tools</h3><p>Everyone has a crew card with a personal tool. It is usually a <b>Two Prongs</b>. Use it once per job. Point at two wires on one crewmate stand and say a number. It works if either matches. One red plus one other: no explosion. The token goes on the other wire. Both red: boom. From job 31, new crew members bring other tools.</p>
+<h3>Crew cards and personal tools</h3><p>Everyone has a crew card with a personal tool. It is usually a <b>Two Prongs</b>. Use it once per job. Point at two wires on one crewmate stand and say a number. It works if either matches. One red plus one other: no explosion. The token goes on the other wire. Both red: boom. From job 32, new crew members bring other tools.</p>
 <h3>Special jobs</h3><p>From job 9, most jobs add a twist. An order, a timer, limits, robots, oxygen... The <b>Job</b> button opens the job card. It shows each special rule as a picture and a line.</p>
 <h3>On this page</h3><ul><li>The <b>dock</b> is beside the board, or under it on a phone. It always says what the game is waiting for. It has a button for every option.</li>
-<li>Tap a <b>glowing wire</b> on the table to pick it. Then tap the value. Then tap the big button.</li>
+<li>Tap a <b>glowing wire</b> of a crewmate. Then tap your own wire with the number you say. That cuts at once.</li>
 <li><b>Hot-seat:</b> the next player may be another human. Then the dock asks you to pass the device. The table shows only wire backs until they confirm.</li>
 <li><b>Timed jobs</b> show a countdown in the dock. The pause button stops the clock and the computer crew.</li>
-<li>Keys: <kbd>Esc</kbd> closes a popup, <kbd>F9</kbd> shows the speed overlay.</li></ul>`;
+<li class="keysonly">Keys: <kbd>Esc</kbd> closes a popup, <kbd>F9</kbd> shows the speed overlay.</li></ul>`;
 // every wire, token, card and table in the game (the Cards drawer, and dump_ref.js for the shared reference page)
 function refEntries(){const E=[];const add=(s,n,tags,t,c,sub)=>E.push({s,n,tags:(tags||[]).filter(Boolean),t,c:c==null?null:c,sub:sub||[]});
  add('Wires','Blue wire',['1 to 12','four of each'],'The wires you match. Four of every number from 1 to 12. Some training jobs use only the low numbers.',48);
@@ -190,7 +190,7 @@ function refEntries(){const E=[];const add=(s,n,tags,t,c,sub)=>E.push({s,n,tags:
  add('Tokens','Fuse (detonator dial)',['starts at one step per player','max 6'],'Burns one step on every miss (two with restriction L). At zero the bomb goes off. Some jobs start it at 1. Some turn it back for dares and meteors.',1);
  add('Tokens','Robot',['jobs 43, 53, 59'],'A wind-up robot standee. In job 43 it walks the track holding wires. In job 53 it is the fuse itself. In job 59 it guides the number line.',1);
  for(const id of EQ_IDS){const e=EQUIP[id];add('Equipment cards',e.n,['unlocks at '+(e.need===4?'four':'two')+' '+(e.v==='Y'?'yellows':e.v+'s'),{any:'any time',turn:'your turn',start:'start of your turn',instant:'instant'}[e.timing],{base:'base',yellow:'from job 9 in yellow jobs',double:'double card, from job 55'}[e.pool]],e.text,1)}
- for(const id in CHARS){const c=CHARS[id];add('Crew cards',c.n,[ITEMS[c.item].n,c.captain?'foreman':'',c.newc?'from job 31':''],c.text+' Personal tool: '+ITEMS[c.item].n+'.',1)}
+ for(const id in CHARS){const c=CHARS[id];add('Crew cards',c.n,[ITEMS[c.item].n,c.captain?'foreman':'',c.newc?'from job '+NEWCHAR_FROM:''],c.text+' Personal tool: '+ITEMS[c.item].n+'.',1)}
  for(const id in ITEMS)add('Personal tools',ITEMS[id].n,[ITEMS[id].timing==='any'?'any time':'your turn','once per job'],ITEMS[id].text,null);
  for(const k of CON_IDS)add('Restriction cards',k+': '+CONSTRAINTS[k].n,[],CONSTRAINTS[k].text,1);
  for(const k in CHALLENGES)add('Dare cards',k+': '+CHALLENGES[k].n,['jobs 55, 60'],CHALLENGES[k].text+' Met: discard it and turn the fuse back one step.',1);

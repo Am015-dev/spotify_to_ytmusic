@@ -47,7 +47,7 @@ function newGame(o){o=o||{};const seed=o.seed!=null?o.seed>>>0:DEFSEED!=null?DEF
   if(!M)throw new Error('no mission '+n);if(!M.pl.includes(np))throw new Error('mission '+n+' is not playable with '+np);
   G={v:1,seed,rng:seed,np,mission:n,phase:'setup',step:null,turn:0,round:0,cur:-1,actor:-1,captain:0,pos:[],seats:[],st:[],robot:null,pile:[],aside:[],box:[],gone:[],
     dial:0,eq:[],eqPool:[],eqDeck:[],tokSup:clone(INFO_TOKENS),tokBox:{},valid:[],fin:{},validOff:0,ann:[],hist:[],marks:[],ms:{},markers:{},tot:{},clock:0,ag:[],agI:0,q:null,over:null,winText:'',
-    log:[],logN:0,uid:0,tfx:{},prompt:null,blockRun:0,stats:{dual:0,dualOk:0,solo:0,miss:0,eqUse:0,turns:0},opts:{turnSec:o.turnSec||12,realtime:!!o.realtime,full:!!o.full},eqOut:[],tokFam:M.tok};
+    log:[],logN:0,uid:0,tfx:{},prompt:null,blockRun:0,stats:{dual:0,dualOk:0,solo:0,miss:0,eqUse:0,turns:0},opts:{turnSec:o.turnSec||12,realtime:!!o.realtime,full:!!o.full,stall:!!o.stall},eqOut:[],tokFam:M.tok};
   G.captain=o.captain!=null?o.captain:rnd(np);
   for(let i=0;i<np;i++){G.pos.push(i);const h=o.seats?o.seats[i]==='human':(o.mode==='hot'||(o.mode==='solo'&&i===0));
     G.seats.push({i,nm:(o.names&&o.names[i])||SEAT_NAMES[i],human:!!h,lv:(o.lv&&o.lv[i])||o.level||'normal',ch:null,chUsed:0,chDown:0,noItem:0,role:null,con:null,conDown:0,ox:0,cards:[],out:0})}
@@ -203,7 +203,9 @@ function skipTurn(why,dial){G.tfx.acted=1;G.tfx.skipped=1;G.hist.push({seat:G.ac
 AG.endTurn=()=>{if(G.over)return;const s=G.cur;hook('end',s);if(G.over)return;checkWin();if(G.over)return;
   if(!G.opts.realtime)advanceClock(G.opts.turnSec);if(G.over)return;
   // safety: four full rounds in a row without any cut, card or tool means the crew is stuck
-  {const h=G.hist[G.hist.length-1];if(G.tfx.skipped||!h||h.turn!==G.turn||h.kind==='skip'||h.kind==='none')G.idle=(G.idle||0)+1;else G.idle=0;const act=G.seats.filter(q=>hasWires(q.i)).length;if(G.idle>=4*Math.max(1,act)){explode('the crew made no progress for four full rounds');return}}
+  {const h=G.hist[G.hist.length-1];if(G.tfx.skipped||!h||h.turn!==G.turn||h.kind==='skip'||h.kind==='none')G.idle=(G.idle||0)+1;else G.idle=0;const act=G.seats.filter(q=>hasWires(q.i)).length;if(G.opts.stall&&G.idle>=4*Math.max(1,act)){explode('the crew made no progress for four full rounds');return}
+    // house rule OFF (default, as the tabletop game): only a true deadlock ends the job: every crew member in a row had no legal cut at all
+    if(!G.opts.stall){const tail=G.hist.slice(-Math.max(1,act));if((tail.length>=act&&tail.every(e=>e.kind==='skip')&&G.idle>=act)||G.idle>=40*Math.max(1,act)){explode('nobody on the crew had a legal cut left');return}}}
   if(!G.tfx.acted&&!G.tfx.skip)G.hist.push({seat:s,kind:'none',turn:G.turn});
   let next=null;
   if(G.tfx.extra)next=G.cur;else if(G.tfx.coffee!=null)next=G.tfx.coffee;
