@@ -2687,6 +2687,83 @@
    "slot": "owner art reused from doorkick-dungeon",
    "owner": "doorkick-dungeon/doorkick-skygrif-boss.mp4",
    "ext": "mp4"
+  },
+  {
+   "stem": "event-first-ember",
+   "kind": "card",
+   "w": 512,
+   "h": 384,
+   "ratio": "4:3",
+   "alpha": false,
+   "wave": 2,
+   "slot": "Event screen picture: The First Ember",
+   "prompt": "(free art, composed by free-art/compose.py)"
+  },
+  {
+   "stem": "event-ash-library",
+   "kind": "card",
+   "w": 512,
+   "h": 384,
+   "ratio": "4:3",
+   "alpha": false,
+   "wave": 2,
+   "slot": "Event screen picture: Ash Library",
+   "prompt": "(free art, composed by free-art/compose.py)"
+  },
+  {
+   "stem": "event-cursed-chest",
+   "kind": "card",
+   "w": 512,
+   "h": 384,
+   "ratio": "4:3",
+   "alpha": false,
+   "wave": 2,
+   "slot": "Event screen picture: Cursed Chest",
+   "prompt": "(free art, composed by free-art/compose.py)"
+  },
+  {
+   "stem": "event-herb-witch",
+   "kind": "card",
+   "w": 512,
+   "h": 384,
+   "ratio": "4:3",
+   "alpha": false,
+   "wave": 2,
+   "slot": "Event screen picture: Herb Witch",
+   "prompt": "(free art, composed by free-art/compose.py)"
+  },
+  {
+   "stem": "event-forge-spirit",
+   "kind": "card",
+   "w": 512,
+   "h": 384,
+   "ratio": "4:3",
+   "alpha": false,
+   "wave": 2,
+   "slot": "Event screen picture: Forge Spirit",
+   "prompt": "(free art, composed by free-art/compose.py)"
+  },
+  {
+   "stem": "event-golden-idol",
+   "kind": "card",
+   "w": 512,
+   "h": 384,
+   "ratio": "4:3",
+   "alpha": false,
+   "wave": 2,
+   "slot": "Event screen picture: Golden Idol",
+   "prompt": "(free art, composed by free-art/compose.py)"
+  },
+  {
+   "stem": "event-kind-pilgrim",
+   "kind": "card",
+   "w": 512,
+   "h": 384,
+   "ratio": "4:3",
+   "alpha": false,
+   "wave": 2,
+   "slot": "Event screen picture: Kind Pilgrim",
+   "prompt": "(free art, composed by free-art/compose.py)"
   }
  ]
 }

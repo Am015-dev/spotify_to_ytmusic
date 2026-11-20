@@ -45,7 +45,7 @@ mk.en = 6; mk.stance = 'c'; playId(G, 'm-empty-fist', 0); ok(mk.en === 6, 'R18 e
 mk.en = 3; mk.stance = 'c'; mk.hand.push(E.mk('m-empty-fist')); E.performMove({ t: 'play', h: 0, c: mk.hand.length - 1, e: 0 }); ok(mk.en === 4, 'R06 calm exit still gives 2 energy');
 // R17 strength cap 8, block cap 60
 G = fresh(['w'], 15); hw = G.hs[0]; hw.st.str = 7; playId(G, 'w-kindle'); ok(hw.st.str === 8, 'R17 strength capped at 8');
-hw.blk = 20 * SC - 2; playId(G, 'w-defend'); ok(hw.blk === 20 * SC, 'R17 player block capped at 20 x SCALE');
+hw.blk = 20 * SC; playId(G, 'w-defend'); ok(hw.blk === 20 * SC, 'R17 player block capped at 20 x SCALE');
 // R01 no hand cap
 hw.hand = []; for (let i = 0; i < 11; i++) hw.hand.push(E.mk('w-defend')); hw.draw = []; for (let i = 0; i < 6; i++) hw.draw.push(E.mk('w-strike'));
 playId(G, 'w-berserk-roll'); ok(hw.hand.length >= 11 && hw.hand.length <= 13, 'R01 no hand cap (' + hw.hand.length + ' cards)');
@@ -92,7 +92,8 @@ E.newGame({ heroes: ['w'], seed: 22 }); E.debug.rest(); G = E.G(); const hr = G.
   Object.entries(D.EVENTS).forEach(([id, ev]) => ev.o.forEach(o => [o.do].concat(o.roll || []).forEach(d => { if (d) ['heal', 'hp', 'mhp', 'gold'].forEach(k => m(d[k], id + ':' + k)); })));
   E.newGame({ heroes: ['w', 'm'], seed: 41 }); m(E.G().gold, 'start gold'); E.debug.shop(); E.G().shop.items.forEach(it => m(it.p, 'price ' + it.id)); m(E.G().shop.rm, 'removal');
   ok(!bad.length, 'R28 one scale: all numbers are tabletop x ' + SC + (bad.length ? ' BAD ' + bad.slice(0, 8).join(' ') : ''));
-  ok(D.CARDS.shiv.ops[0][1] === SC && D.CARDS['w-strike'].ops[0][1] === SC && D.CARDS['w-defend'].ops[0][1] === SC && D.H.w.hp === 10 * SC, 'R28 anchors: Strike 1, Defend 1, Shiv 1, hero 10 HP (x SCALE)'); }
+  ok(D.CARDS.shiv.ops[0][1] === SC && D.CARDS['w-strike'].ops[0][1] === SC && D.CARDS['w-defend'].ops[0][1] === SC && D.H.w.hp === 10 * SC, 'R28 anchors: Strike 1, Defend 1, Shiv 1, hero 10 HP (x SCALE)');
+  ok(SC === 1 && D.CARDS['w-strike'].ops[0][1] === 1 && D.CARDS['w-hammer'].ops[0][1] === 2 && D.H.w.hp === 10 && D.H.s.hp === 9 && D.CAPS.blk === 20, 'F2 tabletop number scale on screen: Strike 1, heavy starter 2, Warrior 10 HP, Rogue 9, Block cap 20'); }
 // R14 treasure: each hero gains a relic
 E.newGame({ heroes: ['w', 'a'], seed: 23 }); E.debug.treasure(); G = E.G(); ok(G.rw.relics.length === 2 && E.performMove({ t: 'relic', i: 0 }) && E.performMove({ t: 'relic', i: 1 }) && G.rw.took.relic, 'R14 treasure: each hero takes a relic');
 // R15 boss relics: 1 per hero + 1 (3 solo), each hero takes one; R16 boss cards come from the rare deck
@@ -132,12 +133,12 @@ ok(its.filter(x => x.t === 'card' && D.CARDS[x.id].hero === 'w').length === 3 &&
 ok(pts[0].p === pts[1].p - SC && rel[0].p === SC * (D.RELICS[rel[0].id].rar === 'u' ? 8 : 5), 'R23 merchant: first relic and potion one coin (SCALE gold) cheaper');
 // UI contract: plain-word keyword lines
 const ln = id => E.lines(E.eff({ id, u: 0 })).join(' ');
-ok(/Retain/.test(ln('m-judgment')) && /Scry 2/.test(ln('m-third-eye')) && /Miracle/.test(ln('m-zen-burst')) && /Shivs \(8-damage/.test(ln('s-blade-fan')), 'lines: Retain, Scry, Miracle, Shiv described');
+ok(/Retain/.test(ln('m-judgment')) && /Scry 2/.test(ln('m-third-eye')) && /Miracle/.test(ln('m-zen-burst')) && new RegExp('Shivs \\(' + SC + '-damage').test(ln('s-blade-fan')), 'lines: Retain, Scry, Miracle, Shiv described');
 // dice: clover relic and lucky potion
 E.newGame({ heroes: ['w'], seed: 1 }); E.performMove({ t: 'go', n: E.validMoves()[0].n }); G = E.G();
 { const h = G.hs[0];
 G.lucky = 1; const before = G.q.length; h.hand = [E.mk('w-wild-swing')]; h.en = 3; h.st = {}; const t0 = G.b.en[0]; t0.blk = 0; t0.st = {}; t0.hp = t0.mhp = 100; const hp0 = t0.hp;
-E.performMove({ t: 'play', h: 0, c: 0, e: 0 }); ok(G.q.slice(before).some(f => f.k === 'die' && f.n === 6) && hp0 - t0.hp >= 14, 'fortune die forces a 6: wild swing deals 14');
+E.performMove({ t: 'play', h: 0, c: 0, e: 0 }); ok(G.q.slice(before).some(f => f.k === 'die' && f.n === 6) && hp0 - t0.hp >= 3 * SC, 'fortune die forces a 6: wild swing deals its top value');
 h.hand = [E.mk('wound'), E.mk('burn')]; ok(!E.validMoves().some(m => m.t === 'play'), 'status cards are unplayable'); }
 // orbs
 E.newGame({ heroes: ['a'], seed: 5 }); E.performMove({ t: 'go', n: E.validMoves()[0].n }); G = E.G(); G.b.en.forEach(e => { e.hp = e.mhp = 200; });   // sturdy foe so evokes cannot end the fight

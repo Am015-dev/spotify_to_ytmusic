@@ -14,10 +14,10 @@ window.EC_STORY = {
       { title: 'Prologue 4: The Gate', intro: 'His captain guards the last door. Beat it before the gate locks.', outro: 'The gate stays open. The ember lives, for now.' }
     ],
     steps: {
-      setup: { say: 'I am Ashgrove, keeper of this tower. You are Garrick: 80 HP, ten honest cards.\nIf your HP hits 0, the climb is over.', react: 'Good. Steady hands. Let us begin.' },
+      setup: { say: 'I am Ashgrove, keeper of this tower. You are Garrick: 10 HP, ten honest cards.\nIf your HP hits 0, the climb is over.', react: 'Good. Steady hands. Let us begin.' },
       intent: { say: 'A Gnawer blocks the stair. Above it you can read its next move:\nit will bite for 4.', react: 'Always read them first. Monsters are honest about that much.' },
       energy: { say: 'Each turn you draw 5 cards and hold 3 embers of energy.\nA card costs the number in its corner.', react: 'Spend it all. Embers do not keep overnight.' },
-      attack: { say: 'Crack its hide open with Anvil Breaker:\nit hits hard and leaves the beast Weak.', react: 'Hear that crack? Weak now: its bites lose 8.' },
+      attack: { say: 'Crack its hide open with Anvil Breaker:\nit hits hard and leaves the beast Weak.', react: 'Hear that crack? Weak now: its bites lose 1.' },
       block: { say: 'That bite is coming. Raise Plate Guard:\nBlock soaks damage until your next turn.', react: 'Shield up. Let it come.' },
       end: { say: 'Your embers are spent. End your turn\nand let the beast make its move.', react: 'Now we watch. Never look away from an enemy turn.' },
       enemyturn: { say: 'It bit, and your Block ate the damage.\nBlock fades when your next turn starts.', react: 'Not a scratch. That is how a warden fights.' },
@@ -32,7 +32,7 @@ window.EC_STORY = {
       junkintent: { say: 'An Iron Warden. It will stuff Seeing Stars into your deck:\njunk cards you can never play.', react: 'His sentries fight dirty. So will we.' },
       potion: { say: 'Potions are free and break after one use.\nPour the Venom Vial on it.', react: 'Hiss! Poison is in its gears now.' },
       poison: { say: 'Poison bites at the end of your turn, through any Block.\nAnd it stays until the thing falls.', react: '' },
-      power: { say: 'Powers burn for the whole fight.\nPlay Kindle: Strength, +8 on every hit.', react: 'Feel that fire in your arms? Every swing hits 8 harder.' },
+      power: { say: 'Powers burn for the whole fight.\nPlay Kindle: Strength, +1 on every hit.', react: 'Feel that fire in your arms? Every swing hits 1 harder.' },
       exhaust: { say: 'Bellow at it: every foe goes Weak, and you Block.\nThe bellow exhausts: gone until the next fight.', react: 'It flinched. Weak things hit soft.' },
       die: { say: 'Some cards roll the tower\'s die: 1-6, low to high.\nSwing wild!', react: 'Ha! Fortune favours the bold.' },
       end2: { say: 'Hold the rest and end your turn.\nWatch the poison chew.', react: '' },
@@ -69,8 +69,8 @@ window.EC_STORY = {
       endturn: 'No card fits your energy? Tap End turn.',
       target: 'Many enemies: lift an attack, then tap your target.',
       vuln: 'Vulnerable: takes double damage from the next attack.',
-      weak: 'Weak: each of its hits deals 8 less damage.',
-      poison: 'Poison hits 8 HP per token each turn. It stays.',
+      weak: 'Weak: each of its hits deals 1 less damage.',
+      poison: 'Poison hits 1 HP per token each turn. It stays.',
       strength: 'Strength adds to every hit you make this fight.',
       power: 'A Power card lasts the whole fight. Play it early.',
       exhaust: 'Exhaust cards vanish for the rest of this fight once played.',
@@ -101,7 +101,7 @@ window.EC_STORY = {
     },
     good: { kill: 'Clean kill!', double: 'Double damage on a Vulnerable foe. Nicely done.', blocked: 'Fully blocked. That is how a warden fights.' },
     poor: { hurt: 'Ouch. A Block card would have soaked some of that.', spikes: 'Spikes bit you. On its Spikes turn, block instead.', leftover: 'You ended with energy left. Spend it all next time.' },
-    end: { title: 'You climbed the tower', did: 'You beat the climb. You used:', heroes: 'Each other hero brings one new trick. Its first fight shows it.', play: 'Play a real game', title2: 'Title' }
+    end: { title: 'You know the basics', did: 'You learned:', heroes: 'Now pick your hero. Each one has its own cards and its own trick.', play: 'Pick your hero', title2: 'Title' }
   },
   // Story mode scenes per chapter (id from campaign.json): intro (2-3 lines), win and loss outros, boss lines before and after
   chapters: {

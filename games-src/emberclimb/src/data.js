@@ -13,14 +13,14 @@ var EC = (typeof EC !== 'undefined') ? EC : {};
   // Shiv, orb values, poison per token and gold all use it; token counts (Strength, Weak, Vulnerable, Poison, Frail) stay tabletop
   // counts and each Strength / Poison token is worth SCALE. Source per value: rules-notes.md. The content tables below were written in
   // video-game sizes; tt() at the bottom converts them once to whole tabletop units x SCALE. Caps follow the tabletop (Block cap 20 x SCALE).
-  var SCALE = 8, CAPS = { str: 8, blk: 160, en: 6, shiv: 5, poison: 30, deb: 3, mir: 5 }, EHP = { 1: 1, 2: 1.6 };
+  var SCALE = 1, CAPS = { str: 8, blk: 20 * SCALE, en: 6, shiv: 5, poison: 30, deb: 3, mir: 5 }, EHP = { 1: 1, 2: 1.6 };
   // gold: tabletop coins x SCALE; the video-game sizes below are 25 gold per tabletop coin (common card 2 coins, rare 6)
   function GOLD(v) { var c = Math.round(Math.abs(v) / 25); return (v < 0 ? -1 : 1) * SCALE * c; }
   var H = {
     w: { k: 'w', name: 'Garrick Cinderplate', role: 'Ember Warrior', hp: 80, mech: 'Strength: every point adds damage to all attacks.', art: 'broad-shouldered armoured warrior with a glowing ember-forged greatsword', relic: 'ember-brand', start: ['w-strike', 'w-strike', 'w-strike', 'w-strike', 'w-strike', 'w-defend', 'w-defend', 'w-defend', 'w-defend', 'w-hammer'], col: '#c8472b' },
     s: { k: 's', name: 'Sable Quillfinger', role: 'Venom Rogue', hp: 70, mech: 'Poison and Shivs: stack poison, flood the table with 0-cost shivs.', art: 'hooded lithe rogue with throwing knives and a vial of green venom', relic: 'whetstone-ring', start: ['s-strike', 's-strike', 's-strike', 's-strike', 's-strike', 's-defend', 's-defend', 's-defend', 's-defend', 's-defend', 's-pinprick', 's-slip-away'], col: '#3f9b5a' },
     a: { k: 'a', name: 'Cog-9', role: 'Orb Automaton', hp: 75, mech: 'Orbs: channel Lightning, Frost and Dark; evoke them for big effects.', art: 'friendly brass clockwork automaton with three glowing orbs orbiting its chest', relic: 'spark-core', start: ['a-strike', 'a-strike', 'a-strike', 'a-strike', 'a-defend', 'a-defend', 'a-defend', 'a-defend', 'a-zap', 'a-dualcast'], col: '#3d8fd0' },
-    m: { k: 'm', name: 'Ione Stillwater', role: 'Stance Monk', hp: 72, mech: 'Stances: Wrath adds 8 damage per hit; Calm gives energy on exit.', art: 'serene barefoot monk in saffron robes with prayer beads, calm and wrathful aura halves', relic: 'prayer-beads', start: ['m-strike', 'm-strike', 'm-strike', 'm-strike', 'm-defend', 'm-defend', 'm-defend', 'm-defend', 'm-eruption', 'm-vigilance'], col: '#c9a227' }
+    m: { k: 'm', name: 'Ione Stillwater', role: 'Stance Monk', hp: 72, mech: 'Stances: Wrath adds 1 damage per hit; Calm gives energy on exit.', art: 'serene barefoot monk in saffron robes with prayer beads, calm and wrathful aura halves', relic: 'prayer-beads', start: ['m-strike', 'm-strike', 'm-strike', 'm-strike', 'm-defend', 'm-defend', 'm-defend', 'm-defend', 'm-eruption', 'm-vigilance'], col: '#c9a227' }
   };
   // ---------- Warrior (W571: our own pool; ids are kept only because they name the picture files)
   c('w-strike', 'w', 'Cinder Strike', 'A', 's', 1, [['dmg', 6]], 'plain sword cut trailing orange sparks');
@@ -192,51 +192,51 @@ var EC = (typeof EC !== 'undefined') ? EC : {};
   var ACTBOSS = { 1: 'mire-behemoth', 2: 'ashen-wraith', 3: 'gate-colossus', 4: 'ember-tyrant' };
   // relic effect keys are read by the engine
   var RELICS = {   // W571: our own relic set (ids name the picture files); the engine reads the ids (engine.js has('...'))
-    'ember-brand': { name: 'Ember Brand', t: 'Heal 8 after each fight, 16 after an elite or boss.', rar: 's', art: 'iron brand glowing orange at the tip' },
+    'ember-brand': { name: 'Ember Brand', t: 'Heal 1 after each fight, 2 after an elite or boss.', rar: 's', art: 'iron brand glowing orange at the tip' },
     'whetstone-ring': { name: 'Whetstone Ring', t: 'Turn 1: add 1 Shiv to your hand.', rar: 's', art: 'silver ring with a tiny whetstone' },
     'spark-core': { name: 'Spark Core', t: 'Start fights with a Frost and a Dark orb.', rar: 's', art: 'glass sphere with a trapped blue spark' },
     'prayer-beads': { name: 'Prayer Beads', t: 'Start every fight in Calm.', rar: 's', art: 'string of wooden prayer beads' },
-    'lucky-coin': { name: 'Lucky Coin', t: '+16 gold now.', rar: 'c', art: 'chipped gold coin balanced on its edge' },
-    'iron-bangle': { name: 'Iron Bangle', t: 'Start fights with 8 Block per foe.', rar: 'c', art: 'thick iron bracelet with a rune notch' },
+    'lucky-coin': { name: 'Lucky Coin', t: '+2 gold now.', rar: 'c', art: 'chipped gold coin balanced on its edge' },
+    'iron-bangle': { name: 'Iron Bangle', t: 'Start fights with 1 Block per foe.', rar: 'c', art: 'thick iron bracelet with a rune notch' },
     'lantern': { name: 'Tin Lantern', t: 'Every 3rd turn: +1 energy.', rar: 'c', art: 'small dented tin lantern lit from within' },
     'bag-of-marbles': { name: 'Spilled Marbles', t: 'Elites and bosses start Vulnerable 2.', rar: 'c', art: 'leather pouch spilling glass marbles' },
-    'clover-dice': { name: 'Clover Dice', t: 'A rolled 1 counts as 4.', rar: 'c', art: 'carved bone die with a four-leaf clover on it' },
-    'healing-moss': { name: 'Healing Moss', t: 'Rest sites heal 16 more.', rar: 'c', art: 'clump of glowing green moss on a stone' },
-    'gold-tooth': { name: 'Gold Tooth', t: '+8 gold after every fight.', rar: 'c', art: 'single gold tooth on a velvet scrap' },
-    'oak-heart': { name: 'Oak Heart', t: '+16 max HP now.', rar: 'c', art: 'heart-shaped knot cut from an oak branch' },
+    'clover-dice': { name: 'Clover Dice', t: 'Cards with a die (like Wild Swing): a rolled 1 counts as 4.', rar: 'c', art: 'carved bone die with a four-leaf clover on it' },
+    'healing-moss': { name: 'Healing Moss', t: 'Rest sites heal 2 more.', rar: 'c', art: 'clump of glowing green moss on a stone' },
+    'gold-tooth': { name: 'Gold Tooth', t: '+1 gold after every fight.', rar: 'c', art: 'single gold tooth on a velvet scrap' },
+    'oak-heart': { name: 'Oak Heart', t: '+2 max HP now.', rar: 'c', art: 'heart-shaped knot cut from an oak branch' },
     'candle-stub': { name: 'Candle Stub', t: 'Turn 2: draw 2 extra.', rar: 'c', art: 'melted candle stub on a saucer' },
     'pocket-satchel': { name: 'Pocket Satchel', t: '+1 potion slot and a potion now.', rar: 'c', art: 'small canvas satchel with brass buckles' },
-    'tin-flute': { name: 'Tin Flute', t: 'Powers give 16 Block when played.', rar: 'u', art: 'little tin flute with painted stripes' },
-    'smoking-censer': { name: 'Smoking Censer', t: 'Attacks deal +8 damage.', rar: 'u', art: 'hanging brass censer trailing grey smoke' },
+    'tin-flute': { name: 'Tin Flute', t: 'Powers give 2 Block when played.', rar: 'u', art: 'little tin flute with painted stripes' },
+    'smoking-censer': { name: 'Smoking Censer', t: 'Attacks deal +1 damage.', rar: 'u', art: 'hanging brass censer trailing grey smoke' },
     'dawnstone': { name: 'Dawnstone', t: '+1 energy every turn; turn 1 draws 1 less.', rar: 'b', art: 'pale pink glowing stone like a sunrise' },
     'gale-cloak': { name: 'Gale Cloak', t: 'From turn 2: draw 1 extra every turn.', rar: 'b', art: 'wind-tossed travelling cloak with a brooch' },
-    'phoenix-ash': { name: 'Phoenix Ash', t: 'Once per run: revive at 40% HP with 16 Block.', rar: 'b', art: 'urn of warm glowing ash with a red feather' }
+    'phoenix-ash': { name: 'Phoenix Ash', t: 'Once per run: revive at 40% HP with 2 Block.', rar: 'b', art: 'urn of warm glowing ash with a red feather' }
   };
   var POTIONS = {   // W571: our own potion set; engine.js usePot() reads the ids
-    'fire-flask': { name: 'Fire Flask', t: 'Deal 24 to a foe; Vulnerable 1.', tgt: 1, art: 'round flask of bright orange fire' },
-    'block-brew': { name: 'Iron Brew', t: 'Gain 8 Block per foe (at least 16).', art: 'grey potion bottle with metal flecks' },
+    'fire-flask': { name: 'Fire Flask', t: 'Deal 3 to a foe; Vulnerable 1.', tgt: 1, art: 'round flask of bright orange fire' },
+    'block-brew': { name: 'Iron Brew', t: 'Gain 1 Block per foe (at least 2).', art: 'grey potion bottle with metal flecks' },
     'strength-tonic': { name: 'Red Tonic', t: 'Gain 1 Strength. Draw 1.', art: 'thick red tonic in a tall bottle' },
     'swift-draught': { name: 'Wing Draught', t: 'Draw 2. Gain 1 energy.', art: 'silver-blue swirling potion with wings' },
-    'energy-vial': { name: 'Bolt Vial', t: 'Gain 3 energy. Lose 8 HP.', art: 'yellow glowing vial with lightning shape' },
+    'energy-vial': { name: 'Bolt Vial', t: 'Gain 3 energy. Lose 1 HP (never your last).', art: 'yellow glowing vial with lightning shape' },
     'venom-vial': { name: 'Venom Vial', t: 'Poison every foe 1.', art: 'skull-stoppered green vial' },
     'frost-gas': { name: 'Frost Gas', t: 'All foes Weak 1 and Vulnerable 1.', art: 'pale blue misty bottle' },
-    'healing-draught': { name: 'Rose Draught', t: 'Heal 24. Gain 8 Block.', art: 'rosy pink potion in a heart-shaped flask' },
-    'fortune-die': { name: 'Fortune Die', t: 'Next 2 dice rolls show 6.', art: 'golden die floating inside a glass bottle' }
+    'healing-draught': { name: 'Rose Draught', t: 'Heal 3. Gain 1 Block.', art: 'rosy pink potion in a heart-shaped flask' },
+    'fortune-die': { name: 'Fortune Die', t: 'Drink it before a card with a die (like Wild Swing). Your next 2 die rolls land on 6.', art: 'golden die floating inside a glass bottle' }
   };
   var EVENTS = {
-    'ember-shrine': { name: 'Ember Shrine', q: 'A shrine hums with warm light.', art: 'small stone shrine with floating embers', o: [{ t: 'Pray: heal 16', do: { heal: 15 } }, { t: 'Offer 8 HP: upgrade a card', do: { hp: -6, upg: 1 } }, { t: 'Walk on', do: {} }] },
-    'wandering-tinker': { name: 'Wandering Tinker', q: 'A tinker offers a trade.', art: 'cheerful tinker with a cart of pots and gadgets', o: [{ t: 'Buy a relic (32 gold)', do: { gold: -90, relic: 1 }, cost: 90 }, { t: 'Sell blood: +16 gold, -8 HP', do: { gold: 60, hp: -8 } }, { t: 'Leave', do: {} }] },
+    'ember-shrine': { name: 'Ember Shrine', q: 'A shrine hums with warm light.', art: 'small stone shrine with floating embers', o: [{ t: 'Pray: heal 2', do: { heal: 15 } }, { t: 'Offer 1 HP: upgrade a card', do: { hp: -6, upg: 1 } }, { t: 'Walk on', do: {} }] },
+    'wandering-tinker': { name: 'Wandering Tinker', q: 'A tinker offers a trade.', art: 'cheerful tinker with a cart of pots and gadgets', o: [{ t: 'Buy a relic (4 gold)', do: { gold: -90, relic: 1 }, cost: 90 }, { t: 'Sell blood: +2 gold, -1 HP', do: { gold: 60, hp: -8 } }, { t: 'Leave', do: {} }] },
     'whispering-well': { name: 'Whispering Well', q: 'Drink? Roll the die.', art: 'old stone well with blue mist and a coin', o: [{ t: 'Drink and roll', roll: [{ hp: -8 }, { gold: 40 }, { relic: 1 }] }, { t: 'Leave', do: {} }] },
-    'stranded-caravan': { name: 'Stranded Caravan', q: 'A broken cart blocks the road.', art: 'wrecked merchant cart in a forest road', o: [{ t: 'Help: lose 8 HP, gain a card', do: { hp: -5, card: 1 } }, { t: 'Loot: +16 gold, Remorse', do: { gold: 45, curse: 'regret' } }, { t: 'Leave', do: {} }] },
-    'mirror-pool': { name: 'Mirror Pool', q: 'Your reflection offers a deal.', art: 'still dark pond reflecting a different sky', o: [{ t: 'Lose 8 HP: remove a card', do: { hp: -7, rem: 1 } }, { t: 'Gain 8 max HP, Cold Feet', do: { mhp: 6, curse: 'doubt' } }, { t: 'Step in: transform a card', do: { xform: 1 } }, { t: 'Leave', do: {} }] },
-    'first-ember': { img: 'event-ember-shrine', start: 1, name: 'The First Ember', q: 'A warm ember offers one gift.', art: 'small glowing ember floating over an open palm', o: [{ t: 'Gain 8 max HP', do: { mhp: 8 } }, { t: 'Take 32 gold', do: { gold: 100 } }, { t: 'Take a rare card', do: { rare: 1 } }, { t: 'Lose 8 HP: take a relic', do: { hp: -10, relic: 1 } }] },
-    'ash-library': { img: 'node-event', name: 'Ash Library', q: 'Half-burnt books line the walls.', art: 'tall scorched bookshelves with drifting pages', o: [{ t: 'Read: gain a card', do: { card: 1 } }, { t: 'Sleep here: heal 16', do: { heal: 12 } }, { t: 'Leave', do: {} }] },
-    'cursed-chest': { img: 'node-event', name: 'Cursed Chest', q: 'A chest hums with a dark tune.', art: 'iron-bound chest leaking purple smoke', o: [{ t: 'Open: a relic and Remorse', do: { relic: 1, curse: 'regret' } }, { t: 'Leave', do: {} }] },
-    'herb-witch': { img: 'event-wandering-tinker', name: 'Herb Witch', q: 'An old woman stirs a pot.', art: 'smiling old woman stirring a bubbling green pot', o: [{ t: 'Buy 2 potions (16 gold)', do: { gold: -40, pot: 2 }, cost: 40 }, { t: 'Taste the stew: heal 8', do: { heal: 8 } }, { t: 'Leave', do: {} }] },
-    'forge-spirit': { img: 'event-ember-shrine', name: 'Forge Spirit', q: 'A spirit offers to hammer a card.', art: 'glowing figure of flame standing at an anvil', o: [{ t: 'Upgrade a card', do: { upg: 1 } }, { t: 'Lose 8 HP: +8 max HP', do: { hp: -6, mhp: 2 } }, { t: 'Leave', do: {} }] },
-    'golden-idol': { img: 'node-event', name: 'Golden Idol', q: 'A golden idol sits on a trap.', art: 'small golden idol on a stone plinth with cracks', o: [{ t: 'Grab it: +32 gold, Injury', do: { gold: 100, curse: 'injury' } }, { t: 'Grab carefully: +16 gold, -8 HP', do: { gold: 50, hp: -9 } }, { t: 'Leave', do: {} }] },
-    'kind-pilgrim': { img: 'event-stranded-caravan', name: 'Kind Pilgrim', q: 'A pilgrim shares the fire.', art: 'hooded pilgrim at a small campfire offering bread', o: [{ t: 'Rest: heal 8', do: { heal: 10 } }, { t: 'Trade stories: remove a card, -8 HP', do: { hp: -4, rem: 1 } }, { t: 'Leave', do: {} }] },
-    'back-alley-gambler': { name: 'Back Alley Gambler', q: 'A grin and a pair of dice.', art: 'hooded gambler at a barrel table with dice', o: [{ t: 'Bet 8 gold and roll: 1-2 lose it, 3-4 keep it, 5 win 16, 6 win 32', roll: [{ gold: -30 }, { gold: -30 }, { gold: 0 }, { gold: 0 }, { gold: 60 }, { gold: 90 }], cost: 30 }, { t: 'Walk away', do: {} }] }
+    'stranded-caravan': { name: 'Stranded Caravan', q: 'A broken cart blocks the road.', art: 'wrecked merchant cart in a forest road', o: [{ t: 'Help: lose 1 HP, gain a card', do: { hp: -5, card: 1 } }, { t: 'Loot: +2 gold, Remorse', do: { gold: 45, curse: 'regret' } }, { t: 'Leave', do: {} }] },
+    'mirror-pool': { name: 'Mirror Pool', q: 'Your reflection offers a deal.', art: 'still dark pond reflecting a different sky', o: [{ t: 'Lose 1 HP: remove a card', do: { hp: -7, rem: 1 } }, { t: 'Gain 1 max HP, Cold Feet', do: { mhp: 6, curse: 'doubt' } }, { t: 'Step in: transform a card', do: { xform: 1 } }, { t: 'Leave', do: {} }] },
+    'first-ember': { start: 1, name: 'The First Ember', q: 'A warm ember offers one gift.', art: 'small glowing ember floating over an open palm', o: [{ t: 'Gain 1 max HP', do: { mhp: 8 } }, { t: 'Take 4 gold', do: { gold: 100 } }, { t: 'Take a rare card', do: { rare: 1 } }, { t: 'Lose 1 HP: take a relic', do: { hp: -10, relic: 1 } }] },
+    'ash-library': { name: 'Ash Library', q: 'Half-burnt books line the walls.', art: 'tall scorched bookshelves with drifting pages', o: [{ t: 'Read: gain a card', do: { card: 1 } }, { t: 'Sleep here: heal 2', do: { heal: 12 } }, { t: 'Leave', do: {} }] },
+    'cursed-chest': { name: 'Cursed Chest', q: 'A chest hums with a dark tune.', art: 'iron-bound chest leaking purple smoke', o: [{ t: 'Open: a relic and Remorse', do: { relic: 1, curse: 'regret' } }, { t: 'Leave', do: {} }] },
+    'herb-witch': { name: 'Herb Witch', q: 'An old woman stirs a pot.', art: 'smiling old woman stirring a bubbling green pot', o: [{ t: 'Buy 2 potions (2 gold)', do: { gold: -40, pot: 2 }, cost: 40 }, { t: 'Taste the stew: heal 1', do: { heal: 8 } }, { t: 'Leave', do: {} }] },
+    'forge-spirit': { name: 'Forge Spirit', q: 'A spirit offers to hammer a card.', art: 'glowing figure of flame standing at an anvil', o: [{ t: 'Upgrade a card', do: { upg: 1 } }, { t: 'Lose 1 HP: +1 max HP', do: { hp: -6, mhp: 2 } }, { t: 'Leave', do: {} }] },
+    'golden-idol': { name: 'Golden Idol', q: 'A golden idol sits on a trap.', art: 'small golden idol on a stone plinth with cracks', o: [{ t: 'Grab it: +4 gold, Injury', do: { gold: 100, curse: 'injury' } }, { t: 'Grab carefully: +2 gold, -1 HP', do: { gold: 50, hp: -9 } }, { t: 'Leave', do: {} }] },
+    'kind-pilgrim': { name: 'Kind Pilgrim', q: 'A pilgrim shares the fire.', art: 'hooded pilgrim at a small campfire offering bread', o: [{ t: 'Rest: heal 1', do: { heal: 10 } }, { t: 'Trade stories: remove a card, -1 HP', do: { hp: -4, rem: 1 } }, { t: 'Leave', do: {} }] },
+    'back-alley-gambler': { name: 'Back Alley Gambler', q: 'A grin and a pair of dice.', art: 'hooded gambler at a barrel table with dice', o: [{ t: 'Bet 1 gold and roll: 1-2 lose it, 3-4 keep it, 5 win 2, 6 win 4', roll: [{ gold: -30 }, { gold: -30 }, { gold: 0 }, { gold: 0 }, { gold: 60 }, { gold: 90 }], cost: 30 }, { t: 'Walk away', do: {} }] }
   };
   var NODES = { m: 'Monster', e: 'Elite', r: 'Rest', s: 'Shop', v: 'Event', t: 'Treasure', b: 'Boss' };
 
@@ -317,7 +317,18 @@ var EC = (typeof EC !== 'undefined') ? EC : {};
     };
     Object.keys(U).forEach(function (id) { if (CARDS[id]) CARDS[id].up = U[id]; });
   })();
-  EC.D = { GOLD: GOLD, SCALE: SCALE, CAPS: CAPS, EHP: EHP, CARDS: CARDS, ORDER: ORDER, H: H, ENEMIES: ENEMIES, ENC: ENC, ENCA: ENCA, ACTBOSS: ACTBOSS, RELICS: RELICS, POTIONS: POTIONS, EVENTS: EVENTS, NODES: NODES, needsTarget: needsTarget,
+  // Passive / trigger rules a foe carries (not part of its intent): one short chip on the foe, one full sentence for the popup and the Rules.
+  function foeNote(id) {
+    var d = ENEMIES[id]; if (!d) return null;
+    if (d.skillTax) return { chip: 'Skill: -' + d.skillTax * SCALE + ' HP', text: 'From its 2nd turn, every Skill you play costs you ' + d.skillTax * SCALE + ' HP. Attacks and Powers are free.' };
+    if (d.deathVuln) return { chip: 'Dies: you Vulnerable', text: 'When it dies, every hero becomes Vulnerable ' + d.deathVuln + '.' };
+    if (d.curl) return { chip: 'Curls: +' + d.curl * SCALE + ' Block', text: 'The first time it is hurt, it curls up and gains ' + d.curl * SCALE + ' Block.' };
+    if (d.split) return { chip: 'Splits when slain', text: 'When it dies it bursts into smaller foes next round.' };
+    if (d.keepBlk) return { chip: 'Keeps its Block', text: 'It keeps its Block between turns. Break the Block before its Mode Shift step and it turns defensive instead of attacking.' };
+    if (d.sleep) return { chip: 'Asleep: wakes if hurt', text: 'It sleeps until you hurt it, then it wakes and fights.' };
+    return null;
+  }
+  EC.D = { foeNote: foeNote, GOLD: GOLD, SCALE: SCALE, CAPS: CAPS, EHP: EHP, CARDS: CARDS, ORDER: ORDER, H: H, ENEMIES: ENEMIES, ENC: ENC, ENCA: ENCA, ACTBOSS: ACTBOSS, RELICS: RELICS, POTIONS: POTIONS, EVENTS: EVENTS, NODES: NODES, needsTarget: needsTarget,
     // Gentle (first climb) player-side numbers: max HP x hp, start with `pots` x `pot`, Rest heals `rest` (tabletop 3) x SCALE. Env GENTLE='{...}' overrides in the bench.
     GENTLE: (typeof process !== 'undefined' && process.env && process.env.GENTLE_CFG) ? JSON.parse(process.env.GENTLE_CFG) : { hp: 5, pots: 3, pot: 'healing-draught', rest: 8 } };
   if (typeof module !== 'undefined') module.exports = EC;

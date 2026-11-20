@@ -142,8 +142,8 @@
     G.map.forEach(function (n) { G.map.forEach(function (o) { if (o.f === n.f + 1) n.nx.push(o.id); }); }); G.F = 6; G.pots = ['venom-vial']; G.boss = 'mire-behemoth';
     G.tutEnc = { 2: ['rust-tick'], 6: ['iron-warden', 'iron-warden'], 7: ['mire-behemoth'] }; G.tutHp = { 6: 55, 7: 40 };
     E.performMove({ t: 'go', n: 0 }); G = g();
-    // guided first fight: one slug with a fixed pattern (bite 8, then bite 8 + Weak), sized so it falls to the second Strike of turn 2 (16 + 2 x 16 = 48)
-    var e = G.b.en[0]; G.b.en = [e]; e.id = 'mire-slug'; e.hp = e.mhp = 44; e.blk = 0; e.st = {}; e.i = 0; e.intent = { atk: 8, tg: 0 };
+    // guided first fight: one slug with a fixed pattern (bite 1, then bite 1 + Weak), sized so it falls to the second Strike of turn 2 (2 + 2 + 2 = 6, tabletop numbers)
+    var e = G.b.en[0]; G.b.en = [e]; e.id = 'mire-slug'; e.hp = e.mhp = 5; e.blk = 0; e.st = {}; e.i = 0; e.intent = { atk: 1, tg: 0 };
     var h = G.hs[0], mk = E.mk; h.hand = [mk('w-hammer'), mk('w-defend'), mk('w-strike'), mk('w-strike'), mk('w-defend')]; h.en = 3; h.blk = 0;
     h.draw = [mk('w-strike'), mk('w-defend'), mk('w-strike'), mk('w-roar'), mk('w-kindle')]; h.disc = [];
     h.deck.push(mk('w-cleave'), mk('w-wild-swing'));   // a hit-all attack and a die card, so both rules come up by playing them
@@ -155,28 +155,29 @@
   function node(t) { return function () { return $('#map .node.t-' + t); }; }
   function goldEl() { var xs = document.querySelectorAll('.reward .chip'); for (var i = 0; i < xs.length; i++) if (/gold/.test(xs[i].textContent)) return xs[i]; return null; }
   // Every core rule in order, one line of 12 words or fewer, one highlighted tap each. ids = the rule keys tools/tut-walk.js checks.
-  var RULES = ['intent', 'energy', 'vuln', 'block', 'endturn', 'pattern', 'strength', 'exhaust', 'potion', 'finish', 'reward', 'leave', 'map', 'go'];   // G3 r2: mostly doing steps, 4 Next-only lines
+  var RULES = ['intent', 'energy', 'vuln', 'block', 'endturn', 'pattern', 'strength', 'exhaust', 'potion', 'finish', 'reward', 'leave', 'map'];   // G3 r2: mostly doing steps, 4 Next-only lines
   function steps() {
     var tap = function (id, n) { return { type: 'tap', times: n || 2, match: function (a) { return a.w === 'card' && a.id === id; } }; };
     var info = function (id, target, say, ready, side) { return { id: id, title: 'Warden Ashgrove', target: target, say: say, wait: null, ready: ready || battleP, side: side }; };
     var en = function () { return $('.en'); }, intent = function () { return $('.en .intent') || $('.en'); };
+    // F2: steps that play an attack keep every live foe tappable and the bubble off them (a lifted attack is played by tapping the foe)
+    var foes = function () { return [].slice.call(document.querySelectorAll('.en:not(.dead)')); }, foeR = function () { return foes().map(function (x) { return x.getBoundingClientRect(); }); };
     return [
       info('intent', intent, 'Goal: beat the boss on top. This icon is its next move.'),
       info('energy', function () { return $('.energy') || $('#end'); }, 'Each turn: 3 energy and 5 new cards. Cards cost energy.'),
-      { id: 'vuln', title: 'Attack', target: function () { return cardEl('w-hammer'); }, say: 'Tap Anvil Breaker twice: a big hit, and the foe is Weak.', wait: tap('w-hammer'), ready: battleP },
+      { id: 'vuln', title: 'Attack', target: function () { return cardEl('w-hammer'); }, say: 'Tap Anvil Breaker twice: a big hit, and the foe is Weak.', wait: tap('w-hammer'), ready: battleP, also: foes, avoid: foeR },
       { id: 'block', title: 'Block', target: function () { return cardEl('w-defend'); }, say: 'Tap Plate Guard twice. Block soaks hits, this turn only.', wait: tap('w-defend'), ready: battleP },
       { id: 'endturn', title: 'End turn', target: function () { return $('#end'); }, endOk: 1, onEnter: function () { setTimeout(function () { UI.render(); }, 30); }, say: 'Tap End turn. Leftover cards go to the discard pile.', wait: { type: 'tap', match: function (a) { return a.w === 'end'; } }, ready: battleP },
-      info('pattern', intent, 'Foes repeat a pattern. Next: a bite that makes you Weak.', turn2),
-      { id: 'strength', title: 'Power', target: function () { return cardEl('w-kindle'); }, say: 'Tap Kindle twice. Strength adds 8 to every hit.', wait: tap('w-kindle'), ready: turn2 },
+      info('pattern', intent, function () { var G = g(), e = G && G.b && G.b.en[0], P = e && UI.intentParts ? UI.intentParts(e) : null; return 'Foes repeat moves. Next: ' + (P ? P.map(function (p) { return p.cap; }).join(' and ') : 'a new move') + '.'; }, turn2),
+      { id: 'strength', title: 'Power', target: function () { return cardEl('w-kindle'); }, say: 'Tap Kindle twice. Strength adds 1 to every hit.', wait: tap('w-kindle'), ready: turn2 },
       { id: 'exhaust', title: 'Weak', target: function () { return cardEl('w-roar'); }, say: 'Tap the Bellow twice. ALL foes Weak, and you Block. Exhausts.', wait: tap('w-roar'), ready: turn2 },
       { id: 'potion', title: 'Potion', target: function () { return $('.ec-potpop .potdrink') || $('.pot.full'); }, say: 'Tap the potion, then Drink. Poison hurts through Block.', wait: { type: 'event', match: function (a) { return a.pots === 0; } }, ready: turn2 },
-      { id: 'finish', title: 'Finish it', target: function () { return cardEl('w-strike'); }, say: 'Tap each Strike twice to finish it.', wait: tap('w-strike', 4), ready: turn2 },
+      { id: 'finish', title: 'Finish it', target: function () { return cardEl('w-strike'); }, say: 'Tap each Strike twice to finish it.', wait: tap('w-strike', 4), ready: turn2, also: foes, avoid: foeR },
       { id: 'reward', title: 'Card reward', target: function () { return $('.picks .card') && $('.picks .card').parentNode; }, say: 'Gold won! Pick 1 of 3 cards for your deck.', wait: { type: 'tap', match: function (a) { return a.w === 'pick'; } }, ready: scr('reward') },
       { id: 'leave', title: 'Onward', target: function () { return $('#leave'); }, say: 'Tap Continue to climb.', wait: { type: 'event', match: function (a) { return a.scr === 'map'; } }, ready: scr('reward') },
-      info('map', function () { return $('#map'); }, 'Choose your path. The boss waits at the top.', scr('map')),
-      { id: 'go', title: 'Your climb', target: function () { return $('#map .node.glow'); }, also: function () { return [].slice.call(document.querySelectorAll('#map .node.glow')).slice(1); }, say: 'Tap a glowing room: a fight or a ? event.', wait: { type: 'event', match: function (a) { return a.scr !== 'map'; } }, ready: scr('map') },
-      { id: 'free', title: 'Your climb', target: function () { return $('#app'); }, say: 'Your climb now.', wait: null, ready: function () { return true; },
-        onEnter: function () { setTimeout(function () { try { GXT.stop(); } catch (e) { } C.on = true; ['intent', 'vuln', 'energy', 'block', 'endturn', 'weak', 'poison', 'strength', 'power', 'exhaust', 'potion', 'reward', 'gold', 'map'].forEach(function (k) { C.seen[k] = 1; }); UI.render(); }, 60); } }
+      // F2: the guide ends at the map. The first real climb is the full branching act with a hero pick (the end card's main button)
+      info('map', function () { return $('#map'); }, 'Paths branch. Pick rooms; the boss waits on top.', scr('map'))
+
     ];
   }
   window.EC_TUT_RULES = RULES;
@@ -194,7 +195,7 @@
   UI.coachFinish = finish;
   UI.tutStart = function () {
     if (!window.GXT) return;
-    GXT.start({ game: 'emberclimb', setup: stage, steps: steps(), story: false, endTitle: 'Your climb', endText: '', onDone: function () { }, onExit: function () { if (C.on) return; if (UI.camp) { C.on = true; C.seen.intent = 1; UI.render(); } else finish(false); } });
+    GXT.start({ game: 'emberclimb', setup: stage, steps: steps(), story: false, endTitle: 'You know the basics', endText: 'Now pick your hero. The real climb: a branching map, 9 floors, then a boss.', endButtons: [{ id: 'pick', label: 'Pick your hero' }, { id: 'title', label: 'Title' }], onDone: function (r) { finish(!r || r.choice !== 'title'); }, onExit: function () { if (C.on) return; if (UI.camp) { C.on = true; C.seen.intent = 1; UI.render(); } else finish(false); } });
     try { if (GXT.active()) UI.render(); } catch (e) { }
   };
   UI.tutFree = function () { return false; };

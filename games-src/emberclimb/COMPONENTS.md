@@ -1,7 +1,7 @@
 # Emberclimb components (F1, 20 Nov 2026)
 
 Counts are read from `src/data.js` (run `node -e "require('./core.js')"` after `python3 build.py` to re-check).
-Every number on screen is the tabletop number x 8 (`D.SCALE`).
+Every number on screen is the tabletop number (`D.SCALE = 1`, F2): Strike 1, Defend 1, Warrior 10 HP, Rest heals 3.
 
 ## Cards
 
@@ -22,13 +22,15 @@ logic-test rule 52 and rules-test check that every card has one and that it is s
 | Component | Count | Notes |
 |---|---|---|
 | Heroes | 4 | all playable in Quick from the start (no Story lock) |
-| Foes | 27 | Act 1 foes use their printed tabletop cards x 8; Act 2, 3 and final foes are our own |
+| Foes | 27 | Act 1 foes use their printed tabletop cards; Act 2, 3 and final foes are our own |
 | Bosses | 4 | act 1 Mire Behemoth (splits), act 2 Ashen Wraith, act 3 Gate Wyrm, final Ember Tyrant |
 | Relics | 19 | 8 open after Story chapters (RLOCK in ui.js) |
 | Potions | 9 | 3 slots per hero; Pocket Satchel adds 1 |
 | Events | 13 | |
-| Climb length | 1 act, 3 acts (default), 3 acts + final | setup screen |
-| Difficulty | Tabletop (default, rulebook numbers), Gentle (opt-in: 5x HP, 3 Healing Draughts, Rest heals 64) | |
+| Climb length | 1 act (default), 3 acts, 3 acts + final | setup screen |
+| Act map | branching, 4 lanes, 9 floors + boss, treasure on floor 5, rest before the boss | every real climb, the first one included (F2); only the guide uses a short fixed map. [unverified] the printed board's row count |
+| Card rewards | pick 1 of 3 from your hero's own class pool (commons/uncommons, rares from elites/bosses) | neutral cards only in shops and events |
+| Difficulty | Tabletop (default, rulebook numbers), Gentle (opt-in: 5x HP, 3 Healing Draughts, Rest heals 8) | |
 
 ## Not identical to the original
 

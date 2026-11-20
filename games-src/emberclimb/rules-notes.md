@@ -5,7 +5,22 @@ official rules as I know them. I cannot open the rulebook from this container, s
 numbers with confidence; "UNCHECKED" means I could not recall the official number with confidence, so it was left alone (nothing invented).
 Names in the game are all original; this file uses plain rule terms only.
 
-## One scale (R16, Nov 2026): every number = tabletop number x SCALE (8)
+## Tabletop scale (F2, 20 Nov 2026): every number on screen IS the tabletop number (`D.SCALE = 1`)
+F1 showed every number x8 (Strike 8, Strength +8, Block 8); the cold-play tester called it odd. F2 sets the one constant `D.SCALE` (data.js)
+to 1, so every damage, Block, HP, heal, HP loss, Weak, Wrath, Shiv, orb, poison, relic, potion, event and gold number is the tabletop value
+(Strike 1, Defend 1, Warrior 10 HP, Rest heals 3, start gold 4). Structure is unchanged: all content was already stored as whole tabletop
+units x SCALE, so play is identical, only the printed numbers shrink. Frail is now "1 less Block per Block card" (it was -25%, which rounds
+to 0 on this scale) [unverified: Frail only comes from our own act 2 foes]. Ascension 2 loses 1 max HP. The table below keeps the old x8
+column for reference; read the "Tabletop source" column as what the game shows now.
+
+## Tension check (F2, 20 Nov 2026)
+The cold-play tester's easy climb (elite 0 HP lost, boss 8) was the guide's short map, where the elite had 55% and the boss 40% HP.
+F2 ends the guide at the map; the first real climb is the rulebook act. `node bench-newcomer.js 300 <hero>` (newcomer policy, Tabletop,
+1 act, now also prints HP lost per fight): normal fights cost HP 41-53% of the time (avg 1.0-1.6 of 9-10 HP), elites 83-100% (avg
+3.6-5.4 HP), the boss every time; reached the boss 10-51%, beat it 0-4%. `bal-newb.js 100 0.3`: reach 44%, beat 10%. So the default is
+already a real threat; foes were not made stronger. Gentle stays opt-in (5x HP, 3 Healing Draughts, Rest heals 8).
+
+## One scale (R16, Nov 2026, superseded by F2 above): every number = tabletop number x SCALE (8)
 The re-review found three scales mixed (HP x8, damage ~x5, Weak/Shiv/rest x3). Now ONE constant, `D.SCALE = 8` (data.js), applies to
 every number: damage, Block, HP, healing, HP loss, Weak, Wrath, Shiv, orb values, poison per token, relic/potion/event numbers and gold.
 Token counts (Strength, Weak, Vulnerable, Poison, Frail, Ritual) stay tabletop counts; each Strength or Poison token is worth SCALE.
