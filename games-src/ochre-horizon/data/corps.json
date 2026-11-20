@@ -1,0 +1,368 @@
+[
+ {
+  "id": "c00",
+  "name": "Open Charter",
+  "beginner": true,
+  "freeCards": true,
+  "tags": [],
+  "mc": 42,
+  "start": [
+   {
+    "op": "draw",
+    "n": 10
+   }
+  ],
+  "text": "Plain start: 42 credits and 10 cards, all free to keep. No special power.",
+  "flavor": "A good first day on Ochre."
+ },
+ {
+  "id": "c01",
+  "name": "Sunward Lanterns",
+  "tags": [
+   "space"
+  ],
+  "mc": 48,
+  "start": [
+   {
+    "op": "prod",
+    "r": "energy",
+    "n": 1
+   }
+  ],
+  "effect": [
+   {
+    "e": "disc",
+    "n": 2,
+    "tag": "space"
+   }
+  ],
+  "text": "Start with 1 energy production. Your space cards cost 2 less.",
+  "flavor": "Every launch lights a window."
+ },
+ {
+  "id": "c02",
+  "name": "Sandstitch Guild",
+  "tags": [
+   "building"
+  ],
+  "mc": 40,
+  "text": "Start with 4 steel. Your steel is worth 1 more.",
+  "flavor": "We stitch the dunes together.",
+  "start": [
+   {
+    "op": "gain",
+    "r": "steel",
+    "n": 4
+   }
+  ],
+  "effect": [
+   {
+    "e": "steelVal",
+    "n": 1
+   }
+  ]
+ },
+ {
+  "id": "c03",
+  "name": "Verdigris Works",
+  "tags": [
+   "plant",
+   "microbe"
+  ],
+  "mc": 44,
+  "text": "Start with 1 plant production. Gain 3 credits each time you place a greenery.",
+  "flavor": "Rust first, then green.",
+  "start": [
+   {
+    "op": "prod",
+    "r": "plant",
+    "n": 1
+   }
+  ],
+  "effect": [
+   {
+    "e": "onTile",
+    "t": "greenery",
+    "do": [
+     {
+      "op": "gain",
+      "r": "mc",
+      "n": 3
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "c04",
+  "name": "Tidewater Charter",
+  "tags": [],
+  "mc": 46,
+  "start": [
+   {
+    "op": "prod",
+    "r": "mc",
+    "n": 2
+   }
+  ],
+  "effect": [
+   {
+    "e": "onTile",
+    "t": "ocean",
+    "do": [
+     {
+      "op": "gain",
+      "r": "mc",
+      "n": 2
+     }
+    ],
+    "any": true
+   }
+  ],
+  "text": "Start with 2 credit production. Each time anyone places an ocean, gain 2 credits.",
+  "flavor": "Rain is a business."
+ },
+ {
+  "id": "c05",
+  "name": "Brightwater Exchange",
+  "tags": [
+   "earth"
+  ],
+  "mc": 46,
+  "text": "Start with 1 credit production. Gain 2 credits each time you play an event.",
+  "flavor": "Ours is the voice on the radio.",
+  "start": [
+   {
+    "op": "prod",
+    "r": "mc",
+    "n": 1
+   }
+  ],
+  "effect": [
+   {
+    "e": "onTag",
+    "tag": "event",
+    "do": [
+     {
+      "op": "gain",
+      "r": "mc",
+      "n": 2
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "c06",
+  "name": "Ironbloom Reactors",
+  "tags": [
+   "power"
+  ],
+  "mc": 42,
+  "text": "Start with 2 heat production. Action: pay 5 heat for 1 titanium and 1 credit.",
+  "flavor": "Cold nights, warm ledgers.",
+  "start": [
+   {
+    "op": "prod",
+    "r": "heat",
+    "n": 2
+   }
+  ],
+  "action": [
+   {
+    "cost": [
+     {
+      "op": "lose",
+      "r": "heat",
+      "n": 5
+     }
+    ],
+    "do": [
+     {
+      "op": "gain",
+      "r": "ti",
+      "n": 1
+     },
+     {
+      "op": "gain",
+      "r": "mc",
+      "n": 1
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "c07",
+  "name": "Orrery Collective",
+  "tags": [
+   "science"
+  ],
+  "mc": 40,
+  "text": "Draw 4 extra cards. Your science cards cost 1 less.",
+  "flavor": "Measure twice, launch once.",
+  "start": [
+   {
+    "op": "draw",
+    "n": 4
+   }
+  ],
+  "effect": [
+   {
+    "e": "disc",
+    "n": 1,
+    "tag": "science"
+   }
+  ]
+ },
+ {
+  "id": "c08",
+  "name": "Cometline Salvage",
+  "tags": [
+   "space",
+   "jovian"
+  ],
+  "mc": 42,
+  "text": "Start with 1 titanium production. Gain 2 credits each time you play a space tag.",
+  "flavor": "We tow what others fear.",
+  "start": [
+   {
+    "op": "prod",
+    "r": "ti",
+    "n": 1
+   }
+  ],
+  "effect": [
+   {
+    "e": "onTag",
+    "tag": "space",
+    "do": [
+     {
+      "op": "gain",
+      "r": "mc",
+      "n": 2
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "c09",
+  "name": "Ranger Collective",
+  "tags": [
+   "animal"
+  ],
+  "mc": 41,
+  "start": [
+   {
+    "op": "draw",
+    "n": 2,
+    "tag": "animal"
+   },
+   {
+    "op": "prod",
+    "r": "plant",
+    "n": 1
+   }
+  ],
+  "effect": [
+   {
+    "e": "onTag",
+    "tag": "animal",
+    "do": [
+     {
+      "op": "addres",
+      "n": 1,
+      "to": "any",
+      "kind": "animal"
+     }
+    ]
+   }
+  ],
+  "text": "Start with 1 plant production and 2 animal cards. Each time you play an animal tag, add an animal anywhere.",
+  "flavor": "The wild comes with a badge."
+ },
+ {
+  "id": "c10",
+  "name": "Deepglass Mining Co.",
+  "tags": [
+   "building"
+  ],
+  "mc": 44,
+  "text": "Start with 2 steel. Gain 3 steel each time you place a city.",
+  "flavor": "Big jobs leave big piles.",
+  "start": [
+   {
+    "op": "gain",
+    "r": "steel",
+    "n": 2
+   }
+  ],
+  "effect": [
+   {
+    "e": "onTile",
+    "t": "city",
+    "do": [
+     {
+      "op": "gain",
+      "r": "steel",
+      "n": 3
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "c11",
+  "name": "Moonrise Board",
+  "tags": [
+   "city"
+  ],
+  "mc": 40,
+  "text": "Start with 2 energy production. Your City project costs 5 less.",
+  "flavor": "Home is where the dome is.",
+  "start": [
+   {
+    "op": "prod",
+    "r": "energy",
+    "n": 2
+   }
+  ],
+  "effect": [
+   {
+    "e": "stdDisc",
+    "n": 5,
+    "which": "city"
+   }
+  ]
+ },
+ {
+  "id": "c12",
+  "name": "Grey Harbor Syndicate",
+  "tags": [
+   "earth"
+  ],
+  "mc": 52,
+  "start": [],
+  "action": [
+   {
+    "cost": [
+     {
+      "op": "lose",
+      "r": "mc",
+      "n": 3
+     }
+    ],
+    "do": [
+     {
+      "op": "rprod",
+      "r": "mc",
+      "n": 1
+     }
+    ]
+   }
+  ],
+  "text": "Action: pay 3 credits and your rival loses 1 credit production.",
+  "flavor": "Nothing personal. Everything profitable."
+ }
+]
