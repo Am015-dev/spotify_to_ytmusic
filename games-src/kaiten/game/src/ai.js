@@ -1,5 +1,5 @@
 // ===================== Kaiten Kitchen computer players =====================
-// KK.AI.choose(G, seat, level?, opts?) -> one of KK.moves(G, seat)      level: 'easy' | 'normal' | 'hard' (default G.players[seat].ai || 'normal')
+// KK.AI.choose(G, seat, level?, opts?) -> one of KK.moves(G, seat)      level: 'easy' | 'easy+' | 'normal' | 'hard' (default G.players[seat].ai || 'normal')
 // KK.AI.step(G, seat) = choose + apply for one seat; KK.AI.stepAll(G) = every undecided AI seat picks (returns number of picks made).
 // The AI only reads public information (tables, discards, hand sizes, played history) and the seat's own hand and own memory of the hands it held.
 // Randomness is seeded from that same information, so the same view always gives the same answer.
@@ -156,8 +156,10 @@ function normalPick(G, seat) {
 // Plays like a first-timer reading the green +N on the belt: takes the dish that scores the most points right now (ties at random),
 // and now and then just grabs a dish it likes. It never plans sets ahead, races custard or saves Twin Sticks, so a newcomer
 // who follows the +N plays it as an equal (bench: games-src/kaiten/game/bench-newplayer.js, "hint-follower" line).
-function easyPick(G, seat) {
+const SMART = { easy: 0.42, 'easy+': 0.65 };   // share of picks where this chef plays like the normal chef (bench-newplayer.js)
+function easyPick(G, seat, level) {
   const rng = mkRng(seedOf(G, seat, 11)), h = G.players[seat].hand;
+  if (rng() < (SMART[level] || 0)) return normalPick(G, seat);   // now and then it sees the whole picture, like the normal chef
   if (rng() < 0.12) return [Math.floor(rng() * h.length)];
   const tab = G.players.map(q => q.table.map(e => ({ id: e.id, w: e.w }))), tot = t => KK.roundScores({ players: t.map(x => ({ table: x })) })[seat].total;
   const base = tot(tab); let bi = 0, bv = -1e9;
@@ -247,7 +249,7 @@ function choose(G, seat, level, opts) {
   level = level || G.players[seat].ai || 'normal';
   const ms = KK.moves(G, seat); if (!ms.length) return null;
   if (ms.length === 1) return ms[0];
-  let pk = level === 'easy' ? easyPick(G, seat) : level === 'hard' ? hardPick(G, seat, opts) : normalPick(G, seat);
+  let pk = level === 'easy' || level === 'easy+' ? easyPick(G, seat, level) : level === 'hard' ? hardPick(G, seat, opts) : normalPick(G, seat);
   return asMove(G, seat, pk) || ms[0];
 }
 function step(G, seat) { const m = choose(G, seat); return m ? KK.apply(G, seat, m) : { ok: false, error: 'no move' }; }

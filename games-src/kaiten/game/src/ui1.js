@@ -22,7 +22,8 @@ const $$ = s => Array.from(document.querySelectorAll(s));
 const esc = s => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 const PN = KIT.PLAYERS.map(p => p.name);
 const DEF = { np: 3, level: 'easy', lv: ['easy', 'easy', 'easy', 'easy'], seats: [2, 3] };   // easy chefs until the player has won once (bench-newplayer.js)
-const DEF_WON = { level: 'normal', lv: ['hard', 'normal', 'normal', 'easy'] };
+const DEF_WON = { level: 'normal', lv: ['hard', 'normal', 'normal', 'easy'] };   // from the 3rd win on
+const DEF_WON1 = { level: 'easy+', lv: ['normal', 'easy+', 'easy+', 'easy'] }, DEF_WON2 = { level: 'easy+', lv: ['hard', 'normal', 'easy+', 'easy'] };   // 1st and 2nd win: step up one chef at a time
 const NIG = { salmon: 2, squid: 3, egg: 1 };
 const ICONS = { roll1: 1, roll2: 2, roll3: 3 };
 const tkey = id => KK.cardKey(id);
@@ -103,7 +104,7 @@ function groupsOf(s, tab, sc) {
   if (c.tempura) { const n = c.tempura, p = Math.floor(n / 2) * 5; mk('tempura', { type: 'tempura', n, pts: p, hint: n % 2 === 0 ? '= ' + p : (p ? '= ' + p : 'need 1'), cls: p ? 'ok' : 'wait', tip: n + ' Crispy Prawn' + (n > 1 ? 's' : '') + '. Each pair scores 5.' + (n % 2 ? ' One more makes a pair.' : '') }); }
   if (c.sashimi) { const n = c.sashimi, p = Math.floor(n / 3) * 10, r = n % 3; mk('sashimi', { type: 'sashimi', n, pts: p, hint: r === 0 ? '= ' + p : (p ? '= ' + p : 'need ' + (3 - r)), cls: p ? 'ok' : 'wait', tip: n + ' Fish Slice' + (n > 1 ? 's' : '') + '. Three score 10.' + (r ? ' ' + (3 - r) + ' more for a set.' : '') }); }
   if (c.dumpling) { const n = c.dumpling, p = KK.dumplingPts(n); mk('dumpling', { type: 'dumpling', n, pts: p, hint: '= ' + p, cls: 'ok', tip: n + ' Steam Bun' + (n > 1 ? 's' : '') + ' = ' + p + ' points.' + (n < 5 ? ' Next bun: ' + KK.dumplingPts(n + 1) + '.' : ' That is the top.') }); }
-  if (c.icons) { const rk = sc.mk[s]; mk('roll', { type: 'roll2', n: c.icons, pts: rk.pts, hint: rk.rank ? ORD[rk.rank] + ' +' + rk.pts : 'no pts', cls: rk.rank ? 'ok' : 'wait', tip: c.icons + ' roll icons. ' + (rk.rank === 1 ? 'Most right now: ' + rk.pts + ' points.' : rk.rank === 2 ? 'Second right now: ' + rk.pts + ' points.' : 'Most scores 6, second 3.') + (rk.rank && sc.rs.filter(r => r.icons === c.icons).length > 1 ? ' Tied, so points split.' : '') }); }
+  if (c.icons) { const rk = sc.mk[s]; mk('roll', { type: 'roll2', n: c.icons, pts: rk.pts, hint: rk.rank ? (sc.rs.filter(r => r.icons === c.icons).length > 1 ? 'tied ' + ORD[rk.rank] + ' +' + rk.pts : ORD[rk.rank] + ' +' + rk.pts) : 'behind', cls: rk.rank ? 'ok' : 'wait', tip: c.icons + ' roll icons. ' + (rk.rank === 1 ? 'Most right now: ' + rk.pts + ' points.' : rk.rank === 2 ? 'Second right now: ' + rk.pts + ' points.' : 'Most scores 6, second 3.') + (rk.rank && sc.rs.filter(r => r.icons === c.icons).length > 1 ? ' Tied, so points split.' : '') }); }
   const by = { salmon: [0, 0], squid: [0, 0], egg: [0, 0] };
   for (const e of t) { const k = tkey(e.id); if (NIG[k]) by[k][e.w >= 0 ? 1 : 0]++; }
   for (const k of ['salmon', 'squid', 'egg']) {
@@ -131,6 +132,17 @@ function gainOf(seat, ids) {
     return liveScores(tab)[seat].total - base;
   } catch (e) { return 0; }
 }
+// roll race standing if this plate were served now: {rank: 0/1/2, pts, tied, lead}
+function rollStand(seat, ids) {
+  try {
+    const tab = tables().map(t => t.map(e => ({ id: e.id, w: e.w })));
+    const holder = { table: tab[seat] };
+    for (const id of KK.placeOrder(ids)) KK._.place(holder, id);
+    const rs = liveScores(tab), ic = rs.map(r => r.icons), mk = makiRank(ic), me = mk[seat];
+    return { rank: me.rank, pts: me.pts, tied: ic.filter(x => x === ic[seat]).length > 1 && me.rank > 0, lead: Math.max.apply(null, ic) };
+  } catch (e) { return { rank: 0, pts: 0, tied: false, lead: 0 }; }
+}
+const rollWords = (r, short) => r.rank ? (r.tied ? 'tied ' + ORD[r.rank] + (short ? ' +' + r.pts : ': +' + r.pts + ' each') : ORD[r.rank] + ' +' + r.pts) : (short ? 'top ' + r.lead : 'behind: top has ' + r.lead);
 function whyPick(ids) {
   const v = viewSeat(), g = gainOf(v, ids), k = ids.map(tkey);
   const t = tables()[v], c = KK.tableCounts(t);
@@ -152,11 +164,13 @@ function logSince(i) { return G.log.filter(x => x.i > i).map(x => x.t); }
 function toast(t) { const el = $('#toast'); if (!el) return; el.textContent = t; el.classList.add('on'); clearTimeout(toast.t); toast.t = setTimeout(() => el.classList.remove('on'), 4000 + Math.ceil(String(t).trim().split(/\s+/).length / 10) * 1000); }
 function lsGet(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
 function lsSet(k, v) { try { localStorage.setItem(k, v); } catch (e) { } }
-function loadPrefs() { try { if (lsGet('kk_won')) Object.assign(DEF, { level: DEF_WON.level, lv: DEF_WON.lv.slice() }); const p = JSON.parse(lsGet('kk_prefs') || '{}'); Object.assign(UI.prefs, p); if (p.speed) AIDELAY = p.speed; } catch (e) { } }
+function loadPrefs() { try { const wn = +lsGet('kk_won') || 0; if (wn) { const W = wn >= 3 ? DEF_WON : wn === 2 ? DEF_WON2 : DEF_WON1; Object.assign(DEF, { level: W.level, lv: W.lv.slice() }); } const p = JSON.parse(lsGet('kk_prefs') || '{}'); Object.assign(UI.prefs, p); if (p.speed) AIDELAY = p.speed; } catch (e) { } }
 function savePrefs() { lsSet('kk_prefs', JSON.stringify(Object.assign({}, UI.prefs, { speed: AIDELAY }))); }
 // UI.fast: the player tapped the table to hurry this reveal / pass along
-const PACE = .34;   // default pause scale: a pick -> reveal -> pass cycle is about 2 s; tap the table to skip the rest
-const wait = ms => ANIM ? new Promise(r => setTimeout(r, ms * PACE * (AIDELAY > 0 ? Math.max(.35, AIDELAY / 650) : .35) * (UI.fast ? .3 : 1))) : Promise.resolve();
+const PACE = .28;   // default pause scale: a pick -> reveal -> pass cycle is about 2 s; tap the table to skip the rest
+// late in a round the choices are few and the pauses shorter (the last turns were 5-6 s each)
+const lateK = () => { const left = G && G.hand && G.turn ? G.hand - G.turn : 9; return left <= 1 ? .5 : left <= 3 ? .72 : 1; };
+const wait = ms => ANIM ? new Promise(r => setTimeout(r, ms * PACE * (AIDELAY > 0 ? Math.max(.35, AIDELAY / 650) : .35) * lateK() * (UI.fast ? .3 : 1))) : Promise.resolve();
 // ---- "what just happened": after every reveal, one line per diner with the score change and its cause
 const CATN = { maki: 'roll race', tempura: 'prawn pair', sashimi: 'fish set', dumpling: 'buns', nigiri: 'nigiri', wasabi: 'Fire Paste ×3' };
 function buildNews(before, after, picks, scored) {
@@ -167,7 +181,7 @@ function buildNews(before, after, picks, scored) {
     const plays = keys.some(k => ICONS[k]);
     for (const k of ['tempura', 'sashimi', 'dumpling', 'nigiri', 'wasabi']) { const x = b[s][k] - a[s][k]; if (x) why.push((x > 0 ? '+' : '−') + Math.abs(x) + ' ' + CATN[k]); }
     const mx = b[s].maki - a[s].maki;
-    if (mx) why.push((mx > 0 ? '+' : '−') + Math.abs(mx) + ' roll race' + (mkB[s].rank ? ' (now ' + ORD[mkB[s].rank] + ')' : ' (lost the lead)'));
+    if (mx) { const ics = b.map(r => r.icons), top = ics.indexOf(Math.max.apply(null, ics)), by = top !== s && mx < 0 ? ', ' + pname(top) + ' took more icons' : ''; why.push((mx > 0 ? '+' : '−') + Math.abs(mx) + ' roll race' + (mkB[s].rank ? ' (now ' + ORD[mkB[s].rank] + by + ')' : ' (lost the lead' + by + ')')); }
     const notes = [];
     if (keys.includes('wasabi') && !pk.cards.some(c => NIG[c.key])) notes.push('the Fire Paste waits to triple ' + (s === viewSeat() ? 'your' : 'their') + ' next nigiri');
     if (keys.includes('chop') && keys.length === 1) notes.push('Twin Sticks: two plates on a later turn');

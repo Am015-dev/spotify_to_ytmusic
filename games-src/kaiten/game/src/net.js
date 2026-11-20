@@ -222,7 +222,7 @@ function netLobbyEl() {
     if (host) {
       const oo = UI.opt = UI.opt || Object.assign({}, DEF, { lv: DEF.lv.slice() });
       const seg = (l, key, vals) => h('div.seg', h('span.lbl', l), vals.map(v => h('button.chipb' + (oo[key] === v ? '.on' : ''), { 'data-a': 'netopt', 'data-k': key, 'data-v': v, type: 'button' }, v)));
-      box.appendChild(h('div.opts', seg('Diners', 'np', [2, 3, 4, 5]), seg('Computer level', 'level', ['easy', 'normal', 'hard'])));
+      box.appendChild(h('div.opts', seg('Diners', 'np', [2, 3, 4, 5]), seg('Computer level', 'level', ['easy', 'easy+', 'normal', 'hard'])));
     }
     box.appendChild(h('p.sm', o.np + ' diners' + (ai > 0 ? ' · ' + ai + ' computer seat' + (ai > 1 ? 's' : '') + ' (' + (o.lv || 'normal') + ')' : '') + '. Empty seats go to the computer; a friend who leaves is replaced by it.'));
   }

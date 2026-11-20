@@ -216,3 +216,42 @@ html.ph.ph-p #rs .rsbox.bar .btn{min-height:50px}
 /* F6: scoring: an empty hand leaves no dead band under the tables */
 #belt:not(:has(.hc)){min-height:0!important;padding-top:0;padding-bottom:0}
 html.ph.ph-p #beltz .lab:has(+ #beltw #belt:not(:has(.hc))){min-height:0}
+
+/* round-scored summary (real games): same card as the result, above the Next round button */
+#rs.kkrnd{align-items:flex-end!important;padding-bottom:8px!important}
+#rs.kkrnd .rsbox.bar{flex-flow:row wrap;align-items:center;justify-content:center;gap:8px;background:#fff3d6;border:3px solid #4a2a22;border-radius:16px;padding:10px 12px;width:min(420px,calc(100vw - 20px));pointer-events:auto;box-shadow:0 14px 44px rgba(0,0,0,.55)}
+#rs.kkrnd .kkrsum{flex-basis:100%;color:#3a1f17;font-size:14px;line-height:1.3}
+#rs.kkrnd .kmine b{display:block;font-size:17px;font-weight:900}
+#rs.kkrnd .kd{display:flex;flex-wrap:wrap;gap:4px 6px;margin-top:3px}
+#rs.kkrnd .kd i{font-style:normal;font-weight:800;background:#f1e0bd;border-radius:8px;padding:1px 7px;font-size:14px}
+#rs.kkrnd .kriv{display:flex;flex-wrap:wrap;gap:2px 12px;margin-top:5px;font-weight:700;font-size:14px}
+#rs.kkrnd .kriv em{font-style:normal;color:#a8561a;font-weight:900}
+#rs.kkrnd .rsbox.bar .btn{flex:1 1 100%;min-height:48px;min-width:0;border-image:none!important;border:3px solid #4a2a22;border-radius:14px;box-shadow:none;background:linear-gradient(180deg,#f47a5f,#d9452c);color:#fff;font-size:18px}
+/* PC: one roster chip per line so "choosing" / "ready" never clips in the narrower side panel */
+@media (min-width:1024px){html:not(.ph) #roster{flex-direction:column;flex-wrap:nowrap}html:not(.ph) #roster .chip{width:100%;min-width:0}html:not(.ph) #roster .chip .ct{min-width:0;overflow:hidden;text-overflow:ellipsis}}
+/* R82 cold-play fixes (ui13.js): live race line, round-over panel in the tutorial, Next on look steps, no bulb in the tutorial */
+#kkrace{display:flex;flex-wrap:wrap;justify-content:center;gap:0 14px;min-height:22px;padding:2px 8px 0;font-weight:800;font-size:14px;line-height:20px;color:#ffe7a8;white-space:nowrap;box-sizing:border-box}
+#kkrace[hidden]{display:none}
+#kkrace.kq{visibility:hidden}
+html.kktut #bulbbtn{display:none!important}
+.kktp{margin:0 auto;align-self:center;background:#fff3d6;color:#3a1f17;border:3px solid #4a2a22;border-radius:14px;padding:10px 16px;width:min(320px,calc(100vw - 32px));text-align:center;box-sizing:border-box}
+.kktp b{font-size:16px}
+.kktp ol{list-style:none;margin:6px 0;padding:0;display:grid;gap:4px}
+.kktp li{display:flex;justify-content:space-between;font-weight:800;font-size:18px}
+.kktp li.me{color:#8c3b27}
+.kktp .kts{font-size:14px;opacity:.85}
+@media (max-height:620px){.gxt-bub.kkhasnext .gxh-tt{padding-right:84px!important}.gxt-bub.kkhasnext .gxh-tx{padding-right:92px!important}}
+#toast[data-race="1"]{top:calc(52px + env(safe-area-inset-top,0px));bottom:auto}
+html.ph.ph-p #belt{padding-bottom:10px}
+/* F5: the popup layer covers the board only (side panel stays readable); tie-break line; dish rows are the "where from" part */
+html:not(.ph) #rs{right:var(--kkdock,0)}
+.kkr1 .ktie{font-size:13px;font-weight:900;color:#a8561a;margin-top:1px}
+.kkbd tr.by th{text-align:left;font-size:12px;font-weight:900;color:#6b5238;text-transform:uppercase;letter-spacing:.04em;padding:3px 6px 0}
+.kkbd tr.dsh th{font-weight:600;color:#5a4330}.kkbd tr.dsh td{background:#efe0bf;font-weight:700}
+@media (max-height:620px) and (min-width:720px){html:not(.ph) #rs.kkrnd{right:0;left:calc(100% - var(--kkdock,100%));padding:0 8px 12px!important}html:not(.ph) #rs.kkrnd .rsbox.bar{width:100%}html:not(.ph) #rs.kkrnd .kkrsum{font-size:13px}html:not(.ph) #rs.kkrnd .rsbox.bar .btn{min-height:44px}}
+@media (max-height:520px){.kkbd tr.by th{padding-top:1px}.kkr1 .ktie{font-size:12px}}
+html:not(.ph) #rs.kkfin{right:var(--kkdock,0)!important}
+/* F5: rival tables never show a clipped "Nothing served yet"; Next round sits clear of the screen edge */
+.seat.tight .ctr .none{display:none}
+@media (max-height:620px){#rs.kkrnd{padding-bottom:20px!important}}
+html.ph.ph-p #belt.two{row-gap:20px}

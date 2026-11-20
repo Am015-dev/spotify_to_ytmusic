@@ -45,7 +45,7 @@ function schedule() {
   if (UI.cards.length && !NET.on) return;
   const ai = KK.pending(G).filter(s => G.players[s].ai);
   if (ai.length) {
-    const d = AIDELAY <= 0 ? 0 : Math.round(AIDELAY * (.12 + .3 * Math.random()));
+    const d = AIDELAY <= 0 ? 0 : Math.round(AIDELAY * (.12 + .3 * Math.random()) * lateK());
     const tok = UI.seq; UI.tm = setTimeout(() => { if (tok === UI.seq) aiPick(ai[0]); }, d); return;
   }
   if (hotSeat()) hotNext();

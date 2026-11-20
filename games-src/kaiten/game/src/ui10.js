@@ -22,7 +22,7 @@ const HLP_RULES = [
   { phase: 'twin', title: 'Twin Sticks', text: 'Keep them on the table. On a later turn take two dishes from your hand at once.', pic: () => HPIC.card('chop', 64) },
   { phase: 'twin', title: 'How to use them', text: 'Tap the glowing sticks, then tap two dishes. The sticks return to the hand you pass.', pic: HPIC.belt },
   { phase: 'twin2', title: 'Two dishes', text: 'Tap two dishes from your hand. You take both, then the hand passes on.', pic: () => HPIC.row(['tempura', 'tempura']) },
-  { phase: 'twin2', title: 'Sticks go back', text: 'The Twin Sticks are put back into your hand, so the next diner can use them.', pic: () => HPIC.card('chop', 64) },
+  { phase: 'twin2', title: 'Sticks go back', text: 'The Twin Sticks ride back in the hand you pass. Whoever takes them can use them on a later turn.', pic: () => HPIC.card('chop', 64) },
   { phase: 'tally', title: 'Counting a round', text: 'Sets, rolls, buns and nigiri are scored now. Custard waits until the game ends.', pic: () => HPIC.row(['tempura', 'roll2', 'dumpling']) },
   { phase: 'tally', title: 'Three rounds', text: 'The meal lasts three rounds. The highest total after round three wins.', pic: () => HPIC.num(3) }
 ];
@@ -45,16 +45,27 @@ function hlpWhy(v, mv) {
   else if (k === 'dumpling') t = 'Every Steam Bun scores more than the last.' + plus;
   else if (k === 'roll1' || k === 'roll2' || k === 'roll3') t = 'Roll icons: the most this round scores 6.';
   else if (k === 'salmon' || k === 'squid' || k === 'egg') t = c.wasabiUnused > 0 ? 'Lands on your Fire Paste and scores triple:' + plus : TY[k].name + ' scores' + plus.replace(' now.', ' now.');
-  else if (k === 'wasabi') t = 'Fire Paste triples the next nigiri you take.';
+  else if (k === 'wasabi') { const n = G.players[v].hand.filter(i => NIG[tkey(i)]).length; t = n ? 'Triples your next nigiri; this hand has ' + n + '.' : 'Fire Paste triples the next nigiri you take.'; }
   else if (k === 'chop') t = 'Twin Sticks let you take two dishes later.';
   else if (k === 'pudding') t = 'Custard Cups pay at the end: most scores 6.';
   else t = 'The best dish for you right now.';
-  return hlpCap(t.replace(/:\s*\+/, ': +'), 15);
+  let alt = -1; try { const hd = G.players[v].hand; for (const o of hd) if (tkey(o) !== k) alt = Math.max(alt, gainOf(v, [o])); } catch (e) { }
+  if (g > 0 && alt >= 0) t = t.replace(/\s*\+\d+ now\.?$/, '').replace(/[:.]$/, '') + ': +' + g + ' now, next best +' + alt + '.';
+  return hlpCap(t.replace(/:\s*\+/, ': +'), 18);
+}
+// R82: never open with Fire Paste when there is no nigiri in this hand to land on it: take the next best dish by the same values
+function hlpSane(v, mv) {
+  if (mv.pick.length !== 1 || tkey(mv.ids[0]) !== 'wasabi') return mv;
+  if (G.players[v].hand.filter(i => NIG[tkey(i)]).length >= 2 && KK.tableCounts(G.players[v].table).wasabiUnused === 0) return mv;
+  try { const cx = KK.AI._.makeCtx(G, v), cs = KK.AI._.candidates(cx).filter(x => !x.pair && x.keys[0] !== 'wasabi').sort((a, b) => b.v - a.v);
+    const m = cs[0] && KK.moves(G, v).find(x => x.pick.join() === cs[0].pick.join()); if (m) return m; } catch (e) { }
+  return mv;
 }
 function hlpSuggest() {
   if (tutOn() || !G || !canPick() || UI.drag || UI.twin && UI.sel.length >= 2) return null;
   const v = viewSeat(); let mv; try { mv = KK.AI.choose(G, v, 'normal'); } catch (e) { return null; }
   if (!mv || !mv.pick || !mv.pick.length) return null;
+  mv = hlpSane(v, mv);
   const why = hlpWhy(v, mv), cardAt = i => () => document.querySelector('#belt .hc[data-i="' + i + '"]');
   if (mv.pick.length === 2 && !UI.twin) { if (!hlpSticks()) return null; return { why, key: mv.pick.join(','), target: hlpSticks }; }
   const idx = mv.pick.find(i => UI.sel.indexOf(i) < 0); if (idx == null || !document.querySelector('#belt .hc[data-i="' + idx + '"]')) return null;
@@ -99,3 +110,23 @@ document.addEventListener('click', e => { if (e.target.closest && e.target.close
 document.addEventListener('click', e => { const el = $('#toast'); if (el && el.classList.contains('on') && e.target.closest && e.target.closest('#toast')) { clearTimeout(toast.t); el.classList.remove('on'); } });
 // A short vibrate tick when a dish snaps onto your tray, and a softer one when you lift it.
 const buzz = ms => { try { if (navigator.vibrate && !pxRM()) navigator.vibrate(ms); } catch (e) { } };
+
+// ---- 1. no bubble is ever clipped: the shell places a bubble before the guide portrait / Next button are added, so clamp it into the screen afterwards (and on every resize)
+function kkFitBubbles() {
+  const vw = innerWidth, vh = innerHeight, m = 6;
+  document.querySelectorAll('.gxh-bub').forEach(b => {
+    if (!b.offsetWidth) return;
+    if (b.offsetWidth > vw - 2 * m) b.style.maxWidth = (vw - 2 * m) + 'px';
+    const w = b.offsetWidth, hh = b.offsetHeight, left = parseFloat(b.style.left) || 0, top = parseFloat(b.style.top) || 0;
+    const nl = Math.max(m, Math.min(vw - m - w, left)), nt = Math.max(0, Math.min(vh - m - hh, top));
+    if (nl !== left) {
+      b.style.left = Math.round(nl) + 'px';
+      const arr = b.querySelector('.gxh-arr'); if (arr && arr.style.left) arr.style.left = Math.round(Math.max(14, Math.min(w - 26, (parseFloat(arr.style.left) || 0) + left - nl))) + 'px';
+    }
+    if (nt !== top) b.style.top = Math.round(nt) + 'px';
+  });
+}
+new MutationObserver(() => { try { kkFitBubbles(); } catch (e) { } }).observe(document.body, { childList: true, subtree: true });
+addEventListener('resize', () => { setTimeout(kkFitBubbles, 120); setTimeout(kkFitBubbles, 500); });
+setInterval(() => { try { kkFitBubbles(); } catch (e) { } }, 300);
+

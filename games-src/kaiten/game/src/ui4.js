@@ -42,7 +42,7 @@ function tallyPop(txt, from, to, cls) {
   const el = h('div.tpop' + (cls ? '.' + cls : ''), txt); el.style.left = Math.round(a.x) + 'px'; el.style.top = Math.round(a.y) + 'px'; document.body.appendChild(el);
   const dx = b ? b.x - a.x : 0, dy = b ? b.y - a.y : -26, f = UI.fast ? .35 : 1;
   const an = el.animate([{ transform: 'translate(-50%,-50%) scale(.4)', opacity: 0 }, { transform: 'translate(-50%,-80%) scale(1.3)', opacity: 1, offset: .28 }, { transform: 'translate(-50%,-60%) scale(1.05)', opacity: 1, offset: .5 },
-    { transform: 'translate(calc(-50% + ' + dx + 'px),calc(-50% + ' + dy + 'px)) scale(' + (b ? .55 : 1) + ')', opacity: b ? .95 : 0 }], { duration: 700 * f, easing: 'ease-in-out' });
+    { transform: 'translate(calc(-50% + ' + dx + 'px),calc(-50% + ' + dy + 'px)) scale(' + (b ? .4 : 1) + ')', opacity: 0 }], { duration: 700 * f, easing: 'ease-in-out' });
   return new Promise(res => { const done = () => { el.remove(); res(); }; an.onfinish = done; an.oncancel = done; setTimeout(done, 1500); });
 }
 // one tray element per (seat, kind of pile); a seat whose pile is not drawn (small tray) falls back to its counter
@@ -66,7 +66,7 @@ async function runTally(sc, last, tok) {
   const np = G.np, F = UI.fz, flights = [];
   UI.news = null; UI.fast = false; F.tally = new Array(np).fill(0); F.msg = 'Counting round ' + sc.round; render();
   const ok = () => tok === UI.seq && UI.rsOpen && UI.fz === F;
-  const bump = s => { const c = chipOf(s); if (!c) return; c.textContent = String(bankedOf(s) + F.tally[s]); if (ANIM && c.animate && !pxRM()) c.animate([{ transform: 'scale(1)' }, { transform: 'scale(1.6)' }, { transform: 'scale(1)' }], { duration: 300 }); snd('coin', { vol: .45 }); };
+  const bump = s => { const c = chipOf(s); if (!c) return; c.textContent = String(bankedOf(s) + F.tally[s]); if (ANIM && c.animate && !pxRM()) c.animate([{ transform: 'scale(1)' }, { transform: 'scale(1.22)' }, { transform: 'scale(1)' }], { duration: 300 }); snd('coin', { vol: .45 }); };
   const give = (s, el, v, z) => {
     z = z || !v;
     if (el && el.classList) el.classList.add(z ? 'tl0' : 'tl');
@@ -100,12 +100,14 @@ async function runTally(sc, last, tok) {
   }
   return true;
 }
+// on desktop the side panel stays clear: the popup layer covers only the board (--kkdock = panel width)
+function rsFit() { const rs = $('#rs'); if (!rs) return; rs.style.removeProperty('--kkdock'); const d = document.querySelector('.gx-dock'); if (!d || isPh()) return; const r = d.getBoundingClientRect(); if (r.width > 0 && r.left > innerWidth * .4) rs.style.setProperty('--kkdock', Math.round(innerWidth - r.left) + 'px'); }
 function rsBar(btns) {
-  const rs = $('#rs'); UI.rsOpen = true; rs.hidden = false;
+  const rs = $('#rs'); UI.rsOpen = true; rs.hidden = false; rsFit();
   rs.replaceChildren(h('div.rsbox.bar', { role: 'group', 'aria-label': 'Next' }, btns.map(b => h('button.btn' + (b.cls ? '.' + b.cls : ''), { type: 'button', 'data-a': b.a }, b.label))));
 }
 function showRound(sc, ge) {
-  const rs = $('#rs'); UI.rsOpen = true; rs.hidden = false; rs.innerHTML = '';
+  const rs = $('#rs'); rs.classList.remove('kkrnd'); UI.rsOpen = true; rs.hidden = false; rs.innerHTML = ''; rsFit();
   const last = G.phase === 'over', tok = UI.seq, F = UI.fz;
   UI.rsInfo = { sc, ge, skip: !ANIM, done: false, last };
   if (!(F && F.tables)) {   // online: the next round is already dealt, so there is no frozen table to count on
@@ -125,8 +127,23 @@ function showRound(sc, ge) {
     }
     F.msg = 'Round ' + sc.round + ' scored'; renderDock();
     rsBar([{ label: 'Next round', a: 'rsnext', cls: 'go' }]);
+    try { if (UI.mode !== 'tutorial') roundSummary(sc); } catch (e) { console.error(e); }
     try { document.querySelector('#rs [data-a=rsnext]').focus({ preventScroll: true }); } catch (e) { }
   })();
+}
+// after each real round: your points by dish, then every rival's total (one short panel above the Next button)
+function roundSummary(sc) {
+  const rs = $('#rs'), box = rs.querySelector('.rsbox'), v = viewSeat(), F = UI.fz; if (!box) return;
+  const tot = s => bankedOf(s) + (F && F.tally ? F.tally[s] : sc.seats[s].total);
+  const dish = [['Rolls', 'maki'], ['Prawns', 'tempura'], ['Fish', 'sashimi'], ['Buns', 'dumpling'], ['Nigiri', 'nigiri']];
+  const pts = (r, k) => (r[k] || 0) + (k === 'nigiri' ? (r.wasabi || 0) : 0);
+  const seats = G.players.map((p, s) => s).filter(s => s !== v), el = h('div.kkrsum');
+  if (v >= 0) {
+    const me = sc.seats[v], got = dish.filter(d => pts(me, d[1]));
+    el.appendChild(h('div.kmine', h('b', 'Round ' + sc.round + ': you +' + me.total), h('span.kd', got.length ? got.map(d => h('i', d[0] + ' ' + (pts(me, d[1]) > 0 ? '+' : '') + pts(me, d[1]))) : 'No points this round')));
+  } else el.appendChild(h('div.kmine', h('b', 'Round ' + sc.round + ' scored')));
+  el.appendChild(h('div.kriv', seats.map(s => h('span', h('b', pname(s)), ' ' + tot(s) + ' ', h('em', '+' + sc.seats[s].total)))));
+  box.insertBefore(el, box.firstChild); rs.classList.add('kkrnd');
 }
 function skipCount() { UI.fast = true; }
 // winners get a crown and a glow on their seat
@@ -138,16 +155,16 @@ function markWinners() {
 function breakdownEl(order, ws, v, tot) {
   const F = G.final, sum = (s, k) => G.rs.reduce((a, r) => a + (r[s][k] || 0), 0);
   const rows = [['Round 1', s => G.rs[0] ? G.rs[0][s].total : 0], ['Round 2', s => G.rs[1] ? G.rs[1][s].total : 0], ['Round 3', s => G.rs[2] ? G.rs[2][s].total : 0], null,
-    ['Rolls', s => sum(s, 'maki')], ['Prawns', s => sum(s, 'tempura')], ['Fish', s => sum(s, 'sashimi')], ['Buns', s => sum(s, 'dumpling')], ['Nigiri', s => sum(s, 'nigiri') + sum(s, 'wasabi')], null,
-    ['Custard', s => F.puddingPts[s], s => F.pudding[s] + ' cup' + (F.pudding[s] === 1 ? '' : 's')]];
+    ['Custard', s => F.puddingPts[s], s => F.pudding[s] + ' cup' + (F.pudding[s] === 1 ? '' : 's')], 'tot', 'by',
+    ['Roll race', s => sum(s, 'maki'), null, 1], ['Prawns', s => sum(s, 'tempura'), null, 1], ['Fish', s => sum(s, 'sashimi'), null, 1], ['Buns', s => sum(s, 'dumpling'), null, 1], ['Nigiri', s => sum(s, 'nigiri') + sum(s, 'wasabi'), null, 1]];
   const nm = s => s === v ? 'You' : pname(s), sg = n => n > 0 ? '+' + n : n < 0 ? '\u2212' + -n : '0';
   const head = h('tr', h('th'), ...order.map(s => h('th' + (ws.indexOf(s) >= 0 ? '.w' : ''), h('span.who', nm(s)), ws.indexOf(s) >= 0 ? h('span.cr', 'winner') : null)));
-  const body = rows.map(r => r ? h('tr', h('th', r[0]), ...order.map(s => { const n = r[1](s); return h('td' + (n < 0 ? '.neg' : n === 0 ? '.z' : ''), r[0] === 'Custard' ? sg(n) : String(n), r[2] ? h('small', r[2](s)) : null); })) : h('tr.sep', h('td', { colspan: order.length + 1 })));
   const tr = h('tr.tot', h('th', 'Total'), ...order.map(s => h('td' + (ws.indexOf(s) >= 0 ? '.w' : ''), String(tot[s]))));
-  return h('table.kkbd', { 'aria-label': 'Points by round, by dish and from custard' }, h('thead', head), h('tbody', body, tr));
+  const body = rows.map(r => r === 'tot' ? tr : r === 'by' ? h('tr.sep.by', h('th', { colspan: order.length + 1 }, 'Where the points came from')) : r ? h('tr' + (r[3] ? '.dsh' : ''), h('th', r[0]), ...order.map(s => { const n = r[1](s); return h('td' + (n < 0 ? '.neg' : n === 0 ? '.z' : ''), r[0] === 'Custard' ? sg(n) : String(n), r[2] ? h('small', r[2](s)) : null); })) : h('tr.sep', h('td', { colspan: order.length + 1 })));
+  return h('table.kkbd', { 'aria-label': 'Points by round and from custard, then by dish' }, h('thead', head), h('tbody', body));
 }
 function showFinal() {
-  const rs = $('#rs'); UI.rsOpen = true; rs.hidden = false;
+  const rs = $('#rs'); rs.classList.remove('kkrnd'); UI.rsOpen = true; rs.hidden = false; rsFit();
   const ws = G.winners || [], me = viewSeat(), iWin = me >= 0 && ws.includes(me);
   if (UI.fz) UI.fz.crown = true; UI.overShown = true; renderDock(); markWinners();
   const bs = NET.on ? netOverButtons() : [{ label: 'Play again', a: 'again', cls: 'go' }, { label: 'Menu', a: 'menu', cls: 'alt' }];
@@ -157,15 +174,15 @@ function showFinal() {
       const box = rs.querySelector('.rsbox');
       const ws2 = G.winners || [], v2 = viewSeat(), win = ws2.indexOf(v2) >= 0, tie = ws2.length > 1, rv = pname(ws2.find(s => s !== v2) != null ? ws2.find(s => s !== v2) : (v2 === 0 ? 1 : 0));
       const line = tie ? KK.STORY.quickResult.tie : (win ? KK.STORY.quickResult.win : KK.STORY.quickResult.lose).replace(/%R/g, rv);
-      const tot = G.final && G.final.totals ? G.final.totals : G.players.map(() => 0), order = G.players.map((p, s) => s).sort((a, b) => tot[b] - tot[a]);
-      box.insertBefore(h('div.kkres', h('div.kkr1', portraitEl(null, 44), h('div', h('b', winLine()), h('span', line))),
+      const tot = G.final && G.final.totals ? G.final.totals : G.players.map(() => 0), order = G.players.map((p, s) => (focusSeat() + s) % G.players.length), top = Math.max(...tot), tied = tot.filter(t => t === top).length > 1;
+      box.insertBefore(h('div.kkres', h('div.kkr1', portraitEl(null, 44), h('div', h('b', winLine()), h('span', line), (tied && ws2.length === 1) ? h('span.ktie', 'Tie on ' + top + ': ' + (ws2[0] === v2 ? 'you win' : pname(ws2[0]) + ' wins') + ' on more custard cups') : null)),
         breakdownEl(order, ws2, v2, tot)), box.firstChild); rs.classList.add('kkfin');
     }
   } catch (e) { console.error(e); }
   const humanWin = NET.on ? iWin : ws.some(s => G.players[s] && !G.players[s].ai);
   if (humanWin) { snd('win', { duck: true }); celebrate($('#rs')); } else snd('round', { duck: true });
   if (humans().length || NET.on) lsSet('kk_done', '1');
-  if (humanWin && UI.mode !== 'tutorial' && !UI.camp) lsSet('kk_won', '1');
+  if (humanWin && UI.mode !== 'tutorial' && !UI.camp) lsSet('kk_won', String(Math.min(9, (+lsGet('kk_won') || 0) + 1)));
   if (UI.mode !== 'net') lsSet('kk_save', '');
 }
 function celebrate(box) {
@@ -173,4 +190,4 @@ function celebrate(box) {
   for (let i = 0; i < 40; i++) { const e = h('i'); e.style.left = Math.round(Math.random() * 100) + '%'; e.style.background = cols[i % cols.length]; e.style.animationDelay = (Math.random() * 2) + 's'; e.style.animationDuration = (2 + Math.random() * 2) + 's'; c.appendChild(e); }
   $('#rs').appendChild(c); setTimeout(() => c.remove(), 6000);
 }
-function closeRS() { const rs = $('#rs'); rs.hidden = true; rs.innerHTML = ''; UI.rsOpen = false; clearTimeout(UI.rsT); }
+function closeRS() { const rs = $('#rs'); rs.classList.remove('kkrnd'); rs.hidden = true; rs.innerHTML = ''; UI.rsOpen = false; clearTimeout(UI.rsT); }

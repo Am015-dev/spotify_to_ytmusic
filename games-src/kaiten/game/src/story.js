@@ -11,7 +11,7 @@ KK.STORY = {
   turn: ['1. Everyone looks at their own hand of plates.', '2. Pick ONE plate. Everybody picks at the same time.', '3. The covers lift, one diner after another, and each plate lands on its owner\'s counter.', '4. Your points pop up with the reason.', '5. Your leftover hand slides to the next diner, theirs comes to you. Repeat until the hands are empty.'],
   // the live-turn instruction line (banner | text, 8 words at most together: gate rule 5); %N = next diner, %R = a rival
   say: {
-    mine: 'Your turn|Tap a dish to take it.',
+    mine: 'Your turn|Tap a dish for the dashed slot.',
     twin: 'Your turn|Tap two dishes.',
     twin2: 'Your turn|Tap a second dish.',
     tap2: 'Your turn|Tap it again.',
@@ -30,14 +30,12 @@ KK.STORY = {
   },
   // the staged tutorial (ui11.js): per step t = bubble title, s = ONE sentence of 12 words or fewer; the glowing thing is the one tap
   tut: {
-    goal: { t: 'Your goal', s: 'Most points after three rounds wins the meal.' },
-    chef: { t: 'Odile' },
+    goal: { t: 'Your goal' },
     pick1: { t: 'Take one dish', s: 'Each turn, take one dish. Nobody sees your pick.' },
     passed: { t: 'Flip and pass', s: 'Picks flip together. Then the hands pass on.' },
     pick2: { t: 'A pair scores 5', s: 'Two Crispy Prawns make a pair: 5 points.' },
     paste: { t: 'Fire Paste', s: 'Fire Paste triples the next nigiri you take.' },
-    nigiri: { t: 'Nigiri on paste', s: 'Moon Nigiri is 3. On your Fire Paste it scores 9.' },
-    nigiriVals: { t: 'Nigiri values', s: 'Nigiri alone: Sun 1, Sunset 2, Moon 3.' },
+    nigiri: { t: 'Nigiri on paste', s: 'Moon 3, Sunset 2, Sun 1; on Fire Paste, Moon scores 9.' },
     sticksTake: { t: 'Twin Sticks', s: 'Twin Sticks let you take two dishes on a later turn.' },
     sticksUse: { t: 'Use the sticks', s: 'Tap your sticks: two dishes this turn.' },
     twinA: { t: 'First dish', s: 'Three Fish Slices score 10. One or two score nothing.' },
@@ -47,16 +45,10 @@ KK.STORY = {
     bun: { t: 'Steam Buns', s: 'Steam Buns climb: 1, 3, 6, 10, then 15.' },
     custard: { t: 'Custard Cup', s: 'Custard Cups stay on your table until the meal ends.' },
     scoreSets: { t: 'Sets scored' },
-    scoreRoll: { t: 'Roll race' },
-    rollTie: { t: 'Roll tie', s: 'A tie for most icons splits 6, and nobody gets second.' },
-    scoreNigiri: { t: 'Nigiri and paste' },
-    scoreChef: { t: 'Odile scored' },
-    clear: { t: 'Round over', s: 'After a round, every dish except custard leaves the table.' },
-    rounds: { t: 'Three rounds', s: 'A real meal has three rounds. Each round deals fresh hands.' },
-    custardEnd: { t: 'Custard counts', s: 'At the very end, most Custard Cups scores 6.' },
-    penalty: { t: 'Fewest cups', s: 'With three or more diners, fewest cups loses 6.' },
-    custardTie: { t: 'Custard ties', s: 'Custard ties split the points, rounded down.' },
-    tieBreak: { t: 'Equal totals', s: 'Equal totals? The diner with more Custard Cups wins.' }
+    rollTie: { t: 'Roll tie' },
+    clear: { t: 'Round over' },
+    custardEnd: { t: 'Custard counts', s: 'Most Custard Cups scores 6 at the end. Ties split.' },
+    penalty: { t: 'Fewest cups', s: 'Fewest loses 6 with 3+ diners. Equal totals: more cups wins.' },
   },
   // chapter payoff lines (shown with the first step of the next chapter)
   payoff: {
@@ -80,7 +72,7 @@ KK.STORY = {
     paste: { w: 's', t: 'Fire Paste triples your NEXT nigiri. Paste first, nigiri after!' },
     pasteNigiri: { w: 's', t: 'Nigiri on Fire Paste: tripled! The best trick on the belt.' },
     sticks: { w: 's', t: 'Twin Sticks: tap them later to take two dishes.' },
-    custard: { w: 's', t: 'Custard pays at the very end: most +6, fewest -6.' },
+    custard: { w: 's', t: 'Custard pays at the very end: most +6, fewest -6 (not with 2 diners).' },
     custard2p: { w: 's', t: 'Custard pays at the very end: most cups +6.' },
     rival: { w: 'o', t: 'Fire Paste for me. My next nigiri triples, Mina!' },
     rival2: { w: 'o', t: 'Rolls are mine this round. You will have to race me!' },
@@ -92,7 +84,7 @@ KK.STORY = {
     makiTie: { w: 's', t: 'A roll tie! The tied diners split 6. Nobody gets second.' },
     custardEnd: { w: 's', t: 'Custard: most cups +6, fewest -6. Ties split.' },
     custardEnd2p: { w: 's', t: 'Custard: most cups +6. Ties split. Two diners: no -6.' },
-    penalty: { w: 's', t: 'With three diners, the fewest cups LOSES 6.' },
+    penalty: { w: 's', t: 'With three or more diners, the fewest cups LOSES 6.' },
     custardTie: { w: 's', t: 'Custard ties split the points, rounded down.' },
     tieBreak: { w: 's', t: 'Equal totals? More Custard Cups wins the meal.' }
   }
