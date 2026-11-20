@@ -150,7 +150,7 @@
   function poisonTotal() { var t = 0; G.b.en.forEach(function (e) { if (!e.dead) t += e.st.poison || 0; }); return t; }
   function addPoison(e, n) { if (!e || e.dead) return 0; n = Math.max(0, Math.min(n, CAP.poison - poisonTotal())); if (n) e.st.poison = (e.st.poison || 0) + n; return n; }
   function roll() {
-    var v = ri(6) + 1; if (G.lucky > 0) { v = 6; G.lucky--; } if (has('clover-dice')) v = Math.min(6, v + 1);
+    var v = ri(6) + 1; if (G.lucky > 0) { v = 6; G.lucky--; } if (has('clover-dice') && v === 1) v = 4;
     fx('die', 'p', v); return v;
   }
   function draw(h, n) {
@@ -172,7 +172,7 @@
     return n;
   }
   function killHero(h) {
-    if (has('phoenix-ash') && !G.revived) { G.revived = 1; h.hp = Math.max(1, Math.floor(h.mhp * 0.3)); fx('revive', 'h' + G.hs.indexOf(h), h.hp); return; }
+    if (has('phoenix-ash') && !G.revived) { G.revived = 1; h.hp = Math.max(1, Math.floor(h.mhp * 0.4)); if (G.b) gainBlk(h, 2 * SC); fx('revive', 'h' + G.hs.indexOf(h), h.hp); return; }
     // last stand (tabletop optional boss rule, shelf version): in a boss fight with 2 heroes the FIRST hero to fall stays at 1 HP with Weak 3
     if (G.lastStand && G.b && G.b.kind === 'b' && G.hs.length > 1 && !G.b.ls) { G.b.ls = 1; h.hp = 1; h.st.weak = CAP.deb; fx('laststand', 'h' + G.hs.indexOf(h), 1); return; }
     // tabletop: if ANY hero reaches 0 HP the party loses at once
@@ -238,8 +238,8 @@
         case 'hit': if (e) for (var i = 0; i < o[1]; i++) hitEnemy(h, e, o[2], card); break;
         case 'dmgx': if (e) hitEnemy(h, e, o[1] + 0 + st(h, 'str') * SC * (o[2] - 1), card); break;
         case 'bodyslam': if (e) hitEnemy(h, e, h.blk - st(h, 'str') * SC, card); break;
-        case 'all': for (var r = 0; r < (X != null ? X : 1); r++) alive().forEach(function (t) { hitEnemy(h, t, o[1], card); }); break;
-        case 'blk': var b = o[1] + (card && card.type === 'S' && has('tin-flute') ? SC : 0); if (st(h, 'frail') > 0) b = Math.floor(b * 0.75); gainBlk(h, b); fx('blk', hi, b); break;
+        case 'all': for (var r = 0; r < (X != null ? X : 1) && G.b && G.scr === 'battle'; r++) alive().forEach(function (t) { hitEnemy(h, t, o[1], card); }); break;
+        case 'blk': var b = o[1]; if (st(h, 'frail') > 0) b = Math.floor(b * 0.75); gainBlk(h, b); fx('blk', hi, b); break;
         case 'str': addSt(h, 'str', o[1]); fx('buff', hi, o[1], 'str'); break;
         case 'dblStr': addSt(h, 'str', st(h, 'str')); fx('buff', hi, 0, 'str'); break;
         case 'vuln': case 'weak': if (e && !e.dead) { addSt(e, k, o[1]); fx('debuff', 'e' + tgt, o[1], k); } break;
@@ -299,7 +299,7 @@
     });
   }
   // rest: tabletop 'Heal 3 HP' on a ~10 HP board = 30%; at the shelf's 70-80 HP scale that is 30% of max HP (rules-notes R09)
-  function restHeal(h) { return (G.gentle ? D.GENTLE.rest : 3) * SC + (has('healing-moss') ? SC : 0); }   // tabletop Rest: heal 3 (x SCALE = 24 = 30% of an 80 HP hero)
+  function restHeal(h) { return (G.gentle ? D.GENTLE.rest : 3) * SC + (has('healing-moss') ? 2 * SC : 0); }   // tabletop Rest: heal 3 (x SCALE = 24 = 30% of an 80 HP hero)
   function startBattle(kind) {
     var P = (G.act > 1 && D.ENCA[G.act]) || D.ENC, pool = kind === 'e' ? P.elite : kind === 'b' ? [[G.boss]] : (G.fights === 0 && P.first ? P.first : G.fights < 3 ? P.weak : P.strong);
     var ids = pool[ri(pool.length)].slice();
@@ -318,10 +318,10 @@
     G.hs.forEach(function (h) {
       if (h.dead) return;
       h.draw = shuffle(h.deck.slice());
-      if (has('iron-bangle')) gainBlk(h, SC); if (has('spark-core') && h.k === 'a') chan(h, 'L'); if (has('prayer-beads') && h.k === 'm') h.mir = Math.min(CAP.mir, 1);
+      if (has('iron-bangle')) gainBlk(h, SC * G.b.en.filter(function (e) { return !e.dead; }).length); if (has('spark-core') && h.k === 'a') { chan(h, 'F'); chan(h, 'D'); } if (has('prayer-beads') && h.k === 'm') h.stance = 'c';
     });
     if (has('spark-core') && !G.hs.some(function (h) { return h.k === 'a'; })) { /* only the Automaton benefits */ }
-    G.b.en.forEach(function (e) { if (has('bag-of-marbles')) addSt(e, 'vuln', 1); });
+    G.b.en.forEach(function (e) { if (has('bag-of-marbles') && (kind === 'e' || kind === 'b')) addSt(e, 'vuln', 2); });
     beginRound();
   }
   function beginRound() {
@@ -339,8 +339,9 @@
     return false;
   }
   function startHeroTurn(h) {
-    if (G.b.turn > 1) h.blk = 0; h.en = Math.min(CAP.en, 3 + (has('dawnstone') ? 1 : 0) + (h.pw.deva || 0) + (G.b.turn === 1 && has('lantern') ? 1 : 0));
-    var n = 5 + (has('gale-cloak') ? 1 : 0) + (G.b.turn === 1 ? (h.k === 's' && has('whetstone-ring') ? 2 : 0) + (has('candle-stub') ? 1 : 0) : 0);
+    if (G.b.turn > 1) h.blk = 0; h.en = Math.min(CAP.en, 3 + (has('dawnstone') ? 1 : 0) + (h.pw.deva || 0) + (G.b.turn % 3 === 0 && has('lantern') ? 1 : 0));
+    var n = 5 + (has('gale-cloak') && G.b.turn > 1 ? 1 : 0) + (G.b.turn === 1 && has('dawnstone') ? -1 : 0) + (G.b.turn === 2 && has('candle-stub') ? 2 : 0);
+    if (G.b.turn === 1 && h.k === 's' && has('whetstone-ring')) addCard(h, 'shiv', 1, 'hand');
     if (h.pw.noxious) alive().forEach(function (e) { addPoison(e, h.pw.noxious); });
     if (h.pw.reactor) chan(h, 'L');
     draw(h, n);
@@ -432,9 +433,9 @@
   function winBattle() {
     if (pendingSplit()) { var sp = G.b.en.filter(function (e) { return e.dead && D.ENEMIES[e.id].split && !e.splitDone; })[0]; if (!sp.splitSaid) { sp.splitSaid = 1; fx('splitsoon', 'e' + G.b.en.indexOf(sp), D.ENEMIES[sp.id].split.length, sp.id); } return; }
     var kind = G.b.kind, gold = SC * (kind === 'b' ? 2 + ri(3) : kind === 'e' ? 1 + ri(2) : 1);   // tabletop coins x SCALE
-    if (has('gold-tooth')) gold = SC * Math.round(gold * 1.5 / SC);
+    if (has('gold-tooth')) gold += SC;
     G.gold += gold;
-    if (has('ember-brand')) G.hs.forEach(function (h) { if (!h.dead) h.hp = Math.min(h.mhp, h.hp + SC); });
+    if (has('ember-brand')) G.hs.forEach(function (h) { if (!h.dead) h.hp = Math.min(h.mhp, h.hp + (kind === 'e' || kind === 'b' ? 2 : 1) * SC); });
     var cards = {}, ps = null;
     G.hs.forEach(function (h, i) { if (!h.dead) cards[i] = cardChoices(h, kind); });
     if (ri(100) < (kind === 'm' ? 40 : 60) && G.pots.length < G.pslots) { var pk = Object.keys(D.POTIONS); ps = pk[ri(pk.length)]; }
@@ -457,7 +458,7 @@
   function pickRelic(rars) { var l = Object.keys(D.RELICS).filter(function (k) { return rars.indexOf(D.RELICS[k].rar) >= 0 && !has(k) && LOCK.indexOf(k) < 0; }); return l.length ? l[ri(l.length)] : null; }
   function gainRelic(id) {
     if (!id || has(id)) return; G.relics.push(id);
-    if (id === 'lucky-coin') G.gold += SC; if (id === 'oak-heart') G.hs.forEach(function (h) { h.mhp += SC; h.hp += SC; }); if (id === 'pocket-satchel') G.pslots++;
+    if (id === 'lucky-coin') G.gold += 2 * SC; if (id === 'oak-heart') G.hs.forEach(function (h) { h.mhp += 2 * SC; h.hp += 2 * SC; }); if (id === 'pocket-satchel') { G.pslots++; var pk3 = Object.keys(D.POTIONS); G.pots.push(pk3[ri(pk3.length)]); }
     fx('relic', 'p', 0, id);
   }
   // ---------- actions
@@ -476,6 +477,7 @@
     if (G.scr !== 'battle') return true;
     if (e.type === 'S') G.b.en.forEach(function (en) { if (!en.dead && D.ENEMIES[en.id].onSkill) { addSt(en, 'str', D.ENEMIES[en.id].onSkill); fx('buff', 'e' + G.b.en.indexOf(en), D.ENEMIES[en.id].onSkill, 'str'); } });
     if (h.pw.afterimg) { gainBlk(h, h.pw.afterimg); }
+    if (e.type === 'P' && has('tin-flute')) { gainBlk(h, 2 * SC); fx('blk', 'h' + hi, 2 * SC); }
     ATK = { weak: st(h, 'weak') > 0, vt: {}, any: 0 };
     runOps(h, e.ops, e, e.tgt ? ti : null, X);
     // a whole card is one attack: spend 1 Weak (attacker) and 1 Vulnerable per target hit, whatever the number of hits
@@ -491,14 +493,14 @@
   function usePot(pi, ti) {
     var id = G.pots[pi], h = G.hs[G.b.cur], hi = 'h' + G.b.cur; G.pots.splice(pi, 1); fx('pot', hi, 0, id);
     switch (id) {
-      case 'fire-flask': hitRaw(G.b.en[ti], 4 * SC); break;
-      case 'block-brew': gainBlk(h, 2 * SC); fx('blk', hi, 2 * SC); break;
-      case 'strength-tonic': addSt(h, 'str', 1); break;
-      case 'swift-draught': draw(h, 3); break;
-      case 'energy-vial': gainEn(h, 2); break;
-      case 'venom-vial': addPoison(G.b.en[ti], 2); break;
-      case 'frost-gas': alive().forEach(function (e) { addSt(e, 'weak', 3); }); break;
-      case 'healing-draught': h.hp = Math.min(h.mhp, h.hp + 3 * SC); fx('heal', hi, 3 * SC); break;
+      case 'fire-flask': hitRaw(G.b.en[ti], 3 * SC); if (G.b.en[ti] && !G.b.en[ti].dead) addSt(G.b.en[ti], 'vuln', 1); break;
+      case 'block-brew': var bb = Math.max(2, alive().length) * SC; gainBlk(h, bb); fx('blk', hi, bb); break;
+      case 'strength-tonic': addSt(h, 'str', 1); draw(h, 1); break;
+      case 'swift-draught': draw(h, 2); gainEn(h, 1); break;
+      case 'energy-vial': gainEn(h, 3); h.hp = Math.max(1, h.hp - SC); fx('hitme', hi, SC, 'pot'); break;   // never lethal
+      case 'venom-vial': alive().forEach(function (e) { addPoison(e, 1); }); break;
+      case 'frost-gas': alive().forEach(function (e) { addSt(e, 'weak', 1); addSt(e, 'vuln', 1); }); break;
+      case 'healing-draught': h.hp = Math.min(h.mhp, h.hp + 3 * SC); fx('heal', hi, 3 * SC); gainBlk(h, SC); break;
       case 'fortune-die': G.lucky = 2; break;
     }
     if (!alive().length) winBattle();

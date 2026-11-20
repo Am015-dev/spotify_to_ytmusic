@@ -142,8 +142,8 @@
     G.map.forEach(function (n) { G.map.forEach(function (o) { if (o.f === n.f + 1) n.nx.push(o.id); }); }); G.F = 6; G.pots = ['venom-vial']; G.boss = 'mire-behemoth';
     G.tutEnc = { 2: ['rust-tick'], 6: ['iron-warden', 'iron-warden'], 7: ['mire-behemoth'] }; G.tutHp = { 6: 55, 7: 40 };
     E.performMove({ t: 'go', n: 0 }); G = g();
-    // guided first fight: one slug with a fixed pattern (bite 8, then bite 8 + Weak), sized so it falls to the second Strike of turn 2 (16 + 2 x 32 = 80)
-    var e = G.b.en[0]; G.b.en = [e]; e.id = 'mire-slug'; e.hp = e.mhp = 72; e.blk = 0; e.st = {}; e.i = 0; e.intent = { atk: 8, tg: 0 };
+    // guided first fight: one slug with a fixed pattern (bite 8, then bite 8 + Weak), sized so it falls to the second Strike of turn 2 (16 + 2 x 16 = 48)
+    var e = G.b.en[0]; G.b.en = [e]; e.id = 'mire-slug'; e.hp = e.mhp = 44; e.blk = 0; e.st = {}; e.i = 0; e.intent = { atk: 8, tg: 0 };
     var h = G.hs[0], mk = E.mk; h.hand = [mk('w-hammer'), mk('w-defend'), mk('w-strike'), mk('w-strike'), mk('w-defend')]; h.en = 3; h.blk = 0;
     h.draw = [mk('w-strike'), mk('w-defend'), mk('w-strike'), mk('w-roar'), mk('w-kindle')]; h.disc = [];
     h.deck.push(mk('w-cleave'), mk('w-wild-swing'));   // a hit-all attack and a die card, so both rules come up by playing them
@@ -163,12 +163,12 @@
     return [
       info('intent', intent, 'Goal: beat the boss on top. This icon is its next move.'),
       info('energy', function () { return $('.energy') || $('#end'); }, 'Each turn: 3 energy and 5 new cards. Cards cost energy.'),
-      { id: 'vuln', title: 'Attack', target: function () { return cardEl('w-hammer'); }, say: 'Tap Anvil Blow twice. Vulnerable: it takes double damage.', wait: tap('w-hammer'), ready: battleP },
+      { id: 'vuln', title: 'Attack', target: function () { return cardEl('w-hammer'); }, say: 'Tap Anvil Breaker twice: a big hit, and the foe is Weak.', wait: tap('w-hammer'), ready: battleP },
       { id: 'block', title: 'Block', target: function () { return cardEl('w-defend'); }, say: 'Tap Plate Guard twice. Block soaks hits, this turn only.', wait: tap('w-defend'), ready: battleP },
       { id: 'endturn', title: 'End turn', target: function () { return $('#end'); }, endOk: 1, onEnter: function () { setTimeout(function () { UI.render(); }, 30); }, say: 'Tap End turn. Leftover cards go to the discard pile.', wait: { type: 'tap', match: function (a) { return a.w === 'end'; } }, ready: battleP },
       info('pattern', intent, 'Foes repeat a pattern. Next: a bite that makes you Weak.', turn2),
       { id: 'strength', title: 'Power', target: function () { return cardEl('w-kindle'); }, say: 'Tap Kindle twice. Strength adds 8 to every hit.', wait: tap('w-kindle'), ready: turn2 },
-      { id: 'exhaust', title: 'Weak', target: function () { return cardEl('w-roar'); }, say: 'Tap the Roar twice. Weak foes hit 8 less. Roar exhausts.', wait: tap('w-roar'), ready: turn2 },
+      { id: 'exhaust', title: 'Weak', target: function () { return cardEl('w-roar'); }, say: 'Tap the Bellow twice. ALL foes Weak, and you Block. Exhausts.', wait: tap('w-roar'), ready: turn2 },
       { id: 'potion', title: 'Potion', target: function () { return $('.ec-potpop .potdrink') || $('.pot.full'); }, say: 'Tap the potion, then Drink. Poison hurts through Block.', wait: { type: 'event', match: function (a) { return a.pots === 0; } }, ready: turn2 },
       { id: 'finish', title: 'Finish it', target: function () { return cardEl('w-strike'); }, say: 'Tap each Strike twice to finish it.', wait: tap('w-strike', 4), ready: turn2 },
       { id: 'reward', title: 'Card reward', target: function () { return $('.picks .card') && $('.picks .card').parentNode; }, say: 'Gold won! Pick 1 of 3 cards for your deck.', wait: { type: 'tap', match: function (a) { return a.w === 'pick'; } }, ready: scr('reward') },
