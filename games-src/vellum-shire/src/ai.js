@@ -55,22 +55,25 @@ var VSAI = (function () {
       if (turnOver(G, g, s) || depth <= 0 || budget <= 0) v = value(g, s);
       else v = best(g, s, depth - 1, lvl).v;
       if (m.w) v -= m.w * 0.15;
-      if (NOISE && depth === 2) v += (Math.random() - 0.5) * NOISE;
+      if (NOISE && depth === 2) v += (rnd() - 0.5) * NOISE;
       if (v > bestV) { bestV = v; bestM = m; }
     }
     if (!bestM) return { v: value(G, s), m: ms[0] };
     return { v: bestV, m: bestM };
   }
+  // AI noise from its own generator, seeded from the game state: the same game plays the same way (tests repeat)
+  var RS = 1; function rnd() { RS = (Math.imul(RS, 1103515245) + 12345) & 0x7fffffff; return RS / 0x7fffffff; }
   function pick(G, lvl) {
+    RS = ((G.seed || 1) * 31 + (G.turnNo || 0) * 977 + G.ph * 131 + G.rd * 17 + G.p[0].dice[0] * 7 + G.p[1].dice[1] * 3 + G.p[0].vp + G.p[1].vp * 5) & 0x7fffffff || 1;
     var s = E.side(G); lvl = lvl || 'normal';
     var ms = E.validMoves(G);
     if (ms.length === 1) return ms[0];
     if (ms[0].t === 'start') { var P0 = G.p[s]; return ms.slice().sort(function (a, b) { return startVal(P0, b.h) - startVal(P0, a.h); })[0]; }
-    if (lvl === 'simple') return ms[Math.floor(Math.random() * ms.length)];
+    if (lvl === 'simple') return ms[Math.floor(rnd() * ms.length)];
     if (lvl === 'easy') { NOISE = 7; budget = 500; var r = best(G, s, 2, 'easy').m; NOISE = 0; return r; }
     if (lvl === 'oneply') {
       // one step ahead with noise
-      var sc = ms.filter(function (m) { return !(m.w > 1); }).map(function (m) { var g = E.clone(G); E.apply(g, m); return { m: m, v: value(g, s) + Math.random() * 6 - (m.w || 0) * 0.5 }; });
+      var sc = ms.filter(function (m) { return !(m.w > 1); }).map(function (m) { var g = E.clone(G); E.apply(g, m); return { m: m, v: value(g, s) + rnd() * 6 - (m.w || 0) * 0.5 }; });
       sc.sort(function (a, b) { return b.v - a.v; });
       return sc[0].m;
     }

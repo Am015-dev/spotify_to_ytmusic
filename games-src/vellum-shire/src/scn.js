@@ -58,7 +58,7 @@
     mut: [{ name: 'computer never moves', js: 'aiStep=function(){}' }] });
   GXS.add({ id: 'vs-stuck', name: 'Nothing fits: Workers glow', ask: 'No spot glows. Is Workers obvious?', seed: 11, when: booted,
     setup: function () { game({}, function (g) { g.p[0].dice = [5, 5]; g.p[0].wk = 0; g.p[0].silver = 0; g.p[0].goods = g.p[0].goods.filter(function (x) { return x.d !== 5; }); g.st[5].t.forEach(function (id) { g.gone.push(id); }); g.st[5].t = []; g.st[5].g = []; }); },
-    checks: [{ kind: 'fn', name: 'Workers glow and the line says so', fn: function () { return (!!document.querySelector('[data-work].hot') && /Nothing fits: tap Workers/.test(document.querySelector('#prompt').textContent)) || document.querySelector('#prompt').textContent; } },
+    checks: [{ kind: 'fn', name: 'Workers glow and the line says so', fn: function () { return (!!document.querySelector('[data-work].hot') && /Nothing fits: tap the glowing worker/.test(document.querySelector('#prompt').textContent)) || document.querySelector('#prompt').textContent; } },
       { kind: 'play', name: 'tap Workers, take 2', snap: function () { return { wk: G.p[0].wk }; },
       steps: [{ sel: '[data-work]', ready: function () { return !!q('[data-work].hot'); } }, { sel: '[data-a="opt"][data-i="0"]', ready: function () { return !!q('[data-a="opt"]'); }, skip: function () { return G.p[0].wk > 0; } }],
       idle: function () { return idle() && G.p[0].wk > 0; }, verify: function (a, b) { return b.wk - a.wk === 2 || JSON.stringify([a, b]); } }],

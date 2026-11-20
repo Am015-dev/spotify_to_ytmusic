@@ -86,9 +86,9 @@ function renderDock(tg) {
     var pd = curPend(), Pl = P(s);
     if (G.pick) setPrompt('Pick a green space for your keep');
     else if (pd) setPrompt({ free: 'Keep: one free action, any die', ship: 'Barge: tap goods in a stall', grab: 'Take a ' + (pd.cols || []).map(function (c) { return COLNAME[c].toLowerCase(); }).join('/') + ' tile', hall: 'Guildhall: place one more tile', ware: 'Granary: tap goods to sell' }[pd.h]);
-    else if (tg.stuck) setPrompt('Nothing fits: tap Workers for +' + (VSE.has(Pl, 'work4') ? 4 : 2));
-    else if (!Pl.used[0] && !Pl.used[1]) setPrompt(UI.dieSel != null ? (UI.zoomed ? 'Tap a glowing space' : 'Now tap a glowing spot') : 'Tap a die, then a glowing spot');
-    else if (!Pl.used[0] || !Pl.used[1]) setPrompt(UI.zoomed ? 'Tap a glowing space' : 'One die left: tap a glowing spot');
+    else if (tg.stuck) setPrompt('Nothing fits: tap the glowing worker for +' + (VSE.has(Pl, 'work4') ? 4 : 2) + ' workers');
+    else if (!Pl.used[0] && !Pl.used[1]) setPrompt(UI.dieSel != null ? (UI.zoomed ? (UI.offOk ? 'Tap a glowing space, or \u25b2 Stalls' : 'Tap a glowing space') : 'Now tap a glowing spot') : 'Tap a die, then a glowing spot');
+    else if (!Pl.used[0] || !Pl.used[1]) setPrompt(UI.zoomed ? (UI.offOk ? 'One die left: a glowing space, or \u25b2 Stalls' : 'One die left: tap a glowing space') : 'One die left: tap a glowing spot');
     else setPrompt('Buy from the ink stall, or end');
     if (tg.stuck) det = 'No glowing spot for your die. Workers always work.';
     else if (!UI.wbSeen && $$('.wb').length) det = 'Red number = workers needed to turn the die.';
@@ -117,7 +117,7 @@ function bindBoard() {
     if (el.dataset.silver != null) return info(el, 'silver');
     if (el.dataset.work != null) { if (UI.tg && UI.tg.work) { return selectWork(); } return info(el, 'work'); }
     if (el.dataset.sto != null) { var k = +el.dataset.sto; if (UI.disc) return tapTarget('sto', k); if (UI.tg && UI.tg.sto[k]) { UI.stoSel = UI.stoSel === k ? -1 : k; UI.sel = null; sfx('tick'); render(); return; } return info(el, 'sto'); }
-    if (el.dataset.die != null) { var i = +el.dataset.die; if (!UI.tg || !UI.tg.die[i]) return info(el, 'die'); UI.dieSel = UI.dieSel === i ? null : i; UI.sel = null; sfx('tick'); render(); }
+    if (el.dataset.die != null) { var i = +el.dataset.die; if (!UI.tg || !UI.tg.die[i]) return info(el, 'die'); UI.dieSel = UI.dieSel === i ? null : i; UI.sel = null; UI.ez = false; UI.ezNo = false; sfx('tick'); render(); }
   });
 }
 // a tap on something with no legal action: say what it is and why, never a dead tap
@@ -248,7 +248,7 @@ function aiStep() {
   var s = VSE.side(G), m = (tutOn() && tutAI()) || VSAI.pick(G, UI.lvl);
   // show which die the computer is using
   if (m.die === 0 || m.die === 1) { var d = $('[data-die="' + m.die + '"]'); if (d) d.classList.add('tgt'); }
-  setPrompt(nameOf(s) + ': ' + title(m).replace(/^Take /, 'takes ').replace(/^Place /, 'places ').replace(/^Sell /, 'sells ').replace(/^Buy /, 'buys ').replace(/^Load /, 'loads ').replace(/^End turn/, 'ends turn'));
+  setPrompt(nameOf(s) + ': ' + title(m).replace(/^Take /, 'takes ').replace(/^Place /, 'places ').replace(/^Sell /, 'sells ').replace(/^Buy /, 'buys ').replace(/^Load /, 'loads ').replace(/^End turn/, 'ends turn') + (function () { var pv = m.t === 'end' ? '' : preview(m); return pv ? ' (' + pv + ')' : ''; })());
   setTimeout(function () { doMove(m); }, ams(450));
 }
 // ---------- save

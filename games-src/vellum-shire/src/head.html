@@ -170,6 +170,7 @@ button{font:inherit;color:inherit}
 .wkb,.svb{width:44px}
 .gstk{width:42px}.gstk .gbox{width:28px;height:28px}
 .wkb.hot{border:3px solid #f2c53d;background:#fff2b8;box-shadow:0 0 0 2px #8a6118,0 0 14px 2px #f2c53d;animation:hot .6s ease-out 1}
+.wkb.hot:after{content:"tap";position:absolute;top:-9px;right:-8px;font:700 12px/18px var(--fb);background:var(--verm);color:#fff;border-radius:9px;padding:0 5px;box-shadow:0 1px 2px #0006}
 @keyframes hot{0%{transform:scale(1.25)}100%{transform:none}}
 #estban{position:absolute;left:50%;top:2px;transform:translateX(-50%);z-index:3;pointer-events:none;font:700 1rem var(--fb);padding:5px 14px;border-radius:999px;background:var(--opp);color:#fff8e8;border:2px solid #6d140f;box-shadow:0 2px 6px #0005;white-space:nowrap;display:none}
 #estban.on{display:block;animation:eban .5s ease-out 1}

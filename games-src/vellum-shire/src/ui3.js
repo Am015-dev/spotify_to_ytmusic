@@ -118,7 +118,7 @@ function hlpInit() {
       avoid: '.tgt,#acts .btn' });
     GXH.bulb({ el: '#bulbbtn', suggest: function () {
       if (!G || G.over || !isHuman(VSE.side(G)) || UI.busy || UI.view !== VSE.side(G)) return null;
-      if (UI.tg && UI.tg.stuck) return { target: function () { return $('[data-work]'); }, why: 'Nothing fits: tap Workers for +' + (VSE.has(P(VSE.side(G)), 'work4') ? 4 : 2) };
+      if (UI.tg && UI.tg.stuck) return { target: function () { return $('[data-work]'); }, why: 'Nothing fits: tap the glowing worker for +' + (VSE.has(P(VSE.side(G)), 'work4') ? 4 : 2) };
       var m = VSAI.pick(G, 'hard'), el = moveTarget(m); if (!el) return null;
       var pv = preview(m); return { target: function () { return moveTarget(m); }, why: title(m) + (m.w ? ' (' + wTxt(m.w) + ')' : '') + (pv ? ': ' + pv : '') };
     }, rulesFor: function () { return null; } });

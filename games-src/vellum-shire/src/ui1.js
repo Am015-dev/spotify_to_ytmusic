@@ -178,7 +178,7 @@ function render() {
   bd.classList.remove('ez'); UI.R0 = fitR();
   UI.small = Math.sqrt(3) * UI.R0 < 44;
   var hk = Object.keys(tg.hex).length, ok = Object.keys(tg.tile).length + Object.keys(tg.ship).length + Object.keys(tg.goods).length;
-  UI.zoomed = !!(UI.small && tg.any && !UI.disc && (UI.ez || (hk && !ok && !UI.ezNo)));
+  UI.zoomed = !!(UI.small && tg.any && !UI.disc && (UI.ez || (hk && !ok && !UI.ezNo))); UI.offOk = ok > 0; // never hide glowing stall tiles behind the zoom unless a space glows too
   if (UI.zoomed) { bd.classList.add('ez'); UI.R = fitR(); } else UI.R = UI.R0;
   $('#estate').style.marginRight = side + 'px';
   renderEstate(tg);
