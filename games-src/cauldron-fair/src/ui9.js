@@ -173,7 +173,8 @@ function stgScreen(R, v, me, myq, hotShared, hotPriv, play) {
   const body = h('div.rsbody'); box.appendChild(body);
   if (kind === 'market' || kind === 'ruby') body.appendChild(sd.body);
   else {
-    if (!hotPriv) { const tab = h('div.dtable'); ds.forEach(d => tab.appendChild(stgRow(d, v, play))); body.appendChild(tab); }
+    const compact = kind === 'tally' && R.round > 1 && !(myq && myq.h === 'de') && !tutOn() && ds.length > 0;   // F4: from day 2 the day card is one compact points card
+    if (!hotPriv && !compact) { const tab = h('div.dtable'); ds.forEach(d => tab.appendChild(stgRow(d, v, play))); body.appendChild(tab); }
     if (!hotPriv && kind === 'tally' && ds.length && !(myq && myq.h === 'de')) body.appendChild(stgRace(ds, v, play, R));   // the boom choice needs the room
     if (kind === 'sheet') { const sh = h('div.dsheet'); sh.appendChild(sd.body); body.appendChild(sh); }
     if (hotShared) body.appendChild(h('div.dwait', 'Next: private choices'));
@@ -206,6 +207,9 @@ function marketEl(p, q) {
   wrap.appendChild(h('div.awn', h('span.pur', { html: ico('coin', 30) }, h('b', coins - cost))));
   const stalls = h('div.stalls' + (matchMedia('(orientation:landscape)').matches ? '' : '.tight'));   // R37: portrait is always the tight layout: it never flips under a tap
   const goodNow = UI.shopGoodNow = shopGood(p, q, sel);
+  { const sg = goodNow.filter(g => sel.indexOf(g.key) < 0 && CF.price(G, g.key[0], +g.key.slice(1)) + cost <= coins);   // F4: two suggested buys with the reason, one tap adds them to your bag
+    if (sg.length && sel.length < 2) wrap.appendChild(h('div.ssug', h('b.ssk', 'Suggested'), sg.map(g => h('button.ssb', { 'data-a': 'shopsel', 'data-k': g.key, type: 'button', 'aria-label': 'Add ' + keyName(g.key) + ': ' + g.why },
+      chipN(g.key, 30), h('span.sst', h('b', keyName(g.key) + ' · ' + CF.price(G, g.key[0], +g.key.slice(1))), h('small', g.why)))))); }
   for (const c of D.SHOP_COLORS.slice().sort((a, b) => (CF.bookOut(G, b) ? 1 : 0) - (CF.bookOut(G, a) ? 1 : 0))) {   // F3: open stalls first, the ones that open later last, so a short screen never hides what you can buy
     const out = CF.bookOut(G, c), st = h('div.stall.c' + c + (out ? '' : '.locked'), { 'data-lp': 'chip:' + c + D.COLORS[c].vals[0] });
     const bk = c === 'O' ? D.BOOKS.O[0] : c === 'K' ? D.BOOKS.K[0] : D.BOOKS[c][G.sets[c]];
@@ -231,7 +235,7 @@ function marketEl(p, q) {
   stalls.addEventListener('click', ev => { const b = ev.target.closest('.tok,.rbt'), sx = ev.target.closest('.stall,.rbar'); if ((b && b.classList.contains('tcut')) || (!b && sx && sx.querySelector('.tout'))) { const s = sx; if (s) setTimeout(() => { const ns = s.isConnected ? s : null; if (ns) ns.scrollIntoView({ block: 'nearest', behavior: 'smooth' }); }, 0); } });
   { const k = sel[sel.length - 1], bk = k ? (k[0] === 'O' ? D.BOOKS.O[0] : k[0] === 'K' ? D.BOOKS.K[0] : D.BOOKS[k[0]][G.sets[k[0]]]) : null;
     const ri = UI.shopInfo && UI.rubyShown ? RUBY_INFO[UI.shopInfo] : null;
-    wrap.appendChild(h('div.sinfo', UI.shopWhy ? h('span.swhy', h('b', UI.shopWhy)) : ri ? h('span', h('b', ri.split(':')[0] + ':'), ri.slice(ri.indexOf(':') + 1)) : bk ? h('span', h('b', keyName(k) + ': '), bk.text) : goodNow.length ? h('span', h('b', 'Good for your bag now: '), keyName(goodNow[0].key) + '. ' + goodNow[0].why) : 'Tap a chip to buy it. Tap i for what it does. Up to 2, different colours.')); }
+    wrap.appendChild(h('div.sinfo', UI.shopWhy ? h('span.swhy', h('b', UI.shopWhy)) : ri ? h('span', h('b', ri.split(':')[0] + ':'), ri.slice(ri.indexOf(':') + 1)) : bk ? h('span', h('b', keyName(k) + ': '), bk.text) : 'Tap a chip to buy it. Tap i for what it does. Up to 2, different colours.')); }
   const bagArt = KIT.ART.bag ? h('img.sbimg', { src: KIT.ART.bag, alt: '' }) : h('span.sbimg', { html: ico('bag', 56) });
   const bagz = h('div.shopbag', { 'aria-label': 'Your bag' }, bagArt, h('div.sbin', sel.length ? sel.map(k => h('button.sbc', { 'data-a': 'shopsel', 'data-k': k, type: 'button', 'aria-label': 'Take ' + keyName(k) + ' out again' }, chipN(k, 40))) : h('span.sbe', { html: ico('bag', 22) })));
   UI.rsFoot = [h('div.shopfoot', bagz, h('button.btn.go.confirm', { 'data-a': 'shopbuy', type: 'button' }, nextLabel()))];
