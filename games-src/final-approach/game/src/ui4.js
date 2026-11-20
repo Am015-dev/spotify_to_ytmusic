@@ -33,6 +33,17 @@ const LOSS_T = { mandatory: 'an Axis or Engines space was empty', spin: 'the pla
 const LOSS_TIP = { mandatory: 'Every round both crew must put a die on the Axis and on the Engines. The panel warns you (red pulse) when your last dice are needed there.', spin: 'A tilt of 3 either way is a spin. Watch the dial and answer your crewmate’s axis die with a close value.', collision: 'Clear a plane with the Radio before you leave its space: a die showing n clears the space n - 1 ahead of you.', overshoot: 'Near the airport keep the engine sum at or under the blue marker: the plane then stays where it is.', corridor: 'On a space with a corridor tab the axis must be in one of its positions when you leave (C = level, L/R = tilted toward the Pilot/Co-pilot).', fuel: 'Use the fuel space every round (any die burns its value; skipping burns 6), or keep the engine dice close when fuel leaks.', short: 'You must be on the airport space when the last altitude starts: plan the moves round by round.' };
 function lossText(R) {
   if (R.why === 'mandatory' && Array.isArray(R.miss) && R.miss.length) return R.miss.map(k => name(+k[2]) + ' (' + pname(+k[2]) + ') had no die on the ' + (k[0] === 'a' ? 'Axis' : 'Engines')).join('; ') + ' at the end of the round.';
+  if ((R.why === 'checks' || R.why === 'speed') && R.checks) {   // name every check that failed, with the numbers
+    const c = R.checks, bad = [];
+    if (c.planes === false) bad.push(FA.planesOnTrack(G) + ' plane' + (FA.planesOnTrack(G) === 1 ? '' : 's') + ' still on the approach track');
+    if (c.gear === false) bad.push('landing gear ' + G.pl.sw.lg.reduce((a, b) => a + b, 0) + '/' + G.pl.sw.lg.length + ' down');
+    if (c.flaps === false) bad.push('flaps ' + G.pl.sw.fl.reduce((a, b) => a + b, 0) + '/' + G.pl.sw.fl.length + ' out');
+    if (c.axis === false) bad.push('wings not level (tilt ' + Math.abs(G.pl.axis) + ')');
+    if (c.speed === false) bad.push(R.why === 'speed' ? R.msg.replace(/\.$/, '') : 'too fast to stop');
+    if (c.intern === false) bad.push('trainee not fully trained');
+    if (c.ice === false) bad.push('icy-runway brakes unfinished');
+    if (bad.length) return 'The landing failed: ' + bad.join('; ') + '.';
+  }
   return R.msg;
 }
 function showFinal() {

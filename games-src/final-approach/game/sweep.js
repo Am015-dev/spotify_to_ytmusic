@@ -41,7 +41,7 @@ const PAGE = `(() => {
       const bad = [];
       const slots = [...document.querySelectorAll('#pz .slot')].filter(vis);
       for (const s of slots) {
-        const sr = s.getBoundingClientRect(), kids = [...s.querySelectorAll('.seat,.ic,.sl,.sw,.dv')].filter(vis), nm = s.dataset.slot;
+        const sr = s.getBoundingClientRect(), kids = [...s.querySelectorAll('.seat,.ic,.sl,.sw,.dv')].filter(vis).filter(k => !(k.matches('.ic') && k.parentElement && getComputedStyle(k.parentElement).position === 'absolute')), nm = s.dataset.slot;
         for (let i = 0; i < kids.length; i++) {
           const a = kids[i].getBoundingClientRect();
           if (kids[i].matches('.seat,.ic,.sl') && (a.left < sr.left - 1.5 || a.right > sr.right + 1.5 || a.top < sr.top - 1.5 || a.bottom > sr.bottom + 1.5)) bad.push('slot ' + nm + ' ' + kids[i].className + ' sticks out of the slot');
@@ -63,23 +63,27 @@ const PAGE = `(() => {
       else if (H > W) { const r = bd.getBoundingClientRect(), pct = 100 * Math.min(r.right, W) * Math.max(0, Math.min(r.bottom, H) - Math.max(r.top, 0)) / (W * H); if (pct < 55) bad.push('board ' + pct.toFixed(1) + '%'); }
       for (const o of this.overlaps()) bad.push(o);
       // status line and any visible text block over 8 words (tips, advice, reports)
-      const pr = words(document.getElementById('prompt').textContent); if (pr.length > 8) bad.push('status ' + pr.length + ' words: ' + pr.join(' '));
+      const pr = words(document.getElementById('prompt').textContent); const ptxt = document.getElementById('prompt').textContent.trim(), partnerLine = [0, 1].some(i => ptxt.startsWith(name(i) + ' ') || ptxt.startsWith(name(i) + ':'));   // the partner's spoken strategy line gets 12 words
+      if (pr.length > (partnerLine ? 12 : 8)) bad.push('status ' + pr.length + ' words: ' + pr.join(' '));
       const tip = document.getElementById('pc'); if (tip && vis(tip)) bad.push('a tip card is visible');
       const toast = document.getElementById('toast'); if (toast && toast.classList.contains('on') && words(toast.textContent).length > 8) bad.push('toast over 8 words: ' + toast.textContent);
       for (const e of document.body.querySelectorAll('*')) {
         if (/^(SCRIPT|STYLE|NOSCRIPT|SVG|TEXT|TSPAN|PATH)$/i.test(e.tagName) || !vis(e) || getComputedStyle(e).display.startsWith('inline')) continue;
         if (![...e.childNodes].some(n => n.nodeType === 3 && n.textContent.trim())) continue;
-        if (e.closest('[class*=drawer],[class*=rules],[id$=log],[aria-modal=true],#rs,#start,.gx-camp,[class*=gxc],[data-help]')) continue;
-        const w = words(e.innerText); if (w.length > 8) bad.push('text block ' + w.length + ' words: ' + w.slice(0, 6).join(' '));
+        if (e.closest('[class*=drawer],[class*=rules],[id$=log],[aria-modal=true],#rs,#start,.gx-camp,[class*=gxc],[data-help],.endb,.fa-react,.fa-ro')) continue;
+        const w = words(e.innerText); if (w.length > 8) bad.push('text block ' + w.length + ' words: ' + w.slice(0, 6).join(' ') + ' [' + String(e.className).slice(0, 24) + ']');
       }
+      for (const e of document.querySelectorAll('.fa-react')) if (vis(e) && words(e.innerText).length > 20) bad.push('partner line over 20 words: ' + e.innerText);   // the partner's spoken line (not a status text)
+      // calm: nothing on the page may loop forever (lifted die, red need pulse, suggestion ring, ghost finger): CSS or script animations with infinite iterations
+      { const inf = document.getAnimations().filter(an => an.playState === 'running' && an.effect && an.effect.getTiming().iterations === Infinity && an.effect.target && an.effect.target.closest && an.effect.target.closest('#bd,#fx,#acts,#says,#selinfo,#goal')).map(an => (an.animationName || 'anim') + ' on ' + String(an.effect.target.className && an.effect.target.className.baseVal != null ? an.effect.target.className.baseVal : an.effect.target.className).slice(0, 30)); if (inf.length) bad.push('infinite loop running: ' + inf.slice(0, 3).join(', ')); }
       // help kit: bubbles stay on the screen, never cover their target or a glowing thing; with tips off no coach bubble appears
-      { const hb = [...document.querySelectorAll('.gxh-bub.on')]; if (!GXH.enabled() && hb.some(b => b.dataset.phase)) bad.push('a coach bubble with tips off');
+      { const hb = [...document.querySelectorAll('.gxh-bub.on')]; if (hb.some(b => b.dataset.phase)) bad.push('a coach bubble on a landing (coaching is Learn to play only)');
         const cores = [...document.querySelectorAll('#pz .slot.legal,#pz .die.can,#pz .die.sel,#pz .die[data-d=p],#acts .btn,#says .say.rec')].filter(e => !e.closest('[data-help]') && vis(e)).map(e => [e, e.getBoundingClientRect()]).filter(([e, q]) => q.right > 0 && q.bottom > 0 && q.left < W && q.top < H).map(([e, q]) => { let w = q.width, h = q.height; const cx = q.left + w / 2, cy = q.top + h / 2; if (w > 56) w = 32; if (h > 56) h = 32; return { left: cx - w / 2, top: cy - h / 2, right: cx + w / 2, bottom: cy + h / 2, n: String(e.dataset.slot || e.id || e.className).slice(0, 20) }; });
         for (const b of hb) { const r = b.getBoundingClientRect(); if (r.left < -1 || r.top < -1 || r.right > W + 1 || r.bottom > H + 1) bad.push('help bubble outside the screen');
           for (const c of cores) if (r.left < c.right && r.right > c.left && r.top < c.bottom && r.bottom > c.top) { bad.push('help bubble ' + [r.left, r.top, r.right, r.bottom].map(Math.round) + ' covers a glowing target ' + c.n + ' ' + [c.left, c.top, c.right, c.bottom].map(Math.round) + ' ' + (b.dataset.phase || 'bulb')); break; } } }
       // learning ladder: the checklist icons are the engine's, nothing of a later chapter is drawn, the picture tilts with the axis
       { const ck = [...document.querySelectorAll('#goal .ck')]; if (!document.querySelector('#goal') || !ck.length) { if (!G.result) bad.push('no landing checklist'); } else {
-          const want = FA.checklist(G), have = ck.map(e => e.dataset.k + ':' + (e.classList.contains('ok') ? 1 : 0)).join(','), exp = want.map(x => x.k + ':' + (x.ok ? 1 : 0)).join(',');
+          const want = FA.checklist(G), have = ck.filter(e => !/^(air|speed)$/.test(e.dataset.k)).map(e => e.dataset.k + ':' + (e.classList.contains('ok') ? 1 : 0)).join(','), exp = want.filter(x => !/^(air|speed)$/.test(x.k)).map(x => x.k + ':' + (x.ok ? 1 : 0)).join(',');   // the third chip is 'to go' (air) and switches to the speed chip at the airport: compared on the other chips
           if (have !== exp) bad.push('checklist icons ' + have + ' vs engine ' + exp);
           const row = document.querySelector('#goal .ckrow').getBoundingClientRect(); for (const e of ck) { const r = e.getBoundingClientRect(); if (r.right > row.right + 6 || r.left < row.left - 1 || r.right > W) bad.push('checklist chip ' + e.dataset.k + ' cut off'); } } }
       if (G.lad) { const shown = [...document.querySelectorAll('#pz .slot')].map(e => e.dataset.slot).sort().join(','); if (shown !== G.keys.slice().sort().join(',')) bad.push('slots drawn ' + shown + ' vs chapter ' + G.keys.join(','));
@@ -87,7 +91,7 @@ const PAGE = `(() => {
         if (!document.querySelector('.pv svg')) bad.push('no plane picture'); }
       { const pg = document.querySelector('.pv .pvt'); if (pg && !UI.pvA) { const m = /rotate\\((-?[\\d.]+)deg/.exec(pg.getAttribute('style') || ''); if (!m || Math.abs(+m[1] - Math.max(-3, Math.min(3, G.pl.axis)) * 10) > .5) bad.push('plane picture tilt ' + (m && m[1]) + ' vs axis ' + G.pl.axis); }
         const gearN = document.querySelectorAll('.pv #pvp path[stroke-width="3.500"]').length; if (document.querySelector('.pv #pvp') && gearN !== G.pl.sw.lg.reduce((a, x) => a + x, 0)) bad.push('plane picture gear legs ' + gearN + ' vs ' + G.pl.sw.lg.join('')); }
-      { const pw = document.querySelectorAll('#pz .slot.legal .pw').length; if (typeof UI.sel === 'number' && UI.sel >= 0 && !G.pend && !UI.busy) { const leg = selectedLegal().filter(k => ['axis', 'engines', 'radio', 'gear', 'flaps', 'brakes', 'conc'].includes(FA.SLOT[k].grp)).length; if (pw !== leg) bad.push('slot previews ' + pw + ' vs ' + leg + ' glowing slots'); } else if (pw) bad.push('a slot preview without a picked die'); }
+      { const pw = document.querySelectorAll('#pz .slot.legal .pw').length; if (typeof UI.sel === 'number' && UI.sel >= 0 && !G.pend && !UI.busy) { const leg = selectedLegal().filter(k => ['axis', 'engines', 'radio', 'gear', 'flaps', 'brakes', 'conc'].includes(FA.SLOT[k].grp)).length; if (pw !== (hintsMode() ? leg : 0)) bad.push('slot previews ' + pw + ' vs ' + leg + ' glowing slots'); } else if (pw) bad.push('a slot preview without a picked die'); }
       { const ch = document.querySelector('#pz .rchip'); if (ch && words(ch.textContent).length > 8) bad.push('reason chip over 8 words: ' + ch.textContent); }
       // the panel shows what the engine says
       if (!UI.started || !G) return bad;
@@ -103,7 +107,7 @@ const PAGE = `(() => {
       const rb = document.querySelector('#pz .badge.rrb b'); if (rb && rb.textContent !== '×' + G.rrHand) bad.push('rerolls ' + rb.textContent + ' vs ' + G.rrHand);
       const sps = [...document.querySelectorAll('#pz .sp')]; sps.forEach((sp, i) => { const n = sp.querySelectorAll('.pl').length; if (n !== G.planes[i]) bad.push('planes on space ' + (i + 1) + ': ' + n + ' vs engine ' + G.planes[i]); });
       const you = sps.findIndex(sp => sp.classList.contains('you')); if (sps.length && !hold && you + 1 !== G.pl.pos) bad.push('plane marker on space ' + (you + 1) + ' vs engine ' + G.pl.pos);
-      const an = document.querySelector('#pz .altnow b'); if (an) { const R = D.alt[G.alt][G.round + G.row0]; if (parseInt(an.textContent) !== R[0]) bad.push('altitude ' + an.textContent + ' vs ' + R[0]); }
+      const an = document.querySelector('#pz .altnow b'); if (an) { const R = D.alt[G.alt][G.round + G.row0]; if (parseInt((/([0-9]+) ft/.exec(an.textContent) || [])[1]) !== R[0]) bad.push('altitude ' + an.textContent + ' vs ' + R[0]); }
       for (const k of Object.keys(G.slots)) { const el = document.querySelector('#pz .slot[data-slot="' + k + '"] .dv'); if (!el) bad.push('placed die missing in ' + k); else if (+el.textContent !== G.slots[k].v) bad.push('slot ' + k + ' shows ' + el.textContent + ' vs ' + G.slots[k].v); }
       // glowing spaces = the engine's legal spaces for the picked die
       if (!UI.busy && typeof UI.sel === 'number' && UI.sel >= 0 && !G.pend && mayAct(actSeat())) { const want = selectedLegal().sort().join(','), have = [...document.querySelectorAll('#pz .slot.legal')].map(e => e.dataset.slot).sort().join(','); if (want !== have) bad.push('glowing spaces ' + have + ' vs legal ' + want); }
@@ -150,48 +154,30 @@ async function playGame(browser, size, gi) {
       if (!R.inside) issues.add('rules card outside the screen (' + ph + ')');
       await page.evaluate(() => document.querySelector('.gxh-rules .gxh-x').click()); await sleep(100);
       if (await page.evaluate(() => !!document.querySelector('.gxh-rules'))) issues.add('rules cards did not close'); };
+    // Calm contract (owner, Nov 2026): no coach bubble in a landing (coaching lives in Learn to play), hints are OFF until the bulb is tapped, nothing loops.
+    // Bulb on: the ghost finger names the computer crew's move; "What should I do?" rings that space (still) and says why in the bottom line. A tap changes nothing in the game.
     const helpFlow = async () => {
-      const hs = await page.evaluate(() => ({ ph: hlpPhase(), step: !!HLP_STEPS[hlpPhase()], st: GXH.state() }));
+      const hs = await page.evaluate(() => ({ ph: hlpPhase(), on: !!UI.prefs.hints, gh: document.querySelectorAll('#fx .gh').length, cpt: document.querySelectorAll('#pz .slot.cpt').length, bub: document.querySelectorAll('.gxh-bub.on,.gxh-ring,.gxh-finger').length, st: GXH.state() }));
       if (hs.st.rules) { issues.add('rules overlay stuck open'); await page.evaluate('GXH.hide()'); return false; }
-      if (!hs.ph) return false;
-      // 1) the first-time bubble of this phase: once, short, points at the board, never covers its target, dismisses on a tap
-      if (tipsOn && hs.step && !seenPh.has(hs.ph)) { seenPh.add(hs.ph); let b = null; const t1 = Date.now();
-        while (Date.now() - t1 < 2500) { b = await page.evaluate(ph => { const e = document.querySelector('.gxh-bub.on[data-phase]'); if (!e) return null; const te = HLP_STEPS[ph].target(), tq = te && te.getBoundingClientRect(), r = e.getBoundingClientRect();
-            return { id: e.dataset.phase, title: e.querySelector('.gxh-tt').textContent, text: e.querySelector('.gxh-tx').textContent, arrow: !!e.querySelector('.gxh-arr'), ok: !!e.querySelector('.gxh-ok'), r: [r.left, r.top, r.right, r.bottom], T: tq && { left: tq.left, top: tq.top, right: tq.right, bottom: tq.bottom } }; }, hs.ph).catch(() => null); if (b) break; await sleep(80); }
-        if (!b) issues.add('no coach bubble for phase ' + hs.ph);
-        else { stats.bubbles[hs.ph] = (stats.bubbles[hs.ph] || 0) + 1;
-          if (b.id !== hs.ph) issues.add('bubble for ' + b.id + ' shown in phase ' + hs.ph);
-          if (wc(b.title) > 4) issues.add('bubble title over 4 words: ' + b.title); if (wc(b.text) > 20) issues.add('bubble text over 20 words (' + wc(b.text) + '): ' + b.text);
-          if (!b.arrow || !b.ok) issues.add('bubble without arrow or Got it (' + hs.ph + ')');
-          if (b.T) { const [l, t, r, bt] = b.r; if (l < b.T.right && r > b.T.left && t < b.T.bottom && bt > b.T.top) issues.add('bubble covers its target (' + hs.ph + ')'); }
-          const bad = await page.evaluate('__sw.audit()'); for (const x of bad) if (/help bubble/.test(x)) { issues.add(x + ' (' + hs.ph + ')'); await shot('help-bubble'); }
-          await page.touchscreen.tap(...NEUTRAL); await sleep(120);
-          if (await page.evaluate(() => !!document.querySelector('.gxh-bub'))) issues.add('bubble did not dismiss on a tap (' + hs.ph + ')');
-          return true; } }
-      // 2) the lightbulb: the first time in every phase, then now and then. Its finger must be the computer crew's move; a tap must not change the game
-      if ((!seenPh.has('bulb:' + hs.ph) || Math.random() < .2) && bulbN < 12) { seenPh.add('bulb:' + hs.ph); bulbN++; stats.bulbs++;
-        const pre = await page.evaluate(() => { const p = hlpPlan(); const v = actSeat(); const rc = f => { const e = f && f(); if (!e) return null; const r = e.getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top + r.height / 2 }; };
-          let legal = null; if (p) { const mv = FA.validMoves(G, v); legal = mv.some(x => x.t === p.m.t && (p.m.t !== 'place' || (x.to === p.m.to && x.d === p.m.d && !!x.c === !!p.m.c)) && (p.m.t !== 'say' || x.c === p.m.c) && (p.m.t !== 'toss' || x.d === p.m.d)); }
-          return { has: !!p, to: p && rc(p.to), from: p && rc(p.from), why: p && p.why, legal, t: p && p.m.t, sig: __sw.own() }; });
-        const bb = await ctrOf('#bulbbtn'); if (!bb) { issues.add('no bulb button'); return false; }
-        await page.touchscreen.tap(...bb); await sleep(380);
-        const r = await page.evaluate(() => { const f = document.querySelector('.gxh-finger'), b = document.querySelector('.gxh-bub.on'), ru = document.querySelector('.gxh-rules');
-          return { f: f && { ...f.dataset }, ring: document.querySelectorAll('.gxh-ring').length, why: b && b.querySelector('.gxh-tx').textContent, link: !!(b && b.querySelector('.gxh-link')), rules: !!ru }; });
-        if (pre.has && pre.to) {
-          if (!pre.legal) issues.add('bulb suggestion is not a legal move (' + pre.t + ')');
-          if (!r.f) issues.add('bulb tapped, no finger (' + hs.ph + ')');
-          else { if (Math.abs(+r.f.tx - pre.to.x) > 3 || Math.abs(+r.f.ty - pre.to.y) > 3) issues.add('bulb finger target ' + r.f.tx + ',' + r.f.ty + ' != the suggestion ' + Math.round(pre.to.x) + ',' + Math.round(pre.to.y) + ' (' + hs.ph + ')');
-            if (pre.from && (!r.f.fx || Math.abs(+r.f.fx - pre.from.x) > 3 || Math.abs(+r.f.fy - pre.from.y) > 3)) issues.add('bulb finger does not start on the suggested die (' + hs.ph + ')'); }
-          if (!r.ring) issues.add('bulb: nothing glows at the suggestion');
-          if (!r.why || wc(r.why) > 15) issues.add('bulb why ' + wc(r.why) + ' words: ' + r.why); if (!r.link) issues.add('bulb bubble has no "How does this work?"');
-          const bad = await page.evaluate('__sw.audit()'); for (const x of bad) if (/help bubble/.test(x)) { issues.add(x + ' (bulb ' + hs.ph + ')'); await shot('help-bulb'); }
-          if (Math.random() < .5 && r.link) { const lk = await ctrOf('.gxh-bub .gxh-link'); if (lk) { await page.touchscreen.tap(...lk); await sleep(250); await rulesCheck(hs.ph); } } else { await page.touchscreen.tap(...NEUTRAL); await sleep(150); }
-        } else { stats.bulbNull++; if (r.f) issues.add('bulb with no suggestion still pointed a finger (' + hs.ph + ')'); if (!r.rules) issues.add('bulb with no suggestion did not open the rules (' + hs.ph + ')'); else await rulesCheck(hs.ph); }
-        await page.evaluate('GXH.hide()');
-        const a = await page.evaluate(() => ({ g: !!document.querySelector('.gxh-bub,.gxh-ring,.gxh-finger,.gxh-rules'), sig: __sw.own() }));
-        if (a.g) issues.add('help still on screen after a tap (' + hs.ph + ')'); if (a.sig !== pre.sig) issues.add('tapping the bulb changed the game (' + hs.ph + ')');
-        return true; }
-      return false; };
+      if (hs.bub) issues.add('a kit helper (bubble, ring or finger) on a landing board (' + hs.ph + ')');
+      if (!hs.on && (hs.gh || hs.cpt)) issues.add('ghost finger or suggestion ring shown with hints off (' + hs.ph + ')');
+      if (!hs.ph || bulbN >= 12 || (seenPh.has('bulb:' + hs.ph) && Math.random() >= .2)) return false;
+      seenPh.add('bulb:' + hs.ph); bulbN++; stats.bulbs++;
+      const pre = await page.evaluate(() => ({ aim: __sw.aim(), sig: __sw.own(), sel: UI.sel, pend: G.pend && G.pend.h }));
+      const bb = await ctrOf('#bulbbtn'); if (!bb) { issues.add('no bulb button'); return false; }
+      if (!hs.on) { await page.touchscreen.tap(...bb); await sleep(450); if (!(await page.evaluate(() => !!UI.prefs.hints))) issues.add('bulb tapped, hints did not turn on (' + hs.ph + ')'); }
+      if (pre.aim && !pre.pend && pre.sel === -1) {
+        let g = null; for (let k = 0; k < 10 && g !== 'ok'; k++) { g = await page.evaluate('__sw.finger()'); if (g !== 'ok') await sleep(200); }
+        if (g !== 'ok') issues.add('hints on: ' + (g || 'no ghost finger') + ' (' + hs.ph + ')');
+        const ab = await ctrOf('#acts [data-a=ask]');
+        if (ab) { await page.touchscreen.tap(...ab); await sleep(350);
+          const r = await page.evaluate(() => ({ cpt: [...document.querySelectorAll('#pz .slot.cpt')].map(e => e.dataset.slot), why: UI.askWhy, sig: __sw.own() }));
+          if (!r.cpt.includes(pre.aim.to)) issues.add('What should I do? did not ring ' + pre.aim.to + ' (rings ' + r.cpt.join() + ') (' + hs.ph + ')');
+          if (!r.why || wc(r.why) > 28) issues.add('advice text ' + wc(r.why) + ' words: ' + r.why);
+          if (r.sig !== pre.sig) issues.add('asking for advice changed the game (' + hs.ph + ')'); }
+      }
+      if (Math.random() < .6) { await page.touchscreen.tap(...bb); await sleep(300); }   // hints off again for the rest of the landing
+      return true; };
     let last = '', lastAt = Date.now(), audits = 0, overAt = 0, ghostChecked = false, rotated = false, tries = {}, rrTaps = 0;
     const t0 = Date.now(), firstMoveWanted = true;
     let it = 0, lastPick = '', lastHelp = 0; const tm = { all: 0, audit: 0, help: 0, act: 0 };
@@ -204,10 +190,8 @@ async function playGame(browser, size, gi) {
       if (Date.now() - t0 > 700 && audits < 700 && !st.ending && (audits % 1 === 0)) { audits++; const tB = Date.now(); const bad = await page.evaluate('__sw.audit()'); tm.audit = Math.max(tm.audit, Date.now() - tB); for (const b of bad) { if (!issues.has(b)) await shot(b); issues.add(b); } }
       if (rot && !rotated && st.round >= 2 && st.ph === 'place') { rotated = true; await page.setViewportSize({ width: H, height: W }); await page.evaluate(() => { dispatchEvent(new Event('resize')); dispatchEvent(new Event('orientationchange')); }); await sleep(900); const bad = await page.evaluate('__sw.audit()'); for (const b of bad) issues.add('landscape: ' + b); await page.setViewportSize({ width: W, height: H }); await page.evaluate(() => { dispatchEvent(new Event('resize')); dispatchEvent(new Event('orientationchange')); }); await sleep(900); }
       if (st.over) { await sleep(200); continue; }
-      if (st.must && st.ph === 'place' && !ghostChecked && firstMoveWanted && st.round === 0 && st.placed < 2 && st.sel === -1) {
-        // the ghost finger must show the first move, and point at the right die
-        let g = null; for (let k = 0; k < 12 && !g; k++) { g = await page.evaluate('__sw.finger()'); if (!g) await sleep(200); }
-        ghostChecked = true; if (!g) { if (await page.evaluate('__sw.aim()')) issues.add('no ghost finger on the first move'); } else if (g !== 'ok') issues.add(g);
+      if (st.must && st.ph === 'place' && !ghostChecked && st.round === 0 && st.placed < 2 && st.sel === -1) {   // default profile: hints off, so no ghost finger on the first move
+        ghostChecked = true; const gh = await page.evaluate(() => (UI.prefs.hints ? 0 : document.querySelectorAll('#fx .gh').length)); if (gh) issues.add('ghost finger on the first move with hints off');
       }
       const tH = Date.now(); const hf = st.must && !st.hold && !st.over && await helpFlow(); tm.help = Math.max(tm.help, Date.now() - tH); if (hf) { lastAt = Date.now(); lastHelp++; continue; }
       const cs = all.cs;
@@ -251,7 +235,7 @@ async function playGame(browser, size, gi) {
     if (!fin.over) { await shot('unfinished'); issues.add('timing ' + JSON.stringify(tm)); issues.add('loop: it=' + it + ' help=' + lastHelp + ' lastPick=' + lastPick + ' bulbN=' + bulbN); issues.add('all: ' + JSON.stringify(await page.evaluate('__sw.all()')).slice(0, 900)); issues.add('diag: ' + JSON.stringify(await page.evaluate(() => { const v = actSeat(); return { sel: UI.sel, warn: UI.warnK, drag: UI.dragging, dead: UI.dead, aim: __sw.aim(), mv: FA.validMoves(G, v).filter(m => m.t === 'place').slice(0, 6), slots: Object.keys(G.slots), turn: G.turn, d: G.dice.map(d => d.map(x => x.u ? '-' : x.v).join('')).join('/'), mand: mandInfo(v) }; }))); issues.add('top at dice: ' + JSON.stringify(await page.evaluate(() => [...document.querySelectorAll('#pz .die')].map(e => { const r = e.getBoundingClientRect(), t = document.elementFromPoint(r.left + r.width / 2, r.top + r.height / 2); return e.dataset.s + e.dataset.d + ':' + e.className + '>' + (t && (t.className || t.tagName)); })))); }
     if (!fin.over) issues.add('landing did not finish in 420 s: ' + JSON.stringify(await page.evaluate('({r:G.round,ph:G.phase,sel:UI.sel,cof:UI.cof,pend:G.pend&&G.pend.h,turn:G.turn,coffee:G.coffee,rr:G.rrHand,dice:G.dice.map(d=>d.map(x=>x.u?"-":x.v).join("")).join("/"),legal:selectedLegal(),moves:FA.validMoves(G,actSeat()).map(m=>m.t).filter((x,i,a)=>a.indexOf(x)===i)})')));
     else if (!camp) {
-      const e = await page.evaluate(`(() => { const b = document.querySelector('#fx .endb'); const r = document.getElementById('rs'); return { banner: b ? b.innerText.trim() : null, again: !!document.querySelector('#acts [data-a=again]'), modal: !r.hidden }; })()`);
+      const e = await page.evaluate(`(() => { const b = document.querySelector('#fx .endb'); const r = document.getElementById('rs'); return { banner: b ? (b.querySelector('b') || b).innerText.trim() : null, again: !!document.querySelector('#acts [data-a=again]'), modal: !r.hidden }; })()`);
       if (!e.banner) { issues.add('no end banner on the board'); await shot('no-banner'); } else if (e.banner.split(/\s+/).length > 8) issues.add('end banner over 8 words: ' + e.banner);
       if (!e.again) issues.add('no Fly again button at the end'); if (e.modal) issues.add('a report panel opened at the end');
     }
@@ -265,7 +249,7 @@ async function playGame(browser, size, gi) {
   const browser = await chromium.launch({ args: ['--no-sandbox'] });
   const jobs = []; for (let g = 0; g < N; g++) if (!process.env.ONLY || +process.env.ONLY === g) jobs.push([g < 12 ? SIZES[Math.floor(g / 6) % 2] : SIZES[g % SIZES.length], g]);
   const results = []; let next = 0;
-  const worker = async () => { while (next < jobs.length) { const [sz, g] = jobs[next++]; const r = await playGame(browser, sz, g); results.push(r); console.log((r.errs.length || r.issues.length ? 'FAIL ' : 'ok   ') + r.tag + ' ' + r.mode + ' ' + r.stats.end + ' taps ' + r.stats.taps + ' drags ' + r.stats.drags + (r.errs.length ? ' ERR ' + r.errs.join(' | ') : '') + (r.issues.length ? ' ISSUES ' + r.issues.slice(0, 6).join(' | ') : '')); } };
+  const worker = async () => { while (next < jobs.length) { const [sz, g] = jobs[next++]; const r = await playGame(browser, sz, g); results.push(r); console.log((r.errs.length || r.issues.length ? 'FAIL ' : 'ok   ') + r.tag + ' ' + r.mode + ' ' + r.stats.end + ' taps ' + r.stats.taps + ' drags ' + r.stats.drags + (r.errs.length ? ' ERR ' + r.errs.join(' | ') : '') + (r.issues.length ? ' ISSUES ' + r.issues.slice(0, +process.env.ISS || 6).join(' | ') : '')); } };
   await Promise.all([worker(), worker(), worker()]);
   await browser.close();
   const bad = results.filter(r => r.errs.length || r.issues.length);

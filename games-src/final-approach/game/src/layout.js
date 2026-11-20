@@ -50,27 +50,27 @@ function build(mode, LW, LH, mods, me, lad, sceneH) {
     r.hud = R(560, T, 170, 100);
     r.lw = LW; r.lh = r.ch;
   } else {
-    const ice = !!mods.ice, wh = sceneH || 116, coffeeRow = !lad || lad >= 6;
-    r.appr = { x: 14, y: 8, w: LW - 28, h: wh }; r.alt = { x: 14, y: wh + 10, w: LW - 28, h: 58 };
-    const A = wh + 10 + 58 + 10 + 48, B = A + 104;
+    const ice = !!mods.ice, wh = sceneH || 112, coffeeRow = !lad || lad >= 6;
+    r.appr = { x: 14, y: 8, w: LW - 28, h: wh }; r.alt = { x: 14, y: wh + 10, w: LW - 28, h: 44 };   // 44 logical: a read-only strip (not tappable); keeps the board spaces >= 44 px on a 375x553 phone
+    const A = wh + 10 + 44 + 14 + 48, B = A + 100;
     slot('ax0', 230, A); slot('ax1', 570, A); r.dial = R(400, A, 120, 120);
     slot('en0', 230, B); slot('en1', 570, B); r.gauge = R(400, B + 4, 230, 96);
     // pilot column (left) / co-pilot column (right): eight slots across the 800 wide panel, kept 9 units in from the edges so a glow is never cut off
-    const P1 = B + 104, P2 = P1 + 100, X = i => 57 + 98 * i;
+    const P1 = B + 100, P2 = P1 + 98, X = i => 57 + 98 * i;
     slot('ra0', X(0), P1); slot('lg0', X(1), P1); slot('lg1', X(2), P1); slot('lg2', X(3), P1);
     if (ice) { for (let i = 0; i < 4; i++) { slot('it' + i, X(i), P2); slot('ib' + i, X(i), P2 + 100); } }
     else { slot('br0', X(0), P2); slot('br1', X(1), P2); slot('br2', X(2), P2); }
     if (!lad || lad >= 5) r.brk = ice ? R(X(3) + 48 + 80, P2 + 100, 150, 84) : R(X(2) + 48 + 80, P2, 150, 84);   // two lines ("Brakes" over the value) in their own box, clear of the brake slots
     slot('fl0', X(4), P1); slot('fl1', X(5), P1); slot('fl2', X(6), P1); slot('fl3', X(7), P1);
     slot('ra1', X(6), P2); slot('ra2', X(7), P2);
-    const R3 = P2 + (ice ? 200 : 100); let C2 = R3;
+    const R3 = P2 + (ice ? 200 : 98); let C2 = R3;
     if (mods.kero) slot('ke', X(5), P2);
     if (mods.intern) { slot('in0', X(1), R3); slot('in1', X(6), R3); r.tokens = { x: 220, y: R3 - 22, w: 360, h: 44 }; C2 = R3 + 100; }
     if (coffeeRow) { slot('co0', 290, C2); slot('co1', 400, C2); slot('co2', 510, C2); r.coffee = R(400, C2 + 62, 300, 24); r.rerolls = R(680, C2 + 6, 150, 60); }
     const fuel = mods.kero || mods.leak;
     if (mods.wind) r.wind = fuel ? R(58, C2, 84, 84) : R(110, C2, 90, 90);
     if (fuel) r.fuel = { x: mods.wind ? 106 : 14, y: C2 - 13, w: mods.wind ? 128 : 220, h: 26 };   // in the coffee row, clear of the tray labels
-    const T = (coffeeRow ? C2 : C2 - 100) + 140 + (coffeeRow ? 0 : 0); r.ch = T + 64;
+    const T = (coffeeRow ? C2 : C2 - 100) + 134; r.ch = T + 64;
     const wm = 490, wo = 292, th = 124; if (me === 0) { r.trayP = { x: 8, y: T - 62, w: wm, h: th }; r.trayC = { x: 8 + wm + 6, y: T - 62, w: wo, h: th }; } else if (me === 1) { r.trayP = { x: 8, y: T - 62, w: wo, h: th }; r.trayC = { x: 8 + wo + 6, y: T - 62, w: wm, h: th }; } else { r.trayP = { x: 8, y: T - 62, w: 388, h: th }; r.trayC = { x: 404, y: T - 62, w: 388, h: th }; }
     r.lw = LW; r.lh = r.ch;
   }

@@ -35,8 +35,8 @@ function dieHint(v) {
         if (!best[g] || c < best[g].c) best[g] = { c, k: m.to };
       }
       const word = (g, k) => {
-        if (g === 'radio') { const at = G.pl.pos + val - 1; return G.planes[at - 1] ? 'radio the plane on ' + at : null; }
-        if (g === 'axis') { const o = G.slots['ax' + (1 - v)]; return o && o.v === val ? 'axis to level' : 'axis'; }
+        if (g === 'radio') { const at = G.pl.pos + val - 1; return G.planes[at - 1] ? 'radio the ' + (at === G.planes.length ? 'airport' : 'plane on ' + at) : null; }
+        if (g === 'axis') { const o = G.slots['ax' + (1 - v)]; if (o && o.v === val) return 'axis to level'; if (o) { const nt = Math.abs(G.pl.axis + (v === 0 ? o.v - val : val - o.v)); if (nt >= 2) return nt >= 3 ? 'axis (spin!)' : 'axis (tilts to 2)'; } else if (Math.abs(G.pl.axis) >= 2) return 'axis (tilt is 2)'; return 'axis'; }
         return { engines: 'engines', gear: 'gear', flaps: 'flaps', brakes: 'brake ' + val, conc: 'coffee', kero: 'fuel', intern: 'trainee', ice: 'icy brake' }[g] || g;
       };
       const ws = Object.keys(best).sort((a, b) => best[a].c - best[b].c).map(g => word(g, best[g].k)).filter(Boolean).slice(0, 2);
@@ -65,7 +65,7 @@ const LOSS_S = { mandatory: 'Empty Axis or Engines', spin: 'Spin! The tilt was t
 const CHK_S = { speed: 'Too fast to stop', planes: 'Planes still on the track', gear: 'Landing gear still up', flaps: 'Flaps not out', axis: 'Not level at landing', intern: 'Trainee not trained', ice: 'Icy brakes unfinished' };
 function endWords() {
   const R = G.result; if (!R) return ''; if (R.win) return 'Landed! Well flown.';
-  if (R.why === 'checks' || R.why === 'speed') { const bad = Object.keys(R.checks || {}).filter(k => !R.checks[k]); if (bad.length) return CHK_S[bad[0]] || 'The landing failed'; }
+  if (R.why === 'checks' || R.why === 'speed') { const bad = Object.keys(R.checks || {}).filter(k => !R.checks[k]); if (bad.length) return (CHK_S[bad[0]] || 'The landing failed') + (bad.length > 1 ? ' +' + (bad.length - 1) : ''); }
   return LOSS_S[R.why] || 'The flight is over';
 }
 function engineEv() { if (!G || !G.events) return null; for (let i = G.events.length - 1; i >= 0; i--) if (G.events[i].t === 'engine') return G.events[i]; return null; }
@@ -162,6 +162,7 @@ function lookPanel() { if (typeof pxClearEnd === 'function') pxClearEnd(); const
   st.textContent = '.tbn{position:absolute;left:0;right:0;margin:0 auto;width:max-content;top:6px;transform:translateY(-14px);z-index:12;pointer-events:none;opacity:0;min-width:150px;max-width:calc(100% - 24px);text-align:center;padding:6px 16px;border-radius:14px;color:#fff;border:2px solid #fff;box-shadow:0 6px 18px rgba(0,0,0,.45);transition:opacity .22s,transform .22s}' +
     '.tbn.in{opacity:1;transform:none}.tbn.out{opacity:0;transform:translateY(-14px)}' +
     '.tbn b{display:block;font-size:19px;line-height:1.2;font-weight:900}.tbn span{display:block;font-size:14px;line-height:1.25;font-weight:700;margin-top:1px}' +
+    '.tbn.strip{min-width:0;max-width:none;padding:0 8px;border-radius:10px;display:flex;align-items:center;justify-content:center}.tbn.strip b{font-size:14px;line-height:1.1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.tbn.strip.out{transform:none}html.ph .fa-react{top:auto;bottom:62px}' +
     '.tbn.me{background:#1d4f9a}.tbn.rv{background:#a24a0b}.tbn.cap{background:#1b2230}' +
     '.fa-por{flex:0 0 40px;width:40px;height:40px;border-radius:50%;border:2px solid var(--fa-pc,#2f4f7a);background:var(--fa-pc,#2f4f7a) center/cover no-repeat;display:flex;align-items:center;justify-content:center;font-size:22px;line-height:1;overflow:hidden}' +
     '.fa-react{position:fixed;left:50%;top:60px;transform:translateX(-50%);z-index:9990;pointer-events:none;display:flex;gap:10px;align-items:center;width:max-content;max-width:min(344px,calc(100vw - 20px));padding:8px 14px 8px 10px;border-radius:14px;background:#1b2230;color:#fff;border:2px solid #ffd46b;font-size:15px;line-height:1.3;font-weight:700;box-shadow:0 8px 22px rgba(0,0,0,.5);animation:fa-rin .25s ease-out both}' +
@@ -184,8 +185,15 @@ function lookPanel() { if (typeof pxClearEnd === 'function') pxClearEnd(); const
 })();
 const TB = { t: 0, t2: 0, key: '' };
 function tbShow(title, sub, cls, ms) {
-  const f = fxLayer(); if (!f) return; let e = f.querySelector('.tbn'); if (!e) { e = h('div.tbn', { 'aria-hidden': 'true' }); f.appendChild(e); }
-  e.className = 'tbn ' + cls; e.innerHTML = ''; e.appendChild(h('b', title)); if (sub) e.appendChild(h('span', sub));
+  const f = fxLayer(); if (!f) return;
+  // portrait phone: the altitude strip already says whose turn it is, and the approach track must stay visible, so a turn banner is not shown;
+  // the partner's caption is one line laid exactly over the (read-only) altitude strip
+  const strip = isPh() && UI.LY && UI.LY.mode === 'P' ? $('#pz .w.altw') : null;
+  if (strip && cls !== 'cap') { tbHide(); return; }
+  let e = f.querySelector('.tbn'); if (!e) { e = h('div.tbn', { 'aria-hidden': 'true' }); f.appendChild(e); }
+  e.className = 'tbn ' + cls + (strip ? ' strip' : ''); e.style.cssText = ''; e.innerHTML = '';
+  if (strip) { const r = relRect(strip); e.style.cssText = 'top:' + Math.round(r.y) + 'px;height:' + Math.round(r.h) + 'px;width:' + Math.round(r.w) + 'px;transform:none'; const tw = title.split(/\s+/).length, sw = (sub || '').split(/\s+/).filter(Boolean); e.appendChild(h('b', title + (sw.length && tw < 8 ? ': ' + sw.slice(0, 8 - tw).join(' ') + (sw.length > 8 - tw ? '…' : '') : ''))); }
+  else { e.appendChild(h('b', title)); if (sub) e.appendChild(h('span', sub)); }
   void e.offsetWidth; e.classList.add('in'); clearTimeout(TB.t); if (ms) TB.t = setTimeout(() => e.classList.add('out'), ms);
 }
 function tbHide() { clearTimeout(TB.t); clearTimeout(TB.t2); const e = $('#fx .tbn'); if (e) e.classList.add('out'); }
