@@ -30,6 +30,8 @@ const [W, H] = (process.argv[2] || '375x667').split('x').map(Number), N = +(proc
     for (let i = 0; started && i < 5000; i++) {
       const st = await page.evaluate(() => ({ over: !!G.over, rs: !document.getElementById('rs').hidden, tv: !document.getElementById('tv').hidden, mine: !G.over && G.seats[VB.actor(G)].human, busy: UI.busy, k: G.turn + '/' + G.phase + '/' + G.round + '/' + G.P[0].used + '/' + G.P[0].store.length + '/' + G.pend.length + '/' + UI.sel + '/' + UI.tab }));
       if (st.rs) break;
+      const bt = await page.evaluate(() => { const b = document.getElementById('beat'); if (!(b && b.classList.contains('on') && b.classList.contains('tap'))) return null; const r = b.getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top + r.height / 2 }; });
+      if (bt) { await page.touchscreen.tap(bt.x, bt.y); await page.waitForTimeout(300); continue; }   /* the season summary waits for a tap */
       if (st.over) { await T('#resB', 600); await page.waitForTimeout(600); continue; }
       if (st.tv) { if (!(await T('#tv .acts .btn:not(.alt)', 400))) await T('#tv .acts .btn', 400); continue; }
       if (await T('.gxh-bubble button, .gxh-coach button, .gxh-x', 250)) continue;

@@ -27,7 +27,54 @@ function starWhy(m) {
   if (m.k === 'discard') return 'Throw away ' + VB.tileName(G.P[s].store[m.s]) + ': least useful now.';
   return gain ? gain + '.' : '';
 }
-function starLine() { if (!hints() || UI.mode === 'tutorial') return ''; var m = hardMove(); return m ? '★ ' + (m.k === 'end' ? 'End turn: no useful move left. Saves your workers for later.' : starWhy(m)) : ''; }
+/* F4: the ★ names the whole turn: "take X, then build it on a 4", plus what the turn earns in one line */
+function planStep(c, m, s) {
+  var p = c.P[s];
+  switch (m.k) {
+    case 'take': case 'grab': return 'take ' + VB.tileName(c.depots[m.v][m.slot]) + ' (stall ' + m.v + ')';
+    case 'buy': return 'buy ' + VB.tileName(c.black[m.slot]) + ' from the back lane';
+    case 'place': return 'build ' + VB.tileName(p.store[m.s]) + ' on a ' + VB.CELLS[m.cell].num;
+    case 'sell': return 'sell your ' + VB.GOODS[m.v];
+    case 'ship': return 'load the goods at stall ' + m.v;
+    case 'workers': return 'take 2 workers';
+    case 'discard': return 'drop ' + VB.tileName(p.store[m.s]);
+    case 'skip': return 'skip the bonus';
+    default: return '';
+  }
+}
+function planLine() {
+  var m = hardMove(); if (!m) return ''; var P0 = pvReset(), pl = P0.plan;
+  if (m.k === 'end') return 'End turn: no useful move left. Saves your workers for later.';
+  if (!pl || pl.moves.length < 2) return starWhy(m);
+  if (P0.planTxt) return P0.planTxt;
+  var c = VB.fclone(G), s = VB.actor(G), last = null, steps = [], pts = 0, sil = 0, wk = 0, what = [];
+  pl.moves.forEach(function (x) {
+    var t = planStep(c, x, s); if (x.k === 'place' && last && c.P[s].store[x.s] && c.P[s].store[x.s].id === last) t = 'build it on a ' + VB.CELLS[x.cell].num; last = (x.k === 'take' || x.k === 'grab') ? c.depots[x.v][x.slot] && c.depots[x.v][x.slot].id : x.k === 'buy' ? c.black[x.slot] && c.black[x.slot].id : null; if (t) steps.push(t);
+    var r = VB.performMove(c, x); if (!r.ok) return;
+    r.ev.forEach(function (ev) { if (ev.p !== s) return; if (ev.e === 'score') { pts += ev.n; if (WHY[ev.why] && what.indexOf(WHY[ev.why]) < 0) what.push(WHY[ev.why]); } if (ev.e === 'silver' && ev.n > 0) sil += ev.n; if (ev.e === 'workers' && ev.n > 0) wk += ev.n; });
+  });
+  steps = steps.slice(0, 3); var txt = steps.join(', then ');
+  var gain = [pts ? '+' + pts + ' pts' + (what.length ? ' (' + what.join(', ') + ')' : '') : '', sil ? '+' + sil + ' silver' : '', wk ? '+' + wk + ' workers' : ''].filter(Boolean).join(', ');
+  P0.planTxt = 'Plan: ' + txt.charAt(0).toUpperCase() + txt.slice(1) + '. ' + (gain ? 'This turn: ' + gain + '.' : 'Sets up your next turn.');
+  return P0.planTxt;
+}
+/* F4: show progress toward the big moments, so they are planned, not lucky: the best meadow, nearly-full area or goods pile */
+function goalLine() {
+  if (!G || G.over || !myTurn() || UI.mode === 'tutorial') return ''; var s = VB.actor(G), p = G.P[s], best = null;
+  function cand(v, t) { if (v > 0 && (!best || v > best.v)) best = { v: v, t: t }; }
+  VB.REGIONS.forEach(function (reg) {
+    var empty = reg.cells.filter(function (x) { return !p.estate[x]; }), mine = reg.cells.length - empty.length;
+    if (!empty.length || !mine) return;
+    var nm = VB.COLNAME[reg.col];
+    if (reg.col === 'pas') { var by = {}; reg.cells.forEach(function (x) { var y = p.estate[x]; if (y && y.t === 'pas') by[y.k] = (by[y.k] || 0) + y.n; });
+      Object.keys(by).forEach(function (k) { cand(by[k] + 2, 'your ' + VB.ANIMALS[k].toLowerCase() + ' meadow holds ' + by[k] + ': the next ' + VB.ANIMALS[k].toLowerCase() + ' tile there scores ' + by[k] + ' + its own'); }); }
+    if (empty.length <= 2 && !p.regDone[reg.id]) { var pts = VB.REGION_PTS[Math.min(8, reg.cells.length)] + VB.PHASE_BONUS[Math.min(4, G.phase)];
+      cand(pts / empty.length, empty.length + ' more ' + nm + ' tile' + (empty.length > 1 ? 's' : '') + ' finish' + (empty.length > 1 ? '' : 'es') + ' that ' + nm + ' area: +' + pts + ' this season'); }
+  });
+  VB.goodsTypes(p).forEach(function (g) { var n = p.goods[g]; if (n >= 3) cand(n * Math.max(2, G.n) * 0.8, n + ' ' + VB.GOODS[g] + ' waiting: a ' + g + ' die (or a Granary) sells them for +' + VB.saleVP(G, p, n)); });
+  return best ? 'Next big one: ' + best.t + '.' : '';
+}
+function starLine() { if (!hints() || UI.mode === 'tutorial') return ''; var m = hardMove(); return m ? '★ ' + planLine() : ''; }
 function tutStarPaint() {   /* Learn to play: exactly one star, always on the coach's target (never a second opinion) */
   if (!G || UI.mode !== 'tutorial') return; var id = null;
   try { var st = GXT.current(), e = st && st.target ? st.target() : null; if (e && e.id && /^(mt-|bl-|ec-|st-|gd-|gs-)/.test(e.id)) id = e.id; } catch (e) { }
@@ -62,17 +109,17 @@ function markBest() {
 /* F3: explain the stall numbers, worker badges, lore and the turn/banner track where they appear: one line, tap for detail */
 function mkLegend() {
   var lore = false; for (var d = 1; d <= 6; d++) (G.depots[d] || []).forEach(function (t) { if (t && t.t === 'know') lore = true; });
-  var txt = 'Stall number = the die you use · badge = workers' + (lore ? ' · scroll = lore' : '') + ' · ⓘ';
+  var txt = 'Stall number = die to match · crates = goods · badge = workers needed' + (lore ? ' · scroll = lore' : '') + ' · ⓘ';
   return h('button.mkleg', { type: 'button', id: 'mkLeg', text: txt, 'aria-label': 'What the market numbers mean', onclick: function () {
-    toast('Take from the stall whose number matches a die. A badge on a tile = workers you pay when no die matches (each worker moves a die by 1). Lore (scroll) tiles change a rule for you or give end points: tap any tile to read it.', 9000); } });
+    toast('The number on a stall is the die you match to take its tiles. The crates (coloured chips) are goods you can pick up. A badge on a tile = workers needed when no die matches (each worker bends a die by 1). White die: the stall where this round\'s new goods land. Lore (scroll) tiles change a rule for you or give end points: tap any tile to read it.', 11000); } });
 }
 function trackText() {
   var ord = (G.order || []).map(function (q) { return isHuman(q) ? 'you' : G.seats[q].name; }).join(', then ');
   return 'Season ' + (G.phase + 1) + ' of ' + G.nPhases + ', round ' + Math.min(G.round + 1, nRounds()) + ' of ' + nRounds() + '. Each round everyone rolls 2 dice. Turn order: ' + ord + '. Higher on the banner track plays first; Barges move you up.';
 }
 function trackWire() { var b = $('#barstat'); if (!b || b.dataset.w) return; b.dataset.w = 1; b.setAttribute('role', 'button'); b.setAttribute('tabindex', '0'); b.title = 'Season and round: tap for what it means'; b.style.cursor = 'pointer'; b.addEventListener('click', function () { if (G) toast(trackText(), 7000); }); }
-var LORESHORT = { 'wk+1': 'Hire +1 worker', saleSil: 'Sell +1 silver', saleVP: 'Sell +1 pt/tile', shipVP: 'Barge +2 pts', mineWk: 'Mine +1 worker', take1: 'Take: die ±1', place1: 'Build: die ±1', store4: 'Storage 4', black1: 'Back lane 1 silver', dupBld: 'Twin buildings', pasVP: 'Pasture +2 pts', wkSil: 'Hire +1 silver', saleWk: 'Sell +1 worker', shipSil: 'Barge +1 silver', mineVP: 'Mine +1 pt', wk2: 'Worker = ±2',
-  'end:hall': 'End: 3/Hall', 'end:carp': 'End: 3/Joiner', 'end:chapel': 'End: 3/Chapel', 'end:mkt': 'End: 3/Fair', 'end:inn': 'End: 3/Inn', 'end:mint': 'End: 3/Counting', 'end:tower': 'End: 3/Beacon', 'end:store': 'End: 3/Granary', 'end:sold': 'End: 1/goods sold', 'end:beast': 'End: 4/animal kind' };
+var LORESHORT = { 'wk+1': 'Hire +1 worker', saleSil: 'Sell +1 silver', saleVP: 'Selling: +1 point a tile', shipVP: 'Barge +2 pts', mineWk: 'Mine +1 worker', take1: 'Taking: bend die 1 free', place1: 'Building: bend die 1 free', store4: 'Hold 4 goods tiles', black1: 'Back lane costs 1 silver', dupBld: 'Two of one building ok', pasVP: 'Pasture +2 pts', wkSil: 'Hire +1 silver', saleWk: 'Sell +1 worker', shipSil: 'Barge +1 silver', mineVP: 'Mine +1 pt', wk2: 'Worker = ±2',
+  'end:hall': '+3 per Hall at end', 'end:carp': '+3 per Joiner at end', 'end:chapel': '+3 per Chapel at end', 'end:mkt': '+3 per Fair at end', 'end:inn': '+3 per Inn at end', 'end:mint': '+3 per Counting at end', 'end:tower': '+3 per Beacon at end', 'end:store': '+3 per Granary at end', 'end:sold': '+1 per goods sold at end', 'end:beast': '+4 per animal kind at end' };
 /* F3 one-tap: a glowing tile (or goods) with exactly one legal way to use it, no workers to spend, acts on the first tap.
    The result is said on the line; a tile with a choice (two dice, worker costs) still opens its card. Not in Learn to play. */
 function oneTap(lg, t, g) {

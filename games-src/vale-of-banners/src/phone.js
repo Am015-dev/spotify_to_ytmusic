@@ -27,7 +27,7 @@ function ensureTabs(y, pad) {
   var rvl = rvName; if (L.tiny && G) rvl = rvName + ' · ' + G.P[rivalSeat()].vp;
   [['estate', L.tiny && G ? 'You · ' + G.P[UI.view].vp : 'Your estate'], ['market', 'Market'], ['rival', rvl]].forEach(function (x) {
     var on = UI.tab === x[0], has = x[0] === 'market' ? mkHas : x[0] === 'estate' ? (mt && UI.sel != null) : false;
-    t.appendChild(h('button.tab' + (on ? '.on' : '') + (has && !on ? '.has' : ''), { type: 'button', id: 'tab-' + x[0], role: 'tab', 'aria-selected': on ? 'true' : 'false', text: x[1], onclick: function () { UI.tab = x[0]; UI.pinTab = null; render(); } }));
+    t.appendChild(h('button.tab' + (on ? '.on' : '') + (has && !on ? '.has' : ''), { type: 'button', id: 'tab-' + x[0], role: 'tab', 'aria-selected': on ? 'true' : 'false', text: x[1], onclick: function () { UI.tab = x[0]; UI.pinTab = null; if (x[0] === 'market') UI.mkHabit = true; else if (x[0] === 'estate') UI.mkHabit = false; render(); } }));
   });
 }
 function rivalSeat() { if (!G) return 1; var best = -1, bs = 1; for (var i = 0; i < G.n; i++) if (i !== UI.view && G.P[i].vp > best) { best = G.P[i].vp; bs = i; } return G.n === 1 ? 0 : bs; }

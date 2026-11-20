@@ -357,7 +357,7 @@ html.gx-noanim .fly,html.gx-reduce .fly{transition:none}
    (375x667, 360x640); the dock body scrolls with the action row pinned to its bottom as a last resort. Crates are 44x44. */
 #mk .stgoods.glow{min-width:44px!important;min-height:44px!important}
 .cell.glow,#es>#esin>.cell{min-width:44px}
-@media (max-width:640px){#barstat{flex:0 0 auto;overflow:visible;text-overflow:clip}}
+@media (max-width:640px){#barstat{flex:0 1 auto;overflow:visible;text-overflow:clip;white-space:normal;line-height:1.1;max-width:112px;text-align:left}}
 #tbanner.top{font-size:20px;padding:3px 14px;gap:10px;max-width:calc(100vw - 16px);box-sizing:border-box}#tbanner.top .rd{width:28px;height:28px;font-size:18px}
 @media (max-width:640px) and (orientation:portrait){
   #dockbody{display:grid;grid-template-columns:auto minmax(0,1fr);gap:4px 8px;align-items:center;overflow-y:auto;touch-action:pan-y}
@@ -427,5 +427,7 @@ html body .gx-drawer{z-index:56!important}
 /* beat cards (Turn over, Round N) sit below the score strip and view tabs, never over the scores */
 html body #beat{top:calc(var(--bartop,0px) + 168px)!important}
 #mk.big:not(.six) .tilebtn.lab .cost{right:0!important}
+#beat.tap{pointer-events:auto!important;cursor:pointer}#beat .tapgo{font-weight:800;color:#e0b040;margin-top:4px}
+@media (min-width:1000px){#mk:not(.ph) .pip{width:32px;height:32px;font-size:19px;border-radius:8px}#mk:not(.ph) .sth{gap:6px}#mk:not(.ph) .cost{font-size:15px!important;line-height:20px;padding:0 6px}#mk:not(.ph) .gchip{font-size:14px!important;min-width:22px}#mk:not(.ph) .tilebtn.lab .tlab{font-size:12px!important}}
 </style>
 </head>
