@@ -124,12 +124,14 @@ function drawPlan() {
   for (var g = 1; g <= GEARS; g++) { var o = go.filter(function (x) { return x.g === g; })[0]; h += '<button class="gb' + (UI.gear === g ? ' on' : '') + (o ? '' : ' off') + '" data-g="' + g + '" ' + (o ? '' : 'disabled') + ' aria-label="Gear ' + g + ': play ' + g + ' card' + (g > 1 ? 's' : '') + (o && o.cost ? ', costs 1 heat' : '') + '"><b>' + g + '</b><small>' + (o && o.cost ? '-1 heat' : g + (g > 1 ? ' cards' : ' card')) + '</small></button>'; }
   h += '</div><div id="hand">';
   var needNow = needCards(c, UI.gear), full = UI.sel.length >= needNow;
-  c.hand.forEach(function (x, j) { var on = UI.sel.indexOf(j) >= 0; h += cardHtml(x, on, x === 'H' || (UI.swap && x === 'X'), j, x === 'H' ? '' : on ? '' : full ? 'dim' : tutOn() ? '' : 'glow'); });
+  c.hand.forEach(function (x, j) { var on = UI.sel.indexOf(j) >= 0; h += cardHtml(x, on, x === 'H' || (UI.swap && x === 'X'), j, x === 'H' ? '' : on ? '' : full ? 'dim' : tutOn() || sugShown() ? '' : 'glow'); });
   UI.boost = false;   /* boost is never planned: it is offered after the reveal (React step) */
-  h += '</div><div id="acts">' + (hintsOn() ? '<button id="sugB">Suggest</button>' : '') + '<button class="go" id="goB">Go!</button></div>';
+  h += '</div>' + cardLegend(c.hand) + '<div id="acts">' + (hintsOn() ? '<button id="sugB">Suggest</button>' : '') + '<button class="go" id="goB">Go!</button></div>';
   var hh = c.hand.filter(function (x) { return x === 'H'; }).length, pips = ''; for (var q = 0; q < ENGINE0; q++) pips += '<i class="pip' + (q < c.eng ? ' on' : '') + '"></i>';
   if (hintsOn()) h += '<div class="chips tray" id="tray"><span class="eng" title="Engine heat: your fuel. Corners burn it."><em>Engine heat</em><span class="pips">' + pips + '</span><b data-engine="G.cars[' + c.i + '].eng">' + c.eng + '</b></span><span title="Heat cards stuck in your hand. Gear 1 or 2 cools them back."><em>Dead heat in hand</em> <b>' + hh + '</b></span>' + '</div>';
   p.innerHTML = h; artApply(p);
+  var sgp = sugShown(), sgDone = sgp && sgp.gear === UI.gear && sgp.idx.length === UI.sel.length && sgp.idx.every(function (j) { return UI.sel.indexOf(j) >= 0; });
+  if (sgp) { var gb0 = p.querySelector('.gb[data-g="' + sgp.gear + '"]'); if (gb0) gb0.classList.add('sg'); sgp.idx.forEach(function (j) { var cb = p.querySelector('.cd[data-i="' + j + '"]'); if (cb) cb.classList.add('sg'); }); }
   p.querySelectorAll('.gb').forEach(function (b) { b.onclick = function () { if (tutOn() && !GXT.act({ type: 'tap', what: 'gear', g: +b.getAttribute('data-g') })) return; sfx('gear'); UI.touchedGear = 1; UI.gear = +b.getAttribute('data-g'); UI.sel = UI.sel.slice(0, needCards(c, UI.gear)); if (c.eng - (Math.abs(UI.gear - c.gear) === 2 ? 1 : 0) < 1) UI.boost = false; drawPlan(); }; });
   p.querySelectorAll('.cd').forEach(function (b) { b.onclick = function () { var j = +b.getAttribute('data-i'); if (c.hand[j] === 'H') { setMsg('Heat cards cannot be played.', 'warn'); return; } var k = UI.sel.indexOf(j);
     if (tutOn()) { if (k >= 0 || !GXT.act({ type: 'tap', what: 'card', i: j })) return; }
@@ -139,8 +141,9 @@ function drawPlan() {
   if ($('#sugB')) $('#sugB').onclick = function () { if (tutOn() && !GXT.act({ type: 'tap', what: 'suggest' })) return; sfx('tap'); suggest(); }; $('#goB').onclick = commit;
   var ready = UI.sel.length === need; $('#goB').disabled = !ready; $('#goB').classList.toggle('glow', ready);
   if (!ready) setMsg(need === 0 ? 'Only heat cards: press Go.' : UI.sel.length === 0 && !UI.touchedGear ? planAdvice(c, need) : (UI.sel.length ? 'Tap ' + (need - UI.sel.length) + ' more card' + (need - UI.sel.length > 1 ? 's' : '') + '.' : STORY.planCards(need)));
-  else if (!hintsOn()) { var cq = curveInfo(); previewSet(null); setMsg('Speed ' + cq.sp + (cq.uncertain ? '?' : '') + (cq.spin ? ': you would spin out!' : cq.burn ? ': corner burns ' + cq.burn + ' heat.' : '. Press Go.'), cq.spin || cq.burn ? 'warn' : ''); }
-  else { var ci = previewSet(curveInfo()); var sp = 'Speed ' + ci.sp + (ci.uncertain ? '?' : ''); if (UI.note && /upgrade|:/.test(UI.note) && UI.sel.some(function (j) { return upgId(c.hand[j]); })) sp += ' (' + UI.note.split(':')[0].replace(/ card$/, '') + ')'; var core = (ci.spin ? sp + ': you would spin out!' : ci.burn ? sp + ': the corner burns ' + ci.burn + ' heat' : ci.ks.length ? sp + ': the corner is safe' : ci.next ? sp + ': road clear, corner in ' + ci.next.d : sp + ': road clear') + (ci.slip && !ci.spin ? ', slipstream likely' : ''); if (!ci.spin && core.split(/\s+/).length <= 5) core += '. ' + STORY.planGo; setMsg(core, ci.spin ? 'warn' : ci.burn ? 'warn' : 'good'); }
+  else if (!hintsOn()) { var cq = curveInfo(); previewSet(null); var tl = tradeLine(cq); setMsg(tl.t, tl.k); }
+  else { var ci = previewSet(curveInfo()), tl2 = tradeLine(ci); setMsg(tl2.t, tl2.k); }
+  if (sgp && !sgDone) setMsg(sugWhy(c, sgp), 'good');
   if (!ready) previewSet(null);
   RACE.ph = UI.swap ? 'discard' : (UI.sel.length || UI.touchedGear) ? 'play' : 'shift'; RACE.spdT = UI.sel.length ? curveInfo().sp : 0;   /* the needle revs as you tap cards */
   if (!ready && need === 0) $('#goB').disabled = false;
@@ -182,16 +185,38 @@ function boostOdds(G, c) {   /* R24: what a boost flip can add (the speed cards 
   if (!q || !vals.length) return { line: 'Boost? 1 heat: add the next speed card.', spin: 0, yes: '', no: '' };
   var spins = 0, lo = 9, hi = 0, sum = 0; vals.forEach(function (v) { lo = Math.min(lo, v); hi = Math.max(hi, v); sum += v; if (cornerCost(G, q.from, landing(G, c, q.from + sp + v), sp + v, q.lim) > c.eng - 1) spins++; });
   var pct = Math.round(spins / vals.length * 100), avg = Math.round(sum / vals.length), L0 = landing(G, c, q.from + sp), nc = nextCorner(L0), d = nc ? nc.d : 99;
-  var inR = nc && d <= hi, line = 'Boost +' + (lo === hi ? lo : lo + ' to +' + hi) + ': spin-out risk ' + pct + '%.';   /* every text <= 8 words (phone-check) */
-  return { line: line, spin: spins, pct: pct,
-    yes: '+' + avg + ' spaces, ' + (!inR ? 'no corner in reach' : (spins ? 'Boost: ' + pct + '% spin' : 'safe') + ' at limit ' + nc.limit),
-    no: spins ? 'No boost: safe, keeps heat' : 'save heat for later corners' };
+  var inR = nc && d <= hi, rng = '+' + (lo === hi ? lo : lo + ' to +' + hi) + ' speed', all = spins === vals.length;   /* F3: plain words, no odds that could contradict the suggestion */
+  var line = 'Boost: ' + rng + (all ? ', would spin you out' : spins ? ', may overshoot the corner' : inR ? ', corner stays safe' : '');
+  return { line: line, spin: spins, all: all, pct: pct,
+    yes: !inR ? 'no corner in reach' : 'safe at limit ' + nc.limit,
+    no: spins ? 'keeps heat, no overshoot' : 'save heat for later corners' };
 }   /* Hints on: the Suggest planner's answer to boost / slipstream */
 /* one plan per hand and board: the Hint text, its highlight and Suggest all read this same answer */
 function planOnce() { var c = you(), k = G.round + '|' + c.pos + '|' + c.gear + '|' + c.eng + '|' + c.hand.join(',') + '|' + G.cars.map(function (x) { return x.pos; }).join(','); if (!UI.pk || UI.pk.k !== k || UI.pk.g !== G) UI.pk = { k: k, g: G, p: suggestPlan(G, c) }; return UI.pk.p; }
-function suggest() {
-  var c = you(), p = planOnce();   /* plans your own hand from your seat with the strongest planner */
-  UI.gear = p.gear; UI.sel = p.idx.slice(); UI.boost = false; drawPlan();   /* boost is offered after the reveal; Suggest marks its advice there */
+function suggest() {   /* F3: Suggest SHOWS the plan (gold gear and cards, why in one line); the player taps them and presses Go */
+  planOnce(); UI.sugK = UI.pk.k; UI.boost = false; drawPlan();
+}
+function sugShown() { return hintsOn() && UI.sugK && UI.pk && UI.pk.g === G && UI.sugK === UI.pk.k && planOnce() && UI.sugK === UI.pk.k ? UI.pk.p : null; }
+function planSpeed(c, idx) { var sp = 0, nx = 0, ul = 0; idx.forEach(function (j) { var x = c.hand[j], u = upgId(x); if (u) { sp += UPG[u].sp; ul += UPG[u].lim; } else if (x === 'X') nx++; else sp += +x; }); return { sp: Math.round(sp + nx * avgSpeed(c)), nx: nx, ul: ul }; }
+function sugWhy(c, p) {   /* the suggested plan's reason, from the same numbers the preview uses (<= 8 words, numbers free) */
+  var q = planSpeed(c, p.idx), ks = cornersIn(G, c.pos, c.pos + q.sp), burn = 0, lim = 0; ks.forEach(function (k) { burn += Math.max(0, q.sp - k.limit - q.ul); lim = lim || k.limit; });
+  var hh = c.hand.filter(function (x) { return x === 'H'; }).length, cool = p.gear <= 2 ? Math.min(hh, COOL[p.gear] || 0) : 0, nc = nextCorner(c.pos), head = 'Hint: gear ' + p.gear + ', speed ' + q.sp + (q.nx ? '?' : '');
+  if (cool) return head + ' · cools ' + cool + ' Heat';
+  if (ks.length) return head + ' · limit ' + lim + (burn ? ', costs ' + burn + ' heat' : ', no heat');
+  return head + (nc ? ' · corner ' + nc.limit + ' in ' + nc.d : ' · road clear');
+}
+function legNew(seen, k) { if (UI.legG !== G) { UI.legG = G; UI.legId = Date.now() % 1e6; } var r = G.round + '|' + UI.legId; if (!seen[k]) seen[k] = []; if (seen[k].indexOf(r) < 0) { if (seen[k].length >= 4) return false; seen[k].push(r); lsSet('rr_leg', JSON.stringify(seen)); } return true; }
+function tradeLine(ci) {   /* F3: before Go, the trade-off in plain numbers: you'd go X, limit Y, costs Z heat */
+  var sp = 'Speed ' + ci.sp + (ci.uncertain ? '?' : ''), lim = ci.ks.length ? ci.ks[0].limit : 0;
+  if (ci.spin) return { t: sp + ' · limit ' + lim + ' · spin out!', k: 'warn' };
+  if (ci.ks.length) return { t: sp + ' · limit ' + lim + (ci.burn ? ' · costs ' + ci.burn + ' heat' : ' · no heat. Go!'), k: ci.burn ? 'warn' : 'good' };
+  return { t: sp + (ci.next ? ' · corner ' + ci.next.limit + ' in ' + ci.next.d : '') + ' · safe. Go!', k: 'good' };
+}
+function cardLegend(hand) {   /* F3: one plain line per dead card type in your hand, for the first rounds it is there (then the board gets the room back) */
+  var h = '', seen = JSON.parse(lsGet('rr_leg') || '{}'), hasH = hand.indexOf('H') >= 0 && legNew(seen, 'H'), hasX = hand.indexOf('X') >= 0 && legNew(seen, 'X'); if (!hasH && !hasX) return '';
+  if (hasH) h += '<span><b>Heat</b> can\'t be played. Gear 1 or 2 clears it.</span>';
+  if (hasX) h += '<span><b>Stress</b> plays a random card from your deck.</span>';
+  return '<div class="legend">' + h + '</div>';
 }
 function commit() {
   if (tutOn() && !GXT.act({ type: 'tap', what: 'go' })) return; sfx('go');
@@ -291,11 +316,11 @@ function askBoost() {   /* React step (rulebook): after your cards are revealed 
   /* a real choice only: if even the smallest flip (1) would spin you, boosting can only hurt, so the question is not asked */
   var spin1 = !!q2 && cornerCost(G, q2.from, landing(G, bc, q2.from + p.speed + 1), p.speed + 1, q2.lim) > bc.eng - 1;   /* R19: always offered (a legal choice), marked when any flip would spin you */
   var nc = q2 ? nextCorner(L0 - 1) : null, sug = hintsOn() && UI.mode !== 'tutorial' ? suggestBoost(G, bc) : false;
-  var bo = boostOdds(G, bc); if (sug && bo.pct > 10) sug = false;   /* R27: never suggest a boost with more than a 10% spin-out risk */
+  var bo = boostOdds(G, bc); if (sug && bo.spin) sug = false;   /* F3: never suggest a boost that could overshoot into a spin */
    /* R24: the plan line shows the spin-out risk before you choose, and the badge says why */
   setPhase('react'); setMsg(bo.line, bo.spin ? 'warn' : '');   /* <= 8 words (phone-check) */
   var old = $('#bq'); if (old) old.remove();
-  $('#panel').insertAdjacentHTML('beforeend', '<div class="slipq" id="bq"><button id="boostN">No boost</button><button class="y' + (risk ? ' risk' : '') + '" id="boostY">Boost -1 heat' + (spin1 ? ' (spins you)' : risk ? ' (risky)' : '') + '</button></div>');
+  $('#panel').insertAdjacentHTML('beforeend', '<div class="slipq" id="bq"><button id="boostN">No boost</button><button class="y' + (bo.spin ? ' risk' : '') + '" id="boostY">Boost -1 heat' + (bo.all ? ' (spins you)' : bo.spin ? ' (may spin)' : '') + '</button></div>');
   if (hintsOn() && UI.mode !== 'tutorial') sugMark(sug ? '#boostY' : '#boostN', sug ? bo.yes : bo.no);
   return new Promise(function (res) {
     var fin = function (v) { if (UI.qHalt) { UI.qHalt(); UI.qHalt = null; } var q = $('#bq'); if (q) q.remove(); res(v); };   /* an answered question leaves the screen at once */
@@ -310,11 +335,11 @@ function askDiscard() {   /* discard step, right after moving: throw away speed 
   if (tutOn() && !(GXT.current() && /^disc/.test(GXT.current().id))) return Promise.resolve([]);   /* not taught yet: no dead buttons */
   var c = G.cars[G.pend.car], sel = [], done = null;
   /* rulebook: every round, after moving, you may discard any cards except Heat and Stress. Nothing is pre-selected; Keep all (or the countdown) skips */
-  setPhase('discard');
+  setPhase('discard'); UI.discNew = !lsGet('rr_disc1') || UI.discNewR === G.round; if (UI.discNew) { lsSet('rr_disc1', '1'); UI.discNewR = G.round; }   /* F3: the first discard step says what it is for */
   var paint = function () {
-    var h = '<div class="who">Discard step</div><div id="hand">';
+    var h = '<div class="who">' + (UI.discNew ? 'Discard step: swap weak cards for fresh ones' : 'Discard step') + '</div><div id="hand">';
     c.hand.forEach(function (x, j) { h += cardHtml(x, sel.indexOf(j) >= 0, x === 'H' || x === 'X', j, ''); });
-    h += '</div><div class="slipq">' + (sel.length ? '<button id="discN">Keep all</button><button class="y" id="discY">Discard ' + sel.length + '</button>' : '<button class="y" id="discN">Keep all</button>') + '</div>';
+    h += '</div>' + cardLegend(c.hand) + '<div class="slipq">' + (sel.length ? '<button id="discN">Keep all</button><button class="y" id="discY">Discard ' + sel.length + '</button>' : '<button class="y" id="discN">Keep all</button>') + '</div>';
     $('#panel').innerHTML = h; artApply($('#panel'));
     setMsg(sel.length ? 'Throw away ' + sel.length + ', then draw back to 7.' : 'Drop unwanted cards, or keep all.');
     document.querySelectorAll('#panel .cd').forEach(function (b) { var j = +b.getAttribute('data-i'); b.onclick = function () {
@@ -368,12 +393,15 @@ function showResult() {
 /* ================= canvas ================= */
 var cv, cx, dpr = 1, trackCache = {};
 function sizeCanvas() {
-  cv = cv || $('#cv'); cx = cx || cv.getContext('2d'); var r = $('#cvw').getBoundingClientRect(); dpr = Math.min(2, window.devicePixelRatio || 1);
+  cv = cv || $('#cv'); cx = cx || cv.getContext('2d'); var r = $('#cvw').getBoundingClientRect(); if (r.width < 2 || r.height < 2) return;   /* F3: a hidden or collapsed board keeps the last real size (0 x 0 broke the camera) */ dpr = Math.min(2, window.devicePixelRatio || 1);
   cv.width = Math.max(2, Math.round(r.width * dpr)); cv.height = Math.max(2, Math.round(r.height * dpr)); UI.W = r.width; UI.H = r.height;
   UI.cam.s = Math.max(UI.H < 330 ? 0.62 : 0.75, Math.min(1.3, Math.min(UI.W, UI.H * 1.3) / 420));   /* close camera: cars ~90-100 px (R9) */
   UI.cam.s = Math.max(UI.cam.s, UI.W / 2000, UI.H / 1200);   /* never show beyond the 2000x1200 board */
   UI.camBase = UI.cam.s;
   if (UI.camPlan && G) { var pf = planFrame(); if (pf) { UI.cam.x = pf.x; UI.cam.y = pf.y; UI.cam.s = pf.s; camClamp(UI.cam, UI.W, UI.H); } }   /* R24: a resize while you plan keeps your car framed */
+  /* F3 flat-green fix: setting cv.width clears the canvas. The dock changes height at every turn change, so the board was resized after
+     this frame's draw and the browser painted one blank (plain green) frame. Redraw at once so no blank frame is ever shown. */
+  if (G && cx && !UI.drawing && performance.now) drawFrame(performance.now());
 }
 function planFrame() {   /* R19: while you plan, the camera frames your car and the next corner sign (with its limit), plus the move preview; returns {x, y, s} or null */
   if (!G || G.phase !== 'plan' || UI.busy || !G.cars[UI.seat] || !G.cars[UI.seat].human || G.cars[UI.seat].fin) return null;
@@ -381,17 +409,22 @@ function planFrame() {   /* R19: while you plan, the camera frames your car and 
   if (nc) { var q = tk.at(((c.pos + nc.d) % tk.N) * tk.seg); pts.push({ x: q.x + Math.sin(q.a) * 98, y: q.y - Math.cos(q.a) * 98 }); }
   if (RACE.prev && RACE.prev.car === c.i) pts.push(tk.space(c.pos + RACE.prev.L, 0));
   var x0 = 1e9, y0 = 1e9, x1 = -1e9, y1 = -1e9; pts.forEach(function (p) { x0 = Math.min(x0, p.x); y0 = Math.min(y0, p.y); x1 = Math.max(x1, p.x); y1 = Math.max(y1, p.y); });
-  var top = 50, W = UI.W, H = UI.H - (H0dash()) - top, m = 90, base = UI.camBase || UI.cam.s;   /* top: the message pill and the minimap sit over the board's top edge */
-  var s = Math.min(base, (W - 40) / (x1 - x0 + 2 * m), (H - 40) / (y1 - y0 + 2 * m));
-  s = Math.max(s, Math.min(W / 2000, H / 1200)); return { x: (x0 + x1) / 2, y: (y0 + y1) / 2 - top / 2 / s, s: s, corner: nc ? (c.pos + nc.d) % tk.N : -1 };
+  var sh = UI.H < 260, top = sh ? 30 : 50, W = Math.max(120, UI.W), H = Math.max(80, UI.H - (H0dash()) - top), m = sh ? 50 : 90, base = UI.camBase || UI.cam.s;   /* top: the message pill and the minimap sit over the board's top edge */
+  /* F3 flat-green fix: on a short board (375x553 with a tall dock, or the browser bar showing) the fit went to ~0 or below 0, so the whole
+     track was drawn microscopic or mirrored off screen (a plain green frame). The zoom now has a floor, and when the corner does not fit
+     at that floor the frame stays on your car and leans toward the corner as far as the car stays on screen. */
+  var fit = Math.min(base, (W - 40) / (x1 - x0 + 2 * m), (H - 40) / (y1 - y0 + 2 * m)), floor = Math.min(base, 0.2), s = Math.max(fit, floor);
+  var mx = (x0 + x1) / 2, my = (y0 + y1) / 2, car = pts[0];
+  if (fit < floor) { var hx = Math.max(0, W / 2 / s - 60), hy = Math.max(0, H / 2 / s - 40); mx = car.x + Math.max(-hx, Math.min(hx, mx - car.x)); my = car.y + Math.max(-hy, Math.min(hy, my - car.y)); }
+  return { x: mx, y: my - top / 2 / s, s: s, corner: nc ? (c.pos + nc.d) % tk.N : -1 };
 }
-function camClamp(cam, W, H) { cam.x = W / cam.s >= 2000 ? 1000 : Math.max(W / 2 / cam.s, Math.min(2000 - W / 2 / cam.s, cam.x)); cam.y = H / cam.s >= 1200 ? 600 : Math.max(H / 2 / cam.s, Math.min(1200 - H / 2 / cam.s, cam.y)); }
+function camClamp(cam, W, H) { if (!(cam.s > 0.05) || !isFinite(cam.s)) cam.s = UI.camBase > 0.05 ? UI.camBase : 0.5; if (!isFinite(cam.x)) cam.x = 1000; if (!isFinite(cam.y)) cam.y = 600; W = Math.max(1, W); H = Math.max(1, H); cam.x = W / cam.s >= 2000 ? 1000 : Math.max(W / 2 / cam.s, Math.min(2000 - W / 2 / cam.s, cam.x)); cam.y = H / cam.s >= 1200 ? 600 : Math.max(H / 2 / cam.s, Math.min(1200 - H / 2 / cam.s, cam.y)); }
 function camToPlan() {   /* R24: called the moment the planning panel is drawn, so the very first frame you plan on already shows your car */
   cvFit(); var pf = planFrame(); if (!pf) return; var cam = UI.cam; cam.x = pf.x; cam.y = pf.y; cam.s = pf.s; camClamp(cam, UI.W, UI.H);
   UI.camCut = performance.now(); UI.camPlan = true; UI.camVK = UI.W + 'x' + UI.H;
 }
 function H0dash() { return UI.H < 420 ? dashH(UI.W, UI.H) : 0; }
-function cvFit() { if (G && $('#cvw')) { var r = $('#cvw').getBoundingClientRect(); if (Math.abs(r.width - (UI.W || 0)) > .5 || Math.abs(r.height - (UI.H || 0)) > .5 || dpr !== Math.min(2, window.devicePixelRatio || 1)) sizeCanvas(); } }
+function cvFit() { if (G && $('#cvw')) { var r = $('#cvw').getBoundingClientRect(); if (r.width >= 2 && r.height >= 2 && (Math.abs(r.width - (UI.W || 0)) > .5 || Math.abs(r.height - (UI.H || 0)) > .5 || dpr !== Math.min(2, window.devicePixelRatio || 1))) sizeCanvas(); } }
 window.addEventListener('resize', cvFit); window.addEventListener('orientationchange', function () { setTimeout(cvFit, 120); });
 if (window.ResizeObserver) { var cvRO = new ResizeObserver(cvFit); document.addEventListener('DOMContentLoaded', function () { var w = $('#cvw'); if (w) cvRO.observe(w); }); if (document.readyState !== 'loading') { var w0 = $('#cvw'); if (w0) cvRO.observe(w0); } }
 function carXY(i, p) {
@@ -429,8 +462,11 @@ function drawCar(c, p, ang, rot, hi) {
   cx.restore();
 }
 function rr(x, y, w, h, r) { cx.beginPath(); cx.moveTo(x + r, y); cx.arcTo(x + w, y, x + w, y + h, r); cx.arcTo(x + w, y + h, x, y + h, r); cx.arcTo(x, y + h, x, y, r); cx.arcTo(x, y, x + w, y, r); cx.closePath(); }
-function frame(now) {
-  requestAnimationFrame(frame); if (!G || $('#game').hidden || !cx) return;
+function frame(now) { requestAnimationFrame(frame); drawFrame(now); }
+function drawFrame(now) {
+  if (!G || $('#game').hidden || !cx || UI.drawing) return; UI.drawing = true; try { drawFrame0(now); } finally { UI.drawing = false; }
+}
+function drawFrame0(now) {
   cvFit(); var W = UI.W, H = UI.H, cam = UI.cam, tk = T(G); UI.spinT = (now % 600) / 600;
   var dt = Math.min(200, Math.max(0, now - (UI.camT || now))); UI.camT = now;
   var pf = planFrame(), tgt = pf || (RACE.prev && G.phase === 'plan' ? T(G).space((G.cars[RACE.prev.car].pos + RACE.prev.L) / 2, 0) : carXY(UI.focus, UI.vis[UI.focus].p)), k = (UI.fast || window.ANIM === false) ? 1 : pf ? 1 - Math.exp(-dt / 70) : 0.12;

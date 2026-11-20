@@ -1,7 +1,8 @@
 /* W496 gate: headless level ladder. Runs N races on sunline (2 laps, 5 cars) with the real engine and AI.
    A: mixed fields (1 easy, 2 normal, 2 hard): average place must order hard < normal < easy.
    B: one Suggest driver (the planner behind the Suggest button) against 4 rivals of each level: podium and win rates.
-   D: a plain newcomer (no Suggest) on Easy: average place 3.6 or better.
+   D: a plain newcomer (no Suggest) on Easy: reaches the podium sometimes (F3: Easy is no longer a walkover).
+   C: a player following Suggest on Easy wins 35-85%.
    Usage: node sim-levels.js [races]   Exit 1 if the ladder is out of order or Suggest vs Easy podiums under 60%. */
 const fs = require('fs'), vm = require('vm'), path = require('path');
 const X = vm.createContext({ console, Math, Date, JSON });
@@ -56,10 +57,10 @@ for (const l of ['easy', 'normal', 'hard']) {
 for (const l of ['easy', 'normal', 'hard']) {
   let pod = 0, win = 0, pl = []; for (let s = 0; s < N; s++) { const r = race(['you', l, l, l, l], 9000 + s, l); const p = r.out[0].place; pl.push(p); if (p <= 3) pod++; if (p === 1) win++; }
   console.log('Player seat following Suggest vs 4', l, ': win', (100 * win / N).toFixed(0) + '%', 'podium', (100 * pod / N).toFixed(0) + '%', 'avg place', (pl.reduce((a, x) => a + x, 0) / N).toFixed(2));
-  if (l === 'easy' && (pod / N < 0.7 || win / N < 0.35)) { console.log('FAIL player following Suggest on easy'); bad = 1; }
+  if (l === 'easy' && (pod / N < 0.7 || win / N < 0.35 || win / N > 0.85)) { console.log('FAIL player following Suggest on easy (F3 target: wins often, not always)'); bad = 1; }
 }
 }
 /* D: a plain newcomer (no Suggest) on default Easy should finish mid-pack on average, not last */
 { NAIVE = true; let pl = 0, pod = 0, nsp = 0, win = 0; const OPP = +(process.env.OPP || 4); for (let s = 0; s < N; s++) { const r = race(["you"].concat(Array(OPP).fill("easy")), 13000 + s, "easy"); pl += r.out[0].place; nsp += r.out[0].spins; if (r.out[0].place <= 3) pod++; if (r.out[0].place === 1) win++; }
-  console.log('Plain newcomer (no Suggest) vs 4 easy: avg place', (pl / N).toFixed(2), 'podium', (100 * pod / N).toFixed(0) + '%', 'win', (100 * win / N).toFixed(0) + '%', 'spins/race', (nsp / N).toFixed(2)); if (pl / N > 3.6) { console.log('FAIL plain newcomer on easy'); bad = 1; } NAIVE = false; }
+  console.log('Plain newcomer (no Suggest) vs 4 easy: avg place', (pl / N).toFixed(2), 'podium', (100 * pod / N).toFixed(0) + '%', 'win', (100 * win / N).toFixed(0) + '%', 'spins/race', (nsp / N).toFixed(2)); if (pod / N < 0.03) { console.log('FAIL plain newcomer on easy never reaches the podium'); bad = 1; }   /* F3 (owner, Nov 2026): Easy was a walkover (Suggest won 100%); now a hint follower wins about half to two thirds, and a player ignoring every hint finishes low */ NAIVE = false; }
 process.exit(bad);

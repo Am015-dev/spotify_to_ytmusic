@@ -10,7 +10,7 @@ const { chromium } = require('playwright');
     const tap = sel => touch ? page.locator(sel).first().tap() : page.locator(sel).first().click();
     await tap('#playB');
     for (let r = 0; r < 3; r++) {
-      await page.waitForSelector('#goB', { timeout: 20000 }); await tap('#sugB'); await page.waitForTimeout(150);
+      await page.waitForSelector('#goB', { timeout: 20000 }); await tap('#sugB'); await page.evaluate(() => { for (let k = 0; k < 6; k++) { const e = document.querySelector('.gb.sg:not(.on)') || document.querySelector('#hand .cd.sg:not(.sel)'); if (!e) break; e.click(); } }); /* F3: Suggest shows the plan; the player taps it */ await page.waitForTimeout(150);
       if (await page.locator('#goB').isDisabled()) { const n = await page.locator('#hand .cd:not(.dead)').count(); for (let i = 0; i < n; i++) if (await page.locator('#goB').isDisabled()) await page.locator('#hand .cd:not(.dead)').nth(i).click(); }
       if (r === 0) await page.screenshot({ path: `shots/plan-${name}.png` });
       await tap('#goB');
@@ -20,7 +20,7 @@ const { chromium } = require('playwright');
     await page.screenshot({ path: `shots/mid-${name}.png` });
     await page.evaluate(() => { UI.forceEnd(); G.cars[0].plan = null; });
     // finish: submit this round then the forced finish ends the race
-    await page.waitForSelector('#goB'); await tap('#sugB'); await tap('#goB');
+    await page.waitForSelector('#goB'); await tap('#sugB'); await page.evaluate(() => { for (let k = 0; k < 6; k++) { const e = document.querySelector('.gb.sg:not(.on)') || document.querySelector('#hand .cd.sg:not(.sel)'); if (!e) break; e.click(); } }); /* F3: Suggest shows the plan; the player taps it */ await tap('#goB');
     await page.waitForSelector('#again', { timeout: 30000 }).catch(() => { });
     const done = await page.locator('#again').count(); await page.screenshot({ path: `shots/result-${name}.png` });
     console.log(name, done ? 'PASS reached result' : 'FAIL no result', 'errors:', errs.length, errs.slice(0, 2).join(' | ')); if (!done || errs.length) fails++;

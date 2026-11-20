@@ -19,6 +19,8 @@ for(let i=0;i<2500&&!done;i++){
  done=await p.evaluate(()=>!!document.querySelector('#modal .podium'));if(done)break;
  if(await tapSel('#slipN')){}
  else if(await tapSel('#goB')){turns++}
+ else if(await tapSel('.gb.sg:not(.on)')){}
+ else if(await tapSel('#hand .cd.sg:not(.sel)')){}
  else if(await tapSel('#sugB')){}
  else if(await tapSel('#hand .cd.glow')){}
  else if(await p.evaluate(()=>UI.busy)){await p.mouse.click(195,100)}
@@ -37,6 +39,8 @@ for(let i=0;i<2500&&!beaten;i++){
  if(g){const t=await tapText(/start|race|let|go\b|continue|next|ok|begin|got|play/);if(!t)await tapText(/skip|try again/)}
  else if(await tapSel('#slipN')){}
  else if(await tapSel('#goB')){}
+ else if(await tapSel('.gb.sg:not(.on)')){}
+ else if(await tapSel('#hand .cd.sg:not(.sel)')){}
  else if(await tapSel('#sugB')){}
  else if(await tapSel('#hand .cd.glow')){}
  else if(await p.evaluate(()=>UI.busy)){await p.mouse.click(195,100)}

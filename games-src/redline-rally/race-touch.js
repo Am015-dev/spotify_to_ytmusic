@@ -33,7 +33,7 @@ const SUG = process.env.SUGGEST === '1', TAPALL = process.env.TAPALL === '1', SE
       if (st.ph === 'plan' && st.go && !st.busy) {
         if (goAt) { const r = await p.evaluate(() => ({ cars: G.cars.filter(c => !c.human && !c.fin).length })); waits.push({ ms: Date.now() - goAt, cars: r.cars }); goAt = 0; }
         await scan('plan');
-        if (SUG && await p.$('#sugB')) { await tap('#sugB', false); await tap('#goB'); goAt = Date.now(); turns++; stuck = 0; continue; }
+        if (SUG && await p.$('#sugB')) { await tap('#sugB', false); for (let k = 0; k < 6; k++) { if (!(await tap('.gb.sg:not(.on)', false)) && !(await tap('#hand .cd.sg:not(.sel)', false))) break; } await tap('#goB'); goAt = Date.now(); turns++; stuck = 0; continue; }
         /* plain newcomer (as in sim-levels D): gear up, one down when a corner sign is within 8 spaces, the biggest cards */
         const g = await p.evaluate(() => { const c = G.cars.find(x => x.human), N = T(G).N; let near = false; for (let d = 1; d <= 8; d++) if (T(G).corners[(c.pos + d) % N]) near = true; return Math.min(4, Math.max(1, c.gear + (near ? -1 : 1))); });
         if (g !== await p.evaluate(() => UI.gear)) { if (!(await tap(`.gb[data-g="${g}"]:not([disabled])`, false))) await tap('.gb:not([disabled])', false); }

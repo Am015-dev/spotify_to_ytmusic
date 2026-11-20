@@ -138,6 +138,9 @@ html body .gxc-node .gxc-disc{color:#fff!important;background:#2e1c0c!important}
 @keyframes goGlow{0%,100%{box-shadow:0 3px 0 #6e1209,0 0 0 0 rgba(255,194,58,0)}50%{box-shadow:0 3px 0 #6e1209,0 0 0 5px rgba(255,194,58,.8)}}
 .reveal{min-height:var(--ch)}
 .who{text-align:center;font-weight:900;font-size:16px;margin:2px 0 4px}
+/* F3: the Suggest plan is shown, never played: gold ring on the gear and the cards; a plain line for Heat and Stress cards */
+.gb.sg,.cd.sg{outline:3px solid #ffd24a;outline-offset:2px}.cd.sg.sel,.gb.sg.on{outline-color:#8cf0b4}
+.legend{display:flex;flex-direction:column;gap:1px;font-size:13px;line-height:1.3;color:#c9d3e6;text-align:center;margin:2px 0 4px}.legend b{color:#fff}
 .tray .eng{gap:6px}.tray em{font-style:normal;color:#d5deee}
 .pips{display:inline-flex;gap:3px}.pip{width:12px;height:12px;border-radius:50%;border:2px solid #ff9b5a;background:transparent}.pip.on{background:#ff7a3a}
 .turn5{margin:4px 0 10px 20px;padding:0}.turn5 li{margin:4px 0;font-size:16px}
@@ -145,7 +148,7 @@ html body .gxc-node .gxc-disc{color:#fff!important;background:#2e1c0c!important}
 @media (prefers-reduced-motion:reduce){.cd.glow,#acts .go.glow{animation:none}.cd.glow{box-shadow:0 0 0 2px #ffc23a}}
 .gxt-n{display:none}.gxt-dots i{width:5px;height:5px}
 @media (max-width:600px){#panel{min-height:0}}
-@media (max-width:999px) and (max-height:520px){html .gx-main{grid-template-columns:minmax(0,1fr) 330px!important;grid-template-rows:minmax(0,1fr)!important}html .gx-dock{max-height:none!important;border-radius:0!important}html .gx-app.gx-dock-min .gx-main{grid-template-columns:minmax(0,1fr) 0!important}}
+@media (max-width:999px) and (max-height:520px) and (orientation:landscape){html .gx-main{grid-template-columns:minmax(0,1fr) 330px!important;grid-template-rows:minmax(0,1fr)!important}html .gx-dock{max-height:none!important;border-radius:0!important}html .gx-app.gx-dock-min .gx-main{grid-template-columns:minmax(0,1fr) 0!important}}
 @media (min-width:900px){:root{--cw:72px}#gears .gl,.cd .k,.cd .t,.gb small,.tray em,.who,#banner,.turn5 li{font-size:16px}#msg{font-size:18px}}
 #coach{position:absolute;left:8px;right:8px;bottom:8px;z-index:6;display:none;align-items:center;gap:8px;padding:8px 10px;border-radius:14px;background:#f3e9cf;color:#1b1710;border:2px solid #c9a24a;box-shadow:0 4px 14px rgba(0,0,0,.55);font-size:15px;line-height:1.3}
 #coach.on{display:flex;animation:bnIn2 .3s ease-out}@keyframes bnIn2{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}

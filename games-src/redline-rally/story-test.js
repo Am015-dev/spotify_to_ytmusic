@@ -6,7 +6,7 @@ const STEP = () => {
   const pick = re => gx_.find(b => re.test(b.textContent) && !/back|easier|retry|again|replay/i.test(b.textContent));
   if (over) { const b = pick(/start|race|let|go\b|continue|next|ok|begin|got|play/i) || gx_.find(b => /skip/i.test(b.textContent)) || gx_.find(b => /try again/i.test(b.textContent)); if (b) { b.click(); return 'gxc:' + b.textContent.trim().slice(0, 12); }  return 'gxc-none:' + [...document.querySelectorAll('.gxc')].map(e => e.className + '[' + [...e.querySelectorAll('button')].filter(vis).map(b => b.textContent.trim().slice(0, 14)).join('|') + ']').join(' ; '); }
   if (vis($('#slipY'))) { $('#slipY').click(); return 'slip'; }
-  if ($('#goB') && vis($('#goB')) && !$('#game').hidden) { if (!$('#goB').disabled) { $('#goB').click(); return 'go'; } $('#sugB').click(); return 'sug'; }
+  if ($('#goB') && vis($('#goB')) && !$('#game').hidden) { if (!$('#goB').disabled) { $('#goB').click(); return 'go'; } const sg = document.querySelector('.gb.sg:not(.on)') || document.querySelector('#hand .cd.sg:not(.sel)'); if (sg) { sg.click(); return 'sg'; } $('#sugB').click(); return 'sug'; }
   return 'idle';
 };
 (async () => {

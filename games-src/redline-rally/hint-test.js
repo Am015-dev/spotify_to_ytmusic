@@ -1,4 +1,4 @@
-/* Hint agreement gate: for 12 rounds the Hint bubble names a gear, the gear button it rings has that same number, and Suggest then selects that gear.  Usage: node hint-test.js */
+/* Hint agreement gate: for 12 rounds the Hint bubble names a gear, the gear button it rings has that same number, and Suggest then rings that gear in gold without playing it (F3: the player taps it).  Usage: node hint-test.js */
 const path = require('path'), { chromium } = require(process.env.PW || 'playwright'), gx = require('../scripts/gx-serve.js');
 (async () => {
   const url = await gx.url('redline-rally', { file: path.join(__dirname, 'redline-rally.html') }), b = await chromium.launch({ args: ['--no-sandbox'] });
@@ -13,7 +13,9 @@ const path = require('path'), { chromium } = require(process.env.PW || 'playwrig
     const ringG = await p.evaluate(() => { const rg = document.querySelector('.gxh-ring'); if (!rg) return null; const q = rg.getBoundingClientRect(), x = q.left + q.width / 2, y = q.top + q.height / 2, e = [...document.querySelectorAll('.gb')].find(g => { const w = g.getBoundingClientRect(); return x >= w.left && x <= w.right && y >= w.top && y <= w.bottom; }); return e ? +e.dataset.g : 0; });
     const planG = await p.evaluate(() => planOnce().gear);
     await p.evaluate(() => { const x = document.querySelector('.gxh-bub .gxh-x'); if (x) x.click(); });
-    await p.tap('#sugB'); await p.waitForTimeout(150); const ui = await p.evaluate(() => UI.gear);
+    const g0 = await p.evaluate(() => UI.gear); await p.tap('#sugB'); await p.waitForTimeout(150); const ui = await p.evaluate(() => { const e = document.querySelector('.gb.sg'); return e ? +e.dataset.g : 0; });
+    if (await p.evaluate(() => UI.sel.length) || (await p.evaluate(() => UI.gear)) !== g0) bad.push(`round ${r}: Suggest played the move (it must only show it)`);
+    for (let k = 0; k < 6; k++) { const e = await p.$('.gb.sg:not(.on)') || await p.$('#hand .cd.sg:not(.sel)'); if (!e) break; await e.tap(); await p.waitForTimeout(80); }
     if (r1.g !== planG || ui !== planG || ringG !== planG) bad.push(`round ${r}: text ${r1.g} ring ${ringG} plan ${planG} suggest ${ui} :: ${r1.t.slice(0, 60)}`);
     if (r1.g == null) bad.push(`round ${r}: no gear in hint text`);
     await p.tap('#goB'); await p.waitForTimeout(300);
