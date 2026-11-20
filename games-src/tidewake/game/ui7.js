@@ -266,10 +266,11 @@ function pgClip(){try{const R=pgRects();for(const e of document.querySelectorAll
   near=R.some(r=>cx>=r.left-36&&cx<=r.right+36&&cy>=r.top-36&&cy<=r.bottom+36)}e.classList.toggle('nearbub',near)}}catch(e){}}
 setInterval(()=>{if(PH.on&&G&&G.phase==='setup')pgClip()},250);
 document.addEventListener('pointerdown',e=>{const t=e.target,inG=!!(t&&t.closest&&t.closest(PG_SEL))||(pgBoard(t)&&pgNear(e.clientX,e.clientY,12));
-  const ch=!inG&&PG.up>0&&Date.now()-PG.up<600;PG.on=inG||ch;PG.chain=ch&&!(Math.abs(e.clientX-PG.x)<30&&Math.abs(e.clientY-PG.y)<30);PG.up=0;if(inG)PH.closeT=Date.now();if(PG.on&&!ch){PG.x=e.clientX;PG.y=e.clientY}},true);
+  const ch=!inG&&PG.up>0&&Date.now()-PG.up<400;PG.on=inG||ch;PG.ch=ch;PG.chain=ch&&!(Math.abs(e.clientX-PG.x)<30&&Math.abs(e.clientY-PG.y)<30);PG.up=0;if(inG)PH.closeT=Date.now();if(PG.on&&!ch){PG.x=e.clientX;PG.y=e.clientY}},true);
 // every press that started on a bubble/card (it may close it) blocks board picks for a short while after it ends (R42: PH.closeT was no longer set)
-document.addEventListener('pointerup',e=>{if(PG.on){PG.up=Date.now();PH.closeT=Date.now()}},true);
-document.addEventListener('pointercancel',e=>{if(PG.on){PG.up=Date.now();PH.closeT=Date.now()}},true);
+// a chained press (the 2nd of a double tap) loses its own click but never arms another chain: steady taps 0.3 s apart were all swallowed (R92 sweep)
+document.addEventListener('pointerup',e=>{if(PG.on&&!PG.ch){PG.up=Date.now();PH.closeT=Date.now()}},true);
+document.addEventListener('pointercancel',e=>{if(PG.on&&!PG.ch){PG.up=Date.now();PH.closeT=Date.now()}},true);
 document.addEventListener('click',e=>{if(!PG.on)return;if(PG.up&&Date.now()-PG.up>1000){PG.on=false;return}const t=e.target;
   if(t&&t.isConnected&&t.closest&&t.closest(PG_SEL))return;
   // a 2nd press within 0.6 s loses its click when it lands on the board or near the first press (a double tap); a control elsewhere (Place, Pass, a tile) answers

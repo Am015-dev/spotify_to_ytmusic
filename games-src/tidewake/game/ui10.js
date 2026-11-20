@@ -94,14 +94,16 @@ function tutStart(o){if(NET.on||typeof GXT==='undefined')return;const pro=!!(o&&
     endTitle:'You know the rules',endText:'Now a real game against a computer. Add-ons are off; tick one in Setup to see how it works.',
     endButtons:pro&&first?[{id:'chapter',label:'Start chapter 1'},{id:'menu',label:'Menu'}]:[{id:'play',label:'Play a real game'},{id:'menu',label:'Menu'}],
     onDone:r=>{const c=r&&r.choice;tutLeave();try{GXT.markDone(TUT_GAME)}catch(e){}
-      if(c==='chapter'&&first){showStart();GXC.play(first.id)}else if(c==='play'){const s=defaultSetup();s.mode='me';s.np=2;s.variant=null;s.noMon=false;s.exp={rift:0,wave:0,maelstrom:0,cannon:0};s.seats[0].h=true;s.seats[1].h=false;startGame(s)}else showStart()},
+      if(c==='chapter'&&first){showStart();GXC.play(first.id)}else if(c==='play'){const s=defaultSetup();s.mode='me';s.np=2;s.variant=null;s.noMon=false;s.exp={rift:0,wave:0,maelstrom:0,cannon:0};s.seats[0].h=true;s.seats[1].h=false;{const cs=[1,2,4,5,6,7].filter(k=>k!==s.seats[0].col);s.seats[1].col=cs[Math.floor(Math.random()*cs.length)]}startGame(s)}else showStart()},
     onExit:()=>{tutLeave();showStart()}})}
 function tutBegin(){const s=defaultSetup();s.mode='me';s.np=2;s.variant=null;s.noMon=false;s.exp={rift:0,wave:0,maelstrom:0,cannon:0};
   s.seats[0]={h:true,lv:'normal',col:0};s.seats[1]={h:false,lv:'easy',col:3};
-  TUTG.base=UI.speed||1;TS.on=true;TUT=tutDice;UI.tut=1;TUTG.on=true;TUTG.starting=1;try{setSeed(TS.seed);setAiSeed(3)}catch(e){}
+  TUTG.base=UI.speed||1;TS.on=true;TUT=tutDice;UI.tut=1;TUTG.on=true;TUTG.starting=1;if(!TUTG.pre)try{TUTG.pre={d:DEFSEED,a:AISALT}}catch(e){TUTG.pre={d:null,a:12345}}try{setSeed(TS.seed);setAiSeed(3)}catch(e){}
   try{startGame(s,{tutorial:true,first:TS.co,seed:TS.seed,names:['Vermilion','Cobalt']})}finally{TUTG.starting=0}
   TUTG.freeze=true;UI.guide='light';UI.confirm=null;try{GXH.hide()}catch(e){}render()}
-function tutLeave(){try{TSW.on=false;swRender()}catch(e){}if(TUTG.base){UI.speed=TUTG.base;try{TWKit.setSpeed(UI.speed)}catch(x){}TUTG.base=0}TUTG.on=false;TUTG.cur=null;TUTG.hold=false;TS.on=false;TUT=null;UI.tut=0;TUTG.freeze=false;clearTimeout(UI.tm);UI.gen++;UI.started=false;UI.busy=false;UI.sel=null;UI.sunk=[];UI.mph=null;
+function tutLeave(){// the tutorial's fixed sea (seed, AI seed) ends with it: later games get a fresh random sea and default names
+  if(TUTG.pre){try{DEFSEED=TUTG.pre.d;setAiSeed(TUTG.pre.a)}catch(e){}TUTG.pre=null}
+  try{TSW.on=false;swRender()}catch(e){}if(TUTG.base){UI.speed=TUTG.base;try{TWKit.setSpeed(UI.speed)}catch(x){}TUTG.base=0}TUTG.on=false;TUTG.cur=null;TUTG.hold=false;TS.on=false;TUT=null;UI.tut=0;TUTG.freeze=false;clearTimeout(UI.tm);UI.gen++;UI.started=false;UI.busy=false;UI.sel=null;UI.sunk=[];UI.mph=null;
   try{GXH.hide()}catch(e){}try{kitReset()}catch(e){}try{PH.pop=null;PH.pd=null;PH.cur=null;phAfter()}catch(e){}}
 // Story is preceded by the guided game (the prologue) until it has been finished once
 function storyOpen(){if(typeof GXC==='undefined')return;if(typeof GXT!=='undefined'&&!NET.on&&!GXT.isDone(TUT_GAME))tutStart({prologue:true});else campOpen()}

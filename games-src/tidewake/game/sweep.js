@@ -102,9 +102,12 @@ async function playGame(browser,W,H,gi){
       await tapAt(...bb);await sleep(380);
       const r=await p.evaluate(()=>{const f=document.querySelector('.gxh-finger'),b=document.querySelector('.gxh-bub.on'),ru=document.querySelector('.gxh-rules');
         let pl=null,to=null,from=null;try{pl=hlpPlan();if(pl){const c=t=>{if(!t)return null;const e=typeof t==='function'?t():t;if(!e)return null;if(e.getBoundingClientRect){const r=e.getBoundingClientRect();return [r.left+r.width/2,r.top+r.height/2]}return [e.x,e.y]};to=c(pl.to);from=pl.from?c(pl.from):null}}catch(e){}
-        return {f:f&&{...f.dataset},ring:document.querySelectorAll('.gxh-ring').length,why:b&&b.querySelector('.gxh-tx').textContent,link:!!(b&&b.querySelector('.gxh-link')),rules:!!ru,key:pl&&pl.key,to,from,sig:G.logN+'|'+G.turn+'|'+(G.q&&G.q.kind)}});
+        const rg=document.querySelector('.gxh-ring'),rq=rg&&rg.getBoundingClientRect();
+        return {f:f&&{...f.dataset,off:f.classList.contains('gxh-off')?'1':''},ring:document.querySelectorAll('.gxh-ring').length,ringc:rq&&rq.width?[rq.left+rq.width/2,rq.top+rq.height/2]:null,why:b&&b.querySelector('.gxh-tx').textContent,link:!!(b&&b.querySelector('.gxh-link')),rules:!!ru,key:pl&&pl.key,to,from,sig:G.logN+'|'+G.turn+'|'+(G.q&&G.q.kind)}});
       if(pre.has&&r.f&&r.to){
         if(r.key!==pre.key)note(tag,'bulb advice changed between two reads: '+pre.key+' -> '+r.key+' ('+hs.ph+')');
+        // calm contract (shell calm pass): the finger is hidden unless the step asks for it; then the glowing ring alone must sit on the advice
+        if(r.f.off&&(!r.ringc||Math.abs(r.ringc[0]-r.to[0])>24||Math.abs(r.ringc[1]-r.to[1])>24))note(tag,'bulb finger hidden and the ring is not on the advice '+JSON.stringify(r.ringc)+' vs '+r.to.map(Math.round)+' ('+hs.ph+')');
         if(Math.abs(+r.f.tx-r.to[0])>20||Math.abs(+r.f.ty-r.to[1])>20)note(tag,'bulb finger target '+r.f.tx+','+r.f.ty+' != the advice '+Math.round(r.to[0])+','+Math.round(r.to[1])+' ('+hs.ph+')');
         if(r.from&&(!r.f.fx||Math.abs(+r.f.fx-r.from[0])>2||Math.abs(+r.f.fy-r.from[1])>2))note(tag,'bulb finger start != the advised tile ('+hs.ph+')');
         if(!r.ring)note(tag,'bulb: nothing glows at the suggestion ('+hs.ph+')');

@@ -116,4 +116,21 @@
       { kind: 'fn', name: 'settings row strip painted', fn: function () { var c = getComputedStyle(document.querySelector('#artdrawer .gx-row'), '::before'); return (c.borderImageSource.indexOf('ui-row-c') >= 0 && GXSK.classes().indexOf('sk-row') >= 0) || 'ui-row-c not painted'; } }
     ]
   });
+  // R92: the tutorial's fixed sea (seed 11, AI seed 3) leaked into every later game. After the tutorial, games must get fresh random seas.
+  GXS.add({
+    id: 'tw-seed', name: 'Games after the tutorial get a fresh sea', ask: 'Is each new game a different sea?', seed: 9, when: booted, group: 'Rules',
+    setup: function () {
+      var o = window.__twseed = { d0: DEFSEED, a0: AISALT };
+      try { GXH.setEnabled(false); } catch (e) { }
+      tutBegin(); o.tutSeed = G.seed; o.tutAi = AISALT; tutLeave(); o.d1 = DEFSEED; o.a1 = AISALT;
+      DEFSEED = null; o.seeds = [];
+      for (var k = 0; k < 2; k++) { var s = defaultSetup(); s.mode = 'me'; s.np = 2; s.variant = null; s.exp = { rift: 0, wave: 0, maelstrom: 0, cannon: 0 }; s.seats.forEach(function (x, i) { x.h = i === 0; }); startGame(s); o.seeds.push(G.seed); }
+      return idle(400);
+    },
+    checks: [
+      { kind: 'fn', name: 'the tutorial used its own fixed sea', fn: function () { var o = window.__twseed; return (o.tutSeed === (TS.seed >>> 0) && o.tutAi === 3) || JSON.stringify(o); } },
+      { kind: 'fn', name: 'leaving the tutorial restores the seed and AI seed', fn: function () { var o = window.__twseed; return (o.d1 === o.d0 && o.a1 === o.a0) || JSON.stringify(o); } },
+      { kind: 'fn', name: 'two later games: two different seas, neither the tutorial one', fn: function () { var o = window.__twseed; return (o.seeds[0] !== o.seeds[1] && o.seeds.indexOf(TS.seed >>> 0) < 0) || JSON.stringify(o); } }
+    ]
+  });
 })();
