@@ -114,7 +114,7 @@ function renderRes() {
     canH = G.phase === 'action' && OH.sideToAct() === 0 && !G.pending && P.heat >= 8 && G.temp < 8;
   OH.RES.forEach(function (r) {
     var R = A.RES[r], go = (r === 'plant' && canG) || (r === 'heat' && canH);
-    h += '<button class="rc' + (go ? ' go glow' : '') + '" data-r="' + r + '" style="background:' + R.col + ';color:' + R.fg + '" aria-label="' + R.name + '"><span class="n">' + A.icon(r, 15) + '<span data-engine="' + r + '">' + P[r] + '</span></span><span class="p">' + (P.prod[r] >= 0 ? '+' : '') + P.prod[r] + '</span><span class="w">' + R.name + '</span></button>';
+    h += '<button class="rc' + (go ? ' go glow' : '') + '" data-r="' + r + '" style="background:' + R.col + ';color:' + R.fg + '" aria-label="' + R.name + (go ? (r === 'plant' ? ': tap to turn ' + OH.greenCost(0) + ' plants into a greenery tile' : ': tap to turn 8 heat into +1 temperature') : '') + '"><span class="n">' + A.icon(r, 15) + '<span data-engine="' + r + '">' + P[r] + '</span></span><span class="p">' + (P.prod[r] >= 0 ? '+' : '') + P.prod[r] + '</span><span class="w' + (go ? ' cv' : '') + '">' + (go ? (r === 'plant' ? OH.greenCost(0) + '→greenery' : '8→+1°C') : R.name) + '</span></button>';
   });
   $('res').innerHTML = h;
 }
@@ -128,24 +128,28 @@ function renderBar() {
   $('bCards').querySelector('.badge') && $('bCards').querySelector('.badge').remove();
   if (my && playN) $('bCards').insertAdjacentHTML('beforeend', '<span class="badge">' + playN + '</span>');
   var ready = 0; OH.actionSources(0).forEach(function (id) { OH.card(id).action.forEach(function (a, i) { if (OH.actOk(0, id, i)) ready++; }); });
-  $('bActS').textContent = ready + ' ready';
+  $('bActS').textContent = ready ? ready + ' ready' : (P.played.some(function (id) { return OH.CARDS[id] && OH.CARDS[id].action && OH.CARDS[id].action.length; }) || P.corp && OH.card(P.corp).action ? 'used or none' : 'none yet');
   $('bPassT').textContent = G.acts === 1 ? 'Done' : 'Pass';
-  $('bPassS').textContent = G.acts === 1 ? (G.pl[1].passed ? 'you go again' : 'end turn') : 'income +' + (P.prod.mc + P.tr);
-  $('bPass').setAttribute('aria-label', G.acts === 1 ? 'Done, end turn' : 'Pass. Income next round: ' + (P.prod.mc + P.tr) + ' credits');
+  $('bPassS').textContent = G.acts === 1 ? (G.pl[1].passed ? 'you go again' : 'end turn, play again') : 'out till next round';
+  $('bPass').setAttribute('aria-label', G.acts === 1 ? 'Done: end this turn, you play again next round' : 'Pass: you are out until the next generation. Income next round: ' + (P.prod.mc + P.tr) + ' credits');
   ['bProj', 'bAct', 'bPass'].forEach(function (b) { $(b).disabled = !my; });
   $('bCards').disabled = false;
 }
 
 // ---------- hint line (8 words max) ----------
-function setHint(t) { $('hintt').textContent = t; $('hint').style.display = t ? '' : 'none'; }
+function setHint(t) {
+  var tr = UI.tryTxt && Date.now() < UI.tryUntil;
+  if (tr) { $('hintt').innerHTML = UI.tryTxt; $('hintt').className = 'try'; $('hint').style.display = ''; return; }
+  $('hintt').className = ''; $('hintt').textContent = t; $('hint').style.display = t ? '' : 'none';
+}
 function hintNow() {
   if (!G) return '';
   if (G.over) return 'Game over';
   var p = OH.sideToAct();
   if (p === 1) return UI.rivalLine || 'Rival is thinking…';
-  if (G.pending) { if (G.pending.h === 'place') return UI.autoZ ? 'Tap a glowing space · drag to look' : 'Tap a glowing space'; return 'Make a choice'; }
-  if (G.phase === 'setup') return 'Pick your company';
-  if (G.phase === 'research' || G.phase === 'draft') return 'New round: pick cards';
+  if (G.pending) { if (G.pending.h === 'place') { var tt = G.pending.d && G.pending.d.t; tt = tt === 'special' ? 'tile' : tt; if (UI.sel) return 'Tap "Place here" to build ' + (tt || 'it'); return 'Tap a glowing space for your ' + (tt || 'tile'); } return G.pending.h === 'pickres' ? 'Pick a card to get the resource' : 'Pick one option'; }
+  if (G.phase === 'setup') return UI.setup && UI.setup.step === 1 ? 'Choose cards, then tap Keep' : 'Pick your company';
+  if (G.phase === 'research' || G.phase === 'draft') return 'New round: tap Buy to finish';
   if (G.phase === 'final') return 'Last chance: plant greenery';
   if (G.phase === 'action') { if (G.pl[1].passed) return G.acts === 1 ? 'Rival is out · action 2, or Done' : 'Rival is out: your turn again'; return G.acts === 1 ? 'Action 2 of 2, or Done' : 'Your turn: 1 or 2 actions'; }
   return '';

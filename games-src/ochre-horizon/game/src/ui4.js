@@ -137,6 +137,12 @@ function preview(m) {
   OH.G = G0;
   return out;
 }
+function timingNote(id) {
+  var c = OH.CARDS[id]; if (!c || !c.effect) return '';
+  var o = c.effect.filter(function (e) { return e.e === 'onTile' && e.t === 'ocean'; })[0];
+  if (!o) return '';
+  return 'Timing: this only pays for oceans placed AFTER you play it. Play it before the oceans go down (' + G.oceans + ' of 9 are placed now).';
+}
 function showCard(id, owner) {
   var c = OH.card(id), P = G.pl[0], inHand = owner === 0 && P.hand.indexOf(id) >= 0, my = OH.sideToAct() === 0 && G.phase === 'action' && !G.pending;
   var h = '<div class="big">' + cardHTML(id, { flavor: 1, owner: owner }) + '</div>';
@@ -146,6 +152,7 @@ function showCard(id, owner) {
       if (pay.steel) parts.push(pay.steel + ' steel'); if (pay.ti) parts.push(pay.ti + ' titanium'); if (pay.heat) parts.push(pay.heat + ' heat'); parts.push(pay.mc + ' credits');
       var gets = my ? preview({ t: 'play', id: id }) : [];
       if (my) h += '<div class="' + (gets.length ? 'row' : 'why') + '" style="min-height:0;margin-top:8px">' + (gets.length ? 'Gives: ' + esc(gets.join(', ')) : 'No gain right now. Check the card text.') + '</div>';
+      var tn = timingNote(id); if (tn) h += '<div class="tnote">' + esc(tn) + '</div>';
       h += '<button class="btn pickable" id="mPlay"' + (my ? '' : ' disabled') + '>Play it<small>Pay ' + parts.join(' + ') + (my ? '' : ' · wait for your turn') + '</small></button>';
     } else h += '<div class="why">' + esc(whyNot(0, id)) + '</div>';
     h += '<button class="btn alt" id="mSell"' + (my ? '' : ' disabled') + '>Sell for 1 credit</button>';
@@ -176,17 +183,18 @@ function showPickRes() {
 }
 function suggestBuys(ids, budget) { try { var save = OH.G; var r = OHAI.chooseBuys(0, ids, Math.max(0, budget), 'normal'); OH.G = save; return r; } catch (e) { return []; } }
 function OHAI_buys(ids, budget) { var sc = ids.map(function (id) { return { id: id, w: OHAI.cardWorth(0, id) }; }).sort(function (a, b) { return b.w - a.w; }), out = []; sc.forEach(function (s) { if (s.w > 2 && (out.length + 1) * 3 <= budget) out.push(s.id); }); return out; }
+var CORP_GOOD = { c00: 'Easy start: no power to learn. Plain 42 credits and free cards.', c01: 'Cheap space cards. Good if your hand has space projects.', c02: 'Steel for building cards. Good with building projects.', c03: 'Plants and greenery. Easy points from planting.', c04: 'Credits whenever oceans go down. Steady income.', c05: 'Credits from event cards. Good with many events.', c06: 'Heat turns into titanium and credits. Slow but strong.', c07: 'Extra cards and cheap science. Good for planning ahead.', c08: 'Titanium and credits from space cards.', c09: 'Animals and plants. Grows slowly, scores late.', c10: 'Steel from cities. Good with building and cities.', c11: 'Cheap cities and energy. Good for a fast start.', c12: 'Hurts the rival\'s income. Needs spare credits.' };
 function showSetup() {
   var P = G.pl[0], st = UI.setup || (UI.setup = { step: 0, corp: null, keep: {} });
   if (st.step === 0) {
     var cs = P.offer.corps.slice(); if (cs.indexOf('c00') < 0 && UI.tut) cs.push('c00');
     var first = UI.tut || !LS.get('oh_done'); if (cs.indexOf('c00') >= 0) { cs.splice(cs.indexOf('c00'), 1); cs.unshift('c00'); }
-    modal('<h3>Pick your company</h3><p style="margin:0 0 8px;opacity:.85">Each company has one power.</p><div class="grid">' + cs.map(function (id) { var rec = first && id === 'c00'; return '<button class="cw pickable" data-corp="' + id + '">' + (rec ? '<span class="recb">Best for a first game</span>' : '') + cardHTML(id, { flavor: 1, pick: rec, chk: 'Pick' }) + '</button>'; }).join('') + '</div>', false);
+    modal('<h3>Pick your company</h3><p class="note">Each company has one power. ' + (first ? '<b>First game? Take Open Charter</b> (marked): no power to learn.' : 'Pick one that fits the cards you like.') + '</p><div class="grid">' + cs.map(function (id) { var rec = first && id === 'c00'; return '<button class="cw pickable" data-corp="' + id + '">' + (rec ? '<span class="recb">Best for a first game</span>' : '') + cardHTML(id, { pick: rec, chk: 'Pick' }) + '<span class="cgood"><b>Good at:</b> ' + esc(CORP_GOOD[id] || '') + '</span></button>'; }).join('') + '</div>', false);
     $('mb').querySelectorAll('[data-corp]').forEach(function (b) { b.addEventListener('click', function () { st.corp = b.getAttribute('data-corp'); st.step = 1; if (P.offer.corps.indexOf(st.corp) < 0) P.offer.corps.push(st.corp); var C = OH.CORPS[st.corp]; st.keep = {}; if (!C.beginner) suggestBuys(P.offer.cards, C.mc - 14).forEach(function (id) { st.keep[id] = 1; }); if (!OH.CORPS[st.corp].beginner) coachShow('keep'); showSetup(); }); });
     coachShow('corp'); return;
   }
   var C = OH.CORPS[st.corp], n = Object.keys(st.keep).length, beg = !!C.beginner;
-  modal('<h3>Keep cards</h3><p style="margin:0 0 8px;opacity:.85">' + (beg ? 'Open Charter keeps all 10 free.' : '3 credits each. Suggested ones are marked.') + '</p><div class="grid">' + P.offer.cards.map(function (id) { return '<button class="cw pickable" data-keep="' + id + '">' + cardHTML(id, { pick: beg || st.keep[id] }) + '</button>'; }).join('') + '</div><div class="stick"><button class="btn pickable" id="mKeep">' + (beg ? 'Keep all 10' : 'Keep ' + plural(n, 'card')) + '<small>' + (beg ? 'Start with 42 credits' : 'Pay ' + 3 * n + ', start with ' + (C.mc - 3 * n) + ' credits') + '</small></button><button class="btn alt" id="mBack">Other company</button></div>', false);
+  modal('<h3>Keep cards</h3><p style="margin:0 0 8px;opacity:.85">' + (beg ? 'Open Charter keeps all 10 free.' : '3 credits each. Marked cards are our suggestion: change them if you like.') + '</p><div class="grid">' + P.offer.cards.map(function (id) { return '<button class="cw pickable" data-keep="' + id + '">' + cardHTML(id, { pick: beg || st.keep[id] }) + '</button>'; }).join('') + '</div><div class="stick"><button class="btn pickable" id="mKeep">' + (beg ? 'Keep all 10' : 'Keep ' + plural(n, 'card')) + '<small>' + (beg ? 'Start with 42 credits' : 'Pay ' + 3 * n + ', start with ' + (C.mc - 3 * n) + ' credits') + '</small></button><button class="btn alt" id="mBack">Other company</button></div>', false);
   $('mb').querySelectorAll('[data-keep]').forEach(function (b) { b.addEventListener('click', function () { if (beg) { b.querySelector('.card').classList.remove('pop'); void b.offsetWidth; b.querySelector('.card').classList.add('pop'); toast('<b>' + esc(OH.card(b.getAttribute('data-keep')).name) + ': kept</b>Open Charter keeps all 10 cards for free.', true, 2000, { now: true, key: 'beg' }); return; } var id = b.getAttribute('data-keep'); if (st.keep[id]) delete st.keep[id]; else if ((n + 1) * 3 <= C.mc) st.keep[id] = 1; else { toast('Not enough credits: each card costs 3.', true, 2000, { now: true, key: 'buy' }); return; } showSetup(); }); });
   $('mKeep').addEventListener('click', function () { var m = { t: 'setup', corp: st.corp, buy: Object.keys(st.keep) }; UI.setup = null; closeModal(); doMove(m); });
   $('mBack').addEventListener('click', function () { st.step = 0; showSetup(); });
@@ -195,7 +203,7 @@ function showResearch() {
   var P = G.pl[0], st = UI.research;
   if (!st || st.gen !== G.gen) { st = UI.research = { gen: G.gen, keep: {} }; suggestBuys(P.research, P.mc - 3).forEach(function (id) { st.keep[id] = 1; }); }
   var n = Object.keys(st.keep).length;
-  modal('<h3>Round ' + G.gen + ': new cards</h3><p style="margin:0 0 8px;opacity:.85">Tap a card to buy or skip it. 3 credits each. You have ' + P.mc + '.</p><div class="grid">' + P.research.map(function (id) { return '<button class="cw pickable" data-rk="' + id + '">' + cardHTML(id, { pick: st.keep[id] }) + '</button>'; }).join('') + '</div><div class="stick"><button class="btn pickable" id="mBuy">' + (n ? 'Buy ' + plural(n, 'card') : 'Buy none') + '<small>' + (n ? 'Pay ' + 3 * n + ' credits' : 'Keep your credits') + '</small></button></div>', false);
+  modal('<h3>Round ' + G.gen + ': new cards</h3><p style="margin:0 0 8px;opacity:.85">Marked cards are our suggestion: tap to change. 3 credits each. You have ' + P.mc + '.</p><div class="grid">' + P.research.map(function (id) { return '<button class="cw pickable" data-rk="' + id + '">' + cardHTML(id, { pick: st.keep[id] }) + '</button>'; }).join('') + '</div><div class="stick"><button class="btn pickable" id="mBuy">' + (n ? 'Buy ' + plural(n, 'card') : 'Buy none') + '<small>' + (n ? 'Pay ' + 3 * n + ' credits' : 'Keep your credits') + '</small></button></div>', false);
   $('mb').querySelectorAll('[data-rk]').forEach(function (b) { b.addEventListener('click', function () { var id = b.getAttribute('data-rk'); if (st.keep[id]) delete st.keep[id]; else if ((n + 1) * 3 <= P.mc) st.keep[id] = 1; else { toast('Not enough credits: each card costs 3.', true, 2000, { now: true, key: 'buy' }); return; } showResearch(); }); });
   $('mBuy').addEventListener('click', function () { closeModal(); doMove({ t: 'buy', ids: Object.keys(st.keep) }); });
   coachShow('research');
@@ -212,10 +220,10 @@ function showFinal() {
   $('mFd').addEventListener('click', function () { closeModal(); doMove({ t: 'done' }); });
 }
 function showPass() {
-  if (G.acts === 1) { doMove({ t: 'end' }); return; }
+  if (G.acts === 1) { if (!LS.get('oh_doneinfo')) { LS.set('oh_doneinfo', '1'); toast('<b>Done: you end this turn</b>You play again after the rival. Pass (later) = out until the next generation.', true, 4200, { now: true, key: 'doneinfo' }); } doMove({ t: 'end' }); return; }
   var playN = G.pl[0].hand.filter(function (id) { return OH.playable(0, id); }).length;
   if (!playN && G.pl[0].mc < 11) { doMove({ t: 'pass' }); return; }
-  modal('<h3>Pass this round?</h3><p>You sit out until next round. Income next round: <b>+' + (G.pl[0].prod.mc + G.pl[0].tr) + ' credits</b>. ' + (playN ? 'You can still play ' + plural(playN, 'card') + '.' : '') + '</p><button class="btn" id="mPassY">Yes, pass</button><button class="btn alt" id="mPassN">Keep playing</button>');
+  modal('<h3>Pass this round?</h3><p><b>Pass: you are out until the next generation.</b> (To only end this turn and play again, use Done.) Income next round: <b>+' + (G.pl[0].prod.mc + G.pl[0].tr) + ' credits</b>. ' + (playN ? 'You can still play ' + plural(playN, 'card') + '.' : '') + '</p><button class="btn" id="mPassY">Yes, pass</button><button class="btn alt" id="mPassN">Keep playing</button>');
   $('mPassY').addEventListener('click', function () { closeModal(); doMove({ t: 'pass' }); });
   $('mPassN').addEventListener('click', closeModal);
 }

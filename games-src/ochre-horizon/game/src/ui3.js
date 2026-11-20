@@ -86,7 +86,7 @@ function doMove(m) {
   var ok = OH.performMove(m);
   if (!ok) { sfx('bad'); toast('That move is not allowed right now.', true, 2400, { now: true }); return false; }
   if (m.t === 'play') sfx('card');
-  UI.sel = null; UI.lastMove = m.t;
+  UI.sel = null; UI.tryTxt = null; UI.lastMove = m.t;
   var d = playEvents();
   render(); save();
   coachCheck(m);

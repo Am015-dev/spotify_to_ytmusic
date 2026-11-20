@@ -61,10 +61,10 @@ var COACH = {
   keep: 'Keep cards you can use soon. Each costs 3.',
   goal: 'Warm it, give it air, fill the oceans. Each step: +1 rating.',
   cards: 'Tap Cards. Play one: pay its cost, get its effect.',
-  turn2: 'Take 1 or 2 actions, then the rival plays.',
+  turn2: 'Done = end this turn, play again after the rival. Pass = out till next round.',
   rating: 'Rating counts as points. Cards, tiles and goals add more.',
   prod: 'Production pays you every round. Income cards early pay most.',
-  place: 'Tap a glowing space, see the bonus, tap again to build.',
+  place: 'Tap a glowing space, see what you get, tap Place here.',
   proj: 'Projects never run out. Comet strike warms the planet.',
   pass: 'Out of money? Pass. Income comes when both pass.',
   research: 'Marked cards are our pick. Tap to change. 3 credits each.',
@@ -119,7 +119,7 @@ $('hintbtn').addEventListener('click', function () {
   var m = OHAI.suggest(0); if (!m) return;
   var t = suggestWords(m);
   if (m.t === 'place') { UI.sel = m.s; focusSpace(m.s); renderBoard(); }
-  toast('<b>Try this</b>' + esc(t[0]) + (t[1] ? '<br><small>' + esc(t[1]) + '</small>' : ''), true, 3600, { now: true, key: 'hint' });
+  UI.tryTxt = 'Try: ' + esc(t[0]) + (t[1] ? '<small>' + esc(t[1]) + '</small>' : ''); UI.tryUntil = Date.now() + 5000; setHint(hintNow()); clearTimeout(UI.tryTm); UI.tryTm = setTimeout(function () { UI.tryTxt = null; if (G) setHint(hintNow()); }, 5100);
 });
 // ---------- end screen ----------
 function showEnd() {

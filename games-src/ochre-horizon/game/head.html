@@ -136,6 +136,13 @@ button{font-family:var(--bd);font-weight:700;font-size:14px;color:inherit;cursor
 #toast{position:fixed;left:50%;bottom:calc(126px + var(--sb));transform:translateX(-50%);z-index:65;pointer-events:none;display:flex;flex-direction:column;align-items:center;gap:6px;width:min(92%,360px)}
 .tst small{display:block;font-size:13px;opacity:.9;margin-top:2px}
 body.placing #toast,body.placing .coach{bottom:calc(196px + var(--sb))}
+.cgood{display:block;background:var(--deep2);color:var(--cream);border-radius:0 0 10px 10px;padding:5px 8px;font-size:12.5px;line-height:1.25;font-weight:600;text-align:left}
+.cgood b{color:var(--gold)}
+.rc .w.cv{font-size:10.5px;font-weight:700;opacity:1}
+.note{margin:0 0 8px;opacity:.9;font-size:13.5px}
+.tnote{background:var(--deep2);border-left:4px solid var(--gold);border-radius:8px;padding:6px 10px;margin-top:8px;font-size:13px;line-height:1.3}
+#hint span.try{background:var(--sun);color:var(--ink);border-color:var(--gold);white-space:normal;line-height:1.2}
+#hint span.try small{display:block;font-weight:500;font-size:12px}
 .recb{display:block;background:var(--gold);color:var(--ink);border-radius:8px 8px 0 0;padding:3px 8px;font-size:12px;font-weight:700;text-align:center}
 #rpanel{display:none}
 .tst{background:var(--ink);border:2px solid var(--rival);color:var(--cream);border-radius:14px;padding:8px 12px;font-size:14px;animation:ti .25s ease-out;box-shadow:0 6px 18px rgba(0,0,0,.4);text-align:center;width:100%}
@@ -166,10 +173,11 @@ table.sc2 tr.tot td{border:0;font-size:20px;color:var(--sun2)}
 .rules h4{font-family:var(--hd);font-weight:400;color:var(--sun2);font-size:17px;margin:14px 0 4px}.rules p{margin:4px 0;line-height:1.4}
 /* PC: wide screen with a mouse (R99 row 8): cards docked left, map centre at full height, rival panel right */
 @media (min-width:1100px) and (min-height:620px){
- body.pc #app{left:400px;right:340px}
- body.pc .sheet{display:flex;top:0;bottom:0;left:0;right:auto;width:400px;max-height:none;border-radius:0;border-top:0;border-right:4px solid var(--sun);animation:none;z-index:40}
+ body.pc{--pl:clamp(300px,22vw,400px);--pr:clamp(250px,17vw,340px)}
+ body.pc #app{left:var(--pl);right:var(--pr)}
+ body.pc .sheet{display:flex;top:0;bottom:0;left:0;right:auto;width:var(--pl);max-height:none;border-radius:0;border-top:0;border-right:4px solid var(--sun);animation:none;z-index:40}
  body.pc #scrim{display:none!important}
- body.pc #rpanel{display:flex;flex-direction:column;position:fixed;right:0;top:0;bottom:0;width:340px;z-index:40;background:var(--deep);border-left:4px solid var(--rival);padding:10px 14px;overflow-y:auto;gap:8px}
+ body.pc #rpanel{display:flex;flex-direction:column;position:fixed;right:0;top:0;bottom:0;width:var(--pr);z-index:40;background:var(--deep);border-left:4px solid var(--rival);padding:10px 14px;overflow-y:auto;gap:8px}
  body.pc #rpanel h2{margin:0;font-family:var(--hd);font-weight:400;font-size:22px;color:var(--rival)}
  body.pc #rpanel h3{margin:6px 0 0;font-family:var(--hd);font-weight:400;font-size:17px;color:var(--sun2)}
  body.pc .rpsc{font-size:15px}body.pc .rpsc b{font-family:var(--hd);font-size:26px;font-weight:400;color:var(--cream)}
@@ -178,16 +186,16 @@ table.sc2 tr.tot td{border:0;font-size:20px;color:var(--sun2)}
  body.pc .rpr{border-radius:10px;padding:5px 6px;text-align:center;line-height:1.15}body.pc .rpr b{font-family:var(--hd);font-weight:400;font-size:20px;display:block}body.pc .rpr span{font-size:12px;font-weight:700}
  body.pc .rpk{font-size:13px;opacity:.85}
  body.pc #rpanel .logl{font-size:13px}
- body.pc #toast{left:calc(50% + 30px);width:min(440px,calc(100vw - 780px))}
- body.pc .coach{left:410px;right:350px}
+ body.pc #toast{left:calc(50% + (var(--pl) - var(--pr)) / 2);width:min(440px,calc(100vw - var(--pl) - var(--pr) - 40px))}
+ body.pc .coach{left:calc(var(--pl) + 10px);right:calc(var(--pr) + 10px)}
  body.pc #modal{z-index:70}
  body.pc #modal .mb{max-width:600px}
  body.pc #modal .grid{grid-template-columns:repeat(3,1fr)}
  body.pc .sheet.docked .x{visibility:hidden}
  body.pc .gauge .gl,body.pc .rc .p,body.pc .rc .w,body.pc .tag,body.pc .card .req,body.pc .card .ty,body.pc #bar .badge{font-size:12px}
- body.pc .gauge{height:52px}body.pc .gauge .gv{font-size:19px}
- body.pc #bar button{height:58px;font-size:16px}body.pc #bar button small{font-size:13px}
- body.pc .rc{height:56px}body.pc .rc .n{font-size:22px}
+ body.pc .gauge{height:44px}body.pc .gauge .gv{font-size:19px}
+ body.pc #bar button{height:52px;font-size:16px}body.pc #bar button small{font-size:13px}
+ body.pc .rc{height:48px}body.pc .rc .n{font-size:22px}
  body.pc .hex:hover .ho{stroke:#fff;stroke-width:2.5}
  body.pc button:hover:not(:disabled){filter:brightness(1.08)}
  body.pc .grid{grid-template-columns:repeat(2,1fr)}

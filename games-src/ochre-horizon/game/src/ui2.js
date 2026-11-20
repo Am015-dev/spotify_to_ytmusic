@@ -59,10 +59,11 @@ function renderBoard() {
   $('hexes').innerHTML = h;
   // confirm button for a selected space
   var cf = $('confirm');
+  if (pend && !UI.sel && pend.spaces.length === 1 && OH.sideToAct() === 0) UI.sel = pend.spaces[0];
   if (pend && UI.sel && pend.spaces.indexOf(UI.sel) >= 0) {
     cf.classList.add('on');
     var g = gainsAt(0, pend.t, UI.sel);
-    $('confirmb').innerHTML = 'Place ' + (pend.t === 'special' ? 'tile' : pend.t) + ' here<small>' + (g.length ? 'You get ' + g.join(', ') : 'No bonus here') + '</small>';
+    $('confirmb').innerHTML = 'Place ' + (pend.t === 'special' ? 'tile' : pend.t) + ' here<small>' + (g.length ? 'You get: ' + g.join(', ') : 'No bonus here, still counts') + '</small>';
   } else cf.classList.remove('on');
 }
 function gainsAt(p, t, s) {
@@ -80,8 +81,9 @@ function gainsAt(p, t, s) {
 function bwSize() { var r = $('bw').getBoundingClientRect(); return [Math.max(50, r.width), Math.max(50, r.height)]; }
 function applyView() {
   var sz = bwSize(), w = sz[0], hh = sz[1], v = UI.view;
-  var base = 420 / Math.min(w, hh);   // units per px at s=1
+  var base = (UI.pc ? 352 : 420) / Math.min(w, hh);   // units per px at s=1
   var uw = w * base / v.s, uh = hh * base / v.s;
+  $('zin').disabled = v.s >= 3.19; $('zout').disabled = v.s <= 1.001; $('zfit').disabled = v.s <= 1.001 && v.x === 0;
   $('board').setAttribute('viewBox', (v.x - uw / 2).toFixed(1) + ' ' + (v.y - uh / 2).toFixed(1) + ' ' + uw.toFixed(1) + ' ' + uh.toFixed(1));
 }
 function fitView() { UI.view = { s: 1, x: 0, y: -4 }; applyView(); }
@@ -108,7 +110,7 @@ function clientToSvg(cx, cy) { var svg = $('board'), pt = svg.createSVGPoint(); 
     if (start && ids.length === 1) {
       var dx = e.clientX - start.x, dy = e.clientY - start.y;
       if (Math.hypot(dx, dy) > 9) moved = true;
-      if (moved && UI.view.s > 1) { var sz = bwSize(), base = 420 / Math.min(sz[0], sz[1]) / UI.view.s; UI.view.x = start.vx - dx * base; UI.view.y = start.vy - dy * base; clampView(); applyView(); }
+      if (moved && UI.view.s > 1) { var sz = bwSize(), base = (UI.pc ? 352 : 420) / Math.min(sz[0], sz[1]) / UI.view.s; UI.view.x = start.vx - dx * base; UI.view.y = start.vy - dy * base; clampView(); applyView(); }
     }
   });
   function up(e) {
@@ -127,7 +129,7 @@ function tapSpace(s) {
   var pend = G.pending && G.pending.h === 'place' && G.pending.p === 0 && OH.sideToAct() === 0 ? G.pending.d : null;
   if (pend && pend.spaces.indexOf(s) >= 0) {
     if (UI.sel === s) { confirmPlace(); return; }
-    UI.sel = s; renderBoard(); sfx('tick'); return;
+    UI.sel = s; renderBoard(); setHint(hintNow()); sfx('tick'); return;
   }
   // info about the space
   var S = M.spaces[s] || M.OFFMAP[s], T = G.tiles[s], parts = [];
