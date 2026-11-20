@@ -80,7 +80,7 @@ function phStripHTML(){if(!G||!UI.started)return '';const d=sideToAct(),zb=phZoo
 // the line under the tiles: the facts only; the star hint and the (i) sit in fixed slots of the action row (R93 cold play: "Use ★ moves around and wraps")
 function phLine(txt){const t=String(txt||'').replace(/<button class="pb small[^"]*"[^>]*>[\s\S]*?<\/button>/g,'');const i=t.indexOf('<div class="sdetx');return i<0?`<span class="ps-lt">${t}</span>`:`<span class="ps-lt">${t.slice(0,i)}</span>${t.slice(i)}`}
 function phSlots(on){const st=phStarOn();const hid=on?'':' aria-hidden="true" tabindex="-1" disabled';
-  return `<button class="pb small star${on?'':' ghost'}" data-a="${st?'sugg':'starhint'}"${hid} aria-label="${st?'Use the starred move':'Show the starred move'}">${st?'Use &#9733;':'&#9733; Hint'}</button><button class="pb small sdet${on?'':' ghost'}" data-ph="stardet"${hid} aria-label="Why" aria-expanded="${PH.det?'true':'false'}">i</button>`}
+  return `<button class="pb small star${on?'':' ghost'}" data-a="sugg"${hid} aria-label="Pick the starred move">&#9733; Hint</button><button class="pb small sdet${on?'':' ghost'}" data-ph="stardet"${hid} aria-label="Why" aria-expanded="${PH.det?'true':'false'}">i</button>`}
 // the star (the computer's safest move) shows only after the player asks, once per turn: the facts on each tile are the choice, not a verdict
 function phStarOn(){return !!G&&UI.starKey===G.logN+':'+sideToAct()}
 // short portrait phones (<= 600 px tall): the line's (i) and Use ★ buttons join the Turn / Place row, so the line stays one text row and the Goal
@@ -120,9 +120,9 @@ function phTileNote(K,d,hand,sel,rm){try{if(UI.tut||!isCur(hand[sel.t]))return '
   const det=`<button class="pb small sdet" data-ph="stardet">i</button>`;
   if(o.bad)return `<b class="warn-l">&#10007; This way sinks you. Turn it or pick another.</b>`+det+(PH.det?`<div class="sdetx" data-help role="note">This way: ${phNoteTxt(o)}.</div>`:'');
   const f=[];f.push(`<span class="tf${o.pc>=15?' hot':''}">Risk <b>${pc(o)}</b></span>`);
-  const inf=o.e&&o.e.info;if(inf&&inf.n!=null)f.push(`<span class="tf${inf.n===0||inf.s2!=null&&inf.s2<.5?' hot':''}">Next turn <b>${inf.n>0?Math.min(inf.n,9)+' safe':'no sure'}</b></span>`);
+  const inf=o.e&&o.e.info;if(inf&&inf.n!=null)f.push(`<span class="tf${inf.n===0||inf.s2!=null&&inf.s2<.5?' hot':''}">Next turn <b>${inf.n>0?Math.min(inf.n,9)+' safe':'0 sure safe'}</b></span>`);
   const S=K.ships[m.s];const ed=q=>q?Math.min(q[0],q[1],BW-1-q[0],BW-1-q[1]):0;
-  if(o.end&&S&&S.x!=null){const a=ed([S.x,S.y]),b=ed(o.end);if(b>a)f.push(`<span class="tf good">To open water</span>`);else if(b<a||b===0)f.push(`<span class="tf${b===0?' hot':''}">${b===0?'Ends at the edge':'Toward the edge'}</span>`)}
+  if(o.end&&S&&S.x!=null){const a=ed([S.x,S.y]),b=ed(o.end);if(b>a)f.push(`<span class="tf good">&#10003; To open water</span>`);else if(b<a||b===0)f.push(`<span class="tf hot">&#9888; ${b===0?'Ends at the edge':'Toward the edge'}</span>`)}
   if(o.sinks.length)f.push(`<span class="tf good">Sinks ${o.sinks.map(i=>esc(nm(i))).join(', ')}!</span>`);else if(o.push.length)f.push(`<span class="tf good">Pushes ${o.push.map(i=>esc(nm(i))).join(', ')} to the edge</span>`);
   let h=f.join(''),full=`This way: ${phNoteTxt(o)}.`;
   if(star&&rm&&rm.a==='place'){if(isB)h=`<span class="tf star">&#9733; this one</span>`+h;else{const ob=phNote(K,d,rm);if(!ob.bad){const why=phWhyBest(K,ob,o);h=`<span class="tf star">&#9733; ${rm.t===m.t?'turned':'tile '+(rm.t+1)}: ${pc(ob)}</span>`+h;full+=` <b>&#9733; ${rm.t===m.t?'turn this tile':'tile '+(rm.t+1)}</b>: ${phNoteTxt(ob)}${why?' ('+why+')':''}.`}}}
@@ -146,7 +146,7 @@ function phSelTile(t){if(!UI.sel)return;UI.rots=UI.rots||[];UI.rots[UI.sel.t]=UI
 function dangerMons(){const me=youSeat();if(me<0||hotSeat()||!G||G.phase!=='play'||UI.tut)return [];const S=G.ships[me];if(!S||!S.alive||S.x==null)return [];
   const sq=[[S.x,S.y]];if(S.on)sq.push(S.on);return G.mons.filter(m=>m.k==='L'&&monHits(m,sq).length)}
 function dangerHTML(){const d=dangerMons();if(!d.length)return '';const who=d.length>1?d.length+' leviathans':esc(levName(d[0].id));const full=`${d.map(m=>levName(m.id)).join(' and ')} can reach your junk if the dice show 6, 7 or 8. Lay a route that stops away from ${d.length>1?'them':'it'}.`;
-  return `<div class="ps-warn" data-danger="1" title="${esc(full)}" aria-label="Danger: ${esc(full)}">&#9888; <b class="wn">${who}</b>${d.length===1&&phNamesNote()?' <span class="wnn">(a leviathan)</span>':''}<b class="wg">${d.length>1?'Leviathans':'A leviathan'}</b> wakes on 6-8: <span class="wd">stop away from ${d.length>1?'them':'it'}.</span></div>`}
+  return `<div class="ps-warn" data-danger="1" title="${esc(full)}" aria-label="Danger: ${esc(full)}">&#9888; <b class="wn">${who}</b>${d.length===1&&phNamesNote()?' <span class="wnn">(a leviathan)</span>':''}<b class="wg">${d.length>1?'Leviathans':'A leviathan'}</b> ${d.length>1?'wake':'wakes'} on 6-8: <span class="wd">stop away from ${d.length>1?'them':'it'}.</span></div>`}
 // the leviathans have names, so the warning's name changes: say so the first few turns it shows (R93 cold play: "warning names change without explanation")
 function phNamesNote(){try{const k=G.logN+':'+G.turn;let n=+(lsGet('tw_wnames')||0);if(UI.wnK!==k&&n<4){UI.wnK=k;n++;lsSet('tw_wnames',String(n));UI.wnShow=true}else if(UI.wnK!==k)UI.wnShow=false;return !!UI.wnShow}catch(e){return false}}
 function phWhose(i){const me=youSeat();return (i===me&&me>=0&&!hotSeat()?'<b>Your turn</b>'+(UI.busy?': the dice roll first':''):'<b>'+esc(nm(i))+"'s turn</b>")}

@@ -90,7 +90,7 @@ document.addEventListener('click',e=>{const t=e.target.closest&&e.target.closest
   case 'pause':UI.pause=!UI.pause;if(!UI.pause)schedule();render();break;
   case 'hint':UI.hint=true;UI.campHints=(UI.campHints||0)+1;{const m=recMove(d);if(m&&m.a==='place'&&UI.sel){UI.sel={t:m.t,r:m.r,s:m.s}}}render();break;
   case 'starhint':{UI.starKey=G.logN+':'+d;UI.campHints=(UI.campHints||0)+1;render();break}
-  case 'sugg':{const m=UI.recM||recMove(d);UI.hint=true;UI.campHints=(UI.campHints||0)+1;if(m&&m.a==='place'&&UI.sel){UI.sel={t:m.t,r:m.r,s:m.s};sfx('tile_rotate')}render();break}
+  case 'sugg':{const m=UI.recM||recMove(d);UI.hint=true;UI.starKey=G.logN+':'+d;UI.campHints=(UI.campHints||0)+1;if(m&&m.a==='place'&&UI.sel){UI.sel={t:m.t,r:m.r,s:m.s};sfx('tile_rotate')}render();break}
   case 'sunkok':{const id=D.id;UI.sunk=(UI.sunk||[]).filter(c=>c.id!==id);UI.marks=(UI.marks||[]).filter(c=>c.id!==id);renderCards();ovUpdate();break}
   case 'rewind':rewindLast();break;
   case 'coachok':{const c=nextLesson();if(c){UI.seen[c.id]=1;if(G&&G.phase==='play')UI.lessonT=G.turn;saveAll();render()}break}
