@@ -540,4 +540,43 @@ html,body{background:#3a1f0e}
 @keyframes bvpop0{50%{transform:scale(1.05)}}
 @media (max-height:600px){#goal{display:none}}
 .card.v4 .nm.t3{font-size:12px;letter-spacing:-.04em}
+/* PLAY2: effect-first card faces in the pyramid. What a card GIVES is the biggest thing on it; price sits below, never over it. */
+#pyr .card.v4 .ef{top:0;left:0;right:0;z-index:3;justify-content:center;gap:1px;padding:3px 1px;min-height:32px;background:var(--cc);box-shadow:0 1px 0 rgba(0,0,0,.35)}
+#pyr .card.v4 .e1{height:26px;padding:0 4px 0 1px;font-size:15px}
+#pyr .card.v4 .e1 .art{width:22px;height:22px;flex-basis:22px}
+#pyr .card.v4 .e1.sm{padding:0}#pyr .card.v4 .e1.sm .art{width:17px;height:17px;flex-basis:17px}
+#pyr .card.v4 .ef .or{font-size:12px;margin:0 -1px}
+#pyr .card.v4.sm .nm{display:none}
+#pyr .card.v4:not(.sm) .nm{top:auto;bottom:28px;background:rgba(6,10,12,.72);font-size:12px;max-height:2.4em;text-align:center}
+#pyr .card.v4 .pr{padding:3px 1px 4px}
+#pyr .card.v4 .c1.pay,#pyr .card.v4 .fr{font-size:15px}
+#pyr.tight .card.cov .ef,#pyr .card.cov .ef{visibility:visible;opacity:1;height:auto;flex-wrap:wrap}
+#pyr .card.v4.cov>.art{filter:brightness(.55) saturate(.6)}
+#pyr .card.v4.cov{border-color:rgba(241,229,198,.55)}
+#pyr .card.v4.opens{outline:3px dashed #ff9b7a;outline-offset:1px}
+#pyr .card.v4.opens::after{content:"opens";position:absolute;left:50%;top:34px;transform:translateX(-50%);z-index:4;background:#7a2416;color:#fff;font:800 11px/1 system-ui,sans-serif;padding:2px 5px;border-radius:7px}
+#pyr .card.v4[data-col=yellow] .ef,#pyr .card.v4[data-col=grey] .ef{box-shadow:0 1px 0 rgba(0,0,0,.25)}
+/* PLAY2: what each city makes, always in view */
+.strip .tab{position:relative}
+.strip .mk{position:absolute;right:4px;top:50%;transform:translateY(-50%);z-index:3;display:flex;flex-wrap:wrap;justify-content:flex-end;gap:2px;max-width:46%}
+.strip .mk1{display:inline-flex;align-items:center;gap:1px;height:24px;padding:0 5px 0 1px;border-radius:12px;background:rgba(8,14,16,.85);color:#fff;font-weight:800;font-size:14px;box-shadow:0 0 0 1px rgba(255,255,255,.18)}
+.strip .mk1 .art{position:relative;display:block;width:20px;height:20px}
+.strip .mk1.any{padding:0 6px;background:#4a3a12;color:#ffe08a}
+/* PLAY2: before you commit, chips show what the move does to the race */
+#zoom .ocs{display:flex;flex-wrap:wrap;justify-content:center;gap:4px;margin:2px 0 6px}
+#zoom .oc{display:inline-block;padding:3px 8px;border-radius:12px;font-weight:800;font-size:14px;line-height:1.2;color:#fff;background:#2b3a3c}
+#zoom .oc.mil{background:#8e2219}#zoom .oc.sci{background:#1d6a3c}#zoom .oc.vp{background:#1f4f8f}#zoom .oc.ag{background:#6b4a8f}#zoom .oc.op{background:#4a2c22;color:#ffc9b8}#zoom .oc.win{background:#f2c230;color:#1c1408}
+/* PLAY2: one big moment per move, plays once and goes */
+.moment{position:fixed;z-index:90;transform:translate(-50%,-50%);pointer-events:none;text-align:center;padding:12px 22px;border-radius:16px;color:#fff;box-shadow:0 10px 30px rgba(0,0,0,.55);animation:momentIn 1.5s cubic-bezier(.2,.9,.3,1.2) 1 forwards;min-width:200px}
+.moment b{display:block;font-size:30px;line-height:1.1;font-weight:900;letter-spacing:.01em}
+.moment small{display:block;font-size:15px;font-weight:700;margin-top:3px;opacity:.95}
+.moment.m-mil{background:linear-gradient(#b8332a,#7a1a12);border:2px solid #ffb3a8}
+.moment.m-sci{background:linear-gradient(#2f9a5a,#145c30);border:2px solid #a9f0c3}
+.moment.m-won{background:linear-gradient(#f2c230,#b0800f);border:2px solid #fff3c4;color:#1c1408}
+@keyframes momentIn{0%{opacity:0;transform:translate(-50%,-50%) scale(.6)}14%{opacity:1;transform:translate(-50%,-50%) scale(1.08)}24%{transform:translate(-50%,-50%) scale(1)}80%{opacity:1}100%{opacity:0;transform:translate(-50%,-62%) scale(.98)}}
+#pawn.bump{animation:pawnBump .9s ease-out 1}
+@keyframes pawnBump{0%{transform:scale(1)}30%{transform:scale(1.7)}100%{transform:scale(1)}}
+@media (prefers-reduced-motion:reduce){.moment{animation:none}#pawn.bump{animation:none}}
+#zoom .zcard .pay{top:58%}
+#draft .wcard .costs{display:flex;flex-wrap:wrap;gap:3px;padding:4px 6px 6px}
 </style></head>
