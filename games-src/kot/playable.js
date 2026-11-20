@@ -226,6 +226,8 @@
     const show = ppHintsOn() && !(G && G.tut) && G && !G.winner && G.active === G.pl.findIndex(p => p.human) && !UI.intro && !UI.choice;
     if (!el) { el = document.createElement('button'); el.id = 'ppwhat'; el.type = 'button'; el.setAttribute('data-pp-what', ''); el.textContent = 'What should I do?'; document.body.appendChild(el) }
     el.style.display = show ? 'block' : 'none';
+    // F2: sit just above the action buttons (it used to cover SMASH! after the last roll)
+    if (show) { let top = innerHeight; document.querySelectorAll('#pacts, #pshop, #dicewrap').forEach(e => { const r = e.getBoundingClientRect(); if (r.height > 0 && getComputedStyle(e).visibility !== 'hidden') top = Math.min(top, r.top) }); el.style.bottom = Math.max(84, Math.round(innerHeight - top + 8)) + 'px' }
   }
 })();
 
