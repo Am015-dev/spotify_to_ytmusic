@@ -532,7 +532,7 @@ var TT_TEST = {};
       var ages = items.filter(function (x) { return /^Age /.test(x.tag); });
       if (!isAI(p)) items = (rated ? [items.filter(function (x) { return x.tag === 'Rating'; })[0]] : items.slice(0, 1)).concat(tokp, ages).filter(function (x, k, a) { return x && a.indexOf(x) === k; });
       else items = items.slice(0, age ? 3 : (U.aiChain || 0) > 1 ? 1 : 2);
-      items.forEach(function (x) { x.ms = isAI(p) ? ((U.aiChain || 0) > 1 ? 450 : 650) : 900; }); if (!isAI(p)) U.aiChain = 0;
+      items.forEach(function (x) { x.ms = isAI(p) ? ((U.aiChain || 0) > 1 ? 650 : 800) : 900; }); if (!isAI(p)) U.aiChain = 0;
     }
     { var nq = E.sideToAct(G); if (U.mode === 'cpu' && !isAI(p) && nq != null && isAI(nq)) items.forEach(function (x) { if (x.tag === 'You' || x.tag === 'Rating') { x.tag = whoTag(nq); x.kind = 'rival'; } }); } // F6: the tag names the next side the moment the turn passes, not "You" / "Rating"
     narrate(items, function () { U.busy = false; after(); });
@@ -556,7 +556,7 @@ var TT_TEST = {};
         if (U.tut && window.TT_TUTOR && TT_TUTOR.holdRival && TT_TUTOR.holdRival()) { U.busy = false; U.aiTimer = setTimeout(function () { if (seq === U.seq && U.G === G) after(); }, 300); return; } // the guided game: the rival waits while a rule bubble is up
         var rng = function () { return E.rnd(G); }, lv = U.lvl, m = (U.tut && window.TT_TUTOR && TT_TUTOR.rivalMove && TT_TUTOR.rivalMove(G)) || AI.pick(G, lv, rng);
         if (!m) { U.busy = false; return; }
-        var chain = U.aiChain = (U.aiChain || 0) + 1; narrate([{ tag: whoTag(p), kind: 'rival', text: intentLine(G, p, m), ms: chain > 1 ? 250 : 650, fn: function () { if (m.i != null) { var e = $('c' + m.i); if (e) e.classList.add('aipick'); } else if (m.t === 'pick') { var w = document.querySelector('[data-pick="' + m.w + '"]'); if (w) w.classList.add('aipick'); } } }],
+        var chain = U.aiChain = (U.aiChain || 0) + 1; narrate([{ tag: whoTag(p), kind: 'rival', text: intentLine(G, p, m), ms: chain > 1 ? 550 : 750, /* PLAY2: chained rival moves stay readable */ fn: function () { if (m.i != null) { var e = $('c' + m.i); if (e) e.classList.add('aipick'); } else if (m.t === 'pick') { var w = document.querySelector('[data-pick="' + m.w + '"]'); if (w) w.classList.add('aipick'); } } }],
           function () { if (seq !== U.seq || U.G !== G) return; U.busy = false; doMove(m); });
       }, quick() ? 200 : stepMs());
     } else { U.busy = false; render0(); armIdle(); if (U.tut && window.TT_TUTOR && TT_TUTOR.onTurn) TT_TUTOR.onTurn(G); }
