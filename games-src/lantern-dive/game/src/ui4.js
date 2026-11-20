@@ -117,6 +117,10 @@ function showResult() {
   bt.append(h('button.btn.alt', { 'data-a': 'rsclose', type: 'button' }, 'Look at the table'));
   bt.append(h('button.btn.alt', { 'data-a': NET.on ? 'netopen' : 'menu', type: 'button' }, NET.on ? 'Lobby' : 'Menu'));
   box.append(bt); rs.append(box); snd(ok ? 'win' : 'lose');
+  if (!ok) {   /* F2: hold the fail result: the retry buttons wake after 1.2 s, so a blind tap cannot skip the reason */
+    const rb = [...bt.querySelectorAll('[data-a^=retry]')]; rb.forEach(b => { b.disabled = true; });
+    setTimeout(() => rb.forEach(b => { b.disabled = false; }), 1200);
+  }
 }
 function closeRS() { const rs = $('#rs'); if (rs) { rs.hidden = true; rs.innerHTML = ''; } UI.rsOpen = false; }
 function nextDive() {

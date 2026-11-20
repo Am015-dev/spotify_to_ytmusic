@@ -126,7 +126,7 @@ function tableGeo() {
   const wideT = side && W >= 1100, seatW = side ? (wideT ? 190 : 132) : (line ? Math.floor((W - 12 - 6 * (k - 1)) / k) : row3 ? Math.min(300, Math.floor((W - 16 - 12) / 3)) : Math.round(Math.min(100, W * .26))), seatH = side ? (wideT ? 112 : 76) : (line ? Math.max(84, UI.lineSeatH || 0) : row3 ? (ph ? 150 : 118) : (small ? 100 : 116));
   const y0 = 4 + (boss ? (small || side ? 34 : 40) : 0), bottom = side ? 52 : (line ? 30 : 54);
   const geo = { W, H, k, side, small, compact, seatW, seatH, av, jr, boss, row3, line, seats: [], slots: [] };
-  const dw = Math.max(30, Math.min(small ? 38 : (ph ? 46 : 58), Math.floor((side ? Math.min(W * .4, 340) : W - 16) / 7) - 4)), droneW = side ? Math.min(W * .42, 340) : W - 8;
+  const dw = Math.max(30, Math.min(small ? 44 : (ph ? 46 : 58), Math.floor((side ? Math.min(W * .4, 340) : W - 16) / 7) - 4)), droneW = side ? Math.min(W * .42, 340) : W - 8;
   geo.dw = dw; geo.droneW = droneW; geo.dh = (drone >= 0 && !side && UI.droneH) || (44 + Math.round(dw * 1.4) + 14);   // F1: the drone row's real height (measured in render) so nothing hides under it
   // trick area
   let top, zl = 0, zr = W;
