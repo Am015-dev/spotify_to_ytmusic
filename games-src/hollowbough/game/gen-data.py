@@ -2,7 +2,7 @@
 # Generates src/data.js from ../cards.json (display names = new_name, text = new_text).
 import json,os,re
 d=json.load(open(os.path.join(os.path.dirname(__file__),'..','cards.json')))
-FIX={'theatre':'theater','cemetary':'cemetery','any critter':'any'}
+FIX={'ballad_finch_pair':'glowworm_playhouse','hollow_sexton_pair':'mossgrave_glade','elderheart_oak_pair':'any'}
 cards=[]
 for c in d['cards']:
     cards.append(dict(key=c['role'],name=c['new_name'],text=c['new_text'],copies=c['copies'],type=c['type'],color=c['color'],
@@ -26,7 +26,7 @@ def rekey(lst,prefix):
         new=prefix+'_'+slug(x['name']); MAP[x['key']]=new; x['key']=new
 rekey(forest,'forest'); rekey(basic,'basic'); rekey(be,'bev'); rekey(se,'sev')
 for c in cards:
-    if c['key']=='barge_toad': c['text']=c['text'].replace('Allotment (Farm-role card)','Bramble Allotment')
+    if c['key']=='reedpunt_toad': c['text']=c['text'].replace('Allotment (Farm-role card)','Bramble Allotment')
 json.dump(MAP,open(os.path.join(os.path.dirname(__file__),'keymap.json'),'w'),indent=1)
 D=dict(game='Hollowbough',cards=cards,forest=forest,basic=basic,
   haven=dict(key='haven',name='Barter Burrow',text='Discard any number of cards from your hand; gain 1 resource of your choice for every 2 discarded. Shared.'),
