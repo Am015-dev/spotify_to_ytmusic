@@ -25,7 +25,7 @@ const TUT_STORY = {
     stay:   { say: 'Hurt, but Downtown pays 2 ★ every turn. Hold your ground: stay.', react: 'Stubborn. I like it.' },
     bonus:  { say: g => `Staying paid off: +2 ★ at turn start, ${g.vp} ★ now. No healing in Downtown, though.` },
     done2:  { say: 'From Downtown your claws hit everyone. Stop rolling and SMASH!', react: 'Both rivals felt that!' },
-    score2: { say: 'Both rivals bled. The heart did nothing: you can’t heal in Downtown.' },
+    score2: { say: 'The claws hit every rival. The heart did nothing: you can’t heal in Downtown.' },
     sweep:  { say: 'Don’t fancy the cards? Pay 2 ⚡ and the vendors deal fresh ones.', react: 'New stock on the shelves.' },
     end2:   { say: 'Enough shopping. Pass the turn.', react: 'Here comes trouble…' },
     yield:  { say: g => `${g.rival} hit you again. Step aside: yield, and Downtown is theirs.`, react: 'Smart retreat. Live to fight.' },
@@ -34,7 +34,7 @@ const TUT_STORY = {
     end3:   { say: 'Squidrik still sits in Downtown. Pass the turn and let the night go on.', react: 'And the night rolls on…' },
     later:  { say: g => `You’ve ${g.vp} ★ now. Four 3s pay 3 ★ plus 1 for the extra die. SMASH!`, react: 'Four 3s! Twenty ★ in sight!' },
     win20:  { say: g => `${g.vp} ★ is the crown. End your turn with 6 and it’s yours.`, react: 'Squidrik’s face says it all.' },
-    result: { say: 'First to the goal wins at once (6 ★ here, 20 in a real game), or the last monster standing. Take a bow.' } },
+    result: { say: 'First to the goal wins when their turn ends (6 ★ here, 20 in a real game), or the last monster standing. Take a bow.' } },
 };
 
 // ===== Coached first game (Addendum 4): the player plays freely from turn 1; Dot speaks once, just in time, one bubble at a time (never blocks input, tap x to dismiss).

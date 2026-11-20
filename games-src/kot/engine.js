@@ -502,7 +502,7 @@ function deaths(){G.pl.forEach(q=>{if(q.alive&&q.hp>maxhp(q))q.hp=maxhp(q)});let
   if(G.bayOn&&alive().length<=4){G.bayOn=false;lg(-1,'Only four monsters remain: the Harbor closes.');
     if(G.bay>=0){const b=G.bay;G.bay=-1;if(G.city===-1){G.city=b;lg(b,`${mname(P(b))} moves from the Harbor to Downtown.`)}else{lg(b,`${mname(P(b))} is washed out of the Harbor.`);const q=P(b);G.bay=b;leaveCity(q,'close')}}}
   checkWin(false)}
-const GOAL=()=>(typeof G!=='undefined'&&G&&G.goal)||20;   // the coached tutorial game is a short one (G.goal=10)
+const GOAL=()=>(typeof G!=='undefined'&&G&&G.goal)||20;   // the coached tutorial game is a short one (G.goal=6)
 const winAt=p=>has(p,'c_astro')?Math.min(17,GOAL()):GOAL();
 function checkWin(final){
   if(G.winner)return true;const a=alive();

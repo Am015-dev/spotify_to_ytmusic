@@ -14,10 +14,10 @@
 /* SMASH!: the real resolve button, hanging over Downtown */
 #ob #pacts [data-act="resolve"]{position:fixed;left:var(--cx,50%);top:var(--cy,40%);transform:translate(-50%,-50%);z-index:4;width:112px;height:112px;min-width:0;min-height:0;padding:0;border-radius:50%;border:4px solid #1a1320;
   background:radial-gradient(circle at 36% 28%,#ffb35a 0%,#ff5a2c 55%,#c81d25 100%);color:#fff;display:grid;place-items:center;text-align:center;cursor:pointer;
-  box-shadow:0 0 0 4px #ffd23f,0 0 26px 8px rgba(255,120,40,.8),4px 6px 0 rgba(0,0,0,.5);animation:obGlow 1.5s ease-in-out infinite}
+  box-shadow:0 0 0 4px #ffd23f,0 0 26px 8px rgba(255,120,40,.8),4px 6px 0 rgba(0,0,0,.5);animation:obGlow 1.5s ease-in-out 3}
 #ob #pacts [data-act="resolve"] .bl{font:400 25px/.95 Bangers,Impact,sans-serif;letter-spacing:.05em;text-shadow:2px 2px 0 #1a1320;display:block;max-width:90px}
 #ob #pacts [data-act="resolve"] small{display:none}
-#ob #pacts [data-act="resolve"].pulse{animation:obGlow .8s ease-in-out infinite;width:124px;height:124px}
+#ob #pacts [data-act="resolve"].pulse{animation:obGlow .8s ease-in-out 3;width:124px;height:124px}
 #ob #pacts [data-act="resolve"]:active{transform:translate(-50%,-50%) scale(.93)}
 @keyframes obGlow{0%,100%{box-shadow:0 0 0 4px #ffd23f,0 0 20px 5px rgba(255,120,40,.7),4px 6px 0 rgba(0,0,0,.5)}50%{box-shadow:0 0 0 6px #fff1a0,0 0 38px 14px rgba(255,150,40,.95),4px 6px 0 rgba(0,0,0,.5)}}
 /* dice */
@@ -56,7 +56,7 @@ html.ph #ob #preview{display:none}
 #ob .obc.no{opacity:.62;filter:saturate(.6)}
 #ob .obc.sel{transform:translateY(-12px) scale(1.04);box-shadow:0 0 0 4px #ffd23f,0 8px 16px rgba(0,0,0,.55)}
 #ob .obc.sugg:not(.sel){outline:3px solid #ffd23f;outline-offset:1px}
-#ob .obc .go{position:absolute;left:50%;bottom:-13px;transform:translateX(-50%);z-index:3;background:#1a1320;color:#ffd23f;font:400 17px/1 Bangers,Impact,sans-serif;letter-spacing:.06em;font-style:normal;padding:4px 10px;border-radius:7px;white-space:nowrap;animation:bmPulse2 .9s ease-in-out infinite}
+#ob .obc .go{position:absolute;left:50%;bottom:-13px;transform:translateX(-50%);z-index:3;background:#1a1320;color:#ffd23f;font:400 17px/1 Bangers,Impact,sans-serif;letter-spacing:.06em;font-style:normal;padding:4px 10px;border-radius:7px;white-space:nowrap;animation:bmPulse2 .9s ease-in-out 4}
 #ob .obc.shake{animation:bShake .4s}
 @media (hover:hover){#ob .obc.ok:hover{transform:translateY(-8px)}}
 /* your cards, along the top */

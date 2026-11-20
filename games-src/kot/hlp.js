@@ -40,7 +40,7 @@ const HLP_DNA='<rect x="8" y="2" width="44" height="56" rx="7" fill="#e9d5ff" st
 const hlpShop=()=>`<svg viewBox="0 0 252 84" xmlns="http://www.w3.org/2000/svg">${[0,1,2].map(i=>`<g transform="translate(${i*84+12},10)">${HLP_CARD}</g>`).join('')}<text x="126" y="80" text-anchor="middle" font-size="15" font-weight="800" font-family="Nunito,sans-serif" fill="#231a10">3 cards for sale</text></svg>`;
 // ---- the help file ----
 const HLP_STEPS={
-  intro:{target:()=>HLP_Q('#choice [data-a="story"]'),title:'Meet your monster',text:'First to 20 ★ wins. Tap Let’s smash to begin.',pic:()=>hlpIcons([HLP_STAR],'',60)},
+  intro:{target:()=>HLP_Q('#choice [data-a="story"]'),title:'Meet your monster',text:'First to 20 ★ wins, if you survive your turn. Tap Let’s smash to begin.',pic:()=>hlpIcons([HLP_STAR],'',60)},
   power:{target:()=>HLP_Q('#choice .acts'),title:'Pick a secret power',text:'Tap the one you want to keep. You play it later.',pic:()=>hlpIcons([HLP_DNA],'',60)},
   yield:{target:()=>HLP_Q('#choice .acts'),title:'Stay or yield?',text:'Yield to leave Downtown and stop the hits. Staying pays 2 ★ each turn.',pic:()=>hlpIcons([HLP_CROWN],'',60)},
   choice:{target:()=>HLP_Q('#choice .acts'),title:'Make a choice',text:'Each button says what it does. Not sure? Tap the bulb.',pic:()=>hlpIcons([HLP_BULB],'',60)},

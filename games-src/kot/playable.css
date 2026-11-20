@@ -107,7 +107,7 @@ html.ph-p #ob #dice:has(.die.kept) .die:not(.kept):not([disabled]){transform:non
 html.ph-p #pppreview{margin:0 4px 6px}
 /* W386e: SMASH! is a real button in the action row next to Roll on portrait phones (it floated over the board, the preview and the dice) */
 html:not(.ph-l) #ob #pacts [data-act="resolve"],html:not(.ph-l) #ob #pacts [data-act="resolve"].pulse{position:static;transform:none;width:auto;height:auto;min-height:58px;flex:1 1 0;border-radius:14px;border-width:3px;animation:none;box-shadow:0 0 0 3px #ffd23f,3px 4px 0 rgba(0,0,0,.5)}
-html:not(.ph-l) #ob #pacts [data-act="resolve"].pulse{animation:obGlow .8s ease-in-out infinite}
+html:not(.ph-l) #ob #pacts [data-act="resolve"].pulse{animation:obGlow .8s ease-in-out 3}
 html:not(.ph-l) #ob #pacts [data-act="reroll"]{flex:1 1 0}
 html:not(.ph-l) #ob #pacts [data-act="resolve"]:active{transform:scale(.96)}
 html:not(.ph-l) #ob #pacts [data-act="resolve"] .bl{font-size:22px;max-width:none}

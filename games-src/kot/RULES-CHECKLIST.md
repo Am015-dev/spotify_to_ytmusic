@@ -103,7 +103,7 @@ Every numbered rule below has exactly one assertion in `logic-test.js` (same num
 
 ## Power cards: Discard
 
-75. Corner Kiosk (1): gain 1 star.
+75. Corner Kiosk (3): gain 1 star.
 76. Rush-Hour Train (4): gain 2 stars.
 77. Tower Block (5): gain 3 stars.
 78. Sky Needle (6): gain 4 stars.

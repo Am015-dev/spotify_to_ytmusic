@@ -151,7 +151,7 @@ function tutSteps(){
    ready:()=>myRoll()&&G.rolls===2&&G.dice.filter(d=>d.f==='3').length===4&&!inCity(0)},
  {id:'win20',title:'Twenty stars',say:'20 ★! You win when your turn ends. Tap End turn.',target:tEnd,wait:{type:'tap',match:isAct('end')},
    ready:()=>myBuy()&&P(0).vp>=20&&!G.winner},
- {id:'result',title:'You win',say:'First to 20 ★ or last standing wins. Now play for real.',target:tfirst('#modal .btn','#modal','#pchips','.gx-board'),wait:null,
+ {id:'result',title:'You win',say:'First to 20 ★ and survive your turn, or last standing, wins. Now play for real.',target:tfirst('#modal .btn','#modal','#pchips','.gx-board'),wait:null,
    ready:()=>!!(G&&G.winner&&UI.stats&&document.querySelector('#modal:not(.hidden)'))});
   // every rule the tutorial teaches, in order: TUT_RULES (tut-walk.js checks each one appears)
   return S}
