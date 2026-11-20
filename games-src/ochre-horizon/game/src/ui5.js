@@ -92,7 +92,7 @@ function coachCheck(m) { if (!UI.tut) return; if ($('coach').classList.contains(
 $('hintbtn').addEventListener('click', function () {
   if (!G || OH.sideToAct() !== 0 || G.phase !== 'action' && !G.pending) { toast('Suggestions work on your turn.', true); return; }
   var m = OHAI.decide('normal'); if (!m) return;
-  var t = m.t === 'play' ? 'Play ' + OH.card(m.id).name : m.t === 'std' ? 'Use ' + OH.STD_NAME[m.k] : m.t === 'place' ? 'Build on the highlighted space' : m.t === 'green' ? 'Plant a greenery' : m.t === 'heat' ? 'Warm the air with heat' : m.t === 'act' ? 'Use ' + OH.card(m.id).name : m.t === 'mile' ? 'Claim the ' + m.k + ' milestone' : m.t === 'award' ? 'Fund the ' + m.k + ' award' : m.t === 'sell' ? 'Sell cards you cannot use' : m.t === 'end' ? 'End your turn' : m.t === 'pass' ? 'Pass for this round' : 'Choose an option';
+  var t = m.t === 'play' ? 'Play ' + OH.card(m.id).name : m.t === 'std' ? 'Use ' + OH.STD_NAME[m.k] : m.t === 'place' ? 'Build on the highlighted space' : m.t === 'green' ? 'Plant a greenery' : m.t === 'heat' ? 'Warm the air with heat' : m.t === 'act' ? 'Use ' + OH.card(m.id).name : m.t === 'mile' ? 'Projects, Milestones: claim ' + m.k : m.t === 'award' ? 'Projects, Awards: fund ' + m.k : m.t === 'sell' ? 'Sell cards you cannot use' : m.t === 'end' ? 'End your turn' : m.t === 'pass' ? 'Pass for this round' : 'Choose an option';
   if (m.t === 'place') { UI.sel = m.s; renderBoard(); }
   toast('<b>Try this</b>' + esc(t), true, 3000);
 });

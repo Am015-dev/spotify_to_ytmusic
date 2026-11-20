@@ -6,12 +6,6 @@
   "freeCards": true,
   "tags": [],
   "mc": 42,
-  "start": [
-   {
-    "op": "draw",
-    "n": 10
-   }
-  ],
   "text": "Plain start: 42 credits and 10 cards, all free to keep. No special power.",
   "flavor": "A good first day on Ochre."
  },

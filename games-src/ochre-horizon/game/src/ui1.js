@@ -94,8 +94,8 @@ function renderTop() {
   var s0 = OH.score(0), s1 = OH.score(1), t = OH.sideToAct();
   $('trYou').textContent = s0.total; $('trRiv').textContent = s1.total;
   $('trYou').setAttribute('data-engine', 'score0'); $('trRiv').setAttribute('data-engine', 'score1');
-  $('nmYou').textContent = 'You'; $('nmRiv').textContent = 'Rival';
-  $('vpYou').textContent = 'Rating ' + G.pl[0].tr; $('vpRiv').textContent = 'Rating ' + G.pl[1].tr;
+  $('nmYou').textContent = 'You · points'; $('nmRiv').textContent = 'Rival · points';
+  $('vpYou').textContent = 'rating ' + G.pl[0].tr; $('vpRiv').textContent = 'rating ' + G.pl[1].tr;
   $('syou').classList.toggle('turn', t === 0 && G.phase === 'action'); $('sriv').classList.toggle('turn', t === 1 && G.phase === 'action');
   var tp = (G.temp + 30) / 38 * 100, op = G.oxy / 14 * 100;
   $('gTemp').className = 'gauge' + (G.temp >= 8 ? ' done' : '');

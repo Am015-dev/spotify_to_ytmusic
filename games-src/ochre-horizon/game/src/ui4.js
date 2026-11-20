@@ -107,6 +107,23 @@ function modal(html, closable) {
 }
 function closeModal() { $('modal').classList.remove('on'); if (!UI.sheet) { $('scrim').classList.remove('on'); $('app').inert = false; } }
 $('modal').addEventListener('click', function (e) { if (e.target === $('modal') && UI.modalClosable) closeModal(); });
+function preview(m) {
+  var G0 = OH.G, b = JSON.parse(JSON.stringify(G0)), out = [];
+  OH.G = JSON.parse(JSON.stringify(G0)); OH.G.ev = []; OH.G.log = [];
+  try {
+    if (OH.performMove(m)) {
+      var a = OH.G.pl[0], z = b.pl[0];
+      OH.RES.forEach(function (r) { var d = a.prod[r] - z.prod[r]; if (d) out.push((d > 0 ? '+' : '') + d + ' ' + RN[r] + ' prod'); });
+      if (a.tr - z.tr) out.push('+' + (a.tr - z.tr) + ' rating');
+      ['plant', 'steel', 'ti', 'heat', 'energy'].forEach(function (r) { var d = a[r] - z[r] + (m.t === 'play' && OH.maxPay(0, OH.CARDS[m.id], OH.cardCost(0, m.id))[r] || 0); if (d > 0) out.push('+' + d + ' ' + RN[r]); });
+      var dh = a.hand.length - z.hand.length + (m.t === 'play' ? 1 : 0); if (dh > 0) out.push('+' + plural(dh, 'card'));
+      var r1 = OH.G.pl[1], r0 = b.pl[1]; OH.RES.forEach(function (r) { var d = r1.prod[r] - r0.prod[r]; if (d < 0) out.push('rival ' + d + ' ' + RN[r] + ' prod'); var e = r1[r] - r0[r]; if (e < 0) out.push('rival ' + e + ' ' + RN[r]); });
+      if (OH.G.pending && OH.G.pending.h === 'place') out.push('place a tile');
+    }
+  } catch (e) { }
+  OH.G = G0;
+  return out;
+}
 function showCard(id, owner) {
   var c = OH.card(id), P = G.pl[0], inHand = owner === 0 && P.hand.indexOf(id) >= 0, my = OH.sideToAct() === 0 && G.phase === 'action' && !G.pending;
   var h = '<div class="big">' + cardHTML(id, { flavor: 1, owner: owner }) + '</div>';
@@ -114,6 +131,8 @@ function showCard(id, owner) {
     if (OH.playable(0, id)) {
       var cost = OH.cardCost(0, id), pay = OH.maxPay(0, c, cost), parts = [];
       if (pay.steel) parts.push(pay.steel + ' steel'); if (pay.ti) parts.push(pay.ti + ' titanium'); if (pay.heat) parts.push(pay.heat + ' heat'); parts.push(pay.mc + ' credits');
+      var gets = my ? preview({ t: 'play', id: id }) : [];
+      if (my) h += '<div class="' + (gets.length ? 'row' : 'why') + '" style="min-height:0;margin-top:8px">' + (gets.length ? 'You get now: ' + esc(gets.join(', ')) : 'Careful: this gives you nothing right now.') + '</div>';
       h += '<button class="btn pickable" id="mPlay"' + (my ? '' : ' disabled') + '>Play it<small>Pay ' + parts.join(' + ') + (my ? '' : ' · wait for your turn') + '</small></button>';
     } else h += '<div class="why">' + esc(whyNot(0, id)) + '</div>';
     h += '<button class="btn alt" id="mSell"' + (my ? '' : ' disabled') + '>Sell for 1 credit</button>';
@@ -149,7 +168,7 @@ function showSetup() {
   if (st.step === 0) {
     var cs = P.offer.corps.slice(); if (cs.indexOf('c00') < 0 && UI.tut) cs.push('c00');
     modal('<h3>Pick your company</h3><p style="margin:0 0 8px;opacity:.85">Each company has one power.</p><div class="grid">' + cs.map(function (id) { return '<button class="cw pickable" data-corp="' + id + '">' + cardHTML(id, { flavor: 1 }) + '</button>'; }).join('') + '</div>', false);
-    $('mb').querySelectorAll('[data-corp]').forEach(function (b) { b.addEventListener('click', function () { st.corp = b.getAttribute('data-corp'); st.step = 1; if (P.offer.corps.indexOf(st.corp) < 0) P.offer.corps.push(st.corp); var C = OH.CORPS[st.corp]; st.keep = {}; if (!C.beginner) suggestBuys(P.offer.cards, C.mc - 14).forEach(function (id) { st.keep[id] = 1; }); coachShow('keep'); showSetup(); }); });
+    $('mb').querySelectorAll('[data-corp]').forEach(function (b) { b.addEventListener('click', function () { st.corp = b.getAttribute('data-corp'); st.step = 1; if (P.offer.corps.indexOf(st.corp) < 0) P.offer.corps.push(st.corp); var C = OH.CORPS[st.corp]; st.keep = {}; if (!C.beginner) suggestBuys(P.offer.cards, C.mc - 14).forEach(function (id) { st.keep[id] = 1; }); if (!OH.CORPS[st.corp].beginner) coachShow('keep'); showSetup(); }); });
     coachShow('corp'); return;
   }
   var C = OH.CORPS[st.corp], n = Object.keys(st.keep).length, beg = !!C.beginner;
@@ -187,7 +206,7 @@ function showPass() {
   $('mPassN').addEventListener('click', closeModal);
 }
 // action bar + top strip
-$('bCards').addEventListener('click', function () { openSheet('cards', null); });
+$('bCards').addEventListener('click', function () { UI.tab = null; openSheet('cards', null); });
 $('bProj').addEventListener('click', function () { openSheet('proj', 'std'); });
 $('bAct').addEventListener('click', function () { openSheet('act'); });
 $('bPass').addEventListener('click', showPass);

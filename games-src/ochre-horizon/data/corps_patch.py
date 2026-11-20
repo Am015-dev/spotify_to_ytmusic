@@ -13,5 +13,6 @@ S('c07',mc=40,start=[{"op":"draw","n":4}],effect=[{"e":"disc","n":1,"tag":"scien
 S('c08',mc=42,start=[{"op":"prod","r":"ti","n":1}],effect=[{"e":"onTag","tag":"space","do":[{"op":"gain","r":"mc","n":2}]}],text="Start with 1 titanium production. Gain 2 credits each time you play a space tag.")
 S('c10',mc=46,start=[{"op":"gain","r":"steel","n":3},{"op":"prod","r":"steel","n":1}],effect=[{"e":"onTile","t":"city","do":[{"op":"gain","r":"steel","n":3}]}],text="Start with 3 steel and 1 steel production. Gain 3 steel each time you place a city.")
 S('c11',mc=40,start=[{"op":"prod","r":"energy","n":2}],effect=[{"e":"stdDisc","n":5,"which":"city"}],text="Start with 2 energy production. Your City project costs 5 less.")
+K['c00'].pop('start',None)   # the beginner keeps its 10 dealt cards free; no extra draw
 json.dump(k,open(P,'w',encoding='utf-8'),indent=1,ensure_ascii=False)
 print('corps patched')
