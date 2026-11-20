@@ -96,19 +96,34 @@ function shortFx(t, n) { n = n || 8; var f = VS.tileFx(t), w = f.split(' '); ret
 function bindBoard() {
   document.addEventListener('click', function (e) {
     if (!G || !UI.started) return;
-    var el = e.target.closest('[data-tile],[data-h],[data-goods],[data-ship],[data-work],[data-sto],[data-die],[data-view],[data-a]');
+    var el = e.target.closest('[data-tile],[data-h],[data-goods],[data-ship],[data-work],[data-sto],[data-die],[data-view],[data-a],[data-silver]');
     if (!el || !el.closest('#bd,#dock')) return;
     if (el.dataset.view != null) { UI.view = +el.dataset.view; UI.sel = null; UI.stoSel = -1; sfx('tick'); render(); return; }
     if (el.dataset.a) return dockAct(el.dataset.a, el);
-    if (UI.busy || G.over || !isHuman(VSE.side(G)) || UI.view !== VSE.side(G)) { if (el.dataset.die == null) return; }
-    if (el.dataset.tile != null) return tapTarget('tile', +el.dataset.tile);
-    if (el.dataset.h != null) return tapTarget('hex', +el.dataset.h);
-    if (el.dataset.goods != null) return tapTarget('goods', +el.dataset.goods);
+    var tg = UI.tg || {}, live = !(UI.busy || G.over || !isHuman(VSE.side(G)) || UI.view !== VSE.side(G));
+    if (!live) return info(el, null);
+    if (el.dataset.tile != null) return tg.tile && tg.tile[el.dataset.tile] ? tapTarget('tile', +el.dataset.tile) : info(el, 'tile');
+    if (el.dataset.h != null) return tg.hex && tg.hex[el.dataset.h] ? tapTarget('hex', +el.dataset.h) : info(el, 'hex');
+    if (el.dataset.goods != null) return tg.goods && tg.goods[el.dataset.goods] ? tapTarget('goods', +el.dataset.goods) : info(el, 'goods');
     if (el.dataset.ship != null) return tapTarget('ship', +el.dataset.ship);
-    if (el.dataset.work != null) { if (UI.tg && UI.tg.work) { UI.tg.workM = { 1: UI.tg.work }; return selectWork(); } return; }
-    if (el.dataset.sto != null) { var k = +el.dataset.sto; if (UI.disc) return tapTarget('sto', k); if (UI.tg && UI.tg.sto[k]) { UI.stoSel = UI.stoSel === k ? -1 : k; UI.sel = null; sfx('tick'); render(); } return; }
-    if (el.dataset.die != null) { var i = +el.dataset.die; if (!UI.tg || !UI.tg.die[i]) return; UI.dieSel = UI.dieSel === i ? null : i; UI.sel = null; sfx('tick'); render(); }
+    if (el.dataset.silver != null) return info(el, 'silver');
+    if (el.dataset.work != null) { if (UI.tg && UI.tg.work) { return selectWork(); } return info(el, 'work'); }
+    if (el.dataset.sto != null) { var k = +el.dataset.sto; if (UI.disc) return tapTarget('sto', k); if (UI.tg && UI.tg.sto[k]) { UI.stoSel = UI.stoSel === k ? -1 : k; UI.sel = null; sfx('tick'); render(); return; } return info(el, 'sto'); }
+    if (el.dataset.die != null) { var i = +el.dataset.die; if (!UI.tg || !UI.tg.die[i]) return info(el, 'die'); UI.dieSel = UI.dieSel === i ? null : i; UI.sel = null; sfx('tick'); render(); }
   });
+}
+// a tap on something with no legal action: say what it is and why, never a dead tap
+function info(el, kind) {
+  var s = UI.view, Pl = P(s), t = '', d = el.dataset;
+  if (d.tile != null) { var tl = T(+d.tile), st = +d.st; t = VS.tileName(tl) + (st ? ': needs a ' + st : ': 2 silver, once a turn'); }
+  else if (d.h != null) { var h = +d.h, id = Pl.est[h]; t = id != null ? VS.tileName(T(id)) : COLNAME[VSE.colAt(Pl, h)] + ' space ' + VS.HEX[h].d + ': needs a stored tile'; }
+  else if (d.goods != null) t = VS.GOODS[+d.goods].n + ': sell with a ' + d.goods;
+  else if (d.silver != null) t = 'Silver: 2 buys an ink-stall tile';
+  else if (d.work != null) t = 'Workers turn a die by 1';
+  else if (d.sto != null) t = Pl.sto[+d.sto] != null ? VS.tileName(T(Pl.sto[+d.sto])) + ': no space for it yet' : 'Storage: 3 spaces for tiles';
+  else if (d.die != null) t = Pl.used[+d.die] ? 'That die is used' : 'Wait for your turn';
+  if (!kind && !G.over && !isHuman(VSE.side(G))) t = nameOf(VSE.side(G)) + ' is playing: ' + t;
+  if (t) { setPrompt(t); UI.taps = (UI.taps || 0) + 1; $('#prompt').dataset.n = UI.taps; el.classList.remove('nudge'); void el.getBoundingClientRect(); el.classList.add('nudge'); sfx('tick'); }
 }
 function selectWork() { var tg = UI.tg; tg.workers = { 1: tg.work }; select('workers', 1); }
 function dockAct(a, el) {
