@@ -155,7 +155,7 @@ function lsSet(k, v) { try { localStorage.setItem(k, v); } catch (e) { } }
 function loadPrefs() { try { if (lsGet('kk_won')) Object.assign(DEF, { level: DEF_WON.level, lv: DEF_WON.lv.slice() }); const p = JSON.parse(lsGet('kk_prefs') || '{}'); Object.assign(UI.prefs, p); if (p.speed) AIDELAY = p.speed; } catch (e) { } }
 function savePrefs() { lsSet('kk_prefs', JSON.stringify(Object.assign({}, UI.prefs, { speed: AIDELAY }))); }
 // UI.fast: the player tapped the table to hurry this reveal / pass along
-const PACE = .34;   // default pause scale: a pick -> reveal -> pass cycle is about 2 s; tap the table to skip the rest
+const PACE = .28;   // default pause scale: a pick -> reveal -> pass cycle is about 2 s; tap the table to skip the rest
 const wait = ms => ANIM ? new Promise(r => setTimeout(r, ms * PACE * (AIDELAY > 0 ? Math.max(.35, AIDELAY / 650) : .35) * (UI.fast ? .3 : 1))) : Promise.resolve();
 // ---- "what just happened": after every reveal, one line per diner with the score change and its cause
 const CATN = { maki: 'roll race', tempura: 'prawn pair', sashimi: 'fish set', dumpling: 'buns', nigiri: 'nigiri', wasabi: 'Fire Paste ×3' };

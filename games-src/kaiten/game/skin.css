@@ -205,3 +205,15 @@ html.kkend #beltz{background:#2f1f1a!important;border-top-color:#1c1210!importan
 /* the result card scrolls on short screens (phone landscape) but Play again / Menu stay in reach */
 #rs.kkfin .rsbox.bar .btn{position:sticky;bottom:0;z-index:3;box-shadow:0 -6px 8px -2px #fff3d6}
 @media (max-height:520px){.kkbd{font-size:13px;border-spacing:0 1px}.kkbd th,.kkbd td{padding:1px 4px}.kkbd .cr{display:none}.kkbd tr.tot td{font-size:17px;padding:2px 4px}.kkbd td small{display:none}.kkr1 div{font-size:13px}.kkr1 b{font-size:17px}}
+/* R82 cold-play fixes (ui13.js): live race line, round-over panel in the tutorial, Next on look steps, no bulb in the tutorial */
+#kkrace{display:flex;flex-wrap:wrap;justify-content:center;gap:0 14px;min-height:22px;padding:2px 8px 0;font-weight:800;font-size:14px;line-height:20px;color:#ffe7a8;white-space:nowrap;box-sizing:border-box}
+#kkrace[hidden]{display:none}
+#kkrace.kq{visibility:hidden}
+html.kktut #bulbbtn{display:none!important}
+.kktp{margin:0 auto;align-self:center;background:#fff3d6;color:#3a1f17;border:3px solid #4a2a22;border-radius:14px;padding:10px 16px;width:min(320px,calc(100vw - 32px));text-align:center;box-sizing:border-box}
+.kktp b{font-size:16px}
+.kktp ol{list-style:none;margin:6px 0;padding:0;display:grid;gap:4px}
+.kktp li{display:flex;justify-content:space-between;font-weight:800;font-size:18px}
+.kktp li.me{color:#8c3b27}
+.kktp .kts{font-size:14px;opacity:.85}
+@media (max-height:620px){.gxt-bub.kkhasnext .gxh-tt{padding-right:84px!important}.gxt-bub.kkhasnext .gxh-tx{padding-right:92px!important}}
