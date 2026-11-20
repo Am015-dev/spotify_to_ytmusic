@@ -40,14 +40,14 @@ let rs = S0 * 7919; const rnd = () => { rs = (rs * 16807) % 2147483647; return r
       if (await T('#beat.on', 250)) continue;
       await page.waitForTimeout(120); const bads = await audit(); audits++;
       if (bads.length) { fails.push('turn ' + st.k + ': ' + bads.slice(0, 3).join(', ')); await page.screenshot({ path: path.join(__dirname, `shots/phone-${W}-g${g}-bad.png`) }); break; }
-      if (st.k === last) stuck++; else { stuck = 0; last = st.k; } if (stuck > 25) { fails.push('stuck at ' + st.k + ' "' + await page.evaluate(() => document.getElementById('prompt').textContent) + '"'); await page.screenshot({ path: path.join(__dirname, `shots/phone-${W}-g${g}-stuck.png`) }); break; }
+      if (st.k === last) stuck++; else { stuck = 0; last = st.k; } if (stuck > 25) { fails.push('stuck at ' + st.k + ' "' + await page.evaluate(() => document.getElementById('prompt').textContent + ' busy=' + UI.busy + ' tv=' + !document.getElementById('tv').hidden + ' moves=' + VB.validMoves(G).map(m => m.k + (m.die != null ? m.die : '')).join(',') + ' pend=' + JSON.stringify(G.pend)) + '"'); await page.screenshot({ path: path.join(__dirname, `shots/phone-${W}-g${g}-stuck.png`) }); break; }
       /* the ★ (market badge, best space, or the ★ on a stored tile, goods, dock button or tab) */
       const STAR = '#mk .tilebtn.bestt.glow, #lane .tilebtn.bestt.glow, #es .cell.best.glow, .bestx';
       if (MODE !== 'read' && (MODE === 'best' || rnd() < 0.5) && await T(STAR, 380)) { best++; continue; }
       /* read = a newcomer who ignores the ★: taps what glows on the screen it is on (tabs that glow count), else any dock button */
       if (MODE === 'read') {
         const L2 = await page.evaluate(() => { const g = [], a = []; const vis = e => { const r = e.getBoundingClientRect(); if (!r.width) return null; const x = r.left + r.width / 2, y = r.top + r.height / 2; const hit = document.elementFromPoint(x, y); return hit && (hit === e || e.contains(hit)) ? { x, y, end: e.id === 'endB' } : null; };
-          document.querySelectorAll('#mk .tilebtn.glow, #lane .tilebtn.glow, #es .cell.glow, #store .tilebtn.glow, #goods .gbtn.glow, #mk .stgoods.glow, #acts .btn.glow, #tabs .tab.has').forEach(e => { const v = vis(e); if (v) g.push(v); });
+          document.querySelectorAll('#mk .tilebtn.glow, #lane .tilebtn.glow, #es .cell.glow, #store .tilebtn.glow, #goods .gbtn.glow, #mk .stgoods.glow, #acts .btn.glow, .wkc.glow, #tabs .tab.has').forEach(e => { const v = vis(e); if (v) g.push(v); });
           document.querySelectorAll('#acts .btn').forEach(e => { const v = vis(e); if (v) a.push(v); });
           /* it reads the board: among glowing spaces it builds where the biggest +N shows */
           let bn = -1, bc = null; document.querySelectorAll('#es .cell.glow').forEach(e => { const t = e.querySelector('.pvb.pts'); const n = t ? +t.textContent.replace('+', '') : 0; const v = vis(e); if (v && n > bn) { bn = n; bc = v; } });
@@ -57,7 +57,7 @@ let rs = S0 * 7919; const rnd = () => { rs = (rs * 16807) % 2147483647; return r
         await page.waitForTimeout(150); continue;
       }
       /* own pick: any glowing thing or dock button, at random */
-      const own1 = await page.evaluate(() => { const L = []; document.querySelectorAll('#mk .tilebtn.glow, #es .cell.glow, #store .tilebtn.glow, #goods .gbtn.glow, #mk .stgoods.glow, #acts .btn, #tabs .tab.has').forEach(e => { const r = e.getBoundingClientRect(); if (!r.width) return; const x = r.left + r.width / 2, y = r.top + r.height / 2; const hit = document.elementFromPoint(x, y); if (hit && (hit === e || e.contains(hit))) L.push({ x, y, end: e.id === 'endB' }); }); return L; });
+      const own1 = await page.evaluate(() => { const L = []; document.querySelectorAll('#mk .tilebtn.glow, #es .cell.glow, #store .tilebtn.glow, #goods .gbtn.glow, #mk .stgoods.glow, #acts .btn, .wkc.glow, #tabs .tab.has').forEach(e => { const r = e.getBoundingClientRect(); if (!r.width) return; const x = r.left + r.width / 2, y = r.top + r.height / 2; const hit = document.elementFromPoint(x, y); if (hit && (hit === e || e.contains(hit))) L.push({ x, y, end: e.id === 'endB' }); }); return L; });
       const pool = own1.filter(o => !o.end).length ? own1.filter(o => !o.end) : own1;
       if (pool.length) { const o = pool[Math.floor(rnd() * pool.length)]; await page.touchscreen.tap(o.x, o.y); taps++; own++; await page.waitForTimeout(380); continue; }
       if (await T(STAR, 380)) { best++; continue; }

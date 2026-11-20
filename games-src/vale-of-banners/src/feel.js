@@ -132,7 +132,7 @@ function camApply(el, smooth) {
   var c = FEEL.cam, w = el || $('#esin'); if (!w) return;
   w.style.transition = smooth && !UI.fast ? 'transform ' + (animMs(420) / 1000) + 's cubic-bezier(.2,.8,.2,1)' : 'none';
   w.style.transform = 'translate(' + c.x + 'px,' + c.y + 'px) scale(' + c.z + ')';
-  var f = $('#zfit'); if (f) f.hidden = c.z <= 1.02;
+  var f = $('#zfit'); if (f) { var zoomable = L.tabs && L.s && 46 / (L.s * 1.732) > 1.02; f.hidden = (c.z <= 1.02 && !zoomable) || (L.tabs && UI.tab !== 'estate'); f.textContent = c.z > 1.02 ? 'Fit' : 'Zoom'; }
 }
 function camClamp() { var c = FEEL.cam, W = L.ew, H = L.eh; c.z = Math.max(1, Math.min(2.6, c.z)); c.x = Math.min(0, Math.max(W - W * c.z, c.x)); c.y = Math.min(0, Math.max(H - H * c.z, c.y)); if (c.z <= 1.001) { c.z = 1; c.x = 0; c.y = 0; } }
 function camTo(ci, z) {   /* glide so cell ci is in view; returns a promise when settled */
@@ -143,7 +143,7 @@ function camTo(ci, z) {   /* glide so cell ci is in view; returns a promise when
 function camReset(smooth) { FEEL.cam = { z: 1, x: 0, y: 0 }; camApply(null, smooth); }
 function feelZoom() {
   var es = $('#es'), P = {}, st = null;
-  var fit = h('button', { id: 'zfit', type: 'button', hidden: true, text: 'Fit', 'aria-label': 'Zoom out to the whole estate', onclick: function () { camReset(true); } });
+  var fit = h('button', { id: 'zfit', type: 'button', hidden: true, text: 'Fit', 'aria-label': 'Zoom the estate in or out', onclick: function () { if (typeof zoomTap === 'function') zoomTap(); else camReset(true); } });
   $('#bd').appendChild(fit);
   es.addEventListener('pointerdown', function (e) {
     if (FEEL.drag && FEEL.drag.on) return; P[e.pointerId] = { x: e.clientX, y: e.clientY }; var ids = Object.keys(P);
@@ -195,4 +195,9 @@ function rollDice(el, vals) {   /* dice tumble, then land on the rolled numbers 
   if (!el || UI.fast) return; var ds = el.querySelectorAll('.rd'), t0 = Date.now(), ms = animMs(520);
   (function f() { var k = (Date.now() - t0) / (ms || 1); for (var i = 0; i < ds.length; i++) ds[i].textContent = k < 1 ? 1 + Math.floor(Math.random() * 6) : vals[i]; if (k < 1) setTimeout(f, 60); })();
 }
-function feelInit() { feelDrag(); feelZoom(); }
+function feelInit() {
+  feelDrag(); feelZoom();
+  /* F3: know when a finger is down, so nothing on the board moves between touchstart and the tap */
+  document.addEventListener('pointerdown', function () { FEEL.touch = 1; }, true);
+  var up = function () { FEEL.touch = 0; FEEL.lastUp = Date.now(); }; document.addEventListener('pointerup', up, true); document.addEventListener('pointercancel', up, true);
+}

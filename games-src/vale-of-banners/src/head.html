@@ -49,6 +49,7 @@ button{font:inherit;font-size:var(--fs)}
 .tilebtn .hx{pointer-events:none}
 .glow{filter:drop-shadow(0 0 2px rgba(255,230,128,.85))}
 .glow.best,.glow.bestt{filter:drop-shadow(0 0 8px #ffd23a) drop-shadow(0 0 2px #fff)}
+.btn.glow.alt,.wkc.glow{box-shadow:0 0 0 3px #ffd23a,0 0 14px rgba(255,210,58,.8)!important;filter:none}
 .dim{opacity:.45}
 .resart{height:0}.resart.hasart{height:76px;margin-bottom:6px}
 .cost{position:absolute;right:-6px;bottom:-4px;background:#5a1408;color:#fff;border-radius:9px;font-size:var(--fs);font-weight:800;padding:0 4px;line-height:17px;pointer-events:none;z-index:2;border:1px solid #fff}
@@ -220,7 +221,18 @@ html.gx-noanim .fly,html.gx-reduce .fly{transition:none}
 #tabs .tab.on{background:#f4ecd8;color:#1d140a;border-color:#ffd23a}
 #tabs .tab.has{border-color:#ffd23a;box-shadow:0 0 0 2px rgba(255,210,58,.5),0 0 12px rgba(255,210,58,.6)}
 #rv{position:absolute;display:flex;flex-direction:column;align-items:center;gap:6px}
+#dockbody>*{flex-shrink:0}
+#mk .mkleg,#mkLeg2,#mkLeg3{grid-column:1/-1;min-height:32px;border:0;border-radius:8px;background:rgba(20,14,10,.72);color:#f4ecd8;font:600 12px/1.25 inherit;padding:4px 8px;text-align:center;cursor:pointer}
+#tt{cursor:pointer}#tt .tthelp{margin-left:6px;opacity:.75;font-size:14px}
+#rvpc{margin-top:8px;padding-top:8px;border-top:1px solid rgba(60,40,20,.25)}#rvpc .rvh{background:#2a2014;color:#f4ecd8;border-radius:10px;padding:6px 10px;font-weight:700;font-size:14px;text-align:center}
+#mkLeg3{width:100%;margin-bottom:6px}
+#rvpc .rvwhy2{color:#5a3d00;font-size:13px;text-align:center;margin:4px 0}
 #rv .rvh{background:rgba(20,14,10,.8);color:#f4ecd8;border-radius:10px;padding:6px 10px;font-weight:700;font-size:14px;text-align:center}
+#rv .rvwhy2{color:#f4ecd8;font-size:13px;text-align:center;margin-top:3px;text-shadow:0 1px 2px #000}
+#prompt .rvwhy{display:block;font-weight:600;font-size:max(13px,.85em)!important;color:#7a2f1a;line-height:1.25}
+#skipRv{position:fixed;right:12px;top:calc(env(safe-area-inset-top,0px) + 56px);z-index:40;min-height:44px;padding:0 16px;border-radius:22px;border:2px solid #ffd23a;background:#1d140a;color:#f4ecd8;font:800 15px/1 inherit;cursor:pointer}
+#skipRv[hidden]{display:none}
+#beat.season{max-width:min(92vw,460px)}
 #mk.big .stall{padding:6px 4px}#mk.big .sth .pip{font-size:16px}
 #mk.big .lane{grid-column:1/-1;flex-direction:row;justify-content:center;gap:8px}#mk.big .lane .sttiles{flex-direction:row;gap:8px}
 #mk.big .stall:not(.lane) .sttiles{display:flex;flex-direction:row;gap:6px;justify-content:center}
@@ -373,6 +385,7 @@ html.gx-noanim .fly,html.gx-reduce .fly{transition:none}
 }
 /* the star's reason line (ui.js starLine) and a labelled Hints button on phones */
 #prompt .starwhy{display:block;font-weight:700;font-size:max(14px,.92em)!important;color:#6b4a00;line-height:1.25;margin-top:1px}
+#prompt .starask{display:inline-flex;align-items:center;min-height:40px;margin-left:6px;padding:0 12px;border-radius:20px;border:2px solid #b8860b;background:#fff3c4;color:#5a3d00;font:800 14px/1 inherit;cursor:pointer;vertical-align:middle}
 html body .gx-bar #hintT span{display:inline!important;font-weight:800;margin-left:2px}
 html body .gx-bar #hintT{padding:4px 8px!important;min-width:44px}
 @media (max-width:640px) and (orientation:portrait) and (max-height:700px){#prompt:has(.starwhy){-webkit-line-clamp:3}}

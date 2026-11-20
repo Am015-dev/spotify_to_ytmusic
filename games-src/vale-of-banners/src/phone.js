@@ -35,12 +35,15 @@ function ensureRival() { var r = $('#rv'); if (!r) { r = h('div', { id: 'rv', ro
 function renderRival() {
   var r = ensureRival(); if (!L.tabs || UI.tab !== 'rival') return; r.innerHTML = ''; var s = rivalSeat(), p = G.P[s];
   r.appendChild(h('div.rvh', { text: G.seats[s].name + ': ' + p.vp + ' points · ' + p.silver + ' silver · ' + p.workers + ' workers' + (G.n > 2 ? ' (tap a name above for the others)' : '') }));
-  var box = h('div.minies'); r.appendChild(box); var hh = r.clientHeight - 40, w = r.clientWidth;
+  r.appendChild(h('div.rvwhy2', { text: scoreWhy(s) }));
+  var box = h('div.minies'); r.appendChild(box); var hh = r.clientHeight - 62, w = r.clientWidth;
   var S = Math.min(w / (7 * 1.732 + 0.4), hh / 11.1); renderEstate(box, s, S);
 }
-function autoZoom() {   /* small phones: when build spaces glow and would be under 44 px, zoom the estate onto them (Fit / pinch undo it) */
+function autoZoom() {   /* small phones (F3): zoom only when the estate holds the ONLY targets, never while a finger is down or just lifted, and never re-centre under a tap */
   if (UI.fast || !G || !L.tabs || UI.tab !== 'estate' || UI.busy) return;
-  if (UI.autoZ === 'anim' && FEEL.cam.z > 1.02 && myTurn() && document.querySelector('#es .cell.glow') && !(FEEL.drag && FEEL.drag.on)) { UI.autoZ = null; camReset(false); }   /* a build zoom must not hide the next glowing spaces (Keep's free action) */
+  if (FEEL.touch || Date.now() - (FEEL.lastUp || 0) < 260) { clearTimeout(autoZoom.t); autoZoom.t = setTimeout(autoZoom, 300); return; }
+  if (UI.autoZ && UI.autoZ !== 'anim' && FEEL.cam.z > 1.02 && otherTargets()) { UI.autoZ = null; camReset(true); return; }   /* targets left the estate: show it whole again */
+  if (otherTargets()) return;
   var need = 46 / (L.s * 1.732); if (need <= 1.02) return;
   var gl = [].slice.call(document.querySelectorAll('#es .cell.glow')), drag = !!(FEEL.drag && FEEL.drag.on);
   if (!gl.length || !myTurn()) { if (UI.autoZ) { UI.autoZ = null; if (!drag) camReset(true); } return; }
@@ -51,6 +54,15 @@ function autoZoom() {   /* small phones: when build spaces glow and would be und
   var zf = Math.min((L.ew - 56) / Math.max(1, x1 - x0), (L.eh - 56) / Math.max(1, y1 - y0)), zz = Math.max(1, Math.min(2.6, need, zf));   /* never zoom a glowing space out of view */
   if (zz <= 1.02) { if (UI.autoZ) { UI.autoZ = null; if (!drag) camReset(true); } UI.autoZ = key; return; }
   var c = FEEL.cam; c.z = zz; c.x = L.ew / 2 - (x0 + x1) / 2 * c.z; c.y = L.eh / 2 - (y0 + y1) / 2 * c.z; camClamp(); camApply(null, !drag); UI.autoZ = key;
+}
+function otherTargets() { return !!document.querySelector('#mk .glow, #lane .glow, #goods .glow, #acts .btn.glow, #tabs .tab.has'); }
+function zoomTap() {   /* the explicit zoom: in onto the glowing spaces (or the middle), out again on the next tap */
+  if (FEEL.cam.z > 1.02) { UI.autoZ = null; camReset(true); return; }
+  var gl = [].slice.call(document.querySelectorAll('#es .cell.glow')), c = FEEL.cam, x0 = 1e9, x1 = -1e9, y0 = 1e9, y1 = -1e9;
+  gl.forEach(function (e) { var xy = cellXY(VB.CELLS[+e.getAttribute('data-ci')], L.s, L.ew, L.eh); x0 = Math.min(x0, xy.x); x1 = Math.max(x1, xy.x); y0 = Math.min(y0, xy.y); y1 = Math.max(y1, xy.y); });
+  if (!gl.length) { x0 = x1 = L.ew / 2; y0 = y1 = L.eh / 2; }
+  var zf = Math.min((L.ew - 56) / Math.max(1, x1 - x0), (L.eh - 56) / Math.max(1, y1 - y0)); c.z = Math.max(1.4, Math.min(2.2, zf));
+  c.x = L.ew / 2 - (x0 + x1) / 2 * c.z; c.y = L.eh / 2 - (y0 + y1) / 2 * c.z; camClamp(); camApply(null, true); UI.autoZ = null;
 }
 function fitEstate() {   /* phone: the estate takes what the market leaves */
   var b = $('#bd'), mk = $('#mk'), W = b.clientWidth, H = b.clientHeight; if (W > H * 1.15 && !portraitPhone()) return;

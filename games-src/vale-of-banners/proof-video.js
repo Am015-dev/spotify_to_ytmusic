@@ -11,7 +11,7 @@ const URL = 'file://' + path.join(__dirname, 'vale-of-banners.html'), OUT = path
   const T = async (sel, ms) => { const p = await find(sel); if (!p) return false; await page.touchscreen.tap(p.x, p.y); taps++; await page.waitForTimeout(ms || 900); return true; };
   await T('#howB', 2500); await page.mouse.wheel(0, 300); await page.waitForTimeout(1200); await T('#rulesd .gx-x', 900);
   if (!(await page.evaluate(() => !document.getElementById('start').hidden && !document.querySelector('.gx-scrim.on')))) await page.keyboard.press('Escape');
-  await T('#quickB', 1200); await T('#goB', 2500); await T('#goalB', 1500);
+  await T('#quickB', 1200); await T('#goB', 2500); await T('#goalB', 1500); await T('#hintT', 1200);
   let lastTurn = -1;
   while (Date.now() - t0 < SECS * 1000) {
     const st = await page.evaluate(() => ({ tv: !document.getElementById('tv').hidden, mine: !!(G && !G.over && G.seats[VB.actor(G)].human && !UI.busy), rs: !document.getElementById('rs').hidden, turn: G && G.turn }));
@@ -20,6 +20,7 @@ const URL = 'file://' + path.join(__dirname, 'vale-of-banners.html'), OUT = path
     if (await T('.gxh-bubble button, .gxh-coach button, .gxh-ok', 700)) continue;
     if (!st.mine) { await page.waitForTimeout(400); continue; }
     if (st.turn !== lastTurn) { lastTurn = st.turn; turns++; await page.waitForTimeout(900); }
+    if (turns % 3 === 2 && await T('#askB', 1600)) continue;   /* F3: ask for the one ★ of the turn now and then */
     if (await T('#mk .tilebtn.bestt.glow', 1000)) continue;
     if (await T('#es .cell.best.glow, #es .cell.glow', 1200)) continue;
     if (await T('#store .tilebtn.glow', 1000)) continue;

@@ -52,6 +52,7 @@
     v += p.pos * 0.4;
     return v;
   };
+  var GENTLE = V.GENTLE = { hardBelow: 4, looseAbove: 12, loose: 9, mid: 3.5, tight: 1 };
   function apply(G, m) { var c = fclone(G); V.performMove(c, m); return c; }
   function noise(G) { return V.rnd(G); }
   /* search the rest of my turn: depth plies, beam = moves expanded per ply */
@@ -73,11 +74,12 @@
     if (lvl === 'random') return M[Math.floor(V.rnd(G) * M.length)];
     var sc = M.map(function (m) { var c = apply(G, m); return { m: m, c: c, v: V.evalSeat(c, s) }; });
     if (lvl === 'easy') { sc.forEach(function (x) { x.v += noise(G) * 6; }); }
-    /* gentle = first-game rival: loose (wide noise), so a newcomer who ignores the ★ wins about 1 in 2 (64/120 headless) and a ★ follower nearly always wins */
+    /* gentle = first-game rival that keeps the game close (F3): it plays hard when it trails, loosens when it leads.
+       Gap = its position value minus the best other seat's, so a newcomer who follows the ★ wins about half, by a few points. */
     if (lvl === 'gentle') {
-      /* a rare whim (any move but ending early); the rest greedy with some noise */
-      if (noise(G) < 0.02) { var ne = M.filter(function (m) { return m.k !== 'end'; }); if (ne.length) return ne[Math.floor(noise(G) * ne.length)]; }
-      sc.forEach(function (x) { x.v += noise(G) * 8; });
+      var gap = V.evalSeat(G, s) - Math.max.apply(null, G.P.map(function (q, i) { return i === s ? -1e9 : V.evalSeat(G, i); }));
+      if (gap < -GENTLE.hardBelow) lvl = 'hard';
+      else { var nz = gap > GENTLE.looseAbove ? GENTLE.loose : gap > 0 ? GENTLE.mid : GENTLE.tight; sc.forEach(function (x) { x.v += noise(G) * nz; }); }
     }
     sc.sort(function (a, b) { return b.v - a.v; });
     if (lvl === 'hard') {
