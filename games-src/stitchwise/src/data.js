@@ -1,5 +1,5 @@
 // Stitchwise data: 33 patches (shape, button cost, time cost, button income), track constants. Original fabric names.
-var SW = { N: 9, TRACK: 53, BTN_SPOTS: [5, 11, 17, 23, 29, 35, 41, 47, 53], LEATHER_SPOTS: [20, 26, 32, 44, 50], START_BTN: 5, BONUS_SIZE: 7, BONUS_PTS: 7, EMPTY_PEN: 2 };
+var SW = { N: 9, TRACK: 53, BTN_SPOTS: [5, 11, 17, 23, 29, 35, 41, 47, 53], LEATHER_SPOTS: [26, 32, 38, 44, 50], START_BTN: 5, BONUS_SIZE: 7, BONUS_PTS: 7, EMPTY_PEN: 2 };
 // [name, shape rows, cost, time, income]. Values checked against two independent public sources (see rules-notes.md).
 var PATCH_DEF = [
   ['Ribbon Scrap', '##', 2, 1, 0], ['Bias Binding', '###', 2, 2, 0], ['Corner Patch', '#./##', 1, 3, 0],

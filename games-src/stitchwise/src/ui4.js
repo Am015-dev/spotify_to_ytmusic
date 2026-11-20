@@ -172,7 +172,7 @@ function t2Mine() { return G && !G.over && !UI.busy && isHuman(swWho(G)); }
 function t2Shape(pid, f) { return swNorm(PATCHES[pid].cells.map(f)); }
 function t2OrIdx(pid, cells) { var k = JSON.stringify(cells), r = -1; PATCHES[pid].or.forEach(function (o, i) { if (JSON.stringify(o) === k) r = i; }); return r; }
 function t2Setup() { // a practice fair, set before the first turn: tokens on 36/37, Wren's old quilt with 3 gaps (nothing changes later)
-  G.pos = [36, 37]; G.stamp = [1, 2]; G.tick = 2; G.cur = 0;
+  G.pos = [36, 37]; G.stamp = [1, 2]; G.tick = 2; G.cur = 0; G.leather[2] = 1; /* the leather on 38 went to Wren earlier; the lesson uses the one on 44 */
   var r1 = t2Shape(8, function (q) { return [-q[1], q[0]]; }), f2 = t2Shape(7, function (q) { return [-q[0], q[1]]; });
   T2.h1 = r1.map(function (q) { return [q[0] + 2, q[1] + 2]; }); T2.o1 = t2OrIdx(8, r1);
   T2.h2 = f2.map(function (q) { return [q[0] + 4, q[1] + 5]; }); T2.o2 = t2OrIdx(7, f2); T2.hl = [6, 6];

@@ -10,7 +10,7 @@ Two players, a 9x9 quilt each, 33 polyomino patches in a ring with a neutral mar
 
 ## Data check against public sources (7 Nov 2026, second pass)
 Two independent public implementations were read through a page fetch (facts only, numbers re-typed into our own `src/data.js`; no code, names, art or text copied; neither repository states a licence, so no `THIRD-PARTY.md`):
-- Source A: a public implementation A (patch data file: id, cost, time, income, cells) and its README (income spots 5, 11, 17, 23, 29, 35, 41, 47, 53; leather spots 20, 26, 32, 44, 50).
+- Source A: a public implementation A (patch data file: id, cost, time, income, cells) and its README (income spots 5, 11, 17, 23, 29, 35, 41, 47, 53; leather spots 20, 26, 32, 44, 50, which is the old printing).
 - Source B: a public implementation B (piece constants file: shape grid where 2 marks a button, buttons, time).
 - Rule facts: arXiv 2001.04233 (a constraint-programming study): 53 steps, 5 leather steps, 9 income steps, patches cost 0-10 buttons, 0-3 income, 5 buttons and a 9x9 board each, marker after the smallest patch, further-back token moves, tie: last to arrive plays, advance = one step past the opponent for that many buttons, start score 5 - 2*81.
 - `cross-check.py` compares A and B (shape up to rotate/flip, cost, time, income): **31 of 33 patches agree exactly**. The 2 that differ were resolved toward B and are still UNCONFIRMED against a rulebook: the long C patch (cost 1, time 5, income 1: A says 7 squares, B says 6) and the cost 2 time 2 patch (A: plus of 5 squares, which would duplicate the plus at cost 5; B: T of 4 squares). Total squares 166.
@@ -19,3 +19,10 @@ Two independent public implementations were read through a page fetch (facts onl
 ## Still guessed
 - Tie on final score, and the leather-patch-on-a-full-quilt skip.
 - The 2 unconfirmed patch entries above.
+
+## Leather spaces: current printing (F1, 20 Nov 2026)
+- The publisher's FAQ says the first leather patch came too early (useless in about half of games) and was moved to a later space;
+  newer prints include the change, and a correction sticker is offered for old boards.
+- The old board (rules sheet diagram) has leather on 20, 26, 32, 44, 50. The correction sticker covers the leather on 20 and adds one
+  in the third ring, on the empty gap between 32 and 44. That gives 26, 32, 38, 44, 50: one leather every 6 spaces, 3 after each button space.
+- Used now: `LEATHER_SPOTS: [26, 32, 38, 44, 50]`. Confidence: high that 20 is gone; the new space read from the sticker and board art as 38.

@@ -19,7 +19,7 @@ G = L.swNew({ seed: 2 }); G.inc[0] = 2; G.pos = [4, 9]; G.stamp = [5, 6]; const 
 G = L.swNew({ seed: 3 }); G.pos = [3, 3]; G.stamp = [9, 4]; G.cur = 0; ok(L.swWho(G) === 0, 'tie');
 G.pos = [5, 3]; G.stamp = [9, 4]; G.cur = 1; L.swApply(G, { t: 'adv' }); ok(G.pos[1] === 6 && G.btn[1] === 5 + 3, 'adv to one ahead of opponent'); ok(L.swWho(G) === 0, 'p0 behind now');
 // leather
-G = L.swNew({ seed: 4 }); G.pos = [18, 21]; G.stamp = [3, 4]; G.cur = 0; L.swApply(G, { t: 'adv' }); ok(G.pend && G.pend.seat === 0 && G.leather[0] === 0, 'leather opens'); ok(L.swMoves(G).every(m => m.t === 'leather'), 'only leather moves');
+G = L.swNew({ seed: 4 }); G.pos = [24, 27]; G.stamp = [3, 4]; G.cur = 0; L.swApply(G, { t: 'adv' }); ok(G.pend && G.pend.seat === 0 && G.leather[0] === 0, 'leather opens'); ok(L.swMoves(G).every(m => m.t === 'leather'), 'only leather moves');
 L.swApply(G, { t: 'leather', x: 4, y: 4 }); ok(G.board[0][40] === 100 && !G.pend, 'leather placed'); ok(!L.swCheck(G), 'inv after leather');
 // buy
 G = L.swNew({ seed: 5 }); G.btn[0] = 30; const off = L.swOffer(G); ok(off.length === 3, '3 offered'); const k = 1, pid = off[k], p = PATCHES[pid]; const ring0 = G.ring.length;
