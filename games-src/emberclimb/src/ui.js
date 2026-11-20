@@ -228,7 +228,7 @@
     if (UI.sub === 'quick') return quick();
     var s = h('div'); s.id = 'title';
     s.appendChild(BG('bg-title'));
-    s.appendChild(h('div', '', null, [h('h1', '', 'EMBERCLIMB'), h('p', 'sub', 'Climb the tower. Build your deck.')]));
+    s.appendChild(h('div', 'ttlhd', null, [h('h1', '', 'EMBERCLIMB'), h('p', 'sub', 'Climb the tower. Build your deck.')]));
     var first = false; try { first = !GXT.status('emberclimb').seen && !localStorage.getItem('emberclimb.save'); } catch (e) { }
     var main = h('div', 'tmain'), row = h('div', 'trow');
     var story = on(h('button', first ? 'btn alt' : 'btn primary', 'Story'), function () { try { GXC.open(); } catch (e) { UI.sub = 'quick'; render(); } }); story.id = 'story';
