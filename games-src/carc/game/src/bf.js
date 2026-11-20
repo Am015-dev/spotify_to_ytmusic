@@ -125,7 +125,8 @@ function edgeArrows(){const bd=boardEl();if(!bd)return;let box=bd.querySelector(
     const o={l:-x,r:x+c-m.W,t:top-y,b:y+c-bot};let k='l';for(const q in o)if(o[q]>o[k])k=q;side[k].push([gx,gy,x+c/2,y+c/2])}
   const br=bd.getBoundingClientRect(),avoid=[];if(on){for(const g of $('#world').querySelectorAll('.glow'))if(g.style.visibility!=='hidden'){const x=+g.dataset.x*c+UI.view.x,y=+g.dataset.y*c+UI.view.y;avoid.push({l:x,t:y,r:x+c,b:y+c})}
     for(const r of fixedRects())avoid.push({l:r.left-br.left,t:r.top-br.top,r:r.right-br.left,b:r.bottom-br.top})}
-  for(const k in side){let e=box.querySelector('[data-s='+k+']');const L=side[k];if(!L.length){if(e)e.hidden=true;continue}
+  const keep=Object.keys(side).filter(k=>side[k].length).sort((a,b)=>side[b].length-side[a].length).slice(0,PHONE()?2:4);   // R108: at most two pills on a phone (the busiest sides); the rest show after a pan
+  for(const k in side){let e=box.querySelector('[data-s='+k+']');const L=side[k];if(!L.length||!keep.includes(k)){if(e)e.hidden=true;continue}
     if(!e){e=document.createElement('button');e.type='button';e.className='gedge';e.dataset.s=k;e.addEventListener('click',ev=>{ev.stopPropagation();edgeGo(e.dataset.s)});box.appendChild(e)}
     e.hidden=false;e.setAttribute('aria-label',L.length+' more '+(L.length>1?'squares':'square')+' this way');e.innerHTML='<b>'+EDGE_ARW[k]+'</b>'+L.length+' more';
     const ax=L.reduce((a,q)=>a+q[2],0)/L.length,ay=L.reduce((a,q)=>a+q[3],0)/L.length,w=e.offsetWidth||96,h=e.offsetHeight||44;
