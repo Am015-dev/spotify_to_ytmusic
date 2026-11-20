@@ -15,6 +15,7 @@ Read CLAUDE.md first and obey its hard rules. Never write the original game's, p
 1. Copy the closest finished shelf game (shell, campaign, tutorial, help, menu, loader, tests, shared mechanics) and adapt it. Use `games-src/scripts/find.sh --maps` and that game's MODULES.md.
 2. Write games-src/<slug>/rules-notes.md (the rules from your own knowledge of the original, plus "Simplified on purpose") and RULES-CHECKLIST.md. Write the engine with a rules-test and a computer opponent (at least Easy and Normal; a newcomer following the hints must win about half the games on Easy).
 3. Phone first, at 375x667 and 375x553: board-first layout, text >= 11 px, taps >= 44 px, 1-3 taps per turn, show what a choice gives BEFORE committing, a quick readable rival turn, satisfying one-shot feedback (no infinite animations, max 1 helper on screen).
+3b. PC too (owner, 20 Nov 2026: "the layout should change for pc and phone so it is easy to play in both"): at 1366x768 and 1920x1080 with a MOUSE the game must use the width (board at full height, hand/score/log/rival in side panels, never a phone column in an empty screen), text >= 12 px, every control clickable (no touch-only or hover-only controls, drag works with a mouse), nothing needs scrolling to play. Screenshot both sizes into proof/.
 4. Tutorial: a short guided first game that teaches every rule it uses, 12 words or fewer per line.
 
 ## Free assets only (credit everything)
