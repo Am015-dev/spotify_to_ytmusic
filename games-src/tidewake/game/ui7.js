@@ -2,7 +2,9 @@
 // ===================== part 7: phone layout (board first, tap to play, pop-ups) =====================
 // Only active when html.ph is set (short side <= 500 px, or a touch screen <= 600 px; ?phone=1 / ?phone=0 force it). Desktop and tablets never touch this code.
 const PH={on:false,land:false,pop:null,pd:null,zoom:false,zk:'',cur:null,mphHide:null,ovHide:null,swipeT:0,tmr:0,strip:'',pop_h:'',toast:''};
-const PH_REGION=[-4.02,4.02,-4.02,4.02];
+const PH_REGION=[-4.02,4.02,-4.02,4.02],PH_WIDE=[-5.1,5.1,-5.1,5.1];
+// R92: while start marks are picked the chart is framed wider, so every edge square gets a 44 px tap zone outside or inside the edge (twZones)
+function phWide(){return !!(PH.on&&G&&UI.started&&G.phase==='setup')}
 const PH_ICO={tile:'<svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="4" width="16" height="16" rx="3"/><path d="M8 4q0 8 8 8M4 14q6 0 6 6"/></svg>',mon:'<svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 17c2-6 5-8 9-8 3 0 4-3 7-3-1 2-1 3 0 4-2 1-2 3-3 4 3 0 4 2 5 4-3-1-5-2-7-1-3 1-6 1-11 0zM9 12h.01"/></svg>',zoom:'<svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="1.5"/><path d="M12 2v4M12 18v4M2 12h4M18 12h4"/></svg>',rl:'<svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12a7 7 0 1 0 2.5-5.4M5 4v4h4"/></svg>',rr:'<svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M19 12a7 7 0 1 1-2.5-5.4M19 4v4h-4"/></svg>'};
 function phDetect(){try{const P=new URLSearchParams(location.search);if(P.has('phone'))return P.get('phone')!=='0'}catch(e){}
   const s=Math.min(innerWidth,innerHeight);if(s<=500)return true;if(innerWidth>=1024&&innerWidth>innerHeight)return true; /* desktop: the board-first layout too (board left, slim strip right) */let c=false;try{c=matchMedia('(pointer:coarse)').matches}catch(e){}return c&&s<=600}
@@ -18,7 +20,7 @@ function phApply(){const R=document.documentElement;const was=PH.on;PH.on=phDete
 // ---------- camera: flat top-down, the 7x7 board + edge numbers fill the square ----------
 function phZoom(){if(!PH.on||!kitOk())return;let c=null,r=null;
   if(PH.zoom&&G&&UI.started){const vs=viewSeat(),sd=sideToAct(),i=vs>=0?vs:sd;let S=i>=0?G.ships[i]:null;let p=S&&shipPos(S);if(!p){S=G.ships.find(x=>shipPos(x));p=S&&shipPos(S)}if(p){c=p.c;r=p.r}}
-  const key=c!=null?c+','+r:'';if(key===PH.zk)return;PH.zk=key;try{if(key)TWKit.focus(c,r,1.7);else TWKit.focus(null)}catch(e){}}
+  const key=c!=null?c+','+r:(phWide()?'W':'');if(key===PH.zk)return;const was=PH.zk;PH.zk=key;try{if(c!=null)TWKit.focus(c,r,1.7);else if(key==='W'||was==='W'){TWKit.setView({region:key==='W'?PH_WIDE:PH_REGION,immediate:true});TWKit.renderOnce()}else TWKit.focus(null)}catch(e){}}
 // ---------- mini tile with the route highlighted ----------
 const PH_P=[[1/3,0],[2/3,0],[1,1/3],[1,2/3],[2/3,1],[1/3,1],[0,2/3],[0,1/3]],PH_N=[[0,1],[0,1],[-1,0],[-1,0],[0,-1],[0,-1],[1,0],[1,0]];
 function phD(a,b){const pa=PH_P[a],pb=PH_P[b],na=PH_N[a],nb=PH_N[b],dd=Math.hypot(pa[0]-pb[0],pa[1]-pb[1]),k=Math.min(.5,Math.max(.17,dd*.55));const f=p=>(6+p[0]*88).toFixed(1)+' '+(6+p[1]*88).toFixed(1);
@@ -262,7 +264,7 @@ const PG_NEAR='.gxh-bub.on,#pc:not([hidden]),.gxh-rules';
 function pgRects(){const o=[];for(const e of document.querySelectorAll(PG_NEAR)){if(!e.getClientRects().length)continue;const r=e.getBoundingClientRect();if(r.width>4&&r.height>4)o.push(r)}return o}
 function pgNear(x,y,m){for(const r of pgRects())if(x>=r.left-m&&x<=r.right+m&&y>=r.top-m&&y<=r.bottom+m)return true;return false}
 const pgBoard=t=>!!(t&&t.closest&&t.closest('#ov,#board,canvas')&&!t.closest('button:not(.opip),.gx-bar,.gx-dock,#ps'));
-function pgClip(){try{const R=pgRects();for(const e of document.querySelectorAll('#ov .opip')){let near=false;if(R.length){const q=e.getBoundingClientRect(),cx=(q.left+q.right)/2,cy=(q.top+q.bottom)/2;
+function pgClip(){try{const R=pgRects();for(const e of document.querySelectorAll('#ov .opip,#ov .ozone')){let near=false;if(R.length){const q=e.getBoundingClientRect(),cx=(q.left+q.right)/2,cy=(q.top+q.bottom)/2;
   near=R.some(r=>cx>=r.left-36&&cx<=r.right+36&&cy>=r.top-36&&cy<=r.bottom+36)}e.classList.toggle('nearbub',near)}}catch(e){}}
 setInterval(()=>{if(PH.on&&G&&G.phase==='setup')pgClip()},250);
 document.addEventListener('pointerdown',e=>{const t=e.target,inG=!!(t&&t.closest&&t.closest(PG_SEL))||(pgBoard(t)&&pgNear(e.clientX,e.clientY,12));

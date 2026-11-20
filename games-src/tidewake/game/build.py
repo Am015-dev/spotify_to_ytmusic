@@ -42,6 +42,10 @@ function updLevGLB(L, t) {
 }
 '''
 KIT_PATCHES=[
+ # R92 calm: the 2D chart's spinning maelstrom / gate and pulsing marks run 3 times, then stay still (no infinite loops)
+ (".tw2-spin{animation:tw2spin 6s linear infinite;",".tw2-spin{animation:tw2spin 6s linear 3;"),
+ (".tw2-spin2{animation:tw2spin 3.4s linear infinite reverse;",".tw2-spin2{animation:tw2spin 3.4s linear 3 reverse;"),
+ (".tw2-pulse{animation:tw2pl 1.2s ease-in-out infinite}",".tw2-pulse{animation:tw2pl 1.2s ease-in-out 3}"),
  # A11. text size audit: SVG labels drawn in board units (font-size .27 / R*.16) report as 0.3px / 0.1px; draw them at a real px size and scale the text down (same look)
  ("""<text x="' + p[0] + '" y="' + (p[1] + .085) + '" text-anchor="middle" font-size=".27\"""","""<text transform="translate(' + p[0] + ' ' + (p[1] + .085) + ') scale(.01)" text-anchor="middle" font-size="27\""""),
  ("""<text y="' + -R * 1.1 + '" text-anchor="middle" font-size="' + R * .16 + '" font-weight="700" fill="' + C.gold + '" stroke="' + C.ink + '" stroke-width="' + R * .015 + '\"""","""<text transform="translate(0 ' + -R * 1.1 + ') scale(.004)" text-anchor="middle" font-size="' + R * 40 + '" font-weight="700" fill="#ffe7a3" stroke="' + C.ink + '" stroke-width="' + R * 3.75 + '\""""),

@@ -117,7 +117,7 @@ html.ph .omark b{font-size:14px!important}
 .drgghost{position:fixed;z-index:60;pointer-events:none;translate:-50% -50%;filter:drop-shadow(0 8px 10px rgba(0,0,0,.55));transition:scale .12s ease-out;scale:1.08}
 .drgghost.snap{scale:1;transition:left .08s ease-out,top .08s ease-out,scale .12s ease-out}
 .drgghost>img,.drgghost>svg{width:100%;height:100%;display:block;border-radius:10px}
-.drgtgt{position:fixed;z-index:59;pointer-events:none;translate:-50% -50%;border-radius:12px;border:3px solid #ffd24a;box-shadow:0 0 0 3px rgba(11,42,51,.8),0 0 18px 6px rgba(255,210,74,.65);animation:drgpulse 1s ease-in-out infinite}
+.drgtgt{position:fixed;z-index:59;pointer-events:none;translate:-50% -50%;border-radius:12px;border:3px solid #ffd24a;box-shadow:0 0 0 3px rgba(11,42,51,.8),0 0 18px 6px rgba(255,210,74,.65);animation:drgpulse 1s ease-in-out 3}
 .drgtgt.hot{border-color:#fff;box-shadow:0 0 0 3px rgba(11,42,51,.8),0 0 26px 10px rgba(255,240,170,.9);animation:none}
 @keyframes drgpulse{50%{box-shadow:0 0 0 3px rgba(11,42,51,.8),0 0 8px 2px rgba(255,210,74,.4)}}
 @media (prefers-reduced-motion:reduce){.drgtgt{animation:none}.drgghost{transition:none}}

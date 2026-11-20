@@ -150,7 +150,8 @@ function ovUpdate(){if(!G||!UI.started||!kitOk()){ovApply([]);return}const D=[];
     if(!(mine&&UI.route))D.push({k:'tag',id:'s'+s.i,wx:w[0],wy:.5,wz:w[1],t:mine?'You':nm(s.i),cls:'ship'+(mine?' me':'')+(myTurn&&s.i===d?' act':''),sail:colOf(s.i).sail});
     if(mine&&myTurn&&G.phase==='play')D.push({k:'ring',id:'r'+s.i,wx:w[0],wz:w[1]})}
   if(myTurn&&G.phase==='setup'&&!G.q){const info=startInfo(d);let bm=null;if(UI.tut){if(!UI.tutBest||UI.tutBest.g!==G.sp){let m=null;try{m=aiMove(d,'hard')}catch(e){}UI.tutBest={g:G.sp,m}}bm=typeof TS!=='undefined'&&TS.on&&TS.myStart?TS.myStart:UI.tutBest.m}
-    for(const o of info){const best=!!(bm&&bm.x===o.m.x&&bm.y===o.m.y&&bm.e===o.m.e);D.push({k:'pip',id:'p'+o.m.x+o.m.y+o.m.e+(bm?(best?'b':'d'):''),wx:o.w[0],wz:o.w[1],t:o.lab,best,dim:!!bm&&!best,pk:!UI.tut||!!(PH.on&&PH.pop!=='start'&&typeof TUTG!=='undefined'&&TUTG.cur&&TUTG.cur.id==='mark'),mx:o.m.x,my:o.m.y,me:o.m.e})}}
+    for(const o of info){const best=!!(bm&&bm.x===o.m.x&&bm.y===o.m.y&&bm.e===o.m.e);D.push({k:'pip',id:'p'+o.m.x+o.m.y+o.m.e+(bm?(best?'b':'d'):''),wx:o.w[0],wz:o.w[1],t:o.lab,best,dim:!!bm&&!best,pk:!UI.tut||!!(PH.on&&PH.pop!=='start'&&typeof TUTG!=='undefined'&&TUTG.cur&&TUTG.cur.id==='mark'),mx:o.m.x,my:o.m.y,me:o.m.e})}
+    if(PH.on)twZones(D)}
   if(UI.route&&!busy)D.push({k:'route',id:'rt',pts:UI.route.pts,bad:UI.route.bad,stop:UI.route.stop,label:UI.route.label});
   if(UI.arrow)D.push({k:'arrow',id:'ar',a:UI.arrow.a,b:UI.arrow.b});
   for(const m of UI.marks||[])D.push({k:'mark',id:'mk'+m.id+m.seat,wx:m.at[0],wz:m.at[1],t:nm(m.seat)+' sunk'});
@@ -169,7 +170,8 @@ function ovApply(D){const sig=JSON.stringify(D);if(sig===OV.sig&&OV.items.length
     else{const e=document.createElement('div');
       if(ds.k==='tag'){e.className='otag '+ds.cls;e.textContent=ds.t;if(ds.sail){const i=document.createElement('i');i.style.background=ds.sail;e.prepend(i)}if(ds.mon!=null)e.dataset.mon=ds.mon}
       else if(ds.k==='ring')e.className='oring';
-      else if(ds.k==='pip'){e.className='opip'+(ds.best?' best':'')+(ds.dim?' dim':'');if(!ds.dim&&ds.pk){e.className+=' pickable';e.setAttribute('role','button');e.setAttribute('aria-label','Start here: '+ds.t);try{const pe=TWKit.portEdge(ds.mx,ds.my,ds.me);if(pe&&pe.edge)e.className+=' e-'+pe.edge;if(pe&&(pe.edge==='left'||pe.edge==='right'))e.className+=' pv'}catch(_){}if(UI.tut||PH.on)e.dataset.ph='pip';else e.dataset.a='startmark';e.dataset.x=ds.mx;e.dataset.y=ds.my;e.dataset.e=ds.me}e.innerHTML=`<b>${esc(ds.t)}</b>${ds.best?'<u>best</u>':''}`}
+      else if(ds.k==='pip'){e.className='opip'+(ds.best?' best':'')+(ds.dim?' dim':'');if(!ds.dim&&ds.pk){e.className+=' pickable';e.setAttribute('role','button');e.setAttribute('aria-label','Start here: '+ds.t);try{const pe=TWKit.portEdge(ds.mx,ds.my,ds.me);if(pe&&pe.edge)e.className+=' e-'+pe.edge;if(pe&&(pe.edge==='left'||pe.edge==='right'))e.className+=' pv'}catch(_){}if(ds.zb)e.className+=' zoned';if(UI.tut||PH.on)e.dataset.ph='pip';else e.dataset.a='startmark';e.dataset.x=ds.mx;e.dataset.y=ds.my;e.dataset.e=ds.me}e.innerHTML=`<b>${esc(ds.t)}</b>${ds.best?'<u>best</u>':''}`}
+      else if(ds.k==='zone'){e.className='ozone z-'+ds.band;e.setAttribute('role','button');e.setAttribute('aria-label','Start marks on this square');e.dataset.ph='pip';e.dataset.x=ds.mx;e.dataset.y=ds.my}
       else if(ds.k==='mark'){e.className='omark';e.innerHTML=`<b>&#10006;</b><span>${esc(ds.t)}</span>`}
       root.appendChild(e);it.el=e}
     OV.items.push(it)}
@@ -181,7 +183,21 @@ function ovPos(force){const root=$('#ov');if(!root||!OV.items.length)return;cons
     if(it.poly){const pts=ds.k==='route'?ds.pts:[ds.a,ds.b];const pp=pts.map(q=>P(q[0],.06,q[1]));if(pp.some(x=>!x))continue;const s=pp.map(x=>x[0].toFixed(1)+','+x[1].toFixed(1)).join(' ');it.poly[0].setAttribute('points',s);it.poly[1].setAttribute('points',s);
       if(ds.k==='route'){const e=pp[pp.length-1];tfm(it.el,e);tfm(it.el2,pp[0]);ovRouteLabels(it,root)}
       else{const a=pp[pp.length-2]||pp[0],b=pp[pp.length-1];const ang=Math.atan2(b[1]-a[1],b[0]-a[0]);const L=14,W=8;const h=[[b[0],b[1]],[b[0]-L*Math.cos(ang)+W*Math.sin(ang),b[1]-L*Math.sin(ang)-W*Math.cos(ang)],[b[0]-L*Math.cos(ang)-W*Math.sin(ang),b[1]-L*Math.sin(ang)+W*Math.cos(ang)]];it.head.setAttribute('points',h.map(x=>x.join(',')).join(' '))}}
+    else if(ds.k==='zone')tfm(it.el,zonePos(P,ds));
+    else if(ds.zb){const q=P(ds.wx,.05,ds.wz),q2=q&&P(ds.wx+ds.nx*.1,.05,ds.wz+ds.nz*.1);if(!q||!q2){tfm(it.el,q);continue}const dx=q2[0]-q[0],dy=q2[1]-q[1],L=Math.hypot(dx,dy)||1,m=ds.zb==='out'?7:-5;tfm(it.el,[q[0]+dx/L*m,q[1]+dy/L*m])}
     else tfm(it.el,P(ds.wx,ds.wy||.05,ds.wz))}}
+// R92: gold marks are 22 px dots, about 10 px apart; a tap on any mark opens its square's pop-up anyway. So each edge square gets ONE 44x44 px tap zone
+// (.ozone, 46 px), never overlapping: corners and even squares inside the edge, odd squares outside it (alternating, so neighbours sit in different bands).
+// Marks of an outside square are drawn 7 px further out (inside ones 5 px in) so their dot sits in its zone. Needs a square pitch >= 28 px (375x553: about 29).
+const ZONE=46;
+function zoneBand(x,y){const E=BW-1,cx=x===0||x===E,cy=y===0||y===E;if(cx&&cy)return 'in';const a=cy?x:y;return a%2?'out':'in'}
+function twZones(D){const seen={};for(const t of D){if(t.k!=='pip'||t.dim||!t.pk)continue;const k=t.mx+','+t.my,band=zoneBand(t.mx,t.my);
+  let pe=null;try{pe=TWKit.portEdge(t.mx,t.my,t.me)}catch(e){}const n={top:[0,-1],bottom:[0,1],left:[-1,0],right:[1,0]}[pe&&pe.edge]||[0,0];t.zb=band;t.nx=n[0];t.nz=n[1];
+  if(seen[k])continue;seen[k]=1;D.push({k:'zone',id:'z'+k,mx:t.mx,my:t.my,band})}}
+function zonePos(P,ds){const E=BW-1,x=ds.mx,y=ds.my,nx=x===0?-1:x===E?1:0,nz=y===0?-1:y===E?1:0,wx=x-BC,wz=y-BC;
+  const C=P(wx,.05,wz);if(!C)return null;const h=ZONE/2;
+  if(nx&&nz){const K=P(wx+nx*.5,.05,wz+nz*.5),A=P(wx+nx*.5,.05,wz),B=P(wx,.05,wz+nz*.5);if(!K||!A||!B)return null;const ux=Math.sign(A[0]-C[0]),uy=Math.sign(B[1]-C[1]);return [K[0]-ux*h,K[1]-uy*h]}
+  const M=P(wx+nx*.5,.05,wz+nz*.5);if(!M)return null;let dx=M[0]-C[0],dy=M[1]-C[1];const L=Math.hypot(dx,dy)||1;dx/=L;dy/=L;const s=ds.band==='out'?h:-h;return [M[0]+dx*s,M[1]+dy*s]}
 // the route's Stop label stays inside the chart (R38: "Off the edge" ran past the right edge at 375x553), and the small "start" label never sits on it:
 // it goes below its point, else above, else it hides (R38: Stop / start overlap)
 function ovRouteLabels(it,root){const sp=it.el&&it.el.lastChild,st=it.el2&&it.el2.firstChild;if(!sp)return;const R=root.getBoundingClientRect();
