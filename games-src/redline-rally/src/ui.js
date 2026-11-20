@@ -433,11 +433,11 @@ function showResult() {
   UI.lockModal = true; var rows = '', me = G.cars.filter(function (c) { return c.human; });
   G.rank.forEach(function (ci, k) {
     var c = G.cars[ci], col = COLS[c.col].hex;
-    rows += '<div class="stand' + (c.human ? ' you' : '') + '"><span class="n">' + (k + 1) + '</span><span class="pt" style="border-color:' + col + '" data-art="portrait-' + c.drv + '">' + (c.drv ? c.name[0] : '★') + '</span><div style="flex:1"><b>' + esc(c.name) + '</b><small>Heat burned ' + c.stats.heat + ' · spin-outs ' + c.stats.spins + ' · slipstreams ' + c.stats.slips + '</small></div></div>';
+    rows += '<div class="stand' + (c.human ? ' you' : '') + '"><span class="n">' + (k + 1) + '</span><span class="pt" style="border-color:' + col + '" data-art="portrait-' + c.drv + '">' + (c.drv ? c.name[0] : '★') + '</span><div style="flex:1"><b>' + esc(c.name) + '</b><small>Heat ' + c.stats.heat + ' · spins ' + c.stats.spins + ' · slipstreams ' + c.stats.slips + '</small></div></div>';
   });
   var w = G.cars[G.rank[0]]; sfx(w.human ? 'win' : 'lose');
   var line = UI.mode === 'tutorial' ? (w.human ? 'You beat Kit to the line. Coach Mara is grinning: the Sunline seat is yours.' : 'Kit took the flag, but you learned every trick. Coach Mara: "Again. You are close."') : w.human ? STORY.resultWin + ' ' + pickLine(STORY.quickWin) : STORY.resultLose(w.name.split(' ')[0]) + ' ' + loseLine();
-  modal('<div class="podium" data-art="bg-podium"><h2>' + (w.human ? 'You win!' : esc(w.name) + ' wins') + '</h2><i class="ic" data-art="ui-trophy" style="width:36px;height:36px"></i>' + podiumHtml(G.rank) + '<p class="rl">' + esc(line) + '</p></div>' + (me[0] && !G.hot ? '<div class="tips"><b>Next race</b>' + raceTips(me[0]).map(function (x) { return '<p>' + esc(x) + '</p>'; }).join('') + '</div>' : '') + rows + '<div class="row" style="margin-top:10px"><button class="big" id="again">Race again</button><button class="ghostb" id="home">Title</button></div>');
+  modal('<div class="podium" data-art="bg-podium"><h2>' + (w.human ? 'You win!' : esc(w.name) + ' wins') + '</h2><i class="ic" data-art="ui-trophy" style="width:36px;height:36px"></i>' + podiumHtml(G.rank) + '<p class="rl">' + esc(line) + '</p></div>' + rows + (me[0] && !G.hot ? '<div class="tips"><b>Next race</b>' + raceTips(me[0]).map(function (x) { return '<p>' + esc(x) + '</p>'; }).join('') + '</div>' : '') + '<div class="row" style="margin-top:10px"><button class="big" id="again">Race again</button><button class="ghostb" id="home">Title</button></div>');
   $('#mx').hidden = true; $('#again').onclick = function () { UI.lockModal = false; startGame(); }; $('#home').onclick = function () { UI.lockModal = false; showTitle(); };
 }
 
@@ -531,8 +531,10 @@ function drawFrame0(now) {
   if (!artDraw(cx, 'track-' + G.track, 0, 0, 2000, 1200, 'cover')) cx.drawImage(trackLayer(G.track), 0, 0, 2000, 1200);
   cx.drawImage(sceneryLayer(G.track), 0, 0, 2000, 1200);
   /* corner signs */
+  var signT = cx.getTransform(), signs = [];   /* F6: sign positions on screen, so the minimap can step aside */
   tk.list.forEach(function (kk) {
     var q = tk.at(kk.idx * tk.seg), sx = q.x + Math.sin(q.a) * 98, sy = q.y - Math.cos(q.a) * 98, nx = kk.idx === UI.planCorner, z = nx ? Math.max(1, 0.62 / cam.s) : 1, r = 36 * z;   /* the next corner keeps a readable size while the camera is zoomed out */
+    signs.push({ p: signT.transformPoint(new DOMPoint(sx, sy)), e: signT.transformPoint(new DOMPoint(sx + r + 10 * z, sy)) });
     if (nx) { cx.save(); cx.globalAlpha = pulse('cs' + kk.idx + 'r' + G.round, now, 1600, 0.4, 0.9); cx.lineWidth = 7 * z; cx.strokeStyle = '#ffd24a'; cx.beginPath(); cx.arc(sx, sy, r + 9 * z, 0, 7); cx.stroke(); cx.restore(); }
     if (!artDraw(cx, 'ui-corner-sign', sx - r, sy - r, 2 * r, 2 * r, 'contain')) { cx.fillStyle = '#fff'; cx.beginPath(); cx.arc(sx, sy, 34 * z, 0, 7); cx.fill(); cx.lineWidth = 8 * z; cx.strokeStyle = '#d8281d'; cx.stroke(); }
     cx.fillStyle = '#111'; cx.font = '900 ' + Math.round(38 * z) + 'px sans-serif'; cx.textAlign = 'center'; cx.textBaseline = 'middle'; cx.fillText(climit(G, kk.limit), sx, sy + 2 * z);
@@ -555,7 +557,10 @@ function drawFrame0(now) {
   var popT = cx.getTransform();   /* pops are drawn after the minimap, in screen space, kept inside the board (W496: no clipped pop) */
   cx.restore();
   /* minimap */
-  var mw = Math.min(110, W * 0.3), mh = mw * 0.6, mx = W - mw - 6, my = 6, sc = mw / 2000;
+  var mw = W < 520 ? Math.min(84, W * 0.24) : Math.min(110, W * 0.3), mh = mw * 0.6, mx = W - mw - 6, my = 6, sc = mw / 2000;   /* F6: smaller on phones */
+  var bInv = cx.getTransform().inverse(), sgS = signs.map(function (o) { var a = bInv.transformPoint(o.p), b = bInv.transformPoint(o.e); return { x: a.x, y: a.y, r: Math.hypot(b.x - a.x, b.y - a.y) }; });
+  var hits = function (x, y) { return sgS.some(function (o) { return o.x + o.r > x - 4 && o.x - o.r < x + mw + 4 && o.y + o.r > y - 4 && o.y - o.r < y + mh + 4; }); };
+  if (hits(mx, my)) { var yb = H - dashH(W, H) - mh - 8; if (!hits(mx, yb)) my = yb; else if (!hits(6, yb)) { mx = 6; my = yb; } }   /* F6: never over a corner sign: drop to the bottom right, else bottom left */
   cx.fillStyle = 'rgba(8,12,20,.93)'; rr(mx - 3, my - 3, mw + 6, mh + 6, 8); cx.fill();   /* opaque: scenery no longer shows through the minimap */
   cx.beginPath(); tk.dense.forEach(function (p, i) { if (i) cx.lineTo(mx + p[0] * sc, my + p[1] * sc); else cx.moveTo(mx + p[0] * sc, my + p[1] * sc); }); cx.closePath(); cx.strokeStyle = '#8b97ad'; cx.lineWidth = 3; cx.stroke();
   G.cars.forEach(function (c) { var q = tk.space(UI.vis[c.i].p, 0); cx.fillStyle = COLS[c.col].hex; cx.beginPath(); cx.arc(mx + q.x * sc, my + q.y * sc, c.human ? 3.6 : 2.6, 0, 7); cx.fill(); if (c.human) { cx.strokeStyle = '#fff'; cx.lineWidth = 1.2; cx.stroke(); } });

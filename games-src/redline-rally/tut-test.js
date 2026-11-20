@@ -6,7 +6,7 @@ const path = require('path'), fs = require('fs'), { chromium } = require(process
 (async () => {
   const url = await gx.url('redline-rally', { file: path.join(__dirname, 'redline-rally.html') }); const b = await chromium.launch({ args: ['--no-sandbox'] }); let fail = 0;
   for (const [n, vp] of [['390x844', { width: 390, height: 844 }], ['375x667', { width: 375, height: 667 }]]) {
-    const shots = n === '390x844' && process.env.TUT_SHOTS;
+    const shots = n === (process.env.TUT_VP || '390x844') && process.env.TUT_SHOTS;
     const c = await b.newContext({ viewport: vp, hasTouch: true, isMobile: true, deviceScaleFactor: shots ? 2 : 1 }), p = await c.newPage(); const errs = [], problems = [];
     p.on('pageerror', e => errs.push(String(e))); p.on('console', m => { if (m.type() === 'error') errs.push(m.text()); });
     await p.addInitScript(() => { window.AIDELAY = .15; });
@@ -38,7 +38,7 @@ const path = require('path'), fs = require('fs'), { chromium } = require(process
         if (sentences > 1) problems.push(st.id + ': ' + sentences + ' sentences');
         await p.waitForTimeout(200);   /* F4: the bubble never sits on the line, the gears, Go, Boost or a question button (except the step's own target) */
         const cv = await p.evaluate(() => { const bub = document.querySelector('.gxt-bub'); if (!bub) return []; const B = bub.getBoundingClientRect(), tg = GXT.current().target && GXT.current().target(), out = [];
-          document.querySelectorAll('#msg, .gb, #goB, #boostT, .slipq button').forEach(e => { if (e === tg || (tg && tg.contains && tg.contains(e))) return; const r = e.getBoundingClientRect(); if (!r.width) return; const ix = Math.min(B.right, r.right) - Math.max(B.left, r.left), iy = Math.min(B.bottom, r.bottom) - Math.max(B.top, r.top); if (ix > 4 && iy > 4) out.push(e.id || e.className); }); return out; });
+          document.querySelectorAll('#msg, #scoreL, .gb, #goB, #boostT, .slipq button').forEach(e => { if (e === tg || (tg && tg.contains && tg.contains(e))) return; const r = e.getBoundingClientRect(); if (!r.width) return; const ix = Math.min(B.right, r.right) - Math.max(B.left, r.left), iy = Math.min(B.bottom, r.bottom) - Math.max(B.top, r.top); if (ix > 4 && iy > 4) out.push(e.id || e.className); }); return out; });
         if (cv.length) covers.push(st.id + ':' + cv.join('+'));
         if (shots) { fs.mkdirSync(shots, { recursive: true }); await p.waitForTimeout(250); await p.screenshot({ path: path.join(shots, 'tut-' + k + '.png') }); }
       }

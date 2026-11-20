@@ -67,7 +67,7 @@ function tutRects(sels) { return function () { return sels.map(function (q) { va
 var TUT_RULES = ['goal', 'gear', 'speed', 'corner', 'burn', 'spin', 'cooldown', 'shift2', 'stress', 'slip', 'discard', 'boost', 'finish'];
 function tutSteps() {
   /* F4: the bubble never covers what the player needs now: the line, gears, hand and Go (avoid) */
-  var need = tutRects(['#msg', '#gears', '#acts', '#hand']), needQ = tutRects(['#msg', '#panel .slipq', '#panel #hand']);
+  var need = tutRects(['#msg', '#scoreL', '#gears', '#acts', '#hand']), needQ = tutRects(['#msg', '#scoreL', '#panel .slipq', '#panel #hand']);
   var gear = function (id, r, g, say, rule) { return { id: id, rule: rule, say: say, target: function () { return document.querySelector('.gb[data-g="' + g + '"]'); }, ready: tutPlan(r), wait: { type: 'tap', match: function (a) { return a.what === 'gear' && a.g === g; } }, wrong: 'Tap gear ' + g + '.', side: 'top', avoid: need }; };
   var go = function (id, r, say, rule) { return { id: id, rule: rule, say: say, target: function () { var b = $('#goB'); return b && !b.disabled ? b : null; }, ready: tutPlan(r), wait: { type: 'tap', match: function (a) { return a.what === 'go'; } }, side: 'top', avoid: need }; };
   var info = function (id, r, say, rule, tg) { return { id: id, rule: rule, say: say, target: tg, ready: tutPlan(r), wait: null, side: 'top', avoid: need }; };
@@ -83,7 +83,7 @@ function tutSteps() {
     go('go3', 3, 'Speed 3 takes the corner clean: tap Go.'),
     gear('gear3', 4, 3, 'Shifting two gears costs 1 heat: tap gear 3.', 'shift2'),
     go('go4', 4, 'Stress plays your deck\'s next speed card: tap Go.', 'stress'),
-    { id: 'slip', rule: 'slip', say: 'Right behind a car, slipstream gives 2 extra spaces, no cards: tap it.', target: function () { return $('#slipY'); }, ready: pend('slip'), wait: { type: 'tap', match: function (a) { return a.what === 'slip'; } }, side: 'top', avoid: tutRects(['#msg']) },
+    { id: 'slip', rule: 'slip', say: 'Behind a car, slipstream adds 2 spaces, no cards: tap it.', target: function () { return $('#slipY'); }, ready: pend('slip'), wait: { type: 'tap', match: function (a) { return a.what === 'slip'; } }, side: 'top', avoid: tutRects(['#msg', '#scoreL']) },
     { id: 'disc', rule: 'discard', say: 'Drop slow cards to draw fresh ones: tap Drop.', target: function () { var b = $('#discY'); return b && !b.disabled ? b : null; }, ready: pend('disc'), wait: { type: 'tap', match: function (a) { return a.what === 'discgo'; } }, side: 'top', avoid: needQ },
     { id: 'boost', rule: 'boost', say: 'Boost: after your cards show, flip one more for 1 heat.', target: function () { return $('#boostT'); }, ready: tutPlan(5), wait: { type: 'tap', match: function (a) { return a.what === 'boost'; } }, side: 'top', avoid: need },
     go('go5', 5, 'Speed 7 plus the boost reaches the line: tap Go.'),
@@ -94,7 +94,7 @@ function tutStart(o) {
   closeModal(); UI.cmpDef = null; UI.tutOver = false; o = o || {};
   GXT.start({
     game: TUT_GAME, setup: function () { UI.mode = 'tutorial'; startGame({ track: 'practice', laps: 1, opp: 2, hum: 1, diff: 'easy', seed: 12, tut: true }); },
-    steps: tutSteps(), story: true, endTitle: 'You know every rule', endText: 'Now a real race against four rivals. Pick a gear, press Go.',
+    steps: tutSteps(), story: true, endTitle: 'You know every rule', endText: 'Now a real race on a full grid. The Suggest plan is picked for you: press Go, or change the gear.',
     onDone: function (r) { tutLeave(false); if (r && r.choice === 'story' && typeof GXC !== 'undefined') GXC.open(); else if (o.then) o.then(); else startGame(); },
     onExit: function () { tutLeave(true); }
   });
