@@ -10,7 +10,7 @@ function startGame(mode, o) {
   UI.sel = null; UI.selCol = null; UI.selProv = null; UI.busy = false; UI.tipsSeen = {};
   $('#start').hidden = true; $('#result').hidden = true; $('#drawer').hidden = true; closeSheet();
   buildMap(); setView({ x: 0, y: 0, w: VTART.W }); homeView(); render(); save();
-  if (UI.learn) tip('Goal: most points at the end');
+  if (UI.learn) { tip('Goal: most points at the end'); setTimeout(function () { if (G && G.turn < 3) banner('Tap a score to see the points'); }, 5200); }
   if (!isHuman(VT.sideToAct(G))) setTimeout(runAI, UI.fast ? 30 : 900);
 }
 // learn mode: one short line the first time each action comes up (8 words max)

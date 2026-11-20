@@ -29,6 +29,7 @@ button:focus-visible, [tabindex]:focus-visible { outline: 3px solid var(--gold);
 .tb.sq { width: 44px; justify-content: center; padding: 0; }
 .tb b { position: absolute; top: -5px; right: -5px; min-width: 18px; height: 18px; border-radius: 9px; background: var(--terra); color: #fff; font-size: 12px; line-height: 18px; text-align: center; }
 .tb.glow { box-shadow: 0 0 0 3px var(--gold); }
+.tb.low b { background: #e2b44f; color: var(--ink); animation: pop .5s ease-out 2; }
 @media (max-width: 400px) { .brand span { display: none; } .tb span { display: none; } }
 
 /* board: the mosaic map */

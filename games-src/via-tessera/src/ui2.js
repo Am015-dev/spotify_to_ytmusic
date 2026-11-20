@@ -15,7 +15,7 @@ function renderPrompt() {
   computeHint();
   if (G.drop && G.drop.length) { say(me + 'Storehouse full: pick goods'); acts([]); openTake(); return; }
   if (!pd) {
-    if (UI.sel == null) { say(me + 'Pick a card to play'); acts([{ t: 'Market', alt: true, f: function () { openMarket(false); } }]); }
+    if (UI.sel == null) { say(me + 'Pick a card to play'); acts([{ t: 'Points', alt: true, f: function () { showScoreNow(); } }, { t: 'Market', alt: true, f: function () { openMarket(false); } }]); }
     else { var c = D.CARDS[p.hand[UI.sel]]; say(cardWhat(c)); acts([{ t: 'Play ' + c.n, glow: true, f: function () { playSel(); } }]); }
     return;
   }
@@ -27,7 +27,7 @@ function renderPrompt() {
     acts([{ t: 'Build ▸', glow: pd.steps <= 0, f: function () { UI.selCol = null; move({ t: 'mdone' }); } }]);
   } else if (h === 'arch-build') {
     var n = VT.validMoves(G).filter(function (m) { return m.t === 'build'; }).length;
-    say(n ? 'Tap a glowing city to build' : (p.houses.length ? 'Nothing more to build' : 'No city you can afford'));
+    say(n ? 'Tap a glowing city to build' : buildWhy(pi));
     acts([{ t: 'Done', alt: n > 0, glow: n === 0, f: function () { move({ t: 'done' }); } }]);
   } else if (h === 'pref') {
     var tx = taxSum();
@@ -52,6 +52,13 @@ function renderPrompt() {
     else { say('Nothing to copy right now'); acts([{ t: 'Done', glow: true, f: function () { move({ t: 'done' }); } }]); }
   }
 }
+// why nothing can be built: no city next to a cart or ship, or the goods / coins are missing
+function buildWhy(pi) {
+  var p = G.pl[pi], near = VT.nearCities(G, pi).filter(function (c) { return G.city[c].h.indexOf(pi) < 0; });
+  if (!near.length) return 'No new city next to your pieces';
+  if (p.goods.brick < 1 && near.every(function (c) { return G.city[c].g !== 'brick'; })) return 'Need 1 brick to build';
+  return 'Need more goods or coins';
+}
 // what ruling a region would give, before you commit
 function prodPreview(pid) {
   var pi = VT.sideToAct(G), gains = G.pl.map(function () { return 0; }), st = G.prov[pid];
@@ -69,12 +76,13 @@ function onMapTap(e) {
   if (pd && pd.h === 'arch-move') {
     if (slot && UI.selCol != null) { var rid = slot.getAttribute('data-r'), k = UI.selCol; move({ t: 'mv', k: k, r: rid }); return; }
     if (colK != null) { UI.selCol = +colK === UI.selCol ? null : +colK; render(); if (UI.selCol != null) frameTargets(); return; }
-    return;
+    banner(UI.selCol != null ? 'Tap a glowing stop on a line' : 'Tap your glowing cart or ship'); return;
   }
   if (pd && pd.h === 'arch-build' && city) { var cid = city.getAttribute('data-c'); if (VT.canBuild(G, pi, cid)) move({ t: 'build', c: cid }); else bump(city); return; }
   if (pd && pd.h === 'pref' && prov) { var p = prov.getAttribute('data-p'); if (G.prov[p].up) { UI.selProv = UI.selProv === p ? null : p; render(); } else bump(prov); return; }
   if (pd && pd.h === 'colo' && city) { var c2 = city.getAttribute('data-c'); var kinds = ['L', 'S'].filter(function (k) { return VT.canPlaceCol(G, pi, c2, k); }); if (!kinds.length) { bump(city); return; } if (kinds.length === 1) move({ t: 'place', c: c2, k: kinds[0] }); else openPlace(c2); return; }
   if (pd && pd.h === 'trib' && city && city.getAttribute('data-c') === D.CAPITAL) return;
+  if (pd && pd.h === 'arch-move' && !slot) { banner('Tap your glowing cart or ship'); return; }
   if (city) showCityTip(city.getAttribute('data-c'));
 }
 function bump(node) { node.classList.add('popin'); setTimeout(function () { node.classList.remove('popin'); }, 450); sfx('no'); }
@@ -114,7 +122,9 @@ function move(m) {
 // visible cause and effect: who got what, flying from where it was earned
 function afterMove(before, pi, m, wasPend) {
   var after = snap();
-  if (m.t === 'play') { var c = D.CARDS[G.lastPlayed]; sfx('card'); if (!isHuman(pi) || UI.mode === 'hot') banner(G.pl[pi].name + ': ' + c.n); }
+  if (m.t === 'play') { var c = D.CARDS[G.lastPlayed]; sfx('card'); if (!isHuman(pi) || UI.mode === 'hot') banner(G.pl[pi].name + ': ' + c.n); else if (c.act === 'trib') banner('Played cards back in hand'); }
+  var left = G.deck.length + G.disp.filter(function (x) { return x != null; }).length;
+  if (left <= 2 && left !== UI._warned && G.phase === 'play') { UI._warned = left; setTimeout(function () { banner(left ? 'Only ' + word(left, 'market card', 'market cards') + ' left' : 'Market empty: last turn'); }, 1300); }
   if (m.t === 'build') { sfx('build'); popAt(VT.CITY[m.c], '+house', PCOL[pi]); }
   if (m.t === 'mv') sfx('step');
   if (m.t === 'prov') { var pid = m.p; D.CITIES.forEach(function (cc) { if (cc.p === pid && G.city[cc.id].h.length) popAt(cc, '+1 ' + D.GOOD_NAME[G.city[cc.id].g], '#fff'); }); sfx('coin'); }

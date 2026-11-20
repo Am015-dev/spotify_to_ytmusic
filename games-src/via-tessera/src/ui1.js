@@ -249,7 +249,8 @@ function renderRace() {
     h += '<span class="chip' + (turn ? ' turn' : '') + '" role="button" tabindex="0" data-score="1" title="' + esc(p.name) + ' points now"><span class="dot" style="background:' + PCOL[i] + '"></span>' + esc(p.name) + ' <b data-engine-score="' + i + '">' + VT.score(G, i).total + '</b></span>';
   });
   $('#race').innerHTML = h;
-  $('#mktn').textContent = G.disp.filter(function (x) { return x != null; }).length;
+  var mleft = G.deck.length + G.disp.filter(function (x) { return x != null; }).length;
+  $('#mktn').textContent = mleft; $('#mktb').setAttribute('aria-label', 'Market: ' + mleft + ' cards left, the game ends at 0'); $('#mktb').classList.toggle('low', mleft <= 3);
 }
 function renderStore() {
   var pi = UI.mode === 'hot' ? Math.max(0, VT.sideToAct(G)) : 0, p = G.pl[pi], h = '<button type="button" class="storebtn" id="storeb" aria-label="Your storehouse"><span class="slots">';
