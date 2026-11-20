@@ -11,7 +11,7 @@ const W = +process.argv[2] || 375, H = +process.argv[3] || 667, STEPS = +process
   await p.goto('file://' + path.resolve(__dirname, 'wickdeep.html'));
   await p.waitForTimeout(800);
   const snap = async (n) => { if (!VIDEO || shot < 6) await p.screenshot({ path: `${OUT}/${String(shot++).padStart(2, '0')}-${n}.png` }); };
-  const tap = async (sel) => { const e = await p.$(sel); if (!e) return false; const bb = await e.boundingBox(); if (!bb) return false; const before = await p.evaluate(() => JSON.stringify([window.G && G.ask, window.UI && UI.pick, window.UI && UI.sel, document.querySelector('#start:not([hidden]),#camp:not([hidden]),#rs:not([hidden])') ? 1 : 0])); await p.touchscreen.tap(bb.x + bb.width / 2, bb.y + bb.height / 2); taps++; await p.waitForTimeout(250); const after = await p.evaluate(() => JSON.stringify([window.G && G.ask, window.UI && UI.pick, window.UI && UI.sel, document.querySelector('#start:not([hidden]),#camp:not([hidden]),#rs:not([hidden])') ? 1 : 0])); if (before === after) dead++; return true; };
+  const tap = async (sel, ask) => { if (ask && (await p.evaluate(() => G && G.ask && G.ask.h)) !== ask) return false; const e = await p.$(sel); if (!e) return false; const bb = await e.boundingBox(); if (!bb) return false; const before = await p.evaluate(() => JSON.stringify([window.G && G.ask, window.UI && UI.pick, window.UI && UI.sel, (document.querySelector('#start:not([hidden]),#camp:not([hidden]),#rs:not([hidden])') || {}).id || ''])); await p.touchscreen.tap(bb.x + bb.width / 2, bb.y + bb.height / 2); taps++; await p.waitForTimeout(250); const after = await p.evaluate(() => JSON.stringify([window.G && G.ask, window.UI && UI.pick, window.UI && UI.sel, (document.querySelector('#start:not([hidden]),#camp:not([hidden]),#rs:not([hidden])') || {}).id || ''])); if (before === after) { dead++; console.log("DEAD", sel, before, await p.evaluate(() => document.getElementById("prompt").textContent)); } return true; };
   await snap('title'); await tap('#playbtn0'); await p.waitForTimeout(400); await snap('brief'); await tap('#enterbtn'); await p.waitForTimeout(900);
   for (let i = 0; i < STEPS; i++) {
     await p.waitForFunction(() => !window.UI || !UI.busy, null, { timeout: 30000 }).catch(() => {});
@@ -22,7 +22,7 @@ const W = +process.argv[2] || 375, H = +process.argv[3] || 667, STEPS = +process
     else if (st.ask === 'first' || st.ask === 'second') { if (st.pick) await tap('#playbtn'); else { const ok = await tap('#tray .half.can'); if (!ok) await tap('#tray .basic button.can'); } }
     else if (st.ask === 'move' || st.ask === 'summon') { const hs = await p.$$('#hot .glow'); if (hs.length) { const bb = await hs[Math.floor(hs.length / 2)].boundingBox(); await p.touchscreen.tap(bb.x + bb.width / 2, bb.y + bb.height / 2); taps++; } else await tap('#pbtns .btn'); }
     else if (st.ask === 'target' || st.ask === 'heal') { if (!(await tap('#hot .glow'))) await tap('#pbtns .btn'); }
-    else if (st.ask === 'srest' || st.ask === 'srest2' || st.ask === 'stunned') await tap('#pbtns .btn.go');
+    else if (st.ask === 'srest' || st.ask === 'srest2' || st.ask === 'stunned') await tap('#pbtns .btn.go', st.ask);
     else if (st.ask === 'lrest' || st.ask === 'recover') await tap('#tray .cd');
     else if (st.ask === 'block') await tap('#pbtns .btn');
     await p.waitForTimeout(300);
