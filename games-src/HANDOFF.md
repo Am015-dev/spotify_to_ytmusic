@@ -297,3 +297,12 @@ Live fix: original-name phrase removed from shelf blurb + sands page (15:2x).
 - Data helpers on separate branches (builders do NOT know about them; merge or wire them in when each builder reports):
   DATA4 -> shelf/W563-new-mars-data games-src/_data/mars/; DATA7 -> shelf/W566-new-dungeon-data games-src/_data/dungeon/; DATA8 -> shelf/W567-new-epic-data games-src/_data/epic/.
 - Dropped: a deep-sea co-op trick-taker (duplicate of lantern-dive). Check games-src/ before proposing any new game; GAMES-TODO.md is stale.
+- 15:28 CORRECTION: a data worker refused to copy a game's full card/monster/scenario content renamed (that recreates the specific game). Brief now: identical RULES and component STRUCTURE (types, counts, distributions); our OWN creative content (card designs in big pools, scenarios, maps, event cards, characters). DATA4/7/8 cancelled. NEW4/NEW7/NEW8 restarted on that rule; NEW2/3/5/6 continue (mostly mechanical components).
+
+## 20 Nov 2026, 18:15 UTC: orchestrator state (owner panel, PC layouts, copy audit, cost rules)
+- Owner control panel (local, this cloud session only): 127.0.0.1:8765 served by the orchestrator's scratchpad panel.py; Overview (decisions with Yes/No, message box, updates), Games, Workers (cost by game), Videos (Shorts-style feed). Owner replies land in scratchpad inbox.jsonl; a background watch-inbox.py wakes the orchestrator. Exported as control-panel-kit.zip (incl. record-video.js).
+- Owner answers 17:00: Twin Thrones rework NO (PLAY3 running), Meadowfold NO (F2 running, aim 4/5), Tidewake ?fx=1 effects stay OFF.
+- New owner rules today: (1) PC layout too: every brief/review checks 1366x768 + 1920x1080 by mouse (NEWGAME-BRIEF 3b). PCAUDIT running -> fix worst/shared cause first for owner yes, then roll out. (2) Cost: Sonnet for list fixers, Opus for design/reviews, Haiku chores; workers ~30 min, stop 45; --full once; strict review only after a fixer's cold play >= 4/5. Skill: .claude/skills/cost-efficiency.
+- Content rule finding: doorkick-dungeon (live) copied the original card pool 1:1 (R98). F18 (Opus) redesigning our own 168 cards; then UI fixes; redeploy needs owner yes. COPYAUDIT running over all games.
+- Closest to done: short-fuse (4/5, F3 polish+PC then review), kaiten-kitchen (4/5-ish, F3 polish+PC then review), crown-city-smash (R97 7.4, F2), perch-and-plume (F3), lantern-dive (F2).
+- Pending: approve baselines (sunglaze, rampart: proof/baselines-new) before deploy; hollowbough R96 list after PLAY2; calm-audit doesn't count #coach/#toast.
