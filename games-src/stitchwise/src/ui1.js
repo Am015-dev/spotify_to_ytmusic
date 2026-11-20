@@ -31,12 +31,13 @@ function viewSeat() { if (!G) return 0; if (UI.peek >= 0) return UI.peek; if (UI
 function nameOf(s) { return UI.names[s] || (s === 0 ? 'You' : 'Computer'); }
 function lvlOf(s) { return UI.mode === 'hot' ? 'human' : (UI.camp ? UI.camp.opponent.aiLevel : UI.lvl); }
 // ---------- layout (board sized to the space the shell leaves)
+function swSideW() { var de = document.documentElement; return de.classList.contains('swshort') && !de.classList.contains('swplace') ? 78 : 0; } // F1: width taken by the plates column on short phones
 function layout() {
   document.documentElement.classList.toggle('sm', innerHeight < 700); var de = document.documentElement, ph = innerWidth <= 600 && innerHeight > innerWidth; de.classList.toggle('ph', ph); /* R2: phone portrait, the quilt is the hero */
-  de.classList.toggle('swplace', ph && !!G && !G.over && isHuman(swWho(G)) && (UI.sel >= 0 || !!G.pend) && UI.peek < 0); var b = GX.boardSize(), W = b.w, H = b.h, wide = W > H * 1.12 && W >= 600; UI.wide = wide; var bd = $('#bd'); bd.classList.toggle('wide', wide);
+  de.classList.toggle('swplace', ph && !!G && !G.over && isHuman(swWho(G)) && (UI.sel >= 0 || !!G.pend) && UI.peek < 0); de.classList.toggle('swshort', ph && innerHeight < 620); /* F1: short phone, the plates stand beside the quilt */ var b = GX.boardSize(), W = b.w, H = b.h, wide = W > H * 1.12 && W >= 600; UI.wide = wide; var bd = $('#bd'); bd.classList.toggle('wide', wide);
   var cs;
-  var fr = artHas('quilt-frame') ? (wide ? 20 : 8) : 0; if (wide) cs = Math.floor(Math.min((H - 20 - 12 - fr) / 9, (W * 0.55 - fr) / 9)); else cs = Math.floor(Math.min((W - 16 - 10 - fr) / 9, (H - 12 - 46 - 56 - 22 - 26 - (innerHeight < 800 ? -12 : 60) - fr) / 9)); /* W484: room for the track header */
-  cs = Math.max(18, Math.min(72, cs)); if (!wide && UI.csFit) cs = Math.max(18, Math.min(UI.csFit, Math.floor((W - 16 - 10 - fr) / 9))); document.documentElement.style.setProperty('--cs', cs + 'px'); UI.cs = cs;
+  var fr = artHas('quilt-frame') ? (wide ? 20 : 8) : 0; if (wide) cs = Math.floor(Math.min((H - 20 - 12 - fr) / 9, (W * 0.55 - fr) / 9)); else cs = Math.floor(Math.min((W - 16 - 10 - fr - swSideW()) / 9, (H - 12 - 46 - 56 - 22 - 26 - (innerHeight < 800 ? -12 : 60) - fr) / 9)); /* W484: room for the track header */
+  cs = Math.max(18, Math.min(72, cs)); if (!wide && UI.csFit) cs = Math.max(18, Math.min(UI.csFit, Math.floor((W - 16 - 10 - fr - swSideW()) / 9))); document.documentElement.style.setProperty('--cs', cs + 'px'); UI.cs = cs;
   var tw = wide ? Math.max(190, Math.min(520, W - 9 * cs - 70)) : Math.min(W - 16, 560); var tr = $('#track'); if (tr) tr.style.width = tw + 'px';
 }
 // ---------- quilt
@@ -128,7 +129,7 @@ function render(fit) {
   sd.appendChild(trackHead()); var tr = renderTrack(); sd.appendChild(tr);
   if (UI.wide && !(UI.wide && hintsOn())) { var mcs = Math.max(14, Math.min(30, Math.floor(((innerHeight - 330) / 9)))), sv = UI.cs, svn = UI.newCells; UI.cs = mcs; UI.newCells = {}; var oq = quiltEl(os, 'opp'); UI.cs = sv; UI.newCells = svn; oq.removeAttribute('id'); oq.className = 'oppq'; oq.style.setProperty('--cs', mcs + 'px'); oq.style.backgroundImage = 'none'; oq.setAttribute('data-a', 'strip'); oq.setAttribute('data-seat', os); oq.setAttribute('role', 'button'); oq.setAttribute('aria-label', nameOf(os) + ' quilt, tap to enlarge'); sd.appendChild(h('div.oppwrap', h('span', os === 0 && UI.mode !== 'hot' ? 'Your quilt' : nameOf(os) + '\u2019s quilt'), oq)); } if (UI.wide && hintsOn()) { sd.appendChild(h('div#tinfo', trackInfo())); var om = h('button.oppmini', { type: 'button', 'data-a': 'strip', 'data-seat': os, 'aria-label': nameOf(os) + ' quilt, tap to enlarge' }, thumb(os), h('span', h('b', os === 0 && UI.mode !== 'hot' ? 'Your quilt' : nameOf(os) + '\u2019s quilt'), h('small', swScore(G, os).empty + ' empty squares \u00B7 score now ' + swScore(G, os).total))); sd.appendChild(om); } placeTokens(); markLanding();
   if (!fit && !UI.wide) { try { var bdE = $('#bd'), top = bdE.getBoundingClientRect().top, low = 0; Array.prototype.forEach.call(bdE.querySelectorAll('#qcol > *, #side > *'), function (e) { var r = e.getBoundingClientRect(); if (r.height) low = Math.max(low, r.bottom - top); }); /* R2: fit the quilt to the real free height, measured */
-    var nc = UI.cs + Math.floor((bdE.clientHeight - low - 6) / 9); if (low && nc !== UI.cs) { UI.csFit = Math.max(18, nc); UI.newCells = svNew; return render(true); } } catch (e) { } }
+    var nc = UI.cs + Math.floor((bdE.clientHeight - low - (document.documentElement.classList.contains('swshort') ? 2 : 6)) / 9); if (low && nc !== UI.cs) { UI.csFit = Math.max(18, nc); UI.newCells = svNew; return render(true); } } catch (e) { } }
   drawGhost();
   var bp = $('#barprompt'); if (bp) bp.textContent = G.over ? 'Game over' : UI.peek >= 0 ? nameOf(UI.peek) + ' is stitching' : (isHuman(swWho(G)) ? (UI.mode === 'hot' ? nameOf(swWho(G)) + ' to play' : 'Your turn') : nameOf(swWho(G)) + ' is stitching');
   var gl = $('#goalline'); if (gl) { gl.hidden = !UI.camp; if (UI.camp) gl.textContent = 'Goal: ' + UI.camp.goal.text + (UI.camp.twist ? ' \u00B7 ' + UI.camp.twist.text : ''); }

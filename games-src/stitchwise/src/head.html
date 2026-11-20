@@ -43,7 +43,7 @@ button{font:inherit;color:inherit}
 .qc.f.eT{border-top:2px solid #0004}.qc.f.eB{border-bottom:2px solid #0004}.qc.f.eL{border-left:2px solid #0004}.qc.f.eR{border-right:2px solid #0004}
 .qc.lea{background:#8a5a3a}.qc.lea::after{content:"";position:absolute;inset:18%;border:2px dashed #f0d9b0;border-radius:3px}
 .qc.torn{background:repeating-linear-gradient(135deg,#6b5a46 0 5px,#4d4032 5px 10px);border:1px solid #2a2118}
-.qc.tgt{outline:2px solid var(--gold);outline-offset:-2px;animation:pulse 1.2s infinite}
+.qc.tgt{outline:2px solid var(--gold);outline-offset:-2px;animation:pulse 1.2s 3}
 @keyframes pulse{50%{background-color:#ffe9a8}}
 .qc.new{animation:stitch .9s ease-out}
 @keyframes stitch{0%{transform:scale(.4);opacity:0;filter:brightness(1.8)}60%{transform:scale(1.1);opacity:1}100%{transform:none}}
@@ -183,7 +183,7 @@ html .gx-row .btn,html .gx-row-k .btn,html .gx-row-l small,html .gx-chip{font-si
 .tc{height:22px}.tc:not(.bspot):not(.lspot):not(.tstart):not(.tend)::after{opacity:.4;font-size:14px;font-weight:900;content:'\203A'}
 .tc.trv:not(.bspot):not(.lspot):not(.tend)::after{content:'\2039'}
 .tc.tstart::after{content:'\25B6';font-size:14px;color:var(--teal)}.tc.tend::after{content:'\2605';color:#b8780a}
-.tc.next{box-shadow:0 0 0 2px #fff,0 0 8px 2px var(--gold);z-index:1}.tc.land{outline:3px solid var(--sky);outline-offset:-1px;animation:landp 1s ease-in-out infinite;z-index:1}@keyframes landp{50%{background:#bcd7ee}}
+.tc.next{box-shadow:0 0 0 2px #fff,0 0 8px 2px var(--gold);z-index:1}.tc.land{outline:3px solid var(--sky);outline-offset:-1px;animation:landp 1s ease-in-out 3;z-index:1}@keyframes landp{50%{background:#bcd7ee}}
 .gx-dock-head .gx-ibtn{color:#2a2118;background:#fff;border:1px solid rgba(0,0,0,.25);font-size:20px;line-height:1;font-weight:800}
 .gxc-head{flex-wrap:wrap;row-gap:2px}.gxc-htitle{order:-1;flex:1 1 100%!important;font-size:21px!important;overflow-wrap:normal!important;white-space:nowrap!important}
 .gx-drawer *:has(>.gx-chip){flex-wrap:wrap!important;gap:6px!important;overflow:visible!important}.gx-drawer .gx-chip{flex:0 0 auto!important;white-space:nowrap!important;width:auto!important;min-width:0!important}
@@ -212,7 +212,7 @@ html .gx-row .btn,html .gx-row-k .btn,html .gx-row-l small,html .gx-chip{font-si
 .offer .of b{font-size:17px;font-weight:800}
 .offer .of small{font-size:14px!important;font-weight:700;color:#5a4630}
 .offer .oc b{color:#8a5a00}.offer .ot b{color:#1d5f8a}.offer .oi b{color:#2b6b2b}
-.offer.can{border:3px solid var(--gold,#e0a520);box-shadow:0 0 0 3px #f2c14e88,0 4px 14px #e0a52066;animation:canp 1.6s ease-in-out infinite}
+.offer.can{border:3px solid var(--gold,#e0a520);box-shadow:0 0 0 3px #f2c14e88,0 4px 14px #e0a52066;animation:canp 1.6s ease-in-out 3}
 @keyframes canp{50%{box-shadow:0 0 0 5px #f2c14e55,0 4px 18px #e0a52088}}
 .offer.no{opacity:.8}.offer.no.cant{opacity:.5}.offer.dim{opacity:.35;filter:saturate(.4)}
 .offer.cant::after{font-size:14px!important}
@@ -351,7 +351,7 @@ html:not(.sm) .offer .ofx{grid-template-columns:1fr!important;gap:2px!important}
 html:not(.sm) .offer .of{justify-content:flex-start!important;padding:1px 6px!important}html:not(.sm) #prompt.w484q{display:none!important}
 html:not(.sm) #acts .btn{min-height:52px;font-size:16px;white-space:nowrap}html:not(.sm) #acts .btn.sm{padding-left:9px;padding-right:9px}html:not(.sm) #acts .btn.go{font-size:18px}
 html:not(.sm) .gx-dock-head .gx-dt{font-size:15px!important;color:#2a1d10}}
-.offer.can{touch-action:none}.offer .hand{position:absolute;right:-8px;top:8px;z-index:5;display:flex;flex-direction:column;align-items:center;animation:handb 1s ease-in-out infinite}
+.offer.can{touch-action:none}.offer .hand{position:absolute;right:-8px;top:8px;z-index:5;display:flex;flex-direction:column;align-items:center;animation:handb 1s ease-in-out 3}
 .offer .hand i{font-style:normal;font-size:30px;line-height:1;filter:drop-shadow(0 2px 3px #0006)}
 .offer .hand b{font-size:14px;font-weight:800;background:#2a1d10;color:#fff;border-radius:6px;padding:0 6px;margin-top:-2px}
 @keyframes handb{50%{transform:translateY(-8px)}}
@@ -392,7 +392,7 @@ html:not(.sm) .gx-dock-head .gx-dt{font-size:15px!important;color:#2a1d10}}
 #tutb .t2b{flex:0 0 auto;min-height:44px;white-space:nowrap}
 #tutb.shake{animation:nope .4s}
 #prompt.t2hide{display:none}
-.t2-hl{outline:4px solid #f2c14e!important;outline-offset:2px;animation:t2p 1.1s ease-in-out infinite!important;position:relative;z-index:5}
+.t2-hl{outline:4px solid #f2c14e!important;outline-offset:2px;animation:t2p 1.1s ease-in-out 3!important;position:relative;z-index:5}
 @keyframes t2p{50%{outline-color:#fff3c4;box-shadow:0 0 0 8px #f2c14e55}}
 @media (prefers-reduced-motion:reduce){.t2-hl{animation:none!important}}
 #tutfin{display:flex;align-items:center;justify-content:center;padding:16px;background:#0008;z-index:80}
@@ -402,7 +402,7 @@ html:not(.sm) .gx-dock-head .gx-dt{font-size:15px!important;color:#2a1d10}}
 #tutfin .t2sub{margin:0;font-size:15px}
 #tutfin .btn{min-height:52px;font-size:18px}
 #prompt .skipn{font-size:14px;opacity:.75;font-weight:600;margin-left:6px}
-#quilt .qc.t2gap{box-shadow:inset 0 0 0 3px #f2c14e,inset 0 0 0 6px #fff3c466;background:#fff6d8!important;animation:t2gp 1.2s ease-in-out infinite}
+#quilt .qc.t2gap{box-shadow:inset 0 0 0 3px #f2c14e,inset 0 0 0 6px #fff3c466;background:#fff6d8!important}
 @keyframes t2gp{50%{box-shadow:inset 0 0 0 3px #d79a1a,inset 0 0 0 7px #f2c14e88}}
 @media (prefers-reduced-motion:reduce){#quilt .qc.t2gap{animation:none}}
 .qc.old{background:linear-gradient(135deg,color-mix(in srgb,var(--pc) 45%,#d8c7a4),color-mix(in srgb,var(--pc) 30%,#c9b48c));box-shadow:inset 0 0 0 1px #0002}
@@ -459,5 +459,25 @@ html.ph.swcomp #prompt:not(.t2hide){white-space:normal;overflow-wrap:anywhere;fo
 #trsheet .tsleg{margin:0;font-size:15px}#trsheet .tsleg svg,#trsheet .tsleg img.ic{width:16px;height:16px;vertical-align:-3px}#trsheet .btn{min-height:48px}
 html.ph .tk .tkn{padding:1px 5px}
 html.ph #track::after{content:'\2922';position:absolute;right:4px;top:-12px;width:22px;height:22px;border-radius:50%;background:#1f5f58;color:#fff;font-size:14px;line-height:22px;text-align:center;box-shadow:0 1px 3px #0008;pointer-events:none;z-index:4}
+/* F1 calm: one helper at a time. Only one affordable patch pulses (3 times, then a still gold edge); when the first-turn hand shows, only its patch moves */
+#offers .offer.can~.offer.can{animation:none}#offers:has(.hand) .offer.can{animation:none}#offers:has(.hand) .offer.can:has(.hand){animation:canp 1.6s ease-in-out 3}
+/* F1: short phone (height < 620): the two player plates stand in a column beside the quilt, so the squares stay >= 28 px; while placing they step aside */
+html.swshort:not(.swplace) #bd:not(.wide) #qcol{display:flex!important;flex-direction:row!important;align-items:center!important;justify-content:center!important;gap:6px!important;width:100%!important}
+html.swshort:not(.swplace) #bd:not(.wide) #qcol>#pills{order:2;display:flex!important;flex-direction:column!important;width:72px!important;flex:0 0 72px!important;gap:6px!important}
+html.swshort:not(.swplace) #pills .pstrip{flex-direction:column!important;align-items:flex-start!important;justify-content:center!important;height:auto!important;min-height:58px!important;padding:4px 5px!important;gap:1px!important;flex:0 0 auto!important;width:100%!important}
+html.swshort:not(.swplace) #pills .pstrip .thumb{display:none!important}html.swshort:not(.swplace) #pills .pstrip[data-seat="1"] .thumb{display:block!important;width:24px!important;height:24px!important;flex:0 0 24px!important}
+html.swshort:not(.swplace) #pills .pstrip b{max-width:100%!important;font-size:14px!important;flex:0 0 auto!important}
+html.swshort:not(.swplace) #pills .pstrip .st{margin-left:0!important;font-size:14px!important}
+html.swshort.swplace #bd:not(.wide) #pills{display:none!important}
+html.swshort #offers.ring{align-items:flex-start!important;padding-bottom:0!important}html.swshort #offers.ring>.offer{height:auto!important}html.swshort #offers.ring>.offer.up{max-height:86px!important;overflow:hidden}
+html.swshort .gx-dock-body{padding-bottom:4px!important}html.swshort .tc{height:18px!important}
+html.swshort .gx-bar{padding-top:2px!important;padding-bottom:2px!important;min-height:48px!important}html.swshort .gx-bar h1{max-height:44px;overflow:hidden}
+html.swshort #bd{padding:2px 6px 2px!important;gap:4px!important;row-gap:4px!important}html.swshort #offers .offer:not(.up) .shape{padding:1px!important}html.swshort #offers.ring{padding-top:3px!important}html.swshort .tc{height:15px!important}html.swshort .tc img.ic,html.swshort .tc svg{width:13px!important;height:13px!important}html.swshort .gx-dock-head{padding-top:1px!important;padding-bottom:1px!important;min-height:0!important}html.swshort #track{padding:3px!important}
+.flt.dn{animation:fltd 1.4s ease-out forwards;background:#1d2a33cc;border-radius:8px;padding:1px 8px;white-space:nowrap}@keyframes fltd{0%{transform:translateY(-6px);opacity:0}15%{transform:translateY(0);opacity:1}75%{opacity:1}100%{transform:translateY(8px);opacity:0}}
+html.swshort #offers .offer:not(.up) .shape{min-height:31px!important;max-height:31px!important;align-content:center;justify-content:center}html.swshort #offers .offer:not(.up) .shape .sc{width:9px!important;height:9px!important}
+html.ph.swtut.swshort .gx-bar #tutb{font-size:13px!important;line-height:1.15!important;padding-top:2px!important;padding-bottom:2px!important}html.ph.swtut.swshort .gx-bar{padding-top:2px!important;padding-bottom:2px!important}
+html.swshort .qframe.art{padding:3px!important}
+html.swshort:not(.swplace) #pills .pstrip .st,html.swshort:not(.swplace) #pills .pstrip .st .bt{white-space:normal!important;flex-wrap:wrap!important;line-height:1.1!important;max-width:100%}html.swshort:not(.swplace) #pills .pstrip{overflow:hidden}
+html.swshort .offer .hand b{display:none}
 </style>
 </head>

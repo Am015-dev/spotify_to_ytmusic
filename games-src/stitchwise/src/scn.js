@@ -26,7 +26,7 @@
     checks: [{ kind: 'play', name: 'income paid', snap: function () { return { b: G.btn[0] }; }, steps: [{ sel: '[data-a=adv]' }], idle: function () { return !UI.busy && G.pos[0] === 9; }, verify: function (a, b) { return b.b === a.b + 6 + 3 || 'got ' + (b.b - a.b); } }],
     mut: [{ name: 'no income', js: 'swPassInc=function(){return {inc:0,lea:null}}' }] });
   GXS.add({ id: 'sw-leather', name: 'Free leather patch', ask: 'Tap an empty square for the leather patch', seed: 11, when: booted,
-    setup: function () { game({ setup: function (g) { g.pos = [18, 22]; g.stamp = [5, 6]; } }); },
+    setup: function () { game({ setup: function (g) { g.pos = [24, 28]; g.stamp = [5, 6]; /* F1: leather now starts on 26 */ } }); },
     checks: [{ kind: 'play', name: 'adv then place', snap: function () { return { n: G.board[0].filter(function (c) { return c === 100; }).length }; }, steps: [{ sel: '[data-a=adv]' }, { sel: function () { return document.querySelectorAll('#quilt .qc')[40]; }, ready: function () { return !!G.pend && !UI.busy; } }], idle: function () { return !UI.busy && !G.pend && G.leather[0] === 0; }, verify: function (a, b) { return b.n === 1 || 'leather squares ' + b.n; } }] });
   GXS.add({ id: 'sw-zoom', name: 'Patch shown large', ask: 'Tap a patch twice. Can you read it?', seed: 11, when: booted,
     setup: function () { game(); showPatch(swOffer(G)[0]); },
