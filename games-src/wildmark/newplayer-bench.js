@@ -43,8 +43,14 @@ function randomPlan(G) {
   return { i, c, r: ro, tc: ts.length ? ts[Math.floor(r() * ts.length)] : null };
 }
 const BOT = process.env.BOT || 'greedy';
+// first: always the first market column, the first legal spot, no turning, the animal on the first legal tile (the review's "always the first option" player)
+function firstPlan(G) {
+  const env = G.seats[G.cur].env, i = [0, 1, 2, 3].find(k => G.market.tiles[k] && G.market.toks[k]), tile = G.market.tiles[i], c = W.spots(env)[0];
+  env[c] = { id: tile.id, t: tile.t, a: tile.a, key: tile.key, rot: 0, tok: null }; const ts = W.tokSpots(env, G.market.toks[i]); delete env[c];
+  return { i, c, r: 0, tc: ts.length ? ts[0] : null };
+}
 function greedy(G) {
-  if (G.stage === 'pick') { G._g = BOT === 'random' ? randomPlan(G) : BOT !== 'greedy' ? newcomerPlan(G) : greedyPlan(G); return { t: 'take', i: G._g.i }; }
+  if (G.stage === 'pick') { G._g = BOT === 'first' ? firstPlan(G) : BOT === 'random' ? randomPlan(G) : BOT !== 'greedy' ? newcomerPlan(G) : greedyPlan(G); return { t: 'take', i: G._g.i }; }
   if (G.stage === 'tile') return { t: 'place', c: G._g.c, rot: G._g.r };
   const tc = G._g.tc; return tc && W.tokSpots(G.seats[G.cur].env, G.hold.tok).includes(tc) ? { t: 'tok', c: tc } : { t: 'back' };
 }

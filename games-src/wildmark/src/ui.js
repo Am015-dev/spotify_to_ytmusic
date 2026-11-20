@@ -445,8 +445,8 @@ var RULES_HTML = '<div class="howturn"><h3>How a turn works</h3><ol><li>Pick one
   '<h3>Crowded market</h3><p>Four matching tokens are replaced at once. With three matching tokens you may replace those three once per turn, for free.</p>' +
   '<h3>Scoring</h3><p>Each animal scores by its card (below). Each terrain scores 1 point per tile in your largest connected habitat of it (edges must match). The largest habitat of each terrain earns a bonus: 2 players 2 (tie 1), 3-4 players 3 for first and 1 for second. Solo: 2 for a habitat of 7+.</p>' +
   '<h3>Solo</h3><p>After each turn the tile and the animal furthest from the stacks (rightmost) leave the game; the rest slide left toward the stacks and new ones fill in at the right.</p>' +
-  '<h3>Ties</h3><p>Most acorns left wins a tie.</p>' +
-  '<h3>Simplified on purpose</h3><ul><li>The animals on each tile and the starting tiles are our own balanced set.</li><li>Elk lines are counted longest first (rarely a point less than the best split).</li><li>Variant cards (B, C, D) use our own house tables and are off unless you switch them on.</li></ul>';
+  '<h3>Ties</h3><p>Most acorns left wins a tie. Still tied after that: the win is shared.</p>' +
+  '<h3>Simplified on purpose</h3><ul><li>The animals on each tile and the starting tiles are our own balanced set.</li><li>Variant cards (B, C, D) are off unless you switch them on.</li></ul>';
 // ---------------------------------------------------------------- large view: tap a placed tile (when it is not a target) or hold a market tile/token
 function tileText(t, tok) {
   var h = '<p><b>' + t.t.map(function (x) { return WM.TER_NAME[x]; }).join(' and ') + '</b> tile' + (t.key ? ', a <b>keystone</b>: an animal placed here earns an acorn.' : (t.t.length > 1 ? '. Each half counts for its own terrain; edges must match to join a habitat.' : '.')) + '</p>';
@@ -544,7 +544,7 @@ function showTitle() {
     st.innerHTML = '<div class="tbox"><h1 class="logo">Wildmark</h1><div class="lbl">Rival rangers</div>' + seg('opp', [[0, 'Solo'], [1, '1'], [2, '2'], [3, '3']], c.opp) +
       '<div class="lbl">Rival skill</div>' + seg('ai', [['gentle', 'Gentle'], ['easy', 'Easy'], ['normal', 'Normal'], ['hard', 'Hard']], c.ai) +
       '<div class="lbl">Players on this device</div>' + seg('humans', [[1, '1'], [2, '2'], [3, '3'], [4, '4']], c.humans) +
-      '<div class="lbl">Variant cards (house tables)</div>' + seg('cards', [['a', 'Off'], ['mix', 'On']], c.cards || 'a') +
+      '<div class="lbl">Variant cards B-D</div>' + seg('cards', [['a', 'Off'], ['mix', 'On']], c.cards || 'a') +
       '<p class="sum">' + esc(setupSum(c)) + '</p><button type="button" class="big" id="goB">Start</button><button type="button" class="ab" id="backT">Back</button></div>';
     return;
   }
@@ -571,7 +571,7 @@ var TITLE_SCENE = '<svg class="tscene" viewBox="0 0 390 760" preserveAspectRatio
   [[30, 520, 1.3], [62, 540, 1], [330, 505, 1.4], [362, 530, 1.1], [300, 545, .9], [95, 575, .8]].map(function (t) { return '<g transform="translate(' + t[0] + ' ' + t[1] + ') scale(' + t[2] + ')"><path d="M0 -60 L18 -18 H8 L24 12 H-24 L-8 -18 H-18Z" fill="#1d3523"/><rect x="-3" y="12" width="6" height="10" fill="#3a2a1a"/></g>'; }).join('') +
   '<path d="M120 200 q10 -8 20 0 q10 -8 20 0" fill="none" stroke="#2a2a30" stroke-width="3" stroke-linecap="round"/>' +
   '<rect width="390" height="760" fill="url(#tsk)" opacity="0" /></svg>';
-function setupSum(c) { return (c.cards === 'mix' ? 'Variant cards with house point tables. ' : '') + (c.opp === 0 && c.humans === 1 ? 'Solo: 20 turns, beat your best score.' : (c.humans > 1 ? c.humans + ' players on this device' : 'You') + (c.opp ? ' vs ' + c.opp + ' ' + c.ai + ' rival' + (c.opp > 1 ? 's' : '') : '') + ', 20 turns each.'); }
+function setupSum(c) { return (c.cards === 'mix' ? 'Variant cards B-D. ' : '') + (c.opp === 0 && c.humans === 1 ? 'Solo: 20 turns, beat your best score.' : (c.humans > 1 ? c.humans + ' players on this device' : 'You') + (c.opp ? ' vs ' + c.opp + ' ' + c.ai + ' rival' + (c.opp > 1 ? 's' : '') : '') + ', 20 turns each.'); }
 // ---------------------------------------------------------------- events
 document.addEventListener('click', function (e) {
   var t = e.target.closest && e.target.closest('button'); if (!t) return;

@@ -1,5 +1,5 @@
 /* Wildmark scoring card sets B, C and D (set A lives in engine.js). G.cards = {bear:'a'|'b'|'c'|'d', ...}; WM.scoreAnimal(env, a, info, set).
-   Patterns follow the rulebook summaries; point tables marked (guessed) in rules-notes.md where no table was found online. */
+   Patterns follow the rulebook summaries; B-D point tables were all checked (see rules-notes.md). */
 (function () {
   var W = window.WM, DIRS = W.DIRS, k = W.k, pk = W.pk, nb = W.nb;
   W.SETS = ['a', 'b', 'c', 'd'];
@@ -36,18 +36,29 @@
       groups(env, 'elk').forEach(function (g) {
         var n = g.length, p = 0;
         if (set === 'c') p = T([0, 2, 4, 7, 10, 14, 18, 23, 28], n);
-        else if (set === 'b') { var rest = g.slice(), tab = [0, 2, 5, 9, 13];   // greedy: diamond(4) > triangle(3) > pair > single
-          var adj = function (x, y) { return nb(x).indexOf(y) >= 0; };
-          for (var want = 4; want >= 1; want--) { var found = true; while (found) { found = false; var pick = null;
-            if (want === 1 && rest.length) pick = [rest[0]];
-            if (want === 2) rest.some(function (x) { return rest.some(function (y) { if (x !== y && adj(x, y)) { pick = [x, y]; return true; } }); });
-            if (want === 3) rest.some(function (x) { return rest.some(function (y) { return rest.some(function (z) { if (x < y && y < z && adj(x, y) && adj(y, z) && adj(x, z)) { pick = [x, y, z]; return true; } }); }); });
-            if (want === 4) rest.some(function (x) { return rest.some(function (y) { if (x === y || !adj(x, y)) return false; var cm = rest.filter(function (z) { return z !== x && z !== y && adj(x, z) && adj(y, z); }); if (cm.length >= 2) { pick = [x, y, cm[0], cm[1]]; return true; } }); });
-            if (pick) { found = true; p += tab[want]; rest = rest.filter(function (x) { return pick.indexOf(x) < 0; }); } } }
+        else if (set === 'b') {   // exact: split the group into singles / pairs / triangles / diamonds for the best total
+          var tab = [0, 2, 5, 9, 13], bm = {}, adj = function (x, y) { return nb(x).indexOf(y) >= 0; }, bb = 20000;
+          var bestB = function (rest) {
+            if (!rest.length) return 0; var key = rest.join('|'); if (bm[key] != null) return bm[key];
+            if (--bb < 0) return rest.length * 2;
+            var x = rest[0], others = rest.slice(1), best = tab[1] + bestB(others), minus = function (arr, set2) { return arr.filter(function (z) { return set2.indexOf(z) < 0; }); };
+            others.forEach(function (y) { if (!adj(x, y)) return; best = Math.max(best, tab[2] + bestB(minus(others, [y])));
+              others.forEach(function (z) { if (z === y || !adj(x, z) || !adj(y, z)) return; best = Math.max(best, tab[3] + bestB(minus(others, [y, z])));
+                others.forEach(function (w) { if (w === y || w === z || [x, y, z].filter(function (m) { return adj(m, w); }).length < 2) return; best = Math.max(best, tab[4] + bestB(minus(others, [y, z, w]))); }); }); });
+            return (bm[key] = best);
+          };
+          p = bestB(g.slice().sort());
         } else if (set === 'd') {   // the largest set of the group's elk that all touch one common space
-          var best = 1; var cand = {}; g.forEach(function (x) { nb(x).forEach(function (y) { cand[y] = 1; }); });
-          Object.keys(cand).forEach(function (cc) { var m = g.filter(function (x) { return nb(x).indexOf(cc) >= 0; }).length; if (m > best) best = m; });
-          p = T([0, 2, 5, 8, 12, 16, 21], best) + (n - best) * 2;
+          var cand = {}, dm = {}, dt = [0, 2, 5, 8, 12, 16, 21]; g.forEach(function (x) { nb(x).forEach(function (y) { cand[y] = 1; }); });
+          var spaces = Object.keys(cand).sort();   // exact: every elk is in at most one ring; a ring is all the free elk touching one space; leftover elk score 2
+          var bestD = function (rest, i) {
+            if (!rest.length) return 0; if (i >= spaces.length) return rest.length * 2;
+            var key = rest.join('|') + '#' + i; if (dm[key] != null) return dm[key];
+            var ring = rest.filter(function (x) { return nb(x).indexOf(spaces[i]) >= 0; }), best = bestD(rest, i + 1);
+            if (ring.length > 1) best = Math.max(best, T(dt, ring.length) + bestD(rest.filter(function (x) { return ring.indexOf(x) < 0; }), i + 1));
+            return (dm[key] = best);
+          };
+          p = bestD(g.slice().sort(), 0);
         }
         if (p) { v += p; lit = lit.concat(g); }
       });
