@@ -58,7 +58,18 @@ Settled (each has a rules-test assert):
 - Empty animal pile: the row refills "while cards remain"; with none left it stays short. No other rule applies.
 - Tie-break: the rulebook counts animal cubes on the board. The spirit cube is not an animal cube and does not count.
 - First player: the rulebook leaves it to the table (a flavour line). Seat 1 starts; the round always finishes, so turns stay equal.
-Still open (cannot be settled without the printed components):
-- Solo sun bonus by spirit type (+2 none, +1 group type, +0 count type) and the +1 sun for side A.
-- Card habitats and tracks come from a structured transcription; not compared card by card with printed art.
-- Side B shape (columns 4,3,4,3,4,3,4, 25 hexes): from an implementation that cites the rulebook diagram.
+## Fixer F2 (20 Nov 2026): checked against the official rulebook text
+Settled (rules-test asserts each):
+- Solo suns: 40/70/90/110/130/140/150/160 = 1-8 suns; side A +1, side B +0; no spirit +2; with a spirit the card's icon gives
+  +1 ("groups of landscapes": both field spirits, both building spirits, water groups) or +0 ("number of landscapes": trees,
+  mountains, every water token). The rulebook example (130 points, side A, field-groups spirit = 7 suns) is a test.
+- Solo setup: 3 central spaces, 3 face-up cards, the other 6 tokens go to the box, all spaces refill, a swap when no card was taken.
+- 32 animal cards, 10 spirit cards, 4 spirit cubes, 75 animal cubes (the rulebook's component list). The 32 card tracks hold 96
+  spaces; no gauntlet game used more than 75 cubes, so the supply never runs short in practice (asserted).
+- Side B water: 5 per island, an island is land split off by water, at least 1 (already so).
+Still unknowable from the rule text (needs the printed pieces):
+- Side B column shape (we use 4,3,4,3,4,3,4 = 25 hexes) and the exact hex count of each side; the rule text gives no numbers.
+- Which spirit card carries which sun icon (we map by what the card counts, as above).
+- Each card's habitat and track as printed (a structured transcription, not compared with the printed art), so the
+  track-length mix (9 cards of 2, 16 of 3, 5 of 4, 2 of 5) is unverified too.
+- What happens if the 75 animal cubes run out (the rulebook is silent; it does not happen in play).

@@ -24,3 +24,5 @@
 | End: 2 or fewer empty hexes, finish the round | rules-test "two empty hexes: the round finishes first", "game ends after the last player" |
 | Full games 1-4 players, both sides, spirits, every move legal, 120 tokens conserved | rules-test gauntlet (E.check after every move) |
 | Rival turn plays and passes back | scn mf-rival |
+| Solo suns: table, side A +1, no spirit +2, groups spirit +1, count spirit +0 (rulebook example = 7) | rules-test "solo" x6 |
+| 75 animal cubes, never exceeded in play | rules-test "animal cubes used" |

@@ -1,6 +1,7 @@
 // Meadowfold computer players. AI.plan() simulates the whole turn on a copy of G and returns the move list the UI plays out step by step.
 // Evaluator = real score now + a little for half-built landscapes + for animal homes one token away. Easy adds noise and skips ideas.
 var AI = (function () {
+  var STR = 0;   // Easy only: 0 = sloppy, 1 = careful. Easy keeps the game close: careful when behind the best human, sloppy when ahead.
   function clone(o) { return JSON.parse(JSON.stringify(o)); }
   function near(s, id) {   // pattern placements missing exactly one hex that is empty: a home one token away
     var pat = E.card(id).pat, C = E.cells(G.side), n = 0;
@@ -52,17 +53,19 @@ var AI = (function () {
     var c = E.card(id), p = c.pts, top = p[p.length - 1] / p.length;
     var tmp = { board: s.board, cubes: s.cubes };
     var now = Object.keys(E.cubeSpots(tmp, id)).length, nr = near(tmp, id);
-    return top * (1 + now * .8 + Math.min(4, nr) * .25) + (lvl === 'easy' ? Math.random() * 8 : 0);
+    return top * (1 + now * .8 + Math.min(4, nr) * .25) + (lvl === 'easy' ? Math.random() * 8 * (1 - STR) : 0);
   }
   function plan(lvl) {
     lvl = lvl || 'normal';
     var saved = G; G = clone(saved);
     var out = [], s = E.seat();
+    STR = 0;
+    if (lvl === 'easy') { var hs = G.seats.filter(function (x) { return !x.ai; }); if (hs.length) { var hb = Math.max.apply(null, hs.map(function (x) { return E.score(x).total; })), a = E.score(s).total - hb; STR = Math.max(0, Math.min(1, EASY.mid - a / EASY.span)); } if (STR >= EASY.up) { G = saved; return plan('hard'); } }
     try {
       if (s.offer) { var bi = 0, bv = -1; s.offer.forEach(function (id, i) { var v = Math.random() * (lvl === 'easy' ? 10 : 1) + (/fields|tree|mount/.test(E.card(id).sc) ? 2 : 0); if (v > bv) { bv = v; bi = i; } }); var m0 = { t: 'spirit', i: bi }; E.apply(m0); out.push(m0); s = E.seat(); }
       cubesGreedy(out);
       // take a card first so the tokens can build toward it
-      if (E.active(s) < 4 && G.row.length && (lvl !== 'easy' || Math.random() < .7)) {
+      if (E.active(s) < 4 && G.row.length && (lvl !== 'easy' || Math.random() < .7 + .3 * STR)) {
         var best = -1, bvv = -1; G.row.forEach(function (id, i) { var v = cardValue(s, id, lvl); if (v > bvv) { bvv = v; best = i; } });
         if (best >= 0 && (lvl !== 'easy' || E.active(s) < 3 || bvv > 9)) { var mc = { t: 'card', i: best }; E.apply(mc); out.push(mc); cubesGreedy(out); }
       }
@@ -72,7 +75,7 @@ var AI = (function () {
         for (; n < 3; n++) {
           var ps = E.moves().filter(function (m) { return m.t === 'place'; }); if (!ps.length) break;
           var sc = ranked(ps), bm = sc[0][1];
-          if (lvl === 'easy') bm = sc[Math.min(sc.length - 1, Math.floor(Math.random() * 4))][1];
+          if (lvl === 'easy') bm = sc[Math.min(sc.length - 1, Math.floor(Math.random() * (1 + Math.round((1 - STR) * 3))))][1];
           E.apply(bm); seq.push(bm); cubesGreedy(seq);
         }
         return evalSeat(E.seat(), lvl);
@@ -87,9 +90,10 @@ var AI = (function () {
           return;
         }
         var seq = [mt]; var v = greedy(0, seq);
-        opts.push({ v: v + (lvl === 'easy' ? Math.random() * 6 : 0), seq: seq });
+        opts.push({ v: v + (lvl === 'easy' ? Math.random() * 6 * (1 - STR) : 0), seq: seq });
       });
       opts.sort(function (a, b) { return b.v - a.v; });
+      if (lvl === 'easy' && opts.length > 1) { var pick = Math.min(opts.length - 1, Math.round((1 - STR) * EASY.drop * (opts.length - 1))); opts = [opts[pick]]; }
       G = base; if (opts[0]) opts[0].seq.forEach(function (m) { if (E.legal(m)) { E.apply(m); out.push(m); } });
       cubesGreedy(out);
       if (G.solo && !G.turn.tookCard && !G.turn.swapped && G.deck.length) { var worst = -1, wv = 1e9; G.row.forEach(function (id, i) { var v = cardValue(E.seat(), id, lvl); if (v < wv) { wv = v; worst = i; } }); if (wv < 6) out.push({ t: 'swap', i: worst }); }
@@ -97,5 +101,6 @@ var AI = (function () {
     } finally { G = saved; }
     return out;
   }
-  return { plan: plan, evalSeat: evalSeat, near: near };
+  var EASY = { mid: .7, span: 16, drop: .5, up: .9 };
+  return { EASY: EASY, plan: plan, evalSeat: evalSeat, near: near };
 })();

@@ -126,8 +126,17 @@ E.newGame({ np: 3, humans: 1 }); G = ctx.getG(); ok(G.cur === 0, 'seat 1 starts 
 // tie-break counts animal cubes only, not the spirit cube
 ok(E.cubesPlaced({ cubes: { '0,0': 3, '1,1': 'S7' } }) === 1, 'tie-break: the spirit cube is not an animal cube');
 
+// solo suns (rulebook solo page): table, +1 on side A, +2 with no spirit, +1 for a "groups" spirit, +0 for a "count" spirit
+E.newGame({ np: 1, humans: 1, side: 'A' }); G = ctx.getG();
+ok(E.suns({ total: 130 }).base === 5, 'solo: 130 points = 5 suns'); ok(E.suns({ total: 39 }).base === 0 && E.suns({ total: 160 }).base === 8, 'solo: below 40 none, 160 = 8');
+ok(E.suns({ total: 130 }).bonus === 3, 'solo side A, no spirit: +1 +2');
+G.side = 'B'; ok(E.suns({ total: 130 }).bonus === 2, 'solo side B, no spirit: +2 only');
+G.side = 'A'; G.seats[0].spirit = { id: 33, placed: true }; ok(E.suns({ total: 130 }).total === 7, 'rulebook example: 130 pts, side A, field-groups spirit = 7 suns');
+G.seats[0].spirit = { id: 42, placed: true }; ok(E.suns({ total: 130 }).bonus === 1, 'solo: a count-type spirit adds no sun');
+const grp = MF.SPIRITS.filter(c => /fields|build|waterGroups/.test(c.sc)).length; ok(grp === 5, 'spirits: 5 count groups, 5 count pieces');
+
 // --- gauntlet ---
-const games = process.env.QUICK ? 4 : 24; let totals = [], wins = [0, 0], lens = [], soloS = [];
+const games = process.env.QUICK ? 4 : 24; let totals = [], wins = [0, 0], lens = [], soloS = [], maxCubes = 0;
 for (let g = 0; g < games; g++) {
   const np = g % 4 === 3 ? 1 : (g % 4) + 2, side = g % 2 ? 'B' : 'A';
   E.newGame({ np, humans: 0, side, spirits: g % 3 === 0, ai: g % 5 === 0 ? 'easy' : 'normal' }); G = ctx.getG();
@@ -138,8 +147,10 @@ for (let g = 0; g < games; g++) {
     if (bad) break;
   }
   ok(!bad && G.over, 'gauntlet game ' + g + ' (' + np + 'p ' + side + '): ' + (bad || (G.over ? 'ok' : 'not over')));
+  maxCubes = Math.max(maxCubes, G.seats.reduce((a, x) => a + E.cubesPlaced(x), 0));
   if (G.result) { G.result.scores.forEach(r => totals.push(r.total)); lens.push(G.seats[0].turns); if (np === 1) soloS.push(G.result.scores[0].total); }
 }
+ok(maxCubes <= 75, 'animal cubes used in a game stay within the 75 in the box (max ' + maxCubes + ')');
 const avg = a => a.length ? Math.round(a.reduce((x, y) => x + y) / a.length) : 0;
 console.log(`gauntlet: ${games} games, avg score ${avg(totals)} (min ${Math.min(...totals)} max ${Math.max(...totals)}), avg turns ${avg(lens)}, solo avg ${avg(soloS)}`);
 console.log((fails ? 'FAIL' : 'PASS') + ` rules-test: ${n - fails}/${n} checks`);

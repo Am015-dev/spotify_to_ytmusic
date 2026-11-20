@@ -13,7 +13,7 @@
 | Valley board | 4 (one per seat) | side A 23 hexes river / side B 25 hexes islands |
 | Animal cards | 32 | listed below |
 | Spirit cards | 10 | listed below (variant) |
-| Animal cubes | 75 | unlimited in play |
+| Animal cubes | 75 | one per settled animal (96 track spaces; games use far fewer) |
 | Spirit cubes | 4 | one per kept spirit |
 
 Pattern notation: first hex, then the direction from the previous hex (flat-top: N, NE, SE, S, SW, NW); any rotation (every habitat equals its own mirror image turned, so mirroring never matters). Spirit cube: not an animal cube for the tie-break.
