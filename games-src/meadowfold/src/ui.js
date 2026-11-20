@@ -83,14 +83,14 @@ function runAI() {
       var d = E.score(s).total - start; UI.recap = s.name + ' scored +' + d + (got.length ? ', settled ' + got.slice(0, 2).join(' and ') : '') + '.';
       save(); if (!UI.fast) SND.card();
       if (UI.fast || G.over) { UI.busy = false; UI.view = G.over ? UI.view : G.cur; return nextActor(); }
-      render(); toast(UI.recap); UI.aiT = setTimeout(function () { UI.busy = false; UI.view = G.cur; nextActor(); }, Math.max(700, AIDELAY * 1.6)); return;
+      render(); toast(UI.recap); UI.aiT = setTimeout(function () { UI.busy = false; UI.view = G.cur; nextActor(); }, Math.max(1400, AIDELAY * 3)); return;
     }
     if (m.t === 'place') { UI.flash = m.k; SND.place(); }
     if (m.t === 'take') { UI.lastPocket = m.i; SND.take(); }
     if (m.t === 'cube') { UI.flash = m.k; SND.animal(); }
     if (m.t === 'card') SND.card();
     render(); var gain = E.score(s).total - sc0; if (gain && m.k) popAt(m.k, gain);
-    UI.aiT = setTimeout(stepAI, UI.fast ? 0 : Math.max(220, AIDELAY * (m.t === 'cube' ? 1.1 : .75)));
+    UI.aiT = setTimeout(stepAI, UI.fast ? 0 : Math.max(380, AIDELAY * (m.t === 'cube' ? 1.4 : 1)));
   })();
 }
 function buzz(p) { try { if (GX.buzz) GX.buzz(p); } catch (e) { } }
@@ -161,6 +161,7 @@ function cardSVG(id, left, big) {
   var minx = 1e9, maxx = -1e9, miny = 1e9, maxy = -1e9; pts.forEach(function (p) { minx = Math.min(minx, p[0]); maxx = Math.max(maxx, p[0]); miny = Math.min(miny, p[1]); maxy = Math.max(maxy, p[1]); });
   var w = maxx - minx + rr * 2.2, h = maxy - miny + rr * 2.2, f = 'k' + id + (big ? 'b' : ''), o = '<svg class="pat" viewBox="' + (minx - rr * 1.1) + ' ' + (miny - rr * 1.1) + ' ' + w + ' ' + h + '" aria-hidden="true">' + ART.defs(f);
   pts.forEach(function (p) { var st = needStack(p[2].n); o += '<polygon points="' + ART.hexPts(p[0], p[1], rr - .6) + '" fill="#fffaf0" stroke="#d8c8ae" stroke-width="' + rr * .07 + '"/>' + ART.stack(st, p[0], p[1], rr * .8, f); if (p[2].cube) o += '<circle cx="' + (p[0] + rr * .38) + '" cy="' + (p[1] - rr * .38) + '" r="' + rr * .36 + '" fill="#fff" stroke="#8a5a3c" stroke-width="' + rr * .08 + '" stroke-dasharray="' + rr * .14 + ' ' + rr * .1 + '"/>'; });
+  if (!big) o = o.replace(/<text[^>]*class="hnum"[^>]*>\d<\/text>/g, '');
   return o + '</svg>';
 }
 function needStack(n) { if (n === 'water' || n === 'field') return [n]; if (n === 'build') return ['mount', 'build']; if (n.indexOf('mount') === 0) return Array(+n[5]).fill('mount'); var h = +n[4], a = Array(h - 1).fill('trunk'); a.push('leaf'); return a; }
@@ -220,6 +221,7 @@ function renderLine() {
   else t = 'Done? Tap End turn.';
   if (UI.recap && !UI.busy && UI.view === G.cur && G.turn.took < 0 && !G.over) t = UI.recap;
   if (G.last && !G.over) t += ' Last round!';
+  else if (!G.over && G.seats.some(function (x) { return E.empties(x) <= 5; })) t += ' Ending soon!';
   $('#line').textContent = t;
 }
 function popAt(k, gain) {

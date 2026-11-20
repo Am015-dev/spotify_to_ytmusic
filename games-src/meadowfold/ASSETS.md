@@ -39,7 +39,7 @@ no fonts beyond the shelf's own (Alegreya Sans, OFL, inlined by build-all), no s
 | owl | Lorc | https://game-icons.net/1x1/lorc/owl.html |
 | pig | Skoll | https://game-icons.net/1x1/skoll/pig.html |
 | rabbit | Delapouite | https://game-icons.net/1x1/delapouite/rabbit.html |
-| ram | Lorc | https://game-icons.net/1x1/lorc/ram.html |
+| ram (ram-profile) | Delapouite | https://game-icons.net/1x1/delapouite/ram-profile.html |
 | rooster | Delapouite | https://game-icons.net/1x1/delapouite/rooster.html |
 | salamander | Lorc | https://game-icons.net/1x1/lorc/salamander.html |
 | sea-turtle | Delapouite | https://game-icons.net/1x1/delapouite/sea-turtle.html |

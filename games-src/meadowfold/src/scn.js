@@ -38,7 +38,7 @@
       { kind: 'play', name: 'stack grey', snap: function () { return (me().board['2,2'] || []).length; },
         steps: [{ sel: '#map .hx.glow[data-k="2,2"]' }], idle: function () { return true; }, verify: function (b, a) { return a === 2 || 'height ' + b + '->' + a; } }
     ],
-    mut: [{ name: 'mountains cannot stack', js: 'var _cs=E.canStack;E.canStack=function(s,k,c){var st=s.board[k]||[];if(c==="mount"&&st.length)return false;return _cs(s,k,c);}' }]
+    mut: [{ name: 'mountains cannot stack', js: 'var _ap=E.apply;E.apply=function(m){if(m.t==="place"&&(G.seats[G.cur].board[m.k]||[]).length)return false;return _ap(m);}' }]
   });
   GXS.add({
     id: 'mf-animal', name: 'Settle an animal', ask: 'Does the duck move in and score?', seed: 9, when: booted,

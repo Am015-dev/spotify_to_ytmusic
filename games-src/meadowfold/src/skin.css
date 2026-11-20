@@ -176,3 +176,7 @@ button{font:inherit;color:inherit}
   .setup .btn.big{grid-column:1/-1}
 }
 .tab em.rd{background:#7b5aa8;color:#fff}
+.bigc .pat .hnum{font-size:12px;stroke-width:3px}
+.acard.hint{box-shadow:0 0 0 4px #e8907e,var(--sh)}
+#map .hint .cell{stroke:#e8907e;stroke-width:4}
+@media (max-width:999px){.pill span{max-width:44px}.pill{gap:3px}}
