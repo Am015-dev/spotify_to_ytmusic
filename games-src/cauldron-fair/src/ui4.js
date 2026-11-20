@@ -28,7 +28,7 @@ function renderReport() {
   const v = viewSeat(), me = v >= 0 ? G.players[v] : null, myq = me && me.q && EVAL_Q[me.q.h] ? me.q : null;
   const oldBody = rs.querySelector('.rsbody'), keepTop = oldBody ? oldBody.scrollTop : 0;
   const hotShared = hotSeat() && G.phase === 'eval' && UI.hotShared !== R.round, hotPriv = hotSeat() && !!myq && !hotShared;   // hot-seat: the table is shown once to everybody, then each maker decides in private
-  const play = !!UI.stgPlay && !hotPriv && bfAnim() && G.players.some(p => dayRow(p, R)); UI.stgPlay = false;
+  const play = !!UI.stgPlay && !hotPriv && bfAnim() && !(typeof tutOn === 'function' && tutOn() && R.round === 1) && G.players.some(p => dayRow(p, R)); UI.stgPlay = false;
   const bar = document.querySelector('.gx-bar'), top = bar ? Math.round(bar.getBoundingClientRect().bottom) : 46;
   rs.hidden = false; rs.classList.add('stg'); rs.style.top = Math.max(0, top) + 'px';
   const sc = stgScreen(R, v, me, myq, hotShared, hotPriv, play);

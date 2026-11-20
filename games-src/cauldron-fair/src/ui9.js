@@ -6,11 +6,11 @@
 const STG = { run: false, round: 0, tm: [], iv: [], dirty: false };
 const FORT_SHORT = {
   lucky7: 'Whites exactly 6: droplet moves one.', spilled: 'If you boom, right rival takes a 2-chip.', doover: 'After chip 4: restart once.', twice: 'Each bonus-die roll also pays 1 ruby.',
-  thick: 'White limit is 8 today.', marrowfair: 'Orange and green 1s move one extra today.', peek: 'Stop safely: draw up to 4, may place one.', glint: 'Ruby space scores 3 points if you did not boom.',
-  spring: 'Empty flasks refill free tonight (not if boomed).', froth: 'Second white chip may go back.', spark: 'Ruby space gives two extra rubies.', pick: 'Black chip, any 2-chip, or 4 rubies.',
-  slide: 'Droplet +1, or +2 if furthest back.', swap: 'May pay 1 ruby for a 1-chip (not purple or black).', alms: 'Fewest rubies take 2 rubies.', underdog: 'Fewest points take a blue 1.',
-  clear: 'Score 3 points, or drop a white 1.', swarm: 'Behind? Rat stone (your head start) moves tails + 1.', dip: 'Draw 4: lowest gets a red 2.', bribe: 'Give back up to 2 head-start spaces: 2 rubies each.',
-  bounty: 'Take a 4-chip, or tails + 1 points.', fork: 'Droplet +1 and a ruby, or a purple chip.', dice: 'Everyone rolls the bonus die; last place twice.', haggle: 'Draw 3: swap one for a bigger chip.'
+  thick: 'White limit is 8 today.', marrowfair: 'Orange and green 1s move one extra.', peek: 'Stop safely: draw 4, place one.', glint: 'Ruby space, no boom: score 3 points.',
+  spring: 'Empty flasks refill free unless you boomed.', froth: 'Second white chip may go back.', spark: 'Ruby space gives two extra rubies.', pick: 'Black chip, any 2-chip, or 4 rubies.',
+  slide: 'Droplet +1, or +2 if furthest back.', swap: 'Pay 1 ruby for a plain 1-chip.', alms: 'Fewest rubies take 2 rubies.', underdog: 'Fewest points take a blue 1.',
+  clear: 'Score 3 points, or drop a white 1.', swarm: 'Behind? Your head start grows: tails + 1.', dip: 'Draw 4: lowest gets a red 2.', bribe: 'Sell head-start spaces: 2 rubies each.',
+  bounty: 'Take a 4-chip, or tails + 1 points.', fork: 'Droplet +1 and ruby, or purple chip.', dice: 'Everyone rolls the die; last place twice.', haggle: 'Draw 3: upgrade one chip.'
 };
 const BOOK_SHORT = {
   O: 'No power. Cheap filler.', K: '2 players: most or tied black, droplet +1; most also a ruby. 3-4: beat each neighbour.',
@@ -207,8 +207,9 @@ function marketEl(p, q) {
   wrap.appendChild(h('div.awn', h('span.pur', { html: ico('coin', 30) }, h('b', coins - cost))));
   const stalls = h('div.stalls' + (matchMedia('(orientation:landscape)').matches ? '' : '.tight'));   // R37: portrait is always the tight layout: it never flips under a tap
   const goodNow = UI.shopGoodNow = shopGood(p, q, sel);
+  let ssug = null;
   { const sg = goodNow.filter(g => sel.indexOf(g.key) < 0 && CF.price(G, g.key[0], +g.key.slice(1)) + cost <= coins);   // F4: two suggested buys with the reason, one tap adds them to your bag
-    if (sg.length && sel.length < 2) wrap.appendChild(h('div.ssug', h('b.ssk', 'Suggested'), sg.map(g => h('button.ssb', { 'data-a': 'shopsel', 'data-k': g.key, type: 'button', 'aria-label': 'Add ' + keyName(g.key) + ': ' + g.why },
+    if (sg.length && sel.length < 2) ssug = (h('div.ssug', h('b.ssk', 'Suggested'), sg.map(g => h('button.ssb', { 'data-a': 'shopsel', 'data-k': g.key, type: 'button', 'aria-label': 'Add ' + keyName(g.key) + ': ' + g.why },
       chipN(g.key, 30), h('span.sst', h('b', keyName(g.key) + ' · ' + CF.price(G, g.key[0], +g.key.slice(1))), h('small', g.why)))))); }
   for (const c of D.SHOP_COLORS.slice().sort((a, b) => (CF.bookOut(G, b) ? 1 : 0) - (CF.bookOut(G, a) ? 1 : 0))) {   // F3: open stalls first, the ones that open later last, so a short screen never hides what you can buy
     const out = CF.bookOut(G, c), st = h('div.stall.c' + c + (out ? '' : '.locked'), { 'data-lp': 'chip:' + c + D.COLORS[c].vals[0] });
@@ -235,6 +236,7 @@ function marketEl(p, q) {
   stalls.addEventListener('click', ev => { const b = ev.target.closest('.tok,.rbt'), sx = ev.target.closest('.stall,.rbar'); if ((b && b.classList.contains('tcut')) || (!b && sx && sx.querySelector('.tout'))) { const s = sx; if (s) setTimeout(() => { const ns = s.isConnected ? s : null; if (ns) ns.scrollIntoView({ block: 'nearest', behavior: 'smooth' }); }, 0); } });
   { const k = sel[sel.length - 1], bk = k ? (k[0] === 'O' ? D.BOOKS.O[0] : k[0] === 'K' ? D.BOOKS.K[0] : D.BOOKS[k[0]][G.sets[k[0]]]) : null;
     const ri = UI.shopInfo && UI.rubyShown ? RUBY_INFO[UI.shopInfo] : null;
+    if (ssug && !UI.shopWhy && !ri && !sel.length) wrap.appendChild(ssug); else
     wrap.appendChild(h('div.sinfo', UI.shopWhy ? h('span.swhy', h('b', UI.shopWhy)) : ri ? h('span', h('b', ri.split(':')[0] + ':'), ri.slice(ri.indexOf(':') + 1)) : bk ? h('span', h('b', keyName(k) + ': '), bk.text) : 'Tap a chip to buy it. Tap i for what it does. Up to 2, different colours.')); }
   const bagArt = KIT.ART.bag ? h('img.sbimg', { src: KIT.ART.bag, alt: '' }) : h('span.sbimg', { html: ico('bag', 56) });
   const bagz = h('div.shopbag', { 'aria-label': 'Your bag' }, bagArt, h('div.sbin', sel.length ? sel.map(k => h('button.sbc', { 'data-a': 'shopsel', 'data-k': k, type: 'button', 'aria-label': 'Take ' + keyName(k) + ' out again' }, chipN(k, 40))) : h('span.sbe', { html: ico('bag', 22) })));

@@ -97,7 +97,7 @@ function playEvents(first) {
 }
 // ---------- the computer players ----------
 function aiOK() { return !(typeof NET !== 'undefined' && NET.on && !isHost()); }
-function meIdle() { if (UI.mode === 'tutorial' || (typeof tutOn === 'function' && tutOn()) || hotSeat()) return false; const v = viewSeat(); if (v < 0 || !G.players[v]) return false; const me = G.players[v]; if (G.phase === 'brew') return me.st !== 'draw' || !!me.lock; return CF.pending(G).indexOf(v) < 0 && !me.q; }
+function meIdle() { if (hotSeat()) return false; const v = viewSeat(); if (v < 0 || !G.players[v]) return false; const me = G.players[v]; if (G.phase === 'brew') return me.st !== 'draw' || !!me.lock; return CF.pending(G).indexOf(v) < 0 && !me.q; }
 function schedule() {
   if (!G || !UI.started || G.phase === 'over' || !aiOK()) return;
   const pend = CF.pending(G);
