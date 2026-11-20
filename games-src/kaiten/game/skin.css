@@ -181,10 +181,10 @@ html.sk-kki .sh .av .sc{min-width:38px;height:38px;line-height:38px;top:-12px;ri
 #kkguide .av i,#kkguide i{font-size:16px}
 #kkguide:not(.on){visibility:hidden}
 /* R5 fixes: phone hand rows never cover names; empty counters say so on phone; PC reveal captions wrap under the score */
-#belt.two{row-gap:24px;min-height:calc(var(--hw)*2.8 + 58px)}
+#belt.two{row-gap:18px;min-height:calc(var(--hw)*2.8 + 52px)}
+@media (min-height:640px){#belt.two{row-gap:24px;min-height:calc(var(--hw)*2.8 + 58px)}html.ph.ph-p #beltw{padding-bottom:30px}}
 /* F6: phone portrait: no decorative belt sushi under the hand (cut at the edge), hand ends above y=640 */
 html.ph.ph-p #beltw .kk-belt{display:none}
-html.ph.ph-p #beltw{padding-bottom:30px}
 html.ph .ctr .none{display:block;font-size:14px}
 #kkgoal .kgh{display:flex;gap:12px;align-items:center;margin-bottom:12px}
 #kkgoal .kgh h2{margin:2px 0 0}

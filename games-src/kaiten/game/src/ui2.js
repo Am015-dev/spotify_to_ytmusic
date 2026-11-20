@@ -136,7 +136,7 @@ function seatEl(s, tab, info, pcs, isMe, dm) {
   return el;
 }
 // F6: the first time a short label shows on your own counter, one plain line says what it means (once per visit; never in tests)
-const TIPS = { grab2: 'Grab 2: Twin Sticks let you take two dishes in one turn. Tap it, then tap two dishes.', need1: 'Need 1: one more of these completes a set and scores.', behind: 'Behind: another diner has more roll icons, so this scores nothing yet. Take more rolls to catch up.' };
+const TIPS = { grab2: 'Grab 2: tap this, then two dishes.', need1: 'Need 1: one more scores this set.', behind: 'Behind: others have more rolls. Take more.' };
 function firstTip(g) {
   if (!G || g.seat !== viewSeat() || !ANIM || /[?&]scn=/.test(location.search)) return;
   const k = g.k === 'chop' ? 'grab2' : /^need/.test(g.hint || '') ? 'need1' : g.k === 'roll' && g.hint === 'no pts' ? 'behind' : null;
