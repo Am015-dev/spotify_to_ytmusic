@@ -49,7 +49,7 @@
     id: 'rv-zoom', name: 'Tile zoom: place a follower', ask: 'Is the zoomed tile and its spots clear?', seed: 8, when: booted,
     setup: function () {
       return table(8).then(function () {
-        var g = UI.legal.filter(function (x) { return x.r === UI.rot; })[0] || UI.legal[0]; UI.rot = g.r; onGlow(g.x, g.y);
+        var g = UI.legal.filter(function (x) { return x.r === UI.rot; })[0] || UI.legal[0]; UI.rot = g.r; placeAt(g.x, g.y);
         return GXS.wait(function () { return G.step === 'fig' && myTurn('fig') && document.querySelector('#ov .fglow') && !UI.tw; }, 12000);
       }).then(function () { return idle(900); });
     },
