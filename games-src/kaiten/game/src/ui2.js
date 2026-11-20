@@ -15,7 +15,7 @@ function renderBar() {
   const s = $('#barstat'); if (!s) return;
   // fz.scoring: the engine has already scored this round and dealt the next, but the last reveal is still on screen
   const re = UI.fz && (UI.fz.roundEnd || UI.fz.scoring), rd = re ? (G.phase === 'over' ? (G.len || D.rounds) : G.round - 1) : G.round, RN = G.len || D.rounds;
-  s.textContent = G.phase === 'over' && !re ? 'Game over' : re ? (isPh() ? 'Round ' + rd + '/' + RN : 'Round ' + rd + ' of ' + RN) + (UI.fz.roundEnd ? ' · scoring' : ' · last turn') : (isPh() ? 'Round ' + G.round + '/' + RN + ' · Turn ' + G.turn + '/' + G.hand : 'Round ' + G.round + ' of ' + RN + ' · Turn ' + G.turn + ' of ' + G.hand);
+  s.textContent = G.phase === 'over' && !re ? 'Game over' : re && isPh() && UI.fz.roundEnd ? 'Scoring ' + rd + '/' + RN : re ? (isPh() ? 'Round ' + rd + '/' + RN : 'Round ' + rd + ' of ' + RN) + (UI.fz.roundEnd ? ' · scoring' : ' · last turn') : (isPh() ? 'Round ' + G.round + '/' + RN + ' · Turn ' + G.turn + '/' + G.hand : 'Round ' + G.round + ' of ' + RN + ' · Turn ' + G.turn + ' of ' + G.hand);
   barTwoLines();
 }
 function barTwoLines() { const s = $('#barstat'); if (s && isPh() && s.textContent.indexOf(' \u00b7 ') > 0 && !s.querySelector('br')) { const a = s.textContent.split(' \u00b7 '); s.replaceChildren(h('b', a[0]), h('br'), a[1].replace('/', ' of ')); } }
@@ -25,7 +25,8 @@ function bankedOf(s) {
   return list.reduce((a, r) => a + r[s].total, 0);
 }
 function totalOf(s, info) {
-  if (UI.fz && UI.fz.tally) return bankedOf(s) + UI.fz.tally[s];   // the round-end count: chips climb as each set scores
+  if (UI.fz && UI.fz.tally) return bankedOf(s) + UI.fz.tally[s];
+  if (UI.fz && UI.fz.tables && (UI.fz.roundEnd || UI.fz.scoring)) return bankedOf(s);   // before the count: show what is banked, so chips only ever climb   // the round-end count: chips climb as each set scores
   if (G.phase === 'over' && !(UI.fz && UI.fz.tables)) return G.final.totals[s];
   return bankedOf(s) + (G.phase === 'over' && !(UI.fz && UI.fz.tables) ? 0 : info.rs[s].total);
 }
@@ -37,6 +38,7 @@ function layoutNums(np, hasMe, tblH) {
   if (w < 560 && !land) cols = 1;
   else for (const c of [1, 2, 3]) { if (c > Math.max(1, o)) break; const rows = Math.ceil(o / c) + meW; if ((tblH - 6 * (Math.ceil(o / c) + (hasMe ? 1 : 0))) / rows >= 86) { cols = c; break; } if (c === 3) cols = 2; }
   if (o <= 1) cols = 1;
+  if (!ph && w >= 640 && o >= 2) cols = Math.min(o, 4);   // PC: every rival's counter side by side, never a phone column
   return { w, h: hgt, cols, orows: Math.ceil(o / cols), ph, land };
 }
 function renderTable() {
@@ -66,7 +68,7 @@ function renderTable() {
     const ctrW = cw - shw - sl - 25;
     // plates on the counter: one row, or two rows of bigger plates when the seat is tall enough (nothing clipped, labels readable)
     // (a layout that fits wins over bigger plates that overflow past the edge)
-    const ng = groupsOf(s, tab, info).list.length + (pcs[s] || !isPh() ? 1 : 0), cap = isMe ? 84 : 68, slotW = p => Math.max(p + 18, 58);   // a group is never narrower than its tag ("need 2 more")
+    const ng = groupsOf(s, tab, info).list.length + (pcs[s] || !isPh() ? 1 : 0), cap = isMe ? (isPh() ? 84 : 112) : (isPh() ? 68 : 92), slotW = p => Math.max(p + 18, 58);   // a group is never narrower than its tag ("need 2 more")
     let tight = false;
     const sw = p => tight ? Math.max(p + 12, 48) : slotW(p), gp = () => tight ? 12 : 18;
     const fit = (rows, hgt) => { const k = Math.ceil(ng / rows); let p = Math.max(24, Math.min(hgt, cap)); if (k * sw(p) > ctrW) p = Math.max(24, (ctrW / k) - gp()); return { p, ok: sw(p) * k <= ctrW + 4 && hgt >= 24 }; };
@@ -194,7 +196,7 @@ function renderBelt() {
   const hand = v >= 0 ? dispHand() : (G.phase === 'over' ? [] : new Array(UI.fz && UI.fz.backN != null ? UI.fz.backN : G.players[f].hand.length).fill(-1));
   const hidden = v < 0;
   const m = Math.max(hand.length, 1), avail = beltWidth() - 20;
-  const land = ph && boardSize().w >= boardSize().h; const hwMax = ph ? (land ? 74 : 84) : Math.max(84, Math.min(118, Math.floor((boardSize().h * .3 - 34) / 1.4))); let hw = Math.max(ph ? (land || innerHeight < 700 ? 54 : 60) : 62, Math.min(hwMax, Math.floor((avail - (m - 1) * 6) / m)));
+  const land = ph && boardSize().w >= boardSize().h; const hwMax = ph ? (land ? 74 : 84) : Math.max(84, Math.min(innerWidth >= 1500 ? 150 : 118, Math.floor((boardSize().h * .3 - 34) / 1.4))); let hw = Math.max(ph ? (land || innerHeight < 700 ? 54 : 60) : 62, Math.min(hwMax, Math.floor((avail - (m - 1) * 6) / m)));
   // a tall phone: two rows of plates instead of a belt that scrolls sideways and hides plates off the edge
   const one = Math.floor((avail - (m - 1) * 6) / m), two = ph && !land && one < 72 && boardSize().h >= 440 && m > 4 && G.phase !== 'over';   // sized for a full hand all round: the belt and the dishes never jump between turns
   if (two) { const k = Math.ceil(m / 2); hw = Math.max(54, Math.min(boardSize().h < 500 ? 62 : 80, Math.floor((avail - (k - 1) * 6) / k))); }
@@ -213,12 +215,12 @@ function renderBelt() {
     const idx = hp && !UI.fz ? hp.hand.indexOf(id) : -1;
     const ty = tkey(id), selPos = UI.sel.indexOf(idx);
     const g = UI.prefs.hint && can ? gainOf(v, [id]) : null;
-    const key = 'c' + id, sg = [id, idx, selPos, rec.indexOf(id) >= 0 ? 1 : 0, can ? 1 : 0, g, UI.twin ? 1 : 0, hw, UI.prefs.tap2 ? 1 : 0].join('|');
+    const key = 'c' + id, sg = [id, idx, selPos, rec.indexOf(id) >= 0 ? 1 : 0, can ? 1 : 0, g, UI.twin ? 1 : 0, hw, UI.prefs.tap2 ? 1 : 0, ICONS[ty] && can ? rollWords(rollStand(v, [id]), 1) : ''].join('|');
     const o = oldC.get(key); if (o && o.dataset.sg === sg && !enter) { frag.push(o); return; }
     const b = h('button.hc' + (selPos >= 0 ? '.sel' : '') + (rec.indexOf(id) >= 0 ? '.rec' : '') + (can ? '' : '.locked'), { type: 'button', 'data-a': 'hcard', 'data-i': idx, 'data-id': id, 'data-owner': v, 'data-up': '1', 'aria-pressed': selPos >= 0 ? 'true' : 'false', 'aria-label': TY[ty].name + '. ' + TY[ty].ruleText + (can ? (UI.prefs.grab1 === false ? '. Tap to lift it' + (selPos >= 0 ? (UI.prefs.tap2 ? ', tap again to serve' : ', then press Serve') : '') : '. Tap to grab it') : '') });
     b.style.setProperty('--k', k);
     b.appendChild(cardNode(ty, hw));
-    if (g != null) b.appendChild(ty === 'pudding' ? h('span.gn.z', { title: 'Custard scores at the end of the game' }, pudLead(v) ? 'end +6' : 'end') : h('span.gn' + (g > 0 ? '' : '.z'), g > 0 ? '+' + g : zeroTag(v, ty)));
+    if (g != null) b.appendChild(ty === 'pudding' ? h('span.gn.z', { title: 'Custard scores at the end of the game' }, pudLead(v) ? 'end +6' : 'end') : (() => { if (ICONS[ty]) { const rr = rollStand(v, [id]); return h('span.gn.roll' + (rr.rank ? '' : '.z'), { title: 'Roll race if served: ' + rollWords(rr) }, rollWords(rr, true)); } return h('span.gn' + (g > 0 ? '' : '.z'), g > 0 ? '+' + g : zeroTag(v, ty)); })());
     if (UI.twin && selPos >= 0) b.appendChild(h('span.pn', String(selPos + 1)));
     if (enter) b.classList.add('ent-' + enter);
     b.dataset.rk = key; b.dataset.sg = sg;

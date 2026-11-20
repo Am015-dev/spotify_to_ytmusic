@@ -49,7 +49,9 @@ function hlpWhy(v, mv) {
   else if (k === 'chop') t = 'Twin Sticks let you take two dishes later.';
   else if (k === 'pudding') t = 'Custard Cups pay at the end: most scores 6.';
   else t = 'The best dish for you right now.';
-  return hlpCap(t.replace(/:\s*\+/, ': +'), 15);
+  let alt = -1; try { const hd = G.players[v].hand; for (const o of hd) if (tkey(o) !== k) alt = Math.max(alt, gainOf(v, [o])); } catch (e) { }
+  if (g > 0 && alt >= 0) t = t.replace(/\s*\+\d+ now\.?$/, '').replace(/[:.]$/, '') + ': +' + g + ' now, next best +' + alt + '.';
+  return hlpCap(t.replace(/:\s*\+/, ': +'), 18);
 }
 function hlpSuggest() {
   if (tutOn() || !G || !canPick() || UI.drag || UI.twin && UI.sel.length >= 2) return null;

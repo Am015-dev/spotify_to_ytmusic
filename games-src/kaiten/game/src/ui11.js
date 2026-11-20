@@ -77,7 +77,7 @@ function tutStepsRaw() {
     lookStep('goal', 'Your goal', 'Most points after three rounds wins the meal.', tq('#tbl .seat.me .av'), () => turnIs(1)),
     lookStep('chef', 'The chef', () => R() + ' picks at the same time, by the same rules.', tq('#tbl .seat:not(.me) .av'), () => turnIs(1)),
     pickStep('pick1', 1, 'Take one dish', 'Each turn, take one dish. Nobody sees your pick.'),
-    lookStep('passed', 'Flip and pass', 'Picks flip together. Then the hands pass on.', tq('#belt'), () => turnIs(2)),
+    lookStep('passed', 'Flip and pass', 'Picks flipped together. Then the hands passed on.', tq('#belt'), () => turnIs(2)),
     pickStep('pick2', 2, 'A pair scores 5', 'Two Crispy Prawns make a pair: 5 points.'),
     pickStep('paste', 3, 'Fire Paste', 'Fire Paste triples the next nigiri you take.'),
     pickStep('nigiri', 4, 'Nigiri on paste', 'Moon Nigiri is 3. On your Fire Paste it scores 9.'),

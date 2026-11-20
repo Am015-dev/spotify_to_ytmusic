@@ -103,7 +103,7 @@ function groupsOf(s, tab, sc) {
   if (c.tempura) { const n = c.tempura, p = Math.floor(n / 2) * 5; mk('tempura', { type: 'tempura', n, pts: p, hint: n % 2 === 0 ? '= ' + p : (p ? '= ' + p : 'need 1'), cls: p ? 'ok' : 'wait', tip: n + ' Crispy Prawn' + (n > 1 ? 's' : '') + '. Each pair scores 5.' + (n % 2 ? ' One more makes a pair.' : '') }); }
   if (c.sashimi) { const n = c.sashimi, p = Math.floor(n / 3) * 10, r = n % 3; mk('sashimi', { type: 'sashimi', n, pts: p, hint: r === 0 ? '= ' + p : (p ? '= ' + p : 'need ' + (3 - r)), cls: p ? 'ok' : 'wait', tip: n + ' Fish Slice' + (n > 1 ? 's' : '') + '. Three score 10.' + (r ? ' ' + (3 - r) + ' more for a set.' : '') }); }
   if (c.dumpling) { const n = c.dumpling, p = KK.dumplingPts(n); mk('dumpling', { type: 'dumpling', n, pts: p, hint: '= ' + p, cls: 'ok', tip: n + ' Steam Bun' + (n > 1 ? 's' : '') + ' = ' + p + ' points.' + (n < 5 ? ' Next bun: ' + KK.dumplingPts(n + 1) + '.' : ' That is the top.') }); }
-  if (c.icons) { const rk = sc.mk[s]; mk('roll', { type: 'roll2', n: c.icons, pts: rk.pts, hint: rk.rank ? ORD[rk.rank] + ' +' + rk.pts : 'no pts', cls: rk.rank ? 'ok' : 'wait', tip: c.icons + ' roll icons. ' + (rk.rank === 1 ? 'Most right now: ' + rk.pts + ' points.' : rk.rank === 2 ? 'Second right now: ' + rk.pts + ' points.' : 'Most scores 6, second 3.') + (rk.rank && sc.rs.filter(r => r.icons === c.icons).length > 1 ? ' Tied, so points split.' : '') }); }
+  if (c.icons) { const rk = sc.mk[s]; mk('roll', { type: 'roll2', n: c.icons, pts: rk.pts, hint: rk.rank ? (sc.rs.filter(r => r.icons === c.icons).length > 1 ? 'tied ' + ORD[rk.rank] + ' +' + rk.pts : ORD[rk.rank] + ' +' + rk.pts) : 'behind', cls: rk.rank ? 'ok' : 'wait', tip: c.icons + ' roll icons. ' + (rk.rank === 1 ? 'Most right now: ' + rk.pts + ' points.' : rk.rank === 2 ? 'Second right now: ' + rk.pts + ' points.' : 'Most scores 6, second 3.') + (rk.rank && sc.rs.filter(r => r.icons === c.icons).length > 1 ? ' Tied, so points split.' : '') }); }
   const by = { salmon: [0, 0], squid: [0, 0], egg: [0, 0] };
   for (const e of t) { const k = tkey(e.id); if (NIG[k]) by[k][e.w >= 0 ? 1 : 0]++; }
   for (const k of ['salmon', 'squid', 'egg']) {
@@ -131,6 +131,17 @@ function gainOf(seat, ids) {
     return liveScores(tab)[seat].total - base;
   } catch (e) { return 0; }
 }
+// roll race standing if this plate were served now: {rank: 0/1/2, pts, tied, lead}
+function rollStand(seat, ids) {
+  try {
+    const tab = tables().map(t => t.map(e => ({ id: e.id, w: e.w })));
+    const holder = { table: tab[seat] };
+    for (const id of KK.placeOrder(ids)) KK._.place(holder, id);
+    const rs = liveScores(tab), ic = rs.map(r => r.icons), mk = makiRank(ic), me = mk[seat];
+    return { rank: me.rank, pts: me.pts, tied: ic.filter(x => x === ic[seat]).length > 1 && me.rank > 0, lead: Math.max.apply(null, ic) };
+  } catch (e) { return { rank: 0, pts: 0, tied: false, lead: 0 }; }
+}
+const rollWords = (r, short) => r.rank ? (r.tied ? 'tied ' + ORD[r.rank] + (short ? ' +' + r.pts : ': +' + r.pts + ' each') : ORD[r.rank] + ' +' + r.pts) : (short ? 'top ' + r.lead : 'behind: top has ' + r.lead);
 function whyPick(ids) {
   const v = viewSeat(), g = gainOf(v, ids), k = ids.map(tkey);
   const t = tables()[v], c = KK.tableCounts(t);
