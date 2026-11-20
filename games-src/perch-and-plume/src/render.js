@@ -242,7 +242,8 @@ function fitDock() {   // phones: the panel gets only the height the board leave
   var m = $('#mat'), de = document.documentElement; if (!m) return;
   if (window.innerWidth >= 1000 || window.innerWidth > window.innerHeight) { de.style.removeProperty('--gx-sheet-h'); return; }
   var top = m.getBoundingClientRect().top + (window.scrollY || 0), room = Math.floor(window.innerHeight - top - 3 * ROWMIN - 14);
-  de.style.setProperty('--gx-sheet-h', Math.max(150, room) + 'px');
+  var H = window.innerHeight, def = H > 700 ? .57 * H - 144 : .45 * H;   // never taller than the head.html default for this height
+  de.style.setProperty('--gx-sheet-h', Math.floor(Math.max(150, Math.min(room, def))) + 'px');
 }
 window.addEventListener('resize', function () { try { fitMat(); } catch (e) { } });
 function fitMat() {   // slots keep a card-like shape: width from the row height, never wider than the screen allows
