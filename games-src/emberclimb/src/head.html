@@ -650,4 +650,12 @@ html body.ec-stage #stage .enemies.ecthree .en .bar{width:96%}html body.ec-stage
 html body.ec-stage #stage .enemies.w24many .en{flex:0 0 calc(33.3% - 2px)!important;max-width:calc(33.3% - 2px)!important}
 html body.ec-stage #stage .arena.ecfit .en>.art,html body.ec-stage #stage .arena.ecfit .w485fig .art{max-width:var(--fmax)!important;margin-left:auto!important;margin-right:auto!important}
 html body.ec-stage #stage .enemies.w24six .en .nm{display:none}html body.ec-stage #stage .enemies.w24six .intent{position:absolute!important;top:0;left:50%;transform:translateX(-50%);margin:0!important;z-index:5;background:rgba(10,7,5,.7)!important;border-radius:999px;max-width:100%;overflow:hidden;white-space:nowrap}html body.ec-stage #stage .enemies.w24six .intent>span{font-size:13px!important}
+/* F1: fanned hand overlaps less with 5 or fewer cards; a covered card keeps its name clear of the next card */
+html body.ec-stage #stage .hand.fan .card{margin:0 calc(var(--cw)*-1*var(--ov,.15))!important}
+html body.ec-stage #stage .hand.fan .card:not(:last-child):not(.sel) .ct{padding-right:calc(var(--cw)*2*var(--ov,.15) + 2px)!important}
+html body.ec-stage #stage .hand.fan .card{display:flex!important;flex-direction:column!important}html body.ec-stage #stage .hand.fan .card .cart{order:1}html body.ec-stage #stage .hand.fan .card .ct{order:2;flex:none;display:block!important;padding:2px 3px!important;max-height:none!important;overflow-wrap:normal!important;line-height:1.1!important;text-align:center}html body.ec-stage #stage .hand.fan .card .cb{order:3}
+/* F1: status chips wrap inside the screen; title mute is a full 44x44 tap */
+html body .stc{display:flex;flex-wrap:wrap;justify-content:center;max-width:100%}html body .stc span{white-space:normal!important;max-width:100%;overflow-wrap:anywhere;text-align:center}
+html body #mute{min-width:44px!important;min-height:44px!important;width:44px;height:44px;padding:0!important;display:inline-flex;align-items:center;justify-content:center}
+html body.ec-stage #stage .hand.fan .card .cart{height:calc(var(--cw)*.46)!important}
 </style></head>

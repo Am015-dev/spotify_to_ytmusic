@@ -515,7 +515,7 @@
     st.appendChild(ctl);
     var hand = h('div', 'hand'), hc = b.ph === 'p' ? cur.hand : []; var nn = hc.length;
     if (SG && LSC()) { hand.classList.add('fan'); var cwl = Math.max(60, Math.min(78, Math.floor((document.documentElement.clientWidth - 300) / (1 + .7 * Math.max(0, nn - 1))))); hand.style.setProperty('--cw', cwl + 'px'); st.style.setProperty('--hh', Math.round(cwl * 0.95 + 10) + 'px'); st.classList.add('w24ls'); }   // R24: short landscape phone: a low hand that peeks up, controls in the bottom corners
-    else if (SG) { hand.classList.add('fan'); var cw0 = Math.max(64, Math.min(112, Math.floor((document.documentElement.clientWidth - 16) / (1 + .7 * Math.max(0, nn - 1))))); hand.style.setProperty('--cw', cw0 + 'px'); st.style.setProperty('--hh', Math.round(Math.min(112, Math.floor((document.documentElement.clientWidth - 16) / 3.8)) * 1.5 + 26) + 'px'); } else if (nn > 5) { hand.classList.add('dense'); hand.style.setProperty('--cw', 'min(var(--hw),' + Math.floor((document.documentElement.clientWidth - 12) / (1 + .82 * (nn - 1))) + 'px)'); }
+    else if (SG) { hand.classList.add('fan'); var ov0 = nn <= 5 ? .05 : .15, cw0 = Math.max(64, Math.min(112, Math.floor((document.documentElement.clientWidth - 16) / (1 + (1 - 2 * ov0) * Math.max(0, nn - 1))))); hand.style.setProperty('--cw', cw0 + 'px'); hand.style.setProperty('--ov', String(ov0)); st.style.setProperty('--hh', Math.round(Math.min(112, Math.floor((document.documentElement.clientWidth - 16) / 3.8)) * 1.5 + 26) + 'px'); } else if (nn > 5) { hand.classList.add('dense'); hand.style.setProperty('--cw', 'min(var(--hw),' + Math.floor((document.documentElement.clientWidth - 12) / (1 + .82 * (nn - 1))) + 'px)'); }
     hc.forEach(function (c, i) {
       var ok = E.canPlay(cur, c) && (E.cost(cur, c) <= cur.en || E.eff(c).cost === 'X'), co = { str: E.eff(c).type === 'A' ? (cur.st.str || 0) : 0 }, el = cardEl(c, co); el.classList.add(ok ? 'ok' : 'no'); if (UI.sel === i) el.classList.add('sel');
       if (SG) { var off = i - (nn - 1) / 2; el.style.setProperty('--rot', (off * (nn > 6 ? 3.5 : 5)) + 'deg'); el.style.setProperty('--dy', Math.min(22, off * off * (nn > 6 ? 2 : 4)) + 'px'); el.style.zIndex = 10 + i; }
@@ -540,6 +540,8 @@
     if (SG && nn) {   // R7: the fanned hand always fits the screen (edge cards rotate outwards, so measure and shrink)
       for (var fit = 0; fit < 3; fit++) { var lo = 1e9, hi2 = -1e9, vwf = document.documentElement.clientWidth; hand.querySelectorAll('.card:not(.sel)').forEach(function (ce) { var q = ce.getBoundingClientRect(); lo = Math.min(lo, q.left); hi2 = Math.max(hi2, q.right); }); if (lo >= 3 && hi2 <= vwf - 3) break; var cwN = Math.floor(parseFloat(hand.style.getPropertyValue('--cw')) * (vwf - 8) / (hi2 - lo + 2)); hand.style.setProperty('--cw', Math.max(48, cwN) + 'px'); }
     }
+    if (SG) hand.querySelectorAll('.card .ct').forEach(function (t) {   // F1: card names show in full: shrink a name that does not fit its visible strip (never under 11 px)
+      var fs = parseFloat(getComputedStyle(t).fontSize) || 14; for (var k = 0; k < 4 && fs > 11 && (t.scrollWidth > t.clientWidth + 1 || t.scrollHeight > t.clientHeight + 1); k++) { fs -= 1; t.style.setProperty('font-size', fs + 'px', 'important'); } });
     var sl = hand.querySelector('.card.sel'); if (sl) { var rr = sl.getBoundingClientRect(), vw = document.documentElement.clientWidth; if (SG) { sl.style.setProperty('--sx', Math.round(vw / 2 - (rr.left + rr.width / 2)) + 'px'); var lim = 0; st.querySelectorAll('.bar, .nm, .w4inc').forEach(function (x) { var q = x.getBoundingClientRect(); if (q.width && q.bottom < innerHeight * 0.8) lim = Math.max(lim, q.bottom); }); var cw1 = parseFloat(hand.style.getPropertyValue('--cw')) || 80, dy = lim + 4 - rr.top; if (dy > 0) sl.style.setProperty('--sy', Math.round(-cw1 * 1.05 + Math.min(dy, innerHeight - 4 - rr.bottom)) + 'px'); } else if (rr.left < 4) sl.style.setProperty('--sx', (4 - rr.left) + 'px'); else if (rr.right > vw - 4) sl.style.setProperty('--sx', (vw - 4 - rr.right) + 'px'); }   // R7: on the stage the lifted card rises in the centre, clear of End turn and the foes' HP
   }
   // W420: value preview of the selected card (dry run in the engine on a copy), incoming damage per hero, why-text, draw animation
@@ -798,7 +800,7 @@
     s.appendChild(h('h1', '', g.won ? ((g.F || 9) >= 9 ? 'SUMMIT!' : 'CLIMB WON!') : 'FALLEN'));
     var bossId = g.boss, kid = g.won ? bossId : g.killer, kd = kid && D.ENEMIES[kid];
     var cause = h('div', 'cause');
-    if (kd && (!g.won || g.floor >= g.F)) cause.appendChild(A('enemy-' + kid, '', { ph: '#6a3a2a', cls: 'cause-art' }));
+    if (kd && (!g.won || g.floor >= g.F)) cause.appendChild(A('enemy-' + ((D.ENEMIES[kid] && D.ENEMIES[kid].img) || kid), '', { ph: '#6a3a2a', cls: 'cause-art' }));
     var full = g.floor >= g.F; if (g.won && !full) { kd = null; }
     cause.appendChild(h('div', 'sub', g.won ? (full ? 'Final boss down: ' + (D.ENEMIES[bossId] ? D.ENEMIES[bossId].name : 'the tower boss') + '.' : 'The guided fight is won.') : (kd ? 'Felled by ' + kd.name + (g.killIn === 'b' ? (kd.boss ? ' (boss)' : ' (boss fight)') : g.killIn === 'e' ? ' (elite)' : '') + '.' : 'Your own cards finished you.')));
     s.appendChild(cause);
