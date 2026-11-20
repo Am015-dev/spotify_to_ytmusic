@@ -98,6 +98,7 @@ async function playGame(browser,W,H,gi){
     // 2) the lightbulb: the first time in every phase, then a quarter of the time
     if(hs.ph&&(!seenPh.has('bulb:'+hs.ph)||Math.random()<.25)&&bulbN<14){seenPh.add('bulb:'+hs.ph);bulbN++;totals.bulbs++;
       const pre=await p.evaluate(()=>{let pl=null;try{pl=hlpPlan()}catch(e){}return {has:!!pl,key:pl&&pl.key,sig:G.logN+'|'+G.turn+'|'+(G.q&&G.q.kind)}});
+      await p.evaluate(()=>{if(UI.hintsLeft!=null)UI.hintsLeft=9});   // Hint is limited per game (hint-limit-test.js); the sweep checks the advice, so it never runs dry
       const bb=await cen('#bulbbtn');if(!bb){note(tag,'no bulb button');return false}
       await tapAt(...bb);await sleep(380);
       const r=await p.evaluate(()=>{const f=document.querySelector('.gxh-finger'),b=document.querySelector('.gxh-bub.on'),ru=document.querySelector('.gxh-rules');
