@@ -144,7 +144,10 @@ function renderTable(V){if(!G)return;const tb=document.getElementById('tb');if(!
   const order=crewOrder(V).filter(s=>V.stands.some(st=>st.owner===s));let crew='';const zm=!!TBL.zm&&order.length>0;if(zm)zoomPick(V,g,order);
   const flat={u:new Map(),plates:g.plates};   // a compact crewmate row: its wires are shown, never tappable (the row itself zooms)
   for(const s of order){const q=V.seats[s];const sts=V.stands.filter(st=>st.owner===s).sort((a,b)=>a.i-b.i);const cmp=zm&&s!==UI.zoom;
-    crew+=`<div class="sg${decider()===s&&!G.over?' cur':''}${q.nUncut?'':' out'}${zm?(cmp?' cmp':' zx'):''}" data-seat="${s}" style="--sc:${SEATC[posOf(s)%5]}"${cmp?` role="button" aria-label="Show ${esc(q.nm)}'s wires"`:''}>${plateHTML(V,q,false,cmp?flat:g)}${standsHTML(V,sts,false,cmp?flat:g)}</div>`}
+    // R95: the zoomed crewmate with two stands opens ONE (the one with the move); the other is a compact strip (tap to swap)
+    const zs=zm&&!cmp&&sts.length>1?zoomStand(V,g,sts):null;
+    const body=zs==null?standsHTML(V,sts,false,cmp?flat:g):`<div class="zcol">${sts.map((st,j)=>st.i===zs?standHTML(V,st,false,g,'Stand '+(j+1)):`<div class="stc" data-zst="${st.i}" role="button" aria-label="Show stand ${j+1}">${standHTML(V,st,false,flat,'Stand '+(j+1))}</div>`).join('')}</div>`;
+    crew+=`<div class="sg${decider()===s&&!G.over?' cur':''}${q.nUncut?'':' out'}${zm?(cmp?' cmp':' zx'):''}${zs!=null?' zs':''}" data-seat="${s}" style="--sc:${SEATC[posOf(s)%5]}"${cmp?` role="button" aria-label="Show ${esc(q.nm)}'s wires"`:''}>${plateHTML(V,q,false,cmp?flat:g)}${body}</div>`}
   // mine
   let mine='';if(me>=0){const sts=V.stands.filter(st=>st.owner===me).sort((a,b)=>a.i-b.i);const q=V.seats[me];
     const T=V.legal?V.legal.tools:{};const toolBtns=[];
@@ -163,27 +166,44 @@ function renderTable(V){if(!G)return;const tb=document.getElementById('tb');if(!
 // The zoomed crewmate follows the move: when what glows changes and the zoomed one has nothing to tap, the zoom moves to the
 // crewmate of the suggested move (or the one with the most glowing wires). A tap on a compact row zooms that crewmate.
 function seatOfU(u){for(const st of UI.V.stands)if(st.slots.some(x=>x.u===u))return st.owner;return null}
+function hintU(){try{if(typeof SC!=='undefined'&&SC.show)return SC.show.u;if(UI.hints&&typeof scShowU==='function')return scShowU()}catch(e){}return null}
+function zoomStand(V,g,sts){const ids=sts.map(st=>st.i);if(UI.sel&&UI.sel.tg&&UI.sel.tg.length&&ids.includes(UI.sel.tg[0].st))return UI.zst=UI.sel.tg[0].st;const cnt=st=>st.slots.filter(x=>g.u.has(x.u)).length;const hot=sts.filter(st=>cnt(st)>0);
+  const key=G.logN+'|'+decider()+'|'+hot.map(st=>st.i).join(',')+'|'+(UI.sel?UI.sel.mode+':'+UI.sel.v:'');
+  if(key!==TBL.zskey||!ids.includes(UI.zst)){TBL.zskey=key;const hu=hintU();const hs=hu!=null?sts.find(st=>st.slots.some(x=>x.u===hu)):null;
+    if(hs)UI.zst=hs.i;else if(!ids.includes(UI.zst)||(hot.length&&!hot.some(st=>st.i===UI.zst)))UI.zst=(hot.slice().sort((a,b)=>cnt(b)-cnt(a))[0]||sts[0]).i}
+  return UI.zst}
 function zoomPick(V,g,order){const cnt={};for(const s of order){let n=0;for(const st of V.stands)if(st.owner===s)for(const x of st.slots)if(g.u.has(x.u))n++;cnt[s]=n}
   const hot=order.filter(s=>cnt[s]>0);const sel=UI.sel;const key=hot.join(',')+'|'+G.logN+'|'+decider()+'|'+(G.q?G.q.kind:'')+'|'+(sel?sel.mode+':'+sel.v+':'+(sel.tg||[]).length+':'+sel.tool:'');
   if(!order.includes(UI.zoom))UI.zoom=null;
+  if(sel&&sel.tg&&sel.tg.length&&sel.tg[0].st!=null){const o=ownerOf(sel.tg[0].st);if(order.includes(o)){UI.zoom=o;TBL.zkey=key;return}}   // cold-play: a picked crew wire keeps its crewmate open (no jump)
   if(key!==TBL.zkey){TBL.zkey=key;if(hot.length&&!hot.includes(UI.zoom)){let pref=null;
-    try{const p=ghostPlan(V);if(p&&p.u!=null)pref=seatOfU(p.u)}catch(e){}
+    try{const hu=hintU();if(hu!=null)pref=seatOfU(hu)}catch(e){}
+    if(pref==null)try{const p=ghostPlan(V);if(p&&p.u!=null)pref=seatOfU(p.u)}catch(e){}
     if(pref==null||!hot.includes(pref))try{const W=wwk(V);const m=W&&W.suggestion&&W.suggestion.m;if(m&&m.st!=null)pref=ownerOf(m.st)}catch(e){}
     UI.zoom=hot.includes(pref)?pref:hot.slice().sort((a,b)=>cnt[b]-cnt[a])[0]}}
   if(UI.zoom==null)UI.zoom=hot.length?hot[0]:order[0]}
 // the zoom hint holds the message line only until the next tap, so the tap's own explanation (e.g. on a red wire) is never hidden
 document.addEventListener('pointerdown',()=>{TBL.tapAt=Date.now();if(TBL.zhintT&&TBL.sayT===TBL.zhintT)TBL.sayT=0;TBL.zhintT=0},true);
 function zoomTo(s){if(UI.zoom===s)return;UI.zoom=s;lsSet('sf_zhint',1);sfx('click');const el=document.getElementById('crew');if(el)el._s=null;renderTable(UI.V)}
-document.addEventListener('click',e=>{const s=e.target.closest&&e.target.closest('#crew.zm .sg.cmp');if(!s||e.target.closest('.plate.glow'))return;e.stopPropagation();e.preventDefault();zoomTo(+s.dataset.seat)},true);
+document.addEventListener('click',e=>{const z=e.target.closest&&e.target.closest('#crew.zm .stc');if(z&&!e.target.closest('.plate.glow')){e.stopPropagation();e.preventDefault();const u=cmpU(e,z);UI.zst=+z.dataset.zst;sfx('click');const el=document.getElementById('crew');if(el)el._s=null;renderTable(UI.V);cmpPick(u);return}},true);
+// cold-play: a tap on a wire in a compact row opens that crewmate AND picks the wire (when it is a target), so one tap does what it looks like
+function cmpU(e,root){let u=null;const t=e.target.closest&&e.target.closest('.tile[data-u]');if(t)u=+t.dataset.u;else{const ts=[...root.querySelectorAll('.tile[data-u]')];let bd=1e9;for(const x of ts){const r=x.getBoundingClientRect();const d=Math.abs(r.left+r.width/2-e.clientX);if(d<bd&&d<r.width){bd=d;u=+x.dataset.u}}}
+  return u}
+function cmpPick(u){if(u==null)return;setTimeout(()=>{const el=document.querySelector('#crew .tile.glow[data-u="'+u+'"]');if(el&&!el.closest('.cmp,.stc')){try{el.scrollIntoView({block:'nearest'})}catch(x){}tapTile(+el.dataset.s,+el.dataset.k)}},0)}
+document.addEventListener('click',e=>{const s=e.target.closest&&e.target.closest('#crew.zm .sg.cmp');if(!s||e.target.closest('.plate.glow'))return;e.stopPropagation();e.preventDefault();const u=cmpU(e,s);zoomTo(+s.dataset.seat);cmpPick(u)},true);
 // lays out the compact rows and the zoomed crewmate; returns false when it cannot fit (the crew area then scrolls)
 function zoomLayout(tb,crew,mine,tm){tb.classList.add('zm');crew.classList.add('zm');crew.classList.remove('rowy','scroll');
   if(tm<52)mine.style.setProperty('--th',Math.max(TMIN,tm)+'px');   // zoom: my wires square below 52 px (a 44 px wire is 44x44), the crew gets the rows saved
   balance(mine,tm,4,mine.querySelector('.stand.two')?20:0);
+  // R95: a short screen gives the crew the height: each of my stands on ONE row (wires 44 px tall, as wide as fits)
+  const mst=[...mine.querySelectorAll('.stand')];if(window.innerHeight<640&&mst.some(st=>st.classList.contains('wrapd'))){const n=Math.max(...mst.map(st=>st.querySelectorAll('.tile').length));
+    const gut=mine.querySelector('.stand.two')?20:0;const w0=Math.min(tm,Math.floor((mine.clientWidth-gut-8+4)/Math.max(1,n))-4);if(mst.length>1||w0>=24){const w1=Math.max(24,w0);mine.style.setProperty('--tw',w1+'px');mine.style.setProperty('--th',TMIN+'px');mst.forEach(st=>{st.style.maxWidth='none';st.classList.remove('wrapd')});mine.classList.add('row1')}}
   const cw=crew.clientWidth-12;const sgs=[...crew.querySelectorAll('.sg')];
   for(const s of sgs.filter(x=>x.classList.contains('cmp'))){const n=s.querySelectorAll('.tile').length,ns=s.querySelectorAll('.stand').length;const pw=s.querySelector('.plate').offsetWidth;const avail=cw-pw-14-(ns-1)*6;
     let tw=Math.min(28,Math.floor((avail+2)/Math.max(1,n))-2),lines=1;if(tw<22){tw=22;lines=Math.ceil(n*24/avail)}
     s.style.setProperty('--tw',tw+'px');s.style.setProperty('--th',(lines===1?30:24)+'px');
     if(lines===1&&s.querySelector('.stand').offsetHeight>40)s.style.setProperty('--th','24px')}   // the chips wrapped after all: two 24 px lines
+  for(const c of crew.querySelectorAll('.stc')){const n=c.querySelectorAll('.tile').length;const avail=c.clientWidth-60;const tw=Math.max(16,Math.min(28,Math.floor((avail+2)/Math.max(1,n))-2));c.style.setProperty('--tw',tw+'px');c.style.setProperty('--th','30px')}
   const zx=sgs.find(x=>x.classList.contains('zx'));let tw=TMINW;
   // rows still too tall: tight rows (shorter plate and row) so every plate stays inside the crew area, clear of my stand
   const tighten=()=>{if(crew.classList.contains('tight'))return;crew.classList.add('tight');for(const s of sgs.filter(x=>x.classList.contains('cmp')))s.style.setProperty('--th',(parseInt(s.style.getPropertyValue('--th'))>24?24:20)+'px')};
@@ -212,7 +232,7 @@ function tileH(tw,ratio){return Math.max(TMIN,Math.round(tw*(tw<52?Math.min(rati
 function balance(root,tw,g,gut){root.querySelectorAll('.stand').forEach(st=>{const n=st.querySelectorAll('.tile').length;const side=st.querySelector('.side');const W=(st.parentNode.clientWidth||st.clientWidth)-(gut||0);const maxc=Math.max(1,Math.floor((W+g)/(tw+g)));const rows=Math.ceil(n/maxc);const cols=Math.max(1,Math.ceil(n/Math.max(1,rows)));st.style.maxWidth=(cols*(tw+g)+(side?44:0))+'px';st.classList.toggle('wrapd',rows>1)})}
 function layoutTable(){const tb=document.getElementById('tb');if(!tb||!G)return;const W=tb.clientWidth,H=tb.clientHeight;if(W<50||H<50)return;
   const crew=document.getElementById('crew'),mine=document.getElementById('mine'),felt=document.getElementById('felt'),gear=document.getElementById('gear');
-  document.documentElement.classList.toggle('short',window.innerHeight<640);tb.classList.remove('zm');crew.classList.remove('zm','tight');crew.querySelectorAll('.sg').forEach(x=>{x.style.removeProperty('--tw');x.style.removeProperty('--th')});
+  document.documentElement.classList.toggle('short',window.innerHeight<640);tb.classList.remove('zm');mine.classList.remove('row1');crew.classList.remove('zm','tight');crew.querySelectorAll('.sg').forEach(x=>{x.style.removeProperty('--tw');x.style.removeProperty('--th')});
   const land=W>H*1.15&&W>=600;mine.classList.remove('mrow');const big=W>=900&&H>=700;tb.classList.toggle('land',land);
   let plateH=44;
   const cs=[...crew.querySelectorAll('.sg')].map(s=>[...s.querySelectorAll('.stand')].map(st=>st.querySelectorAll('.tile').length));
@@ -369,7 +389,9 @@ document.addEventListener('click',e=>{const t=e.target.closest('#tb .tile.glow,#
 function plateTap(seat){const V=UI.V;if(!V||V.seat<0)return;
   if(V.q&&V.q.who===V.seat&&V.q.kind==='designate'){const i=V.q.opts.findIndex(o=>o.d&&o.d.seat===seat);if(i>=0){answer(i);return}}
   const sel=UI.sel;if(sel&&sel.mode==='choose'){const step=nextStep(sel);if(step&&step.key){const vals=[...new Set(selRemaining(sel).map(m=>m[step.key]))];const hit=vals.find(v=>Array.isArray(v)?v.includes(seat):v===seat);if(hit!==undefined){sel.fixed[step.key]=hit;sfx('select');const rem=selRemaining(sel);if(rem.length===1&&!nextStep(sel)){act(rem[0],V.seat);return}refresh()}}}}
-function eqTap(id){const V=UI.V;if(!V||V.seat<0)return;let moves=eqMovesFor(V,id);if(!moves.length)return;const k=moveKey(moves[0]);
+function eqTap(id){const V=UI.V;if(!V||V.seat<0)return;
+  const cs=UI.sel;if(cs&&cs.mode==='choose'&&cs.opts&&cs.opts[0]&&cs.opts[0].a==='eq'&&cs.opts[0].id===id){UI.sel=null;sfx('click');toast('Card put back');refresh();return}   // R95: the glowing card during "Pick one" cancels the pick
+  let moves=eqMovesFor(V,id);if(!moves.length)return;const k=moveKey(moves[0]);
   if(moves.length===1&&!stepsOf(k).length){act(moves[0],V.seat);return}startChoose(moves,!(V.legal&&decider()===V.seat))}
 function chipTap(n){const V=UI.V;const it=TBL.items&&TBL.items[n];if(!it||!V)return;const me=V.seat;
   switch(it.t){

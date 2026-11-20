@@ -133,7 +133,7 @@ function tutStart(o){if(typeof GXT==='undefined')return;const pro=!!(o&&o.prolog
     setup:tutNew,
     onDone:r=>{tutLeave();const c=r&&r.choice;
       if(c==='chapter'&&first){showStart();GXC.play(first.id)}
-      else if(c==='job1'){UI.setup=UI.setup||defaultSetup();startJob({job:1,np:3,seats:['human','ai','ai'],lv:'easy',names:DEFNAMES.slice(),chars:[],captain:0})}
+      else if(c==='job1'){UI.setup=UI.setup||defaultSetup();startJob({job:1,np:2,seats:['human','ai'],lv:'normal',names:DEFNAMES.slice(),chars:[],captain:0,warm:1})}
       else if(c==='story'&&typeof GXC!=='undefined'){showStart();GXC.open()}
       else showStart()},
     onExit:()=>{tutLeave();showStart();if(pro&&typeof GXC!=='undefined')GXC.open()}})}   // skipping the Story prologue opens the chapter map

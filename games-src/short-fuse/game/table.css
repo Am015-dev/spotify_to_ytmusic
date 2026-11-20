@@ -432,3 +432,39 @@ html.short #sc .tr span:nth-child(2){display:none}
 /* F3 PC: text never below 12 px, rig counter larger */
 @media (min-width:900px){.tile small{font-size:13px}.stl{font-size:13px}}
 @media (min-width:640px){#sc{flex-direction:row;align-items:center;gap:18px;flex-wrap:nowrap}#sc .tr{flex:none}#sc .scr{flex:1 1 auto;justify-content:flex-end}}
+@media (hover:none),(pointer:coarse){.keysonly{display:none}}
+/* R95: "Show me" pointer: a ring on the wire to tap and one arrow above it (static, no loop) */
+#tb .tile.hring{outline:4px solid #ffd34d;outline-offset:2px;z-index:3}
+#hptr{position:absolute;z-index:40;transform:translate(-50%,-100%);pointer-events:none;display:flex;flex-direction:column;align-items:center;animation:hpIn .35s ease-out 1}
+#hptr span{font:800 14px var(--fb);color:#1c1408;background:#ffd34d;border:2px solid #1c1408;border-radius:10px;padding:1px 8px;line-height:18px}
+#hptr i{width:0;height:0;border-left:8px solid transparent;border-right:8px solid transparent;border-top:10px solid #1c1408;margin-top:-1px}
+#hptr.up{transform:translate(-50%,0);flex-direction:column-reverse}#hptr.up i{border-top:0;border-bottom:10px solid #1c1408;margin:0 0 -1px}
+@keyframes hpIn{from{opacity:0;margin-top:-8px}to{opacity:1;margin-top:0}}
+@media (prefers-reduced-motion:reduce){#hptr{animation:none}}
+/* R95: the zoomed crewmate's second stand as a compact strip (the strip itself is the 44 px target) */
+#crew.zm .sg.zs{align-items:stretch}
+#crew.zm .zcol{display:flex;flex-direction:column;gap:3px;flex:1 1 auto;min-width:0;align-items:center}
+#crew.zm .stc{display:flex;align-items:center;align-self:stretch;min-height:44px;box-sizing:border-box;padding:2px 6px;border-radius:12px;border:1.5px dashed rgba(255,255,255,.35);background:rgba(8,14,30,.35);cursor:pointer}
+#crew.zm .stc:active{background:rgba(8,14,30,.6)}
+#crew.zm .stc .stand{flex:1 1 auto;justify-content:flex-start;gap:2px;margin-top:0;filter:none;max-width:none!important;flex-wrap:nowrap;overflow:hidden}
+#crew.zm .stc .stand.two .stl{position:static;transform:none;margin-right:4px;flex:none;writing-mode:horizontal-tb;width:auto;height:20px;padding:0 6px;font-size:12px;line-height:18px}
+#crew.zm .stc .rtn,#crew.zm .stc .tile .nt,#crew.zm .stc .tile small,#crew.zm .stc .tile .wr{display:none}
+#crew.zm .stc .tile{border-width:1.5px;border-radius:4px;box-shadow:none;animation:none;pointer-events:none;min-width:16px}
+#crew.zm .stc .tile.back::before{display:none}
+#crew.zm .stc .tile .f{font-size:max(12px,calc(var(--tw)*.6))}
+#crew.zm .stc .tile .coin{min-width:0;width:auto;height:auto;left:1px;right:1px;top:1px;bottom:1px;transform:none;display:flex;align-items:center;justify-content:center;font-size:12px!important;line-height:1;border-width:1px;border-radius:3px;padding:0}
+#crew.zm .stc .tile .coin+.coin{display:none}
+#crew.zm .stc .side{transform:scale(.7);transform-origin:left center}
+/* R95: thumb targets on short screens: compact rows, plates and number chips stay 44 px */
+#crew.zm.tight .sg.cmp,#crew.zm .sg.cmp{min-height:44px}
+#crew.zm .sg.zx .plate,html.sk-plate #crew.zm .sg.zx .plate{min-height:44px}
+#tb .chip.sm{min-width:44px}
+#mine.row1 .stand{flex-wrap:nowrap}
+/* R95: every top-bar button says what it is (a short word under the icon on phones too) */
+@media (max-width:639px){.gx-bar .gx-ibtn{flex-direction:column;gap:1px;padding:2px 3px!important;min-width:50px!important;line-height:1}
+ .gx-bar .gx-ibtn>span{display:block!important;font:800 11px/12px var(--fb,system-ui),sans-serif;text-shadow:0 1px 2px #000,0 0 3px #000;letter-spacing:0;white-space:nowrap}
+ .gx-bar .gx-ibtn svg{width:17px!important;height:17px!important;margin-top:-2px}
+ .gx-bar .gxh-bulb>span.bl{display:block!important;font:800 11px/12px var(--fb,system-ui),sans-serif}}
+.gx-bar .gxh-bulb{display:inline-flex;align-items:center;justify-content:center}
+@media (min-width:640px){.gx-bar .gxh-bulb>span.bl{margin-left:4px}}
+@media (max-width:639px){html.sk .gx-bar .gx-ibtn{border-image-width:5px;border-width:5px}.gx-bar .gxh-bulb{min-width:66px!important}.gx-bar .gx-ibtn svg{margin-top:0}}

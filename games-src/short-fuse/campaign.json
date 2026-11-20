@@ -118,7 +118,7 @@
       },
       "setup": {
         "mission": 1,
-        "players": 3,
+        "players": 2,
         "level": "normal",
         "seed": null
       },
@@ -158,10 +158,10 @@
         "twist": null,
         "setup": {
           "players": 3,
-          "level": "hard"
+          "level": "normal"
         },
         "maxStars": 2,
-        "text": "Sharper teammates: the computer crew plays its very best."
+        "text": "A third crewmate: the fuse starts one step longer."
       },
       "unlock": [
         {
