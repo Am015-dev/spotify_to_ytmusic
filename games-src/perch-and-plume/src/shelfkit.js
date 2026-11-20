@@ -32,7 +32,7 @@ function helpPhase() {
   if (!G || !myTurn() || (typeof tutOn === 'function' && tutOn())) return null;
   if (panelUp()) return null;   // never over a drawer, the story map or a full-screen panel
   var Q = G.q; if (UI.sel != null && !Q) return 'play';
-  if (!Q) return 'act'; return { die: 'die', egg: 'egg', draw: 'draw', bonus: 'bonus', pwTuck: 'power', pwTrade: 'power', play2: 'play', bonusPick: null }[Q.h] || null;
+  if (!Q) return 'act'; return { die: 'die', egg: 'egg', draw: 'draw', bonus: 'bonus', pwTuck: 'power', pwTrade: 'power', pwMay: 'power', play2: 'play', bonusPick: null }[Q.h] || null;
 }
 function panelUp() { var m = document.querySelector('.gxc'); return !!((window.GX && GX.open) || (m && !m.hidden) || !$('#title').hidden || !$('#setup').hidden || !$('#result').hidden || !$('#pass').hidden || !$('#pop').hidden); }
 function hideHelp() { try { if (window.GXH) GXH.hide(); } catch (e) { } }
@@ -50,12 +50,12 @@ function moveTarget(m) {
 function helpInit() {
   if (!window.GXH) return;
   try {
-    GXH.init({ game: 'perch-and-plume', defaultOn: false, avoid: '.glow,#acts .btn,#feeder,#tray',
+    GXH.init({ game: 'perch-and-plume', defaultOn: false, avoid: '.glow,[data-legal],#acts .btn,#feeder,#tray',
       steps: {
         act: { target: function () { return $('.ract[data-h="0"]'); }, title: 'One action a turn', text: 'Use a habitat row, or play a bird from your hand.' },
-        play: { target: function () { return $('.slot.next.glow') || $('#mat'); }, title: 'Place your bird', text: 'A bird goes in the leftmost free space. Spaces further right cost eggs.' },
+        play: { target: function () { return $('.slot.next[data-legal]') || $('#mat'); }, title: 'Place your bird', text: 'A bird goes in the leftmost free space. Spaces further right cost eggs.' },
         die: { target: function () { return $('#feeder'); }, title: 'The birdfeeder', text: 'Each die is one food. An empty feeder rolls all five dice again.' },
-        egg: { target: function () { return $('.bc[data-a="bird"].glow') || $('#mat'); }, title: 'Lay eggs', text: 'Each egg is a point. A bird holds only as many eggs as its nest shows.' },
+        egg: { target: function () { return $('.bc[data-a="bird"][data-legal]') || $('#mat'); }, title: 'Lay eggs', text: 'Each egg is a point. A bird holds only as many eggs as its nest shows.' },
         draw: { target: function () { return $('#tray'); }, title: 'Draw birds', text: 'The tray shows three birds; the deck is a surprise.' },
         bonus: { target: function () { return $('#acts'); }, title: 'A trade', text: 'This space offers a trade for one more. Yes or no thanks.' },
         power: { target: function () { return $('.bc.firing') || $('#hand'); }, title: 'A bird power', text: 'This bird asks for a decision. Skip is always allowed.' }

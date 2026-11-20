@@ -84,6 +84,7 @@
         var w = best(mv.filter(function (m) { return m.t === 'tuck'; }), function (m) { return -cardVal(G, seat, p.hand[m.i], T); });
         return cardVal(G, seat, p.hand[w.i], T) < 1.6 || p.hand.length > 5 ? w : { t: 'skip' };
       }
+      case 'pwMay': return { t: 'use' };
       case 'pwTrade': {
         if (T < 5 || p.hand.length > 4) return { t: 'skip' };
         return best(mv.filter(function (m) { return m.t === 'trade'; }), function (m) { return p.board[m.h][m.c].eggs; }) || { t: 'skip' };

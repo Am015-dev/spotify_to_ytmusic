@@ -102,7 +102,7 @@ async function playOut(p, label, maxMs) {
       const can = await p.evaluate(() => {
         const c = GXT.current(); if (!c || !c.target || !myTurn() || (c.ready && !c.ready())) return false;
         let t = c.target(); if (!t || !t.getBoundingClientRect) return false;
-        if (!t.matches('button,.bc,.die,.slot') ) t = t.querySelector('.glow') || t;
+        if (!t.matches('button,.bc,.die,.slot') ) t = t.querySelector('[data-legal]') || t;
         document.querySelectorAll('[data-tut-tap]').forEach(e => e.removeAttribute('data-tut-tap'));
         t.setAttribute('data-tut-tap', '1'); return true;
       });

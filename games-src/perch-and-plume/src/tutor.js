@@ -7,7 +7,7 @@ var TUT = { on: false };
 function tutOn() { return typeof GXT !== 'undefined' && GXT.active() && UI.mode === 'tutorial'; }
 function tutAct(x) { if (!tutOn()) return true; return GXT.act(x); }
 function tutAIMove(s) {
-  if (UI.mode !== 'tutorial' || s !== 1 || G.q) return null;
+  if ((UI.mode !== 'tutorial' && UI.mode !== 'tutfree') || !G.tut || s !== 1 || G.q) return null;   // Pip always draws cards in the guided game
   return { t: 'act', a: 'cards' };
 }
 function tutPick() {

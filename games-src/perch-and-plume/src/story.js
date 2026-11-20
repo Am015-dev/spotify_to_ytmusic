@@ -23,6 +23,7 @@ var STORY = {
   coach: {
     goal: 'Most points wins. Tap the score.',
     turns: 'One action per turn. Real rounds give 8, then 7, 6, 5.',
+    keep: 'Real games start: from 5 birds and 5 food, keep 5.',
     play: 'Action one: play a bird. Tap this button.',
     cost: 'This bird costs one food from your supply. Tap it.',
     slot: 'Birds fill the leftmost empty space in their habitat.',
@@ -34,6 +35,8 @@ var STORY = {
     die2: 'Two forest birds give two food. Take another die.',
     tuck: 'Brown powers fire right to left. Tuck a card here.',
     cache: 'Tucked cards and stored food are 1 point each.',
+    twofor1: 'Missing a food? Any 2 of your food pay for 1.',
+    trade: 'Some row spaces add a trade: pay food for an extra egg.',
     eggs: 'Action three: lay eggs. The grassland lays them.',
     nest: 'Tap a bird. Each egg is 1 point, up to its nest.',
     pink: "Pip's pink bird reacted to your eggs between turns.",

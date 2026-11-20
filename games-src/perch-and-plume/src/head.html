@@ -124,7 +124,8 @@ body:has(#title:not([hidden])) #barstat{display:none}
 .bc .pwt.brown{border-left-color:#8a5a32;background:#f1e0c8}.bc .pwt.pink{border-left-color:#d77aa0;background:#f8e2ec}.bc .pwt.white{border-left-color:#c9c3b2;background:#f4f1e8}
 .bc.on-board .hband{height:4px}
 /* glowing legal targets */
-.glow{outline:3px solid #ffd76a;outline-offset:1px;box-shadow:0 0 14px 3px rgba(255,215,106,.85);animation:gl 1.2s ease-in-out infinite}
+.glow{outline:3px solid #ffd76a;outline-offset:1px;box-shadow:0 0 14px 3px rgba(255,215,106,.85);animation:gl 1.2s ease-in-out 3}   /* the ONE suggested target (hints on): 3 pulses, then a still outline */
+.slot[data-legal]{outline:2px dashed rgba(255,215,106,.9);outline-offset:-3px}   /* where a chosen bird can go: a still dashed edge, no glow */
 @keyframes gl{50%{box-shadow:0 0 4px 1px rgba(255,215,106,.5)}}
 .sel{transform:translateY(-6px);outline:3px solid #fff;box-shadow:0 0 16px #fff}
 .firing{animation:firing .65s ease;z-index:5}
@@ -262,7 +263,7 @@ html.gx-noanim .firing,html.gx-noanim .popfx,html.gx-noanim .glow,html.gx-reduce
 .reveal .bc .pwt{font-size:14px;-webkit-line-clamp:6}
 .reveal.out{opacity:0;transform:translate(-50%,-140%) scale(.4)}
 @keyframes revin{from{opacity:0;transform:translate(-50%,-20%) scale(.6)}to{opacity:1;transform:translate(-50%,-50%) scale(1)}}
-body.focus .ract:not(.glow),body.focus #hand .bc:not(.glow),body.focus .die:not(.glow),body.focus .bc[data-a="tray"]:not(.glow),body.focus #deckb:not(.glow),body.focus .bc[data-a="bird"]:not(.glow){filter:brightness(.55) saturate(.45);transition:filter .25s}
+body.focus .ract:not([data-legal]),body.focus #hand .bc:not([data-legal]),body.focus .die:not([data-legal]),body.focus .bc[data-a="tray"]:not([data-legal]),body.focus #deckb:not([data-legal]),body.focus .bc[data-a="bird"]:not([data-legal]){filter:brightness(.55) saturate(.45);transition:filter .25s}
 .bc.landed{animation:landin .42s ease-out}
 @keyframes landin{from{transform:translateY(-40px) scale(1.15);opacity:.3}to{transform:none;opacity:1}}
 .die{flex-direction:column;gap:0;height:auto!important;min-height:44px;padding:3px 2px!important;width:48px!important}
@@ -345,10 +346,10 @@ body.confirming #prompt{display:none}
 .a4.best{border-color:#7a4a06;box-shadow:0 0 0 2px #e0a948}
 .bestt{position:relative;outline:3px solid #7a4a06;outline-offset:2px}.bestx{z-index:3;pointer-events:none}
 .bestb{position:absolute;top:-8px;right:8px;font-style:normal;font-weight:800;font-size:14px;background:#7a4a06;color:#fff;border-radius:9px;padding:0 8px;line-height:20px}
-.tutpoint{min-width:44px;min-height:44px;box-sizing:border-box;outline:4px solid #e0a948!important;outline-offset:2px;animation:tutp 1.2s ease-in-out infinite}
+.tutpoint{min-width:44px;min-height:44px;box-sizing:border-box;outline:4px solid #e0a948!important;outline-offset:2px;animation:tutp 1.2s ease-in-out 3}
 .tutpulse{animation:tutpz .45s ease-out 2}
 @keyframes tutpz{50%{box-shadow:0 0 0 3px #fff,0 0 14px 4px #ffd76a}}
-.a4.tutpoint{outline:4px solid #e0a948;outline-offset:2px;animation:tutp 1.2s ease-in-out infinite}
+.a4.tutpoint{outline:4px solid #e0a948;outline-offset:2px;animation:tutp 1.2s ease-in-out 3}
 .a4.tutpoint::after{content:"\25B6  Ottilie";position:absolute;left:-4px;top:-12px;background:#4f7a45;color:#fff;font-size:14px;font-weight:700;border-radius:9px;padding:0 7px;line-height:20px}
 @keyframes tutp{50%{outline-color:#fff}}
 #foodrow{gap:8px}

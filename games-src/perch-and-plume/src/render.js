@@ -57,7 +57,7 @@ function render() {
   $('#barstat').textContent = '';
   $$('#bd .firing,#bd .landed,#bd .pulse').forEach(function (e) { e.classList.remove('firing', 'landed', 'pulse'); });   // parts are kept when unchanged (setH): clear one-shot effects
   renderOpps(cur); renderMid(); renderMat(p, vs); renderDock(p, vs, cur); renderGoalbar(); fitMat();
-  glow(); try { markBest(); } catch (e) { } try { dockToActs(); } catch (e) { } try { bestInView(); } catch (e) { }
+  glow(); try { markBest(); } catch (e) { } try { glowOne(); } catch (e) { } try { dockToActs(); } catch (e) { } try { bestInView(); } catch (e) { }
   if (UI.pend) [40, 160, 420].forEach(function (ms) { setTimeout(function () { try { if (UI.pend) dockToActs(); } catch (e) { } }, ms); });   // late layout (card art, the chosen card's scroll) must not push Play/Cancel out of the panel
   try { rateStart(); showRate(); } catch (e) { }
   try { if (window.GXH && GXH.phase) GXH.phase(helpPhase()); } catch (e) { }
@@ -130,14 +130,14 @@ function renderDock(p, vs, cur) {
   setH($('#foodrow'), '<span class="fl">Your food</span>' + (have.length ? have.map(function (f) { return '<span class="fd" aria-label="' + f + ' ' + p.food[f] + '">' + foodIcon(f) + '<b data-engine="G.pl[' + vs + '].food.' + f + '">' + p.food[f] + '</b><small>' + f + '</small></span>'; }).join('') : '<span class="fd none">none yet</span>') +
     (p.bonus.length ? '<button type="button" class="fd bon" data-gx="goalsd" aria-label="Your secret bonus card">&#9733; bonus card</button>' : ''));
   var ok = {}; if (mine && (!Q || Q.h === 'play2')) PP.playable(G, vs, Q && Q.h === 'play2' ? Q.d.hab : null).forEach(function (x) { ok[x.i] = 1; });
-  var hm = mine && !Q && hintsOn() ? hintMove() : null, bp = hm ? (hm.t === 'play' ? { i: hm.i } : null) : mine && !Q && hintsOn() && typeof coachOn === 'function' && coachOn() ? bestPlay(G, vs) : null;
+  var hm = mine && !Q && bestOn() && (UI.pickBird || UI.sel != null) ? hintMove() : null, bp = hm && hm.t === 'play' ? { i: hm.i } : null;   // Best on a hand card only once you chose Play a bird
   var tuckQ = mine && Q && (Q.h === 'pwTuck' || Q.h === 'bonus');
   var order = p.hand.map(function (id, i) { return i; }).sort(function (x, y) { return (ok[y] ? 1 : 0) - (ok[x] ? 1 : 0) || (ok[x] ? B[p.hand[y]].p - B[p.hand[x]].p : 0) || x - y; });   // birds you can play first, best first
   setH($('#hand'), p.hand.length ? order.map(function (i) {
     var id = p.hand[i], b = B[id], st;
     if (tuckQ) st = '<div class="bk-st go">Tap to use this card</div>';
     else if (!mine) st = '';
-    else if (ok[i]) st = '<div class="bk-st go">' + (UI.sel === i ? (UI.pend ? 'Chosen: tap Play to confirm' : 'Now tap a glowing space on your board') : hintsOn() ? 'Tap to play: +' + b.p + (b.p === 1 ? ' point' : ' points') : 'Tap to play this bird') + '</div>';
+    else if (ok[i]) st = '<div class="bk-st go">' + (UI.sel === i ? (UI.pend ? 'Chosen: tap Play to confirm' : 'Now tap a marked space on your board') : hintsOn() ? 'Tap to play: +' + b.p + (b.p === 1 ? ' point' : ' points') : 'Tap to play this bird') + '</div>';
     else if (!Q) st = '<div class="bk-st no">' + esc(whyCant(id)) + '</div>';
     else st = '';
     var cls = (UI.sel === i ? 'sel' : '') + (mine && !Q && !ok[i] ? ' cant' : '') + (bp && bp.i === i ? ' bestc' : '');
@@ -155,7 +155,7 @@ function dockToActs() {   // the step's buttons and what glows in the panel sit 
   var r = db.getBoundingClientRect(), lim = r.top + (pr && pr.offsetHeight ? pr.offsetHeight + 6 : 0), els = [];
   if (ac.children.length) els.push(ac);
   if (document.body.classList.contains('idle4')) { var a4 = $('#act4') || ac; els = [a4]; }   // choosing an action: only the 4 buttons matter, not a Best hand card below
-  var g = els.length && document.body.classList.contains('idle4') ? null : db.querySelector('#hand .glow, #hand .sel, #acts .glow') || db.querySelector('#hand .bestc'); if (g) els.push(g); else if (!els.length) return;
+  var g = els.length && document.body.classList.contains('idle4') ? null : db.querySelector('#hand .glow, #hand .sel, #acts .glow, #hand [data-legal]') || db.querySelector('#hand .bestc'); if (g) els.push(g); else if (!els.length) return;
   var top = Math.min.apply(null, els.map(function (e) { return e.getBoundingClientRect().top; })), bot = Math.max.apply(null, els.map(function (e) { return e.getBoundingClientRect().bottom; }));
   var d = top < lim ? top - lim : bot > r.bottom ? Math.min(bot - r.bottom + 4, top - lim) : 0;
   if (Math.abs(d) > 2) db.scrollTop += d;
@@ -171,15 +171,16 @@ function promptText(mine) {
   var Q = G.q;
   if (UI.pend) return 'Tap Play to put ' + B[G.pl[UI.view].hand[UI.pend.i]].n + ' in your ' + HABN[UI.pend.h] + '.';
   if (UI.gsDie != null) return 'Grub or seed?';
-  if (!Q) return UI.sel != null ? 'Tap the glowing space on your board.' : UI.pickBird ? 'Pick a glowing bird below.' : 'Choose one action:';
+  if (!Q) return UI.sel != null ? 'Tap the marked space on your board.' : UI.pickBird ? 'Pick a bird below.' : 'Choose one action:';
   var n = Q.d && Q.d.n;
   switch (Q.h) {
-    case 'die': return 'Tap a glowing food die in the feeder to take it (' + n + ' left).';
-    case 'egg': return 'Tap a glowing bird on your board to lay an egg on it (' + n + ' left).';
-    case 'draw': return 'Tap a glowing bird in the tray, or the deck, to take a card (' + n + ' left).';
+    case 'die': return 'Tap a food die in the feeder to take it (' + n + ' left).';
+    case 'egg': return 'Tap a bird on your board to lay an egg on it (' + n + ' left).';
+    case 'draw': return 'Tap a bird in the tray, or the deck, to take a card (' + n + ' left).';
     case 'bonus': return Q.d.kind === 'card' ? 'Discard a card for 1 more food?' : Q.d.kind === 'food' ? 'Pay 1 food for 1 more egg?' : 'Pay 1 egg for 1 more card?';
     case 'pwTuck': return B[G.pl[UI.view].board[Q.d.h][Q.d.c].id].n + ': tuck a card?';
     case 'pwTrade': return B[G.pl[UI.view].board[Q.d.h][Q.d.c].id].n + ': spend an egg?';
+    case 'pwMay': return B[G.pl[UI.view].board[Q.d.h][Q.d.c].id].n + ': use it? Everyone gets one too.';
     case 'play2': return 'Play a second bird in your ' + HABN[Q.d.hab] + '?';
     case 'bonusPick': return 'Keep one bonus card.';
   }
@@ -199,6 +200,7 @@ function actsHTML() {
   switch (Q.h) {
     case 'die': return PP.allSame(G) ? mvBtn({ t: 'reroll' }, 'Reroll the feeder') : '';
     case 'bonus': return Q.d.kind === 'food' ? PP.FOODS.filter(function (f) { return p.food[f]; }).map(function (f) { return mvBtn({ t: 'bonus', yes: true, f: f }, 'Pay ' + foodIcon(f)); }).join('') + mvBtn({ t: 'bonus', yes: false }, 'No thanks') : mvBtn({ t: 'bonus', yes: false }, 'No thanks');
+    case 'pwMay': return mvBtn({ t: 'use' }, 'Use it', 'pri') + mvBtn({ t: 'skip' }, 'Skip');
     case 'pwTuck': case 'pwTrade': case 'play2': return mvBtn({ t: 'skip' }, 'Skip');
     case 'bonusPick': return Q.d.opts.map(function (id, i) { var bc = PP.BON[id]; return '<button type="button" class="bonc" data-a="mv" data-m="' + esc(JSON.stringify({ t: 'pickb', i: i })) + '"><b>' + esc(bc.n) + '</b>' + esc(bc.txt) + '<br>' + bonusTiers(bc) + '</button>'; }).join('');
   }
@@ -206,11 +208,12 @@ function actsHTML() {
 }
 function bonusTiers(bc) { return typeof bc.sc === 'string' ? bc.sc + ' point' + (bc.sc === '1' ? '' : 's') + ' each' : bc.sc.map(function (t) { return t[0] + '+: ' + t[1] + ' pts'; }).join(', '); }
 // glowing legal targets (only while the shown seat decides)
+// legal targets carry data-legal (no glow: they stay bright while the rest dims); the single suggested one glows (glowOne)
 function glow() {
-  $$('.glow').forEach(function (e) { e.classList.remove('glow'); });
+  $$('.glow').forEach(function (e) { e.classList.remove('glow'); }); $$('[data-legal]').forEach(function (e) { e.removeAttribute('data-legal'); });
   document.body.classList.toggle('focus', !!(myTurn() && G && (G.q || UI.sel != null) && !UI.pend && UI.gsDie == null));
   if (!myTurn()) return;
-  var Q = G.q, p = G.pl[UI.view], add = function (sel) { $$(sel).forEach(function (e) { e.classList.add('glow'); }); };
+  var Q = G.q, p = G.pl[UI.view], add = function (sel) { $$(sel).forEach(function (e) { e.setAttribute('data-legal', ''); }); };
   if (UI.pend || UI.gsDie != null) return;
   if (!Q) {
     if (UI.sel != null) { var id = p.hand[UI.sel]; [0, 1, 2].forEach(function (h) { if (PP.playInfo(G, UI.view, id, h)) add('.row[data-h="' + h + '"] .slot.next'); }); return; }
@@ -227,6 +230,12 @@ function glow() {
     if (m.t === 'tuck' || (m.t === 'bonus' && m.i != null)) add('#hand .bc[data-i="' + m.i + '"]');
     if (m.t === 'play') { if (UI.sel === m.i) add('.row[data-h="' + m.h + '"] .slot.next'); else if (UI.sel == null) add('#hand .bc[data-i="' + m.i + '"]'); }
   });
+}
+// one helper at a time: with hints on (never in the guided game, where Ottilie points), only the Best target glows
+function glowOne() {
+  if (!G || !myTurn() || !bestOn() || UI.pend) return;
+  var el = document.body.classList.contains('idle4') && !UI.pickBird ? $('.a4.best') : ($('.bestt') || $('#hand .bc.bestc'));
+  if (el) el.classList.add('glow');
 }
 function fitMat() {   // slots keep a card-like shape: width from the row height, never wider than the screen allows
   var m = $('#mat'); if (!m || !m.clientHeight) return;

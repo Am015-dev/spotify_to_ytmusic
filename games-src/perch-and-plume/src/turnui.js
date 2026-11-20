@@ -22,6 +22,8 @@ function shortPower(id) {
     pTuck: 'when a rival plays in their ' + hab(x[0]) + ', tuck 1 card here.'
   };
   var when = pw.col === 'white' ? 'When played' : pw.col === 'pink' ? "On a rival's turn" : 'When its row is used';
+  var solo = typeof G !== 'undefined' && G && G.pl && G.pl.some(function (q) { return q.auto; });
+  if (solo && pw.col === 'pink') return { col: pw.col, when: 'Solo', txt: 'fires when the Rival Flock wakes your pink powers.' };   // solo: pinks fire only on the Flock's pink icon
   return { col: pw.col, when: when, txt: T[k] || pw.txt };
 }
 var HABW = { F: 'Forest', G: 'Meadow', W: 'Wetland' };
@@ -38,6 +40,7 @@ function hintMove() {
 }
 function markBest() {   // Best badge on the sub-choice the hint picks (die, egg nest, tray card, deck, tuck) and on the space to play into
   $$('.bestx').forEach(function (e) { e.parentNode.removeChild(e); }); $$('.bestt').forEach(function (e) { e.classList.remove('bestt'); });
+  if (!bestOn()) return;
   var m = hintMove(); if (!m) return;
   var el = null;
   if (G.q && m.t === 'die' && UI.gsDie != null) el = UI.gsDie === m.i ? $$('#acts [data-a="mv"]').filter(function (x) { try { return JSON.parse(x.dataset.m).f === m.f; } catch (e) { return false; } })[0] : null;   // grub-or-seed die: Best moves to the right button
@@ -109,7 +112,7 @@ function actIcon(k) {
 function act4HTML() {
   var inf = actInfo(G, UI.view), tp = tutPoint();
   return '<div id="act4" role="group" aria-label="Choose one action">' + ACTDEF.map(function (d) {
-    var a = inf[d.k], best = !tp && hintsOn() && !(typeof coachOn === 'function' && coachOn()) && inf.best === d.k, txt = a.ok ? (hintsOn() ? a.what : a.plain || a.what) : a.why;
+    var a = inf[d.k], best = !tp && bestOn() && inf.best === d.k, txt = a.ok ? (hintsOn() ? a.what : a.plain || a.what) : a.why;
     return '<button type="button" class="a4 a4-' + d.k + (best ? ' best' : '') + (tp === d.k ? ' tutpoint' : '') + '" data-a="a4" data-k="' + d.k + '"' + (a.ok ? '' : ' aria-disabled="true"') + ' data-val="' + a.v.toFixed(2) + '">' +
       '<span class="a4i" aria-hidden="true">' + actIcon(d.k) + '</span><span class="a4t"><b>' + d.t + '</b><span>' + esc(txt) + '</span></span>' +
       (best ? '<em class="bestb">Best</em>' : '') + '</button>';
@@ -225,7 +228,7 @@ function pl(n, w) { return n + ' ' + w + (n === 1 ? '' : 's'); }
 function cap1(t) { t = String(t || ''); return t.charAt(0).toUpperCase() + t.slice(1); }
 function showRate() {
   var el = $('#rate'); if (!el) return;
-  if (!RATE.last || !G || G.phase === 'over' || !hintsOn()) { el.hidden = true; return; }
+  if (!RATE.last || !G || G.phase === 'over' || !bestOn()) { el.hidden = true; return; }
   el.hidden = false; el.className = 'rate r-' + RATE.last.g; el.innerHTML = '<b>' + ({ good: '&#10003;', okay: '~', poor: '!' })[RATE.last.g] + '</b><span>' + esc(RATE.last.t) + '</span>';
 }
 // the tutorial's pointer: which big button Ottilie points at right now (coach.js sets COACH.point)
@@ -236,6 +239,7 @@ function tutPoint() { try { return coachOn() ? COACH.point || null : null; } cat
 // LEARN TO PLAY (tutfree) is the coached game and always shows them.
 function hintsPref() { try { return localStorage.getItem('pp-hints') !== '0'; } catch (e) { return true; } }   // on by default (R19): a newcomer sees Best; the bulb turns it off
 function hintsOn() { return !!(UI.mode === 'tutfree' || UI.hintPref); }
+function bestOn() { return !!(UI.hintPref && UI.mode !== 'tutfree'); }   // Best badges, the glow and move ratings: never in the guided game (Ottilie is its one helper)
 UI.hintPref = hintsPref();
 function hintsBtn() { var b = $('#bulbbtn'); if (!b) return; var on = hintsOn(); b.setAttribute('aria-pressed', on ? 'true' : 'false'); b.setAttribute('aria-label', 'Hints: ' + (on ? 'on' : 'off')); b.classList.toggle('on', on); var t = b.querySelector('.hst'); if (t) t.textContent = on ? 'on' : 'off'; }
 document.addEventListener('click', function (e) {

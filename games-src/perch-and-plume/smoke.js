@@ -18,13 +18,13 @@ const url = process.argv[2] || 'file://' + path.join(__dirname, 'perch-and-plume
       if (!s.mine) { await page.waitForTimeout(150); continue; }
       if (s.gs) await tap('#acts [data-a="mv"]');
       else if (!s.q) { await tap(['.ract[data-h="0"]', '.ract[data-h="1"]', '.ract[data-h="2"]'][turns % 3]); turns++; }
-      else if (s.q === 'die') await tap('.die.glow');
-      else if (s.q === 'egg') await tap('.bc[data-a="bird"].glow');
+      else if (s.q === 'die') await tap('.die[data-legal]');
+      else if (s.q === 'egg') await tap('.bc[data-a="bird"][data-legal]');
       else if (s.q === 'draw') await tap('#deckb');
       else await tap('#acts .btn');
       await page.waitForTimeout(120);
     }
-    for (let k = 0; k < 100; k++) { if (await page.evaluate(() => myTurn() && !G.q)) break; const q = await page.evaluate(() => myTurn() && G.q && G.q.h); if (q === 'die') await tap('.die.glow'); else if (q === 'draw') await tap('#deckb'); else if (q === 'egg') await tap('.bc[data-a="bird"].glow'); else if (q) await tap('#acts .btn'); await page.waitForTimeout(150); }
+    for (let k = 0; k < 100; k++) { if (await page.evaluate(() => myTurn() && !G.q)) break; const q = await page.evaluate(() => myTurn() && G.q && G.q.h); if (q === 'die') await tap('.die[data-legal]'); else if (q === 'draw') await tap('#deckb'); else if (q === 'egg') await tap('.bc[data-a="bird"][data-legal]'); else if (q) await tap('#acts .btn'); await page.waitForTimeout(150); }
     const t3 = await page.evaluate(() => G.pl[0].cubes);
     console.log((t3 === 5 ? 'PASS ' : 'FAIL ') + name + ' three turns played by tapping (cubes left ' + t3 + ')'); if (t3 !== 5) fails++;
     // force the end of the year: every player out of cubes, last round
