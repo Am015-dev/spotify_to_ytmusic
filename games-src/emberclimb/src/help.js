@@ -39,6 +39,14 @@
       G.b.en.forEach(function (e, i) { if (!e.dead && e.intent && e.intent.atk && (e.intent.all || e.intent.tg === hi)) { try { inc += E.previewHit(i, hi) * (e.intent.hits || 1); } catch (x) { } } });
       var need = Math.max(0, inc - h.blk), best = null;
       try { best = E.aiMove(function () { return 0.99; }); } catch (x) { best = null; }
+      // F2: lethal first. A card that wins the fight, or kills a foe that is about to hit you, beats blocking
+      var lw = null, lk = null, lkSave = 0;
+      h.hand.forEach(function (c, ci) { var ef = E.eff(c); if (!E.canPlay(h, c) || (ef.cost !== 'X' && E.cost(h, c) > h.en)) return;
+        G.b.en.forEach(function (e, ei) { if (e.dead || (!ef.tgt && ei > 0)) return; var pv = null; try { pv = E.previewPlay(hi, ci, ef.tgt ? ei : undefined); } catch (x) { pv = null; } if (!pv || pv.rnd) return;
+          if (pv.won && !lw) lw = { ci: ci, ei: ei, tgt: ef.tgt };
+          var save = 0; pv.en.forEach(function (r, k) { var f = G.b.en[k]; if (r && r.kill && f.intent && f.intent.atk && (f.intent.all || f.intent.tg === hi)) { try { save += E.previewHit(k, hi) * (f.intent.hits || 1); } catch (x) { } } });
+          if (save > lkSave) { lkSave = save; lk = { ci: ci, ei: ei, tgt: ef.tgt }; } }); });
+      var lth = lw || lk; if (lth) { var lc = q('.hand .card[data-c="' + lth.ci + '"]'); if (lc) { var lf = lth.tgt ? D.ENEMIES[G.b.en[lth.ei].id].name : ''; return { target: lc, why: lw ? 'Play ' + E.eff(h.hand[lth.ci]).name + (lf ? ' on ' + lf : '') + ': it wins the fight.' : 'Play ' + E.eff(h.hand[lth.ci]).name + (lf ? ' on ' + lf : '') + ': it dies before it hits.' }; } }
       if (need > 0) {   // a hit is coming: point at the biggest playable Block card
         var bi = -1, bb = 0; h.hand.forEach(function (c, i) { var ef = E.eff(c); if (!E.canPlay(h, c) || (ef.cost !== 'X' && E.cost(h, c) > h.en)) return; var b = 0; ef.ops.forEach(function (o) { if (o[0] === 'blk') b += o[1]; }); if (b > bb) { bb = b; bi = i; } });
         if (bi >= 0 && (!best || best.t !== 'play' || need >= h.hp * 0.3 || need > 1)) { var bc = q('.hand .card[data-c="' + bi + '"]'); if (bc) return { target: bc, why: need + ' damage is coming. Block with ' + E.eff(h.hand[bi]).name + '.' }; }

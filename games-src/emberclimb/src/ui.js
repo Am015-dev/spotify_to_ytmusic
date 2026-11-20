@@ -205,6 +205,15 @@
     try { if (window.GXT && GXT.active()) { var tk = g.rw && g.rw.took || {}; GXT.act({ type: 'event', w: 'scr', scr: g.scr, ph: g.b && g.b.ph, pots: (g.pots || []).filter(Boolean).length, relic: !!tk.relic, took0: !!tk.c0, shopSel: UI.shopSel == null ? -1 : UI.shopSel, bought: !!(g.shop && g.shop.items.some(function (x) { return x.sold; })), evres: !!(g.evn && g.evn.res) }); } } catch (e) { }
   }
   UI.render = render;
+  // F2: long lists (shop, rewards, upgrade / remove pickers) show a "More below" pill while rows hide under the bottom bar; a tap scrolls
+  function moreCue() {
+    var box = null; document.querySelectorAll('.reward, .ov .grid').forEach(function (x) { if (x.offsetParent && x.scrollHeight > x.clientHeight + 8 && x.scrollTop + x.clientHeight < x.scrollHeight - 8) box = box || x; });
+    var pill = document.getElementById('w2more');
+    if (!box) { if (pill) pill.hidden = true; return; }
+    if (!pill) { pill = h('button', 'chip w2more', '\u25BE More below'); pill.id = 'w2more'; pill.type = 'button'; pill.addEventListener('click', function () { var b2 = pill.w2box; if (b2) b2.scrollBy({ top: b2.clientHeight * 0.7, behavior: 'smooth' }); }); document.body.appendChild(pill); }
+    pill.w2box = box; pill.hidden = false; var r = box.getBoundingClientRect(); pill.style.left = Math.round(r.left + r.width / 2 - pill.offsetWidth / 2) + 'px'; pill.style.top = Math.round(r.bottom - pill.offsetHeight - 8) + 'px';
+  }
+  setInterval(function () { try { moreCue(); } catch (e) { } }, 250);
   setInterval(function () { try { var fr = !!(UI.tutFree && UI.tutFree()); document.body.classList.toggle('ec-free', fr); var eb = document.getElementById('end'); if (fr && eb && eb.disabled) eb.disabled = false; if (UI.mode !== 'title') tutEvt(); } catch (e) { } }, 200);   // guide free-play steps hide the bubble (the dock line instructs)
   function tutOk(a) { try { if (UI.tutFree && UI.tutFree()) return true; var ok = !(window.GXT && GXT.active()) || GXT.act(a); if (!ok) { toast('Do the glowing step first'); var dm = document.getElementById('dockmsg'); if (dm) dm.textContent = 'Do the glowing step first.'; } return ok; } catch (e) { return true; } }
   function muteBtn() { var b = on(h('button', 'chip tap', SND.on ? '🔊' : '🔇'), function () { SND.toggle(); toast(SND.on ? 'Sound on' : 'Sound off'); render(); }); b.setAttribute('aria-label', SND.on ? 'Sound on: tap to mute' : 'Sound off: tap to unmute'); b.id = 'mute'; return b; }
@@ -407,8 +416,10 @@
     document.body.appendChild(sc); document.body.appendChild(t); setTimeout(function () { if (t.parentNode) close(); }, 9000);
   };
   function stChips(o) {
-    var w = h('div', 'stc'); var SAY = { str: function (n) { return '+' + n * D.SCALE + ' per hit'; }, vuln: function () { return 'next attack x2, 1 used per attack'; }, weak: function () { return 'next attack ' + D.SCALE + ' less per hit, 1 used'; }, poison: function (n) { return 'loses ' + n * D.SCALE + ' HP at turn end (' + D.SCALE + ' per token)'; }, frail: function () { return 'Block 25% less'; } };
-    [['str', 'Strength'], ['vuln', 'Vulnerable'], ['weak', 'Weak'], ['poison', 'Poison'], ['frail', 'Frail']].forEach(function (p) { var n = o.st[p[0]]; if (n) { var sp = h('span', '', null, [A('st-' + p[0], '', { noph: 1 }), document.createTextNode(p[1] + ' ' + n + ': ' + SAY[p[0]](n))]); sp.title = p[1] + ' ' + n + ': ' + SAY[p[0]](n); w.appendChild(sp); } });
+    var w = h('div', 'stc'); var SAY = { str: function (n) { return '+' + n * D.SCALE + ' per hit'; }, vuln: function () { return 'next attack x2, 1 used per attack'; }, weak: function () { return 'next attack ' + D.SCALE + ' less per hit, 1 used'; }, poison: function (n) { return 'loses ' + n * D.SCALE + ' HP at turn end (' + D.SCALE + ' per token)'; }, frail: function () { return 'each Block card gives ' + D.SCALE + ' less'; } };
+    // F2: chips are a word and a number (they no longer cover the sprites); a tap explains (unless a card is lifted: then the tap targets the foe)
+    [['str', 'Strength'], ['vuln', 'Vulnerable'], ['weak', 'Weak'], ['poison', 'Poison'], ['frail', 'Frail']].forEach(function (p) { var n = o.st[p[0]]; if (n) { var say = p[1] + ' ' + n + ': ' + SAY[p[0]](n) + '.', sp = h('span', '', null, [A('st-' + p[0], '', { noph: 1 }), document.createTextNode(p[1] + ' ' + n)]); sp.title = say; sp.setAttribute('aria-label', say);
+      sp.addEventListener('click', function (ev) { if (UI.sel >= 0 || UI.busy || !UI.explain) return; ev.stopPropagation(); UI.explain([{ k: p[0], s: 'st-' + p[0], say: say }]); }); w.appendChild(sp); } });
     return w;
   }
   // W485 stage layout (phone): heroes left, foes right on one floor, fanned hand, orb / piles / End turn in the corners. ?stage=0 = the old layout
@@ -823,10 +834,10 @@
     }
     var dk = h('div', 'rsec'); dk.appendChild(h('b', '', 'Final deck (tap a card)'));
     var gr = h('div', 'rgrid'); g.hs.forEach(function (x) { var seen = {}, order = []; x.deck.forEach(function (c) { var k = c.id + (c.u ? '+' : ''); if (!seen[k]) { seen[k] = { c: c, n: 0 }; order.push(k); } seen[k].n++; }); order.forEach(function (k) { var o = seen[k], t = on(h('button', 'rcard t-' + E.eff(o.c).type, null, [A(o.c.id, '', { cls: 'rart', kind: 'card', noph: 1 }), h('span', '', E.eff(o.c).name), h('i', '', o.n > 1 ? '×' + o.n : '')]), function () { bigCard(o.c); }); t.setAttribute('aria-label', 'View ' + E.eff(o.c).name); gr.appendChild(t); }); });
-    dk.appendChild(gr); s.appendChild(dk);
-    var rl = h('div', 'rsec'); rl.appendChild(h('b', '', 'Relics (tap for text)'));
+    dk.appendChild(gr);
+    var rl = h('div', 'rsec'); rl.appendChild(h('b', '', 'Relics: ' + g.relics.length + ' (tap for text)'));
     var rr = h('div', 'rrow'); g.relics.forEach(function (id) { var t = on(h('button', 'rrel', null, [A('relic-' + id, '✦', { ph: '#8a6a2a' })]), function () { UI.explain([{ k: 'str', s: 'relic-' + id, say: D.RELICS[id].name + ': ' + D.RELICS[id].t }]); }); t.setAttribute('aria-label', D.RELICS[id].name + ': ' + D.RELICS[id].t); t.title = D.RELICS[id].name + ': ' + D.RELICS[id].t; rr.appendChild(t); });
-    rl.appendChild(rr); s.appendChild(rl);
+    rl.appendChild(rr); s.appendChild(rl); s.appendChild(dk);   // F2: relics above the deck, so every relic is in view
     var bt = h('div', 'rbtns');
     var again = on(h('button', 'btn', 'Play again'), function () { done('again'); }); again.id = 'again'; bt.appendChild(again);
     if (r) { var mp = on(h('button', 'btn alt', 'Story map'), function () { done('map'); }); mp.id = 'rmap'; bt.appendChild(mp); }
