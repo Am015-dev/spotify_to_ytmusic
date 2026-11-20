@@ -6,15 +6,15 @@ var CMP_NAMES={c8:['Lumen','Lux']};
 function campLvlReset(){LVL.easy.slip=CMP_SLIP0;LVL.hard.K=CMP_LVL0.K;LVL.hard.roll=CMP_LVL0.roll;LVL.hard.alpha=CMP_LVL0.alpha}
 function campBossSeat(){return 1}
 function campMetrics(g){const p=g.pl[0];const b=endBonus(p);const rivals=g.pl.slice(1).map(q=>q.score);
-  return {won:!!(g.over&&g.over.win.includes(0)),score:p.score,margin:p.score-Math.max.apply(null,rivals),rounds:g.round,breakage:-p.st.floor,cols:b.cols,colours:b.colours,rows:b.rows}}
+  return {won:!!(g.over&&g.over.win.includes(0)),score:p.score,margin:p.score-Math.max.apply(null,rivals),rounds:g.round,floor:-p.st.floor,cols:b.cols,colours:b.colours,rows:b.rows}}
 function campIsWon(g,def){const m=campMetrics(g);if(!m.won)return false;const gl=def.goal||{};
-  if(gl.type==='score'&&m.score<gl.value)return false;if(gl.type==='custom'&&gl.value!=null&&m.breakage>gl.value)return false;return true}
+  if(gl.type==='score'&&m.score<gl.value)return false;if(gl.type==='custom'&&gl.value!=null&&m.floor>gl.value)return false;return true}
 // ---- twists (setup and scoring hooks) ----
 function campApplyTwist(def){const t=def.twist;campLvlReset();if(!t)return;const B=campBossSeat();const nm=def.opponent.name;
   if(t.id==='boss-sun'){G.first=G.cur=B;lg(`Boss rule: ${nm} holds the Sun token and takes first.`,'big')}
   else if(t.id==='boss-head-start'){P(B).score=t.param;lg(`Boss rule: ${nm} starts with ${t.param} points.`,'big')}
   else if(t.id==='boss-glazed-start'){let n=0;for(let r=0;r<t.param;r++){const k=G.bag.indexOf(0);if(k<0)break;G.bag.splice(k,1);P(B).wall[r][WALLCOL(0,r)]=0;n++}
-    lg(`Rival rule: ${nm} starts with ${n} Cobalt tile${n===1?'':'s'} already set.`,'big')}
+    lg(`Rival rule: ${nm} starts with ${n} blue tile${n===1?'':'s'} already set.`,'big')}
   else if(t.id==='boss-column-bonus'){G.camp={colBonus:t.param,seat:B}}
   else if(t.id==='boss-deep-sight'){LVL.hard.roll=t.param;LVL.hard.K=14;lg(`Boss rule: ${nm} studies every take twice as deep.`,'big')}}
 // scoring twist: after the normal ending, the boss earns extra points per complete column, then the winner is worked out again

@@ -23,15 +23,15 @@ const HLP_STEPS={
 const HLP_RULES=[
   {phase:'pick',title:'Take one colour',text:'Pick a kiln and a colour. You take every tile of that colour. The rest slide to the middle.',pic:HPIC.kiln},
   {phase:'pick',title:'The middle',text:'Taking from the middle first also takes the Sun token. It costs floor points, but you start next round.',pic:HPIC.middle},
-  {phase:'pick',title:'Round end',text:'When every kiln and the middle are empty, the round ends. Each full row sends one tile to your wall.',pic:HPIC.racks},
+  {phase:'pick',title:'Round end',text:'When every kiln and the middle are empty, the round ends. Each full rack sends one tile to your wall.',pic:HPIC.racks},
   {phase:'pick',title:'Game end',text:'A full wall row ends the game. Bonuses: row +2, column +7, all five of a colour +10.',pic:HPIC.bonus},
-  {phase:'rack',title:'One colour per row',text:'Row 3 holds three tiles of a single colour. You cannot mix colours in a row.',pic:HPIC.oneColour},
-  {phase:'rack',title:'Blocked rows',text:'A row is blocked if its wall row already has that colour. Blocked and full rows do not glow.',pic:HPIC.blocked},
+  {phase:'rack',title:'One colour per rack',text:'Rack 3 holds three tiles of a single colour. You cannot mix colours on a rack.',pic:HPIC.oneColour},
+  {phase:'rack',title:'Blocked racks',text:'A rack is blocked if its wall row already has that colour. Blocked and full racks do not glow.',pic:HPIC.blocked},
   {phase:'rack',title:'The floor',text:'Extra tiles fall to the floor. Floor spaces cost −1, −1, −2, −2, −2, −3, −3. You can also drop tiles there.',pic:HPIC.floor},
-  {phase:'rack',title:'Touching scores',text:'A lone tile scores 1. A touching tile scores its row line plus its column line.',pic:HPIC.wall},
+  {phase:'rack',title:'Touching scores',text:'A lone tile scores 1. A touching tile scores each line of 2+ tiles it joins: across, down, or both added.',pic:HPIC.wall},
   {phase:'wall',title:'Pick the space',text:'On the grey wall choose any empty space in the row. No colour may repeat in a row or column.',pic:HPIC.wall},
-  {phase:'wall',title:'Touching scores',text:'A lone tile scores 1. A touching tile scores its row line plus its column line.',pic:HPIC.wall},
-  {title:'The goal',text:'Fill your wall with tiles. Touching tiles score more. Most points wins.',pic:HPIC.goal}
+  {phase:'wall',title:'Touching scores',text:'A lone tile scores 1. A touching tile scores each line of 2+ tiles it joins: across, down, or both added.',pic:HPIC.wall},
+  {title:'The goal',text:'Most points wins. Touching tiles score more. A full wall row ends the game.',pic:HPIC.goal}
 ];
 // ---------------------------------------------------------------- which phase is the player in?
 function hlpPhase(){try{if(!BF.on||BF.busy||UI.tut||UI.modal||BF.menu||BF.peek!=null||BF.boss||!G||G.over||isClient())return null;
@@ -44,8 +44,8 @@ function hlpWhy(m,hp){try{
   if(m.act==='wall')return capW(`Column ${m.c+1} touches the most tiles: +${adjPts2(hp.wall,m.r,m.c)} now.`,15);
   const pv=preview(m,hp.i);let t;
   if(m.line===5)t='No better choice: every other move scores less this round.';
-  else if(pv.full&&pv.pts!=null)t=`Fills row ${m.line+1}: about +${pv.pts} when the round ends${pv.pen?`, minus ${-pv.pen} breakage`:''}.`;
-  else t=`Row ${m.line+1} grows to ${pv.cnt} of ${cap(m.line)}${pv.pen?`, costing ${-pv.pen} breakage`:' with nothing broken'}.`;
+  else if(pv.full&&pv.pts!=null)t=`Fills rack ${m.line+1}: about +${pv.pts} when the round ends${pv.pen?`, minus ${-pv.pen} floor`:''}.`;
+  else t=`Rack ${m.line+1} grows to ${pv.cnt} of ${cap(m.line)}${pv.pen?`, costing ${-pv.pen} floor`:' with nothing on the floor'}.`;
   return capW(t,15)}catch(e){return ''}}
 const hlpTile=m=>{const a=m.src<0?G.ctr:G.fac[m.src];if(!a)return null;const k=a.findIndex(t=>t===m.c);return k<0?null:bfEl((m.src<0?'c':'f'+m.src)+'_'+k)};
 // the plan for the bulb (and for the sweep): where the ghost finger goes

@@ -49,7 +49,7 @@ function tutSteps(){
   const rival=n=>({onDone:()=>tutRival(TUT_RIVAL[n])});
   const beat=(n,target,o)=>look(target,atBeat(n),Object.assign({at:n},o||{}));
   return [
-    S('goal','Fill one row of your wall to end the game.',look(()=>tq('[data-bfrow="0"] .bf-wall'),myTurn)),
+    S('goal','Most points wins. A full wall row ends the game.',look(()=>tq('[data-bfrow="0"] .bf-wall'),myTurn)),
     S('take','Kilns hold four tiles. Tap red: you take every red.',pick(0,2)),
     S('rows','Rack 2 holds two tiles of one colour. Tap it.',move(1)),
     S('slide','The leftover tiles slid to the middle. Tap the middle.',Object.assign(look(()=>tq('[data-bfsrc="-1"]'),rivalTurn),rival(0))),
