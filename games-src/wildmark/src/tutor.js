@@ -4,7 +4,7 @@
    Steps: TUT_STEPS below (rule ids in COACH_RULES). Proof: tutorial-end.js (walks it by touch, checks every rule step appears). */
 var TUT_GAME = 'wildmark', TUT_SEED = 11, TUT_TURNS = 7;
 window.GXCOACH = { running: false, explained: [], done: false };   // read by the QA bot's coached mode
-var COACH_RULES = ['goal', 'pick', 'place', 'settle', 'keystone', 'rival', 'bear', 'rotate', 'habitat', 'sweep3', 'elk', 'acornSpend', 'salmon', 'wipe4', 'hawk', 'acornReplace', 'fox', 'majority', 'return', 'end20', 'acornsEnd', 'tiebreak'];
+var COACH_RULES = ['goal', 'pick', 'place', 'settle', 'keystone', 'rival', 'bear', 'rotate', 'habitat', 'sweep3', 'elk', 'acornSpend', 'salmon', 'wipe4', 'hawk', 'acornReplace', 'fox', 'majority', 'end20', 'acornsEnd', 'tiebreak', 'return'];
 // one step = { r: rule id taught (first step of a rule), say: <=12 words, hl: what glows, ok: allowed action, done: finished?, go: on enter }
 // hl kinds: 'next' (the bubble's Next button), 'col:i' (market tile i), 'tok:i' (market animal i), 'spot' (chosen map spot), 'cell' (tile just placed), '#id'
 function tutSteps() {
@@ -61,13 +61,13 @@ function tutSteps() {
     { wait: 1 },
     // turn 7: majority bonus, returning an animal, the end of a real game
     { r: 'majority', say: 'Biggest land of a kind beats Bram: plus 2 points.', hl: 'next' },
-    { say: 'Last turn. Take this pair.', hl: 'col:0', ok: 'take:0', done: function () { return G.stage === 'tile'; } },
-    { say: 'Tap the glowing spot.', hl: 'spot', pick: 'best', ok: 'spot', done: function () { return !!UI.ghost; } },
-    { say: 'Tap Place.', hl: '#okB', ok: 'ok', done: function () { return G.stage === 'tok'; } },
-    { r: 'return', say: 'No good spot? Return the animal to the bag.', hl: '#backB', ok: 'back', done: turnDone },
     { r: 'end20', say: 'Real games last 20 turns each, then everything scores.', hl: 'next' },
     { r: 'acornsEnd', say: 'Every acorn you still hold is worth 1 point.', hl: 'next' },
     { r: 'tiebreak', say: 'Tied on points? More acorns wins.', hl: 'next' },
+    { say: 'Last turn. Take this pair.', hl: 'col:0', ok: 'take:0', done: function () { return G.stage === 'tile'; } },
+    { say: 'Tap the glowing spot.', hl: 'spot', pick: 'best', ok: 'spot', done: function () { return !!UI.ghost; } },
+    { say: 'Tap Place.', hl: '#okB', ok: 'ok', done: function () { return G.stage === 'tok'; } },
+    { r: 'return', say: 'No good spot? Tap Skip animal: it goes back to the bag.', hl: '#backB', ok: 'back', done: turnDone },
     { wait: 2 }
   ];
 }

@@ -377,7 +377,7 @@ function renderDock() {
       if (UI.ghost) { if (G.hold.tile.t.length > 1) a += (quickTok() ? '<button type="button" class="ab rb" id="rotL" aria-label="Turn the tile left">&#8634;</button>' : '') + '<button type="button" class="ab' + (quickTok() ? ' rb' : '') + '" id="rotB" aria-label="Turn the tile right">&#8635;' + (quickTok() ? '' : ' Turn') + '</button>'; a += '<button type="button" class="ab pri" id="okB">' + (quickTok() && WM.tokSpots(G.seats[G.cur].env, G.hold.tok).length + (ghostTakes() ? 1 : 0) ? 'Place tile' : 'Place') + '</button>'; }
       if (UI.undo) a += '<button type="button" class="ab" id="undoB">Back</button>';
     } else if (G.stage === 'tok') {
-      a += '<span class="held">' + mkTok(G.hold.tok) + '</span><button type="button" class="ab" id="backB">Return token</button>';
+      a += '<span class="held">' + mkTok(G.hold.tok) + '</span><button type="button" class="ab" id="backB" aria-label="Skip the animal: it goes back to the bag">Skip animal</button>';
     }
   }
   if (G.stage !== 'pick') UI.acornMenu = false;
@@ -397,12 +397,36 @@ function lineText() {
   if (G.stage === 'tile') { var nT = UI.ghost && quickTok() ? WM.tokSpots(s.env, G.hold.tok).length + (ghostTakes() ? 1 : 0) : 0;
     if (nT) return 'Step 3 of 3: tap a ringed tile for the ' + WM.ANI_NAME[G.hold.tok] + (G.hold.tile.t.length > 1 ? ' (turn the tile first if you like)' : '');
     return UI.ghost ? (G.hold && G.hold.tile && G.hold.tile.t.length > 1 ? 'Step 2 of 3: turn it if you like, then Place' : 'Step 2 of 3: tap Place to put it here') : 'Step 2 of 3: tap a glowing spot for the tile'; }
-  if (G.stage === 'tok') return WM.tokSpots(s.env, G.hold.tok).length ? 'Step 3 of 3: tap a glowing tile for the ' + WM.ANI_NAME[G.hold.tok] : 'Step 3 of 3: no tile takes a ' + WM.ANI_NAME[G.hold.tok] + ': tap Return';
+  if (G.stage === 'tok') return WM.tokSpots(s.env, G.hold.tok).length ? 'Step 3 of 3: tap a glowing tile for the ' + WM.ANI_NAME[G.hold.tok] + ', or Skip animal' : 'Step 3 of 3: no tile takes the ' + WM.ANI_NAME[G.hold.tok] + ': it goes back to the bag';
   return '';
 }
 // first-game coach: one extra plain line per step for the player's first 3 Quick-game turns, then it switches itself off
 var COACH = { pick: 'Each column is one choice: the tile on top and the animal under it come together.', tile: 'Tiles must touch your valley. Matching edges join terrain: 1 point per joined tile.', tok: 'Animals score by their card (the chips on top). A tile shows which animals it accepts.' };
 function coachText() { return hintsOn() && G && !G.over && UI.mode === 'quick' && myTurn() && (UI.prefs.coachN || 0) < 3 && !UI.wipe && !UI.free ? COACH[G.stage] || '' : ''; }
+// F2: when your total changes, a one-shot chip under it says why ("+3 because Bear pair +2, forest area +1"), also when a rival's move changes your land bonus
+function scoreWhy(fin) {
+  var me = meSeat(), s = fin[me], k = G.seed + ':' + me + ':' + G.np, L = UI.lastSc; UI.lastSc = { k: k, s: s };
+  if (!L || L.k !== k || L.s.total === s.total || G.over || UI.fast) return;
+  var d = s.total - L.s.total, P = [], sg = function (n) { return (n > 0 ? '+' : '−') + Math.abs(n); };
+  WM.ANI.forEach(function (a) { var x = s.ani[a] - L.s.ani[a]; if (x) P.push({ d: x, t: (pvSetA(a) ? PV_SHORT[a] : WM.ANI_NAME[a]) + ' ' + sg(x) }); });
+  WM.TER.forEach(function (t) { var tn = WM.TER_NAME[t].toLowerCase(), x = s.hab[t] - L.s.hab[t], b0 = (L.s.bonus || {})[t] || 0, b1 = (s.bonus || {})[t] || 0;
+    if (x) P.push({ d: x, t: tn + ' area ' + sg(x) });
+    if (b1 !== b0) { var who = -1; fin.forEach(function (o, j) { if (j !== me && (who < 0 || o.hab[t] > fin[who].hab[t])) who = j; }); var wn = who >= 0 ? G.seats[who].name : '';
+      var lb = ' (land bonus ' + sg(b1 - b0) + ')';
+      P.push({ d: b1 - b0, t: G.solo ? 'your ' + tn + ' area reached 7' + lb : b1 > b0 ? 'your ' + tn + ' area ' + (b1 === 1 && G.np === 2 ? 'ties for biggest' : 'is the biggest') + lb : (wn ? wn + "'s " + tn + ' area ' + (b1 > 0 ? 'now ties yours' : 'is now bigger than yours') : 'your ' + tn + ' area lost its lead') + lb }); } });
+  var ac = s.acorns - L.s.acorns; if (ac) P.push({ d: ac, t: 'acorn ' + sg(ac) });
+  if (!P.length) return;
+  P.sort(function (x, y) { return Math.abs(y.d) - Math.abs(x.d); });
+  var txt = sg(d) + ' because ' + P.slice(0, 2).map(function (x) { return x.t; }).join(', ') + (P.length > 2 ? ' and more (Scores)' : '');
+  clearTimeout(scoreWhy.t); scoreWhy.t = setTimeout(function () { whyChip(txt, d); }, UI.popAt && Date.now() - UI.popAt < 600 ? 250 : 0);
+}
+function whyChip(txt, d) {
+  var a = $('#seats .seat[data-seat="' + meSeat() + '"]'); if (!a || !a.offsetWidth) a = $('#barstat .pill:last-child'); if (!a) return; var r = a.getBoundingClientRect(); if (!r.width) return;
+  var e = $('#whyc'); if (!e) { e = document.createElement('div'); e.id = 'whyc'; e.setAttribute('role', 'status'); document.body.appendChild(e); }
+  e.className = d > 0 ? 'up' : 'dn'; e.textContent = txt; e.style.top = Math.round(r.bottom + 4) + 'px';
+  var w = Math.min(e.offsetWidth || 200, innerWidth - 16); e.style.left = Math.round(Math.max(8, Math.min(innerWidth - w - 8, r.left))) + 'px';
+  e.classList.remove('on'); void e.offsetWidth; e.classList.add('on'); clearTimeout(whyChip.t); whyChip.t = setTimeout(function () { e.classList.remove('on'); }, 3200);
+}
 function rivalOf(i) { var b = -1, fin = G.over ? G.res : WM.final(G); G.seats.forEach(function (s, j) { if (j !== i && (b < 0 || fin[j].total > fin[b].total)) b = j; }); return b; }
 function renderTop() {
   var me = G.seats[UI.view], fin = G.over ? G.res : WM.final(G), sc = fin[UI.view], h = '';   // one honest score: live totals include the habitat bonuses (as the Scores drawer and result)
@@ -416,6 +440,7 @@ function renderTop() {
   var sh = '';
   if (G.np > 1) G.seats.forEach(function (s, i) { var t = fin[i].total; sh += '<button type="button" class="seat' + (i === UI.view ? ' on' : '') + (i === G.cur ? ' cur' : '') + '" data-seat="' + i + '"><i class="dot' + (i === UI.view ? ' me' : i === rivalOf(UI.view) ? ' riv' : '') + '" aria-hidden="true"></i>' + esc(s.name) + ' <b>' + t + '</b></button>'; });
   $('#seats').innerHTML = sh; $('#seats').hidden = G.np < 2;
+  scoreWhy(fin);
   var tr = $('#terr'); if (!tr) { tr = document.createElement('button'); tr.type = 'button'; tr.id = 'terr'; tr.className = 'terr'; tr.setAttribute('data-gx', 'scored'); $('#board').appendChild(tr); }
   tr.classList.toggle('solo', G.np < 2);
   tr.setAttribute('aria-label', 'Largest area of each terrain' + (rv ? ', you vs ' + G.seats[ri].name : '') + ': open the score sheet');
@@ -469,7 +494,7 @@ function cardsHTML() {
   WM.ANI.forEach(function (a) { var C = cinfo(a), st = cset(a); var mine = G ? (G.over ? G.res : WM.final(G))[meSeat()].ani[a] : null; h += '<div class="card"><div class="cart" data-art="card-' + a + '-' + st + '">' + mkTok(a) + '</div><div><h3>' + esc(WM.ANI_NAME[a]) + ': ' + esc(C.title) + (mine != null ? ' <span class="minep">you: ' + mine + '</span>' : '') + '</h3><p>' + esc(C.rule) + '</p>' + patSvg(a) + '<p class="pts">' + (C.pts ? C.pts.slice(1).map(function (p, i) { return (i + 1) + (i + 2 === C.pts.length ? '+' : '') + ': ' + p; }).join(' &middot; ') : a === 'fox' && st === 'a' ? '0 to 5 per fox' : 'Card ' + st.toUpperCase()) + '</p></div></div>'; });
   return h + '</div>';
 }
-var RULES_HTML = '<div class="howturn"><h3>How a turn works</h3><ol><li>Pick one tile and the animal under it.</li><li>Tap a glowing spot to add the tile to your valley.</li><li>Put the animal on a tile that shows it (or return it).</li><li>Animals score by their card; joined terrain scores too.</li><li>After 20 turns the most points wins.</li></ol></div>' +
+var RULES_HTML = '<div class="howturn"><h3>How a turn works</h3><ol><li>Pick one tile and the animal under it.</li><li>Tap a glowing spot to add the tile to your valley.</li><li>Put the animal on a tile that shows it, or skip it (it goes back to the bag, no penalty).</li><li>Animals score by their card; joined terrain scores too.</li><li>After 20 turns the most points wins.</li></ol></div>' +
   '<h3>Keystones and acorns</h3><p>Keystone tiles (gold rim) have one terrain. An animal on a keystone earns an acorn. Spend an acorn to take any tile with any token, or to replace any tokens in the market. Each acorn left is 1 point at the end.</p>' +
   '<h3>Crowded market</h3><p>Four matching tokens are replaced at once. With three matching tokens you may replace those three once per turn, for free.</p>' +
   '<h3>Scoring</h3><p>Each animal scores by its card (below). Each terrain scores 1 point per tile in your largest connected habitat of it (edges must match). The largest habitat of each terrain earns a bonus: 2 players 2 (tie 1), 3-4 players 3 for first and 1 for second. Solo: 2 for a habitat of 7+.</p>' +

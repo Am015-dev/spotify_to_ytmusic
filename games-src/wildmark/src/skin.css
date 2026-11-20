@@ -425,3 +425,7 @@ html.wm-goal .gxh-bub{visibility:hidden}
 .gain.ph{visibility:hidden}
 @media (max-width:999px){#acts .held svg{height:40px}}
 #acts .ab.rb{min-width:44px;width:44px;padding:0;font-size:22px}
+/* F2: one-shot "+N because..." chip under your score */
+#whyc{position:fixed;z-index:60;max-width:calc(100vw - 16px);padding:6px 10px;border-radius:12px;font-size:14px;font-weight:800;line-height:1.25;background:#f3ead2;color:#1d2420;border:2px solid #3f7a4a;box-shadow:0 3px 12px rgba(0,0,0,.45);pointer-events:none;opacity:0;transform:translateY(-4px);transition:opacity .25s,transform .25s}
+#whyc.dn{border-color:#b5523b}
+#whyc.on{opacity:1;transform:none}

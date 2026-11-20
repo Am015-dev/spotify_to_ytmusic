@@ -1015,7 +1015,7 @@
    "place": "Tiles must touch your valley. The +N on a glowing spot is what it scores. Tap one to see why, then Place.",
    "habitat": "Matching edges join land. Each terrain scores 1 point per tile in your biggest joined group.",
    "rotate": "This tile has two lands. Tap Turn until the edges match your valley, then Place.",
-   "settle": "Animals only live on a tile that shows them. The badge on each tile is its points. No good spot? Return it, no penalty.",
+   "settle": "Animals only live on a tile that shows them. The badge on each tile is its points. No good spot? Tap Skip animal: it goes back to the bag, no penalty.",
    "bear": "Bears score in pairs: groups of exactly 2 touching bears. A third bear spoils the pair.",
    "elk": "Elk score in straight lines. The longer the line, the more points.",
    "salmon": "Salmon score in runs: a chain where each salmon touches at most 2 others.",
