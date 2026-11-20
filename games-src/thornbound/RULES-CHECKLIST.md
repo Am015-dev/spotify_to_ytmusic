@@ -180,21 +180,21 @@ _Place Bids, Resolve Bids, Great Road repopulation._
 ## L. Kingdom Cards, Tactics and Site cards (sampled powers)
 _Not every one of the 51 Kingdom Cards / 16 Tactics / 19 Site cards has its own rule here; the ones below are the powers that change core rules._
 
-138. Sentinel Towers: +5 to the Bidding card, +1 Influence for resolving first, and you may not steal.
-139. Monarch's Seal-Ring: +1 Hand Size on acquiring; -1 when you stop occupying it.
-140. Veiled Patron: absorbs one Attrition (no Hand Size loss), then is discarded.
-141. Statue Wrights (Spring Action): gain 1 Influence if you have a card in a Council.
-142. Buried Hall: burning an Unexhausted Tactic gives 3 Lore (1 + 2 more).
-143. The Lighthouse: acquire the Site of Power card with the lowest Lore cost, then discard the Lighthouse.
-144. Frozen Bastion: all opponents' total Strength in that Region is halved (rounded up).
-145. Blade That Dreamed: +5 Strength in the current Clash, then it and its occupier are discarded.
-146. Dead King's Lance: an Active card gains Deadly for the Clash.
+138. Ward Towers: +3 to the Bidding card, +1 Lore for resolving first, and you may not steal.
+139. Crown Signet: +1 Hand Size on acquiring; -1 when you stop occupying it.
+140. Hidden Granary: absorbs one Attrition (no Hand Size loss), gives 1 Lore, then is discarded.
+141. Marble Gallery (Spring Action): gain 1 Influence with cards in two Councils.
+142. Sunken Vault: burning an Unexhausted Tactic gives 1 Influence and 1 Lore.
+143. Beacon Spire (bold): gain 1 Influence and 2 Lore, then discard it.
+144. Ice Wall: all opponents' total Strength in that Region drops by 3 (not below 0).
+145. Dream Blade: +4 Strength in the current Clash, then it is discarded.
+146. Bone Spear: an Active card of Strength 5 or less gains Deadly for the Clash.
 147. Crown's Edict (Nobility Tactic): every opponent's Bidding Strength becomes 0 (single use).
 148. Doctrine of Masonry (Nobility Tactic): Supporters give 2 Strength each for the Round and stay on the Map in Winter.
 149. Midnight Pressure (Uprising Tactic): each opponent discards one card per Kingdom Card you occupy.
 150. Doctrine of Tempests (Clans Tactic): its user places the Clash Markers.
 151. Martial Writ (Nobility Tactic): opponents may not add cards to the locked Region in its first Clash.
-152. Grand Joust: players secretly play a card; equal Strengths are discarded, highest remaining wins a Location Reward.
+152. Melee Trial: players secretly play a card; equal Strengths are discarded, lowest remaining wins a Location Reward.
 
 ## M. Variants the published game ships
 
@@ -209,7 +209,7 @@ _Not every one of the 51 Kingdom Cards / 16 Tactics / 19 Site cards has its own 
 158. Three players, two tied for the top: only the tied players take part in the new Clash.
 159. A Flanked card fights in the new Region's Clash with its Strength.
 160. Council of Pledges takes Supporters from the Map (not only from the Lost Pile).
-161. A bold Kingdom Card (Veiled Patron) discards the Bidding card and goes to the Supply, not the board.
+161. A bold Kingdom Card (Hidden Granary) discards the Bidding card and goes to the Supply, not the board.
 162. Winning a Clash gives the Location Reward only for the CHOSEN Location: the other Location of that Region gets nothing.
 163. Region reward is per Clash: a player may win several Regions in one Summer and collect each reward.
 
