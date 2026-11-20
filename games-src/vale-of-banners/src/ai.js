@@ -52,7 +52,7 @@
     v += p.pos * 0.4;
     return v;
   };
-  var GENTLE = V.GENTLE = { hardBelow: 4, looseAbove: 12, loose: 9, mid: 3.5, tight: 1 };
+  var GENTLE = V.GENTLE = { midW: 6, midD: 3, hardBelow: 4, looseAbove: 12, loose: 9, mid: 3.5, tight: 1 };
   function apply(G, m) { var c = fclone(G); V.performMove(c, m); return c; }
   function noise(G) { return V.rnd(G); }
   /* search the rest of my turn: depth plies, beam = moves expanded per ply */
@@ -78,7 +78,11 @@
        Gap = its position value minus the best other seat's, so a newcomer who follows the ★ wins about half, by a few points. */
     if (lvl === 'gentle') {
       var gap = V.evalSeat(G, s) - Math.max.apply(null, G.P.map(function (q, i) { return i === s ? -1e9 : V.evalSeat(G, i); }));
-      if (gap < -GENTLE.hardBelow) lvl = 'hard';
+      /* F4: no late surge. In the last two seasons it never switches to full look-ahead, so its strength stays level and a
+         newcomer is not overtaken in season 5 without seeing why. */
+      var late = G.phase >= G.nPhases - 2;
+      if (gap < -GENTLE.hardBelow && !late) lvl = 'hard';
+      else if (late && gap < -GENTLE.hardBelow) lvl = 'mid';
       else { var nz = gap > GENTLE.looseAbove ? GENTLE.loose : gap > 0 ? GENTLE.mid : GENTLE.tight; sc.forEach(function (x) { x.v += noise(G) * nz; }); }
     }
     sc.sort(function (a, b) { return b.v - a.v; });
@@ -87,7 +91,34 @@
       for (var i = 0; i < Math.min(6, sc.length); i++) { var v = search(sc[i].c, s, 3, 4); if (v > bv) { bv = v; best = sc[i]; } }
       return best.m;
     }
+    if (lvl === 'mid') {   /* shorter look-ahead: what Gentle plays when trailing late */
+      var bm = sc[0], mv = -1e9;
+      for (var j = 0; j < Math.min(GENTLE.midW, sc.length); j++) { var u = search(sc[j].c, s, GENTLE.midD, 3); if (u > mv) { mv = u; bm = sc[j]; } }
+      return bm.m;
+    }
     return sc[0].m;
+  };
+  /* F4: the ★ plans the whole turn. Each of the best first moves is played out to the end of the turn (greedy steps), and the
+     plan that leaves the seat best placed wins. Returns { moves: [first, next, ...] } so the hint can say take AND where to build. */
+  V.planTurn = function (G, width) {
+    var s = V.actor(G), M = V.validMoves(G); if (!M.length) return null;
+    if (M.length === 1) return { moves: [M[0]] };
+    var sc = M.map(function (m) { var c = apply(G, m); return { m: m, c: c, v: V.evalSeat(c, s) }; });
+    sc.sort(function (a, b) { return b.v - a.v; });
+    var best = null;
+    for (var i = 0; i < Math.min(width || 8, sc.length); i++) {
+      var c = sc[i].c, seq = [sc[i].m], k = 0;
+      while (!c.over && V.actor(c) === s && k++ < 6) {
+        var N = V.validMoves(c); if (!N.length) break;
+        var nx = N.map(function (m) { var d = apply(c, m); return { m: m, d: d, v: V.evalSeat(d, s) }; });
+        nx.sort(function (a, b) { return b.v - a.v; });
+        if (nx[0].m.k === 'end') break;
+        seq.push(nx[0].m); c = nx[0].d;
+      }
+      var v = V.evalSeat(c, s);
+      if (!best || v > best.v) best = { v: v, moves: seq };
+    }
+    return best;
   };
   /* a one-line reason for the hint bulb */
   V.why = function (G, m) {
