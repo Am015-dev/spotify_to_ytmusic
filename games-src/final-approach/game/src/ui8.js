@@ -50,12 +50,16 @@ function fxLayer() { const bd = $('#bd'); if (!bd) return null; let f = $('#fx')
 const bdRect = () => $('#bd').getBoundingClientRect();
 function relRect(el) { if (!el) return null; const b = bdRect(), r = el.getBoundingClientRect(); return { x: r.left - b.left, y: r.top - b.top, w: r.width, h: r.height, cx: r.left - b.left + r.width / 2, cy: r.top - b.top + r.height / 2 }; }
 function fxPop(x, y, txt, cls, delay) {
-  const f = fxLayer(); if (!f) return; const e = h('div.pop' + (cls ? '.' + cls : ''), { style: 'left:' + Math.round(x) + 'px;top:' + Math.round(y) + 'px;animation-delay:' + (delay || 0) + 'ms' }, txt);
+  const f = fxLayer(); if (!f) return;
+  // one moving thing at a time: the altitude chip and round card say the new height; one coffee pop per round end; pops wait for each other
+  if (cls === 'alt') return; const now = Date.now();
+  if (cls === 'cof') { if (now - (F2.cofT || 0) < 1500) return; F2.cofT = now; }
+  { const at = Math.max(now + (delay || 0), F2.popAt); F2.popAt = at + 1300; delay = at - now; } const e = h('div.pop' + (cls ? '.' + cls : ''), { style: 'left:' + Math.round(x) + 'px;top:' + Math.round(y) + 'px;animation-delay:' + (delay || 0) + 'ms' }, txt);
   f.appendChild(e); setTimeout(() => { try { e.remove(); } catch (er) { } }, 2400 + (delay || 0));
 }
 // the plane flies from space a to space b of the approach strip
 function fxPlane(a, b) {
-  const f = fxLayer(), LY = UI.LY; if (!f || !LY || a === b || !UI.cw) return; const ap = LY.r.appr, cw = UI.cw, off = UI.stripOff || 0;
+  const f = fxLayer(), LY = UI.LY; if (!f || !LY || a === b || !UI.cw) return; F2.popAt = Math.max(F2.popAt, Date.now() + 1150); const ap = LY.r.appr, cw = UI.cw, off = UI.stripOff || 0;
   const px = i => ap.x + 2 + off + (i - .5) * cw, y = ap.y + ap.h * .42, ax = Math.max(ap.x + 8, Math.min(ap.x + ap.w - 8, px(a))), bx = Math.max(ap.x + 8, Math.min(ap.x + ap.w - 8, px(b)));
   const e = h('div.fxplane', { style: 'left:' + Math.round(ax) + 'px;top:' + Math.round(y) + 'px;--dx:' + Math.round(bx - ax) + 'px', html: PLANE_SVG.replace('width="12" height="12"', 'width="34" height="34"') });
   f.appendChild(e); setTimeout(() => { try { e.remove(); } catch (er) { } }, 1500);
@@ -150,7 +154,7 @@ function phPost() {
 function showEndBoard() {
   const f = fxLayer(); if (!f || !G || !G.result) return; try { render(); } catch (e) { }   // the Fly again / Next airport buttons come with the banner
   $$('#fx .endb').forEach(e => e.remove());
-  f.appendChild(h('button.endb.' + (G.result.win ? 'win' : 'lose'), { type: 'button', 'data-a': 'lookpanel', 'aria-label': endWords() + '. ' + endVoice() + ' Tap to look at the panel.' }, h('b', endWords()), h('span.ev', endVoice())));
+  f.appendChild(f2EndCard());
 }
 // one line of the crew's voice under the result (campaign.json tutorial.voice), picked by the round count so it varies
 function endVoice() { try { const v = window.CAMPAIGN.tutorial.voice[G.result.win ? 'win' : 'lose']; return v[(G.round + (G.pl.pos | 0)) % v.length]; } catch (e) { return ''; } }

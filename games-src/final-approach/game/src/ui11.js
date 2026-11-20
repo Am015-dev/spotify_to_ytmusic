@@ -204,17 +204,18 @@ function roRating(a, b) {
 }
 function roShow(a) {
   const b = roSnap(), n = trackOf().sp.length, mv = b.pos - a.pos, rt = roRating(a, b), sp = G.log.slice().reverse().find(l => /speed|Speed/.test(typeof l === 'string' ? l : (l.t || '')));
+  const rows = D.rounds - G.row0, left = rows - b.r, togo = Math.max(0, n - b.pos), alt = (altRows()[b.r + G.row0] || [0])[0];
   const lines = [
-    'Plane: ' + (mv ? 'moved ' + mv + ' space' + (mv > 1 ? 's' : '') : 'stayed put') + ' → ' + (b.pos >= n ? 'on the airport' : 'space ' + b.pos + ' of ' + n),
-    'Axis: ' + (b.axis === 0 ? 'level' : 'tilted ' + Math.abs(b.axis) + (b.axis < 0 ? ' left' : ' right')),
-    a.planes !== b.planes ? 'Planes cleared: ' + (a.planes - b.planes) + ' (' + b.planes + ' left)' : b.planes ? 'Planes on the track: ' + b.planes : 'No planes on the track',
-    'Gear ' + b.lg + '/3 · Flaps ' + b.fl + '/4 · Brakes ' + b.br + ' · Coffee ' + b.cof];
+    ['Plane', (mv ? '+' + mv + ' space' + (mv > 1 ? 's' : '') : 'held') + ' · ' + (togo ? togo + ' to the airport' : 'over the airport')],
+    ['Axis', (b.axis === 0 ? 'level' : 'tilt ' + Math.abs(b.axis) + (b.axis < 0 ? ' left' : ' right') + (Math.abs(b.axis) >= 2 ? ': one more is a spin' : ''))],
+    ['Radio', (a.planes !== b.planes ? (a.planes - b.planes) + ' cleared, ' + b.planes + ' left' : b.planes ? b.planes + ' plane' + (b.planes > 1 ? 's' : '') + ' on the track' : 'track clear')],
+    ['Gear', b.lg + '/3 · Flaps ' + b.fl + '/4 · Brakes ' + b.br]];
   roHide();
   const el = h('div.fa-ro.' + (hintsMode() ? rt[0] : 'good'), { role: 'dialog', 'aria-label': 'Round ' + (a.r + 1) + ' over' },
-    h('div.rh', h('b', 'Round ' + (a.r + 1) + ' over'), h('span', 'Why: all 8 dice are placed.')), h('ul', ...lines.map(t => h('li', t))),
+    h('div.rh', h('b', left <= 1 ? 'Last round: land it!' : 'Round ' + (b.r + 1) + ' of ' + rows + ' · ' + alt + ' ft'), h('span', left <= 1 ? 'Speed must be no more than the brakes.' : (left - 1) + ' round' + (left > 2 ? 's' : '') + ' after this one.')), h('ul', ...lines.map(t => h('li', h('b', t[0] + ' '), t[1]))),
     hintsMode() ? h('p.rr', h('b', rt[0] === 'good' ? 'Good' : rt[0] === 'okay' ? 'Okay' : 'Watch out'), ' ' + rt[1]) : null, h('button.rgo', { type: 'button', 'data-ro': 'go' }, 'Next round'));
   el.addEventListener('click', e => { if (e.target.closest && e.target.closest('[data-ro]')) roHide(); });
-  document.body.appendChild(el); FT.ro = el; clearTimeout(FT.roT); FT.roT = setTimeout(roHide, UI.fc && !UI.fc.ended ? 14000 : 8000);
+  el.classList.add(left <= 1 ? 'f2last' : 'f2r'); el.style.visibility = 'hidden'; document.body.appendChild(el); FT.ro = el; f2PlaceRo(el); clearTimeout(FT.roT); FT.roT = setTimeout(roHide, UI.fc && !UI.fc.ended ? 14000 : 9000);
 }
 // ---------- the Goal, one card before turn 1 (Addendum 7): the win condition in one sentence and three bullets on how you get there ----------
 function goalCard(inStory) {
@@ -224,8 +225,8 @@ function goalCard(inStory) {
   if (scenOf().mods.includes('intern')) rows.push(['intern', 'Trainee done']); if (scenOf().mods.includes('ice')) rows.push(['ice', 'Icy brakes done']);
   const ico = k => h('i.gci', { 'aria-hidden': 'true', html: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' + (CK_ICO[k] || '') + '</svg>' });
   return h('div.fgoal', h(inStory ? 'h3' : 'b', 'Land together in round ' + n),
-    h('ul.gcl', { 'aria-label': 'To land you need' }, ...rows.map(([k, t]) => h('li', { 'data-k': k }, h('span.gbx', { 'aria-hidden': 'true', html: CK_TICK }), ico(k), h('span', t)))),
-    h('p.gcr', 'Every round: fill both Axis and Engines.'),
+    h('ul.gcl', { 'aria-label': 'To land you need' }, ...rows.map(([k, t]) => h('li', { 'data-k': k }, h('span.gbx', { 'aria-hidden': 'true' }), ico(k), h('span', t)))),
+    h('p.gcr', 'Tick all ' + rows.length + ' by the last round. Every round: fill both Axis and Engines.'),
     (ap => ap ? h('p.fwx', wxImg('wx-' + ap.wx, ap.wx), wxImg('time-' + ap.tod, ap.tod), ap.name + ': ' + ap.wx + ', ' + ap.tod + '.') : null)(D.airports[scenOf().ap]),
     mods.length ? h('p', 'Today also: ' + mods.join(', ') + '.') : null);
 }
@@ -258,7 +259,7 @@ function ftAfter() {
   if (pv) { const k = sel && hintsMode() ? previewKey(v) : null; pv.hidden = !k && !UI.askWhy; pv.textContent = k ? previewText(k, v) : UI.askWhy || ''; pv.classList.toggle('bad', !!k && /crash|ends|spin|too fast/i.test(pv.textContent)); }
   // the "What should I do?" button joins the actions on every turn of yours (R6: always, not only with Hints on)
   const ac = $('#acts'), mineNow = typeof v === 'number' && v >= 0 && mayAct(v) && G.phase === 'place' && !G.result && (G.pend ? G.pend.h === 'rr' && !G.pend.d.m[v] : G.turn === v);
-  if (ac && mineNow && !(UI.fc && !UI.fc.ended) && !(typeof tutOn === 'function' && tutOn()) && !ac.querySelector('[data-a=ask]')) ac.appendChild(h('button.btn.ask', { type: 'button', 'data-a': 'ask' }, 'What should I do?'));
+  if (ac && mineNow && !(UI.fc && !UI.fc.ended) && !(typeof tutOn === 'function' && tutOn()) && !ac.querySelector('[data-a=ask]')) ac.appendChild(h('button.btn.ask', { type: 'button', 'data-a': 'ask', 'aria-label': 'What should I do?' }, isPh() && ac.querySelector('[data-a=cof],.cofst,.stp') ? 'Hint' : 'What should I do?'));
   $$('#pz .slot[data-slot]').forEach(e => { const k = e.dataset.slot; if (!FA.SLOT[k]) return; const why = sel && !e.classList.contains('legal') ? whyNot(k, v) : '';
     e.title = why || slotNeedLong(k); e.classList.toggle('nofit', !!why); e.classList.toggle('cpt', !!(UI.cpt && UI.cpt.k === k)); });
   $$('#pz .die[data-s="0"]').forEach(e => e.classList.toggle('cpt', !!(UI.cpt && String(UI.cpt.d) === e.dataset.d && UI.sel !== UI.cpt.d)));
@@ -273,7 +274,7 @@ document.addEventListener('pointerover', e => { if (!hintsMode()) return; const 
     '#ftrk .ftd.p i.on{background:#3d7fe0;border-color:#cfe0ff;opacity:1}#ftrk .ftd.c i.on{background:#f08a24;border-color:#ffe0c0;opacity:1}' +
     '#fprev{margin:4px 0;padding:6px 10px;border-radius:10px;background:#e9f6ea;color:#0d2a12;border:2px solid #2e8b45;font-size:15px;line-height:1.3;font-weight:700}#fprev.bad{background:#fde9e6;color:#5c0f08;border-color:#c0392b}' +
     'html.ph #ftrk{display:none!important}.altdots.ftk{gap:2px}.altdots .dk{width:10px;height:14px;border-radius:3px;border:1.5px solid rgba(255,255,255,.6);opacity:.4}.altdots .dk.p.on{background:#3d7fe0;opacity:1}.altdots .dk.c.on{background:#f08a24;opacity:1}.altdots .dsep{width:4px}html.ph #fprev{font-size:14px;padding:4px 8px;margin:2px 0}' +
-    '.gcl{list-style:none;padding:0!important;margin:8px 0!important;display:grid;grid-template-columns:1fr 1fr;gap:6px}.gcl li{display:flex;align-items:center;gap:6px;margin:0!important;min-height:36px;padding:4px 6px;border-radius:10px;background:rgba(29,79,154,.10);font-size:15px;font-weight:800;line-height:1.15}.gcl .gbx{flex:0 0 20px;height:20px;border-radius:6px;background:#2e9b5b;display:grid;place-items:center}.gcl .gbx svg{width:14px;height:14px}.gcl .gci{flex:0 0 22px;height:22px;color:#1d4f9a}.gcl .gci svg{width:22px;height:22px}.gcr{margin:4px 0 6px;font-size:15px;font-weight:700}' + '.fa-goal{border-color:#1d4f9a}.fa-goal b,.fa-goal h3{display:block;font-size:17px;line-height:1.3;margin:0 0 6px}.fa-goal ul{margin:6px 0 10px}.fgoal ul{padding-left:18px}.fgoal li{margin:3px 0}.stbox .fgoal{background:#e8f0fb;color:#10223a;border-radius:12px;padding:10px 14px;margin:0 0 10px}' +
+    '.gcl{list-style:none;padding:0!important;margin:8px 0!important;display:grid;grid-template-columns:1fr 1fr;gap:6px}.gcl li{display:flex;align-items:center;gap:6px;margin:0!important;min-height:36px;padding:4px 6px;border-radius:10px;background:rgba(29,79,154,.10);font-size:15px;font-weight:800;line-height:1.15}.gcl .gbx{flex:0 0 20px;height:20px;border-radius:6px;background:#fff;border:2px solid #6b5a3a;box-sizing:border-box;display:grid;place-items:center}.gcl .gbx svg{width:14px;height:14px}.gcl .gci{flex:0 0 22px;height:22px;color:#1d4f9a}.gcl .gci svg{width:22px;height:22px}.gcr{margin:4px 0 6px;font-size:15px;font-weight:700}' + '.fa-goal{border-color:#1d4f9a}.fa-goal b,.fa-goal h3{display:block;font-size:17px;line-height:1.3;margin:0 0 6px}.fa-goal ul{margin:6px 0 10px}.fgoal ul{padding-left:18px}.fgoal li{margin:3px 0}.stbox .fgoal{background:#e8f0fb;color:#10223a;border-radius:12px;padding:10px 14px;margin:0 0 10px}' +
     '#acts .btn.ask{background:#fff4d6;color:#3a2a00;border:2px solid #c98a12}.gxh-bulb.hon{box-shadow:0 0 0 3px #ffd46b,0 0 14px #ffd46b}' +
     '#pz .slot .sword{display:block;font-size:15px;line-height:1.1;font-weight:800;letter-spacing:-.3px;color:#fff;background:rgba(10,18,30,.9);border-radius:5px;padding:0 3px;white-space:nowrap}html.ph #pz .slot.hasv .sl{background:rgba(10,18,30,.9);border-radius:5px;padding:0 3px;color:#fff}html.ph #pz .slot .r1{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;opacity:.4;pointer-events:none;z-index:0}html.ph #pz .slot .sword,html.ph #pz .slot .sl{position:relative;z-index:1}html.ph #pz .slot.hasv .sl{font-size:15px;line-height:1.05}' +
     '#pz .trayhit{position:absolute;inset:0;min-height:44px;background:transparent;border:0;padding:0;margin:0;z-index:3;cursor:help}#pz .tray .die.cover{pointer-events:none}#pz .slot[data-slot^=co] .sword{letter-spacing:-.8px;padding:0 1px}#acts .btn[data-a=rr]:not(.go){flex:0 0 auto;width:auto;min-width:0;margin:0 0 0 auto;padding:0 18px;font-size:15px}.ck .cw{font-size:14px;font-weight:800;white-space:nowrap;padding:0 3px}html.ph .gstrip.chk .ckrow{gap:5px;flex-wrap:nowrap;padding-right:0}html.ph .ck{padding:0 1px}html.ph .ckrow:has(.ck:nth-child(6)) .ck .cw{letter-spacing:-.5px;padding:0 1px}html.ph .ckrow:has(.ck:nth-child(6)){gap:3px}html.ph .gstrip.chk .gi{display:none}html.ph .gstrip.chk{padding:2px 4px}html.ph .gstrip.chk .ckrow.ckwrap,.ckwrap{flex-wrap:wrap!important;row-gap:4px;justify-content:center}html.ph .gstrip.chk:has(.ckwrap){height:auto!important;min-height:44px}'+
@@ -288,5 +289,110 @@ document.addEventListener('pointerover', e => { if (!hintsMode()) return; const 
     '.fa-ro ul{margin:8px 0;padding:0 0 0 18px}.fa-ro li{margin:2px 0}.fa-ro .rr{margin:6px 0 10px;font-weight:700}.fa-ro .rgo{width:100%;min-height:46px;border-radius:12px;border:0;background:#1d4f9a;color:#fff;font-size:16px;font-weight:800}' +
     '@keyframes fa-roin{from{opacity:0;transform:translate(-50%,-46%)}to{opacity:1;transform:translate(-50%,-50%)}}@media (min-width:1024px){#ftrk,#fprev,.fa-ro,.fa-ro .rh span,#ftrk .ftd em{font-size:16px}}' +
     '@media (prefers-reduced-motion:reduce){#pz .slot.cpt,.fa-ro{animation:none}}';
+  document.head.appendChild(st);
+})();
+
+// ===================== part 14: tension and clarity (fix round F2, 20 Nov 2026) =====================
+// Cold play said: "could not work out why a die was not accepted", "which dice are mine", "felt like filling in a form", "the screen is busy".
+// This part: the reason for a refused tap appears on the board next to the finger; every slot carries its owner's colour (blue pilot, orange
+// co-pilot, plain = either); gear / flaps / brakes read as one group with the word once; at most one moving thing at a time (pops queue up,
+// rings stop pulsing); the round card sits under the banner; every new round raises the stakes (altitude chip warms, rising chime) and the
+// end card says plainly landed or crashed, why, and how many landing checks were met.
+const F2 = { tap: null, tapR: null, tapT: 0, popAt: 0, sig: '' };
+// one short reason a flight ends, for the end card and the "this ends the flight" warning
+function f2LossLine(R) {
+  if (!R) return '';
+  if ((R.why === 'checks' || R.why === 'speed') && R.checks) { const bad = Object.keys(R.checks).filter(k => !R.checks[k]); if (bad.length) return (CHK_S[bad[0]] || 'the landing failed').toLowerCase(); }
+  return (LOSS_S[R.why] || 'the flight is over').toLowerCase();
+}
+// ---------- the refused tap: the reason, next to the finger ----------
+const f2Target = e => e.target && e.target.closest && e.target.closest('#pz .slot[data-slot], #pz .die, #pz .trayhit, #pz .tray');
+function f2Mark(e) { const t = f2Target(e); F2.tap = t || null; F2.tapR = t ? t.getBoundingClientRect() : null; F2.tapT = Date.now(); if (!t) $$('.f2why').forEach(x => x.remove()); }
+document.addEventListener('pointerdown', f2Mark, true);
+document.addEventListener('click', e => { if (Date.now() - F2.tapT > 800) f2Mark(e); }, true);   // mouse or keyboard clicks without a pointerdown
+function f2Why(t) {
+  const r = F2.tapR; if (!r || Date.now() - F2.tapT > 1500 || !t) return; F2.tapR = null;
+  $$('.f2why').forEach(x => x.remove());
+  const b = h('div.f2why', { role: 'status' }, t); document.body.appendChild(b);
+  const w = b.offsetWidth, hh = b.offsetHeight, x = Math.max(8, Math.min(innerWidth - w - 8, r.left + r.width / 2 - w / 2));
+  let y = r.top - hh - 8; if (y < 52) y = r.bottom + 8;
+  b.style.left = Math.round(x) + 'px'; b.style.top = Math.round(y) + 'px';
+  clearTimeout(F2.whyT); F2.whyT = setTimeout(() => { try { b.remove(); } catch (e) { } }, 3200);
+}
+// ---------- the round card: below the banner and the altitude line, above the dock; shown once the board has stopped moving ----------
+function f2PlaceRo(el) {
+  const go = () => {
+    if (!el.isConnected) return;
+    const tops = ['.tbn', '.w.altw', '.w.appr'].map(s => $(s)).filter(e => e && e.getBoundingClientRect().height > 0).map(e => e.getBoundingClientRect().bottom);
+    const top0 = Math.max(8, ...tops) + 8, dk = $('#dock'), dt = dk ? dk.getBoundingClientRect().top : innerHeight, bot = (dt > top0 + 160 ? dt : innerHeight) - 8;
+    if (isPh() && bot - top0 >= 160) { el.style.top = Math.round(top0) + 'px'; el.style.transform = 'translate(-50%,0)'; el.style.maxHeight = Math.round(bot - top0) + 'px'; el.style.overflowY = 'auto'; }
+    el.style.animation = 'none'; el.style.visibility = '';
+  };
+  el.style.animation = 'none'; setTimeout(go, Math.max(0, Math.min(2600, F2.popAt - Date.now())));
+}
+// ---------- after every render: owner groups, stakes, old bubbles ----------
+// the bottom line is never cut: one line, then a smaller line, then two lines, then two smaller lines
+function f2Fit() {
+  const pr = $('#prompt'); if (!pr || !isPh()) return;
+  const over = () => pr.scrollWidth > pr.clientWidth + 1 || pr.scrollHeight > pr.clientHeight + 1;
+  pr.classList.remove('p2'); pr.style.fontSize = ''; pr.style.lineHeight = '';
+  if (!over()) return; pr.style.fontSize = '15px'; if (!over()) return;
+  pr.style.fontSize = ''; pr.classList.add('p2'); if (!over()) return; pr.style.fontSize = '12px'; pr.style.lineHeight = '15px';
+}
+const F2GRP = ['gear', 'flaps', 'brakes', 'ice'];
+function f2After() {
+  if (!G || !UI.started) return;
+  const pz = $('#pz'); if (!pz) return;
+  // a chip from the round before (the last engine bubble too) never outlives its round or the flight
+  const sig = G.seed + ':' + G.sid + ':' + G.round + ':' + !!G.result;
+  if (sig !== F2.sig) { F2.sig = sig; if (UI.chip) { UI.chip = null; $$('#pz .rchip').forEach(e => e.remove()); } }
+  // the word once per group (Gear 1-2 · 3-4 · 5-6), a shared backdrop in the owner's colour
+  const box = {};
+  $$('#pz .slot[data-slot]').forEach(b => {
+    const S = FA.SLOT[b.dataset.slot]; if (!S || !F2GRP.includes(S.grp)) return;
+    if (S.ix > 0) b.classList.add('f2g');
+    const g = S.grp + (S.grp === 'ice' ? S.row : '') + ':' + S.s, x = b.offsetLeft, y = b.offsetTop, w = b.offsetWidth, hh = b.offsetHeight;
+    const o = box[g] || (box[g] = { s: S.s, x0: x, y0: y, x1: x + w, y1: y + hh });
+    o.x0 = Math.min(o.x0, x); o.y0 = Math.min(o.y0, y); o.x1 = Math.max(o.x1, x + w); o.y1 = Math.max(o.y1, y + hh);
+  });
+  for (const g in box) { const o = box[g], p = 4; pz.insertBefore(h('div.f2grp.' + (o.s === 0 ? 'p' : o.s === 1 ? 'c' : 'n'), { 'aria-hidden': 'true', style: 'left:' + (o.x0 - p) + 'px;top:' + (o.y0 - p) + 'px;width:' + (o.x1 - o.x0 + 2 * p) + 'px;height:' + (o.y1 - o.y0 + 2 * p) + 'px' }), pz.firstChild); }
+  // rising stakes: the altitude chip warms round by round; the last round says so
+  const left = D.rounds - G.row0 - G.round, an = $('.altnow');
+  document.documentElement.classList.toggle('f2-last', !G.result && left <= 1);
+  if (an) { an.dataset.st = G.result ? '' : left <= 1 ? 'last' : left <= 2 ? 'hot' : left <= 4 ? 'warm' : 'calm'; const b = an.querySelector('b'); if (b && left <= 1 && !G.result && !/Final/.test(b.textContent)) b.textContent = b.textContent.replace(/^R\d+\/\d+/, 'Final'); }
+}
+// ---------- the end card: landed or crashed, why, the score of checks ----------
+function f2EndCard() {
+  const R = G.result, win = !!R.win, L = FA.checklist(G), judged = R.checks && (R.why === 'checks' || R.why === 'speed' || win);
+  const okOf = x => judged && x.k in R.checks ? !!R.checks[x.k] : x.ok, n = L.filter(okOf).length;
+  const why = win ? 'All ' + L.length + ' landing checks met.' : judged ? 'Landing failed: ' + f2LossLine(R) + '.' : 'Round ' + (G.round + 1) + ': ' + f2LossLine(R) + '.';
+  const chips = L.map(x => h('span.f2ck.' + (okOf(x) ? 'ok' : 'no'), h('i', okOf(x) ? '✓' : '✗'), (CK_WORD(Object.assign({}, x, { ok: okOf(x) })) || x.k)));
+  return h('button.endb.f2end.' + (win ? 'win' : 'lose'), { type: 'button', 'data-a': 'lookpanel', 'aria-label': (win ? 'Landed. ' : 'Crashed. ') + why + ' ' + n + ' of ' + L.length + ' checks. Tap to look at the panel.' },
+    h('b', win ? 'Landed!' : 'Crashed'), h('span.f2ew', why), h('span.f2ec', n + ' / ' + L.length + ' landing checks'), h('span.f2cks', ...chips), h('small.f2tap', 'Tap to see the panel'));
+}
+(function () {
+  const st = document.createElement('style');
+  st.textContent =
+    // the refusal bubble
+    '.f2why{position:fixed;z-index:9995;max-width:min(300px,calc(100vw - 16px));padding:7px 11px;border-radius:12px;background:#fff7dc;color:#1b1206;border:2px solid #c0392b;font-size:15px;font-weight:800;line-height:1.25;box-shadow:0 4px 14px rgba(0,0,0,.55);pointer-events:none}' +
+    // owner colour on every slot: a bar along the bottom (blue = pilot, orange = co-pilot); group backdrops behind gear, flaps and brakes
+    '#pz .slot.p:not(.full){background-image:linear-gradient(to top,#3d7fe0 0,#3d7fe0 4px,transparent 4px)!important}#pz .slot.c:not(.full){background-image:linear-gradient(to top,#f08a24 0,#f08a24 4px,transparent 4px)!important}' +
+    '#pz .f2grp{position:absolute;z-index:0;border-radius:10px;pointer-events:none;border:2px solid rgba(255,255,255,.18);background:rgba(255,255,255,.06)}#pz .f2grp.p{border-color:rgba(61,127,224,.75);background:rgba(61,127,224,.16)}#pz .f2grp.c{border-color:rgba(240,138,36,.75);background:rgba(240,138,36,.16)}' +
+    '#pz .slot[data-slot^=en] .sword{font-size:12px!important;letter-spacing:-.02em}#pz .slot.f2g .sword{display:none!important}#pz .slot.f2g .sl{font-size:max(15px,1.12em)!important}' +
+    '#pz .tray .who{font-weight:900!important;letter-spacing:.02em}#pz .tray.p .who{color:#8fc0ff!important}#pz .tray.c .who{color:#ffc07a!important}' +
+    // calm: no pulsing rings, no flashing Roll; the dashed outline only on the chosen die
+    '#pz .slot.need,#pz .slot.cpt,#pz .hl,.rchip,#acts .btn,#acts [data-a=ready],#acts [data-a=ready]::before,.gxh-ring,.gxt-ring,.rtleft.low{animation:none!important}' +
+    '#pz .die.cpt:not(.sel){outline:none!important}#pz .die.sel{outline:3px dashed #fff!important;outline-offset:4px}' +
+    '.pop{animation-duration:1.25s!important}' +
+    // rising stakes on the altitude chip
+    '.altnow[data-st]{border-radius:999px;padding:0 8px}.altnow[data-st=warm]{background:rgba(242,185,44,.22)}.altnow[data-st=hot]{background:rgba(240,138,36,.38)}.altnow[data-st=last]{background:#b3261e;color:#fff}' +
+    'html.f2-last #pz .slot.legal.deadly{box-shadow:0 0 0 3px #e0402c,0 0 12px 3px rgba(224,64,44,.8)!important}' +
+    // the round card: stakes first; the last round in red
+    '.fa-ro li b{color:#1d4f9a}.fa-ro.f2last{border-color:#b3261e}.fa-ro.f2last .rh b{color:#b3261e}' +
+    // the end card
+    '#fx .endb.f2end{display:flex!important;flex-direction:column;align-items:center;gap:4px;bottom:10%;padding:12px 12px 10px}.endb.f2end b{font-size:clamp(26px,8vw,36px);letter-spacing:.02em}.endb.f2end.win b{color:#7dff95}.endb.f2end.lose b{color:#ff8a78}' +
+    '.f2ew{font-size:16px;font-weight:800;line-height:1.25}.f2ec{font-size:15px;font-weight:900;color:#ffd76a}.f2cks{display:flex;flex-wrap:wrap;justify-content:center;gap:4px;margin-top:2px}' +
+    '.f2ck{display:inline-flex;align-items:center;gap:3px;padding:2px 7px;border-radius:999px;font-size:13px;font-weight:800;background:rgba(255,255,255,.12)}.f2ck.ok i{color:#7dff95;font-style:normal}.f2ck.no{background:rgba(224,64,44,.3)}.f2ck.no i{color:#ff8a78;font-style:normal}' +
+    '.f2tap{font-size:12px;opacity:.8}';
   document.head.appendChild(st);
 })();

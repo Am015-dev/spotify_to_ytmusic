@@ -23,7 +23,7 @@ const icoEl = grp => h('i.ic', { 'aria-hidden': 'true', html: '<svg viewBox="0 0
 // mandatory spaces of seat a that are still empty, and how many dice it has left: warn before a missing Axis / Engine die loses the flight
 function mandInfo(a) { if (!G || typeof a !== 'number' || a < 0 || G.phase !== 'place' || G.result) return null; const need = ['ax' + a, 'en' + a].filter(k => G.keys.includes(k) && !G.slots[k]), left = FA.unusedDice(G, a).length; return { need, left, tight: need.length > 0 && left > 0 && left <= need.length, lost: need.length > left }; }
 const needNames = need => need.map(k => FA.SLOT[k].grp === 'axis' ? 'Axis' : 'Engines').join(' and ');
-const SLOTWORD = { axis: 'Axis', engines: 'Speed', radio: 'Radio', gear: 'Gear', flaps: 'Flap', brakes: 'Brake', conc: 'Coffee', kero: 'Fuel', intern: 'Trainee', ice: 'Ice' };   // the word on each empty slot
+const SLOTWORD = { axis: 'Axis', engines: 'Engines', radio: 'Radio', gear: 'Gear', flaps: 'Flap', brakes: 'Brake', conc: 'Coffee', kero: 'Fuel', intern: 'Trainee', ice: 'Ice' };   // the word on each empty slot
 const SLOTLAB = k => { const S = FA.SLOT[k]; if (S.grp === 'gear' || S.grp === 'flaps') return S.vals.join('-'); if (S.grp === 'brakes' || S.grp === 'ice') return String(S.vals[0]); return ''; };
 function selectedLegal() {
   const v = actSeat(); if (typeof v !== 'number' || v < 0 || !mayAct(v)) return [];
@@ -93,7 +93,7 @@ function render() {
     const b = css(h('button.' + cls.replace(/ /g, '.'), { type: 'button', 'data-a': 'slot', 'data-slot': k, 'aria-label': slotName(k) + (dead[k] ? ' (this die here ends the flight)' : '') + ', ' + (d ? 'holds a ' + d.v : slotNeed(k) + (S.s === 0 ? ', pilot' : S.s === 1 ? ', co-pilot' : ', either crew')) }), q);
     b.style.setProperty('--u', Math.round(q.w) + 'px');
     if (d) b.appendChild(dvEl(d.v, d.k === 'i' ? 't' : d.k === 'x' ? 'k' : (d.s === 0 ? 'b' : 'o'))); else {
-      const pvw = hintsMode() && legal.includes(k) && typeof act === 'number' && act >= 0 && typeof UI.sel === 'number' && UI.sel >= 0 && !G.pend && G.dice[act][UI.sel] ? slotPreview(k, act, G.dice[act][UI.sel].v + UI.cof) : null; if (pvw) b.classList.add('pvw'); const lab = SLOTLAB(k); b.classList.add(lab ? 'hasv' : 'nov'); b.appendChild(h('span.r1', icoEl(S.grp))); b.appendChild(h('span.sword', SLOTWORD[S.grp] || '')); if (lab) b.appendChild(h('span.sl', lab)); if (pvw) b.appendChild(h('span.pw' + (pvw.bad ? '.bad' : pvw.good ? '.good' : ''), h('b', pvw.big), h('small', pvw.cap))); }
+      const pvw = (hintsMode() || dead[k] || ((S.grp === 'axis' || S.grp === 'engines') && G.slots[(S.grp === 'axis' ? 'ax' : 'en') + (1 - act)])) && legal.includes(k) && typeof act === 'number' && act >= 0 && typeof UI.sel === 'number' && UI.sel >= 0 && !G.pend && G.dice[act][UI.sel] ? slotPreview(k, act, G.dice[act][UI.sel].v + UI.cof) : null; if (pvw) b.classList.add('pvw'); const lab = SLOTLAB(k); b.classList.add(lab ? 'hasv' : 'nov'); b.appendChild(h('span.r1', icoEl(S.grp))); b.appendChild(h('span.sword', SLOTWORD[S.grp] || '')); if (lab) b.appendChild(h('span.sl', lab)); if (pvw) b.appendChild(h('span.pw' + (pvw.bad ? '.bad' : pvw.good ? '.good' : ''), h('b', pvw.big), h('small', pvw.cap))); }
     const swOn = S.grp === 'gear' && G.pl.sw.lg[S.ix] || S.grp === 'flaps' && G.pl.sw.fl[S.ix] || S.grp === 'brakes' && G.pl.sw.br[S.ix];
     if (swOn) { b.appendChild(h('i.sw.on')); if (!d) { b.classList.add('done'); b.appendChild(h('i.dn', { 'aria-hidden': 'true' }, '✓')); b.setAttribute('aria-label', b.getAttribute('aria-label') + ', done'); } } else if (['gear', 'flaps', 'brakes'].includes(S.grp)) b.appendChild(h('i.sw'));
     pz.appendChild(b);
@@ -116,7 +116,7 @@ function render() {
   // ---- trays
   for (const s of [0, 1]) {
     const q = s === 0 ? r.trayP : r.trayC, show = v === 'all' || v === s || !!G.open, nd = G.nd || 4, gap = 6, ds = Math.min(80, (q.w - 12 - gap * (nd - 1)) / nd, q.h - 8);
-    const tr2 = css(h('div.tray.' + (s === 0 ? 'p' : 'c'), { 'aria-label': pname(s) + "'s dice" + (show ? '' : ' (hidden behind the screen)') }, h('span.who', G.open ? (G.ai[s] ? name(s) + '’s dice' : 'Your dice') : pname(s))), q);
+    const tr2 = css(h('div.tray.' + (s === 0 ? 'p' : 'c'), { 'aria-label': pname(s) + "'s dice" + (show ? '' : ' (hidden behind the screen)') }, h('span.who', (s === viewSeat() ? 'You' : name(s)) + ' · ' + pname(s))), q);
     const rrmode = G.pend && G.pend.h === 'rr' && me === s && mayAct(s) && !G.pend.d.m[s];
     for (let i = 0; i < nd; i++) {
       const d = G.dice[s][i], used = d.u || G.phase !== 'place', sel = UI.sel === i && me === s, cv = sel && UI.cof ? d.v + UI.cof : d.v;   // coffee changes the face shown
@@ -134,6 +134,7 @@ function render() {
   if (typeof pxSync === 'function') pxSync();
   if (typeof netRenderHook === 'function') netRenderHook();
   if (typeof ftAfter === 'function') try { ftAfter(); } catch (e) { }   // tracker, preview, slot needs, coach pointer (ui11.js)
+  try { f2After(); f2Fit(); } catch (e) { }   // owner groups, rising stakes, the bottom line never cut (ui11.js, part F2)
 }
 function pendLabel() { const p = G.pend; return p.h === 'rr' ? 'Reroll: choose dice' : p.h === 'intern' ? 'Trainee token' : p.h === 'sync' ? 'Cross-check die' : 'Hand-over'; }
 // ---------- what just happened: a short line per move in the dock (the partner's placements included), a slot flash, the plane held back while the speed
@@ -186,7 +187,7 @@ function hideRecap() { const el = $('#recap'); if (el) { el.hidden = true; el.in
 function promptText() { return phPrompt(); }
 function renderDock() {
   const v = actSeat(), pr = promptText(), mine = typeof v === 'number' && v >= 0 && mayAct(v) && FA.pending(G).includes(v);
-  const p = $('#prompt'); if (p) { p.textContent = pr; p.className = mine ? 'mine' : ''; } const bp = $('#barprompt'); if (bp) { bp.textContent = pr; }
+  const p = $('#prompt'); if (p) { p.textContent = pr; p.className = mine ? 'mine' : ''; try { f2Fit(); } catch (e) { } } const bp = $('#barprompt'); if (bp) { bp.textContent = pr; }
   // what just happened
   const fd = $('#feed'); if (fd) { const k = String(UI.feedK || 0) + (UI.coach && UI.coach.tip ? 't' : '') + (UI.sel != null && UI.sel !== -1 ? 's' : ''); if (fd.dataset.k !== k || !UI.feed || !UI.feed.length) { fd.innerHTML = ''; fd.dataset.k = k; fd.hidden = !(UI.feed && UI.feed.length) || !!G.result || !!(UI.coach && UI.coach.tip) || (UI.sel != null && UI.sel !== -1); if (UI.feed) for (const t of UI.feed) fd.appendChild(h('div.fl', t)); fd.classList.remove('anim'); void fd.offsetWidth; if (ANIM) fd.classList.add('anim'); } }
   // roadmap
@@ -254,7 +255,7 @@ function lossIf(v, m) {
 }
 function deadlySlots(v, legal) {
   const o = {}; if (!legal.length || typeof v !== 'number' || v < 0 || G.result) return o;
-  for (const k of legal) { const R = lossIf(v, { t: 'place', d: UI.sel, to: k, c: UI.cof }); if (R) o[k] = 'this ends the flight. ' + (R.msg || '') + ' Tap it twice if you really mean it.'; }
+  for (const k of legal) { const R = lossIf(v, { t: 'place', d: UI.sel, to: k, c: UI.cof }); if (R) { o[k] = 'this ends the flight. ' + (R.msg || '') + ' Tap it twice if you really mean it.'; (UI.deadWhy = UI.deadWhy || {})[k] = f2LossLine(R); } }
   return o;
 }
 // one line saying what the selected die would do on the mandatory spaces

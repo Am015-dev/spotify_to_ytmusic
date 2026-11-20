@@ -42,7 +42,7 @@ function sfxFor(m, was) {
   try {
     if (m.t === 'place') { snd('dieland'); if (G.pl.axis !== was.axis) snd('axis'); if (G.pl.pos !== was.pos) snd('engine'); if (FA.planesOnTrack(G) < was.planes) snd('radio'); if (JSON.stringify(G.pl.sw) !== was.sw) snd('switch'); if (FA.SLOT[m.to].grp === 'conc') snd('coffee'); }
     else if (m.t === 'ready' && G.phase === 'place') snd('roll'); else if (m.t === 'rrpick' && !G.pend) snd('roll'); else if (m.t === 'say') snd('click');
-    if (G.round !== was.round && !G.result) snd('round');
+    if (G.round !== was.round && !G.result) { snd('round', { rate: .86 + .07 * G.round }); if (FA.isFinal(G)) setTimeout(() => snd('alarm', { vol: .5 }), 500); }
   } catch (e) { }
 }
 // ---- the scheduler: asks the computer for its move, waits for humans, shows pass screens
@@ -62,7 +62,7 @@ function schedule() {
 }
 // ---- human actions
 function dieTap(s, d) {
-  if (!mayAct(s)) { if (G.phase === 'place' && !G.result) toast(s === viewSeat() ? 'Not your move yet.' : 'Those dice are hidden behind the screen.'); return; }
+  if (!mayAct(s)) { if (G.phase === 'place' && !G.result) toast(s === viewSeat() ? 'Not your move yet: ' + name(G.turn) + ' is placing.' : 'Those are ' + name(s) + '’s hidden dice.'); return; }
   const v = actSeat(); if (v !== s) return;
   if (G.pend && G.pend.h === 'rr') { if (!G.pend.d.m[s] && typeof d === 'number' && !G.dice[s][d].u) { UI.rrm[d] = !UI.rrm[d]; render(); } return; }
   if (G.pend && G.pend.h === 'wt' && G.pend.d.a !== s) { const m = { t: 'wt2', d }; if (FA.validMoves(G, s).some(x => x.t === 'wt2' && x.d === d)) commit(s, m); return; }
@@ -72,17 +72,18 @@ function dieTap(s, d) {
 }
 function slotTap(k) {
   const v = actSeat(); if (typeof v !== 'number' || v < 0 || !mayAct(v)) { if (G && !G.result) toast('Wait for your turn.'); return; }
-  if (G.slots[k]) { toast(slotName(k) + ' is taken.'); return; }
-  if (UI.sel === -1 || UI.sel == null) { toast('Pick a die first.'); return; }
+  if (G.slots[k]) { toast(slotName(k) + ' is used this round.'); return; }
+  if (UI.sel === -1 || UI.sel == null) { toast('Pick one of your ' + (v === 0 ? 'blue' : 'orange') + ' dice first.'); return; }
   const m = { t: 'place', d: UI.sel, to: k, c: UI.cof };
   if (FA.validMoves(G, v).some(x => x.t === 'place' && x.d === m.d && x.to === k && (x.c || 0) === m.c)) {
     // the last dice are needed on the empty Axis / Engines: a second tap on the same space places anyway
-    const mi = mandInfo(v); if (UI.sel !== 'p' && mi && mi.tight && !mi.lost && !mi.need.includes(k) && UI.warnK !== k) { UI.warnK = k; snd('error'); toast(needNames(mi.need) + ' still empty. Tap again.'); return; }
+    const mi = mandInfo(v); if (UI.sel !== 'p' && mi && mi.tight && !mi.lost && !mi.need.includes(k) && UI.warnK !== k) { UI.warnK = k; snd('error'); toast('Save a die for ' + needNames(mi.need) + '. Tap again to skip.'); return; }
     // this die here ends the flight at once: the first tap only explains, a second tap places it
-    if (UI.dead && UI.dead[k] && UI.warnK !== k) { UI.warnK = k; snd('error'); toast('This ends the flight. Tap again.'); return; }
+    if (UI.dead && UI.dead[k] && UI.warnK !== k) { UI.warnK = k; snd('error'); toast('This ends the flight' + (UI.deadWhy && UI.deadWhy[k] ? ': ' + UI.deadWhy[k] : '') + '. Tap again to do it.'); return; }
     UI.warnK = null; sendMove(v, m); return; }
   const val = (UI.sel === 'p' ? G.pend.d.val : G.dice[v][UI.sel].v) + UI.cof; const S = FA.SLOT[k];
-  const why = S.s !== null && S.s !== v ? 'That space belongs to the ' + (S.s === 0 ? 'pilot' : 'co-pilot') + '.' : (S.grp === 'flaps' && S.ix > 0 && !G.pl.sw.fl[S.ix - 1]) ? 'Flaps go in order: use the one above first.' : (S.grp === 'brakes' && S.ix > 0 && !G.pl.sw.br[S.ix - 1]) ? 'Brakes go in order: 2, then 4, then 6.' : (S.grp === 'ice' && S.ix !== G.pl.ice) ? 'Only the next icy-runway column can be used.' : (S.grp === 'intern' && G.intern.length && val === (v === 0 ? G.intern[0] : G.intern[G.intern.length - 1])) ? 'The die must differ from the next trainee token.' : S.vals ? slotName(k) + ' ' + slotNeed(k) + ' (your die shows ' + val + ').' : 'That does not fit.';
+  const fix = S.vals && S.vals.length ? Math.min(...S.vals.map(n => Math.abs(n - val))) : 99;
+  const why = S.s !== null && S.s !== v ? 'That is ' + name(S.s) + '’s space (' + (S.s === 0 ? 'blue' : 'orange') + ').' : (S.grp === 'flaps' && S.ix > 0 && !G.pl.sw.fl[S.ix - 1]) ? 'Flaps go in order: flap ' + S.ix + ' first.' : (S.grp === 'brakes' && S.ix > 0 && !G.pl.sw.br[S.ix - 1]) ? 'Brakes go in order: 2, then 4, then 6.' : (S.grp === 'ice' && S.ix !== G.pl.ice) ? 'Only the next icy-runway column is open.' : (S.grp === 'intern' && G.intern.length && val === (v === 0 ? G.intern[0] : G.intern[G.intern.length - 1])) ? 'Must differ from the next trainee token.' : S.vals ? SLOTWORD[S.grp] + ' ' + SLOTLAB(k) + ' takes ' + (S.vals.length === 1 ? 'a ' + S.vals[0] : S.vals.join(' or ')) + '. Yours is ' + val + '.' + (fix <= G.coffee - Math.abs(UI.cof || 0) ? ' Coffee can fix it.' : '') : 'That die does not fit here.';
   snd('error'); toast(why);
 }
 // route: online clients send to the host, everybody else applies at once
