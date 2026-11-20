@@ -79,7 +79,7 @@
   }
   function chooseBuys(p, ids, budget, level) {
     var hand = OH.G.pl[p].hand.length;
-    var scored = ids.map(function (id) { return { id: id, w: cardWorth(p, id) + (level === 'easy' ? (Math.random() * 6 - 3) : 0) }; }).sort(function (a, b) { return b.w - a.w; });
+    var scored = ids.map(function (id) { return { id: id, w: cardWorth(p, id) + (level === 'easy' ? (Math.random() * 16 - 8) : 0) }; }).sort(function (a, b) { return b.w - a.w; });
     var out = [];
     scored.forEach(function (s) { if (s.w > 2 + Math.max(0, hand + out.length - 8) * 2 && (out.length + 1) * 3 <= budget) out.push(s.id); });
     return out;
@@ -127,9 +127,9 @@
       if (worst.length) mv.push({ t: 'sell', ids: worst.slice(0, Math.max(1, P3.hand.length - 6)) });
     }
     var scored = mv.map(function (m) { return { m: m, v: tryMove(m, p, 0) }; });
-    var passV = evalState(G, p) - 0.5;   // value of doing nothing
+    var passV = evalState(G, p) - (level === 'easy' ? 0.5 : AI.PASSOFF);   // value of doing nothing (easy gives up sooner)
     scored.forEach(function (s) { if (s.m.t === 'pass') s.v = passV - 0.01; if (s.m.t === 'end') s.v = passV; });
-    if (level === 'easy') scored.forEach(function (s) { s.v += Math.random() * 7; });
+    if (level === 'easy') { scored = scored.filter(function (s) { return s.m.t !== 'mile' && s.m.t !== 'award'; }); scored.forEach(function (s) { s.v += Math.random() * 16; if (s.m.t === 'pass') s.v += 6; }); }
     scored.sort(function (a, b) { return b.v - a.v; });
     var top = scored[0].m;
     // awards: fund only when clearly ahead
@@ -138,6 +138,6 @@
   }
   // how good a move is, in words (for the hint): same evaluation as decide()
   function rank(level) { return decide(level || 'normal'); }
-  var AI = root.OHAI = { decide: decide, rank: rank, value: value, gensLeft: gensLeft, cardWorth: cardWorth };
+  var AI = root.OHAI = { PASSOFF: +(typeof process !== 'undefined' && process.env.OH_PASSOFF) || 4, decide: decide, rank: rank, value: value, gensLeft: gensLeft, cardWorth: cardWorth };
   if (typeof module !== 'undefined') module.exports = AI;
 })(typeof window !== 'undefined' ? window : globalThis);

@@ -45,14 +45,19 @@
   "tags": [
    "building"
   ],
-  "mc": 40,
-  "text": "Start with 4 steel. Your steel is worth 1 more.",
+  "mc": 46,
+  "text": "Start with 5 steel and 1 steel production. Your steel is worth 1 more.",
   "flavor": "We stitch the dunes together.",
   "start": [
    {
     "op": "gain",
     "r": "steel",
-    "n": 4
+    "n": 5
+   },
+   {
+    "op": "prod",
+    "r": "steel",
+    "n": 1
    }
   ],
   "effect": [
@@ -69,14 +74,19 @@
    "plant",
    "microbe"
   ],
-  "mc": 44,
-  "text": "Start with 1 plant production. Gain 3 credits each time you place a greenery.",
+  "mc": 46,
+  "text": "Start with 1 plant production and 4 plants. Gain 4 credits each time you place a greenery.",
   "flavor": "Rust first, then green.",
   "start": [
    {
     "op": "prod",
     "r": "plant",
     "n": 1
+   },
+   {
+    "op": "gain",
+    "r": "plant",
+    "n": 4
    }
   ],
   "effect": [
@@ -87,7 +97,7 @@
      {
       "op": "gain",
       "r": "mc",
-      "n": 3
+      "n": 4
      }
     ]
    }
@@ -158,14 +168,14 @@
   "tags": [
    "power"
   ],
-  "mc": 42,
-  "text": "Start with 2 heat production. Action: pay 5 heat for 1 titanium and 1 credit.",
+  "mc": 46,
+  "text": "Start with 3 heat production. Action: pay 4 heat for 1 titanium and 2 credits.",
   "flavor": "Cold nights, warm ledgers.",
   "start": [
    {
     "op": "prod",
     "r": "heat",
-    "n": 2
+    "n": 3
    }
   ],
   "action": [
@@ -174,7 +184,7 @@
      {
       "op": "lose",
       "r": "heat",
-      "n": 5
+      "n": 4
      }
     ],
     "do": [
@@ -186,7 +196,7 @@
      {
       "op": "gain",
       "r": "mc",
-      "n": 1
+      "n": 2
      }
     ]
    }
@@ -288,14 +298,19 @@
   "tags": [
    "building"
   ],
-  "mc": 44,
-  "text": "Start with 2 steel. Gain 3 steel each time you place a city.",
+  "mc": 46,
+  "text": "Start with 3 steel and 1 steel production. Gain 3 steel each time you place a city.",
   "flavor": "Big jobs leave big piles.",
   "start": [
    {
     "op": "gain",
     "r": "steel",
-    "n": 2
+    "n": 3
+   },
+   {
+    "op": "prod",
+    "r": "steel",
+    "n": 1
    }
   ],
   "effect": [

@@ -8,6 +8,7 @@ const N = +process.argv[2] || 20, LV = [process.argv[3] || 'normal', process.arg
 let wins = [0, 0], gens = [], fails = 0, corpW = {}, corpN = {}, margins = [], steps = 0, t0 = Date.now(), stuck = 0, cardsPlayed = new Set();
 for (let g = 0; g < N; g++) {
   OH.newGame({ seed: 1000 + g * 7919 });
+  if (process.env.OH_FORCE) { OH.G.pl[0].offer.corps = [process.env.OH_FORCE]; OH.G.pl[1].offer.corps = OH.G.pl[1].offer.corps.filter(c => c !== process.env.OH_FORCE).slice(0, 1); }
   let n = 0;
   while (!OH.G.over && n < 6000) {
     const p = OH.sideToAct(); if (p < 0) { stuck++; break; }
