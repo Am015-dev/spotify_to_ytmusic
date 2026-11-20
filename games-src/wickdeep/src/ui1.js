@@ -84,7 +84,7 @@ function fitCam(force) {
   ks.forEach(function (k) { var w = hexWorld(k); x0 = Math.min(x0, w.x); x1 = Math.max(x1, w.x); y0 = Math.min(y0, w.y); y1 = Math.max(y1, w.y); });
   var bw = x1 - x0 + 2.2, bh = y1 - y0 + 2.6;
   var z = Math.min(BW / bw, (BH - 50) / bh);
-  CAM.z = Math.max(16, Math.min(46, z)); CAM.x = (x0 + x1) / 2; CAM.y = (y0 + y1) / 2;
+  CAM.z = Math.max(16, Math.min(innerWidth >= 800 ? 64 : 46, z)); CAM.x = (x0 + x1) / 2; CAM.y = (y0 + y1) / 2;
   clampCam();
 }
 function clampCam() {
@@ -210,9 +210,9 @@ function drawFig(f) {
   var by = s.y + R * 0.66 * big;
   CX.fillStyle = '#000'; CX.fillRect(s.x - w / 2 - 1, by - 1, w + 2, Math.max(4, R * 0.16) + 2);
   CX.fillStyle = f.team === 'h' ? '#7fc46a' : '#d0533c'; CX.fillRect(s.x - w / 2, by, w * hpw, Math.max(4, R * 0.16));
-  if (R >= 20) { CX.font = '700 ' + Math.max(10, Math.round(R * 0.36)) + 'px Silkscreen,monospace'; CX.textAlign = 'center'; CX.textBaseline = 'top'; CX.fillStyle = '#000'; CX.fillText(Math.max(0, f.hp), s.x + 1, by + Math.max(4, R * 0.16) + 2); CX.fillStyle = '#fff'; CX.fillText(Math.max(0, f.hp), s.x, by + Math.max(4, R * 0.16) + 1); }
+  if (R >= 16) { CX.font = '700 ' + Math.max(innerWidth >= 800 ? 12 : 11, Math.round(R * 0.36)) + 'px Silkscreen,monospace'; CX.textAlign = 'center'; CX.textBaseline = 'top'; CX.fillStyle = '#000'; CX.fillText(Math.max(0, f.hp), s.x + 1, by + Math.max(4, R * 0.16) + 2); CX.fillStyle = '#fff'; CX.fillText(Math.max(0, f.hp), s.x, by + Math.max(4, R * 0.16) + 1); }
   // monster number
-  if (f.kind === 'mon') { var nx = s.x + R * 0.55, ny = s.y - R * 0.55; CX.fillStyle = f.elite ? '#f2c94c' : '#e9dfc8'; CX.fillRect(nx - 6, ny - 6, 12, 12); CX.fillStyle = '#000'; CX.font = '700 10px Silkscreen,monospace'; CX.textAlign = 'center'; CX.textBaseline = 'middle'; CX.fillText(f.num, nx, ny + 1); }
+  if (f.kind === 'mon') { var nx = s.x + R * 0.55, ny = s.y - R * 0.55; CX.fillStyle = f.elite ? '#f2c94c' : '#e9dfc8'; CX.fillRect(nx - 7, ny - 7, 14, 14); CX.fillStyle = '#000'; CX.font = '700 ' + (innerWidth >= 800 ? 12 : 11) + 'px Silkscreen,monospace'; CX.textAlign = 'center'; CX.textBaseline = 'middle'; CX.fillText(f.num, nx, ny + 1); }
   // conditions
   var cs = Object.keys(f.cond || {}); if (f.rnd && f.rnd.shd) cs.push('shd'); if (f.rnd && f.rnd.ret) cs.push('ret');
   cs.forEach(function (c, i) {
@@ -304,3 +304,6 @@ function initBoardInput() {
   $('zout').addEventListener('click', function () { CAM.fit = true; fitCam(true); draw(); });
 }
 function curFig() { return G && G.ask && G.ask.id ? E.fig(G, G.ask.id) : null; }
+
+$('legend') && $('legend').addEventListener('click', function () { UI.legendOff = true; try { localStorage.setItem('wd_leg', '1'); } catch (e) { } $('legend').hidden = true; });
+try { if (localStorage.getItem('wd_leg')) UI.legendOff = true; } catch (e) { }

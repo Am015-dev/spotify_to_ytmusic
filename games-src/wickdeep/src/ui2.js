@@ -128,7 +128,9 @@ function setPrompt(text, btns) {
 function renderDock() {
   var tray = $('tray'); tray.innerHTML = '';
   if (!G) return;
-  if (UI.insp && !UI.busy && !G.done) { setPrompt(UI.insp.t, [{ t: 'Close', id: 'inspx', fn: closeInsp }]); var d = document.createElement('div'); d.className = 'inspd'; d.innerHTML = UI.insp.h; tray.appendChild(d); return; }
+  if (UI.tut && !UI.busy && !G.done && !UI.insp && G.ask && typeof nextLesson === 'function') { var ls = nextLesson(); if (ls) { UI.seen[ls.k] = 1; UI.insp = { t: ls.t, h: ls.h, lesson: 1 }; } }
+  var lg = $('legend'); if (lg) { var showLg = !UI.legendOff && G.round <= 1 && G.ask && (G.ask.h === 'sel' || G.ask.h === 'first') && !UI.insp; lg.hidden = !showLg; }
+  if (UI.insp && !UI.busy && !G.done) { setPrompt(UI.insp.t, [{ t: UI.insp.lesson ? 'Got it' : 'Close', cls: UI.insp.lesson ? 'go' : '', id: 'inspx', fn: closeInsp }]); var d = document.createElement('div'); d.className = 'inspd'; d.innerHTML = UI.insp.h; tray.appendChild(d); return; }
   if (G.done) { setPrompt(G.done.won ? 'Victory!' : 'Defeat', [{ t: 'Continue', cls: 'go', fn: showResult }]); return; }
   var A = G.ask; if (!A || UI.busy) { setPrompt(UI.busy ? '' : '…', []); return; }
   var f = curFig(), H = f ? D.HERO[f.cls] : null;

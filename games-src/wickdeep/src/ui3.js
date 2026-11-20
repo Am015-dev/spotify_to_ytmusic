@@ -197,9 +197,25 @@ function showHero(i) {
 
 // ---------- tutorial ----------
 function startTutorial() {
-  UI.tut = true; UI.goals = null;
+  UI.tut = true; UI.seen = {}; UI.goals = null;
   CAMP = CAMP || C.load();
   startScenario(1, { tut: true, seed: 4242, party: [{ cls: 'warden', lvl: 1 }, { cls: 'ringer', lvl: 1 }] });
+}
+function nextLesson() {
+  var A = G.ask, S = UI.seen = UI.seen || {}, heroes = E.liveHeroes(G), h = heroes[UI.tab] || heroes[0];
+  var L = function (k, t, x) { return S[k] ? null : { k: k, t: t, h: '<p>' + x + '</p>' }; };
+  if (A.h === 'sel') {
+    if (G.round > 1 && h && h.disc.length >= 2 && h.hand.length <= 6) { var r = L('rest', 'Resting', 'Played cards wait in your played pile. <b>Rest</b> takes your turn: you lose one played card for good, take the rest back and heal 2. A short rest after a round does the same, losing a random card.'); if (r) return r; }
+    if (h && (UI.sel[h.id] || []).length === 2) { var i = L('init', 'Initiative', 'The small number in a card corner is its <b>initiative</b>. You act at the lower of your two numbers. Lowest goes first; monsters have numbers too (top left bar).'); if (i) return i; }
+    return L('cards', 'Two cards', 'Each round you secretly choose <b>2 cards</b> from your hand. Tap two cards, then Ready.');
+  }
+  if (A.h === 'first') return L('halves', 'Top and bottom', 'Every card has a <b>top half</b> and a <b>bottom half</b>. On your turn play the top of one card and the bottom of the other, in either order.');
+  if (A.h === 'second') { var lo = L('lost', 'Lost or played', 'A half marked <b>LOST</b> removes its card from the scenario for good. Other cards go to your played pile and come back when you rest.'); if (lo) return lo; }
+  if (A.h === 'target') { var m = L('mods', 'Luck card', 'Each attack flips a <b>modifier card</b>: +1, −1, ×2 or MISS. It changes the damage, so a hit is never sure.'); if (m) return m; }
+  var any = function (fn) { return heroes.concat(G.figs.filter(function (f) { return f.team === 'm' && f.hp > 0; })).some(fn); };
+  if (E.EL.some(function (e) { return G.el[e] > 0; })) { var e = L('elem', 'Elements', 'The icons at the top are <b>elements</b>. Some halves charge one; another half can spend it for a bonus. They fade after a round or two.'); if (e) return e; }
+  if (any(function (f) { return Object.keys(f.cond || {}).some(function (k) { return f.cond[k] && (D.COND_NAME[k] || k === 'imm'); }); })) { var c = L('cond', 'Conditions', 'A figure with a status like Poison, Stuck or Stun is marked. Tap any figure to read what it does.'); if (c) return c; }
+  return null;
 }
 function coachLine() {
   if (!G || !G.ask) return '';
