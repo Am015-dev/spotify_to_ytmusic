@@ -45,10 +45,12 @@ function commitCard(id,c){UI.hand=null;
   return ok}
 // ---------------------------------------------------------------- taps on the map
 function regionTap(r){const M=UI.bf;if(!M||!M.kind||(UI.card&&UI.card.kind!=='tip'))return false;
-  if(M.kind==='place'||M.kind==='tie'){if(UI.hand!=null){const c=cardMoves(UI.hand).find(x=>x.type==='region'&&x.r===r);if(c){commitCard(UI.hand,c);return true}}return false}
+  if(M.kind==='place'||M.kind==='tie'){if(UI.hand!=null){const c=cardMoves(UI.hand).find(x=>x.type==='region'&&x.r===r);if(c){commitCard(UI.hand,c);return true}}else nudgeHand(r);return false}
   if(M.kind==='menu'){const m=M.mv.find(x=>x.t==='act'&&x.a==='supp'&&x.p&&x.p.r===r&&x.p.n===1);if(m){bfPopAt(regionRect(r),'+1',fcol(M.s));humanMove(m.k);return true}return false}
   if(M.kind==='clashOrder'){orderTap(r);return true}
   return false}
+// F15 (cold play): a region tapped before a card was picked answers, instead of doing nothing: "Pick a card first" there, and the hand nudges once
+function nudgeHand(r){try{bfPopAt(regionRect(r),'Pick a card first','#fff2a8');toast('Pick a card from your hand first, then tap the region.');const h=$('#handw');if(h){h.classList.remove('tb-nudge');void h.offsetWidth;h.classList.add('tb-nudge');setTimeout(()=>h.classList.remove('tb-nudge'),700)}}catch(e){}}
 function locTap(l){const M=UI.bf;if(!M||!M.kind||(UI.card&&UI.card.kind!=='tip'))return false;
   if(M.kind==='herald'||M.kind==='location'){const m=M.mv.find(x=>x.loc===l);if(m){humanMove(m.k);return true}return false}
   return regionTap(l>>1)}
