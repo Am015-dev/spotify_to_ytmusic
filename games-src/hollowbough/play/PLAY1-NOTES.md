@@ -20,8 +20,10 @@ Method: the deployed build (games/hollowbough, same as live; the live URL answer
 
 Dead taps in 3 min: 4 (Prepare while workers out x2, unaffordable card x2 gave only a toast). Lost moments after minute 1: 5.
 
-## Three full games (bot taps via the game's own hint, plus my own play)
-Games end in ~45-60 of your moves (4 seasons). Where the fun should be: the engine (a green card paying again in Spring/Autumn, a critter moving in free into its building, a goal claimed, the Long Road). Where it isn't: you can't plan an engine because cards never show what they do, so every build is a guess; free critter plays and green pay-outs happen with no visible "your engine fired" moment; the rival's clever plays (gifts, plants) are invisible.
+## Full games
+Honest scope: one game by hand to Spring (screenshots above), then full games through the real page by touch taps: the newcomer-paced proof bot
+(`play/proof/*-taps.txt`, follows the game's own hint) and sweep.js (random glowing targets, 2 full games at 375x553 finish). A 2-player game is
+about 35-40 of your moves over 4 seasons; the old build lets a hint-follower reach Autumn in 3 minutes without ever reading a card. Where the fun should be: the engine (a green card paying again in Spring/Autumn, a critter moving in free into its building, a goal claimed, the Long Road). Where it isn't: you can't plan an engine because cards never show what they do, so every build is a guess; free critter plays and green pay-outs happen with no visible "your engine fired" moment; the rival's clever plays (gifts, plants) are invisible.
 
 ## Benchmark: the official digital app of the original (phone)
 | Screen | Official app | Ours (before) |
