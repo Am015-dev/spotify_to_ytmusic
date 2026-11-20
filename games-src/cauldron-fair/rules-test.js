@@ -47,10 +47,10 @@ test('after the flask you may keep drawing and the chip can come back', () => {
 test('the explosion threshold is recomputed after a flask (white sum goes back down)', () => {
   const G = T.game(2); T.order(G, 0, ['W3', 'W3', 'W1', 'W2', 'W1']); T.draw(G, 0, 3); T.ok(G, 0, { t: 'flask' }); eq(CF.whiteSum(P(G, 0)), 6); T.draw(G, 0); eq(P(G, 0).boom, true);
 });
-test('track values: space 15 = 15 coins, 3 VP, no ruby; space 16 has a ruby; space 53 is the spoon 35/15', () => {
-  eq([D.COINS[15], D.VP[15], D.RUBY[15]], [15, 3, 0]); eq([D.COINS[16], D.VP[16], D.RUBY[16]], [15, 3, 1]); eq([D.COINS[53], D.VP[53]], [35, 15]);
+test('track values: space 15 = 13 coins, 3 VP, ruby; space 16 = 13 coins, 4 VP, no ruby; space 53 is the spoon 34/15', () => {
+  eq([D.COINS[15], D.VP[15], D.RUBY[15]], [13, 3, 1]); eq([D.COINS[16], D.VP[16], D.RUBY[16]], [13, 4, 0]); eq([D.COINS[53], D.VP[53]], [34, 15]);
   eq(D.COINS.length, 54); eq(D.RUBY_AT.length, 15);
-  eq([D.COINS[23], D.VP[23], D.COINS[32], D.VP[32]], [19, 5, 23, 8], 'rulebook example spaces');
+  eq([D.COINS[23], D.VP[23], D.COINS[32], D.VP[32]], [17, 6, 22, 8], 'sample spaces');
 });
 test('scoring space is the space after the last chip; chips stop on space 52; the spoon is 53', () => {
   const G = T.game(2); T.order(G, 0, ['G4', 'G4', 'G4', 'G4', 'G4', 'G4', 'G4', 'G4', 'G4', 'G4', 'G4', 'G4', 'G4', 'B4']); T.draw(G, 0, 13); eq(P(G, 0).pot[12].pos, 52); eq(CF.spaceOf(P(G, 0)), 53);
@@ -95,7 +95,7 @@ test('an exploded player does not roll and chooses victory points OR shopping, a
 });
 test('buying rules: two of one colour refused, over budget refused, sold-out refused, yellow not yet in round 1', () => {
   const G = T.game(2); T.order(G, 0, ['G4', 'G4', 'G4']); T.order(G, 1, ['O1']); T.draw(G, 0, 3); T.stop(G, 0); T.draw(G, 1); T.stop(G, 1);
-  eq(P(G, 0).q.h, 'shop'); eq(P(G, 0).q.d.coins, 13);
+  eq(P(G, 0).q.h, 'shop'); eq(P(G, 0).q.d.coins, 12);
   yes(T.bad(G, 0, { t: 'buy', items: ['G1', 'G2'] }), 'same colour twice'); yes(T.bad(G, 0, { t: 'buy', items: ['B4'] }), 'too expensive (19)'); yes(T.bad(G, 0, { t: 'buy', items: ['Y1'] }), 'yellow not out in round 1');
   yes(T.bad(G, 0, { t: 'buy', items: ['W1'] }), 'white is never sold'); yes(T.bad(G, 0, { t: 'buy', items: ['B1', 'R1', 'G1'] }), 'three chips');
   G.supply.B2 = 0; yes(T.bad(G, 0, { t: 'buy', items: ['B2'] }), 'sold out'); G.supply.B2 = 8;
@@ -106,10 +106,10 @@ test('bought chips go into the bag for the next round; all drawn chips return to
   const G = T.game(2); T.order(G, 0, ['G4', 'G4', 'G4']); T.order(G, 1, ['O1']); T.draw(G, 0, 3); T.stop(G, 0); T.draw(G, 1); T.stop(G, 1);
   T.ok(G, 0, { t: 'buy', items: ['G2'] }); T.finish(G); eq(G.round, 2); yes(P(G, 0).bag.length >= 4, 'the three drawn chips and the G2 (and any die chip)'); yes(P(G, 0).bag.some(c => c.c === 'G' && c.v === 2), 'the G2 is in the bag'); T.inv(G);
 });
-test('prices follow the book set in play (blue 1-chip: 5 / 5 / 4 / 5)', () => {
-  const o = [1, 2, 3, 4].map(s => CF.price(T.game(2, { sets: s }), 'B', 1)); eq(o, [5, 5, 4, 5]);
-  eq([1, 2, 3, 4].map(s => CF.price(T.game(2, { sets: s }), 'G', 4)), [14, 18, 18, 14]); eq([1, 2, 3, 4].map(s => CF.price(T.game(2, { sets: s }), 'P', 1)), [9, 12, 10, 11]);
-  eq([1, 2, 3, 4].map(s => CF.price(T.game(2, { sets: s }), 'R', 2)), [10, 8, 9, 11]); eq([1, 2, 3, 4].map(s => CF.price(T.game(2, { sets: s }), 'Y', 4)), [18, 19, 18, 18]); eq([CF.price(T.game(2), 'O', 1), CF.price(T.game(2), 'K', 1)], [3, 10]);
+test('prices follow the book set in play (blue 1-chip: 5 / 6 / 3 / 6)', () => {
+  const o = [1, 2, 3, 4].map(s => CF.price(T.game(2, { sets: s }), 'B', 1)); eq(o, [5, 6, 3, 6]);
+  eq([1, 2, 3, 4].map(s => CF.price(T.game(2, { sets: s }), 'G', 4)), [13, 17, 17, 13]); eq([1, 2, 3, 4].map(s => CF.price(T.game(2, { sets: s }), 'P', 1)), [8, 11, 9, 10]);
+  eq([1, 2, 3, 4].map(s => CF.price(T.game(2, { sets: s }), 'R', 2)), [10, 7, 9, 11]); eq([1, 2, 3, 4].map(s => CF.price(T.game(2, { sets: s }), 'Y', 4)), [17, 18, 17, 17]); eq([CF.price(T.game(2), 'O', 1), CF.price(T.game(2), 'K', 1)], [3, 9]);
 });
 test('rubies: 2 buy a droplet step (repeatable) or refill an empty flask', () => {
   const G = T.game(2); P(G, 0).rubies = 5; P(G, 0).flask = false; T.order(G, 0, ['O1']); T.order(G, 1, ['O1']); T.draw(G, 0); T.stop(G, 0); T.draw(G, 1); T.stop(G, 1);
@@ -160,8 +160,8 @@ test('shared win when points and furthest chip are equal', () => {
 
 // ---------- ingredient powers ----------
 const SET = (c, n) => { const o = sets(); o[c] = n; return o; };
-test('orange chip has no power; Marrow Fair makes it move 1 extra', () => {
-  const G = T.game(2, { card: 'marrowfair' }); T.order(G, 0, ['O1', 'O1', 'G1']); T.draw(G, 0, 3); eq(T.pot(G, 0), ['O1@2', 'O1@4', 'G1@5']);
+test('orange chip has no power; Root Market makes orange and green 1-chips move 1 extra', () => {
+  const G = T.game(2, { card: 'marrowfair' }); T.order(G, 0, ['O1', 'O1', 'G1']); T.draw(G, 0, 3); eq(T.pot(G, 0), ['O1@2', 'O1@4', 'G1@6']);
 });
 test('green set 1: a ruby per green chip that is last or next-to-last only', () => {
   const G = T.game(2, { setObj: SET('G', 1) }); play(G, ['G1', 'O1', 'G1', 'G1']); T.stopOthers(G, 0); eq(P(G, 0).rubies, 1 + 2 + 1, 'start ruby + two greens + the ruby on space 5');
@@ -176,9 +176,9 @@ test('green set 2: a green 4 gives yellow 1 or purple 1 only if that book is out
   const G = T.game(2, { setObj: SET('G', 2), round: 1 }); play(G, ['O1', 'G4']); T.stop(G, 0); T.stopOthers(G, 0); yes(!P(G, 0).q || P(G, 0).q.h !== 'g2', 'no book out in round 1: nothing offered');
   const H = T.game(2, { setObj: SET('G', 2), round: 3 }); play(H, ['O1', 'G4']); T.stop(H, 0); T.stopOthers(H, 0); eq(P(H, 0).q.d.opts, ['Y1', 'P1']);
 });
-test('green set 3: whites exactly 7 -> the last chip slides forward by the sum of the green chips', () => {
-  const G = T.game(2, { setObj: SET('G', 3) }); play(G, ['G2', 'W3', 'W3', 'W1', 'G1']); const before = CF.spaceOf(P(G, 0)); T.stopOthers(G, 0); eq(P(G, 0).q.h, 'g3'); T.answer(G, 0, { yes: true }); eq(P(G, 0).res.space - before, 3);
-  const H = T.game(2, { setObj: SET('G', 3) }); play(H, ['G2', 'W3', 'W2', 'G1']); const b2 = CF.spaceOf(P(H, 0)); T.stopOthers(H, 0); eq(P(H, 0).res.space - b2, 0, 'whites are 5: no slide');
+test('green set 3: whites 5 or 6 -> the last chip slides forward by the sum of the green chips', () => {
+  const G = T.game(2, { setObj: SET('G', 3) }); play(G, ['G2', 'W3', 'W2', 'W1', 'G1']); const before = CF.spaceOf(P(G, 0)); T.stopOthers(G, 0); eq(P(G, 0).q.h, 'g3'); T.answer(G, 0, { yes: true }); eq(P(G, 0).res.space - before, 3);
+  const H = T.game(2, { setObj: SET('G', 3) }); play(H, ['G2', 'W3', 'W1', 'G1']); const b2 = CF.spaceOf(P(H, 0)); T.stopOthers(H, 0); eq(P(H, 0).res.space - b2, 0, 'whites are 4: no slide');
 });
 test('green set 4: pay 1 ruby per last/next-to-last green for a droplet step', () => {
   const G = T.game(2, { setObj: SET('G', 4) }); P(G, 0).rubies = 3; play(G, ['O1', 'G1', 'G2']); T.stop(G, 0); T.stopOthers(G, 0); eq(P(G, 0).q.h, 'g4'); eq(P(G, 0).q.d.max, 2); T.answer(G, 0, { n: 2 }); eq([P(G, 0).droplet, P(G, 0).rubies], [2, 2], '3 rubies - 2 paid + 1 for the ruby on space 5');
@@ -206,8 +206,8 @@ test('blue set 3: a blue chip on a ruby space gives 1 ruby (any number); not els
 });
 test('blue set 4: a blue chip on a ruby space scores its number as points (1, 2 or 4)', () => {
   const G = T.game(2, { setObj: SET('B', 4) }); T.order(G, 0, ['G4', 'B1']); T.draw(G, 0, 2); eq(P(G, 0).vp, 1);
-  const H = T.game(2, { setObj: SET('B', 4) }); T.order(H, 0, ['G4', 'B4']); T.draw(H, 0, 2); eq(P(H, 0).vp, 0, 'B4 lands on 8 (no ruby)');
-  const X = T.game(2, { setObj: SET('B', 4) }); T.order(X, 0, ['G4', 'O1', 'B4']); P(X, 0).droplet = 0; T.draw(X, 0, 3); eq(X.players[0].pot[2].pos, 9); eq(P(X, 0).vp, 4);
+  const H = T.game(2, { setObj: SET('B', 4) }); T.order(H, 0, ['G4', 'B4']); T.draw(H, 0, 2); eq(P(H, 0).vp, 4, 'B4 lands on 8 (a ruby space)');
+  const X = T.game(2, { setObj: SET('B', 4) }); T.order(X, 0, ['G4', 'O1', 'B4']); P(X, 0).droplet = 0; T.draw(X, 0, 3); eq(X.players[0].pot[2].pos, 9); eq(P(X, 0).vp, 0, 'space 9 has no ruby');
 });
 test('red set 1: +1 space with 1-2 orange chips in the pot, +2 with 3 or more', () => {
   const G = T.game(2, { setObj: SET('R', 1) }); T.order(G, 0, ['R1', 'O1', 'R1', 'O1', 'O1', 'R1']); T.draw(G, 0, 6); eq(T.pot(G, 0), ['R1@1', 'O1@2', 'R1@4', 'O1@5', 'O1@6', 'R1@9']);
@@ -237,19 +237,19 @@ test('yellow set 3: limit 8 with one yellow, 9 with three yellows', () => {
   const G = T.game(2, { setObj: SET('Y', 3), round: 2 }); T.order(G, 0, ['Y1', 'W3', 'W3', 'W2', 'W1']); T.draw(G, 0, 4); eq(CF.limitOf(G, P(G, 0)), 8); eq(P(G, 0).boom, false, '3+3+2 = 8 is allowed with limit 8'); T.draw(G, 0); eq(P(G, 0).boom, true);
   const H = T.game(2, { setObj: SET('Y', 3), round: 2 }); T.order(H, 0, ['Y1', 'Y1', 'Y1', 'W3', 'W3', 'W3']); T.draw(H, 0, 6); eq(CF.limitOf(H, P(H, 0)), 9); eq(P(H, 0).boom, false);
 });
-test('yellow set 4: 1st yellow +1, 2nd +2, 3rd +3 extra, then nothing', () => {
-  const G = T.game(2, { setObj: SET('Y', 4), round: 2 }); T.order(G, 0, ['Y1', 'Y1', 'Y1', 'Y1']); T.draw(G, 0, 4); eq(T.pot(G, 0), ['Y1@2', 'Y1@5', 'Y1@9', 'Y1@10']);
+test('yellow set 4: 1st yellow +1, 2nd to 4th +2 extra, then nothing', () => {
+  const G = T.game(2, { setObj: SET('Y', 4), round: 2 }); T.order(G, 0, ['Y1', 'Y1', 'Y1', 'Y1']); T.draw(G, 0, 4); eq(T.pot(G, 0), ['Y1@2', 'Y1@5', 'Y1@8', 'Y1@11']);
 });
-test('purple set 1: 1 = 1 VP; 2 = 1 VP + ruby; 3 = 2 VP + droplet', () => {
-  const G = T.game(2, { setObj: SET('P', 1), round: 3 }); play(G, ['O1', 'P1']); T.stop(G, 0); T.stopOthers(G, 0); eq(P(G, 0).vp, 1);
-  const H = T.game(2, { setObj: SET('P', 1), round: 3 }); play(H, ['O1', 'P1', 'P1', 'P1']); T.stop(H, 0); T.stopOthers(H, 0); eq(P(H, 0).q.h, 'p1', 'a choice is offered'); eq(CF.moves(H, 0).map(m => m.k), [3, 2, 1]); T.finish(H); eq([P(H, 0).vp, P(H, 0).droplet], [2, 1]);
+test('purple set 1: 1 = 1 ruby; 2 = 1 VP + droplet; 3 = 2 VP + ruby', () => {
+  const G = T.game(2, { setObj: SET('P', 1), round: 3 }); play(G, ['O1', 'P1']); T.stop(G, 0); T.stopOthers(G, 0); eq(P(G, 0).rubies, 2);
+  const H = T.game(2, { setObj: SET('P', 1), round: 3 }); play(H, ['O1', 'P1', 'P1', 'P1']); T.stop(H, 0); T.stopOthers(H, 0); eq(P(H, 0).q.h, 'p1', 'a choice is offered'); eq(CF.moves(H, 0).map(m => m.k), [3, 2, 1]); T.finish(H); eq([P(H, 0).vp, P(H, 0).droplet], [2, 0]);
 });
 test('purple set 2: hand in purple chips for chips, points, rubies and droplet steps; 4 purples may not use the 2-reward twice', () => {
   const G = T.game(2, { setObj: SET('P', 2), round: 3 }); play(G, ['O1', 'P1', 'P1', 'P1']); T.stop(G, 0); T.stopOthers(G, 0); eq(P(G, 0).q.h, 'p2');
-  eq(P(G, 0).q.d.sets, [[], [1], [2], [3], [1, 2]]); T.answer(G, 0, { set: [3] }); eq([P(G, 0).vp, P(G, 0).droplet], [6, 2]); yes(P(G, 0).newChips.some(c => c.c === 'Y' && c.v === 4), 'yellow 4');
+  eq(P(G, 0).q.d.sets, [[], [1], [2], [3], [1, 2]]); T.answer(G, 0, { set: [3] }); eq([P(G, 0).vp, P(G, 0).droplet], [5, 2]); yes(P(G, 0).newChips.some(c => c.c === 'R' && c.v === 4), 'red 4');
   const H = T.game(2, { setObj: SET('P', 2), round: 3 }); play(H, ['O1', 'P1', 'P1', 'P1', 'P1']); T.stop(H, 0); T.stopOthers(H, 0); yes(!P(H, 0).q.d.sets.some(s => s.length === 2 && s[0] === 2 && s[1] === 2), 'no 2+2'); yes(P(H, 0).q.d.sets.some(s => s.join() === '1,3'), '1+3 is four purples');
 });
-test('purple set 3: each purple scores by its space (0-9: 0, 10-19: 1, 20-29: 2, 30+: 3)', () => {
+test('purple set 3: each purple scores by its space (0-7: 0, 8-17: 1, 18-29: 2, 30+: 3)', () => {
   const G = T.game(2, { setObj: SET('P', 3), round: 3 }); T.order(G, 0, ['G4', 'P1']); P(G, 0).droplet = 8; T.draw(G, 0, 2); eq(T.pot(G, 0), ['G4@12', 'P1@13']); T.stopOthers(G, 0); T.finish(G); eq(P(G, 0).vp, D.VP[14] + 1, 'space 14 plus 1 VP for the purple on space 13');
   const H = T.game(2, { setObj: SET('P', 3), round: 3 }); T.order(H, 0, ['O1', 'P1']); T.draw(H, 0, 2); T.stopOthers(H, 0); T.finish(H); eq(P(H, 0).vp, D.VP[3], 'purple on space 2 scores nothing');
 });
@@ -271,32 +271,32 @@ test('black chip, 3+ players: more than the left OR right neighbour = droplet; m
 
 // ---------- fortune cards ----------
 const fort = (id, np, o) => T.game(np || 2, Object.assign({ card: id }, o || {}));
-test('card Lucky Seven: exactly 7 white at the end = droplet', () => { const G = fort('lucky7'); play(G, ['W3', 'W3', 'W1']); T.stop(G, 0); T.stopOthers(G, 0); T.finish(G); eq(P(G, 0).droplet, 1); const H = fort('lucky7'); play(H, ['W3', 'W2']); T.stop(H, 0); T.stopOthers(H, 0); T.finish(H); eq(P(H, 0).droplet, 0); });
-test('card Spilled Brew: if you explode the player on your left takes any 2-chip', () => {
-  const G = fort('spilled', 3); T.order(G, 0, ['W3', 'W3', 'W3']); T.draw(G, 0, 3); T.stopOthers(G, 0); eq(G.phase, 'eval'); eq(CF.pending(G).includes(1), true); eq(P(G, 1).q.h, 'gift'); T.answer(G, 1, { o: 'B2' }); yes(P(G, 1).newChips.some(c => c.c === 'B' && c.v === 2));
+test('card Lucky Six: exactly 6 white at the end = droplet', () => { const G = fort('lucky7'); play(G, ['W3', 'W2', 'W1']); T.stop(G, 0); T.stopOthers(G, 0); T.finish(G); eq(P(G, 0).droplet, 1); const H = fort('lucky7'); play(H, ['W3', 'W2']); T.stop(H, 0); T.stopOthers(H, 0); T.finish(H); eq(P(H, 0).droplet, 0); });
+test('card Tipped Cauldron: if you explode the player on your right takes any 2-chip', () => {
+  const G = fort('spilled', 3); T.order(G, 1, ['W3', 'W3', 'W3']); T.draw(G, 1, 3); T.stopOthers(G, 1); eq(G.phase, 'eval'); eq(CF.pending(G).includes(0), true); eq(P(G, 0).q.h, 'gift'); T.answer(G, 0, { o: 'B2' }); yes(P(G, 0).newChips.some(c => c.c === 'B' && c.v === 2));
 });
-test('card Do-Over: right after the 5th chip tip everything back and start again, once', () => {
-  const G = fort('doover'); T.order(G, 0, ['O1', 'O1', 'O1', 'O1', 'O1', 'O1', 'O1']); T.draw(G, 0, 5); T.ok(G, 0, { t: 'restart', yes: true }); eq(P(G, 0).pot.length, 0); eq(P(G, 0).bag.length, 7); T.draw(G, 0, 5); yes(T.bad(G, 0, { t: 'restart', yes: true }), 'only once');
-  const H = fort('doover'); T.order(H, 0, ['O1', 'O1', 'O1', 'O1', 'W3', 'W3', 'W3', 'O1']); T.draw(H, 0, 5); eq(P(H, 0).boom, false); const X = fort('doover'); T.order(X, 0, ['O1', 'O1', 'W3', 'W3', 'W3']); T.draw(X, 0, 5); yes(P(X, 0).boom, 'exploded on the 5th'); eq(P(X, 0).q, null, 'no do-over after an exploding 5th chip'); eq([P(X, 0).boom, P(X, 0).st], [true, 'done']);
+test('card Fresh Start: right after the 4th chip tip everything back and start again, once', () => {
+  const G = fort('doover'); T.order(G, 0, ['O1', 'O1', 'O1', 'O1', 'O1', 'O1', 'O1']); T.draw(G, 0, 4); T.ok(G, 0, { t: 'restart', yes: true }); eq(P(G, 0).pot.length, 0); eq(P(G, 0).bag.length, 7); T.draw(G, 0, 4); yes(T.bad(G, 0, { t: 'restart', yes: true }), 'only once');
+  const H = fort('doover'); T.order(H, 0, ['O1', 'O1', 'O1', 'O1', 'W3', 'W3', 'W3', 'O1']); T.draw(H, 0, 5); eq(P(H, 0).boom, false); const X = fort('doover'); T.order(X, 0, ['O1', 'W3', 'W3', 'W3']); T.draw(X, 0, 4); yes(P(X, 0).boom, 'exploded on the 4th'); eq(P(X, 0).q, null, 'no do-over after an exploding 4th chip'); eq([P(X, 0).boom, P(X, 0).st], [true, 'done']);
 });
-test('card Twice Rolled: the die is rolled twice', () => { const G = fort('twice'); play(G, ['G4', 'G4', 'G4']); T.stop(G, 0); T.stopOthers(G, 0); T.finish(G); eq(ev(G, 'die').filter(e => e.seat === 0).length, 2); });
-test('card Thick Skin: explosion limit 9', () => { const G = fort('thick'); T.order(G, 0, ['W3', 'W3', 'W3', 'W1']); T.draw(G, 0, 3); eq(P(G, 0).boom, false); T.draw(G, 0); eq(P(G, 0).boom, true); });
-test('card Peek and Pick: stopping without exploding lets you draw up to 5 chips and place one', () => {
-  const G = fort('peek'); T.order(G, 0, ['O1', 'G4', 'O1', 'O1', 'O1', 'O1', 'O1']); T.draw(G, 0); T.stop(G, 0); eq(P(G, 0).q.h, 'peek'); eq(P(G, 0).hold.length, 5); T.answer(G, 0, { idx: 0 }); eq(P(G, 0).pot.length, 2);
+test('card Lucky Roller: the die is rolled once and pays 1 extra ruby', () => { const G = fort('twice'); play(G, ['G4', 'G4', 'G4']); T.stop(G, 0); T.stopOthers(G, 0); T.finish(G); eq(ev(G, 'die').filter(e => e.seat === 0).length, 1); yes(P(G, 0).rubies >= 2, 'start ruby + the card ruby'); });
+test('card Sturdy Pot: explosion limit 8', () => { const G = fort('thick'); T.order(G, 0, ['W3', 'W3', 'W2', 'W1']); T.draw(G, 0, 3); eq(P(G, 0).boom, false); T.draw(G, 0); eq(P(G, 0).boom, true); });
+test('card Quick Look: stopping without exploding lets you draw up to 4 chips and place one', () => {
+  const G = fort('peek'); T.order(G, 0, ['O1', 'G4', 'O1', 'O1', 'O1', 'O1', 'O1']); T.draw(G, 0); T.stop(G, 0); eq(P(G, 0).q.h, 'peek'); eq(P(G, 0).hold.length, 4); T.answer(G, 0, { idx: 0 }); eq(P(G, 0).pot.length, 2);
   const H = fort('peek'); T.order(H, 0, ['O1', 'W3', 'W3', 'W3']); T.draw(H, 0, 4); eq(P(H, 0).q, null, 'no peek after an explosion');
 });
-test('card Ruby Glint: +2 VP when the scoring space shows a ruby, even exploded; Red Spark: +1 extra ruby', () => {
-  const G = fort('glint'); play(G, ['O1', 'O1', 'O1', 'O1']); T.stop(G, 0); T.stopOthers(G, 0); T.finish(G); eq(P(G, 0).vp, 2); // space 5 = ruby, 0 VP
-  const H = fort('spark'); play(H, ['O1', 'O1', 'O1', 'O1']); T.stop(H, 0); T.stopOthers(H, 0); T.finish(H); eq(P(H, 0).rubies, 3);
+test('card Ruby Gleam: +3 VP when the scoring space shows a ruby and you did not explode; Ember Spark: +2 extra rubies', () => {
+  const G = fort('glint'); play(G, ['O1', 'O1', 'O1', 'O1']); T.stop(G, 0); T.stopOthers(G, 0); T.finish(G); eq(P(G, 0).vp, 3); // space 5 = ruby, 0 VP
+  const H = fort('spark'); play(H, ['O1', 'O1', 'O1', 'O1']); T.stop(H, 0); T.stopOthers(H, 0); T.finish(H); eq(P(H, 0).rubies, 4);
   const X = fort('glint'); T.order(X, 0, ['O1', 'O1', 'O1', 'W3', 'W3', 'W3']); T.draw(X, 0, 6); T.stopOthers(X, 0); T.finish(X, (s, q, ms) => q.h === 'de' ? ms.find(m => m.o === 'buy') : undefined); yes(P(X, 0).vp >= 0);
 });
 test('card Spring Water: every flask is refilled at the end', () => { const G = fort('spring'); P(G, 0).flask = false; T.order(G, 0, ['O1']); T.order(G, 1, ['O1']); T.draw(G, 0); T.stop(G, 0); T.draw(G, 1); T.stop(G, 1); T.finish(G); eq(P(G, 0).flask, true); });
-test('card Frothing Pot: the first white chip can go back for free; once', () => {
-  const G = fort('froth'); T.order(G, 0, ['W1', 'W1', 'W2']); T.draw(G, 0); T.ok(G, 0, { t: 'froth' }); eq(P(G, 0).pot.length, 0); eq(P(G, 0).flask, true); T.draw(G, 0); yes(T.bad(G, 0, { t: 'froth' }), 'not for the second white');
-  const H = fort('froth'); T.order(H, 0, ['W1', 'O1', 'W1']); T.draw(H, 0); T.draw(H, 0); yes(T.bad(H, 0, { t: 'froth' }), 'window closed after the next draw');
+test('card Second Skim: the second white chip can go back for free; once', () => {
+  const G = fort('froth'); T.order(G, 0, ['W1', 'W1', 'W2']); T.draw(G, 0, 2); T.ok(G, 0, { t: 'froth' }); eq(P(G, 0).pot.length, 1); eq(P(G, 0).flask, true); T.draw(G, 0); yes(T.bad(G, 0, { t: 'froth' }), 'not again');
+  const H = fort('froth'); T.order(H, 0, ['W1', 'W1', 'O1']); T.draw(H, 0, 2); T.draw(H, 0); yes(T.bad(H, 0, { t: 'froth' }), 'window closed after the next draw');
 });
-test('card Pedlar\'s Pick: black chip, any 2-chip, or 3 rubies', () => {
-  const G = withCard('pick'); eq(G.phase, 'prep'); const r0 = P(G, 0).rubies; yes(CF.moves(G, 0).some(m => m.o === 'K1'), 'black offered'); T.answer(G, 0, { o: 'rubies' }); eq(P(G, 0).rubies, r0 + 3); T.answer(G, 1, { o: 'G2' }); yes(P(G, 1).bag.some(c => c.c === 'G' && c.v === 2)); eq(G.phase, 'brew');
+test('card Pedlar\'s Pick: black chip, any 2-chip, or 4 rubies', () => {
+  const G = withCard('pick'); eq(G.phase, 'prep'); const r0 = P(G, 0).rubies; yes(CF.moves(G, 0).some(m => m.o === 'K1'), 'black offered'); T.answer(G, 0, { o: 'rubies' }); eq(P(G, 0).rubies, r0 + 4); T.answer(G, 1, { o: 'G2' }); yes(P(G, 1).bag.some(c => c.c === 'G' && c.v === 2)); eq(G.phase, 'brew');
 });
 function G9(G, id) { G.force = id; CF._.startRound(G); }
 // a fresh game whose current round starts with `card` on top (round > 1: the game is parked in that round first)
@@ -306,17 +306,17 @@ function withCard(card, np, o) {
   if (parked) { G.round = o.round; if (o.vp) o.vp.forEach((v, i) => G.players[i].vp = v); if (o.rubies) o.rubies.forEach((v, i) => G.players[i].rubies = v); G.force = card; CF._.startRound(G); CF._.adv(G); }
   return G;
 }
-test('card A Little Slide: droplet one space for everyone', () => { const G = withCard('slide', 3); eq(G.players.map(p => p.droplet), [1, 1, 1]); eq(G.phase, 'brew'); });
+test('card Tailwind: droplet one space, two for whoever is furthest back', () => { const G = withCard('slide', 3); eq(G.players.map(p => p.droplet), [2, 2, 2], 'all level: all furthest back'); eq(G.phase, 'brew'); });
 test('card Swap Stall: trade 1 ruby for a 1-chip (not purple/black)', () => { const G = withCard('swap'); eq(G.phase, 'prep'); const ms = CF.moves(G, 0); yes(ms.every(m => m.o === '' || /^[OGBR]1$/.test(m.o)), 'only O/G/B/R 1-chips in round 1'); T.answer(G, 0, { o: 'B1' }); eq(P(G, 0).rubies, 0); yes(P(G, 0).bag.some(c => c.c === 'B')); });
-test('card Kind Alms: only the player(s) with the fewest rubies take 1', () => { const G = withCard('alms', 3, { rubies: [3, 1, 1] }); eq(G.players.map(p => p.rubies), [3, 2, 2]); });
-test('card Underdog Gift: the fewest VP take a green 1', () => { const G = withCard('underdog', 3, { vp: [5, 0, 0] }); eq(G.players.map(p => p.bag.length), [9, 10, 10]); });
-test('card Clear the Pods: 4 VP or remove a white 1 (goes back to the supply)', () => { const G = withCard('clear'); T.answer(G, 0, { o: 'vp' }); eq(P(G, 0).vp, 4); const w0 = G.supply.W1; T.answer(G, 1, { o: 'white' }); eq(G.supply.W1, w0 + 1); eq(P(G, 1).bag.length, 8); T.inv(G); });
-test('card Rat Swarm: rat tails counted again', () => { const G = withCard('swarm', 3, { round: 2, vp: [10, 0, 10] }); eq(G.players[1].ratTails, 5); eq(G.players[1].rat, 10); });
-test('card Lucky Dip: lowest total takes a blue 2, the others a ruby, chips return', () => { const G = withCard('dip', 2); eq(G.players.reduce((a, p) => a + p.bag.length, 0) >= 18, true); const bl = G.players.map(p => p.bag.filter(c => c.c === 'B' && c.v === 2).length); yes(bl[0] + bl[1] >= 1, 'someone got the blue 2'); T.inv(G); });
-test('card Rat Bribe: move the rat stone back 1-3 and take that many rubies', () => { const G = withCard('bribe', 2, { round: 2, vp: [12, 0] }); eq(G.players[1].rat, 6); eq(P(G, 1).q.d.max, 3); T.answer(G, 1, { n: 2 }); eq([P(G, 1).rat, P(G, 1).rubies], [4, 3]); eq(P(G, 0).q, null, 'the leader has no rat stone'); });
-test('card Rat Bounty: any 4-chip or 1 VP per rat tail behind the leader', () => { const G = withCard('bounty', 2, { round: 2, vp: [12, 0] }); T.answer(G, 1, { o: 'vp' }); eq(P(G, 1).vp, 6); T.answer(G, 0, { o: 'G4' }); yes(P(G, 0).bag.some(c => c.c === 'G' && c.v === 4)); });
-test('card Fork in the Road: droplet 2 or a purple chip (purple only once its book is out)', () => { const G = withCard('fork'); eq(CF.moves(G, 0).map(m => m.o), ['drop']); T.answer(G, 0, { o: 'drop' }); eq(P(G, 0).droplet, 2); const H = withCard('fork', 2, { round: 3 }); eq(CF.moves(H, 0).map(m => m.o), ['drop', 'P1']); });
-test('card Fairground Dice: everyone rolls the bonus die once', () => { const G = withCard('dice', 3); eq(ev(G, 'die').length, 3); eq(G.phase, 'brew'); });
+test('card Poor Box: only the player(s) with the fewest rubies take 2', () => { const G = withCard('alms', 3, { rubies: [3, 1, 1] }); eq(G.players.map(p => p.rubies), [3, 3, 3]); });
+test('card Helping Hand: the fewest VP take a blue 1', () => { const G = withCard('underdog', 3, { vp: [5, 0, 0] }); eq(G.players.map(p => p.bag.length), [9, 10, 10]); });
+test('card Clear the Pods: 3 VP or remove a white 1 (goes back to the supply)', () => { const G = withCard('clear'); T.answer(G, 0, { o: 'vp' }); eq(P(G, 0).vp, 3); const w0 = G.supply.W1; T.answer(G, 1, { o: 'white' }); eq(G.supply.W1, w0 + 1); eq(P(G, 1).bag.length, 8); T.inv(G); });
+test('card Rat Parade: rat tails counted again, plus one', () => { const G = withCard('swarm', 3, { round: 2, vp: [10, 0, 10] }); eq(G.players[1].ratTails, 5); eq(G.players[1].rat, 11); });
+test('card Grab Bag: lowest total takes a red 2, the others a ruby, chips return', () => { const G = withCard('dip', 2); eq(G.players.reduce((a, p) => a + p.bag.length, 0) >= 18, true); const bl = G.players.map(p => p.bag.filter(c => c.c === 'R' && c.v === 2).length); yes(bl[0] + bl[1] >= 1, 'someone got the red 2'); T.inv(G); });
+test('card Hush Money: move the rat stone back 1-2 and take 2 rubies per space', () => { const G = withCard('bribe', 2, { round: 2, vp: [12, 0] }); eq(G.players[1].rat, 6); eq(P(G, 1).q.d.max, 2); T.answer(G, 1, { n: 2 }); eq([P(G, 1).rat, P(G, 1).rubies], [4, 5]); eq(P(G, 0).q, null, 'the leader has no rat stone'); });
+test('card Rat Prize: any 4-chip or rat tails + 1 VP', () => { const G = withCard('bounty', 2, { round: 2, vp: [12, 0] }); T.answer(G, 1, { o: 'vp' }); eq(P(G, 1).vp, 7); T.answer(G, 0, { o: 'G4' }); yes(P(G, 0).bag.some(c => c.c === 'G' && c.v === 4)); });
+test('card Crossroads: droplet 1 and a ruby, or a purple chip (purple only once its book is out)', () => { const G = withCard('fork'); eq(CF.moves(G, 0).map(m => m.o), ['drop']); T.answer(G, 0, { o: 'drop' }); eq(P(G, 0).droplet, 1); const H = withCard('fork', 2, { round: 3 }); eq(CF.moves(H, 0).map(m => m.o), ['drop', 'P1']); });
+test('card Carnival Dice: everyone rolls the bonus die once, the lowest scorer twice', () => { const G = withCard('dice', 3, { vp: [5, 0, 0] }); eq(ev(G, 'die').length, 5); eq(G.phase, 'brew'); });
 test('card Haggler\'s Hour: draw 4, swap one for the next higher chip of its colour; if none can, take a green 1', () => {
   const G = withCard('haggle'); eq(G.phase === 'prep' || G.phase === 'brew', true); T.inv(G);
   const H = CF.newGame({ players: 2, seed: 2 }); for (const p of H.players) p.q = null; T.order(H, 0, ['W1', 'W1', 'O1', 'W2', 'W1']); H.fcard = 'haggle'; H.phase = 'prep'; H.players[0].hold = []; for (let i = 0; i < 4; i++) H.players[0].hold.push(H.players[0].bag.pop()); H.players[0].q = { h: 'haggle', d: {} };
@@ -350,12 +350,12 @@ test('Upgrade sigh: the swapped chip leaves the pot without changing the scoring
   eq(P(G, 0).q.h, 'p4'); T.answer(G, 0, { from: 'G1', to: 'G2' }); eq(P(G, 0).res.space, 3, 'scoring space unchanged'); yes(P(G, 0).newChips.some(c => c.c === 'G' && c.v === 2)); T.finish(G); yes(P(G, 0).bag.some(c => c.c === 'G' && c.v === 2)); T.inv(G);
 });
 test('purple card Clear the Pods: its points are in before the rat tails are counted', () => {
-  const G = T.game(2); G.round = 2; P(G, 0).vp = 6; P(G, 1).vp = 10; G.force = 'clear'; CF._.startRound(G); eq(P(G, 0).q.h, 'clear'); eq(P(G, 0).rat, 0, 'not counted yet');
+  const G = T.game(2); G.round = 2; P(G, 0).vp = 7; P(G, 1).vp = 10; G.force = 'clear'; CF._.startRound(G); eq(P(G, 0).q.h, 'clear'); eq(P(G, 0).rat, 0, 'not counted yet');
   T.answer(G, 0, { o: 'vp' }); T.answer(G, 1, { o: 'white' }); eq([P(G, 0).vp, P(G, 1).vp], [10, 10]); eq([P(G, 0).ratTails, P(G, 0).rat], [0, 0], 'tied with the leader now: no rat tails');
   const H = T.game(2); H.round = 2; P(H, 0).vp = 6; P(H, 1).vp = 10; H.force = 'clear'; CF._.startRound(H); T.answer(H, 0, { o: 'white' }); T.answer(H, 1, { o: 'vp' }); eq(P(H, 0).ratTails, D.ratTails(6, 14), 'the leader moved on: tails against 14');
 });
-test('Do-Over is not offered when the 5th chip explodes', () => {
-  const G = fort('doover'); T.order(G, 0, ['O1', 'O1', 'W3', 'W3', 'W3']); T.draw(G, 0, 5); yes(P(G, 0).boom); eq(P(G, 0).q, null); yes(T.bad(G, 0, { t: 'restart', yes: true }));
+test('Fresh Start is not offered when the 4th chip explodes', () => {
+  const G = fort('doover'); T.order(G, 0, ['O1', 'W3', 'W3', 'W3']); T.draw(G, 0, 4); yes(P(G, 0).boom); eq(P(G, 0).q, null); yes(T.bad(G, 0, { t: 'restart', yes: true }));
 });
 test('day 9 (Stir!): draw and stop are secret until everybody has chosen, then all are applied together', () => {
   const G = T.game(2); G.round = 9; T.order(G, 0, ['O1', 'O1', 'O1']); T.order(G, 1, ['O1', 'O1', 'O1']);
@@ -367,18 +367,18 @@ test('day 9 (Stir!): draw and stop are secret until everybody has chosen, then a
 });
 test('day 9: other days are not held back (draws apply at once)', () => { const G = T.game(2); G.round = 8; T.order(G, 0, ['O1']); T.draw(G, 0); eq(P(G, 0).pot.length, 1); });
 test('Gentle sigh: a lower reward can be chosen', () => {
-  const G = T.game(2, { setObj: SET('P', 1), round: 3 }); play(G, ['O1', 'P1', 'P1', 'P1']); T.stop(G, 0); T.stopOthers(G, 0); T.answer(G, 0, { k: 1 }); T.finish(G); eq([P(G, 0).vp, P(G, 0).droplet], [1, 0]);
+  const G = T.game(2, { setObj: SET('P', 1), round: 3 }); play(G, ['O1', 'P1', 'P1', 'P1']); T.stop(G, 0); T.stopOthers(G, 0); T.answer(G, 0, { k: 1 }); T.finish(G); eq([P(G, 0).vp, P(G, 0).droplet], [0, 0]);
 });
-test('Lucky-seven moss: the slide may be declined when it would lose the ruby on the scoring space', () => {
-  const mk = () => { const G = T.game(2, { setObj: SET('G', 3), round: 3 }); T.order(G, 0, ['G1', 'W3', 'W2', 'W2']); T.order(G, 1, ['O1']); T.draw(G, 0, 4); eq(CF.whiteSum(P(G, 0)), 7); T.stop(G, 0); T.stopOthers(G, 0); return G; };
-  const G = mk(); eq(P(G, 0).res.space, 9); eq(P(G, 0).q.h, 'g3'); const r0 = P(G, 0).rubies; T.answer(G, 0, { yes: false }); eq(P(G, 0).res.space, 9); T.finish(G); eq(P(G, 0).rubies, r0 + 1, 'ruby kept');
-  const H = mk(); T.answer(H, 0, { yes: true }); eq(P(H, 0).res.space, 10); T.finish(H);
+test('Steady-six moss: the slide may be declined when it would lose the ruby on the scoring space', () => {
+  const mk = () => { const G = T.game(2, { setObj: SET('G', 3), round: 3 }); T.order(G, 0, ['G1', 'W3', 'W2', 'W1']); T.order(G, 1, ['O1']); T.draw(G, 0, 4); eq(CF.whiteSum(P(G, 0)), 6); T.stop(G, 0); T.stopOthers(G, 0); return G; };
+  const G = mk(); eq(P(G, 0).res.space, 8); eq(P(G, 0).q.h, 'g3'); const r0 = P(G, 0).rubies; T.answer(G, 0, { yes: false }); eq(P(G, 0).res.space, 8); T.finish(G); eq(P(G, 0).rubies, r0 + 1, 'ruby kept');
+  const H = mk(); T.answer(H, 0, { yes: true }); eq(P(H, 0).res.space, 9); T.finish(H);
 });
-test('Haggler\'s Hour: with only white chips in the hand the player takes a Mossback 1 (white upgrades do not count)', () => {
+test('Haggler\'s Hour: with only white chips in the hand the player takes a Wren Feather 1 (white upgrades do not count)', () => {
   const G = T.game(2); T.order(G, 0, ['W1', 'W1', 'W1', 'W1', 'W1']); T.order(G, 1, ['W1', 'W1', 'W1', 'W1']); G.force = 'haggle'; G.round = 2; CF._.startRound(G);
-  eq(P(G, 0).q, null); eq(P(G, 0).hold.length, 0); yes(P(G, 0).bag.some(c => c.c === 'G' && c.v === 1), 'green 1 in the bag');
+  eq(P(G, 0).q, null); eq(P(G, 0).hold.length, 0); yes(P(G, 0).bag.some(c => c.c === 'B' && c.v === 1), 'blue 1 in the bag');
 });
-test('bonus die: six faces, 1 VP shows twice (the fan tool\'s reading of the rules\' five outcomes)', () => { T.dieOn(); eq(D.DIE.slice().sort(), ['drop', 'orange', 'ruby', 'vp1', 'vp1', 'vp2']); T.dieOff(); });
+test('bonus die: six faces, the ruby shows twice', () => { T.dieOn(); eq(D.DIE.slice().sort(), ['drop', 'orange', 'ruby', 'ruby', 'vp1', 'vp2']); T.dieOff(); });
 test('day 9: every card option stays (the card comes before the brew, so a new chip can be drawn that day)', () => {
   for (const id of ['swap', 'fork', 'haggle', 'pick']) {
     const G = T.game(2); G.round = 9; P(G, 0).rubies = 2; P(G, 1).rubies = 2; T.order(G, 0, ['W1', 'G1', 'O1', 'B1']); T.order(G, 1, ['W1', 'G1', 'O1', 'B1']); G.force = id; CF._.startRound(G);
@@ -386,14 +386,14 @@ test('day 9: every card option stays (the card comes before the brew, so a new c
     yes(!G.log.slice(-6).some(l => /never be (drawn|used)/.test(typeof l === 'string' ? l : (l.t || l.text || JSON.stringify(l)))), id + ': no false last-day line');
   }
   const F = T.game(2); F.round = 9; G9(F, 'pick'); yes(CF.moves(F, 0).some(m => m.o === 'rubies') && CF.moves(F, 0).some(m => /^[GBRY]2$/.test(m.o)), 'Pedlar\'s Pick keeps the chip choice');
-  const K = T.game(2); K.round = 9; G9(K, 'fork'); T.answer(K, 0, { o: 'drop' }); eq(P(K, 0).droplet, 2, 'Fork droplet step helps on day 9');
-  const B = T.game(2); B.round = 9; P(B, 0).vp = 0; P(B, 1).vp = 12; G9(B, 'bounty'); yes(CF.moves(B, 0).some(m => /^[A-Z]4$/.test(m.o)), 'Rat Bounty keeps the 4-chip option on day 9');
+  const K = T.game(2); K.round = 9; G9(K, 'fork'); T.answer(K, 0, { o: 'drop' }); eq(P(K, 0).droplet, 1, 'Crossroads droplet step helps on day 9');
+  const B = T.game(2); B.round = 9; P(B, 0).vp = 0; P(B, 1).vp = 12; G9(B, 'bounty'); yes(CF.moves(B, 0).some(m => /^[A-Z]4$/.test(m.o)), 'Rat Prize keeps the 4-chip option on day 9');
   const H = T.game(2); H.round = 9; H.force = 'spilled'; CF._.startRound(H); T.order(H, 0, ['W3', 'W3', 'W3']); H.phase = 'brew'; T.run9(H, [3, 1]); eq(CF.pending(H).filter(s => P(H, s).q && P(H, s).q.h === 'gift').length, 0, 'no gift on day 9');
   const X = T.game(2); X.round = 3; P(X, 0).vp = 10; P(X, 1).vp = 10; X.force = 'bounty'; CF._.startRound(X); eq(CF.moves(X, 0).some(m => m.o === 'vp'), false, 'no points option when you trail by nothing'); yes(CF.moves(X, 0).length > 0);
 });
 
-test('pass up an action: Lucky-seven moss slide is always optional (declining keeps the scoring space)', () => {
-  const G = T.game(2, { setObj: SET('G', 3) }); play(G, ['G2', 'W3', 'W3', 'W1', 'G1']); const before = CF.spaceOf(P(G, 0)); T.stopOthers(G, 0);
+test('pass up an action: Steady-six moss slide is always optional (declining keeps the scoring space)', () => {
+  const G = T.game(2, { setObj: SET('G', 3) }); play(G, ['G2', 'W3', 'W2', 'W1', 'G1']); const before = CF.spaceOf(P(G, 0)); T.stopOthers(G, 0);
   eq(P(G, 0).q.h, 'g3'); T.answer(G, 0, { yes: false }); eq(P(G, 0).res.space, before); T.finish(G); T.inv(G);
 });
 test('upgrade does not touch the current round: the swapped chip stays in the cauldron and leaves for the supply at clean-up', () => {
@@ -407,17 +407,17 @@ test('R90 card before rats: A Little Slide moves a trailing droplet AND the rat 
   const G = T.game(2); G.round = 3; P(G, 0).vp = 0; P(G, 1).vp = 12; P(G, 0).droplet = 3; G.force = 'slide'; CF._.startRound(G); CF._.adv(G);
   const t = D.ratTails(0, 12); yes(t >= 3, 'trails by enough'); eq(P(G, 0).droplet, 4); eq(P(G, 0).rat, 4 + t, 'start = droplet + 1 + tails'); eq(CF.startPos(P(G, 0)), 4 + t);
 });
-test('R90 card before rats: Fork in the Road droplet 2 is not swallowed by the rat stone', () => {
+test('R90 card before rats: Crossroads droplet step is not swallowed by the rat stone', () => {
   const G = T.game(2); G.round = 3; P(G, 0).vp = 0; P(G, 1).vp = 12; P(G, 0).droplet = 3; G.force = 'fork'; CF._.startRound(G); eq(P(G, 0).rat, 0, 'not counted while the card is open');
-  T.answer(G, 0, { o: 'drop' }); T.answer(G, 1, { o: 'drop' }); eq(P(G, 0).droplet, 5); eq(P(G, 0).rat, 5 + D.ratTails(0, 12));
+  T.answer(G, 0, { o: 'drop' }); T.answer(G, 1, { o: 'drop' }); eq(P(G, 0).droplet, 4); eq(P(G, 0).rat, 4 + D.ratTails(0, 12));
 });
-test('R90 card before rats: Fairground Dice points count before the rat tails', () => {
+test('R90 card before rats: Carnival Dice points count before the rat tails', () => {
   const D0 = D.DIE.slice();
   try {
     const G = T.game(2); for (let i = 0; i < 6; i++) D.DIE[i] = 'vp2'; G.round = 3; P(G, 0).vp = 10; P(G, 1).vp = 12; G.force = 'dice'; CF._.startRound(G); CF._.adv(G);
-    eq([P(G, 0).vp, P(G, 1).vp], [12, 14]); eq(P(G, 0).ratTails, D.ratTails(12, 14), 'tails against the score after the die');
+    eq([P(G, 0).vp, P(G, 1).vp], [14, 14]); eq(P(G, 0).ratTails, D.ratTails(14, 14), 'tails against the score after the die');
     const H = T.game(2); H.round = 3; P(H, 0).vp = 0; P(H, 1).vp = 12; P(H, 0).droplet = 2; for (let i = 0; i < 6; i++) D.DIE[i] = 'drop'; H.force = 'dice'; CF._.startRound(H); CF._.adv(H);
-    eq(P(H, 0).droplet, 3); eq(P(H, 0).rat, 3 + D.ratTails(0, 12), 'die droplet step counts');
+    eq(P(H, 0).droplet, 4); eq(P(H, 0).rat, 4 + D.ratTails(0, 12), 'die droplet step counts');
   } finally { for (let i = 0; i < 6; i++) D.DIE[i] = D0[i]; }
 });
 test('R90 Pedlar\'s Pick: no Cinder Moth offered when black is sold out', () => {

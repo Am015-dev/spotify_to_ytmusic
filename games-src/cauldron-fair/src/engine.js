@@ -35,7 +35,7 @@ const left = (G, s) => (s + 1) % G.np, right = (G, s) => (s - 1 + G.np) % G.np;
 const whiteSum = p => p.pot.reduce((a, c) => a + (c.c === 'W' ? c.v : 0), 0);
 const count = (arr, c) => arr.reduce((a, x) => a + (x.c === c ? 1 : 0), 0);
 function limitOf(G, p) {
-  let l = D.limit + (G.fcard === 'thick' ? 2 : 0);
+  let l = D.limit + (G.fcard === 'thick' ? 1 : 0);
   if (G.sets.Y === 3) { const y = count(p.pot, 'Y'); l += y >= 3 ? 2 : y >= 1 ? 1 : 0; }
   return l;
 }
@@ -113,26 +113,26 @@ function purple(G, id) {
   const lowest = (fn) => { const m = Math.min.apply(null, P.map(fn)); return P.filter(p => fn(p) === m); };
   switch (id) {
     case 'pick': for (const p of P) ask(G, p, 'pick'); break;          // the card comes before the brew, so a new chip can be drawn even on the last day
-    case 'slide': for (const p of P) drop(G, p, 1, 'card'); break;
+    case 'slide': { const back = lowest(p => p.droplet); for (const p of P) drop(G, p, back.indexOf(p) >= 0 ? 2 : 1, 'Tailwind'); break; }
     case 'swap': for (const p of P) if (p.rubies >= 1) ask(G, p, 'swap'); break;
-    case 'alms': for (const p of lowest(p => p.rubies)) { p.rubies++; ev(G, { t: 'gain', seat: p.seat, k: 'ruby', n: 1 }); lg(G, nm(G, p) + ' takes a ruby (fewest).'); } break;
-    case 'underdog': for (const p of lowest(p => p.vp)) { give(G, p, 'G1', true); lg(G, nm(G, p) + ' takes a Mossback 1 (fewest points).'); } break;
+    case 'alms': for (const p of lowest(p => p.rubies)) { p.rubies += 2; ev(G, { t: 'gain', seat: p.seat, k: 'ruby', n: 2 }); lg(G, nm(G, p) + ' takes 2 rubies (fewest).'); } break;
+    case 'underdog': for (const p of lowest(p => p.vp)) { give(G, p, 'B1', true); lg(G, nm(G, p) + ' takes a Wren Feather 1 (fewest points).'); } break;
     case 'clear': for (const p of P) ask(G, p, 'clear'); break;
-    case 'swarm': for (const p of P) if (p.rat > 0) { p.rat = Math.min(LASTC, p.rat + p.ratTails); lg(G, nm(G, p) + ' counts the rat tails again: the rat stone moves on.'); ev(G, { t: 'rat', seat: p.seat, tails: p.ratTails, pos: p.rat }); } break;
+    case 'swarm': for (const p of P) if (p.rat > 0) { p.rat = Math.min(LASTC, p.rat + p.ratTails + (p.ratTails > 0 ? 1 : 0)); lg(G, nm(G, p) + ' counts the rat tails again: the rat stone moves on.'); ev(G, { t: 'rat', seat: p.seat, tails: p.ratTails, pos: p.rat }); } break;
     case 'dip': {
-      const sums = P.map(p => { const ch = []; const n = Math.min(5, p.bag.length); for (let i = 0; i < n; i++) ch.push(p.bag.pop()); const s = ch.reduce((a, c) => a + c.v, 0); ev(G, { t: 'peek', seat: p.seat, chips: ch.map(c => ({ i: c.i, c: c.c, v: c.v })) }); ch.forEach(c => bagInsert(p, c)); return s; });
+      const sums = P.map(p => { const ch = []; const n = Math.min(4, p.bag.length); for (let i = 0; i < n; i++) ch.push(p.bag.pop()); const s = ch.reduce((a, c) => a + c.v, 0); ev(G, { t: 'peek', seat: p.seat, chips: ch.map(c => ({ i: c.i, c: c.c, v: c.v })) }); ch.forEach(c => bagInsert(p, c)); return s; });
       const m = Math.min.apply(null, sums);
-      P.forEach((p, i) => { if (sums[i] === m) { give(G, p, 'B2', true); lg(G, nm(G, p) + ' has the lowest total (' + sums[i] + ') and takes a Wren Feather 2.'); } else { p.rubies++; ev(G, { t: 'gain', seat: p.seat, k: 'ruby', n: 1 }); lg(G, nm(G, p) + ' draws ' + sums[i] + ' and takes a ruby.'); } });
+      P.forEach((p, i) => { if (sums[i] === m) { give(G, p, 'R2', true); lg(G, nm(G, p) + ' has the lowest total (' + sums[i] + ') and takes a Scarlet Cap 2.'); } else { p.rubies++; ev(G, { t: 'gain', seat: p.seat, k: 'ruby', n: 1 }); lg(G, nm(G, p) + ' draws ' + sums[i] + ' and takes a ruby.'); } });
       break;
     }
-    case 'bribe': for (const p of P) if (p.rat > p.droplet) ask(G, p, 'bribe', { max: Math.min(3, p.rat - p.droplet) }); break;
-    case 'bounty': for (const p of P) { if (!chipsOfValue(G, 4).length) { if (p.ratTails > 0) addVp(G, p, p.ratTails, 'Rat Bounty'); } else ask(G, p, 'bounty'); } break;
+    case 'bribe': for (const p of P) if (p.rat > p.droplet) ask(G, p, 'bribe', { max: Math.min(2, p.rat - p.droplet) }); break;
+    case 'bounty': for (const p of P) { if (!chipsOfValue(G, 4).length) { if (p.ratTails > 0) addVp(G, p, bountyVp(G, p), 'Rat Prize'); } else ask(G, p, 'bounty'); } break;
     case 'fork': for (const p of P) ask(G, p, 'fork'); break;
-    case 'dice': for (const p of P) rollDie(G, p, 'card'); break;
+    case 'dice': { const lo = lowest(p => p.vp); for (const p of P) { rollDie(G, p, 'card'); if (lo.indexOf(p) >= 0) rollDie(G, p, 'card'); } break; }
     case 'haggle': for (const p of P) {
-      const ch = []; const n = Math.min(4, p.bag.length); for (let i = 0; i < n; i++) ch.push(p.bag.pop()); p.hold = ch;
+      const ch = []; const n = Math.min(3, p.bag.length); for (let i = 0; i < n; i++) ch.push(p.bag.pop()); p.hold = ch;
       ev(G, { t: 'peek', seat: p.seat, chips: ch.map(c => ({ i: c.i, c: c.c, v: c.v })) });
-      if (upgrades(G, p.hold, true).length) ask(G, p, 'haggle'); else { give(G, p, 'G1', true); lg(G, nm(G, p) + ' cannot swap anything and takes a Mossback 1.'); p.hold.forEach(c => bagInsert(p, c)); p.hold = []; }
+      if (upgrades(G, p.hold, true).length) ask(G, p, 'haggle'); else { give(G, p, 'B1', true); lg(G, nm(G, p) + ' cannot swap anything and takes a Wren Feather 1.'); p.hold.forEach(c => bagInsert(p, c)); p.hold = []; }
     } break;
     default: break;
   }
@@ -151,7 +151,7 @@ function drop(G, p, n, why) { p.droplet = Math.min(LASTC, p.droplet + n); ev(G, 
 function addVp(G, p, n, why) { if (!n) return; p.vp += n; ev(G, { t: 'gain', seat: p.seat, k: 'vp', n }); lg(G, nm(G, p) + ' scores ' + n + ' point' + (n > 1 ? 's' : '') + (why ? ' (' + why + ')' : '') + '.'); }
 function addRuby(G, p, n, why) { if (!n) return; p.rubies += n; ev(G, { t: 'gain', seat: p.seat, k: 'ruby', n }); lg(G, nm(G, p) + ' takes ' + n + ' ' + (n > 1 ? 'rubies' : 'ruby') + (why ? ' (' + why + ')' : '') + '.'); }
 function rollDie(G, p, why) {
-  const times = G.fcard === 'twice' ? 2 : 1;
+  const times = 1; if (G.fcard === 'twice') addRuby(G, p, 1, 'Lucky Roller');
   for (let k = 0; k < times; k++) {
     const f = D.DIE[rnd(G, 6)]; ev(G, { t: 'die', seat: p.seat, face: f }); use(G, 'die_' + f); if (p.res) (p.res.die = p.res.die || []).push(f);
     lg(G, nm(G, p) + ' rolls the bonus die: ' + D.DIE_TEXT[f] + '.');
@@ -165,12 +165,12 @@ function moveOf(G, p, chip) {
   let base = chip.v;
   if (chip.c === 'W' && chip.v === 1 && G.sets.R === 4 && count(p.pot, 'R') > 0) base = 2;
   let mv = base; if (f.dbl) { mv *= 2; }
-  if (chip.c === 'O' && G.fcard === 'marrowfair') mv += 1;
+  if ((chip.c === 'O' || (chip.c === 'G' && chip.v === 1)) && G.fcard === 'marrowfair') mv += 1;
   if (chip.c === 'R') {
-    if (eff === 'r1') { const o = count(p.pot, 'O'); mv += o >= 3 ? 2 : o >= 1 ? 1 : 0; }
+    if (eff === 'r1') { const o = count(p.pot, 'O'); mv += o >= 2 ? 2 : o >= 1 ? 1 : 0; }
     if (eff === 'r3') { const l = p.pot[p.pot.length - 1]; if (l && l.c === 'W') mv += l.v; }
   }
-  if (chip.c === 'Y' && eff === 'y4') { const n = count(p.pot, 'Y') + 1; if (n <= 3) mv += n; }
+  if (chip.c === 'Y' && eff === 'y4') { const n = count(p.pot, 'Y') + 1; if (n <= 4) mv += n === 1 ? 1 : 2; }
   return mv;
 }
 // place `chip` (already out of the bag) and run its immediate power. Sets p.q for powers that need a decision, enters the post stage on a pop.
@@ -185,7 +185,7 @@ function placeChip(G, p, chip, how) {
   f.canFlask = false; f.frOpen = false;
   if (chip.c === 'W') {
     f.whites++; f.canFlask = true;
-    if (G.fcard === 'froth' && !f.frUsed && f.whites === 1) f.frOpen = true;
+    if (G.fcard === 'froth' && !f.frUsed && f.whites === 2) f.frOpen = true;
     if (whiteSum(p) > limitOf(G, p)) { explode(G, p, covered); return; }
   }
   if (chip.c === 'O') return;
@@ -205,7 +205,7 @@ function explode(G, p, covered) {
 function enterPost(G, p) {
   if (p.st === 'post' || p.st === 'done') return;
   p.st = 'post'; p.postq = [];
-  if (G.fcard === 'doover' && !p.f.doUsed && p.pot.length === 5 && !p.boom) p.postq.push({ h: 'restart' });   // an exploding 5th chip ends the day: no do-over
+  if (G.fcard === 'doover' && !p.f.doUsed && p.pot.length === 4 && !p.boom) p.postq.push({ h: 'restart' });   // an exploding 4th chip ends the day: no do-over
   if (G.fcard === 'peek' && !p.boom) p.postq.push({ h: 'peek' });
   for (const c of p.side) p.postq.push({ h: 'side', d: { id: c.i } });
   ev(G, { t: 'stop', seat: p.seat, boom: p.boom });
@@ -216,7 +216,7 @@ function nextPost(G, p) {
     const n = p.postq.shift();
     if (!n) { p.st = 'done'; p.res = p.res || null; ev(G, { t: 'done', seat: p.seat }); return; }
     if (n.h === 'peek') {
-      const k = Math.min(5, p.bag.length); if (!k) continue;
+      const k = Math.min(4, p.bag.length); if (!k) continue;
       p.hold = []; for (let i = 0; i < k; i++) p.hold.push(p.bag.pop()); ev(G, { t: 'peek', seat: p.seat, chips: p.hold.map(c => ({ i: c.i, c: c.c, v: c.v })) });
     }
     ask(G, p, n.h, n.d);
@@ -260,7 +260,7 @@ function moves(G, seat) {
     if (p.pot.length > 0) out.push(L({ t: 'stop' }, 'Stop here'));
     if (p.flask && f.canFlask && !p.boom && p.pot.length && p.pot[p.pot.length - 1].c === 'W') out.push(L({ t: 'flask' }, 'Flask: put the last white chip back'));
     if (f.frOpen && !p.boom) out.push(L({ t: 'froth' }, 'Put the first white chip back (free)'));
-    if (G.fcard === 'doover' && !f.doUsed && p.pot.length === 5) out.push(L({ t: 'restart', yes: true }, 'Do-over: tip everything back'));
+    if (G.fcard === 'doover' && !f.doUsed && p.pot.length === 4) out.push(L({ t: 'restart', yes: true }, 'Fresh Start: tip everything back'));
     if (p.pot.length === 0 && p.rat > p.droplet) for (let n = 0; n < p.rat - p.droplet; n++) out.push(L({ t: 'ratset', n }, 'Rat stone: use only ' + n + ' of its ' + (p.rat - p.droplet) + ' space' + (p.rat - p.droplet > 1 ? 's' : '')));
     return out;
   }
@@ -271,13 +271,13 @@ function moves(G, seat) {
   const q = p.q, d = q.d;
   switch (q.h) {
     case 'pick': {
-      if (G.supply.K1 > 0) out.push(L({ t: 'pick', o: 'K1' }, 'Take a Cinder Moth: a black chip for your bag')); for (const k of chipsOfValue(G, 2)) out.push(L({ t: 'pick', o: k }, 'Take a ' + nameOf(k))); out.push(L({ t: 'pick', o: 'rubies' }, 'Take 3 rubies: spend them at the market')); break;
+      if (G.supply.K1 > 0) out.push(L({ t: 'pick', o: 'K1' }, 'Take a Cinder Moth: a black chip for your bag')); for (const k of chipsOfValue(G, 2)) out.push(L({ t: 'pick', o: k }, 'Take a ' + nameOf(k))); out.push(L({ t: 'pick', o: 'rubies' }, 'Take 4 rubies: spend them at the market')); break;
     }
     case 'swap': out.push(L({ t: 'swap', o: '' }, 'Keep my ruby: trade nothing')); for (const c of oneChips(G)) if (G.supply[c + 1] > 0) out.push(L({ t: 'swap', o: c + 1 }, 'Trade a ruby for a ' + nameOf(c + 1))); break;
-    case 'clear': out.push(L({ t: 'clear', o: 'vp' }, 'Score 4 points now')); if (p.bag.some(c => c.c === 'W' && c.v === 1)) out.push(L({ t: 'clear', o: 'white' }, 'Remove a white 1: fewer chips that can explode')); break;
-    case 'bribe': for (let n = 0; n <= d.max; n++) out.push(L({ t: 'bribe', n }, n ? 'Move the rat stone back ' + n + ' for ' + n + ' ' + (n > 1 ? 'rubies' : 'ruby') : 'Keep the rat stone')); break;
+    case 'clear': out.push(L({ t: 'clear', o: 'vp' }, 'Score 3 points now')); if (p.bag.some(c => c.c === 'W' && c.v === 1)) out.push(L({ t: 'clear', o: 'white' }, 'Remove a white 1: fewer chips that can explode')); break;
+    case 'bribe': for (let n = 0; n <= d.max; n++) out.push(L({ t: 'bribe', n }, n ? 'Move the rat stone back ' + n + ' for ' + 2 * n + ' rubies' : 'Keep the rat stone')); break;
     case 'bounty': for (const k of chipsOfValue(G, 4)) out.push(L({ t: 'bounty', o: k }, 'Take a ' + nameOf(k))); if (bountyVp(G, p) > 0) out.push(L({ t: 'bounty', o: 'vp' }, 'Score ' + bountyVp(G, p) + ' point' + (bountyVp(G, p) === 1 ? '' : 's') + ' for the rat tails')); break;
-    case 'fork': out.push(L({ t: 'fork', o: 'drop' }, 'Move your droplet 2 spaces ahead')); if (bookOut(G, 'P') && G.supply.P1 > 0) out.push(L({ t: 'fork', o: 'P1' }, 'Take a purple chip (Dusk Sigh) for your bag')); break;
+    case 'fork': out.push(L({ t: 'fork', o: 'drop' }, 'Move your droplet 1 space and take a ruby')); if (bookOut(G, 'P') && G.supply.P1 > 0) out.push(L({ t: 'fork', o: 'P1' }, 'Take a purple chip (Dusk Sigh) for your bag')); break;
     case 'haggle': out.push(L({ t: 'haggle', idx: -1 }, 'Keep all as they are')); for (const u of upgrades(G, p.hold, true)) out.push(L({ t: 'haggle', idx: u.idx }, 'Swap the ' + nameOf(u.from) + ' for a ' + nameOf(u.to))); break;
     case 'crow': out.push(L({ t: 'crow', idx: -1 }, 'Place none, put them all back')); p.hold.forEach((c, i) => out.push(L({ t: 'crow', idx: i }, 'Place the ' + nameOf(ck(c))))); break;
     case 'y1': out.push(L({ t: 'y1', yes: true }, 'Put the white chip back in the bag'), L({ t: 'y1', yes: false }, 'Leave it')); break;
@@ -290,7 +290,7 @@ function moves(G, seat) {
     case 'gift': for (const k of chipsOfValue(G, 2)) out.push(L({ t: 'gift', o: k }, 'Take a ' + nameOf(k))); break;
     case 'g2': for (const k of d.opts) out.push(L({ t: 'g2', o: k }, 'Take a ' + nameOf(k))); out.push(L({ t: 'g2', o: '' }, 'Take nothing')); break;
     case 'g4': for (let n = 0; n <= d.max; n++) out.push(L({ t: 'g4', n }, n ? 'Pay ' + n + ' ' + (n > 1 ? 'rubies' : 'ruby') + ': start ' + n + ' space' + (n > 1 ? 's' : '') + ' further on each day' : 'Pay nothing')); break;
-    case 'p1': for (let k = d.n; k >= 1; k--) out.push(L({ t: 'p1', k }, k === 1 ? 'Gentle sigh, lowest: 1 point' : k === 2 ? 'Gentle sigh, middle: 1 point and a ruby' : 'Gentle sigh, best: 2 points and a droplet step')); break;
+    case 'p1': for (let k = d.n; k >= 1; k--) out.push(L({ t: 'p1', k }, k === 1 ? 'Gentle sigh, lowest: 1 ruby' : k === 2 ? 'Gentle sigh, middle: 1 point and a droplet step' : 'Gentle sigh, best: 2 points and a ruby')); break;
     case 'g3': out.push(L({ t: 'g3', yes: true }, 'Slide the last chip ' + d.s + ' space' + (d.s > 1 ? 's' : '')), L({ t: 'g3', yes: false }, 'Stay (keep the ruby on this space)')); break;
     case 'p2': for (const s of d.sets) out.push(L({ t: 'p2', set: s }, s.length ? 'Trade ' + s.map(k => k + ' purple').join(' + ') : 'Keep my purples')); break;
     case 'p4': out.push(L({ t: 'p4', from: '', to: '' }, 'No upgrade')); for (const u of d.opts) out.push(L({ t: 'p4', from: u.from, to: u.to }, 'Swap a ' + nameOf(u.from) + ' for a ' + nameOf(u.to))); break;
@@ -301,7 +301,7 @@ function moves(G, seat) {
   }
   return out;
 }
-function bountyVp(G, p) { return p.ratTails || 0; }
+function bountyVp(G, p) { return p.ratTails > 0 ? p.ratTails + 1 : 0; }
 
 // ---------- apply ----------
 function apply(G, seat, mv) {
@@ -361,11 +361,11 @@ function H(G, p, m) {
     }
     if (t === 'froth') {
       const l = p.pot[p.pot.length - 1];
-      if (!f.frOpen || p.boom || !l || l.c !== 'W') return 'Frothing Pot cannot be used now';
+      if (!f.frOpen || p.boom || !l || l.c !== 'W') return 'Second Skim cannot be used now';
       p.pot.pop(); bagInsert(p, l); f.frOpen = false; f.frUsed = true; f.canFlask = false; use(G, 'froth');
       ev(G, { t: 'flask', seat: p.seat, chip: { i: l.i, c: l.c, v: l.v }, free: true }); lg(G, nm(G, p) + ' puts the first white chip back for free.'); return null;
     }
-    if (t === 'restart') { if (m.yes !== true || G.fcard !== 'doover' || f.doUsed || p.pot.length !== 5) return 'no do-over now'; restart(G, p); return null; }
+    if (t === 'restart') { if (m.yes !== true || G.fcard !== 'doover' || f.doUsed || p.pot.length !== 4) return 'no do-over now'; restart(G, p); return null; }
     if (t === 'ratset') {
       const steps = p.rat - p.droplet;
       if (p.pot.length || !Number.isInteger(m.n) || m.n < 0 || m.n >= steps) return 'bad rat move';
@@ -379,7 +379,7 @@ function H(G, p, m) {
   switch (q.h) {
     case 'pick': {
       const o = m.o;
-      if (o === 'rubies') addRuby(G, p, 3, 'Pedlar\'s Pick');
+      if (o === 'rubies') addRuby(G, p, 4, 'Pedlar\'s Pick');
       else if (o === 'K1') { if (!give(G, p, 'K1', true, 'Pedlar\'s Pick')) return 'no Cinder Moth left'; }
       else if (typeof o === 'string' && chipsOfValue(G, 2).indexOf(o) >= 0) give(G, p, o, true, 'Pedlar\'s Pick');
       else return 'bad choice';
@@ -391,25 +391,25 @@ function H(G, p, m) {
       p.rubies--; give(G, p, m.o, true); lg(G, nm(G, p) + ' trades a ruby for a ' + nameOf(m.o) + '.'); p.q = null; break;
     }
     case 'clear': {
-      if (m.o === 'vp') addVp(G, p, 4, 'Clear the Pods');
+      if (m.o === 'vp') addVp(G, p, 3, 'Clear the Pods');
       else if (m.o === 'white') { const i = p.bag.findIndex(c => c.c === 'W' && c.v === 1); if (i < 0) return 'no white 1 in the bag'; putBack(G, p.bag.splice(i, 1)[0]); lg(G, nm(G, p) + ' removes a white 1 from the bag.'); }
       else return 'bad choice';
       p.q = null; break;
     }
     case 'bribe': {
       if (!Number.isInteger(m.n) || m.n < 0 || m.n > d.max) return 'bad number';
-      if (m.n) { p.rat = Math.max(p.droplet, p.rat - m.n); if (p.rat <= p.droplet) p.rat = 0; addRuby(G, p, m.n, 'Rat Bribe'); ev(G, { t: 'rat', seat: p.seat, tails: p.ratTails, pos: p.rat }); }
+      if (m.n) { p.rat = Math.max(p.droplet, p.rat - m.n); if (p.rat <= p.droplet) p.rat = 0; addRuby(G, p, 2 * m.n, 'Hush Money'); ev(G, { t: 'rat', seat: p.seat, tails: p.ratTails, pos: p.rat }); }
       p.q = null; break;
     }
     case 'bounty': {
-      if (m.o === 'vp') { if (bountyVp(G, p) <= 0) return 'bad choice'; addVp(G, p, bountyVp(G, p), 'Rat Bounty'); }
-      else if (typeof m.o === 'string' && chipsOfValue(G, 4).indexOf(m.o) >= 0) give(G, p, m.o, true, 'Rat Bounty');
+      if (m.o === 'vp') { if (bountyVp(G, p) <= 0) return 'bad choice'; addVp(G, p, bountyVp(G, p), 'Rat Prize'); }
+      else if (typeof m.o === 'string' && chipsOfValue(G, 4).indexOf(m.o) >= 0) give(G, p, m.o, true, 'Rat Prize');
       else return 'bad choice';
       p.q = null; break;
     }
     case 'fork': {
-      if (m.o === 'drop') drop(G, p, 2, 'Fork in the Road');
-      else if (m.o === 'P1' && bookOut(G, 'P') && G.supply.P1 > 0) give(G, p, 'P1', true, 'Fork in the Road');
+      if (m.o === 'drop') { drop(G, p, 1, 'Crossroads'); addRuby(G, p, 1, 'Crossroads'); }
+      else if (m.o === 'P1' && bookOut(G, 'P') && G.supply.P1 > 0) give(G, p, 'P1', true, 'Crossroads');
       else return 'bad choice';
       p.q = null; break;
     }
@@ -500,11 +500,11 @@ function placeChipPost(G, p, chip) {
   chip.pos = Math.min(LASTC, lastPos(p) + chip.v); p.pot.push(chip);
   ev(G, { t: 'place', seat: p.seat, chip: { i: chip.i, c: chip.c, v: chip.v }, pos: chip.pos, mv: chip.v, how: 'side', ruby: !!D.RUBY[chip.pos] });
 }
-function p1reward(G, p, k) { if (k === 1) addVp(G, p, 1, 'Gentle sigh'); else if (k === 2) { addVp(G, p, 1, 'Gentle sigh'); addRuby(G, p, 1, 'Gentle sigh'); } else if (k === 3) { addVp(G, p, 2, 'Gentle sigh'); drop(G, p, 1, 'Gentle sigh'); } }
+function p1reward(G, p, k) { if (k === 1) addRuby(G, p, 1, 'Gentle sigh'); else if (k === 2) { addVp(G, p, 1, 'Gentle sigh'); drop(G, p, 1, 'Gentle sigh'); } else if (k === 3) { addVp(G, p, 2, 'Gentle sigh'); addRuby(G, p, 1, 'Gentle sigh'); } }
 function p2reward(G, p, k) {
-  if (k === 1) { give(G, p, 'K1', false, 'Trade wind'); addVp(G, p, 1, 'Trade wind'); addRuby(G, p, 1, 'Trade wind'); }
-  else if (k === 2) { give(G, p, 'G1', false, 'Trade wind'); give(G, p, 'B2', false, 'Trade wind'); addVp(G, p, 3, 'Trade wind'); drop(G, p, 1, 'Trade wind'); }
-  else if (k === 3) { give(G, p, 'Y4', false, 'Trade wind'); addVp(G, p, 6, 'Trade wind'); addRuby(G, p, 1, 'Trade wind'); drop(G, p, 2, 'Trade wind'); }
+  if (k === 1) { give(G, p, 'R1', false, 'Trade wind'); addRuby(G, p, 2, 'Trade wind'); }
+  else if (k === 2) { give(G, p, 'G2', false, 'Trade wind'); give(G, p, 'R2', false, 'Trade wind'); addVp(G, p, 2, 'Trade wind'); addRuby(G, p, 1, 'Trade wind'); }
+  else if (k === 3) { give(G, p, 'R4', false, 'Trade wind'); addVp(G, p, 5, 'Trade wind'); drop(G, p, 2, 'Trade wind'); }
 }
 
 // ---------- the state machine ----------
@@ -536,8 +536,8 @@ function evalStep(G) {
         p.res = { vp0: p.vp, ru0: p.rubies, pos: lastPos(p), space: spaceOf(p), boom: p.boom, prot: p.prot, die: [], bought: [], mode: 'both', vp: 0, coins: 0, ruby: 0, white: whiteSum(p), chips: p.pot.length };
         ev(G, { t: 'scored', seat: p.seat, space: p.res.space, boom: p.boom });
       }
-      for (const p of P) if (G.fcard === 'lucky7' && !p.boom && whiteSum(p) === 7) { drop(G, p, 1, 'Lucky Seven'); use(G, 'lucky7hit'); }
-      if (G.fcard === 'spilled' && G.round < lastOf(G)) for (const p of P) if (p.boom) { const l = P[left(G, p.seat)]; if (chipsOfValue(G, 2).length) { ask(G, l, 'gift'); lg(G, pn(G, l.seat) + ' may take a 2-chip from ' + nm(G, p) + '\'s spilled brew.'); } }
+      for (const p of P) if (G.fcard === 'lucky7' && !p.boom && whiteSum(p) === 6) { drop(G, p, 1, 'Lucky Six'); use(G, 'lucky7hit'); }
+      if (G.fcard === 'spilled' && G.round < lastOf(G)) for (const p of P) if (p.boom) { const l = P[right(G, p.seat)]; if (chipsOfValue(G, 2).length) { ask(G, l, 'gift'); lg(G, pn(G, l.seat) + ' may take a 2-chip from ' + nm(G, p) + '\'s spilled brew.'); } }
       E.step = 'gifts'; return 'go';
     }
     case 'gifts': { if (hasQ(G)) return 'wait'; E.step = 'die'; return 'go'; }
@@ -555,7 +555,7 @@ function evalStep(G) {
     }
     case 'ruby': {
       for (const p of P) {
-        if (D.RUBY[p.res.space]) { addRuby(G, p, 1, 'ruby space'); p.res.ruby++; use(G, 'rubySpace'); if (G.fcard === 'spark') { addRuby(G, p, 1, 'Red Spark'); p.res.ruby++; } }
+        if (D.RUBY[p.res.space]) { addRuby(G, p, 1, 'ruby space'); p.res.ruby++; use(G, 'rubySpace'); if (G.fcard === 'spark') { addRuby(G, p, 2, 'Ember Spark'); p.res.ruby += 2; } }
       }
       E.step = 'de'; for (const p of P) { const s = p.res.space; p.res.coins = D.COINS[s]; p.res.vp = D.VP[s]; p.res.spoon = s === SPOON; if (s === SPOON) use(G, 'spoon'); }
       for (const p of P) {
@@ -571,7 +571,7 @@ function evalStep(G) {
       if (hasQ(G)) return 'wait';
       for (const p of order) {
         const r = p.res;
-        if (G.fcard === 'glint' && D.RUBY[r.space]) addVp(G, p, 2, 'Ruby Glint');
+        if (G.fcard === 'glint' && D.RUBY[r.space] && !p.boom) addVp(G, p, 3, 'Ruby Gleam');
         if (r.mode === 'both' || r.mode === 'vp') { addVp(G, p, r.vp, 'the scoring space'); }
         if (G.round === lastOf(G) && (r.mode === 'both' || r.mode === 'buy')) { const n = Math.floor(r.coins / D.endCoinsPerVp); if (n) addVp(G, p, n, r.coins + ' coins (5 coins = 1 point)'); }
         r.gotVp = p.vp;
@@ -589,7 +589,7 @@ function evalStep(G) {
     }
     case 'ruby2': {
       if (G.round === lastOf(G)) { E.step = 'clean'; return 'go'; }
-      if (G.fcard === 'spring') { for (const p of P) if (!p.flask) { p.flask = true; ev(G, { t: 'refill', seat: p.seat, free: true }); } lg(G, 'Spring Water: every flask is refilled.'); }
+      if (G.fcard === 'spring') { for (const p of P) if (!p.flask && !p.boom) { p.flask = true; ev(G, { t: 'refill', seat: p.seat, free: true }); } lg(G, 'Rain Barrel: empty flasks are refilled.'); }
       if (!E.rubyAsked) { E.rubyAsked = true; for (const p of P) if (p.rubies >= D.rubySpend) ask(G, p, 'ruby'); }
       if (hasQ(G)) return 'wait';
       E.step = 'clean'; return 'go';
@@ -625,7 +625,7 @@ function runActs(G, p) {
       p.gq = null; p.acts.shift(); continue;
     }
     if (a === 'g3') {
-      p.acts.shift(); if (whiteSum(p) === 7) {
+      p.acts.shift(); if (whiteSum(p) >= 5 && whiteSum(p) <= 6) {
         const s = p.pot.filter(c => c.c === 'G').reduce((x, c) => x + c.v, 0), l = p.pot[p.pot.length - 1], np2 = Math.min(LASTC, l.pos + s);
         if (np2 !== l.pos) { ask(G, p, 'g3', { s, to: np2 }); return false; }   // the rulebook allows passing up any action: sliding is always optional
         slideLast(G, p, s);
@@ -640,7 +640,7 @@ function runActs(G, p) {
       for (const s of subs) if (s.reduce((x, y) => x + y, 0) <= n && s.every(k => rewardOk(G, k))) sets.push(s);
       if (sets.length > 1) { ask(G, p, 'p2', { sets }); return false; } continue;
     }
-    if (a === 'p3') { p.acts.shift(); let t = 0; for (const c of p.pot) if (c.c === 'P') t += c.pos >= 30 ? 3 : c.pos >= 20 ? 2 : c.pos >= 10 ? 1 : 0; if (t) addVp(G, p, t, 'Deep sigh'); continue; }
+    if (a === 'p3') { p.acts.shift(); let t = 0; for (const c of p.pot) if (c.c === 'P') t += c.pos >= 30 ? 3 : c.pos >= 18 ? 2 : c.pos >= 8 ? 1 : 0; if (t) addVp(G, p, t, 'Deep sigh'); continue; }
     if (a === 'p4') {
       p.acts.shift(); const n = count(p.pot, 'P'); const opts = [];
       const levels = [];
@@ -654,9 +654,9 @@ function runActs(G, p) {
 }
 function slideLast(G, p, s) {
   const l = p.pot[p.pot.length - 1]; l.pos = Math.min(LASTC, l.pos + s); p.res.pos = l.pos; p.res.space = Math.min(l.pos + 1, SPOON);
-  ev(G, { t: 'slide', seat: p.seat, chip: l.i, pos: l.pos }); lg(G, nm(G, p) + ' slides the last chip ' + s + ' space' + (s > 1 ? 's' : '') + ' (Lucky-seven moss).'); use(G, 'g3hit');
+  ev(G, { t: 'slide', seat: p.seat, chip: l.i, pos: l.pos }); lg(G, nm(G, p) + ' slides the last chip ' + s + ' space' + (s > 1 ? 's' : '') + ' (Steady-six moss).'); use(G, 'g3hit');
 }
-function rewardOk(G, k) { const need = k === 1 ? ['K1'] : k === 2 ? ['G1', 'B2'] : ['Y4']; return need.every(x => G.supply[x] > 0) || true; }
+function rewardOk(G, k) { const need = k === 1 ? ['R1'] : k === 2 ? ['G2', 'R2'] : ['R4']; return need.every(x => G.supply[x] > 0) || true; }
 function blackAct(G, p) {
   const mine = count(p.pot, 'K'); if (!mine) return;
   let drop1 = false, ruby = false;

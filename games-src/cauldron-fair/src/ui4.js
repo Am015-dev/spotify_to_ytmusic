@@ -37,6 +37,8 @@ function renderReport() {
   if (play) { sc.box.addEventListener('pointerdown', () => stgFinish()); stgPlay(sc.box, sc.ds, R); }
   tipCheck(); if (typeof hlpAfter === 'function') hlpAfter();
   const done = G.phase !== 'eval' && !myq && !hotShared;
+  if (myq) UI.repHadQ = R.round;   // F4: after your own choices the report closes itself: no extra 'On to day N' tap
+  if (done && UI.repHadQ === R.round && !hotSeat() && !(typeof NET !== 'undefined' && NET.on) && !(typeof tutOn === 'function' && tutOn()) && G.phase !== 'over') { clearTimeout(UI.repAutoF); UI.repAutoF = setTimeout(() => { if (UI.rsMode === 'report' && UI.rsOpen && G.phase !== 'eval') repContinue(); }, 350); }
   if (typeof NET !== 'undefined' && NET.on && done && !UI.repAuto) { UI.repAuto = setTimeout(() => { UI.repAuto = 0; if (UI.rsMode === 'report' && G.phase !== 'eval') repContinue(); }, 30000); }
 }
 function repContinue() {

@@ -56,23 +56,23 @@ function powerValue(S, space, pos) {
   const G = S.G, r = S.round - 1; let val = 0; const last2 = S.pot.slice(-2);
   const ng = last2.filter(c => c.c === 'G').length, ge = D.BOOKS.G[G.sets.G].eff;
   if (ng) { if (ge === 'g1') val += ng * RW[r]; else if (ge === 'g2') val += ng * 0.8; else if (ge === 'g4') val += ng * Math.max(0, DW[r] - 2 * RW[r]) * 0.5; }
-  if (ge === 'g3' && S.ws === 7) { const s = S.pot.filter(c => c.c === 'G').reduce((a, c) => a + c.v, 0); val += s * (CW[r] + 0.25) * 0.9; }
+  if (ge === 'g3' && S.ws >= 5 && S.ws <= 6) { const s = S.pot.filter(c => c.c === 'G').reduce((a, c) => a + c.v, 0); val += s * (CW[r] + 0.25) * 0.9; }
   const np = S.pot.filter(c => c.c === 'P').length, pe = D.BOOKS.P[G.sets.P].eff;
   if (np) {
-    if (pe === 'p1') val += np === 1 ? 1 : np === 2 ? 1 + RW[r] : 2 + DW[r];
-    else if (pe === 'p2') val += np === 1 ? 1 + RW[r] + 0.6 : np === 2 ? 3 + DW[r] + 2.2 : 6 + RW[r] + 2 * DW[r] + 3.2;
-    else if (pe === 'p3') { for (const c of S.pot) if (c.c === 'P') val += c.pos >= 30 ? 3 : c.pos >= 20 ? 2 : c.pos >= 10 ? 1 : 0; }
+    if (pe === 'p1') val += np === 1 ? RW[r] : np === 2 ? 1 + DW[r] : 2 + RW[r];
+    else if (pe === 'p2') val += np === 1 ? 2 * RW[r] + 0.9 : np === 2 ? 2 + RW[r] + 3.2 : 5 + 2 * DW[r] + 2.4;
+    else if (pe === 'p3') { for (const c of S.pot) if (c.c === 'P') val += c.pos >= 30 ? 3 : c.pos >= 18 ? 2 : c.pos >= 8 ? 1 : 0; }
     else if (pe === 'p4') val += 0.9 * Math.min(np, 3);
   }
   const nk = S.pot.filter(c => c.c === 'K').length; if (nk) val += (G.np === 2 ? 0.55 : 0.5) * (DW[r] * 0.5 + RW[r] * 0.3) * Math.min(nk, 2);
   const fc = G.fcard; const rub = D.RUBY[Math.round(space)] ? 1 : 0;
-  if (fc === 'lucky7' && S.ws === 7) val += DW[r]; if (fc === 'glint' && rub) val += 2; if (fc === 'spark' && rub) val += RW[r];
+  if (fc === 'lucky7' && S.ws === 6) val += DW[r]; if (fc === 'glint' && rub) val += 3; if (fc === 'spark' && rub) val += 2 * RW[r];
   return val;
 }
 function valueStop(S) {
   const r = S.round - 1; let pos = lastPosS(S) + S.sideMove + S.extra;
   const G = S.G;
-  if (G.sets.G === 3 && S.ws === 7) { pos += S.pot.filter(c => c.c === 'G').reduce((a, c) => a + c.v, 0); }
+  if (G.sets.G === 3 && S.ws >= 5 && S.ws <= 6) { pos += S.pot.filter(c => c.c === 'G').reduce((a, c) => a + c.v, 0); }
   pos = Math.min(LASTC, pos); const space = Math.min(pos + 1, SPOON);
   const coins = lerp(D.COINS, space), vp = lerp(D.VP, space), ruby = D.RUBY[Math.min(SPOON, Math.round(space))] ? 1 : 0;
   const cw = CW[r], rw = RW[r];
@@ -213,12 +213,12 @@ function choose(G, seat, level) {
   const noisy = (LV.noise || 0) > 0 && rnd() < LV.noise;
   if (noisy) return legal[Math.floor(rnd() * legal.length)];
   switch (q.h) {
-    case 'pick': return bestBy(legal, m => m.o === 'rubies' ? 3 * RW[r] : chipVal(G, p, m.o, LV.base) * 1.0);
+    case 'pick': return bestBy(legal, m => m.o === 'rubies' ? 4 * RW[r] : chipVal(G, p, m.o, LV.base) * 1.0);
     case 'swap': return bestBy(legal, m => m.o === '' ? RW[r] : chipVal(G, p, m.o, LV.base));
-    case 'clear': return bestBy(legal, m => m.o === 'vp' ? 4 : (G.round <= 3 ? 4.6 : 2.2));
+    case 'clear': return bestBy(legal, m => m.o === 'vp' ? 3 : (G.round <= 3 ? 4.6 : 2.2));
     case 'bribe': { const spaceV = 0.3 + CW[r] * 0.9; return bestBy(legal, m => m.n * (RW[r] - 0 * spaceV) - m.n * spaceV * 0.6 * 0 + (m.n ? 0 : 0) + (RW[r] > spaceV ? m.n : -m.n * 0.01)); }
-    case 'bounty': return bestBy(legal, m => m.o === 'vp' ? (p.ratTails || 0) : chipVal(G, p, m.o, LV.base));
-    case 'fork': return bestBy(legal, m => m.o === 'drop' ? 2 * DW[r] : chipVal(G, p, m.o, LV.base) * 1.2);
+    case 'bounty': return bestBy(legal, m => m.o === 'vp' ? (p.ratTails > 0 ? p.ratTails + 1 : 0) : chipVal(G, p, m.o, LV.base));
+    case 'fork': return bestBy(legal, m => m.o === 'drop' ? DW[r] + RW[r] : chipVal(G, p, m.o, LV.base) * 1.2);
     case 'haggle': return bestBy(legal, m => m.idx < 0 ? 0 : chipVal(G, p, p.hold[m.idx].c + (CF.upgrades(G, p.hold, true).find(u => u.idx === m.idx).to.slice(1)), LV.base) - chipVal(G, p, ck(p.hold[m.idx]), LV.base) - (p.hold[m.idx].c === 'W' ? 5 : 0));
     case 'crow': case 'peek': {
       const S = S0(); S.counts = Object.assign({}, S.counts); const dep = Math.max(depth - 1, 0);
@@ -239,9 +239,9 @@ function choose(G, seat, level) {
     case 'gift': return bestBy(legal, m => chipVal(G, p, m.o, LV.base));
     case 'g2': return bestBy(legal, m => m.o === '' ? -1 : chipVal(G, p, m.o, LV.base));
     case 'g4': return bestBy(legal, m => m.n * (DW[r] - 2 * RW[r] * 0.5 - 0.2 * 0) * (DW[r] > RW[r] * 1.2 ? 1 : -1) - 0.0001 * m.n);
-    case 'p1': return bestBy(legal, m => m.k === 1 ? 1 : m.k === 2 ? 1 + RW[r] : 2 + DW[r]);
+    case 'p1': return bestBy(legal, m => m.k === 1 ? RW[r] : m.k === 2 ? 1 + DW[r] : 2 + RW[r]);
     case 'g3': { const D0 = CF.DATA, s0 = p.res.space, s1 = Math.min(d.to + 1, D0.SPOON); return legal.find(m => m.yes === ((D0.COINS[s1] - D0.COINS[s0]) * CW[r] + (D0.VP[s1] - D0.VP[s0]) > RW[r])) || legal[0]; }
-    case 'p2': return bestBy(legal, m => m.set.reduce((a, k) => a + (k === 1 ? 1 + RW[r] + 0.6 : k === 2 ? 3 + DW[r] + 2.2 : 6 + RW[r] + 2 * DW[r] + 3.2), 0));
+    case 'p2': return bestBy(legal, m => m.set.reduce((a, k) => a + (k === 1 ? 2 * RW[r] + 0.9 : k === 2 ? 2 + RW[r] + 3.2 : 5 + 2 * DW[r] + 2.4), 0));
     case 'p4': return bestBy(legal, m => m.from === '' ? 0 : chipVal(G, p, m.to, LV.base) - chipVal(G, p, m.from, LV.base) + 0.3);
     case 'de': {
       const coins = d.coins, vp = d.vp;

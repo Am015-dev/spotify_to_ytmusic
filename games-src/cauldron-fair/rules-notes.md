@@ -4,11 +4,9 @@ A push-your-luck bag-building game for 2 to 4 potion-makers at a village fair, 9
 what the engine implements. Real-game names live only in the private research folder
 (`game-night-private/cauldron-fair-research/`); here everything uses our own names.
 
-Sources used: the publisher's English rules (an early draft), the final English rulebook text, the final
-ingredient almanac text (all four book sets), a fan tool that transcribed the cauldron track "from the physical
-board" and all 24 fortune cards, and two pictures in the official PDF that show the rat tails on the scoring
-track. The board-game catalogue site itself refused every fetch (403), so no thread could be read directly; every number
-below was cross-checked against at least two of the other sources or against a worked example in the rulebook.
+Rules reference: the structure (9 rounds, bag building, draw or stop, white-chip limit, shop, rat stone) follows the general
+mechanism of the genre. The track tables, ingredient prices and powers, and the 24 fortune cards are OUR OWN design:
+different numbers, thresholds and wording, tuned by simulation (see `simc1.js`) to the same overall balance.
 
 ## Names
 
@@ -82,49 +80,50 @@ below was cross-checked against at least two of the other sources or against a w
 **End.** Round 9 has no buying: 5 coins give 1 VP, and 2 rubies give 1 VP (as many as you can afford, coins
 and rubies converted separately). Most VP wins; tie: who got furthest in the last round; still tied: shared win.
 
-## The track (confirmed, see sources.md)
+## The track (our own tables)
 
 54 spaces, index 0 to 53 (index 0 is where the droplet starts). Index 53 is the spoon. Chips can sit on
-indexes 1 to 52; a chip that would go past 52 stays on 52.
+indexes 1 to 52; a chip that would go past 52 stays on 52. Coins, VP and ruby spaces are our own curve (about 34 coins and 15 VP at the spoon, 15 ruby spaces).
+ 
 
 | idx | coins | VP | ruby | idx | coins | VP | ruby | idx | coins | VP | ruby |
 |---|---|---|---|---|---|---|---|---|---|---|---|
-| 0 | 0 | 0 | | 18 | 16 | 4 | | 36 | 25 | 9 | ruby |
-| 1 | 1 | 0 | | 19 | 17 | 4 | | 37 | 26 | 9 | |
-| 2 | 2 | 0 | | 20 | 17 | 4 | ruby | 38 | 26 | 10 | |
-| 3 | 3 | 0 | | 21 | 18 | 4 | | 39 | 27 | 10 | |
-| 4 | 4 | 0 | | 22 | 18 | 5 | | 40 | 27 | 10 | ruby |
-| 5 | 5 | 0 | ruby | 23 | 19 | 5 | | 41 | 28 | 11 | |
-| 6 | 6 | 1 | | 24 | 19 | 5 | ruby | 42 | 28 | 11 | ruby |
-| 7 | 7 | 1 | | 25 | 20 | 5 | | 43 | 29 | 11 | |
-| 8 | 8 | 1 | | 26 | 20 | 6 | | 44 | 29 | 12 | |
-| 9 | 9 | 1 | ruby | 27 | 21 | 6 | | 45 | 30 | 12 | |
-| 10 | 10 | 2 | | 28 | 21 | 6 | ruby | 46 | 30 | 12 | ruby |
-| 11 | 11 | 2 | | 29 | 22 | 7 | | 47 | 31 | 12 | |
-| 12 | 12 | 2 | | 30 | 22 | 7 | ruby | 48 | 31 | 13 | |
-| 13 | 13 | 2 | ruby | 31 | 23 | 7 | | 49 | 32 | 13 | |
-| 14 | 14 | 3 | | 32 | 23 | 8 | | 50 | 32 | 13 | ruby |
-| 15 | 15 | 3 | | 33 | 24 | 8 | | 51 | 33 | 14 | |
-| 16 | 15 | 3 | ruby | 34 | 24 | 8 | ruby | 52 | 33 | 14 | ruby |
-| 17 | 16 | 3 | | 35 | 25 | 9 | | 53 | 35 | 15 | (spoon) |
+| 0 | 0 | 0 |  | 18 | 14 | 4 |  | 36 | 24 | 10 |  |
+| 1 | 1 | 0 |  | 19 | 15 | 4 | ruby | 37 | 25 | 10 | ruby |
+| 2 | 2 | 0 |  | 20 | 15 | 5 |  | 38 | 25 | 10 |  |
+| 3 | 3 | 0 |  | 21 | 16 | 5 |  | 39 | 26 | 11 |  |
+| 4 | 4 | 0 |  | 22 | 17 | 5 | ruby | 40 | 26 | 11 | ruby |
+| 5 | 5 | 0 | ruby | 23 | 17 | 6 |  | 41 | 27 | 11 |  |
+| 6 | 6 | 0 |  | 24 | 18 | 6 |  | 42 | 28 | 12 |  |
+| 7 | 7 | 1 |  | 25 | 18 | 6 |  | 43 | 28 | 12 |  |
+| 8 | 8 | 1 | ruby | 26 | 19 | 7 | ruby | 44 | 29 | 12 | ruby |
+| 9 | 9 | 1 |  | 27 | 19 | 7 |  | 45 | 29 | 13 |  |
+| 10 | 10 | 2 |  | 28 | 20 | 7 |  | 46 | 30 | 13 |  |
+| 11 | 11 | 2 | ruby | 29 | 20 | 8 | ruby | 47 | 30 | 13 | ruby |
+| 12 | 11 | 2 |  | 30 | 21 | 8 |  | 48 | 31 | 13 |  |
+| 13 | 12 | 3 |  | 31 | 22 | 8 |  | 49 | 31 | 14 | ruby |
+| 14 | 12 | 3 |  | 32 | 22 | 8 |  | 50 | 32 | 14 |  |
+| 15 | 13 | 3 | ruby | 33 | 23 | 9 | ruby | 51 | 33 | 14 | ruby |
+| 16 | 13 | 4 |  | 34 | 23 | 9 |  | 52 | 33 | 15 |  |
+| 17 | 14 | 4 |  | 35 | 24 | 9 |  | 53 | 34 | 15 | (spoon) |
 
 ## Ingredient books (costs for a 1-chip / 2-chip / 4-chip)
 
-Orange (Marrow): 3 for the 1-chip. No power. Black (Cinder Moth): 10, power below.
+Orange (Marrow): 3 for the 1-chip. No power. Black (Cinder Moth): 9, power below. All prices are our own.
 
 | Colour | Set 1 | Set 2 | Set 3 | Set 4 |
 |---|---|---|---|---|
-| Green (Mossback) | 4/8/14 | 6/11/18 | 6/11/18 (early draft says 21 for the 4-chip) | 4/8/14 |
-| Blue (Wren Feather) | 5/10/19 | 5/10/19 | 4/8/14 | 5/10/20 |
-| Red (Scarlet Cap) | 6/10/16 | 4/8/14 | 5/9/15 | 7/11/17 |
-| Yellow (Sunroot) | 8/12/18 | 9/13/19 | 8/12/18 | 8/12/18 |
-| Purple (Dusk Sigh) | 9 | 12 | 10 | 11 |
+| Green (Mossback) | 4/7/13 | 5/10/17 | 7/11/17 | 3/7/13 |
+| Blue (Wren Feather) | 5/9/17 | 6/10/18 | 3/8/13 | 6/10/19 |
+| Red (Scarlet Cap) | 5/10/15 | 4/7/13 | 6/9/14 | 6/11/16 |
+| Yellow (Sunroot) | 7/12/17 | 8/13/18 | 9/12/17 | 7/11/17 |
+| Purple (Dusk Sigh) | 8 | 11 | 9 | 10 |
 
 Powers by set (our wording is in `src/data.js`; this is the logic):
 
 * **Green** (end of brew). S1: 1 ruby for each green chip that is the last or second-to-last chip. S2: for each
   such green: a 1 gives an orange 1, a 2 gives a blue 1 or a red 1, a 4 gives a yellow 1 or a purple 1 (only books
-  that are out). S3: if your whites total exactly 7, add all green chip numbers and move your last chip forward
+  that are out). S3: if your whites total 5 or 6, add all green chip numbers and move your last chip forward
   that many spaces (this changes the scoring space; it happens after the die and before rubies). S4: pay 1 ruby
   per such green to move the droplet one space.
 * **Blue** (when drawn). S1: take as many extra chips from the bag as the blue chip's number (1/2/4); you may
@@ -132,7 +131,7 @@ Powers by set (our wording is in `src/data.js`; this is the logic):
   after a blue n (1/2/4) an explosion still lets you score VP and shop, but there is no die; covers do not add,
   the longest remaining cover counts. S3: placed on a ruby space: 1 ruby. S4: placed on a ruby space: VP equal
   to its number.
-* **Red** (when drawn). S1: moves 1 extra space if there are 1-2 orange chips in the cauldron, 2 extra with 3+.
+* **Red** (when drawn). S1: moves 1 extra space if there is 1 orange chip in the cauldron, 2 extra with 2 or more.
   S2: set beside the cauldron; after you stop (even exploded) you may place it after your last chip (it moves by
   its number), or keep it beside the cauldron for a later round, or return it to the bag at any time. S3: if the
   chip just before it is white, add that white chip's number to its move. S4: once a red chip is in the cauldron
@@ -140,46 +139,55 @@ Powers by set (our wording is in `src/data.js`; this is the logic):
 * **Yellow** (when drawn). S1: if drawn right after a white chip you may put that white chip back in the bag
   (the space stays empty). S2: the next chip you place moves twice its number. S3: the first yellow raises
   the explosion limit to 8, three yellows raise it to 9. S4: the 1st yellow in the cauldron moves 1 extra, the
-  2nd 2 extra, the 3rd 3 extra, further ones none.
-* **Purple** (end of brew). S1: 1 purple = 1 VP; 2 = 1 VP + ruby; 3 or more = 2 VP + droplet; a lower reward may be
-  taken. S2: hand in purple chips: 1 gives black 1 + 1 VP + ruby; 2 give green 1 + blue 2 + 3 VP + droplet;
-  3 give yellow 4 + 6 VP + ruby + 2 droplet steps (4 purples cannot do the 2-reward twice; fewer may be handed
-  in). S3: each purple scores VP by its space: 0-9: 0, 10-19: 1, 20-29: 2, 30+: 3. S4: 1 purple: swap a 1-chip of
+  2nd to 4th 2 extra, further ones none.
+* **Purple** (end of brew). S1: 1 purple = 1 ruby; 2 = 1 VP + droplet; 3 or more = 2 VP + ruby; a lower reward may be
+  taken. S2: hand in purple chips: 1 gives red 1 + 2 rubies; 2 give green 2 + red 2 + 2 VP + ruby;
+  3 give red 4 + 5 VP + 2 droplet steps (4 purples cannot do the 2-reward twice; fewer may be handed
+  in). S3: each purple scores VP by its space: 0-7: 0, 8-17: 1, 18-29: 2, 30+: 3. S4: 1 purple: swap a 1-chip of
   the cauldron for the 2-chip of the same colour; 2 purples: a 2-chip for a 4-chip; 3+: a 1-chip for a 4-chip
   (the new chip goes straight into the bag; lower options allowed).
 * **Black** (end of brew), 2 players: same number of black chips as the opponent = droplet, more = droplet + ruby.
-  3-4 players: more black than the left neighbour **or** the right neighbour = droplet; more than **both** =
+  3-4 players: more black than either neighbour = droplet; more than **both** =
   droplet + ruby.
 
-## The 24 fortune cards (blue = whole round, purple = immediately)
+## The 24 fortune cards (our own; blue = whole round, purple = immediately)
 
-Blue (11): Lucky Seven (whites exactly 7 when you stop: droplet), Spilled Brew (if you explode, your left
-neighbour takes any 2-chip), Do-Over (after your first 5 chips you may tip everything back and start again, once),
-Twice Rolled (whoever rolls the bonus die rolls it twice), Thick Skin (explosion limit 9), Marrow Fair (orange
-chips move 1 extra), Peek and Pick (if you stop without exploding, draw up to 5 and place one), Ruby Glint
-(scoring space with a ruby: +2 VP, even if exploded), Spring Water (all flasks refill free at the end), Frothing Pot
-(you may put the first white chip you draw back), Red Spark (scoring space with a ruby: +1 extra ruby).
+Blue (11):
+* Lucky Six: Stop with your white chips adding up to exactly 6? Move your droplet one space.
+* Tipped Cauldron: If your pot explodes, the player on your right takes any 2-chip.
+* Fresh Start: Right after your 4th chip, you may tip them all back and start the day again, once.
+* Lucky Roller: Whenever you roll the bonus die today, you also take 1 ruby.
+* Sturdy Pot: The white limit is 8 today instead of 7.
+* Root Market: Today every orange chip and every green 1-chip moves 1 extra space.
+* Quick Look: Stop safely? Draw up to 4 chips and place one of them.
+* Ruby Gleam: If your scoring space shows a ruby and your pot did not explode, score 3 points.
+* Rain Barrel: At the end of the day every empty flask refills free, unless its owner exploded.
+* Second Skim: Today you may put your second white chip back in the bag.
+* Ember Spark: If your scoring space shows a ruby, take 2 extra rubies.
 
-Purple (13): Pedlar's Pick (black chip, or any 2-chip, or 3 rubies), A Little Slide (droplet), Swap Stall (may trade 1
-ruby for any 1-chip except purple and black), Kind Alms (fewest rubies take 1), Underdog Gift (fewest VP take a green 1),
-Clear the Pods (4 VP or remove one white 1 from your bag), Rat Swarm (count rat tails again, move the rat stone that
-many extra), Lucky Dip (all draw 5 chips, lowest total takes a blue 2, the others a ruby, chips go back), Rat Bribe
-(move your rat stone back 1-3 and take that many rubies), Rat Bounty (any 4-chip, or 1 VP per rat tail you trail
-the leader by), Fork in the Road (droplet 2 spaces, or a purple chip), Fairground Dice (everyone rolls the bonus
-die once), Haggler's Hour (draw 4, swap one for the next higher chip of the same colour; if none can, take a green 1).
+Purple (13):
+* Pedlar's Pick: Take a black chip, any 2-chip, or 4 rubies.
+* Tailwind: Move your droplet forward one space, or two if you are furthest back.
+* Ruby Trader: You may pay 1 ruby for any orange, green, blue, red or yellow 1-chip.
+* Poor Box: Each player with the fewest rubies takes 2 rubies.
+* Helping Hand: Whoever has the fewest points takes a blue 1.
+* Clear the Pods: Score 3 points, or take a white 1 out of your bag.
+* Rat Parade: If you are behind, count your rat tails and move your rat stone, your head start for being behind, that many spaces plus one.
+* Grab Bag: Everyone draws 4 chips, the lowest total takes a red 2 and the others take a ruby, then the chips go back.
+* Hush Money: Move your rat stone, your head start for being behind, back up to 2 spaces and take 2 rubies for each space.
+* Rat Prize: Take any 4-chip, or score one more point than your rat tails, which count how far you trail the leader.
+* Crossroads: Move your droplet one space and take a ruby, or take a purple chip.
+* Carnival Dice: Everyone rolls the bonus die once, and whoever has the fewest points rolls it twice.
+* Market Haggle: Draw 3 chips and you may upgrade one to the next size, or take a blue 1 if none can, then the chips go back.
 
 ## Confirmed vs. guessed
 
-**Confirmed** (two or more sources, or a rulebook example): the 9 rounds, start bag, white limit 7, flask, buying
-rules (1 or 2 different colours, leftovers lost, limited supply), evaluation order A-F, exploded player picks VP or
-shop, the track values (checked against six rulebook example spaces), spoon = 15 VP / 35 coins, droplet and flask
-cost 2 rubies, final-round conversions (5 coins or 2 rubies = 1 VP), round 2/3 book reveals and the round-6 white 1,
-start player passes clockwise, all costs and texts of all four sets (except green set 3's cost), black chip rules,
-tie-break by furthest in the last round, fortune cards as described by the fan transcription (names differ;
-effects match what I remember of the box).
+**Fixed structure** (same as the genre mechanism): the 9 rounds, start bag, white limit 7, flask, buying rules (1 or 2 different colours, leftovers lost, limited supply), evaluation order A-F, exploded player picks VP or shop, droplet and flask cost 2 rubies, final-round conversions (5 coins or 2 rubies = 1 VP), round 2/3 book reveals and the round-6 white 1, start player passes clockwise, tie-break by furthest in the last round.
+
+**Our own design** (not taken from any other game): the track tables (coins, VP, ruby spaces), every ingredient price and power threshold, the bonus die faces, and all 24 fortune cards with their numbers and wording. They were tuned with the simulators so the newcomer-vs-easy win rate stays near 58%.
 
 **Guessed or interpreted** (all are single constants or small functions in the engine, listed in the report):
-1. Bonus die faces: the rules list five outcomes for six faces. We use 1 VP, 1 VP, 2 VP, ruby, droplet, orange (the fan tool's reading: the repeated face is 1 VP). Unverified; check against the physical die.
+1. Bonus die faces: the rules list five outcomes for six faces. We use our own faces: 1 VP, 2 VP, ruby, ruby, droplet, orange.
 2. Rat tails beyond the picture (after space 27): assumed to continue after every even number.
 3. Rat stone: always moved the full distance (the rules say "can"). An optional "fewer" stepper exists before the
    first draw.

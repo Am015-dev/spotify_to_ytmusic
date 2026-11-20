@@ -24,7 +24,7 @@ function rfScan() {
   if (!G) return; if (RF.n < 0 || G.evN < RF.n) { RF.n = G.evN; RF.q = []; return; }
   const v = viewSeat(), ev = G.events.filter(e => e.n > RF.n); RF.n = G.evN;
   if (!rfOn()) return;
-  for (const e of ev) { if (e.seat == null || e.seat === v || !G.players[e.seat] || !G.players[e.seat].ai) continue; const c = rfCaption(e); if (c) RF.q.push(c); }
+  for (const e of ev) { if (e.seat == null || e.seat === v || !G.players[e.seat] || !G.players[e.seat].ai) continue; const c = rfCaption(e); if (c && !(c.key && typeof meIdle === 'function' && meIdle())) RF.q.push(c); }
   if (RF.q.length > 8) RF.q.splice(0, RF.q.length - 8);
   if (RF.q.length && !RF.cur) rfNext();
 }
@@ -103,6 +103,9 @@ function goalCard(force) {
   let e = $('#goalcard'); if (e) e.remove(); if (!G) return;
   if (!force && (/[?&]scn=/.test(location.search) || (typeof GXS !== 'undefined' && GXS.running && GXS.running()))) return;   // scenario runs drive the board directly
 
+  const lsG = k => { try { return localStorage.getItem(k); } catch (x) { return null; } };
+  if (!force && (lsG('cf_goal1') || (typeof GXT !== 'undefined' && GXT.isDone && GXT.isDone(TUT_GAME)))) return;   // F4: the goal is told once (tutorial or first game); the Day chip re-opens it
+  try { localStorage.setItem('cf_goal1', '1'); } catch (x) { }
   const n = LASTD();
   e = h('div#goalcard', { role: 'dialog', 'aria-label': 'The goal' });
   e.innerHTML = '<div class="gc"><div class="gck">The goal</div><h3>Have the most points after ' + n + ' days.</h3><ul><li>Chips from your bag move along your pot.</li><li>Stop before the whites pass 7, or it explodes.</li><li>Your last space pays coins and points.</li></ul><button type="button" class="gcok">Let\u2019s brew</button></div>';

@@ -20,7 +20,7 @@ function newGame(mode, o) {
   const seed = UI.seed != null ? UI.seed : (Date.now() ^ (Math.random() * 1e9)) | 0; UI.seed = null;
   G = CF.newGame({ players: np, seed, names, ai, chars, setMode: sets === 'random' ? 'random' : sets, guided: mode === 'guided', length: mode === 'tutorial' ? 2 : undefined, firstCard: mode === 'tutorial' ? 'pick' : mode === 'guided' ? 'lucky7' : (o.camp && o.camp.setup && o.camp.setup.firstCard) || undefined });
   if (o.camp) campTwist(G, o.camp.twist);
-  if (mode === 'tutorial') G.force = 'thick';      // day 2 (the last day) turns up Thick Skin: a blue card, the limit is 9 all day
+  if (mode === 'tutorial') G.force = 'thick';      // day 2 (the last day) turns up Sturdy Pot: a blue card, the limit is 8 all day
   UI.camp = o.camp || null; UI.mode = mode; UI.cfg = c; UI.started = true; UI.holder = -1; UI.focus = 0; UI.evN = G.evN; UI.over = null; UI.overShown = false; UI.rsOpen = false; UI.repSeen = 0; UI.shopSel = []; UI.potSig = ''; UI.tip = null; UI.tipRound = {}; UI.tipMark = null; UI.tipOpen = false; UI.hotShared = 0; UI.tipq = []; UI.tipShown = {};
   UI.coach = { level: mode === 'tutorial' ? 'off' : mode === 'guided' ? 'full' : (UI.coach.level === 'full' && mode !== 'guided' ? 'light' : UI.coach.level), seen: {} };
   if (mode === 'guided' && UI.coach.level === 'off') UI.coach.level = 'full';
@@ -97,6 +97,7 @@ function playEvents(first) {
 }
 // ---------- the computer players ----------
 function aiOK() { return !(typeof NET !== 'undefined' && NET.on && !isHost()); }
+function meIdle() { if (UI.mode === 'tutorial' || (typeof tutOn === 'function' && tutOn()) || hotSeat()) return false; const v = viewSeat(); if (v < 0 || !G.players[v]) return false; const me = G.players[v]; if (G.phase === 'brew') return me.st !== 'draw' || !!me.lock; return CF.pending(G).indexOf(v) < 0 && !me.q; }
 function schedule() {
   if (!G || !UI.started || G.phase === 'over' || !aiOK()) return;
   const pend = CF.pending(G);
@@ -105,7 +106,7 @@ function schedule() {
     if (UI.rsOpen && G.phase !== 'eval' && !UI.sim) continue;               // hold the next day until the report is closed
     if (UI.mode === 'guided' && (UI.tip && UI.tip.block) && !UI.sim) continue;
     if (UI.sim) { aiStep(s); continue; }
-    let d = AIDELAY * (0.55 + Math.random() * 0.9); if (G.phase === 'brew' && p.st === 'draw' && p.pot.length === 0) d *= 0.7; if (G.phase !== 'brew') d *= 0.6; if (UI.fastAI && G.phase === 'brew') d = 110;
+    let d = AIDELAY * (0.55 + Math.random() * 0.9); if (G.phase === 'brew' && p.st === 'draw' && p.pot.length === 0) d *= 0.7; if (G.phase !== 'brew') d *= 0.6; if (UI.fastAI && G.phase === 'brew') d = 110; if (meIdle()) d = G.phase === 'brew' ? 45 : 60;   // F4: once you are done, the rivals finish together in about a second
     const seq = UI.seq; UI.tm[s] = setTimeout(() => { UI.tm[s] = 0; if (seq !== UI.seq) return; aiStep(s); }, d);
   }
 }

@@ -1,23 +1,24 @@
 // ===================== part 2: render (board, thumbnails, dock, risk, questions) =====================
 // Text for every question the engine can ask (title, explanation). Options come from CF.moves().
+const FN = id => { const f = D.FORTUNE.find(x => x.id === id); return f ? f.name : id; };   // F4: fortune names live in data.js only
 const QINFO = {
-  pick: ['Pedlar\'s Pick', () => 'Take a chip or 3 rubies'],
-  swap: ['Swap Stall', () => 'Trade 1 ruby for a chip'],
-  clear: ['Clear the Pods', () => 'Score 4, or drop a white 1'],
-  bribe: ['Rat Bribe', (p, d) => 'Rat back up to ' + d.max + ', rubies each'],
-  bounty: ['Rat Bounty', p => 'Take a 4-chip or points'],
-  fork: ['Fork in the Road', () => 'Droplet +2, or a Dusk Sigh'],
-  haggle: ['Haggler\'s Hour', () => 'Swap one chip for a higher one'],
+  pick: [FN('pick'), () => 'Take a chip or 4 rubies'],
+  swap: [FN('swap'), () => 'Pay 1 ruby for a 1-chip, or keep it'],
+  clear: [FN('clear'), () => 'Score 3, or drop a white 1'],
+  bribe: [FN('bribe'), (p, d) => 'The rat stone is your catch-up head start. Give back up to ' + d.max + ' of it: 2 rubies per space'],
+  bounty: [FN('bounty'), p => 'Take a 4-chip, or points for how far you trail the leader'],
+  fork: [FN('fork'), () => 'Droplet +1 and a ruby, or a Dusk Sigh'],
+  haggle: [FN('haggle'), () => 'Swap one chip for a higher one'],
   crow: ['Wren Feather: pick one', () => 'Place one as your next chip'],
-  peek: ['Second Look', () => 'Place one chip, or none'],
+  peek: [FN('peek'), () => 'Place one chip, or none'],
   y1: ['Yellow chip power', () => 'Yellow after a white: send that white back?'],
-  restart: ['Do-Over', () => 'Restart the day? Once only'],
+  restart: [FN('doover'), () => 'Restart the day? Once only'],
   side: ['Scarlet Cap beside the pot', () => 'Add it, keep it, or return it'],
-  gift: ['Spilled Brew', () => 'Take any 2-chip'],
+  gift: [FN('spilled'), () => 'Take any 2-chip'],
   g2: ['Mossback gift', () => 'Pick your free chip'],
   g4: ['Drip moss', (p, d) => '1 ruby per step, up to ' + d.max],
   p1: ['Gentle sigh', (p, d) => d.n > 1 ? 'Pick one reward: best, middle or lowest' : 'Take your reward: 1 point'],
-  g3: ['Lucky-seven moss', (p, d) => 'Slide ' + d.s + ' space' + (d.s > 1 ? 's' : '') + ', or stay'],
+  g3: ['Steady-six moss', (p, d) => 'Slide ' + d.s + ' space' + (d.s > 1 ? 's' : '') + ', or stay'],
   p2: ['Trade wind', () => 'Trade purple chips for rewards'],
   p4: ['Upgrade sigh', () => 'Swap one pot chip for a bigger'],
   de: ['Your cauldron exploded', (p, d) => 'Take ' + d.vp + ' points or shop'],
@@ -64,7 +65,7 @@ function stateLabel(p) {
 // why the white limit is not 7 today (empty when it is 7)
 function limitNote(p) {
   const lim = CF.limitOf(G, p); if (lim === D.limit) return ''; const why = [];
-  if (G.fcard === 'thick') why.push('Thick Skin'); if (G.sets.Y === 3 && p.pot.some(c => c.c === 'Y')) why.push('Sunroot');
+  if (G.fcard === 'thick') why.push(FN('thick')); if (G.sets.Y === 3 && p.pot.some(c => c.c === 'Y')) why.push('Sunroot');
   return 'White limit ' + lim + ' today' + (why.length ? ' (' + why.join(' + ') + ')' : '');
 }
 function seatCls(p) { const s = seatState(p); return s === 'draw' || s === 'choose' || s === 'post' ? 'dr' : s === 'boom' ? 'bm' : s === 'done' ? 'dn' : ''; }
@@ -186,7 +187,7 @@ function renderQ(p, legal, qb) {
   const q = p.q, info = QINFO[q.h], qk = p.seat + ':' + G.round + ':' + q.h + ':' + JSON.stringify(q.d || {});
   if (qk !== UI.qWas) UI.qT = tapMark(); qb.dataset.qk = qk; qb.hidden = false;   // R90 B2: only a NEW question ignores the trailing click; a re-render of the same one never eats a tap
   const fromCard = { pick: 1, swap: 1, clear: 1, bribe: 1, bounty: 1, fork: 1, haggle: 1, peek: 1, gift: 1, restart: 1 }[q.h];
-  qb.append(h('div.qt', fromCard && G.fcard ? fortImg(D.FORTUNE.find(x => x.id === G.fcard) || { id: G.fcard }, 'qfimg') : null, h('b', fromCard ? 'Today\'s fortune card' : info[0]), h('div.qx', info[1](p, q.d))));
+  qb.append(h('div.qt', fromCard && G.fcard ? fortImg(D.FORTUNE.find(x => x.id === G.fcard) || { id: G.fcard }, 'qfimg') : null, h('b', fromCard ? 'Today\'s fortune: ' + info[0] : info[0]), h('div.qx', info[1](p, q.d))));
   if (p.hold.length && p.hold[0] && p.hold[0].c) qb.append(h('div.hold', { 'data-priv': p.seat }, p.hold.map((c, i) => h('span.cb', chipN(c.c + c.v, 34)))));
   const opts = h('div.opts' + (legal.length > 3 ? '.g2' : ''));
   legal.forEach(m => opts.appendChild(moveBtn(m, p)));
@@ -205,7 +206,7 @@ let rndT = 0;
 function autoWatch() {   // once I have stopped, watch the computer that is still drawing; go back to my own pot when the day ends
   const v = viewSeat(); if (v < 0 || hotSeat() || !bfAnim() || tutOn()) return; const me = G.players[v];
   if (UI.autoF && (G.phase !== 'brew' || UI.autoF !== G.round)) { if (UI.focus !== v && UI.autoF) UI.focus = v; UI.autoF = 0; UI.fastAI = false; return; }
-  if (!UI.autoF && G.phase === 'brew' && (me.lock || me.st === 'done') && UI.focus === v) { const c = G.players.find(q => q.ai && q.st === 'draw' && !q.boom && q.seat !== v); if (c) { UI.focus = c.seat; UI.autoF = G.round; } }
+  if (UI.watchRivals && !UI.autoF && G.phase === 'brew' && (me.lock || me.st === 'done') && UI.focus === v) { const c = G.players.find(q => q.ai && q.st === 'draw' && !q.boom && q.seat !== v); if (c) { UI.focus = c.seat; UI.autoF = G.round; } }
   if (UI.autoF && UI.focus !== v) { const c = G.players[UI.focus]; if (c && c.st !== 'draw') { const n = G.players.find(q => q.ai && q.st === 'draw' && !q.boom && q.seat !== v); if (n) UI.focus = n.seat; } }
 }
 function render() {

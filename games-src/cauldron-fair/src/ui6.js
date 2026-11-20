@@ -86,7 +86,7 @@ function brewDeck(p, v, legal) {
   deck.appendChild(h('div.bline', { 'aria-live': 'polite' }, bfLine(p, r, fm)));
   const mtr = bfMeter(p, v, p.lock ? null : fm, legal); deck.appendChild(mtr);
   const extras = [legal.find(x => x.t === 'froth') ? h('button.btn.alt.bx', { 'data-a': 'mv', 'data-i': legal.indexOf(legal.find(x => x.t === 'froth')), type: 'button', 'aria-label': 'Put the white chip back, free' }, h('b', '↩ White'), h('small', 'back, free')) : null,
-    legal.find(x => x.t === 'restart') ? h('button.btn.alt.bx', { 'data-a': 'mv', 'data-i': legal.indexOf(legal.find(x => x.t === 'restart')), type: 'button', 'aria-label': 'Do-over: tip the chips back, once' }, h('b', 'Do-over'), h('small', 'once')) : null].filter(Boolean);
+    legal.find(x => x.t === 'restart') ? h('button.btn.alt.bx', { 'data-a': 'mv', 'data-i': legal.indexOf(legal.find(x => x.t === 'restart')), type: 'button', 'aria-label': 'Fresh Start: tip the chips back, once' }, h('b', 'Restart'), h('small', 'once')) : null].filter(Boolean);
   const bagArt = KIT.ART.bag ? h('img.bagimg', { src: KIT.ART.bag, alt: '' }) : h('span.bagimg', { html: ico('bag', 80) });
   const bag3 = !KIT.ART.bag || bagCur ? null : h('img.bag3d', { src: MODELS + 'bag.webp', alt: '', draggable: 'false', decoding: 'async' });   // the 3D bag swings in while the hand rummages (default bag only, not the unlocked skins)
   const bag = dm ? h('button.btn.drawb.bagb' + (BF.pulling ? '.pull' : ''), { 'data-a': 'mv', 'data-i': legal.indexOf(dm), type: 'button', 'aria-label': 'Draw: pull a chip from your bag (' + bagN(p) + ' chips inside)' },

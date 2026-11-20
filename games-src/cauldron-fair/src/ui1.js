@@ -122,6 +122,7 @@ function dayWhy(p, round) {
 // F3 9: one toast at a time, and never over the prompt or the action buttons: it sits just above whichever of them is highest
 function toastPlace(e) {
   try {
+    if (!document.documentElement.classList.contains('ph')) { const bar = document.querySelector('.gx-bar'), bb = bar ? bar.getBoundingClientRect().bottom : 48; e.style.top = Math.round(bb + 8) + 'px'; e.style.bottom = 'auto'; return; }   // F4: on PC the toast sits under the top bar, never over the board's last spaces or the turn line
     e.style.top = 'auto'; e.style.bottom = '18px'; let top = innerHeight;
     ['#instr', '#acts', '#qbox', '#prompt'].forEach(sel => { const x = document.querySelector(sel); if (!x || x.hidden) return; const r = x.getBoundingClientRect(); if (r.width > 40 && r.height > 8 && r.top > innerHeight * .3 && r.top < top) top = r.top; });
     if (top < innerHeight) e.style.bottom = Math.round(innerHeight - top + 8) + 'px';

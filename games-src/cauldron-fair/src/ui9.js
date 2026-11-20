@@ -5,19 +5,19 @@
 // and sends the same moves (act() with CF.moves()).
 const STG = { run: false, round: 0, tm: [], iv: [], dirty: false };
 const FORT_SHORT = {
-  lucky7: 'Exactly 7 white: droplet moves one.', spilled: 'If you boom, left rival takes a 2-chip.', doover: 'After chip 5: restart once.', twice: 'Bonus die rolls twice today.',
-  thick: 'White limit is 9 today.', marrowfair: 'Orange chips move one extra today.', peek: 'Stop safely: draw up to 5, may place one.', glint: 'Ruby space scores 2 points, even boomed.',
-  spring: 'Flasks refill free tonight.', froth: 'First white chip may go back.', spark: 'Ruby space gives one extra ruby.', pick: 'Black chip, any 2-chip, or 3 rubies.',
-  slide: 'Droplet moves one space.', swap: 'May trade 1 ruby for a 1-chip (not purple or black).', alms: 'Fewest rubies take 1 ruby.', underdog: 'Fewest points take a green 1.',
-  clear: 'Score 4 points, or drop a white 1.', swarm: 'Rat stone moves by your rat tails.', dip: 'Draw 5: lowest gets blue 2.', bribe: 'Rat back 1 to 3 spaces for rubies.',
-  bounty: 'Take a 4-chip, or points per tail.', fork: 'Droplet +2, or take a purple chip.', dice: 'Everyone rolls the bonus die once.', haggle: 'Draw 4: swap one for a bigger chip.'
+  lucky7: 'Whites exactly 6: droplet moves one.', spilled: 'If you boom, right rival takes a 2-chip.', doover: 'After chip 4: restart once.', twice: 'Each bonus-die roll also pays 1 ruby.',
+  thick: 'White limit is 8 today.', marrowfair: 'Orange and green 1s move one extra today.', peek: 'Stop safely: draw up to 4, may place one.', glint: 'Ruby space scores 3 points if you did not boom.',
+  spring: 'Empty flasks refill free tonight (not if boomed).', froth: 'Second white chip may go back.', spark: 'Ruby space gives two extra rubies.', pick: 'Black chip, any 2-chip, or 4 rubies.',
+  slide: 'Droplet +1, or +2 if furthest back.', swap: 'May pay 1 ruby for a 1-chip (not purple or black).', alms: 'Fewest rubies take 2 rubies.', underdog: 'Fewest points take a blue 1.',
+  clear: 'Score 3 points, or drop a white 1.', swarm: 'Behind? Rat stone (your head start) moves tails + 1.', dip: 'Draw 4: lowest gets a red 2.', bribe: 'Give back up to 2 head-start spaces: 2 rubies each.',
+  bounty: 'Take a 4-chip, or tails + 1 points.', fork: 'Droplet +1 and a ruby, or a purple chip.', dice: 'Everyone rolls the bonus die; last place twice.', haggle: 'Draw 3: swap one for a bigger chip.'
 };
 const BOOK_SHORT = {
   O: 'No power. Cheap filler.', K: '2 players: most or tied black, droplet +1; most also a ruby. 3-4: beat each neighbour.',
-  G: { 1: 'Last two chips green: 1 ruby each.', 2: 'Last-two greens give free chips.', 3: 'White exactly 7: greens push you on.', 4: 'Last-two greens: 1 ruby moves droplet.' },
+  G: { 1: 'Last two chips green: 1 ruby each.', 2: 'Last-two greens give free chips.', 3: 'Whites total 5 or 6: greens push you on.', 4: 'Last-two greens: 1 ruby moves droplet.' },
   B: { 1: 'On landing, peek chips, place one.', 2: 'Covers your next 1, 2 or 4 chips: boom then, keep points and coins, but no die.', 3: 'On a ruby space: take 1 ruby.', 4: 'On a ruby space: points equal its number.' },
   R: { 1: 'Slides extra for oranges in your pot.', 2: 'Set aside, add after your last chip.', 3: 'Adds the white chip before it.', 4: 'Later white 1s move 2 spaces.' },
-  Y: { 1: 'After a white: put that white back.', 2: 'Next chip moves twice as far.', 3: 'White limit grows to 8 or 9.', 4: 'Each yellow moves extra: 1, 2, 3.' },
+  Y: { 1: 'After a white: put that white back.', 2: 'Next chip moves twice as far.', 3: 'White limit grows to 8, then 9.', 4: 'Yellows move extra: 1st +1, then +2.' },
   P: { 1: 'After brewing: purples give points, rubies.', 2: 'Hand in purples for chips and rewards.', 3: 'Purples score by how far they sit.', 4: 'Purples upgrade a pot chip.' }
 };
 function chipShort(key) { const c = key[0], b = BOOK_SHORT[c]; return typeof b === 'string' ? b : (b && G ? b[G.sets[c]] : '') || ''; }
@@ -104,20 +104,20 @@ function stgCount(el, from, to, ms) {
 }
 function stgPlay(box, ds, R) {
   STG.run = true; STG.round = R.round; STG.tm = []; STG.iv = []; STG.dirty = false;
-  const rows = [...box.querySelectorAll('.ds')], n = rows.length, step = Math.max(200, Math.min(260, Math.round(800 / Math.max(1, n))));
+  const rows = [...box.querySelectorAll('.ds')], n = rows.length, step = 90;   // F4: rows count together, the whole count is under a second
   const at = (ms, fn) => STG.tm.push(setTimeout(() => { if (STG.run && STG.round === R.round) { try { fn(); } catch (e) { console.error(e); } } }, ms));
   try { box.addEventListener('pointerdown', () => stgFinish(), { once: true }); } catch (e) { }   // F3: a tap skips the count
   const FACES = ['vp1', 'vp2', 'ruby', 'drop', 'orange', 'vp1'];
-  let t = 200, last = 0;
+  let t = 100, last = 0;
   rows.forEach((row, i) => {
     const d = ds[i]; const T0 = t; const potEl = row.querySelector('.dpot'), tile = row.querySelector('.dtile'), tn = row.querySelector('.tn'), chip = row.querySelector('.dtot'), drb = row.querySelector('.drb');
     at(T0, () => { row.classList.remove('pre'); row.classList.add('lit', 'in'); potEl.innerHTML = stgPot(d, true); snd('plop'); });
-    let tt = T0 + 300;
+    let tt = T0 + 160;
     if (d.die.length) {
       const dd = row.querySelector('.ddie');
-      at(tt, () => { dd.classList.add('roll'); snd('click'); let k = 0; const iv = setInterval(() => { [...dd.children].forEach((c, j) => { c.innerHTML = KIT.ICON.die(30, FACES[(k + j * 2) % FACES.length]); }); k++; }, 75); STG.iv.push(iv); setTimeout(() => clearInterval(iv), 300); });
-      at(tt + 330, () => { dd.classList.remove('roll', 'pend'); [...dd.children].forEach((c, j) => { c.innerHTML = KIT.ICON.die(30, d.die[j]); }); snd('coin'); });
-      tt += 380;
+      at(tt, () => { dd.classList.add('roll'); snd('click'); let k = 0; const iv = setInterval(() => { [...dd.children].forEach((c, j) => { c.innerHTML = KIT.ICON.die(30, FACES[(k + j * 2) % FACES.length]); }); k++; }, 75); STG.iv.push(iv); setTimeout(() => clearInterval(iv), 220); });
+      at(tt + 240, () => { dd.classList.remove('roll', 'pend'); [...dd.children].forEach((c, j) => { c.innerHTML = KIT.ICON.die(30, d.die[j]); }); snd('coin'); });
+      tt += 270;
     }
     at(tt, () => {
       if (d.gain !== 0 && tile) stgFlyTo(tile, chip, ico('vp', 22) + '<b>' + (d.gain > 0 ? '+' : '') + d.gain + '</b>', 'dfv', 420, 0, () => { chip.classList.add('pop'); snd('coin'); stgCount(tn, d.start, d.after, 320); });
@@ -125,9 +125,9 @@ function stgPlay(box, ds, R) {
       if (d.rg > 0 && tile) for (let k = 0; k < Math.min(3, d.rg); k++) stgFlyTo(tile, drb, ico('ruby', 20), 'dfr', 460, 120 + k * 90, k === 0 ? () => { drb.classList.add('pop'); snd('ruby'); } : null);
       if (d.boom && !d.prot) row.classList.add('shake');
     });
-    last = tt + 330; t += (d.die.length ? step + 160 : step);
+    last = tt + 330; t += step;
   });
-  at(Math.max(last, t) + 160, () => { stgFinish(); });
+  at(Math.max(last, t) + 60, () => { stgFinish(); });
 }
 // ---------- W471: the points race under the day's pots: every maker's total as a bar, today's gain lit, who leads in one line
 function stgRace(ds, v, play, R) {
