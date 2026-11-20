@@ -215,7 +215,7 @@ function rivLine(t, ai) {
     if (t.indexOf(n + ' ') !== 0) continue;
     if ((m = /places a worker: (.+)\.$/.exec(t))) return n + ' went to ' + m[1];
     if ((m = /adds (.+) to their city\.$/.exec(t))) return n + ' built ' + m[1];
-    if ((m = /prepares for (\w+)/.exec(t))) return n + ' got ready for ' + m[1];
+    if ((m = /prepares for (\w+)/.exec(t))) { const s = G.players.findIndex(p => p.name === n); return n + ' got ready for ' + m[1] + '. ' + (s >= 0 ? rivToward(s).replace(n + ' is', 'It is') : ''); }
     if (/ passes\.$/.test(t)) return n + ' is done for the year';
     if ((m = /achieves (.+)\.$/.exec(t))) return n + ' claimed ' + m[1];
     if ((m = /gives (.+)$/.exec(t)) && / You\b| you\b/.test(t)) return { me: n + ' gave you ' + m[1].replace(/^You /, '').replace(/\.$/, '') };

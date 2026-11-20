@@ -144,7 +144,7 @@ function goalCard() {
   const src = typeof HB_ART !== 'undefined' && HB_ART.ever_tree ? HB_ART.ever_tree : null;   // the great tree painting
   UI.cards.unshift({ kind: 'goal', title: 'Your goal', sub: 'Win the Elderheart Oak', body: () => h('div.hb-goal', src ? h('img.hb-goal-art', { src, alt: '', draggable: 'false' }) : null,
     h('div.hb-goal-k', 'Your goal'), h('h2.hb-goal-t', 'Win the Elderheart Oak'),
-    h('ul.goal', h('li', 'Build a city of critters and buildings.'), h('li', 'Cards, tokens and events all score points.'), h('li', 'Most points after Autumn wins.'))), buttons: [{ label: 'Start', a: 'cont' }] }); render();
+    h('ul.goal', h('li', 'Build a city of critters and buildings.'), h('li', 'Cards, tokens and events all score points.'), h('li', 'Most points after Autumn wins.')), h('p.hb-aim', h('b', 'A good start: '), aimLine(Math.max(0, viewSeat())))), buttons: [{ label: 'Start', a: 'cont' }] }); render();
 }
 const SEE = { vals: null, key: '', last: null, scores: null, actor: -1, rate: null };
 function seeToast(id, html, ms, top) {
@@ -237,12 +237,14 @@ document.addEventListener('pointerup', () => setTimeout(() => seeToastOff('hbpre
         rate = d <= .12 ? ['good', (me === best ? 'Great move, the best one.' : 'Good move.')] : d <= .4 ? ['okay', 'Fine. ' + nm(best) + ' was a bit better.'] : ['poor', 'Hmm. ' + nm(best) + ' was much better.']; } }
     } catch (e) { rate = null; }
     seeToastOff('hbprev');
+    const paySnap = paySnapOf(m);   // PLAY2: the season payout card (ui14)
     const r = o.apply(this, arguments);
+    payAfter(paySnap);
     if (rate) { SEE.rate = rate; if (UI.cfg && UI.cfg.coached) UI.fbQ = [{ t: rate[1], at: Date.now() }]; else seeToast('hbrate', '<b class="r-' + rate[0] + '">' + rate[1] + '</b>', 4200, 168); }
     return r;
   };
 })();
-(function () { const o = render; render = function () { const r = o.apply(this, arguments); try { seeTracker(); seeTurnOver(); setTimeout(() => { try { seeBadges(); } catch (e) { } }, 60); } catch (e) { console.warn('see', e); } return r; }; })();
+(function () { const o = render; render = function () { const r = o.apply(this, arguments); try { seeTracker(); seeTurnOver(); payRender(); setTimeout(() => { try { seeBadges(); } catch (e) { } }, 60); } catch (e) { console.warn('see', e); } return r; }; })();
 
 document.addEventListener('click', e => { const b = e.target.closest && e.target.closest('#hintsbtn'); if (!b) return; UI.hints = !UI.hints; try { localStorage.setItem('hb_hints', UI.hints ? '1' : '0'); } catch (x) { } seeToastOff('hbprev'); seeToastOff('hbrate'); seeToastOff('hbover'); SEE.key = ''; render(); });
 (function () { const o = render; render = function () { const r = o.apply(this, arguments); try { const on = hintsActive(); document.documentElement.classList.toggle('hints-on', on); const b = $('#hintsbtn'); if (b) { b.setAttribute('aria-pressed', on ? 'true' : 'false'); b.classList.toggle('on', on); b.hidden = !!(UI.cfg && UI.cfg.coached); }

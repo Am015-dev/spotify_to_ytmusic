@@ -26,6 +26,7 @@ function renderRival(seat) {
   }
   const p = G.players[seat], sc = score(seat);
   b.appendChild(h('div.rhead', pawn(seat, 28), h('div', h('b', p.name), h('div.sm', (p.ai ? 'Computer (' + p.ai + ')' : 'Player') + ' · ' + SEASN[p.season] + (p.passed ? ' · passed' : '')))));
+  if (p.ai || seat !== viewSeat()) b.appendChild(h('p.p2-toward', rivToward(seat)));
   b.appendChild(h('div.kv', h('span', 'Points so far'), h('b', sc.total)));
   [['Cards in the city', sc.cards, 'points printed on your buildings and critters'], ['Point tokens', sc.tokens, 'tokens from cards and places'], ['Events', sc.events, 'flags you claimed (3 each for basic events)'], ['Bonus cards', sc.bonus, 'prosperity bonuses'], ['Journey', sc.journey, 'workers on the Long Road']].forEach(r => { if (r[1] || r[0] === 'Cards in the city') b.appendChild(h('div.kv.why', h('span', r[0] + ': ' + r[2]), h('b', '+' + r[1]))); });
   b.appendChild(h('div.kv', h('span', 'Workers'), h('b', availW(p) + ' free of ' + p.workers)));
@@ -86,7 +87,7 @@ document.addEventListener('click', ev => {
   if (d.start && !a) { newGame(d.start); return; }
   switch (a) {
     case 't': onTarget(d.t, t); break;
-    case 'tm': { const m = UI.tm2 && UI.tm2[+d.mi]; if (m) { if (typeof tutGate === 'function' && !tutGate(UI.sel ? 'o:' + d.mi : tgOf(m), !!UI.sel)) break; UI.sel = null; actFrom(m, t); } break; }
+    case 'tm': { const m = UI.tm2 && UI.tm2[+d.mi]; if (m) { if (typeof tutGate === 'function' && !tutGate(UI.sel ? 'o:' + d.mi : tgOf(m), !!UI.sel)) break; UI.sel = null; if (choiceLook(m, t)) break; actFrom(m, t); } break; }
     case 'selx': UI.sel = null; render(); break;
     case 'city': if (!UI.animBusy) { UI.sel = null; UI.cityOpen = { logN: G.logN }; snd('click', { vol: .4 }); render(); } break;
     case 'handtog': UI.handHide = !UI.handHide; snd('click', { vol: .4 }); render(); break;

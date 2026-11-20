@@ -481,7 +481,7 @@ function renderActs(mm, qm, qShown) {
   if (!mine && !(GX.undo.can())) { return; }
   const prep = mm.find(m => m.type === 'prepare'), pass = mm.find(m => m.type === 'pass');
   if (GX.undo.can() && !(NET.on)) a.appendChild(h('button.btn.alt.undo', { 'data-a': 'undo', type: 'button', 'aria-label': 'Undo my last step' }, '↶'));
-  if (mine) {
+  if (mine && !G.q) {   // PLAY2: no Prepare / Pass while a choice is open
     if (prep) { const e = h('button.btn.prep.glow', { type: 'button', 'aria-label': 'Prepare for ' + SEASN[p.season + 1] }, seasonIcon(p.season + 1, 26), h('span.prepw', h('b', 'Prepare for ' + SEASN[p.season + 1]), SEASON_GIVES[p.season + 1] ? h('small', SEASON_GIVES[p.season + 1]) : null)); UI.tgEls.prep = e; e.setAttribute('data-a', 't'); e.setAttribute('data-t', 'prep'); a.appendChild(e); }
     else if (p.season < 3) { const n = availW(p); a.appendChild(h('button.btn.prep.dis', { type: 'button', 'aria-disabled': 'true', 'data-a': 'noprep', 'aria-label': 'Prepare after your last worker' }, seasonIcon(p.season + 1, 26), h('span.prepw', n > 0 ? [h('b', 'Prepare'), h('small', n + ' worker' + (n > 1 ? 's' : '') + ' left')] : 'Prepare'))); }   // says why it is off
     if (pass) { const armed = UI.passArm && Date.now() - UI.passArm < 2600; const e = h('button.btn.pass' + (armed ? '.armed' : ''), { type: 'button' }, armed ? 'Sure?' : 'Pass'); UI.tgEls.pass = e; e.setAttribute('data-a', 't'); e.setAttribute('data-t', 'pass'); a.appendChild(e); }
@@ -644,6 +644,7 @@ function pvSetTab(v, quiet) {
 }
 // the meadow row scrolls sideways: bring the card the finger points at (else the first glowing one) fully into view, moving the row as little as possible
 function meadFix() {
+  if (UI.pressAt && Date.now() - UI.pressAt < 900) return;   // PLAY2: never slide the row under a finger that is pressing
   const mead = document.querySelector('#bd .pv-mead'); if (!mead) return; const q = mead.getBoundingClientRect(); if (q.width < 4) return;
   const rt = UI.rec && UI.rec.m && UI.tgEls && UI.tgEls[tgOf(UI.rec.m)], want = rt && mead.contains(rt) ? rt : mead.querySelector('.glow'); if (!want) return;
   const r = want.getBoundingClientRect(); if (r.left >= q.left - 1 && r.right <= q.right + 1) return;
@@ -740,7 +741,7 @@ function pvRender() {
     else if (tg && qLoc.has(tg)) { e.classList.add('glow'); regTg('q:' + qLoc.get(tg), e); qShown.add(qLoc.get(tg)); }
     else if (tg) { e.setAttribute('data-a', 't'); e.setAttribute('data-t', 'x:' + tg); if (mine) e.classList.add('no'); }
     if (UI.sel && UI.sel.tg === tg) e.classList.add('sel');
-    if (kind === 'bev' || kind === 'sev') { const ev = (kind === 'bev' ? G.bev : G.sev)[i]; if (ev.o !== -1 && ev.o != null) { e.classList.add('done'); e.appendChild(h('div.pw', pawn(ev.o, 22))); } }
+    if (kind === 'bev' || kind === 'sev') { const ev = (kind === 'bev' ? G.bev : G.sev)[i]; if (ev.o !== -1 && ev.o != null) { e.classList.add('done'); e.appendChild(h('div.pw', pawn(ev.o, 22))); } else { const g = goalProg(kind, i, fs); if (g) e.appendChild(h('span.p2-prog' + (g.have >= g.n ? '.full' : ''), 'You: ' + g.txt)); } }
     else { const ws = workersAt(kind, i); if (ws.length) { const pw = h('div.pw'); ws.slice(0, 4).forEach(s => pw.appendChild(pawn(s, tall ? 30 : 26))); e.appendChild(pw); if (!info.shared && kind !== 'journey' && kind !== 'haven' && !e.classList.contains('glow')) { e.classList.add('taken'); e.appendChild(h('span.pv-taken', 'Taken')); } } }
     return e;
   };
@@ -755,7 +756,7 @@ function pvRender() {
     Array.from(spots.children).forEach((c, k) => { const r = Math.floor(k / nc), col = k % nc; c.style.left = xs[col] + '%'; c.style.top = (0.6 + r * 99 / rows + (short ? 0 : col % 2 ? 1.2 : 0)) + '%';   /* rows hang from the top of their band, so nothing overlaps or leaves the board */ }); }
   // ---- goals (events): their own panel, so Places fits one screen
   const pGo = panel('goals', 'Goals: first to qualify claims'), gl = h('div.pv-spots.pv-goals.pv-scrolly'); pGo.appendChild(gl);
-  if (tall) gl.appendChild(h('div.pv-sub', 'Cards fit a goal? Send a worker.'));
+  gl.appendChild(h('div.pv-sub.p2-goal', GOAL_LINE));
   const gcell = e => gl.appendChild(h('div.pv-cell', e));
   gcell(tile('journey', 0, true)); G.bev.forEach((x, i) => gcell(tile('bev', i, true))); G.sev.forEach((x, i) => gcell(tile('sev', i, true)));
   // ---- meadow: a swipeable row of big readable cards
@@ -767,6 +768,7 @@ function pvRender() {
       const sp = spec(id), ptg = 'p:meadow:' + id, need = pvNeed(sp.cost, me.res);
       const st = qCard.has(id) ? ['ok', 'Tap to choose'] : okp.has(ptg) ? ['ok', 'Can build'] : need.length ? ['no', 'Need ' + need.join(', ')] : mine && availW(me) >= 0 && HB.cityCount(G, fs) >= 15 ? ['no', 'City is full'] : ['meh', mine ? 'Not now' : 'Affordable'];
       e.setAttribute('data-zoom', 'card:' + id); e.setAttribute('data-id', id); e.appendChild(pvFace(id, { state: st }));
+      { const cb = v >= 0 && comboOf(id, fs); if (cb && cb.short) e.appendChild(h('span.p2-combo' + (cb.free ? '.free' : ''), cb.short)); }
       if (okp.has(ptg)) { e.classList.add('glow'); regTg(ptg, e); }
       else if (qCard.has(id)) { e.classList.add('glow'); regTg('q:' + qCard.get(id), e); qShown.add(qCard.get(id)); }
       else { e.setAttribute('data-a', 't'); e.setAttribute('data-t', 'x:m' + id); }
@@ -820,6 +822,7 @@ function pvRender() {
   hand.forEach((id, i) => {
     const tg = 'p:hand:' + id, off = i - (nH - 1) / 2;
     const b = h('button.sc.hc', { 'data-zoom': 'card:' + id, 'data-id': id, type: 'button', 'aria-label': cname(id) + ' (in hand)' }, pvFace(id, { small: true }));
+    { const cb = !mini && comboOf(id, v); if (cb && cb.short) b.appendChild(h('span.p2-combo' + (cb.free ? '.free' : ''), cb.short)); }
     b.style.cssText = short ? `left:0;top:${20 + i * (ch + gapH)}px;width:${cw}px;height:${ch}px;--dy:0px;z-index:${i + 2}` : `left:${x0 + i * (cw + gapH)}px;width:${cw}px;height:${ch}px;--dy:${fits && tall && !tiny ? Math.round(off * off * 1.6) : 0}px;z-index:${i + 2}`;
     if (okp.has(tg)) { b.classList.add('glow'); regTg(tg, b); }
     else if (qCard.has(id)) { b.classList.add('glow'); regTg('q:' + qCard.get(id), b); qShown.add(qCard.get(id)); }
@@ -838,6 +841,7 @@ function pvRender() {
   if (UI.pvForce) { UI.pvTab = UI.pvForce; UI.pvForce = null; }
   else if (myNow && !UI.pvMine) { UI.pvTab = availW(me) > 0 && okw.size ? 'places' : (glowIn('meadow') ? 'meadow' : 'places'); if (!glowIn(UI.pvTab)) { const k = PV_TABS.map(x => x[0]).find(glowIn); if (k) UI.pvTab = k; } }
   else if (mine && (G.q || UI.sel) && !glowIn(UI.pvTab || 'places')) { const k = PV_TABS.map(x => x[0]).find(glowIn); if (k) UI.pvTab = k; }
+  if (mine && G.q && !glowIn(UI.pvTab || 'places')) { const k = PV_TABS.map(x => x[0]).find(glowIn); if (k) UI.pvTab = k; }   // PLAY2: a pending choice always shows the panel with its glowing choices
   UI.pvMine = myNow;
   if (UI.tutTab && typeof tutOn === 'function' && tutOn()) UI.pvTab = UI.tutTab;   // Learn: the panel the current step points at stays in front
   if (!UI.pvTab) UI.pvTab = 'places';
