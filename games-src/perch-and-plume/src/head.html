@@ -42,6 +42,7 @@ svg{display:block}
 .deck{appearance:none;flex:0 0 auto;width:52px;min-height:56px;border-radius:8px;border:2px solid var(--paper);background:var(--moss2);color:var(--paper);font-size:var(--fs);font-weight:700;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;line-height:1.1;padding:2px}
 /* ---- the mat: three habitat rows */
 #mat{flex:1 1 auto;min-height:0;display:flex;flex-direction:column;gap:4px}
+@media (max-width:999px) and (orientation:portrait){.row{min-height:52px}#mat{min-height:168px}}   /* rows never collapse; the panel scrolls instead (render.js fitDock) */
 .row{flex:1 1 0;min-height:0;display:grid;grid-template-columns:var(--rh,64px) repeat(5,var(--sw,minmax(0,1fr)));justify-content:center;gap:4px;padding:3px;border-radius:12px;position:relative}
 .row[data-h="0"]{background:linear-gradient(90deg,rgba(79,122,69,.95),rgba(79,122,69,.55))}
 .row[data-h="1"]{background:linear-gradient(90deg,rgba(201,164,67,.95),rgba(201,164,67,.55))}
@@ -475,7 +476,7 @@ body.confirming #prompt{display:none}
 .tcard .bc .vp{top:1px;right:1px;min-width:20px;height:20px;font-size:14px}
 .deck{width:56px!important;min-height:64px!important}
 .slot .bc{inset:-2px}
-#toast{top:auto;bottom:calc(var(--gx-sheet-h) + 8px)}   /* pills sit just above the dock, never over the score chips or food */
+#toast{top:calc(env(safe-area-inset-top,0px) + 4px);bottom:auto;z-index:90}   /* phones: pills sit over the top bar, never over the board rows, the keep cards or the score */
 #toast .t{padding:6px 12px}}
 /* R27: a turn opens on the 4 actions. The dock never anchors-scrolls, "What should I do?" sits under them, and on short screens the
    2x2 is compact (one-line note) so tracker, food and all 4 actions fit without scrolling */

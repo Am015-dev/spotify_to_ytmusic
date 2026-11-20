@@ -130,7 +130,7 @@ function renderDock(p, vs, cur) {
   setH($('#foodrow'), '<span class="fl">Your food</span>' + (have.length ? have.map(function (f) { return '<span class="fd" aria-label="' + f + ' ' + p.food[f] + '">' + foodIcon(f) + '<b data-engine="G.pl[' + vs + '].food.' + f + '">' + p.food[f] + '</b><small>' + f + '</small></span>'; }).join('') : '<span class="fd none">none yet</span>') +
     (p.bonus.length ? '<button type="button" class="fd bon" data-gx="goalsd" aria-label="Your secret bonus card">&#9733; bonus card</button>' : ''));
   var ok = {}; if (mine && (!Q || Q.h === 'play2')) PP.playable(G, vs, Q && Q.h === 'play2' ? Q.d.hab : null).forEach(function (x) { ok[x.i] = 1; });
-  var hm = mine && !Q && bestOn() && (UI.pickBird || UI.sel != null) ? hintMove() : null, bp = hm && hm.t === 'play' ? { i: hm.i } : null;   // Best on a hand card only once you chose Play a bird
+  var hm = mine && !Q && bestOn() && UI.pickBird && UI.sel == null ? hintMove() : null, bp = hm && hm.t === 'play' ? { i: hm.i } : null;   // Best on a hand card only once you chose Play a bird
   var tuckQ = mine && Q && (Q.h === 'pwTuck' || Q.h === 'bonus');
   var order = p.hand.map(function (id, i) { return i; }).sort(function (x, y) { return (ok[y] ? 1 : 0) - (ok[x] ? 1 : 0) || (ok[x] ? B[p.hand[y]].p - B[p.hand[x]].p : 0) || x - y; });   // birds you can play first, best first
   setH($('#hand'), p.hand.length ? order.map(function (i) {
@@ -237,8 +237,16 @@ function glowOne() {
   var el = document.body.classList.contains('idle4') && !UI.pickBird ? $('.a4.best') : ($('.bestt') || $('#hand .bc.bestc'));
   if (el) el.classList.add('glow');
 }
+var ROWMIN = 52;   // a habitat row never gets shorter than this on a phone (birds, egg chips and 44 px taps stay readable)
+function fitDock() {   // phones: the panel gets only the height the board leaves after 3 full rows; the panel scrolls instead of the rows shrinking
+  var m = $('#mat'), de = document.documentElement; if (!m) return;
+  if (window.innerWidth >= 1000 || window.innerWidth > window.innerHeight) { de.style.removeProperty('--gx-sheet-h'); return; }
+  var top = m.getBoundingClientRect().top + (window.scrollY || 0), room = Math.floor(window.innerHeight - top - 3 * ROWMIN - 14);
+  de.style.setProperty('--gx-sheet-h', Math.max(150, room) + 'px');
+}
+window.addEventListener('resize', function () { try { fitMat(); } catch (e) { } });
 function fitMat() {   // slots keep a card-like shape: width from the row height, never wider than the screen allows
-  var m = $('#mat'); if (!m || !m.clientHeight) return;
+  var m = $('#mat'); if (!m) return; fitDock(); if (!m.clientHeight) return;
   var rh = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--rh')) || 64, rowH = (m.clientHeight - 8) / 3, w = (m.clientWidth - rh - 30) / 5;
   m.style.setProperty('--sw', Math.max(44, Math.floor(Math.min(w, rowH * .78))) + 'px');
 }
