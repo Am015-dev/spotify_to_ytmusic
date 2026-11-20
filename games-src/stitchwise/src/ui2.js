@@ -29,7 +29,7 @@ function bestPlacement(pid, seat) { return aiBestPlace(G.board[seat], PATCHES[pi
 function selectOffer(k) { if (!t2Allow('offer', k)) return; if (UI.cdAt && Date.now() - UI.cdAt < 500) return; /* W484: the click that ends a card drag */ if (UI.coach) setTimeout(function () { if (UI.sel >= 0) coachSay('pick', null, true); }, 0);
   var s = swWho(G); if (G.over || UI.busy || !isHuman(s) || G.pend) return; var pid = swOffer(G)[k], p = PATCHES[pid]; if (pid == null) return;
   if (!tutAct({ what: 'offer', k: k })) return;
-  if (UI.sel === k) { showPatch(pid); return; }
+  if (UI.sel === k) { swFlash(p.name + ': ' + p.cost + ' buttons, ' + p.time + ' time, +' + p.inc + ' income'); render(); return; } /* F4: a second tap gives a short note, never a sheet over the placement */
   if (G.btn[s] < p.cost) { sfx('bad'); var nd = p.cost - G.btn[s]; swFlash('Need ' + nd + ' more button' + (nd === 1 ? '' : 's') + ' for ' + p.name); UI.sel = -1; render(); /* F4: a short inline note, never a sheet */ var ob = $$('#offers .offer')[k]; if (ob) { ob.classList.add('nope'); setTimeout(function () { ob.className = ob.className.replace(' nope', ''); }, 500); } return; }
   if (!swPlacements(G.board[s], p).length) { sfx('bad'); swFlash(p.name + ' has no room on your quilt'); render(); return; }
   UI.sel = k; sfx('pick'); var bp = UI.tutorial ? null : sugPlace(pid, s); UI.sug = bp ? bp.slice(0, 3) : null; UI.placed = !bp; UI.hint = false; /* F4: the good spot is a hint: nothing shows until the player asks, then a dashed outline; the player still confirms it */
