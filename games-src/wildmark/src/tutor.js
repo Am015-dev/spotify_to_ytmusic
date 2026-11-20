@@ -13,7 +13,7 @@ function tutSteps() {
     { r: 'goal', say: 'Beat Bram: score more points in your valley than he does.', hl: 'next' },
     { r: 'pick', say: 'Each turn take a tile and the animal below it.', hl: 'col:0', ok: 'take:0', done: function () { return G.stage === 'tile'; } },
     { r: 'place', say: 'Your tile must touch your valley. Tap the glowing spot.', hl: 'spot', pick: 'best', ok: 'spot', done: function () { return !!UI.ghost; } },
-    { r: 'settle', say: 'Animals live on tiles that show them. Tap the ringed bear tile.', hl: 'cell', ok: 'tok', done: turnDone },
+    { r: 'settle', say: 'Bears live on tiles that show them. Tap your new ringed tile.', hl: 'cell', ok: 'tok', done: turnDone },
     { r: 'keystone', say: 'Gold keystone tile: an animal on it earns you an acorn.', hl: 'next' },
     { r: 'rival', say: 'Now Bram plays: he takes, places and settles like you.', hl: 'next' },
     { wait: 1 },
@@ -164,7 +164,7 @@ function coachFinalHTML() {
   var r = G.res[0], b = G.res[1], tb = 0, hb = 0; WM.TER.forEach(function (t) { hb += r.hab[t]; tb += r.bonus[t] || 0; });
   window.WM_COACH = { explained: Object.keys(UI.tut.seen), shown: UI.tut.shown.slice(), later: [], step: UI.tut.i, steps: UI.tut.steps.length };
   window.GXCOACH = { running: false, explained: Object.keys(UI.tut.seen), later: [], done: true };
-  var h = '<div class="cfinal"><p class="ch"><i class="cface" aria-hidden="true"></i><b>Rowan</b> Here is how your score adds up.</p><ol>';
+  var h = '<div class="cfinal"><p class="ch"><i class="cface" aria-hidden="true"></i><span><b>Rowan</b> Here is how your score adds up.</span></p><ol>';
   h += '<li>Animals: <b>' + r.aniT + '</b></li>';
   h += '<li>Biggest land of each kind: <b>' + hb + '</b>, bonus <b>' + tb + '</b></li>';
   h += '<li>Acorns kept: <b>' + r.acorns + '</b></li>';
@@ -185,6 +185,6 @@ function tutStart(o) {
   UI.coachPrologue = !!(o && o.prologue); UI.prefs.played = 1; savePrefs();
   UI.tut = { steps: tutSteps(), i: 0, entered: false, seen: {}, shown: [], fixed: {}, t0: 0, spot: null, best: 0, busy: false };
   window.GXCOACH = { running: true, explained: [], done: false };
-  UI.mode = 'coach'; newGame({ np: 2, humans: 1, ai: 'novice', seed: TUT_SEED, turns: TUT_TURNS, names: [null, 'Bram'] }); UI.mode = 'coach';
+  UI.mode = 'coach'; newGame({ np: 2, humans: 1, ai: 'novice', seed: TUT_SEED, turns: TUT_TURNS, names: [null, 'Bram'] }); UI.mode = 'coach'; G.tutRival = true;
   tutFix(); render();
 }

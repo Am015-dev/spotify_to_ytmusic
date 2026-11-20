@@ -77,6 +77,7 @@
       if (s.acorns > 0 && lv !== 'easy') {
         for (var a1 = 0; a1 < 4; a1++) for (var b1 = 0; b1 < 4; b1++) { if (a1 === b1 || !G.market.tiles[a1] || !G.market.toks[b1]) continue; var e2 = evalPair(G.market.tiles[a1], G.market.toks[b1], acornV); if (e2.v > best.v + 0.01) best = Object.assign(e2, { m: { t: 'free', ti: a1, ki: b1 } }); }
       }
+      if (G.tutRival) { var lo = 1e9; for (var q = 0; q < 4; q++) { if (!G.market.tiles[q] || !G.market.toks[q]) continue; var eq = evalPair(G.market.tiles[q], G.market.toks[q], 0); if (eq.v < lo) { lo = eq.v; best = Object.assign(eq, { m: { t: 'take', i: q } }); } } }   // the guided first game: Bram takes the weakest pair, so a player who follows Rowan wins
       return { pick: best.m, place: { t: 'place', c: best.c, rot: best.rot }, tokC: best.tok, v: best.v };
     },
     // one move for the current stage (used by tests and the UI). Wipe 3 when it helps (hard/normal), never at easy.
