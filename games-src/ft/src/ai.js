@@ -1,7 +1,7 @@
 // ---------- computer players: plan the whole move (start, path, colour), then play it step by step ----------
 let AIPLAN=null;
 // easy = the default rival: loose walks 9 in 10, eases off once ahead, tightens when 3+ behind (rubber band = close games); tuned (F3, touch-bench.js) so a newcomer who follows the starting-tile hint wins about 1 in 2 by a small margin
-const LVL={easy:{noise:1.5,depth:12000,bid:.1,ease:1,loose:.9,pool:1,chase:3,tight:.7},normal:{noise:.6,depth:20000,bid:.3,ease:4,loose:.7,pool:.7,chase:5,tight:.5},hard:{noise:0,depth:60000,bid:.35,ease:0}};
+const LVL={easy:{noise:2.2,depth:12000,bid:.1,ease:5,loose:1,pool:1,chase:6,tight:.4},normal:{noise:.6,depth:20000,bid:.3,ease:4,loose:.7,pool:.7,chase:5,tight:.5},hard:{noise:0,depth:60000,bid:.35,ease:0}};
 function aiLead(p){if(!G||!G.pl)return 0;const s=scoreOf(p).total;let o=-1e9;for(const q of G.pl)if(q.i!==p.i)o=Math.max(o,scoreOf(q).total);return s-o}
 function aiNoise(p){const L=LVL[p.lv]||LVL.normal;if(p.__nz!=null)return p.__nz;return L.noise}
 function aiEase(p){const L=LVL[p.lv]||LVL.normal;if(!L.ease)return 0;const d=aiLead(p);return d>L.ease?Math.min(4,1+(d-L.ease)/10):0}
