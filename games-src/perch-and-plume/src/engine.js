@@ -196,18 +196,20 @@
     if (!G.pl.some(function (q) { return q.auto; })) G.first = (G.first + 1) % G.pl.length;   // solo: you always go first
     startRound(G);
   }
+  // does bird b (in slot s, or just b for a card in hand) count for the bonus card? (a hand bird: eggs/nest-egg tests count it as "could")
+  function bonusHit(id, b, s) {
+    var t = BON[id].test;
+    if (t.t === 'ws') return t.lt ? b.ws < t.lt : b.ws > t.gt;
+    if (t.t === 'nestEgg') return nestIs(b, t.n) && (!s || s.eggs > 0);
+    if (t.t === 'eats') return eats(b, t.f);
+    if (t.t === 'only') return b.h === t.h;
+    if (t.t === 'pts') return b.p <= t.le;
+    if (t.t === 'eggs') return !s || s.eggs >= t.ge;
+    if (t.t === 'power') return t.k.indexOf(b.pw) >= 0;
+    return false;
+  }
   function bonusScore(p, id) {
-    var bc = BON[id], t = bc.test, n = birds(p).filter(function (x) {
-      var b = x.b;
-      if (t.t === 'ws') return t.lt ? b.ws < t.lt : b.ws > t.gt;
-      if (t.t === 'nestEgg') return nestIs(b, t.n) && x.s.eggs > 0;
-      if (t.t === 'eats') return eats(b, t.f);
-      if (t.t === 'only') return b.h === t.h;
-      if (t.t === 'pts') return b.p <= t.le;
-      if (t.t === 'eggs') return x.s.eggs >= t.ge;
-      if (t.t === 'power') return t.k.indexOf(b.pw) >= 0;
-      return false;
-    }).length;
+    var bc = BON[id], n = birds(p).filter(function (x) { return bonusHit(id, x.b, x.s); }).length;
     if (typeof bc.sc === 'string') return { n: n, pts: n * (+bc.sc) };
     var pts = 0; bc.sc.forEach(function (tier) { if (n >= tier[0]) pts = tier[1]; });
     return { n: n, pts: pts };
@@ -298,8 +300,8 @@
       laySelf: 'Lay 1 egg on this bird.',
       layNest: 'Lay 1 egg on each of your birds with a ' + NESTN[x[0]] + ' nest.',
       draw1: 'Draw 1 card from the deck.',
-      hunt: 'Look at the top card of the deck. If its wings are under ' + x[0] + ' cm across, tuck it behind this bird. If not, discard it.',
-      huntDie: 'Roll all dice not in the birdfeeder. If any shows ' + FN[x[0]] + ', cache 1 ' + FN[x[0]] + ' on this bird.',
+      hunt: 'Peek at the top deck card. Wingspan under ' + x[0] + ' cm? It slides under this bird for 1 point. Otherwise it is discarded.',
+      huntDie: 'Shake the dice that are outside the feeder. A ' + FN[x[0]] + ' lands? Store 1 ' + FN[x[0]] + ' on this bird.',
       allFood: 'Every player gains 1 ' + FN[x[0]] + ' from the supply.',
       allDraw: 'Every player draws 1 card from the deck.',
       trade: 'Discard 1 egg from another of your birds to draw 2 cards.',
@@ -675,7 +677,7 @@
 
   var PP = { DATA: DATA, B: B, BON: BON, GOL: GOL, FOODS: FOODS, FACES: FACES, HABS: HABS, YIELD: YIELD, BONUSSP: BONUSSP, EGGCOST: EGGCOST, CUBES: CUBES, GOALPTS: GOALPTS,
     newGame: newGame, validMoves: validMoves, performMove: performMove, sideToAct: sideToAct, checkInvariants: checkInvariants, render_game_to_text: render_game_to_text,
-    payOptions: payOptions, playInfo: playInfo, playable: playable, eggSources: eggSources, rowYield: rowYield, power: power, scoreOf: scoreOf, bonusScore: bonusScore,
+    payOptions: payOptions, playInfo: playInfo, playable: playable, eggSources: eggSources, rowYield: rowYield, power: power, scoreOf: scoreOf, bonusScore: bonusScore, bonusHit: bonusHit,
     goalCount: goalCount, placeGoal: placeGoal, birds: birds, eggsOn: eggsOn, eggSpace: eggSpace, foodN: foodN, allSame: allSame, nestIs: nestIs, eats: eats, clone: clone, rnd: rnd, shuffle: shuffle };
   root.PP = PP;
   if (typeof module !== 'undefined') module.exports = PP;

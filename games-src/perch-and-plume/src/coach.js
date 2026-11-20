@@ -15,29 +15,21 @@ function tOnBoard(id) { var b = G.pl[UI.view].board; for (var r = 0; r < 3; r++)
 function tQ(h) { return !!(G.q && G.q.h === h && PP.sideToAct(G) === UI.view); }
 // the steps, in teaching order. t() = the one element to tap; done() = the step is over (info steps: their target was tapped).
 var TSTEPS = [
-  { id: 'goal', info: 1, t: function () { return tq('#opps .sline') || tq('#opps'); } },
-  { id: 'turns', info: 1, t: function () { return tq('#trk'); } },
-  { id: 'keep', info: 1, t: function () { return tq('#hand'); } },
-  { id: 'play', t: function () { return tq('.a4[data-k="play"]'); }, done: function () { return UI.pickBird || UI.sel != null || !!tOnBoard(TUT.ids.play); } },
-  { id: 'cost', t: function () { return tHandCard(TUT.ids.play); }, done: function () { return UI.sel != null || !!tOnBoard(TUT.ids.play); } },
-  { id: 'slot', t: function () { return tq('.row[data-h="1"] [data-legal].slot') || tq('[data-legal].slot'); }, done: function () { return !!UI.pend || !!tOnBoard(TUT.ids.play); } },
-  { id: 'pay', t: function () { return tq('#acts [data-a="playgo"]'); }, done: function () { return !!tOnBoard(TUT.ids.play); } },
+  { id: 'goal', info: 1, t: function () { return tq('#opps .sr2.me') || tq('#opps'); } },
+  // one step, four taps: Play a bird, the bird, the space, Play. Its sentence follows where you are (sub).
+  { id: 'play', sub: function () { return UI.pend ? 'pay' : UI.sel != null ? 'slot' : UI.pickBird ? 'cost' : 'play'; },
+    t: function () { var k = this.sub(); return k === 'pay' ? tq('#acts [data-a="playgo"]') : k === 'slot' ? (tq('.row[data-h="1"] [data-legal].slot') || tq('[data-legal].slot')) : k === 'cost' ? tHandCard(TUT.ids.play) : tq('.a4[data-k="play"]'); },
+    done: function () { return !!tOnBoard(TUT.ids.play); } },
   { id: 'white', info: 1, t: function () { var rc = tOnBoard(TUT.ids.play); var e = rc && tq('#mat [data-a="bird"][data-h="' + rc[0] + '"][data-c="' + rc[1] + '"]'); return e && (e.closest('.slot') || e); } },
-  { id: 'rgoal', info: 1, t: function () { return tq('#trk .tr-g'); } },
-  { id: 'food', t: function () { return tq('.a4[data-k="food"]'); }, done: function () { return tQ('die') || tQ('pwTuck') || COACH.acted.food; } },
-  { id: 'die', t: function () { return tq('#feeder .die[data-legal]'); }, enter: function () { COACH.snap = G.feeder.filter(Boolean).length; }, done: function () { return !tQ('die') || G.feeder.filter(Boolean).length < COACH.snap; } },
-  { id: 'die2', t: function () { return tq('#feeder .die[data-legal]'); }, done: function () { return !tQ('die'); } },
+  { id: 'food', sub: function () { return tQ('die') ? (G.feeder.filter(Boolean).length < COACH.snap ? 'die2' : 'die') : 'food'; },
+    t: function () { return tQ('die') ? tq('#feeder .die[data-legal]') : tq('.a4[data-k="food"]'); },
+    enter: function () { COACH.snap = G.feeder.filter(Boolean).length; }, done: function () { return !!COACH.acted.food && !tQ('die'); } },
   { id: 'tuck', t: function () { return tq('#hand [data-a="hand"]'); }, done: function () { return !tQ('pwTuck'); } },
   { id: 'cache', info: 1, t: function () { return tq('#mat .row[data-h="0"]'); } },
   { id: 'twofor1', info: 1, t: function () { return tq('#foodrow'); } },
-  { id: 'trade', info: 1, t: function () { return tq('#mat .row[data-h="1"]'); } },
-  { id: 'eggs', t: function () { return tq('.a4[data-k="eggs"]'); }, done: function () { return tQ('egg') || COACH.acted.eggs; } },
-  { id: 'nest', t: function () { return tq('#mat [data-legal]'); }, done: function () { return !tQ('egg'); } },
+  { id: 'eggs', sub: function () { return tQ('egg') ? 'nest' : 'eggs'; }, t: function () { return tQ('egg') ? tq('#mat [data-legal]') : tq('.a4[data-k="eggs"]'); }, done: function () { return !!COACH.acted.eggs && !tQ('egg'); } },
   { id: 'pink', info: 1, t: function () { return tq('#opps .opp') || tq('#opps'); } },
-  { id: 'cards', t: function () { return tq('.a4[data-k="cards"]'); }, done: function () { return tQ('draw') || COACH.acted.cards; } },
-  { id: 'tray', t: function () { return tq('#tray [data-legal]'); }, done: function () { return !tQ('draw'); } },
-  { id: 'goalr', res: 1, info: 1, t: function () { return tq('#result .walk li[data-k="goals"]'); } },
-  { id: 'bonus', res: 1, info: 1, t: function () { return tq('#result .walk li[data-k="bonus"]'); } },
+  { id: 'cards', sub: function () { return tQ('draw') ? 'tray' : 'cards'; }, t: function () { return tQ('draw') ? tq('#tray [data-legal]') : tq('.a4[data-k="cards"]'); }, done: function () { return !!COACH.acted.cards && !tQ('draw'); } },
   { id: 'final', res: 1, info: 1, t: function () { return tq('#result .walk li.tot'); } },
   { id: 'real', res: 1, t: function () { return tq('#result #again'); }, done: function () { return false; } }
 ];
@@ -61,11 +53,11 @@ function coachWait(s) {
 }
 // one bubble: the step's sentence, in the panel above the instruction bar (or above the score walk-through on the result screen)
 function coachSay(s) {
-  var txt = STORY.coach[s.id] || '', n = COACH.i + 1;
-  if (COACH.cur && COACH.cur.dataset.rule === s.id && COACH.cur.isConnected) return;
+  var sk = s.sub ? s.sub() : '', txt = STORY.coach[sk ? s.id + '_' + sk : s.id] || '', n = COACH.i + 1;
+  if (COACH.cur && COACH.cur.dataset.rule === s.id && COACH.cur.dataset.sub === sk && COACH.cur.isConnected) return;
   if (COACH.cur && COACH.cur.parentNode) COACH.cur.parentNode.removeChild(COACH.cur);
-  var d = document.createElement('div'); d.className = 'coachb'; d.setAttribute('data-help', 'coach'); d.setAttribute('role', 'status'); d.setAttribute('aria-live', 'polite'); d.dataset.rule = s.id;
-  d.innerHTML = faceHTML('ottilie', STORY.cast.ottilie) + '<span class="saytx"><b>Step ' + n + ' of ' + TSTEPS.length + '</b>' + esc(txt) + '</span>' + (s.info && !s.res ? '<button type="button" class="coachnext btn" data-coach-next="1">Next</button>' : '');
+  var d = document.createElement('div'); d.className = 'coachb'; d.setAttribute('data-help', 'coach'); d.setAttribute('role', 'status'); d.setAttribute('aria-live', 'polite'); d.dataset.rule = s.id; d.dataset.sub = sk;
+  d.innerHTML = faceHTML('ottilie', STORY.cast.ottilie) + '<span class="saytx"><small class="stepn">Step ' + n + ' of ' + TSTEPS.length + '</small><b class="tgoal">Goal: ' + esc((STORY.coachGoal || {})[s.id] || '') + '</b>' + esc(txt) + '</span>' + (s.info && !s.res ? '<button type="button" class="coachnext btn" data-coach-next="1">Next</button>' : '');
   var host, at;
   if (s.res) { host = $('#result'); at = host && host.querySelector('.walk'); }
   else { host = $('#dockbody'); at = $('#prompt'); }
@@ -120,6 +112,7 @@ document.addEventListener('click', function (e) {
   }
   if (e.target.closest && e.target.closest('[data-coach-next],.gx-bar,header,#menubtn,#rulesbtn,.gx-drawer,.gx-sheet-x,#pop')) return;   // a card zoom can always be closed
   e.stopPropagation(); e.preventDefault();
+  try { nope(t, 'Tap here'); } catch (e) { }   // a wrong tap: the glowing thing shakes and says where
   t.classList.remove('tutpulse'); void t.offsetWidth; t.classList.add('tutpulse'); t.setAttribute('data-nudge', ((t.getAttribute('data-nudge') || '') + '.').slice(-60));   // the pulse is the answer to a stray tap; a changing attribute makes it a visible change for the audit
 }, true);
 // effects as they play (flow.js calls this for every event): remember which row actions you took
@@ -137,7 +130,7 @@ function coachResultHTML(sc, me) {
     ['birds', 'Birds', s.birds, 'the points printed on your ' + nb + ' bird' + (nb === 1 ? '' : 's')],
     ['eggs', 'Eggs', s.eggs, eggs + ' egg' + (eggs === 1 ? '' : 's') + ', 1 point each'],
     ['goals', 'Round goal', s.goals, 'most grassland birds at round end'],
-    ['bonus', 'Bonus card', s.bonus, 'your secret card, scored at the end'],
+    ['bonus', 'Bonus card', s.bonus, 'your secret card; gold-edged birds add to it'],
     ['cache', 'Stored food', s.cache, '1 point each'],
     ['tuck', 'Tucked cards', s.tuck, '1 point each']
   ];

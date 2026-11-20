@@ -29,7 +29,7 @@ async function step(p) {
     if (m.t === 'act') return { k: 'sel', s: '.ract[data-h="' + ['food', 'eggs', 'cards'].indexOf(m.a) + '"]' };
     if (m.t === 'play') { if (UI.sel !== m.i) return { k: 'sel', s: '#hand .bc[data-i="' + m.i + '"]' }; return { k: 'sel', s: '.row[data-h="' + m.h + '"] .slot.next' }; }
     if (m.t === 'die') return { k: 'sel', s: '.die[data-i="' + m.i + '"]' };
-    if (m.t === 'reroll' || m.t === 'skip' || m.t === 'pickb' || (m.t === 'bonus' && (!m.yes || m.f))) return { k: 'mv', m };
+    if (m.t === 'reroll' || m.t === 'skip' || m.t === 'use' || m.t === 'pickb' || (m.t === 'bonus' && (!m.yes || m.f))) return { k: 'mv', m };
     if (m.t === 'egg' || m.t === 'trade' || (m.t === 'bonus' && m.h != null)) return { k: 'sel', s: '.bc[data-a="bird"][data-h="' + m.h + '"][data-c="' + m.c + '"]' };
     if (m.t === 'tray') return { k: 'sel', s: '.bc[data-a="tray"][data-i="' + m.i + '"]' };
     if (m.t === 'deck') return { k: 'sel', s: '#deckb' };
@@ -64,7 +64,7 @@ async function playOut(p, label, maxMs) {
 (async () => {
   fs.mkdirSync(path.join(__dirname, 'shots'), { recursive: true });
   const b = await chromium.launch();
-  const ctx = await b.newContext({ viewport: VP, hasTouch: TOUCH, isMobile: TOUCH });
+  const ctx = await b.newContext(Object.assign({ viewport: process.env.PP_W ? { width: +process.env.PP_W, height: +process.env.PP_H } : VP, hasTouch: TOUCH, isMobile: TOUCH }, process.env.PP_VIDEO ? { recordVideo: { dir: process.env.PP_VIDEO, size: { width: +process.env.PP_W || VP.width, height: +process.env.PP_H || VP.height } } } : {}));
   await ctx.addInitScript(() => { try { localStorage.setItem('gns-prefs', JSON.stringify({ anim: 'fast', ai: 'fast' })); } catch (e) { } });
   const p = await ctx.newPage(); const errs = [];
   p.on('pageerror', e => errs.push('pageerror ' + e.message)); p.on('console', m => { if (m.type() === 'error') errs.push('console ' + m.text()); });
@@ -131,7 +131,7 @@ async function playOut(p, label, maxMs) {
     }
   }
   log(errs.length === 0, 'no page or console errors' + (errs.length ? ': ' + errs.slice(0, 3).join(' | ') : ''));
-  await b.close();
+  await ctx.close(); await b.close();
   console.log(fails ? 'FAIL play ' + SIZE : 'PASS play ' + SIZE);
   process.exit(fails ? 1 : 0);
 })();
