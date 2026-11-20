@@ -108,3 +108,18 @@ Next: upgrade cards, weather and legends, sound, online, a second pass on AI (dr
   stale Suggest line hidden once you hold the suggested gear; "You are now 2nd"; PC Go pinned to the bottom of the tray.
 - Cold verdict: could play, fun 3.5/5, would play again, ~2.2 taps/turn felt good. Open: speed dashboard can cover corner signs on PC,
   result rows 4-5 sit under the sticky buttons at 1366x768, minimap labels small on phone.
+
+## F6 (shelf/W572-redline-strict): Go follows the help, heat gets spent, gear trade line
+- Cause of "Suggest+Go finishes last": Suggest only ringed the plan in gold; Go kept your current gear (gear 1 all race). Now, with Hints on
+  (default) and outside the tutorial, each turn starts with the Suggest plan already picked (gear, cards, Boost toggle). Go alone follows it;
+  a gear tap changes it (cards auto-picked for that gear as before). Suggest still rings gold, never changes the pick (hint-test).
+- Planner ('pro' only, ai.js AIP.pro.end = 16): heat weighs less in the last 16 spaces (heat left at the flag is wasted).
+- bench-suggest.js (sunline 2 laps, 4 Easy rivals, 150 races): MODE=go (old) avg place 4.99, podium 0%, gear 1.00, heat left 6.6;
+  now avg 1.39, win 73%, top-2 89%, podium 99%, gear 2.14, heat left 1.8. sim-levels.js passes (Suggest on Easy wins 79% < 85% cap).
+- Gear trade line under the heat line ("Gear 3: +3 spaces, spin risk at corner 4 · Gear 1: -1 space, safe, cools heat"), one row,
+  hidden while the card legend shows (else Go is pushed off screen at 375x553: cam-test caught it).
+- Text matches the engine: slipstream = 2 extra spaces, no cards; a corner it carries you past still costs heat at your speed.
+  Finish: trade line says "crosses the line (N away)! Spaces past it count too"; the round rating names boost/adrenaline/slipstream spaces.
+- Post-race tips compare you with the picked plan (turns in a lower gear than picked; heat unused in the last lap).
+- Phone result: standings above the tips, one-row stats; all 5 rows above the buttons at 375x553/667. Tutorial bubbles avoid #scoreL;
+  end text "a full grid". Phone minimap 84 px wide and moves to the bottom when it would cover a corner sign.
