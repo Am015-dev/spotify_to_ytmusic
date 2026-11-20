@@ -6,11 +6,12 @@ function fitMarket() {   /* phone tabs: shrink the stalls (or lay the six stalls
   var limit = Math.min(L.ey + L.eh, dkT), hx = parseInt(mk.style.getPropertyValue('--hex'), 10) || 44, best = null;
   function bottom() { return mk.getBoundingClientRect().top - $('#bd').getBoundingClientRect().top + mk.scrollHeight; }
   [false, true].forEach(function (six) {
-    if (best && best.fit) return;
+    if (best && best.fit && !best.six) return;
     mk.classList.toggle('six', six); mk.style.gridTemplateColumns = six ? 'repeat(6,minmax(0,1fr))' : 'repeat(3,1fr)'; mk.style.gap = six ? '3px' : '6px';
-    var h0 = six ? hx : Math.max(hx, Math.min(54, Math.floor(mk.clientWidth / 6) - 10)); mk.style.setProperty('--hex', h0 + 'px');   /* F2: the 3-column market may grow past the first guess */
+    var h0 = six ? hx : Math.min(Math.floor((mk.clientWidth / 3 - 46) / 2), Math.max(hx, 54)); mk.style.setProperty('--hex', h0 + 'px');   /* F2: the 3-column market may grow past the first guess */
     while (bottom() > limit && h0 > 30) { h0 -= 2; mk.style.setProperty('--hex', h0 + 'px'); }
     var r = { six: six, hex: h0, b: bottom() }; r.fit = r.b <= limit;
+    if (!six && r.fit && r.hex >= 34) { best = r; return; }   /* F2: the roomy 3-column market wins whenever it fits at a readable size, so stalls do not jump between layouts */
     if (!best || (r.fit && !best.fit) || (r.fit && best.fit && r.hex > best.hex) || (!r.fit && !best.fit && r.b < best.b)) best = r;   /* nothing fits: take the shorter layout */
   });
   mk.classList.toggle('six', best.six); mk.style.gridTemplateColumns = best.six ? 'repeat(6,minmax(0,1fr))' : 'repeat(3,1fr)'; mk.style.gap = best.six ? '3px' : '6px'; mk.style.setProperty('--hex', best.hex + 'px');

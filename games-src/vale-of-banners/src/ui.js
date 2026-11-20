@@ -140,7 +140,7 @@ function turnBanner() {
   b.innerHTML = ''; b.appendChild(h('span', { text: txt })); b.appendChild(h('span.rds', {}, G.P[a].dice.map(function (v) { return h('span.rd', { text: v }); }))); b.style.setProperty('--sc', VB.SEATCOL[a] || '#2a2014');
   try { var dh = document.querySelector('.gx-dock-head'), drr = dh && dh.getBoundingClientRect(); if (drr && drr.height && drr.top > 80) { b.style.top = Math.round(drr.top + drr.height / 2) + 'px'; b.classList.add('top'); } } catch (e) { }   /* F2: over the dock's title row; never over the score strip or a glowing target */   /* very short phones (no strip): over the top bar; it lets taps through */   /* sit over the rival strip: never over a glowing target */
   UI.hold = UI.fast ? 0 : Date.now() + animMs(isHuman(a) ? 900 : 500);
-  if (UI.fast || QS.get('scn') || tutVoice()) return; b.classList.remove('on'); void b.offsetWidth; b.classList.add('on'); sfx('dice'); rollDice(b, G.P[a].dice);
+  if (UI.fast || QS.get('scn') || tutVoice()) return; b.classList.remove('on'); void b.offsetWidth; b.classList.add('on'); sfx('dice');   /* F2: the banner shows the real dice at once (a tumbling number read as the wrong roll) */
 }
 function describe(m, s) {
   var n = G.seats[s].name, p = G.P[s], t;
@@ -355,7 +355,7 @@ function render() {
   try { GXH.phase(myTurn() && !UI.camp || myTurn() ? helpPhase() : null); } catch (e) { }
 }
 /* every ★ says why (R21): one short reason line under the prompt, also in the tile card and the bulb */
-var TWHY = { castle: 'a free action when built', mine: 'pays silver every season', ship: 'loads goods, banner up the track', pas: 'scores its meadow\'s animals now', know: 'bends one rule for you',
+var TWHY = { castle: 'a free action when built', mine: 'pays silver every season', ship: 'loads goods, banner up the track', pas: 'scores its meadow\'s animals now', know: 'a rule change or end-game points for you',
   hall: 'build one more tile at once', carp: 'then take any Building', chapel: 'then take a Keep, Mine or Lore', mkt: 'then take a Barge or Pasture', inn: 'gives 4 workers', mint: 'gives 2 silver', tower: 'scores 4 points', store: 'sell goods with any die' };
 function tileWhy(t) { return t ? (t.t === 'bld' ? TWHY[t.k] : TWHY[t.t]) || 'more land' : ''; }
 function starWhy(m) {
@@ -562,7 +562,7 @@ function renderDock() {
   }
   var seen = {};
   var wkIn = portraitPhone() ? gd : ac, nW = 2 + (p.know['wk+1'] ? 1 : 0);
-  if (wkIn === gd && gt.length >= 3 && [0, 1].some(function (i) { return !p.used[i]; })) gd.classList.add('many');   /* room for the swap buttons on one row */   /* F2: phones put the swap buttons in the goods row, so the action row only holds End turn */
+  if (wkIn === gd && gt.length >= 2 && [0, 1].some(function (i) { return !p.used[i]; })) gd.classList.add('many');   /* room for the swap buttons on one row */   /* F2: phones put the swap buttons in the goods row, so the action row only holds End turn */
   if (wkIn === gd) { var tp0 = gd.querySelector('.tip'); if (tp0) tp0.remove(); }
   [0, 1].forEach(function (i) { if (p.used[i] || seen[p.dice[i]]) return; seen[p.dice[i]] = 1; wkIn.appendChild(h('button.btn.alt' + (wkIn === gd ? '.wkc' : ''), { type: 'button', id: 'wk' + i, html: wkIn === gd ? '<b>' + p.dice[i] + '</b> → ' + nW + ' ' + MEEPLE : null, text: wkIn === gd ? null : p.dice[i] + ' → ' + nW + ' workers', 'aria-label': 'Swap your ' + p.dice[i] + ' for ' + (2 + (p.know['wk+1'] ? 1 : 0)) + ' workers', onclick: function () { doMove(pick(VB.validMoves(G).filter(function (m) { return m.k === 'workers' && m.die === i; }))); } })); });
   if (p.used[0] && p.used[1]) { var eb = h('button.btn', { type: 'button', id: 'endB', text: 'End turn', onclick: function () { doMove({ k: 'end' }); } }); ac.appendChild(eb);
@@ -579,7 +579,7 @@ function promptText() {
   var a = VB.actor(G); if (!isHuman(a)) return UI.cap || G.seats[a].name + ' is thinking...';
   var top = pend(), p = G.P[a];
   if (top) return { castle: 'Keep: one free action. Tap any glowing tile, or Skip it.', hall: 'Moot Hall: tap a stored tile, then any glowing space. Or Skip.', grab: 'Tap any glowing tile, then Take it, free.', store: 'Granary: tap a goods kind, then Sell. Or Skip.', ship: 'Barge: tap a glowing stall\'s goods to load them. Or Skip.', discard: 'Storage is full. Tap a stored tile, then Throw this away.' }[top.t];
-  if (UI.sel != null) { try { coach('preview'); } catch (e) { } return hints() ? 'Glowing spaces: +N scores now, 2/5 is region progress.' : 'Put it on a glowing space. Tap it again to cancel.'; }
+  if (UI.sel != null) { try { coach('preview'); } catch (e) { } return (UI.pre === UI.sel ? 'Your new tile is in hand: tap a glowing space to build it. ' : '') + (hints() ? 'Glowing spaces: +N scores now, 2/5 is region progress.' : 'Put it on a glowing space. Tap the tile again to put it back.'); }
   if (p.used[0] && p.used[1]) return 'Both dice used. Tap End turn.';
   var sm = UI.die == null && hints() ? hardMove() : null;   /* with hints on, the line names the same move as the star (R21: never two instructions) */
   if (sm && (sm.k === 'take' || sm.k === 'grab') && !sm.w) return 'Tap the ★ tile in stall ' + sm.v + ', then Take to storage.';
@@ -627,7 +627,7 @@ var PLAIN = { 'Take one extra action at once, as if you had a die showing any nu
   'Place one more tile from your storage at once, on any free space of its colour next to your land (any number).': 'Build one more stored tile now. Any number works.',
   'Take a Keep, Mine or Lore tile from a market stall into your storage.': 'Take a Keep, Mine or Lore tile from any stall.',
   'Take a Barge or Pasture tile from a market stall into your storage.': 'Take a Barge or Pasture tile from any stall.',
-  'A quarter may not hold two of the same Building.': 'No two of the same building in one region.' };
+  'A region may not hold two of the same Building.': 'No two of the same building in one region.' };
 function plainText(t) { return (VB.tileText(t) || '').split(/(?<=[.!?])\s+(?=[A-Z])/).reduce(function (o, s) { var k = Object.keys(PLAIN).filter(function (x) { return s.indexOf(x) === 0; })[0]; o.push(k ? PLAIN[k] : s); return o; }, []); }
 function closeTile() { $('#tv').hidden = true; render(); schedule(); }
 function dieLabel(m) { return m.die === 'x' ? 'free' : 'die ' + G.P[VB.actor(G)].dice[m.die] + (m.w ? ', ' + m.w + ' worker' + (m.w > 1 ? 's' : '') : ''); }
@@ -664,7 +664,7 @@ function tapStore(i) {
   if (!tutOk({ what: 'store', s: i })) return;
   if (myTurn() && top && top.t === 'discard') { showTile(t, [{ label: 'Throw this away', fn: function () { doMove({ k: 'discard', s: i }); } }]); return; }
   var can = myTurn() && storeLegal(i);
-  if (can && (UI.sel === i)) { UI.sel = null; render(); return; }
+  if (can && (UI.sel === i)) { UI.sel = null; UI.pre = null; render(); return; }
   if (can) { UI.sel = i; UI.tab = 'estate'; UI.pinTab = null; render(); return; }
   var c = VB.CELLS.filter(function (x) { return x.col === t.t && !p.estate[x.i]; });
   showTile(t, [], !c.length ? 'No empty ' + VB.COLNAME[t.t] + ' space left.' : VB.placeTargets(p, t, 0).length ? 'Goes on a ' + VB.COLNAME[t.t] + ' space touching your land. Use that space\'s number.' : 'No ' + VB.COLNAME[t.t] + ' space touches your land yet.');
@@ -741,7 +741,7 @@ function doMove(m) {
   if (m.k === 'end' && isHuman(s)) { var rl = UI.mode === 'tutorial' ? { k: 'okay', t: '' } : rateLine(); UI.lastRate = rl; try { coach('turnover'); } catch (e) { } if (hints() && UI.mode !== 'tutorial') beat('Turn over', rl.t, 'turn ' + rl.k); }
   if (UI.die != null && G.P[s].used[UI.die]) UI.die = null;
   if (UI.bump && typeof m.die === 'number' && G.P[s].used[m.die]) delete UI.bump[m.die]; if (m.k === 'end') UI.bump = {};
-  UI.busy = true; UI.sel = null;
+  UI.busy = true; UI.sel = null; UI.pre = null;
   if (m.k === 'place') { UI.chain = m.die === 'x' ? UI.chain + 1 : 1; } else if (m.k === 'end') UI.chain = 0;
   if (L.tabs && isHuman(s) && (m.k === 'take' || m.k === 'buy' || m.k === 'grab') && !(typeof GXT !== 'undefined' && GXT.running())) UI.tab = 'estate';
   try { if (UI.mode === 'tutorial' && typeof GXT !== 'undefined' && GXT.active() && isHuman(s)) { GXT.act({ type: 'event', what: m.k }); if (GXT.active()) GXT.act({ type: 'tap', what: 'do-' + m.k }); } } catch (e) { }
@@ -759,7 +759,7 @@ function doMove(m) {
         var z0 = FEEL.cam.z; if (L.tabs && (UI.autoZ || z0 <= 1.02)) UI.autoZ = 'anim';   /* an animation zoom is not a hand zoom: autoZoom may undo it */
         return (L.tabs ? camTo(ev.cell, Math.max(z0, 1.3)) : camTo(ev.cell)).then(function () { if (!src) src = rectOf('st-0'); return fly(src, rectOf(dst), ev.tile); }).then(function () { buzz(10); if (el) { el.style.visibility = ''; el.animate && el.animate([{ transform: 'translate(-50%,-50%) scale(1.25)' }, { transform: 'translate(-50%,-50%) scale(1)' }], { duration: animMs(260) || 1 }); } if (ev.chain && chainNow > 1) popAt(rectOf(dst), 'Chain of ' + chainNow); if (L.tabs && z0 <= 1.01) setTimeout(function () { if (!(FEEL.drag && FEEL.drag.on)) camReset(true); }, animMs(700)); });
       }
-      if (ev.e === 'score') { sfx('score'); var rr = ev.cell != null && ev.p === UI.view ? rectOf('ec-' + ev.cell) : rectOf('r-vp'); if (ev.p !== UI.view) { var pc = UI.peekCell && ev.cell != null ? UI.peekCell.getBoundingClientRect() : null, oc = document.querySelector('.och[data-seat="' + ev.p + '"]'); rr = pc || (oc && oc.getBoundingClientRect()); } var why = '+' + ev.n + ' ' + (WHY[ev.why] || 'points'); if (ev.why === 'region' && ev.cell != null && hints()) { var bz = VB.PHASE_BONUS[Math.min(4, G.phase)]; why += ' (' + (ev.n - bz) + ' size + ' + bz + ' early)'; } if (ev.why === 'region' && ev.cell != null) flashRegion(ev.cell, ev.p); popAt(rr, why); if (ev.p !== UI.view) setCap(G.seats[ev.p].name + ': ' + why); return Promise.all([flyPts(rr, scoreEl(ev.p), '+' + ev.n), wait(UI.quick ? 80 : animMs(ev.why === 'region' ? 900 : 550))]).then(function () { renderOpp(); }); }
+      if (ev.e === 'score') { sfx('score'); var rr = ev.cell != null && ev.p === UI.view ? rectOf('ec-' + ev.cell) : rectOf('r-vp'); if (ev.p !== UI.view) { var pc = UI.peekCell && ev.cell != null ? UI.peekCell.getBoundingClientRect() : null, oc = document.querySelector('.och[data-seat="' + ev.p + '"]'); rr = pc || (oc && oc.getBoundingClientRect()); } var why = '+' + ev.n + ' ' + (WHY[ev.why] || 'points'); if (ev.why === 'region' && ev.cell != null && hints()) { var bz = VB.PHASE_BONUS[Math.min(4, G.phase)]; why += ' (' + (ev.n - bz) + ' size + ' + bz + ' early)'; } if (ev.why === 'region' && ev.cell != null) flashRegion(ev.cell, ev.p); popAt(rr, ev.p !== UI.view ? G.seats[ev.p].name + ' ' + why : why); if (ev.p !== UI.view) setCap(G.seats[ev.p].name + ': ' + why); return Promise.all([flyPts(rr, scoreEl(ev.p), '+' + ev.n), wait(UI.quick ? 80 : animMs(ev.why === 'region' ? 900 : 550))]).then(function () { renderOpp(); }); }
       if (ev.e === 'sell') { sfx('sell'); return wait(animMs(200)); }
       if (ev.e === 'die') { return null; }
       if (ev.e === 'end') { sfx('end'); return null; }
@@ -777,7 +777,7 @@ function doMove(m) {
 function preSelect(m, s) {   /* F2: a tile you just took that fits right now is picked up for you: one tap on a glowing space builds it (tap it again to put it back) */
   if (!G || G.over || UI.mode === 'tutorial' || !isHuman(s) || VB.actor(G) !== s || pend() || UI.sel != null) return;
   if (m.k !== 'take' && m.k !== 'buy' && m.k !== 'grab') return;
-  var i = G.P[s].store.length - 1; if (i >= 0 && storeLegal(i)) { UI.sel = i; if (L.tabs) UI.tab = 'estate'; render(); }
+  var i = G.P[s].store.length - 1; if (i >= 0 && storeLegal(i)) { UI.sel = i; UI.pre = i; if (L.tabs) UI.tab = 'estate'; render(); }
 }
 function autoEnd(m, s) {   /* F2: both dice used and nothing else is legal (no back-lane buy, no free action): the turn ends by itself, one tap fewer */
   if (!G || G.over || m.k === 'end' || UI.mode === 'tutorial' || !isHuman(s) || VB.actor(G) !== s || pend()) return;

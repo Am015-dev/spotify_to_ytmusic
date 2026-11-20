@@ -37,7 +37,7 @@ var VB = (typeof VB !== 'undefined') ? VB : {};
     { id: 'k7',  name: "Mason's Rule",      e: 'place1',   text: 'Placing a tile: change the die by 1 for free.' },
     { id: 'k8',  name: 'Larder Plans',      e: 'store4',   text: 'Your storage holds 4 tiles instead of 3.' },
     { id: 'k9',  name: "Sly Wink",   e: 'black1',   text: 'The back-lane stall costs you 1 silver instead of 2.' },
-    { id: 'k10', name: 'Guild Charter', e: 'dupBld',   text: 'You may build the same kind of Building twice in one quarter.' },
+    { id: 'k10', name: 'Guild Charter', e: 'dupBld',   text: 'You may build the same kind of Building twice in one region.' },
     { id: 'k11', name: "Flock Psalter",e: 'pasVP',    text: 'When you place a Pasture, score 2 more points.' },
     { id: 'k12', name: 'Purse Strings',     e: 'wkSil',    text: 'When you take workers, also take 1 silver.' },
     { id: 'k13', name: "Dock Pact",   e: 'saleWk',   text: 'When you sell goods, also take 1 worker.' },
@@ -85,7 +85,7 @@ var VB = (typeof VB !== 'undefined') ? VB : {};
   };
   V.tileText = function (x) {
     if (!x) return '';
-    if (x.t === 'bld') return V.BLD[x.k].text + ' A quarter may not hold two of the same Building.';
+    if (x.t === 'bld') return V.BLD[x.k].text + ' A region may not hold two of the same Building.';
     if (x.t === 'know') return V.KNOWBY[x.k].text;
     if (x.t === 'pas') return V.PAS.text;
     return { castle: V.KEEP.text, mine: V.MINE.text, ship: V.SHIP.text }[x.t];
