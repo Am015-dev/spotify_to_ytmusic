@@ -54,7 +54,7 @@ function hlpWhy(v, mv) {
 // R82: never open with Fire Paste when there is no nigiri in this hand to land on it: take the next best dish by the same values
 function hlpSane(v, mv) {
   if (mv.pick.length !== 1 || tkey(mv.ids[0]) !== 'wasabi') return mv;
-  if (G.players[v].hand.some(i => NIG[tkey(i)]) && KK.tableCounts(G.players[v].table).wasabiUnused === 0) return mv;
+  if (G.players[v].hand.filter(i => NIG[tkey(i)]).length >= 2 && KK.tableCounts(G.players[v].table).wasabiUnused === 0) return mv;
   try { const cx = KK.AI._.makeCtx(G, v), cs = KK.AI._.candidates(cx).filter(x => !x.pair && x.keys[0] !== 'wasabi').sort((a, b) => b.v - a.v);
     const m = cs[0] && KK.moves(G, v).find(x => x.pick.join() === cs[0].pick.join()); if (m) return m; } catch (e) { }
   return mv;

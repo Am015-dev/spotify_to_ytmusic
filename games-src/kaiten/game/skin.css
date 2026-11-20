@@ -217,3 +217,5 @@ html.kktut #bulbbtn{display:none!important}
 .kktp li.me{color:#8c3b27}
 .kktp .kts{font-size:14px;opacity:.85}
 @media (max-height:620px){.gxt-bub.kkhasnext .gxh-tt{padding-right:84px!important}.gxt-bub.kkhasnext .gxh-tx{padding-right:92px!important}}
+#toast[data-race="1"]{top:calc(52px + env(safe-area-inset-top,0px));bottom:auto}
+html.ph.ph-p #belt{padding-bottom:10px}

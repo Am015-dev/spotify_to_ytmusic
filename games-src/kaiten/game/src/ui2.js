@@ -32,14 +32,14 @@ function kkRace() {
   const info = seatScoreInfo(tables()), parts = kkRaceLine(info);
   const sig = parts.join('|'); if (el.dataset.sig !== sig) { el.dataset.sig = sig; el.replaceChildren(...(parts.length ? parts.map(t => h('span', t)) : [h('span.kq', 'Rolls and custard: nobody has any yet')])); }
   el.classList.toggle('kq', !parts.length);
-  if (UI.rsOpen || (G.phase === 'pick' && G.turn >= G.hand)) { const t = $('#toast'); if (t && t.dataset.race) { t.classList.remove('on'); t.dataset.race = ''; } }
+  if (UI.rsOpen || (G.phase === 'pick' && G.turn >= G.hand)) { const t = $('#toast'); if (t && t.dataset.race) { t.classList.remove('on'); } }
   // why did my points move? only when the picture has settled (not mid-reveal) and a roll race flipped
   if (UI.fz || G.phase !== 'pick') return;
   const v = viewSeat(), R = UI.kkRace && UI.kkRace.g === G && UI.kkRace.round === G.round ? UI.kkRace : (UI.kkRace = { g: G, round: G.round, pts: null });
   const cur = info.rs[v].maki;
   if (R.pts != null && cur !== R.pts) {
     const top = G.players.map((p, s) => s).filter(s => s !== v).sort((a, b) => info.rs[b].icons - info.rs[a].icons)[0], d = cur - R.pts, mine = info.rs[v].icons, theirs = top == null ? 0 : info.rs[top].icons;
-    if (top != null && !UI.rsOpen && G.turn < G.hand) { $('#toast').dataset.race = '1'; clearTimeout(toast.t); } if (top != null && !UI.rsOpen && G.turn < G.hand) toast(d < 0 ? 'Roll race: ' + pname(top) + ' has ' + theirs + ' icons to your ' + mine + '. You −' + (-d) + '.' : 'Roll race: your ' + mine + ' icons now beat ' + pname(top) + '\'s ' + theirs + '. You +' + d + '.');
+    if (top != null && !UI.rsOpen && G.turn < G.hand) { $('#toast').dataset.race = '1'; } if (top != null && !UI.rsOpen && G.turn < G.hand) toast(d < 0 ? 'Roll race: ' + pname(top) + ' has ' + theirs + ' icons to your ' + mine + '. You −' + (-d) + '.' : 'Roll race: your ' + mine + ' icons now beat ' + pname(top) + '\'s ' + theirs + '. You +' + d + '.');
   }
   R.pts = cur;
 }
