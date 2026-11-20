@@ -88,7 +88,7 @@
       "intro": [
         {
           "who": "brix",
-          "text": "Welcome to the crew, rookie. Today we only practise on blue wires, one to six."
+          "text": "Welcome to the crew, rookie. Today we only practise on blue wires, one to seven."
         },
         {
           "who": "brix",
@@ -126,7 +126,7 @@
       "goal": {
         "type": "mission",
         "value": 1,
-        "text": "Clear Job 1 (Boot Camp I): cut every wire before the fuse burns down."
+        "text": "Clear Job 1 (First Snip): cut every wire before the fuse burns down."
       },
       "hints": true,
       "stars": [
@@ -183,13 +183,13 @@
         },
         {
           "who": "tally",
-          "text": "There are only two of them in the rig. Find their owners before you name yellow."
+          "text": "There are four of them in the rig. Find their owners before you name yellow."
         }
       ],
       "outro": [
         {
           "who": "tally",
-          "text": "Two yellows, two clean cuts. I wrote that down twice for luck."
+          "text": "Four yellows, all clean. I wrote that down twice for luck."
         }
       ],
       "opponent": {
@@ -213,7 +213,7 @@
       "goal": {
         "type": "mission",
         "value": 2,
-        "text": "Clear Job 2 (Boot Camp II): cut every wire, including both yellows."
+        "text": "Clear Job 2 (Yellow Tape): cut every wire, including all four yellows."
       },
       "hints": true,
       "stars": [
@@ -308,7 +308,7 @@
       "goal": {
         "type": "mission",
         "value": 3,
-        "text": "Clear Job 3 (Boot Camp III) without ever pointing at the red wire."
+        "text": "Clear Job 3 (The Red Lead) without ever pointing at the red wire."
       },
       "hints": true,
       "stars": [
@@ -407,7 +407,7 @@
       "goal": {
         "type": "mission",
         "value": 8,
-        "text": "Clear Job 8 (Graduation): all 48 blues plus the red and yellow candidates."
+        "text": "Clear Job 8 (Pier Exam): all 48 blues plus the red and yellow candidates."
       },
       "hints": true,
       "stars": [
@@ -494,7 +494,7 @@
         "taunt": "The painted device wins. Quill's brass key glints. 'Do try again.'"
       },
       "setup": {
-        "mission": 11,
+        "mission": 9,
         "players": 3,
         "level": "normal",
         "seed": null
@@ -502,8 +502,8 @@
       "twist": null,
       "goal": {
         "type": "mission",
-        "value": 11,
-        "text": "Clear Job 11 (Colourblind): never cut one of the four painted wires early."
+        "value": 9,
+        "text": "Clear Job 9 (Paint Shop): never cut one of the four painted wires early."
       },
       "hints": false,
       "stars": [
@@ -589,7 +589,7 @@
         "taunt": "Someone's tokens fooled you. Quill sends a postcard: 'Trust, but count.'"
       },
       "setup": {
-        "mission": 17,
+        "mission": 14,
         "players": 3,
         "level": "normal",
         "seed": null
@@ -597,8 +597,8 @@
       "twist": null,
       "goal": {
         "type": "mission",
-        "value": 17,
-        "text": "Clear Job 17 (Fibber): read the fibber's false tokens as 'not this value'."
+        "value": 14,
+        "text": "Clear Job 14 (Two-Faced Gardener): read the fibber's false tokens as 'not this value'."
       },
       "hints": false,
       "stars": [
@@ -684,7 +684,7 @@
         "praise": "Found the Weak Link. Quill sighs: 'Fine. I will find a better one.'"
       },
       "setup": {
-        "mission": 34,
+        "mission": 41,
         "players": 3,
         "level": "normal",
         "seed": null
@@ -696,8 +696,8 @@
       },
       "goal": {
         "type": "mission",
-        "value": 34,
-        "text": "Clear Job 34 (Mole Hunt): defuse the device while the weak link hides among you."
+        "value": 41,
+        "text": "Clear Job 41 (Inside Job): defuse the device while the weak link hides among you."
       },
       "hints": false,
       "stars": [
@@ -784,7 +784,7 @@
         "taunt": "The tower bell tolls on your fuse. Quill claps once. 'Again.'"
       },
       "setup": {
-        "mission": 46,
+        "mission": 19,
         "players": 3,
         "level": "normal",
         "seed": null
@@ -792,8 +792,8 @@
       "twist": null,
       "goal": {
         "type": "mission",
-        "value": 46,
-        "text": "Clear Job 46 (Lucky Sevens): cut every other wire, then all four 7s together."
+        "value": 19,
+        "text": "Clear Job 19 (Seven Bells): cut every other wire, then all four 7s together."
       },
       "hints": false,
       "stars": [
@@ -879,7 +879,7 @@
         "taunt": "The blind spot got you. Quill: 'Everyone has one.'"
       },
       "setup": {
-        "mission": 38,
+        "mission": 18,
         "players": 3,
         "level": "normal",
         "seed": null
@@ -887,8 +887,8 @@
       "twist": null,
       "goal": {
         "type": "mission",
-        "value": 38,
-        "text": "Clear Job 38 (Blind Spot): the foreman cuts the wire they cannot see."
+        "value": 18,
+        "text": "Clear Job 18 (Back to Front): the foreman cuts the wire they cannot see."
       },
       "hints": false,
       "stars": [
@@ -982,7 +982,7 @@
         "praise": "The masterpiece is silent. Quill removes his hat. You win, together."
       },
       "setup": {
-        "mission": 57,
+        "mission": 51,
         "players": 5,
         "level": "normal",
         "seed": null
@@ -994,8 +994,8 @@
       },
       "goal": {
         "type": "mission",
-        "value": 57,
-        "text": "Clear Job 57 (Self-Destruct) with a fuse 1 step shorter than usual."
+        "value": 51,
+        "text": "Clear Job 51 (Domino Rules) with a fuse 1 step shorter than usual."
       },
       "hints": false,
       "stars": [

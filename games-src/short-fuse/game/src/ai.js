@@ -13,7 +13,11 @@
 //   (49), who can still play after the hand-over (65), solo cuts kept in reserve (26, 47, 65), robot brakes kept (53), flipped wires taken
 //   off a crewmate before they must gamble (64), one-shot probes saved for worse turns, the Blast Blanket kept for forced gambles, opening tokens
 //   where the table cannot tell the value, public sure cuts left for crewmates, a small bonus for informative targets; 200 samples.
-const AILV={easy:{S:16,noise:.6,tools:.3,think:0,forget:1,sloppy:.9,ch:1},normal:{S:160,noise:0,tools:1,think:2,ch:2,info:.12},hard:{S:200,noise:0,tools:1,think:2,ch:1,info:.12}};
+const AILV={easy:{S:16,noise:.6,tools:.3,think:0,forget:1,sloppy:.9,ch:1},normal:{S:160,noise:0,tools:1,think:2,ch:2,info:.12},hard:{S:200,noise:0,tools:1,think:2,ch:1,info:.12},
+ // Normal with a person at the table: the computer crew thinks less far ahead, now and then misjudges a cut, and leaves the person's own
+ // wires for them, so the person carries real weight and feels the fuse (tester: "the computer crew does most of the work")
+ crew:{S:60,noise:.25,tools:1,think:1,ch:2,leave:.9}};
+const aiLevel=K=>{const lv=K.seats[K.seat].lv;if(lv==='normal'&&!K.seats[K.seat].human&&K.seats.some(q=>q.human))return AILV.crew;return AILV[lv]||AILV.normal};
 let AISALT=12345,AICHAINS=0;function setAiSeed(s){AISALT=s>>>0}function setAiChains(n){AICHAINS=n}
 function mkRng(seed){let a=seed>>>0;return ()=>{a=(a+0x6D2B79F5)|0;let t=Math.imul(a^a>>>15,a|1);t^=t+Math.imul(t^t>>>7,t|61);return ((t^t>>>14)>>>0)/4294967296}}
 function kHash(K){let h=AISALT^(K.seat*2654435761);const mix=x=>{h=Math.imul(h^x,2246822519)>>>0;h^=h>>>13};mix(K.turn);mix(K.hist.length);mix(K.ann.length);mix(K.q?K.q.opts?K.q.opts.length:1:0);mix(K.legal?K.legal.plain.length:0);mix(Math.round(K.clock));return h>>>0}
@@ -216,7 +220,7 @@ function bunkerUrgency(K){const b=K.ms.bunker;if(!b||!b.goal||b.goal==='finish'|
   const T=Math.ceil((b.ends-K.clock)/Math.max(1,tpt));const need=bkDist(K,b.r,b.c)+(BUNKER.action[b.goal]?1:0);const slack=T-need;return slack<=0?2.6:slack===1?2:slack===2?1.4:1}
 // ---------- decisions ----------
 function aiMove(seat){const K=knowledge(seat);return decide(K)}
-function decide(K){const rnd=mkRng(kHash(K));const L=AILV[K.seats[K.seat].lv]||AILV.normal;
+function decide(K){const rnd=mkRng(kHash(K));const L=aiLevel(K);
   if(K.q&&K.q.who===K.seat)return {a:'q',i:aiAnswer(K,rnd,L)};
   if(!K.legal)return offTurn(K,rnd,L);
   return mainDecision(K,rnd,L)}
@@ -252,7 +256,8 @@ function mainDecision(K,rnd,L){const lg2=K.legal;const held=heldCounts(K);const 
     let fx=extra?(L.think>=1?stepCost(K):.8):0;
     // ...but a crewmate left with nothing but flipped wires must gamble on them (a wrong guess explodes): take one off them first
     if(extra&&L.think>=2){const q=K.stands[m.st].owner;let nf=0;for(const st of K.stands)if(st.owner===q)for(const x of st.slots)if(!x.cut&&!x.flip)nf++;if(nf===0)fx-=2.5*sc1;else if(nf===1)fx-=1.1*sc1}
-    const ev=p*(1+bonusFor(K,m.v))-(1-p-pr)*(missCost(K,extra)-.25)-pr*rcst-fx+noisy(L,rnd);cand.push({m,ev,p,why:`${Math.round(p*100)}% that this wire is ${VN(m.v)}`})}
+    const lv2=L.leave&&K.seats[K.stands[m.st].owner]&&K.seats[K.stands[m.st].owner].human?L.leave:0;
+    const ev=p*(1+bonusFor(K,m.v))-(1-p-pr)*(missCost(K,extra)-.25)-pr*rcst-fx-lv2+noisy(L,rnd);cand.push({m,ev,p,why:`${Math.round(p*100)}% that this wire is ${VN(m.v)}`})}
   // own flipped wires (38, 56, 64): a wrong guess explodes, so a "certain" guess is checked for a counter-example deal first
   const flipSure=m=>{for(const st of K.stands)if(st.mine)for(let k=0;k<st.slots.length;k++){const x=st.slots[k];if(x.flip&&!x.cut&&x.u===m.fu)return L.think<1||certainCheck(K,st.i,k,CODE(m.v),rnd,L)}return false};
   for(const m of lg2.solo.filter(x=>x.flip)){let p=pFlipOwn(K,Z,m);if(p>.985&&!flipSure(m))p=.5;cand.push({m,ev:p*2-(1-p)*BOOM,p,why:`your flipped wire is ${VN(m.v)} with ${Math.round(p*100)}%`})}
