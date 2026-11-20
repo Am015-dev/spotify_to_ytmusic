@@ -1,8 +1,9 @@
 // ---------- computer players ----------
-// easy: random legal placement with a bias toward points; normal: greedy value of placement + follower incl. completion odds;
+// easy / medium: the normal reckoning, but it often settles for one of its top few spots and sometimes keeps a follower back
+// (a real rival that closes its own roads and towns, yet leaves chances); normal: greedy value of placement + follower incl. completion odds;
 // hard: adds field/majority weighting and a one-ply look at the tiles still in the bag (can each open side still be filled?).
-let AIPLAN=null;var EASYK={good:25,drop:50,claim:30,keep:2};var HARDK={a:2,b:4,f:0,top:3,types:6,w:.6,cap:36};
-const LVL={easy:{opp:.3,slots:false},normal:{opp:.8,slots:false},hard:{opp:.9,slots:true}};
+let AIPLAN=null;var EASYK={easy:{best:30,k:6,drop:30,keep:2,farm:0},medium:{best:45,k:4,drop:20,keep:1,farm:1}};var HARDK={a:2,b:4,f:0,top:3,types:6,w:.6,cap:36};
+const LVL={easy:{opp:.2,slots:false},medium:{opp:.5,slots:false},normal:{opp:.8,slots:false},hard:{opp:.9,slots:true}};
 function lvOf(s){return LVL[P(s).lv]?P(s).lv:'normal'}
 // ---- what is still in the bag (public: anyone can count the tiles) ----
 let FITC={key:'',m:{}};
@@ -68,12 +69,10 @@ function aiPlan(s,lvIn){const lv=lvIn||lvOf(s),t=G.cur.t,places=legalPlacements(
     let bf=null,bfv=0;for(const op of figOptionsFromProbe(pr,s)){const d=descGroup(op.g,pr,lv,virt);const v=figValue(op.k,d,op.g.figs,s,lv);if(v>bfv){bfv=v;bf=op}}
     const tot=pv.v+bonus+bfv;const c={q,v:tot,pv,bf,bfv,bonus,pr};all.push(c);if(!best||tot>best.v)best=c}
   if(lv==='hard'&&all.length>1&&tilesLeft()>1)best=lookAhead(s,all)||best;
-  if(lv==='easy'&&all.length){// mostly random, nudged toward points
-    // a beatable first rival: mostly a random spot, one claim now and then, never a farmer
-    const r=rnd(100);if(r<EASYK.good){all.sort((a,b)=>b.pv.dl[s]-a.pv.dl[s]);best=all[rnd(Math.min(4,all.length))]}else best=all[rnd(all.length)];
-    if(best.bf&&(best.bf.g.ty==='F'||rnd(100)<EASYK.drop))best.bf=null;
-    if(!best.bf&&rnd(100)<EASYK.claim){const ops=figOptionsFromProbe(best.pr,s).filter(o=>o.k==='f'&&o.g.ty!=='F');if(ops.length)best.bf=ops[rnd(ops.length)]}
-    if(best.bf&&P(s).sup.f<=EASYK.keep)best.bf=null}
+  const K=EASYK[lv];if(K&&all.length>1){// a beatable rival: the best spot some of the time, else one of its top few
+    all.sort((a,b)=>b.v-a.v);if(rnd(100)>=K.best)best=all[rnd(Math.min(K.k,all.length))];
+    if(best.bf&&best.bf.g.ty==='F'&&!K.farm)best.bf=null;
+    if(best.bf&&!best.bf.g.done&&(rnd(100)<K.drop||P(s).sup.f<=K.keep))best.bf=null}
   const place={act:'place',x:best.q.x,y:best.q.y,r:best.q.r};const fig=best.bf?{act:'fig',k:best.bf.k,l:best.bf.l}:{act:'skip'};
   return {place,fig,why:best.pv.why,bonus:best.bonus,figOpt:best.bf,v:best.v,pr:best.pr}}
 // hard: one ply ahead. For the best few plans, play them on a copy of the state and ask what the next rival could
@@ -103,7 +102,7 @@ function adviceText(plan,s){const bits=[];const nm=i=>P(i).nm;
     else if(w.k==='priory')bits.push('surrounds your priory for 9 points')}
   if(plan.bonus)bits.push('your mason earns an extra turn');
   const f=plan.figOpt;if(f){const g=f.g;const role=f.k==='f'?ROLE[g.ty]:FIGN[f.k];
-    if(f.k==='bld')bits.push(`puts your mason on the ${FEAT[g.ty]}: each later tile that extends it gives you an extra turn`);
+    if(f.k==='bld')bits.push(`puts your mason on the ${FEAT[g.ty]}: when you add a tile to it later, you take one extra turn`);
     else if(f.k==='pig')bits.push('puts your hog with your farmer: +1 per finished town at the end');
     else{const d=descGroup(g,plan.pr,'normal');const w=Math.round(worth(d,'normal'));
       bits.push(g.done?`scores at once with a ${role} (${w} points) and gets it back`:g.ty==='F'?`sends a farmer into the field (it pays 3 per finished town beside it at the end)`:`sets a ${role} on the ${FEAT[g.ty]} (about ${w} points once it is finished)`)}}

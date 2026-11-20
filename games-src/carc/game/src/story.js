@@ -18,18 +18,18 @@ const STORY={
     place2:{ch:2,who:'guide',title:'Close the road',say:'Close your road. Followers go only on the tile just laid.'},
     fig_priory:{ch:2,who:'guide',title:'Claim the priory',say:'Claim the priory. Eight tiles around it score 9.'},
     road_done:{ch:2,who:'guide',title:'Road finished',say:'Finished road: 1 point per tile. Tap the lit tiles.'},
-    place3:{ch:2,who:'guide',title:'Build a town',say:'Town meets town. Tap the square to close the town.'},
-    fig_town:{ch:2,who:'guide',title:'Claim the town',say:'Claim the town before it closes.'},
-    town_done:{ch:2,who:'guide',title:'Town finished',say:'Finished town: 2 points per tile. Tap the lit tiles.'},
+    place3:{ch:2,who:'guide',title:'Build a town',say:'Town meets town. Tap the glowing square to grow the town.'},
+    fig_town:{ch:2,who:'guide',title:'Claim the town',say:'Claim the open town now. Whoever closes it, you score.'},
+    town_done:{ch:2,who:'guide',title:'Town finished',say:'Hob closed your town. It still scores for you. Tap it.'},
     place4:{ch:3,who:'guide',title:'Fill the ring',say:'A priory needs all eight neighbours. Lay the fourth.'},
     fig_farmer:{ch:3,who:'guide',title:'Send a farmer',say:'A follower in a field is a farmer. It never comes home.'},
     place5:{ch:3,who:'guide',title:'Keep building',say:'Lay this tile. No follower needed this time.'},
     place6:{ch:3,who:'guide',title:'The last tile',say:'This tile closes the ring around your priory.'},
     skip:{ch:3,who:'guide',title:'Keep your follower',say:'Nothing to claim here. Tap Skip to keep your follower.'},
     priory_done:{ch:4,who:'guide',title:'Priory scored',say:'Eight neighbours: the priory scores 9. Follower comes home.'},
-    final:{ch:4,who:'guide',title:'Final scoring',say:'Last tile! Open things: 1 per tile. Farmers: 3 per finished town.'},
+    final:{ch:4,who:'guide',title:'Final scoring',say:'Open things: 1 per tile and banner. Farmers: 3 per finished town.'},
     claimed:{ch:1,who:'guide',title:'One owner',say:'A claimed road or town takes no second follower. Tap the tile.'},
-    pennant:{ch:2,who:'guide',title:'Banners',say:'Each banner in a finished town adds 2 points. Tap the tiles.'},
+    pennant:{ch:2,who:'guide',title:'Banners',say:'A banner adds 2. Three tiles plus one banner: 8. Tap it.'},
     majority:{ch:3,who:'guide',title:'Most followers',say:'Most followers on a road or town scores it. Tap the tiles.'},
     tie:{ch:3,who:'guide',title:'Ties',say:'Tied for most followers? Both score in full. Tap the tiles.'},
     discard:{ch:3,who:'guide',title:'No fit',say:'A tile that fits nowhere is swapped for a new one.'},
@@ -63,14 +63,14 @@ STORY.coach={
   rate_good:{who:'guide',t:'Good move! It was the best score on the board.'},
   rate_okay:{who:'guide',t:'Okay. A better spot was open. Tap the scores above to see which.'},
   rate_poor:{who:'guide',t:'Not your best. A much better spot was open. Compare the tags on the squares.'},
-  last:{who:'guide',t:'Last tiles! After the final tile, the game ends. Unfinished roads and towns score 1 per tile.'}
+  last:{who:'guide',t:'Last tiles! After the final tile, the game ends. Unfinished roads score 1 per tile, towns 1 per tile and banner.'}
 };
 STORY.coachEnd={
   road:c=>`Roads: ${c.a} during play, ${c.b} at the end, ${c.a+c.b} in all. 1 point per tile.`,
-  town:c=>`Towns: ${c.a} during play, ${c.b} at the end, ${c.a+c.b} in all. 2 per tile if finished, 1 if not.`,
+  town:c=>`Towns: ${c.a} during play, ${c.b} at the end, ${c.a+c.b} in all. 2 per tile and banner if finished, 1 if not.`,
   priory:c=>`Priories: ${c.a} during play, ${c.b} at the end, ${c.a+c.b} in all. 9 with 8 neighbours, else 1 plus 1 per neighbour.`,
   field:c=>`Fields: ${c.b} from farmers. 3 for each finished town beside their field.`,
   total:c=>c.win?`You ${c.me}, Hob ${c.hob}. You win the deeds!`:c.tie?`You ${c.me}, Hob ${c.hob}. A tie!`:`You ${c.me}, Hob ${c.hob}. Hob wins this time. Play again?`,
   later:'Rules to learn later'
 };
-STORY.coachLater={river:'River: each tile must continue the river.',inns:'Taverns: a finished tavern road scores double.',goods:'Merchants: the most of each good scores 10.',tie:'Ties: equal followers both score in full.',majority:'Most followers takes the points.',discard:'A tile that fits nowhere is swapped.',banner:'Each banner adds 2 to a finished town.',score_road:'A finished road scores 1 per tile.',score_town:'A finished town scores 2 per tile.',score_priory:'A priory with 8 neighbours scores 9.'};
+STORY.coachLater={river:'River: each tile must continue the river.',inns:'Taverns: a finished tavern road scores 2 per tile, an open one 0. A basilica town scores 3 per tile and banner, an open one 0.',goods:'Merchants: the most of each good scores 10.',tie:'Ties: equal followers both score in full.',majority:'Most followers takes the points.',discard:'A tile that fits nowhere is swapped.',banner:'Each banner adds 2 to a finished town.',score_road:'A finished road scores 1 per tile.',score_town:'A finished town scores 2 per tile.',score_priory:'A priory with 8 neighbours scores 9.'};

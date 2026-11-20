@@ -64,7 +64,8 @@ const PROBE = () => {
   // portrait: board >= 55% of the screen
   if (innerHeight > innerWidth) { const a = Math.round(100 * bd.width * bd.height / (innerWidth * innerHeight)); out.board = a; if (a < 55) out.bad.push('board only ' + a + '%'); }
   // wordy text anywhere (play screen)
-  if (!document.querySelector('#modal .scrim') && !document.querySelector('.gxc')) for (const e of document.querySelectorAll('#app *')) { if (!e.children.length && e.textContent.trim().split(/\s+/).length > 8) out.bad.push('wordy: ' + e.textContent.trim().slice(0, 40)); }
+  if (!document.querySelector('#modal .scrim') && !document.querySelector('.gxc')) for (const e of document.querySelectorAll('#app *')) { if (e.closest('#srlive')) continue;   // the screen-reader live line is never drawn
+    if (!e.children.length && e.textContent.trim().split(/\s+/).length > 8) out.bad.push('wordy: ' + e.textContent.trim().slice(0, 40)); }
   return out;
 };
 async function probe(p) { return p.evaluate(PROBE); }

@@ -83,7 +83,7 @@ function startTurn(p,bonus){if(G.over)return;let t;
   while(true){t=drawNext();if(t==null){finish();return}
     if(legalPlacements(t).length)break;
     if(isRiver(t)&&G.rstack.length&&G.rstack.some(x=>x!==t)){G.rstack.push(t);lg(`The river tile “${TT[t].n}” fits nowhere yet. It goes back in the river pile.`);continue}
-    G.disc.push(t);G.stats.discards++;lg(`“${TT[t].n}” fits nowhere. It is set aside and you draw again.`,'bad');fx('discard')}
+    G.disc.push(t);G.stats.discards++;lg(`“${TT[t].n}” fits nowhere. It is set aside and ${P(p).nm} draws again.`,'bad');fx('discard')}
   G.turn++;G.cur={p,t,bonus:!!bonus,k:null,bonusEarned:false,figPlaced:null,scored:[]};G.step='place';
   if(!G.halfway&&tilesLeft()<=Math.floor(G.total/2)){G.halfway=true;storyBeat('half')}
   lg(`${P(p).nm} draws “${TT[t].n}”${bonus?' (extra turn)':''}.`,'turn');fx('turn',p)}

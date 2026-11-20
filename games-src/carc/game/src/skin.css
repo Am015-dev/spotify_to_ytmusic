@@ -146,7 +146,7 @@ body:has(#menu) #status{visibility:hidden}
 .glow{position:absolute}
 .glow .pvb{position:absolute;left:50%;top:4px;transform:translateX(-50%);z-index:2;background:#281b12;color:#fff3dc;border:2px solid #ffd24a;border-radius:9px;padding:2px 7px;font:800 14px/1.1 var(--ff);white-space:nowrap;pointer-events:none}
 .glow .pvb.good{background:#1f4a14;border-color:#9be07a}.glow .pvb.bad{background:#6b1d12;border-color:#ff9a7a}
-#world .pvhl{outline:4px solid #ffd24a;outline-offset:-4px;box-shadow:0 0 0 3px #281b12,0 0 18px #ffd24a;z-index:3;animation:pulse 1s ease-in-out infinite}
+#world .pvhl{outline:4px solid #ffd24a;outline-offset:-4px;box-shadow:0 0 0 3px #281b12,0 0 18px #ffd24a;z-index:3;animation:pulse 1s ease-in-out 3}
 #sheet{flex:0 0 auto;background:#281b12;color:#fff3dc;padding:4px 10px 5px;border-bottom:2px solid var(--gold,#b5883a);font:600 14px/1.3 var(--ff)}
 #sheet .srow{display:flex;gap:4px 10px;flex-wrap:wrap;justify-content:space-between}
 #sheet .sc{display:inline-flex;align-items:baseline;gap:4px;white-space:nowrap}#sheet .sc i{font-style:normal;color:#ffe2a6;font-weight:700}
@@ -161,7 +161,7 @@ body:has(#menu) #status{visibility:hidden}
 .glow .pvb.off,.fglow .flab.off{display:none}
 .glow.sel svg{opacity:.95}
 .glow.sel::after{border-color:#fff;box-shadow:0 0 0 calc(3px/var(--sc,1)) #ffd24a,0 0 calc(16px/var(--sc,1)) #ffd24a;animation:none}
-.fglow{animation:fpulse 1.2s ease-in-out infinite}
+.fglow{animation:fpulse 1.2s ease-in-out 3}
 @keyframes fpulse{50%{box-shadow:0 0 4px #ffd24a}}
 .fglow .flab{background:#281b12;font-size:14px;z-index:3}
 .fglow .flab[data-pos=t]{top:auto;bottom:100%;transform:translate(-50%,-4px)}
@@ -205,7 +205,7 @@ html.sk #top #left,html.sk #top #left b{font-size:14px!important}
 #status .rc{display:block;margin-top:4px;padding-top:4px;border-top:1px solid rgba(255,226,166,.28);font-size:14px;line-height:1.25;color:#f0d9b0;background:#281b12}
 @media(min-width:1024px){#status .rc{font-size:16px}}
 .glow svg{opacity:.66}
-.glow::after{border-width:calc(4px/var(--sc));box-shadow:0 0 calc(14px/var(--sc)) #ffd24a,inset 0 0 calc(18px/var(--sc)) rgba(255,210,74,.45);animation:pulse2 1.4s ease-in-out infinite}
+.glow::after{border-width:calc(4px/var(--sc));box-shadow:0 0 calc(14px/var(--sc)) #ffd24a,inset 0 0 calc(18px/var(--sc)) rgba(255,210,74,.45);animation:pulse2 1.4s ease-in-out 3}
 @keyframes pulse2{50%{opacity:.6}}
 @media(prefers-reduced-motion:reduce){.glow::after{animation:none}}
 #goal .gwin{font:800 18px/1.3 var(--ff-h,var(--ff));color:#2a1608;margin:0 0 10px}
@@ -355,3 +355,8 @@ body:has(#endplate) #hand #hinfo{visibility:hidden}
 .gedge b{color:#ffd24a;font-size:14px}
 .gedge[hidden]{display:none}
 body:has(#modal .scrim) .gedges{display:none}
+/* F1: at phone width the seats never run under the tile count: the count drops its "tiles" word (the tile icon says it), gaps tighten */
+@media(max-width:420px){html.sk #left .lt small{display:none!important}}
+/* F1: the story line fades in from 40%, never from nothing, so it is readable (and checkable) from its first frame */
+@keyframes rv-scin{from{opacity:.4;transform:translateY(6px)}to{opacity:1;transform:none}}
+.gxc-scene .gxc-sc-text.in{animation:rv-scin .3s ease-out}

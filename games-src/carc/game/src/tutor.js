@@ -9,14 +9,15 @@
 //   or skip the follower ................... skip (and place5, where the skip is done for you)
 //   one owner only per road/town/field ..... computer
 //   what the computer does ................. computer
-//   finished road scores, follower goes home  road_done      finished town scores 2 a tile ... town_done
+//   finished road scores, follower goes home  road_done      finished town scores 2 a tile ... town_done (closed by the rival: it still scores for you)
+//   each banner adds 2 to a finished town .. pennant (the town tile of turn 5 carries a banner)
 //   priory ringed by eight tiles scores 9 .. place4, place5, place6, priory_done
 //   end: open features score 1 a tile, farmers 3 per finished town, most points wins ... final, winner
 //   seven followers ........................ fig_road        River, Taverns, Merchants .... end card (the lightbulb explains them)
 const TUT_GAME='rampart-and-vine';
 // turn n: [tile, x, y, rotation, follower {ty, side?} or null]
 const TUT_TURNS=[
- [29,1,0,0,{ty:'R'}],[28,1,1,3,{ty:'R',side:1}],[1,-1,0,3,{ty:'M'}],[31,2,1,0,null],[21,0,-1,2,{ty:'C'}],[21,-1,-1,0,null],
+ [29,1,0,0,{ty:'R'}],[28,1,1,3,{ty:'R',side:1}],[1,-1,0,3,{ty:'M'}],[31,2,1,0,null],[11,0,-1,3,{ty:'C'}],[21,-1,-1,1,null],
  [21,-2,-1,0,{ty:'F'}],[29,-2,0,0,null],[29,-2,1,1,null],[9,-1,1,2,null],[21,0,1,3,null]];
 const tutOn=()=>typeof GXT!=='undefined'&&GXT.active()&&!!UI.tut;
 const tutFirst=()=>{try{return !!UI.first&&!(typeof GXT!=='undefined'&&GXT.status(TUT_GAME).seen)}catch(e){return false}};
@@ -85,11 +86,10 @@ function tutSteps0(){
  {id:'fig_priory',title:'Claim the priory',say:'A priory scores 9 when eight tiles surround it. Tap the circle to claim it.',target:tutFig(3),wait:figW(3),ready:()=>tutP(3,'fig')},
  {id:'road_done',title:'Road finished',say:'A finished road scores 1 point per tile: 4 for you. Your follower comes home.',target:tutCellsFn(['0,0','1,0','1,1','-1,0']),wait:tileW,
    onEnter:()=>{hold();tOn()},onDone:()=>{tOff();release()},hold:true,ready:()=>tutAfter(4,4)},
- {id:'place3',title:'Make a town',say:'Town meets town. This edge closes the town above. Tap the glowing square.',target:tutGlow(5),wait:placeW(5),ready:()=>tutP(5,'place')&&tutRot(2)},
- {id:'fig_town',title:'Claim the town',say:'Claim it before it closes. A finished town scores 2 per tile.',target:tutFig(5),wait:figW(5),ready:()=>tutP(5,'fig')},
- {id:'town_done',title:'Town finished',say:'',target:tutCellsFn(['0,0','0,-1']),wait:tileW,
-   onEnter:()=>{hold();tOn()},onDone:tOff,hold:true,ready:()=>tutAfter(6,8)},
- {id:'pennant',title:'Banners',say:'',target:tutCellsFn(['0,0','0,-1']),wait:tileW,onEnter:tOn,onDone:()=>{tOff();release()},hold:true,ready:()=>tutAfter(6,8)},
+ {id:'place3',title:'Make a town',say:'Town meets town. This tile grows the town above. Tap the glowing square.',target:tutGlow(5),wait:placeW(5),ready:()=>tutP(5,'place')&&tutRot(3)},
+ {id:'fig_town',title:'Claim the town',say:'Claim the town while it is open. A finished town scores 2 per tile.',target:tutFig(5),wait:figW(5),ready:()=>tutP(5,'fig')},
+ {id:'town_done',title:'Town finished',say:'',target:tutCellsFn(['0,0','0,-1','-1,-1']),wait:tileW,onEnter:tOn,onDone:tOff,ready:()=>tutP(7,'place')&&P(0).score===12},
+ {id:'pennant',title:'Banners',say:'',target:tutCellsFn(['0,-1']),wait:tileW,onEnter:tOn,onDone:tOff,ready:()=>tutP(7,'place')&&P(0).score===12},
  {id:'place4',title:'Fill the ring',say:'A priory needs all eight neighbours. This is the fourth. Tap the glowing square.',target:tutGlow(7),wait:placeW(7),ready:()=>tutP(7,'place')&&tutRot(0)},
  {id:'fig_farmer',title:'Send a farmer',say:'A follower in a field is a farmer. At game end it scores 3 per finished town beside it.',target:tutFig(7),wait:figW(7),ready:()=>tutP(7,'fig')},
  {id:'majority',title:'Most followers',say:'',target:tutCellsFn(['0,0','1,0','1,1']),wait:tileW,onEnter:()=>{tOn();tutDemo([['0,0',0],['1,0',0],['1,1',1]],'You 2, Hob 1: only you score')},onDone:()=>{tOff();tutDemoOff()},ready:()=>tutP(9,'place')},
@@ -99,7 +99,7 @@ function tutSteps0(){
  {id:'place6',title:'The last tile',say:'This completes the ring around your priory. Tap the glowing square.',target:tutGlow(11),wait:placeW(11),ready:()=>tutP(11,'place')&&tutRot(3)},
  {id:'skip',title:'Or skip',say:'Nothing to claim here. Tap Skip to end your turn.',target:()=>document.querySelector('#hskip'),wait:{type:'tap',match:a=>a.what==='skip'},ready:()=>tutP(11,'fig')},
  {id:'priory_done',title:'Priory scored',say:'Eight tiles around it: 9 points! Your follower comes home.',target:tutCellsFn(RING),wait:null,onEnter:()=>{UI.user=false;refit(true)},ready:()=>!!G&&G.over&&P(0).sc.priory===9},
- {id:'final',title:'Final scoring',say:'Valley full! Your farmer scores 3 for the finished town. Unfinished roads and towns score 1 per tile.',target:tutCellsFn(['-2,-1']),also:tutCellsFn(['0,-1']),wait:null,
+ {id:'final',title:'Final scoring',say:'Valley full! Your farmer scores 3 for the finished town. Open roads score 1 per tile, open towns 1 per tile and banner.',target:tutCellsFn(['-2,-1']),also:tutCellsFn(['0,-1']),wait:null,
    onEnter:()=>tutFinalPops(),ready:()=>!!G&&G.over},
  {id:'winner',title:'Most points wins',say:()=>(P(0).score>=P(1).score?'You win ':'Hob wins ')+Math.max(P(0).score,P(1).score)+' to '+Math.min(P(0).score,P(1).score)+'. Most points wins!',target:()=>UI.tl['0,0'],wait:null,wrong:'Tap Finish.',ready:()=>!!G&&G.over}
   ]}

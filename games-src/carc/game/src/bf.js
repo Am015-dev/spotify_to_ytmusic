@@ -2,7 +2,7 @@
 const $=s=>document.querySelector(s);
 const esc=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const PCOL=['#c8372d','#2d62b8','#e2ae22','#3b8a45','#34323b','#a064c0'];
-const MINC=30,MAXC=118;// cell size in screen pixels
+const MINC=44,MAXC=118;// cell size in screen pixels (44: a glow is always a full finger target)
 const FIGICON={f:'meeple',big:'champ',bld:'mason',pig:'hog'};
 AIDELAY=Math.max(AIDELAY,950);   // rival steps are shown one at a time with a caption; tap the board to speed up
 Object.assign(UI,{rot:0,deg:0,turn:-1,stepKey:'',user:false,hint:null,aiT:0,tl:{},mp:{},fxSeen:0,view:{s:.4,x:0,y:0},camp:null,first:false,moved:false,
@@ -11,7 +11,7 @@ try{UI.first=localStorage.getItem('rv_seen')!=='1';UI.speed=localStorage.getItem
 const human=()=>G&&G.pl.some(p=>p.human);
 // Addendum 7: PLAY is clean; HINTS (top-bar toggle, off by default) turns on previews, badges, ratings and the bulb; the coached game always teaches
 function hintsOn(){return !!(UI.coach||UI.tut||UI.hints)}
-function setHints(on){UI.hints=!!on;try{localStorage.setItem('rv_hints',on?'1':'0')}catch(e){}document.documentElement.classList.toggle('hints',hintsOn());const b=$('#hintsbtn');if(b){b.setAttribute('aria-pressed',String(!!on));b.querySelector('span').textContent=on?'Hints on':'Hints'}if(G){UI.pvc={};render()}}
+function setHints(on){UI.hints=!!on;try{localStorage.setItem('rv_hints',on?'1':'0')}catch(e){}document.documentElement.classList.toggle('hints',hintsOn());const b=$('#hintsbtn');if(b){b.setAttribute('aria-pressed',String(!!on));b.querySelector('span').textContent=on&&innerWidth>420?'Hints on':'Hints'}if(G){UI.pvc={};render()}}
 const myTurn=step=>{if(!G||G.over||!G.cur)return false;const s=sideToAct();return s>=0&&P(s).human&&(!step||G.step===step)};
 const seatName=p=>p.human&&G.pl.filter(q=>q.human).length===1?'You':p.nm;
 function say(t,tn,rc){const el=$('#status');const p=G&&G.cur&&!G.over?P(G.cur.p):null;el.style.setProperty('--c',p?PCOL[p.i]:'#e0a83a');
@@ -39,8 +39,8 @@ function tweenView(to,ms){cancelAnimationFrame(UI.tween);UI.tw=false;UI.twTo=to;
   const step=t=>{const k=Math.min(1,(t-t0)/ms),e=1-Math.pow(1-k,3);setView({s:a.s+(to.s-a.s)*e,x:a.x+(to.x-a.x)*e,y:a.y+(to.y-a.y)*e});if(k<1)UI.tween=requestAnimationFrame(step);else{UI.tw=false;UI.twTo=null;ensureGlowVisible();figShow()}};UI.tween=requestAnimationFrame(step)}
 function focusView(cx,cy,cell){const m=measure(),s=cell/100,top=topSafe(),bot=botSafe();return {s,x:m.W/2-cx*100*s,y:top+(m.H-top-bot)/2-cy*100*s}}
 function fitCells(cells,m){let x0=1e9,y0=1e9,x1=-1e9,y1=-1e9;for(const [x,y] of cells){x0=Math.min(x0,x);x1=Math.max(x1,x);y0=Math.min(y0,y);y1=Math.max(y1,y)}
-  const w=x1-x0+1,h=y1-y0+1,aw=m.W-14,ah=m.H-52,c0=Math.min(aw/w,ah/h);return {c:Math.max(MINC,Math.min(innerWidth>=1024?190:MAXC,c0)),fits:c0>=MINC,cx:(x0+x1+1)/2,cy:(y0+y1+1)/2,w,h}}
-function viewFor(f,m){const s=f.c/100;return {s,x:m.W/2-f.cx*100*s,y:m.H/2+16-f.cy*100*s}}
+  const w=x1-x0+1,h=y1-y0+1,aw=m.W-14,ah=m.H-topSafe()-botSafe()-8,c0=Math.min(aw/w,ah/h);return {c:Math.max(MINC,Math.min(innerWidth>=1024?190:MAXC,c0)),fits:c0>=MINC,cx:(x0+x1+1)/2,cy:(y0+y1+1)/2,w,h}}
+function viewFor(f,m){const s=f.c/100,top=topSafe(),bot=botSafe();return {s,x:m.W/2-f.cx*100*s,y:top+(m.H-top-bot)/2-f.cy*100*s}}   // centred in the space between the status card and the hand
 function fitTarget(){const m=measure();if(!G.order.length)return {s:.4,x:0,y:0};const last=unkey(G.cur&&G.cur.k||G.order[G.order.length-1]);
   const gl=UI.legal.map(g=>[g.x,g.y]);let f=fitCells(G.order.map(unkey).concat(gl),m);if(f.fits)return viewFor(f,m);
   f=fitCells(gl.concat([last]),m);return viewFor(f,m)}
@@ -113,7 +113,7 @@ function placeOverlay(){placeGhost();const m=measure(),pad=14;const cell=UI.view
   for(const el of $('#ov').children){const o=el._o;if(!o)continue;const [sx,sy]=toScreen(o.wx,o.wy);el.style.transform=`translate(${sx+o.dx}px,${sy+o.dy}px) translate(-50%,-50%)`;
     if(o.cull){const r=o.r||0;const vis=sx>pad+r&&sx<m.W-pad-r&&sy>pad+r+28&&sy<m.H-pad-r;el.style.visibility=vis?'':'hidden'}}
   // glows must lie fully inside the board so none is half cut off or under the bars
-  const c=UI.view.s*100;for(const g of $('#world').querySelectorAll('.glow')){const x=+g.dataset.x*c+UI.view.x,y=+g.dataset.y*c+UI.view.y;g.style.visibility=(x>=0&&y>=34&&x+c<=m.W&&y+c<=m.H-botSafe())?'':'hidden'}edgeArrows();spreadFigs();keepPops();layoutTags();layoutFlabs()}
+  const c=UI.view.s*100,gt=topSafe()-8,gb=m.H-botSafe();for(const g of $('#world').querySelectorAll('.glow')){const x=+g.dataset.x*c+UI.view.x,y=+g.dataset.y*c+UI.view.y;g.style.visibility=(x>=0&&y>=gt&&x+c<=m.W&&y+c<=gb)?'':'hidden'}edgeArrows();spreadFigs();keepPops();layoutTags();layoutFlabs()}
 // R9: glows that do not fit on a small phone get an arrow at the board edge ("2 more"); a tap slides the view to them
 const EDGE_ARW={l:'\u25C0',r:'\u25B6',t:'\u25B2',b:'\u25BC'};
 function edgeArrows(){const bd=boardEl();if(!bd)return;let box=bd.querySelector('.gedges');if(!box){box=document.createElement('div');box.className='gedges';bd.appendChild(box)}
@@ -200,18 +200,18 @@ function hookDrag(b){if(!b||b._dg)return;b._dg=1;
   const end=e=>{const d=UI.drag;if(!d||d.id!==e.pointerId)return;UI.drag=null;b.classList.remove('lifted');if(!d.on)return;UI.dragJust=Date.now();if(d.gh)d.gh.remove();if(d.over)d.over.classList.remove('dragover');
     if(e.type==='pointerup'&&d.over&&myTurn('place')){const x=+d.over.dataset.x,y=+d.over.dataset.y;if(isLegal({act:'place',x,y,r:UI.rot},sideToAct()))placeAt(x,y)}};
   b.addEventListener('pointerup',end);b.addEventListener('pointercancel',end)}
-function renderStatus(){let t='',tn='';const c=capNow(),sc=c&&UI.cap.score;
+function renderStatus(){let t='',tn='',rc='';const c=capNow(),sc=c&&UI.cap.score;
   if(sc){tn='Scoring';t=c}
   else if(G.over){tn='Game over';t='Counting the points…'}
   else if(UI.tut&&UI.tutTile){tn='Learn';t='Tap the lit tile to go on.'}
   else if(G.cur){const me=myTurn();const p=P(G.cur.p);tn=me?'Your turn':`${p.nm}’s turn`;
-    if(me&&c&&UI.cap.intro&&G.step==='place')t=c;
-    else if(me&&G.step==='place'&&UI.prev)t=UI.prev.t;
+    if(me&&c&&UI.cap.intro&&G.step==='place')rc=c;   // the rival recap sits under the action line, never in its place
+    if(me&&G.step==='place'&&UI.prev)t=UI.prev.t;
     else if(me&&G.step==='place'&&UI.sel){let l='';try{l=prevCalc(UI.sel.x,UI.sel.y,UI.sel.r).line}catch(e){}t=(hintsOn()&&l&&!/^Nothing/.test(l)?l+' ':'')+'Tap Place here to confirm, or your tile to turn it.'}
     else if(me&&G.step==='place')t=G.cur.bonus?'Extra turn! Place your tile.':isRiver(G.cur.t)?'Place it to continue the river.':(UI.rots&&UI.rots.length>1?'Turn, then place on a glow.':'Place your tile on a glow.');
     else if(me)t='Add a follower, or Skip.';
     else t=c||'Watch their tile go down.'}
-  say(t,tn,'')}
+  say(t,tn,rc)}
 // ---------- turn bookkeeping ----------
 function syncTurn(){if(!G||G.over||!G.cur)return;const key=G.turn+':'+G.step;if(key===UI.stepKey)return;UI.stepKey=key;
   if(myTurn('place')){UI.legal=legalPlacements(G.cur.t);UI.rots=[...new Set(UI.legal.map(g=>g.r))].sort();UI.hint=null;
@@ -308,7 +308,7 @@ function showStart(){closeMenu();UI.endShown=false;const o=UI.setup,sv=savedGame
   const tg=(k,t)=>`<button class="opt" data-t="${k}" aria-pressed="${!!o[k]}">${t}</button>`;
   $('#modal').innerHTML=`<div class="scrim"><div class="card" role="dialog" aria-label="Start"><h1>Rampart &amp; Vine</h1><p class="sub">${STORY.quickTitle}</p>${tutFirst()?tutBtn('btn alt'):''}<button class="btn big" data-a="play">Play vs computer</button>
     <button class="btn alt" data-a="story">Story</button>${sv?`<button class="btn alt" data-a="cont">Continue game</button>`:''}${tutFirst()?'':tutBtn('btn alt')}
-    <div class="opts">${chips('rivals',[[1,'1 rival'],[2,'2 rivals'],[3,'3 rivals']])}</div><div class="opts">${chips('lv',[['easy','Easy'],['normal','Normal'],['hard','Hard']])}</div>
+    <div class="opts">${chips('rivals',[[1,'1 rival'],[2,'2 rivals'],[3,'3 rivals']])}</div><div class="opts">${chips('lv',[['easy','Easy'],['medium','Medium'],['normal','Normal'],['hard','Hard']])}</div>
     <div class="opts">${tg('river','River')}${tg('ic','Taverns')}${tg('tb','Merchants')}</div></div></div>`;
   const m=$('#modal');m.querySelectorAll('.opt').forEach(b=>b.onclick=()=>{if(b.dataset.k)o[b.dataset.k]=isNaN(+b.dataset.v)?b.dataset.v:+b.dataset.v;else o[b.dataset.t]=!o[b.dataset.t];showStart()});
   m.querySelector('[data-a=play]').onclick=()=>{if(tutOffer())showOffer();else beginGame()};m.querySelector('[data-a=story]').onclick=()=>{if(typeof campOpen==='function')campOpen()};
@@ -360,7 +360,7 @@ function layoutFlabs(){const fl=[...document.querySelectorAll('#ov .fglow')];if(
 // score pops never sit on the turn strip
 function keepPops(){const st=$('#status');if(!st||!st.offsetHeight)return;const sb0=st.getBoundingClientRect().bottom-boardEl().getBoundingClientRect().top+6;for(const e of $('#ov').querySelectorAll('.pop')){const o=e._o;if(!o)continue;const sb=sb0+e.offsetHeight/2,hw=e.offsetWidth/2+6,W=boardEl().clientWidth;const [sx,sy]=toScreen(o.wx,o.wy);const x=Math.max(hw,Math.min(W-hw,sx+o.dx)),y=Math.max(sb,sy+o.dy);if(x!==sx+o.dx||y!==sy+o.dy)e.style.transform=`translate(${x}px,${y}px) translate(-50%,-50%)`}}
 // ---------- boot ----------
-function boot(){UI.reduce=window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches;initGestures();$('#menubtn').addEventListener('click',openMenu);{let h=false;try{h=localStorage.getItem('rv_hints')==='1'}catch(e){}const hb=document.createElement('button');hb.id='hintsbtn';hb.type='button';hb.className='gx-ibtn';hb.innerHTML='<span>Hints</span>';hb.addEventListener('click',()=>setHints(!UI.hints));$('#top').insertBefore(hb,$('#bulbbtn'));setHints(h)}{const rc=document.createElement('button');rc.id='recentre';rc.type='button';rc.setAttribute('aria-label','Recentre the view');rc.innerHTML='<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><circle cx="12" cy="12" r="7" fill="none" stroke="currentColor" stroke-width="2.4"/><circle cx="12" cy="12" r="2.6" fill="currentColor"/><path d="M12 1v4M12 19v4M1 12h4M19 12h4" stroke="currentColor" stroke-width="2.4"/></svg><span>Recentre</span>';rc.addEventListener('click',recentre);boardEl().appendChild(rc)}
+function boot(){UI.reduce=window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches;initGestures();$('#menubtn').addEventListener('click',openMenu);{let h=true;try{const v=localStorage.getItem('rv_hints');h=v==null?true:v==='1'}catch(e){}const hb=document.createElement('button');hb.id='hintsbtn';hb.type='button';hb.className='gx-ibtn';hb.innerHTML='<span>Hints</span>';hb.addEventListener('click',()=>setHints(!UI.hints));$('#top').insertBefore(hb,$('#bulbbtn'));setHints(h)}{const rc=document.createElement('button');rc.id='recentre';rc.type='button';rc.setAttribute('aria-label','Recentre the view');rc.innerHTML='<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><circle cx="12" cy="12" r="7" fill="none" stroke="currentColor" stroke-width="2.4"/><circle cx="12" cy="12" r="2.6" fill="currentColor"/><path d="M12 1v4M12 19v4M1 12h4M19 12h4" stroke="currentColor" stroke-width="2.4"/></svg><span>Recentre</span>';rc.addEventListener('click',recentre);boardEl().appendChild(rc)}
   document.addEventListener('keydown',e=>{if(e.key==='Escape')closeMenu();if((e.key==='r'||e.key==='R')&&myTurn('place'))rotate()});
   GXV.watch(()=>{if(!G||!G.order.length)return;if(myTurn('fig')&&!UI.user)zoomTile(G.cur.k,false);else if(myTurn('place')&&!UI.user){if(UI.sel)camSpot(UI.sel.x,UI.sel.y,0);else camAim(0)}else if(!UI.user)refit(false);else placeOverlay();updateGhost()});
   showStart()}
