@@ -100,12 +100,14 @@ async function runTally(sc, last, tok) {
   }
   return true;
 }
+// on desktop the side panel stays clear: the popup layer covers only the board (--kkdock = panel width)
+function rsFit() { const rs = $('#rs'); if (!rs) return; rs.style.removeProperty('--kkdock'); const d = document.querySelector('.gx-dock'); if (!d || isPh()) return; const r = d.getBoundingClientRect(); if (r.width > 0 && r.left > innerWidth * .4) rs.style.setProperty('--kkdock', Math.round(innerWidth - r.left) + 'px'); }
 function rsBar(btns) {
-  const rs = $('#rs'); UI.rsOpen = true; rs.hidden = false;
+  const rs = $('#rs'); UI.rsOpen = true; rs.hidden = false; rsFit();
   rs.replaceChildren(h('div.rsbox.bar', { role: 'group', 'aria-label': 'Next' }, btns.map(b => h('button.btn' + (b.cls ? '.' + b.cls : ''), { type: 'button', 'data-a': b.a }, b.label))));
 }
 function showRound(sc, ge) {
-  const rs = $('#rs'); rs.classList.remove('kkrnd'); UI.rsOpen = true; rs.hidden = false; rs.innerHTML = '';
+  const rs = $('#rs'); rs.classList.remove('kkrnd'); UI.rsOpen = true; rs.hidden = false; rs.innerHTML = ''; rsFit();
   const last = G.phase === 'over', tok = UI.seq, F = UI.fz;
   UI.rsInfo = { sc, ge, skip: !ANIM, done: false, last };
   if (!(F && F.tables)) {   // online: the next round is already dealt, so there is no frozen table to count on
@@ -153,16 +155,16 @@ function markWinners() {
 function breakdownEl(order, ws, v, tot) {
   const F = G.final, sum = (s, k) => G.rs.reduce((a, r) => a + (r[s][k] || 0), 0);
   const rows = [['Round 1', s => G.rs[0] ? G.rs[0][s].total : 0], ['Round 2', s => G.rs[1] ? G.rs[1][s].total : 0], ['Round 3', s => G.rs[2] ? G.rs[2][s].total : 0], null,
-    ['Roll race', s => sum(s, 'maki')], ['Prawns', s => sum(s, 'tempura')], ['Fish', s => sum(s, 'sashimi')], ['Buns', s => sum(s, 'dumpling')], ['Nigiri', s => sum(s, 'nigiri') + sum(s, 'wasabi')], null,
-    ['Custard', s => F.puddingPts[s], s => F.pudding[s] + ' cup' + (F.pudding[s] === 1 ? '' : 's')]];
+    ['Custard', s => F.puddingPts[s], s => F.pudding[s] + ' cup' + (F.pudding[s] === 1 ? '' : 's')], 'tot', 'by',
+    ['Roll race', s => sum(s, 'maki'), null, 1], ['Prawns', s => sum(s, 'tempura'), null, 1], ['Fish', s => sum(s, 'sashimi'), null, 1], ['Buns', s => sum(s, 'dumpling'), null, 1], ['Nigiri', s => sum(s, 'nigiri') + sum(s, 'wasabi'), null, 1]];
   const nm = s => s === v ? 'You' : pname(s), sg = n => n > 0 ? '+' + n : n < 0 ? '\u2212' + -n : '0';
   const head = h('tr', h('th'), ...order.map(s => h('th' + (ws.indexOf(s) >= 0 ? '.w' : ''), h('span.who', nm(s)), ws.indexOf(s) >= 0 ? h('span.cr', 'winner') : null)));
-  const body = rows.map(r => r ? h('tr', h('th', r[0]), ...order.map(s => { const n = r[1](s); return h('td' + (n < 0 ? '.neg' : n === 0 ? '.z' : ''), r[0] === 'Custard' ? sg(n) : String(n), r[2] ? h('small', r[2](s)) : null); })) : h('tr.sep', h('td', { colspan: order.length + 1 })));
   const tr = h('tr.tot', h('th', 'Total'), ...order.map(s => h('td' + (ws.indexOf(s) >= 0 ? '.w' : ''), String(tot[s]))));
-  return h('table.kkbd', { 'aria-label': 'Points by round, by dish and from custard' }, h('thead', head), h('tbody', body, tr));
+  const body = rows.map(r => r === 'tot' ? tr : r === 'by' ? h('tr.sep.by', h('th', { colspan: order.length + 1 }, 'Where the points came from')) : r ? h('tr' + (r[3] ? '.dsh' : ''), h('th', r[0]), ...order.map(s => { const n = r[1](s); return h('td' + (n < 0 ? '.neg' : n === 0 ? '.z' : ''), r[0] === 'Custard' ? sg(n) : String(n), r[2] ? h('small', r[2](s)) : null); })) : h('tr.sep', h('td', { colspan: order.length + 1 })));
+  return h('table.kkbd', { 'aria-label': 'Points by round and from custard, then by dish' }, h('thead', head), h('tbody', body));
 }
 function showFinal() {
-  const rs = $('#rs'); rs.classList.remove('kkrnd'); UI.rsOpen = true; rs.hidden = false;
+  const rs = $('#rs'); rs.classList.remove('kkrnd'); UI.rsOpen = true; rs.hidden = false; rsFit();
   const ws = G.winners || [], me = viewSeat(), iWin = me >= 0 && ws.includes(me);
   if (UI.fz) UI.fz.crown = true; UI.overShown = true; renderDock(); markWinners();
   const bs = NET.on ? netOverButtons() : [{ label: 'Play again', a: 'again', cls: 'go' }, { label: 'Menu', a: 'menu', cls: 'alt' }];
@@ -172,8 +174,8 @@ function showFinal() {
       const box = rs.querySelector('.rsbox');
       const ws2 = G.winners || [], v2 = viewSeat(), win = ws2.indexOf(v2) >= 0, tie = ws2.length > 1, rv = pname(ws2.find(s => s !== v2) != null ? ws2.find(s => s !== v2) : (v2 === 0 ? 1 : 0));
       const line = tie ? KK.STORY.quickResult.tie : (win ? KK.STORY.quickResult.win : KK.STORY.quickResult.lose).replace(/%R/g, rv);
-      const tot = G.final && G.final.totals ? G.final.totals : G.players.map(() => 0), order = G.players.map((p, s) => s).sort((a, b) => tot[b] - tot[a]);
-      box.insertBefore(h('div.kkres', h('div.kkr1', portraitEl(null, 44), h('div', h('b', winLine()), h('span', line))),
+      const tot = G.final && G.final.totals ? G.final.totals : G.players.map(() => 0), order = G.players.map((p, s) => (focusSeat() + s) % G.players.length), top = Math.max(...tot), tied = tot.filter(t => t === top).length > 1;
+      box.insertBefore(h('div.kkres', h('div.kkr1', portraitEl(null, 44), h('div', h('b', winLine()), h('span', line), (tied && ws2.length === 1) ? h('span.ktie', 'Tie on ' + top + ': ' + (ws2[0] === v2 ? 'you win' : pname(ws2[0]) + ' wins') + ' on more custard cups') : null)),
         breakdownEl(order, ws2, v2, tot)), box.firstChild); rs.classList.add('kkfin');
     }
   } catch (e) { console.error(e); }

@@ -365,14 +365,15 @@ html.ph.ph-l .setup.scard{width:min(820px,100%)}
 @media (prefers-reduced-motion:reduce){.tbtn:active{transform:none}}
 /* tall desktop windows (1920x1080): tables sit together, no empty middle band */
 @media (min-height:800px) and (min-width:1000px){html:not(.ph) #tbl{grid-auto-rows:auto;align-content:center;row-gap:20px}html:not(.ph) .seat:not(.me){height:clamp(150px,20dvh,215px)}html:not(.ph) .seat.me{height:clamp(190px,24dvh,260px)}}
-@media (max-height:600px) and (min-width:720px){html:not(.ph) .seat:not(.me){align-self:stretch}html:not(.ph) #tbl{gap:4px}html:not(.ph) #beltz .lab{display:none}}
+@media (max-height:600px) and (min-width:720px){html:not(.ph) .seat:not(.me){align-self:stretch}html:not(.ph) #tbl{gap:4px}html:not(.ph) #beltz .lab{display:none}
+html:not(.ph) .seat:not(.me){height:124px;align-self:start}html:not(.ph) .seat.me{height:142px;max-height:142px;align-self:start}html:not(.ph) .seat.me .ctr{flex-wrap:nowrap;overflow-x:auto;overflow-y:hidden;align-items:center;scrollbar-width:thin}}
 /* short landscape desktop (910x512): setup fits without scrolling, Start stays on screen */
 @media (max-height:640px) and (min-width:720px){html:not(.ph) #start[data-v=setup]{padding:6px}html:not(.ph) .setup.scard{padding:8px 12px;gap:6px}
 html:not(.ph) .setup .kkflav,html:not(.ph) .setup .ssub,html:not(.ph) .dtx .story,html:not(.ph) .dtx .enjoy{display:none}
 html:not(.ph) .setup .shead h2{font-size:1.2rem}html:not(.ph) .setup .sback{font-size:24px;line-height:30px}
 html:not(.ph) .dgrid{grid-template-columns:repeat(4,1fr);gap:6px}html:not(.ph) .dcard{padding:6px;gap:4px}
 html:not(.ph) .dtop{gap:6px}html:not(.ph) .dimg{width:44px;height:44px}html:not(.ph) .dtop h3{font-size:16px}
-html:not(.ph) .dcard .drow{flex-direction:column;align-items:stretch}html:not(.ph) .lvs .chipb{padding:2px 2px;font-size:12px;min-height:30px}
+html:not(.ph) .dcard .drow{flex-direction:column;flex-wrap:nowrap;align-items:stretch;gap:4px}html:not(.ph) .dcard .drow>.chipb.seatb{min-height:34px;padding:2px 8px}html:not(.ph) .dcard .lvs{flex:0 0 auto;min-width:0}html:not(.ph) .dcard .lvs .chipb{flex:1 1 0;min-width:0;min-height:34px}html:not(.ph) .lvs .chipb{padding:2px 2px;font-size:12px;min-height:30px}
 html:not(.ph) .sgo .sbtn.big{min-height:46px}html:not(.ph) .sgo .sbtn.big b{font-size:17px}html:not(.ph) .sgo{gap:6px}html:not(.ph) .sgo .sbtn{min-height:44px}}
 
 /* clarity pass: race, last-turn feed, inline tips, wrapped counters, score change badges, two-row belt */

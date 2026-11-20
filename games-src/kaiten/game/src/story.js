@@ -11,7 +11,7 @@ KK.STORY = {
   turn: ['1. Everyone looks at their own hand of plates.', '2. Pick ONE plate. Everybody picks at the same time.', '3. The covers lift, one diner after another, and each plate lands on its owner\'s counter.', '4. Your points pop up with the reason.', '5. Your leftover hand slides to the next diner, theirs comes to you. Repeat until the hands are empty.'],
   // the live-turn instruction line (banner | text, 8 words at most together: gate rule 5); %N = next diner, %R = a rival
   say: {
-    mine: 'Your turn|Tap a dish to take it.',
+    mine: 'Your turn|Tap a dish for the dashed slot.',
     twin: 'Your turn|Tap two dishes.',
     twin2: 'Your turn|Tap a second dish.',
     tap2: 'Your turn|Tap it again.',
