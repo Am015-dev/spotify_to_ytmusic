@@ -777,6 +777,14 @@ body:has(#modal .scrim) .gedges{display:none}
 }
 html.gx-reduce .gxc *,html.gx-noanim .gxc *{animation:none!important;transition:none!important}
 @media (prefers-reduced-motion:reduce){.gxc *{animation:none!important}}
+/* desktop: the campaign is a centred wide page, not a phone column */
+@media (min-width:1000px) and (orientation:landscape){
+  .gxc-screen{max-width:min(760px,64vw)}
+  .gxc-map-on .gxc-screen{max-width:min(960px,72vw)}
+  .gxc-path{max-width:min(860px,66vw)}
+  .gxc-sheet{max-width:min(760px,60vw)}
+  .gxc-lab{max-width:220px}
+}
 
 
 /* ===== painted art: table, tile backs, pieces, title and end art, Music picker (html.tbl / .cb / .ti are set once the file has loaded) ===== */
@@ -817,7 +825,15 @@ html.sk .gx-bar .gx-ibtn,html.sk .gx-bar{text-shadow:0 1px 2px rgba(0,0,0,.75)}
 html.sk .gxc-act b,html.sk .gxc-act small{text-shadow:0 1px 3px rgba(0,0,0,.9)}
 /* panels never swallow the art on phones: docks are capped, sheets slide not fade */
 @media (max-width:999px) and (orientation:portrait){.gx-dock{max-height:min(var(--gx-sheet-h,40dvh),44dvh)}}
-@media (max-width:999px) and (orientation:landscape){.gx-dock{max-height:min(var(--gx-sheet-h,40dvh),34dvh)}}
+@media (max-width:719px) and (orientation:landscape){.gx-dock{max-height:min(var(--gx-sheet-h,40dvh),34dvh)}}
+/* short desktop windows (landscape, 720-999 px wide): side dock, board at full height. This file loads last, so it also undoes
+   per-game "(max-width:999px)" sheet heights/rows; games in their own phone layout (html.ph) keep theirs. */
+@media (min-width:720px) and (max-width:999px) and (orientation:landscape){
+  html:not(.ph) body .gx-main{grid-template-columns:minmax(0,1fr) var(--gx-dock-w);grid-template-rows:minmax(0,1fr)}
+  html:not(.ph) body .gx-app.gx-dock-min .gx-main{grid-template-columns:minmax(0,1fr) 0}
+  html:not(.ph) body .gx-app .gx-dock,html:not(.ph) body .gx-app.gx-sheet-full .gx-dock{height:auto;max-height:none;border-radius:0}
+  html:not(.ph) body .gx-app.gx-dock-min .gx-dock{visibility:hidden}
+}
 /* calm motion: no looping pulses for people who asked for less, nothing flashes faster than ~1 Hz */
 @media (prefers-reduced-motion:reduce){
   html body :is(.gxh-ring,.gxt-ring,.gxc-node.next .gxc-disc,.gxh-bub,.gxt-bub){animation:none!important}
