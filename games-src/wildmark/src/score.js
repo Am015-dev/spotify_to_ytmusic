@@ -179,7 +179,7 @@ function goalShow() {
   var riv = G.np > 1 ? G.seats.filter(function (s, i) { return i !== 0; }).map(function (s) { return s.name; }).join(' and ') : '';
   e.innerHTML = '<div class="gcard" role="dialog" aria-label="Goal"><h2>Goal</h2><p class="g1">' + esc(riv ? 'Have more points than ' + riv + ' after ' + G.turns + ' turns.' : 'Score as many points as you can in ' + G.turns + ' turns.') + '</p><ul>' +
     '<li><b>Animals</b> score by their card: bears in pairs, elk in lines, salmon in runs, lone hawks, foxes next to different animals.</li>' +
-    '<li><b>Land</b>: each terrain scores 1 point per tile in your largest joined area' + (!riv ? ', +2 at 7 or more.' : G.np > 2 ? ', +3 if yours is the biggest, +1 for second.' : ', +2 if yours is the biggest.') + '</li>' +
+    '<li><b>Land</b>: each terrain scores 1 point per tile in your largest joined area' + (!riv ? ', +2 at 7 or more.' : G.np > 2 ? ', +3 if yours is the biggest, +1 for second.' : ', +2 if yours is the biggest (a tie: +1 each).') + '</li>' +
     '<li><b>Acorns</b> from gold keystone tiles: 1 point each at the end.</li></ul>' +
     '<p class="g2">Each turn: take a tile with its animal, add the tile, place the animal. Tap Scores any time to see why.</p><button type="button" class="big" id="goalGo">Start</button></div>';
   e.hidden = false; document.documentElement.classList.add('wm-goal'); var tt = $('#toast'); if (tt) tt.classList.remove('on');

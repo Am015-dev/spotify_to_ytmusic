@@ -78,8 +78,8 @@ function resume() { var s = loadSave(); if (!s) return; G = s.G; UI.aiRun = fals
 function step() {
   clearTimeout(UI.aiT);
   if (!G) return;
-  if (G.over) { render(); setTimeout(showResult, ANIM ? 900 : 50); return; }
-  if (G.seats[G.cur].ai) { UI.aiT = setTimeout(aiStep, UI.fast ? 30 : AIDELAY); return; }
+  if (G.over) { render(); setTimeout(showResult, ANIM ? 450 : 50); return; }
+  if (G.seats[G.cur].ai) { UI.aiT = setTimeout(aiStep, UI.fast ? 30 : G.seats[G.cur].done >= G.turns - 1 ? 200 : AIDELAY); return; }
   if (UI.humans > 1 && UI.passed !== G.cur && G.stage === 'pick') { showPass(); return; }
   UI.lastHuman = G.cur; if (UI.view !== G.cur) { UI.view = G.cur; fitView(false, true); }
   var bk = G.cur + ':' + G.seats[G.cur].done; if (!UI.fast && G.np > 1 && UI.humans === 1 && UI.mode !== 'tutorial' && !UI.tut && G.stage === 'pick' && UI.banKey !== bk) { UI.banKey = bk; banner('Your turn'); }
@@ -116,7 +116,8 @@ function terrText(t) { return t.t.map(function (x) { return WM.TER_NAME[x]; }).j
 function aiStep() {
   if (!G || G.over || !G.seats[G.cur].ai || UI.tutor) return;
   var nm = G.seats[G.cur].name, seat = G.cur, slow = !UI.fast && UI.humans === 1 && UI.mode !== 'tutorial';
-  var D = function (ms) { return UI.fast ? 10 : Math.round(ms * (UI.aiQuick ? 0.35 : 1)); };
+  var lastT = G.seats[seat].done >= G.turns - 1;   // R107: the closing move of the game is quick: the result shows in about 1.5 s
+  var D = function (ms) { return UI.fast ? 10 : Math.round(ms * (lastT ? 0.25 : UI.aiQuick ? 0.35 : 1)); };
   var m = WM.AI.choose(G);
   if (G.stage !== 'pick') { WM.apply(G, m); render(); step(); return; }
   var key = seat + ':' + G.seats[seat].done; if (slow) UI.aiRun = true;   // F3: the whole rival turn (take, place, settle, summary) is theirs: no taps reach your market or valley
@@ -144,7 +145,7 @@ function aiStep() {
         UI.showAI = { seat: UI.view, sum: 1, text: nm + ': ' + tName + (m2.t === 'tok' ? ' + ' + WM.ANI_NAME[h.tok] : ', ' + WM.ANI_NAME[h.tok] + ' sent back') + ' (ringed). ' + (d > 0 ? '+' + d : d < 0 ? '−' + Math.abs(d) : '+0') + ' → ' + fin[seat].total + (me !== seat ? ' · you ' + fin[me].total : '') + '. Tap to go on' };
         render();
         var done = false, end = function () { if (done) return; done = true; UI.aiHold = null; UI.aiRun = false; clearTimeout(UI.aiT); UI.showAI = null; UI.inset = null; if (!G) return; if (UI.view !== meSeat()) { UI.view = meSeat(); fitView(false, true); } render(); step(); };
-        UI.aiHold = end; UI.aiT = setTimeout(end, UI.aiQuick ? 900 : 3000);
+        UI.aiHold = end; UI.aiT = setTimeout(end, lastT ? 600 : UI.aiQuick ? 900 : 3000);
       }, D(1000));
     }, D(900));
   }, D(slow ? 1100 : AIDELAY * 0.8));
@@ -537,14 +538,14 @@ function scoresHTML() {   // every source with its why, you vs the rivals (also 
   WM.ANI.forEach(function (a) { var bf = best(sc.map(function (x) { return x.ani[a]; }));
     h += '<tr><td class="src">' + mkTok(a) + '<span>' + esc(WM.ANI_NAME[a]) + '<small>' + esc(pvSetA(a) ? PV_TABLE[a] : cinfo(a).rule) + '</small></span></td>' + sc.map(function (x, i) { return cell(bf(x.ani[a]), x.ani[a], pvDesc(G.seats[i].env, a).text); }).join('') + '</tr>'; });
   WM.TER.forEach(function (t) { var bt = best(sc.map(function (x) { return x.hab[t] + (x.bonus[t] || 0); }));
-    h += '<tr><td class="src"><i class="sw" style="background:' + WM.TER_COL[t] + '"></i><span>' + WM.TER_NAME[t] + '<small>1 point per tile in your largest joined area</small></span></td>' + sc.map(function (x) { var b = x.bonus[t] || 0; return cell(bt(x.hab[t] + b), x.hab[t] + b, 'largest area ' + x.hab[t] + (b ? ' + bonus ' + b + (G.solo ? ' (7 or more)' : ' (biggest' + (b === 1 && G.np === 2 ? ', tied' : '') + ')') : '')); }).join('') + '</tr>'; });
+    h += '<tr><td class="src"><i class="sw" style="background:' + WM.TER_COL[t] + '"></i><span>' + WM.TER_NAME[t] + '<small>1 point per tile in your largest joined area</small></span></td>' + sc.map(function (x) { var b = x.bonus[t] || 0; return cell(bt(x.hab[t] + b), x.hab[t] + b, 'largest area ' + x.hab[t] + (b ? ' + bonus ' + b + (G.solo ? ' (7 or more)' : b === 1 && G.np === 2 ? ' (tied for biggest)' : b === 1 ? ' (second biggest, or a tie)' : ' (biggest)') : '')); }).join('') + '</tr>'; });
   h += '<tr><td class="src"><span>Acorns<small>1 point each at the end</small></span></td>' + sc.map(function (x) { return cell('', x.acorns, pvPl(x.acorns, 'acorn', 'acorns') + ' kept'); }).join('') + '</tr>';
   h += '<tr class="tot"><td>Total</td>' + sc.map(function (x) { return '<td><b>' + x.total + '</b><small>animals ' + x.aniT + ' + land ' + (x.habT + x.bonusT) + ' + acorns ' + x.acorns + '</small></td>'; }).join('') + '</tr></table>';
   return h + '<p class="note">' + (G.solo ? 'Solo: a terrain area of 7 or more tiles earns 2 extra points.' : 'Bonus: the biggest area of a terrain earns ' + (G.np === 2 ? '+2 (a tie +1 each)' : '+3 first, +1 second; tied first: 2 each for two, 1 each for three or more, then no second') + '.') + '</p>';
 }
 function cardsHTML() {
   var h = '<div class="cards">';
-  WM.ANI.forEach(function (a) { var C = cinfo(a), st = cset(a); var mine = G ? (G.over ? G.res : WM.final(G))[meSeat()].ani[a] : null; h += '<div class="card"><div class="cart" data-art="card-' + a + '-' + st + '">' + mkTok(a) + '</div><div><h3>' + esc(WM.ANI_NAME[a]) + ': ' + esc(C.title) + (mine != null ? ' <span class="minep">you: ' + mine + '</span>' : '') + '</h3><p>' + esc(C.rule) + '</p>' + patSvg(a) + '<p class="pts">' + (C.pts ? C.pts.slice(1).map(function (p, i) { return (i + 1) + (i + 2 === C.pts.length ? '+' : '') + ': ' + p; }).join(' &middot; ') : a === 'fox' && st === 'a' ? '0 to 5 per fox' : 'Card ' + st.toUpperCase()) + '</p></div></div>'; });
+  WM.ANI.forEach(function (a) { var C = cinfo(a), st = cset(a); var mine = G ? (G.over ? G.res : WM.final(G))[meSeat()].ani[a] : null; h += '<div class="card"><div class="cart" data-art="card-' + a + '-' + st + '">' + mkTok(a) + '</div><div><h3>' + esc(WM.ANI_NAME[a]) + ': ' + esc(C.title) + (mine != null ? ' <span class="minep">you: ' + mine + '</span>' : '') + '</h3><p>' + esc(C.rule) + '</p>' + patSvg(a) + '<p class="pts">' + (C.pts ? C.pts.slice(1).map(function (p, i) { return (i + 1) + (i + 2 === C.pts.length && C.pts[C.pts.length - 1] !== 13 ? '+' : '') + ': ' + p; }).join(' &middot; ') : a === 'fox' && st === 'a' ? '0 to 5 per fox' : 'Card ' + st.toUpperCase()) + '</p></div></div>'; });
   return h + '</div>';
 }
 var RULES_HTML = '<div class="howturn"><h3>How a turn works</h3><ol><li>Pick one tile and the animal under it.</li><li>Tap a glowing spot to add the tile to your valley.</li><li>Put the animal on a tile that shows it, or skip it (it goes back to the bag, no penalty).</li><li>Animals score by their card; joined terrain scores too.</li><li>After 20 turns the most points wins.</li></ol></div>' +
@@ -564,7 +565,7 @@ function tileText(t, tok) {
 function showBig(kind, obj, tok) {
   var body = document.createElement('div'); body.className = 'bigv';
   if (kind === 'tile') body.innerHTML = '<div class="bigpic">' + mkTile(obj, 60) + '</div>' + tileText(obj, tok);
-  else { var C = cinfo(obj); body.innerHTML = '<div class="bigpic">' + mkTok(obj) + '</div><h3>' + esc(WM.ANI_NAME[obj]) + ' token</h3><p>Scores by <b>' + esc(C.title) + '</b>: ' + esc(C.rule) + '</p>' + patSvg(obj) + '<p class="pts">' + (C.pts ? C.pts.slice(1).map(function (p, i) { return (i + 1) + (i + 2 === C.pts.length ? '+' : '') + ': ' + p; }).join(' &middot; ') : obj === 'fox' && cset(obj) === 'a' ? '0 to 5 per fox' : 'Card ' + cset(obj).toUpperCase()) + '</p>'; }
+  else { var C = cinfo(obj); body.innerHTML = '<div class="bigpic">' + mkTok(obj) + '</div><h3>' + esc(WM.ANI_NAME[obj]) + ' token</h3><p>Scores by <b>' + esc(C.title) + '</b>: ' + esc(C.rule) + '</p>' + patSvg(obj) + '<p class="pts">' + (C.pts ? C.pts.slice(1).map(function (p, i) { return (i + 1) + (i + 2 === C.pts.length && C.pts[C.pts.length - 1] !== 13 ? '+' : '') + ': ' + p; }).join(' &middot; ') : obj === 'fox' && cset(obj) === 'a' ? '0 to 5 per fox' : 'Card ' + cset(obj).toUpperCase()) + '</p>'; }
   GX.drawer('bigd', kind === 'tile' ? 'Habitat tile' : 'Animal token', body, false); GX.show('bigd');
 }
 (function wireDrag() {   // drag a market column onto the valley: it lifts, snaps to the nearest glowing spot, and drops there (tap still works)
@@ -617,14 +618,17 @@ function showBig(kind, obj, tok) {
 function whyLine(sc, me) {   // one short line: why you won or lost (the biggest gap between you and the best rival)
   if (G.solo || sc.length < 2) return '';
   var riv = -1; sc.forEach(function (x, i) { if (i !== me && (riv < 0 || x.total > sc[riv].total)) riv = i; });
-  var a = sc[me], b = sc[riv], nm = G.seats[riv].name, parts = [
+  var a = sc[me], b = sc[riv], nm = G.seats[riv].name;
+  if (a.total === b.total) return '<p class="why">Tied on points' + (G.winner === -2 ? ': a shared win (same acorns too).' : ': ' + (G.winner === me ? 'you win' : esc(nm) + ' wins') + ' on acorns, ' + (G.winner === me ? a.acorns + ' vs ' + b.acorns : b.acorns + ' vs ' + a.acorns) + '.') + '</p>';
+  var parts = [
     { k: 'animals', d: a.aniT - b.aniT, t: 'animal cards ' + a.aniT + ' vs ' + b.aniT },
     { k: 'habitats', d: a.habT - b.habT, t: 'habitats ' + a.habT + ' vs ' + b.habT },
     { k: 'bonus', d: a.bonusT - b.bonusT, t: 'habitat bonuses +' + a.bonusT + ' vs +' + b.bonusT },
     { k: 'acorns', d: a.acorns - b.acorns, t: 'acorns ' + a.acorns + ' vs ' + b.acorns }];
   var win = a.total >= b.total; parts.sort(function (x, y) { return win ? y.d - x.d : x.d - y.d; });
   var p = parts[0]; if (!p.d) return '<p class="why">Neck and neck with ' + esc(nm) + ' in every column.</p>';
-  return '<p class="why">' + (win ? 'You beat ' + esc(nm) + ' most on ' : esc(nm) + ' beat you most on ') + p.t + ' (you first).</p>';
+  var TIP = { animals: 'Try next: take the column with the biggest "up to +N" and finish animal patterns.', habitats: 'Try next: match tile edges so each land grows into one big joined area.', bonus: 'Try next: pick one land and grow it past ' + esc(nm) + "'s to win its bonus.", acorns: 'Try next: settle animals on gold keystone tiles for acorns, and keep them.' };
+  return '<p class="why">' + (win ? 'You beat ' + esc(nm) + ' most on ' : esc(nm) + ' beat you most on ') + p.t.replace(/^(.*) (\+?\d+) vs (\+?\d+)$/, function (m, w, x, y) { return w + ': you ' + x + ', ' + esc(nm) + ' ' + y; }) + '.</p>' + (win ? '' : '<p class="why tip">' + TIP[p.k] + '</p>');
 }
 function standHTML(sc, me) {   // final totals up top, winner first
   var ord = sc.map(function (x, i) { return i; }).sort(function (a, b) { return (sc[b].total * 100 + sc[b].acorns) - (sc[a].total * 100 + sc[a].acorns); });

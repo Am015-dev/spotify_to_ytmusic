@@ -737,7 +737,7 @@
     },
     {
      "who": "ward",
-     "text": "No sweeping the market here: the old growth keeps what it is given. New animal cards here."
+     "text": "No three-alike sweeps here: the old growth keeps what it is given. New animal cards here."
     }
    ],
    "outro": [
@@ -917,7 +917,7 @@
     },
     {
      "who": "ward",
-     "text": "The Warden is strong, rich in acorns, and nobody may sweep the market. New animal cards here."
+     "text": "The Warden is strong, rich in acorns, and nobody may sweep three alike. New animal cards here."
     }
    ],
    "outro": [
@@ -1011,7 +1011,7 @@
   "endText": "Rowan: That was a real game. The strip under your valley rated every move. Now the seasons are 20 turns long.",
   "turns": 6,
   "coach": {
-   "goal": "Bram wants this valley for timber. Out-score him in 6 turns and it stays wild. Each column shows \"up to +N\": the points it adds now. Pick one.",
+   "goal": "Bram wants this valley for timber. Out-score him in 7 turns and it stays wild. Each column shows \"up to +N\": the points it adds now. Pick one.",
    "place": "Tiles must touch your valley. The +N on a glowing spot is what it scores. Tap one to see why, then Place.",
    "habitat": "Matching edges join land. Each terrain scores 1 point per tile in your biggest joined group.",
    "rotate": "This tile has two lands. Tap Turn until the edges match your valley, then Place.",
