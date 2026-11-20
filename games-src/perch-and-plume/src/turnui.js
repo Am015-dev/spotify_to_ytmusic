@@ -26,7 +26,7 @@ function shortPower(id) {
   if (solo && pw.col === 'pink') return { col: pw.col, when: 'Solo', txt: 'fires when the Rival Flock wakes your pink powers.' };   // solo: pinks fire only on the Flock's pink icon
   return { col: pw.col, when: when, txt: T[k] || pw.txt };
 }
-var HABW = { F: 'Forest', G: 'Meadow', W: 'Wetland' };
+var HABW = { F: 'Forest', G: 'Grassland', W: 'Wetland' };
 // ---------------- the value estimate (points now, plus a little for what an action sets up)
 function eggRoom(p) { return PP.birds(p).reduce(function (a, x) { return a + Math.max(0, x.b.e - x.s.eggs); }, 0); }
 // the Best hint = the hard computer's choice for this exact moment (look-ahead over engines, the round goal and bonus cards),
@@ -219,6 +219,7 @@ function rateEnd() {   // after the turn is over: compare with the best-value es
   if (RATE.point && ch === RATE.point) grade = 'good';
   var line = RATE.point && ch === RATE.point ? 'Good: ' + pts + '. Lesson learned!' : grade === 'good' ? 'Good: ' + pts + (ch === best ? ', the best move this turn.' : ', as good as the best move.')
     : (grade === 'okay' ? 'Okay: ' : 'Poor: ') + pts + '. ' + cap1(nm[best]) + ' was worth more (' + inf[best].gain + ').';
+  if ((ch === 'food' || ch === 'cards') && gain <= 0 && grade === 'poor') line = 'Okay: ' + (ch === 'food' ? 'food' : 'new birds') + ' now, birds to play next turn.';   // a setup move scores later, so it is never "Poor: 0 points"
   if (ch === 'food' && gain === 0 && grade === 'good') line = 'Good: food now lets you play birds next turn.';
   RATE.k = null; RATE.last = { g: grade, t: line };
   showRate();

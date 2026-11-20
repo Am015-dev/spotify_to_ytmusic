@@ -80,7 +80,7 @@ function showKeep(s) { hideHelp();
   draw();
 }
 // ---------------- game over
-function gameOver() { hideHelp();
+function gameOver() { hideHelp(); UI.cap = null; try { var pr = $('#prompt'); if (pr) pr.textContent = 'The year is over.'; $('#toast').innerHTML = ''; } catch (e) { }   // no stale line under the result
   if (UI.overShown === G) return; UI.overShown = G;
   clearSave(); musicSync(); sfx('end');
   try { localStorage.setItem('pp-played', '1'); } catch (e) { }
@@ -104,7 +104,8 @@ function gameOver() { hideHelp();
   }
   var h = artHTML('bg-result', 'bgart', '') + (UI.camp && UI.camp.goal ? '<h2>' + esc(gwin ? 'Goal met!' : 'Goal missed') + '</h2><p class="yr">' + esc(line) + '</p>' + goalHTML : '<h2>' + esc(line) + '</h2>') + voice + '<table class="stand"><tr><th>Player</th><th>Birds</th><th>Bonus</th><th>Goals</th><th>Eggs</th><th>Stored food</th><th>Tucked</th><th>Total</th></tr>' +
     order.map(function (i) { var s = sc[i]; return '<tr class="' + (winners.indexOf(i) >= 0 ? 'win' : '') + '"><td>' + esc(G.pl[i].name) + '</td><td>' + s.birds + '</td><td>' + s.bonus + '</td><td>' + s.goals + '</td><td>' + s.eggs + '</td><td>' + s.cache + '</td><td>' + s.tuck + (s.lead ? '+' + s.lead : '') + '</td><td><b data-engine="G.final[' + i + '].total">' + s.total + '</b></td></tr>'; }).join('') + '</table>';
-  h += '<p class="rnote">Birds = card points. Stored food = food cached on birds. Ties go to the most food left over in your supply.</p><div class="tmenu">' +
+  if (G.gres && G.gres.length) h += '<div class="gbreak"><b>Round goals</b>' + G.gres.map(function (r, k) { return '<p><span>Round ' + (k + 1) + ': ' + esc(PP.GOL[r.gid || G.goals[k]].n) + '</span> ' + r.pts.map(function (v, i) { return esc(isHuman(i) && humans().length <= 1 ? 'You' : G.pl[i].name) + ' ' + v; }).join(', ') + '</p>'; }).join('') + '</div>';
+  h += '<p class="rnote">Birds = card points. Stored food = food cached on birds. Ties go to the most food left over in your supply (the solo rival too).</p><div class="tmenu">' +
     (UI.camp ? '<button type="button" class="btn big primary" id="again">Continue the story</button>' : '<button type="button" class="btn big primary" id="again">Play again</button><button type="button" class="btn" id="totitle">Title screen</button>') + '</div>';
   el.innerHTML = h;
   setTimeout(function () {
@@ -131,7 +132,7 @@ var RULES = [
 function rulesBody() {
   var d = document.createElement('div'); d.className = 'dr';
   d.innerHTML = '<h3>How a turn works</h3><ol class="howturn"><li>On your turn you do ONE thing.</li><li>Play a bird from your hand into a row (pay the food on the card).</li><li>Or tap a row button: forest = food, grassland = eggs, wetland = cards.</li><li>Every bird in that row then uses its power, right to left.</li><li>After 4 rounds, most points wins: birds, bonus cards, goals, eggs, cached food, tucked cards.</li></ol>' + RULES.map(function (r) { return '<h3>' + r[0] + '</h3><p>' + r[1] + '</p>'; }).join('') +
-    '<h3>Simplified on purpose</h3><ul><li>Food and eggs you pay for a bird are picked for you (cheapest first).</li><li>Brown powers are optional: you are asked when one also helps others; one that only helps you fires by itself.</li><li>120 birds, 18 bonus cards and 12 goals, all original.</li><li>A row\'s trade (card for food, food for egg, egg for card) is offered before the row\'s gain, not after.</li><li>Row yields: forest and wetland 1,1,2,2,3,3; grassland 2,2,3,3,4,4; a trade on every second space.</li><li>The 4 round goals never repeat a family.</li><li>When the feeder dice all match and a power wants a food that is not there, the dice are rerolled for you.</li></ul>' +
+    '<h3>Simplified on purpose</h3><ul><li>Food and eggs you pay for a bird are picked for you (cheapest first).</li><li>Brown powers are optional: you are asked when one also helps others; one that only helps you fires by itself.</li><li>120 birds, 18 bonus cards and 12 goals, all original.</li><li>A row\'s trade (card for food, food for egg, egg for card) is offered before the row\'s gain, not after.</li><li>Row yields: forest and wetland 1,1,2,2,3,3; grassland 2,2,3,3,4,4; a trade on every second space.</li><li>The round goals all differ, except that two may be about nests.</li><li>When the feeder dice all match and a power wants a food that is not there, the dice are rerolled for you.</li></ul>' +
     '<h3>Row actions by birds in the row</h3><p>Forest food: 1, 1+trade, 2, 2+trade, 3, 3+trade. Grassland eggs: 2, 2+trade, 3, 3+trade, 4, 4+trade. Wetland cards: 1, 1+trade, 2, 2+trade, 3, 3+trade.</p>' +
     '<div class="tmenu" style="margin:10px 0"><button type="button" class="btn" id="rtut">Play the tutorial</button><button type="button" class="btn" id="rref">All cards</button></div>';
   setTimeout(function () { var t = $('#rtut', d); if (t) t.onclick = function () { GX.close(); tutStart(); }; var r = $('#rref', d); if (r) r.onclick = function () { GX.close(); try { GX.refOpen(); } catch (e) { } }; }, 0);
@@ -141,7 +142,7 @@ function goalsBody() {
   var d = document.createElement('div'); d.className = 'dr';
   if (!G) { d.innerHTML = '<p>Start a game to see its round goals.</p>'; return d; }
   var me = UI.view, p = G.pl[me];
-  d.innerHTML = '<h3>Round goals</h3>' + G.goals.map(function (gid, r) {
+  d.innerHTML = '<h3>Round goals</h3><p class="gnote">Each goal counts only what its name says (a nest goal: eggs on that nest type only). Most gets the most points.</p>' + G.goals.map(function (gid, r) {
     var res = G.gres[r], cur = r === G.round && G.phase !== 'over';
     var detail = res ? res.pts.map(function (v, i) { return G.pl[i].name + ' ' + v; }).join(', ') : 'Now: ' + G.pl.map(function (q, i) { return q.name + ' ' + PP.goalCount(G, i, gid); }).join(', ');
     return '<div class="gl' + (cur ? ' now' : '') + '"><span>Round ' + (r + 1) + ': ' + esc(PP.GOL[gid].n) + '<br><small>' + PP.GOALPTS[Math.min(r, 3)].join('/') + ' pts · ' + esc(detail) + '</small></span></div>';

@@ -222,7 +222,7 @@ function rvSummary(s, done) {
   document.body.appendChild(d);
   var tm = 0, fin = function (auto) { if (!d.isConnected) return; dropEl(d); clearTimeout(tm); if (auto === true) UI.rvGone = Date.now(); done(); };
   d.addEventListener('click', function (e) { e.stopPropagation(); var b = e.target.closest('[data-rv]'); fin(); if (b && b.dataset.rv === 'board') openOpp(s); });
-  tm = setTimeout(function () { fin(true); }, 2600); UI.timers.push(tm);
+  tm = setTimeout(function () { fin(true); }, 1400); UI.timers.push(tm);
 }
 function dropEl(x) { if (x && x.parentNode) x.parentNode.removeChild(x); }
 // "Your turn" / "<Rival>'s turn" banner; the turn waits for it (~1 s), a tap skips it
@@ -273,7 +273,7 @@ function pump() {
   if (!isHuman(s) && G.phase === 'play' && typeof coachHold === 'function' && coachHold()) { UI.pumpT = setTimeout(pump, 250); return; }   // tutorial: the rival waits while a "see" step is shown
   if (G.phase === 'play' && humans().length && !(typeof coachOn === 'function' && coachOn())) { if (isHuman(s)) UI.rvT0 = 0; else if (!UI.rvT0) UI.rvT0 = Date.now(); }   // start of the wait budget (see spd())
   var tk = s + ':' + G.round + ':' + G.pl[s].cubes;
-  if (G.phase === 'play' && !G.q && UI.turnKey !== tk) { UI.turnKey = tk; var tut = typeof coachOn === 'function' && coachOn(); UI.speed = !isHuman(s) ? (tut ? 6 : (UI.rvT0 && UI.speed > 1 ? UI.speed : 1)) : (tut ? 2 : 1); turnBanner(s); return; }   // a skip tap lasts for the whole wait, not into your turn
+  if (G.phase === 'play' && !G.q && UI.turnKey !== tk) { UI.turnKey = tk; var tut = typeof coachOn === 'function' && coachOn(); UI.speed = !isHuman(s) ? (tut ? 6 : Math.max(2.6, UI.rvT0 && UI.speed > 1 ? UI.speed : 1)) : (tut ? 2 : 1); turnBanner(s); return; }   // a skip tap lasts for the whole wait, not into your turn
   if (isHuman(s) && UI.eggAll) { var em = s === UI.view && eggPick(); if (em) { render(); apply(em, s); return; } UI.eggAll = false; }
   if (isHuman(s)) {
     if (s !== UI.view) { if (humans().length > 1) { askPass(s, function () { UI.view = s; render(); }); return; } UI.view = s; }

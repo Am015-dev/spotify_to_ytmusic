@@ -26,7 +26,7 @@ function toastNext() {
   setTimeout(function () { d.remove(); TQ.on = false; TQ.cur = null; toastNext(); }, x.ms);
 }
 // R19: the wait between your turns has a budget: after 2 s of rival play (round-end scoring, two rival turns in a row) the rest runs 6x faster
-function spd() { var sp = UI.speed || 1; if (UI.rvT0 && Date.now() - UI.rvT0 > 2000) sp = Math.max(sp, 6); return sp; }
+function spd() { var sp = UI.speed || 1; if (UI.rvT0 && Date.now() - UI.rvT0 > 1000) sp = Math.max(sp, 8); return sp; }
 function aMs(ms) { if (UI.fast) return 0; var sp = spd(); try { return Math.round((GX.animMs ? GX.animMs(ms) : ms) / sp); } catch (e) { return ms; } }
 function costHTML(b) { return b.c.map(function (s) { if (s === '*') return foodIcon('any'); var p = s.split('|'); return p.length > 1 ? p.map(function (f) { return foodIcon(f); }).join('<i>/</i>') : foodIcon(s); }).join(b.c.some(function (s) { return s.indexOf('|') >= 0; }) ? '' : '<i>+</i>'); }
 // a bird card: size 'slot' (on the board: picture, points, eggs) | 'tray' (picture + points) | 'hand' / 'big' (the readable card:
