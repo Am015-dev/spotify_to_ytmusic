@@ -537,6 +537,12 @@
     if (PV && sl0()) { var bt = [], rr0 = sl0().getBoundingClientRect(), vw0 = document.documentElement.clientWidth; g.hs.forEach(function (x, k) { if (PV.blk[k] > 0) bt.push('+' + PV.blk[k] + ' block' + (g.hs.length > 1 ? ' ' + D.H[x.k].name.split(' ')[0] : '')); if (PV.heal[k] > 0) bt.push('+' + PV.heal[k] + ' HP'); });
       if (bt.length) { var fb = h('div', 'w4hbf', bt.join(', ')); st.appendChild(fb); var fw = fb.offsetWidth, rx = rr0.right + 8; if (rx + fw > vw0 - 8) rx = Math.max(8, rr0.left - 8 - fw); fb.style.left = rx + 'px'; fb.style.top = Math.max(8, rr0.top + 10) + 'px'; } }   // W420 block preview beside the lifted card
     function sl0() { return hand.querySelector('.card.sel'); }
+    if (b.ph === 'p' && UI.sel >= 0 && sl0() && !(window.GXT && GXT.active())) {   // F2: a lifted card can be put back (this chip, or a tap on empty table)
+      var cx0 = on(h('button', 'chip w2cancel', '\u2715 Put back'), function () { UI.sel = -1; render(); }); cx0.id = 'cancelsel'; cx0.setAttribute('aria-label', 'Put the card back in your hand'); st.appendChild(cx0);
+      var rq = sl0().getBoundingClientRect(), vwq = document.documentElement.clientWidth, cw0 = cx0.offsetWidth, lx = rq.left - 8 - cw0; if (lx < 6) lx = Math.min(vwq - cw0 - 6, rq.right + 8);
+      cx0.style.left = Math.round(lx) + 'px'; cx0.style.top = Math.round(Math.max(60, rq.bottom - 56)) + 'px';
+    }
+    st.addEventListener('click', function (ev) { var t = ev.target; if (UI.sel < 0 || UI.busy || (window.GXT && GXT.active())) return; if (t.closest && t.closest('.card,.en,button,.chip,.pot,.ov,[role=dialog],a,input')) return; UI.sel = -1; render(); });
     if (SG && nn) {   // R7: the fanned hand always fits the screen (edge cards rotate outwards, so measure and shrink)
       for (var fit = 0; fit < 3; fit++) { var lo = 1e9, hi2 = -1e9, vwf = document.documentElement.clientWidth; hand.querySelectorAll('.card:not(.sel)').forEach(function (ce) { var q = ce.getBoundingClientRect(); lo = Math.min(lo, q.left); hi2 = Math.max(hi2, q.right); }); if (lo >= 3 && hi2 <= vwf - 3) break; var cwN = Math.floor(parseFloat(hand.style.getPropertyValue('--cw')) * (vwf - 8) / (hi2 - lo + 2)); hand.style.setProperty('--cw', Math.max(48, cwN) + 'px'); }
     }
@@ -627,7 +633,7 @@
     if (E.eff(c).tgt && al.length > 1) { toast('Tap an enemy'); return; }
     playIt(i, E.eff(c).tgt ? al[0] : undefined);
   }
-  function onEnemy(i) { var g = G(); if (g.b.ph === 'p' && UI.sel >= 0 && needTarget()) playIt(UI.sel, i); }
+  function onEnemy(i) { var g = G(); if (g.b.ph === 'p' && UI.sel >= 0 && needTarget()) { var c0 = g.hs[g.b.cur].hand[UI.sel]; if (c0 && !tutOk({ type: 'tap', w: 'card', id: c0.id })) return; playIt(UI.sel, i); } }   // F2: tapping the glowing foe counts as the guide's second tap
   function playIt(ci, ti) {
     var g = G(), mv = { t: 'play', h: g.b.cur, c: ci }; if (ti != null) mv.e = ti;
     var hc0 = g.hs[g.b.cur], cc0 = hc0.hand[ci]; UI.lastName = whyOf(hc0, cc0, ti != null ? g.b.en[ti] : null); SFX('play'); UI.busy = true; flyCard(ci, ti, function () {

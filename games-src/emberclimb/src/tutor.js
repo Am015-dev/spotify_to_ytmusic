@@ -160,17 +160,19 @@
     var tap = function (id, n) { return { type: 'tap', times: n || 2, match: function (a) { return a.w === 'card' && a.id === id; } }; };
     var info = function (id, target, say, ready, side) { return { id: id, title: 'Warden Ashgrove', target: target, say: say, wait: null, ready: ready || battleP, side: side }; };
     var en = function () { return $('.en'); }, intent = function () { return $('.en .intent') || $('.en'); };
+    // F2: steps that play an attack keep every live foe tappable and the bubble off them (a lifted attack is played by tapping the foe)
+    var foes = function () { return [].slice.call(document.querySelectorAll('.en:not(.dead)')); }, foeR = function () { return foes().map(function (x) { return x.getBoundingClientRect(); }); };
     return [
       info('intent', intent, 'Goal: beat the boss on top. This icon is its next move.'),
       info('energy', function () { return $('.energy') || $('#end'); }, 'Each turn: 3 energy and 5 new cards. Cards cost energy.'),
-      { id: 'vuln', title: 'Attack', target: function () { return cardEl('w-hammer'); }, say: 'Tap Anvil Blow twice. Vulnerable: it takes double damage.', wait: tap('w-hammer'), ready: battleP },
+      { id: 'vuln', title: 'Attack', target: function () { return cardEl('w-hammer'); }, say: 'Tap Anvil Blow twice. Vulnerable: it takes double damage.', wait: tap('w-hammer'), ready: battleP, also: foes, avoid: foeR },
       { id: 'block', title: 'Block', target: function () { return cardEl('w-defend'); }, say: 'Tap Plate Guard twice. Block soaks hits, this turn only.', wait: tap('w-defend'), ready: battleP },
       { id: 'endturn', title: 'End turn', target: function () { return $('#end'); }, endOk: 1, onEnter: function () { setTimeout(function () { UI.render(); }, 30); }, say: 'Tap End turn. Leftover cards go to the discard pile.', wait: { type: 'tap', match: function (a) { return a.w === 'end'; } }, ready: battleP },
       info('pattern', intent, 'Foes repeat a pattern. Next: a bite that makes you Weak.', turn2),
       { id: 'strength', title: 'Power', target: function () { return cardEl('w-kindle'); }, say: 'Tap Kindle twice. Strength adds 8 to every hit.', wait: tap('w-kindle'), ready: turn2 },
       { id: 'exhaust', title: 'Weak', target: function () { return cardEl('w-roar'); }, say: 'Tap the Roar twice. Weak foes hit 8 less. Roar exhausts.', wait: tap('w-roar'), ready: turn2 },
       { id: 'potion', title: 'Potion', target: function () { return $('.ec-potpop .potdrink') || $('.pot.full'); }, say: 'Tap the potion, then Drink. Poison hurts through Block.', wait: { type: 'event', match: function (a) { return a.pots === 0; } }, ready: turn2 },
-      { id: 'finish', title: 'Finish it', target: function () { return cardEl('w-strike'); }, say: 'Tap each Strike twice to finish it.', wait: tap('w-strike', 4), ready: turn2 },
+      { id: 'finish', title: 'Finish it', target: function () { return cardEl('w-strike'); }, say: 'Tap each Strike twice to finish it.', wait: tap('w-strike', 4), ready: turn2, also: foes, avoid: foeR },
       { id: 'reward', title: 'Card reward', target: function () { return $('.picks .card') && $('.picks .card').parentNode; }, say: 'Gold won! Pick 1 of 3 cards for your deck.', wait: { type: 'tap', match: function (a) { return a.w === 'pick'; } }, ready: scr('reward') },
       { id: 'leave', title: 'Onward', target: function () { return $('#leave'); }, say: 'Tap Continue to climb.', wait: { type: 'event', match: function (a) { return a.scr === 'map'; } }, ready: scr('reward') },
       info('map', function () { return $('#map'); }, 'Choose your path. The boss waits at the top.', scr('map')),
