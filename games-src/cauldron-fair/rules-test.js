@@ -64,7 +64,7 @@ test('a pot that exploded still has a scoring space', () => {
 // ---------- rats ----------
 test('rat tail counting: 0 between 5 and 6, 1 between 3 and 6, 2 between 2 and 6 (rulebook example)', () => { eq([D.ratTails(5, 6), D.ratTails(3, 6), D.ratTails(2, 6)], [0, 1, 2]); eq(D.ratTails(0, 10), 5); eq(D.ratTails(7, 7), 0); });
 test('rats start on round 2: non-leaders get tails, the leader and tied leaders none; the stone sits past the droplet', () => {
-  const G = T.game(3); G.round = 2; G.players[0].vp = 10; G.players[1].vp = 4; G.players[2].vp = 10; G.players[1].droplet = 1; CF._.startRound(G);
+  const G = T.game(3); G.round = 2; G.players[0].vp = 10; G.players[1].vp = 4; G.players[2].vp = 10; G.players[1].droplet = 1; G.force = 'lucky7'; CF._.startRound(G); CF._.adv(G);
   eq(G.players.map(p => p.ratTails), [0, 3, 0]); eq(G.players[1].rat, 4); eq(G.players[0].rat, 0);
 });
 test('round 1 has no rats', () => { const G = CF.newGame({ players: 2, seed: 3 }); eq(G.players.map(p => p.rat), [0, 0]); });
@@ -298,6 +298,7 @@ test('card Frothing Pot: the first white chip can go back for free; once', () =>
 test('card Pedlar\'s Pick: black chip, any 2-chip, or 3 rubies', () => {
   const G = withCard('pick'); eq(G.phase, 'prep'); const r0 = P(G, 0).rubies; yes(CF.moves(G, 0).some(m => m.o === 'K1'), 'black offered'); T.answer(G, 0, { o: 'rubies' }); eq(P(G, 0).rubies, r0 + 3); T.answer(G, 1, { o: 'G2' }); yes(P(G, 1).bag.some(c => c.c === 'G' && c.v === 2)); eq(G.phase, 'brew');
 });
+function G9(G, id) { G.force = id; CF._.startRound(G); }
 // a fresh game whose current round starts with `card` on top (round > 1: the game is parked in that round first)
 function withCard(card, np, o) {
   o = o || {}; T.dieOff(); const parked = o.round || o.vp || o.rubies; if (!o.round) o.round = 1;
@@ -378,9 +379,15 @@ test('Haggler\'s Hour: with only white chips in the hand the player takes a Moss
   eq(P(G, 0).q, null); eq(P(G, 0).hold.length, 0); yes(P(G, 0).bag.some(c => c.c === 'G' && c.v === 1), 'green 1 in the bag');
 });
 test('bonus die: six faces, 1 VP shows twice (the fan tool\'s reading of the rules\' five outcomes)', () => { T.dieOn(); eq(D.DIE.slice().sort(), ['drop', 'orange', 'ruby', 'vp1', 'vp1', 'vp2']); T.dieOff(); });
-test('day 9: Spilled Brew, Swap Stall, Fork, Haggler and Pedlar\'s Pick are skipped or reduced (a chip could never be drawn)', () => {
-  for (const id of ['swap', 'fork', 'haggle']) { const G = T.game(2); G.round = 9; G.force = id; CF._.startRound(G); eq(P(G, 0).q, null, id); eq(CF.pending(G).length, 0); }
-  const G = T.game(2); G.round = 9; const r0 = P(G, 0).rubies; G.force = 'pick'; CF._.startRound(G); eq(P(G, 0).rubies, r0 + 3); eq(P(G, 0).q, null);
+test('day 9: every card option stays (the card comes before the brew, so a new chip can be drawn that day)', () => {
+  for (const id of ['swap', 'fork', 'haggle', 'pick']) {
+    const G = T.game(2); G.round = 9; P(G, 0).rubies = 2; P(G, 1).rubies = 2; T.order(G, 0, ['W1', 'G1', 'O1', 'B1']); T.order(G, 1, ['W1', 'G1', 'O1', 'B1']); G.force = id; CF._.startRound(G);
+    yes(P(G, 0).q && P(G, 0).q.h === id, id + ' asks on day 9');
+    yes(!G.log.slice(-6).some(l => /never be (drawn|used)/.test(typeof l === 'string' ? l : (l.t || l.text || JSON.stringify(l)))), id + ': no false last-day line');
+  }
+  const F = T.game(2); F.round = 9; G9(F, 'pick'); yes(CF.moves(F, 0).some(m => m.o === 'rubies') && CF.moves(F, 0).some(m => /^[GBRY]2$/.test(m.o)), 'Pedlar\'s Pick keeps the chip choice');
+  const K = T.game(2); K.round = 9; G9(K, 'fork'); T.answer(K, 0, { o: 'drop' }); eq(P(K, 0).droplet, 2, 'Fork droplet step helps on day 9');
+  const B = T.game(2); B.round = 9; P(B, 0).vp = 0; P(B, 1).vp = 12; G9(B, 'bounty'); yes(CF.moves(B, 0).some(m => /^[A-Z]4$/.test(m.o)), 'Rat Bounty keeps the 4-chip option on day 9');
   const H = T.game(2); H.round = 9; H.force = 'spilled'; CF._.startRound(H); T.order(H, 0, ['W3', 'W3', 'W3']); H.phase = 'brew'; T.run9(H, [3, 1]); eq(CF.pending(H).filter(s => P(H, s).q && P(H, s).q.h === 'gift').length, 0, 'no gift on day 9');
   const X = T.game(2); X.round = 3; P(X, 0).vp = 10; P(X, 1).vp = 10; X.force = 'bounty'; CF._.startRound(X); eq(CF.moves(X, 0).some(m => m.o === 'vp'), false, 'no points option when you trail by nothing'); yes(CF.moves(X, 0).length > 0);
 });
@@ -393,6 +400,28 @@ test('upgrade does not touch the current round: the swapped chip stays in the ca
   const G = T.game(2, { setObj: SET('P', 4), round: 3 }); play(G, ['G1', 'P1']); T.stop(G, 0); T.stopOthers(G, 0); const n0 = P(G, 0).pot.length, g2 = G.supply.G2, g1 = G.supply.G1;
   T.answer(G, 0, { from: 'G1', to: 'G2' }); eq(P(G, 0).pot.length, n0, 'pot unchanged'); yes(P(G, 0).pot.some(c => c.c === 'G' && c.v === 1), 'old chip still in the cauldron'); T.inv(G);
   T.finish(G); eq(P(G, 0).bag.filter(c => c.c === 'G' && c.v === 1).length, 0, 'the swapped chip is gone'); eq(G.supply.G1, g1 + 1); eq(G.supply.G2, g2 - 1); T.inv(G);
+});
+
+// ---------- R90: the fortune card resolves before the rat tails are counted ----------
+test('R90 card before rats: A Little Slide moves a trailing droplet AND the rat stone counts from there', () => {
+  const G = T.game(2); G.round = 3; P(G, 0).vp = 0; P(G, 1).vp = 12; P(G, 0).droplet = 3; G.force = 'slide'; CF._.startRound(G); CF._.adv(G);
+  const t = D.ratTails(0, 12); yes(t >= 3, 'trails by enough'); eq(P(G, 0).droplet, 4); eq(P(G, 0).rat, 4 + t, 'start = droplet + 1 + tails'); eq(CF.startPos(P(G, 0)), 4 + t);
+});
+test('R90 card before rats: Fork in the Road droplet 2 is not swallowed by the rat stone', () => {
+  const G = T.game(2); G.round = 3; P(G, 0).vp = 0; P(G, 1).vp = 12; P(G, 0).droplet = 3; G.force = 'fork'; CF._.startRound(G); eq(P(G, 0).rat, 0, 'not counted while the card is open');
+  T.answer(G, 0, { o: 'drop' }); T.answer(G, 1, { o: 'drop' }); eq(P(G, 0).droplet, 5); eq(P(G, 0).rat, 5 + D.ratTails(0, 12));
+});
+test('R90 card before rats: Fairground Dice points count before the rat tails', () => {
+  const D0 = D.DIE.slice();
+  try {
+    const G = T.game(2); for (let i = 0; i < 6; i++) D.DIE[i] = 'vp2'; G.round = 3; P(G, 0).vp = 10; P(G, 1).vp = 12; G.force = 'dice'; CF._.startRound(G); CF._.adv(G);
+    eq([P(G, 0).vp, P(G, 1).vp], [12, 14]); eq(P(G, 0).ratTails, D.ratTails(12, 14), 'tails against the score after the die');
+    const H = T.game(2); H.round = 3; P(H, 0).vp = 0; P(H, 1).vp = 12; P(H, 0).droplet = 2; for (let i = 0; i < 6; i++) D.DIE[i] = 'drop'; H.force = 'dice'; CF._.startRound(H); CF._.adv(H);
+    eq(P(H, 0).droplet, 3); eq(P(H, 0).rat, 3 + D.ratTails(0, 12), 'die droplet step counts');
+  } finally { for (let i = 0; i < 6; i++) D.DIE[i] = D0[i]; }
+});
+test('R90 Pedlar\'s Pick: no Cinder Moth offered when black is sold out', () => {
+  const G = T.game(2); G.supply.K1 = 0; G.force = 'pick'; CF._.startRound(G); eq(CF.moves(G, 0).some(m => m.o === 'K1'), false);
 });
 let pass = 0, fail = 0;
 for (const [n, f] of tests) { try { f(); pass++; console.log('PASS ' + n); } catch (e) { fail++; console.log('FAIL ' + n + '\n     ' + (e.message || e).split('\n')[0]); } }

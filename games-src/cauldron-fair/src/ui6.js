@@ -85,8 +85,8 @@ function brewDeck(p, v, legal) {
   const deck = h('div.bdeck' + (heat > .7 ? '.hot' : ''));
   deck.appendChild(h('div.bline', { 'aria-live': 'polite' }, bfLine(p, r, fm)));
   deck.appendChild(bfMeter(p, v, p.lock ? null : fm, legal));
-  const extras = [legal.find(x => x.t === 'froth') ? h('button.btn.alt.sec', { 'data-a': 'mv', 'data-i': legal.indexOf(legal.find(x => x.t === 'froth')), type: 'button' }, '↩ White chip back, free') : null,
-    legal.find(x => x.t === 'restart') ? h('button.btn.alt.sec', { 'data-a': 'mv', 'data-i': legal.indexOf(legal.find(x => x.t === 'restart')), type: 'button' }, 'Do-over: tip the chips back, once') : null].filter(Boolean);
+  const extras = [legal.find(x => x.t === 'froth') ? h('button.btn.alt.bx', { 'data-a': 'mv', 'data-i': legal.indexOf(legal.find(x => x.t === 'froth')), type: 'button', 'aria-label': 'Put the white chip back, free' }, h('b', '↩ White'), h('small', 'back, free')) : null,
+    legal.find(x => x.t === 'restart') ? h('button.btn.alt.bx', { 'data-a': 'mv', 'data-i': legal.indexOf(legal.find(x => x.t === 'restart')), type: 'button', 'aria-label': 'Do-over: tip the chips back, once' }, h('b', 'Do-over'), h('small', 'once')) : null].filter(Boolean);
   const bagArt = KIT.ART.bag ? h('img.bagimg', { src: KIT.ART.bag, alt: '' }) : h('span.bagimg', { html: ico('bag', 80) });
   const bag3 = !KIT.ART.bag || bagCur ? null : h('img.bag3d', { src: MODELS + 'bag.webp', alt: '', draggable: 'false', decoding: 'async' });   // the 3D bag swings in while the hand rummages (default bag only, not the unlocked skins)
   const bag = dm ? h('button.btn.drawb.bagb' + (BF.pulling ? '.pull' : ''), { 'data-a': 'mv', 'data-i': legal.indexOf(dm), type: 'button', 'aria-label': 'Draw: pull a chip from your bag (' + bagN(p) + ' chips inside)' },
@@ -95,8 +95,7 @@ function brewDeck(p, v, legal) {
   const keep = h('small.keep', h('span', { html: ico('vp', 15) }), D.VP[sp], h('span', { html: ico('coin', 15) }), D.COINS[sp], D.RUBY[sp] ? h('span', { html: ico('ruby', 15) }) : null);
   const stop = sm ? h('button.btn.stopb', { 'data-a': 'mv', 'data-i': legal.indexOf(sm), type: 'button', disabled: BF.pulling ? true : null, 'aria-label': 'Stop and keep ' + D.VP[sp] + ' points and ' + D.COINS[sp] + ' coins' }, h('b', 'Stop'), keep)
     : h('button.btn.stopb.off', { type: 'button', disabled: true, title: 'Pull your first chip first' }, h('b', 'Stop'), p.pot.length ? keep : h('small.keep', 'after a chip'));
-  deck.appendChild(h('div.brow', bag, stop));
-  if (extras.length) deck.appendChild(h('div.bextra', extras));   // below Draw/Stop, so the two big buttons never move
+  deck.appendChild(h('div.brow', bag, stop, ...extras));   // R90 phone: the rare extras sit in the same row, so nothing runs past the bottom of a 553 px screen
   return deck;
 }
 // ---------- the boil: the pot reacts to the risk (CSS on #cwrap, the painted layer reads BF.heat) ----------
@@ -148,7 +147,8 @@ function bfGhostTarget() {
   if (!G || !UI.started || G.phase === 'over' || hotSeat() || UI.coach.level === 'off' || tutOn()) return null;
   const p = mineP(); if (!p) return null; const fresh = UI.mode === 'guided' || !UI.prefs.drew;
   if (UI.rsOpen && UI.rsMode === 'report') {
-    if (p.q && p.q.h === 'shop' && !UI.prefs.shopped && !(UI.shopSel || []).length) return document.querySelector('#rs .tok.sug:not([disabled])') || document.querySelector('#rs .tok:not([disabled])');
+    if (document.querySelector('#rs .sug')) return null;   // R90 calm: the glowing suggestion is already the one helper; no finger on top
+    if (p.q && p.q.h === 'shop' && !UI.prefs.shopped && !(UI.shopSel || []).length) return document.querySelector('#rs .tok.sug:not([disabled]):not(.dis)') || document.querySelector('#rs .tok:not([disabled]):not(.dis)');
     if (p.q && p.q.h === 'shop' && !UI.prefs.shopped && (UI.shopSel || []).length) return document.querySelector('#rs [data-a=shopbuy]');
     return null;
   }
@@ -183,6 +183,9 @@ function bfFly(fromR, toEl, key, size) {
   catch (x) { e.remove(); toEl.style.visibility = ''; }
 }
 function shopToggle(key) {
+  const tb = document.querySelector('#rs .stalls .tok[data-k="' + key + '"]');
+  if (tb && tb.dataset.why && !(UI.shopSel || []).includes(key)) { UI.shopWhy = tb.dataset.why; snd('click'); renderReport(); const nb = document.querySelector('#rs .stalls .tok[data-k="' + key + '"]'); if (nb) nb.classList.add('shk'); return; }
+  UI.shopWhy = null;
   const c = key[0]; let sel = UI.shopSel.slice(); const i = sel.indexOf(key), adding = i < 0;
   const src = document.querySelector('#rs .tok[data-k="' + key + '"] svg'), fromR = src ? src.getBoundingClientRect() : null;
   if (i >= 0) sel.splice(i, 1); else { sel = sel.filter(k => k[0] !== c); sel.push(key); if (sel.length > 2) sel.shift(); }
@@ -192,12 +195,13 @@ function shopToggle(key) {
 }
 function shopBuy() {
   const v = viewSeat(); if (v < 0) return; const items = UI.shopSel.slice();
-  const go = () => { UI.shopSel = []; UI.shopInfo = null; UI.prefs.shopped = true; savePrefs(); if (UI.rubyShown && mineP()) UI.rubyAuto = Object.assign({}, rubyPick(mineP())); UI.advFor = G.rep ? G.rep.round : 0; if (!act({ t: 'buy', items }, v)) { const me = mineP(); if (me) UI.instrNote = { ver: me.ver, text: 'That did not work. Pick again.' }; } };
+  const go = () => { UI.shopSel = []; UI.shopInfo = null; UI.shopWhy = null; UI.prefs.shopped = true; savePrefs(); if (UI.rubyShown && mineP()) UI.rubyAuto = Object.assign({}, rubyPick(mineP())); UI.advFor = G.rep ? G.rep.round : 0; if (!act({ t: 'buy', items }, v)) { const me = mineP(); if (me) UI.instrNote = { ver: me.ver, text: 'That did not work. Pick again.' }; } };
   const cs = $$('#rs .sbc'), img = document.querySelector('#rs .sbimg');
   if (!items.length || !bfAnim() || !cs.length || !img) { go(); return; }
   if (UI.buying) return; UI.buying = true;
   const ir = img.getBoundingClientRect();
-  cs.forEach((c, k) => { const r = c.getBoundingClientRect(); try { c.animate([{ transform: 'none', opacity: 1 }, { transform: 'translate(' + (ir.left + ir.width / 2 - r.left - r.width / 2) + 'px,' + (ir.top + ir.height * .3 - r.top - r.height / 2 - 40) + 'px) scale(.8)', offset: .55 }, { transform: 'translate(' + (ir.left + ir.width / 2 - r.left - r.width / 2) + 'px,' + (ir.top + ir.height * .45 - r.top - r.height / 2) + 'px) scale(.2)', opacity: 0 }], { duration: 520, delay: k * 120, fill: 'forwards', easing: 'ease-in' }); } catch (x) { } });
+  cs.forEach((c0, k) => { const r = c0.getBoundingClientRect(); const c = h('div.bfchip', { html: c0.innerHTML, 'aria-hidden': 'true' }); c.style.left = r.left + 'px'; c.style.top = r.top + 'px'; document.body.appendChild(c); c0.style.visibility = 'hidden'; setTimeout(() => c.remove(), 1400 + k * 120);   // R90: a clone falls into the bag, never the 44 px button itself
+    try { c.animate([{ transform: 'none', opacity: 1 }, { transform: 'translate(' + (ir.left + ir.width / 2 - r.left - r.width / 2) + 'px,' + (ir.top + ir.height * .3 - r.top - r.height / 2 - 40) + 'px) scale(.8)', offset: .55 }, { transform: 'translate(' + (ir.left + ir.width / 2 - r.left - r.width / 2) + 'px,' + (ir.top + ir.height * .45 - r.top - r.height / 2) + 'px) scale(.2)', opacity: 0 }], { duration: 520, delay: k * 120, fill: 'forwards', easing: 'ease-in' }); } catch (x) { } });
   try { img.animate([{ transform: 'none' }, { transform: 'scale(1.12,.9)' }, { transform: 'none' }], { duration: 300, delay: 480 + (cs.length - 1) * 120 }); } catch (x) { }
   snd('buy'); setTimeout(() => { UI.buying = false; go(); }, 720 + (cs.length - 1) * 120);
 }

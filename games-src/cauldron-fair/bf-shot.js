@@ -28,7 +28,7 @@ const OUT = path.join(__dirname, 'shots'); fs.mkdirSync(OUT, { recursive: true }
       const st = await p.evaluate(() => { const v = viewSeat(), q = G.players[v]; return { rs: UI.rsOpen, q: q.q && q.q.h }; });
       if (!st.rs) break;
       if (await tapSel('#rstip [data-a=tipok]')) { await p.waitForTimeout(300); continue; }
-      if (st.q === 'shop') { await shot('d' + day + 'shop'); await tapSel('#rs .tok:not([disabled])'); await p.waitForTimeout(200); await shot('d' + day + 'shopfly'); await p.waitForTimeout(500); await shot('d' + day + 'shop1'); await tapSel('#rs [data-a=shopbuy]'); await p.waitForTimeout(350); await shot('d' + day + 'buying'); await p.waitForTimeout(900); continue; }
+      if (st.q === 'shop') { await shot('d' + day + 'shop'); await tapSel('#rs .tok:not([disabled]):not(.dis)'); await p.waitForTimeout(200); await shot('d' + day + 'shopfly'); await p.waitForTimeout(500); await shot('d' + day + 'shop1'); await tapSel('#rs [data-a=shopbuy]'); await p.waitForTimeout(350); await shot('d' + day + 'buying'); await p.waitForTimeout(900); continue; }
       if (st.q && !['gift','g2','g4','p1','g3','p2','p4','de','shop','ruby'].includes(st.q)) { if (await tapSel('#rs [data-a=rscont]:not([disabled])')) { await p.waitForTimeout(900); continue; } }
       if (st.q) { await shot('d' + day + 'q-' + st.q); await tapSel('#rs .dec [data-a=mv]'); await p.waitForTimeout(700); continue; }
       if (await tapSel('#rs [data-a=rscont]:not([disabled])')) { await p.waitForTimeout(900); continue; }

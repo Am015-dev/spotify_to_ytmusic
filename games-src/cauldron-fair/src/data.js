@@ -60,7 +60,7 @@ var BOOKS = {
   },
   P: {
     1: { price: [9], eff: 'p1', title: 'Gentle sigh', text: 'After the brew, count purple chips. One: 1 VP. Two: 1 VP and a ruby. Three or more: 2 VP and a droplet step. You may take less.' },
-    2: { price: [12], eff: 'p2', title: 'Trade wind', text: 'After the brew, you may hand in purple chips. One: a black 1, 1 VP and a ruby. Two: a green 1, a blue 2, 3 VP, a droplet step. Three: a yellow 4, 6 VP, a ruby, two droplet steps. You may hand in fewer. The two-chip reward works once.' },
+    2: { price: [12], eff: 'p2', title: 'Trade wind', text: 'After the brew, you may hand in purple chips. One: a black 1, 1 VP and a ruby. Two: a green 1, a blue 2, 3 VP, a droplet step. Three: a yellow 4, 6 VP, a ruby, two droplet steps. You may hand in fewer, or mix rewards. Each reward works once a day.' },
     3: { price: [10], eff: 'p3', title: 'Deep sigh', text: 'After the brew, each purple scores by its space. Spaces 0-9: 0 VP. 10-19: 1. 20-29: 2. 30 and up: 3.' },
     4: { price: [11], eff: 'p4', title: 'Upgrade sigh', text: 'After the brew, upgrade one chip of the same colour. One purple: a 1-chip becomes a 2-chip. Two: a 2-chip becomes a 4-chip. Three or more: a 1-chip becomes a 4-chip. The new chip goes into your bag.' }
   }
@@ -75,7 +75,7 @@ var FORTUNE = [
   { id: 'twice', kind: 'blue', name: 'Twice Rolled', text: 'Roll the bonus die today? Roll it twice and take both.' },
   { id: 'thick', kind: 'blue', name: 'Thick Skin', text: 'The limit is 9 today instead of 7.' },
   { id: 'marrowfair', kind: 'blue', name: 'Marrow Fair', text: 'Today every orange chip moves 1 extra space.' },
-  { id: 'peek', kind: 'blue', name: 'Peek and Pick', text: 'Stop safely? Draw up to 5 chips and place one of them.' },
+  { id: 'peek', kind: 'blue', name: 'Second Look', text: 'Stop safely? Draw up to 5 chips and place one of them.' },
   { id: 'glint', kind: 'blue', name: 'Ruby Glint', text: 'Scoring space shows a ruby? Score 2 VP, even after exploding.' },
   { id: 'spring', kind: 'blue', name: 'Spring Water', text: 'At the end of the day every flask refills free.' },
   { id: 'froth', kind: 'blue', name: 'Frothing Pot', text: 'Today you may put your first white chip back in the bag.' },

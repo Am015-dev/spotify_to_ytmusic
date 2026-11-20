@@ -84,7 +84,7 @@ const CHECKS = () => {
       if (!hint) bad.push(['ghost', 'finger shown on ' + hit + ' with no hint text']);
       else if (!want || hit !== want) bad.push(['ghost', 'finger on ' + hit + ' but hint says "' + hint + '"']);
     } else {
-      const tg = document.querySelector('#rs .tok.sug:not([disabled]), #rs .tok:not([disabled]), #rs [data-a=shopbuy]'); if (!tg) bad.push(['ghost', 'finger in report with no target']);
+      const tg = document.querySelector('#rs .tok.sug:not([disabled]):not(.dis), #rs .tok:not([disabled]):not(.dis), #rs [data-a=shopbuy]'); if (!tg) bad.push(['ghost', 'finger in report with no target']);
     }
   }
   // help elements: inside the screen, never over a glowing / tappable thing's core; with tips off no coach bubble at all

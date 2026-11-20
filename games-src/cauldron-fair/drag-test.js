@@ -24,7 +24,7 @@ const sleep = ms => new Promise(r => setTimeout(r, ms));
   await p.evaluate(() => { AIDELAY = 60; });
   for (let i = 0; i < 3; i++) { const bg = await ctr('#acts .bagb:not(.off)'); if (bg) await p.touchscreen.tap(bg.x, bg.y); await sleep(1300); await p.evaluate(() => { document.querySelectorAll('#coach [data-cx=ok]').forEach(o => o.click()); }); }
   { const st = await ctr('#acts .stopb'); if (st) await p.touchscreen.tap(st.x, st.y); }
-  let tok = null; for (let i = 0; i < 60 && !tok; i++) { await sleep(500); await p.evaluate(() => { document.querySelectorAll('#coach [data-cx=ok]').forEach(o => o.click()); const c = document.querySelector('#rs [data-a=repnext],#rs .confirm:not([disabled])'); if (c && !document.querySelector('#rs .tok')) c.click(); }); tok = await ctr('#rs .tok:not([disabled])'); }
+  let tok = null; for (let i = 0; i < 60 && !tok; i++) { await sleep(500); await p.evaluate(() => { document.querySelectorAll('#coach [data-cx=ok]').forEach(o => o.click()); const c = document.querySelector('#rs [data-a=repnext],#rs .confirm:not([disabled])'); if (c && !document.querySelector('#rs .tok')) c.click(); }); tok = await ctr('#rs .tok:not([disabled]):not(.dis)'); }
   const bag = await ctr('#rs .sbimg');
   if (tok && bag) { const n0 = await p.evaluate(() => (UI.shopSel || []).length); const g2 = await drag(tok, bag); await sleep(700); const n1 = await p.evaluate(() => (UI.shopSel || []).length); console.log((n1 === n0 + 1 && g2 ? 'PASS' : 'FAIL') + ' shop drag: picked ' + n0 + ' -> ' + n1 + ', bag glowed ' + g2); if (!(n1 === n0 + 1 && g2)) errs.push('shop drag'); }
   else { console.log('FAIL shop not reached', !!tok, !!bag); errs.push('no shop'); }

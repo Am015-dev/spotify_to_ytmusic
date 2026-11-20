@@ -6,16 +6,16 @@
 const STG = { run: false, round: 0, tm: [], iv: [], dirty: false };
 const FORT_SHORT = {
   lucky7: 'Exactly 7 white: droplet moves one.', spilled: 'If you boom, left rival takes a 2-chip.', doover: 'After chip 5: restart once.', twice: 'Bonus die rolls twice today.',
-  thick: 'White limit is 9 today.', marrowfair: 'Orange chips move one extra today.', peek: 'Stop safely: draw 5, place one.', glint: 'Ruby space scores 2 points, even boomed.',
+  thick: 'White limit is 9 today.', marrowfair: 'Orange chips move one extra today.', peek: 'Stop safely: draw up to 5, may place one.', glint: 'Ruby space scores 2 points, even boomed.',
   spring: 'Flasks refill free tonight.', froth: 'First white chip may go back.', spark: 'Ruby space gives one extra ruby.', pick: 'Black chip, any 2-chip, or 3 rubies.',
-  slide: 'Droplet moves one space.', swap: 'Trade 1 ruby for a 1-chip.', alms: 'Fewest rubies take 1 ruby.', underdog: 'Fewest points take a green 1.',
+  slide: 'Droplet moves one space.', swap: 'May trade 1 ruby for a 1-chip (not purple or black).', alms: 'Fewest rubies take 1 ruby.', underdog: 'Fewest points take a green 1.',
   clear: 'Score 4 points, or drop a white 1.', swarm: 'Rat stone moves by your rat tails.', dip: 'Draw 5: lowest gets blue 2.', bribe: 'Rat back 1 to 3 spaces for rubies.',
   bounty: 'Take a 4-chip, or points per tail.', fork: 'Droplet +2, or take a purple chip.', dice: 'Everyone rolls the bonus die once.', haggle: 'Draw 4: swap one for a bigger chip.'
 };
 const BOOK_SHORT = {
-  O: 'No power. Cheap filler.', K: 'Most black chips: droplet moves, maybe ruby.',
+  O: 'No power. Cheap filler.', K: '2 players: most or tied black, droplet +1; most also a ruby. 3-4: beat each neighbour.',
   G: { 1: 'Last two chips green: 1 ruby each.', 2: 'Last-two greens give free chips.', 3: 'White exactly 7: greens push you on.', 4: 'Last-two greens: 1 ruby moves droplet.' },
-  B: { 1: 'On landing, peek chips, place one.', 2: 'Keeps your points if you boom.', 3: 'On a ruby space: take 1 ruby.', 4: 'On a ruby space: points equal its number.' },
+  B: { 1: 'On landing, peek chips, place one.', 2: 'Covers your next 1, 2 or 4 chips: boom then, keep points and coins, but no die.', 3: 'On a ruby space: take 1 ruby.', 4: 'On a ruby space: points equal its number.' },
   R: { 1: 'Slides extra for oranges in your pot.', 2: 'Set aside, add after your last chip.', 3: 'Adds the white chip before it.', 4: 'Later white 1s move 2 spaces.' },
   Y: { 1: 'After a white: put that white back.', 2: 'Next chip moves twice as far.', 3: 'White limit grows to 8 or 9.', 4: 'Each yellow moves extra: 1, 2, 3.' },
   P: { 1: 'After brewing: purples give points, rubies.', 2: 'Hand in purples for chips and rewards.', 3: 'Purples score by how far they sit.', 4: 'Purples upgrade a pot chip.' }
@@ -68,7 +68,7 @@ function stgRow(d, v, anim) {
   const tile = h('div.dtile');
   if (q) {
     const legal = mvList(p.seat); UI.legal[p.seat] = legal; const dec = h('div.dec.dec-de');
-    legal.forEach(m => dec.appendChild(h('button.dpick.pickglow' + (m.o === 'vp' ? '.dpv' : '.dpc'), { 'data-a': 'mv', 'data-i': legal.indexOf(m), type: 'button', 'aria-label': m.o === 'vp' ? 'Take ' + q.d.vp + ' points' : 'Shop with ' + q.d.coins + ' coins' }, h('span', { html: ico(m.o === 'vp' ? 'vp' : 'coin', 34) }), h('b', m.o === 'vp' ? '+' + q.d.vp : q.d.coins), h('small.dpl', m.o === 'vp' ? 'Take points' : 'Take coins'))));
+    legal.forEach(m => dec.appendChild(h('button.dpick' + (m.o === 'vp' ? '.dpv' : '.dpc'), { 'data-a': 'mv', 'data-i': legal.indexOf(m), type: 'button', 'aria-label': m.o === 'vp' ? 'Take ' + q.d.vp + ' points' : 'Shop with ' + q.d.coins + ' coins' }, h('span', { html: ico(m.o === 'vp' ? 'vp' : 'coin', 34) }), h('b', m.o === 'vp' ? '+' + q.d.vp : q.d.coins), h('small.dpl', m.o === 'vp' ? 'Take points' : 'Take coins'))));
     tile.appendChild(dec); try { sugMark(dec, p, q, legal); } catch (e) { }
   } else {
     const dimC = lose && d.mode === 'vp', dimV = lose && d.mode === 'buy';
@@ -195,9 +195,9 @@ function stgScreen(R, v, me, myq, hotShared, hotPriv, play) {
 // ---------- the market stall ----------
 // what each stall's chip does, in plain words short enough for a 375px phone (tap a chip for the full text)
 const STALL_DO = { none: 'No power, cheapest', black: 'Most moths: droplet', g1: 'In last 2: a ruby', g2: 'In last 2: free chip', g3: 'Whites at 7: slide on', g4: 'In last 2: buy droplet',
-  b1: 'Peek, then pick one', b2: 'Shields next chips', b3: 'On a ruby: +1 ruby', b4: 'On a ruby: points', r1: '+1 after an orange', r2: 'Set aside, add later', r3: 'After a white: jumps', r4: 'White 1s move 2',
+  b1: 'Peek, then pick one', b2: 'Shields next chips', b3: 'On a ruby: +1 ruby', b4: 'On a ruby: points', r1: 'Oranges in pot: +1/+2', r2: 'Set aside, add later', r3: 'After a white: jumps', r4: 'White 1s move 2',
   y1: 'After a white: undo it', y2: 'Next chip moves ×2', y3: 'Raises your limit', y4: 'Moves extra spaces', p1: 'Points at the count', p2: 'Trade in for prizes', p3: 'Far out: points', p4: 'Upgrades a chip' };
-const STALL_DO3 = { none: 'Cheapest', black: 'Moth: droplet', g1: 'Last 2: ruby', g2: 'Last 2: chip', g3: 'Slide on at 7', g4: 'Last 2: droplet', b1: 'Peek, then pick', b2: 'Shields chips', b3: 'On ruby: +1', b4: 'On ruby: points', r1: '+1 after orange', r2: 'Set aside', r3: 'Jumps after white', r4: 'White 1s go 2', y1: 'Undo a white', y2: 'Next chip x2', y3: 'Raises limit', y4: 'Moves extra', p1: 'Points at count', p2: 'Trade for prizes', p3: 'Far out: points', p4: 'Upgrades a chip' };   // R28: the 3-column stalls say it in fewer words, never cut by an ellipsis
+const STALL_DO3 = { none: 'Cheapest', black: 'Moth: droplet', g1: 'Last 2: ruby', g2: 'Last 2: chip', g3: 'Slide on at 7', g4: 'Last 2: droplet', b1: 'Peek, then pick', b2: 'Shields chips', b3: 'On ruby: +1', b4: 'On ruby: points', r1: 'Oranges: +1/+2', r2: 'Set aside', r3: 'Jumps after white', r4: 'White 1s go 2', y1: 'Undo a white', y2: 'Next chip x2', y3: 'Raises limit', y4: 'Moves extra', p1: 'Points at count', p2: 'Trade for prizes', p3: 'Far out: points', p4: 'Upgrades a chip' };   // R28: the 3-column stalls say it in fewer words, never cut by an ellipsis
 function marketEl(p, q) {
   const wrap = h('div.mkt'); const coins = q.d.coins, sel = UI.shopSel = (UI.shopSel || []).filter(k => G.supply[k] > 0);
   const cost = sel.reduce((a, k) => a + CF.price(G, k[0], +k.slice(1)), 0);
@@ -213,7 +213,8 @@ function marketEl(p, q) {
       if (c === 'W' || (c === 'O' && val !== 1)) return; const key = c + val, price = CF.price(G, c, val), left = G.supply[key];
       const on = sel.indexOf(key) >= 0; const others = sel.filter(k => k[0] !== c).reduce((a, k) => a + CF.price(G, k[0], +k.slice(1)), 0);
       const dis = !out || left < 1 || price + others > coins;
-      row.appendChild(h('div.tokw', { 'data-lp': 'chip:' + key }, h('button.tok' + (on ? '.on' : '') + (dis && !on ? '' : '.tglow'), { 'data-a': 'shopsel', 'data-k': key, type: 'button', disabled: dis && !on ? true : null, 'aria-pressed': on ? 'true' : 'false', 'aria-label': keyName(key) + ' for ' + price + ' coins' + (left < 1 ? ', sold out' : '') },
+      const why = dis && !on ? (!out ? 'Opens on day ' + D.BOOK_ROUND[c] : left < 1 ? 'Sold out' : 'Costs ' + price + (others ? ' (+' + others + ' in your bag)' : '') + ', you have ' + coins) : '';   // R90 B1: a chip you cannot buy still answers the tap
+      row.appendChild(h('div.tokw', { 'data-lp': 'chip:' + key }, h('button.tok' + (on ? '.on' : '') + (dis && !on ? '.dis' : '.can'), { 'data-a': 'shopsel', 'data-k': key, 'data-why': why || null, type: 'button', 'aria-disabled': dis && !on ? 'true' : null, 'aria-pressed': on ? 'true' : 'false', 'aria-label': keyName(key) + ' for ' + price + ' coins' + (left < 1 ? ', sold out' : '') },
         chipN(key, 44), h('span.pc', h('span', { html: ico('coin', 13) }), left < 1 ? '—' : price))));
     });
     st.appendChild(row); stalls.appendChild(st);
@@ -227,7 +228,7 @@ function marketEl(p, q) {
   stalls.addEventListener('click', ev => { const b = ev.target.closest('.tok,.rbt'), sx = ev.target.closest('.stall,.rbar'); if ((b && b.classList.contains('tcut')) || (!b && sx && sx.querySelector('.tout'))) { const s = sx; if (s) setTimeout(() => { const ns = s.isConnected ? s : null; if (ns) ns.scrollIntoView({ block: 'nearest', behavior: 'smooth' }); }, 0); } });
   { const k = sel[sel.length - 1], bk = k ? (k[0] === 'O' ? D.BOOKS.O[0] : k[0] === 'K' ? D.BOOKS.K[0] : D.BOOKS[k[0]][G.sets[k[0]]]) : null;
     const ri = UI.shopInfo && UI.rubyShown ? RUBY_INFO[UI.shopInfo] : null;
-    wrap.appendChild(h('div.sinfo', ri ? h('span', h('b', ri.split(':')[0] + ':'), ri.slice(ri.indexOf(':') + 1)) : bk ? h('span', h('b', keyName(k) + ': '), bk.text) : 'Tap a chip to see what it does. Buy up to 2, different colours.')); }
+    wrap.appendChild(h('div.sinfo', UI.shopWhy ? h('span.swhy', h('b', UI.shopWhy)) : ri ? h('span', h('b', ri.split(':')[0] + ':'), ri.slice(ri.indexOf(':') + 1)) : bk ? h('span', h('b', keyName(k) + ': '), bk.text) : 'Tap a chip to see what it does. Buy up to 2, different colours.')); }
   const bagArt = KIT.ART.bag ? h('img.sbimg', { src: KIT.ART.bag, alt: '' }) : h('span.sbimg', { html: ico('bag', 56) });
   const bagz = h('div.shopbag', { 'aria-label': 'Your bag' }, bagArt, h('div.sbin', sel.length ? sel.map(k => h('button.sbc', { 'data-a': 'shopsel', 'data-k': k, type: 'button', 'aria-label': 'Take ' + keyName(k) + ' out again' }, chipN(k, 40))) : h('span.sbe', { html: ico('bag', 22) })));
   UI.rsFoot = [h('div.shopfoot', bagz, h('button.btn.go.confirm', { 'data-a': 'shopbuy', type: 'button' }, nextLabel()))];
@@ -278,8 +279,8 @@ function rubyBar(p) {   // the ruby stall of the market: plain words on each but
   const S = rubyState(p), n = D.rubySpend, el = h('div.rbar.rubyp', h('div.rbh', h('b', 'Rubies'), rubyGems(p, S.cost, true)));
   const dk = S.nextDrop(), fk = S.flaskKey(), undoDrop = dk && S.sel.drop && +dk[0] === 0;
   const dropTxt = undoDrop ? 'Drop moved +' + S.sel.drop : 'Move your drop +' + (S.sel.drop + 1), flaskTxt = p.flask ? 'Flask is full' : S.sel.flask ? 'Flask refilled' : 'Refill flask';
-  el.appendChild(h('button.rbt.rdrop.rwd' + (S.sel.drop ? '.on' : '') + (dk ? '.tglow' : ''), { 'data-a': 'rubysel', 'data-k': dk || '', 'data-ri': 'drop', type: 'button', disabled: dk ? null : true, 'aria-label': dropTxt + ': ' + n + ' rubies' }, h('span', { html: ico('drop', 24) }), h('span.rwt', h('b', dropTxt), h('em', undoDrop ? 'tap to undo' : n + ' rubies'))));
-  el.appendChild(h('button.rbt.rflask.rwd' + (S.sel.flask ? '.on' : '') + (fk ? '.tglow' : ''), { 'data-a': 'rubysel', 'data-k': fk || '', 'data-ri': 'flask', type: 'button', disabled: fk ? null : true, 'aria-label': p.flask ? 'Flask is full' : flaskTxt + ': ' + n + ' rubies' }, h('span', { html: ico('flask', 24, p.flask || S.sel.flask) }), h('span.rwt', h('b', flaskTxt), p.flask ? null : h('em', S.sel.flask ? 'tap to undo' : n + ' rubies'))));
+  el.appendChild(h('button.rbt.rdrop.rwd' + (S.sel.drop ? '.on' : '') + (dk ? '.can' : ''), { 'data-a': 'rubysel', 'data-k': dk || '', 'data-ri': 'drop', type: 'button', disabled: dk ? null : true, 'aria-label': dropTxt + ': ' + n + ' rubies' }, h('span', { html: ico('drop', 24) }), h('span.rwt', h('b', dropTxt), h('em', undoDrop ? 'tap to undo' : n + ' rubies'))));
+  el.appendChild(h('button.rbt.rflask.rwd' + (S.sel.flask ? '.on' : '') + (fk ? '.can' : ''), { 'data-a': 'rubysel', 'data-k': fk || '', 'data-ri': 'flask', type: 'button', disabled: fk ? null : true, 'aria-label': p.flask ? 'Flask is full' : flaskTxt + ': ' + n + ' rubies' }, h('span', { html: ico('flask', 24, p.flask || S.sel.flask) }), h('span.rwt', h('b', flaskTxt), p.flask ? null : h('em', S.sel.flask ? 'tap to undo' : n + ' rubies'))));
   const best = el.querySelector('[data-k="' + UI.rubyBest + '"]'); if (best) best.classList.add('sug');
   return el;
 }
@@ -295,12 +296,12 @@ function rubyBoard(p) {   // the ruby-only screen: a zoomed cauldron, the drople
   const pot = h('div.rpot', { html: svg });
   for (let k = 0; k <= S.mx; k++) {
     const q = pts[p.droplet + k]; if (!q) break; const key = S.keyFor(k, S.sel.flask); if (!key) continue; const here = k === S.sel.drop;
-    pot.appendChild(h('button.rtg.tglow' + (here ? '.here' : '') + (key === UI.rubyBest ? '.sug' : ''), { 'data-a': 'rubysel', 'data-k': key, type: 'button', 'aria-pressed': here ? 'true' : 'false', 'aria-label': k ? 'Start ' + k + ' further on' : 'Keep the droplet here', style: 'left:' + ((q.x - vx) / sz * 100).toFixed(2) + '%;top:' + ((q.y - vy) / sz * 100).toFixed(2) + '%;width:' + (1.15 / sz * 100).toFixed(2) + '%;height:' + (1.15 / sz * 100).toFixed(2) + '%' },
+    pot.appendChild(h('button.rtg.can' + (here ? '.here' : '') + (key === UI.rubyBest ? '.sug' : ''), { 'data-a': 'rubysel', 'data-k': key, type: 'button', 'aria-pressed': here ? 'true' : 'false', 'aria-label': k ? 'Start ' + k + ' further on' : 'Keep the droplet here', style: 'left:' + ((q.x - vx) / sz * 100).toFixed(2) + '%;top:' + ((q.y - vy) / sz * 100).toFixed(2) + '%;width:' + (1.15 / sz * 100).toFixed(2) + '%;height:' + (1.15 / sz * 100).toFixed(2) + '%' },
       here ? null : h('span.rgh', { html: ico('drop', 26) }), k ? h('i', { html: ico('ruby', 12) }, k * D.rubySpend) : null));
   }
   wrap.appendChild(pot);
   const fk = S.flaskKey();
-  wrap.appendChild(h('div.rside', h('button.rbt.rflask.big' + (S.sel.flask ? '.on' : '') + (fk ? '.tglow' : '') + (fk && fk === UI.rubyBest ? '.sug' : ''), { 'data-a': 'rubysel', 'data-k': fk || '', type: 'button', disabled: fk ? null : true, 'aria-label': p.flask ? 'Flask is full' : 'Refill the flask for ' + D.rubySpend + ' rubies' }, h('span', { html: ico('flask', 54, p.flask || S.sel.flask) }), p.flask ? null : h('i', '−' + D.rubySpend), h('em.rlb', p.flask ? 'Flask full' : S.sel.flask ? 'Refilled' : 'Refill flask')),
+  wrap.appendChild(h('div.rside', h('button.rbt.rflask.big' + (S.sel.flask ? '.on' : '') + (fk ? '.can' : '') + (fk && fk === UI.rubyBest ? '.sug' : ''), { 'data-a': 'rubysel', 'data-k': fk || '', type: 'button', disabled: fk ? null : true, 'aria-label': p.flask ? 'Flask is full' : 'Refill the flask for ' + D.rubySpend + ' rubies' }, h('span', { html: ico('flask', 54, p.flask || S.sel.flask) }), p.flask ? null : h('i', '−' + D.rubySpend), h('em.rlb', p.flask ? 'Flask full' : S.sel.flask ? 'Refilled' : 'Refill flask')),
     h('span.rdp', { html: ico('drop', 22) }, h('b', p.droplet + S.sel.drop), h('em.rlb', 'Start space'))));
   return wrap;
 }

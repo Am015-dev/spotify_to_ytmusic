@@ -9,15 +9,15 @@ const QINFO = {
   fork: ['Fork in the Road', () => 'Droplet +2, or a Dusk Sigh'],
   haggle: ['Haggler\'s Hour', () => 'Swap one chip for a higher one'],
   crow: ['Wren Feather: pick one', () => 'Place one as your next chip'],
-  peek: ['Peek and Pick', () => 'Place one chip, or none'],
+  peek: ['Second Look', () => 'Place one chip, or none'],
   y1: ['Send a white back', () => 'Return the white chip to the bag?'],
   restart: ['Do-Over', () => 'Restart the day? Once only'],
   side: ['Scarlet Cap beside the pot', () => 'Add it, keep it, or return it'],
   gift: ['Spilled Brew', () => 'Take any 2-chip'],
   g2: ['Mossback gift', () => 'Pick your free chip'],
   g4: ['Drip moss', (p, d) => '1 ruby per step, up to ' + d.max],
-  p1: ['Gentle sigh', d => 'Take up to ' + d.n + ' rewards'],
-  g3: ['Lucky-seven moss', d => 'Slide ' + d.s + ' spaces, or stay'],
+  p1: ['Gentle sigh', (p, d) => d.n > 1 ? 'Pick one reward: best, middle or lowest' : 'Take your reward: 1 point'],
+  g3: ['Lucky-seven moss', (p, d) => 'Slide ' + d.s + ' space' + (d.s > 1 ? 's' : '') + ', or stay'],
   p2: ['Trade wind', () => 'Trade purple chips for rewards'],
   p4: ['Upgrade sigh', () => 'Swap one pot chip for a bigger'],
   de: ['Your cauldron exploded', (p, d) => 'Take ' + d.vp + ' points or shop'],
@@ -157,7 +157,7 @@ function renderRoster() {
   }
 }
 function renderActs() {
-  const a = $('#acts'), qb = $('#qbox'); if (!a || !qb) return; a.innerHTML = ''; qb.innerHTML = ''; qb.hidden = true; renderRat(null);
+  const a = $('#acts'), qb = $('#qbox'); if (!a || !qb) return; a.innerHTML = ''; UI.qWas = qb.hidden ? '' : (qb.dataset.qk || ''); qb.innerHTML = ''; qb.hidden = true; renderRat(null);
   const v = viewSeat(); if (v < 0 || !G || G.phase === 'over') return;
   if (hotSeat() && UI.holder < 0) return;
   const p = G.players[v]; const legal = mvList(v); UI.legal[v] = legal;
@@ -168,7 +168,8 @@ function renderActs() {
   a.appendChild(brewDeck(p, v, legal));
 }
 function renderQ(p, legal, qb) {
-  const q = p.q, info = QINFO[q.h]; if (qb.hidden) UI.qT = tapMark(); qb.hidden = false;
+  const q = p.q, info = QINFO[q.h], qk = p.seat + ':' + G.round + ':' + q.h + ':' + JSON.stringify(q.d || {});
+  if (qk !== UI.qWas) UI.qT = tapMark(); qb.dataset.qk = qk; qb.hidden = false;   // R90 B2: only a NEW question ignores the trailing click; a re-render of the same one never eats a tap
   const fromCard = { pick: 1, swap: 1, clear: 1, bribe: 1, bounty: 1, fork: 1, haggle: 1, peek: 1, gift: 1, restart: 1 }[q.h];
   qb.append(h('div.qt', fromCard && G.fcard ? fortImg(D.FORTUNE.find(x => x.id === G.fcard) || { id: G.fcard }, 'qfimg') : null, h('b', fromCard ? 'Today\'s fortune card' : info[0]), h('div.qx', info[1](p, q.d))));
   if (p.hold.length && p.hold[0] && p.hold[0].c) qb.append(h('div.hold', { 'data-priv': p.seat }, p.hold.map((c, i) => h('span.cb', chipN(c.c + c.v, 34)))));

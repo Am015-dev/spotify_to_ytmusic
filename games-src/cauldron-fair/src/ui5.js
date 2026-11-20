@@ -18,7 +18,7 @@ function buildRules() {
   sec('How a turn works', h('ol', ...li([
     'Draw chips from your bag one by one. Each moves that many spaces.',
     'White chips must add up to 7 or less. Over 7 and the pot explodes.',
-    'Stop whenever you like. Your last chip picks your space. Big number: coins. Brown badge: points.',
+    'After your first chip, stop whenever you like. The space after your last chip pays. Big number: coins. Brown badge: points.',
     'Then the day is counted. Buy new chips with coins. Spend rubies. Next day.',
     'After day 9 the most victory points wins.'])), h('p.sm', 'The full rules follow.'));
   sec('The goal', h('p', h('b', 'Have the most points after 9 days.')), h('ul', [h('li', 'Draw chips from your bag to fill your pot.'), h('li', 'Stop before the white chips add up past 7.'), h('li', 'Your last space pays coins and points.')]));
@@ -27,10 +27,10 @@ function buildRules() {
     'From day 2, players behind get a rat stone. Count rat tails between you and the leader. Your first chip starts that many spaces further.',
     'Everybody brews at the same time. Each chip moves as many spaces as its number. Then draw again, or stop.',
     'When everyone has stopped, the day is counted. Bonus die, powers, rubies, points, shop.',
-    'Spend rubies if you like. Then all your chips go back in the bag. A new day begins.'])));
+    'Spend rubies if you like (not after day 9). Then all your chips go back in the bag. A new day begins.'])));
   sec('Brewing and explosions', h('p', 'White chips (Fizzpods) are dangerous. Only they count towards the limit. Past 7, your cauldron explodes. The last chip stays and you must stop. Later you take your points or your coins, not both.'),
     h('p', 'If your bag runs empty, you stop. Your last chip still picks your space.'),
-    h('p', 'Once a day, your flask puts your last white chip back. It cannot undo an explosion. Refill it with 2 rubies.'),
+    h('p', 'Your flask puts your last white chip back once. It cannot undo an explosion. Then it stays empty until you refill it with 2 rubies.'),
     h('p', 'On the last day, everyone picks Draw or Stop in secret. Then all picks are shown at once. On other days the computers draw while you think.'));
   sec('The spiral', h('p', 'You score the space right after your last chip. Big number: coins to shop. Brown number: points. Some spaces hold a ruby. The last space is the spoon: 15 points and 35 coins.'));
   sec('Counting the day', h('ol', ...li([

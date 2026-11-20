@@ -12,7 +12,7 @@ const TUT_RULES = [
   ['the scoring space is the one after your last chip', 'keep'],
   ['white chips and the explosion limit of 7 (the meter)', 'keep2'],
   ['you may stop any time', 'keep2'],
-  ['the flask puts the last white chip back (once a day)', 'flask', 'seven'],
+  ['the flask puts the last white chip back (once, until refilled)', 'flask', 'seven'],
   ['pushing your luck: one more white explodes', 'push'],
   ['the bonus die: the furthest safe pot rolls; its faces', 'report'],
   ['a ruby on the scoring space gives a ruby', 'd2stop'],
@@ -146,7 +146,7 @@ function tutStart(o) {
   GXT.start({
     game: TUT_GAME, steps: tutSteps(), story: !!(window.CAMPAIGN && typeof GXC !== 'undefined'),
     endTitle: 'Now a real game',
-    endText: o ? 'You know every rule. Chapter 1 is next.' : 'You know every rule. Your first real game starts now.',
+    endText: o ? 'You know the basics. Hold any chip to read its power. Chapter 1 is next.' : 'You know the basics. Hold any chip to read its power. Your first real game starts now.',
     endButtons: o && first ? [{ id: 'chapter', label: 'Start chapter 1' }] : [{ id: 'real', label: 'Play a real game' }],
     setup: () => { try { GX.close(); } catch (e) { } const st = $('#start'); if (st) st.hidden = true; closeRS(true); UI.seed = TUT_SEED; UI.tut = {}; BF.pulling = false; newGame('tutorial'); },
     onDone: r => {

@@ -41,7 +41,7 @@
       { kind: 'visible', sel: '.awn', name: 'awning with the coin purse' },
       { kind: 'visible', sel: '.stalls .stall', name: 'stall board' },
       { kind: 'fn', name: 'every shown price is >= 12 px', fn: function () { var bad = [].slice.call(document.querySelectorAll('.stall .tok .pc')).filter(function (e) { return parseFloat(getComputedStyle(e).fontSize) < 12; }); return bad.length === 0 || bad.length + ' prices under 12 px'; } },
-      { kind: 'fn', name: 'a stall chip is tappable (>= 44 px high)', fn: function () { var t = document.querySelector('.stall .tok:not([disabled])'); if (!t) return 'no buyable chip'; var r = t.getBoundingClientRect(); return (r.width >= 44 && r.height >= 44) || Math.round(r.width) + 'x' + Math.round(r.height); } }
+      { kind: 'fn', name: 'a stall chip is tappable (>= 44 px high)', fn: function () { var t = document.querySelector('.stall .tok:not([disabled]):not(.dis)'); if (!t) return 'no buyable chip'; var r = t.getBoundingClientRect(); return (r.width >= 44 && r.height >= 44) || Math.round(r.width) + 'x' + Math.round(r.height); } }
     ]
   });
   GXS.add({

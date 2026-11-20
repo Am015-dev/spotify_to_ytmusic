@@ -50,9 +50,13 @@ function tileBtn(m, p, big, small, icons) { return h('button.btn.alt.tile', { 'd
 // a glowing "best" on the choice a good maker would take, so no choice screen is a guess
 function sugMark(box, p, q, legal) {
   try {
+    if (UI.mode === 'tutorial') return;   // R90 calm: in the tutorial the bubble is the one helper; no second glow
     if (q.h === 'shop') {
       const keys = CF.AI.shopChoice(G, p, q.d.coins, 'normal', () => 0.5) || []; const left = keys.slice();
-      box.querySelectorAll('.stalls .tok').forEach(b => { const i = left.indexOf(b.dataset.k); if (i >= 0 && !b.disabled) { left.splice(i, 1); b.classList.add('sug'); } });
+      // R90 calm: one helper at a time. Only the next suggested chip not yet in the bag glows; the ruby hint shows once the chips are picked
+      const sel = UI.shopSel || [], nxt = keys.find(k => sel.indexOf(k) < 0); let any = false;
+      box.querySelectorAll('.stalls .tok').forEach(b => { if (!any && nxt && b.dataset.k === nxt && !b.classList.contains('dis')) { any = true; b.classList.add('sug'); } });
+      if (any) box.querySelectorAll('.rbar .sug').forEach(b => b.classList.remove('sug'));
       return;
     }
     let m = CF.AI.choose(G, p.seat, 'normal'); if (!m) return; if (q.h === 'crow' && m.idx >= 0 && p.hold[m.idx] && p.hold[m.idx].c === 'W') m = legal.find(x => x.idx === -1) || m;

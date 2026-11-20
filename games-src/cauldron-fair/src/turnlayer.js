@@ -130,7 +130,7 @@ const DRAG = { on: null };
 const dragSpec = el => {
   if (!el || !el.closest) return null;
   const card = el.closest('#qbox [data-a=mv]:not([disabled])'); if (card) return { el: card, target: () => document.querySelector('#cwrap') };
-  const tok = el.closest('#rs .tok:not([disabled])'); if (tok) return { el: tok, target: () => document.querySelector('#rs .sbimg') };
+  const tok = el.closest('#rs .tok:not([disabled]):not(.dis)'); if (tok) return { el: tok, target: () => document.querySelector('#rs .sbimg') };
   return null;
 };
 function dragEnd(drop) {

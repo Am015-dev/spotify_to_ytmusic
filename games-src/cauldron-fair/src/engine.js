@@ -82,16 +82,19 @@ function resetSeat(G, p) {
   p.f = { dbl: false, safe: 0, doUsed: false, frOpen: false, frUsed: false, canFlask: false, whites: 0, spill: false };
 }
 function startRound(G) {
-  G.phase = 'prep'; G.ev = null; G.shopSeat = -1;
+  G.phase = 'prep'; G.ev = null; G.shopSeat = -1; G.ratsDone = false;
   for (const p of G.players) resetSeat(G, p);
   let id; if (G.force && FORT[G.force]) { id = G.force; const ix = G.fdeck.indexOf(id); if (ix >= 0) G.fdeck.splice(ix, 1); else { const jx = G.fdisc.indexOf(id); if (jx >= 0) G.fdisc.splice(jx, 1); } G.force = null; } else id = G.fdeck.pop();
   G.fcard = id; G.fdisc.push(id);
   const card = FORT[id]; use(G, 'fortune_' + id);
   ev(G, { t: 'round', round: G.round, start: G.start }); ev(G, { t: 'fortune', id });
   lg(G, 'Day ' + G.round + ' of ' + lastOf(G) + '. ' + pn(G, G.start) + ' turns up the fortune card "' + card.name + '": ' + card.text);
-  if (id !== 'clear') setRats(G);          // Clear the Pods gives points first: the rat tails are counted after the answers (see H 'clear')
+  // the fortune card resolves first (its droplet steps, points and answers), then the rat tails are counted from the new droplet (adv).
+  // Only the cards that act on the rat stone itself need the rats counted before them.
+  if (RATS_FIRST[id]) { setRats(G); G.ratsDone = true; }
   purple(G, id);
 }
+const RATS_FIRST = { swarm: 1, bribe: 1, bounty: 1 };
 function setRats(G) {
   if (G.round < 2) return;
   const lead = leaderVp(G);
@@ -106,12 +109,12 @@ const oneChips = G => ['O', 'G', 'B', 'R'].concat(bookOut(G, 'Y') ? ['Y'] : []);
 const chipsOfValue = (G, v) => ['G', 'B', 'R', 'Y'].filter(c => bookOut(G, c) && D.COLORS[c].vals.indexOf(v) >= 0 && G.supply[c + v] > 0).map(c => c + v);
 function ask(G, p, h, d) { p.q = { h, d: d || {} }; }
 function purple(G, id) {
-  const P = G.players, last = G.round === lastOf(G);
+  const P = G.players;
   const lowest = (fn) => { const m = Math.min.apply(null, P.map(fn)); return P.filter(p => fn(p) === m); };
   switch (id) {
-    case 'pick': if (last) { for (const p of P) addRuby(G, p, 3, 'Pedlar\'s Pick'); lg(G, 'Last day: a chip could never be drawn, so everybody simply takes the 3 rubies.'); } else for (const p of P) ask(G, p, 'pick'); break;
+    case 'pick': for (const p of P) ask(G, p, 'pick'); break;          // the card comes before the brew, so a new chip can be drawn even on the last day
     case 'slide': for (const p of P) drop(G, p, 1, 'card'); break;
-    case 'swap': if (last) lg(G, 'Last day: a chip could never be drawn, so Swap Stall is skipped (rubies are worth points now).'); else for (const p of P) if (p.rubies >= 1) ask(G, p, 'swap'); break;
+    case 'swap': for (const p of P) if (p.rubies >= 1) ask(G, p, 'swap'); break;
     case 'alms': for (const p of lowest(p => p.rubies)) { p.rubies++; ev(G, { t: 'gain', seat: p.seat, k: 'ruby', n: 1 }); lg(G, nm(G, p) + ' takes a ruby (fewest).'); } break;
     case 'underdog': for (const p of lowest(p => p.vp)) { give(G, p, 'G1', true); lg(G, nm(G, p) + ' takes a Mossback 1 (fewest points).'); } break;
     case 'clear': for (const p of P) ask(G, p, 'clear'); break;
@@ -123,10 +126,10 @@ function purple(G, id) {
       break;
     }
     case 'bribe': for (const p of P) if (p.rat > p.droplet) ask(G, p, 'bribe', { max: Math.min(3, p.rat - p.droplet) }); break;
-    case 'bounty': for (const p of P) { if (last || !chipsOfValue(G, 4).length) { if (p.ratTails > 0) addVp(G, p, p.ratTails, 'Rat Bounty'); } else ask(G, p, 'bounty'); } if (last) lg(G, 'Last day: Rat Bounty gives points only (a chip could never be drawn).'); break;
-    case 'fork': if (last) lg(G, 'Last day: a droplet step or chip would never be used, so Fork in the Road is skipped.'); else for (const p of P) ask(G, p, 'fork'); break;
+    case 'bounty': for (const p of P) { if (!chipsOfValue(G, 4).length) { if (p.ratTails > 0) addVp(G, p, p.ratTails, 'Rat Bounty'); } else ask(G, p, 'bounty'); } break;
+    case 'fork': for (const p of P) ask(G, p, 'fork'); break;
     case 'dice': for (const p of P) rollDie(G, p, 'card'); break;
-    case 'haggle': if (last) { lg(G, 'Last day: a chip could never be drawn, so Haggler\'s Hour is skipped.'); break; } for (const p of P) {
+    case 'haggle': for (const p of P) {
       const ch = []; const n = Math.min(4, p.bag.length); for (let i = 0; i < n; i++) ch.push(p.bag.pop()); p.hold = ch;
       ev(G, { t: 'peek', seat: p.seat, chips: ch.map(c => ({ i: c.i, c: c.c, v: c.v })) });
       if (upgrades(G, p.hold, true).length) ask(G, p, 'haggle'); else { give(G, p, 'G1', true); lg(G, nm(G, p) + ' cannot swap anything and takes a Mossback 1.'); p.hold.forEach(c => bagInsert(p, c)); p.hold = []; }
@@ -268,7 +271,7 @@ function moves(G, seat) {
   const q = p.q, d = q.d;
   switch (q.h) {
     case 'pick': {
-      out.push(L({ t: 'pick', o: 'K1' }, 'Take a Cinder Moth')); for (const k of chipsOfValue(G, 2)) out.push(L({ t: 'pick', o: k }, 'Take a ' + nameOf(k))); out.push(L({ t: 'pick', o: 'rubies' }, 'Take 3 rubies')); break;
+      if (G.supply.K1 > 0) out.push(L({ t: 'pick', o: 'K1' }, 'Take a Cinder Moth')); for (const k of chipsOfValue(G, 2)) out.push(L({ t: 'pick', o: k }, 'Take a ' + nameOf(k))); out.push(L({ t: 'pick', o: 'rubies' }, 'Take 3 rubies')); break;
     }
     case 'swap': out.push(L({ t: 'swap', o: '' }, 'Keep my ruby')); for (const c of oneChips(G)) if (G.supply[c + 1] > 0) out.push(L({ t: 'swap', o: c + 1 }, 'Trade a ruby for a ' + nameOf(c + 1))); break;
     case 'clear': out.push(L({ t: 'clear', o: 'vp' }, 'Score 4 points')); if (p.bag.some(c => c.c === 'W' && c.v === 1)) out.push(L({ t: 'clear', o: 'white' }, 'Remove a white 1 from my bag')); break;
@@ -391,7 +394,7 @@ function H(G, p, m) {
       if (m.o === 'vp') addVp(G, p, 4, 'Clear the Pods');
       else if (m.o === 'white') { const i = p.bag.findIndex(c => c.c === 'W' && c.v === 1); if (i < 0) return 'no white 1 in the bag'; putBack(G, p.bag.splice(i, 1)[0]); lg(G, nm(G, p) + ' removes a white 1 from the bag.'); }
       else return 'bad choice';
-      p.q = null; if (G.phase === 'prep' && !G.players.some(x => x.q && x.q.h === 'clear')) setRats(G); break;
+      p.q = null; break;
     }
     case 'bribe': {
       if (!Number.isInteger(m.n) || m.n < 0 || m.n > d.max) return 'bad number';
@@ -509,7 +512,7 @@ const hasQ = G => G.players.some(p => p.q);
 function adv(G) {
   for (let guard = 0; guard < 200; guard++) {
     if (G.phase === 'over') return;
-    if (G.phase === 'prep') { for (const p of G.players) if (!p.q) { /* nothing */ } if (hasQ(G)) return; G.phase = 'brew'; ev(G, { t: 'brew' }); lg(G, 'Everyone brews at once: draw, or stop.'); continue; }
+    if (G.phase === 'prep') { for (const p of G.players) if (!p.q) { /* nothing */ } if (hasQ(G)) return; if (!G.ratsDone) { G.ratsDone = true; setRats(G); } G.phase = 'brew'; ev(G, { t: 'brew' }); lg(G, 'Everyone brews at once: draw, or stop.'); continue; }
     if (G.phase === 'brew') {
       for (const p of G.players) settle(G, p);
       if (!G.players.every(p => p.st === 'done')) return;

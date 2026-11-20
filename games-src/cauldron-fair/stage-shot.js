@@ -28,7 +28,7 @@ const OUT = path.join(__dirname, 'playtest'); fs.mkdirSync(OUT, { recursive: tru
       const st = await p.evaluate(() => { const v = viewSeat(), q = G.players[v]; return { rs: UI.rsOpen, q: q.q && q.q.h, kind: (document.querySelector('.rsbox.stg') || {}).className || '' }; });
       if (!st.rs) break;
       if (await tapSel('#rstip [data-a=tipok]')) { await p.waitForTimeout(300); continue; }
-      if (st.q === 'shop') { await shot('d' + day + '_shop'); await tapSel('#rs .tok:not([disabled])'); await p.waitForTimeout(250); await shot('d' + day + '_shopfly'); await p.waitForTimeout(600); await shot('d' + day + '_shop1'); await tapSel('#rs [data-a=shopbuy]'); await p.waitForTimeout(1500); continue; }
+      if (st.q === 'shop') { await shot('d' + day + '_shop'); await tapSel('#rs .tok:not([disabled]):not(.dis)'); await p.waitForTimeout(250); await shot('d' + day + '_shopfly'); await p.waitForTimeout(600); await shot('d' + day + '_shop1'); await tapSel('#rs [data-a=shopbuy]'); await p.waitForTimeout(1500); continue; }
       if (st.q === 'ruby') { await shot('d' + day + '_ruby'); await tapSel('#rs .rtg:not(.here)'); await p.waitForTimeout(400); await shot('d' + day + '_ruby2'); await tapSel('#rs [data-a=rubygo]'); await p.waitForTimeout(1200); continue; }
       if (st.q === 'de') { await shot('d' + day + '_de'); await tapSel('#rs .dpick'); await p.waitForTimeout(900); continue; }
       if (st.q) { await shot('d' + day + '_q-' + st.q); await tapSel('#rs .dec [data-a=mv]'); await p.waitForTimeout(700); continue; }

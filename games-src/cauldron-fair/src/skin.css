@@ -148,12 +148,12 @@ html.ph #barstat .bfl{display:none}
 #coach.on{pointer-events:none}#coach.on button{pointer-events:auto}
 html.ph #barstat .bav{display:none}
 html.ph #barstat{flex-shrink:0;overflow:visible}
-.flb.armed{outline:3px solid #f2b81e;outline-offset:2px;animation:flarm 0.8s ease-in-out infinite alternate}@keyframes flarm{to{outline-color:#fff6dc}}@media (prefers-reduced-motion:reduce){.flb.armed{animation:none}}
+.flb.armed{outline:3px solid #f2b81e;outline-offset:2px;animation:flarm 0.8s ease-in-out 4 alternate}@keyframes flarm{to{outline-color:#fff6dc}}@media (prefers-reduced-motion:reduce){.flb.armed{animation:none}}
 /* W471 round 2: drag cards and chips */
 #qbox [data-a=mv],#rs .tok{touch-action:none;cursor:grab}
 .dragghost{position:fixed!important;left:0;top:0;margin:0!important;z-index:200;pointer-events:none;box-shadow:0 12px 26px rgba(0,0,0,.45)!important;cursor:grabbing}
 .dragsrc{opacity:.35}
-.droptgt{outline:4px dashed #f2b81e;outline-offset:6px;border-radius:50%;animation:dropglow .9s ease-in-out infinite alternate}
+.droptgt{outline:4px dashed #f2b81e;outline-offset:6px;border-radius:50%;animation:dropglow .9s ease-in-out 4 alternate}
 #rs .sbimg.droptgt{border-radius:16px}
 .droptgt.dropover{outline-style:solid;outline-color:#fff6dc;filter:drop-shadow(0 0 18px rgba(242,184,30,.9))}
 @keyframes dropglow{to{outline-color:#fff6dc}}
@@ -273,3 +273,12 @@ html.sk-stall .stalls.tight .stall{border-width:22px 7px 6px;border-image-width:
 @media (orientation:portrait){.mkt .sinfo{max-height:none!important;overflow:visible!important;flex:0 0 auto}}
 @media (max-height:640px){html.sk-awn .awn{height:40px}}
 .stall .sdo .ss{display:none}.stalls.c3 .sdo .sl{display:none}.stalls.c3 .sdo .ss{display:inline}.stalls.tight .stall .sdo{display:none}
+/* R90 phone: while the day report covers the table, the rival thumbnails underneath are hidden, so nothing tappable sits under the sheet */
+body:has(#rs:not([hidden])) :is(#others,#acts,#qbox,#ratchip){visibility:hidden}
+/* R90 phone (375x553 and other short portrait screens, two players): the fortune chip and the rat chip move up into the free corners of the
+   rival row, so no label of the spiral track sits under them */
+@media (orientation:portrait) and (max-height:620px){
+  body:has(#others > .th:only-child) #fortchip{top:8px;bottom:auto!important;left:4px;max-width:calc(50% - 64px);padding:0 8px}
+  body:has(#others > .th:only-child) #fortchip .fk{display:none}
+  body:has(#others > .th:only-child) #ratchip{top:8px;bottom:auto!important;right:4px}
+}

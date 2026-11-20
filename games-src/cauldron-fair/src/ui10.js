@@ -17,7 +17,7 @@ const HLP_STEPS = {
   card: { target: hfirst('#qbox [data-a=mv].sug', '#qbox [data-a=mv]', '#qbox'), title: 'Fortune card', text: 'Today\'s card gives a choice. Tap the one you want.', pic: () => hpics([['ico', 'ruby']]) },
   chip: { target: hfirst('#qbox [data-a=mv].sug', '#qbox [data-a=mv]', '#qbox'), title: 'Chip power', text: 'Place the chip shown, or put them all back.', pic: () => hpics([['chip', 'B1']]) },
   boom: { target: hfirst('#rs .ds.me .dtile', '#rs .dtile', '#rs .dec'), title: 'Your pot exploded', text: 'Take the victory points or the coins.', pic: () => hpics([['ico', 'boom']]) },
-  shop: { target: hfirst('#rs .tok.sug:not(.on):not([disabled])', '#rs .tok:not(.on):not([disabled])', '#rs .stalls'), title: 'The fair stalls', text: 'Tap chips to buy up to two. Pick different colours.', pic: () => hpics([['ico', 'coin']]) },
+  shop: { target: hfirst('#rs .tok.sug:not(.on):not([disabled]):not(.dis)', '#rs .tok:not(.on):not([disabled]):not(.dis)', '#rs .stalls'), title: 'The fair stalls', text: 'Tap chips to buy up to two. Pick different colours.', pic: () => hpics([['ico', 'coin']]) },
   ruby: { target: hfirst('#rs .rbt.rdrop', '#rs .rtg:not(.here)', '#rs .rbar', '#rs .rpot'), title: 'Spend rubies', text: '2 rubies move your droplet one space or refill your flask.', pic: () => hpics([['ico', 'ruby']]) },
   power: { target: hfirst('#rs .dec [data-a=mv].sug', '#rs .dec [data-a=mv]', '#rs .dsheet'), title: 'Chip power', text: 'One of your chips gives a reward. Tap the one you want.', pic: () => hpics([['chip', 'G1']]) }
 };
@@ -31,7 +31,7 @@ const HLP_RULES = [
   { phase: 'first', title: 'White chips', text: 'The meter adds up your white chips. Over 7 and the pot explodes.', pic: () => hpics([['chip', 'W1'], ['chip', 'W2'], ['chip', 'W3'], '>', ['ico', 'boom', 'Over 7']]) },
   { phase: 'brew', title: 'Draw or stop', text: 'Drawing scores more but risks an explosion. Stop keeps your space.', pic: () => hpics([['ico', 'bag', 'Draw'], ['ico', 'check', 'Stop']]) },
   { phase: 'brew', title: 'The danger meter', text: 'It shows the chance your next chip explodes. If it is red, think about stopping.', pic: () => hpics([['chip', 'W3', 'Risky']]) },
-  { phase: 'brew', title: 'The flask', text: 'Once a day, the flask puts your last white chip back. Rubies refill it.', pic: () => hpics([['ico', 'flask', 'Flask'], '>', ['ico', 'bag', 'Back']]) },
+  { phase: 'brew', title: 'The flask', text: 'Once, the flask puts your last white chip back. Then it stays empty until you pay 2 rubies.', pic: () => hpics([['ico', 'flask', 'Flask'], '>', ['ico', 'bag', 'Back']]) },
   { phase: 'brew', title: 'The bonus die', text: 'When all have stopped, the richest safe cauldron rolls the bonus die.', pic: () => hpics([['ico', 'die', 'Die']]) },
   { phase: 'hot', title: 'Close to boiling', text: 'Your whites are near 7. A white chip may explode your pot. Other colours are safe.', pic: () => hpics([['chip', 'W3'], '>', ['ico', 'boom']]) },
   { phase: 'hot', title: 'The flask', text: 'Drew a white? Tap the flask to put it back. It cannot undo an explosion.', pic: () => hpics([['ico', 'flask', 'Flask'], '>', ['ico', 'bag', 'Back']]) },
@@ -48,12 +48,12 @@ const HLP_RULES = [
   { phase: 'boom', title: 'Points or coins', text: 'Take your space\'s points, or its coins. Not both.', pic: () => hpics([['ico', 'vp', 'Points'], ['ico', 'coin', 'Coins']]) },
   { phase: 'boom', title: 'Coins buy chips', text: 'Better chips help on later days. Points win the game.', pic: () => hpics([['ico', 'coin'], '>', ['chip', 'B1'], '>', ['ico', 'bag']]) },
   { phase: 'shop', title: 'Buy for your bag', text: 'Buy one or two chips of different colours. They go in your bag.', pic: () => hpics([['ico', 'coin'], '>', ['chip', 'B1'], ['chip', 'G1']]) },
-  { phase: 'shop', title: 'Each colour has a power', text: 'Orange has no power. Green gives rubies, blue peeks, red moves, black counts. Hold a chip to read it.', pic: () => hpics([['chip', 'O1'], ['chip', 'G1'], ['chip', 'B1'], ['chip', 'R1'], ['chip', 'K1']]) },
+  { phase: 'shop', title: 'Each colour has a power', text: 'Orange has no power. Every other colour has its own power, set by its book. Hold a chip to read it.', pic: () => hpics([['chip', 'O1'], ['chip', 'G1'], ['chip', 'B1'], ['chip', 'R1'], ['chip', 'K1']]) },
   { phase: 'shop', title: 'Locked stalls', text: 'Yellow opens on day 2, purple on day 3. Sold-out chips are gone.', pic: () => hpics([['chip', 'Y1', 'Day 2'], ['chip', 'P1', 'Day 3']]) },
   { phase: 'ruby', title: 'Spend rubies', text: 'Spend 2 rubies to move your droplet one space or refill the flask.', pic: () => hpics([['ico', 'ruby', '2'], '>', ['ico', 'drop', 'Droplet']]) },
   { phase: 'ruby', title: 'The droplet', text: 'Your first chip starts at the droplet. Move it on for a head start each day.', pic: () => hpics([['ico', 'drop'], '>', ['chip', 'G1']]) },
   { phase: 'ruby', title: 'Keep them?', text: 'Unspent rubies stay. At the end, 2 rubies make 1 point.', pic: () => hpics([['ico', 'ruby', '2'], '>', ['ico', 'vp', '1']]) },
-  { phase: 'power', title: 'Chip powers', text: 'Green, purple and black chips near the end act after the brew.', pic: () => hpics([['chip', 'G1'], ['chip', 'P1'], ['chip', 'K1']]) },
+  { phase: 'power', title: 'Chip powers', text: 'Some powers act after the brew: black and purple count wherever they sit, green checks your last two chips.', pic: () => hpics([['chip', 'G1'], ['chip', 'P1'], ['chip', 'K1']]) },
   { phase: 'power', title: 'Pick a reward', text: 'The glowing option is a good pick. Tap one.', pic: () => hpics([['ico', 'check']]) }
 ];
 // ---------------------------------------------------------------- the phase the player is deciding in (null when there is nothing to decide)
@@ -85,6 +85,9 @@ function hlpWhy(p, q, m) {
     case 'shop': return 'These chips make your bag stronger for the coins you have.';
     case 'ruby': return m.drop || m.flask ? (m.flask && !m.drop ? 'Refill the flask so you can use it tomorrow.' : 'A further start gives every day a head start.') : 'Keep the rubies: 2 of them are worth a point at the end.';
     case 'pick': return m.o === 'rubies' ? 'Rubies buy droplet steps and flask refills.' : 'A new chip makes your bag stronger.';
+    case 'y1': return m.yes ? 'Put the white back: your pot stays further from exploding.' : 'Your whites are low: keep the chip where it is.';
+    case 'clear': return m.o === 'vp' ? '4 points now are worth more than one white less.' : 'One white less makes every later brew safer.';
+    case 'fork': return m.o === 'drop' ? 'Two droplet steps make every chip today land further out.' : 'A purple chip scores again at every count.';
     case 'crow': case 'peek': return m.idx < 0 ? 'None of these chips helps now: put them all back.' : 'This chip fits your pot best. Place it.';
     default: return 'This is the best option for your bag right now.';
   }
@@ -97,7 +100,7 @@ function hlpSuggest() {
       if (UI.rsMode !== 'report' || STG.run || !q) return null;
       const m = (q.h === 'shop' || q.h === 'ruby') ? null : CF.AI.choose(G, v, 'normal'); const sel = document.querySelector('#rs .tok.on, #rs .rtg.here');
       let tgt;
-      if (q.h === 'shop') tgt = document.querySelector('#rs .tok.sug:not(.on):not([disabled])') || document.querySelector('#rs [data-a=shopbuy]');
+      if (q.h === 'shop') tgt = document.querySelector('#rs .tok.sug:not(.on):not([disabled]):not(.dis)') || document.querySelector('#rs [data-a=shopbuy]');
       else if (q.h === 'ruby') tgt = document.querySelector('#rs .rtg.sug:not(.here), #rs .rbt.sug') || document.querySelector('#rs [data-a=rubygo]');
       else tgt = document.querySelector('#rs [data-a=mv].sug, #rs .dpick.sug');
       if (!tgt || !tgt.getBoundingClientRect().width) return null;
@@ -105,7 +108,11 @@ function hlpSuggest() {
       return { why, target: () => tgt.isConnected ? tgt : null };
     }
     if (q) {
-      const btn = document.querySelector('#qbox [data-a=mv].sug'); if (!btn) return null;
+      // R90: a decision always gets an answer from the bulb (never only rules cards over the buttons): the .sug button, else the AI's pick by index
+      let btn = document.querySelector('#qbox [data-a=mv].sug');
+      if (!btn) { const m0 = CF.AI.choose(G, v, 'normal'), lg0 = UI.legal[v] || [], js = m0 ? JSON.stringify(stripM ? stripM(m0) : m0) : ''; const i0 = lg0.findIndex(x => JSON.stringify(stripM ? stripM(x) : x) === js);
+        btn = i0 >= 0 ? [...document.querySelectorAll('[data-a=mv][data-i="' + i0 + '"]')].find(b => b.getBoundingClientRect().width) : null; }
+      if (!btn) return null;
       const m = (UI.legal[v] || [])[+btn.dataset.i]; if (!m) return null; const why = capW(hlpWhy(p, q, m), 15); if (!why) return null;
       return { why, target: () => btn.isConnected ? btn : document.querySelector('#qbox [data-a=mv].sug') };
     }
