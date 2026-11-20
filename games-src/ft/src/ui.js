@@ -42,7 +42,7 @@ function lineText(){if(!G)return '';if(G.over){const hs=G.pl.filter(x=>x.human);
   if(!hp){const nm=seatName(p);if(online()&&p.human)return `Waiting for ${nm}`;if(G.q)return `${nm} is choosing`;if(G.phase==='bid')return `${nm} is bidding`;return `${nm} is ${{move:G.move?'moving':'choosing',tribe:'collecting',tile:'acting',sell:'finishing'}[G.step]||'playing'}`}
   {const gs=typeof gdStep==='function'?gdStep():null;if(gs&&gs.who!=='me')return 'Tap Next to go on'}
   if(G.q)return qLine(G.q);if(UI.pendDj||UI.pendItem)return 'Tap a glowing tile';
-  if(G.phase==='bid'){const two=hp.markers>1;return 'Tap a glowing spot to bid'}
+  if(G.phase==='bid'){const two=hp.markers>1;return two?'Pick 2 turns: earlier costs more':'Pick your turn: earlier costs more'}   // F2: says what bidding is for, in one plain line
   switch(G.step){
   case 'move':if(G.move&&typeof f3Mine==='function'){const f=f3Line();if(f)return f}return !G.move?'Tap a glowing tile to lift people':G.move.hand.length===1?'Last one: land on its colour':'Tap a glowing tile to drop one';
   case 'tribe':return {assassin:'Shadow: remove one person in reach',builder:hp.fk?'Tap Earn to take your coins':'Tap Collect to take your coins',merchant:'Tap Collect to fetch goods',vizier:'Tap Collect: Advisors join you',elder:'Tap Collect: Sages join you',artisan:'Tap Collect: Crafters join you'}[G.act.color]||'';
@@ -84,10 +84,12 @@ function shortOpt(l){let t=String(l).replace(/\s*\(.*?\)/g,'').replace(/:.*$/,''
 function bidGood(hp,bm){const k=m=>m.spot+':'+(m.fk||0);const g=new Set();let adv=null;try{adv=typeof hlpAdvice==='function'?hlpAdvice():null}catch(e){}
   for(const m of bm){const pr=bidPrice(hp,m.spot,m.fk);if(pr===0||(pr<=Math.max(1,Math.floor(hp.coins*.06))&&adv&&adv.act==='bid'&&adv.spot===m.spot&&(adv.fk||0)===(m.fk||0)))g.add(k(m))}
   if(!g.size){let lo=1e9;for(const m of bm)lo=Math.min(lo,bidPrice(hp,m.spot,m.fk));bm.forEach(m=>{if(bidPrice(hp,m.spot,m.fk)===lo)g.add(k(m))})}return m=>g.has(k(m))}
-function trackHtml(hp,vm){const bm=vm.filter(m=>m.act==='bid');const good=bidGood(hp,bm);const done=new Set(G.bids.map(b=>b.spot));
-  const ord=['1st','2nd','3rd','4th','5th','6th','7th','8th','9th','10th','11th','12th'];
-  return `<div class="bidt${G.track.length>7?' two':''}" aria-label="Turn order">${G.track.map((t,s)=>{const b=G.bids.find(x=>x.spot===s);const mine=bm.filter(m=>m.spot===s);
-    return `<div class="spot ${b?'taken':''}" style="${b?'--pc:'+PCOL[b.mk.p]:''}"><small class="ord">${ord[s]}</small>${mine.map(m=>`<button class="sp-b ${good(m)?'glow':'dear'} ${m.fk?'fkv':''}" data-mv='${mvAttr(m)}' aria-label="${bidPrice(hp,s,m.fk)?bidPrice(hp,s,m.fk)+' coins':'free'}${m.fk?' with '+m.fk+' Mystic':''}">${m.fk?`<i>−${m.fk}🔮</i>${bidPrice(hp,s,m.fk)}🪙`:`${t.cost}🪙`}</button>`).join('')||`<span class="sp-c">${t.cost}🪙</span>`}${b?'<i class="mk"></i>':''}</div>`}).join('')}</div>`}
+function trackHtml(hp,vm){const bm=vm.filter(m=>m.act==='bid');const good=bidGood(hp,bm);
+  const ord=['1st','2nd','3rd','4th','5th','6th','7th','8th','9th','10th','11th','12th'];const cost=c=>c?c+'🪙':'free';
+  // F2: every spot is one big button that names its place in the turn order and its price; taken spots name who took them
+  return `<div class="bidt${G.track.length>7?' two':''}" aria-label="Turn order: earlier costs more">${G.track.map((t,s)=>{const b=G.bids.find(x=>x.spot===s);const mine=bm.filter(m=>m.spot===s);
+    const who=b?esc(seatName(P(b.mk.p))):'';
+    return `<div class="spot ${b?'taken':mine.length?'open':'shut'}" style="${b?'--pc:'+PCOL[b.mk.p]:''}">${mine.map(m=>{const pr=bidPrice(hp,s,m.fk);return `<button class="sp-b ${good(m)?'glow':'dear'} ${m.fk?'fkv':''}" data-mv='${mvAttr(m)}' aria-label="${ord[s]} in turn order, ${pr?pr+' coins':'free'}${m.fk?' with '+m.fk+' Mystic':''}"><small class="ord">${ord[s]}</small><b class="spc">${m.fk?`<i>−${m.fk}🔮</i>`:''}${cost(pr)}</b></button>`}).join('')||`<small class="ord">${ord[s]}</small><span class="sp-c">${b?who:cost(t.cost)}</span>`}${b?'<i class="mk"></i>':''}</div>`}).join('')}</div>`}
 function powerChips(hp,vm){const pw=[...vm.filter(m=>m.act==='djinn'),...vm.filter(m=>m.act==='item')];if(!pw.length)return '';const seen=new Set();let h='';
   for(const m of pw){if(m.act==='djinn'){const key=m.k+JSON.stringify(m.pay);if(seen.has(key))continue;seen.add(key);const pay='pay '+[m.pay.el?m.pay.el+' Sage'+(m.pay.el>1?'s':''):'',m.pay.fk?m.pay.fk+' Mystic'+(m.pay.fk>1?'s':''):''].filter(Boolean).join(' + ');
       h+=m.t>=0?`<button class="ab pw${UI.pendDj&&same(UI.pendDj,{k:m.k,pay:m.pay})?' on':''}" data-pw='${mvAttr({k:m.k,pay:m.pay})}'>✨ ${esc(DJ[m.k].n)} <small>${pay}</small></button>`:abtn(m,`✨ ${esc(DJ[m.k].n)} <small>${pay}</small>`,'pw')}
@@ -215,5 +217,5 @@ function loadSaved(){try{const g=JSON.parse(localStorage.getItem(SAVE));if(!g||!
 // ---------- the computer: about 1.5 s per decision (one caption each), 0.4 s a drop; Skip or a tap on the table hurries it ----------
 const modalStops=()=>UI.modal&&UI.modal!=='lobby';
 let aiTimer=null;function schedule(){if(online()&&isClient())return;if(aiTimer||!G||G.over||UI.pause||modalStops()||tutHeld())return;const s=sideToAct();if(s<0||P(s).human)return;
-  const drop=G.step==='move'&&G.move&&G.move.drops.length;const lift=G.step==='move'&&G.move&&!G.move.drops.length;const watch=G.pl.some(p=>p.human);const base=!watch?420:drop?380:lift?1300:1500;   /* F3: one readable caption per rival decision (~1.5 s), drops quicker *//* W497: a rival turn takes about 2-3 s; Skip or a tap on the table hurries it */const d=ANIM?Math.max(0,base/(UI.speed||1)*(UI.hurry?.12:1)):0;
+  const drop=G.step==='move'&&G.move&&G.move.drops.length;const lift=G.step==='move'&&G.move&&!G.move.drops.length;const watch=G.pl.some(p=>p.human);const base=!watch?420:drop?380:lift?1300:1500;   /* F3: one readable caption per rival decision (~1.5 s), drops quicker; Skip or a tap on the table hurries it */const d=ANIM?Math.max(0,base/(UI.speed||1)*(UI.hurry?.12:1)):0;
   aiTimer=setTimeout(()=>{aiTimer=null;if(!G||G.over||modalStops()||tutHeld()||(online()&&isClient()))return;const s2=sideToAct();if(s2<0||P(s2).human)return;const m=aiMove(s2);if(!m){console.error('AI has no move in '+G.phase+'/'+G.step);return}go(m)},d)}

@@ -50,7 +50,8 @@ function animate(prev){const cur=snapState();if(!ANIM||!prev||document.hidden)re
   cur.tot.forEach((t,i)=>{const d=t-(prev.tot[i]||0);if(!d)return;const se=seatEl(i);if(!se)return;const ss=se.querySelector('.ss');if(ss){ss.classList.add('bump')}
     if(G&&G.over)return;if(G&&!G.coach&&!G.tut)return;   // R25: in Play the seat's labelled pop (playable.js) says it once; no second chip. No score chips over the result card; the chip sits under the seat, never over its name and coins
     const lab=(G&&G.pl[i]&&G.pl[i].human&&G.pl.filter(x=>x.human).length===1?'You':(G&&G.pl[i]?G.pl[i].nm:''))+' '+(d>0?'+':'−')+Math.abs(d)+(Math.abs(d)===1?' pt':' pts');   // every chip says whose points and that they are points
-    const sr=se.getBoundingClientRect();const at=tf&&i===actor?ctr(tf.getBoundingClientRect()):{x:sr.left+sr.width/2,y:sr.bottom+14};floatText(lab,at,d>0?'up':'dn')})}
+    const sr=se.getBoundingClientRect();const at={x:sr.left+sr.width/2,y:sr.bottom+14};   // F2: score chips start under the seat, never on the tiles
+   floatText(lab,at,d>0?'up':'dn')})}
 // the chooser lights its sensible option (the computer's own pick for you, or the best Shadow target); the rest stay tappable
 function chzBest(c){try{const hp=me();if(!hp)return 0;let adv=null;const cz=UI.chz;try{UI.chz=null;adv=typeof hlpAdvice==='function'?hlpAdvice():null}catch(e){}finally{UI.chz=cz}   // R38: the advice is read as if the chooser were shut, so the planned colour is the one marked best
   if(adv){const j=c.opts.findIndex(o=>same(o.m,adv));if(j>=0)return j}
