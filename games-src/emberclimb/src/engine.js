@@ -625,6 +625,7 @@
       case 'pick': var cid = G.rw.cards[mv.h][mv.i]; G.hs[mv.h].deck.push(mk(cid)); G.rw.took['c' + mv.h] = 1; returnCards(G.hs[mv.h].k, G.rw.cards[mv.h].filter(function (x, i) { return i !== mv.i; })); break;
       case 'skip': G.rw.took['c' + mv.h] = 1; returnCards(G.hs[mv.h].k, G.rw.cards[mv.h]); break;
       case 'leave': if (G.scr === 'reward' && G.rw && G.rw.pot && !G.rw.took.pot && G.pots.length < G.pslots) { G.pots.push(G.rw.pot); G.rw.took.pot = 1; }   // F3: a won potion is never lost by tapping Continue
+        if (G.scr === 'reward' && G.rw && G.rw.relics) { var offered = G.rw.relics.filter(Boolean); if (offered.length <= (G.rw.nrel || 1)) G.rw.relics.forEach(function (rid, ri2) { if (rid && !G.rw.took['r' + ri2]) { gainRelic(rid); G.rw.took['r' + ri2] = 1; } }); }   // F3: a treasure / elite relic with no choice to make is never lost by tapping Continue (a boss choice of 3 still needs a pick)
         leaveNode(); break;
       case 'stop': G.rw = null; G.scr = 'over'; G.won = 1; break;
       case 'heal': var hh = G.hs[mv.h]; hh.hp = Math.min(hh.mhp, hh.hp + restHeal(hh)); G.rest.todo.splice(G.rest.todo.indexOf(mv.h), 1); if (!G.rest.todo.length) leaveNode(); break;
