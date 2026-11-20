@@ -164,7 +164,7 @@ function trGoalHTML() {
   var gid = G.goals && G.goals[G.round], g = gid && PP_DATA.goals.filter(function (x) { return x.id === gid; })[0]; if (!g) return '';
   var me = UI.view, cnt = G.pl.map(function (p, i) { return (i === me ? 'you ' : p.name + ' ') + PP.goalCount(G, i, gid); });
   cnt.unshift(cnt.splice(me, 1)[0]);
-  return '<span class="tr-g" data-a="trgoal"><b>Round goal</b> (scored at round end): ' + esc(g.n) + ' · ' + esc(cnt.join(', ')) + '</span>';
+  return '<span class="tr-g" data-a="trgoal"><b>Goal at round end:</b> ' + esc(g.n) + ' · ' + esc(cnt.join(', ')) + '</span>';
 }
 function scoreHTML() {   // F2: real points now, in plain words ("You 32 · Fern 28"); tap a name: you = how it adds up, a rival = their board
   var sc = G.pl.map(function (p, i) { return PP.scoreOf(G, i).total; }), me = UI.view, ord = G.pl.map(function (p, i) { return i; });
