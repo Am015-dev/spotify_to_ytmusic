@@ -212,8 +212,9 @@ function pxDrawSeat(o, s, R, Cr, me, ch) {
 function pxDrawBelt(Rz, Rw) {
   const g = PX.beltBg; g.clear(); g.rect(Rz.x, Rz.y, Rz.w, Rz.h).fill(0x2f1f1a); g.rect(Rz.x, Rz.y, Rz.w, 3).fill(0x1c1210);
   const ch = PX.hw ? PX.hw * 1.4 : 100, bh = Math.max(40, Math.min(Rw.h - 14, ch * .62)), by = Rw.y + Rw.h - bh - 6;
-  PX.belt.visible = true; PX.belt.x = Rw.x; PX.belt.y = by; PX.belt.width = Rw.w; PX.belt.height = bh; const k = bh / 128; PX.belt.tileScale.set(k, k);
-  PX.beltShade.clear(); PX.beltShade.rect(Rw.x, by - 4, Rw.w, 4).fill({ color: 0x000000, alpha: .35 }); PX.beltShade.rect(Rw.x, by + bh, Rw.w, 4).fill({ color: 0x000000, alpha: .3 });
+  const noBelt = document.documentElement.classList.contains('ph-p') || !document.querySelector('#belt .hc');   // F6: no sushi strip on a portrait phone (cut at the edge) or under an empty hand (scoring)
+  PX.belt.visible = !noBelt; PX.belt.x = Rw.x; PX.belt.y = by; PX.belt.width = Rw.w; PX.belt.height = bh; const k = bh / 128; PX.belt.tileScale.set(k, k);
+  PX.beltShade.clear(); if (!noBelt) { PX.beltShade.rect(Rw.x, by - 4, Rw.w, 4).fill({ color: 0x000000, alpha: .35 }); PX.beltShade.rect(Rw.x, by + bh, Rw.w, 4).fill({ color: 0x000000, alpha: .3 }); }
 }
 // ---- plates (groups on a counter): up to 3 stacked painted plates
 function pxPlateObj(key, s) {

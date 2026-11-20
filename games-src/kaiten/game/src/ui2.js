@@ -135,6 +135,14 @@ function seatEl(s, tab, info, pcs, isMe, dm) {
   el.appendChild(slotEl(s, dm.sl, dm.cmp));
   return el;
 }
+// F6: the first time a short label shows on your own counter, one plain line says what it means (once per visit; never in tests)
+const TIPS = { grab2: 'Grab 2: Twin Sticks let you take two dishes in one turn. Tap it, then tap two dishes.', need1: 'Need 1: one more of these completes a set and scores.', behind: 'Behind: another diner has more roll icons, so this scores nothing yet. Take more rolls to catch up.' };
+function firstTip(g) {
+  if (!G || g.seat !== viewSeat() || !ANIM || /[?&]scn=/.test(location.search)) return;
+  const k = g.k === 'chop' ? 'grab2' : /^need/.test(g.hint || '') ? 'need1' : g.k === 'roll' && g.hint === 'no pts' ? 'behind' : null;
+  firstTip.seen = firstTip.seen || {}; if (!k || firstTip.seen[k]) return; firstTip.seen[k] = 1;
+  setTimeout(() => { try { if (G && !UI.busy) toast(TIPS[k]); } catch (e) { } }, 1200);
+}
 function grpEl(g, pd, landing) {
   const layers = Math.min(g.n, 3);
   const sticks = g.k === 'chop' && twinReady() && g.seat === viewSeat();
@@ -143,6 +151,7 @@ function grpEl(g, pd, landing) {
   for (let i = 0; i < layers; i++) pl.appendChild(plateN(g.type, pd, g.on));
   b.appendChild(pl);
   if (g.n > 1 || g.k === 'roll') b.appendChild(h('span.bg', (g.k === 'roll' ? '' : '×') + g.n));
+  firstTip(g);
   b.appendChild(h('span.hn', sticks ? (UI.twin ? 'tap 2 dishes' : 'tap: grab 2') : g.hint));
   return b;
 }
@@ -196,7 +205,7 @@ function renderBelt() {
   const m = Math.max(hand.length, 1), avail = beltWidth() - 20;
   const land = ph && boardSize().w >= boardSize().h; const hwMax = ph ? (land ? 74 : 84) : Math.max(84, Math.min(118, Math.floor((boardSize().h * .3 - 34) / 1.4))); let hw = Math.max(ph ? (land || innerHeight < 700 ? 54 : 60) : 62, Math.min(hwMax, Math.floor((avail - (m - 1) * 6) / m)));
   // a tall phone: two rows of plates instead of a belt that scrolls sideways and hides plates off the edge
-  const one = Math.floor((avail - (m - 1) * 6) / m), two = ph && !land && one < 72 && boardSize().h >= 440 && m > 4 && G.phase !== 'over';   // sized for a full hand all round: the belt and the dishes never jump between turns
+  const one = Math.floor((avail - (m - 1) * 6) / m), two = ph && !land && one < 72 && boardSize().h >= 440 && m > 6 && G.phase !== 'over';   // sized for a full hand all round: the belt and the dishes never jump between turns
   if (two) { const k = Math.ceil(m / 2); hw = Math.max(54, Math.min(boardSize().h < 500 ? 62 : 80, Math.floor((avail - (k - 1) * 6) / k))); }
   else if (ph && hand.length && land) { const fitN = Math.floor((avail - (hand.length - 1) * 6) / hand.length); if (fitN < hw) hw = Math.max(44, fitN); }   // shrink a little rather than hide plates past the edge
   // the belt never takes more than about half the board: the counters stay readable on short phones
@@ -285,7 +294,7 @@ function placePrompt() {
 function renderDock() {
   const pr = $('#prompt'); if (pr) { const t = promptText(); pr.textContent = t; const v = viewSeat(); pr.className = canPick() && v >= 0 ? 'mine' : ''; try { decoratePrompt(); } catch (e) { console.error(e); } }
   renderLabActs();
-  const dt = document.querySelector('.gx-dt'); if (dt) dt.textContent = G.phase === 'over' ? 'Game over' : (canPick() ? 'Your turn' : 'Table');
+  const dt = document.querySelector('.gx-dt'); if (dt) dt.textContent = G.phase === 'over' && !(UI.fz && UI.fz.tables && !UI.fz.crown) ? 'Game over' : G.phase === 'over' ? 'Counting' : (canPick() ? 'Your turn' : 'Table');
   // round track
   const rt = $('#rt'); if (rt) { const re = UI.fz && (UI.fz.roundEnd || UI.fz.scoring); rt.innerHTML = KIT.roundTrackSVG(Math.min(re ? (G.phase === 'over' ? (G.len || D.rounds) : G.round - 1) : G.round, D.rounds), { size: isPh() ? 24 : 30 }); rt.appendChild(h('span', G.phase === 'over' && !re ? 'Final' : re ? 'Round scoring' : 'Turn ' + G.turn + ' of ' + G.hand + ' · hands pass on')); }
   // roster chips

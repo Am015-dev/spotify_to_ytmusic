@@ -247,8 +247,8 @@ function passDone() {
 }
 // ---- the guide card: a portrait and two short lines (the tutorial reaction beats, the quick game opening, the result)
 function portraitEl(who, px) {
-  const w = who || ST.guide, el = h('span.kkport', { style: 'width:' + px + 'px;height:' + px + 'px;background:' + w.color }, h('i', w.name.replace(/^Auntie /, '').charAt(0)));
-  const im = new Image(); im.alt = ''; im.src = MEDIA + w.portrait; im.onload = () => { el.appendChild(im); }; return el;
+  const w = who || ST.guide, el = h('span.kkport', { style: 'display:none;width:' + px + 'px;height:' + px + 'px;background:' + w.color });
+  const im = new Image(); im.alt = ''; im.src = MEDIA + w.portrait; im.onload = () => { el.appendChild(im); el.style.display = ''; }; return el;   // F6: no painted portrait = no disc (the bare letter read as a broken icon)
 }
 function guideSay(text, ms, who) {
   let g = $('#kkguide'); if (!g) { g = h('div#kkguide', { role: 'status', 'aria-live': 'polite' }); document.body.appendChild(g); }
