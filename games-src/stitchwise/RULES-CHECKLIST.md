@@ -11,7 +11,7 @@ Where the rulebook is silent, the rule says INTERPRETATION. Patch/track tables a
 4. The smallest patch is the 1x2 (two squares). The neutral token sits between it and the next patch clockwise, so the first three patches on offer are the three after it.
 5. The time board has a start space and 53 further spaces (last space = 53). Both time tokens start on the start space.
 6. Button-income spaces (9): 5, 11, 17, 23, 29, 35, 41, 47, 53 (public data tables; the rulebook only says "some spaces").
-7. Special 1x1 patches (5) lie on spaces 20, 26, 32, 44, 50, all available at the start.
+7. Special 1x1 patches (5) lie on spaces 26, 32, 38, 44, 50, all available at the start.
 8. The 7x7 special tile starts unclaimed.
 9. The chosen start player moves first (the start-player token is on top at the start).
 

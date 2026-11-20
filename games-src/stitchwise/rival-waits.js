@@ -19,7 +19,7 @@ const { chromium } = require('playwright');
       const q = await (await pg.$('#quilt')).boundingBox(); csPlace.push(q.width / 9);
       for (const a of ['rot', 'flip']) { const e = await pg.$('[data-a=' + a + ']'); if (e) { const bb = await e.boundingBox(); rot.push(Math.min(bb.width, bb.height)); } }
       await pg.evaluate(mv => { UI.o = mv.o; UI.gx = mv.x; UI.gy = mv.y; drawGhost(); }, mv);
-      { const sg = await pg.$('[data-a=sugok]'); if (sg) { await tap(sg); await pg.waitForTimeout(200); } } const s = await pg.$('[data-a=sew]:not([disabled])'); if (s) { await tap(s); done = true; } else { const c = await pg.$('[data-a=cancel]'); if (c) await tap(c); await pg.waitForTimeout(300); }
+      for (let k = 0; k < 2; k++) { const sg = await pg.$('[data-a=sugok]'); if (sg) { await tap(sg); await pg.waitForTimeout(200); } } const s = await pg.$('[data-a=sew]:not([disabled])'); if (s) { await tap(s); done = true; } else { const c = await pg.$('[data-a=cancel]'); if (c) await tap(c); await pg.waitForTimeout(300); }
     }
     if (!done) { const a = await pg.$('[data-a=adv]'); await tap(a); }
     const t0 = Date.now(), l0 = await pg.evaluate(() => G.log.length);

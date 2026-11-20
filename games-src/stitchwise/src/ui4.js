@@ -207,13 +207,13 @@ function t2Steps() {
       onBtn: function () { UI.tutAi = true; schedule(); }, done: function () { return T2.pressed && t2Mine(); } },
     Object.assign(advStep('advance', 'advance', 'Or Advance: jump just past Marden, earn 1 button per space.', function () { return G.log.some(function (l) { return l[0] === 0 && l[1] === 'adv'; }); }), { eager: true }), /* F2: the line moves on the moment you tap Advance */
     advStep('income', 'income', 'Gold spot = payday: each button icon on your patches pays 1.', function () { return G.pos[0] > 41 && t2Mine(); }),
-    advStep('leather', 'leather', 'Cream leather square: first to pass it gets a free 1x1.', function () { return !!G.pend; }),
+    advStep('leather', 'leather', 'Brown leather square: first to pass it gets a free 1x1.', function () { return !!G.pend; }),
     { id: 'leather2', rule: 'leather', say: 'Tap the single gold gap to sew it.', target: function () { return $$('#quilt .qc')[T2.hl[1] * 9 + T2.hl[0]]; }, allow: function (a, k) { var ok = a === 'leather' && k === T2.hl[1] * 9 + T2.hl[0]; if (a === 'leather' && !ok) { var tt = $('#tutb .t2t'); if (tt) tt.textContent = 'That gap is for your next patch. Tap the single square.'; } return ok; }, done: function () { return G.board[0][T2.hl[1] * 9 + T2.hl[0]] === 100 && t2Mine(); } },
     { id: 'bonus', rule: 'bonus', say: 'First to fill a 7x7 square gets +7. Tap this patch.', target: t2Offer(1), allow: function (a, k) { return a === 'offer' && k === 1; }, done: function () { return UI.sel === 1; } },
     { id: 'flip', rule: 'flip', say: 'Mirror it to match the last gap. Tap Flip.', target: function () { return $('[data-a=flip]'); }, allow: function (a) { return a === 'flip'; }, done: function () { return UI.o === T2.o2; } },
     { id: 'place2', rule: 'bonus', say: 'Drag or tap it into the last gold gap.', target: ghost, gap: 'h2', allow: function (a) { return a === 'rot' || a === 'flip'; }, done: function () { return t2AtGap(T2.h2); } },
     { id: 'sew2', rule: 'bonus', say: 'Sew it on: your 7x7 square is full, +7.', target: sew, gap: 'h2', allow: function (a) { return a === 'sew' && t2AtGap(T2.h2); }, done: function () { return G.bonus === 0 && t2Mine(); } },
-    advStep('end', 'end', 'Game ends when both reach the end. Keep tapping Advance.', function () { return G.over; })
+    advStep('end', 'end', 'Game ends when both reach the end. Tap Advance to finish.', function () { return G.over; })
   ];
 }
 function tutStart(o) { // replaces the coached half-game: a guided first game, then a real one

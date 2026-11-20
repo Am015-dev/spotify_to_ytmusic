@@ -26,9 +26,11 @@ function renderSetup(st) {
   opt('Back', '', '.alt', function () { showStart(); });
   card.appendChild(m); st.innerHTML = ''; st.appendChild(card);
 }
+/* F4: in the tutorial, Sew it on fires on the press: a redraw between press and release (the step moving on) can no longer swallow the first tap */
+document.addEventListener('pointerdown', function (e) { if (typeof T2 === 'undefined' || !T2 || !e.target.closest) return; var t = e.target.closest('[data-a=sew]'); if (!t || t.disabled || UI.busy) return; UI.sewPd = Date.now(); confirmSew(); }, true);
 document.addEventListener('click', function (e) {
   var t = e.target.closest('[data-a]'); if (!t) return; var a = t.dataset.a;
-  if (a === 'trhelp') { if (G) trackSheet(); else toast('Time track: pass a button spot = income. Pass a leather patch = free 1\u00D71. Further back plays next.', 4000); } else if (a === 'trclose') { var ts = $('#trsheet'); if (ts) ts.remove(); } else if (a === 'offer') selectOffer(+t.dataset.k); else if (a === 'adv') doAdvance(); else if (a === 'rot') rotate(); else if (a === 'flip') flip(); else if (a === 'sew') confirmSew(); else if (a === 'sugok') acceptSug(); else if (a === 'cancel') cancelSel();
+  if (a === 'trhelp') { if (G) trackSheet(); else toast('Time track: pass a button spot = income. Pass a leather patch = free 1\u00D71. Further back plays next.', 4000); } else if (a === 'trclose') { var ts = $('#trsheet'); if (ts) ts.remove(); } else if (a === 'offer') selectOffer(+t.dataset.k); else if (a === 'adv') doAdvance(); else if (a === 'rot') rotate(); else if (a === 'flip') flip(); else if (a === 'sew') { if (UI.sewPd && Date.now() - UI.sewPd < 800) return; confirmSew(); } else if (a === 'sugok') acceptSug(); else if (a === 'cancel') cancelSel();
   else if (a === 'strip') { if (G && !UI.coach) { t.classList.add('tapped'); setTimeout(function () { t.classList.remove('tapped'); }, 500); showScoreDrawer(); return; } var sd = +t.dataset.seat; if (sd !== viewSeat()) showOppQuilt(sd); else { t.classList.add('tapped'); setTimeout(function () { t.classList.remove('tapped'); }, 500); } }
   else if (a === 'resume') loadGame(); else if (a === 'quick' || a === 'start') showStart('setup'); else if (a === 'rules') { GX.show('rulesd'); }
   else if (a === 'story') storyOpen(); else if (a === 'learn') tutStart(); else if (a === 'goalok') closeGoal(); else if (a === 'whatdo') whatDo(); else if (a === 'skipmap') { coachSkipToMap(); } else if (a === 'result') showResult(); else if (a === 'again') { var lv = UI.lvl; newGame(UI.mode === 'hot' ? 'hot' : 'vs', { lvl: lv }); } else if (a === 'title') showStart(); else if (a === 'look') { $('#rs').hidden = true; }
@@ -78,7 +80,7 @@ function whyLine(sc) { // F3: why you won or lost, from the two numbers that dec
 function showResult(o) {
   o = o || {}; try { GXH.hide(); } catch (e) { } var rs = $('#rs'); rs.hidden = false; rs.className = 'ov rsv'; var sc = [swScore(G, 0), swScore(G, 1)], w = swWinner(G), hot = UI.mode === 'hot';
   artBg(rs, 'bg-title'); var saved = UI.cs, saveNew = UI.newCells; UI.newCells = {}; var wide = innerWidth >= 700;
-  UI.cs = Math.max(13, Math.min(40, Math.floor(((Math.min(innerWidth, 900) - 60) / 2 - 16) / 9), Math.floor((innerHeight - (innerHeight < 500 ? 236 : 296) - (UI.coach ? 120 : 0)) / 9)));
+  UI.cs = Math.max(13, Math.min(40, Math.floor(((Math.min(innerWidth, 900) - 60) / 2 - 16) / 9), Math.floor((innerHeight - (innerHeight < 500 ? 236 : innerHeight < 620 && innerWidth > innerHeight ? 296 : 296) - (UI.coach ? 120 : 0)) / 9)));
   var c = h('div.rv'), cols = h('div.rvcols'), cells = [], tot = [], pen = [];
   [0, 1].forEach(function (s) {
     var q = quiltEl(s, 'rvq'); q.removeAttribute('id'); q.style.setProperty('--cs', UI.cs + 'px'); q.style.backgroundImage = 'none'; q.classList.remove('art');

@@ -46,7 +46,7 @@ let fails = 0; const ok = (c, m) => { if (!c) { fails++; console.log('FAIL', m);
   let n = 0;
   while (n++ < 160) { await myTurn(); const st = await pg.evaluate(() => ({ over: G.over, pend: !!G.pend, can: document.querySelectorAll('#offers .offer.can').length })); if (st.over) break;
     if (st.pend) { const c = await pg.evaluate(() => { const i = G.board[0].findIndex(v => v === -1); const q = document.querySelector('#quilt').getBoundingClientRect(), cs = q.width / 9; return [q.left + ((i % 9) + .5) * cs, q.top + (((i / 9) | 0) + .5) * cs]; }); await pg.mouse.click(c[0], c[1]); await pg.waitForTimeout(400); continue; }
-    if (st.can && n % 3) { await click('#offers .offer.can'); if (await pg.$('[data-a=sugok]')) await click('[data-a=sugok]'); await pg.evaluate(() => { if (!canSew()) snapNear(); renderDockLight(); }); if (await pg.$('[data-a=sew]:not([disabled])')) await click('[data-a=sew]'); else await click('[data-a=cancel]'); }
+    if (st.can && n % 3) { await click('#offers .offer.can'); for (let k = 0; k < 2 && await pg.$('[data-a=sugok]'); k++) await click('[data-a=sugok]'); await pg.evaluate(() => { if (!canSew()) snapNear(); renderDockLight(); }); if (await pg.$('[data-a=sew]:not([disabled])')) await click('[data-a=sew]'); else await click('[data-a=cancel]'); }
     else await click('[data-a=adv]');
     await pg.waitForTimeout(150); }
   await pg.waitForSelector('#rs:not([hidden]) .rvban.on .rvt1', { timeout: 30000 }).catch(() => ok(false, 'result screen'));
