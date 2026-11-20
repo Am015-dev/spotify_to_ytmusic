@@ -317,3 +317,4 @@ body:has(#na-coach:not([hidden])) #bffing,body:has(.gxh-bub.on) #bffing{display:
 #na-coachend .gxt-endc{position:relative}
 #na-coachend .na-endx{position:absolute;top:8px;right:8px;width:44px;height:44px;border-radius:50%;border:2px solid rgba(0,0,0,.25);background:rgba(255,255,255,.85);color:#1a1020;font:800 20px/1 "Exo 2",sans-serif;cursor:pointer;display:flex;align-items:center;justify-content:center}
 #na-coachend .gxt-et{padding-right:46px}
+#bfl>.bftlab{max-width:calc(100vw - 16px);white-space:normal;text-align:center}

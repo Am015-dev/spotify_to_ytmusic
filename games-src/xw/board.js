@@ -147,7 +147,7 @@ function bfRender(){const on=want();if(on!==BF.on){BF.on=on;R.classList.toggle('
   if(!play){R.classList.remove('bf-sheet');clear();BF.key='';bar.hidden=true;top.innerHTML='';top._h='';fing.hidden=true;return}bar.hidden=false;
   maybeRelease();
   // my ship had nobody to shoot: say so on the board, with the fix
-  {const N=(UI.notes&&UI.notes[G.round])||[];for(const n of N){if(n.kind==='noshot'&&!n.bf){n.bf=1;const s=ship(n.id);if(s&&mineS(s)){const w=whyShort(s);BF.lastNo={r:G.round,t:w};banner(`<b>${esc(shortName(s))} can't shoot</b><span>${esc(w)}</span>`,1500)}BF.noshotT=1}}}
+  {const N=(UI.notes&&UI.notes[G.round])||[];for(const n of N){if(n.kind==='noshot'&&!n.bf){n.bf=1;const s=ship(n.id);if(s&&mineS(s)){const w=whyTiny(s);BF.lastNo={r:G.round,t:w};banner(`<b>You can't shoot</b><span>${esc(w.charAt(0).toUpperCase()+w.slice(1))}.</span>`,1500)}BF.noshotT=1}}}
   // the round summary between rounds is a board banner here, not a page of text
   if(sumPending()){UI.sumSeen=G.round-1;banner(`<b>Round ${G.round}</b>`,1100)}
   const k=ctx();if(BF.noshotT&&ban&&['dice','res','target','plan'].includes(k)&&performance.now()>=(BF.banUntil||0)){ban.hidden=true;BF.noshotT=0}
@@ -165,7 +165,7 @@ function bfRender(){const on=want();if(on!==BF.on){BF.on=on;R.classList.toggle('
   else if(k==='dice')diceUI();else if(k==='res')resUI();else if(k==='note')noteUI();else if(k==='over')overUI();else if(k==='ask')askUI();else if(k==='fly')setHint('');else watchUI(s);try{ghost3D()}catch(e){console.error(e)}}
 // "whose turn, doing what": one short banner each time the turn changes hands (the lesson has its own bubbles)
 function turnBanner(k){if(typeof tutOn==='function'&&tutOn())return;if(!G||G.winner||G.round<1||UI.hold||BF.wave)return;const s=G.cur&&ship(G.cur);let id='',h='';const T=LORE.turn;
-  if(k==='plan'){id='p'+G.round;const ln=BF.lastNo&&BF.lastNo.r===G.round-1?BF.lastNo.t:'';h=`<b>${T.plan[0].replace('{r}',G.round)}</b><span>${ln?`No shot last round: ${esc(ln)}`:T.plan[1]}</span>`}/* F2: the no-shot reason is repeated here, the round banner would otherwise replace it at once */
+  if(k==='plan'){id='p'+G.round;const ln=BF.lastNo&&BF.lastNo.r===G.round-1?BF.lastNo.t:'';h=`<b>${T.plan[0].replace('{r}',G.round)}</b><span>${ln?`No shot: ${esc(ln)}.`:T.plan[1]}</span>`}/* F2: the no-shot reason is repeated here, the round banner would otherwise replace it at once */
   else if((k==='action'||k==='sub')&&s){id='a'+G.round+G.cur;h=`<b>${T.mine}</b><span>${esc(shortName(s))} flew. Now pick an action.</span>`}
   else if(k==='target'&&s){id='t'+G.round+G.cur;h=`<b>${T.mine}: ${T.combat}</b><span>${esc(shortName(s))} can shoot. Pick a target.</span>`}
   else if(k==='watch'&&s&&!mineS(s)){id='w'+G.round+G.phase+G.cur;h=`<b>${T.rival}</b><span>${esc(shortName(s))} ${G.step===3?'takes aim':'moves'}</span>`}
@@ -226,7 +226,7 @@ function dialPlan(s,all){const b=B(s),L=dialList(s),pick0=UI.draft[s.id];let pic
   if(pick0==null||!L.some(o=>o.i===pick0))BF.drot=-L.findIndex(o=>o.i===pick)*BF.dstep;/* a fresh dial opens ON the ★ move: the wheel's old rotation from last round must not pick for you */
   el.hidden=false;el.style.setProperty('--dbar',((bar?bar.offsetHeight:114)+8)+'px');dialSpin(false);
   const m=dialOf(s)[pick],c=exColor(s,m).c,om=offMat(s,m),rk=om?0:rockHits(s,m),bw=om?null:bumpWho(s,m);let aim=[];try{aim=!rk&&!om?inArcOf(s,finalPose(s,b,m)):[]}catch(e){}
-  const warn=om?'<b class="rk om">Off the mat: ship lost!</b>':bw?`<b class="rk">May bump ${esc(shortName(bw))}: no action</b>`:rk===2?'<b class="rk">Lands on a rock: roll damage, no shot</b>':rk?'<b class="rk">Clips a rock: roll damage</b>':aim.length?`🎯 ${esc(shortName(aim[0].e))} in your sights, range ${aim[0].rg}`:'No enemy in your sights';
+  const warn=om?'<b class="rk om">Off the mat: ship lost!</b>':bw?`<b class="rk">May bump ${esc(shortName(bw))}: no action</b>`:rk===2?'<b class="rk">Lands on a rock: roll damage, no shot</b>':rk?'<b class="rk">Clips a rock: damage roll, no action</b>':aim.length?`🎯 ${esc(shortName(aim[0].e))} in your sights, range ${aim[0].rg}`:pick===sug?`★ ${esc((()=>{try{const t=autoWhy(s,pick);return t.charAt(0).toUpperCase()+t.slice(1)}catch(e){return 'No enemy in your sights'}})())}`:'No enemy in your sights';
   el.querySelector('.dwin').innerHTML=`<span class="dnose" title="Where your ship points on the board"><i style="transform:rotate(${shipDeg(s)}deg)">▲</i><small>nose</small></span><span class="dtx"><span class="dmv ${c}">${mvLabel(m,s,0)} <span class="dwd">${esc(mvWords(m))}${m.c==='r'?' · <b class="r">stress</b>':m.c==='g'?' · easy':''}</span></span><span class="dws">${warn}</span></span>`;
   pathW(tplPoints(s,b,m,4),'bfp on '+c);const gp=ghostW(s,m,c+' on',true);if(!om)try{arcW(s,gp)}catch(e){}item('','bfring sel',{ship:s.id,ring:true,tag:'div'});
   setHint(`Tap a move for ${esc(shortName(s))}`);
@@ -249,7 +249,7 @@ function targetUI(s){if(!s)return;try{rangeBands(s)}catch(e){console.error(e)}co
   const best=opts.slice().sort((a,b)=>b.e-a.e)[0];const per={};
   for(const o of opts){const j=per[o.d.id]=(per[o.d.id]||0)+1;const p=XY(o.d);const a0=shownXY(s);pathW([a0,p],'bfshot aim');
     const it=item(`<span>${o===best?'★':''}🎯</span><i>${o.n}<small>vs</small>${o.m}</i>${o.w.k!=='P'?`<em>${esc(o.w.n.split(' ')[0])}</em>`:''}`,'bftgt'+(o===best?' rec':''),{ship:o.d.id,dy:j>1?1.1*(j-1):0,data:{bfw:o.w.k,bft:o.d.id},label:`Shoot ${o.d.name}: ${o.n} attack dice against ${o.m} defence`});if(o===best)finger(it.el)}
-  {const o=best;if(o){let rg='';try{const r=arcReach(s,B(s),o.d,B(o.d),s.arc);rg=r?rangeOf(r.d):''}catch(e){}item(esc(`Fire at ${shortName(o.d)}${rg?` · range ${rg}`:''} · ${o.n} dice vs ${o.m}`),'bftlab',{ship:o.d.id,dy:-1.9,tag:'div'})}}
+  {const o=best;if(o){let rg='';try{const r=arcReach(s,B(s),o.d,B(o.d),s.arc);rg=r?rangeOf(r.d):''}catch(e){}item(esc(`Fire at ${String(shortName(o.d)).split(' ')[0]}${rg?` · range ${rg}`:''} · ${o.n} vs ${o.m} dice`),'bftlab',{ship:o.d.id,dy:-1.9,tag:'div'})}}
   for(const e of enemiesOf(s)){if(opts.some(o=>o.d.id===e.id))continue;const w=whyShort(s,e);const t=/out of arc and/.test(w)?'out of arc & range':/out of arc/.test(w)?'out of arc':/out of range/.test(w)?'out of range':/Touching/.test(w)?'touching':/guarded/.test(w)?'guarded':'';if(t)item(t,'bfwhy',{ship:e.id,dy:-1.15,tag:'div'})}
   setHint(opts.length?'Tap a glowing enemy to shoot':esc(whyShort(s)));
   setBtns(`<button class="btn" data-act="fire" data-w="skip">Hold fire</button>`)}
@@ -348,7 +348,7 @@ function loop(){requestAnimationFrame(loop);if(!BF.on||!ov||ov.hidden||!v3()||!G
       if(it.dy)y+=it.dy*(r*1.3+26);
       else if(/\block\b/.test(it.el.className)&&G.cur&&G.cur!==it.ship){const m=ship(G.cur);if(m){const mq=px(XY(m).x,XY(m).y,1);y+=(y<=mq[1]?-1:1)*(r*1.3+26)*.6}}}   // the Lock chip sits on the far side of the enemy from your ship, clear of your name plate
     else{const q=px(it.x,it.y,.5);x=q[0];y=q[1]}
-    it.sx=x;it.sy=y;const cl=it.el.className;it.r=it.relax?23:/bftgt/.test(cl)?32:/bfact/.test(cl)?(/skip/.test(cl)?24:37):0;it.hw=/bfact/.test(cl)?(/skip/.test(cl)?22:34):/bftgt/.test(cl)?32:/bftlab/.test(cl)?122:0;if(it.relax||it.r)rel.push(it)}
+    it.sx=x;it.sy=y;const cl=it.el.className;it.r=it.relax?23:/bftgt/.test(cl)?32:/bfact/.test(cl)?(/skip/.test(cl)?24:37):0;it.hw=/bfact/.test(cl)?(/skip/.test(cl)?22:34):/bftgt/.test(cl)?32:/bftlab/.test(cl)?Math.max(60,it.el.offsetWidth/2+8):0;if(it.relax||it.r)rel.push(it)}
   relaxItems(rel,Wd,Ht);
   for(const it of BF.items){if(it.sx==null)continue;const hw=it.hw||22,x=Math.max(hw,Math.min(Wd-hw,it.sx)),y=Math.max(22,Math.min(/bfm/.test(it.el.className)?Ht-(bar?bar.offsetHeight:90)-20:Ht-22,it.sy));it.el.style.display='';it.el.style.visibility='';it.el.style.transform=`translate(${x.toFixed(1)}px,${y.toFixed(1)}px) translate(-50%,-50%)`}
   if(glide){cam.position.copy(sp0);cam.quaternion.copy(sq0);cam.updateMatrixWorld()}

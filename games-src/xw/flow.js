@@ -75,6 +75,10 @@ function whyShort(s,e0){if(s.flags.noAtk)return 'It sits on an asteroid: no shoo
   if(G.touch.some(p=>(p[0]===s.id&&p[1]===e.id)||(p[1]===s.id&&p[0]===e.id))&&!exTouchOK(s,e))return `Touching ${n}: touching ships can't shoot.`;
   const r=arcReach(s,B(s),e,B(e),s.arc);if(!r){const rr=rangeOf(baseDist(s,B(s),e,B(e)));return rr<=3?`${n} is not in front of you (out of arc).`:`${n} is out of arc and out of range.`}
   if(rangeOf(r.d)>3)return `${n} is out of range (range 4+).`;return `${n} is guarded: an escort draws the fire.`}
+// F2: the reason as a few words for the 8-word banners: "Varn out of your arc"
+function whyTiny(s,e0){const w=whyShort(s,e0);const en=enemiesOf(s);const e=e0||en.slice().sort((a,b)=>baseDist(s,B(s),a,B(a))-baseDist(s,B(s),b,B(b)))[0];const n=e?String(typeof shortName==='function'?shortName(e):e.name).split(' ')[0]:'';
+  if(/asteroid/.test(w))return 'you sat on an asteroid';if(/damage card/.test(w))return 'a damage card jammed your guns';if(/Touching/.test(w))return `touching ${n}`;
+  if(/out of arc and/.test(w))return `${n} out of arc and range`;if(/out of arc/.test(w))return `${n} out of your arc`;if(/out of range/.test(w))return `${n} out of range`;if(/guarded/.test(w))return `${n} was guarded`;return w}
 // F2: what Auto picked, in a few words (same evaluation as the ★ suggestion)
 function autoWhy(s,i){const m0=dialOf(s)[i],b=B(s),p=finalPose(s,b,m0);const en=enemiesOf(s);const N=e=>typeof shortName==='function'?shortName(e):e.name;
   if(offMat(s,m0))return 'the only move left';const mine=en.map(e=>{const r=arcReach(p,b,e,B(e),s.arc);return r&&rangeOf(r.d)<=3?{e,rg:rangeOf(r.d)}:null}).filter(Boolean).sort((x,y)=>x.rg-y.rg);
