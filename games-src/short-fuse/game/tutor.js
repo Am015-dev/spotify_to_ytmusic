@@ -109,7 +109,7 @@ function tutSteps(){return tutStory([
    target:tutEl(2,3),also:tq('#fuse'),wait:null,ai:tutQ,ready:()=>!!G&&G.dial===2&&G.st[2].w[tutIdx(2,3)].tok.length>0&&tutCalm()},
  {id:'gear',title:'Use equipment',ai:tutCrew,say:'Rewind is unlocked. Tap it to turn the fuse back one step. Gear works once.',target:tq('#gear .eqk.glow'),
    wait:{type:'tap',match:a=>a.what==='eq'&&a.id==='eq6'},ready:()=>tutMyTurn()&&!!document.querySelector('#gear .eqk.glow')},
- {id:'yellow1',title:'Yellow wires',say:'Every yellow is just "yellow". You hold one. Plum\'s last wire must be the other: tap it.',target:tutEl(2,64),
+ {id:'yellow1',title:'Yellow wires',say:'Every yellow is just "yellow". You hold one. Plum\'s one uncut wire must be the other: tap the glowing one.',target:tutEl(2,64),
    wait:{type:'tap',match:a=>a.what==='tile'&&!a.own&&a.id===64},ready:()=>tutMyTurn()&&!UI.sel&&G.dial===3},
  {id:'yellow2',title:'Say yellow',say:'Name your yellow wire. A yellow can only be matched with another yellow.',target:tutEl(0,59),
    wait:{type:'tap',match:a=>a.what==='tile'&&a.own&&a.id===59},ready:()=>tutMyTurn()&&tutSelTo(2,64)},

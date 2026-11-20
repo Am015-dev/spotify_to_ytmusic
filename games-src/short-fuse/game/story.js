@@ -30,7 +30,7 @@ const STORY={
    wrongres:[2,'quill','Tick, tick',()=>{const t=G.st[2].w[tutIdx(2,3)].tok[0];return 'Both missed: a fuse step burned; Plum\'s token shows '+(t?t.v:1)+'.'}],
    crew2:[2,'brix','Use the clue','Teal used that clue; a check means all four are cut.'],
    gear:[3,'brix','Gear','Teal used that token; tap Rewind to turn the fuse back once.'],
-   yellow1:[3,'brix','Yellow wires','Yellow only matches yellow: tap Plum\'s yellow, his last wire.'],
+   yellow1:[3,'brix','Yellow wires','Yellow matches yellow: tap Plum\'s glowing wire.'],
    yellow2:[3,'brix','Say yellow','Tap your yellow to say "yellow".'],
    red:[3,'quill','Never red','Tap your red: never say red or point at one.'],
    solo:[4,'brix','Solo cut','You hold every 6 left: tap one to cut both alone.'],
