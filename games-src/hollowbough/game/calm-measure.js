@@ -33,10 +33,10 @@ async function game(browser, W, H, gi) {
   const inView = `(r, pad) => { if (!r || r.width < 2) return false; pad = pad || 0; const l = r.left + pad, t = r.top + pad, rt = r.right - pad, b = r.bottom - pad; const vw = Math.max(0, Math.min(rt, innerWidth) - Math.max(l, 0)), vh = Math.max(0, Math.min(b, innerHeight) - Math.max(t, 0)); return vw * vh >= 0.7 * (rt - l) * (b - t) && (l + rt) / 2 > 0 && (l + rt) / 2 < innerWidth && (t + b) / 2 > 0 && (t + b) / 2 < innerHeight; }`;   // target (ring minus its 4px padding): centre on screen and at least 70% of it visible
   let steps = 0;
   for (; steps < 700; steps++) {
-    const st = await p.evaluate(() => ({ over: G.phase === 'over', cards: UI.cards.length, busy: !!UI.animBusy, mine: (() => { const a = HB.actor(G); return a >= 0 && !G.players[a].ai; })() }));
+    const st = await p.evaluate(() => ({ over: G.phase === 'over', cards: UI.cards.length, busy: !!UI.animBusy, flintpit: (() => { const a = HB.actor(G); return a >= 0 && !G.players[a].ai; })() }));
     if (st.over && !st.cards) break;
     if (st.cards) { const ok = await p.$('#pc:not([hidden]) [data-a=cont],#pc:not([hidden]) [data-a=take]'); if (ok) await ok.tap().catch(() => { }); await sleep(150); continue; }
-    if (!st.mine || st.busy) { await sleep(100); continue; }
+    if (!st.flintpit || st.busy) { await sleep(100); continue; }
     if (steps % 3 === 0) {
       const hc = await p.evaluate(() => { if (!G.q || UI.sel) return null; const e = [...document.querySelectorAll('.hc')].find(x => { const r = x.getBoundingClientRect(); return r.width > 4 && r.left >= 0 && r.right <= innerWidth && r.top >= 0 && r.bottom <= innerHeight && document.elementFromPoint(r.left + r.width / 2, r.top + r.height / 2) .contains(x) || x.contains(document.elementFromPoint(r.left + r.width / 2, r.top + r.height / 2)); }); if (!e || e.classList.contains('glow')) return null; document.getElementById('toast').classList.remove('on'); const r = e.getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top + r.height / 2, kind: G.q.kind }; });
       if (hc) { T.qHandTaps++; await p.touchscreen.tap(hc.x, hc.y); await sleep(150); const tx = await p.evaluate(() => { const e = document.getElementById('toast'); return e.classList.contains('on') ? e.textContent : ''; }); if (!tx) { T.silent++; fail(tag, 'silent hand-card tap during choice ' + hc.kind); } }

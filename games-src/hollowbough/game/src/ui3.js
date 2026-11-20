@@ -6,7 +6,7 @@ function shake(el) { if (!el) return; el.classList.remove('shk'); void el.offset
 function deadSay(tg) {
   try {
     const a = HB.actor(G), p = G.players[a]; if (!p || p.ai || (typeof NET !== 'undefined' && NET.on && a !== viewSeat())) return;
-    if (G.q) { toast(G.q.kind === 'meadow' || G.q.kind === 'clear' || G.q.kind === 'inn' ? 'Tap a meadow card, not your hand' : 'Finish the choice first'); return; }
+    if (G.q) { toast(G.q.kind === 'meadow' || G.q.kind === 'clear' || G.q.kind === 'lantern_rest' ? 'Tap a meadow card, not your hand' : 'Finish the choice first'); return; }
     const m = /^x:([hm])(\d+)$/.exec(tg);
     if (m) {
       const id = +m[2], c = cdef(id), cost = c.cost || {}, miss = [];

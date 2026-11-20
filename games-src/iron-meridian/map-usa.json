@@ -1033,210 +1033,210 @@
    "a": "los_angeles",
    "b": "new_york",
    "points": 21,
-   "ref": "USA base destination ticket"
+   "ref": "base destination ticket"
   },
   {
    "id": "t02",
    "a": "duluth",
    "b": "houston",
    "points": 8,
-   "ref": "USA base destination ticket"
+   "ref": "base destination ticket"
   },
   {
    "id": "t03",
    "a": "sault_st_marie",
    "b": "nashville",
    "points": 8,
-   "ref": "USA base destination ticket"
+   "ref": "base destination ticket"
   },
   {
    "id": "t04",
    "a": "new_york",
    "b": "atlanta",
    "points": 6,
-   "ref": "USA base destination ticket"
+   "ref": "base destination ticket"
   },
   {
    "id": "t05",
    "a": "portland",
    "b": "nashville",
    "points": 17,
-   "ref": "USA base destination ticket"
+   "ref": "base destination ticket"
   },
   {
    "id": "t06",
    "a": "vancouver",
    "b": "montreal",
    "points": 20,
-   "ref": "USA base destination ticket"
+   "ref": "base destination ticket"
   },
   {
    "id": "t07",
    "a": "duluth",
    "b": "el_paso",
    "points": 10,
-   "ref": "USA base destination ticket"
+   "ref": "base destination ticket"
   },
   {
    "id": "t08",
    "a": "toronto",
    "b": "miami",
    "points": 10,
-   "ref": "USA base destination ticket"
+   "ref": "base destination ticket"
   },
   {
    "id": "t09",
    "a": "portland",
    "b": "phoenix",
    "points": 11,
-   "ref": "USA base destination ticket"
+   "ref": "base destination ticket"
   },
   {
    "id": "t10",
    "a": "dallas",
    "b": "new_york",
    "points": 11,
-   "ref": "USA base destination ticket"
+   "ref": "base destination ticket"
   },
   {
    "id": "t11",
    "a": "calgary",
    "b": "salt_lake_city",
    "points": 7,
-   "ref": "USA base destination ticket"
+   "ref": "base destination ticket"
   },
   {
    "id": "t12",
    "a": "calgary",
    "b": "phoenix",
    "points": 13,
-   "ref": "USA base destination ticket"
+   "ref": "base destination ticket"
   },
   {
    "id": "t13",
    "a": "los_angeles",
    "b": "miami",
    "points": 20,
-   "ref": "USA base destination ticket"
+   "ref": "base destination ticket"
   },
   {
    "id": "t14",
    "a": "winnipeg",
    "b": "little_rock",
    "points": 11,
-   "ref": "USA base destination ticket"
+   "ref": "base destination ticket"
   },
   {
    "id": "t15",
    "a": "san_francisco",
    "b": "atlanta",
    "points": 17,
-   "ref": "USA base destination ticket"
+   "ref": "base destination ticket"
   },
   {
    "id": "t16",
    "a": "kansas_city",
    "b": "houston",
    "points": 5,
-   "ref": "USA base destination ticket"
+   "ref": "base destination ticket"
   },
   {
    "id": "t17",
    "a": "los_angeles",
    "b": "chicago",
    "points": 16,
-   "ref": "USA base destination ticket"
+   "ref": "base destination ticket"
   },
   {
    "id": "t18",
    "a": "denver",
    "b": "pittsburgh",
    "points": 11,
-   "ref": "USA base destination ticket"
+   "ref": "base destination ticket"
   },
   {
    "id": "t19",
    "a": "chicago",
    "b": "santa_fe",
    "points": 9,
-   "ref": "USA base destination ticket"
+   "ref": "base destination ticket"
   },
   {
    "id": "t20",
    "a": "vancouver",
    "b": "santa_fe",
    "points": 13,
-   "ref": "USA base destination ticket"
+   "ref": "base destination ticket"
   },
   {
    "id": "t21",
    "a": "boston",
    "b": "miami",
    "points": 12,
-   "ref": "USA base destination ticket"
+   "ref": "base destination ticket"
   },
   {
    "id": "t22",
    "a": "chicago",
    "b": "new_orleans",
    "points": 7,
-   "ref": "USA base destination ticket"
+   "ref": "base destination ticket"
   },
   {
    "id": "t23",
    "a": "montreal",
    "b": "atlanta",
    "points": 9,
-   "ref": "USA base destination ticket"
+   "ref": "base destination ticket"
   },
   {
    "id": "t24",
    "a": "seattle",
    "b": "new_york",
    "points": 22,
-   "ref": "USA base destination ticket"
+   "ref": "base destination ticket"
   },
   {
    "id": "t25",
    "a": "denver",
    "b": "el_paso",
    "points": 4,
-   "ref": "USA base destination ticket"
+   "ref": "base destination ticket"
   },
   {
    "id": "t26",
    "a": "helena",
    "b": "los_angeles",
    "points": 8,
-   "ref": "USA base destination ticket"
+   "ref": "base destination ticket"
   },
   {
    "id": "t27",
    "a": "winnipeg",
    "b": "houston",
    "points": 12,
-   "ref": "USA base destination ticket"
+   "ref": "base destination ticket"
   },
   {
    "id": "t28",
    "a": "montreal",
    "b": "new_orleans",
    "points": 13,
-   "ref": "USA base destination ticket"
+   "ref": "base destination ticket"
   },
   {
    "id": "t29",
    "a": "sault_st_marie",
    "b": "oklahoma_city",
    "points": 9,
-   "ref": "USA base destination ticket"
+   "ref": "base destination ticket"
   },
   {
    "id": "t30",
    "a": "seattle",
    "b": "los_angeles",
    "points": 9,
-   "ref": "USA base destination ticket"
+   "ref": "base destination ticket"
   }
  ],
  "scoring": {
