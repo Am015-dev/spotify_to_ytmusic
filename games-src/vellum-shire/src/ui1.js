@@ -94,7 +94,7 @@ function renderEstate(tg) {
       out += iconG(iconKey(t), c.x, c.y - (t.col === 'F' ? R * 0.12 : 0), R * 1.05, COLINK[t.col]);
       if (t.col === 'F') out += '<text x="' + c.x.toFixed(1) + '" y="' + (c.y + R * 0.68).toFixed(1) + '" text-anchor="middle" font-weight="700" font-size="' + (R * 0.42).toFixed(1) + '" fill="' + COLINK[t.col] + '">' + t.a + '</text>';
     } else {
-      out += '<polygon class="hx" points="' + hexPts(c.x, c.y, R - 0.5) + '" fill="' + COLHEX[hx.col] + '" fill-opacity=".38"/>';
+      out += '<polygon class="hx" points="' + hexPts(c.x, c.y, R - 0.5) + '" fill="' + COLHEX[VSE.colAt(Pl, hx.i)] + '" fill-opacity=".38"/>';
       out += pipsG(hx.d, c.x, c.y, R * 0.95, '#2b1d10');
     }
     if (m) { var wb = minW(m); if (wb) out += '<circle cx="' + (c.x + R * 0.55).toFixed(1) + '" cy="' + (c.y - R * 0.55).toFixed(1) + '" r="' + (R * 0.28).toFixed(1) + '" fill="#b3261e"/><text x="' + (c.x + R * 0.55).toFixed(1) + '" y="' + (c.y - R * 0.45).toFixed(1) + '" text-anchor="middle" font-weight="700" font-size="' + (R * 0.34).toFixed(1) + '" fill="#fff">' + wb + '</text>'; }
@@ -104,12 +104,12 @@ function renderEstate(tg) {
   VS.HEX.forEach(function (hx) { var c = hexXY(hx, R); out += '<polygon class="gild" data-gh="' + hx.i + '" points="' + hexPts(c.x, c.y, R - 1) + '"/>'; });
   // region borders: thick ink between different regions
   var dirs = [[0, -0.5, -1, 5, 0], [0, 0.5, -1, 0, 1], [0, 1, 0, 1, 2], [0, 0.5, 1, 2, 3], [0, -0.5, 1, 3, 4], [0, -1, 0, 4, 5]];
-  var path = '';
+  var path = '', ro = VSE.board(Pl).regOf;
   VS.HEX.forEach(function (hx) {
     var c = hexXY(hx, R);
     dirs.forEach(function (d) {
       var nb = VS.HEX.filter(function (o) { return o.r === hx.r + d[2] && o.x === hx.x + d[1]; })[0];
-      if (nb && VS.REG_OF[nb.i] === VS.REG_OF[hx.i]) return;
+      if (nb && ro[nb.i] === ro[hx.i]) return;
       if (nb && nb.i < hx.i) return;
       var a1 = Math.PI / 180 * (60 * d[3] - 90), a2 = Math.PI / 180 * (60 * d[4] - 90);
       path += 'M' + (c.x + R * Math.cos(a1)).toFixed(1) + ' ' + (c.y + R * Math.sin(a1)).toFixed(1) + 'L' + (c.x + R * Math.cos(a2)).toFixed(1) + ' ' + (c.y + R * Math.sin(a2)).toFixed(1);
@@ -121,7 +121,7 @@ function renderEstate(tg) {
   $('#esttabs').innerHTML = '<button class="etab' + (UI.view === 0 ? ' on' : '') + '" data-view="0">You</button><button class="etab op' + (UI.view === 1 ? ' on' : '') + '" data-view="1">' + nameOf(1) + '</button>';
   var seals = Pl.seals.length ? Pl.seals.length + ' seal' + (Pl.seals.length > 1 ? 's' : '') : '';
   var est = $('#estseal'); if (!est) { est = document.createElement('div'); est.id = 'estseal'; $('#estwrap').appendChild(est); }
-  est.textContent = seals;
+  est.textContent = (Pl.board > 1 ? 'Board ' + Pl.board : '') + (seals ? (Pl.board > 1 ? ' \u00b7 ' : '') + seals : '');
 }
 // ---------- tray: dice, workers, silver, storage, goods (always the seat being viewed, which is you unless you peek)
 function renderTray(tg) {
@@ -155,6 +155,7 @@ function targets() {
     if (m.t === 'take' || m.t === 'buy' || m.t === 'grab') push(tg.tile, m.tile, m);
     else if (m.t === 'place') { if (UI.stoSel < 0 || UI.stoSel === m.s) push(tg.hex, m.h, m); push(tg.sto, m.s, m); }
     else if (m.t === 'sell') push(tg.goods, m.v, m);
+    else if (m.t === 'start') push(tg.hex, m.h, m);
     else if (m.t === 'ship') push(tg.ship, m.st, m);
     else if (m.t === 'work') { tg.work = (tg.work || []).concat([m]); }
     else if (m.t === 'skip') tg.skip = m;

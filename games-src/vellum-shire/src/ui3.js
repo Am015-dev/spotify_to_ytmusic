@@ -11,19 +11,21 @@ function showStart() {
     (sv ? '<button class="btn go" data-s="cont">Continue your game</button>' : '') +
     '<button class="btn' + (sv ? '' : ' go') + '" data-s="vs">Play vs computer</button>' +
     '<div class="lbl">Computer</div><div class="row">' + [['easy', 'Easy'], ['normal', 'Normal'], ['hard', 'Hard']].map(function (x) { return '<button class="btn' + (lv === x[0] ? ' on' : '') + '" data-lvl="' + x[0] + '">' + x[1] + '</button>'; }).join('') + '</div>' +
+    '<div class="lbl">Estate</div><div class="row">' + [['std', 'Standard'], ['random', 'Random boards']].map(function (x) { return '<button class="btn' + ((UI.boards || 'std') === x[0] ? ' on' : '') + '" data-brd="' + x[0] + '">' + x[1] + '</button>'; }).join('') + '</div>' +
     (firstTime() ? '' : tut) +
     '<button class="btn" data-s="hot">Two players, one phone</button></div></div>';
   $('#start').hidden = false;
 }
 document.addEventListener('click', function (e) {
-  var b = e.target.closest('#start [data-s],#start [data-lvl],#rs [data-r]'); if (!b) return;
+  var b = e.target.closest('#start [data-s],#start [data-lvl],#start [data-brd],#rs [data-r]'); if (!b) return;
+  if (b.dataset.brd) { UI.boards = b.dataset.brd; showStart(); return; }
   try { localStorage.setItem('vs_seen', '1'); } catch (x) { }
   if (b.dataset.lvl) { UI.lvl = b.dataset.lvl; try { localStorage.setItem('vs_lvl', UI.lvl); } catch (x) { } showStart(); return; }
   var a = b.dataset.s || b.dataset.r;
   if (a === 'cont') { var o = loadSave(); if (o) { G = o.G; UI.mode = o.mode; UI.lvl = o.lvl; UI.human = o.human; UI.started = true; UI.view = 0; UI.busy = false; $('#start').hidden = true; G.ev = []; render(); flow(); } return; }
-  if (a === 'vs') newGame('vs', { lvl: UI.lvl });
-  if (a === 'hot') newGame('hot');
-  if (a === 'again') newGame(UI.mode === 'hot' ? 'hot' : 'vs', { lvl: UI.lvl });
+  if (a === 'vs') newGame('vs', { lvl: UI.lvl, boards: UI.boards });
+  if (a === 'hot') newGame('hot', { boards: UI.boards });
+  if (a === 'again') newGame(UI.mode === 'hot' ? 'hot' : 'vs', { lvl: UI.lvl, boards: UI.boards });
   if (a === 'menu') { $('#rs').hidden = true; showStart(); }
 });
 // ---------- result

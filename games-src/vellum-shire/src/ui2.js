@@ -26,6 +26,7 @@ function title(m) {
   if (m.t === 'work') return 'Take ' + (VSE.has(Pl, 'work4') ? 4 : 2) + ' workers';
   if (m.t === 'ship') return 'Load goods from stall ' + m.st + (m.st2 ? '+' + m.st2 : '');
   if (m.t === 'skip') return 'Skip';
+  if (m.t === 'start') return 'Start keep here';
   return 'End turn';
 }
 // one option per die (the cheapest), disc variants kept aside
@@ -79,7 +80,8 @@ function renderDock(tg) {
     }).join('') + '<button class="btn" data-a="cancel">Cancel</button>';
   } else {
     var pd = curPend(), Pl = P(s);
-    if (pd) setPrompt({ free: 'Keep: one free action, any die', ship: 'Barge: tap goods in a stall', grab: 'Take a ' + (pd.cols || []).map(function (c) { return COLNAME[c].toLowerCase(); }).join('/') + ' tile', hall: 'Guildhall: place one more tile', ware: 'Granary: tap goods to sell' }[pd.h]);
+    if (G.pick) setPrompt('Pick a green space for your keep');
+    else if (pd) setPrompt({ free: 'Keep: one free action, any die', ship: 'Barge: tap goods in a stall', grab: 'Take a ' + (pd.cols || []).map(function (c) { return COLNAME[c].toLowerCase(); }).join('/') + ' tile', hall: 'Guildhall: place one more tile', ware: 'Granary: tap goods to sell' }[pd.h]);
     else if (!Pl.used[0] && !Pl.used[1]) setPrompt(UI.dieSel != null ? 'Now tap a glowing spot' : 'Tap a die, then a glowing spot');
     else if (!Pl.used[0] || !Pl.used[1]) setPrompt('One die left');
     else setPrompt('Buy from the ink stall, or end');
@@ -180,7 +182,7 @@ function playEvents(evs, before, s) {
       renderScore();
     }, 420);
     else if (e.e === 'region') step(function () {
-      VS.REGIONS[e.reg].cells.forEach(function (c) { var g = $('[data-gh="' + c + '"]'); if (g) { g.classList.remove('on'); void g.getBBox; g.classList.add('on'); } });
+      VSE.board(G.p[e.s]).regions[e.reg].cells.forEach(function (c) { var g = $('[data-gh="' + c + '"]'); if (g) { g.classList.remove('on'); void g.getBBox; g.classList.add('on'); } });
       sfx('gild'); banner('Region complete!', '+' + e.n + ' and +' + e.bonus + ' chapter bonus');
     }, 1100);
     else if (e.e === 'seal') step(function () { sfx('gild'); banner('Gilded seal!', COLNAME[e.col] + ' all filled: +' + (e.big ? VS.BIG_BONUS : VS.SMALL_BONUS)); }, 1100);
@@ -236,7 +238,7 @@ function newGame(mode, o) {
   o = o || {};
   UI.mode = mode || 'vs'; UI.human = UI.mode === 'hot' ? [true, true] : (UI.mode === 'watch' ? [false, false] : [true, false]);
   if (o.lvl) UI.lvl = o.lvl;
-  G = VSE.newGame({ seed: o.seed != null ? o.seed : (Date.now() & 0x7fffffff), first: o.first != null ? o.first : 0, setup: o.setup });
+  G = VSE.newGame({ seed: o.seed != null ? o.seed : (Date.now() & 0x7fffffff), first: o.first != null ? o.first : 0, setup: o.setup, boards: o.boards || 'std' });
   G.ev = [];
   UI.view = 0; UI.sel = null; UI.disc = null; UI.stoSel = -1; UI.dieSel = null; UI.busy = false; UI.started = true; UI.tut = !!o.tut;
   $('#start').hidden = true; $('#rs').hidden = true;

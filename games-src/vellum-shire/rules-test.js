@@ -31,6 +31,11 @@ eq(V.HEX[V.START].col + V.HEX[V.START].d, 'K6', 'start keep on the centre 6');
 eq(V.SIZE_PTS.slice(1), [1, 3, 6, 10, 15, 21, 28, 36], 'region size points');
 eq(V.PHASE_BONUS, [10, 8, 6, 4, 2], 'chapter bonus');
 eq([V.SELL_VP, V.BIG_BONUS, V.SMALL_BONUS, V.BLACK_PER_PHASE], [2, 5, 2, 4], '2-player numbers');
+eq(Object.keys(V.BOARDS).length, 9, '9 estate boards');
+for (const n in V.BOARDS) { const c = {}; V.BOARDS[n].col.forEach(x => c[x] = (c[x] || 0) + 1); eq(['T', 'F', 'L', 'B', 'K', 'Q'].map(k => c[k]), [12, 6, 6, 6, 4, 3], 'board ' + n + ' colours'); }
+{ const g = E.newGame({ seed: 8, boards: 'random' }); ok(g.p[0].board !== g.p[1].board, 'random boards differ'); eq(E.validMoves(g).map(m => m.t), ['start', 'start', 'start', 'start'], 'pick one of 4 keep spaces');
+  E.apply(g, E.validMoves(g)[0]); E.apply(g, E.validMoves(g)[1]); ok(!g.pick && E.validMoves(g).some(m => m.t === 'take' || m.t === 'work'), 'then play starts');
+  while (!g.over) E.apply(g, A.pick(g, 'easy')); eq(E.checkInvariants(g), [], 'random-board game finishes clean'); }
 // ---------- setup
 let G = E.newGame({ seed: 5, first: 0 });
 eq(G.p.map(p => p.silver), [1, 1], '1 silver each');

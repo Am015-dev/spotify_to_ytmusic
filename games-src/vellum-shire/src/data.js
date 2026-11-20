@@ -120,4 +120,21 @@ VS.tileFx = function (t) {
   if (t.col === 'L') return VS.LORE[t.a].fx;
   return { K: 'Take one extra action with any die number.', B: 'Load goods from a stall. Move up the procession.', Q: 'Each chapter end: +1 silver.' }[t.col];
 };
+// all 9 estate boards of the original (colour layouts; the die numbers are the same on every board). Board 1 is the standard game.
+VS.LAYOUTS = { 1: ['FKKL', 'FFKLT', 'FFTLTT', 'BBBKBBB', 'TTQTTF', 'TQLTT', 'QLLT'],
+  2: ['BTFK', 'FBTFT', 'FFFTLT', 'TTTTTLK', 'LLQLQB', 'TTQLB', 'KBBK'], 3: ['FFFF', 'BBKBB', 'TQLLBT', 'TTLKLTT', 'TTLLTT', 'KFQQK', 'TFBT'],
+  4: ['KFTB', 'FFTBB', 'TTTBKQ', 'FFFLLQB', 'TKLTTT', 'TQTLL', 'BTLK'], 5: ['FTTB', 'FFTQQ', 'TKLBBB', 'TTFLKTT', 'LKFLBT', 'TFTKB', 'LLTQ'],
+  6: ['LLKB', 'LTTBT', 'FFQBTT', 'LTTKBTT', 'LTTQBT', 'LQFFB', 'KFFK'], 7: ['LKKB', 'LFFFB', 'BQTTQF', 'BLTTTFT', 'TLTTFT', 'TBQLT', 'BKKL'],
+  8: ['TTBT', 'BKLKT', 'TLQLLB', 'TFLQFLT', 'BFFFQT', 'TKFKB', 'TBTT'], 9: ['TTKL', 'TTFFB', 'TTFFBB', 'KLLQBKL', 'BBLQTF', 'LTTTF', 'QKTT'] };
+VS.BOARDS = {};
+Object.keys(VS.LAYOUTS).forEach(function (n) {
+  var col = VS.LAYOUTS[n].join('').split(''), reg = [], of = [];
+  VS.HEX.forEach(function (h) {
+    if (of[h.i] != null) return;
+    var id = reg.length, q = [h.i], cells = []; of[h.i] = id;
+    while (q.length) { var i = q.pop(); cells.push(i); VS.HEX[i].nb.forEach(function (x) { if (of[x] == null && col[x] === col[h.i]) { of[x] = id; q.push(x); } }); }
+    reg.push({ id: id, col: col[h.i], cells: cells.sort(function (a, b) { return a - b; }) });
+  });
+  VS.BOARDS[n] = { n: +n, col: col, regions: reg, regOf: of };
+});
 if (typeof module !== 'undefined') module.exports = VS;

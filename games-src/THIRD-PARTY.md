@@ -37,3 +37,14 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 ```
+
+## Vellum Shire: ink icons and manuscript fonts
+
+- **game-icons.net icons** (path data inlined in `vellum-shire/src/icons.js`). Licence: CC BY 3.0 (https://creativecommons.org/licenses/by/3.0/).
+  Source: https://game-icons.net (downloaded 20 Nov 2026 from `https://game-icons.net/icons/000000/transparent/1x1/<author>/<name>.svg`).
+  - Delapouite: castle, drakkar, cow, sheep, chicken, barn, watchtower, hand-saw, church, medieval-pavilion, tavern-sign, bank, greek-temple, two-coins, person, wooden-crate, barrel, bread, flour, house
+  - Lorc: mining, open-book, quill-ink, scroll-unfurled, laurel-crown, hammer-nails, wheat, locked-chest, scales, cog, swap-bag, hourglass
+  - Skoll: pig
+  - Credited in the game's Menu > About line. Recoloured (fill only); shapes unchanged.
+- **Fonts** (woff2 in `vellum-shire/fonts/`, base64-inlined by `vellum-shire/build.py`). Licence: SIL Open Font License 1.1 (text kept next to each file as `OFL-*.txt`).
+  - Uncial Antiqua (Astigmatic), UnifrakturMaguntia (Peter Wiegel / j. 'mach' wust), IM Fell English (Igino Marini). Source: Google Fonts (fonts.googleapis.com / fonts.gstatic.com), latin subset.

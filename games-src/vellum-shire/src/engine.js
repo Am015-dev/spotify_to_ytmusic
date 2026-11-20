@@ -7,6 +7,8 @@ var VSE = (function () {
   function d6(G) { return 1 + Math.floor(rng(G) * 6); }
   function shuffle(G, a) { for (var i = a.length - 1; i > 0; i--) { var j = Math.floor(rng(G) * (i + 1)), x = a[i]; a[i] = a[j]; a[j] = x; } return a; }
   function T(id) { return V.TILES[id]; }
+  function B(P) { return V.BOARDS[P.board || 1]; }
+  function colAt(P, h) { return B(P).col[h]; }
   function has(P, k) { return P.lore.some(function (n) { return V.LORE[n].k === k; }); }
   function newGame(o) {
     o = o || {};
@@ -22,15 +24,17 @@ var VSE = (function () {
     G.supply = goods; // 17 face-down goods: start goods come from here
     for (var n = 1; n <= 6; n++) G.st[n] = { t: [], g: [] };
     for (var s = 0; s < 2; s++) {
-      var P = { est: [], sto: [null, null, null], goods: [], sold: [0, 0, 0, 0, 0, 0, 0], silver: 1, wk: 0, vp: 0, dice: [0, 0], used: [1, 1], bought: false, trk: 0, trkH: 0, lore: [], seals: [], log: [] };
+      var P = { board: 1, est: [], sto: [null, null, null], goods: [], sold: [0, 0, 0, 0, 0, 0, 0], silver: 1, wk: 0, vp: 0, dice: [0, 0], used: [1, 1], bought: false, trk: 0, trkH: 0, lore: [], seals: [], log: [] };
       for (var i = 0; i < 37; i++) P.est.push(null);
-      P.est[V.START] = G.stack.K.pop(); // start keep (no effect, no points)
+      if (o.boards === 'random') { do { P.board = 1 + Math.floor(rng(G) * 9); } while (s === 1 && P.board === G.p[0].board); }
+      else P.est[V.START] = G.stack.K.pop(); // start keep on the centre 6 (no effect, no points)
       for (var g = 0; g < 3; g++) addGoods(P, G.supply.pop());
       G.p.push(P);
     }
     var f = G.first, o2 = 1 - f;
     G.p[f].wk = 1; G.p[o2].wk = 2; G.p[f].trkH = 2; G.p[o2].trkH = 1;
     G.unused = G.supply; G.supply = []; // the rest of the 17 are not used
+    if (o.boards === 'random') G.pick = [f, o2]; // advanced setup: each player chooses a keep space for the start keep, in turn order
     if (o.setup) o.setup(G);
     setupPhase(G); startRound(G);
     return G;
@@ -59,7 +63,7 @@ var VSE = (function () {
     G.p.forEach(function (P) { P.dice = [d6(G), d6(G)]; P.used = [0, 0]; P.bought = false; });
     G.ev.push({ e: 'turn', s: G.order[0] });
   }
-  function side(G) { return G.over ? -1 : G.order[G.ti]; }
+  function side(G) { if (G.over) return -1; if (G.pick && G.pick.length) return G.pick[0]; return G.order[G.ti]; }
   function dist(a, b) { var d = Math.abs(a - b); return Math.min(d, 6 - d); }
   // workers needed to turn die value raw into v for an action (kind: take/place/sell/work, col: tile colour for place)
   function cost(P, raw, v, kind, col) {
@@ -69,13 +73,13 @@ var VSE = (function () {
     var need = Math.max(0, dist(raw, v) - free), step = has(P, 'work2') ? 2 : 1;
     return Math.ceil(need / step);
   }
-  function region(h) { return V.REGIONS[V.REG_OF[h]]; }
+  function region(P, h) { var b = B(P); return b.regions[b.regOf[h]]; }
   function canPlaceAt(G, s, id, h, anyDie, v) {
     var P = G.p[s], t = T(id), hx = V.HEX[h];
-    if (P.est[h] != null || hx.col !== t.col) return false;
+    if (P.est[h] != null || colAt(P, h) !== t.col) return false;
     if (!anyDie && hx.d !== v) return false;
     if (!hx.nb.some(function (n) { return P.est[n] != null; })) return false;
-    if (t.col === 'T' && !has(P, 'anyb')) { if (region(h).cells.some(function (c) { return P.est[c] != null && T(P.est[c]).k === t.k; })) return false; }
+    if (t.col === 'T' && !has(P, 'anyb')) { if (region(P, h).cells.some(function (c) { return P.est[c] != null && T(P.est[c]).k === t.k; })) return false; }
     return true;
   }
   function freeSlot(P) { return P.sto.indexOf(null); }
@@ -98,8 +102,8 @@ var VSE = (function () {
     P.sto.forEach(function (id, sl) {
       if (id == null) return;
       for (var h = 0; h < 37; h++) {
-        var hx = V.HEX[h]; if (hx.col !== T(id).col) continue;
-        var cc = anyV ? 0 : cost(P, raw, hx.d, 'place', hx.col);
+        var hx = V.HEX[h]; if (colAt(P, h) !== T(id).col) continue;
+        var cc = anyV ? 0 : cost(P, raw, hx.d, 'place', T(id).col);
         if (cc > wk) continue;
         if (canPlaceAt(G, s, id, h, true, 0)) push({ t: 'place', die: die, v: hx.d, w: cc, s: sl, h: h });
       }
@@ -115,6 +119,7 @@ var VSE = (function () {
   function validMoves(G) {
     if (G.over) return [];
     var s = side(G), P = G.p[s], out = [];
+    if (G.pick && G.pick.length) { for (var h = 0; h < 37; h++) if (colAt(P, h) === 'K') out.push({ t: 'start', h: h }); return out; }
     var pd = G.pend[G.pend.length - 1];
     if (pd) {
       if (pd.h === 'free') { dieActions(G, s, -1, 0, true, out); }
@@ -166,12 +171,12 @@ var VSE = (function () {
     var P = G.p[s], id = P.sto[sl], t = T(id);
     P.sto[sl] = null; P.est[h] = id;
     ev(G, { e: 'place', s: s, tile: id, h: h });
-    var reg = region(h);
+    var reg = region(P, h);
     if (reg.cells.every(function (c) { return P.est[c] != null; })) {
       gain(G, s, V.SIZE_PTS[reg.cells.length] + V.PHASE_BONUS[G.ph], 'region');
       ev(G, { e: 'region', s: s, reg: reg.id, n: V.SIZE_PTS[reg.cells.length], bonus: V.PHASE_BONUS[G.ph] });
     }
-    var all = V.HEX.filter(function (x) { return x.col === t.col; });
+    var all = V.HEX.filter(function (x) { return colAt(P, x.i) === t.col; });
     if (all.every(function (x) { return P.est[x.i] != null; })) {
       var sl2 = G.seal[t.col];
       if (sl2[0] < 0) { sl2[0] = s; P.seals.push(t.col + 'L'); gain(G, s, V.BIG_BONUS, 'seal'); ev(G, { e: 'seal', s: s, col: t.col, big: 1 }); }
@@ -222,6 +227,7 @@ var VSE = (function () {
       case 'grab': G.pend.pop(); fromStall(G, m.st, m.tile); sl = toStorage(G, s, m.tile, m.disc); ev(G, { e: 'take', s: s, st: m.st, tile: m.tile, slot: sl }); break;
       case 'skip': G.pend.pop(); break;
       case 'end': nextTurn(G); return { ok: true };
+      case 'start': P.est[m.h] = G.stack.K.pop(); G.pick.shift(); ev(G, { e: 'place', s: s, tile: P.est[m.h], h: m.h }); if (!G.pick.length) { delete G.pick; ev(G, { e: 'turn', s: side(G) }); } return { ok: true };
     }
     settle(G);
     return { ok: true };
@@ -302,12 +308,12 @@ var VSE = (function () {
     G.p.forEach(function (P, s) {
       if (P.goods.length > 3) e.push('goods kinds ' + s);
       if (P.wk < 0 || P.silver < 0) e.push('negative ' + s);
-      P.est.forEach(function (id, h) { if (id != null && T(id).col !== V.HEX[h].col) e.push('colour ' + s + ' ' + h); });
+      P.est.forEach(function (id, h) { if (id != null && T(id).col !== colAt(P, h)) e.push('colour ' + s + ' ' + h); });
       for (var k = 1; k <= 6; k++) if (G.st[k].t.length > 2) e.push('stall overfull ' + k);
     });
     return e;
   }
   return { newGame: newGame, validMoves: validMoves, apply: apply, side: side, cost: cost, canPlaceAt: canPlaceAt, final: final, clone: clone, checkInvariants: checkInvariants,
-    has: has, region: region, same: same, isLegal: isLegal, dist: dist, orderOf: orderOf, loadShip: loadShip, countTiles: countTiles, countGoods: countGoods, rng: rng, finish: finish };
+    has: has, region: region, same: same, isLegal: isLegal, dist: dist, orderOf: orderOf, loadShip: loadShip, countTiles: countTiles, countGoods: countGoods, rng: rng, finish: finish, board: B, colAt: colAt };
 })();
 if (typeof module !== 'undefined') module.exports = VSE;

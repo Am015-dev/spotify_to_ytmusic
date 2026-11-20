@@ -16,12 +16,12 @@ var VSAI = (function () {
     P.sto.forEach(function (id) {
       if (id == null) return;
       var t = T(id), spots = V.HEX.filter(function (h) { return E.canPlaceAt(G, s, id, h.i, true, 0); }).length;
-      var anyEmpty = V.HEX.some(function (h) { return h.col === t.col && P.est[h.i] == null; });
+      var anyEmpty = V.HEX.some(function (h) { return E.colAt(P, h.i) === t.col && P.est[h.i] == null; });
       if (!anyEmpty) return;
       v += (late ? 0.3 : 0.6) * (COLV[t.col] * (spots ? 1 : 0.55) + (t.col === 'F' ? t.a * 0.6 : 0) + (t.col === 'L' ? loreVal(G, P, t.a) : 0));
     });
     // estate: progress on regions, placed lore and quarries
-    V.REGIONS.forEach(function (r) {
+    E.board(P).regions.forEach(function (r) {
       var f = r.cells.filter(function (c) { return P.est[c] != null; }).length, n = r.cells.length;
       if (f === n || f === 0) return;
       v += (V.SIZE_PTS[n] + V.PHASE_BONUS[G.ph] * 0.7) * Math.pow(f / n, 1.6) * (L > 3 ? 0.55 : 0.3);
@@ -37,6 +37,7 @@ var VSAI = (function () {
     P.lore.forEach(function (n) { if (V.LORE[n].k.indexOf('end') === 0) v += endLore(G, s, n); });
     return v;
   }
+  function startVal(P, h) { var c = {}; V.HEX[h].nb.forEach(function (n) { c[E.colAt(P, n)] = 1; }); return Object.keys(c).length * 2 + V.HEX[h].nb.length - Math.abs(V.HEX[h].r - 3) * 0.5; }
   function loreVal(G, P, n) { var k = V.LORE[n].k; if (k.indexOf('endB:') === 0) return 2; if (k === 'endSold' || k === 'endKinds') return 3; return 2.5; }
   function endLore(G, s, n) { var f = E.final(G, s); var P = G.p[s]; var save = P.lore; P.lore = [n]; var x = E.final(G, s).lore; P.lore = save; return x; }
   function turnOver(G0, G1, s) { return G1.over || E.side(G1) !== s || (G1.p[s].used[0] && G1.p[s].used[1] && !G1.pend.length); }
@@ -62,6 +63,7 @@ var VSAI = (function () {
     var s = E.side(G); lvl = lvl || 'normal';
     var ms = E.validMoves(G);
     if (ms.length === 1) return ms[0];
+    if (ms[0].t === 'start') { var P0 = G.p[s]; return ms.slice().sort(function (a, b) { return startVal(P0, b.h) - startVal(P0, a.h); })[0]; }
     if (lvl === 'simple') return ms[Math.floor(Math.random() * ms.length)];
     if (lvl === 'easy') {
       // one step ahead with noise
