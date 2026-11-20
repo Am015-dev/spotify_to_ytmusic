@@ -87,7 +87,9 @@ function step() {
 }
 function autoTok() {   // one legal target for the animal, and it costs nothing: place it for the player (tap targets stay live until it lands)
   clearTimeout(UI.autoT); if (UI.fast || UI.tut || UI.mode === 'tutorial' || UI.mode === 'coach' || !myTurn() || G.stage !== 'tok') return;
-  var env = G.seats[G.cur].env, sp = WM.tokSpots(env, G.hold.tok); if (sp.length !== 1 || pvTok(env, sp[0], G.hold.tok).d < 0) return;
+  var env = G.seats[G.cur].env, sp = WM.tokSpots(env, G.hold.tok);
+  if (!sp.length) { var k0 = G.cur + ':' + G.seats[G.cur].done; $('#line').innerHTML = '<b class="stepn" aria-label="Step 3 of 3">3<small>/3</small></b><span class="stept">No tile takes the ' + esc(WM.ANI_NAME[G.hold.tok]) + ': it goes back to the bag</span>'; UI.autoT = setTimeout(function () { if (G && myTurn() && G.stage === 'tok' && G.cur + ':' + G.seats[G.cur].done === k0) act({ t: 'back' }); }, 1100); return; }
+  if (sp.length !== 1 || pvTok(env, sp[0], G.hold.tok).d < 0) return;
   var key = G.cur + ':' + G.seats[G.cur].done; $('#line').innerHTML = '<b class="stepn" aria-label="Step 3 of 3">3<small>/3</small></b><span class="stept">Only one spot: the ' + esc(WM.ANI_NAME[G.hold.tok]) + ' goes here</span>';
   UI.autoT = setTimeout(function () { if (G && myTurn() && G.stage === 'tok' && G.cur + ':' + G.seats[G.cur].done === key) act({ t: 'tok', c: sp[0] }); }, 650);
 }
@@ -186,6 +188,8 @@ function onMarket(kind, i) {
 function take(m) { UI.undo = WM.clone(G); sfx('tap'); pvTurnStart(m); UI.verdict = null; WM.apply(G, m); UI.ghost = null; render(); fitView(); }
 function onCell(c, isSpot) {
   var vx = G && G.seats[UI.view].env[c];
+  if (G && myTurn() && quickTarget(c)) { sfx('tap'); quickPlace(c); return; }
+  if (G && myTurn() && G.stage === 'tile' && UI.ghost && UI.ghost.c === c && quickTok()) { confirmPlace(); return; }   // tap the tile again: put it down (turn it with the buttons)
   if (vx && !isSpot && (!myTurn() || G.stage === 'pick' || (G.stage === 'tile' && !(UI.ghost && UI.ghost.c === c)))) { showBig('tile', vx, vx.tok); return; }
   if (!myTurn()) return;
   if (G.stage === 'tile') {
@@ -200,12 +204,17 @@ function onCell(c, isSpot) {
     act({ t: 'tok', c: c });
   }
 }
+// F2: 3-tap turn. With the tile shown on a spot, every tile that can take the animal is ringed: one tap puts the tile down AND the animal there.
+function quickTok() { return !UI.tut && UI.mode !== 'tutorial' && UI.mode !== 'coach' && !UI.fast; }
+function ghostTakes() { return !!(UI.ghost && G.hold && G.hold.tile.a.indexOf(G.hold.tok) >= 0); }
+function quickTarget(c) { if (!UI.ghost || !quickTok() || G.stage !== 'tile') return false; if (c === UI.ghost.c) return ghostTakes(); var x = G.seats[G.cur].env[c]; return !!(x && !x.tok && x.a.indexOf(G.hold.tok) >= 0); }
+function quickPlace(c) { var g = UI.ghost; if (!g) return; act({ t: 'place', c: g.c, rot: g.rot }); clearTimeout(UI.autoT); if (G && myTurn() && G.stage === 'tok') act({ t: 'tok', c: c }); }
 function bestRot(c) {   // the rotation that joins the most matching edges (a friendly default; the player can turn it)
   var t = G.hold.tile; if (t.t.length === 1) return 0; var env = G.seats[G.cur].env, best = 0, bv = -1;
   for (var r = 0; r < 6; r++) { var v = 0, cell = { t: t.t, rot: r }; WM.nb(c).forEach(function (n, d) { if (env[n] && WM.edgeT(env[n], (d + 3) % 6) === WM.edgeT(cell, d)) v++; }); if (v > bv) { bv = v; best = r; } }
   return best;
 }
-function rotate() { if (!UI.ghost || !tutOK({ what: 'rot' })) return; if (G.hold.tile.t.length > 1) { UI.ghost.rot = (UI.ghost.rot + 1) % 6; sfx('tap'); } else toast('One terrain: no need to turn it.'); render(); }
+function rotate(dir) { if (!UI.ghost || !tutOK({ what: 'rot' })) return; if (G.hold.tile.t.length > 1) { UI.ghost.rot = (UI.ghost.rot + (dir < 0 ? 5 : 1)) % 6; sfx('tap'); } else toast('One terrain: no need to turn it.'); render(); }
 function confirmPlace() { if (!UI.ghost || !tutOK({ what: 'ok' })) return; act({ t: 'place', c: UI.ghost.c, rot: UI.ghost.rot }); fitView(); }
 function undoTake() { if (!UI.undo || !tutOK({ what: 'undo' })) return; G = UI.undo; UI.undo = null; UI.ghost = null; sfx('tap'); render(); fitView(); }
 // ---------------------------------------------------------------- pan and zoom
@@ -301,13 +310,13 @@ function drawMap() {
   var an1 = UI.anim && UI.anim.until > Date.now() ? UI.anim : null;
   var keys = Object.keys(env).sort(function (a, b) { return WM.pk(a)[1] - WM.pk(b)[1]; });
   keys.forEach(function (c) {
-    var x = env[c], p = pix(c), tgt = mine && G.stage === 'tok' && !x.tok && x.a.indexOf(G.hold.tok) >= 0, isLast = G.last && G.last.seat === UI.view && (G.last.tile === c);
+    var x = env[c], p = pix(c), tgt = mine && (G.stage === 'tok' || (G.stage === 'tile' && UI.ghost && quickTok())) && !x.tok && x.a.indexOf(G.hold.tok) >= 0, isLast = G.last && G.last.seat === UI.view && (G.last.tile === c);
     if (tgt && hon) { var tv = pvTok(env, c, G.hold.tok).d; bad += pvBadge(p[0] + SZ * 0.5, p[1] - SZ * 0.55, tv, c); }
     out += '<g class="hx' + (tgt ? ' tgt' : '') + (lit.indexOf(c) >= 0 ? ' lit' : '') + (pvl.indexOf(c) >= 0 ? ' pvlit' : '') + (brk.indexOf(c) >= 0 ? ' pvbrk' : '') + (isLast ? ' last' : '') + (an1 && an1.c === c && an1.k === 'drop' ? ' drop' : '') + '" data-c="' + c + '">' + tileSvg(x, p[0], p[1], SZ - 1, x.rot, { tok: x.tok, map: 1, hop: an1 && an1.c === c && an1.k === 'hop' }) + (tgt ? '<polygon class="ring" points="' + poly(p[0], p[1], SZ - 4, [0, 1, 2, 3, 4, 5]) + '"/>' : '') + '</g>';
   });
   if (mine && G.stage === 'tile') {
     WM.spots(env).forEach(function (c) { if (UI.ghost && UI.ghost.c === c) return; var p = pix(c); out += '<polygon class="spot' + (UI.hov === c ? ' hov' : '') + '" data-c="' + c + '" points="' + poly(p[0], p[1], SZ - 1, [0, 1, 2, 3, 4, 5]) + '"/>'; if (hon) bad += pvBadge(p[0], p[1], pvSpotBest(env, c), c, 1); });
-    if (UI.ghost) { var p = pix(UI.ghost.c); out += '<g class="ghost" data-c="' + UI.ghost.c + '">' + tileSvg(G.hold.tile, p[0], p[1], SZ - 1, UI.ghost.rot) + '<polygon class="gring" points="' + poly(p[0], p[1], SZ + 2, [0, 1, 2, 3, 4, 5]) + '"/></g>'; }
+    if (UI.ghost) { var p = pix(UI.ghost.c), gt = quickTok() && ghostTakes(); out += '<g class="ghost' + (gt ? ' tgt' : '') + '" data-c="' + UI.ghost.c + '">' + tileSvg(G.hold.tile, p[0], p[1], SZ - 1, UI.ghost.rot) + '<polygon class="gring" points="' + poly(p[0], p[1], SZ + 2, [0, 1, 2, 3, 4, 5]) + '"/>' + (gt ? '<polygon class="ring" points="' + poly(p[0], p[1], SZ - 4, [0, 1, 2, 3, 4, 5]) + '"/>' : '') + '</g>'; }
   }
   var wh = boardWH();
   pvl.forEach(function (c) { var q = pix(c); bad = '<polygon class="pvring" points="' + poly(q[0], q[1], SZ - 3, [0, 1, 2, 3, 4, 5]) + '"/>' + bad; });
@@ -365,7 +374,7 @@ function renderDock() {
       }
     } else if (G.stage === 'tile') {
       a += '<span class="held">' + mkTile(G.hold.tile, 24) + mkTok(G.hold.tok) + '</span>';
-      if (UI.ghost) { if (G.hold.tile.t.length > 1) a += '<button type="button" class="ab" id="rotB" aria-label="Turn the tile">&#8635; Turn</button>'; a += '<button type="button" class="ab pri" id="okB">Place</button>'; }
+      if (UI.ghost) { if (G.hold.tile.t.length > 1) a += (quickTok() ? '<button type="button" class="ab rb" id="rotL" aria-label="Turn the tile left">&#8634;</button>' : '') + '<button type="button" class="ab' + (quickTok() ? ' rb' : '') + '" id="rotB" aria-label="Turn the tile right">&#8635;' + (quickTok() ? '' : ' Turn') + '</button>'; a += '<button type="button" class="ab pri" id="okB">' + (quickTok() && WM.tokSpots(G.seats[G.cur].env, G.hold.tok).length + (ghostTakes() ? 1 : 0) ? 'Place tile' : 'Place') + '</button>'; }
       if (UI.undo) a += '<button type="button" class="ab" id="undoB">Back</button>';
     } else if (G.stage === 'tok') {
       a += '<span class="held">' + mkTok(G.hold.tok) + '</span><button type="button" class="ab" id="backB">Return token</button>';
@@ -385,7 +394,9 @@ function lineText() {
   if (UI.view !== meSeat() && !myTurn()) return G.seats[UI.view].name + "'s valley. Tap You to return";
   if (s.ai) return s.name + ' is choosing';
   if (G.stage === 'pick') return UI.wipe ? 'Tap the animals to replace, then Replace' : UI.free ? (UI.free.ti == null ? 'Acorn: pick any tile' : 'Now pick any animal') : 'Step 1 of 3: drag or tap a tile + animal pair';
-  if (G.stage === 'tile') return UI.ghost ? (G.hold && G.hold.tile && G.hold.tile.t.length > 1 ? 'Step 2 of 3: turn it if you like, then Place' : 'Step 2 of 3: tap Place to put it here') : 'Step 2 of 3: tap a glowing spot for the tile';
+  if (G.stage === 'tile') { var nT = UI.ghost && quickTok() ? WM.tokSpots(s.env, G.hold.tok).length + (ghostTakes() ? 1 : 0) : 0;
+    if (nT) return 'Step 3 of 3: tap a ringed tile for the ' + WM.ANI_NAME[G.hold.tok] + (G.hold.tile.t.length > 1 ? ' (turn the tile first if you like)' : '');
+    return UI.ghost ? (G.hold && G.hold.tile && G.hold.tile.t.length > 1 ? 'Step 2 of 3: turn it if you like, then Place' : 'Step 2 of 3: tap Place to put it here') : 'Step 2 of 3: tap a glowing spot for the tile'; }
   if (G.stage === 'tok') return WM.tokSpots(s.env, G.hold.tok).length ? 'Step 3 of 3: tap a glowing tile for the ' + WM.ANI_NAME[G.hold.tok] : 'Step 3 of 3: no tile takes a ' + WM.ANI_NAME[G.hold.tok] + ': tap Return';
   return '';
 }
@@ -621,7 +632,8 @@ document.addEventListener('click', function (e) {
     case 'wipeB': if (!tutOK({ what: 'wipeB' })) break; UI.acornMenu = false; UI.wipe = []; UI.prefs.seenAcorn = 1; savePrefs(); render(); break;
     case 'wokB': if (!UI.wipe || !UI.wipe.length || !tutOK({ what: 'wok' })) break; WM.apply(G, { t: 'wipe', idx: UI.wipe.slice() }); UI.wipe = null; sfx('wipe'); render(); break;
     case 'cancelB': if (!tutOK({ what: 'cancel' })) break; UI.free = null; UI.wipe = null; render(); break;
-    case 'rotB': rotate(); break;
+    case 'rotB': rotate(1); break;
+    case 'rotL': rotate(-1); break;
     case 'okB': confirmPlace(); break;
     case 'undoB': undoTake(); break;
     case 'backB': if (!tutOK({ what: 'back' })) break; act({ t: 'back' }); break;
