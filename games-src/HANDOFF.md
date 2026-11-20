@@ -279,3 +279,22 @@ Live fix: original-name phrase removed from shelf blurb + sands page (15:2x).
 - R70 PASS 7.5. Deployed (game-only + endline-test sweep). Live check clean (only site-root favicon 404).
 - Follow-ups (not blocking): clear floating +N pops when sheets open, 375 status line cut, chain-link help text, wonder cost line, soften Easy "Poor move".
 - In review: R72 shipwreck, R73 doorkick. Fixing: F12 vinegrave, F14 thornbound. CALM1 (shelf/W530-calm-pass, owner-approved shell calm pass) triaging sweep failures.
+
+## 20 Nov 15:00 UTC: calm pass live on all games; strict re-review of old games started
+- Shell calm pass deployed (24/24 PASS, live check clean). Tidewake fx live behind ?fx=1 (owner to say yes/no). Pages workflow now sparse-checks out games/ (full checkout hung twice).
+- In flight: R74 thornbound, R75 doorkick, F13 vinegrave (W490), F15 shipwreck (W468); strict re-reviews R76 emberclimb, R77 redline-rally, R78 short-fuse.
+- Owner goal: tell them when ALL games pass the strict bar and are live. Remaining old games to re-review in waves: sunglaze, kaiten-kitchen, rampart-and-vine, stitchwise, crown-city-smash, final-approach, lantern-dive, wildmark, perch-and-plume, sands-of-qamar, nebula-aces, cauldron-fair, vale-of-banners, tidewake.
+
+## 20 Nov 15:10 UTC: OWNER: "hollowbough and twin thrones are unplayable and not fun" (both had passed strict review)
+- Lesson: the rubric/test pass does not match the owner's eyes. A game goes to the owner only with a before/after webm of the first 3 minutes at 375x667 and a cold-play verdict from an agent that did not build it.
+- PLAY1 hollowbough (shelf/W550-hollowbough-play), PLAY2 twin-thrones (shelf/W551-twin-thrones-play): Opus workers diagnosing and fixing the core play against the original's official app.
+- 21 strict reviews/fixers in flight (R74-R92, F13 vinegrave, F15 shipwreck). Treat their PASS as necessary, not sufficient: add the cold-play video step before asking the owner.
+
+## 20 Nov 15:25 UTC: new games (owner: identical rules and components; more agents OK)
+- Builders (brief games-src/briefs/NEWGAME-BRIEF.md, identical rules/components, only names/art original):
+  NEW2 estate dice+tiles W561, NEW3 Roman cards W562, NEW4 Mars engine W563, NEW5 gem duel W564, NEW6 landscapes+animals W565,
+  NEW7 co-op tactical dungeon (owner "D&D", no brand names) W566, NEW8 epic war + artifact hunt (owner "LOTR", no book names) W567.
+- Data helpers on separate branches (builders do NOT know about them; merge or wire them in when each builder reports):
+  DATA4 -> shelf/W563-new-mars-data games-src/_data/mars/; DATA7 -> shelf/W566-new-dungeon-data games-src/_data/dungeon/; DATA8 -> shelf/W567-new-epic-data games-src/_data/epic/.
+- Dropped: a deep-sea co-op trick-taker (duplicate of lantern-dive). Check games-src/ before proposing any new game; GAMES-TODO.md is stale.
+- 15:28 CORRECTION: a data worker refused to copy a game's full card/monster/scenario content renamed (that recreates the specific game). Brief now: identical RULES and component STRUCTURE (types, counts, distributions); our OWN creative content (card designs in big pools, scenarios, maps, event cards, characters). DATA4/7/8 cancelled. NEW4/NEW7/NEW8 restarted on that rule; NEW2/3/5/6 continue (mostly mechanical components).
