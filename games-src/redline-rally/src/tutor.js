@@ -123,7 +123,7 @@ function chapterMenu() { tutStart(); }
 /* Hint text: the move itself (gear and cards from the strongest planner), not a generic tip */
 function hintWhy() {
   try {
-    var c = you(), p = suggestPlan(G, c), nm = p.idx.map(function (i) { var x = c.hand[i]; return x === 'X' ? 'the Stress card' : isSpeed(x) ? 'the ' + x : cardText(x).split(/[:.]/)[0].replace(/ card$/, ''); }); nm = nm.map(function (t) { return /^(Burst|Brake)/.test(t) ? 'the ' + t : t; });
+    var c = you(), p = planOnce(), nm = p.idx.map(function (i) { var x = c.hand[i]; return x === 'X' ? 'the Stress card' : isSpeed(x) ? 'the ' + x : cardText(x).split(/[:.]/)[0].replace(/ card$/, ''); }); nm = nm.map(function (t) { return /^(Burst|Brake)/.test(t) ? 'the ' + t : t; });
     return 'Take gear ' + p.gear + ' and play ' + (nm.length > 1 ? nm.slice(0, -1).join(', ') + ' and ' + nm[nm.length - 1] : nm[0]) + '. Tap Suggest to fill it in, then Go.';
   } catch (e) { return 'Tap Suggest and the computer picks a gear and cards for you. Then tap Go.'; }
 }
@@ -139,6 +139,6 @@ function helpBoot() {
   ];
   GXH.init({ game: 'redline-rally', defaultOn: false, steps: {}, rules: R, top: function () { var dk = document.querySelector('.gx-dock'); if (innerHeight < 600 && dk) { var r = dk.getBoundingClientRect(); if (r.top > innerHeight * 0.3) return Math.ceil(r.top) + 4; } var b = document.querySelector('.gx-bar'), rb = b && b.getBoundingClientRect(); return rb && rb.bottom > 0 && rb.bottom < innerHeight / 2 ? Math.ceil(rb.bottom) + 4 : 6; } });   /* short phones: the Hint bubble stays over the dock, never over the board */
   GXH.bulb({ el: '#bulbbtn', rulesFor: function () { return null; }, suggest: function () {
-    if (!G || G.phase !== 'plan' || !$('#sugB')) return null; return { target: function () { return $('#sugB'); }, why: hintWhy() };
+    if (!G || G.phase !== 'plan' || !$('#sugB')) return null; return { target: function () { return $('.gb[data-g="' + planOnce().gear + '"]') || $('#sugB'); }, why: hintWhy() };
   } });
 }

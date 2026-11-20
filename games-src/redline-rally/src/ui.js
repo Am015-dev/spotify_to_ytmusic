@@ -187,8 +187,10 @@ function boostOdds(G, c) {   /* R24: what a boost flip can add (the speed cards 
     yes: '+' + avg + ' spaces, ' + (!inR ? 'no corner in reach' : (spins ? 'Boost: ' + pct + '% spin' : 'safe') + ' at limit ' + nc.limit),
     no: spins ? 'No boost: safe, keeps heat' : 'save heat for later corners' };
 }   /* Hints on: the Suggest planner's answer to boost / slipstream */
+/* one plan per hand and board: the Hint text, its highlight and Suggest all read this same answer */
+function planOnce() { var c = you(), k = G.round + '|' + c.pos + '|' + c.gear + '|' + c.eng + '|' + c.hand.join(',') + '|' + G.cars.map(function (x) { return x.pos; }).join(','); if (!UI.pk || UI.pk.k !== k || UI.pk.g !== G) UI.pk = { k: k, g: G, p: suggestPlan(G, c) }; return UI.pk.p; }
 function suggest() {
-  var c = you(), p = suggestPlan(G, c);   /* plans your own hand from your seat with the strongest planner */
+  var c = you(), p = planOnce();   /* plans your own hand from your seat with the strongest planner */
   UI.gear = p.gear; UI.sel = p.idx.slice(); UI.boost = false; drawPlan();   /* boost is offered after the reveal; Suggest marks its advice there */
 }
 function commit() {
