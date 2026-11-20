@@ -290,3 +290,5 @@ button.mv{position:relative}
 body:has(#na-coach:not([hidden])) #bffing,body:has(.gxh-bub.on) #bffing{display:none!important}
 #bf:has(#bfban:not([hidden])) .bfring.need{animation:none}
 .na-real{text-align:left;font-size:14px}.na-real ul{margin:4px 0 0;padding-left:18px}.na-real li{margin:2px 0;line-height:1.3}
+/* the dice panel wins: no banner on top of the dice (the panel's own header names the attacker) */
+#bfdice:not([hidden])~#bfban:not(:has([data-keep])){display:none!important}

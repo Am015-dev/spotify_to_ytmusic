@@ -346,7 +346,8 @@ const _tap=PHN.tap;PHN.tap=function(e){if(BF.on)return PHN.tapBF(e)||(G&&G.phase
 document.addEventListener('pointerdown',e=>{if(!BF.on||!UI.hold||!G)return;if(typeof tutOn==='function'&&tutOn())return;if(e.target.closest('.gx-bar,#more,#modal,.gx-dock'))return;if(BF.holdT){clearTimeout(BF.holdT);BF.holdT=0}setTimeout(()=>{if(UI.hold)releaseHold()},0)},true);
 const _rs=resize3D;resize3D=function(){const w=V3.w,h=V3.h;const r=_rs.apply(this,arguments);if(BF.on&&(V3.w!==w||V3.h!==h)){BF.fkey='';BF.key='';requestAnimationFrame(()=>{try{bfRender()}catch(e){}})}return r};
 const _cv=camView;camView=function(){const r=_cv.apply(this,arguments);if(BF.on){BF.fkey='';requestAnimationFrame(()=>{try{bfRender()}catch(e){}})}return r};
-{const _bfR=bfRender;bfRender=function(){const r=_bfR.apply(this,arguments);if(ban&&!ban.hidden)placeBan();return r}}// the dice panel or target chips can appear after the banner: move or drop it
+{const _bfR=bfRender;bfRender=function(){const r=_bfR.apply(this,arguments);if(ban&&!ban.hidden)placeBan();return r}}// the dice panel or target chips can appear after the banner: move or drop it (also between renders, while dice roll in)
+setInterval(()=>{if(ban&&!ban.hidden&&((dice&&!dice.hidden)||document.querySelector('.bftgt')))placeBan()},250);
 BF.render=bfRender;BF.fit=fit;BF.release=release;BF.hideBan=()=>{if(ban){ban.hidden=true;BF.banUntil=0;BF.banQ=[]}};BF.px=px;BF.shipR=shipR;BF.shownXY=shownXY;
 })();
 // the open "More" menu sits on a dim backdrop: the page behind reads as covered, a tap on the backdrop closes the menu
