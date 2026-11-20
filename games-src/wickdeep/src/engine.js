@@ -188,6 +188,7 @@
   function newScenario(scId, party, o) {
     o = o || {};
     var sc = D.SCEN[scId], np = Math.max(2, party.length);
+    if (o.tut && sc.map) { sc = Object.assign({}, sc, { map: sc.map.map(function (r, i) { return i === 3 ? '...o.a.' : r; }) }); }  // tutorial: a rat in the first room, two steps away
     var avg = party.reduce(function (s, p) { return s + (p.lvl || 1); }, 0) / party.length;
     var L = Math.max(0, Math.min(7, Math.ceil(avg / 2) + (o.diff || 0) + (party.length === 1 ? 1 : 0)));
     var G = { v: 1, sc: scId, np: np, nh: party.length, L: L, rs: (o.seed || 1) | 0, round: 0, phase: 'select', figs: [], md: {}, el: {}, ev: [], log: [], uid: 1, order: [], ti: 0, ask: null, act: null, done: null, sel: {}, mamd: null, hexes: 0, tut: !!o.tut };

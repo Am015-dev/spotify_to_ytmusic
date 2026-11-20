@@ -197,3 +197,22 @@ button{font-family:inherit;color:inherit}
 @media (max-width:420px){#legend{right:52px;top:auto;bottom:4px;font-size:11px;line-height:1.2}#legend span{display:none}}
 @media (min-width:800px) and (hover:hover){.cd .nm{padding-left:32px}#legend{top:56px}}
 @media (min-width:800px) and (hover:hover){.cd.play{height:auto;min-height:112px}.cd .basic button{min-height:28px;font-size:12px}}
+
+@keyframes shk{0%,100%{transform:translate(0,0)}20%{transform:translate(-4px,2px)}40%{transform:translate(4px,-2px)}60%{transform:translate(-3px,-1px)}80%{transform:translate(2px,1px)}}
+#board.shk{animation:shk .28s 1}
+@media (prefers-reduced-motion:reduce){#board.shk{animation:none}}
+.inspd .it{margin:0 0 2px;font:700 13px/1.2 var(--px);color:var(--flame)}
+@media (max-width:700px){
+  #tray.hand2{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:4px;overflow:hidden;-webkit-mask-image:none;mask-image:none;align-content:start;padding:2px}
+  #tray.hand2>.hrow,#tray.hand2>.side{grid-column:1/-1}
+  .hrow{display:flex;gap:6px;align-items:stretch}
+  .hrow .htabs{flex:0 0 auto;flex-direction:row;align-items:center}.hrow .htabs>*{min-height:36px;height:36px;width:40px;min-width:0;padding:0}
+  #tray.hand2 .cd{flex:none;min-height:44px;max-height:46px;min-width:0}
+  #tray.hand2 .cd .half,#tray.hand2 .cd .lv{display:none}
+  #tray.hand2 .cd .nm{white-space:normal;padding:0 2px;margin-top:20px;font-size:10.5px;line-height:1.05;max-height:23px;overflow:hidden;text-align:center;min-height:0}
+  #tray.hand2 .cd .in{left:50%;transform:translateX(-50%);top:2px}
+  #tray.hand2 .cd .ord1{right:2px;bottom:2px;width:16px;height:16px;font-size:10px;line-height:16px}
+  .cdet{flex:1;min-width:0;display:flex;flex-wrap:wrap;align-content:center;gap:0 8px;font:12px/1.15 var(--tx);color:var(--ink);background:#241c28;border:1px solid #5b4a5e;border-radius:5px;padding:2px 6px}
+  #tray.hand2>.side{display:none}.cdet .cnt{color:#b49a72;font-size:11px}
+  .cdet b{flex:1 0 100%;font:700 11px/1.2 var(--px);color:var(--flame)}.cdet i{font-style:normal;color:#b49a72}
+}

@@ -217,15 +217,24 @@ function nextLesson() {
   if (any(function (f) { return Object.keys(f.cond || {}).some(function (k) { return f.cond[k] && (D.COND_NAME[k] || k === 'imm'); }); })) { var c = L('cond', 'Conditions', 'A figure with a status like Poison, Stuck or Stun is marked. Tap any figure to read what it does.'); if (c) return c; }
   return null;
 }
+function coachFoe(f) {
+  var best = null;
+  G.figs.forEach(function (m) { if (m.team === 'm' && m.hp > 0 && E.seen(G, m.pos)) { var d = f ? E.dist(f.pos, m.pos) : 9; if (!best || d < best.d) best = { m: m, d: d }; } });
+  return best;
+}
 function coachLine() {
   if (!G || !G.ask) return '';
-  var A = G.ask, f = curFig();
+  var A = G.ask, f = curFig(), fo = coachFoe(f), nm = fo ? figName(fo.m) : '';
+  var plan = !fo ? 'Pick 2 cards.' : fo.d <= 1 ? 'A ' + nm + ' is next to you. Pick 2 cards and hit it.' : 'A ' + nm + ' is in the room. Pick 2 cards: one to move, one to hit.';
   switch (A.h) {
-    case 'sel': { var heroes = E.liveHeroes(G), h = heroes[UI.tab] || heroes[0], n = (UI.sel[h.id] || []).length; if (G.round > 2 && h.disc.length >= 2 && h.hand.length <= 3) return 'Low on cards? Rest to get them back.'; return n === 0 ? 'Pick 2 cards. The small number sets who goes first.' : n === 1 ? 'Pick one more card.' : 'Tap Ready.'; }
-    case 'first': return UI.pick ? 'Tap Play. The other card gives the other half.' : 'Use the top of one card, the bottom of the other.';
-    case 'second': return UI.pick ? 'Tap Play.' : 'Now the other half of the other card.';
-    case 'move': return 'Tap a lit hex to walk there.';
-    case 'target': return 'Tap a red foe. A flipped card adds luck.';
+    case 'sel': { var heroes = E.liveHeroes(G), h = heroes[UI.tab] || heroes[0], n = (UI.sel[h.id] || []).length; if (G.round > 2 && h.disc.length >= 2 && h.hand.length <= 3) return 'Low on cards? Rest to get them back.'; return n === 0 ? plan : n === 1 ? 'Pick one more card.' : 'Tap Ready.'; }
+    case 'first': case 'second': {
+      if (UI.pick) return 'Tap Play.';
+      if (!fo) return A.h === 'first' ? 'Use the top of one card, the bottom of the other.' : 'Now the other half of the other card.';
+      return fo.d <= 1 ? 'The ' + nm + ' is next to you: play an attack half.' : 'The ' + nm + ' is ' + fo.d + ' hexes away: play a move half, then attack.';
+    }
+    case 'move': return fo && fo.d > 1 ? 'Tap a lit hex closer to the ' + nm + '.' : 'Tap a lit hex to walk there.';
+    case 'target': return 'Tap the red foe. A flipped card adds luck.';
     case 'srest': return 'Rest: lose 1 random played card, get the rest back.';
     case 'lrest': return 'Pick a card to lose. Resting heals 2.';
     case 'block': return 'Lose a card to ignore this hit, or take it.';

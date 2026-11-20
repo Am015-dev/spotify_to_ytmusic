@@ -126,7 +126,17 @@ function setPrompt(text, btns) {
   (btns || []).forEach(function (b) { var x = document.createElement('button'); x.type = 'button'; x.className = 'btn' + (b.cls ? ' ' + b.cls : ''); x.textContent = b.t; if (b.id) x.id = b.id; if (b.dis) x.disabled = true; x.addEventListener('click', b.fn); pb.appendChild(x); });
 }
 function renderDock() {
-  var tray = $('tray'); tray.innerHTML = '';
+  // a hero/foe info card never replaces the prompt or its buttons: they stay, info goes in the tray with a Close button
+  var pk = (UI.insp && !UI.insp.lesson && !UI.busy && G && !G.done) ? UI.insp : null; if (pk) UI.insp = null;
+  renderDock0();
+  if (pk && !UI.insp && !UI.busy && G && !G.done) {
+    UI.insp = pk; var tr = $('tray'); tr.innerHTML = ''; tr.className = '';
+    var d = document.createElement('div'); d.className = 'inspd'; d.innerHTML = '<h4 class="it">' + esc(pk.t) + '</h4>' + pk.h; tr.appendChild(d);
+    var x = document.createElement('button'); x.type = 'button'; x.className = 'btn'; x.id = 'inspx'; x.textContent = 'Close'; x.addEventListener('click', closeInsp); $('pbtns').appendChild(x);
+  } else if (pk) UI.insp = pk;
+}
+function renderDock0() {
+  var tray = $('tray'); tray.innerHTML = ''; tray.className = '';
   if (!G) return;
   if (UI.tut && !UI.busy && !G.done && !UI.insp && G.ask && typeof nextLesson === 'function') { var ls = nextLesson(); if (ls) { UI.seen[ls.k] = 1; UI.insp = { t: ls.t, h: ls.h, lesson: 1 }; } }
   var lg = $('legend'); if (lg) { var showLg = !UI.legendOff && !UI.tut && G.round <= 1 && G.ask && (G.ask.h === 'sel' || G.ask.h === 'first') && !UI.insp; lg.hidden = !showLg; }
@@ -145,7 +155,7 @@ function renderDock() {
     case 'recover': setPrompt('Take one card back', [{ t: 'Skip', fn: function () { doMove({ t: 'skip' }); } }]); A.cs.forEach(function (c) { var el = cardEl(c); el.addEventListener('click', function () { doMove({ t: 'card', c: c }); }); tray.appendChild(el); }); return;
     case 'lrest': setPrompt(H.n + ' rests: lose one card', []); f.disc.forEach(function (c) { var el = cardEl(c); el.addEventListener('click', function () { doMove({ t: 'lose', c: c }); }); tray.appendChild(el); }); return;
     case 'srest': {
-      if (!A.must && f.hand.length >= 4 && !UI.tut) { setTimeout(function () { if (G && G.ask === A) doMove({ t: 'nosrest' }); }, 0); setPrompt('', []); return; }
+      if (!A.must && (f.hand.length >= 4 || G.round <= 1)) { setTimeout(function () { if (G && G.ask === A) doMove({ t: 'nosrest' }); }, 0); setPrompt('', []); return; }
       setPrompt(H.n + ': short rest?', [{ t: 'Rest', cls: 'go', fn: function () { doMove({ t: 'srest' }); } }].concat(A.must ? [] : [{ t: 'No', fn: function () { doMove({ t: 'nosrest' }); } }]));
       tray.appendChild(infoP('Lose 1 random played card. Get the other ' + (f.disc.length - 1) + ' back.')); return;
     }
@@ -185,13 +195,21 @@ function dockSelect() {
   if (picked.length < 2 && canPlay) btns.push({ t: 'Hint', id: 'hintbtn', fn: function () { var h = hintSel(f); if (h) { UI.sel[f.id] = h.slice(); toast('Suggested: ' + h.map(function (c) { return D.CARD[c].n; }).join(' + ')); renderDock(); } } });
   btns.push({ t: 'Ready', cls: 'go', id: 'readybtn', dis: picked.length !== 2, fn: function () { var p = UI.sel[f.id]; UI.sel[f.id] = []; doMove({ t: 'sel', id: f.id, cards: p.slice() }); } });
   setPrompt(!canPlay ? H.n + ': must rest' : picked.length === 2 ? H.n + ': ready?' : H.n + ': pick ' + (2 - picked.length) + ' card' + (picked.length ? '' : 's'), btns);
-  var tabs = heroTabs(); if (tabs) tray.appendChild(tabs);
+  var tabs = heroTabs();
+  var phone = window.matchMedia && window.matchMedia('(max-width:700px)').matches;
+  if (phone) {
+    // compact hand (2 rows, no sideways scroll): tap selects and shows the card enlarged in the strip
+    tray.className = 'hand2';
+    var dc = UI.det && f.hand.indexOf(UI.det) >= 0 ? UI.det : (picked.length ? picked[picked.length - 1] : f.hand[0]), cc = D.CARD[dc], dv = document.createElement('div');
+    dv.className = 'cdet'; dv.innerHTML = '<b>' + esc(cc.n) + ' · ' + cc.i + '</b><span><i>Top</i> ' + esc(halfWords(cc.top)) + '</span><span><i>Bottom</i> ' + esc(halfWords(cc.bot)) + '</span><span class="cnt">Played ' + f.disc.length + ' · Lost ' + f.lost.length + '</span>';
+    var hr = document.createElement('div'); hr.className = 'hrow'; if (tabs) hr.appendChild(tabs); hr.appendChild(dv); tray.appendChild(hr);
+  } else if (tabs) tray.appendChild(tabs);
   f.hand.forEach(function (c) {
     var i = picked.indexOf(c), el = cardEl(c, { sel: i >= 0, ord: i >= 0 ? i + 1 : 0 });
     el.addEventListener('click', function () {
       var p = UI.sel[f.id] = (UI.sel[f.id] || []).slice(), j = p.indexOf(c);
       if (j >= 0) p.splice(j, 1); else { if (p.length >= 2) p.shift(); p.push(c); }
-      sfx('tick'); renderDock();
+      UI.det = c; sfx('tick'); renderDock();
     });
     tray.appendChild(el);
   });
@@ -357,6 +375,8 @@ async function playEv(e) {
       var lab = document.createElement('div'); lab.className = 'modlab'; var mv0 = cards[0].map(function (x) { return modHTML(x).t; }).join(' ');
       lab.textContent = e.nul ? 'Miss!' : (e.x2 ? 'Hit ' + e.base + ' ×2' : 'Hit ' + e.base + ' ' + mv0) + (e.sh ? ' − shield ' + e.sh : '') + ' = ' + e.dmg; mc.appendChild(lab);
       sfx(e.x2 ? 'crit' : e.nul ? 'miss' : 'hit');
+      if (!e.nul && !UI.fast) { var bd = $('board'); bd.classList.remove('shk'); void bd.offsetWidth; bd.classList.add('shk'); }
+      if (at.team === 'h') toast(e.nul ? 'MISS: the luck card cancels the hit' : (e.x2 ? 'x2 luck card: double damage! ' : 'Luck card ' + mv0 + ': ') + e.dmg + ' damage');
       var ts = toScreen(tg.pos), as = toScreen(at.pos), ranged = E.dist(at.pos, tg.pos) > 1;
       FX.play(ranged ? 'impact' : 'slash', ts.x, ts.y, ranged ? { angle: Math.atan2(ts.y - as.y, ts.x - as.x) } : { facing: ts.x >= as.x ? 1 : -1 });
       logLine(figName(at) + ' hits ' + figName(tg) + ': ' + e.base + ' ' + cards[0].map(function (x) { return modHTML(x).t; }).join(' ') + ' → ' + (e.nul ? 'miss' : e.dmg));
@@ -366,7 +386,7 @@ async function playEv(e) {
     case 'dmg': v = vf(e.id); if (v) v.hp = e.hp; float(e.id, '−' + e.n, 'dmg'); if (v) { v.flash = 1; draw(); await sleep(speed(90)); v.flash = 0; } draw(); try { GX.buzz && GX.buzz(20); } catch (x) { } return sleep(speed(150));
     case 'heal': v = vf(e.id); if (v) v.hp = Math.min(v.max, v.hp + e.n); if (e.n > 0) { float(e.id, '+' + e.n, 'heal'); var hp = toScreen((v || E.fig(G, e.id) || {}).pos || '0,0'); FX.play('heal', hp.x, hp.y + CAM.z * 0.5, { count: 8 }); sfx('heal'); } draw(); return sleep(speed(e.n > 0 ? 300 : 0));
     case 'cure': float(e.id, 'Cured', 'heal'); v = vf(e.id); if (v) { delete v.cond.poi; delete v.cond.wnd; } return;
-    case 'die': v = vf(e.id); float(e.id, '✝', 'info'); sfx('die'); if (UI.view) delete UI.view.m[e.id]; draw(); logLine(figName(v || { kind: e.kind, type: e.type }) + ' is defeated.'); return sleep(speed(250));
+    case 'die': v = vf(e.id); float(e.id, '✝', 'info'); if (v && v.team === 'm') toast(figName(v) + ' defeated!'); sfx('die'); if (UI.view) delete UI.view.m[e.id]; draw(); logLine(figName(v || { kind: e.kind, type: e.type }) + ' is defeated.'); return sleep(speed(250));
     case 'exh': if (UI.view) delete UI.view.m[e.id]; f = E.fig(G, e.id); toast(figName(f) + ' is out!'); logLine(figName(f) + ' is exhausted.'); sfx('die'); draw(); return sleep(speed(600));
     case 'cond': v = vf(e.id); if (v) v.cond[e.c] = 1; float(e.id, D.COND_NAME[e.c], 'info'); draw(); return sleep(speed(120));
     case 'immune': float(e.id, 'Immune', 'info'); return;
