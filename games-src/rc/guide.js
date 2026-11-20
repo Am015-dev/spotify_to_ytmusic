@@ -142,7 +142,7 @@ function gInside(x,y,el,pad){if(!el)return false;const r=el.getBoundingClientRec
 function gPt(ev){const t=ev.changedTouches&&ev.changedTouches[0]||ev.touches&&ev.touches[0];return t?[t.clientX,t.clientY]:[ev.clientX,ev.clientY]}
 function gGate(ev){if(!GUIDE.on)return;
   // R94/F16: the step's scene is on screen but its bubble has not appeared yet (the tick runs every 250 ms): hold the tap, or Continue / Start day N runs the scene past it
-  if(!GUIDE.shown){const c=gCur();let hold=false;try{hold=!!c&&!!c.beat&&gDay()===c.day&&gBeat()===c.beat&&!(ev.target&&ev.target.closest&&ev.target.closest('#coachskip'))}catch(e){}
+  if(!GUIDE.shown){const c=gCur();let hold=false;try{hold=!!c&&!!c.beat&&gDay()===c.day&&gBeat()===c.beat&&(!c.when||!!c.when())&&!(ev.target&&ev.target.closest&&ev.target.closest('#coachskip'))}catch(e){}
     if(hold){ev.stopPropagation();if(ev.cancelable&&ev.type!=='touchstart')ev.preventDefault();if(ev.type==='click')setTimeout(gTick,0)}return}
   const s=gCur();if(!s||GUIDE.shown!==s.id)return;
   const t=ev.target;if(t&&t.closest&&(t.closest('#coachskip')||t.closest('#coachb button')||t.closest('.gx-top,.gx-bar,#topbar')&&false))return;
