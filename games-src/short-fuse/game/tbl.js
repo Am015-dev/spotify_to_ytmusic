@@ -167,7 +167,7 @@ function renderTable(V){if(!G)return;const tb=document.getElementById('tb');if(!
 // crewmate of the suggested move (or the one with the most glowing wires). A tap on a compact row zooms that crewmate.
 function seatOfU(u){for(const st of UI.V.stands)if(st.slots.some(x=>x.u===u))return st.owner;return null}
 function hintU(){try{if(typeof SC!=='undefined'&&SC.show)return SC.show.u;if(UI.hints&&typeof scShowU==='function')return scShowU()}catch(e){}return null}
-function zoomStand(V,g,sts){const ids=sts.map(st=>st.i);const cnt=st=>st.slots.filter(x=>g.u.has(x.u)).length;const hot=sts.filter(st=>cnt(st)>0);
+function zoomStand(V,g,sts){const ids=sts.map(st=>st.i);if(UI.sel&&UI.sel.tg&&UI.sel.tg.length&&ids.includes(UI.sel.tg[0].st))return UI.zst=UI.sel.tg[0].st;const cnt=st=>st.slots.filter(x=>g.u.has(x.u)).length;const hot=sts.filter(st=>cnt(st)>0);
   const key=G.logN+'|'+decider()+'|'+hot.map(st=>st.i).join(',')+'|'+(UI.sel?UI.sel.mode+':'+UI.sel.v:'');
   if(key!==TBL.zskey||!ids.includes(UI.zst)){TBL.zskey=key;const hu=hintU();const hs=hu!=null?sts.find(st=>st.slots.some(x=>x.u===hu)):null;
     if(hs)UI.zst=hs.i;else if(!ids.includes(UI.zst)||(hot.length&&!hot.some(st=>st.i===UI.zst)))UI.zst=(hot.slice().sort((a,b)=>cnt(b)-cnt(a))[0]||sts[0]).i}
@@ -175,6 +175,7 @@ function zoomStand(V,g,sts){const ids=sts.map(st=>st.i);const cnt=st=>st.slots.f
 function zoomPick(V,g,order){const cnt={};for(const s of order){let n=0;for(const st of V.stands)if(st.owner===s)for(const x of st.slots)if(g.u.has(x.u))n++;cnt[s]=n}
   const hot=order.filter(s=>cnt[s]>0);const sel=UI.sel;const key=hot.join(',')+'|'+G.logN+'|'+decider()+'|'+(G.q?G.q.kind:'')+'|'+(sel?sel.mode+':'+sel.v+':'+(sel.tg||[]).length+':'+sel.tool:'');
   if(!order.includes(UI.zoom))UI.zoom=null;
+  if(sel&&sel.tg&&sel.tg.length&&sel.tg[0].st!=null){const o=ownerOf(sel.tg[0].st);if(order.includes(o)){UI.zoom=o;TBL.zkey=key;return}}   // cold-play: a picked crew wire keeps its crewmate open (no jump)
   if(key!==TBL.zkey){TBL.zkey=key;if(hot.length&&!hot.includes(UI.zoom)){let pref=null;
     try{const hu=hintU();if(hu!=null)pref=seatOfU(hu)}catch(e){}
     if(pref==null)try{const p=ghostPlan(V);if(p&&p.u!=null)pref=seatOfU(p.u)}catch(e){}
@@ -184,8 +185,12 @@ function zoomPick(V,g,order){const cnt={};for(const s of order){let n=0;for(cons
 // the zoom hint holds the message line only until the next tap, so the tap's own explanation (e.g. on a red wire) is never hidden
 document.addEventListener('pointerdown',()=>{TBL.tapAt=Date.now();if(TBL.zhintT&&TBL.sayT===TBL.zhintT)TBL.sayT=0;TBL.zhintT=0},true);
 function zoomTo(s){if(UI.zoom===s)return;UI.zoom=s;lsSet('sf_zhint',1);sfx('click');const el=document.getElementById('crew');if(el)el._s=null;renderTable(UI.V)}
-document.addEventListener('click',e=>{const z=e.target.closest&&e.target.closest('#crew.zm .stc');if(z&&!e.target.closest('.plate.glow')){e.stopPropagation();e.preventDefault();UI.zst=+z.dataset.zst;sfx('click');const el=document.getElementById('crew');if(el)el._s=null;renderTable(UI.V);return}},true);
-document.addEventListener('click',e=>{const s=e.target.closest&&e.target.closest('#crew.zm .sg.cmp');if(!s||e.target.closest('.plate.glow'))return;e.stopPropagation();e.preventDefault();zoomTo(+s.dataset.seat)},true);
+document.addEventListener('click',e=>{const z=e.target.closest&&e.target.closest('#crew.zm .stc');if(z&&!e.target.closest('.plate.glow')){e.stopPropagation();e.preventDefault();const u=cmpU(e,z);UI.zst=+z.dataset.zst;sfx('click');const el=document.getElementById('crew');if(el)el._s=null;renderTable(UI.V);cmpPick(u);return}},true);
+// cold-play: a tap on a wire in a compact row opens that crewmate AND picks the wire (when it is a target), so one tap does what it looks like
+function cmpU(e,root){let u=null;const t=e.target.closest&&e.target.closest('.tile[data-u]');if(t)u=+t.dataset.u;else{const ts=[...root.querySelectorAll('.tile[data-u]')];let bd=1e9;for(const x of ts){const r=x.getBoundingClientRect();const d=Math.abs(r.left+r.width/2-e.clientX);if(d<bd&&d<r.width){bd=d;u=+x.dataset.u}}}
+  return u}
+function cmpPick(u){if(u==null)return;setTimeout(()=>{const el=document.querySelector('#crew .tile.glow[data-u="'+u+'"]');if(el&&!el.closest('.cmp,.stc')){try{el.scrollIntoView({block:'nearest'})}catch(x){}tapTile(+el.dataset.s,+el.dataset.k)}},0)}
+document.addEventListener('click',e=>{const s=e.target.closest&&e.target.closest('#crew.zm .sg.cmp');if(!s||e.target.closest('.plate.glow'))return;e.stopPropagation();e.preventDefault();const u=cmpU(e,s);zoomTo(+s.dataset.seat);cmpPick(u)},true);
 // lays out the compact rows and the zoomed crewmate; returns false when it cannot fit (the crew area then scrolls)
 function zoomLayout(tb,crew,mine,tm){tb.classList.add('zm');crew.classList.add('zm');crew.classList.remove('rowy','scroll');
   if(tm<52)mine.style.setProperty('--th',Math.max(TMIN,tm)+'px');   // zoom: my wires square below 52 px (a 44 px wire is 44x44), the crew gets the rows saved
