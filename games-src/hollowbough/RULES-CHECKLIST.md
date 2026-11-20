@@ -256,3 +256,6 @@ Every rule below has exactly one assertion block in `logic-test.js` with the sam
 213. Solo: Echo/Miner Mole may copy a Production card in his city.
 214. Solo: anything you must give a rival (Post Office cards, Monk berries) is simply discarded/lost.
 215. Passing is allowed only in Autumn: in Winter, Spring and Summer the year goes on (no Pass move).
+216. Every Critter names a real Construction (or any) as its free home: no broken links in the card data.
+217. Mudpie Jester (fool) moves in free when its Midsummer Green (fair_grounds) is open, and is planted in a rival city.
+218. Player text: rules drawer and coach say Pass is only in Autumn, production pays in Spring and Autumn, Summer gives up to 2 meadow cards.

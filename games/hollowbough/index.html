@@ -534,7 +534,7 @@ html.sk .gx-drawer-head{padding-left:16px;padding-right:12px}
 .scount{background:rgba(42,31,25,.88);color:#fff!important;opacity:1;border-radius:7px;padding:1px 6px;text-shadow:none}
 .chip{background:#fff8e6}.chip .cn,.chip .cl{color:#2a1f19}
 .online{background:#fbf4e2;color:#2a1f19}.online p,.online summary{color:#2a1f19;opacity:1}
-#start.art .skylogo{width:max-content;max-width:92%;margin:0 auto;padding:6px 18px;border-radius:14px;background:rgba(25,35,18,.78);color:#fff}
+#start.art .skylogo{width:max-content;max-width:92%;box-sizing:border-box;margin:0 auto;padding:6px 18px;border-radius:14px;background:rgba(25,35,18,.78);color:#fff}
 #start.art .skylogo small{color:#fff}
 .gxc-head{background-size:auto 88px!important;background-repeat:repeat-x!important;background-color:#3b2a1a}
 .gxc-htitle b{background:rgba(25,35,18,.82);color:#fff;padding:2px 10px;border-radius:10px}
@@ -597,6 +597,8 @@ html.sk .gx-drawer-head{padding-left:16px;padding-right:12px}
 @media (max-width:600px){.gxc-head{flex-wrap:wrap;row-gap:4px}.gxc-htitle{order:-1;flex:1 0 100%;overflow-wrap:normal;word-break:keep-all;font-size:17px}}
 /* R10: story map stage labels 14px on phones (no label under 14px) */
 .gxc-lab{font-size:14px!important}
+/* every mode: the bulb's ring pulses three times, then holds still */
+.gxh-ring:not(.from){animation-iteration-count:3}
 
 /* ===== W457 Play view (src/ui2.js pvRender; hooks in ui3.js / ui5.js): one focus at a time. Scoped to #bd.pv so ?board=old keeps the old board. ===== */
 #bd.pv{--pv-paper:#f8edd2;--pv-paper2:#efdcb2;--pv-ink:#3b2a1c;--pv-wood:#5a3c22;--pv-gold:#ffd25a;--pv-ok:#1f6a2b;--pv-no:#a2382a;
@@ -622,8 +624,7 @@ html.sk .gx-drawer-head{padding-left:16px;padding-right:12px}
 #bd.pv .rs.wk{gap:0;padding-left:6px;border-left:2px solid rgba(59,42,28,.25)}
 #bd.pv .pv-meeple{display:inline-flex;margin:0 -3px;touch-action:none;cursor:default;transition:transform .15s}
 #bd.pv .pv-meeple.out{opacity:.25;filter:grayscale(1)}
-#bd.pv .pv-meeple.can{cursor:grab;animation:pvbob 1.6s ease-in-out infinite}
-#bd.pv .pv-meeple.can:nth-child(2){animation-delay:.2s}#bd.pv .pv-meeple.can:nth-child(3){animation-delay:.4s}#bd.pv .pv-meeple.can:nth-child(4){animation-delay:.6s}
+#bd.pv .pv-meeple.can{cursor:grab}
 #bd.pv .pv-meeple.pv-lifted{opacity:.2;animation:none}
 #bd.pv .pv-wn{font-size:14px!important;font-weight:700;margin-left:6px;white-space:nowrap}
 @keyframes pvbob{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}
@@ -633,7 +634,7 @@ html.sk .gx-drawer-head{padding-left:16px;padding-right:12px}
 #bd.pv .pv-tab .pv-tn{font-size:14px;white-space:nowrap;background:rgba(255,255,255,.14);border-radius:8px;padding:1px 6px}
 #bd.pv .pv-tab.on{background:var(--pv-paper);color:var(--pv-ink);box-shadow:0 2px 0 rgba(0,0,0,.35)}
 #bd.pv .pv-tab.on .pv-tn{background:rgba(59,42,28,.12)}
-#bd.pv .pv-tab.hot::after{content:'';position:absolute;right:7px;top:6px;width:10px;height:10px;border-radius:50%;background:var(--pv-gold);box-shadow:0 0 0 2px #5a3c22,0 0 8px 2px rgba(255,210,90,.9);animation:glowp 1.3s ease-in-out infinite}
+#bd.pv .pv-tab.hot::after{content:'';position:absolute;right:7px;top:6px;width:10px;height:10px;border-radius:50%;background:var(--pv-gold);box-shadow:0 0 0 2px #5a3c22,0 0 6px 1px rgba(255,210,90,.7)}
 #bd.pv .pv-tab.on.hot::after{display:none}
 /* ---- stage + panels */
 #bd.pv .pv-stage{flex:1 1 0;min-height:0;position:relative}
@@ -659,7 +660,7 @@ html.sk .gx-drawer-head{padding-left:16px;padding-right:12px}
 #bd.pv .pv-small .pv-sw b{font-size:14px}
 #bd.pv .pv-sw span{font-size:14px;font-weight:600;opacity:.78;margin-top:1px}
 #bd.pv .tile.glow{border-color:#7a5200;box-shadow:0 0 0 2px var(--pv-gold),0 3px 0 rgba(0,0,0,.4),0 0 14px 2px rgba(255,210,90,.75);animation:none}
-#bd.pv .tile.glow::before{content:'';position:absolute;inset:-4px;border-radius:15px;border:3px solid var(--pv-gold);animation:glowp 1.3s ease-in-out infinite;pointer-events:none}
+#bd.pv .tile.glow::before{content:'';position:absolute;inset:-4px;border-radius:15px;border:3px solid var(--pv-gold);animation:glowp 1.3s ease-in-out 3;pointer-events:none}
 #bd.pv .tile.no{opacity:.62;filter:saturate(.55)}
 #bd.pv .tile.taken{opacity:.7;filter:grayscale(.35)}
 #bd.pv .tile.done{opacity:.55}
@@ -1076,6 +1077,29 @@ html.ph #prompt,html.ph .gx-bar #prompt{-webkit-line-clamp:unset!important;displ
 html.ph .gx-bar{min-height:52px}
 html.ph #barprompt{max-height:none!important;overflow:visible!important}
 #acts.tray .tchip.tcard.tbig{align-self:flex-start}
+/* FIXED13 calm play (owner: "confusing and distracting"): a normal game has no finger, no coach bubble, no pulsing.
+   Legal places and cards keep a soft steady gold edge; one gentle nudge outline after 8 s idle (src/ui11.js hlpNudge).
+   The Hints switch lives in the Menu: the top-bar Hints button looked like a second bulb. */
+#hintsbtn{display:none!important}
+html.calm #bd.pv .tile.glow,html.calm #bd.pv.tall .pv-board .tile.glow{animation:none!important}
+html.calm #bd.pv .tile.glow::before,html.calm #bd.pv.tall .pv-board .tile.glow::before,html.calm #bd.pv.tall .pv-board .tile.pv-place.glow::before{animation:none!important;border-color:#e9b93a!important;box-shadow:0 0 0 1px rgba(255,214,90,.55),0 0 6px 1px rgba(255,214,90,.35)!important}
+html.calm #bd.pv .mc.glow .pvc,html.calm #bd.pv .hc.glow .pvc,html.calm #bd.pv .strip.city .sc.glow .pvm{box-shadow:0 0 0 2px var(--pv-gold),0 3px 0 rgba(0,0,0,.4)!important}
+html.calm .tile.glow .face,html.calm .tile.glow .face::after,html.calm .mc.glow .cd,html.calm .sc.glow .cd,html.calm .tchip.glow,html.calm .cvc.glow .cd,html.calm #acts .btn.prep.glow,html.calm .pv-tab.glow{animation:none!important}
+.nudge{outline:3px solid #fff1a8!important;outline-offset:2px;animation:hbnudge 1.6s ease-in-out 3}
+html #bd.pv .tile.nudge{outline:0!important;animation:none}
+html #bd.pv .tile.nudge::before,html.calm #bd.pv.tall .pv-board .tile.pv-place.nudge::before{border-width:4px!important;border-color:#fff1a8!important;box-shadow:0 0 0 2px #ffb81f,0 0 14px 4px rgba(255,214,90,.8)!important;animation:hbnudgeb 1.6s ease-in-out 3!important}
+html #bd.pv .mc.nudge,html #bd.pv .hc.nudge,html #bd.pv .sc.nudge{outline:0!important;animation:none}
+html #bd.pv .mc.nudge .pvc,html #bd.pv .hc.nudge .pvc,html #bd.pv .sc.nudge .pvm{box-shadow:0 0 0 4px #fff1a8,0 0 0 6px #ffb81f,0 0 14px 4px rgba(255,214,90,.8)!important}
+@keyframes hbnudge{0%,100%{outline-color:#fff1a8}50%{outline-color:#ffb81f}}
+@keyframes hbnudgeb{0%,100%{border-color:#fff1a8}50%{border-color:#ffb81f}}
+@media (prefers-reduced-motion:reduce){.nudge{animation:none}}
+/* FIXED13: with the tokens column (r5) a 375 px phone cut "workers": one meeple is enough there, the number says how many */
+@media (max-width:400px){#bd.pv .resrow.r5 .rs.wk .pv-meeple~.pv-meeple{display:none}#bd.pv .resrow.r5 .rs.wk .pv-wn{margin-left:2px}#bd.pv .resrow.r5 .rs.wk .rsw{font-size:.8em!important;letter-spacing:-.2px}#bd.pv .resrow.r5 .rs.wk{padding-left:3px}}
+
+/* one helper at a time: the tab dot steps aside while the nudge or the bulb's ring shows */
+body:has(.nudge,.gxh-ring,#finger:not([hidden])) #bd.pv .pv-tab.hot::after{display:none}
+/* FIXED16: the hand cards sit ~14px above the hand strip; every scrolling panel ends with room for them, so the last row (Goals) is never covered at 375x553 */
+#bd.pv .pv-scrolly,#bd.pv .pv-goals{padding-bottom:26px!important;scroll-padding-bottom:26px}
 
 :root{--ink:#3b2f2a;--paper:#f6ecd6;--paper2:#ecdcba;--wood:#a67c52;--wood2:#7c5636;--leaf:#5f8f4a;--gold:#e3b02e;--red:#b04a38;--gx-bg:#2c3b27;--gx-bar:#22301f;--gx-panel:#f6ecd6;--gx-ink:#3b2f2a;--gx-accent:#e3b02e;--gx-dock-w:clamp(330px,31vw,430px);--gx-bar-h:48px;
   --font:'Palatino Linotype','Book Antiqua',Palatino,'Iowan Old Style','Hoefler Text',Georgia,'DejaVu Serif',serif}
@@ -1206,7 +1230,7 @@ body:has(.gxh-bub.on) #prompt{visibility:hidden}  /* one instruction line: the t
 #finger{position:absolute;width:40px;height:48px;z-index:49;pointer-events:none;filter:drop-shadow(0 3px 4px rgba(0,0,0,.55));opacity:0}
 #finger[hidden]{display:none}
 #finger svg{width:100%;height:100%}
-#finger.go{animation:ftap 1.5s ease-in-out infinite}
+#finger.go{animation:ftap 1.5s ease-in-out 3 forwards}
 @keyframes ftap{0%{opacity:0;transform:translate(22px,30px) scale(1)}22%{opacity:1;transform:translate(0,0) scale(1)}42%{opacity:1;transform:translate(0,2px) scale(.9)}58%{opacity:1;transform:translate(0,0) scale(1)}86%{opacity:1;transform:translate(0,0) scale(1)}100%{opacity:0;transform:translate(0,0) scale(1)}}
 @keyframes glowp{0%,100%{box-shadow:0 0 0 3px #f2c230,0 0 9px 2px rgba(255,214,90,.8),inset 0 0 0 2px rgba(255,255,255,.55)}50%{box-shadow:0 0 0 3px #fff3b0,0 0 18px 7px rgba(255,226,120,.98),inset 0 0 0 2px rgba(255,255,255,.85)}}
 @keyframes shk{0%,100%{transform:none}20%{transform:translateX(-4px)}40%{transform:translateX(4px)}60%{transform:translateX(-3px)}80%{transform:translateX(3px)}}
@@ -1215,8 +1239,8 @@ body:has(.gxh-bub.on) #prompt{visibility:hidden}  /* one instruction line: the t
 .bmp{animation:bmp .5s}
 .tile,.mc,.sc,.chip,.tchip,.btn{touch-action:manipulation;-webkit-touch-callout:none}
 .tile.glow{z-index:6}
-.tile.glow .face{animation:glowp 1.3s ease-in-out infinite}
-.mc.glow .cd,.sc.glow .cd{border-radius:6px;animation:glowp 1.3s ease-in-out infinite}
+.tile.glow .face{animation:glowp 1.3s ease-in-out 3}
+.mc.glow .cd,.sc.glow .cd{border-radius:6px;animation:glowp 1.3s ease-in-out 3}
 .sc.glow{z-index:40!important;margin-top:-5px}
 .tile.sel .face,.mc.sel .cd,.sc.sel .cd{outline:3px solid #fff;outline-offset:1px}
 .sc{position:absolute;margin:0;padding:0;border:0;background:none;cursor:pointer}
@@ -1242,11 +1266,11 @@ body:has(.gxh-bub.on) #prompt{visibility:hidden}  /* one instruction line: the t
 #acts .btn{flex:1 1 0;padding:2px 6px;display:inline-flex;align-items:center;justify-content:center;gap:6px;font-size:15px}
 #acts .btn.undo{flex:0 0 54px;font-size:24px;padding:0}
 #acts .btn.dis{opacity:.4}
-#acts .btn.prep.glow{animation:glowp 1.3s ease-in-out infinite}
+#acts .btn.prep.glow{animation:glowp 1.3s ease-in-out 3}
 #acts .btn.pass{background:linear-gradient(180deg,#e8a08c,#b04a38)}
 #acts .btn.pass.armed{background:linear-gradient(180deg,#e3b02e,#c58f14);color:#2a1f19;text-shadow:none}
 .tchip{appearance:none;border:2px solid var(--ink);background:linear-gradient(180deg,#fff8e6,#ecdcba);border-radius:12px;min-height:44px;min-width:44px;padding:2px 10px;display:inline-flex;align-items:center;justify-content:center;gap:6px;cursor:pointer;font-size:14px;font-weight:700;color:var(--ink);max-width:100%}
-.tchip.glow{animation:glowp 1.3s ease-in-out infinite}
+.tchip.glow{animation:glowp 1.3s ease-in-out 3}
 .tchip.tcard{padding:2px 4px;border-radius:8px;min-width:0;min-height:0}
 .tchip.tx{background:rgba(255,255,255,.85);font-size:24px;padding:0 8px;min-width:44px;animation:none}
 #acts.tall{align-items:center}
@@ -1274,7 +1298,7 @@ body:has(.gxh-bub.on) #prompt{visibility:hidden}  /* one instruction line: the t
 .t-bev .face::after,.t-sev .face::after{border-radius:10px;inset:0}
 .t-deck .face::after,.t-disc .face::after,.t-tree .face::after{display:none}
 .tile.glow .face{animation:none}
-.tile.glow .face::after{animation:glowp 1.3s ease-in-out infinite}
+.tile.glow .face::after{animation:glowp 1.3s ease-in-out 3}
 .tile.sel .face{outline:0}.tile.sel .face::after{outline:3px solid #fff;outline-offset:1px}
 .t-deck .face,.t-disc .face,.t-tree .face{background:radial-gradient(circle at 35% 30%,#fff8e6,#e2d0a4)!important;border:2px solid var(--ink)!important;border-radius:11px;inset:1px;box-shadow:0 2px 3px rgba(0,0,0,.4)!important;display:flex;align-items:center;justify-content:center}
 .t-deck .its,.t-disc .its,.t-tree .its{flex-direction:row;gap:1px}
@@ -1310,7 +1334,7 @@ body:has(.gxh-bub.on) #prompt{visibility:hidden}  /* one instruction line: the t
 .cvcell{position:relative;outline:2px dashed rgba(246,236,214,.35);outline-offset:-2px;border-radius:8px;background:rgba(25,15,6,.35)}
 .cvc{position:absolute;left:0;top:0;margin:0;padding:0;border:0;background:none;display:block}
 .cvc .cd{position:absolute;left:0;top:0}
-.cvc.glow{z-index:3}.cvc.glow .cd{border-radius:6px;animation:glowp 1.3s ease-in-out infinite}
+.cvc.glow{z-index:3}.cvc.glow .cd{border-radius:6px;animation:glowp 1.3s ease-in-out 3}
 .cvx{min-width:120px}
 .pcard{top:0;bottom:0;border-top:0}
 .gx-bar .gx-ibtn{flex:0 0 auto}
@@ -4678,7 +4702,7 @@ root.HBKit = HB;
 <script>
 // Generated by game/gen-data.py from cards.json. Do not edit by hand.
 // Internal `key` fields are for code only; show `name`/`text` to players.
-(function(g){var HB=g.HB=g.HB||{};HB.DATA={"game":"Hollowbough","cards":[{"key":"architect","name":"Master Lathwright","text":"At the end of the game, score 1 point per resin and per pebble you still hold, to a maximum of 6.","copies":2,"type":"prosperity","color":"purple","kind":"critter","unique":true,"cost":{"berry":4},"pts":2,"linked":"crane"},{"key":"bard","name":"Ballad Finch","text":"Sing away up to 5 cards from your hand and take a point token for each.","copies":2,"type":"traveler","color":"tan","kind":"critter","unique":true,"cost":{"berry":3},"pts":0,"linked":"theater"},{"key":"barge_toad","name":"Reedpunt Toad","text":"Gain 2 twigs for every Bramble Allotment in your city.","copies":3,"type":"production","color":"green","kind":"critter","unique":false,"cost":{"berry":2},"pts":1,"linked":"twig_barge"},{"key":"chip_sweep","name":"Tinder Chipmunk","text":"Re-run one other production card in your own city.","copies":3,"type":"production","color":"green","kind":"critter","unique":false,"cost":{"berry":3},"pts":2,"linked":"resin_refinery"},{"key":"doctor","name":"Poultice Badger","text":"Spend up to 3 berries and take a point token for each one spent.","copies":2,"type":"production","color":"green","kind":"critter","unique":true,"cost":{"berry":4},"pts":4,"linked":"university"},{"key":"fool","name":"Mudpie Jester","text":"Plant this prankster in a rival village; it takes one of their spaces and costs them 2 points.","copies":2,"type":"traveler","color":"tan","kind":"critter","unique":true,"cost":{"berry":3},"pts":-2,"linked":"fairgrounds"},{"key":"historian","name":"Chronicle Owl","text":"Whenever you play another card, draw 1 card afterwards.","copies":3,"type":"governance","color":"blue","kind":"critter","unique":true,"cost":{"berry":2},"pts":1,"linked":"clock_tower"},{"key":"husband","name":"Goodman Vole","text":"Shares a space with one Goodwife. If paired and you own an Allotment, gain any 1 resource on play and every production.","copies":4,"type":"production","color":"green","kind":"critter","unique":false,"cost":{"berry":3},"pts":2,"linked":"farm"},{"key":"innkeeper","name":"Hostler Hedgehog","text":"When you play a Critter you may send this hedgehog away to cut 3 berries off its price.","copies":3,"type":"governance","color":"blue","kind":"critter","unique":true,"cost":{"berry":1},"pts":1,"linked":"inn"},{"key":"judge","name":"Gavel Marten","text":"When playing any card, pay one required resource with a different resource of your choice.","copies":2,"type":"governance","color":"blue","kind":"critter","unique":true,"cost":{"berry":3},"pts":2,"linked":"courthouse"},{"key":"king","name":"Bramble Sovereign","text":"End of game: 1 point per basic event and 2 points per special event you achieved.","copies":2,"type":"prosperity","color":"purple","kind":"critter","unique":true,"cost":{"berry":6},"pts":4,"linked":"castle"},{"key":"miner_mole","name":"Echo Mole","text":"Mimic any one production card in a rival village, as though it were theirs.","copies":3,"type":"production","color":"green","kind":"critter","unique":false,"cost":{"berry":3},"pts":1,"linked":"mine"},{"key":"monk","name":"Brother Moss","text":"Give up to 2 berries to a rival and take 2 point tokens for each. Opens the second Cloister slot.","copies":2,"type":"production","color":"green","kind":"critter","unique":true,"cost":{"berry":1},"pts":0,"linked":"monastery"},{"key":"peddler","name":"Haggle Magpie","text":"Swap up to 2 of your resources for any 2 resources from the supply.","copies":3,"type":"production","color":"green","kind":"critter","unique":false,"cost":{"berry":2},"pts":1,"linked":"ruins"},{"key":"postal_pigeon","name":"Parcel Dove","text":"Reveal 2 cards; you may play one worth up to 3 base points free; discard the other.","copies":3,"type":"traveler","color":"tan","kind":"critter","unique":false,"cost":{"berry":2},"pts":0,"linked":"post_office"},{"key":"queen","name":"Thistle Regent","text":"Send a worker here to play any card worth up to 3 base points from hand or meadow without paying.","copies":2,"type":"destination","color":"red","kind":"critter","unique":true,"cost":{"berry":5},"pts":4,"linked":"palace"},{"key":"ranger","name":"Trailwarden Fox","text":"Relocate one of your deployed workers to another legal spot. Opens the second Thornhold cell.","copies":2,"type":"traveler","color":"tan","kind":"critter","unique":true,"cost":{"berry":2},"pts":1,"linked":"dungeon"},{"key":"shepherd","name":"Crook Shrew","text":"Gain 3 berries plus 1 point token per token on your Shrine. If bought with berries, they go to a rival.","copies":2,"type":"traveler","color":"tan","kind":"critter","unique":true,"cost":{"berry":3},"pts":1,"linked":"chapel"},{"key":"shopkeeper","name":"Tallyshop Mouse","text":"Gain 1 berry whenever you play another Critter.","copies":3,"type":"governance","color":"blue","kind":"critter","unique":true,"cost":{"berry":2},"pts":1,"linked":"general_store"},{"key":"teacher","name":"Slate Schoolmarm","text":"Draw 2 cards, keep one, and hand the other to a rival.","copies":3,"type":"production","color":"green","kind":"critter","unique":false,"cost":{"berry":2},"pts":2,"linked":"school"},{"key":"undertaker","name":"Hollow Sexton","text":"Clear 3 meadow cards, refill, then take 1 meadow card. Opens the second Grove plot.","copies":2,"type":"traveler","color":"tan","kind":"critter","unique":true,"cost":{"berry":2},"pts":1,"linked":"cemetery"},{"key":"wanderer","name":"Footsore Drifter","text":"Draw 3 cards. Does not use up a city space.","copies":3,"type":"traveler","color":"tan","kind":"critter","unique":false,"cost":{"berry":2},"pts":1,"linked":"lookout"},{"key":"wife","name":"Goodwife Vole","text":"Shares a space with a Goodman; if paired, worth 3 extra points at the end.","copies":4,"type":"prosperity","color":"purple","kind":"critter","unique":false,"cost":{"berry":2},"pts":2,"linked":"farm"},{"key":"woodcarver","name":"Whittle Beaver","text":"Spend up to 3 twigs and take a point token for each.","copies":3,"type":"production","color":"green","kind":"critter","unique":false,"cost":{"berry":2},"pts":2,"linked":"storehouse"},{"key":"castle","name":"Stonecrown Keep","text":"End of game: 1 point per common construction in your city.","copies":2,"type":"prosperity","color":"purple","kind":"construction","unique":true,"cost":{"twig":2,"resin":3,"pebble":3},"pts":4,"linked":"king"},{"key":"cemetery","name":"Mossgrave Glade","text":"A worker settles here forever; reveal 4 cards from deck or discard pile and play one free, discarding the rest.","copies":2,"type":"destination","color":"red","kind":"construction","unique":true,"cost":{"pebble":2},"pts":0,"linked":"undertaker"},{"key":"chapel","name":"Candlewick Shrine","text":"Add a point token here, then draw 2 cards for every token now on the Shrine.","copies":2,"type":"destination","color":"red","kind":"construction","unique":true,"cost":{"twig":2,"resin":1,"pebble":1},"pts":2,"linked":"shepherd"},{"key":"clock_tower","name":"Dewdrop Belfry","text":"Place 3 tokens here when built. Before recalling workers each season, spend one to repeat a basic or forest spot you occupy. Leftover tokens score.","copies":3,"type":"governance","color":"blue","kind":"construction","unique":true,"cost":{"twig":3,"pebble":1},"pts":0,"linked":"historian"},{"key":"courthouse","name":"Mosswood Assize","text":"Gain 1 twig, resin or pebble each time you build another construction.","copies":2,"type":"governance","color":"blue","kind":"construction","unique":true,"cost":{"twig":1,"resin":1,"pebble":2},"pts":2,"linked":"judge"},{"key":"crane","name":"Pulley Lift","text":"When building a Construction, dismantle this lift to cut 3 resources of your choice off the price.","copies":3,"type":"governance","color":"blue","kind":"construction","unique":true,"cost":{"pebble":1},"pts":1,"linked":"architect"},{"key":"dungeon","name":"Thornhold Cells","text":"Lock one of your Critters beneath this card to cut 3 resources off the price of a card. Opens a second cell with a Trailwarden.","copies":2,"type":"governance","color":"blue","kind":"construction","unique":true,"cost":{"resin":1,"pebble":2},"pts":0,"linked":"ranger"},{"key":"ever_tree","name":"Elderheart Oak","text":"End of game: 1 point per purple card in your city (itself included). Can house any one Critter for free.","copies":2,"type":"prosperity","color":"purple","kind":"construction","unique":true,"cost":{"twig":3,"resin":3,"pebble":3},"pts":5,"linked":"any"},{"key":"fair_grounds","name":"Midsummer Green","text":"Draw 2 cards.","copies":3,"type":"production","color":"green","kind":"construction","unique":true,"cost":{"twig":1,"resin":2,"pebble":1},"pts":3,"linked":"fool"},{"key":"farm","name":"Bramble Allotment","text":"Gain 1 berry.","copies":8,"type":"production","color":"green","kind":"construction","unique":false,"cost":{"twig":2,"resin":1},"pts":1,"linked":null},{"key":"general_store","name":"Cranny Market","text":"Gain 1 berry, or 2 berries if you own any Allotment.","copies":3,"type":"production","color":"green","kind":"construction","unique":false,"cost":{"resin":1,"pebble":1},"pts":1,"linked":"shopkeeper"},{"key":"inn","name":"Lantern Rest","text":"Send a worker to play a meadow card for 3 fewer resources. Rivals may visit too and pay you 1 point.","copies":3,"type":"destination","color":"red","kind":"construction","unique":false,"cost":{"twig":2,"resin":1},"pts":2,"linked":"innkeeper"},{"key":"lookout","name":"Spyglass Perch","text":"Copy any one basic or forest spot, even if it is occupied.","copies":2,"type":"destination","color":"red","kind":"construction","unique":true,"cost":{"twig":1,"resin":1,"pebble":1},"pts":2,"linked":"wanderer"},{"key":"mine","name":"Flintpit","text":"Gain 1 pebble.","copies":3,"type":"production","color":"green","kind":"construction","unique":false,"cost":{"twig":1,"resin":1,"pebble":1},"pts":2,"linked":"miner_mole"},{"key":"monastery","name":"Quietstone Cloister","text":"A worker settles here forever: give 2 resources to a rival and take 4 point tokens.","copies":2,"type":"destination","color":"red","kind":"construction","unique":true,"cost":{"twig":1,"resin":1,"pebble":1},"pts":1,"linked":"monk"},{"key":"palace","name":"Gildenfern Court","text":"End of game: 1 point per unique construction, itself included.","copies":2,"type":"prosperity","color":"purple","kind":"construction","unique":true,"cost":{"twig":2,"resin":3,"pebble":3},"pts":4,"linked":"queen"},{"key":"post_office","name":"Dovecote Depot","text":"Give a rival 2 cards, discard any others you like, then refill your hand from the deck. Visitors pay you 1 point.","copies":3,"type":"destination","color":"red","kind":"construction","unique":false,"cost":{"twig":1,"resin":2},"pts":2,"linked":"postal_pigeon"},{"key":"resin_refinery","name":"Amber Still","text":"Gain 1 resin.","copies":3,"type":"production","color":"green","kind":"construction","unique":false,"cost":{"resin":1,"pebble":1},"pts":1,"linked":"chip_sweep"},{"key":"ruins","name":"Toppled Hall","text":"Raze one of your constructions, build here in its place, regain its exact cost, and draw 2 cards.","copies":3,"type":"traveler","color":"tan","kind":"construction","unique":false,"cost":{},"pts":0,"linked":"peddler"},{"key":"school","name":"Acorn Academy","text":"End of game: 1 point per common critter.","copies":2,"type":"prosperity","color":"purple","kind":"construction","unique":true,"cost":{"twig":2,"resin":2},"pts":2,"linked":"teacher"},{"key":"storehouse","name":"Hoard Cellar","text":"Each production adds a stack (3 twigs, 2 resin, 1 pebble or 2 berries) to this card; send a worker to haul it all away.","copies":3,"type":"production","color":"green","kind":"construction","unique":false,"cost":{"twig":1,"resin":1,"pebble":1},"pts":2,"linked":"woodcarver"},{"key":"theater","name":"Glowworm Playhouse","text":"End of game: 1 point per unique critter.","copies":2,"type":"prosperity","color":"purple","kind":"construction","unique":true,"cost":{"twig":3,"resin":1,"pebble":1},"pts":3,"linked":"bard"},{"key":"twig_barge","name":"Kindling Raft","text":"Gain 2 twigs.","copies":3,"type":"production","color":"green","kind":"construction","unique":false,"cost":{"twig":1,"pebble":1},"pts":1,"linked":"barge_toad"},{"key":"university","name":"Lorewood College","text":"Disband one of your cards, regain its exact cost, plus any 1 resource and 1 point.","copies":2,"type":"destination","color":"red","kind":"construction","unique":true,"cost":{"resin":1,"pebble":2},"pts":3,"linked":"doctor"}],"forest":[{"key":"forest_berry_thicket","name":"Berry Thicket","text":"Gain 2 berries and draw 1 card."},{"key":"forest_foragers_crossing","name":"Foragers Crossing","text":"Gain any 2 resources (twig/resin/pebble/berry, mix allowed)."},{"key":"forest_rummage_hollow","name":"Rummage Hollow","text":"Discard any number of cards, then draw 2 for each one discarded (limit 8)."},{"key":"forest_echoing_meadow","name":"Echoing Meadow","text":"Repeat any one basic location and also draw 1 card."},{"key":"forest_quarry_burrow","name":"Quarry Burrow","text":"Gain 1 pebble and draw 3 cards."},{"key":"forest_mixed_glade","name":"Mixed Glade","text":"Gain 1 twig, 1 resin and 1 berry."},{"key":"forest_bumper_bramble","name":"Bumper Bramble","text":"Gain 3 berries."},{"key":"forest_sapwell_copse","name":"Sapwell Copse","text":"Gain 2 resin and 1 twig."},{"key":"forest_postbag_clearing","name":"Postbag Clearing","text":"Draw 2 cards and gain any 1 resource."},{"key":"forest_barter_stump","name":"Barter Stump","text":"Discard up to 3 cards; gain 1 resource of your choice for each."},{"key":"forest_meadow_bazaar","name":"Meadow Bazaar","text":"Take 2 meadow cards; you may immediately play one of them for 1 fewer resource."}],"basic":[{"key":"basic_berry_patch","name":"Berry Patch","text":"Gain 1 berry. Shared.","gain":{"berry":1},"draw":0,"pts":0,"shared":true},{"key":"basic_dewberry_nook","name":"Dewberry Nook","text":"Gain 1 berry and draw 1 card.","gain":{"berry":1},"draw":1,"pts":0,"shared":false},{"key":"basic_amber_weep","name":"Amber Weep","text":"Gain 1 resin and draw 1 card. Shared.","gain":{"resin":1},"draw":1,"pts":0,"shared":true},{"key":"basic_pebble_bank","name":"Pebble Bank","text":"Gain 1 pebble.","gain":{"pebble":1},"draw":0,"pts":0,"shared":false},{"key":"basic_twig_heap","name":"Twig Heap","text":"Gain 3 twigs.","gain":{"twig":3},"draw":0,"pts":0,"shared":false},{"key":"basic_gossip_glade","name":"Gossip Glade","text":"Draw 2 cards and take 1 point token. Shared.","gain":{},"draw":2,"pts":1,"shared":true},{"key":"basic_resin_pool","name":"Resin Pool","text":"Gain 2 resin.","gain":{"resin":2},"draw":0,"pts":0,"shared":false},{"key":"basic_kindling_glen","name":"Kindling Glen","text":"Gain 2 twigs and draw 1 card. Shared.","gain":{"twig":2},"draw":1,"pts":0,"shared":true}],"haven":{"key":"haven","name":"Barter Burrow","text":"Discard any number of cards from your hand; gain 1 resource of your choice for every 2 discarded. Shared."},"journey":[{"points":5,"discard":5,"shared":false,"name":"Long Road 5"},{"points":4,"discard":4,"shared":false,"name":"Long Road 4"},{"points":3,"discard":3,"shared":false,"name":"Long Road 3"},{"points":2,"discard":2,"shared":true,"name":"Long Road 2"}],"journeyName":"The Long Road","basicEvents":[{"key":"bev_harvest_gathering","name":"Harvest Gathering","need":{"production":4},"pts":3,"text":"Needs 4 production (green) in your city. Worth 3 points."},{"key":"bev_wayfarers_fair","name":"Wayfarers' Fair","need":{"destination":3},"pts":3,"text":"Needs 3 destination (red) in your city. Worth 3 points."},{"key":"bev_elders_council","name":"Elders Council","need":{"governance":3},"pts":3,"text":"Needs 3 governance (blue) in your city. Worth 3 points."},{"key":"bev_wanderers_moot","name":"Wanderers' Moot","need":{"traveler":3},"pts":3,"text":"Needs 3 traveler (tan) in your city. Worth 3 points."}],"specialEvents":[{"key":"sev_grand_market_scheme","name":"Grand Market Scheme","text":"Hand up to 3 resources to rivals and take 2 point tokens for each, immediately.","req":["shopkeeper","post_office"],"colors":null,"pts":0,"score":null},{"key":"sev_hurry_scurry_dash","name":"Hurry-Scurry Dash","text":"Return one of your deployed workers to hand at once. Worth 4 points.","req":["chip_sweep","clock_tower"],"colors":null,"pts":4,"score":{"flat":4}},{"key":"sev_night_of_sparklers","name":"Night of Sparklers","text":"Stack up to 3 of your twigs here; each is worth 2 points at the end.","req":["lookout","miner_mole"],"colors":null,"pts":0,"score":{"per_twig_on_event":2}},{"key":"sev_lost_parchments_unearthed","name":"Lost Parchments Unearthed","text":"Reveal 5 cards; keep any in hand or tuck any under this event (1 point each at the end).","req":["historian","ruins"],"colors":null,"pts":0,"score":{"per_card_beneath":1}},{"key":"sev_acorn_bandits_seized","name":"Acorn Bandits Seized","text":"Tuck up to 2 Critters from your city under this event; each is worth 3 points.","req":["courthouse","ranger"],"colors":null,"pts":0,"score":{"per_critter_beneath":3}},{"key":"sev_marsh_fever_remedy","name":"Marsh Fever Remedy","text":"Pay 2 berries and discard 2 cards from your city. Worth 6 points.","req":["undertaker","barge_toad"],"colors":null,"pts":6,"score":{"flat":6}},{"key":"sev_wingborne_healers","name":"Wingborne Healers","text":"Worth 3 points for every Goodman Vole and Goodwife Vole pair in every city, yours and rivals.","req":["doctor","postal_pigeon"],"colors":null,"pts":0,"score":{"per_husband_wife_pair_in_all_cities":3}},{"key":"sev_commencement_of_pupils","name":"Commencement of Pupils","text":"Tuck up to 3 Critters from your hand under this event; each is worth 2 points.","req":["teacher","university"],"colors":null,"pts":0,"score":{"per_critter_beneath":2}},{"key":"sev_counsel_for_scoundrels","name":"Counsel for Scoundrels","text":"Worth 3 points per prisoner in your Thornhold Cells at game end.","req":["monk","dungeon"],"colors":null,"pts":0,"score":{"per_dungeon_prisoner":3}},{"key":"sev_pilgrims_trail","name":"Pilgrims Trail","text":"Worth 3 points per worker in your Quietstone Cloister at game end.","req":["monastery","wanderer"],"colors":null,"pts":0,"score":{"per_worker_in_monastery":3}},{"key":"sev_resident_minstrel","name":"Resident Minstrel","text":"Stack up to 3 of your berries here; each is worth 2 points.","req":["inn","bard"],"colors":null,"pts":0,"score":{"per_berry_on_event":2}},{"key":"sev_gilded_shrine_vault","name":"Gilded Shrine Vault","text":"Immediately draw 1 card and gain 1 resource per token on your Shrine; also 2 points per token at game end.","req":["woodcarver","chapel"],"colors":null,"pts":0,"score":{"per_token_on_chapel":2}},{"key":"sev_vigil_of_remembrance","name":"Vigil of Remembrance","text":"Worth 3 points per worker buried in your Mossgrave Glade.","req":["cemetery","shepherd"],"colors":null,"pts":0,"score":{"per_cemetery_worker":3}},{"key":"sev_toll_holiday","name":"Toll Holiday","text":"Run all your production cards now. Worth 3 points.","req":["judge","queen"],"colors":null,"pts":3,"score":{"flat":3}},{"key":"sev_grand_hollow_games","name":"Grand Hollow Games","text":"Requires at least 2 cards of each of the five colors in your city. Worth 9 points.","req":[],"colors":{"production":2,"traveler":2,"governance":2,"prosperity":2,"destination":2},"pts":9,"score":{"flat":9}},{"key":"sev_change_of_proprietors","name":"Change of Proprietors","text":"Stack up to 3 of your resources here; berry/twig = 1 point, resin/pebble = 2 points each at the end.","req":["peddler","general_store"],"colors":null,"pts":0,"score":{"per_resource_on_event":{"berry":1,"twig":1,"resin":2,"pebble":2}}}],"components":{"workers_total":24,"workers_per_player":6,"resources":{"berry":30,"twig":30,"resin":25,"pebble":20},"point_tokens":{"1pt":20,"3pt":10},"occupied_tokens":20,"basic_event_tiles":4,"special_event_cards":16,"forest_cards":11,"deck_cards":128,"die":"1 eight-sided die (solo)","other":["1 game board","1 Elderheart Oak piece","1 victory (scoring) card"]},"soloName":"Old Grimbeard","soloLevels":["Grumpy","Gruff","Ghastly"]};if(typeof module==='object'&&module.exports)module.exports=HB.DATA;})(typeof globalThis!=='undefined'?globalThis:this);
+(function(g){var HB=g.HB=g.HB||{};HB.DATA={"game":"Hollowbough","cards":[{"key":"architect","name":"Master Lathwright","text":"At the end of the game, score 1 point per resin and per pebble you still hold, to a maximum of 6.","copies":2,"type":"prosperity","color":"purple","kind":"critter","unique":true,"cost":{"berry":4},"pts":2,"linked":"crane"},{"key":"bard","name":"Ballad Finch","text":"Sing away up to 5 cards from your hand and take a point token for each.","copies":2,"type":"traveler","color":"tan","kind":"critter","unique":true,"cost":{"berry":3},"pts":0,"linked":"theater"},{"key":"barge_toad","name":"Reedpunt Toad","text":"Gain 2 twigs for every Bramble Allotment in your city.","copies":3,"type":"production","color":"green","kind":"critter","unique":false,"cost":{"berry":2},"pts":1,"linked":"twig_barge"},{"key":"chip_sweep","name":"Tinder Chipmunk","text":"Re-run one other production card in your own city.","copies":3,"type":"production","color":"green","kind":"critter","unique":false,"cost":{"berry":3},"pts":2,"linked":"resin_refinery"},{"key":"doctor","name":"Poultice Badger","text":"Spend up to 3 berries and take a point token for each one spent.","copies":2,"type":"production","color":"green","kind":"critter","unique":true,"cost":{"berry":4},"pts":4,"linked":"university"},{"key":"fool","name":"Mudpie Jester","text":"Plant this prankster in a rival village; it takes one of their spaces and costs them 2 points.","copies":2,"type":"traveler","color":"tan","kind":"critter","unique":true,"cost":{"berry":3},"pts":-2,"linked":"fair_grounds"},{"key":"historian","name":"Chronicle Owl","text":"Whenever you play another card, draw 1 card afterwards.","copies":3,"type":"governance","color":"blue","kind":"critter","unique":true,"cost":{"berry":2},"pts":1,"linked":"clock_tower"},{"key":"husband","name":"Goodman Vole","text":"Shares a space with one Goodwife. If paired and you own an Allotment, gain any 1 resource on play and every production.","copies":4,"type":"production","color":"green","kind":"critter","unique":false,"cost":{"berry":3},"pts":2,"linked":"farm"},{"key":"innkeeper","name":"Hostler Hedgehog","text":"When you play a Critter you may send this hedgehog away to cut 3 berries off its price.","copies":3,"type":"governance","color":"blue","kind":"critter","unique":true,"cost":{"berry":1},"pts":1,"linked":"inn"},{"key":"judge","name":"Gavel Marten","text":"When playing any card, pay one required resource with a different resource of your choice.","copies":2,"type":"governance","color":"blue","kind":"critter","unique":true,"cost":{"berry":3},"pts":2,"linked":"courthouse"},{"key":"king","name":"Bramble Sovereign","text":"End of game: 1 point per basic event and 2 points per special event you achieved.","copies":2,"type":"prosperity","color":"purple","kind":"critter","unique":true,"cost":{"berry":6},"pts":4,"linked":"castle"},{"key":"miner_mole","name":"Echo Mole","text":"Mimic any one production card in a rival village, as though it were theirs.","copies":3,"type":"production","color":"green","kind":"critter","unique":false,"cost":{"berry":3},"pts":1,"linked":"mine"},{"key":"monk","name":"Brother Moss","text":"Give up to 2 berries to a rival and take 2 point tokens for each. Opens the second Cloister slot.","copies":2,"type":"production","color":"green","kind":"critter","unique":true,"cost":{"berry":1},"pts":0,"linked":"monastery"},{"key":"peddler","name":"Haggle Magpie","text":"Swap up to 2 of your resources for any 2 resources from the supply.","copies":3,"type":"production","color":"green","kind":"critter","unique":false,"cost":{"berry":2},"pts":1,"linked":"ruins"},{"key":"postal_pigeon","name":"Parcel Dove","text":"Reveal 2 cards; you may play one worth up to 3 base points free; discard the other.","copies":3,"type":"traveler","color":"tan","kind":"critter","unique":false,"cost":{"berry":2},"pts":0,"linked":"post_office"},{"key":"queen","name":"Thistle Regent","text":"Send a worker here to play any card worth up to 3 base points from hand or meadow without paying.","copies":2,"type":"destination","color":"red","kind":"critter","unique":true,"cost":{"berry":5},"pts":4,"linked":"palace"},{"key":"ranger","name":"Trailwarden Fox","text":"Relocate one of your deployed workers to another legal spot. Opens the second Thornhold cell.","copies":2,"type":"traveler","color":"tan","kind":"critter","unique":true,"cost":{"berry":2},"pts":1,"linked":"dungeon"},{"key":"shepherd","name":"Crook Shrew","text":"Gain 3 berries plus 1 point token per token on your Shrine. If bought with berries, they go to a rival.","copies":2,"type":"traveler","color":"tan","kind":"critter","unique":true,"cost":{"berry":3},"pts":1,"linked":"chapel"},{"key":"shopkeeper","name":"Tallyshop Mouse","text":"Gain 1 berry whenever you play another Critter.","copies":3,"type":"governance","color":"blue","kind":"critter","unique":true,"cost":{"berry":2},"pts":1,"linked":"general_store"},{"key":"teacher","name":"Slate Schoolmarm","text":"Draw 2 cards, keep one, and hand the other to a rival.","copies":3,"type":"production","color":"green","kind":"critter","unique":false,"cost":{"berry":2},"pts":2,"linked":"school"},{"key":"undertaker","name":"Hollow Sexton","text":"Clear 3 meadow cards, refill, then take 1 meadow card. Opens the second Mossgrave Glade plot.","copies":2,"type":"traveler","color":"tan","kind":"critter","unique":true,"cost":{"berry":2},"pts":1,"linked":"cemetery"},{"key":"wanderer","name":"Footsore Drifter","text":"Draw 3 cards. Does not use up a city space.","copies":3,"type":"traveler","color":"tan","kind":"critter","unique":false,"cost":{"berry":2},"pts":1,"linked":"lookout"},{"key":"wife","name":"Goodwife Vole","text":"Shares a space with a Goodman; if paired, worth 3 extra points at the end.","copies":4,"type":"prosperity","color":"purple","kind":"critter","unique":false,"cost":{"berry":2},"pts":2,"linked":"farm"},{"key":"woodcarver","name":"Whittle Beaver","text":"Spend up to 3 twigs and take a point token for each.","copies":3,"type":"production","color":"green","kind":"critter","unique":false,"cost":{"berry":2},"pts":2,"linked":"storehouse"},{"key":"castle","name":"Stonecrown Keep","text":"End of game: 1 point per common construction in your city.","copies":2,"type":"prosperity","color":"purple","kind":"construction","unique":true,"cost":{"twig":2,"resin":3,"pebble":3},"pts":4,"linked":"king"},{"key":"cemetery","name":"Mossgrave Glade","text":"A worker settles here forever; reveal 4 cards from deck or discard pile and play one free, discarding the rest.","copies":2,"type":"destination","color":"red","kind":"construction","unique":true,"cost":{"pebble":2},"pts":0,"linked":"undertaker"},{"key":"chapel","name":"Candlewick Shrine","text":"Add a point token here, then draw 2 cards for every token now on the Shrine.","copies":2,"type":"destination","color":"red","kind":"construction","unique":true,"cost":{"twig":2,"resin":1,"pebble":1},"pts":2,"linked":"shepherd"},{"key":"clock_tower","name":"Dewdrop Belfry","text":"Place 3 tokens here when built. Before recalling workers each season, spend one to repeat a basic or forest spot you occupy. Leftover tokens score.","copies":3,"type":"governance","color":"blue","kind":"construction","unique":true,"cost":{"twig":3,"pebble":1},"pts":0,"linked":"historian"},{"key":"courthouse","name":"Mosswood Assize","text":"Gain 1 twig, resin or pebble each time you build another construction.","copies":2,"type":"governance","color":"blue","kind":"construction","unique":true,"cost":{"twig":1,"resin":1,"pebble":2},"pts":2,"linked":"judge"},{"key":"crane","name":"Pulley Lift","text":"When building a Construction, dismantle this lift to cut 3 resources of your choice off the price.","copies":3,"type":"governance","color":"blue","kind":"construction","unique":true,"cost":{"pebble":1},"pts":1,"linked":"architect"},{"key":"dungeon","name":"Thornhold Cells","text":"Lock one of your Critters beneath this card to cut 3 resources off the price of a card. Opens a second cell with a Trailwarden.","copies":2,"type":"governance","color":"blue","kind":"construction","unique":true,"cost":{"resin":1,"pebble":2},"pts":0,"linked":"ranger"},{"key":"ever_tree","name":"Elderheart Oak","text":"End of game: 1 point per purple card in your city (itself included). Can house any one Critter for free.","copies":2,"type":"prosperity","color":"purple","kind":"construction","unique":true,"cost":{"twig":3,"resin":3,"pebble":3},"pts":5,"linked":"any"},{"key":"fair_grounds","name":"Midsummer Green","text":"Draw 2 cards.","copies":3,"type":"production","color":"green","kind":"construction","unique":true,"cost":{"twig":1,"resin":2,"pebble":1},"pts":3,"linked":"fool"},{"key":"farm","name":"Bramble Allotment","text":"Gain 1 berry.","copies":8,"type":"production","color":"green","kind":"construction","unique":false,"cost":{"twig":2,"resin":1},"pts":1,"linked":null},{"key":"general_store","name":"Cranny Market","text":"Gain 1 berry, or 2 berries if you own any Allotment.","copies":3,"type":"production","color":"green","kind":"construction","unique":false,"cost":{"resin":1,"pebble":1},"pts":1,"linked":"shopkeeper"},{"key":"inn","name":"Lantern Rest","text":"Send a worker to play a meadow card for 3 fewer resources. Rivals may visit too and pay you 1 point.","copies":3,"type":"destination","color":"red","kind":"construction","unique":false,"cost":{"twig":2,"resin":1},"pts":2,"linked":"innkeeper"},{"key":"lookout","name":"Spyglass Perch","text":"Copy any one basic or forest spot, even if it is occupied.","copies":2,"type":"destination","color":"red","kind":"construction","unique":true,"cost":{"twig":1,"resin":1,"pebble":1},"pts":2,"linked":"wanderer"},{"key":"mine","name":"Flintpit","text":"Gain 1 pebble.","copies":3,"type":"production","color":"green","kind":"construction","unique":false,"cost":{"twig":1,"resin":1,"pebble":1},"pts":2,"linked":"miner_mole"},{"key":"monastery","name":"Quietstone Cloister","text":"A worker settles here forever: give 2 resources to a rival and take 4 point tokens.","copies":2,"type":"destination","color":"red","kind":"construction","unique":true,"cost":{"twig":1,"resin":1,"pebble":1},"pts":1,"linked":"monk"},{"key":"palace","name":"Gildenfern Court","text":"End of game: 1 point per unique construction, itself included.","copies":2,"type":"prosperity","color":"purple","kind":"construction","unique":true,"cost":{"twig":2,"resin":3,"pebble":3},"pts":4,"linked":"queen"},{"key":"post_office","name":"Dovecote Depot","text":"Give a rival 2 cards, discard any others you like, then refill your hand from the deck. Visitors pay you 1 point.","copies":3,"type":"destination","color":"red","kind":"construction","unique":false,"cost":{"twig":1,"resin":2},"pts":2,"linked":"postal_pigeon"},{"key":"resin_refinery","name":"Amber Still","text":"Gain 1 resin.","copies":3,"type":"production","color":"green","kind":"construction","unique":false,"cost":{"resin":1,"pebble":1},"pts":1,"linked":"chip_sweep"},{"key":"ruins","name":"Toppled Hall","text":"Raze one of your constructions, build here in its place, regain its exact cost, and draw 2 cards.","copies":3,"type":"traveler","color":"tan","kind":"construction","unique":false,"cost":{},"pts":0,"linked":"peddler"},{"key":"school","name":"Acorn Academy","text":"End of game: 1 point per common critter.","copies":2,"type":"prosperity","color":"purple","kind":"construction","unique":true,"cost":{"twig":2,"resin":2},"pts":2,"linked":"teacher"},{"key":"storehouse","name":"Hoard Cellar","text":"Each production adds a stack (3 twigs, 2 resin, 1 pebble or 2 berries) to this card; send a worker to haul it all away.","copies":3,"type":"production","color":"green","kind":"construction","unique":false,"cost":{"twig":1,"resin":1,"pebble":1},"pts":2,"linked":"woodcarver"},{"key":"theater","name":"Glowworm Playhouse","text":"End of game: 1 point per unique critter.","copies":2,"type":"prosperity","color":"purple","kind":"construction","unique":true,"cost":{"twig":3,"resin":1,"pebble":1},"pts":3,"linked":"bard"},{"key":"twig_barge","name":"Kindling Raft","text":"Gain 2 twigs.","copies":3,"type":"production","color":"green","kind":"construction","unique":false,"cost":{"twig":1,"pebble":1},"pts":1,"linked":"barge_toad"},{"key":"university","name":"Lorewood College","text":"Disband one of your cards, regain its exact cost, plus any 1 resource and 1 point.","copies":2,"type":"destination","color":"red","kind":"construction","unique":true,"cost":{"resin":1,"pebble":2},"pts":3,"linked":"doctor"}],"forest":[{"key":"forest_berry_thicket","name":"Berry Thicket","text":"Gain 2 berries and draw 1 card."},{"key":"forest_foragers_crossing","name":"Foragers Crossing","text":"Gain any 2 resources (twig/resin/pebble/berry, mix allowed)."},{"key":"forest_rummage_hollow","name":"Rummage Hollow","text":"Discard any number of cards, then draw 2 for each one discarded (limit 8)."},{"key":"forest_echoing_meadow","name":"Echoing Meadow","text":"Repeat any one basic location and also draw 1 card."},{"key":"forest_quarry_burrow","name":"Quarry Burrow","text":"Gain 1 pebble and draw 3 cards."},{"key":"forest_mixed_glade","name":"Mixed Glade","text":"Gain 1 twig, 1 resin and 1 berry."},{"key":"forest_bumper_bramble","name":"Bumper Bramble","text":"Gain 3 berries."},{"key":"forest_sapwell_copse","name":"Sapwell Copse","text":"Gain 2 resin and 1 twig."},{"key":"forest_postbag_clearing","name":"Postbag Clearing","text":"Draw 2 cards and gain any 1 resource."},{"key":"forest_barter_stump","name":"Barter Stump","text":"Discard up to 3 cards; gain 1 resource of your choice for each."},{"key":"forest_meadow_bazaar","name":"Meadow Bazaar","text":"Take 2 meadow cards; you may immediately play one of them for 1 fewer resource."}],"basic":[{"key":"basic_berry_patch","name":"Berry Patch","text":"Gain 1 berry. Shared.","gain":{"berry":1},"draw":0,"pts":0,"shared":true},{"key":"basic_dewberry_nook","name":"Dewberry Nook","text":"Gain 1 berry and draw 1 card.","gain":{"berry":1},"draw":1,"pts":0,"shared":false},{"key":"basic_amber_weep","name":"Amber Weep","text":"Gain 1 resin and draw 1 card. Shared.","gain":{"resin":1},"draw":1,"pts":0,"shared":true},{"key":"basic_pebble_bank","name":"Pebble Bank","text":"Gain 1 pebble.","gain":{"pebble":1},"draw":0,"pts":0,"shared":false},{"key":"basic_twig_heap","name":"Twig Heap","text":"Gain 3 twigs.","gain":{"twig":3},"draw":0,"pts":0,"shared":false},{"key":"basic_gossip_glade","name":"Gossip Glade","text":"Draw 2 cards and take 1 point token. Shared.","gain":{},"draw":2,"pts":1,"shared":true},{"key":"basic_resin_pool","name":"Resin Pool","text":"Gain 2 resin.","gain":{"resin":2},"draw":0,"pts":0,"shared":false},{"key":"basic_kindling_glen","name":"Kindling Glen","text":"Gain 2 twigs and draw 1 card. Shared.","gain":{"twig":2},"draw":1,"pts":0,"shared":true}],"haven":{"key":"haven","name":"Barter Burrow","text":"Discard any number of cards from your hand; gain 1 resource of your choice for every 2 discarded. Shared."},"journey":[{"points":5,"discard":5,"shared":false,"name":"Long Road 5"},{"points":4,"discard":4,"shared":false,"name":"Long Road 4"},{"points":3,"discard":3,"shared":false,"name":"Long Road 3"},{"points":2,"discard":2,"shared":true,"name":"Long Road 2"}],"journeyName":"The Long Road","basicEvents":[{"key":"bev_harvest_gathering","name":"Harvest Gathering","need":{"production":4},"pts":3,"text":"Needs 4 production (green) in your city. Worth 3 points."},{"key":"bev_wayfarers_fair","name":"Wayfarers' Fair","need":{"destination":3},"pts":3,"text":"Needs 3 destination (red) in your city. Worth 3 points."},{"key":"bev_elders_council","name":"Elders Council","need":{"governance":3},"pts":3,"text":"Needs 3 governance (blue) in your city. Worth 3 points."},{"key":"bev_wanderers_moot","name":"Wanderers' Moot","need":{"traveler":3},"pts":3,"text":"Needs 3 traveler (tan) in your city. Worth 3 points."}],"specialEvents":[{"key":"sev_grand_market_scheme","name":"Grand Market Scheme","text":"Hand up to 3 resources to rivals and take 2 point tokens for each, immediately.","req":["shopkeeper","post_office"],"colors":null,"pts":0,"score":null},{"key":"sev_hurry_scurry_dash","name":"Hurry-Scurry Dash","text":"Return one of your deployed workers to hand at once. Worth 4 points.","req":["chip_sweep","clock_tower"],"colors":null,"pts":4,"score":{"flat":4}},{"key":"sev_night_of_sparklers","name":"Night of Sparklers","text":"Stack up to 3 of your twigs here; each is worth 2 points at the end.","req":["lookout","miner_mole"],"colors":null,"pts":0,"score":{"per_twig_on_event":2}},{"key":"sev_lost_parchments_unearthed","name":"Lost Parchments Unearthed","text":"Reveal 5 cards; keep any in hand or tuck any under this event (1 point each at the end).","req":["historian","ruins"],"colors":null,"pts":0,"score":{"per_card_beneath":1}},{"key":"sev_acorn_bandits_seized","name":"Acorn Bandits Seized","text":"Tuck up to 2 Critters from your city under this event; each is worth 3 points.","req":["courthouse","ranger"],"colors":null,"pts":0,"score":{"per_critter_beneath":3}},{"key":"sev_marsh_fever_remedy","name":"Marsh Fever Remedy","text":"Pay 2 berries and discard 2 cards from your city. Worth 6 points.","req":["undertaker","barge_toad"],"colors":null,"pts":6,"score":{"flat":6}},{"key":"sev_wingborne_healers","name":"Wingborne Healers","text":"Worth 3 points for every Goodman Vole and Goodwife Vole pair in every city, yours and rivals.","req":["doctor","postal_pigeon"],"colors":null,"pts":0,"score":{"per_husband_wife_pair_in_all_cities":3}},{"key":"sev_commencement_of_pupils","name":"Commencement of Pupils","text":"Tuck up to 3 Critters from your hand under this event; each is worth 2 points.","req":["teacher","university"],"colors":null,"pts":0,"score":{"per_critter_beneath":2}},{"key":"sev_counsel_for_scoundrels","name":"Counsel for Scoundrels","text":"Worth 3 points per prisoner in your Thornhold Cells at game end.","req":["monk","dungeon"],"colors":null,"pts":0,"score":{"per_dungeon_prisoner":3}},{"key":"sev_pilgrims_trail","name":"Pilgrims Trail","text":"Worth 3 points per worker in your Quietstone Cloister at game end.","req":["monastery","wanderer"],"colors":null,"pts":0,"score":{"per_worker_in_monastery":3}},{"key":"sev_resident_minstrel","name":"Resident Minstrel","text":"Stack up to 3 of your berries here; each is worth 2 points.","req":["inn","bard"],"colors":null,"pts":0,"score":{"per_berry_on_event":2}},{"key":"sev_gilded_shrine_vault","name":"Gilded Shrine Vault","text":"Immediately draw 1 card and gain 1 resource per token on your Shrine; also 2 points per token at game end.","req":["woodcarver","chapel"],"colors":null,"pts":0,"score":{"per_token_on_chapel":2}},{"key":"sev_vigil_of_remembrance","name":"Vigil of Remembrance","text":"Worth 3 points per worker buried in your Mossgrave Glade.","req":["cemetery","shepherd"],"colors":null,"pts":0,"score":{"per_cemetery_worker":3}},{"key":"sev_toll_holiday","name":"Toll Holiday","text":"Run all your production cards now. Worth 3 points.","req":["judge","queen"],"colors":null,"pts":3,"score":{"flat":3}},{"key":"sev_grand_hollow_games","name":"Grand Hollow Games","text":"Requires at least 2 cards of each of the five colors in your city. Worth 9 points.","req":[],"colors":{"production":2,"traveler":2,"governance":2,"prosperity":2,"destination":2},"pts":9,"score":{"flat":9}},{"key":"sev_change_of_proprietors","name":"Change of Proprietors","text":"Stack up to 3 of your resources here; berry/twig = 1 point, resin/pebble = 2 points each at the end.","req":["peddler","general_store"],"colors":null,"pts":0,"score":{"per_resource_on_event":{"berry":1,"twig":1,"resin":2,"pebble":2}}}],"components":{"workers_total":24,"workers_per_player":6,"resources":{"berry":30,"twig":30,"resin":25,"pebble":20},"point_tokens":{"1pt":20,"3pt":10},"occupied_tokens":20,"basic_event_tiles":4,"special_event_cards":16,"forest_cards":11,"deck_cards":128,"die":"1 eight-sided die (solo)","other":["1 game board","1 Elderheart Oak piece","1 victory (scoring) card"]},"soloName":"Old Grimbeard","soloLevels":["Grumpy","Gruff","Ghastly"]};if(typeof module==='object'&&module.exports)module.exports=HB.DATA;})(typeof globalThis!=='undefined'?globalThis:this);
 
 </script>
 <script>
@@ -7185,9 +7209,9 @@ function myMoves() {
 function tileInfo(kind, i) {
   switch (kind) {
     case 'basic': { const b = D.basic[i]; return { name: b.name, text: b.text, shared: b.shared, key: 'basic:' + i }; }
-    case 'forest': { const f = D.forest[G.forest[i]]; return { name: f.name, text: f.text, shared: false, key: 'forest:' + i }; }
+    case 'forest': { const f = D.forest[G.forest[i]]; return { name: f.name, text: f.text, shared: false, slots: G.np >= 4 ? 'Two workers, never two of yours.' : '', key: 'forest:' + i }; }
     case 'haven': return { name: D.haven.name, text: D.haven.text, shared: true, key: 'haven:' };
-    case 'journey': return { name: D.journeyName, text: 'Autumn only. Discard 5, 4, 3 or 2 cards. The worker stays and scores that many points.', shared: false, key: 'journey:' };
+    case 'journey': return { name: D.journeyName, text: 'Autumn only. Discard 5, 4, 3 or 2 cards. The worker stays and scores that many points.', shared: false, slots: 'One worker on 5, 4 and 3. The 2 spot takes any number.', key: 'journey:' };
     case 'bev': { const e = D.basicEvents[G.bev[i].k]; return { name: e.name, text: e.text, key: 'event:b' + i }; }
     case 'sev': { const e = D.specialEvents[G.sev[i].k]; return { name: e.name, text: e.text, key: 'event:s' + i }; }
   }
@@ -7227,13 +7251,13 @@ function tgOf(m) {
   if (m.type === 'choose') return 'q:' + m.i;
   return '';
 }
-// ---- the newcomer guide (R35): in a guided or vs game the ghost finger shows by default (off only when the player turned hints off),
-// and on a plain turn only the 1-3 best places or cards glow; every other legal place still answers a tap, it just does not shine
+// ---- the newcomer guide: the ghost finger and the 1-3 best glows show in the guided first game, and in a normal game only when the
+// player turned Hints on (Menu; off by default: owner, FIXED13 "confusing and distracting"). Otherwise every legal place glows softly.
 function guideOn() {
   if (!G || G.phase === 'over' || (UI.cfg && UI.cfg.tutorial) || UI.camp || NET.on) return false;
   if (UI.mode === 'guided') return true;
   if (UI.mode !== 'vs' && UI.mode !== 'solo') return false;
-  try { return localStorage.getItem('hb_hints') !== '0'; } catch (e) { return true; }
+  return !!UI.hints;
 }
 function guideTop() {
   const seat = viewSeat(), key = G.logN + ':' + G.turn + ':' + seat;
@@ -7451,7 +7475,7 @@ function chipEl(s, n) {
 }
 // a choice of which effect goes first: each option names the card and says in one line what it does
 const effQ = () => !!(G && G.q && (G.q.kind === 'trigger' || G.q.kind === 'production'));
-function effLine(id) { const w = String(cdef(id).text || '').replace(/\s*\([^)]*\)/g, '').split(/\s+/); return w.length > 10 ? w.slice(0, 9).join(' ') + '…' : w.join(' '); }
+function effLine(id) { const w = String(cdef(id).text || '').replace(/\s*\([^)]*\)/g, '').replace(' in your own city', '').split(/\s+/); return w.length > 8 ? w.slice(0, 7).join(' ') + '…' : w.join(' '); }
 // ---- action row: Prepare / Pass / Undo, or (when something needs choosing) the choices as chips
 function trayChip(m, i, tg) {
   let inner;
@@ -7509,7 +7533,7 @@ function renderActs(mm, qm, qShown) {
   if (GX.undo.can() && !(NET.on)) a.appendChild(h('button.btn.alt.undo', { 'data-a': 'undo', type: 'button', 'aria-label': 'Undo my last step' }, '↶'));
   if (mine) {
     if (prep) { const e = h('button.btn.prep.glow', { type: 'button', 'aria-label': 'Prepare for ' + SEASN[p.season + 1] }, seasonIcon(p.season + 1, 26), h('span', 'Prepare')); UI.tgEls.prep = e; e.setAttribute('data-a', 't'); e.setAttribute('data-t', 'prep'); a.appendChild(e); }
-    else if (p.season < 3) { const n = availW(p); a.appendChild(h('button.btn.prep.dis', { type: 'button', disabled: true, 'aria-label': 'Prepare after your last worker' }, seasonIcon(p.season + 1, 26), h('span.prepw', n > 0 ? [h('b', 'Prepare'), h('small', n + ' worker' + (n > 1 ? 's' : '') + ' left')] : 'Prepare'))); }   // says why it is off
+    else if (p.season < 3) { const n = availW(p); a.appendChild(h('button.btn.prep.dis', { type: 'button', 'aria-disabled': 'true', 'data-a': 'noprep', 'aria-label': 'Prepare after your last worker' }, seasonIcon(p.season + 1, 26), h('span.prepw', n > 0 ? [h('b', 'Prepare'), h('small', n + ' worker' + (n > 1 ? 's' : '') + ' left')] : 'Prepare'))); }   // says why it is off
     if (pass) { const armed = UI.passArm && Date.now() - UI.passArm < 2600; const e = h('button.btn.pass' + (armed ? '.armed' : ''), { type: 'button' }, armed ? 'Sure?' : 'Pass'); UI.tgEls.pass = e; e.setAttribute('data-a', 't'); e.setAttribute('data-t', 'pass'); a.appendChild(e); }
   }
 }
@@ -7531,7 +7555,7 @@ function promptText() {
   if (p.ai) return UI.aiCap || p.name + ' is playing…';
   if (G.q) return qShort(G.q);
   const n = availW(p);
-  if (isPh() && !hotSeat() && humans().length <= 1) return n > 0 ? 'Place a worker' : p.season < 3 ? 'Build or Prepare' : 'Build or Pass';   // phone: one short line (Pass only in Autumn)
+  if (isPh() && !hotSeat() && humans().length <= 1) { const canB = myMoves().some(m => m.type === 'play'); return n > 0 ? (canB ? 'Place a worker or build' : 'Place a worker') : p.season < 3 ? (canB ? 'Build or Prepare' : 'Prepare') : (canB ? 'Build or Pass' : 'Pass'); }   // phone: one short line (Pass only in Autumn)
   const pre = hotSeat() || humans().length > 1 ? p.name + ': ' : 'Your turn: ';
   const last = p.season < 3 ? 'Prepare' : 'Pass';
   return pre + (n > 0 ? (PV_ON ? 'place a worker.' : 'tap a glowing spot.') : (PV_ON ? 'build or ' + last + '.' : 'play a card or ' + last + '.'));
@@ -7547,6 +7571,7 @@ function qShort(q) {
 function chipText(label) {
   let s = String(label || '');
   let m;
+  if ((m = s.match(/^Long Road \d+ - discard (\d+) cards?; .*scores (\d+)/))) return 'discard ' + m[1] + ' \u00b7 ' + m[2] + ' pts';
   if ((m = s.match(/^Do not use /))) return 'Skip: repeat nothing';
   if ((m = s.match(/^Spend a token: repeat (.*)$/))) s = 'Repeat ' + m[1];
   if ((m = s.match(/^Give 1 berry to (\S+) and take 2 point tokens/))) return 'Give ' + m[1] + ' a berry: +2 tokens';
@@ -7608,10 +7633,10 @@ function pvWord(k, n) {
   return '';
 }
 const PV_SPECIAL = {
-  forest_rummage_hollow: ['Swap cards', 'draw 2 per discard', 'card'], forest_echoing_meadow: ['Copy a place', '+ 1 card', 'copy'],
+  forest_rummage_hollow: ['Swap cards', 'draw 2 per discard', 'card'], forest_echoing_meadow: ['Copy a basic place', '+ 1 card', 'copy'],
   forest_barter_stump: ['Cards to goods', '1 each, up to 3', 'any'], forest_meadow_bazaar: ['Take 2 meadow', 'play 1 for 1 less', 'meadow']
 };
-const PV_BOARD = { forest_rummage_hollow: 'Swap cards', forest_echoing_meadow: 'Copy a place', forest_barter_stump: 'Cards to goods', forest_mixed_glade: 'twig, resin, berry', forest_meadow_bazaar: 'Meadow card 1 off' };
+const PV_BOARD = { forest_rummage_hollow: 'Swap cards', forest_echoing_meadow: 'Copy a basic place', forest_barter_stump: 'Cards to goods', forest_mixed_glade: 'twig, resin, berry', forest_meadow_bazaar: 'Meadow card 1 off' };
 const PV_TCOL = { production: 'green', destination: 'red', governance: 'blue', traveler: 'tan', prosperity: 'purple' };
 function pvSpot(kind, i) {
   const join = l => { const w = l.map(([k, n]) => pvWord(k, n)).filter(Boolean); return { main: w.slice(0, 2).join(' + '), sub: w.slice(2).join(' + '), ico: l[0] ? l[0][0] : 'any' }; };
@@ -7883,7 +7908,9 @@ function pvRender() {
   if (short) { hs.scrollTop = UI.hsy || 0; hs.addEventListener('scroll', () => { UI.hsy = hs.scrollTop; }, { passive: true }); const g = hs.querySelector('.glow'); if (g && (g.offsetTop < hs.scrollTop || g.offsetTop + g.offsetHeight > hs.scrollTop + hs.clientHeight)) hs.scrollTop = g.offsetTop - 20; }
   else hs.scrollLeft = fits ? 0 : (UI.hsx || 0); if (!short) { const g = (UI.rec && UI.rec.m && UI.tgEls[tgOf(UI.rec.m)]) || hs.querySelector('.glow'); if (g && g.closest('.strip.hand') === hs) hscrollTo(g); }
   if (guideOn()) { try { computeRec(); } catch (e) { } }   // the finger is there as soon as the turn is drawn
+  document.documentElement.classList.toggle('calm', !guideOn() && !(UI.cfg && UI.cfg.tutorial));   // a normal game: soft, still glows
   renderPrompt(); renderBar(); pvFitWords(bd); placeFinger();
+  if (typeof hlpIdleArm === 'function') hlpIdleArm();
   if (typeof hlpMarks === 'function' && G.phase !== 'over') hlpMarks();
 }
 // no cut words on a phone: a label whose longest word is wider than its box (or that runs past its card) steps its font down, to 11 px at the least
@@ -7896,6 +7923,19 @@ function pvFitWords(root) {
 }
 // ---- hook into the existing game: board renderer, scroll-into-view, flights, rival moves, prompt words
 // Play view part of hscrollTo (src/ui3.js): show the panel holding el, scroll it into view; true when el is in the meadow row (done)
+// bring el fully on screen: open its phone tab, then move every scrolling ancestor (rows sideways, lists up and down) by real rectangles
+function pvReveal(el) {
+  if (!el || !el.closest) return;
+  const p = el.closest('#bd.pv .pv-panel'); if (p && pvTall() && !p.classList.contains('on')) pvSetTab(p.dataset.p, true);
+  for (let a = el.parentElement, n = 0; a && a !== document.body && n < 12; a = a.parentElement, n++) {
+    const cs = getComputedStyle(a), sx = /auto|scroll/.test(cs.overflowX) && a.scrollWidth > a.clientWidth + 1, sy = /auto|scroll/.test(cs.overflowY) && a.scrollHeight > a.clientHeight + 1;
+    if (!sx && !sy) continue;
+    const r = el.getBoundingClientRect(), q = a.getBoundingClientRect();
+    if (sx && (r.left < q.left + 6 || r.right > q.right - 6)) a.scrollLeft += r.left - q.left - (parseFloat(cs.scrollPaddingLeft) || 8);   // align the card's left edge: a snapping row (scroll-snap start, 8px padding) lands exactly there
+    if (sy) { if (r.top < q.top + 4) a.scrollTop += r.top - q.top - 6; else if (r.bottom > q.bottom - 4) a.scrollTop += r.bottom - q.bottom + 6; }
+    if (a.classList.contains('pv-mead')) UI.pvMx = a.scrollLeft; else if (a.classList.contains('pv-board-t')) UI.pvBx = a.scrollLeft; else if (a.classList.contains('hscroll')) { UI.hsx = a.scrollLeft; UI.hsy = a.scrollTop; }
+  }
+}
 function pvScrollTo(el) {
   const p = el && el.closest && el.closest('#bd.pv .pv-panel');
   if (p && pvTall() && !p.classList.contains('on')) pvSetTab(p.dataset.p, true);
@@ -7964,9 +8004,25 @@ function longestWord(e) {
 // ---- shake: "not here"
 function shake(el) { if (!el) return; el.classList.remove('shk'); void el.offsetWidth; el.classList.add('shk'); setTimeout(() => el.classList.remove('shk'), 420); snd('error', { vol: .3 }); }
 // ---- tap on a board target
+// a tap on something that cannot be used right now answers with one short line (never silent)
+function deadSay(tg) {
+  try {
+    const a = HB.actor(G), p = G.players[a]; if (!p || p.ai || (typeof NET !== 'undefined' && NET.on && a !== viewSeat())) return;
+    if (G.q) { toast(G.q.kind === 'meadow' || G.q.kind === 'clear' || G.q.kind === 'inn' ? 'Tap a meadow card, not your hand' : 'Finish the choice first'); return; }
+    const m = /^x:([hm])(\d+)$/.exec(tg);
+    if (m) {
+      const id = +m[2], c = cdef(id), cost = c.cost || {}, miss = [];
+      for (const r of HB.RES) { const n = (cost[r] || 0) - (p.res[r] || 0); if (n > 0) miss.push(n + ' more ' + (r === 'berry' ? (n > 1 ? 'berries' : 'berry') : r === 'resin' ? 'resin' : r + (n > 1 ? 's' : ''))); }
+      if (miss.length) { toast('Needs ' + miss.join(' and ')); return; }
+      if (p.city.length >= HB.CITY) { toast('Your city is full'); return; }
+      toast(m[1] === 'm' ? 'You cannot build that one now' : 'You cannot build that now'); return;
+    }
+    toast(availW(p) <= 0 ? 'No workers left. Prepare instead' : 'Not available right now');
+  } catch (e) { }
+}
 function onTarget(tg, el) {
   if (!G || UI.cards.length) return;
-  if (/^x:/.test(tg) || UI.animBusy) { UI.sel = null; shake(el); return; }
+  if (/^x:/.test(tg) || UI.animBusy) { UI.sel = null; shake(el); if (/^x:/.test(tg) && !UI.animBusy) deadSay(tg); return; }
   const mm = myMoves();
   if (tg === 'pass') {
     const m = mm.find(x => x.type === 'pass'); if (!m) return;
@@ -7977,6 +8033,7 @@ function onTarget(tg, el) {
   const ms = mm.filter(m => tgOf(m) === tg);
   if (!ms.length) { shake(el); return; }
   if (ms.length === 1) { UI.sel = null; actFrom(ms[0], el); return; }
+  if (UI.sel && UI.sel.tg === tg) { toast(ms.some(m => m.type === 'play') ? 'Pick how to pay below' : 'Pick one of the numbers below'); return; }   // the same card again: say where the answer is
   UI.sel = { tg, ms, logN: G.logN }; snd('click', { vol: .5 }); render();
 }
 function actFrom(m, el) {
@@ -7999,7 +8056,7 @@ function openZoom(spec) {
       box.appendChild(h('div.zinfo', k === 'deck' ? [h('b', 'Draw pile'), h('p', G.deck.length + ' cards')] : k === 'disc' ? [h('b', 'Discards'), h('p', G.discard.length + ' cards')] : [h('b', 'Seasons'), h('p', 'Prepare to move on.')]));
     } else {
       const t = h('div.ztile.tile.t-' + k, tileFace({ kind: k, i }, true)); box.appendChild(t);
-      box.appendChild(h('div.zinfo', h('b', info.name || ''), h('p', (info.text || '').replace(/ Shared\.$/, '')), h('p.sm', info.shared ? 'Any number of workers.' : 'One worker.')));
+      box.appendChild(h('div.zinfo', h('b', info.name || ''), h('p', (info.text || '').replace(/ Shared\.$/, '')), h('p.sm', info.slots || (info.shared ? 'Any number of workers.' : 'One worker.'))));
     }
   }
   z.appendChild(box); z.hidden = false; UI.zoomAt = Date.now();
@@ -8108,7 +8165,7 @@ function fingerWanted() {
   if (UI.mode === 'guided') return true;
   if (typeof guideOn === 'function' && guideOn()) return true;   // R35: the finger shows by default in vs games too (hints off turns it off)
   if (UI.camp && UI.coach && UI.coach.level !== 'off' && UI.camp.hints) return true;
-  return !UI.fingerSeen && UI.mode !== 'net' && UI.mode !== 'ai';
+  return false;   // FIXED13: a normal game shows no finger unless Hints are on (the first game is the guided one)
 }
 // a hand chip outside the sideways-scrolling hand row: bring it into view (the row remembers where it was)
 function hscrollTo(el) { hscrollTo0(el); fingerFollow(); }
@@ -8129,6 +8186,7 @@ function placeFinger() {
   let f = $('#finger'); if (!f) { f = h('div#finger', { 'aria-hidden': 'true', html: '<svg viewBox="0 0 40 48"><rect x="13" y="2" width="13" height="30" rx="6.500" fill="#fff8e6" stroke="#3b2f2a" stroke-width="2.200"/><rect x="7" y="22" width="27" height="25" rx="11" fill="#fff8e6" stroke="#3b2f2a" stroke-width="2.200"/></svg>' }); $('#board').appendChild(f); }
   f.hidden = true;
   if (!fingerWanted() || !UI.rec || !UI.rec.m || !myMoves().length) return;
+  try { const s = GXH.state(); if (s.cur || s.rules) return; } catch (e) { }   // a coach bubble or the bulb is showing: it is the one helper on screen
   let tg = tgOf(UI.rec.m);
   if (UI.sel) { const i = UI.sel.ms.findIndex(x => sameM(x, UI.rec.m)); if (i >= 0) tg = 'o:' + i; else return; }
   let el = UI.tgEls && UI.tgEls[tg];
@@ -8432,14 +8490,14 @@ function loadSave() {
 // ===================== part 6: coach, drawers (log, rules, menu, rivals), start screen, events, phone mode, boot =====================
 // (the old guided-game advice cards are gone: first-time help is the gx-help kit, see ui11.js)
 // ---- drawers
-const RULES = `<h3>How a turn works</h3><ol class="hwt"><li>The banner shows whose turn it is. The top line says what to do.</li><li>Tap a glowing place for a worker. Tap a glowing card to build it.</li><li>The move plays out, then your points or goods show.</li><li>Rivals play the same way.</li><li>When all workers are out, Prepare. When you are done, Pass.</li></ol>
+const RULES = `<h3>How a turn works</h3><ol class="hwt"><li>The banner shows whose turn it is. The top line says what to do.</li><li>Tap a glowing place for a worker. Tap a glowing card to build it.</li><li>The move plays out, then your points or goods show.</li><li>Rivals play the same way.</li><li>When all workers are out, Prepare. After your Autumn Prepare, Pass when you are done.</li></ol>
 <h3>The goal</h3><p>Build the best city. A city holds up to 15 cards. When all have passed, add up your points. Cards, tokens, bonuses, events and the Long Road all count. The highest total wins.</p>
-<h3>How a turn goes</h3><p>On your turn, do <b>one</b> of these:</p><ul><li><b>Place a worker</b> on an open place and use it at once.</li><li><b>Play a card</b> from your hand or from the meadow by paying its price.</li><li><b>Prepare</b> (only when all your workers are out).</li></ul><p>When you are done, <b>Pass</b>. You take no more turns. Your city still scores.</p>
+<h3>How a turn goes</h3><p>On your turn, do <b>one</b> of these:</p><ul><li><b>Place a worker</b> on an open place and use it at once.</li><li><b>Play a card</b> from your hand or from the meadow by paying its price.</li><li><b>Prepare</b> (only when all your workers are out).</li></ul><p>Pass only in Autumn, after your last Prepare. When you are done, <b>Pass</b>. You take no more turns. Your city still scores.</p>
 <h3>Places for workers</h3><ul><li><b>Brown places</b> give resources, cards or a point token. Some are Shared. Others take one worker.</li><li><b>Forest places</b> (green) take one worker. In a four-player game, two can share.</li><li><b>The Barter Burrow</b> trades cards for resources. Discard 2 cards, get 1 resource.</li><li><b>The Long Road</b> opens in Autumn. Discard 5, 4, 3 or 2 cards. The worker stays and scores that many points.</li><li><b>Destinations</b> are red cards in your city. A worker there uses the card. Open ones can be visited by rivals. The owner gets a point token.</li><li><b>Events</b> need a worker and the right city. Each can be claimed once.</li></ul>
 <h3>Playing cards</h3><p>Pay the price in twigs, resin, pebbles and berries. Play from your hand or the eight-card meadow. Your hand holds 8 cards. A <b>unique</b> card can be in your city once. A common card can be in as often as you like.</p><p><b>Playing free:</b> each critter has one matching building. If you own it and it has no token, play the critter free. Put a token on the building. Each building does this once.</p><p>Some cards (Lantern Rest, Pulley Lift, Thornhold Cells, Gavel Marten, Hostler Hedgehog) change the price. They show as extra buttons when you play a card.</p>
-<h3>Changes in this version</h3><ul><li>Resources never run out.</li><li>Each destination holds one worker. Cards with a permanent helper hold two.</li><li>Solo: a tie with the bear is a loss.</li><li>A worker on a claimed event comes home like the others.</li><li>The cemetery shows the top four cards of the discard pile.</li><li>An empty deck is refilled from the discard pile.</li></ul>
+<h3>Changes in this version</h3><ul><li>Resources never run out.</li><li>The Glade and the Cloister take a second worker once you own their critter (the Sexton or Brother Moss).</li><li>Solo: a tie with the bear is a loss.</li><li>A worker on a claimed event comes home like the others.</li><li>An empty deck is refilled from the discard pile.</li></ul>
 <h3>Card colours</h3><ul><li><b>Tan, Traveler:</b> works once when played.</li><li><b>Green, Production:</b> works when played, then every Spring and Autumn.</li><li><b>Red, Destination:</b> a place for workers.</li><li><b>Blue, Governance:</b> a lasting bonus or discount.</li><li><b>Purple, Prosperity:</b> bonus points at the end.</li></ul>
-<h3>Seasons</h3><p>Everyone starts in Winter with 2 workers. <b>Spring</b> gives +1 worker and runs production. <b>Summer</b> gives +1 worker and 2 meadow cards. <b>Autumn</b> gives +2 workers and runs production again. Each player moves through seasons alone.</p>
+<h3>Seasons</h3><p>Everyone starts in Winter with 2 workers. <b>Spring</b> gives +1 worker and runs production. <b>Summer</b> gives +1 worker and up to 2 meadow cards (no production). <b>Autumn</b> gives +2 workers and runs production again. Each player moves through seasons alone.</p>
 <h3>Scoring</h3><p>Count printed card points, point tokens, purple bonuses, events and Long Road workers. Ties go to more events, then more leftover resources.</p>
 <h3>Solo play</h3><p>You play Old Grimbeard. He picks places and cards by dice. You win with more points than he has. Pick Grumpy, Gruff or Ghastly.</p>
 <h3>Tips</h3><ul><li>Build production early. It pays every Spring and Autumn.</li><li>Keep cheap cards in hand. Watch the meadow too.</li><li>Tap the lightbulb for a good move and why.</li></ul>`;
@@ -8523,6 +8581,7 @@ document.addEventListener('click', ev => {
     case 'handtog': UI.handHide = !UI.handHide; snd('click', { vol: .4 }); render(); break;
     case 'cityx': UI.cityOpen = null; render(); break;
     case 'noop': break;
+    case 'noprep': { const p = G && G.players[HB.actor(G)]; const n = p ? availW(p) : 0; toast(n > 0 ? 'Place your workers first (' + n + ' left)' : 'Prepare is not available now'); snd('error', { vol: .3 }); break; }
     case 'chip': UI.rseat = d.seat === 'G' ? 'G' : +d.seat; GX.show('rivald'); renderRival(UI.rseat); break;
     case 'rtab': renderRival(d.seat === 'G' ? 'G' : +d.seat); break;
     case 'cont': nextCard(); break;
@@ -8635,6 +8694,7 @@ function kitSettings() {
       S.appendChild(GX.row('Read', [h('button.gx-sb', { 'data-a': 'rules', type: 'button' }, 'How to play'), h('button.gx-sb', { 'data-a': 'refopen', type: 'button' }, 'Cards & places')]));
       if (typeof GXT !== 'undefined') { const tb = tutNode('gx-sb'); if (tb) { tb.querySelector('span') && tb.querySelector('span').remove(); S.appendChild(GX.row('Tutorial', tb)); } }
       if (typeof hlpInit === 'function') { hlpInit(); if (typeof GXH !== 'undefined') S.appendChild(GXH.settingsRow({ rowClass: 'gx-row', btnClass: 'gx-sb' })); }
+      S.appendChild(GX.row('Hints', GX.onoff(!!UI.hints, v => { UI.hints = !!v; try { localStorage.setItem('hb_hints', v ? '1' : '0'); } catch (x) { } UI.gtop = null; UI.recKey = ''; render(); }, 'Hints'), 'Finger on the best move, previews and ratings'));
     },
     about: { name: 'Hollowbough', version: 'preview', text: 'A woodland city-building game. Art and music by Am015-dev.' }
   });
@@ -8904,7 +8964,7 @@ const HLP_RULES = [
   { phase: 'prepare', title: 'Your own seasons', text: 'Each player goes through Winter, Spring, Summer and Autumn alone.', pic: () => hpics([[() => HP.season(0)], '>', [() => HP.season(1)], '>', [() => HP.season(2)], '>', [() => HP.season(3)]]) },
   { phase: 'lastCall', title: 'Nothing left? Pass', text: 'With nothing left to do, tap Pass twice. You take no more turns.', pic: () => hpics([[HP.worker, 'All out'], '>', [HP.tree, 'Done']]) },
   { phase: 'lastCall', title: 'Your city still scores', text: 'When all have passed, cards, tokens, events and Long Road workers score.', pic: () => hpics([[HP.back, 'Cards'], [HP.point, 'Tokens'], [HP.flag, 'Events']]) },
-  { phase: 'lastCall', title: 'Highest total wins', text: 'The highest total wins. A tie goes to the player with more events.', pic: () => hpics([[HP.point, 'Points'], '>', [HP.star, 'Winner']]) },
+  { phase: 'lastCall', title: 'Highest total wins', text: 'The highest total wins. Ties: more events, then more leftover goods.', pic: () => hpics([[HP.point, 'Points'], '>', [HP.star, 'Winner']]) },
   { phase: 'how', title: 'Several ways', text: 'This can be used in more than one way. Tap the option you want.', pic: () => hpics([[HP.back, 'Card'], '>', [HP.cost, 'Pay']]) },
   { phase: 'how', title: 'Pay or play free', text: 'Pay the price. Or play a critter free into its open matching building.', pic: () => hpics([[HP.cost, 'Pay'], [HP.star, 'Or free']]) },
   { phase: 'how', title: 'Cheaper plays', text: 'Some of your cards make a play cheaper. They show as extra buttons.', pic: () => hpics([[HP.back, 'Card'], '>', [() => HP.res('pebble'), 'Fewer']]) },
@@ -8952,7 +9012,8 @@ function hlpWhy(m, a) {
     else if (m.k === 'dest') t = (m.o === a ? 'Use ' + cname(m.c) + ' in your city.' : 'Visit ' + cname(m.c) + ': you use its power. Its owner gets a point token.');
   } else if (m.type === 'play') {
     const nm = cname(m.card), pts = cdef(m.card).pts;
-    if (m.how === 'pay') t = 'Build ' + nm + ': you can afford it' + (pts ? ', and it scores ' + pts + (pts === 1 ? ' point.' : ' points.') : '.');
+    if (HB.cardKey(m.card) === 'fool') t = 'Plant ' + nm + ' in a rival city: it costs them 2 points.';
+    else if (m.how === 'pay') t = 'Build ' + nm + ': you can afford it' + (pts ? ', and it scores ' + pts + (pts === 1 ? ' point.' : ' points.') : '.');
     else if (m.how === 'occupy') t = 'Play ' + nm + ' free into its matching building.';
     else t = 'Play ' + nm + ' the cheaper way.';
   } else if (m.type === 'prepare') t = 'All workers are out: Prepare for ' + SEASN[Math.min(3, p.season + 1)] + '. They come home.';
@@ -8976,7 +9037,7 @@ function hlpSuggest() {
   const a = HB.actor(G);
   try { computeRec(true); } catch (e) { return null; }
   const m = UI.rec && UI.rec.m; if (!m || !hlpEl(m)) return null;
-  try { const pn = hlpEl(m).closest('.pv-panel'); if (pn && !pn.classList.contains('on')) pvSetTab(pn.dataset.p, true); pvScrollTo(hlpEl(m)); } catch (x) { }   // and scrolled into view   // the target may sit on another phone tab: bring it forward
+  try { pvReveal(hlpEl(m)); } catch (x) { }   // and scrolled into view   // the target may sit on another phone tab: bring it forward
   const mk = m.type === 'choose' ? 'q' + m.i : tgOf(m);
   // the helper's target may sit on another phone tab (Meadow, City, Goals): bring that panel forward so the finger and glow are visible
   return { why: hlpWhy(m, a), key: mk, m, target: () => hlpEl(m) };
@@ -9006,10 +9067,46 @@ function hlpAfter() {
   hlpInit(); hlpMarks(); clearTimeout(UI.hmk); UI.hmk = setTimeout(hlpMarks, 200);   // again just before a bubble is placed (things may still be moving) if (typeof GXH === 'undefined') return;
   const st = $('#start'), nb = $('#netbox');
   // first time in each phase: one short coach bubble (the kit keeps it off glowing targets and buttons); tapping the lightbulb asks again
-  void st; void nb; try { GXH.phase(hlpPhase()); } catch (e) { }
+  void st; void nb;
+  // FIXED13: coach bubbles only in the guided first game; a normal game is clean (the bulb answers on demand and closes when the moment changes)
+  try { const ph = hlpPhase(); if (hlpCoached()) GXH.phase(ph); else { const s = GXH.state(); if (s.cur && (s.cur.kind === 'coach' || (s.cur.phase != null && s.cur.phase !== ph))) GXH.hide(); } } catch (e) { }
 }
+function hlpCoached() { return UI.mode === 'guided' || !!(UI.cfg && UI.cfg.coached); }
+// ---------------------------------------------------------------- the idle nudge (FIXED13): a normal game shows no helper; after 8 s without a tap
+// on your turn, the helper's pick gets one soft gold outline (no finger, no bubble). Tips off in the Menu turns it off too.
+const HLP_IDLE_MS = 8000;
+function hlpIdleClear() { clearTimeout(UI.idleT); document.querySelectorAll('.nudge').forEach(e => e.classList.remove('nudge')); }
+function hlpIdleArm() {
+  hlpIdleClear();
+  if (!G || !UI.started || G.phase === 'over' || hlpCoached() || guideOn() || (UI.cfg && UI.cfg.tutorial)) return;
+  UI.idleT = setTimeout(hlpNudge, HLP_IDLE_MS);
+}
+function hlpNudge() {
+  try {
+    if (!hlpPhase()) { UI.idleT = setTimeout(hlpNudge, 1500); return; }   // cards flying or a card open: wait, then try again
+    if (typeof GXH !== 'undefined') { const s = GXH.state(); if (!s.on || s.cur || s.rules) return; }
+    computeRec(true); const m = UI.rec && UI.rec.m; let el = hlpEl(m); if (!el || (m.type === 'pass')) return;
+    try { pvReveal(el); } catch (e) { }   // open the right tab and scroll the target into view first, then outline it there (the tab dot hides meanwhile)
+    el.classList.add('nudge');
+  } catch (e) { }
+}
+document.addEventListener('pointerdown', () => { if (typeof hlpIdleArm === 'function' && UI.started) hlpIdleArm(); }, true);
+// the guided game: when a coach bubble closes (a tap), the finger comes back (it hides while a bubble shows: one helper at a time)
+document.addEventListener('pointerup', () => { if (!UI.started || !hlpCoached()) return; clearTimeout(UI.fbk); UI.fbk = setTimeout(() => { try { const f = document.getElementById('finger'); if (f && f.hidden && !GXH.state().cur) placeFinger(); } catch (e) { } }, 400); }, true);
+// one helper at a time (FIXED13): the moment a coach bubble or the bulb's answer appears, the ghost finger steps aside (it comes back on the next tap)
+try { new MutationObserver(ms => { for (const m of ms) for (const n of m.addedNodes) if (n.nodeType === 1 && n.classList && n.classList.contains('gxh-bub')) { const f = document.getElementById('finger'); if (f) f.hidden = true; hlpIdleClear(); return; } }).observe(document.body, { childList: true }); } catch (e) { }
+
+// every mode (guided too): the bulb's ring pulses 3 times (CSS) and its finger taps twice, then both hold still / go away (the shared kit loops them forever)
+try {
+  new MutationObserver(ms => {
+    for (const m of ms) for (const n of m.addedNodes) {
+      if (!n.classList || !n.classList.contains('gxh-finger') || !n.getAnimations) continue;
+      for (const a of n.getAnimations()) { try { a.effect.updateTiming({ iterations: 2 }); a.onfinish = () => { n.style.display = 'none'; }; } catch (e) { } }
+    }
+  }).observe(document.body, { childList: true });
+} catch (e) { }
 // ===================== part 12: the tutorial (shell/gx-tutor.js): a staged short game that teaches every rule by doing it once =====================
-// The staged game: you and Bramble, one fixed deal (seed 4242), a city that already holds three red buildings; you play Winter, Spring, Summer and Autumn (Bramble passes after Spring).
+// The staged game: you and Bramble, one fixed deal (seed 4242), a city that already holds three red buildings; you play Winter, Spring, Summer and Autumn; Bramble plays the same year on shared places and passes in Autumn.
 // Bramble is scripted (tutAi) so each rule appears on cue. Nothing of it is saved, scored or counted. Each step spotlights one thing; only that thing answers;
 // the step moves on only when the game reports that exact tap (GXT.act from onTarget).
 const TUT_GAME = 'hollowbough', TUT_SEED = 4242;
@@ -9039,7 +9136,6 @@ function tutStage(g) {
   const bard = tutTake(g, 'bard', out); const o5 = g.meadow[5]; if (o5 >= 0) g.discard.push(o5); g.meadow[5] = bard; TUT_BARD = bard;   // bought at the Inn in Summer
   { const mk = D.specialEvents.findIndex(e => e.key === 'sev_resident_minstrel'), j = g.sev.findIndex(e => e.k === mk); if (j > 0) g.sev[j].k = g.sev[0].k; g.sev[0].k = mk; }   // Inn + that card = this special event
   g.forest = [6, 1, 5];   // Bumper Bramble, Foragers Crossing, Mixed Glade
-  g.tale = true;          // the lesson is a short year: it may end before Autumn (a real game passes only in Autumn)
   g.nolog = false;
 }
 const tutId = k => { const h = G && G.players[0].hand.find(id => HB.cardKey(id) === k); return h == null ? -1 : h; };
@@ -9059,11 +9155,15 @@ const isDone = o => o.card === undefined && o.res === undefined;
   HB.AI.choose = function (g, seat, level) {
     if (UI.cfg && UI.cfg.coached && UI.coachEnd && g === G && seat === 1) { const ps = HB.moves(g, 1).find(m => m.type === 'pass'); if (ps) return ps; }
     if (UI.cfg && UI.cfg.tutorial && !UI.cfg.coached && g === G && seat === 1) {
-      const p = g.players[1], mv = HB.moves(g, 1), key = (p.season === 0 ? 'w' : 's') + p.dep.length;
+      // FIXED13: Bramble plays the whole year legally (passing is only allowed in Autumn): Winter as scripted, then only shared basic places
+      // (never blocks a place the lesson needs), Prepare when her workers are out, no Summer meadow cards (the lesson's cards stay), Pass in Autumn
+      const p = g.players[1], mv = HB.moves(g, 1);
       const basic = k => mv.find(m => m.type === 'worker' && m.k === 'basic' && D.basic[m.i].key === k);
-      const want = { w0: () => basic('basic_pebble_bank'), w1: () => basic('basic_kindling_glen'), w2: () => mv.find(m => m.type === 'prepare'),
-        s0: () => basic('basic_gossip_glade'), s1: () => basic('basic_amber_weep'), s2: () => mv.find(m => m.type === 'pass') };
-      const m = want[key] && want[key](); if (m) return m;
+      if (g.q) { const st = mv.find(m => m.type === 'choose' && /^Stop/.test(m.label || '')); if (st) return st; return o.apply(this, arguments); }
+      if (p.season === 0) { const w = [() => basic('basic_pebble_bank'), () => basic('basic_kindling_glen')][p.dep.length]; const m = w && w(); if (m) return m; }
+      else { const order = p.season === 1 ? ['basic_gossip_glade', 'basic_amber_weep', 'basic_kindling_glen'] : ['basic_amber_weep', 'basic_kindling_glen', 'basic_berry_patch'];
+        for (let k = 0; k < order.length; k++) { const m = basic(order[(p.dep.length + k) % order.length]); if (m) return m; } }
+      const pr = mv.find(m => m.type === 'prepare') || mv.find(m => m.type === 'pass'); if (pr) return pr;
     }
     return o.apply(this, arguments);
   };
@@ -9238,15 +9338,15 @@ const COACH = [
   { id: 'stock', when: (p) => p.dep.length >= 1, say: p => 'Twigs, resin, pebbles and berries pay for cards. You hold ' + p.res.twig + ' twigs, ' + p.res.resin + ' resin, ' + p.res.pebble + ' pebbles and ' + p.res.berry + ' berries.', later: 'Goods pay for cards.' },
   { id: 'rival', when: (p, r) => r.dep.length >= 1 && p.dep.length >= 1, say: (p, r) => r.name + ' sent a worker. A place without the Shared mark holds one worker. It is closed to you.', later: 'A place without the Shared mark holds one worker.' },
   { id: 'hand', when: (p) => myTurnC() && p.hand.length > 0 && p.dep.length >= 1, say: () => 'Your hand holds plans. Glowing ones are affordable. Pay the price to build. City holds 15, hand holds 8.', later: 'Hand holds 8, city holds 15. Glowing cards are affordable.' },
-  { id: 'build', when: (p) => p.city.length > 3, say: () => 'A building! It stays in your city. Production cards pay again each season.', later: 'Buildings stay in your city. Production pays each season.' },
+  { id: 'build', when: (p) => p.city.length > 3, say: () => 'A building! It stays in your city. Green cards pay again in Spring and Autumn.', later: 'Cards stay in your city. Green cards pay in Spring and Autumn.' },
   { id: 'free', when: (p) => !!p.hand.find(id => HB.cardKey(id) === 'wife') && p.city.some(e => HB.cardKey(e.id) === 'farm') && myTurnC(), say: () => 'The Goodwife fits your Allotment. She moves in free. Play her from your hand.', later: 'A critter moves into its matching building free.' },
   { id: 'meadow', when: (p) => myTurnC() && p.dep.length >= 2 && p.res.berry >= 1, say: () => 'Anyone can buy from the meadow. Critters cost berries. The meadow refills.', later: 'The meadow holds 8 cards for anyone. Critters cost berries.' },
   { id: 'event', when: (p) => myTurnC() && p.season >= 1, say: () => 'Flags are events. Build what one needs, then claim it for three points. Only one player can.', later: 'Events: build what they need, claim first, 3 points.' },
-  { id: 'prep', when: (p) => !p.passed && p.season < 3 && p.workers - p.dep.length === 0 && myTurnC(), say: () => 'All workers are out. Prepare: they come home, you gain one, production pays.', later: 'Prepare: workers come home, +1 worker, production pays.' },
-  { id: 'spring', when: (p) => p.season >= 1, say: p => 'A new season! You have ' + p.workers + ' workers. Summer draws cards. Autumn brings extra workers.', later: 'Seasons: Winter, Spring, Summer (draw cards), Autumn (extra workers).' },
+  { id: 'prep', when: (p) => !p.passed && p.season < 3 && p.workers - p.dep.length === 0 && myTurnC(), say: p => 'All workers are out. Prepare: they come home and you gain ' + (p.season === 2 ? 'two more' : 'one more') + '. ' + (p.season === 1 ? 'Summer: take up to 2 meadow cards.' : 'Green cards pay.'), later: 'Prepare: workers come home. Spring and Autumn: green cards pay. Summer: take up to 2 meadow cards.' },
+  { id: 'spring', when: (p) => p.season >= 1, say: p => 'A new season! You have ' + p.workers + ' workers. Summer lets you take meadow cards. Autumn brings two more workers.', later: 'Seasons: Spring +1 worker, Summer +1 (meadow cards), Autumn +2.' },
   { id: 'shared', when: (p) => myTurnC() && p.season >= 1, say: () => 'Shared places take many workers. Rivals share the Berry Patch.', later: 'Shared places take many workers.' },
-  { id: 'forest', when: (p) => myTurnC() && p.dep.length >= 2, say: () => 'The forest pays more goods. Each spot holds one worker.', later: 'Forest places pay more.' },
-  { id: 'pass', when: (p) => !p.passed && myTurnC() && (p.season >= 2 || (p.season >= 1 && p.workers - p.dep.length === 0)), say: () => 'When you are done, Pass. The game ends when all have passed. Unused workers are wasted.', later: 'Pass ends your game. Unused workers are wasted.' }
+  { id: 'forest', when: (p) => myTurnC() && p.dep.length >= 2, say: () => G.np >= 4 ? 'The forest pays more goods. Each spot takes two workers, never two of yours.' : 'The forest pays more goods. Each spot holds one worker.', later: 'Forest places pay more.' },
+  { id: 'pass', when: (p) => !p.passed && myTurnC() && p.season >= 3 && p.workers - p.dep.length === 0, say: () => 'Autumn is the last season. When you are done, Pass. The game ends when all have passed.', later: 'Pass only in Autumn, after your last Prepare. Unused workers are wasted.' }
 ];
 // rules that need a situation we cannot count on: told at the end
 const COACH_TALE = 1e9;   // the first game plays the whole year (R21: ending it after 14 actions left the rival with 4 cards); the cut-off code stays for a future short mode
@@ -9254,7 +9354,7 @@ const COACH_LATER = [
   { id: 'inn', later: 'The Inn and Post Office are open. You play a rival\'s open card. They get a point.' },
   { id: 'haven', later: 'The Haven turns two discarded cards into one resource.' },
   { id: 'longroad', later: 'The Long Road opens in Autumn only.' },
-  { id: 'special', later: 'Special events need certain buildings and cost goods.' },
+  { id: 'special', later: 'Each special event needs two named cards in your city.' },
   { id: 'tie', later: 'Ties go to most events, then most leftover goods.' }
 ];
 const myTurnC = () => !!G && UI.started && G.phase !== 'over' && !UI.cards.length && !UI.animBusy && HB.actor(G) === 0;
@@ -9272,7 +9372,7 @@ function coachFeedback(p) {
   if (!b || b.season !== snap.season && snap.dep === 0) return null;
   const say = (k, t) => { const L = UI.fbLog = UI.fbLog || []; if (L.filter(x => x === k).length >= 2) return null; L.push(k); return t; };
   if (snap.passed && !b.passed) return snap.un > 0 ? say('poor:pass', 'You passed with ' + snap.un + ' worker' + (snap.un > 1 ? 's' : '') + ' still home. Each was a lost action.') : say('good:pass', 'Good: every worker was used before you passed.');
-  if (snap.city > b.city) { const e = p.city[p.city.length - 1], sp = e && spec(e.id); return say('good:build', 'Good: ' + (sp ? sp.name : 'a building') + ' is built' + (sp && sp.points ? ', worth ' + sp.points + ' point' + (sp.points > 1 ? 's' : '') + ' for good.' : '. It will keep paying every season.')); }
+  if (snap.city > b.city) { const e = p.city[p.city.length - 1], sp = e && spec(e.id); return say('good:build', 'Good: ' + (sp ? sp.name : 'a building') + ' is built' + (sp && sp.points ? ', worth ' + sp.points + ' point' + (sp.points > 1 ? 's' : '') + ' for good.' : (e && HB.cardOf(e.id).color === 'green' ? '. It pays again in Spring and Autumn.' : '.'))); }
   if (snap.pts >= b.pts + 3) return say('good:points', 'Good: +' + (snap.pts - b.pts) + ' points in one move. Events and big cards pay best.');
   if (snap.hand >= 8 && b.hand < 8) return say('poor:hand', 'Careful: your hand is full at 8. Extra cards are lost. Play one soon.');
   if (snap.dep > b.dep && snap.res <= b.res && snap.hand <= b.hand && snap.pts <= b.pts) return say('poor:empty', 'That worker gained nothing. Check what glows before you send one.');
