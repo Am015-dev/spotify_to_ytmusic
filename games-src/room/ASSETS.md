@@ -22,3 +22,15 @@ Everything below is **CC0 1.0** (public domain) from **Poly Haven** (https://pol
 ## How they are made (offline, not part of the page)
 `render/fetch.py` downloads the models and textures, `render/scene.html` (three.js 0.158 from `games-src/node_modules`, GLTFLoader, RGBELoader) builds the room, `render/render.js` renders it in headless Chromium (SwiftShader) and `render/make.py` crops and encodes WebP. One level camera (1.45 m high, 5 m from the wall, off-axis frustum so verticals stay vertical) is used for every layer so furniture shares one floor; 1 m at the wall plane is 25.71 stage em. Run `cd games-src/room/render && python3 fetch.py model Television_01 modern_wooden_cabinet modern_coffee_table_01 mid_century_lounge_chair vintage_suitcase potted_plant_02 && python3 fetch.py tex wood_floor beige_wall_002 walnut_veneer velour_velvet && python3 fetch.py hdri brown_photostudio_02` then `python3 patch_textures.py` and `python3 make.py`. `render/assets/` and `render/out/` are git-ignored (about 60 MB of sources).
 The positions of the live TV screen (13.8 x 10.5 em at 3.49, 49.9) and knobs are measured from the render (`meta.screen`, `meta.knobs` in `render/out/meta-*.json`).
+
+## Game Night TV trailers (games/tv/)
+CH 3 on the room TV ("CH 3 · Highlights", after the video-game channels) plays short trailers of the live board games: a muted preview on the small
+screen (poster only under reduced motion), and a tap opens the full-screen player (one vertical trailer per screen, swipe / wheel / arrow keys,
+tap to pause, scrub bar, sound off by default, "Play this game", close). Code: the TV section of `games/index.html` (`HL`, `hlScreen`, `hlOpen`...).
+Files: `games/tv/<slug>.webm` (VP9, 376x668, 24 fps, ~22 s, about 0.3-1.1 MB) + `<slug>.webp` poster, `tv.json` (slug, id, name, file, poster,
+duration) and `tv.js` (the same list as a script; the shelf loads it after the page, so it also works from file://). The service worker does not
+precache them; a played trailer is cached at runtime only. All footage is our own play of our own games (no third-party assets).
+Re-record after a game update (from the CURRENT live build in games/, never a work branch): `node games-src/room/tv/record-trailers.js <slug> [...]`
+(no slugs = every live board game; skips mainhattan-* and deep-signal; `TV_PAR=2` games at once, `TV_SECS=22`). The bot taps by touch at 375x667:
+title -> start, then the game's own lightbulb suggestion each beat. Look at a contact sheet before shipping
+(`ffmpeg -i games/tv/<slug>.webm -vf "fps=1/2.5,scale=150:-1,tile=9x1" -frames:v 1 sheet.png`). Test: `node games-src/room/tv-test.js`.
