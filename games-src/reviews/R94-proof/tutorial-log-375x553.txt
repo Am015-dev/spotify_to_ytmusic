@@ -1,0 +1,57 @@
+START SCREEN: Shipwreck Isle | Shipwrecked. Work together, stay alive, and get rescued. | Play ▶ | New here? Learn in 5 minutes | Short, one tap at a time, no reading | 📖 Story chapters | Game setup: Marooned · 2 players · Easy island | Scenario | Marooned | The Hexed Isle | Stranded Friend | Settlers | Players | 1 | 2 | 3 | 4 | Difficulty | Easy island | Normal | Hard | Play online with friends
+OFFER: New here? | Light a fire and stack 15 wood by day 12, and keep everyone alive. | Learn by playing: 5 minutes, one tap at a time. | Learn in 5 minutes | Play anyway
+STEP goal d1 "Day 1 of 12. Light a fire and stack 15 wood." res={"food":4,"pfood":0,"wood":4,"fur":0} roof=0 wx={} ringOverBubble=false clip=
+STEP death d1 "Life left. If any castaway dies, everyone loses." res={"food":4,"pfood":0,"wood":4,"fur":0} roof=0 wx={} ringOverBubble=false clip=
+STEP phases d1 "Every day: event, morale, production, action, weather, night." res={"food":4,"pfood":0,"wood":4,"fur":0} roof=0 wx={} ringOverBubble=false clip=
+STEP event0 d1 "Day 1 has no event card. One comes each day after." res={"food":4,"pfood":0,"wood":4,"fur":0} roof=0 wx={} ringOverBubble=true clip=
+STEP morale0 d1 "Morale gives or takes determination ✊ each morning." res={"food":4,"pfood":0,"wood":4,"fur":0} roof=0 wx={} ringOverBubble=true clip=
+STEP prod d1 "Production: the camp gives 1 food and 1 wood." res={"food":4,"pfood":0,"wood":4,"fur":0} roof=0 wx={} ringOverBubble=false clip=
+STEP pawns d1 "Each castaway has 2 pawns. Tap the Carpenter." res={"food":4,"pfood":0,"wood":4,"fur":0} roof=0 wx={} ringOverBubble=false clip=
+STEP explore d1 "Tap a glowing unknown place. One pawn there rolls dice." res={"food":4,"pfood":0,"wood":4,"fur":0} roof=0 wx={} ringOverBubble=false clip=
+STEP dice d1 "Dice can fail, wound you, or start an adventure." res={"food":4,"pfood":0,"wood":4,"fur":0} roof=0 wx={} ringOverBubble=false clip=
+STEP pawn2 d1 "Now tap the Carpenter’s second pawn." res={"food":4,"pfood":0,"wood":4,"fur":0} roof=0 wx={} ringOverBubble=false clip=
+STEP same d1 "Tap the same place. Two pawns never roll: a sure success." res={"food":4,"pfood":0,"wood":4,"fur":0} roof=0 wx={} ringOverBubble=false clip=
+STEP camp1 d1 "The Cook joins. Tap the camp. Building happens there." res={"food":4,"pfood":0,"wood":4,"fur":0} roof=0 wx={} ringOverBubble=false clip=bfpw  set :2🧭
+STEP shelter d1 "Build a shelter for 2 wood. It stops night wounds." res={"food":4,"pfood":0,"wood":4,"fur":0} roof=0 wx={} ringOverBubble=false clip=bfpw  set :2🧭
+STEP camp2 d1 "Tap the camp again." res={"food":4,"pfood":0,"wood":4,"fur":0} roof=0 wx={} ringOverBubble=false clip=bfpw  set :2🧭
+STEP shovel d1 "Inventions are tools. Make the Shovel; the beach allows it." res={"food":4,"pfood":0,"wood":4,"fur":0} roof=0 wx={} ringOverBubble=false clip=bfpw  set :2🧭
+STEP camp3 d1 "Friday helps. Tap the camp once more." res={"food":4,"pfood":0,"wood":4,"fur":0} roof=0 wx={} ringOverBubble=false clip=bfpw  set :2🧭;bfpw  set :2🔨
+STEP shovel2 d1 "Help with the Shovel, so it surely gets made." res={"food":4,"pfood":0,"wood":4,"fur":0} roof=0 wx={} ringOverBubble=false clip=bfpw  set :2🧭;bfpw  set :2🔨
+STEP go d1 "Every pawn has a job. Tap Start day." res={"food":4,"pfood":0,"wood":4,"fur":0} roof=0 wx={} ringOverBubble=false clip=bfpw  set :2🧭;bfpw  set :2🔨
+STEP weather d2 "Weather: each cloud above your roof ruins food and wood." res={"food":1,"pfood":0,"wood":4,"fur":0} roof=0 wx={"rain":0,"snow":0,"storm":0,"animal":null,"out":[],"round":1} ringOverBubble=false clip=
+STEP eat d2 "Night: each castaway eats 1 food, or takes 2 wounds." res={"food":1,"pfood":0,"wood":4,"fur":0} roof=0 wx={"rain":0,"snow":0,"storm":0,"animal":null,"out":[],"round":1} ringOverBubble=false clip=
+STEP outside d2 "No shelter? Everyone takes 1 wound sleeping outside." res={"food":1,"pfood":0,"wood":4,"fur":0} roof=0 wx={"rain":0,"snow":0,"storm":0,"animal":null,"out":[],"round":1} ringOverBubble=false clip=
+STEP wounds d2 "Wounds use up life. Life at zero means death." res={"food":1,"pfood":0,"wood":4,"fur":0} roof=0 wx={"rain":0,"snow":0,"storm":0,"animal":null,"out":[],"round":1} ringOverBubble=false clip=
+STEP morale d2 "Morale: high morale gives determination, low takes it." res={"food":1,"pfood":0,"wood":4,"fur":0} roof=0 wx={"rain":0,"snow":0,"storm":0,"animal":null,"out":[],"round":1} ringOverBubble=true clip=
+STEP t2 d2 "Tap the camp. Threats are handled there." res={"food":1,"pfood":0,"wood":4,"fur":0} roof=0 wx={"rain":0,"snow":0,"storm":0,"animal":null,"out":[],"round":1} ringOverBubble=false clip=
+STEP t3 d2 "Dig a Drain with the Shovel. The threat is gone." res={"food":1,"pfood":0,"wood":4,"fur":0} roof=0 wx={"rain":0,"snow":0,"storm":0,"animal":null,"out":[],"round":1} ringOverBubble=false clip=
+STEP g2 d2 "Tap the land you found yesterday." res={"food":1,"pfood":0,"wood":4,"fur":0} roof=0 wx={"rain":0,"snow":0,"storm":0,"animal":null,"out":[],"round":1} ringOverBubble=false clip=
+STEP g3 d2 "Gather food. Food and wood arrive after all jobs." res={"food":1,"pfood":0,"wood":4,"fur":0} roof=0 wx={"rain":0,"snow":0,"storm":0,"animal":null,"out":[],"round":1} ringOverBubble=false clip=
+STEP r2 d2 "Tap the camp." res={"food":1,"pfood":0,"wood":4,"fur":0} roof=0 wx={"rain":0,"snow":0,"storm":0,"animal":null,"out":[],"round":1} ringOverBubble=false clip=
+STEP r3 d2 "Rest heals 1 wound." res={"food":1,"pfood":0,"wood":4,"fur":0} roof=0 wx={"rain":0,"snow":0,"storm":0,"animal":null,"out":[],"round":1} ringOverBubble=false clip=
+STEP h2 d2 "A beast was spotted. Tap the camp. Hunts start there." res={"food":1,"pfood":0,"wood":4,"fur":0} roof=0 wx={"rain":0,"snow":0,"storm":0,"animal":null,"out":[],"round":1} ringOverBubble=false clip=bfpw  set :2😴
+STEP h3 d2 "Hunt. Each point your weapon is short costs a wound." res={"food":1,"pfood":0,"wood":4,"fur":0} roof=0 wx={"rain":0,"snow":0,"storm":0,"animal":null,"out":[],"round":1} ringOverBubble=false clip=bfpw  set :2😴
+STEP h5 d2 "A hunt needs 2 pawns: Friday joins. Tap the camp." res={"food":1,"pfood":0,"wood":4,"fur":0} roof=0 wx={"rain":0,"snow":0,"storm":0,"animal":null,"out":[],"round":1} ringOverBubble=false clip=bfpw  set bad:2🏹;bfpw  set :2😴
+STEP h6 d2 "Join the hunt. No dice: weapon against strength." res={"food":1,"pfood":0,"wood":4,"fur":0} roof=0 wx={"rain":0,"snow":0,"storm":0,"animal":null,"out":[],"round":1} ringOverBubble=false clip=bfpw  set bad:2🏹;bfpw  set :2😴
+STEP go2 d2 "Every pawn has a job. Tap Start day." res={"food":1,"pfood":0,"wood":4,"fur":0} roof=0 wx={"rain":0,"snow":0,"storm":0,"animal":null,"out":[],"round":1} ringOverBubble=false clip=bfpw  set :2🏹;bfpw  set :2😴
+STEP rain d3 "Rain cloud, no roof: lose 1 food and 1 wood." res={"food":1,"pfood":0,"wood":4,"fur":0} roof=0 wx={"rain":1,"snow":0,"storm":0,"animal":null,"out":[],"round":2} ringOverBubble=false clip=
+STEP c2 d3 "Tap the camp." res={"food":1,"pfood":0,"wood":4,"fur":0} roof=0 wx={"rain":1,"snow":0,"storm":0,"animal":null,"out":[],"round":2} ringOverBubble=false clip=
+STEP c3 d3 "Tidy the camp: 2 determination and morale up." res={"food":1,"pfood":0,"wood":4,"fur":0} roof=0 wx={"rain":1,"snow":0,"storm":0,"animal":null,"out":[],"round":2} ringOverBubble=false clip=
+STEP x2 d3 "A real roll: tap this unknown place, and go alone." res={"food":1,"pfood":0,"wood":4,"fur":0} roof=0 wx={"rain":1,"snow":0,"storm":0,"animal":null,"out":[],"round":2} ringOverBubble=false clip=bfpw  set :2🏕️
+STEP w2 d3 "Now the way home. Tap the camp." res={"food":1,"pfood":0,"wood":4,"fur":0} roof=0 wx={"rain":1,"snow":0,"storm":0,"animal":null,"out":[],"round":2} ringOverBubble=false clip=bfpw  set :2🏕️
+STEP w3 d3 "Add wood to the signal pile. It needs no pawn." res={"food":1,"pfood":0,"wood":4,"fur":0} roof=0 wx={"rain":1,"snow":0,"storm":0,"animal":null,"out":[],"round":2} ringOverBubble=false clip=bfpw  set :2🏕️
+STEP w4 d3 "Next stages: 2, 3, 4, 5 wood. One stage a day." res={"food":1,"pfood":0,"wood":3,"fur":0} roof=0 wx={"rain":1,"snow":0,"storm":0,"animal":null,"out":[],"round":2} ringOverBubble=false clip=bfpw  set :2🏕️
+STEP f2 d3 "Build the Fire. The mountains you found allow it." res={"food":1,"pfood":0,"wood":3,"fur":0} roof=0 wx={"rain":1,"snow":0,"storm":0,"animal":null,"out":[],"round":2} ringOverBubble=false clip=bfpw  set :2🏕️
+STEP f3 d3 "Make the Fire sure: tap the camp again." res={"food":1,"pfood":0,"wood":3,"fur":0} roof=0 wx={"rain":1,"snow":0,"storm":0,"animal":null,"out":[],"round":2} ringOverBubble=false clip=bfpw  set :2🏕️
+STEP f4 d3 "Join the Fire. Fire plus 15 wood by day 10-12 wins." res={"food":1,"pfood":0,"wood":3,"fur":0} roof=0 wx={"rain":1,"snow":0,"storm":0,"animal":null,"out":[],"round":2} ringOverBubble=false clip=bfpw  set :2🏕️
+STEP go3 d3 "Tap Start day and watch the dice." res={"food":1,"pfood":0,"wood":3,"fur":0} roof=0 wx={"rain":1,"snow":0,"storm":0,"animal":null,"out":[],"round":2} ringOverBubble=false clip=bfpw  set :2🏕️;bfpw  set :2🔨
+STEP roll d4 "The dice: ✔ success, 🩸 a wound, ❓ an adventure." res={"food":1,"pfood":0,"wood":4,"fur":0} roof=0 wx={"rain":1,"snow":0,"storm":0,"animal":null,"out":[],"round":2} ringOverBubble=true clip=
+STEP advc d4 "The ? token drew this adventure card. It happens now." res={"food":1,"pfood":0,"wood":4,"fur":0} roof=0 wx={"rain":1,"snow":0,"storm":0,"animal":null,"out":[],"round":2} ringOverBubble=true clip=
+STEP wx1 d4 "Normal island, days 4-6: a rain die. Build a roof first." res={"food":1,"pfood":0,"wood":4,"fur":0} roof=0 wx={"rain":0,"snow":0,"storm":0,"animal":null,"out":[],"round":3} ringOverBubble=true clip=
+STEP wx2 d4 "Normal island, day 7+: snow costs wood and counts against the roof." res={"food":1,"pfood":0,"wood":4,"fur":0} roof=0 wx={"rain":0,"snow":0,"storm":0,"animal":null,"out":[],"round":3} ringOverBubble=true clip=
+STEP wx3 d4 "Normal island, day 7+: animals take food, palisade, or fight (strength 3)." res={"food":1,"pfood":0,"wood":4,"fur":0} roof=0 wx={"rain":0,"snow":0,"storm":0,"animal":null,"out":[],"round":3} ringOverBubble=true clip=
+STEP end d4 "Now you know the rules. Play on, or start a real game!" res={"food":1,"pfood":0,"wood":4,"fur":0} roof=0 wx={"rain":0,"snow":0,"storm":0,"animal":null,"out":[],"round":3} ringOverBubble=true clip=
+TUTORIAL END after 139s steps 51 : {"rd":4,"res":"{\"food\":1,\"pfood\":0,\"wood\":4,\"fur\":0}","chars":"undefined {};undefined {}"}
+PLAY STUCK {"st":"plan2","rd":4,"over":false,"modal":false,"res":"{\"food\":1,\"pfood\":0,\"wood\":4,\"fur\":0}","pp":4}
+["Carpenter still has a pawn to place.","Carpenter still has a pawn to place.","Cook still has a pawn to place.","Cook still has a pawn to place."]
+SUMMARY 375x553: samples=243 maxHelpers=1 maxInfiniteLoops=0 hintWindowMaxHelpers=0 hintWindowMaxLoops=0 helperSecondsOver1=0 errors=1 console: Failed to load resource: net::ERR_FAILED lastDay=4 hints=52

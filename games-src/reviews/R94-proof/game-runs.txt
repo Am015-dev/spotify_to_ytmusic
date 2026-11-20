@@ -1,0 +1,31 @@
+/tmp/claude-0/-home-user-spotify-to-ytmusic/fd92e9a2-1543-567a-9490-60766803458d/scratchpad/g667.out:DAY 2 res={"food":1,"pfood":0,"wood":3,"fur":0}
+/tmp/claude-0/-home-user-spotify-to-ytmusic/fd92e9a2-1543-567a-9490-60766803458d/scratchpad/g667.out:DAY 3 res={"food":1,"pfood":0,"wood":5,"fur":0}
+/tmp/claude-0/-home-user-spotify-to-ytmusic/fd92e9a2-1543-567a-9490-60766803458d/scratchpad/g667.out:DAY 4 res={"food":0,"pfood":0,"wood":6,"fur":0}
+/tmp/claude-0/-home-user-spotify-to-ytmusic/fd92e9a2-1543-567a-9490-60766803458d/scratchpad/g667.out:DAY 5 res={"food":0,"pfood":0,"wood":7,"fur":0}
+/tmp/claude-0/-home-user-spotify-to-ytmusic/fd92e9a2-1543-567a-9490-60766803458d/scratchpad/g667.out:DAY 6 res={"food":0,"pfood":0,"wood":10,"fur":0}
+/tmp/claude-0/-home-user-spotify-to-ytmusic/fd92e9a2-1543-567a-9490-60766803458d/scratchpad/g667.out:DAY 7 res={"food":0,"pfood":0,"wood":10,"fur":0}
+/tmp/claude-0/-home-user-spotify-to-ytmusic/fd92e9a2-1543-567a-9490-60766803458d/scratchpad/g667.out:DAY 8 res={"food":0,"pfood":0,"wood":10,"fur":0}
+/tmp/claude-0/-home-user-spotify-to-ytmusic/fd92e9a2-1543-567a-9490-60766803458d/scratchpad/g667.out:DAY 9 res={"food":0,"pfood":0,"wood":10,"fur":0}
+/tmp/claude-0/-home-user-spotify-to-ytmusic/fd92e9a2-1543-567a-9490-60766803458d/scratchpad/g667.out:DAY 10 res={"food":0,"pfood":0,"wood":10,"fur":0}
+/tmp/claude-0/-home-user-spotify-to-ytmusic/fd92e9a2-1543-567a-9490-60766803458d/scratchpad/g667.out:DAY 11 res={"food":0,"pfood":0,"wood":9,"fur":0}
+/tmp/claude-0/-home-user-spotify-to-ytmusic/fd92e9a2-1543-567a-9490-60766803458d/scratchpad/g667.out:DAY 12 res={"food":0,"pfood":0,"wood":9,"fur":0}
+/tmp/claude-0/-home-user-spotify-to-ytmusic/fd92e9a2-1543-567a-9490-60766803458d/scratchpad/g667.out:GAME OVER day 12 res {"food":0,"pfood":0,"wood":9,"fur":0}
+/tmp/claude-0/-home-user-spotify-to-ytmusic/fd92e9a2-1543-567a-9490-60766803458d/scratchpad/g667.out:OVER TEXT: 3 | ? | 7 | Camp | 8 | Beach | 11 | ? | 2 | River | 6 | ? | 1 | ? | ❓ | -1🍖 | -1🍖 | -2♥ | 12/12 | 
+/tmp/claude-0/-home-user-spotify-to-ytmusic/fd92e9a2-1543-567a-9490-60766803458d/scratchpad/g667.out:SUMMARY 375x667: samples=298 maxHelpers=0 maxInfiniteLoops=0 hintWindowMaxHelpers=0 hintWindowMaxLoops=0 helperSecondsO
+/tmp/claude-0/-home-user-spotify-to-ytmusic/fd92e9a2-1543-567a-9490-60766803458d/scratchpad/g553.out:DAY 2 res={"food":0,"pfood":0,"wood":3,"fur":0}
+/tmp/claude-0/-home-user-spotify-to-ytmusic/fd92e9a2-1543-567a-9490-60766803458d/scratchpad/g553.out:DAY 3 res={"food":1,"pfood":0,"wood":7,"fur":0}
+/tmp/claude-0/-home-user-spotify-to-ytmusic/fd92e9a2-1543-567a-9490-60766803458d/scratchpad/g553.out:DAY 4 res={"food":1,"pfood":0,"wood":8,"fur":0}
+/tmp/claude-0/-home-user-spotify-to-ytmusic/fd92e9a2-1543-567a-9490-60766803458d/scratchpad/g553.out:DAY 5 res={"food":0,"pfood":0,"wood":8,"fur":0}
+/tmp/claude-0/-home-user-spotify-to-ytmusic/fd92e9a2-1543-567a-9490-60766803458d/scratchpad/g553.out:DAY 6 res={"food":1,"pfood":0,"wood":10,"fur":0}
+/tmp/claude-0/-home-user-spotify-to-ytmusic/fd92e9a2-1543-567a-9490-60766803458d/scratchpad/g553.out:DAY 7 res={"food":1,"pfood":0,"wood":9,"fur":0}
+/tmp/claude-0/-home-user-spotify-to-ytmusic/fd92e9a2-1543-567a-9490-60766803458d/scratchpad/g553.out:DAY 8 res={"food":0,"pfood":0,"wood":10,"fur":0}
+/tmp/claude-0/-home-user-spotify-to-ytmusic/fd92e9a2-1543-567a-9490-60766803458d/scratchpad/g553.out:DAY 9 res={"food":0,"pfood":0,"wood":11,"fur":0}
+/tmp/claude-0/-home-user-spotify-to-ytmusic/fd92e9a2-1543-567a-9490-60766803458d/scratchpad/g553.out:DAY 10 res={"food":0,"pfood":0,"wood":12,"fur":0}
+/tmp/claude-0/-home-user-spotify-to-ytmusic/fd92e9a2-1543-567a-9490-60766803458d/scratchpad/g553.out:GAME OVER day 10 res {"food":0,"pfood":0,"wood":12,"fur":0}
+/tmp/claude-0/-home-user-spotify-to-ytmusic/fd92e9a2-1543-567a-9490-60766803458d/scratchpad/g553.out:OVER TEXT: 7 | Hills | 8 | Camp | 12 | Plains | 2 | ? | 6 | Mountains | 11 | ? | 1 | ? | 5 | ? | 10 | ? | 15 | ? | 🔨
+/tmp/claude-0/-home-user-spotify-to-ytmusic/fd92e9a2-1543-567a-9490-60766803458d/scratchpad/g553.out:SUMMARY 375x553: samples=261 maxHelpers=0 maxInfiniteLoops=0 hintWindowMaxHelpers=0 hintWindowMaxLoops=0 helperSecondsO
+/tmp/claude-0/-home-user-spotify-to-ytmusic/fd92e9a2-1543-567a-9490-60766803458d/scratchpad/k553.out:DAY 5 res={"food":1,"pfood":0,"wood":6,"fur":0}
+/tmp/claude-0/-home-user-spotify-to-ytmusic/fd92e9a2-1543-567a-9490-60766803458d/scratchpad/k553.out:DAY 6 res={"food":2,"pfood":0,"wood":8,"fur":1}
+/tmp/claude-0/-home-user-spotify-to-ytmusic/fd92e9a2-1543-567a-9490-60766803458d/scratchpad/k553.out:DAY 7 res={"food":0,"pfood":0,"wood":10,"fur":1}
+/tmp/claude-0/-home-user-spotify-to-ytmusic/fd92e9a2-1543-567a-9490-60766803458d/scratchpad/k553.out:DAY 8 res={"food":0,"pfood":0,"wood":12,"fur":1}
+/tmp/claude-0/-home-user-spotify-to-ytmusic/fd92e9a2-1543-567a-9490-60766803458d/scratchpad/k553.out:SUMMARY 375x553: samples=270 maxHelpers=1 maxInfiniteLoops=0 hintWindowMaxHelpers=0 hintWindowMaxLoops=0 helperSecondsO
