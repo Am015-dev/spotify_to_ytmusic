@@ -31,6 +31,7 @@
   }
   function eff(c) {
     var d = D.CARDS[c.id], r = { id: c.id, name: d.name + (c.u ? '+' : ''), type: d.type, rar: d.rar, cost: d.cost, ops: d.ops, fl: d.fl, tgt: d.tgt, hero: d.hero, u: c.u };
+    if (c.u && d.up) { if (d.up.o) r.ops = d.up.o; if (d.up.c != null) r.cost = d.up.c; if (d.up.f != null) r.fl = d.up.f; r.tgt = D.needsTarget(r.ops); return r; }   // F1: the card's own upgrade
     if (c.u) { var o2 = upOps(d.ops); if (JSON.stringify(o2) === JSON.stringify(d.ops) && typeof d.cost === 'number' && d.cost > 0) r.cost = d.cost - 1; else r.ops = o2; }
     return r;
   }

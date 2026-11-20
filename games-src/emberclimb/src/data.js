@@ -272,6 +272,49 @@ var EC = (typeof EC !== 'undefined') ? EC : {};
     function f(d) { if (!d) return; if (d.heal) d.heal = HPV(d.heal); if (d.hp) d.hp = HPV(d.hp); if (d.mhp) d.mhp = HPV(d.mhp); if (d.gold) d.gold = GOLD(d.gold); }
     f(o.do); (o.roll || []).forEach(f); if (o.cost) o.cost = GOLD(o.cost);
   }); });
+
+  // F1: every card has its own printed upgrade (no generic +1). Numbers are final (tabletop units x SCALE). o = new effects, c = new cost, f = new flags.
+  (function () {
+    var S = SCALE, U = {
+      'w-strike': { o: [['dmg', 2 * S]] }, 'w-defend': { o: [['blk', 2 * S]] }, 'w-hammer': { o: [['dmg', 3 * S], ['vuln', 3]] },
+      'w-cleave': { o: [['all', 3 * S]] }, 'w-twin-slash': { o: [['hit', 2, 2 * S]] }, 'w-warm-up': { o: [['str', 1], ['draw', 2]] },
+      'w-bulwark-bash': { o: [['dmg', 2 * S], ['blk', S]] }, 'w-sunder': { o: [['dmg', 2 * S], ['vuln', 3]] }, 'w-iron-skin': { o: [['blk', 3 * S]] },
+      'w-skull-rap': { o: [['dmg', S], ['draw', 2]] }, 'w-roar': { o: [['weakAll', 2]] }, 'w-wild-swing': { o: [['roll', [['dmg', 2 * S]], [['dmg', 3 * S]], [['dmg', 4 * S]]]] },
+      'w-whirlwind': { o: [['all', 2 * S]] }, 'w-kindle': { o: [['str', 2]] }, 'w-slow-burn': { c: 0 }, 'w-body-check': { c: 0 },
+      'w-second-wind': { o: [['loss', S], ['draw', 3]] }, 'w-berserk-roll': { c: 0 }, 'w-reapers-edge': { o: [['dmg', 2 * S], ['heal', 2 * S]] },
+      'w-plate-up': { o: [['power', 'plated', 2 * S]] }, 'w-pyre-heart': { c: 2 }, 'w-colossus-slam': { o: [['dmgx', 2 * S, 5]] },
+      'w-double-down': { f: '' }, 'w-final-gambit': { o: [['dmg', 8 * S]] },
+      's-strike': { o: [['dmg', 2 * S]] }, 's-defend': { o: [['blk', 2 * S]] }, 's-pinprick': { o: [['dmg', S], ['weak', 2]] },
+      's-slip-away': { o: [['blk', 3 * S]] }, 's-blade-fan': { o: [['shiv', 4]] }, 's-toxic-vial': { o: [['poison', 2]] },
+      's-quick-stab': { o: [['dmg', 2 * S], ['draw', 1]] }, 's-dodge-roll': { o: [['blk', 2 * S], ['draw', 1]] }, 's-hidden-knives': { o: [['shiv', 3], ['blk', S]] },
+      's-dagger-spray': { o: [['all', S], ['all', S], ['all', S]] }, 's-cripple': { o: [['weak', 2], ['vuln', 2]] },
+      's-lucky-pick': { o: [['blk', 2 * S], ['roll', [], [['draw', 1]], [['draw', 2], ['nrg', 1]]]] }, 's-snap-cut': { o: [['dmg', S], ['poison', 2]] },
+      's-catalyst': { f: '' }, 's-noxious': { c: 0 }, 's-envenom': { c: 1 }, 's-knife-rain': { o: [['shiv', 5]], c: 1 },
+      's-backstab': { o: [['dmg', 3 * S]] }, 's-choking-cloud': { o: [['poisonAll', 2]] }, 's-needle-rain': { o: [['hit', 4, S]] },
+      's-venom-storm': { o: [['poisonAll', 2]] }, 's-afterimage': { c: 0 }, 's-final-flourish': { o: [['dmg', 8 * S]] },
+      's-plague-doctor': { o: [['poison', 2], ['dblPoison']] },
+      'a-strike': { o: [['dmg', 2 * S]] }, 'a-defend': { o: [['blk', 2 * S]] }, 'a-zap': { c: 0 }, 'a-dualcast': { c: 0 },
+      'a-ball-lightning': { o: [['dmg', 2 * S], ['chan', 'L']] }, 'a-cool-circuit': { o: [['chan', 'F'], ['draw', 2]] }, 'a-charge-up': { o: [['blk', 2 * S], ['chan', 'L']] },
+      'a-barrier-pulse': { o: [['blk', 2 * S]], c: 0 }, 'a-beam-cell': { o: [['dmg', 2 * S], ['chan', 'L']] }, 'a-sweeping-beam': { o: [['all', 2 * S], ['draw', 1]] },
+      'a-overclock': { o: [['draw', 3], ['add', 'burn', 1, 'disc']] }, 'a-static-jolt': { c: 0 }, 'a-compile-strike': { o: [['dmg', 2 * S], ['chan', 'F']] },
+      'a-capacitor': { o: [['power', 'slots', 3]] }, 'a-defrag': { o: [['power', 'focus', 2]] }, 'a-glacier': { o: [['blk', 2 * S], ['chan', 'F'], ['chan', 'F']] },
+      'a-darkness': { o: [['chan', 'D'], ['evoke2']] }, 'a-tempest': { o: [['chanX', 'L', 1]] }, 'a-multicast': { o: [['evokeX', 1]] },
+      'a-core-breach': { o: [['all', 3 * S]] }, 'a-biased-core': { o: [['power', 'focus', 4]] }, 'a-meteor-strike': { o: [['dmg', 6 * S], ['chan', 'L'], ['chan', 'L'], ['chan', 'L']] },
+      'a-hyperbeam': { o: [['all', 6 * S], ['focus', -1]] }, 'a-reactor': { c: 1 },
+      'm-strike': { o: [['dmg', 2 * S]] }, 'm-defend': { o: [['blk', 2 * S]] }, 'm-eruption': { c: 1 }, 'm-vigilance': { o: [['blk', 3 * S], ['stance', 'c']] },
+      'm-palm-flurry': { o: [['dmg', 2 * S], ['draw', 1]] }, 'm-crush-joints': { o: [['dmg', 2 * S], ['vuln', 2]] }, 'm-pressure-point': { o: [['poison', 2]] },
+      'm-still-water': { o: [['stance', 'c'], ['blk', 2 * S]] }, 'm-sash-whip': { o: [['dmg', 2 * S], ['weak', 2]] }, 'm-cut-through': { o: [['dmg', 2 * S], ['blk', S]] },
+      'm-empty-fist': { o: [['dmg', 3 * S], ['stance', 'n']] }, 'm-bow': { o: [['blk', S], ['scry', 3]] }, 'm-third-eye': { o: [['blk', 2 * S], ['scry', 4]] },
+      'm-inner-peace': { o: [['draw', 4], ['stance', 'c']] }, 'm-wheel-kick': { o: [['dmg', 4 * S], ['draw', 2]] }, 'm-rushdown': { c: 0 },
+      'm-mental-fort': { o: [['power', 'mental', 2 * S]] }, 'm-flying-sleeves': { o: [['hit', 2, 2 * S]] }, 'm-windmill': { o: [['all', 2 * S]] },
+      'm-roll-with-it': { o: [['roll', [['blk', 2 * S]], [['blk', 3 * S]], [['blk', 4 * S], ['stance', 'c']]]] }, 'm-sky-hammer': { o: [['hit', 5, S]] },
+      'm-zen-burst': { o: [['mir', 3], ['stance', 'c']] }, 'm-deva-form': { c: 2 }, 'm-judgment': { o: [['dmg', 8 * S]] },
+      'n-bandage': { o: [['heal', 2 * S]] }, 'n-good-instincts': { o: [['blk', 2 * S]] }, 'n-finesse': { o: [['blk', 2 * S], ['draw', 1]] },
+      'n-panic-button': { o: [['blk', 8 * S]] }, 'n-hand-of-greed': { o: [['dmg', 5 * S]] },
+      'calm-spark': { o: [['nrg', 2]] }, 'shiv': { o: [['dmg', 2 * S]] }
+    };
+    Object.keys(U).forEach(function (id) { if (CARDS[id]) CARDS[id].up = U[id]; });
+  })();
   EC.D = { GOLD: GOLD, SCALE: SCALE, CAPS: CAPS, EHP: EHP, CARDS: CARDS, ORDER: ORDER, H: H, ENEMIES: ENEMIES, ENC: ENC, ENCA: ENCA, ACTBOSS: ACTBOSS, RELICS: RELICS, POTIONS: POTIONS, EVENTS: EVENTS, NODES: NODES, needsTarget: needsTarget,
     // Gentle (first climb) player-side numbers: max HP x hp, start with `pots` x `pot`, Rest heals `rest` (tabletop 3) x SCALE. Env GENTLE='{...}' overrides in the bench.
     GENTLE: (typeof process !== 'undefined' && process.env && process.env.GENTLE_CFG) ? JSON.parse(process.env.GENTLE_CFG) : { hp: 5, pots: 3, pot: 'healing-draught', rest: 8 } };

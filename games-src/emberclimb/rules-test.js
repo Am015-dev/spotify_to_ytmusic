@@ -152,7 +152,7 @@ const snap = JSON.stringify(E.G()); ok(JSON.stringify(JSON.parse(snap)) === snap
 // card texts: every line short enough for a phone
 let long = 0; D.ORDER.forEach(id => { [0, 1].forEach(u => { E.lines(E.eff({ id, u })).forEach(l => { if (l.replace(/[^A-Za-z0-9']+/g, ' ').trim().split(' ').length > 8) long++; }); }); }); ok(long === 0, 'every card text line is 8 words or fewer (' + long + ' long)');
 // every upgraded card differs from the base
-let same = 0; D.ORDER.forEach(id => { const c = D.CARDS[id]; if (!c.ops.length) return; const u = E.eff({ id, u: 1 }); if (JSON.stringify([u.ops, u.cost]) === JSON.stringify([c.ops, c.cost])) same++; }); ok(same === 0, 'every card improves when upgraded (' + same + ' unchanged)');
+let same = 0; D.ORDER.forEach(id => { const c = D.CARDS[id]; if (!c.ops.length) return; const u = E.eff({ id, u: 1 }); if (JSON.stringify([u.ops, u.cost, u.fl]) === JSON.stringify([c.ops, c.cost, c.fl]) || !c.up) same++; }); ok(same === 0, 'every card improves when upgraded (' + same + ' unchanged)');
 // full climbs (3 acts + final act): never stuck, no invariant error
 { let fs = 0, fw = 0; for (let i = 0; i < 12; i++) { const r = E.autoplay({ heroes: [['w'], ['s'], ['a'], ['m'], ['w', 's'], ['a', 'm']][i % 6], seed: 5000 + i, acts: 3, final: 1 }); if (r.stuck || r.bad) fs++; if (r.won) fw++; } ok(fs === 0, 'R22/R25 full 4-act climbs: none stuck (' + fw + '/12 won)'); }
 console.log('targeted checks', bad ? 'FAIL' : 'PASS');
