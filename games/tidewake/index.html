@@ -1037,7 +1037,7 @@ html body :is(.gxh-ring,.gxt-ring){animation-duration:1.6s}
 <li>Art and music by Am015-dev</li></ul>
 <p><small>All sounds were trimmed, layered, loudness-normalised and converted to MP3 for this game. Names, card text and art are original.</small></p>
 </section>
-</div></section>
+<p class="tiny">Pixel effect code (rain, and the helpers our splash effect draws with): Sprite Fusion pixel-art VFX by Hugo Duprez, MIT licence.</p></div></section>
 <div id="start" role="dialog" aria-label="New game" hidden></div>
 <div id="netbox" hidden></div>
 <div id="live" class="sr" aria-live="polite"></div>
@@ -5864,6 +5864,327 @@ setInterval(()=>{if(!NET.on)return;const st=netStatus()+'|'+NET.peers.length;if(
 
 </script>
 <script>
+// Tidewake pixel effects: shared pixel-buffer helpers (Px, dithered dot, splash ellipse, colours, seeded random, noise).
+// Ported from TypeScript to plain browser JS (no build step, no imports) from the Sprite Fusion pixel-art VFX library
+// (https://www.spritefusion.com/pixel-art-vfx, rain.ts). Changes: plain JS, one global (TWFXPX), an RGBA colour helper and a
+// full-ring option on splash (the board is seen from above). See games-src/THIRD-PARTY.md.
+//
+// MIT License
+// Copyright (c) 2026 Hugo Duprez
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation
+// files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy,
+// modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software
+// is furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+// OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
+// LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR
+// IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+(function (g) {
+  'use strict';
+  var TAU = Math.PI * 2;
+  var BAYER = [0, 8, 2, 10, 12, 4, 14, 6, 3, 11, 1, 9, 15, 7, 13, 5];
+  // a Frame is { w, h, ox, oy, color: Uint32Array } (little-endian ABGR, the layout ImageData uses)
+  function Px(f) { this.w = f.w; this.h = f.h; this.ox = f.ox || 0; this.oy = f.oy || 0; this.data = f.color; }
+  Px.prototype.at = function (x, y) { x = (x - this.ox) | 0; y = (y - this.oy) | 0; return x < 0 || y < 0 || x >= this.w || y >= this.h ? -1 : y * this.w + x; };
+  Px.prototype.set = function (x, y, c) { var i = this.at(x, y); if (i >= 0) this.data[i] = c; };
+  Px.prototype.line = function (x0, y0, x1, y1, c) {
+    x0 = Math.round(x0); y0 = Math.round(y0); x1 = Math.round(x1); y1 = Math.round(y1);
+    var dx = Math.abs(x1 - x0), dy = -Math.abs(y1 - y0), sx = x0 < x1 ? 1 : -1, sy = y0 < y1 ? 1 : -1, err = dx + dy;
+    for (var n = 0; n < 4096; n++) {
+      this.set(x0, y0, c);
+      if (x0 === x1 && y0 === y1) break;
+      var e2 = 2 * err;
+      if (e2 >= dy) { err += dy; x0 += sx; }
+      if (e2 <= dx) { err += dx; y0 += sy; }
+    }
+  };
+  // ordered-dither dot: a < 1 keeps only the Bayer cells under the threshold (pixel-art transparency)
+  function dot(buf, x, y, c, a) {
+    if (a === undefined) a = 1;
+    var px = Math.floor(x), py = Math.floor(y);
+    if (a >= 1 || a > (BAYER[((py & 3) << 2) | (px & 3)] + 0.5) / 16) buf.set(px, py, c);
+  }
+  // splash ring: the lower part of an ellipse (the back arc is hidden by the water), dithered by a; full = the whole ring (seen from above)
+  function splash(buf, cx, cy, rx, ry, c, a, full) {
+    var n = Math.ceil(Math.max(rx, ry) * TAU * 1.3);
+    for (var j = 0; j < n; j++) {
+      var ang = (j / n) * TAU, ca = Math.cos(ang), sa = Math.sin(ang);
+      if (sa < -0.2 && !full) continue;
+      for (var o = -0.5; o <= 0.5; o += 0.5) dot(buf, cx + ca * (rx + o), cy + sa * (ry + o * (ry / Math.max(1, rx))), c, a);
+    }
+  }
+  function rgba(r, gg, b, a) { return ((a & 255) << 24) | ((b & 255) << 16) | ((gg & 255) << 8) | (r & 255); }
+  function hex(h) { var v = parseInt(h.slice(1), 16); return rgba((v >> 16) & 255, (v >> 8) & 255, v & 255, 255); }
+  function Rng(seed) { this.s = (seed >>> 0) || 1; }
+  Rng.prototype.next = function () {
+    var t = (this.s = (this.s + 0x6d2b79f5) >>> 0);
+    t = Math.imul(t ^ (t >>> 15), t | 1);
+    t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+  Rng.prototype.range = function (a, b) { return a + (b - a) * this.next(); };
+  Rng.prototype.int = function (a, b) { return Math.floor(this.range(a, b + 1)); };
+  Rng.prototype.chance = function (p) { return this.next() < p; };
+  function hash(n, k) { k = k || 0; return ((Math.imul(n + 1 + k * 7919, 2654435761) >>> 0) % 100000) / 100000; }
+  function noise(x, seed) {
+    seed = seed || 0; var i = Math.floor(x), f = x - i, u = f * f * (3 - 2 * f);
+    return hash(i, seed) * 2 - 1 + (hash(i + 1, seed) - hash(i, seed)) * 2 * u;
+  }
+  g.TWFXPX = { Px: Px, dot: dot, splash: splash, rgba: rgba, hex: hex, Rng: Rng, hash: hash, noise: noise, TAU: TAU, PX: 2 };
+})(typeof window !== 'undefined' ? window : globalThis);
+
+</script>
+<script>
+// Tidewake pixel effects: rain squall (plays when a Rogue Wave arrives or moves).
+// Ported from TypeScript to plain browser JS from the Sprite Fusion pixel-art VFX library
+// (https://www.spritefusion.com/pixel-art-vfx, rain.ts). Kept: three depth layers of slanted streaks with bright heads, splash
+// rings and flying bits with gravity, the palette and speeds. Changed for a board seen from above: each drop falls to its own
+// landing point on the sea (given by the caller, so splashes gather in the wave's row or column) instead of a ground line; rings
+// are whole one-pass ellipses and fewer mid-layer drops splash (phone frame time); the squall is FINITE (it rains for `dur` seconds, then the drops drain and done() turns true); the
+// side-view mist band is left out; the palette is lifted for the teal sea. See games-src/THIRD-PARTY.md.
+//
+// MIT License
+// Copyright (c) 2026 Hugo Duprez
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation
+// files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy,
+// modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software
+// is furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+// OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
+// LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR
+// IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+(function (g) {
+  'use strict';
+  var P = g.TWFXPX, Px = P.Px, dot = P.dot, hex = P.hex;
+  // palette lifted from the original's dusk blues so the streaks hold on Tidewake's teal sea
+  var C = { far: hex('#5a7aa8'), farH: hex('#7d9cc8'), mid: hex('#8fb0d8'), midH: hex('#c4dcf2'), near: hex('#a9c8e8'), nearH: hex('#f2f8ff') };
+  var SPEED = [760, 1050, 1450], LEN = [3, 6, 12], BODY = [C.far, C.mid, C.near], HEAD = [C.farH, C.midH, C.nearH];
+  var PX = P.PX;
+  // o: { land(R) -> [x, y] landing point in CSS px, top: y where drops start, area: CSS px^2 of the board, dur: seconds of rain,
+  //      slant, density, seed }
+  function rain(o) {
+    var R = new P.Rng(o.seed || 1), D = o.density == null ? 1 : o.density;
+    var DX = o.slant == null ? -0.22 : o.slant, DL = Math.hypot(DX, 1), ux = DX / DL, uy = 1 / DL;
+    var TOP = o.top, DUR = o.dur || 1.6;
+    // the original's counts are for a 680 x 370 area; scale by the board's area, capped so a big desktop board stays light
+    var k = Math.min(1.4, Math.max(0.35, (o.area || 250000) / (680 * 370))) * D;
+    var drops = [], splashes = [], bits = [], t = 0, stopped = false;
+    function reset(d) {
+      var l = o.land(R); d.lx = l[0]; d.ly = l[1];
+      var y0 = TOP - R.range(0, 160), dist = (d.ly - y0) / uy;
+      d.x = d.lx - ux * dist; d.y = y0;
+      d.sp = SPEED[d.layer] * R.range(0.9, 1.1);
+      d.stop = d.layer === 0 ? d.ly - R.range(10, 90) : d.ly;  // the far layer fades out before it reaches the water
+    }
+    [[0, 230], [1, 120], [2, 34]].forEach(function (ln) {
+      for (var i = 0; i < Math.round(ln[1] * k); i++) { var d = { layer: ln[0] }; reset(d); drops.push(d); }
+    });
+    function again(i) { if (stopped) drops.splice(i, 1); else reset(drops[i]); }
+    // a one-pass ring (the shared splash() draws three passes; dozens of rings at once cost too much on a throttled phone)
+    function ring(buf, cx, cy, rx, ry, c, a) {
+      var n = Math.ceil(rx * 5);
+      for (var j = 0; j < n; j++) { var ang = (j / n) * P.TAU; dot(buf, cx + Math.cos(ang) * rx, cy + Math.sin(ang) * ry, c, a); }
+    }
+    function drawLayer(buf, layer) {
+      var L = LEN[layer], c = BODY[layer], h = HEAD[layer];
+      for (var i = 0; i < drops.length; i++) {
+        var d = drops[i]; if (d.layer !== layer) continue;
+        var x = d.x / PX, y = d.y / PX;
+        buf.line(x - ux * L, y - uy * L, x - ux * L * 0.4, y - uy * L * 0.4, c);
+        buf.line(x - ux * L * 0.4, y - uy * L * 0.4, x, y, h);
+      }
+    }
+    return {
+      update: function (dt) {
+        t += dt; if (!stopped && t >= DUR) stopped = true;
+        for (var i = drops.length - 1; i >= 0; i--) {
+          var d = drops[i];
+          d.x += ux * d.sp * dt; d.y += uy * d.sp * dt;
+          if (d.layer === 0 && d.y > d.stop) again(i);
+          else if (d.y >= d.ly) {
+            if (d.layer === 2 || R.chance(0.3)) splashes.push({ x: d.lx, y: d.ly, t: t });
+            for (var n = 0; n < (d.layer === 2 ? 3 : R.int(0, 2)); n++) bits.push({ x: d.lx, y: d.ly - 1, gy: d.ly, vx: R.range(-90, 70), vy: -R.range(110, 230), life: R.range(0.18, 0.32) });
+            again(i);
+          }
+        }
+        for (var j = bits.length - 1; j >= 0; j--) {
+          var b = bits[j];
+          if ((b.life -= dt) <= 0 || b.y > b.gy) { bits.splice(j, 1); continue; }
+          b.vy += 1900 * dt; b.x += b.vx * dt; b.y += b.vy * dt;
+        }
+        for (var s = splashes.length - 1; s >= 0; s--) if (t - splashes[s].t > 0.4) splashes.splice(s, 1);
+      },
+      draw: function (f) {
+        var buf = new Px(f);
+        drawLayer(buf, 0); drawLayer(buf, 1);
+        for (var i = 0; i < splashes.length; i++) {
+          var s = splashes[i], u = (t - s.t) / 0.4, rx = 1 + 5 * Math.sqrt(u);
+          ring(buf, s.x / PX, s.y / PX, rx, rx * 0.4, u < 0.3 ? C.midH : C.mid, 1 - u);
+        }
+        for (var j = 0; j < bits.length; j++) dot(buf, bits[j].x / PX, bits[j].y / PX, C.nearH);
+        drawLayer(buf, 2);
+      },
+      stop: function () { stopped = true; },
+      done: function () { return stopped && drops.length === 0 && bits.length === 0 && splashes.length === 0; }
+    };
+  }
+  g.TWFX_rain = rain;
+})(typeof window !== 'undefined' ? window : globalThis);
+
+</script>
+<script>
+// Tidewake pixel effects: spray (plays once where a junk sinks). Our own effect, made the way the Sprite Fusion notes describe:
+// five quick drafts (records/spray-drafts.js, frame strips records/draft-*.png), then one picked and refined. It combines the
+// geyser draft's staggered ripple rings with a tapered crown column that sheds arcing drops, a dark hole as the hull goes under,
+// and two late bubbles. Finite: about 1.3 s, then done() turns true. Draws with the helpers in px.js (MIT, Sprite Fusion; see
+// games-src/THIRD-PARTY.md).
+(function (g) {
+  'use strict';
+  var P = g.TWFXPX, Px = P.Px, dot = P.dot, splash = P.splash, hex = P.hex, PX = P.PX;
+  var FOAM = hex('#f4fbff'), LIGHT = hex('#cfe9f2'), MID = hex('#8fc7d6'), DARK = hex('#163e50');
+  // o: { x, y: the sinking point in CSS px, s: one board square in CSS px, seed }
+  function spray(o) {
+    var R = new P.Rng(o.seed || 7), s = Math.max(24, o.s), t = 0, drops = [], rings = [], bubbles = [], shed = 0;
+    var cx = o.x / PX, cy = o.y / PX;
+    function colH() { return t < 0.22 ? s * 0.95 * Math.sin(t / 0.22 * Math.PI / 2) : Math.max(0, s * 0.95 * (1 - (t - 0.22) / 0.33)); }
+    return {
+      update: function (dt) {
+        t += dt;
+        // the column sheds drops from its top while it stands; they arc out and land in small rings
+        if (t > 0.08 && t < 0.42) {
+          shed += dt * 60;
+          while (shed >= 1) {
+            shed -= 1; var ang = R.range(0, P.TAU), sp = R.range(0.35, 0.9) * s;
+            drops.push({ x: o.x, y: o.y - colH() * R.range(0.6, 1), vx: Math.cos(ang) * sp, vy: -R.range(0.1, 0.7) * s, gy: o.y + Math.sin(ang) * s * 0.18, life: 0.9 });
+          }
+        }
+        for (var i = drops.length - 1; i >= 0; i--) {
+          var d = drops[i]; d.vy += s * 6 * dt; d.x += d.vx * dt; d.y += d.vy * dt;
+          if ((d.life -= dt) <= 0 || (d.vy > 0 && d.y >= d.gy)) { if (R.chance(0.45)) rings.push({ x: d.x, y: d.gy, t: t }); drops.splice(i, 1); }
+        }
+        for (var j = rings.length - 1; j >= 0; j--) if (t - rings[j].t > 0.3) rings.splice(j, 1);
+        if (t > 0.6 && t < 0.95 && bubbles.length < 2 && R.chance(0.08)) bubbles.push({ x: o.x + R.range(-s * 0.15, s * 0.15), y: o.y + R.range(-s * 0.05, s * 0.05), t: t });
+        for (var b = bubbles.length - 1; b >= 0; b--) if (t - bubbles[b].t > 0.3) bubbles.splice(b, 1);
+      },
+      draw: function (f) {
+        var buf = new Px(f), i, u;
+        // the hole: a dark ellipse where the hull goes under, closing as the rings spread
+        u = t / 0.7; if (u < 1) for (var hy = -2; hy <= 2; hy++) for (var hx = -5; hx <= 5; hx++) { var r = (hx * hx) / 25 + (hy * hy) / 4; if (r <= 1 - u * 0.6) dot(buf, cx + hx * s / 56, cy + hy * s / 56, DARK, 0.75 * (1 - u)); }
+        // three staggered ripple rings (from the geyser draft)
+        for (var k = 0; k < 3; k++) { u = (t - k * 0.18) / 0.8; if (u < 0 || u > 1) continue; splash(buf, cx, cy, (s * 0.15 + s * 0.6 * u) / PX, (s * 0.06 + s * 0.24 * u) / PX, k ? MID : FOAM, 1 - u, true); }
+        // the crown column: wide foam base, tapering to a ragged top, dithered at the edges
+        var h = colH() / PX, w0 = s * 0.2 / PX;
+        for (var y = 0; y < h; y++) {
+          var q = y / Math.max(1, h), w = w0 * (1 - q * 0.7) + (P.hash(y, (t * 30) | 0) - 0.5);
+          for (var x = -Math.ceil(w); x <= Math.ceil(w); x++) { var e = Math.abs(x) / Math.max(1, w); dot(buf, cx + x, cy - y, e > 0.65 ? MID : q > 0.8 ? LIGHT : FOAM, e > 0.85 ? 0.5 : 1 - q * 0.35); }
+        }
+        for (i = 0; i < rings.length; i++) { u = (t - rings[i].t) / 0.3; splash(buf, rings[i].x / PX, rings[i].y / PX, 1 + 2.5 * u, (1 + 2.5 * u) * 0.45, LIGHT, 1 - u, true); }
+        for (i = 0; i < drops.length; i++) { dot(buf, drops[i].x / PX, drops[i].y / PX, FOAM); dot(buf, drops[i].x / PX - drops[i].vx * 0.02 / PX, drops[i].y / PX - drops[i].vy * 0.02 / PX, MID, 0.6); }
+        for (i = 0; i < bubbles.length; i++) { u = (t - bubbles[i].t) / 0.3; splash(buf, bubbles[i].x / PX, bubbles[i].y / PX, 1 + u * 1.5, 1 + u, u < 0.6 ? FOAM : LIGHT, 1 - u * 0.8, true); }
+      },
+      stop: function () { t = Math.max(t, 0.95); },
+      done: function () { return t > 1.16 && !drops.length && !rings.length && !bubbles.length; }
+    };
+  }
+  g.TWFX_spray = spray;
+})(typeof window !== 'undefined' ? window : globalThis);
+
+</script>
+<script>
+// Tidewake pixel effects: runtime (flag, one canvas layer, one finite loop, event hooks). Our own code.
+// OFF by default: on only with ?fx=1 in the address (the Menu then shows an "Effects" toggle; ?fx=0 shows it too, starting off).
+// Never runs with prefers-reduced-motion: reduce, or with the game's own "Animations off".
+// The layer is one <canvas> in #board, under the overlay labels (#ov) and chips, pointer-events:none, drawn at 2 CSS px per pixel.
+// Each effect plays once per game event and stops; the loop stops when the last effect is done (hard cap 4 s per effect).
+// Effects: rain.js (ported, MIT) when a Rogue Wave arrives or moves; spray.js (ours) where a junk sinks.
+(function (g) {
+  'use strict';
+  var P = g.TWFXPX, PX = P.PX, CAP = 4;
+  var q = ''; try { q = new URLSearchParams(location.search).get('fx'); } catch (e) {}
+  var F = { on: q === '1', menu: q === '1' || q === '0', list: [], raf: 0, cv: null, cx: null, img: null, w: 0, h: 0, last: 0, n: 0,
+    st: { frames: 0, played: 0, cost: [], skipped: 0 } };
+  function reduced() { try { return matchMedia('(prefers-reduced-motion: reduce)').matches; } catch (e) { return false; } }
+  function allowed() { return F.on && !reduced() && !(typeof ANIM !== 'undefined' && !ANIM) && !!document.getElementById('board'); }
+  function proj() { try { return typeof ovMakeProj === 'function' ? ovMakeProj() : null; } catch (e) { return null; } }
+  function layer() {
+    var bd = document.getElementById('board'); if (!bd) return false;
+    if (!F.cv || F.cv.parentNode !== bd) {
+      F.cv = document.createElement('canvas'); F.cv.className = 'twfx'; F.cv.setAttribute('aria-hidden', 'true');
+      F.cv.style.cssText = 'position:absolute;left:0;top:0;width:100%;height:100%;z-index:1;pointer-events:none;image-rendering:pixelated;will-change:transform;contain:strict;';
+      bd.appendChild(F.cv); F.cx = F.cv.getContext('2d'); F.w = F.h = 0;
+    }
+    var w = Math.max(1, Math.ceil(bd.clientWidth / PX)), h = Math.max(1, Math.ceil(bd.clientHeight / PX));
+    if (w !== F.w || h !== F.h) { F.w = F.cv.width = w; F.h = F.cv.height = h; F.img = F.cx.createImageData(w, h); F.buf = new Uint32Array(F.img.data.buffer); }
+    F.cv.hidden = false; return true;
+  }
+  function tick(now) {
+    F.raf = 0; var t0 = performance.now();
+    var dt = Math.min(0.05, Math.max(0, (now - (F.last || now)) / 1000)); F.last = now;
+    if (!F.list.length || !allowed() || !layer()) return end();
+    var i, it;
+    for (i = F.list.length - 1; i >= 0; i--) { it = F.list[i]; it.age += dt; it.fx.update(dt); if (it.fx.done() || it.age > CAP) F.list.splice(i, 1); }
+    if (!F.list.length) return end();
+    // no full-board dim under the squall: a semi-transparent layer over the whole board cost 20-50 ms frames on a 4x-throttled phone
+    F.buf.fill(0);
+    var f = { w: F.w, h: F.h, ox: 0, oy: 0, color: F.buf };
+    for (i = 0; i < F.list.length; i++) F.list[i].fx.draw(f);
+    F.cx.putImageData(F.img, 0, 0);
+    F.st.frames++; F.st.cost.push(performance.now() - t0); if (F.st.cost.length > 600) F.st.cost.shift();
+    F.raf = requestAnimationFrame(tick);
+  }
+  function end() { F.list.length = 0; F.last = 0; if (F.cx) F.cx.clearRect(0, 0, F.w, F.h); if (F.cv) F.cv.hidden = true; }
+  function play(fx) {
+    if (!fx) return false; F.list.push({ fx: fx, age: 0 }); F.st.played++;
+    if (!F.raf) { F.last = 0; F.raf = requestAnimationFrame(tick); }
+    return true;
+  }
+  function geom() {
+    var pj = proj(); if (!pj) return null;
+    var B = typeof BC === 'number' ? BC : 3, lo = -B - 0.5, hi = B + 0.5;
+    var cs = [pj(lo, 0, lo), pj(hi, 0, lo), pj(lo, 0, hi), pj(hi, 0, hi)].filter(Boolean); if (cs.length < 4) return null;
+    var xs = cs.map(function (p) { return p[0]; }), ys = cs.map(function (p) { return p[1]; });
+    var x0 = Math.min.apply(0, xs), x1 = Math.max.apply(0, xs), y0 = Math.min.apply(0, ys), y1 = Math.max.apply(0, ys);
+    return { pj: pj, B: B, lo: lo, hi: hi, x0: x0, x1: x1, y0: y0, y1: y1, sq: (x1 - x0) / (2 * B + 1) };
+  }
+  var TW = {
+    get on() { return F.on; },
+    get menu() { return F.menu; },
+    setOn: function (b) { F.on = !!b; if (!F.on) end(); return F.on; },
+    active: function () { return F.list.length; },
+    stats: function () { var c = F.st.cost.slice().sort(function (a, b) { return a - b; }); return { played: F.st.played, frames: F.st.frames, skipped: F.st.skipped, active: F.list.length, costAvg: c.length ? c.reduce(function (a, b) { return a + b; }, 0) / c.length : 0, costP95: c.length ? c[Math.floor(c.length * 0.95)] : 0, costMax: c.length ? c[c.length - 1] : 0 }; },
+    // a Rogue Wave arrives or moves: w = { x, y, r } (r odd = the wave runs down column x, even = along row y)
+    wave: function (w) {
+      if (!allowed() || !w) { F.st.skipped++; return false; } var G2 = geom(); if (!G2 || !layer()) return false;
+      var col = !!(w.r & 1), band = (col ? w.x : w.y) - G2.B;
+      var land = function (R) {
+        var a = R.range(G2.lo, G2.hi), b = R.chance(0.55) ? band + R.range(-0.5, 0.5) : R.range(G2.lo, G2.hi);
+        var p = col ? G2.pj(b, 0, a) : G2.pj(a, 0, b); return p || [(G2.x0 + G2.x1) / 2, (G2.y0 + G2.y1) / 2];
+      };
+      return play(g.TWFX_rain({ land: land, top: G2.y0 - 30, area: (G2.x1 - G2.x0) * (G2.y1 - G2.y0), dur: 2.0, seed: (Date.now() & 0xffff) + 1 }));
+    },
+    // a junk sinks: k = its kit position { c, r, port }
+    sink: function (k) {
+      if (!allowed() || !k) { F.st.skipped++; return false; } var G2 = geom(); if (!G2 || !layer()) return false;
+      var wp = null; try { wp = TWKit.portWorld(k.c, k.r, k.port); } catch (e) {}
+      var p = wp ? G2.pj(wp[0], 0, wp[1]) : G2.pj(k.c - G2.B, 0, k.r - G2.B); if (!p) return false;
+      return play(g.TWFX_spray({ x: p[0], y: p[1], s: G2.sq * 1.35, seed: (Date.now() & 0xffff) + 3 }));
+    },
+    // the Menu's "Effects" button (only when the address has ?fx=)
+    menuHTML: function (cls) { return F.menu ? '<button class="' + cls + (F.on ? ' on' : '') + '" data-a="fxtog">Effects ' + (F.on ? 'on' : 'off') + '</button>' : ''; }
+  };
+  g.TWFX = TW;
+})(typeof window !== 'undefined' ? window : globalThis);
+
+</script>
+<script>
 // ===================== Tidewake: page logic (part 1: helpers, recorders, kit mirror) =====================
 const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
 const esc=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
@@ -6018,13 +6339,13 @@ async function playEv(e,gen){
     if(e.k==='M'){TWKit.maelstrom(e.x,e.y,false);delete KS.mael[key]}else{TWKit.removeLeviathan(e.x,e.y);delete KS.mons[key]}await sleep(700);break}
   case 'sink':{sunkAdd(e);const id=sid(e.seat),k=KS.ships[id];if(!k){await sleep(400);break}const w=e.why;
     if(/collided/.test(w)){const partner=Object.keys(KS.ships).find(o=>o!==id&&!KS.ships[o].dying&&KS.ships[o].c===k.c&&KS.ships[o].r===k.r&&KS.ships[o].port===k.port);
-      sfx('crash');if(partner)await kitWait(TWKit.collide(id,partner),1500);sfx('ship_sink',{at:.3});TWKit.sinkShip(id,{how:'crash'});delete KS.ships[id];if(partner){TWKit.sinkShip(partner,{how:'crash'});delete KS.ships[partner]}await sleep(900);try{TWKit.removeShip(id);if(partner)TWKit.removeShip(partner)}catch(x){}break}
+      sfx('crash');if(partner)await kitWait(TWKit.collide(id,partner),1500);if(window.TWFX)TWFX.sink(k);sfx('ship_sink',{at:.3});TWKit.sinkShip(id,{how:'crash'});delete KS.ships[id];if(partner){TWKit.sinkShip(partner,{how:'crash'});delete KS.ships[partner]}await sleep(900);try{TWKit.removeShip(id);if(partner)TWKit.removeShip(partner)}catch(x){}break}
     let how='wave',at;if(/Maelstrom/.test(w)){how='maelstrom';const m=G.mons.find(q=>q.k==='M')||(G.arr&&G.arr.k==='M'&&G.arr);if(m)at={c:m.x,r:m.y};sfx('maelstrom')}
     else if(/ran into|crushed|blocked/.test(w)){how='leviathan';const mm=e.pos&&e.pos.on?e.pos.on:(e.pos&&e.pos.x!=null?[e.pos.x,e.pos.y]:null);if(mm)TWKit.leviathanRoar(mm[0],mm[1]);sfx('leviathan_roar')}
     else if(/capsized/.test(w)){how='wave';sfx('rogue_wave')}else sfx('splash');
-    sfx('ship_sink',{at:.2});delete KS.hold[e.seat];delete KS.ships[id];UI.trig.sunk=1;await kitWait(TWKit.sinkShip(id,{how,at}),2500);try{TWKit.removeShip(id)}catch(x){}await sleep(250);break}
-  case 'wavenew':{kitWave({x:e.x,y:e.y,r:e.r});sfx('rogue_wave');say(`A Rogue Wave arrives: ${(e.r&1)?'column '+(e.x+1):'row '+(e.y+1)}, strength 2. A junk in that band must roll 2 or more or capsize; the wave moves on and gets stronger.`,'big');await sleep(2000);break}
-  case 'wave':{sfx('rogue_wave');TWKit.shake&&TWKit.shake(.04,500);kitWave(e.to);await sleep(1000);break}
+    if(window.TWFX)TWFX.sink(k);sfx('ship_sink',{at:.2});delete KS.hold[e.seat];delete KS.ships[id];UI.trig.sunk=1;await kitWait(TWKit.sinkShip(id,{how,at}),2500);try{TWKit.removeShip(id)}catch(x){}await sleep(250);break}
+  case 'wavenew':{kitWave({x:e.x,y:e.y,r:e.r});if(window.TWFX)TWFX.wave(e);sfx('rogue_wave');say(`A Rogue Wave arrives: ${(e.r&1)?'column '+(e.x+1):'row '+(e.y+1)}, strength 2. A junk in that band must roll 2 or more or capsize; the wave moves on and gets stronger.`,'big');await sleep(2000);break}
+  case 'wave':{sfx('rogue_wave');TWKit.shake&&TWKit.shake(.04,500);kitWave(e.to);if(window.TWFX)TWFX.wave(e.to);await sleep(1000);break}
   }
 }
 
@@ -6261,6 +6582,7 @@ document.addEventListener('click',e=>{const t=e.target.closest&&e.target.closest
   case 'snd':toggleSound();renderSettings();break;case 'mus':toggleMusic();renderSettings();break;
   case 'speed':UI.speed=+D.v;try{TWKit.setSpeed(UI.speed)}catch(x){}saveSettings();renderSettings();break;
   case 'gfx':try{TWKit.setQuality(D.v);if(window.PerfHUD)PerfHUD.hitch()}catch(x){}renderSettings();break;
+  case 'fxtog':if(window.TWFX)TWFX.setOn(!TWFX.on);renderSettings();break;
   case 'animtog':UI.anim=!UI.anim;ANIM=UI.anim?1:0;saveSettings();renderSettings();break;
   case 'guidemenu':UI.guide=UI.guide==='full'?'light':'full';saveSettings();saveAll();renderSettings();if(G)render();break;
   case 'xray':UI.xray=!UI.xray;renderCrew();break;
@@ -6286,7 +6608,7 @@ function renderCrew(){const b=$('#crewbody');if(!G){b.innerHTML='<p>Start a game
 function renderSettings(){const g=(()=>{try{return TWKit.getQuality()}catch(e){return {pref:'auto',active:'2d'}}})();const on3=!!(TWKit._K&&TWKit._K.on);const sp=[[.5,'Slow'],[1,'Normal'],[2,'Fast'],[5,'Very fast']];
   $('#setbody').innerHTML=`<div class="setgrid"><div class="phonly"><div class="lbl">Game info</div><div class="row"><button type="button" class="btn" data-gx="rulesd">How to play</button><button type="button" class="btn" data-gx="crewd">Crews</button><button type="button" class="btn" data-gx="logd">Log</button></div></div>
   <div><div class="lbl">Sound</div><div class="row"><button class="btn${SND.on?' on':''}" data-a="snd">Sound ${SND.on?'on':'off'}</button><button class="btn${SND.music?' on':''}" data-a="mus">Music ${SND.music?'on':'off'}</button><button class="btn" data-a="musicpick">Songs…</button></div></div>
-  <div><div class="lbl">Computer captains' speed</div><div class="row">${sp.map(([v,l])=>`<button class="btn small${UI.speed===v?' on':''}" data-a="speed" data-v="${v}">${l}</button>`).join('')}<button class="btn small${UI.anim?' on':''}" data-a="animtog">Animations ${UI.anim?'on':'off'}</button></div></div>
+  <div><div class="lbl">Computer captains' speed</div><div class="row">${sp.map(([v,l])=>`<button class="btn small${UI.speed===v?' on':''}" data-a="speed" data-v="${v}">${l}</button>`).join('')}<button class="btn small${UI.anim?' on':''}" data-a="animtog">Animations ${UI.anim?'on':'off'}</button>${window.TWFX?TWFX.menuHTML('btn small'):''}</div></div>
   <div><div class="lbl">Graphics ${on3?`(now: ${esc(g.active)})`:'(2D chart: no WebGL here)'}</div><div class="row">${['auto','high','medium','low'].map(q=>`<button class="btn small${g.pref===q?' on':''}" data-a="gfx" data-v="${q}" ${on3?'':'disabled'}>${q[0].toUpperCase()+q.slice(1)}</button>`).join('')}</div><p class="tiny">Auto picks Low on a software graphics driver and steps down by itself if frames drop.</p><div id="perfslot" class="row">${window.PerfHUD&&PerfHUD.buttonsHTML?PerfHUD.buttonsHTML('btn small'):''}</div></div>
   <div><div class="lbl">Help</div>${typeof hlpInit==='function'&&(hlpInit(),typeof GXH!=='undefined')?GXH.settingsHTML({rowClass:'row',btnClass:'btn small'}):''}<div class="row"><button type="button" class="btn small" data-gx="piecesd">Pieces: every tile and leviathan</button></div>${typeof tutBtn==='function'&&!NET.on?'<div class="row">'+tutBtn('btn small')+'</div>':''}</div>
   <div><div class="lbl">Game</div><div class="row">${isClient()?'<button class="btn small" data-a="netleave">Leave the online game</button>':''}${isClient()?'':G&&UI.started?'<button class="btn small" data-a="restart">Restart this setup</button>':''}${isClient()?'':'<button class="btn small" data-a="tonew">New game...</button>'}<button class="btn small" data-gx="credd">Credits</button></div></div></div>`}

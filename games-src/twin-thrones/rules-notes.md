@@ -51,5 +51,8 @@ Rule of thumb for a paid release: the UNSURE lines are cost-only (no effect or s
 - VERIFIED by touch: face-down cards turn up when freed, build / sell (2 + yellow) / wonder, trading 2 + rival brown/grey, chains free,
   pair -> progress token, loot spaces, 7-wonder cap, weaker military chooses the next starter (tie: last card taker), scoring + blue tie-break.
 
+## FIXED1 (14 Nov 2026)
+Card data re-checked against the original card list. The UNSURE cost lines above for Lookout, Open Bazaar, Archery Range, the Age II/III science cards and the Age III blue/red/yellow cards are now settled and changed (RULES-AUDIT.md, logic-test section L). Still UNSURE: Beacon Isle and Thunder Idol costs.
+
 ## Not built
 Online play, campaign (see HANDOFF.md). Sound and the first-game guide were added in R2 (HANDOFF-R2.md).

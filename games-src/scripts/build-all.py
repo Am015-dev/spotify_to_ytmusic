@@ -68,7 +68,7 @@ SWEEPS = {
     "sunglaze":         ("azul/game",           ["sweep.js", "rotate-test.js"]),
     "thornbound":       ("thornbound/game",     ["sweep.js"]),
     "tidewake":         ("tidewake/game",       ["sweep.js"]),
-    "twin-thrones":     ("twin-thrones",        ["rules-test.js"]),
+    "twin-thrones":     ("twin-thrones",        ["rules-test.js", "endline-test.js"]),
     "vale-of-banners":  ("vale-of-banners",     ["rules-test.js"]),
     "wildmark":         ("wildmark",            ["rules-test.js"]),
     "vinegrave":        ("vinegrave",           ["rules-test.js"]),

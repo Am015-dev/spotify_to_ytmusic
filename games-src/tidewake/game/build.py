@@ -95,8 +95,9 @@ T=os.path.join(SP,'node_modules','three','build','three.min.js')
 SRC={'gx-scenario.js': os.path.join(SP, 'shell', 'gx-scenario.js'), 'scn.js': os.path.join(D,'scn.js'), 'shell.js':os.path.join(SP,'shell','shell.js'),'gx-viewport.js':os.path.join(SP,'shell','gx-viewport.js'),'gx-skin.js':os.path.join(SP,'shell','gx-skin.js'),'gx-help.js':os.path.join(SP,'shell','gx-help.js'),'gx-glb.js':os.path.join(SP,'shell','gx-glb.js'),'gx-tutor.js':os.path.join(SP,'shell','gx-tutor.js'),'gx-campaign.js':os.path.join(SP,'shell','gx-campaign.js'),'campaign-data.js':'','perfhud.js':os.path.join(SP,'perf','perfhud.js'),
      'gameaudio.js':os.path.join(SP,'audio','gameaudio.js'),'audio-data.js':os.path.join(SP,'tidewake','audio','audio-data.js'),
      'data.js':os.path.join(D,'src','data.js'),'engine.js':os.path.join(D,'src','engine.js'),'ai.js':os.path.join(D,'src','ai.js'),'tutscript.js':os.path.join(D,'src','tutscript.js'),'netstrip.js':os.path.join(D,'src','netstrip.js'),
-     'trystero.min.js':os.path.join(SP,'net','trystero.min.js'),'netroom.js':os.path.join(SP,'net','netroom.js'),'gx-music.js':os.path.join(SP,'shell','gx-music.js'),'media.js':os.path.join(D,'media.js')}
-ORDER = ['gx-scenario.js', 'scn.js', 'shell.js','gx-viewport.js','gx-skin.js','gx-help.js','gx-tutor.js','gx-music.js','gx-campaign.js','campaign-data.js','perfhud.js','trystero.min.js','netroom.js','three.min.js','gx-glb.js','kit.js','data.js','engine.js','ai.js','tutscript.js','netstrip.js','texts.js','gameaudio.js','audio-data.js','sound.js','net.js','ui.js','media.js']
+     'trystero.min.js':os.path.join(SP,'net','trystero.min.js'),'netroom.js':os.path.join(SP,'net','netroom.js'),'gx-music.js':os.path.join(SP,'shell','gx-music.js'),'media.js':os.path.join(D,'media.js'),
+     'px.js':os.path.join(SP,'tidewake','fx','px.js'),'rain.js':os.path.join(SP,'tidewake','fx','rain.js'),'spray.js':os.path.join(SP,'tidewake','fx','spray.js'),'fx.js':os.path.join(SP,'tidewake','fx','fx.js')}
+ORDER = ['gx-scenario.js', 'scn.js', 'shell.js','gx-viewport.js','gx-skin.js','gx-help.js','gx-tutor.js','gx-music.js','gx-campaign.js','campaign-data.js','perfhud.js','trystero.min.js','netroom.js','three.min.js','gx-glb.js','kit.js','data.js','engine.js','ai.js','tutscript.js','netstrip.js','texts.js','gameaudio.js','audio-data.js','sound.js','net.js','px.js','rain.js','spray.js','fx.js','ui.js','media.js']
 TW_LOADER="""<script>/* painted sea + compass for the board paint (kit patch 9): TW_ART.water is set only when all four tiles loaded */
 window.TW_ART={};(function(){function ld(f,cb){var i=new Image();i.onload=function(){cb(i)};i.src='media/'+f+'.webp'}
 var W=[],n=0;['a','b','c','d'].forEach(function(k,j){ld('tile-water-'+k,function(i){W[j]=i;if(++n===4)TW_ART.water=W})});ld('compass-rose',function(i){TW_ART.compass=i})})();</script>"""
@@ -111,6 +112,7 @@ for f in ORDER:
     elif f=='campaign-data.js':
         import json;src='window.CAMPAIGN = '+json.dumps(json.load(open(os.path.join(SP,'tidewake','campaign.json'),encoding='utf-8')),separators=(',',':'),ensure_ascii=False)+';'
     else:src=rd(SRC.get(f,os.path.join(D,f)))
+    if f=='fx.js' and os.environ.get('TW_FX_ON')=='1':src=src.replace("on: q === '1'","on: q !== '0'")   # gate/test builds only: effects on without ?fx=1
     src=src.replace('</script','<\\/script')
     body=body.replace(tag,'<script>\n'+src+'\n</script>')
 out=h+body
