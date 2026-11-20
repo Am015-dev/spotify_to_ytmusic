@@ -227,6 +227,7 @@ function recap(pi, start, list) {
 function openTrade() {
   var pi = VT.sideToAct(G), p = G.pl[pi];
   UI.trade = UI.trade && UI.trade.turn === G.turn ? UI.trade : { turn: G.turn, q: { brick: 0, food: 0, tool: 0, wine: 0, cloth: 0 } };
+  if (!UI.trade.filled && UI.hints && UI.learn && UI.hintTrade) { UI.trade.filled = 1; UI.hintTrade.forEach(function (o) { UI.trade.q[o[0]] = o[1]; }); }   // learn mode: the suggested trade is already set up
   drawTrade();
 }
 function tradeOps() { var q = UI.trade.q, ops = []; D.GOODS.forEach(function (g) { if (q[g]) ops.push([g, q[g]]); }); return ops; }
@@ -282,6 +283,12 @@ function hintTarget() {
   if (m.t === 'play') return UI.sel === m.i ? $('#acts .btn') : $('#hand .cd[data-i="' + m.i + '"]');
   if (m.t === 'mv') return UI.selCol === m.k ? document.querySelector('.slothit[data-r="' + m.r + '"]') : document.querySelector('.colhit[data-k="' + m.k + '"]');
   if (m.t === 'build') return document.querySelector('.city[data-c="' + m.c + '"] .hit');
+  if (m.t === 'place') {
+    if (G.pend && G.pend.h === 'trib') { var lb = m.k === 'L' ? 'Cart' : 'Ship', bb = document.querySelectorAll('#acts .btn'); for (var j = 0; j < bb.length; j++) if (bb[j].textContent === lb) return bb[j]; return null; }
+    if (UI.sheet && UI.sheet.indexOf('New in') === 0) return document.querySelector('#sheet [data-k="' + m.k + '"]');
+    return document.querySelector('.city[data-c="' + m.c + '"] .hit');
+  }
+  if (m.t === 'take') return document.querySelector('#sheet [data-g="' + m.g + '"]');
   if (m.t === 'prov') return UI.selProv === m.p ? $('#acts .btn') : document.querySelector('.prov[data-p="' + m.p + '"] .hit');
   if (m.t === 'buy') return UI.sheet ? document.querySelector('#sheet .cd[data-s="' + m.s + '"]') : $('#acts .btn');
   if (m.t === 'done' && UI.sheet === 'Buy a card') return $('#mdone');
