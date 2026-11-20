@@ -193,7 +193,7 @@ function scoreWhy() {
 /* ---------- Play mode: one "Goal" card before turn 1 ---------- */
 function goalCard(then) {
   UI.lockModal = true;
-  modal('<h2>Goal: first across the line after ' + G.laps + ' lap' + (G.laps > 1 ? 's' : '') + '</h2><ul class="goal"><li><b>Gear = cards.</b> Gear 3 means you play 3 cards.</li><li><b>Add them up.</b> The total is how far you drive.</li><li><b>Corners burn heat.</b> Too fast for your heat? You spin.</li></ul>' + (G.sup ? '<p class="wxl"><b>Brake</b> = speed 0, safe in corners. <b>Burst</b> = speed 5, one big push. Stuck? Tap <b>Suggest</b>.</p>' : '') +
+  modal('<h2>Goal: first across the line after ' + G.laps + ' lap' + (G.laps > 1 ? 's' : '') + '</h2><ul class="goal"><li><b>Gear = cards.</b> Gear 3 means you play 3 cards.</li><li><b>Add them up.</b> The total is how far you drive.</li><li><b>Corners burn heat.</b> Too fast for your heat? You spin.</li><li><b>Heat</b> is your engine fuel: corners and boosts spend it.</li><li><b>Stress</b> is a gamble: it plays as a random card flipped.</li><li><b>Slipstream:</b> end behind a car to glide 2 free spaces.</li></ul>' + (G.sup ? '<p class="wxl"><b>Brake</b> = speed 0, safe in corners. <b>Burst</b> = speed 5, one big push. Stuck? Tap <b>Suggest</b>.</p>' : '') +
     (G.wx && G.wx !== 'dry' ? '<p class="wxl"><b>' + esc(WEATHER[G.wx].name) + ':</b> ' + esc(WEATHER[G.wx].txt) + '</p>' : '') + '<button class="big" id="goalB" style="width:100%">Start the race</button>');
   $('#mx').hidden = true; $('#goalB').onclick = function () { UI.lockModal = false; closeModal(); then(); };
 }

@@ -134,6 +134,7 @@ function helpBoot() {
     { title: 'Gear and cards', text: 'Your gear is how many cards you play. Shift one gear free, or two gears for 1 heat. The cards add up to your speed.' },
     { title: 'Corners', text: 'Each corner has a speed limit. Every point you go over costs 1 heat from your engine. Too little heat in your engine to pay means a spin-out.' },
     { title: 'Heat', text: 'Heat you pay goes to your discard pile and comes back as dead cards in your hand. Gears 1 and 2 send heat back to the engine.' },
+    { title: 'Stress', text: 'A Stress card is a gamble: it plays as a random card flipped.' },
     { title: 'Slipstream and boost', text: 'End next to or right behind a car to glide 2 more spaces. Boost: pay 1 heat to flip an extra speed card.' },
     { title: 'Upgrades', text: 'With Upgrades on you draft 3 cards before the race. They are played like speed cards and add a bonus.' }
   ];
