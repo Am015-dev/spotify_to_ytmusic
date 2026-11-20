@@ -37,7 +37,6 @@
  },
  "factions": {
   "nobility": {
-   "original_faction": "Nobility",
    "name_new": "The Gilded Line",
    "deck_total": 19,
    "deck_composition": "14 Basic (incl. Heir that starts in hand) + 5 Site-of-Power cards (advanced and HQ)",
@@ -258,7 +257,6 @@
    "faction_markers": 10
   },
   "clans": {
-   "original_faction": "Clans",
    "name_new": "The Tidebound",
    "deck_total": 19,
    "deck_composition": "14 Basic (incl. Heir that starts in hand) + 5 Site-of-Power cards (advanced and HQ)",
@@ -490,7 +488,6 @@
    "faction_markers": 10
   },
   "uprising": {
-   "original_faction": "Uprising",
    "name_new": "The Ember Guild",
    "deck_total": 19,
    "deck_composition": "14 Basic (incl. Heir that starts in hand) + 5 Site-of-Power cards (advanced and HQ)",
@@ -705,7 +702,6 @@
    "faction_markers": 10
   },
   "gathering": {
-   "original_faction": "Gathering",
    "name_new": "The Pale Vigil",
    "deck_total": 19,
    "deck_composition": "14 Basic (incl. Heir that starts in hand) + 5 Site-of-Power cards (advanced and HQ)",

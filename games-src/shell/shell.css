@@ -1,7 +1,7 @@
 /* ===== Board-first shell (shared by every game on the shelf) =====
    The page never scrolls. The board fills what the bar and the dock leave; the dock is in flow (never over the board);
    everything else opens in a closable popup (drawer). Games theme it with the --gx-* variables. */
-:root{--gx-bar-h:52px;--gx-dock-w:clamp(300px,30vw,420px);--gx-bg:#10151c;--gx-bar:#0b1016;--gx-panel:#f4ecd8;--gx-ink:#231a10;--gx-line:rgba(0,0,0,.25);--gx-accent:#e0a948;--gx-shadow:0 20px 60px rgba(0,0,0,.5);--gx-radius:14px}
+:root{--gx-bar-h:52px;--gx-dock-w:clamp(300px,28vw,520px);--gx-bg:#10151c;--gx-bar:#0b1016;--gx-panel:#f4ecd8;--gx-ink:#231a10;--gx-line:rgba(0,0,0,.25);--gx-accent:#e0a948;--gx-shadow:0 20px 60px rgba(0,0,0,.5);--gx-radius:14px}
 html.gx,html.gx body{height:100%;margin:0;overflow:hidden;overscroll-behavior:none}
 .gx-app{position:fixed;inset:0;display:grid;grid-template-rows:auto minmax(0,1fr);background:var(--gx-bg)}
 .gx-bar{min-height:var(--gx-bar-h);display:flex;align-items:center;gap:6px;padding:4px 10px;padding-top:calc(4px + env(safe-area-inset-top,0px));overflow-x:auto;overflow-y:hidden;scrollbar-width:none;position:relative;z-index:6}
@@ -31,8 +31,9 @@ html.gx,html.gx body{height:100%;margin:0;overflow:hidden;overscroll-behavior:no
 .gx-drawer-head h2{margin:0;font-size:1.15rem;flex:1;min-width:0}
 .gx-x{appearance:none;border:0;background:transparent;font-size:1.6rem;line-height:1;cursor:pointer;color:inherit;min-width:44px;min-height:44px;border-radius:10px}
 .gx-drawer-body{flex:1;min-height:0;overflow:auto;padding:10px 12px 16px;overscroll-behavior:contain}
-/* narrow screens: the dock becomes a sheet under the board (still in flow), the drawers slide up from the bottom */
-@media (max-width:999px){
+/* phones (portrait, or anything under 720 px wide): the dock becomes a sheet under the board (still in flow), the drawers slide up
+   from the bottom. Any landscape window >= 720 px wide (a 1366 laptop at 150 % = 910x512) keeps the side dock: board left at full height. */
+@media (max-width:719px),(max-width:999px) and (orientation:portrait){
   .gx-main{grid-template-columns:minmax(0,1fr);grid-template-rows:minmax(0,1fr) auto}
   .gx-app.gx-dock-min .gx-main{grid-template-columns:minmax(0,1fr)}
   .gx-dock{max-height:var(--gx-sheet-h,40dvh);border-radius:var(--gx-radius) var(--gx-radius) 0 0;padding-bottom:env(safe-area-inset-bottom,0px)}
@@ -45,5 +46,7 @@ html.gx,html.gx body{height:100%;margin:0;overflow:hidden;overscroll-behavior:no
   .gx-drawer.wide{width:auto}
   .gx-hide-narrow{display:none!important}
 }
-@media (min-width:1000px){.gx-grab{display:none}}
+@media (min-width:1000px),(min-width:720px) and (orientation:landscape){.gx-grab{display:none}}
+/* big screens: popups grow with the screen instead of staying a phone-width column */
+@media (min-width:1280px) and (orientation:landscape){.gx-drawer{width:min(640px,36vw)}.gx-drawer.wide{width:min(1180px,calc(100vw - 16px))}}
 @media (prefers-reduced-motion:reduce){.gx-drawer,.gx-scrim{transition:none}}
