@@ -110,7 +110,7 @@ function jkey(w){w=w.toLowerCase();for(const k of ['clash','herald','govern','co
   const scan=()=>{if(busy()||Date.now()<until)return;const root=document.querySelector('#tbturn'),act=document.querySelector('#act');const txt=((root&&!root.hidden?root.textContent:'')+' '+(act?act.textContent:''));
     for(const [k,re] of RE){if(seen[k]||!re.test(txt))continue;seen[k]=1;try{localStorage.setItem('tb_terms',JSON.stringify(seen))}catch(e){}
       const j=JARGON[k];if(!j)continue;if(!el){el=document.createElement('div');el.id='tbterm';el.setAttribute('data-help','');el.setAttribute('role','status');document.body.appendChild(el)}
-      el.innerHTML='<b>'+esc2(j[0])+':</b> '+esc2(j[1]);el.hidden=false;const rb=root&&root.getBoundingClientRect();el.style.top=Math.round((rb&&rb.bottom||60)+6)+'px';until=Date.now()+4200;clearTimeout(t);t=setTimeout(()=>{if(el)el.hidden=true},4000);break}};
+      el.innerHTML='<b>'+esc2(j[0])+':</b> '+esc2(j[1]);el.hidden=false;const rb=root&&root.getBoundingClientRect();el.style.top=Math.round((rb&&rb.bottom||60)+6)+'px';until=Date.now()+6200;clearTimeout(t);t=setTimeout(()=>{if(el)el.hidden=true},6000);break}};
   setInterval(scan,600);window.tbTermsSeen=()=>seen;window.tbTermsReset=()=>{seen={};try{localStorage.removeItem('tb_terms')}catch(e){}}})();
 function jargon(h){UI._jg=UI._jg||{};if(UI._jgG!==G){UI._jgG=G;UI._jg={}}const used={};
   return h.replace(JRE,w=>{const k=jkey(w);if(used[k]||(UI._jg[k]&&UI._jg[k]!==UI._jgKey))return w;used[k]=1;if(!UI._jg[k])UI._jg[k]=UI._jgKey;return '<button type="button" class="tbt-term" data-tbterm="'+k+'">'+w+'</button>'})}
