@@ -199,7 +199,7 @@ function t2Steps() {
   return [
     { id: 'buy', rule: 'buy', say: 'Fill the 3 gold gaps. Only 3 patches are for sale: tap this.', target: t2Offer(1), allow: function (a, k) { return a === 'offer' && k === 1; }, done: function () { return UI.sel === 1; } },
     { id: 'rotate', rule: 'rotate', say: 'Turn it to match the top gap. Tap Rotate.', target: function () { return $('[data-a=rot]'); }, allow: function (a) { return a === 'rot'; }, done: function () { return UI.o === T2.o1; } },
-    { id: 'place', rule: 'place', say: 'Drag the patch into the gold gap.', target: ghost, gap: 'h1', allow: function (a) { return a === 'rot' || a === 'flip'; }, done: function () { return t2AtGap(T2.h1); } },
+    { id: 'place', rule: 'place', say: 'Drag or tap the patch into the gold gap.', target: ghost, gap: 'h1', allow: function (a) { return a === 'rot' || a === 'flip'; }, done: function () { return t2AtGap(T2.h1); } },
     { id: 'pay', rule: 'pay', say: 'Sew it on. You pay its 4 buttons.', target: sew, gap: 'h1', allow: function (a) { return a === 'sew' && t2AtGap(T2.h1); }, done: function () { return G.owned[0].length >= 1; } },
     { id: 'time', rule: 'time', say: 'It cost 2 time: you moved 2. Furthest back plays next.', btn: 'Watch', target: function () { return $('#tutb .t2b'); },
       onBtn: function () { UI.tutAi = true; schedule(); }, done: function () { return T2.pressed && t2Mine(); } },
@@ -209,7 +209,7 @@ function t2Steps() {
     { id: 'leather2', rule: 'leather', say: 'Tap the single gold gap to sew it.', target: function () { return $$('#quilt .qc')[T2.hl[1] * 9 + T2.hl[0]]; }, allow: function (a, k) { var ok = a === 'leather' && k === T2.hl[1] * 9 + T2.hl[0]; if (a === 'leather' && !ok) { var tt = $('#tutb .t2t'); if (tt) tt.textContent = 'That gap is for your next patch. Tap the single square.'; } return ok; }, done: function () { return G.board[0][T2.hl[1] * 9 + T2.hl[0]] === 100 && t2Mine(); } },
     { id: 'bonus', rule: 'bonus', say: 'First to fill a 7x7 square gets +7. Tap this patch.', target: t2Offer(1), allow: function (a, k) { return a === 'offer' && k === 1; }, done: function () { return UI.sel === 1; } },
     { id: 'flip', rule: 'flip', say: 'Mirror it to match the last gap. Tap Flip.', target: function () { return $('[data-a=flip]'); }, allow: function (a) { return a === 'flip'; }, done: function () { return UI.o === T2.o2; } },
-    { id: 'place2', rule: 'bonus', say: 'Drag it into the last gold gap.', target: ghost, gap: 'h2', allow: function (a) { return a === 'rot' || a === 'flip'; }, done: function () { return t2AtGap(T2.h2); } },
+    { id: 'place2', rule: 'bonus', say: 'Drag or tap it into the last gold gap.', target: ghost, gap: 'h2', allow: function (a) { return a === 'rot' || a === 'flip'; }, done: function () { return t2AtGap(T2.h2); } },
     { id: 'sew2', rule: 'bonus', say: 'Sew it on: your 7x7 square is full, +7.', target: sew, gap: 'h2', allow: function (a) { return a === 'sew' && t2AtGap(T2.h2); }, done: function () { return G.bonus === 0 && t2Mine(); } },
     advStep('end', 'end', 'Game ends when both reach the end. Keep tapping Advance.', function () { return G.over; })
   ];

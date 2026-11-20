@@ -77,12 +77,12 @@ function swShort(s) { var n = nameOf(s); return UI.mode !== 'hot' && s === 0 ? '
 function whyDot(s) { return h('i.trdot', { style: 'background:' + (s === 0 ? 'var(--me)' : 'var(--opp)') }); }
 function turnWhy() { // F2: every turn, one line: whose turn and why (the token further back plays)
   if (!G || G.over) return null; var s = swWho(G); if (s < 0) return null; var o = 1 - s, me = UI.mode !== 'hot' && isHuman(s), nm = swShort(s), a = G.pos[s], b = G.pos[o], lg = G.log || [], again = lg.length && lg[lg.length - 1][0] === s, txt;
-  var who = me ? 'your turn' : nm + '\u2019s turn'; if (again) who += ' again';
-  if (G.pend) txt = (me ? 'You passed' : nm + ' passed') + ' a leather spot: free 1\u00D71';
-  else if (b >= SW.TRACK) txt = swShort(o) + ' has finished: ' + who;
-  else if (a < b) txt = (me ? 'You\u2019re behind' : nm + ' is behind') + ' (' + a + ' vs ' + b + '): ' + who;
+  var who = me ? 'your turn' : nm + ' plays'; if (again) who += ' again'; var vs = UI.wide ? ' (' + a + ' vs ' + b + ')' : ''; /* F2 cold play: short enough for the phone prompt row (the tags show the numbers) */
+  if (G.pend) txt = (me ? 'You passed' : nm + ' passed') + ' leather: free 1\u00D71';
+  else if (b >= SW.TRACK) txt = swShort(o) + ' finished: ' + who;
+  else if (a < b) txt = (me ? 'You\u2019re behind' : nm + ' is behind') + vs + ': ' + who;
   else if (!lg.length) txt = 'Both on ' + a + ': ' + (me ? 'you start' : nm + ' starts');
-  else txt = 'Level on ' + a + ': ' + (me ? 'you' : nm) + ' arrived last, so ' + who;
+  else txt = (me ? 'On top' : nm + ' on top') + ' at ' + a + ': ' + who;
   return txt; }
 function turnWhyEl() { var txt = turnWhy(); if (!txt) return null; var s = swWho(G); return h('div#trwhy', { 'data-a': 'trhelp', role: 'button', tabindex: '0', 'aria-label': txt + '. Tap for the time track.' }, whyDot(s), h('span', txt)); }
 function timePreview() { // F2: before you commit: where this patch's time puts you, and who plays next
