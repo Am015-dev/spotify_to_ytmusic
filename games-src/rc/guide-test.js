@@ -23,7 +23,8 @@ const sleep=ms=>new Promise(r=>setTimeout(r,ms));
     return {fin:!!document.querySelector('#coachb.guide[data-kind=final]:not([hidden])'),step:b&&b.dataset.step,rule:b&&b.dataset.rule,say:b&&(b.querySelector('.ct')||{}).textContent,ring:rr&&[rr.left+rr.width/2,rr.top+rr.height/2],st:PHO.st,over:!!(G&&G.over)}});
   if(s.fin)break;if(s.over){probs.push('game over during the tutorial');break}
   if(s.step&&s.ring){
-   if(!order.includes(s.step)){order.push(s.step);says[s.step]=[s.rule,s.say];await sleep(350);if(s.step==='wx1'){const f=await p.evaluate(()=>G.res.food);if(!(f>0))probs.push('Food '+f+' at the end of day 3: g3 did not gather food');else console.log('day 3 end: food '+f)}if(SHOTS){shotN++;await p.screenshot({path:path.join(SHOTS,'tut-'+shotN+'.png')})}}
+   if(!order.includes(s.step)){order.push(s.step);says[s.step]=[s.rule,s.say];await sleep(350);if(s.step==='wx1'){const f=await p.evaluate(()=>{const e=document.querySelector('#bfres .tk:nth-child(2)');const m=e&&(e.textContent||'').match(/-?\d+/);return {shown:m?+m[0]:null,txt:e&&e.textContent.trim(),beat:(()=>{try{return UI.beats[storyIdx()].kind}catch(err){return null}})(),eng:G.res.food}});   // R94: the food the day-3 summary SHOWS (G.res is already past day 4's production)
+     if(f.beat!=='daysum')probs.push('wx1 is not on the day-3 summary: '+f.beat);if(!(f.shown>0)){probs.push('Food '+f.shown+' on screen at the end of day 3 ('+f.txt+')');if(process.env.GLOG)console.log(await p.evaluate(()=>G.log.slice(0,90).map(l=>l.t).join('\n')))}else console.log('day 3 end: food on screen '+f.shown+' (engine '+f.eng+')');if(process.env.GLOG)console.log(await p.evaluate(()=>G.log.slice(0,90).map(l=>l.t).join('\n')))}if(SHOTS){shotN++;await p.screenshot({path:path.join(SHOTS,'tut-'+shotN+'.png')})}}
    if(!wrongDone&&s.step==='explore'){wrongDone=true;const n0=await p.evaluate(()=>G.plan.acts.reduce((a,x)=>a+x.pw.length,0));await p.touchscreen.tap(30,H-40);await sleep(400);await p.touchscreen.tap(W/2,140);await sleep(400);
      const n1=await p.evaluate(()=>({tut:!!G.tut,modal:UI.modal,n:G.plan.acts.reduce((a,x)=>a+x.pw.length,0),step:GXGUIDE.step,pop:!!(PHO.pop&&PHO.pop.k!=='tile')}));if(n1.n!==n0||n1.step!=='explore')probs.push('a wrong tap changed the game: '+JSON.stringify(n1))}
    await p.touchscreen.tap(s.ring[0],s.ring[1]);await sleep(500)}
@@ -32,6 +33,7 @@ const sleep=ms=>new Promise(r=>setTimeout(r,ms));
  const r=await p.evaluate(()=>({rules:GXGUIDE.rules,seen:GXGUIDE.seen,steps:GXGUIDE.steps}));
  const shownRules=[...new Set(order.map(o=>says[o][0]))];
  for(const ru of r.rules)if(!shownRules.includes(ru))probs.push('rule step never shown: '+ru);
+ for(const st of r.steps)if(!st.skip&&!order.includes(st.id))probs.push('step never shown: '+st.id);   // R94: wx1 was passed over once at 375x667
  const must=['goal','death','phases','event','morale','production','pawns','explore','dice','sure','build','shelter','invention','action','weather','night','wounds','adventure','threat','gather','camp','rest','hunt','roof','pile','fire','real'];
  for(const m of must)if(!r.rules.includes(m))probs.push('rule missing from the step list: '+m);
  for(const st of r.steps){const n=st.say.replace(/[^A-Za-z0-9'’?✊]+/g,' ').trim().split(' ').filter(Boolean).length;if(n>12)probs.push(st.id+' has '+n+' words')}

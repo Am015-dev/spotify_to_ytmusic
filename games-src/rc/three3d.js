@@ -567,7 +567,7 @@ function placeLabels(){if(!V3.lab)return;const cv=V3.r.domElement;const w=cv.cli
   for(const id in V3.lab){const el=V3.lab[id];if(el.hidden)continue;const p=hexPos(MAP[id].q,MAP[id].r);(V3.ph?v.set(p.x-1.0,HEXH+.2,p.z-1.0):v.set(p.x,HEXH+.2,p.z+HEXR*.55)).project(V3.cam);
     if(v.z>1){el.style.opacity=0;continue}el.style.opacity='';L.push({el,x:(v.x+1)/2*w,y:(1-v.y)/2*h,w:el._w||(el._w=el.offsetWidth),h:el._h||(el._h=el.offsetHeight)})}
   // G6 review: on a phone two pills ("Mountains" "8 Camp") must never run into each other: push the lower one down (labels sorted top to bottom)
-  if(V3.ph){L.sort((a,b)=>a.y-b.y);for(let i=0;i<L.length;i++){const a=L[i];for(let j=0;j<i;j++){const b=L[j];if(Math.abs(a.x-b.x)<(a.w+b.w)/2+3&&Math.abs(a.y-b.y)<(a.h+b.h)/2+2)a.y=b.y+(a.h+b.h)/2+2}}}
+  if(V3.ph){L.sort((a,b)=>a.y-b.y);for(let i=0;i<L.length;i++){const a=L[i];for(let j=0;j<i;j++){const b=L[j];if(Math.abs(a.x-b.x)<(a.w+b.w)/2+14&&Math.abs(a.y-b.y)<(a.h+b.h)/2+3)a.y=b.y+(a.h+b.h)/2+4}}}   // R94: "7 Hills" and "8 Camp" side by side read as one pill: keep 14 px apart or step down
   for(const o of L){const tr=`translate(${o.x.toFixed(1)}px,${o.y.toFixed(1)}px) translate(-50%,-50%)`;if(o.el._tr!==tr){o.el._tr=tr;o.el.style.transform=tr}}}
 function tween(obj,k,to,dur,done){V3.tweens.push({obj,k,from:obj[k],to,t:0,dur,done})}
 // a little dust puff where a tile lands or a pawn arrives

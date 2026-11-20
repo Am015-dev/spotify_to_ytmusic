@@ -157,10 +157,10 @@ function startHtml(){const o=UI.setup;let saved=null;try{saved=localStorage.getI
   return `<div class="mbox wide start"><h2>Shipwreck Isle</h2><p class="lede">Shipwrecked. Work together, stay alive, and get rescued.</p>
    <div class="mb"><button class="btn go big" data-a="start" ${o.chars.length?'':'disabled'}>${saved?'New game ▶':'Play ▶'}</button>${saved?`<button class="btn" data-a="continue">Continue</button>`:''}</div>
    ${typeof tutBlock==='function'?tutBlock('top'):''}<div class="mb"><button class="btn" data-a="story">📖 Story chapters</button></div>
-   <details class="quick setup" open><summary>Game setup: ${esc(SCENARIOS[o.scen].n)} · ${o.chars.length} player${o.chars.length>1?'s':''} · ${o.diff==='easy'?'Easy island':o.diff==='hard'?'Hard':'Normal'}</summary>
+   <details class="quick setup" open><summary>Game setup: ${esc(SCENARIOS[o.scen].n)} · ${o.chars.length} player${o.chars.length>1?'s':''} · ${o.diff==='easy'?'Easier':o.diff==='hard'?'Harder':'Normal'}</summary>
    ${seg('Scenario',SCEN_ORDER.map(k=>['scen',k,SCENARIOS[k].n,o.scen===k]))}
    ${seg('Players',[1,2,3,4].map(n=>['np',n,String(n),o.chars.length===n]))}
-   ${seg('Difficulty',[['easy','Easy island'],['standard','Normal'],['hard','Hard']].map(([k,n])=>['diff',k,n,o.diff===k]))}${o.diff!=='easy'?`<p class="diffwarn" role="note">⚠ ${o.diff==='hard'?'Hard':'Normal'} is hard: the full rules, and ✨ hints won’t carry you.</p>`:''}</details>
+   ${seg('Difficulty',[['easy','Easier'],['standard','Normal'],['hard','Harder']].map(([k,n])=>['diff',k,n,o.diff===k]))}${o.diff!=='easy'?`<p class="diffwarn" role="note">⚠ ${o.diff==='hard'?'Harder':'Normal'}: no dog, fewer starting items. Easier suits a first game.</p>`:''}</details>
    <details class="morep"><summary>Play online with friends</summary>${typeof tutBlock==='function'?tutBlock('after'):''}${typeof onlineBlock==='function'?onlineBlock():''}</details></div>`}
 function cardsHtml(){const t=UI.ctab||'events';const q=(UI.cq||'').toLowerCase();const tabs=[['events','Events'],['adv','Adventures'],['mys','Mysteries'],['beasts','Beasts'],['inv','Inventions'],['items','Items'],['tokens','Discovery tokens'],['tiles','Island tiles'],['scen','Scenarios']];
   let list=[];

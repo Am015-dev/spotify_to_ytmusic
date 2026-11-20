@@ -48,6 +48,7 @@ const GUIDE_STEPS=[
  {id:'go',day:1,rule:'action',when:gPlan,kind:'act',say:'Every pawn has a job. Tap Start day.',tgt:()=>gdq('#bf [data-a=go]'),done:()=>!gPlan()},
  {id:'weather',day:1,rule:'weather',beat:'weather',kind:'act',say:'Weather: each cloud above your roof ruins food and wood.',tgt:gNext,done:()=>gBeat()!=='weather'},
  {id:'eat',day:1,rule:'night',beat:'night',kind:'info',say:'Night: each castaway eats 1 food, or takes 2 wounds.',tgt:()=>gRes(2)},
+ {id:'spoil',day:1,rule:'night',beat:'night',kind:'info',say:'Leftover fresh food spoils overnight. Dry food 🥫 keeps.',tgt:()=>gRes(2)},
  {id:'outside',day:1,rule:'night',beat:'night',kind:'info',say:'No shelter? Everyone takes 1 wound sleeping outside.',tgt:()=>gRes(5)},
  {id:'wounds',day:1,rule:'wounds',beat:'daysum',kind:'info',say:'Wounds use up life. Life at zero means death.',tgt:()=>gRes(4)},
  {id:'event',day:2,rule:'event',beat:'event',kind:'info',say:'An event card. Its effect happens right now.',tgt:()=>gdq('#bfcard')},
@@ -58,8 +59,8 @@ const GUIDE_STEPS=[
  {id:'t3',day:2,rule:'threat',when:gPlan,kind:'act',say:'Dig a Drain with the Shovel. The threat is gone.',tgt:()=>gRow('threat'),done:()=>!!gAct('threat')},
  {sel:'c1_0',id:'g2',day:2,rule:'gather',when:gPlan,kind:'act',say:'Tap the land you found yesterday.',tgt:()=>gGlow(gExp()),done:()=>gPop()===gExp()},
  {id:'g3',day:2,rule:'gather',when:gPlan,skip:()=>!!gAct('gather'),kind:'act',say:'Gather food. Food and wood arrive after all jobs.',tgt:()=>{let f=null;for(const e of document.querySelectorAll('#ppop .bfr[data-place]')){let o=null;try{o=JSON.parse(decodeURIComponent(e.dataset.place))}catch(err){}if(!o||o.type!=='gather'||!o.tgt)continue;let s=null;try{s=srcs(o.tgt.pos).find(x=>x.i===o.tgt.i)}catch(err){}if(s&&s.s!=='wood')f=f||e}return f||gRow('gather')},done:()=>!!gAct('gather')},
- {sel:'c1_1',id:'r2',day:2,rule:'rest',when:gPlan,kind:'act',say:'Tap the camp.',tgt:()=>gGlow(gCamp()),done:()=>gPop()===gCamp()},
- {id:'r3',day:2,rule:'rest',when:gPlan,kind:'act',say:'Rest heals 1 wound.',tgt:()=>gRow('rest'),done:()=>!!gAct('rest')},
+ {sel:'c1_1',id:'g4',day:2,rule:'gather',when:gPlan,kind:'act',say:'Tap that land again. Two pawns make the food sure.',tgt:()=>gGlow(gExp()),done:()=>{const a=gAct('gather');return gPop()===gExp()||!!a&&a.pw.length>=2}},
+ {id:'g5',day:2,rule:'gather',when:gPlan,skip:()=>{const a=gAct('gather');return !!a&&a.pw.length>=2},kind:'act',say:'Join the food gather. Two pawns never roll.',tgt:()=>{const a=gAct('gather');if(a){for(const e of document.querySelectorAll('#ppop .bfr[data-place]')){let o=null;try{o=JSON.parse(decodeURIComponent(e.dataset.place))}catch(err){}if(o&&o.type==='gather'&&o.tgt&&a.tgt&&o.tgt.pos===a.tgt.pos&&o.tgt.i===a.tgt.i)return e}}return gRow('gather')},done:()=>{const a=gAct('gather');return !!a&&a.pw.length>=2}},
  {sel:'c0_1',id:'h2',day:2,rule:'hunt',when:gPlan,kind:'act',say:'A beast was spotted. Tap the camp. Hunts start there.',tgt:()=>gGlow(gCamp()),done:()=>gPop()===gCamp()},
  {id:'h3',day:2,rule:'hunt',when:gPlan,kind:'act',say:'Hunt. Each point your weapon is short costs a wound.',tgt:()=>gRow('hunt'),done:()=>!!gAct('hunt')||(()=>{try{return G.plan.acts.some(a=>a.type==='hunt'&&a.pw.length)}catch(e){return false}})()},
  {sel:'FRI',id:'h5',day:2,rule:'hunt',when:gPlan,kind:'act',say:'A hunt needs 2 pawns: Friday joins. Tap the camp.',tgt:()=>gGlow(gCamp()),done:()=>{const a=gAct('hunt');return gPop()===gCamp()||!!a&&a.pw.length>=2}},
@@ -76,27 +77,29 @@ const GUIDE_STEPS=[
  {id:'f2',day:3,rule:'fire',when:gPlan,kind:'act',say:'Build the Fire. The mountains you found allow it.',tgt:()=>gRow('build','fire')||gGlow(gCamp()),done:()=>!!gAct('build','fire')},
  {sel:'c1_1',id:'f3',day:3,rule:'fire',when:gPlan,kind:'act',say:'Make the Fire sure: tap the camp again.',tgt:()=>gGlow(gCamp()),done:()=>{const a=gAct('build','fire');return gPop()===gCamp()||!!a&&a.pw.length>=2}},
  {id:'f4',day:3,rule:'fire',when:gPlan,kind:'act',skip:()=>{const a=gAct('build','fire');return !!a&&a.pw.length>=2},say:'Join the Fire. Fire plus 15 wood by day 10-12 wins.',tgt:()=>gRow('build','fire'),done:()=>{const a=gAct('build','fire');return !!a&&a.pw.length>=2}},
- {id:'x4',day:3,rule:'roll',when:gPlan,kind:'act',say:'Tap ✨ to give the other pawns jobs.',tgt:()=>gdq('#bf [data-a=suggest]'),done:()=>{try{return !planProblems().length}catch(e){return false}}},
+ {sel:'FRI',id:'r2',day:3,rule:'rest',when:gPlan,kind:'act',say:'Friday rests today. Tap the camp.',tgt:()=>gGlow(gCamp()),done:()=>gPop()===gCamp()||!!gAct('rest')},
+ {id:'r3',day:3,rule:'rest',when:gPlan,skip:()=>!!gAct('rest'),kind:'act',say:'Rest heals 1 wound.',tgt:()=>gRow('rest'),done:()=>!!gAct('rest')},
+ {id:'x4',day:3,rule:'roll',when:gPlan,skip:()=>{try{return !planProblems().length}catch(e){return true}},kind:'act',say:'Tap ✨ to give the other pawns jobs.',tgt:()=>gdq('#bf [data-a=suggest]'),done:()=>{try{return !planProblems().length}catch(e){return false}}},
  {id:'go3',day:3,rule:'roll',when:gPlan,kind:'act',say:'Tap Start day and watch the dice.',tgt:()=>gdq('#bf [data-a=go]'),done:()=>!gPlan()},
  {id:'roll',day:3,rule:'roll',beat:'act',when:gDiceBeat,kind:'info',say:'The dice: ✔ success, 🩸 a wound, ❓ an adventure.',tgt:()=>null},
  {id:'advc',day:3,rule:'adventure',beat:'adventure',kind:'info',say:'The ? token drew this adventure card. It happens now.',tgt:()=>gdq('#bfcard')},
- {id:'wx1',day:3,rule:'weather',beat:'daysum',kind:'info',say:'Normal island, days 4-6: a rain die. Build a roof first.',tgt:()=>null},
- {id:'wx2',day:3,rule:'weather',beat:'daysum',kind:'info',say:'Normal island, day 7+: snow costs wood and counts against the roof.',tgt:()=>null},
- {id:'wx3',day:3,rule:'weather',beat:'daysum',kind:'info',say:'Normal island, day 7+: animals take food, palisade, or fight (strength 3).',tgt:()=>null},
+ {id:'wx1',day:3,rule:'weather',beat:'daysum',kind:'info',say:'From day 4 a rain die rolls. Build a roof first.',tgt:()=>null},
+ {id:'wx2',day:3,rule:'weather',beat:'daysum',kind:'info',say:'From day 7 snow too: it burns wood and needs roof.',tgt:()=>null},
+ {id:'wx3',day:3,rule:'weather',beat:'daysum',kind:'info',say:'Day 7 on, animals take food, palisade, or fight (strength 3).',tgt:()=>null},
  {id:'end',day:3,rule:'real',beat:'daysum',kind:'info',say:'Now you know the rules. Play on, or start a real game!',tgt:()=>null}
 ];
 const GUIDE_RULES=[...new Set(GUIDE_STEPS.map(s=>s.rule))];
-window.GXGUIDE={get running(){return GUIDE.on},get step(){const s=GUIDE_STEPS[GUIDE.i];return s?s.id:null},get seen(){return GUIDE.seen.slice()},rules:GUIDE_RULES,steps:GUIDE_STEPS.map(s=>({id:s.id,rule:s.rule,say:s.say})),get done(){return GUIDE.done}};
+window.GXGUIDE={get running(){return GUIDE.on},get step(){const s=GUIDE_STEPS[GUIDE.i];return s?s.id:null},get seen(){return GUIDE.seen.slice()},rules:GUIDE_RULES,steps:GUIDE_STEPS.map(s=>({id:s.id,rule:s.rule,say:s.say,skip:!!s.skip})),get done(){return GUIDE.done}};
 function gEl(){let e=gdq('#coachb');if(!e){coachEl();e=gdq('#coachb')}return e}
 function gRing(){let r=gdq('#tutring');if(!r){r=document.createElement('div');r.id='tutring';r.setAttribute('aria-hidden','true');document.body.appendChild(r)}return r}
 const gCur=()=>GUIDE.on?GUIDE_STEPS[GUIDE.i]:null;
 // is the current step on screen (its scene or moment has come)?
 const GORD={dawn:0,event:1,threat:1,morning:2,prod:3,plan:4,go:5,act:5,adventure:5,mystery:5,fight:5,finds:6,weather:7,night:8,daysum:9};
-function gDay(){try{if(PHO.st==='story'){for(let i=storyIdx();i>=0;i--){const b=UI.beats[i];if(b&&b.kind==='dawn'&&b.data)return b.data.round}}return G.round}catch(e){return 0}}
+function gDay(){try{if(PHO.st==='story'){for(let i=storyIdx();i>=0;i--){const b=UI.beats[i];if(b&&b.kind==='dawn'&&b.data)return GUIDE.day=b.data.round}if(GUIDE.day)return GUIDE.day}return GUIDE.day=G.round}catch(e){return GUIDE.day||0}}   // R94: between two scenes (no beat on screen) the day is the story's last day, never G.round (the engine is a day ahead)
 const gNow=()=>gPlan()?'plan':gBeat();
 function gReady(s){if(!s||!G||G.over)return false;if(UI.modal)return false;if(gDay()!==s.day)return false;if(s.beat)return gBeat()===s.beat&&(!s.when||!!s.when());if(s.when){let ok=false;try{ok=!!s.when()}catch(e){}if(!ok)return false}return true}
 // a scene step whose scene has already gone by (or never shows, like calm weather) is passed over
-function gPassed(s){if(!s.beat||GUIDE.shown===s.id)return false;const d=gDay();if(d>s.day)return true;const n=gNow();return d===s.day&&n!=null&&GORD[n]!=null&&GORD[n]>GORD[s.beat]}
+function gPassed(s){if(!s.beat||GUIDE.shown===s.id)return false;try{if(PHO.st==='story'&&storyIdx()<0)return false}catch(e){}const d=gDay();if(d>s.day)return true;const n=gNow();return d===s.day&&n!=null&&GORD[n]!=null&&GORD[n]>GORD[s.beat]}
 function gTarget(s){let el=null;try{el=s.tgt&&s.tgt()}catch(e){el=null}if(el&&el.getBoundingClientRect){const r=el.getBoundingClientRect();if(r.width>2&&r.height>2&&!(el.closest&&el.closest('[hidden]')))return el}return null}
 // the scene a step explains waits on screen until the step is done (bf.js asks tutClaimed before auto-advancing a scene)
 function tutClaimed(i){if(!GUIDE.on)return false;const s=gCur();if(!s)return false;if(GUIDE.shown===s.id)return true;
@@ -150,14 +153,16 @@ function gGate(ev){if(!GUIDE.on||!GUIDE.shown)return;const s=gCur();if(!s||GUIDE
 ['pointerdown','pointerup','mousedown','mouseup','click','touchend'].forEach(k=>window.addEventListener(k,gGate,true));
 document.addEventListener('click',ev=>{const b=ev.target.closest&&ev.target.closest('#coachb [data-guide]');if(!b)return;const k=b.dataset.guide;ev.stopPropagation();
   if(k==='next'){const s=gCur();if(s&&s.kind==='info')gAdvance()}else if(k==='keep'||k==='new'||k==='menu')guideEnd(k)},true);
-function gFinish(){GUIDE.done=true;clearInterval(GUIDE.t);GUIDE.t=0;gHide();const e=gEl();e.classList.add('guide');e.hidden=false;e.dataset.kind='final';e.dataset.rule='real';e.style.top='96px';e.style.bottom='auto';
+function gFinish(){GUIDE.done=true;clearInterval(GUIDE.t);GUIDE.t=0;gHide();{const k=gdq('#coachskip');if(k)k.remove()}   // R94: Skip tutorial goes once the tutorial is over
+  const e=gEl();e.classList.add('guide');e.hidden=false;e.dataset.kind='final';e.dataset.rule='real';e.style.bottom='auto';
+  {let y=96;for(const q of document.querySelectorAll('#bfres,#bftop,.gx-bar,#topbar')){const r=q.getBoundingClientRect();if(r.height>0&&r.top<innerHeight/3)y=Math.max(y,r.bottom+10)}e.style.top=Math.round(y)+'px'}   // R94: the end card sits under the resource bar, never over it
   e.innerHTML='<b class="cn">You know the rules!</b><ul class="walk"><li>Fire and 15 wood by day 12.</li><li>Keep everyone fed, sheltered and alive.</li></ul><div class="cbs"><button type="button" class="cb pri" data-guide="keep">Keep playing</button><button type="button" class="cb" data-guide="new">New game</button></div>';
   try{coachMark({done:1,open:0,step:0})}catch(err){}try{GXT.markDone&&GXT.markDone(TUT_GAME)}catch(err){}}
 function guideEnd(k){const e=gdq('#coachb');if(e){e.hidden=true;e.classList.remove('guide')}guideStop();
-  if(k==='keep'){try{delete G.tut;delete G.coach;BF.ghostDone=TUT_KEEP.ghost!=null?TUT_KEEP.ghost:BF.ghostDone;refresh()}catch(err){}return}
+  if(k==='keep'){try{delete G.tut;delete G.coach;delete G.wxT;BF.ghostDone=TUT_KEEP.ghost!=null?TUT_KEEP.ghost:BF.ghostDone;refresh()}catch(err){}return}
   tutLeave();if(k==='new'){try{UI.guide.on=false;UI.cmpDef=null;beginGame()}catch(err){openStart()}}else openStart()}
 function guideStop(){GUIDE.on=false;clearInterval(GUIDE.t);GUIDE.t=0;gHide();const k=gdq('#coachskip');if(k)k.remove();try{if(GUIDE.tips!=null)GXH.setEnabled(GUIDE.tips)}catch(e){}GUIDE.tips=null}
-function guideStart(){GUIDE.on=true;GUIDE.i=0;GUIDE.seen=[];GUIDE.shown=null;GUIDE.done=false;GUIDE.exp=null;GUIDE.seeded=0;
+function guideStart(){GUIDE.on=true;GUIDE.i=0;GUIDE.seen=[];GUIDE.shown=null;GUIDE.done=false;GUIDE.exp=null;GUIDE.exp2=null;GUIDE.seeded=0;GUIDE.day=0;
   try{GUIDE.tips=GXH.enabled();GXH.setEnabled(false);GXH.hide()}catch(e){}
   tutBegin();G.coach=1;try{coachMark({open:1,done:0,skipped:0})}catch(e){}
   const sk=coachSkipEl();sk.addEventListener('click',()=>guideStop());

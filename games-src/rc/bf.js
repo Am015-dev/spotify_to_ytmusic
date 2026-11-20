@@ -245,8 +245,10 @@ BF.rain=function(pos,r,s,storm){const ov=q('#bfov');if(!ov||!BF.on)return;const 
 const CARDICON={event:'🎴',threat:'⏳',adventure:'🧭',mystery:'❓',fight:'⚔️'};const TYICON={book:'📖',build:'🔨',explore:'🧭',gather:'🌿',wreck:'⚓'};
 BF.cardClear=function(){const c=q('#bfcard');if(c)c.remove()};
 // R8 review: own-plan games died sleeping outside while the summary said "on track": name the dangers for the coming night first
+// R94: the day summary comes after the night, so its food line is about TOMORROW night: the dry food kept plus the camp's morning production
+function prodFoodSoon(){try{const t=campTile(),m=G.map[G.camp.pos];if(!t||m.fog)return 0;let f=0;t.src.forEach((x,i)=>{if(!m.exh[i]&&x!=='wood')f++});if(m.tok.c_food)f++;if(m.tok.c_food2)f++;return f}catch(e){return 0}}
 function dangerLines(st){if(!st)return [];return withState(st,()=>{const o=[];if(!hasShelter())o.push('No shelter: everyone takes a wound each night. Build one (2 wood).');
-  const need=eatersNeed(),have=food();if(have<need)o.push(`Food ${have} of ${need} for tonight: the hungry take 2 wounds each.`);
+  const need=eatersNeed(),have=food()+prodFoodSoon();if(have<need)o.push(`Tomorrow: food ${have} of ${need} after the camp’s haul. Gather food.`);
   const low=living().filter(c=>!c.npc&&!c.out&&CHARS[c.k].die-c.w<=3);for(const c of low)o.push(`${c.nm} has ${CHARS[c.k].die-c.w} life left: rest heals 1.`);return o.slice(0,2)})}
 // R3 review: the day's summary is one card and one tap: what changed, the goal's pace, and tomorrow's event card (already drawn)
 BF.sumCard=function(i,ov){const b=UI.beats[i];let ch=[],pc=null,nx='';try{const x=daySumData(i);ch=x.A&&x.B?deltas(x.A,x.B).slice(0,7):[]}catch(e){}

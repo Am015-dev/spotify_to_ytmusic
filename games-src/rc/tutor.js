@@ -9,12 +9,10 @@ const tutOn=()=>false;   // the spotlight tutorial is gone; the coached game (be
 // the staged deal: called by newGame before the first scene. Day 1 has no event card; day 2 turns over Chill Rain (a rain cloud and a threat).
 // Learn to play is a gentler island (same rules, kinder deal): the mountains for Fire come second, the mildest event cards, weak beasts first,
 // a little more food and wood, and no weather dice (Chill Rain still brings a cloud on day 2 to teach the roof). A player who follows ✨ Suggest wins.
-// "Easy island" (the default first real game, and Easy afterwards): easyDeal below, a gentler but real game. Normal keeps the full rules.
-// Easy island is a real challenge (owner review G6: the old kind deal won every time with life never under 8): full adventure and mystery decks,
-// an event deck of the milder cards with newGame's book / "?" split (Easy: 4 + 8, so adventures come up every game), the friendly tile order
-// (mountains for the fire come early), no weather dice. Knobs: harsh (swap out the N harshest), wx 2 + rain/snow (gentle weather table).
-// Measured (easy-sim.js, 80 games, ✨ plan every day): ✨ pick on every choice 56 rescued (70%), first option on every choice 47 (59%). The pile starts at 3 (wreck timber).
-var EASYK=typeof EASYK!=='undefined'?EASYK:{harsh:0,tiles:1,res:4,wx:0,mild:14,beasts:1,pile:3};
+// "Easier" (the default first real game): the rulebook's own easier variant and nothing else (R94: rules identical to the original).
+// newGame does it all: the dog, 4 starting items, 2 fewer book events (2 more "?" events). Weather dice, decks, tile order and resources stay as printed.
+// easyDeal keeps its old house knobs only for experiments (easy-sim.js EASYK='{...}'); every knob is off by default.
+var EASYK=typeof EASYK!=='undefined'?EASYK:{harsh:0,tiles:0,res:0,wx:1,mild:0,beasts:0,pile:0};
 function easyDeal(){if(G.scen!=='marooned'||G.cmp)return;if(EASYK.pile&&G.sc&&!G.sc.pile){G.sc.pile=EASYK.pile;G.easyPile=EASYK.pile;lg('Easy island: timber from the wreck starts the signal pile at '+EASYK.pile+'/15.','good')}if(EASYK.tiles)G.tileDeck=[4,5,10,6,3,1,2,7,9,11];if(EASYK.res){G.res.food=Math.max(EASYK.res,G.res.food);G.res.wood=Math.max(EASYK.res,G.res.wood)}if(!EASYK.wx)G.wxT={};else if(EASYK.wx===2){G.wxT={};for(let r=EASYK.rain||4;r<=12;r++)G.wxT[r]=r>=EASYK.snow?['rain','snow']:['rain']}
   const harm=k=>{try{return opsValue(CARD[k].ev||[])+opsValue(CARD[k].te||[])}catch(e){return 0}};const book=k=>CARD[k].icon==='book';
   const harsh=new Set([...new Set(EVENTS.map(e=>e.k))].sort((a,b)=>harm(a)-harm(b)).slice(0,EASYK.harsh));
@@ -22,7 +20,8 @@ function easyDeal(){if(G.scen!=='marooned'||G.cmp)return;if(EASYK.pile&&G.sc&&!G
   G.ev.deck=G.ev.deck.map(k=>{if(!harsh.has(k))return k;const i=spare.findIndex(x=>book(x)===book(k));return i<0?k:spare.splice(i,1)[0]});
   if(EASYK.mild){const all=[...new Set(EVENTS.map(e=>e.k))].sort((a,b)=>harm(b)-harm(a)),n=G.ev.deck.length,nb=G.ev.deck.filter(book).length,half=Math.ceil(EASYK.mild/2);   // the mildest cards, same book / "?" split as the real deck
     const pick=(f,k,m)=>shuffle(all.filter(f).slice(0,m)).slice(0,k);G.ev.deck=shuffle(pick(book,nb,Math.max(nb,half)).concat(pick(k=>!book(k),n-nb,Math.max(n-nb,half))))}if(EASYK.beasts)G.beast.sort((a,b)=>BEAST[a].str-BEAST[b].str)}
-function tutDeal(){G.tut=1;G.learn=1;G.res.food=Math.max(3,G.res.food);G.res.wood=Math.max(3,G.res.wood);if(G.scen==='marooned')G.tileDeck=[5,4,10,6,3,1,2,7,9,11];G.ev.threat=[null,null];G.wxT={};
+function tutDeal(){G.tut=1;G.learn=1;G.res.food=Math.max(3,G.res.food);G.res.wood=Math.max(3,G.res.wood);G.res.pfood=Math.max(1,G.res.pfood);   // R94: a crate of dry food from the wreck: it never spoils, so day 3 ends with food in store
+  if(G.scen==='marooned')G.tileDeck=[5,4,10,6,3,1,2,7,9,11];G.ev.threat=[null,null];G.wxT={};
   const harm=k=>{try{return opsValue(CARD[k].ev||[])+opsValue(CARD[k].te||[])}catch(e){return 0}};const mild=[...new Set(EVENTS.map(e=>e.k))].filter(k=>k!=='chillrain').sort((a,b)=>harm(b)-harm(a)).slice(0,14);
   G.ev.deck=['chillrain'].concat(shuffle(mild)).slice(0,G.ev.deck.length);G.beast.sort((a,b)=>BEAST[a].str-BEAST[b].str)}
 // ---------------------------------------------------------------- the staged game starts and stops

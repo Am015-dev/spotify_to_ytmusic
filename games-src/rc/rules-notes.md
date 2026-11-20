@@ -111,13 +111,16 @@ These were researched from the 1st-edition English rulebook, card scans and fan 
 
 These are the rulebook's own variants.
 
-| Setting | Changes |
-|---|---|
-| Easier | Dog, 4 starting items, 2 fewer book events and 2 more adventure events |
-| Standard | Base rules |
-| Harder | 1 starting item, 2 more book events |
+| Setting (on screen) | Changes | Code |
+|---|---|---|
+| Easier (the default first game) | Dog, 4 starting items, 2 fewer book events and 2 more adventure events | `newGame` with `diff:'easy'` (engine.js); `easyDeal` (tutor.js) changes nothing by default (`EASYK` all off) |
+| Normal | Base rules, 2 starting items | `diff:'standard'` |
+| Harder | 1 starting item, 2 more book events | `diff:'hard'` |
 
+Every setting keeps the printed weather dice, event deck, tile order and starting resources.
 Friday and the dog can be toggled separately.
+Learn to play is not a setting: it is a staged lesson deal (`tutDeal`, tutor.js) with fixed tiles, mild events, 3 food, 3 wood, 1 dry food and no weather dice.
+Keep playing after the lesson turns the printed weather dice back on.
 
 ## Computer castaways
 
