@@ -770,9 +770,14 @@ function doMove(m) {
     UI.busy = false; peekOff(); if (L.tabs && m.k === 'end') camReset(true);
     if (m.k === 'end') onTurnChange();
     save(); render(); schedule(); try { coachCheck(m, s, r.ev); } catch (e) { }
-    autoEnd(m, s);
+    preSelect(m, s); autoEnd(m, s);
     if (G.over) setTimeout(gameOver, Math.max(animMs(500), UI.fast ? 0 : (say.until || 0) - Date.now() + 300));
   });
+}
+function preSelect(m, s) {   /* F2: a tile you just took that fits right now is picked up for you: one tap on a glowing space builds it (tap it again to put it back) */
+  if (!G || G.over || UI.mode === 'tutorial' || !isHuman(s) || VB.actor(G) !== s || pend() || UI.sel != null) return;
+  if (m.k !== 'take' && m.k !== 'buy' && m.k !== 'grab') return;
+  var i = G.P[s].store.length - 1; if (i >= 0 && storeLegal(i)) { UI.sel = i; if (L.tabs) UI.tab = 'estate'; render(); }
 }
 function autoEnd(m, s) {   /* F2: both dice used and nothing else is legal (no back-lane buy, no free action): the turn ends by itself, one tap fewer */
   if (!G || G.over || m.k === 'end' || UI.mode === 'tutorial' || !isHuman(s) || VB.actor(G) !== s || pend()) return;
