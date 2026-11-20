@@ -14,11 +14,11 @@ function hintsOn(){return !!(UI.coach||UI.tut||UI.hints)}
 function setHints(on){UI.hints=!!on;try{localStorage.setItem('rv_hints',on?'1':'0')}catch(e){}document.documentElement.classList.toggle('hints',hintsOn());const b=$('#hintsbtn');if(b){b.setAttribute('aria-pressed',String(!!on));b.querySelector('span').textContent=on&&innerWidth>420?'Hints on':'Hints'}if(G){UI.pvc={};render()}}
 const myTurn=step=>{if(!G||G.over||!G.cur)return false;const s=sideToAct();return s>=0&&P(s).human&&(!step||G.step===step)};
 const seatName=p=>p.human&&G.pl.filter(q=>q.human).length===1?'You':p.nm;
-function say(t,tn,rc){const el=$('#status');const p=G&&G.cur&&!G.over?P(G.cur.p):null;el.style.setProperty('--c',p?PCOL[p.i]:'#e0a83a');
-  el.innerHTML=(tn?`<b class="tn"><i class="tdot"></i>${esc(tn)}</b>`:'')+`<span class="ins">${esc(t)}</span>`+(rc?`<span class="rc">${esc(rc)}</span>`:'');el.classList.toggle('mine',myTurn());{const sr=$('#srlive'),tx=(tn?tn+'. ':'')+t;if(sr&&sr.textContent!==tx)sr.textContent=tx}if(G)try{spreadFigs();keepPops();layoutTags();layoutFlabs()}catch(e){}}
+function say(t,tn,rc,tip){const el=$('#status');const p=G&&G.cur&&!G.over?P(G.cur.p):null;el.style.setProperty('--c',p?PCOL[p.i]:'#e0a83a');
+  el.innerHTML=(tn?`<b class="tn"><i class="tdot"></i>${esc(tn)}</b>`:'')+`<span class="ins">${esc(t)}</span>`+(rc?`<span class="rc">${esc(rc)}</span>`:'')+(tip?`<span class="rc tip">${esc(tip)}</span>`:'');el.classList.toggle('mine',myTurn());{const sr=$('#srlive'),tx=(tn?tn+'. ':'')+t;if(sr&&sr.textContent!==tx)sr.textContent=tx}if(G)try{spreadFigs();keepPops();layoutTags();layoutFlabs()}catch(e){}}
 // rival steps: a short caption per step (what it drew, where it put it, what it claimed, what it scored), shown ~1.4 s each
 function lastFig(){for(const e of G.log.slice(0,8)){const m=e.t.match(/^(.+?) (?:sets|puts) a .*on the (\w+)\.$/);if(m)return {nm:m[1],ty:m[2],p:G.pl.findIndex(p=>p.nm===m[1])}}return null}
-function readMs(t){return 4000+Math.ceil(String(t).split(/\s+/).length/10)*1000}
+function readMs(t){return 2200+Math.ceil(String(t).split(/\s+/).length/10)*500}   // F2: shorter captions (was 4 s+)
 function capSet(t,ms,score,intro,step){UI.capQ=UI.capQ||[];ms=step?Math.round((ms||1500)/(UI.speed||1)):Math.max(readMs(t),ms||0);UI.capQ.push({t,ms,score:!!score,intro:!!intro});if(!UI.capCur)capNext()}
 function capNext(){const n=(UI.capQ||[]).shift();clearTimeout(UI.capT);if(!n){UI.cap=null;UI.capCur=0;if(G)try{renderStatus()}catch(e){}return}
   UI.cap={t:n.t,score:n.score,intro:n.intro,until:Date.now()+n.ms};UI.capCur=1;if(G&&G.cur)try{renderStatus()}catch(e){}UI.capT=setTimeout(capNext,n.ms)}
@@ -52,8 +52,10 @@ function refit(anim){if(!G||!G.order.length)return;UI.user=false;tweenView(fitTa
 function zoomTile(k,anim){const m=measure(),[x,y]=unkey(k),ph=PHONE(),c=Math.max(UI.view.s*100,Math.min(m.W*(ph?.44:.2),(m.H-topSafe()-botSafe())*.4,ph?170:220));tweenView(focusView(x+.5,y+.5,c),anim?380:0)}
 // ---------- camera follow (W426): frame the spots near the last tile, zoom in on the chosen spot, ease back out, follow the rival ----------
 const PHONE=()=>innerWidth<700;
-function topSafe(){const s=$('#status'),b=boardEl();if(!s||!b||!s.offsetHeight)return 40;return Math.max(40,s.getBoundingClientRect().bottom-b.getBoundingClientRect().top+8)}
-function botSafe(){const h=$('#hand'),rc=$('#recentre'),rh=rc&&rc.offsetHeight&&getComputedStyle(rc).bottom!=='auto'?rc.offsetHeight+14:0;if(!h||getComputedStyle(h).position!=='absolute')return rh;return h.offsetHeight+18+rh}   // keep glows clear of the Recentre button too
+const WIDE=()=>innerWidth>=1000&&innerHeight>=600;   // F2: PC layout, the tile, turn line and scores live in a side panel
+function sheetH(){const e=$('#goal')||$('#modal .scrim.side .card');return e&&e.offsetHeight&&!WIDE()?e.offsetHeight+14:0}
+function topSafe(){const s=$('#status'),b=boardEl();if(WIDE())return 14;if(!s||!b||!s.offsetHeight)return 40;return Math.max(40,s.getBoundingClientRect().bottom-b.getBoundingClientRect().top+8)}
+function botSafe(){const h=$('#hand'),rc=$('#recentre'),rh=rc&&rc.offsetHeight&&getComputedStyle(rc).bottom!=='auto'?rc.offsetHeight+14:0;if(!h||getComputedStyle(h).position!=='absolute')return rh+sheetH();return h.offsetHeight+18+rh+sheetH()}   // keep glows clear of the Recentre button too
 function frameCells(cells,cmin,cmax){const m=measure();let x0=1e9,y0=1e9,x1=-1e9,y1=-1e9;for(const [x,y] of cells){x0=Math.min(x0,x);x1=Math.max(x1,x);y0=Math.min(y0,y);y1=Math.max(y1,y)}
   const top=topSafe(),bot=botSafe(),aw=m.W-24,ah=m.H-top-bot-12,c=Math.max(cmin,Math.min(cmax,Math.min(aw/(x1-x0+1),ah/(y1-y0+1)))),s=c/100;return {s,x:m.W/2-(x0+x1+1)/2*100*s,y:top+ah/2-(y0+y1+1)/2*100*s}}
 function aimCells(){const last=unkey(G.order[G.order.length-1]);const g=UI.legal.filter(q=>q.r===UI.rot).map(q=>{let rk=0;try{rk=pvRank(prevCalc(q.x,q.y,UI.rot))}catch(e){}return {q,rk,d:Math.hypot(q.x-last[0],q.y-last[1])}}).sort((a,b)=>a.d-b.d);
@@ -141,7 +143,11 @@ function renderMeeples(){const live={};
     const e=document.createElement('div');e.className='mp';e.style.setProperty('--c',PCOL[f.p]);e.innerHTML=pcHtml(FIGICON[f.k],f.p);
     e._p=f.p;addOv(e,wx,wy,{dx:f.k==='bld'||f.k==='pig'?10:0,dy:f.k==='bld'||f.k==='pig'?-8:0});UI.mp[id]=e}
   for(const id in UI.mp)if(!live[id]){const e=UI.mp[id];delete UI.mp[id];flyHome(e)}
+  for(const id in live){const f=live[id],e=UI.mp[id];if(!e)continue;const pt=f.p===pvMe()?potOf(f):0;let b=e.querySelector('.pot');if(!pt){if(b)b.remove();continue}if(!b){b=document.createElement('span');b.className='pot';e.appendChild(b)}b.textContent='+'+pt;e.title='+'+pt+' points when it closes'}
   placeOverlay()}
+// F2: points a follower of mine will earn when its open road, town or priory closes (shown as +N on the follower, and summed under the score)
+function potOf(f){try{const r=find(f.s),F=G.fd[r];if(!F||F.done||F.ty==='F')return 0;if(!majority(figsIn(r)).includes(f.p))return 0;return featPoints(F,true)}catch(e){return 0}}
+function pendTotal(p){let n=0;const seen=new Set();for(const f of G.figs){if(f.p!==p)continue;try{const r=find(f.s);if(seen.has(r))continue;seen.add(r);n+=potOf(f)}catch(e){}}return n}
 function renderFigSpots(){for(const e of [...$('#ov').children])if(e.classList.contains('fglow'))e.remove();
   UI.figs=[];if(!myTurn('fig'))return;const p=sideToAct(),T=G.tiles[G.cur.k],moves=figMoves(p).filter(m=>m.act==='fig');
   const byL={};for(const m of moves)(byL[m.l]=byL[m.l]||[]).push(m);
@@ -167,7 +173,7 @@ function updateGhost(){const old=$('#ghost');if(old)old.remove();if(!hintOn()||!
     else{const [wx,wy]=spotWorld(G.cur.k,UI.hintFig.l);const b=UI.figs.find(q=>q._m.k===UI.hintFig.k&&q._m.l===UI.hintFig.l);if(b)b.classList.add('hintspot');showGhost(wx,wy,null,null,b?b._o.dx:0)}}}
 // ---------- top strip, hand, status ----------
 function renderTop(){const el=$('#seats');el.innerHTML=G.pl.map(p=>{const s=p.sup,cur=!G.over&&sideToAct()===p.i;
-    return `<div class="seat${cur?' cur':''}" style="--c:${PCOL[p.i]}" data-i="${p.i}"><i class="dot"></i><span class="sl1"><span class="nm">${esc(seatName(p))}</span><b>${p.score}</b></span><span class="sl2"><span class="fl" title="followers left">${fi('meeple',p.i)}${s.f}<small> left</small></span>${s.big?`${fi('champ',p.i)}`:''}${s.bld?`${fi('mason',p.i)}`:''}${s.pig?`${fi('hog',p.i)}`:''}</span>${p.goods.wine+p.goods.grain+p.goods.cloth?`<span class="fl" title="goods">${ico('wine')}${p.goods.wine+p.goods.grain+p.goods.cloth}</span>`:''}</span></div>`}).join('');
+    return `<div class="seat${cur?' cur':''}" style="--c:${PCOL[p.i]}" data-i="${p.i}"><i class="dot"></i><span class="sl1"><span class="nm">${esc(seatName(p))}</span><b>${p.score}</b></span><span class="sl2"><span class="fl" title="followers left">${fi('meeple',p.i)}${s.f}<small> left</small></span>${s.big?`${fi('champ',p.i)}`:''}${s.bld?`${fi('mason',p.i)}`:''}${s.pig?`${fi('hog',p.i)}`:''}${p.human&&!G.over&&pendTotal(p.i)?`<span class="pend" title="points you get when your open features close">+${pendTotal(p.i)} soon</span>`:''}</span>${p.goods.wine+p.goods.grain+p.goods.cloth?`<span class="fl" title="goods">${ico('wine')}${p.goods.wine+p.goods.grain+p.goods.cloth}</span>`:''}</span></div>`}).join('');
   $('#left').innerHTML=`<i class="pile"></i><svg class="plain" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="4" width="16" height="16" rx="3"/></svg><span class="lt"><b>${tilesLeft()}</b><small>tiles</small></span>`}
 // feedback: a tile lands with a thud + dust ring; a follower pops, then hops home to its owner's chip
 function thud(k){const e=UI.tl[k];if(!e||UI.reduce)return;const [x,y]=unkey(k),w=$('#world');
@@ -201,25 +207,30 @@ function hookDrag(b){if(!b||b._dg)return;b._dg=1;
   const end=e=>{const d=UI.drag;if(!d||d.id!==e.pointerId)return;UI.drag=null;b.classList.remove('lifted');if(!d.on)return;UI.dragJust=Date.now();if(d.gh)d.gh.remove();if(d.over)d.over.classList.remove('dragover');
     if(e.type==='pointerup'&&d.over&&myTurn('place')){const x=+d.over.dataset.x,y=+d.over.dataset.y;if(isLegal({act:'place',x,y,r:UI.rot},sideToAct()))placeAt(x,y)}};
   b.addEventListener('pointerup',end);b.addEventListener('pointercancel',end)}
-function renderStatus(){let t='',tn='',rc='';const c=capNow(),sc=c&&UI.cap.score;
-  if(sc){tn='Scoring';t=c}
+// F2: what the numbers on a follower spot mean, one line
+function figTip(){try{const ty=new Set((UI.figs||[]).map(b=>{const T=G.tiles[G.cur.k];return G.fd[find(T.s0+ +b._m.l)].ty}));
+  if(ty.has('M'))return 'Priory: 1 + one per tile around it.';if(ty.has('F'))return 'Farmer: 3 per finished town, at end.';
+  if(ty.has('C'))return 'Town 2 per tile, road 1, when closed.';if(ty.has('R'))return 'Road: 1 point per tile when closed.'}catch(e){}return ''}
+function renderStatus(){let t='',tn='',rc='',tip='';const c=capNow(),sc=c&&UI.cap.score;
+  if(sc&&!myTurn('place')){tn='Scoring';t=c}
   else if(G.over){tn='Game over';t='Counting the points…'}
   else if(UI.tut&&UI.tutTile){tn='Learn';t='Tap the lit tile to go on.'}
   else if(G.cur){const me=myTurn();const p=P(G.cur.p);tn=me?'Your turn':`${p.nm}’s turn`;
-    if(me&&c&&UI.cap.intro&&G.step==='place')rc=c;   // the rival recap sits under the action line, never in its place
+    if(me&&c&&(UI.cap.intro||UI.cap.score)&&G.step==='place')rc=c;   // the rival recap sits under the action line, never in its place
     if(me&&G.step==='place'&&UI.prev)t=UI.prev.t;
     else if(me&&G.step==='place'&&UI.sel){let l='';try{l=prevCalc(UI.sel.x,UI.sel.y,UI.sel.r).line}catch(e){}t=(hintsOn()&&l&&!/^Nothing/.test(l)?l+' ':'')+'Tap Place here to confirm, or your tile to turn it.'}
     else if(me&&G.step==='place')t=G.cur.bonus?'Extra turn! Place your tile.':isRiver(G.cur.t)?'Place it to continue the river.':(UI.rots&&UI.rots.length>1?'Turn, then place on a glow.':'Place your tile on a glow.');
-    else if(me)t='Add a follower, or Skip.';
-    else t=c||'Watch their tile go down.'}
-  say(t,tn,rc)}
+    else if(me){t='Add a follower, or Skip.';tip=figTip()}
+    else t=c||'Tap the board to skip.'}
+  say(t,tn,rc,tip);{const e=$('#status'),h=e?e.offsetHeight:0;if(h!==UI._sh){UI._sh=h;if(G&&myTurn('place')&&!UI.tw&&!UI.aiFly&&!UI.user&&!document.querySelector('.gxh-bub')&&!WIDE()){const sr=e.getBoundingClientRect();if([...document.querySelectorAll('#world .glow')].some(g=>g.style.visibility!=='hidden'&&(r=>r.top<sr.bottom&&r.bottom>sr.top&&r.left<sr.right&&r.right>sr.left)(g.getBoundingClientRect()))){placeOverlay();camAim(300)}}}}}   // F2: a taller turn card (caption under the action line) re-frames the glows so none hides under it
 // ---------- turn bookkeeping ----------
 function syncTurn(){if(!G||G.over||!G.cur)return;const key=G.turn+':'+G.step;if(key===UI.stepKey)return;UI.stepKey=key;
   if(myTurn('place')){UI.legal=legalPlacements(G.cur.t);UI.rots=[...new Set(UI.legal.map(g=>g.r))].sort();UI.hint=null;
     const cnt=r=>UI.legal.filter(g=>g.r===r).length;let best=UI.rots[0];for(const r of UI.rots)if(cnt(r)>cnt(best))best=r;UI.rot=best;
     if(hintOn()){try{const plan=aiPlan(G.cur.p,'normal');UI.hint={x:plan.place.x,y:plan.place.y,r:plan.place.r};UI.rot=plan.place.r;UI.hintFig=null}catch(e){UI.hint=null}}
-    UI.deg=UI.rot*90;UI.user=false;UI.sel=null;camAim()}
-  else if(myTurn('fig')){UI.legal=[];UI.hintFig=hintOn()?bestFigNow(G.cur.p,'normal'):null;if(!UI.user)zoomTile(G.cur.k,true)}
+    UI.deg=UI.rot*90;UI.user=false;UI.sel=null;camAim();
+    if(UI.cap&&UI.cap.until-Date.now()>1200){UI.cap.until=Date.now()+1200;clearTimeout(UI.capT);UI.capT=setTimeout(capNext,1200);if(UI.capQ)UI.capQ.length=0}}   // F2: the last caption never sits on your instruction for long
+  else if(myTurn('fig')){UI.legal=[];UI.hintFig=hintOn()?bestFigNow(G.cur.p,'normal'):null;UI.user=false;zoomTile(G.cur.k,true)}   // F2: the view always comes back to the action after a placement
   else{UI.legal=[];UI.hint=null;UI.hintFig=null;UI.sel=null}}
 // ---------- the main render ----------
 function render(){if(!G)return;syncTurn();renderTop();renderTiles();renderGlows();renderMeeples();renderFigSpots();renderHand();renderStatus();renderSheet();updateGhost();placeOverlay();ensureGlowVisible();setTimeout(ensureGlowVisible,500);hlpAfter()}
@@ -239,18 +250,20 @@ function aiAct(){UI.aiT=0;if(!G||G.over||UI.aiFly)return;const s=sideToAct();if(
   if(m.act==='place'&&!UI.sim&&!UI.reduce&&ANIM&&UI.speed<8){aiFly(m,s);return}
   const r=performMove(m,s);if(!r.success)console.error('ai move failed',r.error)}
 // the rival's tile, step by step: it lifts out of the bag (top bar), flies to its spot, turns to its final angle, then lands
-function aiFly(m,s){const sp=1/(UI.speed||1),w=$('#world'),t=G.cur.t;UI.aiFly=true;if(!UI.user)camValley([[m.x,m.y]],[m.x,m.y],Math.round(450*sp));
-  const go=()=>{const bag=$('#left'),b=boardEl().getBoundingClientRect();let bx=m.x*100,by=(m.y-3)*100;if(bag){const r=bag.getBoundingClientRect();bx=(r.left+r.width/2-b.left-UI.view.x)/UI.view.s-50;by=(r.top+r.height/2-b.top-UI.view.y)/UI.view.s-50}
+function aiFly(m,s){const sp=.6/(UI.speed||1),w=$('#world'),t=G.cur.t,tok={dead:false};UI.aiFly=true;
+  UI.aiSkipFn=()=>{if(tok.dead)return;tok.dead=true;UI.aiSkipFn=null;for(const e of [...document.querySelectorAll('#world .tl.fly')])e.remove();UI.aiFly=false;if(sideToAct()===s&&G.cur&&G.cur.t===t){const r=performMove(m,s);if(!r.success)console.error('ai move failed',r.error)}};   // F2: the rival's turn is quick (60% of the old time) and a tap on the board skips it
+  UI.user=false;camValley([[m.x,m.y]],[m.x,m.y],Math.round(450*sp));
+  const go=()=>{if(tok.dead)return;const bag=$('#left'),b=boardEl().getBoundingClientRect();let bx=m.x*100,by=(m.y-3)*100;if(bag){const r=bag.getBoundingClientRect();bx=(r.left+r.width/2-b.left-UI.view.x)/UI.view.s-50;by=(r.top+r.height/2-b.top-UI.view.y)/UI.view.s-50}
     const f=document.createElement('div');f.className='tl fly';f.style.left=m.x*100+'px';f.style.top=m.y*100+'px';f.style.setProperty('--pc',PCOL[s]);f.innerHTML=tileSvg(t,0);
     const r0=(m.r+3)*90,r1=r0+90,dx=bx-m.x*100,dy=by-m.y*100;f.style.transform=`translate(${dx}px,${dy}px) rotate(${r0}deg) scale(.45)`;f.style.opacity='0';w.appendChild(f);sfx('turn');
-    const T=(ms,fn)=>setTimeout(()=>{if(!G||G.over||!f.isConnected){UI.aiFly=false;f.remove();return}fn()},Math.round(ms*sp));
+    const T=(ms,fn)=>setTimeout(()=>{if(tok.dead)return;if(!G||G.over||!f.isConnected){UI.aiFly=false;f.remove();return}fn()},Math.round(ms*sp));
     requestAnimationFrame(()=>{f.style.transition=`transform ${Math.round(900*sp)}ms cubic-bezier(.3,.7,.3,1),opacity ${Math.round(250*sp)}ms`;f.style.opacity='1';f.style.transform=`translate(0,0) rotate(${r0}deg) scale(1.14)`});
     T(1000,()=>{f.style.transition=`transform ${Math.round(420*sp)}ms ease-in-out`;f.style.transform=`rotate(${r1}deg) scale(1.14)`;sfx('click')});
     T(1550,()=>{f.style.transition=`transform ${Math.round(180*sp)}ms ease-in`;f.style.transform=`rotate(${r1}deg) scale(1)`});
-    T(1760,()=>{f.remove();UI.aiFly=false;if(sideToAct()!==s||!G.cur||G.cur.t!==t)return;const r=performMove(m,s);if(!r.success)console.error('ai move failed',r.error)})};
+    T(1760,()=>{tok.dead=true;UI.aiSkipFn=null;f.remove();UI.aiFly=false;if(sideToAct()!==s||!G.cur||G.cur.t!==t)return;const r=performMove(m,s);if(!r.success)console.error('ai move failed',r.error)})};
   setTimeout(go,Math.round(480*sp))}
-function schedAI(){if(UI.aiT||!G||G.over)return;const s=sideToAct();if(s<0||P(s).human)return;UI.aiT=setTimeout(aiAct,Math.max((G.step==='place'?AIDELAY:AIDELAY*1.1)/UI.speed,Math.min(capRemain(),3000/(UI.speed||1))))}   // captions still queued keep showing; the rival waits at most 3 s for them
-function aiNow(){if(UI.capQ&&UI.capQ.length)UI.capQ.length=0;if(UI.aiT){clearTimeout(UI.aiT);aiAct()}}
+function schedAI(){if(UI.aiT||!G||G.over)return;const s=sideToAct();if(s<0||P(s).human)return;UI.aiT=setTimeout(aiAct,Math.max((G.step==='place'?AIDELAY:AIDELAY*1.1)/UI.speed,Math.min(capRemain(),1800/(UI.speed||1))))}   // captions still queued keep showing; the rival waits at most 3 s for them
+function aiNow(){if(UI.aiSkipFn)UI.aiSkipFn();if(UI.capQ&&UI.capQ.length)UI.capQ.length=0;if(UI.aiT){clearTimeout(UI.aiT);aiAct()}}
 // ---------- effects: scores light up the feature and fly to the seat chip ----------
 function playFx(){const list=UI.fx.slice(UI.fxSeen);UI.fxSeen=UI.fx.length;let n=0;
   for(const f of list){if(UI.coach)try{coachFx(f)}catch(e){console.error(e)}if(f.t==='fig'){const lf=lastFig();if(lf&&lf.p>=0&&!P(lf.p).human)UI.recap=`${lf.nm} took a ${lf.ty}.`}else if(f.t==='turn'&&!P(f.x).human)UI.recap='';try{rvTrack(f)}catch(e){console.error(e)}}
@@ -322,12 +335,14 @@ function openMenu(){if($('#menu'))return closeMenu();const d=document.createElem
   setTimeout(()=>document.addEventListener('pointerdown',menuAway,true),0)}
 function menuAway(e){if(!e.target.closest('#menu,#menubtn'))closeMenu()}
 function closeMenu(){const d=$('#menu');if(d)d.remove();document.removeEventListener('pointerdown',menuAway,true);if(d)hlpAfter()}
-function showRules(){$('#modal').innerHTML=`<div class="scrim"><div class="card drawer" role="dialog" aria-label="How to play"><h2>How to play</h2><p class="raim">Score the most points by finishing roads and towns.</p><ul><li>Draw a tile. Turn it and lay it so edges match.</li><li>Then put a follower on a road, town, priory or field.</li><li>Or skip and keep your follower.</li><li>Finish a road or town. Its owner scores and the follower goes home.</li><li>A priory with eight tiles around it scores 9.</li><li>At the end, a farmer scores 3 per finished town.</li><li>Most followers on a road, town or field takes its points.</li><li>Equal followers: each scores in full.</li><li>A tile that fits nowhere is swapped for a new one.</li><li>Most points wins.</li></ul><button class="btn" data-a="x">Got it</button></div></div>`;$('#modal [data-a=x]').onclick=()=>{$('#modal').innerHTML=''}}
+function showRules(){$('#modal').innerHTML=`<div class="scrim side"><div class="card drawer" role="dialog" aria-label="How to play"><h2>How to play</h2><p class="raim">Score the most points by finishing roads and towns.</p><ul><li>Draw a tile. Turn it and lay it so edges match.</li><li>Then put a follower on a road, town, priory or field.</li><li>Or skip and keep your follower.</li><li>Finish a road or town. Its owner scores and the follower goes home.</li><li>A priory with eight tiles around it scores 9.</li><li>At the end, a farmer scores 3 per finished town.</li><li>Most followers on a road, town or field takes its points.</li><li>Equal followers: each scores in full.</li><li>A tile that fits nowhere is swapped for a new one.</li><li>Most points wins.</li></ul><button class="btn" data-a="x">Got it</button></div></div>`;$('#modal [data-a=x]').onclick=closeSheets;sheetPos()}
+function sheetPos(){const h=$('#hand'),r=h&&h.getBoundingClientRect(),b=(r&&!WIDE()?Math.max(0,innerHeight-r.top)+8:12)+'px';for(const e of [$('#goal'),$('#modal .scrim.side')])if(e)e.style.setProperty('--sb',b);setTimeout(()=>{if(G&&G.order.length)refit(true)},30)}
+function closeSheets(){const g=$('#goal'),m=$('#modal .scrim.side');if(!g&&!m)return false;if(g)g.remove();if(m)$('#modal').innerHTML='';setTimeout(()=>{if(G&&G.order.length)refit(true)},30);return true}
 // ---------- new game / continue ----------
 function beginGame(o){UI.camp=o&&o.camp?o.camp:null;if(o&&!o.camp||!o)o=o||setupOpts();UI.lastOpts=o;resetUI();DEFSEED=o.seed!=null?o.seed:null;newGame(o);$('#modal').innerHTML='';UI.humanTurns=0;refit(false);showGoal();}
 function showGoal(){const o=$('#goal');if(o)o.remove();if(UI.coach||UI.tut||UI.sim||!G||!human()||/[?&]scn=/.test(location.search))return;const d=document.createElement('section');d.id='goal';d.setAttribute('aria-label','Goal');
   d.innerHTML='<h2>How you win</h2><p class="gwin">Have the most points when the last tile is laid.</p><ul><li>Put a follower on a road, town or priory.</li><li>Finish it, and you score. Towns pay double.</li><li>Farmers in fields score at the very end.</li></ul><button type="button" id="goalok">Got it, start</button>';
-  $('#app').appendChild(d);$('#goalok').addEventListener('click',()=>d.remove())}
+  ($('#side')||$('#app')).prepend(d);$('#goalok').addEventListener('click',closeSheets);sheetPos()}
 function setupOpts(){const s=UI.setup,np=1+s.rivals,seats=[];for(let i=0;i<np;i++)seats.push(i?'ai':'human');return {np,seats,lv:seats.map(()=>s.lv),ex:{river:s.river,ic:s.ic,tb:s.tb}}}
 function resetUI(){UI.recap="";UI.rv=null;UI.rvLine="";UI.capQ=[];UI.cap=null;UI.capCur=0;clearTimeout(UI.capT);UI.fx.length=0;UI.fxSeen=0;UI.turn=-1;UI.stepKey='';UI.endShown=false;UI.handKey=null;UI.aiT&&clearTimeout(UI.aiT);UI.aiT=0;for(const k in UI.tl)UI.tl[k].remove();UI.tl={};for(const k in UI.mp)UI.mp[k].remove();UI.mp={};$('#ov').innerHTML='';UI.seenInit=false;UI.legal=[];UI.hint=null;UI.hintFig=null;closeMenu()}
 function loadSaved(){const g=savedGame();if(!g)return;resetUI();G=g;UI.camp=null;UI.fxSeen=0;UI.fx.length=0;$('#modal').innerHTML='';UI.lastOpts=setupOpts();render();refit(false);schedAI()}
@@ -338,7 +353,7 @@ function initGestures(){const b=boardEl(),pt=new Map();let last=null;
   function zoomAt(px,py,k){const v=UI.view,m=measure();let s=v.s*k;s=Math.max(MINC/100*.6,Math.min(2.4,s));k=s/v.s;setView({s,x:px-(px-v.x)*k,y:py-(py-v.y)*k})}
   b.addEventListener('pointerdown',e=>{UI.lastPT=e.pointerType;const r=b.getBoundingClientRect();pt.set(e.pointerId,{x:e.clientX-r.left,y:e.clientY-r.top});UI.moved=false;UI.down={x:e.clientX,y:e.clientY};UI.twPaused=UI.tw?UI.twTo:null;cancelAnimationFrame(UI.tween);UI.tw=false;
     if(pt.size===2)last={d:dist(),m:mid()};
-    if(!e.target.closest('button'))aiNow()});
+    if(!e.target.closest('button')){aiNow();closeSheets()}});
   b.addEventListener('pointermove',e=>{if(!pt.has(e.pointerId))return;const r=b.getBoundingClientRect(),p=pt.get(e.pointerId),nx=e.clientX-r.left,ny=e.clientY-r.top;
     if(UI.down&&Math.hypot(e.clientX-UI.down.x,e.clientY-UI.down.y)>9)UI.moved=true;
     if(pt.size===1){if(UI.moved){const v=UI.view;setView({s:v.s,x:v.x+nx-p.x,y:v.y+ny-p.y});UI.user=true}pt.set(e.pointerId,{x:nx,y:ny})}
@@ -361,7 +376,11 @@ function layoutFlabs(){const fl=[...document.querySelectorAll('#ov .fglow')];if(
 // score pops never sit on the turn strip
 function keepPops(){const st=$('#status');if(!st||!st.offsetHeight)return;const sb0=st.getBoundingClientRect().bottom-boardEl().getBoundingClientRect().top+6;for(const e of $('#ov').querySelectorAll('.pop')){const o=e._o;if(!o)continue;const sb=sb0+e.offsetHeight/2,hw=e.offsetWidth/2+6,W=boardEl().clientWidth;const [sx,sy]=toScreen(o.wx,o.wy);const x=Math.max(hw,Math.min(W-hw,sx+o.dx)),y=Math.max(sb,sy+o.dy);if(x!==sx+o.dx||y!==sy+o.dy)e.style.transform=`translate(${x}px,${y}px) translate(-50%,-50%)`}}
 // ---------- boot ----------
-function boot(){UI.reduce=window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches;initGestures();$('#menubtn').addEventListener('click',openMenu);{let h=true;try{const v=localStorage.getItem('rv_hints');h=v==null?true:v==='1'}catch(e){}const hb=document.createElement('button');hb.id='hintsbtn';hb.type='button';hb.className='gx-ibtn';hb.innerHTML='<span>Hints</span>';hb.addEventListener('click',()=>setHints(!UI.hints));$('#top').insertBefore(hb,$('#bulbbtn'));setHints(h)}{const rc=document.createElement('button');rc.id='recentre';rc.type='button';rc.setAttribute('aria-label','Recentre the view');rc.innerHTML='<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><circle cx="12" cy="12" r="7" fill="none" stroke="currentColor" stroke-width="2.4"/><circle cx="12" cy="12" r="2.6" fill="currentColor"/><path d="M12 1v4M12 19v4M1 12h4M19 12h4" stroke="currentColor" stroke-width="2.4"/></svg><span>Recentre</span>';rc.addEventListener('click',recentre);boardEl().appendChild(rc)}
+function layoutWide(){const main=$('#main'),board=$('#board');if(!main||!board)return;let side=$('#side');const w=WIDE();
+  if(w&&!side){side=document.createElement('aside');side.id='side';side.setAttribute('aria-label','Scores, your tile and the turn');main.appendChild(side);side.appendChild($('#seats'));side.appendChild($('#status'));side.appendChild($('#hand'));const g=$('#goal');if(g)side.prepend(g);document.documentElement.classList.add('wide')}
+  else if(!w&&side){board.appendChild($('#status'));main.appendChild($('#hand'));$('#top').insertBefore($('#seats'),$('#top').firstChild);const g=$('#goal');if(g)$('#app').appendChild(g);side.remove();document.documentElement.classList.remove('wide')}
+  else return;sheetPos();setTimeout(()=>{if(G&&G.order.length){UI.user=false;refit(false);render()}},40)}
+function boot(){layoutWide();let rz=0;addEventListener('resize',()=>{clearTimeout(rz);rz=setTimeout(layoutWide,150)});UI.reduce=window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches;initGestures();$('#menubtn').addEventListener('click',openMenu);{let h=true;try{const v=localStorage.getItem('rv_hints');h=v==null?true:v==='1'}catch(e){}const hb=document.createElement('button');hb.id='hintsbtn';hb.type='button';hb.className='gx-ibtn';hb.innerHTML='<span>Hints</span>';hb.addEventListener('click',()=>setHints(!UI.hints));$('#top').insertBefore(hb,$('#bulbbtn'));setHints(h)}{const rc=document.createElement('button');rc.id='recentre';rc.type='button';rc.setAttribute('aria-label','Recentre the view');rc.innerHTML='<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><circle cx="12" cy="12" r="7" fill="none" stroke="currentColor" stroke-width="2.4"/><circle cx="12" cy="12" r="2.6" fill="currentColor"/><path d="M12 1v4M12 19v4M1 12h4M19 12h4" stroke="currentColor" stroke-width="2.4"/></svg><span>Recentre</span>';rc.addEventListener('click',recentre);boardEl().appendChild(rc)}
   document.addEventListener('keydown',e=>{if(e.key==='Escape')closeMenu();if((e.key==='r'||e.key==='R')&&myTurn('place'))rotate()});
   GXV.watch(()=>{if(!G||!G.order.length)return;if(myTurn('fig')&&!UI.user)zoomTile(G.cur.k,false);else if(myTurn('place')&&!UI.user){if(UI.sel)camSpot(UI.sel.x,UI.sel.y,0);else camAim(0)}else if(!UI.user)refit(false);else placeOverlay();updateGhost()});
   showStart()}

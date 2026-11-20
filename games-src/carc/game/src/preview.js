@@ -37,8 +37,8 @@ function prevCalc(x, y, r) {
 function prevFig(l) {
   const T = G.tiles[G.cur.k], id = find(T.s0 + +l), F = G.fd[id]; if (!F) return '';
   const nm = PV_TY[F.ty];
-  if (F.ty === 'F') return 'farmer';
-  if (F.ty === 'M') return 'priory 9';
+  if (F.ty === 'F') { const n = fieldCities(F).size; return n ? 'farmer +' + 3 * n + ' now' : 'farmer, pays at end'; }   // F2: a number you can read, or the plain word
+  if (F.ty === 'M') return 'priory ' + nbrCount(F.x, F.y) + ' of 9';
   const done = F.oe && F.oe.length === 0;
   if (done) return nm + ' +' + featPoints(F, true) + ' now';
   return nm + ' +' + featPoints(F, true);

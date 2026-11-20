@@ -75,9 +75,13 @@ hlpRulesSync();
 const HLPS={key:'',plan:null};
 function hlpPlan(){if(!G||G.over||!G.cur||UI.sim||!myTurn())return null;const s=G.cur.p;
   if(G.step==='place'){const k=G.turn+':'+G.order.length+':'+G.cur.t;if(HLPS.key!==k){HLPS.key=k;HLPS.plan=null;try{HLPS.plan=aiPlan(s,'normal')}catch(e){}}
-    const pl=HLPS.plan;if(!pl||!isLegal(pl.place,s))return null;return {kind:'place',move:pl.place,why:hlpWhyPlace(pl,s)}}
+    const pl=HLPS.plan;if(G.order.length<=16){const q=hlpQuick(pl);if(q)return {kind:'place',move:q.move,why:q.why}}   // F2: the first turns point at points that arrive fast
+    if(!pl||!isLegal(pl.place,s))return null;return {kind:'place',move:pl.place,why:hlpWhyPlace(pl,s)}}
   if(G.step==='fig'){let m=null;try{m=bestFigNow(s,'normal')}catch(e){}if(!m||!isLegal(m,s))return null;return {kind:'fig',move:m,why:hlpWhyFig(m,s)}}
   return null}
+// F2: early on, the best hint is a tile that finishes a small road or town right now
+function hlpQuick(pl){try{let best=null,bk=0,pts=0;for(const g of legalPlacements(G.cur.t)){const pv=prevCalc(g.x,g.y,g.r),rk=pvRank(pv);if(rk>=100&&rk>bk){bk=rk;best=g;pts=pv.pts}}
+  if(!best)return null;const mv=Object.assign({},pl&&pl.place||{act:'place'},{x:best.x,y:best.y,r:best.r});if(!isLegal(mv,G.cur.p))return null;return {move:mv,why:`Finishes a road or town now: +${pts} points.`}}catch(e){return null}}
 function hlpWhyPlace(pl,s){for(const w of pl.why||[]){
     if(w.k==='close'&&w.win.includes(s))return `Finishes your ${FEAT[w.ty]}: +${Math.round(w.pts)} points.`;
     if(w.k==='grow')return `Grows the ${FEAT[w.ty]} you already hold.`;

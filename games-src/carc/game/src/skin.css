@@ -83,7 +83,7 @@ html.sk .menu .opt{min-height:38px;font:700 14px/1 var(--ff);padding:0}
 @media(orientation:landscape) and (max-height:700px){.hname{display:none}}
 html.sk .gxc-res h2{background:none;padding:6px 0;text-shadow:none}
 .card[aria-label=Result] .sub{color:#3a2410;font:600 15px/1.35 var(--ff);padding:0 6px}
-body:has(#modal .scrim) #status{display:none}
+body:has(#modal .scrim:not(.side)) #status{display:none}
 .hname em{font:700 14px/1.2 var(--ff);font-style:normal;color:#ffd99a}
 
 /* audit pass: solid backings and contrast */
@@ -170,7 +170,7 @@ body:has(#menu) #status{visibility:hidden}
 .pop small{font-size:14px;background:#281b12}
 #recentre{position:absolute;right:10px;bottom:10px;z-index:7;display:flex;align-items:center;gap:6px;min-height:40px;padding:6px 12px;border:2px solid #e0a83a;border-radius:999px;background:#281b12;color:#fff3dc;font:800 14px/1 var(--ff);box-shadow:0 2px 8px rgba(0,0,0,.4);cursor:pointer}
 #recentre:active{transform:translateY(1px)}
-body:has(#modal .scrim) #recentre{display:none}
+body:has(#modal .scrim:not(.side)) #recentre{display:none}
 #hplace{border:0;border-radius:999px;background:var(--terra,#b5532f);color:#fff8ec;font:800 17px var(--ff);padding:13px 22px;min-height:48px;box-shadow:0 3px 0 #7d3418,0 0 0 3px #ffd99a;white-space:nowrap}
 #hand.hassel .hname{display:none}
 #sheet{position:relative;z-index:8;padding:0}
@@ -354,9 +354,40 @@ body:has(#endplate) #hand #hinfo{visibility:hidden}
 .gedge{position:absolute;left:0;top:0;pointer-events:auto;display:flex;align-items:center;gap:5px;min-height:44px;min-width:44px;padding:0 12px;border:2px solid #ffd24a;border-radius:999px;background:rgba(40,27,18,.92);color:#fff3dc;font:800 14px/1 var(--ff);white-space:nowrap;box-shadow:0 2px 8px rgba(0,0,0,.45);cursor:pointer}
 .gedge b{color:#ffd24a;font-size:14px}
 .gedge[hidden]{display:none}
-body:has(#modal .scrim) .gedges{display:none}
+body:has(#modal .scrim:not(.side)) .gedges{display:none}
 /* F1: the story line fades in from 40%, never from nothing, so it is readable (and checkable) from its first frame */
 @keyframes rv-scin{from{opacity:.4;transform:translateY(6px)}to{opacity:1;transform:none}}
 .gxc-scene .gxc-sc-text.in{animation:rv-scin .3s ease-out}
 /* F1: at phone width the two seats keep clear of the tile count (same in both looks, so the painted skin moves no box) */
 @media(max-width:420px){html #seats,html.sk #seats{gap:1px}}
+
+/* ---- F2: sheets never cover the board (goal card, rules): they dock above the tray (phone) or in the side panel (PC); a tap on the board closes them ---- */
+#goal{top:auto;left:50%;bottom:var(--sb,120px);transform:translateX(-50%);width:min(360px,calc(100% - 20px));padding:10px 14px;z-index:9}
+#goal h2{font-size:18px;margin:0 0 2px}#goal .gwin{font-size:15px;margin:0 0 4px}#goal ul{margin:0 0 6px}#goal li{margin:1px 0;font-size:14px}#goal button{min-height:44px}
+#modal .scrim.side{background:none;pointer-events:none;align-items:flex-end;justify-content:center;padding:0 10px var(--sb,120px);z-index:9}
+#modal .scrim.side .card{pointer-events:auto;max-height:min(46vh,340px);overflow:auto;width:min(380px,100%);box-shadow:0 8px 24px rgba(0,0,0,.5)}
+#modal .scrim.side .card ul{font-size:14px}
+/* "N more" chips: bigger, solid, and they say what they are */
+.gedge{min-height:44px;padding:0 14px;font:800 15px/1 var(--ff);background:#281b12;border:2px solid #ffd24a;color:#fff8ea}.gedge b{font-size:16px;color:#ffd24a}
+/* ---- F2: PC (>=1000 x 600): the board uses the width; scores, turn line and tile sit in a side panel ---- */
+html.wide #main{flex-direction:row;position:static}
+html.wide #side{flex:0 0 clamp(290px,23vw,380px);display:flex;flex-direction:column;gap:12px;padding:12px;background:linear-gradient(90deg,#2b1a0d,#3a2412);border-left:3px solid #b5883a;overflow:auto;z-index:6;color:#fff3dc}
+html.wide #side #seats{display:flex;flex-direction:column;gap:6px;overflow:visible;order:1}
+html.wide #side .seat{width:100%;flex:0 0 auto;display:flex;align-items:center;justify-content:space-between;padding:5px 12px 5px 8px}
+html.wide #side .seat .nm{max-width:none;font-size:16px}html.wide #side .seat .sl1{display:flex;gap:8px;align-items:center;flex:1}html.wide #side .seat .sl2{display:flex;gap:6px;font-size:14px}
+html.wide #side #status{position:static;transform:none;left:auto;top:auto;width:auto;max-width:none;order:2;pointer-events:auto}
+html.wide #side #goal{position:static;transform:none;width:auto;order:3;margin:0}
+html.wide #side #hand{position:static;transform:none;order:4;margin:0;width:auto;flex-direction:column;gap:10px;padding:12px;border:2px solid #b5883a;border-image:none;border-radius:14px;background:#4a2f1a;filter:none}
+html.wide #side #htile{width:min(200px,60%);height:auto;aspect-ratio:1}
+html.wide #side #hplace,html.wide #side #hskip{width:100%;min-height:48px;font-size:17px}
+html.wide #modal .scrim.side{left:auto;right:0;top:0;bottom:0;width:clamp(290px,23vw,380px);padding:12px;align-items:flex-start}
+html.wide #modal .scrim.side .card{max-height:calc(100vh - 24px);width:100%}
+html.wide #recentre{left:14px;right:auto}
+/* F2: potential points on a follower and under the score */
+.mp .pot{position:absolute;left:50%;top:-6px;transform:translateX(-50%);padding:1px 5px;border-radius:9px;background:#ffe9a6;color:#3a2410;border:1.5px solid #7d3418;font:800 12px/1.2 var(--ff);white-space:nowrap;pointer-events:none;z-index:2}
+.seat .pend{font:800 12px/1 var(--ff);color:#ffe9a6;white-space:nowrap}
+html.wide .seat .pend{font-size:14px}
+#status .rc.tip{color:#ffe9a6;font-size:14px}
+@media(max-width:700px){.seat .pend{display:none}}
+html.wide #side .seat .nm,html.wide #side .seat b{font-size:18px}html.wide #side .seat .fl{font-size:15px}html.wide #side .seat .fl small{font-size:14px}
+@media(max-width:420px){#seats .seat:not(.cur) .nm{display:none!important}}

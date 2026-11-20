@@ -18,7 +18,7 @@ Edition: the 3rd edition (2-tile town = 4, farmers 3 per completed town, hog +1 
 2. Base tiles by number of town (city) sides: 28 with none, 18 with one, 18 with two, 7 with three, 1 with four
 3. Every one of the 23 base tile kinds (the 24 of the box, with the two mirrored town-corner-road tiles counted together) has its exact box count
 4. Tile geometry: every town/road side belongs to exactly one town/road piece; field pieces cover exactly the non-town sides; a field touches a town whenever a town side lies at one of its corners and never touches one it cannot reach (base, river, Taverns & Basilicas tiles)
-5. Tile geometry: every town/road side belongs to exactly one town/road piece; field pieces cover exactly the non-town sides; a field touches a town whenever a town side lies at one of its corners and never touches one it cannot reach (Merchants & Masons tiles)
+5. [unverified] Tile geometry: every town/road side belongs to exactly one town/road piece; field pieces cover exactly the non-town sides; a field touches a town whenever a town side lies at one of its corners and never touches one it cannot reach (Merchants & Masons tiles)
 6. Exactly 10 base tiles carry a pennant (coat of arms)
 7. Exactly 6 base tiles carry a monastery (4 alone, 2 with a road)
 8. The start tile has a town on one side and a road running straight through the opposite two sides; it is the first tile, at the centre, unrotated
@@ -104,7 +104,10 @@ Edition: the 3rd edition (2-tile town = 4, farmers 3 per completed town, hog +1 
 70. River: the river tile must continue the river; a curve may not bend the same way as the previous curve (no U-turn)
 71. Sixth player is allowed with Taverns & Basilicas
 
-## Note on rule 5 (known open)
+## Note on rule 5 ([unverified], F2 checked 20 Nov 2026)
+F2 re-ran `game/geo_test.js`: 85/85 tiles draw without errors, and it still prints 6 adjacency warnings on those pieces (the data lists a town next to a field that the drawn corners do not reach). No other rule in this file depends on them. Neither the original rulebook text nor the physical tiles are available to this build, so the field-to-town links of those seven pieces stay **[unverified]**. The data was not changed (a guess would move farmer scores by up to 3 per town on 7 of 24 expansion tiles, only when that set is switched on). Confirm against the real tiles, then edit `game/src/data.js` field links and the drawing together.
+
+Original note:
 Seven Merchants & Masons field pieces (TB_CcRRx_c x2, TB_CcRR_wG, TB_CcRC_c, TB_CcRC_g, TB_CcRx_w, TB_RCcx_g) list a town as adjacent to a field that,
 by corner geometry, does not reach it (the field lies across a road stub or hedge). The drawn art agrees with the data, and the rulebook text available here does not
 say which is right, so the data was NOT changed: a wrong guess would change farmer scores, and a fix would also need the tile drawings (UI, owned by W426).
