@@ -588,5 +588,10 @@ body.q-egg .bc[data-a="bird"][data-legal]::after{content:"+1 egg";position:absol
 .coachb .saytx .tgoal{display:block;font-size:15px;color:#2f5a27}
 @media (min-width:1000px){.sr2{font-size:18px}.sr2 b{font-size:24px}#opps .scnow,.sr2 small{font-size:14px}.rvsum{top:120px}}
 @media (max-width:640px){#foodrow .fd.bon .bcn,#foodrow .fd.bon .bcp{display:none}}
+/* F5: no empty picture box in rule tips; the hand shows it scrolls (edge fade) */
+.gxh-rules .gxh-pic:empty{display:none}
+#hand.more-r{-webkit-mask-image:linear-gradient(90deg,#000 calc(100% - 36px),transparent);mask-image:linear-gradient(90deg,#000 calc(100% - 36px),transparent)}
+#hand.more-l.more-r{-webkit-mask-image:linear-gradient(90deg,transparent,#000 24px,#000 calc(100% - 36px),transparent);mask-image:linear-gradient(90deg,transparent,#000 24px,#000 calc(100% - 36px),transparent)}
+#hand.more-l:not(.more-r){-webkit-mask-image:linear-gradient(90deg,transparent,#000 24px);mask-image:linear-gradient(90deg,transparent,#000 24px)}
 </style>
 </head>

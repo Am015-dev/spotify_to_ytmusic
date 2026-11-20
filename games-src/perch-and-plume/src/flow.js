@@ -199,7 +199,7 @@ function playFx(list, actor) {
   return chain;
 }
 // ---------------- the turn engine: computer moves, hot-seat hand-over, game over
-function aiDelay() { if (UI.fast) return 30; var sp = spd(); try { return Math.round((GX.aiDelay ? GX.aiDelay(850) : 850) / sp); } catch (e) { return 850; } }
+function aiDelay() { if (UI.fast) return 30; var sp = spd(); try { return Math.round((GX.aiDelay ? GX.aiDelay(500) : 500) / sp); } catch (e) { return 850; } }
 // one plain line saying what is happening now (rival steps), shown in the instruction bar and as a pill over the board
 function caption(t) {
   UI.cap = t; var p = $('#prompt'); if (p) p.textContent = t;
@@ -236,7 +236,7 @@ function turnBanner(s) {
   UI.cap = me ? null : G.pl[s].name + ' is choosing an action.'; render();
   var done = false, fin = function () { if (done) return; done = true; dropEl(d); UI.busy = false; pump(); };
   d.addEventListener('click', fin);
-  var t = setTimeout(fin, aMs(me ? 600 : 800)); UI.timers.push(t);
+  var t = setTimeout(fin, aMs(me ? 450 : 450)); UI.timers.push(t);
 }
 // the rival's played bird is shown large for a moment, then shrinks away
 function reveal(id, label, seat) {
@@ -244,7 +244,7 @@ function reveal(id, label, seat) {
   var d = document.createElement('div'); d.className = 'reveal'; d.setAttribute('data-volatile', '');
   d.innerHTML = '<div class="rvl">' + esc(label) + '</div>' + cardHTML(id, 'hand', null, '');
   document.body.appendChild(d);
-  return wait(aMs(1100)).then(function () { d.classList.add('out'); return wait(aMs(350)); }).then(function () { dropEl(d); });
+  return wait(aMs(700)).then(function () { d.classList.add('out'); return wait(aMs(350)); }).then(function () { dropEl(d); });
 }
 // steps that need no decision resolve by themselves with one readable line: an optional power you chose to skip (setting, or
 // "Always skip this kind"), and a step with exactly one legal move (the only bird that can take the egg, the last die). Every rule choice stays possible.

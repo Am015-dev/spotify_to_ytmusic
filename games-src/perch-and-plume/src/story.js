@@ -21,7 +21,7 @@ var STORY = {
   },
   // the guided first game: one line per step, in teaching order (ids = TUTORIAL-COVERAGE.md, steps in coach.js). Max 12 words each.
   coach: {
-    goal: 'Most points wins. The round goal pays grassland birds. Tap your score.',
+    goal: 'Most points wins. The round goal pays grassland birds.',
     play_play: 'Tap the glowing Play a bird button.',
     play_cost: 'It costs one food you already have. Tap the glowing bird.',
     play_slot: 'Birds go in the leftmost empty space. Tap the glowing space.',

@@ -138,8 +138,9 @@ function handGo(i) {
   var c = h.querySelectorAll('.bc')[i]; if (c) h.scrollTo({ left: c.offsetLeft - h.offsetLeft - 6, behavior: UI.fast ? 'auto' : 'smooth' });
   handPager();
 }
+function handFade() { var h = $('#hand'); if (!h) return; var r = h.scrollWidth - h.clientWidth - h.scrollLeft > 6, l = h.scrollLeft > 6; h.classList.toggle('more-r', r); h.classList.toggle('more-l', l); }
 function handPager() {
-  var pg = $('#hpg'); if (!pg) return; var n = G.pl[UI.view].hand.length;
+  handFade(); var pg = $('#hpg'); if (!pg) return; var n = G.pl[UI.view].hand.length;
   pg.innerHTML = n > 1 ? '<button type="button" class="hpb" data-a="hprev" aria-label="Previous bird"' + (UI.hix <= 0 ? ' disabled' : '') + '>&#8249;</button><span>Bird ' + (UI.hix + 1) + ' of ' + n + '</span><button type="button" class="hpb" data-a="hnext" aria-label="Next bird"' + (UI.hix >= n - 1 ? ' disabled' : '') + '>&#8250;</button>' : '';
 }
 document.addEventListener('click', function (e) {
@@ -148,7 +149,7 @@ document.addEventListener('click', function (e) {
 }, true);
 function handScrollSync() {
   var h = $('#hand'); if (!h || h.dataset.sync) return; h.dataset.sync = '1';
-  h.addEventListener('scroll', function () { clearTimeout(h._t); h._t = setTimeout(function () { var cs = h.querySelectorAll('.bc'); if (!cs.length) return; var w = cs[0].offsetWidth + 16; var i = Math.round(h.scrollLeft / w); if (i !== UI.hix) { UI.hix = i; handPager(); } }, 80); }, { passive: true });
+  h.addEventListener('scroll', function () { handFade(); clearTimeout(h._t); h._t = setTimeout(function () { var cs = h.querySelectorAll('.bc'); if (!cs.length) return; var w = cs[0].offsetWidth + 16; var i = Math.round(h.scrollLeft / w); if (i !== UI.hix) { UI.hix = i; handPager(); } }, 80); }, { passive: true });
 }
 // ---------------- turn tracker + score breakdown (top of the board)
 function trackerHTML() {
@@ -220,6 +221,7 @@ function rateEnd() {   // after the turn is over: compare with the best-value es
   var line = RATE.point && ch === RATE.point ? 'Good: ' + pts + '. Lesson learned!' : grade === 'good' ? 'Good: ' + pts + (ch === best ? ', the best move this turn.' : ', as good as the best move.')
     : (grade === 'okay' ? 'Okay: ' : 'Poor: ') + pts + '. ' + cap1(nm[best]) + ' was worth more (' + inf[best].gain + ').';
   if ((ch === 'food' || ch === 'cards') && gain <= 0 && grade === 'poor') line = 'Okay: ' + (ch === 'food' ? 'food' : 'new birds') + ' now, birds to play next turn.';   // a setup move scores later, so it is never "Poor: 0 points"
+  if (ch === 'cards' && gain === 0 && grade === 'good') line = 'Good: fills your hand for next turn.';
   if (ch === 'food' && gain === 0 && grade === 'good') line = 'Good: food now lets you play birds next turn.';
   RATE.k = null; RATE.last = { g: grade, t: line };
   showRate();
