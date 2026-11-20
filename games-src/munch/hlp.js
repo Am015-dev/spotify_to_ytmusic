@@ -190,7 +190,9 @@ function hlpForce(b){const cs=hlpCores(),T=hlpOwn(b);
   if(a&&T){const side=c.b<=T.t+6?'bottom':c.t>=T.b-6?'top':'';b.className=b.className.replace(/\bgxh-a-\w+/g,'').trim()+(side?' gxh-a-'+side:'');
     a.style.top='';a.style.visibility=side?'':'hidden';if(side)a.style.left=Math.round(Math.max(14,Math.min(c.r-c.l-26,(T.l+T.r)/2-c.l-6)))+'px'}
   return true}
-function hlpUncover(){if(typeof GXH==='undefined'||!_hlpInit||!hlpCovers())return;GXH.relayout();if(!hlpCovers())return;
+// a bulb bubble is never relaid out (the kit redraws it as a fresh bubble on every relayout, and it lands on the same glow again: that loops); move it ourselves, or hide it
+function hlpUncover(){if(typeof GXH==='undefined'||!_hlpInit||!hlpCovers())return;
+  if(!document.querySelector('.gxh-bub.on.gxh-bulbb'))GXH.relayout();if(!hlpCovers())return;
   const cs=hlpCores();for(const b of hlpBubs())if(hlpBadAt(b,hlpBox(b),cs)&&!hlpForce(b))GXH.hide()}   // no spot at all on this screen: the glowing spots speak for themselves
 // cards slide and fan after a bubble appears: while one is up, check every frame (cheap: one query when a bubble is on)
 (function loop(){try{if(document.querySelector('.gxh-bub.on:not(.gxt-bub)'))hlpUncover()}catch(e){}try{for(const b of document.querySelectorAll('.gxh-bub.on'))hlpClamp(b)}catch(e){}requestAnimationFrame(loop)})();
