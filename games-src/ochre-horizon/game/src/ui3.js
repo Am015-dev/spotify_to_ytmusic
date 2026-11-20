@@ -91,5 +91,5 @@ function pump() {
   if (G.phase === 'research') return showResearch();
   if (G.phase === 'draft') return showDraft();
   if (G.phase === 'final') return showFinal();
-  if (G.phase === 'action') coachShow(G.gen === 1 && G.acts === 0 ? 'goal' : G.gen === 2 ? 'research2' : 'turn');
+  if (G.phase === 'action') coachShow(G.gen === 1 && G.acts === 0 && !UI.coachDone.goal ? 'goal' : G.gen === 2 && !UI.coachDone.research2 ? 'research2' : 'turn');
 }

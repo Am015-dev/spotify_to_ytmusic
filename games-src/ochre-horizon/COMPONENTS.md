@@ -17,7 +17,7 @@ base game with corporate-era cards. Structure numbers from memory are marked [un
 | Map | 61 hexes, rows 5-6-7-8-9-8-7-6-5 | same shape | own bonus layout |
 | Ocean spaces / ocean tiles | 12 / 9 | 12 / 9 | |
 | Named spaces | 4 volcanic, 1 reserved city site, 2 off-map city spaces | same count and kinds | Mount Ember, Cinder Crown, Ash Throne, Red Anvil; Rift City Site; Lantern Moon Port, Far-Moon Habitat |
-| Special tiles (cards that place them) | 9 cards | [unverified] ~11 | |
+| Special tiles (cards that place them) | 8 cards | [unverified] ~11 | |
 | Milestones | 5 (claim max 3, 8 credits, 5 VP) | 5 | Steward TR 34, Founder 3 cities, Grower plant prod 4, Engineer 7 building, Navigator 5 space |
 | Awards | 5 (fund max 3 at 8/14/20; 5 VP to leader) | 5 | Surveyor tiles, Financier credit prod, Visionary science tags, Stoker heat, Prospector steel+ti prod |
 | Temperature track | -30..+8°C, 2° steps, bonuses at -24, -20, 0 | same | |

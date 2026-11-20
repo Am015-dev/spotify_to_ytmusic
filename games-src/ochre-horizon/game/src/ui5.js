@@ -74,13 +74,19 @@ var COACH = {
 function coachShow(k) {
   if (!UI.tut || UI.coachDone[k] || UI.scn) return;
   if ($('coach').classList.contains('on')) return;   // one helper at a time
-  if (k === 'turn') { var order = ['cards', 'turn2', 'proj', 'plants', 'pass', 'goals', 'end']; for (var i = 0; i < order.length; i++) if (!UI.coachDone[order[i]]) { if (order[i] === 'plants' && !(G.pl[0].plant >= OH.greenCost(0))) continue; k = order[i]; break; } if (k === 'turn') return; }
+  if (k === 'turn') {
+    var P = G.pl[0], playN = P.hand.filter(function (id) { return OH.playable(0, id); }).length;
+    var when = { cards: true, turn2: G.acts === 1, proj: UI.coachDone.cards && G.acts === 0 && G.gen >= 1 && UI.coachDone.turn2, plants: P.plant >= OH.greenCost(0), pass: !playN && P.mc < 14, goals: G.gen >= 3, end: G.gen >= 4 };
+    var order = ['cards', 'turn2', 'plants', 'proj', 'pass', 'goals', 'end'];
+    for (var i = 0; i < order.length; i++) if (!UI.coachDone[order[i]] && when[order[i]]) { k = order[i]; break; }
+    if (k === 'turn') return;
+  }
   UI.coachDone[k] = 1; UI.coachKey = k;
   $('coachT').textContent = COACH[k]; $('coach').classList.add('on');
   if (k === 'goal') { ['gTemp', 'gOxy', 'gOcean'].forEach(function (g) { $(g).classList.remove('pulse'); void $(g).offsetWidth; $(g).classList.add('pulse'); }); }
 }
 function coachHide() { $('coach').classList.remove('on'); }
-$('coachB').addEventListener('click', function () { coachHide(); if (G && OH.sideToAct() === 0 && G.phase === 'action' && !G.pending) setTimeout(function () { coachShow('turn'); }, 250); });
+$('coachB').addEventListener('click', function () { coachHide(); });
 function coachCheck(m) { if (!UI.tut) return; if ($('coach').classList.contains('on') && (m.t === 'play' || m.t === 'place' || m.t === 'setup' || m.t === 'buy' || m.t === 'pass')) coachHide(); }
 // ---------- suggestion (lightbulb): the computer's own pick for you ----------
 $('hintbtn').addEventListener('click', function () {
