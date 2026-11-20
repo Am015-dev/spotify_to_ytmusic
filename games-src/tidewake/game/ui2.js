@@ -75,13 +75,13 @@ async function playEv(e,gen){
     if(e.k==='M'){TWKit.maelstrom(e.x,e.y,false);delete KS.mael[key]}else{TWKit.removeLeviathan(e.x,e.y);delete KS.mons[key]}await sleep(700);break}
   case 'sink':{sunkAdd(e);const id=sid(e.seat),k=KS.ships[id];if(!k){await sleep(400);break}const w=e.why;
     if(/collided/.test(w)){const partner=Object.keys(KS.ships).find(o=>o!==id&&!KS.ships[o].dying&&KS.ships[o].c===k.c&&KS.ships[o].r===k.r&&KS.ships[o].port===k.port);
-      sfx('crash');if(partner)await kitWait(TWKit.collide(id,partner),1500);sfx('ship_sink',{at:.3});TWKit.sinkShip(id,{how:'crash'});delete KS.ships[id];if(partner){TWKit.sinkShip(partner,{how:'crash'});delete KS.ships[partner]}await sleep(900);try{TWKit.removeShip(id);if(partner)TWKit.removeShip(partner)}catch(x){}break}
+      sfx('crash');if(partner)await kitWait(TWKit.collide(id,partner),1500);if(window.TWFX)TWFX.sink(k);sfx('ship_sink',{at:.3});TWKit.sinkShip(id,{how:'crash'});delete KS.ships[id];if(partner){TWKit.sinkShip(partner,{how:'crash'});delete KS.ships[partner]}await sleep(900);try{TWKit.removeShip(id);if(partner)TWKit.removeShip(partner)}catch(x){}break}
     let how='wave',at;if(/Maelstrom/.test(w)){how='maelstrom';const m=G.mons.find(q=>q.k==='M')||(G.arr&&G.arr.k==='M'&&G.arr);if(m)at={c:m.x,r:m.y};sfx('maelstrom')}
     else if(/ran into|crushed|blocked/.test(w)){how='leviathan';const mm=e.pos&&e.pos.on?e.pos.on:(e.pos&&e.pos.x!=null?[e.pos.x,e.pos.y]:null);if(mm)TWKit.leviathanRoar(mm[0],mm[1]);sfx('leviathan_roar')}
     else if(/capsized/.test(w)){how='wave';sfx('rogue_wave')}else sfx('splash');
-    sfx('ship_sink',{at:.2});delete KS.hold[e.seat];delete KS.ships[id];UI.trig.sunk=1;await kitWait(TWKit.sinkShip(id,{how,at}),2500);try{TWKit.removeShip(id)}catch(x){}await sleep(250);break}
-  case 'wavenew':{kitWave({x:e.x,y:e.y,r:e.r});sfx('rogue_wave');say(`A Rogue Wave arrives: ${(e.r&1)?'column '+(e.x+1):'row '+(e.y+1)}, strength 2. A junk in that band must roll 2 or more or capsize; the wave moves on and gets stronger.`,'big');await sleep(2000);break}
-  case 'wave':{sfx('rogue_wave');TWKit.shake&&TWKit.shake(.04,500);kitWave(e.to);await sleep(1000);break}
+    if(window.TWFX)TWFX.sink(k);sfx('ship_sink',{at:.2});delete KS.hold[e.seat];delete KS.ships[id];UI.trig.sunk=1;await kitWait(TWKit.sinkShip(id,{how,at}),2500);try{TWKit.removeShip(id)}catch(x){}await sleep(250);break}
+  case 'wavenew':{kitWave({x:e.x,y:e.y,r:e.r});if(window.TWFX)TWFX.wave(e);sfx('rogue_wave');say(`A Rogue Wave arrives: ${(e.r&1)?'column '+(e.x+1):'row '+(e.y+1)}, strength 2. A junk in that band must roll 2 or more or capsize; the wave moves on and gets stronger.`,'big');await sleep(2000);break}
+  case 'wave':{sfx('rogue_wave');TWKit.shake&&TWKit.shake(.04,500);kitWave(e.to);if(window.TWFX)TWFX.wave(e.to);await sleep(1000);break}
   }
 }
 
