@@ -3,6 +3,7 @@ UI.dieSel = null;
 function curPend() { return G.pend[G.pend.length - 1] || null; }
 function dieTxt(m) { if (m.die === -1) return 'free'; if (m.die === -2) return ''; return 'die ' + P(VSE.side(G)).dice[m.die]; }
 function wTxt(w) { return w ? w + ' worker' + (w > 1 ? 's' : '') : ''; }
+function keepTxt(k) { return String(k).split('').map(function (d) { return VS.GOODS[+d].n; }).join(' + '); }
 // what a move gives, from a dry run on a copy of the state
 function preview(m) {
   var s = VSE.side(G), g = VSE.clone(G), a = g.p[s], b = G.p[s];
@@ -24,15 +25,15 @@ function title(m) {
   if (m.t === 'place') return 'Place ' + VS.tileName(T(Pl.sto[m.s]));
   if (m.t === 'sell') { var e = Pl.goods.filter(function (x) { return x.d === m.v; })[0]; return 'Sell ' + (e ? e.n : 0) + ' ' + VS.GOODS[m.v].n; }
   if (m.t === 'work') return 'Take ' + (VSE.has(Pl, 'work4') ? 4 : 2) + ' workers';
-  if (m.t === 'ship') return 'Load goods from stall ' + m.st + (m.st2 ? '+' + m.st2 : '');
+  if (m.t === 'ship') return m.keep ? 'Too many kinds: keep which?' : 'Load goods from stall ' + m.st + (m.st2 ? '+' + m.st2 : '');
   if (m.t === 'skip') return 'Skip';
   if (m.t === 'start') return 'Start keep here';
   return 'End turn';
 }
 // one option per die (the cheapest), disc variants kept aside
 function optionsOf(ms) {
-  var by = {};
-  ms.forEach(function (m) { var k = m.die + ':' + (m.t === 'buy' ? 'b' : ''); if (!by[k] || (m.w || 0) < (by[k].w || 0)) by[k] = m; });
+  var by = {}, dv = function (d) { return d >= 0 && G ? 'v' + P(VSE.side(G)).dice[d] : d; }; // equal dice: one choice, not two
+  ms.forEach(function (m) { var k = dv(m.die) + ':' + (m.t === 'buy' ? 'b' : '') + (m.keep || ''); if (!by[k] || (m.w || 0) < (by[k].w || 0)) by[k] = m; });
   var o = Object.keys(by).map(function (k) { return by[k]; });
   o.sort(function (a, b) { return (a.w || 0) - (b.w || 0) || (b.t === 'buy') - (a.t === 'buy'); });
   return o;
@@ -44,10 +45,11 @@ function select(kind, key) {
   if (UI.sel && UI.sel.kind === kind && UI.sel.key === key) { confirm(UI.sel.opts[0]); return; }
   UI.sel = { kind: kind, key: key, opts: optionsOf(ms), all: ms };
   sfx('tick');
+  if (UI.sel.opts.length === 1 && UI.sel.opts[0].disc != null && kind === 'tile' && !tutOn()) { confirm(UI.sel.opts[0]); return; }
   render();
   if (UI.sel.opts.length === 1 && (UI.sel.opts[0].t === 'work' || UI.sel.opts[0].t === 'ship') && !tutOn()) confirm(UI.sel.opts[0]);
 }
-function cancelSel() { UI.sel = null; UI.disc = null; UI.stoSel = -1; render(); }
+function cancelSel() { UI.sel = null; UI.disc = null; UI.stoSel = -1; UI.ez = false; UI.ezNo = false; render(); }
 function confirm(m) {
   if (!m) return;
   // storage full: ask which stored tile to drop
@@ -66,29 +68,33 @@ function setPrompt(t) { $('#prompt').textContent = t; }
 function renderDock(tg) {
   var det = '', acts = '', s = G.over ? -1 : VSE.side(G);
   if (G.over) { setPrompt(winText()); acts = '<button class="btn go" data-a="result">See scores</button>'; }
-  else if (!isHuman(s) || UI.busy) { setPrompt(isHuman(s) ? 'Watch the board' : nameOf(s) + ' is playing'); }
-  else if (UI.disc) { setPrompt('Storage full: tap a tile to drop'); acts = '<button class="btn" data-a="cancel">Cancel</button>'; }
+  else if (!isHuman(s) || UI.busy) { setPrompt(isHuman(s) ? 'Watch the board' : (UI.view === s && !isHuman(s) ? nameOf(s) + ' plays: red board is theirs' : nameOf(s) + ' is playing')); }
+  else if (UI.disc) { var dm = UI.disc[0]; setPrompt('Storage full: tap a stored tile to drop');
+    det = title(dm) + (dm.w ? ' (uses ' + wTxt(dm.w) + ')' : '') + ': ' + shortFx(T(dm.tile), 6); acts = '<button class="btn" data-a="cancel">Cancel</button>'; }
   else if (UI.sel) {
     var o = UI.sel.opts, m0 = o[0];
-    setPrompt(title(m0));
+    setPrompt((m0.disc != null ? 'Storage full: ' : '') + title(m0));
     var pv = preview(m0); if (pv) det = '<b>' + pv + '</b>';
-    if ((m0.t === 'take' || m0.t === 'buy' || m0.t === 'grab') && !pv) det = 'To storage. Placed: ' + shortFx(T(m0.tile), 5);
+    if ((m0.t === 'take' || m0.t === 'buy' || m0.t === 'grab') && !pv) det = (m0.disc != null ? 'Storage full, you drop one. ' : 'To storage. ') + 'Placed: ' + shortFx(T(m0.tile), 6);
+    if (m0.t === 'ship' && m0.keep) det = 'Only 3 goods kinds fit. Pick the ones to keep.';
     if (m0.t === 'place') { var t0 = T(P(s).sto[m0.s]); if (!pv && t0.col !== 'K') det = shortFx(t0); }
     acts = o.map(function (m, i) {
-      var lbl = o.length === 1 ? 'Do it' : (m.die >= 0 ? 'Use ' : '') + (dieTxt(m) || 'Do it');
-      return '<button class="btn' + (i === 0 ? ' go' : '') + '" data-a="opt" data-i="' + i + '">' + lbl + (m.w ? ' <small>' + wTxt(m.w) + '</small>' : '') + '</button>';
+      var lbl = m.keep ? 'Keep ' + keepTxt(m.keep) : o.length === 1 ? 'Do it' : (m.die >= 0 ? 'Use ' : '') + (dieTxt(m) || 'Do it');
+      return '<button class="btn' + (i === 0 ? ' go' : '') + '" data-a="opt" data-i="' + i + '">' + lbl + (m.w ? ' <small>uses ' + wTxt(m.w) + '</small>' : '') + '</button>';
     }).join('') + '<button class="btn" data-a="cancel">Cancel</button>';
   } else {
     var pd = curPend(), Pl = P(s);
     if (G.pick) setPrompt('Pick a green space for your keep');
     else if (pd) setPrompt({ free: 'Keep: one free action, any die', ship: 'Barge: tap goods in a stall', grab: 'Take a ' + (pd.cols || []).map(function (c) { return COLNAME[c].toLowerCase(); }).join('/') + ' tile', hall: 'Guildhall: place one more tile', ware: 'Granary: tap goods to sell' }[pd.h]);
-    else if (!Pl.used[0] && !Pl.used[1]) setPrompt(UI.dieSel != null ? 'Now tap a glowing spot' : 'Tap a die, then a glowing spot');
-    else if (!Pl.used[0] || !Pl.used[1]) setPrompt('One die left');
+    else if (tg.stuck) setPrompt('Nothing fits: tap Workers for +' + (VSE.has(Pl, 'work4') ? 4 : 2));
+    else if (!Pl.used[0] && !Pl.used[1]) setPrompt(UI.dieSel != null ? (UI.zoomed ? 'Tap a glowing space' : 'Now tap a glowing spot') : 'Tap a die, then a glowing spot');
+    else if (!Pl.used[0] || !Pl.used[1]) setPrompt(UI.zoomed ? 'Tap a glowing space' : 'One die left: tap a glowing spot');
     else setPrompt('Buy from the ink stall, or end');
+    if (tg.stuck) det = 'No glowing spot for your die. Workers always work.';
+    else if (!UI.wbSeen && $$('.wb').length) det = 'Red number = workers needed to turn the die.';
     if (tg.skip) acts += '<button class="btn" data-a="skip">Skip</button>';
     if (tg.end) acts += '<button class="btn go" data-a="end">End turn</button>';
   }
-  if (det && innerHeight < 620 && UI.sel) { $('#prompt').textContent += ': ' + det.replace(/<[^>]+>/g, '').replace(/^To storage\. Placed: .*/, 'to storage'); det = ''; }
   $('#detail').innerHTML = det; $('#acts').innerHTML = acts;
 }
 function shortFx(t, n) { n = n || 8; var f = VS.tileFx(t), w = f.split(' '); return w.length <= n ? f : w.slice(0, n - 1).join(' ').replace(/[,.:]$/, '') + '\u2026'; }
@@ -96,9 +102,11 @@ function shortFx(t, n) { n = n || 8; var f = VS.tileFx(t), w = f.split(' '); ret
 function bindBoard() {
   document.addEventListener('click', function (e) {
     if (!G || !UI.started) return;
+    if (UI.small && !UI.zoomed && UI.tg && UI.tg.any && !UI.disc && e.target.closest('#estate') && !e.target.closest('[data-h]')) { UI.ez = true; UI.ezNo = false; sfx('tick'); render(); return; }
     var el = e.target.closest('[data-tile],[data-h],[data-goods],[data-ship],[data-work],[data-sto],[data-die],[data-view],[data-a],[data-silver]');
     if (!el || !el.closest('#bd,#dock')) return;
-    if (el.dataset.view != null) { UI.view = +el.dataset.view; UI.sel = null; UI.stoSel = -1; sfx('tick'); render(); return; }
+    if (el.dataset.view != null) { UI.view = +el.dataset.view; UI.sel = null; UI.stoSel = -1; UI.ez = false; sfx('tick'); render(); return; }
+    if (el.dataset.h != null && UI.small && !UI.zoomed && UI.tg && UI.tg.any && !UI.disc) { UI.ez = true; UI.ezNo = false; sfx('tick'); if (UI.tg.hex[el.dataset.h]) return tapTarget('hex', +el.dataset.h); render(); return; }
     if (el.dataset.a) return dockAct(el.dataset.a, el);
     var tg = UI.tg || {}, live = !(UI.busy || G.over || !isHuman(VSE.side(G)) || UI.view !== VSE.side(G));
     if (!live) return info(el, null);
@@ -128,6 +136,7 @@ function info(el, kind) {
 function selectWork() { var tg = UI.tg; tg.workers = { 1: tg.work }; select('workers', 1); }
 function dockAct(a, el) {
   if (a === 'cancel') return cancelSel();
+  if (a === 'unzoom') { UI.ez = false; UI.ezNo = true; if (UI.sel && UI.sel.kind === 'hex') UI.sel = null; sfx('tick'); render(); return; }
   if (a === 'opt') return confirm(UI.sel.opts[+el.dataset.i]);
   if (a === 'skip') return doMove({ t: 'skip' });
   if (a === 'end') return doMove({ t: 'end' });
@@ -143,6 +152,15 @@ targets = function () {
   if (tg.work) { tg.work = tg.work.filter(keep); if (!tg.work.length) tg.work = null; }
   return tg;
 };
+var _targets2 = targets;
+targets = function () {
+  var tg = _targets2();
+  tg.stuck = false;
+  if (!tg.any || UI.disc || !tg.work || G.pick || G.pend.length) return tg;
+  var useful = function (o) { return Object.keys(o).some(function (k) { return o[k].some(function (m) { return m.t !== 'buy'; }); }); };
+  if (!useful(tg.tile) && !useful(tg.hex) && !useful(tg.goods) && !useful(tg.ship)) tg.stuck = true;
+  return tg;
+};
 // ---------- doing a move
 function rectOf(sel) { var e = $(sel); return e ? e.getBoundingClientRect() : null; }
 function doMove(m) {
@@ -155,7 +173,8 @@ function doMove(m) {
   var r = VSE.apply(G, m);
   if (!r.ok) { console.warn('illegal', m); return; }
   var evs = G.ev.slice();
-  UI.sel = null; UI.disc = null; UI.stoSel = -1;
+  UI.sel = null; UI.disc = null; UI.stoSel = -1; UI.ez = false; UI.ezNo = false;
+  if (m.w) UI.wbSeen = true;
   if (m.die === 0 || m.die === 1) UI.dieSel = null;
   save();
   UI.busy = true;

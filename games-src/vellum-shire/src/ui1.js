@@ -118,7 +118,9 @@ function renderEstate(tg) {
   out += '<path class="reg" d="' + path + '" stroke-width="' + Math.max(2, R * 0.11).toFixed(1) + '"/>';
   out += '</svg>';
   $('#estate').innerHTML = out;
-  $('#esttabs').innerHTML = '<button class="etab' + (UI.view === 0 ? ' on' : '') + '" data-view="0"><i style="background:var(--me)"></i>You</button><button class="etab op' + (UI.view === 1 ? ' on' : '') + '" data-view="1"><i style="background:var(--opp)"></i>' + nameOf(1) + '</button>';
+  if (UI.zoomed) $('#esttabs').innerHTML = '<button class="etab back" data-a="unzoom" aria-label="Show the stalls">&#9650; Stalls</button>';
+  else $('#esttabs').innerHTML = UI.view === 0 ? '<button class="etab op" data-view="1" aria-label="See the ' + nameOf(1) + '\u2019s estate"><i style="background:var(--opp)"></i>' + nameOf(1) + ' \u25b8</button>' :
+    '<button class="etab on" data-view="0" aria-label="Back to your estate">\u25c2 <i style="background:var(--me)"></i>You</button>';
   var seals = Pl.seals.length ? Pl.seals.length + ' seal' + (Pl.seals.length > 1 ? 's' : '') : '';
   var est = $('#estseal'); if (!est) { est = document.createElement('div'); est.id = 'estseal'; $('#estwrap').appendChild(est); }
   est.textContent = (Pl.board > 1 ? 'Board ' + Pl.board : '') + (seals ? (Pl.board > 1 ? ' \u00b7 ' : '') + seals : '');
@@ -130,13 +132,14 @@ function renderTray(tg) {
     var used = Pl.used[i]; var tgt = tg && tg.die[i];
     return '<button class="die' + (used ? ' used' : '') + (UI.dieSel === i ? ' on' : (tgt ? ' tgt' : '')) + '" data-die="' + i + '" aria-label="Die ' + Pl.dice[i] + (used ? ' used' : '') + '">' + dieSVG(Pl.dice[i] || 1, { bg: s === 0 ? '#fffdf5' : '#fbe9e4' }) + '</button>';
   }).join('') + '</div>';
-  html += '<div class="grp"><button class="wkb' + (tg && tg.work ? ' tgt' : '') + '" data-work="1" aria-label="Workers ' + Pl.wk + '">' + icon('worker', '#2b1d10', 18) + '<span data-engine="G.p.' + s + '.wk">' + Pl.wk + '</span></button>' +
+  html += '<div class="grp"><button class="wkb' + (tg && tg.work ? ' tgt' : '') + (tg && tg.stuck ? ' hot' : '') + '" data-work="1" aria-label="Workers ' + Pl.wk + '">' + icon('worker', '#2b1d10', 18) + '<span data-engine="G.p.' + s + '.wk">' + Pl.wk + '</span></button>' +
     '<button class="svb" data-silver="1" aria-label="Silver ' + Pl.silver + '">' + icon('coin', '#6b6f78', 18) + '<span data-engine="G.p.' + s + '.silver">' + Pl.silver + '</span></button></div>';
-  html += '<div class="grp" id="store">' + [0, 1, 2].map(function (k) {
+  var sto = [0, 1, 2].map(function (k) {
     var id = Pl.sto[k], c = (tg && (tg.sto[k] || (UI.disc && tg.disc[k]))) ? ' tgt' : '';
     if (id == null) return '<button class="sto" data-sto="' + k + '" aria-label="Empty storage"><svg viewBox="0 0 100 110"><polygon points="' + hexPts(50, 55, 44) + '" fill="rgba(90,65,38,.08)" stroke="#5a4126" stroke-width="3" stroke-dasharray="6 5"/></svg></button>';
     return '<button class="sto' + c + (UI.stoSel === k ? ' sel' : '') + '" data-sto="' + k + '" aria-label="Stored ' + VS.tileName(T(id)) + '">' + tileSVG(T(id)) + '</button>';
-  }).join('') + '</div>';
+  }).join('');
+  $('#stobox').innerHTML = sto;
   html += '<div class="grp" id="goods">' + [0, 1, 2].map(function (k) {
     var g = Pl.goods[k];
     if (!g) return '<span class="gstk empty"><span class="gbox"></span></span>';
@@ -170,8 +173,26 @@ function render() {
   layout();
   var tg = targets(); UI.tg = tg;
   renderScore(); renderStalls(tg); renderTray(tg); renderDock(tg);
-  var ew = $('#estwrap'), wW = ew.clientWidth, wH = ew.clientHeight;
-  UI.R = Math.max(12, Math.floor(Math.min((wH - 4) / 11, (wW - 4) / 12.2) * 10) / 10);
+  var bd = $('#bd'), ew = $('#estwrap'), side = 47;
+  var fitR = function () { return Math.max(12, Math.floor(Math.min((ew.clientHeight - 4) / 11, (ew.clientWidth - side - 6) / 12.124) * 10) / 10); };
+  bd.classList.remove('ez'); UI.R0 = fitR();
+  UI.small = Math.sqrt(3) * UI.R0 < 44;
+  var hk = Object.keys(tg.hex).length, ok = Object.keys(tg.tile).length + Object.keys(tg.ship).length + Object.keys(tg.goods).length;
+  UI.zoomed = !!(UI.small && tg.any && !UI.disc && (UI.ez || (hk && !ok && !UI.ezNo)));
+  if (UI.zoomed) { bd.classList.add('ez'); UI.R = fitR(); } else UI.R = UI.R0;
+  $('#estate').style.marginRight = side + 'px';
   renderEstate(tg);
+  estBanner();
   try { GXH.phase(G.over ? null : (isHuman(VSE.side(G)) && !UI.busy ? (G.pend.length ? 'pend' : 'turn') : null)); } catch (e) { }
+}
+
+// a clear banner whenever the board shows the rival's estate (and a short one when it comes back to yours)
+function estBanner() {
+  var b = $('#estban'); if (!b) return;
+  var v = UI.view, changed = UI.lastView !== v; UI.lastView = v;
+  $('#estwrap').classList.toggle('opp', v !== 0);
+  if (v !== 0) { UI.lastWasOpp = true; if (changed) { clearTimeout(UI.banT); b.textContent = nameOf(v) + '\u2019s estate'; b.className = ''; void b.offsetWidth; b.className = 'on'; UI.banT = setTimeout(function () { b.className = ''; }, 1500); } return; }
+  if (changed && UI.lastWasOpp) { b.textContent = 'Your estate'; b.className = ''; void b.offsetWidth; b.className = 'on me'; clearTimeout(UI.banT); UI.banT = setTimeout(function () { b.className = ''; }, 1300); }
+  else if (changed) b.className = '';
+  UI.lastWasOpp = false;
 }

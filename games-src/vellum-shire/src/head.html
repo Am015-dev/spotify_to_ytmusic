@@ -152,6 +152,38 @@ button{font:inherit;color:inherit}
 .rbody p{margin:4px 0}
 .rbody ul{margin:4px 0;padding-left:20px}
 .drop-cap{float:left;font:400 3.1rem/0.85 var(--fc);color:var(--verm);margin:2px 6px 0 0;text-shadow:1px 1px 0 var(--gold)}
+/* F1: 44 px targets, storage beside the estate, tap-to-zoom estate, stuck cue, rival banner */
+@media (max-width:999px){.gx-dock-head [data-gx="dock"]{display:none}}
+@media (max-width:520px){#bd{inset:2px;padding:2px;gap:3px}#stalls{gap:2px}}
+.stall{border:0;box-shadow:inset 0 0 0 1px rgba(90,65,38,.35);padding:2px 0 3px}
+.stall.blk{flex:0 0 92px;max-width:none;box-shadow:inset 0 0 0 1px #000}
+.stall .sh{height:22px}.stall .sh svg{width:22px;height:22px}
+.tile{max-width:none;min-width:44px;height:max(44px,calc(var(--ts) * 1.1))}
+.stall .tl{min-height:calc(2 * max(44px,calc(var(--ts) * 1.1)) + 2px)}
+.stall.blk .tile{width:calc(50% - 1px);min-width:44px;height:max(44px,calc(var(--ts) * .99))}
+.tile.sel{transform:translateY(-2px) scale(1.06);filter:drop-shadow(0 0 0 #b3261e) drop-shadow(0 0 3px #b3261e) drop-shadow(0 0 2px #b3261e)}
+.tile .wb,.gchip .wb,.wkb .wb{font-size:12px}
+#stobox{position:absolute;right:0;top:50%;transform:translateY(-50%);z-index:2;display:flex;flex-direction:column;gap:2px;padding:1px;border-radius:9px;background:rgba(255,250,235,.6);box-shadow:inset 0 0 0 1px rgba(90,65,38,.3)}
+#stobox .sto{width:44px;height:46px}
+#stobox:before{content:'Storage';display:block;font:700 11px var(--fb);color:var(--ink2);text-align:center}
+.die{width:max(44px,var(--u));height:max(44px,var(--u))}
+.wkb,.svb{width:44px}
+.gstk{width:42px}.gstk .gbox{width:28px;height:28px}
+.wkb.hot{border:3px solid #f2c53d;background:#fff2b8;box-shadow:0 0 0 2px #8a6118,0 0 14px 2px #f2c53d;animation:hot .6s ease-out 1}
+@keyframes hot{0%{transform:scale(1.25)}100%{transform:none}}
+#estban{position:absolute;left:50%;top:2px;transform:translateX(-50%);z-index:3;pointer-events:none;font:700 1rem var(--fb);padding:5px 14px;border-radius:999px;background:var(--opp);color:#fff8e8;border:2px solid #6d140f;box-shadow:0 2px 6px #0005;white-space:nowrap;display:none}
+#estban.on{display:block;animation:eban .5s ease-out 1}
+#estban.me{background:var(--me);border-color:#14305e}
+@keyframes eban{0%{opacity:0;transform:translate(-50%,-8px) scale(1.15)}100%{opacity:1;transform:translateX(-50%)}}
+#bd.ez #stalls{display:none}
+#estwrap.opp{box-shadow:inset 0 0 0 3px var(--opp);border-radius:10px;background:rgba(179,38,30,.06)}
+.etab.back{background:var(--ink);color:var(--gold1);border-color:var(--ink)}
+#detail{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-height:1.3em}
+#detail:empty{display:block}
+.stall .sh{height:20px}.stall .sh svg{width:20px;height:20px}
+.stall .gd{min-height:12px}
+#esttabs{top:0;left:0}
+.etab{padding:2px 6px;font-size:.9rem}
 html.cb .hcell .cbm{display:block}
 .cbm{display:none}
 </style>

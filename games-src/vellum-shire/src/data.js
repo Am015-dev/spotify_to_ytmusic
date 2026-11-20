@@ -42,7 +42,7 @@ var VS = {
     { n: 'Wine', c: '#a8322c' }, { n: 'Woad', c: '#6a4a94' }, { n: 'Honey', c: '#d9822b' }],
   // lore tiles 1..26 (ink back: 7,12,14,15,24,25). k = effect key used by the engine.
   LORE: [null,
-    { n: 'Free Charter', k: 'anyb', fx: 'A town may hold the same building twice.' },
+    { n: 'Free Charter', k: 'anyb', fx: 'A town may hold the same building more than once.' },
     { n: 'Deep Seams', k: 'minew', fx: 'Each chapter end: +1 worker per quarry.' },
     { n: 'Silver Tongue', k: 'sell2', fx: 'Selling goods gives 2 silver, not 1.' },
     { n: 'Hired Porters', k: 'sellw', fx: 'Selling goods also gives 1 worker.' },

@@ -118,6 +118,13 @@ m = find(G, x => x.t === 'ship' && x.st === 4 && !x.st2); E.apply(G, m);
 ok(G.p[0].goods.length <= 3, 'at most 3 goods kinds');
 ok(G.p[0].goods.reduce((a, b) => a + b.n, 0) > before, 'barge loads goods');
 eq(G.p[0].trk, 1, 'barge moves you up the procession');
+// barge overflow: more new kinds than free goods spaces -> the player chooses which kinds to keep
+G = fresh(); give(G, 0, 'B'); G.p[0].dice = [2, 2]; G.p[0].goods = [{ d: 1, n: 1 }, { d: 2, n: 1 }]; G.st[4].g = [3, 4, 5, 1];
+m = find(G, x => x.t === 'place' && x.h === h32 && x.w === 0); E.apply(G, m);
+eq(E.validMoves(G).filter(x => x.t === 'ship' && x.st === 4).map(x => x.keep).sort(), ['3', '4', '5'], 'overflow: one choice per kind that fits');
+m = find(G, x => x.t === 'ship' && x.st === 4 && x.keep === '4'); E.apply(G, m);
+eq([G.p[0].goods.map(x => x.d + 'x' + x.n).join(), G.st[4].g.join()], ['1x2,2x1,4x1', '3,5'], 'overflow: chosen kind + held kind loaded, the rest stays');
+ok(/more than once/.test(V.LORE[1].fx), 'lore 1 text: same building more than once (engine allows any number)');
 // sell
 G = fresh(); G.p[0].goods = [{ d: 4, n: 3 }]; G.p[0].dice = [4, 1]; G.p[0].silver = 0;
 m = find(G, x => x.t === 'sell' && x.v === 4 && x.w === 0); vp0 = G.p[0].vp; E.apply(G, m);
@@ -176,9 +183,9 @@ eq([illegal, inv], [0, 0], 'no illegal move, no broken invariant');
 ok(wins.normalVsEasy >= NG * 0.5, 'Normal beats Easy at least half the games (' + wins.normalVsEasy + '/' + NG + ')');
 const avg = i => Math.round(scores.reduce((a, s) => a + s[i], 0) / scores.length);
 console.log('gauntlet', NG, 'games; normal beat easy', wins.normalVsEasy, '; avg scores', avg(0), avg(1));
-// seat balance: normal vs normal
+// seat balance: hard vs hard (no noise, so the same every run)
 let s0w = 0; const NB = process.env.QUICK ? 4 : 16;
-for (let g = 0; g < NB; g++) { const gg = E.newGame({ seed: 5000 + g, first: 0 }); while (!gg.over) E.apply(gg, A.pick(gg, 'normal')); if (gg.winner === 0) s0w++; }
+for (let g = 0; g < NB; g++) { const gg = E.newGame({ seed: 5000 + g, first: 0 }); while (!gg.over) E.apply(gg, A.pick(gg, 'hard')); if (gg.winner === 0) s0w++; }
 ok(s0w >= NB * 0.2 && s0w <= NB * 0.8, 'first seat wins ' + s0w + '/' + NB + ' (fair)');
 console.log((fail ? 'FAIL ' : 'PASS ') + pass + ' passed, ' + fail + ' failed');
 process.exit(fail ? 1 : 0);

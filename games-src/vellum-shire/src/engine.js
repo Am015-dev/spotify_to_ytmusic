@@ -125,8 +125,8 @@ var VSE = (function () {
       if (pd.h === 'free') { dieActions(G, s, -1, 0, true, out); }
       else if (pd.h === 'ship') {
         for (var n = 1; n <= 6; n++) {
-          if (G.st[n].g.length) out.push({ t: 'ship', st: n });
-          if (has(P, 'ship2')) { var n2 = n % 6 + 1; if (G.st[n].g.length || G.st[n2].g.length) out.push({ t: 'ship', st: n, st2: n2 }); }
+          if (G.st[n].g.length) shipVariants(P, G.st[n].g, { t: 'ship', st: n }, out);
+          if (has(P, 'ship2')) { var n2 = n % 6 + 1; if (G.st[n].g.length || G.st[n2].g.length) shipVariants(P, G.st[n].g.concat(G.st[n2].g), { t: 'ship', st: n, st2: n2 }, out); }
         }
       } else if (pd.h === 'grab') {
         for (n = 1; n <= 6; n++) G.st[n].t.forEach(function (id) { if (pd.cols.indexOf(T(id).col) >= 0) takeVariants(P, { t: 'grab', st: n, tile: id }).forEach(function (m) { out.push(m); }); });
@@ -144,7 +144,7 @@ var VSE = (function () {
     if (P.used[0] && P.used[1]) out.push({ t: 'end' });
     return out;
   }
-  function same(a, b) { return a.t === b.t && a.die === b.die && a.v === b.v && a.st === b.st && a.st2 === b.st2 && a.tile === b.tile && a.disc === b.disc && a.s === b.s && a.h === b.h; }
+  function same(a, b) { return a.t === b.t && a.die === b.die && a.v === b.v && a.st === b.st && a.st2 === b.st2 && a.tile === b.tile && a.disc === b.disc && a.keep === b.keep && a.s === b.s && a.h === b.h; }
   function isLegal(G, m) { return validMoves(G).some(function (x) { return same(x, m); }); }
   function ev(G, o) { G.ev.push(o); }
   function gain(G, s, vp, why) { if (!vp) return; G.p[s].vp += vp; ev(G, { e: 'vp', s: s, n: vp, why: why }); }
@@ -203,8 +203,22 @@ var VSE = (function () {
         if ([1, 2, 3, 4, 5, 6].some(function (n) { return G.st[n].t.some(function (id2) { return cols.indexOf(T(id2).col) >= 0; }); })) G.pend.push({ h: 'grab', cols: cols }); }
     }
   }
-  function loadShip(G, s, n) {
+  // more new goods kinds than free goods spaces: the player chooses which kinds to keep (one move per choice)
+  function shipVariants(P, g, base, out) {
+    var nk = [], free = 3 - P.goods.length;
+    g.forEach(function (d) { if (nk.indexOf(d) < 0 && !P.goods.some(function (x) { return x.d === d; })) nk.push(d); });
+    nk.sort(function (a, b) { return a - b; });
+    if (nk.length <= free || free <= 0) { out.push(base); return; }
+    (function rec(i, pick) {
+      if (pick.length === free) { var m = Object.assign({}, base); m.keep = pick.join(''); out.push(m); return; }
+      for (var j = i; j < nk.length; j++) rec(j + 1, pick.concat([nk[j]]));
+    })(0, []);
+  }
+  function loadShip(G, s, n, keep) {
     var P = G.p[s], g = G.st[n].g; if (!g.length) return;
+    if (keep) { var held = P.goods.map(function (x) { return x.d; }), lf = [], got0 = 0; // chosen kinds only
+      g.forEach(function (d) { if ((held.indexOf(d) >= 0 || keep.indexOf(String(d)) >= 0) && addGoods(P, d)) got0++; else lf.push(d); });
+      G.st[n].g = lf; ev(G, { e: 'load', s: s, st: n, n: got0 }); return; }
     var counts = {}; g.forEach(function (d) { counts[d] = (counts[d] || 0) + 1; });
     var kinds = Object.keys(counts).map(Number).sort(function (a, b) { var ha = P.goods.some(function (x) { return x.d === a; }) ? 1 : 0, hb = P.goods.some(function (x) { return x.d === b; }) ? 1 : 0; return (hb - ha) || (counts[b] - counts[a]) || (a - b); });
     var left = [], got = 0;
@@ -223,7 +237,7 @@ var VSE = (function () {
       case 'sell': if (m.die === -2) G.pend.pop(); else useDie(G, s, m); sell(G, s, m.v); break;
       case 'work': useDie(G, s, m); var n = has(P, 'work4') ? 4 : 2; P.wk += n; ev(G, { e: 'workers', s: s, n: n }); if (has(P, 'work1s')) { P.silver += 1; ev(G, { e: 'silver', s: s, n: 1 }); } break;
       case 'buy': P.bought = true; P.silver -= 2; fromStall(G, m.st, m.tile); sl = toStorage(G, s, m.tile, m.disc); ev(G, { e: 'buy', s: s, st: m.st, tile: m.tile, slot: sl }); break;
-      case 'ship': G.pend.pop(); loadShip(G, s, m.st); if (m.st2) loadShip(G, s, m.st2); break;
+      case 'ship': G.pend.pop(); loadShip(G, s, m.st, m.keep); if (m.st2) loadShip(G, s, m.st2, m.keep); break;
       case 'grab': G.pend.pop(); fromStall(G, m.st, m.tile); sl = toStorage(G, s, m.tile, m.disc); ev(G, { e: 'take', s: s, st: m.st, tile: m.tile, slot: sl }); break;
       case 'skip': G.pend.pop(); break;
       case 'end': nextTurn(G); return { ok: true };

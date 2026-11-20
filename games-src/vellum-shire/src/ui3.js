@@ -94,7 +94,7 @@ function buildMenu() {
       about: { name: 'Vellum Shire', version: '1.0', text: 'Ink icons by Delapouite, Lorc and Skoll (game-icons.net, CC BY 3.0). Fonts: Uncial Antiqua, UnifrakturMaguntia, IM Fell English (SIL OFL).' } });
   } catch (e) { console.warn(e); }
 }
-// ---------- help bulb: the suggestion is the Normal computer's own pick
+// ---------- help bulb: the suggestion is the Hard computer's own pick
 function moveTarget(m) {
   if (!m) return null;
   if (m.t === 'take' || m.t === 'buy' || m.t === 'grab') return $('[data-tile="' + m.tile + '"]');
@@ -118,7 +118,8 @@ function hlpInit() {
       avoid: '.tgt,#acts .btn' });
     GXH.bulb({ el: '#bulbbtn', suggest: function () {
       if (!G || G.over || !isHuman(VSE.side(G)) || UI.busy || UI.view !== VSE.side(G)) return null;
-      var m = VSAI.pick(G, 'normal'), el = moveTarget(m); if (!el) return null;
+      if (UI.tg && UI.tg.stuck) return { target: function () { return $('[data-work]'); }, why: 'Nothing fits: tap Workers for +' + (VSE.has(P(VSE.side(G)), 'work4') ? 4 : 2) };
+      var m = VSAI.pick(G, 'hard'), el = moveTarget(m); if (!el) return null;
       var pv = preview(m); return { target: function () { return moveTarget(m); }, why: title(m) + (m.w ? ' (' + wTxt(m.w) + ')' : '') + (pv ? ': ' + pv : '') };
     }, rulesFor: function () { return null; } });
   } catch (e) { console.warn(e); }
@@ -167,6 +168,7 @@ function tutSteps() {
     { id: 'sell', title: 'Sell goods', say: 'Your 6 sells goods marked 6. Tap them.', target: tq('[data-goods="6"]'), ready: function () { return !UI.busy && !!$('[data-goods="6"].tgt'); }, wait: tapM('goods') },
     { id: 'sell2', say: '2 points per goods tile, plus silver. Tap Do it.', target: tq('[data-a="opt"]'), wait: tapM('opt') },
     { id: 'work', title: 'Workers', say: 'Workers turn a die up or down by 1.', target: tq('[data-work]'), ready: function () { return !UI.busy; }, wait: null },
+    { id: 'stuck', title: 'Nothing fits?', say: 'No glowing spot for a die? Tap Workers: +2.', target: tq('[data-work]'), ready: function () { return !UI.busy; }, wait: null },
     { id: 'ink', title: 'Ink stall', say: 'Once a turn, pay 2 silver for an ink-stall tile.', target: tq('.stall.blk'), wait: null },
     { id: 'region', title: 'Big points', say: 'Fill a whole region of one colour for big points!', target: tq('#estate'), wait: null }
   ];

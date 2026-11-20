@@ -56,6 +56,19 @@
         { sel: '[data-a="end"]', skip: function () { return !q('[data-a="end"]'); }, ready: function () { return idle(); } }],
       idle: function () { return idle() && G.turnNo >= 2 && VSE.side(G) === 0; }, verify: function (a, b) { return b.t >= 2 || 'turns ' + b.t; } }],
     mut: [{ name: 'computer never moves', js: 'aiStep=function(){}' }] });
+  GXS.add({ id: 'vs-stuck', name: 'Nothing fits: Workers glow', ask: 'No spot glows. Is Workers obvious?', seed: 11, when: booted,
+    setup: function () { game({}, function (g) { g.p[0].dice = [5, 5]; g.p[0].wk = 0; g.p[0].silver = 0; g.p[0].goods = g.p[0].goods.filter(function (x) { return x.d !== 5; }); g.st[5].t.forEach(function (id) { g.gone.push(id); }); g.st[5].t = []; g.st[5].g = []; }); },
+    checks: [{ kind: 'fn', name: 'Workers glow and the line says so', fn: function () { return (!!document.querySelector('[data-work].hot') && /Nothing fits: tap Workers/.test(document.querySelector('#prompt').textContent)) || document.querySelector('#prompt').textContent; } },
+      { kind: 'play', name: 'tap Workers, take 2', snap: function () { return { wk: G.p[0].wk }; },
+      steps: [{ sel: '[data-work]', ready: function () { return !!q('[data-work].hot'); } }, { sel: '[data-a="opt"][data-i="0"]', ready: function () { return !!q('[data-a="opt"]'); }, skip: function () { return G.p[0].wk > 0; } }],
+      idle: function () { return idle() && G.p[0].wk > 0; }, verify: function (a, b) { return b.wk - a.wk === 2 || JSON.stringify([a, b]); } }],
+    mut: [{ name: 'no stuck cue', js: 'targets=(function(f){return function(){var t=f();t.stuck=false;return t}})(targets);render()' }] });
+  GXS.add({ id: 'vs-full', name: 'Storage full on the first tap', ask: 'Tap a tile with full storage', seed: 11, when: booted,
+    setup: function () { game({}, function (g) { g.p[0].dice = [3, 3]; g.p[0].wk = 0; give(g, 'B'); give(g, 'B'); give(g, 'Q'); }); },
+    checks: [{ kind: 'play', name: 'first tap says storage full', snap: function () { return {}; },
+      steps: [{ sel: '.stall[data-st="3"] .tile.tgt', ready: function () { return !!q('.stall[data-st="3"] .tile.tgt'); } }],
+      idle: function () { return idle() && !!UI.disc; }, verify: function () { var t = document.querySelector('#prompt').textContent; return /Storage full/.test(t) || t; } }],
+    mut: [{ name: 'silent first tap', js: 'setPrompt=function(){}' }] });
   GXS.add({ id: 'vs-zoom', name: 'Every tile, shown large', ask: 'Can you read the lore tile?', seed: 11, when: booted,
     setup: function () { game(); GX.refOpen('l-3'); },
     checks: [{ kind: 'fn', name: 'reference open on lore 3', fn: function () { var t = document.body.innerText; return /Silver Tongue/.test(t) || 'no lore text'; } }] });

@@ -7,7 +7,7 @@ const URL = process.env.VS_URL || 'file://' + path.resolve(__dirname, 'vellum-sh
 (async () => {
   const b = await chromium.launch(); let fails = 0;
   for (let g = 0; g < N; g++) {
-    const ctx = await b.newContext({ viewport: { width: 375, height: 667 }, hasTouch: true, isMobile: true, deviceScaleFactor: vdir ? 2 : 1, recordVideo: vdir ? { dir: vdir, size: { width: 375, height: 667 } } : undefined });
+    const ctx = await b.newContext({ viewport: { width: 375, height: +process.env.VS_H || 667 }, hasTouch: true, isMobile: true, deviceScaleFactor: vdir ? 2 : 1, recordVideo: vdir ? { dir: vdir, size: { width: 375, height: 667 } } : undefined });
     const p = await ctx.newPage(); const errs = []; p.on('pageerror', e => errs.push(e.message)); p.on('console', m => { if (m.type() === 'error') errs.push(m.text()); });
     await p.goto(URL); await p.waitForTimeout(800);
     if (fast) await p.evaluate(() => { window.ANIM = false; window.AIDELAY = 30; });
