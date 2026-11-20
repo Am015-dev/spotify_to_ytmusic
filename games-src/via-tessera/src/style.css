@@ -154,6 +154,8 @@ button:focus-visible, [tabindex]:focus-visible { outline: 3px solid var(--gold);
 .panel h2 { font-family: var(--serif); color: var(--terra2); margin: 0 0 8px; font-size: 20px; }
 .panel p { margin: 0 0 10px; line-height: 1.35; }
 .panel .btn { width: 100%; margin-top: 8px; }
+/* text sits at least 8 px inside the column the buttons draw */
+.panel h2, .panel > p, .panel .rules, .panel .small, .sh-head h2, .sheet .lead, .sheet .deckn, .sheet .tsum .small { padding-left: 8px; padding-right: 8px; }
 .seg { display: flex; gap: 6px; margin: 6px 0; }
 .seg button { flex: 1; min-height: 44px; border-radius: 10px; border: 2px solid var(--grout); background: var(--marble2); font-weight: 700; font-size: 15px; }
 .seg button[aria-pressed="true"] { background: var(--lapis); color: #fff; }

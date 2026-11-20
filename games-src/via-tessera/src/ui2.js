@@ -187,6 +187,7 @@ function openMarket(buying) {
   var pi = Math.max(0, VT.sideToAct(G)), pd = G.pend, consul = buying && pd && pd.consul, h = '<p class="lead">' + (buying ? (consul ? 'Printed price only' : 'Price grows to the right') : 'Cards you can buy later') + '</p><div class="mrow">';
   var hs = UI.hint && UI.hint.t === 'buy' ? UI.hint.s : -1;
   G.disp.forEach(function (id, s) {
+    if (id == null) { h += '<div class="mc"><div class="pile" style="width:76px;height:100px">bought</div></div>'; return; }
     var can = buying && pd && pd.left > 0 && VT.canBuyCard(G, pi, s, consul);
     h += '<div class="mc ' + (buying ? (can ? 'can' : 'no') : '') + '">' + cardHTML(id, (can ? 'glow ' : '') + (hs === s ? 'hint' : ''), 'data-s="' + s + '"' + (buying && !can ? ' aria-disabled="true"' : '')) + '<div class="price">' + priceHTML(s, consul) + '</div><div class="note">' + esc(cardWhat(D.CARDS[id]).split(',')[0].split(' then')[0]) + '</div></div>';
   });
@@ -272,6 +273,11 @@ function hintTarget() {
 }
 function placeFinger() {
   var t = UI.hints && UI.learn ? hintTarget() : null;
+  // a hinted map target outside the view: bring it in once (never fights the player's own panning)
+  if (t && t.closest && t.closest('#map') && UI._centered !== UI._hk) {
+    UI._centered = UI._hk; var r = t.getBoundingClientRect(), b = $('#board').getBoundingClientRect();
+    if (r.left < b.left || r.right > b.right || r.top < b.top || r.bottom > b.bottom) { var v = UI.view, sx = v.w / b.width; animView({ x: v.x + (r.left + r.width / 2 - b.left - b.width / 2) * sx, y: v.y + (r.top + r.height / 2 - b.top - b.height / 2) * sx, w: v.w }); setTimeout(placeFinger, 480); return; }
+  }
   showFinger(t);
   document.querySelectorAll('.hint').forEach(function (x) { if (!x.classList.contains('cd')) x.classList.remove('hint'); });
 }

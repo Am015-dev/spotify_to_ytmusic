@@ -45,6 +45,7 @@ GAMES = {
     "wildmark":         ("Wildmark",         "wildmark",            "wildmark"),
     "stitchwise":       ("Stitchwise",       "stitchwise",          "stitchwise"),
     "vinegrave":        ("Vinegrave",        "vinegrave",           "vinegrave"),
+    "via-tessera":      ("Via Tessera",      "via-tessera",         "via-tessera"),
     "mainhattan-nightrun": ("Mainhattan Nightrun", "nightrun/parts", "nightrun"),
 }
 MAP_DIR = {"mainhattan-nightrun": "nightrun"}   # where MODULES.md goes when not the build dir

@@ -55,7 +55,7 @@ function buildMap() {
   var img = UI.mosaic || (UI.mosaic = VTART.mosaic(D, 2));
   if (img) el('image', { href: img, x: 0, y: 0, width: VTART.W, height: VTART.H, preserveAspectRatio: 'none' }, svg);
   else el('rect', { x: 0, y: 0, width: VTART.W, height: VTART.H, fill: '#1f4e8c' }, svg);
-  ['routes', 'provs', 'slots', 'cities', 'cols', 'over'].forEach(function (k) { L[k] = el('g', { 'class': 'ly-' + k }, svg); });
+  ['routes', 'cities', 'provs', 'slots', 'cols', 'over'].forEach(function (k) { L[k] = el('g', { 'class': 'ly-' + k }, svg); });
   D.ROUTES.forEach(function (r) { var g = GEO[r.id]; el('path', { 'class': 'rt ' + r.t, d: 'M' + g.A.x + ' ' + g.A.y + 'Q' + g.cx + ' ' + g.cy + ' ' + g.B.x + ' ' + g.B.y }, L.routes); });
   renderMap();
 }
@@ -195,7 +195,16 @@ function frameTargets() {
   var pi = VT.sideToAct(G);
   if (UI.selCol != null && pi >= 0) { var col = G.pl[pi].cols[UI.selCol]; if (col.at) pts.push(col.at.r != null ? { x: GEO[col.at.r].mx, y: GEO[col.at.r].my } : VT.CITY[col.at.c]); }
   for (var k in t.col) { var a = k.split(':'), cc = G.pl[+a[0]].cols[+a[1]]; if (cc.at) pts.push(cc.at.r != null ? { x: GEO[cc.at.r].mx, y: GEO[cc.at.r].my } : VT.CITY[cc.at.c]); }
-  if (pts.length) fitPoints(pts, 80, 360);
+  if (!pts.length) return;
+  // too spread out for a phone: frame the few targets nearest the hint (or the middle of the current view)
+  var x0 = Math.min.apply(null, pts.map(function (q) { return q.x; })), x1 = Math.max.apply(null, pts.map(function (q) { return q.x; }));
+  var bb = boardBox();
+  if (x1 - x0 > 560 && bb.w < 700) {
+    var c = UI.view ? { x: UI.view.x + UI.view.w / 2, y: UI.view.y + UI.view.h / 2 } : VT.CITY[D.CAPITAL];
+    var hm = UI.hint; if (hm && hm.t === 'prov') c = provPos(D.PROVS.filter(function (x) { return x.id === hm.p; })[0]); else if (hm && hm.t === 'build') c = VT.CITY[hm.c];
+    pts = pts.slice().sort(function (a, b) { return Math.hypot(a.x - c.x, a.y - c.y) - Math.hypot(b.x - c.x, b.y - c.y); }).slice(0, 4);
+  }
+  fitPoints(pts, 80, 360);
 }
 function wireCamera() {
   var svg = $('#map'), pts = {}, start = null, moved = false;
@@ -233,7 +242,7 @@ function renderRace() {
     h += '<span class="chip' + (turn ? ' turn' : '') + '" title="' + esc(p.name) + ' points now"><span class="dot" style="background:' + PCOL[i] + '"></span>' + esc(p.name) + ' <b data-engine-score="' + i + '">' + VT.score(G, i).total + '</b></span>';
   });
   $('#race').innerHTML = h;
-  $('#mktn').textContent = G.disp.length;
+  $('#mktn').textContent = G.disp.filter(function (x) { return x != null; }).length;
 }
 function renderStore() {
   var pi = UI.mode === 'hot' ? Math.max(0, VT.sideToAct(G)) : 0, p = G.pl[pi], h = '<button type="button" class="storebtn" id="storeb" aria-label="Your storehouse"><span class="slots">';
