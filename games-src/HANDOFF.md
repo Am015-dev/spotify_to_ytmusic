@@ -289,3 +289,12 @@ Live fix: original-name phrase removed from shelf blurb + sands page (15:2x).
 - Lesson: the rubric/test pass does not match the owner's eyes. A game goes to the owner only with a before/after webm of the first 3 minutes at 375x667 and a cold-play verdict from an agent that did not build it.
 - PLAY1 hollowbough (shelf/W550-hollowbough-play), PLAY2 twin-thrones (shelf/W551-twin-thrones-play): Opus workers diagnosing and fixing the core play against the original's official app.
 - 21 strict reviews/fixers in flight (R74-R92, F13 vinegrave, F15 shipwreck). Treat their PASS as necessary, not sufficient: add the cold-play video step before asking the owner.
+
+## 20 Nov 15:25 UTC: new games (owner: identical rules and components; more agents OK)
+- Builders (brief games-src/briefs/NEWGAME-BRIEF.md, identical rules/components, only names/art original):
+  NEW2 estate dice+tiles W561, NEW3 Roman cards W562, NEW4 Mars engine W563, NEW5 gem duel W564, NEW6 landscapes+animals W565,
+  NEW7 co-op tactical dungeon (owner "D&D", no brand names) W566, NEW8 epic war + artifact hunt (owner "LOTR", no book names) W567.
+- Data helpers on separate branches (builders do NOT know about them; merge or wire them in when each builder reports):
+  DATA4 -> shelf/W563-new-mars-data games-src/_data/mars/; DATA7 -> shelf/W566-new-dungeon-data games-src/_data/dungeon/; DATA8 -> shelf/W567-new-epic-data games-src/_data/epic/.
+- Dropped: a deep-sea co-op trick-taker (duplicate of lantern-dive). Check games-src/ before proposing any new game; GAMES-TODO.md is stale.
+- 15:28 CORRECTION: a data worker refused to copy a game's full card/monster/scenario content renamed (that recreates the specific game). Brief now: identical RULES and component STRUCTURE (types, counts, distributions); our OWN creative content (card designs in big pools, scenarios, maps, event cards, characters). DATA4/7/8 cancelled. NEW4/NEW7/NEW8 restarted on that rule; NEW2/3/5/6 continue (mostly mechanical components).
