@@ -481,3 +481,17 @@ html.ph .mine .hand.scrolls{scroll-snap-type:x proximity;scroll-padding:0 8px;ov
 html.ph .mine .hand.scrolls::-webkit-scrollbar{display:none}
 html.ph .mine .hand.scrolls .card{scroll-snap-align:start}
 html.ph .mine .hand.scrolls::after{content:"";flex:0 0 8px}
+/* F19 PC: card names and numbers on the hand are real text (12 px floor), the tiny type label and gold are dropped from the fan (colour + popup carry them) */
+@media (pointer:fine){
+  html:not(.ph) .mine .hand .card .cn,html.ph-l .mine .hand .card .cn{font-size:12px!important;line-height:1.1;max-width:100%;white-space:normal;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+  html:not(.ph) .mine .hand .card :is(.tag,.gold),html.ph-l .mine .hand .card :is(.tag,.gold){font-size:12px!important}
+  html:not(.ph) .mine .hand .card .kind,html.ph-l .mine .hand .card .kind{display:none}
+  html:not(.ph) .mine .gear .gchip,html:not(.ph) .mine .gear .gl{font-size:12px}
+}
+@media (pointer:fine){html .opps .lb{font-size:12px!important}}
+@media (pointer:fine){
+  html:not(.ph) .mine .hand .card .cx,html.ph-l .mine .hand .card .cx,html:not(.ph) .mine .hand .card small,html.ph-l .mine .hand .card small{display:none}
+  html:not(.ph) :is(.arena,.bfstage,.gear,.tableau) .card .cn,html:not(.ph) :is(.arena,.bfstage) .card :is(.tag,.gold){font-size:12px!important}
+  html:not(.ph) :is(.arena,.bfstage,.gear) .card :is(.cx,.kind,small){display:none}
+}
+@media (pointer:fine){html:not(.ph) .pile .card .cn{font-size:12px!important}}

@@ -3,7 +3,7 @@
 // compact player chips (same data-opp handler as the old rival boxes) and mirrors the status text into the top bar.
 const PH={on:false,
   want(){let f=null;try{const m=location.search.match(/[?&]phone=(\d)/);if(m)f=m[1]==='1'}catch(e){}if(f!=null)return f;
-    const s=Math.min(innerWidth,innerHeight);let co=false;try{co=matchMedia('(pointer:coarse)').matches}catch(e){}return s<=500||(co&&s<=600)},
+    const s=Math.min(innerWidth,innerHeight);let co=false;try{co=matchMedia('(pointer:coarse)').matches}catch(e){}return (s<=500&&(innerHeight>innerWidth||innerWidth<720||co))||(co&&s<=600)||(innerWidth>innerHeight&&innerHeight<=560&&innerWidth<=1100)},
   apply(){const h=document.documentElement,on=this.want(),l=innerWidth>innerHeight;this.on=on;
     h.classList.toggle('ph',on);h.classList.toggle('ph-p',on&&!l);h.classList.toggle('ph-l',on&&l);
     if(on){const a=document.querySelector('.gx-app');if(a)a.classList.remove('gx-dock-min','gx-sheet-full')}
