@@ -31,6 +31,8 @@ button{font-family:inherit;color:inherit}
 #zoombox button{width:40px;height:40px;border-radius:6px;background:rgba(12,9,14,.85);border:1px solid #3a3142;font:700 20px/1 var(--px);color:var(--ink)}
 #hot{position:absolute;inset:0;pointer-events:none}
 .hot{position:absolute;pointer-events:auto;border:0;background:transparent;border-radius:50%;padding:0;cursor:pointer}
+.hot.atk,.hot.heal{animation:tgp .7s ease-out 3}
+@keyframes tgp{0%{box-shadow:0 0 0 0 rgba(255,106,74,.9)}100%{box-shadow:0 0 0 14px rgba(255,106,74,0)}}
 .hot:focus-visible{outline:2px solid var(--flame)}
 #floats{position:absolute;inset:0;pointer-events:none;overflow:hidden}
 .fl{position:absolute;font:700 18px/1 var(--px);transform:translate(-50%,-50%);text-shadow:0 2px 0 #000,0 0 6px #000;animation:flup .9s ease-out forwards;white-space:nowrap}
@@ -46,7 +48,7 @@ button{font-family:inherit;color:inherit}
 @media (prefers-reduced-motion:reduce){.mod,.fl{animation:none}}
 /* dock */
 .gx-dock{background:linear-gradient(#17121b,#0f0c12);border-top:2px solid #000;box-shadow:0 -1px 0 #3a2e2a}
-.gx-dock-body{padding:4px 6px 6px;display:flex;flex-direction:column;gap:4px;overflow:hidden}
+.gx-dock-body{min-height:calc(var(--gx-sheet-h) - 4px);box-sizing:border-box;padding:4px 6px 6px;display:flex;flex-direction:column;gap:4px;overflow:hidden}
 #promptrow{display:flex;align-items:center;gap:6px;min-height:40px}
 #prompt{flex:1;margin:0;font:700 13px/1.2 var(--px);color:var(--flame);min-width:0}
 #pbtns{display:flex;gap:4px;flex-wrap:nowrap}
@@ -71,7 +73,7 @@ button{font-family:inherit;color:inherit}
 .cd.dis{opacity:.42}
 .cd.play .half.can{background:rgba(232,163,60,.18);box-shadow:inset 0 0 0 2px var(--wax);cursor:pointer}
 .cd.play .half.can.pick{background:rgba(232,163,60,.45)}
-.cd.play .half.no{opacity:.35}
+.cd.play .half.no{opacity:.4;background:#cbbfa6;color:#6e6458}
 .cd.lostc{filter:grayscale(.8) brightness(.6)}
 .cd .basic{display:flex;gap:2px;padding:2px}
 .cd .basic button{flex:1;min-height:30px;font:700 10px/1 var(--px);border-radius:3px;border:1px solid #6b5a48;background:#ddd0b4}

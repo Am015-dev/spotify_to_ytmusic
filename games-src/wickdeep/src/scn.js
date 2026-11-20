@@ -22,7 +22,7 @@
   GXS.add({ id: 'wd-move', name: 'Your turn: move', ask: 'Can you play a half and move?', seed: 7, when: booted,
     setup: function () { fresh(1, null, 7); toTurn(); return calm(); },
     checks: [{ kind: 'play', name: 'play a move half, then walk', snap: function () { var f = WD.fig(G, G.ask.id); return { id: f.id, pos: f.pos }; },
-      steps: [{ sel: function () { var hs = [].slice.call(document.querySelectorAll('#tray .half.can')); return hs.filter(function (h) { return /Move|Jump/.test(h.textContent); })[0] || hs[0]; } }, { sel: '#playbtn' },
+      steps: [{ sel: function () { var hs = [].slice.call(document.querySelectorAll('#tray .half.can')); return hs.filter(function (h) { return /Move|Jump/.test(h.textContent); })[0] || hs[0]; } }, { sel: '#playbtn', skip: function () { return !document.getElementById('playbtn'); } },
         { sel: '#hot .glow', skip: function () { return !G.ask || G.ask.h !== 'move'; } }], idle: idle,
       verify: function (b) { var f = WD.fig(G, b.id); return !f || f.pos !== b.pos || G.ask.h !== 'move' || 'did not move'; } }],
     mut: [{ name: 'moves ignored', js: 'WD.apply = function(G){ return G; }' }] });
@@ -35,7 +35,7 @@
       WDUI.refresh(); return calm();
     },
     checks: [{ kind: 'play', name: 'Hit 2 a monster', snap: function () { return { hp: (WD.fig(G, 'mx') || { hp: 0 }).hp, n: G.mamd.draw.length + G.mamd.disc.length }; },
-      steps: [{ sel: function () { return document.querySelector('#tray .basic button.can[data-b="top"]'); } }, { sel: '#playbtn' }, { sel: '#hot .glow.atk', skip: function () { return !G.ask || G.ask.h !== 'target'; } }], idle: idle,
+      steps: [{ sel: function () { return document.querySelector('#tray .basic button.can[data-b="top"]'); } }, { sel: '#playbtn', skip: function () { return !document.getElementById('playbtn'); } }, { sel: '#hot .glow.atk', skip: function () { return !G.ask || G.ask.h !== 'target'; } }], idle: idle,
       verify: function (b) { var m = WD.fig(G, 'mx'), d = (G.figs[0].amd.disc.length + G.figs[1].amd.disc.length); return d > 0 || (m ? m.hp < b.hp : true) || 'no attack card drawn'; } }],
     mut: [{ name: 'attack skipped', js: 'var _a=WD.apply; WD.apply=function(G,m){ if(m.t==="tgt") m={t:"skip"}; return _a(G,m); }' }] });
   GXS.add({ id: 'wd-camp', name: 'Campaign map', ask: 'Can you see the scenario map?', seed: 9, when: booted,

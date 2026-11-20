@@ -25,7 +25,7 @@ function paintSprite(cv, tile, tint) { var x = cv.getContext('2d'); cv.width = c
 function spriteCanvas(tile, tint) { return paintSprite(document.createElement('canvas'), tile, tint); }
 function refreshSprites() { document.querySelectorAll('canvas[data-tile]').forEach(function (c) { paintSprite(c, +c.dataset.tile, c.dataset.tint || ''); }); }
 function tileCanvas(tile, tint) { var c = spriteCanvas(tile, tint); c.dataset.tile = tile; if (tint) c.dataset.tint = tint; return c; }
-var TILE = { door: 45, doorOpen: 33, trap: 41, chest: 89, obstacles: [82, 64, 63, 72, 65, 73], rubble: 12 };
+var TILE = { door: 45, doorOpen: 33, trap: 41, chest: 89, obstacles: [82, 64, 65], rubble: 12 };
 function figTile(f) {
   if (f.kind === 'hero') return D.HERO[f.cls].tile;
   if (f.kind === 'boss') return D.BOSS[f.type].tile;

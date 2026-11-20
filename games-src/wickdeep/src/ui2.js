@@ -142,6 +142,7 @@ function renderDock() {
     case 'recover': setPrompt('Take one card back', [{ t: 'Skip', fn: function () { doMove({ t: 'skip' }); } }]); A.cs.forEach(function (c) { var el = cardEl(c); el.addEventListener('click', function () { doMove({ t: 'card', c: c }); }); tray.appendChild(el); }); return;
     case 'lrest': setPrompt(H.n + ' rests: lose one card', []); f.disc.forEach(function (c) { var el = cardEl(c); el.addEventListener('click', function () { doMove({ t: 'lose', c: c }); }); tray.appendChild(el); }); return;
     case 'srest': {
+      if (!A.must && f.hand.length >= 4 && !UI.tut) { setTimeout(function () { if (G && G.ask === A) doMove({ t: 'nosrest' }); }, 0); setPrompt('', []); return; }
       setPrompt(H.n + ': short rest?', [{ t: 'Rest', cls: 'go', fn: function () { doMove({ t: 'srest' }); } }].concat(A.must ? [] : [{ t: 'No', fn: function () { doMove({ t: 'nosrest' }); } }]));
       tray.appendChild(infoP('Lose 1 random played card. Get the other ' + (f.disc.length - 1) + ' back.')); return;
     }
@@ -178,6 +179,7 @@ function dockSelect() {
   var canRest = f.disc.length >= 2, canPlay = f.hand.length >= 2;
   var btns = [];
   if (canRest) btns.push({ t: 'Rest', id: 'lrbtn', fn: function () { UI.sel[f.id] = []; doMove({ t: 'lrest', id: f.id }); } });
+  if (picked.length < 2 && canPlay) btns.push({ t: 'Hint', id: 'hintbtn', fn: function () { var h = hintSel(f); if (h) { UI.sel[f.id] = h.slice(); toast('Suggested: ' + h.map(function (c) { return D.CARD[c].n; }).join(' + ')); renderDock(); } } });
   btns.push({ t: 'Ready', cls: 'go', id: 'readybtn', dis: picked.length !== 2, fn: function () { var p = UI.sel[f.id]; UI.sel[f.id] = []; doMove({ t: 'sel', id: f.id, cards: p.slice() }); } });
   setPrompt(!canPlay ? H.n + ': must rest' : picked.length === 2 ? H.n + ': ready?' : H.n + ': pick ' + (2 - picked.length) + ' card' + (picked.length ? '' : 's'), btns);
   var tabs = heroTabs(); if (tabs) tray.appendChild(tabs);
@@ -195,20 +197,29 @@ function dockSelect() {
   st.innerHTML = '<span class="chip">HP ' + f.hp + '/' + f.max + '</span><span class="chip">Played ' + f.disc.length + '</span><span class="chip">Lost ' + f.lost.length + '</span>';
   tray.appendChild(st);
 }
+// the helper's pick for one hero (same evaluation the test games use)
+function hintSel(f) {
+  var save = G.sel, m; G.sel = {}; Object.keys(save).forEach(function (k) { G.sel[k] = save[k]; });
+  E.liveHeroes(G).forEach(function (h) { if (h.id !== f.id) G.sel[h.id] = 1; });
+  try { m = AI.choose(G); } catch (e) { m = null; }
+  G.sel = save;
+  return m && m.t === 'sel' ? m.cards : null;
+}
 function dockPlay(f) {
   var A = G.ask, tray = $('tray'), H = D.HERO[f.cls], opts = E.validMoves(G).filter(function (m) { return m.t === 'half'; });
   var can = function (c, h, basic) { return opts.some(function (m) { return m.c === c && m.h === h && !!m.basic === !!basic; }); };
   var pk = UI.pick;
-  var txt = A.h === 'first' ? H.n + ': play a top or bottom' : H.n + ': now the other half';
+  var txt = A.h === 'first' ? H.n + ': tap a top or bottom' : H.n + ': tap the other half';
   var btns = [];
+  if (!pk) btns.push({ t: 'Hint', id: 'hintbtn', fn: function () { var m = AI.choose(G); if (m && m.t === 'half') { UI.pick = { c: m.c, h: m.h, basic: m.basic }; refresh(); } } });
   if (pk) btns.push({ t: 'Play', cls: 'go', id: 'playbtn', fn: function () { var m = { t: 'half', c: pk.c, h: pk.h }; if (pk.basic) m.basic = 1; UI.pick = null; doMove(m); } });
   setPrompt(pk ? (pk.basic ? (pk.h === 'top' ? 'Hit 2' : 'Move 2') : halfWords(D.CARD[pk.c][pk.h])) : txt, btns);
   f.sel.forEach(function (c) {
     var used = G.act.used.indexOf(c) >= 0; if (used) return;
     var st = function (h) { return can(c, h) ? 'can' + (pk && pk.c === c && pk.h === h && !pk.basic ? ' pick' : '') : 'no'; };
     var el = cardEl(c, { play: { top: st('top'), bot: st('bot') }, basic: { top: can(c, 'top', 1), bot: can(c, 'bot', 1) } });
-    el.querySelectorAll('.half.can').forEach(function (hd) { hd.addEventListener('click', function () { var h = hd.dataset.h; if (pk && pk.c === c && pk.h === h && !pk.basic) { UI.pick = null; doMove({ t: 'half', c: c, h: h }); return; } UI.pick = { c: c, h: h }; sfx('tick'); refresh(); }); });
-    el.querySelectorAll('.basic button.can').forEach(function (bb) { bb.addEventListener('click', function () { UI.pick = { c: c, h: bb.dataset.b, basic: 1 }; refresh(); }); });
+    el.querySelectorAll('.half.can').forEach(function (hd) { hd.addEventListener('click', function () { UI.pick = null; sfx('tick'); doMove({ t: 'half', c: c, h: hd.dataset.h }); }); });
+    el.querySelectorAll('.basic button.can').forEach(function (bb) { bb.addEventListener('click', function () { UI.pick = null; doMove({ t: 'half', c: c, h: bb.dataset.b, basic: 1 }); }); });
     tray.appendChild(el);
   });
   itemsCol(f);
@@ -339,7 +350,8 @@ async function playEv(e) {
       var mc = $('modc'); mc.innerHTML = ''; mc.hidden = false;
       var cards = [e.mod].concat(e.other ? [e.other] : []);
       cards.forEach(function (set, si) { set.forEach(function (x) { var mm = modHTML(x), d = document.createElement('div'); d.className = 'mod ' + mm.cls + (si === 1 ? ' off' : ''); d.innerHTML = mm.t + '<small>' + (si === 0 ? (e.adv ? 'best' : e.dis ? 'worst' : '') : 'other') + '</small>'; mc.appendChild(d); }); });
-      var lab = document.createElement('div'); lab.className = 'modlab'; lab.textContent = (e.nul ? 'Miss!' : e.dmg + ' dmg') + (e.sh ? ' (shield ' + e.sh + ')' : ''); mc.appendChild(lab);
+      var lab = document.createElement('div'); lab.className = 'modlab'; var mv0 = cards[0].map(function (x) { return modHTML(x).t; }).join(' ');
+      lab.textContent = e.nul ? 'Miss!' : (e.x2 ? 'Hit ' + e.base + ' ×2' : 'Hit ' + e.base + ' ' + mv0) + (e.sh ? ' − shield ' + e.sh : '') + ' = ' + e.dmg; mc.appendChild(lab);
       sfx(e.x2 ? 'crit' : e.nul ? 'miss' : 'hit');
       var ts = toScreen(tg.pos), as = toScreen(at.pos), ranged = E.dist(at.pos, tg.pos) > 1;
       FX.play(ranged ? 'impact' : 'slash', ts.x, ts.y, ranged ? { angle: Math.atan2(ts.y - as.y, ts.x - as.x) } : { facing: ts.x >= as.x ? 1 : -1 });

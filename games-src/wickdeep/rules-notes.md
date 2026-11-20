@@ -66,6 +66,7 @@ builder's own knowledge of the genre's rules. Every hero, card, monster, item, m
 ## Simplified on purpose (interface shortcuts, not rule cuts)
 - You are asked to block with cards only when a hit would knock you out; trap and retaliate damage cannot be blocked.
 - Armor items are used on your own turn and shield you for the rest of that round (not as a reaction to a hit).
+- The optional short rest is only offered when your hand is down to 3 cards or fewer (or you must rest); the long rest is always available.
 - Push and pull pick the best hex automatically (furthest from / closest to the attacker).
 - An element bonus is always used when the element is available.
 - Line of sight is traced centre to centre (with a tiny nudge each way) instead of corner to corner.
