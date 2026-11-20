@@ -260,3 +260,4 @@ html.ph #beltz:has(#belt:not(:has(.hc))){background:#2f1f1a!important;border-top
 html.kkpx #beltz:has(#belt:not(:has(.hc))){background:rgba(47,31,26,.92)!important}
 html.ph.ph-p:has(#stage:not([hidden])) #beltz,html.ph.ph-p:has(.kk-cloche) #beltz{background:#2f1f1a!important;border-top-color:#1c1210!important}
 .kkbd .cr{font-size:13px}.kkbd tr.by th{font-size:13px}
+html:has(.gx-drawer.on) .gxh-bub{visibility:hidden!important;pointer-events:none!important}
