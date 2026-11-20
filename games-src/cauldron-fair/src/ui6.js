@@ -184,7 +184,8 @@ function bfFly(fromR, toEl, key, size) {
 }
 function shopToggle(key) {
   const tb = document.querySelector('#rs .stalls .tok[data-k="' + key + '"]');
-  if (tb && tb.dataset.why && !(UI.shopSel || []).includes(key)) { UI.shopWhy = tb.dataset.why; snd('click'); renderReport(); const nb = document.querySelector('#rs .stalls .tok[data-k="' + key + '"]'); if (nb) nb.classList.add('shk'); return; }
+  if (tb && tb.dataset.why && !(UI.shopSel || []).includes(key)) { UI.shopWhy = UI.shopWhy === tb.dataset.why ? null : tb.dataset.why;   // a second tap on the same chip clears the reason again
+    snd('click'); renderReport(); const nb = document.querySelector('#rs .stalls .tok[data-k="' + key + '"]'); if (nb && UI.shopWhy) nb.classList.add('shk'); return; }
   UI.shopWhy = null;
   const c = key[0]; let sel = UI.shopSel.slice(); const i = sel.indexOf(key), adding = i < 0;
   const src = document.querySelector('#rs .tok[data-k="' + key + '"] svg'), fromR = src ? src.getBoundingClientRect() : null;
