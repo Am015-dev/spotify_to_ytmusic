@@ -35,7 +35,7 @@ function scTracker(){const ln=document.getElementById('line');if(!ln)return;cons
 function scPreview(){const ln=document.getElementById('line');if(!ln)return;const e=scEl('trk2','trk2',(document.getElementById('trk')||ln).nextSibling);if(!G||G.over||online()||G.coach||!G.pl[0].human){e.hidden=true;return}
   let txt='';const p=G.pl[0];
   if(scMine()&&G.step==='move'){scCompute();
-    if(!G.move){if(SC.bestTotal>=0)txt='★ Best start: +'+SC.bestTotal+' ('+SC.bestLabel+')'}
+    if(!G.move){const one=UI.pick.length===1?SC.starts[UI.pick[0]]:null;if(one&&one.best)txt='★ Suggested start: +'+one.best.total+' ('+scText(one.best.parts)+' ('+tileName(G.board[one.best.o.e])+'))';else if(SC.bestTotal>=0)txt='★ Best start: +'+SC.bestTotal+' ('+SC.bestLabel+')'}   // F1: the line describes the one glowing tile
     else{const k=G.move.path.length;let best=null;const tg=SC.hov!=null&&stepTargets().includes(SC.hov)?[SC.hov]:stepTargets();const sx=SC.starts[G.move.start];
       if(sx)for(const nx of tg)for(const x of sx.outs)if(scPrefix(x,G.move.path,nx)&&(!best||x.total>best.total))best=x;
       txt=best?(SC.hov!=null?'Here: ':'Best from here: ')+'+'+best.total+': '+scText(best.parts):'Keep walking. The last one must match its colour.'}}

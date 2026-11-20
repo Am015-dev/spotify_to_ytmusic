@@ -43,6 +43,6 @@ Counts: WRONG 1 (med), MISSING 1 (med), SIMPLIFIED 7
 - Tie-break: summaries say tied players share; one possible official tie-break (most coins) was not found. Confidence low.
 - Merchants: summaries say the cards come off the front of the row; code does the same. Confidence med.
 
-## Fixed (W391)
-- WRONG game ends after the whole round -> fixed: the game ends at the end of the turn in which the last camel is placed (two of three summaries; the third says a final round, so confidence is medium). Test "game-ends-at-end-of-the-turn-of-the-last-camel" (ft/rules-test.js).
-- MISSING finite palms and palaces -> fixed with 22 palms and 10 palaces (counts believed, not sourced); a tile action with an empty supply does nothing. Test "palm-and-palace-supply-is-finite".
+## Fixed (W391; updated F1, Nov 2026: the engine now ends the game at the end of the ROUND in which the last camel is placed, and has 12 palms and 10 palaces, as R88 verified)
+- (superseded) WRONG game ends after the whole round -> W391 changed it to the end of the turn in which the last camel is placed (two of three summaries; the third says a final round, so confidence is medium). Test "game-ends-at-end-of-the-turn-of-the-last-camel" (ft/rules-test.js).
+- MISSING finite palms and palaces -> fixed (now 12 palms and 10 palaces; W391 first used 22 palms) (counts believed, not sourced); a tile action with an empty supply does nothing. Test "palm-and-palace-supply-is-finite".
