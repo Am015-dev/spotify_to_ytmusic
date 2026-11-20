@@ -17,7 +17,7 @@ function lsSet(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}
 const ICO={
  bomb:'<circle cx="11" cy="14" r="7" fill="#1c1838"/><path d="M15 8l2-2m0 0l1.5 1.5M17 6c1-2 3-2 4-1" stroke="#ffc928" stroke-width="2" fill="none" stroke-linecap="round"/><circle cx="8.5" cy="11.5" r="1.6" fill="#fff" opacity=".8"/>',
  target:'<circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="4"/><circle cx="12" cy="12" r="1" fill="currentColor"/>',
- gear:'<path d="M12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M5.6 18.4l2.1-2.1M16.3 7.7l2.1-2.1"/><circle cx="12" cy="12" r="4"/>',
+ gear:'<rect x="5" y="2.5" width="14" height="19" rx="2.5"/><path d="M12 8.5v1.2M12 14.3v1.2M8.5 12h1.2M14.3 12h1.2M9.6 9.6l.8.8M13.6 13.6l.8.8M9.6 14.4l.8-.8M13.6 10.4l.8-.8"/><circle cx="12" cy="12" r="1.8"/>',
  bulb:'<path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-4 10.5c.8.8 1 1.6 1 2.5h6c0-.9.2-1.7 1-2.5A6 6 0 0 0 12 3z"/>',
  scroll:'<path d="M7 4h11v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-2h3V4z"/><path d="M10 8h5M10 12h5"/>',
  book:'<path d="M4 5a2 2 0 0 1 2-2h13v16H6a2 2 0 0 0-2 2V5z"/><path d="M4 19a2 2 0 0 1 2-2h13"/>',
@@ -146,7 +146,7 @@ function schedule(){if(isClient()||UI.aiT||!G||G.over||UI.pause||!UI.started||ai
   const s=decider();const open=G.step==='claim'||G.step==='snip';
   if(s>=0&&isHuman(s)&&!open){if(UI.offChecked!==G.logN){UI.offChecked=G.logN;const st=aiStep();if(st&&!isHuman(st.seat))UI.aiT=setTimeout(()=>{UI.aiT=null;if(G&&!G.over&&!UI.pause&&!legal(st.m,st.seat))applyMove(st.m,st.seat)},ANIM?AIDELAY/UI.speed:0)}return}
   if(passTo()>=0&&!open)return;
-  let d=ANIM?AIDELAY/UI.speed:0;if(open&&humans().length&&ANIM)d=Math.max(d,2200/UI.speed);if(ANIM&&UI.aiNotBefore)d=Math.max(d,UI.aiNotBefore-Date.now());
+  let d=ANIM?AIDELAY/UI.speed:0;if(open&&humans().length&&ANIM)d=Math.max(d,2200/UI.speed);if(ANIM&&UI.aiNotBefore)d=Math.max(d,Math.min(UI.aiNotBefore-Date.now(),open?99999:1250/UI.speed));   // R95: a computer turn waits at most ~2 s in all (1.25 s + the 0.75 s point)
   if(!ANIM&&open&&humans().length)d=AIDELAY;
   UI.aiT=setTimeout(()=>{UI.aiT=null;if(!G||G.over||UI.pause)return;if(UI.sel&&UI.sel.off){schedule();return}
     let st=null;try{st=aiStep()}catch(e){console.error(e);return}if(!st)return;if(isHuman(st.seat))return;
@@ -297,14 +297,15 @@ function renderRef(){const E=refEntries();let h='',sec='';for(const e of E){if(e
     h+=`<div class="ref"><span class="rc">${e.c!=null?'×'+e.c:'·'}</span><div><b>${esc(e.n)}</b>${e.tags.map(t=>`<small>${esc(t)}</small>`).join('')}<br>${esc(e.t)}</div></div>`}
   $('#refbody').innerHTML=h+'</div>'}
 // ---------- settings ----------
-function saveSettings(){lsSet('sf_set',{speed:UI.speed})}
-function loadSettings(){const s=lsGet('sf_set',{});if(s.speed)UI.speed=s.speed}
+function saveSettings(){lsSet('sf_set',{speed:UI.speed,stall:UI.stall?1:0})}
+function loadSettings(){const s=lsGet('sf_set',{});if(s.speed)UI.speed=s.speed;UI.stall=!!s.stall}
 function renderSettings(){const sp=[[.5,'Slow'],[1,'Normal'],[2,'Fast'],[5,'Very fast']];
   $('#setbody').innerHTML=`<div class="setgrid">
   <div><div class="lbl">Sound</div><div class="row"><button class="btn${SND.on?' on':''}" data-a="snd" id="sndbtn">${ico('snd')}Sound ${SND.on?'on':'off'}</button><button class="btn${SND.music?' on':''}" data-a="mus" id="musbtn">${ico('music')}Music ${SND.music?'on':'off'}</button><button class="btn small" data-gx="musicd">${ico('music')}Pick songs</button></div></div>
   <div><div class="lbl">Pictures</div><div class="row"><button class="btn small${LOWGFX?' on':''}" data-a="gfx" id="gfxbtn">Low graphics ${LOWGFX?'on':'off'}</button></div></div>
   <div><div class="lbl">Computer crew speed</div><div class="row">${sp.map(([v,l])=>`<button class="btn small${UI.speed===v?' on':''}" data-a="speed" data-v="${v}">${l}</button>`).join('')}</div></div>
   <div><div class="lbl">Game</div><div class="row">${isClient()?`<button class="btn small" data-a="netleave">${ico('back')}Leave the online game</button>`:`${G&&!G.over?`<button class="btn small" data-a="pause">${ico(UI.pause?'play':'pause')}${UI.pause?'Resume':'Pause'}</button><button class="btn small" data-a="restart">${ico('flip')}Restart</button>`:''}<button class="btn small" data-a="newgame">${ico('map')}Jobs</button>`}</div></div>
+  <div><div class="lbl">Optional house rule (not in the tabletop game)</div><div class="row"><button class="btn small${UI.stall?' on':''}" data-a="stall" id="stallbtn">4 rounds with no progress = boom: ${UI.stall?'on':'off'}</button></div></div>
   <div><div class="lbl">More</div><div class="row"><button class="btn small" data-gx="logd">${ico('scroll')}Log</button><button class="btn small" data-gx="refd">${ico('cards')}Cards</button><button class="btn small" data-gx="credd">${ico('info')}Credits</button><a class="btn small" href="cards.html" target="_blank" rel="noopener">${ico('cards')}Card list</a></div></div></div>${typeof GXH!=='undefined'?`<div><div class="lbl">Tips</div>${GXH.settingsHTML({rowClass:"row",btnClass:"btn small"})}</div>`:''}${typeof GXT!=='undefined'?`<div><div class="lbl">Learn</div><div class="row">${tutBtn('btn small')}</div></div>`:''}`}
 // ---------- campaign progress ----------
 function jobProg(){if(!UI.prog)UI.prog=lsGet('sf_camp',{v:1,jobs:{}});return UI.prog}
