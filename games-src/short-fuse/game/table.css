@@ -23,9 +23,9 @@
 .rp i{flex:1;height:100%;border-radius:5px;background:repeating-linear-gradient(60deg,#d99a5b 0 3px,#a8652b 3px 6px);border:1.5px solid #4a2a14;box-sizing:border-box;transition:background .4s}
 .rp i.ash{background:#2b2630;border-color:#15121a;opacity:.9}
 .rp i.next{box-shadow:0 0 6px 1px rgba(255,160,40,.6)}
-.spark{position:absolute;top:50%;width:18px;height:18px;margin:-9px 0 0 -9px;border-radius:50%;background:radial-gradient(circle,#fff 0 22%,#ffe066 24% 45%,#ff7a12 48% 68%,transparent 72%);animation:flick .16s infinite alternate;transition:left .7s ease;pointer-events:none}
+.spark{position:absolute;top:50%;width:18px;height:18px;margin:-9px 0 0 -9px;border-radius:50%;background:radial-gradient(circle,#fff 0 22%,#ffe066 24% 45%,#ff7a12 48% 68%,transparent 72%);animation:flick .16s 3 alternate;transition:left .7s ease;pointer-events:none}
 .fz.danger .spark{animation-duration:.08s}
-.fz.danger .bm{animation:shk .35s infinite}
+.fz.danger .bm{animation:shk .35s 3}
 .fz.burn .rp i.next{animation:burn .9s}
 .fz.phew .spark{filter:hue-rotate(160deg)}
 .bm{flex:none;width:36px;height:36px;position:relative;z-index:1;filter:drop-shadow(0 1px 0 rgba(0,0,0,.6))}
@@ -43,7 +43,7 @@
 .cc b{font:1.1rem var(--fd);color:#ffd23f}
 .clk{display:flex;align-items:center;gap:3px;flex:none;font:1rem var(--fd);color:#fff;background:rgba(0,0,0,.35);border-radius:10px;padding:1px 7px}
 .clk svg{width:16px;height:16px}
-.clk.low{background:#c11d1d;animation:shk .4s infinite}
+.clk.low{background:#c11d1d;animation:shk .4s 3}
 #say{flex:none;height:26px;display:flex;align-items:center;justify-content:center;font:800 1rem var(--fb);color:#fff;text-shadow:0 1px 0 rgba(0,0,0,.6);letter-spacing:.2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding:0 8px}
 #say.hot{color:#ffe066}
 /* felt */
@@ -114,7 +114,7 @@ button.plate{cursor:pointer;font-family:inherit}
 #mine .tile.back.mine .f{opacity:.8;font-size:calc(var(--tw)*.55)}
 .tn .tile .nt,.tn .tile small{display:none}
 /* what glows */
-.tile.glow,.plate.glow,.eqk.glow,.chip.glow{cursor:pointer;animation:gl 1s ease-in-out infinite alternate}
+.tile.glow,.plate.glow,.eqk.glow,.chip.glow{cursor:pointer;animation:gl 1s ease-in-out 3 alternate forwards}
 .tile.glow{box-shadow:0 0 0 3px #ffe066,0 0 14px 4px rgba(255,224,102,.85)}
 .tile.g-val{box-shadow:0 0 0 3px #7be8ff,0 0 14px 4px rgba(123,232,255,.8)}
 .tile.g-solo{box-shadow:0 0 0 3px #8cf06a,0 0 16px 5px rgba(140,240,106,.9)}
@@ -188,8 +188,8 @@ button.plate{cursor:pointer;font-family:inherit}
 #tb.boomfx{animation:shk2 .6s 3}
 @keyframes flashfx{0%{opacity:0}12%{opacity:1}100%{opacity:0}}
 #tb.dng .fz .spark{filter:drop-shadow(0 0 6px #ff3b2d)}
-#ghost{z-index:26;pointer-events:none;width:44px;height:52px;margin:0;animation:gtap 1.5s ease-in-out infinite;filter:drop-shadow(0 4px 4px rgba(0,0,0,.5))}
-#ghost[data-kind=drag]{animation:gdrag 2.4s ease-in-out infinite}
+#ghost{z-index:26;pointer-events:none;width:44px;height:52px;margin:0;animation:gtap 1.5s ease-in-out 3;filter:drop-shadow(0 4px 4px rgba(0,0,0,.5))}
+#ghost[data-kind=drag]{animation:gdrag 2.4s ease-in-out 3}
 @keyframes gtap{0%,100%{transform:translate(0,0) scale(1)}35%{transform:translate(0,-8px) scale(1)}55%{transform:translate(0,2px) scale(.88)}}
 @keyframes gdrag{0%{transform:translate(0,0) scale(1);opacity:0}10%{opacity:1}25%{transform:translate(0,0) scale(.9)}75%{transform:translate(var(--dx),var(--dy)) scale(.9)}90%{transform:translate(var(--dx),var(--dy)) scale(1);opacity:1}100%{transform:translate(var(--dx),var(--dy));opacity:0}}
 /* the start screen */
@@ -329,7 +329,7 @@ html.short #sc .tr span:nth-child(2){display:none}
 #pv.pre{white-space:normal}
 @media (min-width:900px){#sc,#sc .tk,#sc .sch,#pv,.cc{font-size:1rem}#sc .sch b{font-size:1.0625rem}#sc{padding:4px 12px}#pv{max-height:52px}}
 .briefc .bpts{margin:2px 14px 6px;padding-left:18px;text-align:left;font:700 1rem/1.3 var(--fb);color:#1c1408}.briefc .bjob{margin:0 12px 6px;font:700 .875rem var(--fb);color:#4a3418}
-#bulbbtn.hon{box-shadow:0 0 0 3px #ffd34d,0 0 14px #ffd34d}#pv .wsd{font:800 .875rem var(--fb);color:#1c1408;background:#ffd34d;border:0;border-radius:12px;padding:2px 10px;min-height:28px;cursor:pointer}
+#bulbbtn.hon{box-shadow:0 0 0 3px #ffd34d,0 0 14px #ffd34d}#pv .wsd{font:800 .875rem var(--fb);color:#1c1408;background:#ffd34d;border:0;border-radius:12px;padding:2px 14px;min-height:44px;min-width:44px;cursor:pointer}
 .card2.briefc .bn{display:none}
 /* review R1 (row 4): each stand is one framed rack; two stands are labelled and spaced apart; a wrapped stand shows a return arrow */
 .stand{border-radius:7px;background:rgba(8,14,28,.32);box-shadow:0 0 0 3px rgba(8,14,28,.32),0 0 0 4px rgba(255,255,255,.16)}
@@ -382,7 +382,7 @@ html.short #sc .tr span:nth-child(2){display:none}
 #crew.zm .sg.cmp .side{transform:scale(.7);transform-origin:left center}
 #crew.zm .sg.zx{flex:none;flex-direction:row;align-items:center;justify-content:center;gap:4px}
 #crew.zm .sg.zx .plate,html.sk-plate #crew.zm .sg.zx .plate{flex:none;writing-mode:vertical-rl;transform:rotate(180deg);width:18px;height:auto;max-height:52px;min-height:40px;padding:3px 0;gap:2px;justify-content:center;
-  border:0;border-image:none;border-radius:8px;background:var(--sc);color:#14163a;filter:none;font:900 10px/18px var(--fb);text-shadow:none;overflow:hidden}
+  border:0;border-image:none;border-radius:8px;background:var(--sc);color:#14163a;filter:none;font:900 11px/18px var(--fb);text-shadow:none;overflow:hidden}
 #crew.zm .sg.zx .plate::after{display:none}
 #crew.zm .sg.zx .plate b{max-width:none;max-height:44px}
 #crew.zm .sg.zx .plate>:not(b){display:none}
@@ -390,7 +390,7 @@ html.short #sc .tr span:nth-child(2){display:none}
 #tb.zm .stand.wrapd{row-gap:6px}
 #tb.zm .stand.wrapd .rtn{top:var(--th);height:4px}
 #tb.zm .stand.two{margin-top:0}
-#tb.zm .stand.two .stl{top:50%;left:auto;right:calc(100% + 3px);transform:translateY(-50%) rotate(180deg);writing-mode:vertical-rl;height:auto;width:16px;padding:4px 0;font-size:10px;line-height:16px}
+#tb.zm .stand.two .stl{top:50%;left:auto;right:calc(100% + 3px);transform:translateY(-50%) rotate(180deg);writing-mode:vertical-rl;height:auto;width:16px;padding:4px 0;font-size:11px;line-height:16px}
 #tb.zm #mine{padding-top:1px;padding-bottom:calc(2px + env(safe-area-inset-bottom,0px))}
 #tb.zm #mine .sg{gap:2px}
 #crew.zm .sg.cmp .plate .pdot{display:none}

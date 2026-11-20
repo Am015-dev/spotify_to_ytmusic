@@ -9,7 +9,6 @@ function coStart(o){const pro=!!(o&&o.prologue);try{const d=document.getElementB
   try{GX.close()}catch(e){}hideStart();try{GXH.hide()}catch(e){}
   UI.coach={seen:{},q:[],cur:null,pro:pro,t:0,turns:0};CO.done=false;coClear();
   if(!MISSIONS[67]){MISSIONS[67]=Object.assign({},MISSIONS[1],{n:67,nm:'Training run',text:'A tiny practice bomb: 15 wires, three crew, one gear card.',pl:[3],blue:3,red:null,yel:null,eq:{n:0},rules:[],info:'std',tok:'num',audio:false,timer:null});BRIEFS[67]='A tiny practice bomb.';TUT.mission=true}
-  if(TUT.eqv==null){TUT.eqv=EQUIP.eq6.v;EQUIP.eq6.v=2}
   UI.tut=false;UI.tutTok=(UI.tutTok||0)+1;kitReset();clearTimeout(UI.aiT);UI.aiT=null;UI.rt=false;UI.started=false;UI.sel=null;UI.prev=null;UI.holder=-1;UI.offSeat=null;UI.campDone=0;UI.campShown=0;UI.wwk=null;UI.pause=false;UI.camp=null;UI.brief=null;UI.aiNotBefore=0;UI.lastPrompt=null;UI.ghost={info:0,turn:0};
   UI.started=true;
   newGame({np:3,mission:67,seats:['human','ai','ai'],level:'easy',names:DEFNAMES.slice(0,3),realtime:false,captain:0,seed:7});

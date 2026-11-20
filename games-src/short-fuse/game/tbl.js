@@ -192,7 +192,7 @@ function zoomLayout(tb,crew,mine,tm){tb.classList.add('zm');crew.classList.add('
     // the zoomed crewmate's wires: square below 52 px, so 44 px wires fit before anything shrinks
     const fitZ=lo=>{for(tw=54;tw>=lo;tw--){zx.style.setProperty('--tw',tw+'px');zx.style.setProperty('--th',(tw<52?Math.max(TMIN,tw):tileH(tw,1.3))+'px');balance(zx,tw,3,pw+(two?20:0));if(fits())return true}tw=lo;return false};
     // 44 px wires first; then tight compact rows; only then smaller wires (very short screens)
-    if(!fitZ(44)){tighten();if(!fitZ(44))fitZ(22)}}
+    if(!fitZ(44)){tighten();fitZ(44)}}
   if(!fits())tighten();
   if(!TBL.zhint&&sgs.length>1&&!lsGet('sf_zhint',0)){TBL.zhint=1;lsSet('sf_zhint',1);const t0=Date.now();setTimeout(()=>{if((TBL.tapAt||0)>t0)return;toast('Tap a crewmate to see their wires');TBL.zhintT=TBL.sayT},400)}
   return {tw,fit:crew.scrollHeight<=crew.clientHeight+1}}
@@ -204,10 +204,10 @@ function fitSize(counts,W,H,o){const g=o.gap;const ratio=o.ratio;let best=null;
     if(h>H+1)continue;if(!best)best={tw,rows};else if(tw>=best.tw-4&&rows<best.rows)best={tw,rows}}
   return best?best.tw:o.min}
 // every wire is a thumb target: never under 44x44 (crowded jobs scroll the crew area instead of shrinking it)
-const TMIN=44,TMINW=30;
+const TMIN=44,TMINW=44;
 // my own wires: never under 44 px wide on screens 600 px tall or more (they wrap to more rows instead); only very short screens
 // (375x553 Safari with bars) fall back to 30 px, where four rows of 44 px wires would leave the crew no room
-function mineMinW(){return window.innerHeight>=600?44:TMINW}   // also the crew's floor: below it the crew zooms (or scrolls)
+function mineMinW(){return 44}   // also the crew's floor: below it the crew zooms (or scrolls)
 function tileH(tw,ratio){return Math.max(TMIN,Math.round(tw*(tw<52?Math.min(ratio,1.12):ratio)))}
 function balance(root,tw,g,gut){root.querySelectorAll('.stand').forEach(st=>{const n=st.querySelectorAll('.tile').length;const side=st.querySelector('.side');const W=(st.parentNode.clientWidth||st.clientWidth)-(gut||0);const maxc=Math.max(1,Math.floor((W+g)/(tw+g)));const rows=Math.ceil(n/maxc);const cols=Math.max(1,Math.ceil(n/Math.max(1,rows)));st.style.maxWidth=(cols*(tw+g)+(side?44:0))+'px';st.classList.toggle('wrapd',rows>1)})}
 function layoutTable(){const tb=document.getElementById('tb');if(!tb||!G)return;const W=tb.clientWidth,H=tb.clientHeight;if(W<50||H<50)return;

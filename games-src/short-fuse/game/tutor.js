@@ -14,10 +14,10 @@
 //   personal tool: the Twin Probe, once per job (used for the practice miss) ........... probe, wrong1b
 //   yellow wires: a yellow matches only a yellow, you must hold one to say "yellow" .. yellow1, yellow2
 //   red wires: tap yours; never point at one; a hand of only reds reveals itself ..... red, win
-// The staged job (never saved): three players (you = Amber, the foreman, then Teal, then Plum), 15 wires: blue 1-3 (four each), yellows 1.1 and 2.1, red 2.5.
-//   You   : Y 2 2 2 R 3        Teal: 1 1 2 3        Plum: 1 1 Y 3 3      fuse 3 steps, one gear card (Rewind, unlocked by two 2s)
+// The staged job (never saved): three players (you = Amber, the foreman, then Teal, then Plum), 15 wires: blue 1, 6 and 7 (four each), yellows 1.1 and 6.1, red 6.5.
+//   You   : Y 6 6 6 R 7        Teal: 1 1 6 7        Plum: 1 1 Y 7 7      fuse 3 steps, one gear card (Rewind, unlocked by two 6s, its real value)
 //   T1 you hit Teal's token-2 · T2 Teal hits your token-3 · T3 Plum solo-cuts his 3s · T4 you use the Twin Probe on Plum's 2nd and 3rd wires and miss (Plum tags the 1) · T5 Teal uses that token ·
-//   T6 Plum hits Teal's last 1 · T7 you use Rewind and cut the last yellow · T8 you solo your 2s, your red is revealed for you, defused.
+//   T6 Plum hits Teal's last 1 · T7 you use Rewind and cut the last yellow · T8 you solo your 6s, your red is revealed for you, defused.
 // The computer never moves by itself in here: the steps that say "the crew plays" run its scripted moves (tutMove) and wait for them.
 const TUT_GAME='short-fuse';
 const TUT={eqv:null,mission:false};
@@ -25,23 +25,22 @@ const tutOn=()=>typeof GXT!=='undefined'&&GXT.active()&&!!UI.tut;
 const tutBtn=cls=>typeof GXT==='undefined'?'':GXT.menuHTML({game:TUT_GAME,first:firstTime(),cls:cls,launch:tutStart});
 function firstTime(){return !lsGet('sf_played',0)}
 const tq=sel=>()=>{const e=document.querySelector(sel);return e&&e.getBoundingClientRect().width?e:null};
-// ---------------------------------------------------------------- the fixed layout (wire ids: blue v = (v-1)*4+j, red v.5 = 48+v-1, yellow v.1 = 59+v-1)
-const TUT_STANDS=[[59,4,5,6,49,8],[0,1,7,9],[2,3,60,10,11]];
+// ---------------------------------------------------------------- the fixed layout (wire ids: blue v = (v-1)*4+j, red v.5 = 48+v-1, yellow v.1 = 59+v-1; the rig uses the 6s and 7s so Rewind unlocks at its real value, 6)
+const TUT_STANDS=[[59,20,21,22,53,24],[0,1,23,25],[2,3,64,26,27]];
 const tutIdx=(si,id)=>G.st[si].w.findIndex(x=>x.id===id);
 const tutEl=(si,id)=>()=>{if(!G)return null;const k=tutIdx(si,id);const sl=k>=0&&G.st[si].w[k];const e=sl&&tileEl(sl.u);return e&&e.getBoundingClientRect().width?e:null};
-const myTwoK=()=>G.st[0].w.findIndex(x=>!x.cut&&cv(x.id)===2);
+const myTwoK=()=>G.st[0].w.findIndex(x=>!x.cut&&cv(x.id)===6);
 const tutMyTurn=()=>!!G&&!G.over&&G.phase==='turn'&&G.actor===0&&G.step==='act'&&!G.q&&!!(UI.V&&UI.V.legal);
 const tutSelTo=(si,id)=>!!UI.sel&&UI.sel.mode==='dual'&&UI.sel.tg.length===1&&UI.sel.tg[0].st===si&&UI.sel.tg[0].k===tutIdx(si,id);
 function tutRebuild(){const M=MISSIONS[67];
   G.q=null;G.ag=[];G.agI=0;G.log=[];G.logN=0;G.uid=0;G.captain=0;G.pos=[0,1,2];G.phase='setup';G.step=null;G.turn=0;G.round=0;G.hist=[];G.ann=[];G.marks=[];G.valid=[];G.fin={};G.over=null;G.winText='';G.tfx={};
   G.st=TUT_STANDS.map((ids,i)=>({i,pos:i,w:ids.slice().sort((a,b)=>sv(a)-sv(b)||a-b).map(newSlot),side:[]}));
-  G.tot={1:4,2:4,3:4,Y:2};G.tokSup=clone(INFO_TOKENS);G.gone=[];G.box=[];G.aside=[];G.pile=[];G.markers={red:[2.5],redQ:0,redN:1,yel:[1.1,2.1],yelQ:0,yelN:2};
+  G.tot={1:4,6:4,7:4,Y:2};G.tokSup=clone(INFO_TOKENS);G.gone=[];G.box=[];G.aside=[];G.pile=[];G.markers={red:[6.5],redQ:0,redN:1,yel:[1.1,6.1],yelQ:0,yelN:2};
   G.eq=[{id:'eq6',st:'locked',down:0,cover:null,perm:0}];G.eqPool=[];G.eqDeck=[];G.eqOut=[];G.dial=3;G.stats={dual:0,dualOk:0,solo:0,miss:0,eqUse:0,turns:0};G.idle=0;
   lg('Training run: you, Teal and Plum. You are the foreman.','big');
   infoSetup(M);later('beginPlay');flow()}
 function tutNew(){
   if(!MISSIONS[67]){MISSIONS[67]=Object.assign({},MISSIONS[1],{n:67,nm:'Training run',text:'A tiny practice bomb: 15 wires, three crew, one gear card.',pl:[3],blue:3,red:null,yel:null,eq:{n:0},rules:[],info:'std',tok:'num',audio:false,timer:null});BRIEFS[67]='A tiny practice bomb. Learn every rule here.';TUT.mission=true}
-  if(TUT.eqv==null){TUT.eqv=EQUIP.eq6.v;EQUIP.eq6.v=2}
   UI.tut=true;UI.tutTok=(UI.tutTok||0)+1;
   try{GX.close()}catch(e){}hideStart();try{GXH.hide()}catch(e){}
   kitReset();clearTimeout(UI.aiT);UI.aiT=null;UI.rt=false;UI.started=false;UI.sel=null;UI.prev=null;UI.holder=-1;UI.offSeat=null;UI.campDone=0;UI.campShown=0;UI.wwk=null;UI.pause=false;UI.camp=null;UI.brief=null;UI.aiNotBefore=0;UI.lastPrompt=null;UI.ghost={info:0,turn:0};
@@ -60,11 +59,11 @@ function tutLeave(){UI.tut=false;UI.tutTok=(UI.tutTok||0)+1;clearTimeout(UI.aiT)
 const tutWait=ms=>new Promise(r=>setTimeout(r,ms/Math.max(1,UI.speed||1)));
 function tutMove(seat){
   if(G.q&&G.q.who===seat){if(G.q.kind!=='infoStd')return {a:'q',i:0};
-    const want=seat===1?7:10;                                  // Teal shows her 2, Plum shows a 3
+    const want=seat===1?23:26;                                 // Teal shows her 6, Plum shows a 7
     const i=G.q.opts.findIndex(o=>{const f=findU(o.d.u);return f&&G.st[f.s].w[f.k].id===want});return {a:'q',i:Math.max(0,i)}}
   const T=G.turn;
-  if(seat===1&&T===2)return {a:'dual',st:0,ks:[tutIdx(0,8)],v:3};                    // Teal uses your token: your 3
-  if(seat===2&&T===3)return {a:'solo',v:3};                                           // Plum holds both 3s left
+  if(seat===1&&T===2)return {a:'dual',st:0,ks:[tutIdx(0,24)],v:7};                   // Teal uses your token: your 7
+  if(seat===2&&T===3)return {a:'solo',v:7};                                           // Plum holds both 7s left
   if(seat===1&&T===5)return {a:'dual',st:2,ks:[tutIdx(2,3)],v:1};                     // Teal uses the token your miss put on Plum's wire
   if(seat===2&&T===6)return {a:'dual',st:1,ks:[tutIdx(1,1)],v:1};                     // Plum finishes the 1s
   return null}
@@ -87,37 +86,37 @@ const tutProbeSel=n=>!!UI.sel&&UI.sel.mode==='dual'&&UI.sel.tool==='dd'&&UI.sel.
 async function tutQ(){const tok=UI.tutTok;for(let n=0;n<4&&tutAlive(tok)&&G.q&&!isHuman(G.q.who);n++){if(!await tutAct(G.q.who,tok))break}}
 // the red wire is not a legal tap, so the board ignores it: during the red step the tutorial listens for it
 document.addEventListener('click',e=>{if(!tutOn())return;const t=e.target.closest&&e.target.closest('#mine .tile');if(!t||!G)return;const sl=G.st[+t.dataset.s]&&G.st[+t.dataset.s].w[+t.dataset.k];if(sl&&sl.id===49&&!sl.cut)GXT.act({type:'tap',what:'red'})});
-const hitTxt=()=>{const t=G.st[1].w[tutIdx(1,7)];return t&&t.cut};
+const hitTxt=()=>{const t=G.st[1].w[tutIdx(1,23)];return t&&t.cut};
 function tutSteps(){return tutStory([
  {id:'goal',title:'The goal',say:()=>'Cut all '+G.st.reduce((a,s)=>a+s.w.length,0)+' wires together; a miss burns the fuse, red means boom.',target:tq('#cutc'),also:tq('#fuse'),wait:null,ready:()=>!!G&&!!G.q},
  {id:'mine',title:'Your wires',say:'These wires are yours. Only you see the numbers. Every stand is sorted, lowest on the left.',target:tq('#mine'),wait:null},
- {id:'token',title:'Show a wire',say:'Everyone starts by showing one wire. Tap your 3: a token tells the crew its number.',target:tutEl(0,8),
+ {id:'token',title:'Show a wire',say:'Everyone starts by showing one wire. Tap your 7: a token tells the crew its number.',target:tutEl(0,24),
    wait:{type:'tap',match:a=>a.what==='tile'&&a.own&&a.id===8},ready:()=>!!G&&!!G.q&&G.q.who===0&&G.q.kind==='infoStd'},
- {id:'point',title:'Point at a wire',ai:tutCrew,say:'Your turn. Teal\'s token says 2. Tap that wire to point at it.',target:tutEl(1,7),
+ {id:'point',title:'Point at a wire',ai:tutCrew,say:'Your turn. Teal\'s token says 6. Tap that wire to point at it.',target:tutEl(1,23),
    wait:{type:'tap',match:a=>a.what==='tile'&&!a.own&&a.id===7},ready:()=>tutMyTurn()&&!UI.sel},
- {id:'name',title:'Name a number',say:'Now say a number you hold. Tap one of your 2s. If Teal has a 2, you both cut.',target:()=>{const k=myTwoK();return k>=0?tileEl(G.st[0].w[k].u):null},
-   wait:{type:'tap',match:a=>a.what==='tile'&&a.own&&cv(a.id)===2&&a.k===myTwoK()},ready:()=>tutMyTurn()&&tutSelTo(1,7)},
- {id:'hit',title:'A hit!',say:'Match! Both 2s are cut and Rewind unlocked. One cut per turn, then it passes clockwise.',target:tq('#gear .eqk'),wait:null,ready:()=>hitTxt()&&!G.over&&tutCalm()},
+ {id:'name',title:'Name a number',say:'Now say a number you hold. Tap one of your 6s. If Teal has a 6, you both cut.',target:()=>{const k=myTwoK();return k>=0?tileEl(G.st[0].w[k].u):null},
+   wait:{type:'tap',match:a=>a.what==='tile'&&a.own&&cv(a.id)===6&&a.k===myTwoK()},ready:()=>tutMyTurn()&&tutSelTo(1,23)},
+ {id:'hit',title:'A hit!',say:'Match! Both 6s are cut and Rewind unlocked. One cut per turn, then it passes clockwise.',target:tq('#gear .eqk'),wait:null,ready:()=>hitTxt()&&!G.over&&tutCalm()},
  {id:'probe',title:'Your Twin Probe',ai:tutCrew,say:'Tap your Twin Probe: it tests two wires at once.',target:tutProbeChip,
    wait:{type:'tap',match:a=>a.what==='chip'&&tutIsProbe(a.n)},ready:()=>tutMyTurn()&&!UI.sel&&!!tutProbeChip()},
  {id:'wrong1',title:'A wrong guess',say:'No clue is sure here, so guess: tap Plum\'s second wire.',target:tutEl(2,3),
    wait:{type:'tap',match:a=>a.what==='tile'&&!a.own&&a.id===3},ready:()=>tutMyTurn()&&tutProbeSel(0)},
- {id:'wrong1b',title:'Two wires',say:'Now tap his third wire too.',target:tutEl(2,60),
-   wait:{type:'tap',match:a=>a.what==='tile'&&!a.own&&a.id===60},ready:()=>tutMyTurn()&&tutProbeSel(1)},
- {id:'wrong2',title:'Name a number',say:'Say 2, a risky guess: nothing proves it is a 2.',target:()=>{const k=myTwoK();return k>=0?tileEl(G.st[0].w[k].u):null},
-   wait:{type:'tap',match:a=>a.what==='tile'&&a.own&&cv(a.id)===2&&a.k===myTwoK()},ready:()=>tutMyTurn()&&tutProbeSel(2)},
+ {id:'wrong1b',title:'Two wires',say:'Now tap his third wire too.',target:tutEl(2,64),
+   wait:{type:'tap',match:a=>a.what==='tile'&&!a.own&&a.id===64},ready:()=>tutMyTurn()&&tutProbeSel(1)},
+ {id:'wrong2',title:'Name a number',say:'Say 6, a risky guess: nothing proves it is a 6.',target:()=>{const k=myTwoK();return k>=0?tileEl(G.st[0].w[k].u):null},
+   wait:{type:'tap',match:a=>a.what==='tile'&&a.own&&cv(a.id)===6&&a.k===myTwoK()},ready:()=>tutMyTurn()&&tutProbeSel(2)},
  {id:'wrongres',title:'A miss',say:()=>{const t=G.st[2].w[tutIdx(2,3)].tok[0];return 'Wrong! The fuse burned one step, and a token shows the true number: a '+(t?t.v:1)+'.'},
    target:tutEl(2,3),also:tq('#fuse'),wait:null,ai:tutQ,ready:()=>!!G&&G.dial===2&&G.st[2].w[tutIdx(2,3)].tok.length>0&&tutCalm()},
  {id:'gear',title:'Use equipment',ai:tutCrew,say:'Rewind is unlocked. Tap it to turn the fuse back one step. Gear works once.',target:tq('#gear .eqk.glow'),
    wait:{type:'tap',match:a=>a.what==='eq'&&a.id==='eq6'},ready:()=>tutMyTurn()&&!!document.querySelector('#gear .eqk.glow')},
- {id:'yellow1',title:'Yellow wires',say:'Every yellow is just "yellow". You hold one. Plum\'s last wire must be the other: tap it.',target:tutEl(2,60),
-   wait:{type:'tap',match:a=>a.what==='tile'&&!a.own&&a.id===60},ready:()=>tutMyTurn()&&!UI.sel&&G.dial===3},
+ {id:'yellow1',title:'Yellow wires',say:'Every yellow is just "yellow". You hold one. Plum\'s last wire must be the other: tap it.',target:tutEl(2,64),
+   wait:{type:'tap',match:a=>a.what==='tile'&&!a.own&&a.id===64},ready:()=>tutMyTurn()&&!UI.sel&&G.dial===3},
  {id:'yellow2',title:'Say yellow',say:'Name your yellow wire. A yellow can only be matched with another yellow.',target:tutEl(0,59),
-   wait:{type:'tap',match:a=>a.what==='tile'&&a.own&&a.id===59},ready:()=>tutMyTurn()&&tutSelTo(2,60)},
- {id:'red',title:'Red wires',say:'Tap your red: never say red or point at one.',target:tutEl(0,49),wait:{type:'tap',match:a=>a.what==='red'},ready:()=>tutMyTurn()&&!!G.st[2].w[tutIdx(2,60)].cut},
- {id:'solo',title:'Solo cut',say:'You hold every 2 left, so cut them alone. Tap one: both are cut, with no risk.',target:()=>{const k=myTwoK();return k>=0?tileEl(G.st[0].w[k].u):null},
-   wait:{type:'tap',match:a=>a.what==='tile'&&a.own&&cv(a.id)===2&&a.k===myTwoK()},ready:()=>tutMyTurn()},
- {id:'win',title:'Defused!',say:'Every wire is cut: defused! Your last red was revealed for you. Win together, or lose together.',target:tq('#cutc'),wait:null,ready:()=>!!G&&!!G.over&&G.over.win}
+   wait:{type:'tap',match:a=>a.what==='tile'&&a.own&&a.id===59},ready:()=>tutMyTurn()&&tutSelTo(2,64)},
+ {id:'red',title:'Red wires',say:'Tap your red: never say red or point at one.',target:tutEl(0,53),wait:{type:'tap',match:a=>a.what==='red'},ready:()=>tutMyTurn()&&!!G.st[2].w[tutIdx(2,64)].cut},
+ {id:'solo',title:'Solo cut',say:'You hold every 6 left, so cut them alone. Tap one: both are cut, with no risk.',target:()=>{const k=myTwoK();return k>=0?tileEl(G.st[0].w[k].u):null},
+   wait:{type:'tap',match:a=>a.what==='tile'&&a.own&&cv(a.id)===6&&a.k===myTwoK()},ready:()=>tutMyTurn()},
+ {id:'win',title:'Defused!',say:'Every wire is cut: defused! Your last red was revealed for you. Win together, or lose together.',target:tq('#cutc'),wait:null,wrong:'Tap Finish.',ready:()=>!!G&&!!G.over&&G.over.win}
 ])}
 // the story layer: every bubble is Brix (or Quill) talking: reaction, reason, then the one thing to do. All words live in story.js.
 function tutStory(steps){const wires=()=>G.st.reduce((a,s)=>a+s.w.length,0);

@@ -346,7 +346,7 @@ function mainMoves(seat,any,plainOnly){const o=[];const push=m=>{const extra=hoo
     if(!full)continue;
     const tgT=targetable(seat,si,{tool:'x'});const nv=vs.filter(v=>v!=='Y');
     for(const t of tools){if(t==='dd')for(let a=0;a<tgT.length;a++)for(let b=a+1;b<tgT.length;b++)for(const v of nv)push({a:'dual',st:si,ks:[tgT[a],tgT[b]],v,tool:'dd'});
-      if(t==='eq3'||t==='pt3')for(let a=0;a+2<tgT.length;a++)for(const v of nv)push({a:'dual',st:si,ks:[tgT[a],tgT[a+1],tgT[a+2]],v,tool:t});
+      if(t==='eq3'||t==='pt3')for(let a=0;a<tgT.length;a++)for(let b=a+1;b<tgT.length;b++)for(let c=b+1;c<tgT.length;c++)for(const v of nv)push({a:'dual',st:si,ks:[tgT[a],tgT[b],tgT[c]],v,tool:t});   // any three wires on the stand, as the rule says
       if(t==='eq5'){const all=G.st[si].w.map((x,k)=>k).filter(k=>!G.st[si].w[k].cut&&!G.st[si].w[k].x&&!G.st[si].w[k].flip);if(all.length&&all.every(k=>tgT.includes(k)))for(const v of nv)push({a:'dual',st:si,ks:all,v,tool:'eq5'})}}
     for(const t of twos)for(let a=0;a<vs.length;a++)for(let b=a+1;b<vs.length;b++)for(const k of tgT)push({a:'dual',st:si,ks:[k],v:vs[a],v2:vs[b],two:t})}
   const myFlips=hasRule(G.mission,'flip')?slotsOf(seat).filter(x=>x.sl.flip&&!x.sl.cut):[];
