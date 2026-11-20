@@ -73,8 +73,9 @@ var UI = (function () {
       '<span><b data-engine="OA_TEST.pts.' + p + '">' + E.points(P) + '</b>/20 pts</span>' +
       '<span>' + OART.icon('crown') + '<b>' + E.crowns(P) + '</b>/10</span>' +
       '<span>' + OART.gm(bc.c) + '<b>' + bc.v + '</b>/10</span></span><span class="favs">';
-    for (var i = 0; i < P.fav; i++) h += me ? '<button class="favb' + (human() && !g.pend && P.fav && !g.refilled && !(U.tut && U.tut.noFav) ? ' glow' : '') + '" data-fav="1" aria-label="Use a Favour">' + OART.icon('scroll') + '</button>' : '<span class="favb">' + OART.icon('scroll') + '</span>';
+    if (P.fav) { var fl = P.fav > 1 ? '<b class="fx">' + P.fav + '</b>' : ''; h += me ? '<button class="favb' + (human() && !g.pend && !g.refilled && !(U.tut && U.tut.noFav) ? ' glow' : '') + '" data-fav="1" aria-label="Use a Favour (' + P.fav + ')">' + OART.icon('scroll') + fl + '</button>' : '<span class="favb">' + OART.icon('scroll') + fl + '</span>'; }
     h += '</span>';
+    if (me) h += '<span class="resb" aria-label="Gems held, max 10">' + E.tokens(P) + '/10</span>';
     h += me ? '<button class="resb" id="resbtn"' + (P.res.length ? '' : ' disabled') + ' aria-label="Your reserved jewels">Kept ' + P.res.length + '/3</button>' : '<span class="resb" aria-label="Rival reserved">Kept ' + P.res.length + '/3</span>';
     h += '</div><div class="cols">';
     E.TOK.forEach(function (c) {
@@ -124,7 +125,7 @@ var UI = (function () {
     h += '</div></div>';
     if (U.sel.length && human()) {
       var run = runFor(U.sel), got = U.sel.map(function (s) { return g.board[s]; }), warn = got.length === 3 && got[0] === got[1] && got[1] === got[2] || got.filter(function (x) { return x === 'p'; }).length >= 2;
-      h += '<button class="btn pri" id="takebtn"' + (run ? '' : ' disabled') + '>Take ' + got.length + '<span class="pv">' + got.map(function (c) { return OART.gm(c); }).join('') + '</span>' + (warn ? '<small>Rival gets a Favour</small>' : '') + '</button>';
+      h += '<button class="btn pri" id="takebtn"' + (run ? '' : ' disabled') + '>Take ' + got.length + '<span class="pv">' + got.map(function (c) { return OART.gm(c); }).join('') + '</span>' + (warn ? '<small>Rival gets a Favour</small>' : '') + (E.tokens(P) + got.length > 10 ? '<small>Over 10: return ' + (E.tokens(P) + got.length - 10) + '</small>' : '') + '</button>';
       h += '<button class="btn" id="clearbtn">Cancel</button>';
     } else if (U.mode === 'res' || U.mode === 'fav') {
       h += '<button class="btn" id="clearbtn">Cancel</button>';
@@ -134,7 +135,7 @@ var UI = (function () {
       h += '</div></div>';
     }
     var rf = human() && !g.pend && canRefill() && !U.sel.length && !U.mode;
-    h += '<button class="btn' + (rf && onlyRefill() ? ' pri glow' : '') + '" id="refillbtn"' + (rf ? '' : ' disabled') + '>Refill<small>Bag: ' + g.bag.length + '</small></button>';
+    h += '<button class="btn' + (rf && onlyRefill() ? ' pri glow' : '') + '" id="refillbtn"' + (rf ? '' : ' disabled') + '>Refill<small>Bag ' + g.bag.length + ' · rival +1 scroll</small></button>';
     el.innerHTML = h;
   }
   function status() {
@@ -145,7 +146,7 @@ var UI = (function () {
     else if (U.recap && !q && !U.mode && !U.sel.length) { s = U.recap; el.classList.add('rv'); }
     else if (q) s = q.h === 'wild' ? 'Tap a colour to match' : q.h === 'tok' ? 'Take one more ' + NAME[q.c] : q.h === 'steal' ? "Tap a rival's gem to take" : q.h === 'royal' ? 'Choose a patron' : 'Tap your gems to return ' + q.n;
     else if (U.mode === 'fav') s = 'Tap any gem to take it';
-    else if (U.mode === 'res') s = 'Tap a jewel to keep';
+    else if (U.mode === 'res') s = 'Gold: now tap a jewel to keep';
     else if (U.sel.length) s = U.sel.length < 3 ? 'Add gems in line, or Take' : 'Tap Take';
     else if (onlyRefill()) s = 'No moves: refill the board';
     else s = 'Take gems, or buy a jewel';
@@ -255,7 +256,7 @@ var UI = (function () {
         }
       }
       if (run !== aiRun) return;
-      U.recap = lines.length ? lines.join('. ') + '. Your turn' : null;
+      U.recap = lines.length ? 'Rival ' + lines.join(', then ') + '. Your turn' : null;
       U.busy = false; U.say = null; render(); after();
     })();
   }
