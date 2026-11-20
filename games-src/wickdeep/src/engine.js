@@ -164,7 +164,7 @@
     ev(G, { e: 'reveal', room: room });
     G.place.filter(function (p) { return G.hex[p.k].room === room; }).forEach(function (p) {
       if (figAt(G, p.k)) return; spawn(G, p);
-      var f = G.figs[G.figs.length - 1]; ev(G, { e: 'spawn', id: f.id });
+      var f = G.figs[G.figs.length - 1]; ev(G, { e: 'spawn', id: f.id, f: clone(f) });
       if (G.phase === 'turns' && (f.kind === 'mon' || f.kind === 'boss')) lateJoin(G, f.type);
     });
   }
@@ -289,7 +289,7 @@
   function finishLongRest(G, f, lose) {
     if (lose != null) { var i = f.disc.indexOf(lose); if (i >= 0) f.disc.splice(i, 1); f.lost.push(lose); }
     f.hand = f.hand.concat(f.disc); f.disc = [];
-    healFig(G, f, 2, f); f.items.forEach(function (it) { if (it.st === 'spent') it.st = 'ok'; });
+    f.lrests = (f.lrests || 0) + 1; healFig(G, f, 2, f); f.items.forEach(function (it) { if (it.st === 'spent') it.st = 'ok'; });
     ev(G, { e: 'lrest', id: f.id, lost: lose });
   }
   function endHeroTurn(G, f) {
@@ -505,7 +505,7 @@
     return tryEps(1e-6) || tryEps(-1e-6);
   }
   function attackTargets(G, f, a) {
-    var range = a.r ? a.r + itemBonus(f, 'rng') : 1;
+    var range = a.r ? a.r + (f.kind === 'hero' ? itemBonus(f, 'rng') : 0) : 1;
     return enemiesOf(G, f).filter(function (o) { return o.pos && !o.cond.inv && dist(o.pos, f.pos) <= range && los(G, f.pos, o.pos); });
   }
 
@@ -566,7 +566,7 @@
         return true;
       }
     }
-    t.hp -= n; ev(G, { e: 'dmg', id: t.id, n: n, hp: t.hp });
+    t.hp -= n; if (t.kind === 'hero') { t.taken = (t.taken || 0) + n; t.minhp = Math.min(t.minhp == null ? t.max : t.minhp, Math.max(0, t.hp)); } ev(G, { e: 'dmg', id: t.id, n: n, hp: t.hp });
     if (t.hp <= 0) { kill(G, t, src); return false; }
     return true;
   }
@@ -692,7 +692,7 @@
     if (!spot) return;
     var st = monStats(type, G.L, false), used = G.figs.filter(function (f) { return f.type === type; }).map(function (f) { return f.num; }), n = 1; while (used.indexOf(n) >= 0) n++;
     var f = { id: 'm' + (G.uid++), kind: 'mon', team: 'm', type: type, elite: false, pos: spot, hp: st.hp, max: st.hp, cond: {}, rnd: {}, num: n, summoned: 1 };
-    G.figs.push(f); ensureDeck(G, type, D.MON[type].deck); ev(G, { e: 'spawn', id: f.id, summoned: 1 });
+    G.figs.push(f); ensureDeck(G, type, D.MON[type].deck); ev(G, { e: 'spawn', id: f.id, summoned: 1, f: clone(f) });
     // summoned this round: it does not act this round (it was not on the board when cards were drawn)
   }
   function bossSpecial(G, m, n, Q) {
@@ -784,7 +784,7 @@
     G.srq = null; beginSelect(G);
   }
   function shortRest(G, f, mv) {
-    if (!f.sr) { f.sr = { pick: f.disc[Math.floor(rnd(G) * f.disc.length)], re: false }; }
+    if (!f.sr) { f.sr = { pick: f.disc[Math.floor(rnd(G) * f.disc.length)], re: false }; G.ask = { h: 'srest2', id: f.id, pick: f.sr.pick }; return; }
     if (mv.t === 'srest-redo' && !f.sr.re) {
       f.sr.re = true; damage(G, f, 1, null, true);
       var others = f.disc.filter(function (c) { return c !== f.sr.pick; }); if (others.length) f.sr.pick = others[Math.floor(rnd(G) * others.length)];
@@ -819,7 +819,7 @@
   function finish(G, won) {
     G.done = { won: won, round: G.round }; G.phase = 'over'; G.ask = null;
     var gold = D.goldPerCoin(G.L), bonus = won ? D.bonusXp(G.L) : 0;
-    G.done.res = heroes(G).map(function (f) { return { id: f.id, cls: f.cls, xp: f.sxp + bonus, gold: f.coins * gold + ((G.trGold || {})[f.id] || 0), kills: f.kills, exh: f.exh, goal: f.goal }; });
+    G.done.res = heroes(G).map(function (f) { return { id: f.id, cls: f.cls, xp: f.sxp + bonus, sxp: f.sxp, gold: f.coins * gold + ((G.trGold || {})[f.id] || 0), coins: f.coins, kills: f.kills, exh: f.exh, goal: f.goal, minhp: f.minhp == null ? f.max : f.minhp, max: f.max, taken: f.taken || 0, dealt: f.dealt, lostCount: f.lost.length, lrests: f.lrests || 0, items: f.items.map(function (i) { return i.id; }) }; });
     G.done.items = (G.trItems || []).slice();
     ev(G, { e: 'over', won: won });
   }
@@ -837,16 +837,16 @@
           if (h.disc.length >= 2) out.push({ t: 'lrest', id: h.id });
         });
         return out;
-      case 'first': case 'second': return halfOptions(G, f);
+      case 'first': case 'second': return halfOptions(G, f).concat(itemMoves(G));
       case 'stunned': return [{ t: 'ok' }];
-      case 'move': return A.hexes.map(function (k) { return { t: 'hex', k: k }; }).concat([{ t: 'skip' }]);
-      case 'target': return A.ids.map(function (id) { return { t: 'tgt', id: id }; }).concat([{ t: 'skip' }]);
+      case 'move': return A.hexes.map(function (k) { return { t: 'hex', k: k }; }).concat([{ t: 'skip' }], itemMoves(G));
+      case 'target': return A.ids.map(function (id) { return { t: 'tgt', id: id }; }).concat([{ t: 'skip' }], itemMoves(G));
       case 'heal': return A.ids.map(function (id) { return { t: 'tgt', id: id }; }).concat([{ t: 'skip' }]);
       case 'summon': return A.hexes.map(function (k) { return { t: 'hex', k: k }; }).concat([{ t: 'skip' }]);
       case 'recover': return A.cs.map(function (c) { return { t: 'card', c: c }; }).concat([{ t: 'skip' }]);
       case 'lrest': return f.disc.map(function (c) { return { t: 'lose', c: c }; });
       case 'srest': return (A.must ? [] : [{ t: 'nosrest' }]).concat([{ t: 'srest' }]);
-      case 'srest2': return [{ t: 'srest' }, { t: 'srest-redo' }].slice(0, 1).concat([]);
+      case 'srest2': return f.sr && !f.sr.re && f.hp > 1 ? [{ t: 'srest' }, { t: 'srest-redo' }] : [{ t: 'srest' }];
       case 'block':
         out.push({ t: 'take' });
         f.hand.forEach(function (c) { if (!f.sel || f.sel.indexOf(c) < 0 || G.phase !== 'turns') out.push({ t: 'block', c: c }); });
@@ -855,6 +855,31 @@
     }
     return out;
   }
+  var TURN_ASKS = { first: 1, second: 1, move: 1, target: 1, heal: 1 };
+  function itemMoves(G) {
+    var A = G.ask; if (!A || !TURN_ASKS[A.h]) return [];
+    var f = fig(G, A.id); if (!f || f.kind !== 'hero') return [];
+    var out = []; f.items.forEach(function (it, i) { if (it.st === 'ok') out.push({ t: 'item', i: i }); });
+    return out;
+  }
+  function useItem(G, f, i) {
+    var it = f.items[i], d = D.ITEM_BY[it.id];
+    it.st = d.use === 'lost' ? 'lost' : 'spent';
+    ev(G, { e: 'item', id: f.id, item: it.id });
+    switch (d.k) {
+      case 'atk': case 'adv': case 'mov': case 'rng': (f.armed = f.armed || []).push({ k: d.k, v: d.v }); break;
+      case 'shd': f.rnd.shd = (f.rnd.shd || 0) + d.v; break;
+      case 'ret': f.rnd.ret = (f.rnd.ret || 0) + d.v; f.rnd.retr = 1; break;
+      case 'heal': healFig(G, f, d.v, f); break;
+      case 'cure': healFig(G, f, 1, f); break;
+      case 'stamina': for (var n = 0; n < d.v && f.disc.length; n++) f.hand.push(f.disc.pop()); break;
+      case 'str': addCond(G, f, 'str'); break;
+      case 'inv': addCond(G, f, 'inv'); break;
+      case 'inf': G.el[d.v] = 2; ev(G, { e: 'infuse', el: d.v }); break;
+    }
+    // refresh the current question (a boot may reach further, a hood may reach further foes)
+    if (G.act && G.act.cur && (G.ask.h === 'move' || G.ask.h === 'target')) { var a = G.act.q[G.act.i]; var nx = heroAction(G, f, a); if (nx) G.ask = nx; }
+  }
   function sideToAct(G) { return G.ask ? (G.ask.id || 'party') : null; }
   function apply(G, mv) {
     var A = G.ask, f = A && A.id ? fig(G, A.id) : null;
@@ -862,7 +887,7 @@
     switch (mv.t) {
       case 'sel': { var h = fig(G, mv.id); h.sel = mv.cards.slice(); h.lrest = false; G.sel[h.id] = 1; ev(G, { e: 'sel', id: h.id }); break; }
       case 'lrest': { var h2 = fig(G, mv.id); h2.sel = null; h2.lrest = true; G.sel[h2.id] = 1; ev(G, { e: 'sel', id: h2.id, lrest: 1 }); break; }
-      case 'half': playHalf(G, f, mv); return G;
+      case 'half': if (!f || !f.sel || f.sel.indexOf(mv.c) < 0 || G.act.used.indexOf(mv.c) >= 0) throw new Error('card not in play'); playHalf(G, f, mv); return G;
       case 'ok': G.act.used = f.sel.slice(); f.hand = f.hand.filter(function (c) { return f.sel.indexOf(c) < 0; }); f.disc = f.disc.concat(f.sel); endHeroTurn(G, f); return G;
       case 'hex':
         if (A.h === 'move') { var a = G.act.q[G.act.i], R = reach(G, f, A.v, { jump: A.jump, hero: 1 }); walk(G, f, pathTo(R, mv.k), { jump: A.jump }); G.act.cur.did = true; spendArmed(f, 'mov'); persBonus(G, f, 'mov', true); a.done = 1; G.act.i++; afterHeroStep(G, f); return G; }
@@ -873,7 +898,7 @@
           var a2 = G.act.q[G.act.i], t = fig(G, mv.id);
           a2.hits.push(mv.id); doAttack(G, f, t, a2); G.act.cur.did = true;
           if (a2.splash && t && t.pos && fig(G, t.id) && !f.exh) G.figs.filter(function (o) { return o.team !== f.team && o.pos && o !== t && dist(o.pos, t.pos) === 1 && a2.hits.indexOf(o.id) < 0; }).forEach(function (o) { a2.hits.push(o.id); doAttack(G, f, o, a2); });
-          if (f.exh || !f.pos || a2.hits.length >= (a2.tg || 1) || !attackTargets(G, f, a2).some(function (o) { return a2.hits.indexOf(o.id) < 0; })) { spendArmed(f, 'atk'); spendArmed(f, 'adv'); persBonus(G, f, 'atk', true); G.act.i++; }
+          if (f.exh || !f.pos || a2.hits.length >= (a2.tg || 1) || !attackTargets(G, f, a2).some(function (o) { return a2.hits.indexOf(o.id) < 0; })) { spendArmed(f, 'atk'); spendArmed(f, 'adv'); spendArmed(f, 'rng'); persBonus(G, f, 'atk', true); G.act.i++; }
           afterHeroStep(G, f); return G;
         }
         if (A.h === 'heal') { var a3 = G.act.q[G.act.i]; healFig(G, fig(G, mv.id), a3.v, f); a3.healed = 1; G.act.cur.did = true; G.act.i++; afterHeroStep(G, f); return G; }
@@ -886,6 +911,7 @@
       case 'srest': case 'srest-redo': shortRest(G, f, mv); return G;
       case 'nosrest': G.srq.shift(); nextShortRest(G); return G;
       case 'take': case 'block': case 'block2': resolveBlock(G, f, mv); return G;
+      case 'item': useItem(G, f, mv.i); return G;
       default: throw new Error('bad move ' + mv.t);
     }
     if (A.h === 'sel' && liveHeroes(G).every(function (h) { return G.sel[h.id]; })) { G.ask = null; startRound(G); }
@@ -903,7 +929,7 @@
     G.figs.push({ id: id, kind: 'sum', team: 'h', type: sid, owner: f.id, pos: k, hp: s.hp + (s.hpL || 0) * (f.lvl - 1), max: s.hp + (s.hpL || 0) * (f.lvl - 1), cond: {}, rnd: {} });
     G.act.cur.persist = true; G.act.cur.did = true; G.act.cur.pid = null;
     G.act.cur.sumId = id;
-    ev(G, { e: 'summon', id: id, owner: f.id, k: k });
+    ev(G, { e: 'summon', id: id, owner: f.id, k: k, f: clone(fig(G, id)) });
     // the card stays active until the summon dies
     var cur = G.act.cur, oldDone = cur; cur.sum = id;
   }
@@ -912,7 +938,7 @@
   cardDone = function (G, f) { var cur = G.act.cur; if (cur && cur.sum && !f.exh) { var hi = f.hand.indexOf(cur.c); if (hi >= 0) f.hand.splice(hi, 1); f.active.push({ c: cur.c, sum: cur.sum }); if (cur.xp && cur.did) { f.sxp += cur.xp; ev(G, { e: 'xp', id: f.id, n: cur.xp }); } G.act.cur = null; if (G.act.step === 'first') { G.act.step = 'second'; G.ask = { h: 'second', id: f.id }; } else endHeroTurn(G, f); return; } return _cardDone(G, f); };
   function resolveBlock(G, f, mv) {
     var A = G.ask; G.ask = null;
-    if (mv.t === 'take') { f.hp -= A.n; ev(G, { e: 'dmg', id: f.id, n: A.n, hp: f.hp }); if (f.hp <= 0) kill(G, f, A.src ? fig(G, A.src) : null); }
+    if (mv.t === 'take') { f.hp -= A.n; f.taken = (f.taken || 0) + A.n; f.minhp = Math.min(f.minhp == null ? f.max : f.minhp, Math.max(0, f.hp)); ev(G, { e: 'dmg', id: f.id, n: A.n, hp: f.hp }); if (f.hp <= 0) kill(G, f, A.src ? fig(G, A.src) : null); }
     else if (mv.t === 'block') { f.hand.splice(f.hand.indexOf(mv.c), 1); f.lost.push(mv.c); ev(G, { e: 'block', id: f.id, n: A.n, cards: [mv.c] }); }
     else { var two = f.disc.splice(0, 2); f.lost = f.lost.concat(two); ev(G, { e: 'block', id: f.id, n: A.n, cards: two }); }
     resume(G);
@@ -946,7 +972,7 @@
   }
 
   g.WD = { K: K, P: P, nb: nb, dist: dist, parse: parse, parseMap: parseMap, newScenario: newScenario, validMoves: validMoves, apply: apply, sideToAct: sideToAct,
-    checkInvariants: checkInvariants, fig: fig, figAt: figAt, heroes: heroes, liveHeroes: liveHeroes, reach: reach, pathTo: pathTo, los: los, attackTargets: attackTargets,
+    checkInvariants: checkInvariants, itemMoves: itemMoves, fig: fig, figAt: figAt, heroes: heroes, liveHeroes: liveHeroes, reach: reach, pathTo: pathTo, los: los, attackTargets: attackTargets,
     seen: seen, shieldOf: shieldOf, monInfo: monInfo, findFocus: findFocus, baseAmd: baseAmd, applyPerk: applyPerk, rnd: rnd, shuffle: shuffle, clone: clone, EL: EL, DIRS: DIRS, goalState: goalState, initOf: initOf,
     modValue: modValue };
 })(typeof window !== 'undefined' ? window : globalThis);

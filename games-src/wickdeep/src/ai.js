@@ -56,6 +56,15 @@
   function choose(G, lvl) {
     var mv = E.validMoves(G); if (!mv.length) return null;
     var A = G.ask, f = A.id ? E.fig(G, A.id) : null;
+    var im = mv.filter(function (m) { return m.t === 'item'; });
+    for (var ii = 0; ii < im.length; ii++) {
+      var it = D.ITEM_BY[f.items[im[ii].i].id], near = nearestFoeDist(G, f);
+      if ((it.k === 'heal' || it.k === 'cure') && f.hp * 2 <= f.max) return im[ii];
+      if (it.k === 'stamina' && f.hand.length <= 3 && f.disc.length >= 2) return im[ii];
+      if ((it.k === 'shd' || it.k === 'ret') && A.h === 'first' && near <= 3 && it.k !== 'x') return im[ii];
+      if ((it.k === 'atk' || it.k === 'adv') && A.h === 'target') return im[ii];
+      if (it.k === 'str' && A.h === 'target' && f.hp < f.max) return im[ii];
+    }
     switch (A.h) {
       case 'sel': {
         // one hero at a time
@@ -69,6 +78,7 @@
       case 'first': case 'second': {
         var best2 = null, bv2 = -1e9;
         mv.forEach(function (m) {
+          if (m.t !== 'half') return;
           var c = D.CARD[m.c], text = m.basic ? (m.h === 'top' ? 'a2' : 'm2') : (m.h === 'top' ? c.top : c.bot);
           var v = halfValue(G, f, text, m.h === 'top');
           if (A.h === 'first') { var other = f.sel.filter(function (x) { return x !== m.c; })[0], oc = D.CARD[other]; v += Math.max(halfValue(G, f, m.h === 'top' ? oc.bot : oc.top, m.h !== 'top'), 1.6); }
