@@ -35,8 +35,13 @@ const OUT = path.join(__dirname, '..', 'playable-shots', 'w494'); fs.mkdirSync(O
     const RULES = await pg.evaluate(() => window.EC_TUT_RULES || []);
     let at = -1; RULES.forEach(r => { const j = seen.indexOf(r); if (j < 0) fail(name + ': rule step missing: ' + r); else if (j < at) fail(name + ': rule step out of order: ' + r); else at = j; });
     Object.keys(says).forEach(id => { const w = String(says[id] || '').replace(/[^a-zA-Z0-9'’+]+/g, ' ').trim().split(' ').filter(Boolean).length; if (w > 12) fail(name + ': step ' + id + ' has ' + w + ' words'); });
-    const end = await pg.evaluate(() => ({ kit: !!(window.GXT && GXT.active()), coach: UI.coachOn && UI.coachOn(), scr: EC.E.G().scr, at: EC.E.G().at }));
-    if (end.kit || !end.coach || end.scr === 'map') fail(name + ': run did not continue after the tutorial ' + JSON.stringify(end));
+    // F2: the guide ends on its end card; "Pick your hero" opens the hero pick, and Start climb gives a full branching act (9 floors + boss)
+    const pk = await centre('[data-gxt-end="pick"]'); if (!pk) fail(name + ': no Pick your hero button at the end'); else await tapXY(pk.x, pk.y); await sleep(500);
+    const heroes = await pg.evaluate(() => document.querySelectorAll('#title.pick .hero').length);
+    if (heroes !== 4) fail(name + ': hero pick not shown after the guide (' + heroes + ' heroes)');
+    const pl = await centre('#play'); if (pl) await tapXY(pl.x, pl.y); await sleep(600);
+    const end = await pg.evaluate(() => { const g = EC.E.G(), f1 = g.map.filter(n => n.f === 1).length, br = g.map.some(n => n.nx.length > 1); return { kit: !!(window.GXT && GXT.active()), F: g.F, f1, br, scr: g.scr, hero: g.hs[0].k }; });
+    if (end.kit || end.F !== 9 || end.f1 < 2 || !end.br) fail(name + ': first real climb is not a full branching act ' + JSON.stringify(end));
     if (errs.length) fail(name + ' errors: ' + errs.slice(0, 3).join(' | '));
     console.log(name, 'steps', seen.length + ':', seen.join(' > '), '| after:', JSON.stringify(end));
     await ctx.close();

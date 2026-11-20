@@ -11,7 +11,7 @@
     { title: 'The climb', text: 'Walk up the map room by room. Glowing rooms are your next step. Beat the boss at the top to win.', pic: svg('climb') },
     { title: 'Your turn', text: 'You draw 5 cards and have 3 energy each turn. Tap a card once to lift it, again to play it. Pick a target if asked.', pic: svg('turn') },
     { title: 'Read the intent', text: 'Enemies show what they will do next. Block cancels attacks. Out of energy? End your turn.', pic: svg('intent') },
-    { title: 'Status effects', text: 'Vulnerable (max 3): takes double damage from the next attack. Weak (max 3): each of its hits deals 8 less damage. One is used up per attack; Weak against Vulnerable cancels both. Poison: 8 HP per token at end of turn, stays. Dice: 1-2 low, 3-4 middle, 5-6 high.', pic: svg('status') },
+    { title: 'Status effects', text: 'Vulnerable (max 3): takes double damage from the next attack. Weak (max 3): each of its hits deals 1 less damage. One is used up per attack; Weak against Vulnerable cancels both. Poison: 1 HP per token at end of turn, stays. Dice: 1-2 low, 3-4 middle, 5-6 high.', pic: svg('status') },
     { title: 'Foe rules', text: 'Some foes have a rule of their own, shown as a purple chip under them. Tap the chip to read it; it flashes when it fires.\nThorn Brute: from its 2nd turn each Skill you play costs you ' + D.SCALE + ' HP.\nRust Tick: curls up (Block) when first hurt.\nGape Grub: its death makes you Vulnerable.\nGate Wyrm: keeps its Block; break it and it turns defensive.\nMire Behemoth: bursts into smaller foes when slain.\nSleeper Statue: wakes when hurt.', pic: svg('status') },
     { title: 'After a fight', text: 'Pick 1 of 3 new cards, or skip to keep your deck lean.', pic: svg('reward') },
     { title: 'Rest and shop', text: 'Campfires heal or upgrade a card. Shops sell cards, relics and potions for gold.', pic: svg('rest') },
@@ -20,13 +20,13 @@
     { phase: 'map', title: 'The boss', text: 'The crown room at the top is the boss. Beat it to win the climb.', pic: svg('boss') },
     { phase: 'battle', title: 'Play cards', text: 'Tap a card once to lift it, again to play it. Pick a target if asked. You have 3 energy a turn.', pic: svg('turn') },
     { phase: 'battle', title: 'Intent and block', text: 'The icon over an enemy is its next move. Block cancels attacks this turn.', pic: svg('intent') },
-    { phase: 'battle', title: 'Status effects', text: 'Vulnerable: takes double damage. Weak: each hit deals 8 less. One used per attack. Poison: 8 HP per token each turn, it stays.', pic: svg('status') },
+    { phase: 'battle', title: 'Status effects', text: 'Vulnerable: takes double damage. Weak: each hit deals 1 less. One used per attack. Poison: 1 HP per token each turn, it stays.', pic: svg('status') },
     { phase: 'reward', title: 'Pick a card', text: 'Add one of three cards to your deck, or skip to keep it lean. A sharper deck climbs higher.', pic: svg('reward') },
     { phase: 'rest', title: 'Campfire', text: 'Heal some HP, or smith to upgrade one card. Pick one.', pic: svg('rest') },
     { phase: 'shop', title: 'Shop', text: 'Tap an item to see it, then Buy. Cards, relics and potions cost gold.', pic: svg('shop') },
     { phase: 'event', title: 'Event', text: 'A choice with a price or a prize. Read each option, then pick one.', pic: svg('event') },
-    { title: 'Tabletop or Gentle', text: 'Two difficulties on the setup screen.\nTabletop (rulebook) is the default. It uses the rulebook numbers. It is hard.\nGentle is an easier mode made for this screen. It is NOT the rulebook.\nGentle: 5 times your HP, start with 3 Healing Draughts, Rest heals 64 (not 24).\nFoes are exactly the same on both.', pic: svg('climb') },
-    { title: 'How close to the tabletop', text: 'Numbers are 8 times the tabletop scale (a Strike deals 8).\nAct 1 foes use their printed tabletop cards x 8. Act 2, Act 3 and final foes are our own.\nNames, card text and art are our own.\nPick 1 act, 3 acts, or 3 acts and the final boss.\nEvery card has its own upgrade.\nThe map is generated, not a printed board. Some cards and events roll a die.\nPotions drop by chance after fights. You hold 3 per hero; some relics add a slot.\n1 or 2 heroes, not 4.', pic: svg('climb') }
+    { title: 'Tabletop or Gentle', text: 'Two difficulties on the setup screen.\nTabletop (rulebook) is the default. It uses the rulebook numbers. It is hard.\nGentle is an easier mode made for this screen. It is NOT the rulebook.\nGentle: 5 times your HP, start with 3 Healing Draughts, Rest heals 8 (not 3).\nFoes are exactly the same on both.', pic: svg('climb') },
+    { title: 'How close to the tabletop', text: 'Numbers are the tabletop numbers (a Strike deals 1, a hero has about 10 HP).\nAct 1 foes use their printed tabletop cards. Act 2, Act 3 and final foes are our own.\nNames, card text and art are our own.\nPick 1 act, 3 acts, or 3 acts and the final boss.\nEvery card has its own upgrade.\nThe map is generated, not a printed board. Some cards and events roll a die.\nPotions drop by chance after fights. You hold 3 per hero; some relics add a slot.\n1 or 2 heroes, not 4.', pic: svg('climb') }
   ];
   function phase() { var gg = g(); if (!gg || (window.UI && UI.mode === 'title')) return null; return gg.scr === 'over' ? null : gg.scr; }
   UI.phase = phase;
@@ -40,9 +40,17 @@
       G.b.en.forEach(function (e, i) { if (!e.dead && e.intent && e.intent.atk && (e.intent.all || e.intent.tg === hi)) { try { inc += E.previewHit(i, hi) * (e.intent.hits || 1); } catch (x) { } } });
       var need = Math.max(0, inc - h.blk), best = null;
       try { best = E.aiMove(function () { return 0.99; }); } catch (x) { best = null; }
+      // F2: lethal first. A card that wins the fight, or kills a foe that is about to hit you, beats blocking
+      var lw = null, lk = null, lkSave = 0;
+      h.hand.forEach(function (c, ci) { var ef = E.eff(c); if (!E.canPlay(h, c) || (ef.cost !== 'X' && E.cost(h, c) > h.en)) return;
+        G.b.en.forEach(function (e, ei) { if (e.dead || (!ef.tgt && ei > 0)) return; var pv = null; try { pv = E.previewPlay(hi, ci, ef.tgt ? ei : undefined); } catch (x) { pv = null; } if (!pv || pv.rnd) return;
+          if (pv.won && !lw) lw = { ci: ci, ei: ei, tgt: ef.tgt };
+          var save = 0; pv.en.forEach(function (r, k) { var f = G.b.en[k]; if (r && r.kill && f.intent && f.intent.atk && (f.intent.all || f.intent.tg === hi)) { try { save += E.previewHit(k, hi) * (f.intent.hits || 1); } catch (x) { } } });
+          if (save > lkSave) { lkSave = save; lk = { ci: ci, ei: ei, tgt: ef.tgt }; } }); });
+      var lth = lw || lk; if (lth) { var lc = q('.hand .card[data-c="' + lth.ci + '"]'); if (lc) { var lf = lth.tgt ? D.ENEMIES[G.b.en[lth.ei].id].name : ''; return { target: lc, why: lw ? 'Play ' + E.eff(h.hand[lth.ci]).name + (lf ? ' on ' + lf : '') + ': it wins the fight.' : 'Play ' + E.eff(h.hand[lth.ci]).name + (lf ? ' on ' + lf : '') + ': it dies before it hits.' }; } }
       if (need > 0) {   // a hit is coming: point at the biggest playable Block card
         var bi = -1, bb = 0; h.hand.forEach(function (c, i) { var ef = E.eff(c); if (!E.canPlay(h, c) || (ef.cost !== 'X' && E.cost(h, c) > h.en)) return; var b = 0; ef.ops.forEach(function (o) { if (o[0] === 'blk') b += o[1]; }); if (b > bb) { bb = b; bi = i; } });
-        if (bi >= 0 && (!best || best.t !== 'play' || need >= h.hp * 0.3 || need > 8)) { var bc = q('.hand .card[data-c="' + bi + '"]'); if (bc) return { target: bc, why: need + ' damage is coming. Block with ' + E.eff(h.hand[bi]).name + '.' }; }
+        if (bi >= 0 && (!best || best.t !== 'play' || need >= h.hp * 0.3 || need > 1)) { var bc = q('.hand .card[data-c="' + bi + '"]'); if (bc) return { target: bc, why: need + ' damage is coming. Block with ' + E.eff(h.hand[bi]).name + '.' }; }
       }
       if (best && best.t === 'play') {
         var c = h.hand[best.c], ef = E.eff(c), el = q('.hand .card[data-c="' + best.c + '"]'); if (!el) return null;
