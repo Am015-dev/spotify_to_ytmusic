@@ -432,6 +432,7 @@ function bfClick(e){if(BF.dragEnd&&Date.now()-BF.dragEnd<450&&!e.__bfdrag)return
   if(!tile&&e.clientX!=null){const sc=t.closest('[data-bfsrc]');if(sc){const i=+sc.dataset.bfsrc;let best=null,bd=1e9,tw=0;// a tap anywhere on a kiln (or near a middle tile) takes the nearest tile
       for(const el of BF.tbl.querySelectorAll(`[data-k^="${i<0?'c_':'f'+i+'_'}"]`)){const r=el.getBoundingClientRect();const d=Math.hypot(r.left+r.width/2-e.clientX,r.top+r.height/2-e.clientY);if(d<bd){bd=d;best=el;tw=r.width}}
       if(best&&(i>=0||bd<tw*1.7))tile=best}}
+  if(!tile&&e.clientX!=null&&t.closest('.bf-table')){let bd=1e9,best=null;for(const el of BF.tbl.querySelectorAll('[data-k]:not(.hid)')){const r=el.getBoundingClientRect();if(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom)continue;const v=bfR(el);const d=Math.hypot(v.left+v.width/2-e.clientX,v.top+v.height/2-e.clientY);if(d<bd){bd=d;best=el}}if(best)tile=best}   // F1: a tap inside a tile's 44px box (outside its drawing) still takes it
   const k=tile&&tile.dataset.k;
   if(k&&(k[0]==='f'||k[0]==='c')&&k!=='sun'){const s=slotSel(k);if(s){if(s.c<NC){const ar=s.src<0?G.ctr:G.fac[s.src];if(ar.includes(PRISM))s.j=UI.sel&&UI.sel.src===s.src&&UI.sel.c===s.c?UI.sel.j:1}
       if(UI.sel&&UI.sel.src===s.src&&UI.sel.c===s.c){UI.sel=null;UI.tgt=null;UI.adv=null;sfx('click');upd();return}UI.sel=null;pickSel(s);return}}

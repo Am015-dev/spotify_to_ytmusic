@@ -43,8 +43,9 @@ const atBeat=n=>()=>TUT.at===n;
 // one step = one sentence + one tap. kind: 'pick' (a tile), 'move' (a rack), 'look' (tap the glowing thing to go on); at = a round-end beat it holds
 function tutSteps(){
   const S=(id,say,o)=>Object.assign({id,say},o);
-  const pick=(src,c)=>({target:tKiln(src,c),ready:myTurn,wait:{type:'tap',match:a=>a.k==='pick'&&a.src===src&&a.c===c}});
-  const move=line=>({target:tRack(line),ready:()=>myTurn()&&!!UI.sel,wait:{type:'tap',match:a=>a.k==='move'&&a.line===line}});
+  const tR=q=>{const e=tq(q);return e?e.getBoundingClientRect():null};   // F1: the bubble keeps off what the player needs next (the kilns on a take, the other racks and the floor on a rack tap)
+  const pick=(src,c)=>({target:tKiln(src,c),ready:myTurn,avoid:()=>[tR('.bf-table')],wait:{type:'tap',match:a=>a.k==='pick'&&a.src===src&&a.c===c}});
+  const move=line=>({target:tRack(line),ready:()=>myTurn()&&!!UI.sel,avoid:()=>[tR('.bf-fl')].concat([0,1,2,3,4].filter(r=>r!==line).map(r=>tR(`[data-bfrow="${r}"]`))),wait:{type:'tap',match:a=>a.k==='move'&&a.line===line}});
   const look=(target,ready,o)=>Object.assign({target,ready,look:1,wait:{type:'tap',match:a=>a.k==='look'}},o||{});
   const rival=n=>({onDone:()=>tutRival(TUT_RIVAL[n])});
   const beat=(n,target,o)=>look(target,atBeat(n),Object.assign({at:n},o||{}));
@@ -54,7 +55,7 @@ function tutSteps(){
     S('rows','Rack 2 holds two tiles of one colour. Tap it.',move(1)),
     S('slide','The leftover tiles slid to the middle. Tap the middle.',Object.assign(look(()=>tq('[data-bfsrc="-1"]'),rivalTurn),rival(0))),
     S('rival','Tamsin took four snowflakes. Now tap a red in kiln 3.',pick(2,2)),
-    S('blocked','Rack 3 is shut: its wall row has red. Tap rack 4.',Object.assign(move(3),rival(1),{side:'bottom'})),
+    S('blocked','Rack 3 is shut: its wall row has red. Tap rack 4.',Object.assign(move(3),rival(1))),
     S('middle','Tap a yellow in the middle. First one there gets the Sun.',pick(-1,1)),
     S('sun','Tap rack 3. The Sun token goes on your floor.',move(2)),
     S('keep','Rack 3 is not full. It keeps its tiles for later.',Object.assign(look(tRack(2),rivalTurn),rival(2))),

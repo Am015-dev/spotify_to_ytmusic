@@ -194,3 +194,6 @@ html.bf-land #bf .bf-line .bf-say{background:rgba(10,20,50,.72);padding:4px 14px
 /* F1 (R79 P3): the bulb bubble keeps a readable width and stays on screen (the shell's short-phone padding was for a corner OK button it doesn't have) */
 html body .gxh-bub.gxh-bulbb{min-width:min(236px,calc(100vw - 12px));box-sizing:border-box}
 html body .gxh-bub.gxh-bulbb .gxh-tx{padding-right:0}
+/* the drawn tile takes the pointer, so a neighbour's 44px box never covers a tile's centre; a tap in the box margin reaches the kiln/middle/table and bfClick takes the nearest tile */
+#bf .bf-table .bf-t{pointer-events:none}
+#bf .bf-table .bf-t>svg{pointer-events:auto}
