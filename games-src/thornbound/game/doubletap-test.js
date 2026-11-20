@@ -1,5 +1,5 @@
 // Double-tap test (R64, R71): a second fast tap on the Goal card's "Got it", the coach bubble's "Got it" or the bulb bubble must not reach what is underneath; legit taps 550 ms apart are never eaten.
-// A probe button is put exactly under "Got it"; double-taps by touch and by mouse must leave it untouched, a tap 450 ms later must reach it.
+// A probe button is put exactly under "Got it"; double-taps by touch and by mouse must leave it untouched, a tap 500 ms later must reach it.
 // node doubletap-test.js [size=375x667]
 const PW=(()=>{try{return require('playwright')}catch(e){return require('/opt/node-tools/node_modules/playwright')}})();
 const fs=require('fs');const html=fs.readFileSync(__dirname+'/thornbound.html');
@@ -21,7 +21,7 @@ const [W,H]=(process.argv[2]||'375x667').split('x').map(Number);const sleep=ms=>
   let at=await open();await p.touchscreen.tap(...at);await sleep(120);await p.touchscreen.tap(...at);await sleep(150);let s=await state();
   say(!s.goal&&s.probe===0,'touch double-tap on "Got it": goal closed '+!s.goal+', taps reaching the panel below '+s.probe);
   // 2. a later tap still works
-  await sleep(450);await p.touchscreen.tap(...at);await sleep(150);s=await state();say(s.probe===1,'a tap 450 ms later reaches the panel ('+s.probe+')');
+  await sleep(500);await p.touchscreen.tap(...at);await sleep(150);s=await state();say(s.probe===1,'a tap 500 ms later reaches the panel ('+s.probe+')');
   // 3. mouse double-click
   at=await open();await p.mouse.click(at[0],at[1],{clickCount:1});await sleep(90);await p.mouse.click(at[0],at[1]);await sleep(150);s=await state();
   say(!s.goal&&s.probe===0,'mouse double-click on "Got it": taps reaching the panel below '+s.probe);
@@ -41,7 +41,7 @@ const [W,H]=(process.argv[2]||'375x667').split('x').map(Number);const sleep=ms=>
       const open0=await p.evaluate(()=>!!document.querySelector('.gxh-bub.on'));await p.touchscreen.tap(...at);await sleep(gap);await p.evaluate(()=>{window.__clk=0});await p.touchscreen.tap(...at);await sleep(250);
       const r=await p.evaluate(()=>{document.body.removeEventListener('click',window.__cl,false);return {clk:window.__clk,bub:!!document.querySelector('.gxh-bub.on')}});r.open0=open0;r.goal=await goalOpen();r.eaten=(await p.evaluate(()=>TBTAPGUARD.eaten))-e0;return r};
     let coach=0,bulb=0;
-    for(const gap of [110,180,250]){await reset();
+    for(const gap of [110,180,250,400]){await reset();
       // coach bubble: force the free-play coach to show its bubble for the current phase
       await p.evaluate(()=>{try{GXH.reset&&GXH.reset()}catch(e){}try{GXH.phase(null);GXH.phase(hlpPhase())}catch(e){}});await sleep(1600);
       let at=await bubAt('.gxh-bub.on:not(.gxh-bulbb) .gxh-ok');

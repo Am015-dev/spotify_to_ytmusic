@@ -211,10 +211,10 @@ window.tbStripPaint=()=>{try{paint()}catch(x){}};setInterval(()=>{try{if(G&&UI.s
 window.tbLineOver=function(ln){try{const L=ln.getBoundingClientRect(),w=document.createTreeWalker(ln,NodeFilter.SHOW_TEXT,null),rg=document.createRange();let n;
   while((n=w.nextNode())){if(!/\S/.test(n.nodeValue))continue;rg.selectNodeContents(n);for(const r of rg.getClientRects())if(r.width&&(r.bottom>L.bottom+1||r.top<L.top-1))return true}return false}catch(e){return ln.scrollHeight>ln.clientHeight+1}};
 // ---- tap guard (R64): a fast second tap must not fall through to the panel under an overlay that just closed.
-// For 350 ms after a tap closes any overlay (Goal card, message card, pop-up, glossary, a modal, or a hint bubble), a tap near that same spot
+// For 450 ms after a tap closes any overlay (Goal card, message card, pop-up, glossary, a modal, or a hint bubble), a tap near that same spot
 // (a double-tap) is swallowed. Taps elsewhere on the screen still work at once. A tap on a tutorial's dim cell is never swallowed: the cell already
 // eats it and answers with a shake and a hint (F15).
-(function(){const MS=350,R=40,D=document,OV='#tbgoal,[aria-modal="true"],.gx-goal,.gxh-bub,#pc,#ppop,#gdef,#start';let until=0,at=null,down={t:-1e9,x:0,y:0};
+(function(){const MS=450,R=40,D=document,OV='#tbgoal,[aria-modal="true"],.gx-goal,.gxh-bub,#pc,#ppop,#gdef,#start';let until=0,at=null,down={t:-1e9,x:0,y:0};
   const gone=e=>!e.isConnected||e.hidden||(e.closest&&e.closest('[hidden]'))||(e.classList&&e.classList.contains('gxh-bub')&&!e.classList.contains('on'));
   const arm=()=>{const now=performance.now();if(now-down.t>600)return;until=now+MS;at={x:down.x,y:down.y}};
   let eaten=0;window.TBTAPGUARD={get eaten(){return eaten},get until(){return until},get at(){return at},arm,ms:MS,radius:R,get on(){return performance.now()<until}};
