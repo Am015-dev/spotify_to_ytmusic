@@ -57,7 +57,7 @@ const GUIDE_STEPS=[
  {sel:'c0_0',id:'t2',day:2,rule:'threat',when:gPlan,kind:'act',say:'Tap the camp. Threats are handled there.',tgt:()=>gGlow(gCamp()),done:()=>gPop()===gCamp()},
  {id:'t3',day:2,rule:'threat',when:gPlan,kind:'act',say:'Dig a Drain with the Shovel. The threat is gone.',tgt:()=>gRow('threat'),done:()=>!!gAct('threat')},
  {sel:'c1_0',id:'g2',day:2,rule:'gather',when:gPlan,kind:'act',say:'Tap the land you found yesterday.',tgt:()=>gGlow(gExp()),done:()=>gPop()===gExp()},
- {id:'g3',day:2,rule:'gather',when:gPlan,skip:()=>!!gAct('gather'),kind:'act',say:'Gather food. Food and wood arrive after all jobs.',tgt:()=>{let f=null;for(const e of document.querySelectorAll('#ppop .bfr[data-place]'))if(/fish|food/i.test(e.textContent)&&/gather/.test(decodeURIComponent(e.dataset.place)))f=f||e;return f||gRow('gather')},done:()=>!!gAct('gather')},
+ {id:'g3',day:2,rule:'gather',when:gPlan,skip:()=>!!gAct('gather'),kind:'act',say:'Gather food. Food and wood arrive after all jobs.',tgt:()=>{let f=null;for(const e of document.querySelectorAll('#ppop .bfr[data-place]')){let o=null;try{o=JSON.parse(decodeURIComponent(e.dataset.place))}catch(err){}if(!o||o.type!=='gather'||!o.tgt)continue;let s=null;try{s=srcs(o.tgt.pos).find(x=>x.i===o.tgt.i)}catch(err){}if(s&&s.s!=='wood')f=f||e}return f||gRow('gather')},done:()=>!!gAct('gather')},
  {sel:'c1_1',id:'r2',day:2,rule:'rest',when:gPlan,kind:'act',say:'Tap the camp.',tgt:()=>gGlow(gCamp()),done:()=>gPop()===gCamp()},
  {id:'r3',day:2,rule:'rest',when:gPlan,kind:'act',say:'Rest heals 1 wound.',tgt:()=>gRow('rest'),done:()=>!!gAct('rest')},
  {sel:'c0_1',id:'h2',day:2,rule:'hunt',when:gPlan,kind:'act',say:'A beast was spotted. Tap the camp. Hunts start there.',tgt:()=>gGlow(gCamp()),done:()=>gPop()===gCamp()},
@@ -80,9 +80,9 @@ const GUIDE_STEPS=[
  {id:'go3',day:3,rule:'roll',when:gPlan,kind:'act',say:'Tap Start day and watch the dice.',tgt:()=>gdq('#bf [data-a=go]'),done:()=>!gPlan()},
  {id:'roll',day:3,rule:'roll',beat:'act',when:gDiceBeat,kind:'info',say:'The dice: ✔ success, 🩸 a wound, ❓ an adventure.',tgt:()=>null},
  {id:'advc',day:3,rule:'adventure',beat:'adventure',kind:'info',say:'The ? token drew this adventure card. It happens now.',tgt:()=>gdq('#bfcard')},
- {id:'wx1',day:3,rule:'weather',beat:'daysum',kind:'info',say:'Days 4 to 6 roll a rain die. Build a roof first.',tgt:()=>null},
- {id:'wx2',day:3,rule:'weather',beat:'daysum',kind:'info',say:'From day 7, snow burns 1 wood. Storms knock down the palisade.',tgt:()=>null},
- {id:'wx3',day:3,rule:'weather',beat:'daysum',kind:'info',say:'Hungry animals take food, palisade, or fight: strength 3 against your weapon.',tgt:()=>null},
+ {id:'wx1',day:3,rule:'weather',beat:'daysum',kind:'info',say:'Normal island, days 4-6: a rain die. Build a roof first.',tgt:()=>null},
+ {id:'wx2',day:3,rule:'weather',beat:'daysum',kind:'info',say:'Normal island, day 7+: snow costs wood and counts against the roof.',tgt:()=>null},
+ {id:'wx3',day:3,rule:'weather',beat:'daysum',kind:'info',say:'Normal island, day 7+: animals take food, palisade, or fight (strength 3).',tgt:()=>null},
  {id:'end',day:3,rule:'real',beat:'daysum',kind:'info',say:'Now you know the rules. Play on, or start a real game!',tgt:()=>null}
 ];
 const GUIDE_RULES=[...new Set(GUIDE_STEPS.map(s=>s.rule))];
@@ -111,7 +111,7 @@ function gShow(s,el){const e=gEl();const r=gRing();e.classList.add('guide');e.hi
   const n=GUIDE.i+1,N=GUIDE_STEPS.length;
   e.innerHTML='<b class="cn">'+n+'/'+N+'</b><span class="ct"></span>'+(el&&s.kind!=='info'?'':'<button type="button" class="gnext" data-guide="next">Next ▶</button>');e.querySelector('.ct').textContent=s.say;
   if(el&&el.closest&&el.closest('#ppop')){try{el.scrollIntoView({block:'center'})}catch(err){}}
-  const tgt=el||e.querySelector('.gnext');const tr=tgt.getBoundingClientRect();const pad=6;
+  const tgt=el||e.querySelector('.gnext');const tr=((el&&el.classList&&el.classList.contains('bfpw')&&el.closest('.bfpc'))||tgt).getBoundingClientRect();const pad=6;
   r.hidden=false;r.classList.remove('nudge');r.style.animation='none';void r.offsetWidth;r.style.animation='';   // F14: each step's ring pulses 3 times, then holds
   r.style.left=(tr.left-pad)+'px';r.style.top=(tr.top-pad)+'px';r.style.width=(tr.width+pad*2)+'px';r.style.height=(tr.height+pad*2)+'px';
   document.body.classList.add('guiding');
@@ -132,7 +132,7 @@ function gTick(){try{
     if(GUIDE.shown===s.id){GUIDE.shown=null;gHide()}return}
   const el=s.kind==='info'&&!s.tgt?null:gTarget(s);
   if(s.kind!=='info'&&!el){gHide();return}   // wait for the thing to appear (a popup row, a glow)
-  if(GUIDE.shown===s.id){if(el){const r=gdq('#tutring'),tr=el.getBoundingClientRect();if(r){r.style.left=(tr.left-6)+'px';r.style.top=(tr.top-6)+'px';r.style.width=(tr.width+12)+'px';r.style.height=(tr.height+12)+'px'}}return}
+  if(GUIDE.shown===s.id){if(el){const r=gdq('#tutring'),tr=((el.classList&&el.classList.contains('bfpw')&&el.closest('.bfpc'))||el).getBoundingClientRect();if(r){r.style.left=(tr.left-6)+'px';r.style.top=(tr.top-6)+'px';r.style.width=(tr.width+12)+'px';r.style.height=(tr.height+12)+'px'}}return}
   GUIDE.shown=s.id;gShow(s,el)}catch(e){console.error(e)}}
 // only the highlight (and the bubble's own buttons, Skip) answers while a step shows
 function gInside(x,y,el,pad){if(!el)return false;const r=el.getBoundingClientRect();pad=pad||10;return x>=r.left-pad&&x<=r.right+pad&&y>=r.top-pad&&y<=r.bottom+pad}

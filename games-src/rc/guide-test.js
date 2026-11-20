@@ -23,7 +23,7 @@ const sleep=ms=>new Promise(r=>setTimeout(r,ms));
     return {fin:!!document.querySelector('#coachb.guide[data-kind=final]:not([hidden])'),step:b&&b.dataset.step,rule:b&&b.dataset.rule,say:b&&(b.querySelector('.ct')||{}).textContent,ring:rr&&[rr.left+rr.width/2,rr.top+rr.height/2],st:PHO.st,over:!!(G&&G.over)}});
   if(s.fin)break;if(s.over){probs.push('game over during the tutorial');break}
   if(s.step&&s.ring){
-   if(!order.includes(s.step)){order.push(s.step);says[s.step]=[s.rule,s.say];await sleep(350);if(SHOTS){shotN++;await p.screenshot({path:path.join(SHOTS,'tut-'+shotN+'.png')})}}
+   if(!order.includes(s.step)){order.push(s.step);says[s.step]=[s.rule,s.say];await sleep(350);if(s.step==='wx1'){const f=await p.evaluate(()=>G.res.food);if(!(f>0))probs.push('Food '+f+' at the end of day 3: g3 did not gather food');else console.log('day 3 end: food '+f)}if(SHOTS){shotN++;await p.screenshot({path:path.join(SHOTS,'tut-'+shotN+'.png')})}}
    if(!wrongDone&&s.step==='explore'){wrongDone=true;const n0=await p.evaluate(()=>G.plan.acts.reduce((a,x)=>a+x.pw.length,0));await p.touchscreen.tap(30,H-40);await sleep(400);await p.touchscreen.tap(W/2,140);await sleep(400);
      const n1=await p.evaluate(()=>({tut:!!G.tut,modal:UI.modal,n:G.plan.acts.reduce((a,x)=>a+x.pw.length,0),step:GXGUIDE.step,pop:!!(PHO.pop&&PHO.pop.k!=='tile')}));if(n1.n!==n0||n1.step!=='explore')probs.push('a wrong tap changed the game: '+JSON.stringify(n1))}
    await p.touchscreen.tap(s.ring[0],s.ring[1]);await sleep(500)}

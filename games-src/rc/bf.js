@@ -79,7 +79,7 @@ function planCap(st){const cur=curPawn();const pb=planProblems();
   if(UI.confirm&&planOpen())return brief(String(UI.confirm).replace(/^⚠\s*/,''));
   if(cur){const n=pawnLabel(cur).split(' ')[0];const lt=legalTiles(cur);if(!lt.length)return `No job for ${n} now`;const gl=BF.glowRound===G.round||(typeof GUIDE!=='undefined'&&GUIDE.on&&!GUIDE.done)||G.tut||G.coach;if(!gl)return 'Tap a pawn to see where it works';return pb.length||cur.c!=null?`${n}: tap a glowing place`:`${n}: tap a place, or start`}
   if(pb.length)return badActs().size?'Tap a pulsing pawn to fix it':brief(pb[0]);return 'All set. Start the day!'}
-BF.status=function(){if(BF.msg&&Date.now()<BF.msg.until)return BF.msg.t;BF.msg=null;
+BF.status=function(){if(BF.msg&&Date.now()<BF.msg.until){let live=true;try{live=!BF.msg.ok||BF.msg.ok()}catch(e){}if(live)return BF.msg.t}BF.msg=null;
   const st=PHO.st;if(st==='story'){const i=storyIdx();if(i<0)return '';const last=i>=UI.beats.length-1;if(last&&humanQ())return posQ()?'Tap a glowing space':brief(G.q.title);return w8(capFor(i))}
   if(st==='plan'||st==='plan2')return w8(planCap(st));if(st==='over')return G.over&&G.over.win?'Rescued!':'Lost on the island';
   if(allAI())return UI.pause?'Paused':'The computer is playing';return 'The castaways are working'};

@@ -117,3 +117,8 @@ html:has(.gxh-ring) #bfgh{display:none!important}
 #cardsbody a[href="cards.html"]{display:inline-flex;align-items:center;min-height:44px}
 /* F14: after the list scrolled, the search box took the taps meant for the drawer's close button: the head stays on top */
 .gx-drawer .gx-drawer-head{position:relative;z-index:3}
+
+/* F15 (R72 row 5): the pawn name sits clear of the hand ring; the place pop-up header uses the game's font */
+html.bf .bfpc .bfpn{position:relative;z-index:2;text-shadow:0 0 3px #fff6dc,0 0 3px #fff6dc}
+html.ph.bf #ppop .pp-h,html.ph.bf #ppop .pp-h b{font-family:var(--sans)}
+html.ph.bf #ppop .pp-h b{font-weight:700;font-size:1.1rem;line-height:1.2}

@@ -199,7 +199,11 @@ function msgCheck(){const el=$('#dockmsg');if(!el||el.hidden||!G)return;if(UI.ms
 // Start the day: first ask when a red priority is still open
 function wizPlaced(){if(planOpen()&&!allAI()&&pstep()===2&&!curPawn())setPStep(3)}
 // Start day refused on the board (the dock toast is hidden on phones): say it on the board line and, when a free pawn can fill the short job, pick it so its places glow
-function startFix(msg){const a=G.plan.acts.find(x=>x.pw.length<actNeed(x).need);if(!a){BF.say(msg,6000);return}
+function startFix(msg){const a=G.plan.acts.find(x=>x.pw.length<actNeed(x).need);if(!a){
+    // F15 (R72 row 4): a refused Start day names a pawn: select it and ring it (glows on) instead of leaving a line that nothing clears
+    if(/still has a pawn/.test(msg)){const nm=String(msg).replace(/ still has.*$/,'');const p=humanFree().find(q=>q.c!=null&&pawnLabel(q)===nm)||humanFree().find(q=>q.c!=null);
+      if(p){UI.sel=p.id;UI.ps.skip=UI.ps.skip.filter(x=>x!==p.id);BF.glowRound=G.round;BF.msg=null;if(pstep()!==2)setPStep(2);return}}
+    BF.say(msg,6000);return}
   const pos=a.type==='explore'?a.tgt:a.type==='gather'?a.tgt.pos:a.type==='build'&&a.tgt&&a.tgt.cross!=null?a.tgt.cross:G.camp.pos;
   const p=humanFree().find(q=>!pawnWhy(q.id,a));if(p){UI.sel=p.id;UI.ps.skip=UI.ps.skip.filter(x=>x!==p.id);BF.say(`${pawnLabel(p).split(' ')[0]}: tap place ${pos+1} to help`,8000)}
   else{const nd=actNeed(a).need;for(const id of a.pw.slice())unplace(id);BF.say(`Place ${pos+1} needs ${nd} pawns: give yours another job`,8000)}
@@ -256,7 +260,7 @@ document.addEventListener('click',e=>{const pr=e.target.closest&&e.target.closes
   case 'clear':clearPlan(G.chars.filter(c=>c.human).map(c=>c.i));refresh();return;
   case 'pile':{const r=pileAdd(1);if(r)toast(r);return}case 'pilemax':{const room=SCEN.marooned.pileRoom();const free=G.res.wood-committed().wood;const n=Math.min(room,free);const res=shelterReserve();const k=G.round+':'+G.logN+':'+free;
     if(res&&n>0&&free-n<res&&UI.pileOK!==k){UI.pileOK=k;toast(typeof BF!=='undefined'&&BF.on?'⚠ Uses shelter wood! Tap again to add':`⚠ That leaves ${free-n} wood, and the shelter needs ${res}. Without a shelter everyone takes a wound each night. Tap again to add it anyway.`,7000);return}
-    const r=pileAdd(room);if(r)toast('Can’t add wood now: '+r+'.');else{sfx('place');const c=typeof curPawn==='function'&&curPawn();toast(typeof BF!=='undefined'&&BF.on?(c?`🔥 Pile +${n}. ${pawnLabel(c).split(' ')[0]} still needs a job`:`🔥 Pile +${n} (no pawn used)`):`🔥 +${n} wood on the signal pile (${G.sc.pile}/15). That uses no pawn${c?`: ${pawnLabel(c).split(' ')[0]} still needs a job, tap a glowing place`:''}.`,6000);if(typeof PHO!=='undefined'&&PHO.closePop)PHO.closePop(true);refresh()}return}
+    const r=pileAdd(room);if(r)toast('Can’t add wood now: '+r+'.');else{sfx('place');const c=typeof curPawn==='function'&&curPawn();toast(typeof BF!=='undefined'&&BF.on?(c?`🔥 Pile +${n}. ${pawnLabel(c).split(' ')[0]} still needs a job`:`🔥 Pile +${n} (no pawn used)`):`🔥 +${n} wood on the signal pile (${G.sc.pile}/15). That uses no pawn${c?`: ${pawnLabel(c).split(' ')[0]} still needs a job, tap a glowing place`:''}.`,6000);if(typeof PHO!=='undefined'&&PHO.closePop)PHO.closePop(true);if(c&&typeof BF!=='undefined'&&BF.on&&BF.msg)BF.msg.ok=()=>{try{const pl=placedIds();return allPawns().some(p=>(c.c!=null?p.c===c.c:p.id===c.id)&&!pl.has(p.id))}catch(e){return false}};refresh()}return}
   case 'untile':UI.tileSel=null;render();return;
   case 'later':UI.openLater=!UI.openLater;e.preventDefault();render();return;
   case 'moveask':G.moveAsk=b.checked?1:0;return;
