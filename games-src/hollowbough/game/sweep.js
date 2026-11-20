@@ -126,7 +126,7 @@ async function playGame(browser, W, H, gi, mode) {
     if (!tg.length) {
       // nothing glows: only Pass is left (tap twice, it asks "Sure?")
       const pb = await p.$('#acts .pass'); if (!pb) { await sleep(150); continue; }
-      passTaps++; await pb.tap().catch(() => { }); await sleep(120); const pb2 = await p.$('#acts .pass'); if (pb2) await pb2.tap().catch(() => { }); await sleep(250); continue;
+      passTaps++; { const w = await p.evaluate(() => UI.tabAutoAt ? Math.max(0, 400 - (Date.now() - UI.tabAutoAt)) : 0); if (w) await sleep(w); } await pb.tap().catch(() => { }); await sleep(120); const pb2 = await p.$('#acts .pass'); if (pb2) await pb2.tap().catch(() => { }); await sleep(250); continue;
     }
     const trays = tg.filter(x => x.tray); const pool = trays.length ? trays : tg;
     // the compact city strip opens full screen: 15 slots, nothing changes in the game, a glowing destination in it can be used, Done closes it
@@ -152,6 +152,7 @@ async function playGame(browser, W, H, gi, mode) {
     if (R() < .04) { const n = await p.evaluate(() => { if (UI.sel) return null; /* with a choice tray open the glow is hidden but the cards stay live (older behaviour) */ const e = document.querySelector('.sc:not(.glow),.mc:not(.glow):not(.empty)'); if (!e) return null; const r = e.getBoundingClientRect(); const c = [r.left + r.width / 2, r.top + r.height / 2]; const hit = document.elementFromPoint(c[0], c[1]); return { c, logN: G.logN, ok: !!hit }; }); if (n && n.ok) { await p.touchscreen.tap(n.c[0], n.c[1]); await sleep(200); const l2 = await p.evaluate(() => G.logN); if (l2 !== n.logN) fail(tag, 'tap on a non-glowing card changed the game: ' + (await p.evaluate(() => G.log.slice(-2).map(x => x.t).join(' / ') + ' | actor ' + HB.actor(G) + ' ai ' + G.players[HB.actor(G)].ai))); const cv = await p.$('#cityov .cvx'); if (cv) { await cv.tap().catch(() => { }); await sleep(150); } } }
     const pick = pool[Math.floor(R() * pool.length)];
     const before = await sig();
+    { const w = await p.evaluate(() => UI.tabAutoAt ? Math.max(0, 400 - (Date.now() - UI.tabAutoAt)) : 0); if (w) await sleep(w); }   // PLAY2: a person reacts to a panel that switched by itself (taps within 0.35 s of the switch are ignored)
     if (pick.sw != null) { const np = await p.evaluate(ix => { const e = document.querySelector('.glow[data-sw="' + ix + '"]'); if (!e) return null; if (e.closest('.hscroll')) e.scrollIntoView({ block: 'nearest', inline: 'nearest' }); const r = e.getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top + r.height / 2 }; }, pick.sw); if (np) { pick.x = np.x; pick.y = np.y; } }
     await p.touchscreen.tap(pick.x, pick.y);
     { await sleep(150); const lk = await p.$('#pc[data-card=look]:not([hidden]) [data-a=lookgo], #pc[data-card=look]:not([hidden]) [data-a=lookno]'); if (lk) { const lb = await lk.boundingBox(); if (lb) await p.touchscreen.tap(lb.x + lb.width / 2, lb.y + lb.height / 2); } }   // PLAY1: a tap opens the look sheet; its button (a real tap) commits

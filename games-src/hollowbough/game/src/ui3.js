@@ -20,7 +20,7 @@ function deadSay(tg) {
 }
 function onTarget(tg, el) {
   if (!G || UI.cards.length) return;
-  if (!UI.lookSkip && UI.tabAutoAt && Date.now() - UI.tabAutoAt < 500) { shake(el); return; }   // PLAY2: the panel just changed under the finger
+  if (!UI.lookSkip && !/^x:/.test(tg) && UI.tabAutoAt && Date.now() - UI.tabAutoAt < 350) { shake(el); return; }   // PLAY2: the panel just changed under the finger
   if (lookFirst(tg, el)) return;   // PLAY1: a tap shows what the move does and gives; the sheet's button commits
   if (/^x:/.test(tg) || UI.animBusy) { UI.sel = null; shake(el); if (/^x:/.test(tg) && !UI.animBusy) deadSay(tg); return; }
   const mm = myMoves();
@@ -467,7 +467,7 @@ function goalProg(kind, i, seat) {
   }
   return null;
 }
-const GOAL_LINE = 'Goals: first to own the cards sends a worker and scores.';
+const GOAL_LINE = 'Own the cards first, then send a worker.';   // board text: 8 words at most
 const SHARED_LINE = 'Shared: any number of workers fit here.';
 
 // ---- 4. plans: pairs, green pay-outs, an aim, a season payout
