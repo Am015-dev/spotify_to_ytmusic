@@ -252,7 +252,7 @@ function bonusLine(p, id) {
   var nx = null; bc.sc.forEach(function (t) { if (!nx && sc.n < t[0]) nx = t; });
   return sc.n + (nx ? ' of ' + nx[0] : '') + ' counted \u00b7 ' + sc.pts + ' pts now' + (nx ? ', ' + nx[1] + ' pts at ' + nx[0] : ', top tier');
 }
-function bonusChip(p) { return p.bonus.map(function (id) { var bc = PP.BON[id], sc = PP.bonusScore(p, id); return '&#9733; ' + esc(bc.n) + ' ' + sc.n + (typeof bc.sc === 'string' ? '' : '/' + (bc.sc.filter(function (t) { return sc.n < t[0]; })[0] || bc.sc[bc.sc.length - 1])[0]) + ' \u00b7 ' + sc.pts + ' pts'; }).join(' ; '); }
+function bonusChip(p) { return p.bonus.map(function (id) { var bc = PP.BON[id], sc = PP.bonusScore(p, id); return '&#9733; <span class="bcn">' + esc(bc.n) + ' </span>' + sc.n + (typeof bc.sc === 'string' ? '' : '/' + (bc.sc.filter(function (t) { return sc.n < t[0]; })[0] || bc.sc[bc.sc.length - 1])[0]) + '<span class="bcp"> \u00b7 ' + sc.pts + ' pts</span>'; }).join(' ; '); }
 // would this bird (card id, in hand or tray) move one of my bonus cards forward?
 function bonusAdv(p, bid) { var out = null; p.bonus.forEach(function (id) { if (!out && PP.bonusHit(id, B[bid], null)) out = PP.BON[id].n; }); return out; }
 function bonusTiers(bc) { return typeof bc.sc === 'string' ? bc.sc + ' point' + (bc.sc === '1' ? '' : 's') + ' each' : bc.sc.map(function (t) { return t[0] + '+: ' + t[1] + ' pts'; }).join(', '); }
