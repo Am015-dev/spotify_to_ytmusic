@@ -105,12 +105,16 @@ function autoPick(c, g) {
   if (UI.mode === 'tutorial' && typeof tutPick === 'function') { var tp = tutPick(c, g); if (tp) return tp; }
   var idx = null; try { var sp = planOnce(); if (sp && sp.gear === g && sp.idx) idx = sp.idx.slice(); } catch (e) { }
   if (!idx) try { idx = autoPickPlan(G, c, g); } catch (e) { idx = null; }
+  if (idx && idx.length === need && pickSpins(c, g, idx)) {   /* F4 cold play: never auto-pick a spin when the slowest cards of that gear are safe */
+    var slow = c.hand.map(function (x, j) { return { j: j, v: x === 'H' ? 99 : x === 'X' ? 2.4 : upgId(x) ? UPG[upgId(x)].sp : +x }; }).filter(function (o) { return o.v < 99; }); slow.sort(function (a, b) { return a.v - b.v; });
+    var lo = slow.slice(0, need).map(function (o) { return o.j; }); if (!pickSpins(c, g, lo)) idx = lo; }
   if (!idx || idx.length !== need) { idx = []; var vals = c.hand.map(function (x, j) { return { j: j, v: x === 'H' ? -9 : x === 'X' ? 2.4 : upgId(x) ? UPG[upgId(x)].sp : +x }; }).filter(function (o) { return o.v > -9; }); vals.sort(function (a, b) { return b.v - a.v; }); idx = vals.slice(0, need).map(function (o) { return o.j; }); }
   return idx;
 }
+function pickSpins(c, g, idx) { var q = planSpeed(c, idx), adr = G.adr && G.adr.indexOf(c.i) >= 0 ? 1 : 0, sp = q.sp + (q.nx ? 1 : 0), ks = cornersIn(G, c.pos, c.pos + sp + adr), burn = 0; ks.forEach(function (k) { burn += Math.max(0, sp - k.limit - q.ul); }); return burn > c.eng - (Math.abs(g - c.gear) === 2 ? 1 : 0); }
 function heatLine(c) {   /* F4: one line: your engine heat, the Heat cards in hand and which gear clears how many (the gear you picked in green) */
   var hh = c.hand.filter(function (x) { return x === 'H'; }).length, adr = G.adr && G.adr.indexOf(c.i) >= 0 ? 1 : 0, g = UI.gear;
-  var t = '<b>Engine heat ' + c.eng + '/' + ENGINE0 + '</b>';
+  var t = '<b>Engine heat ' + c.eng + '</b>';
   if (!hh) return t + ' · no Heat cards';
   var part = function (q) { var n = Math.min(hh, COOL[q] + adr); return '<span class="' + (g === q && n ? 'ok' : '') + '">gear ' + q + ' clears ' + n + '</span>'; };
   return t + ' · ' + hh + ' Heat card' + (hh > 1 ? 's' : '') + ': ' + part(1) + ', ' + part(2);
@@ -162,7 +166,7 @@ function drawPlan() {
   if (!ready) setMsg(need === 0 ? 'Only heat cards: press Go.' : UI.sel.length === 0 && !UI.touchedGear ? planAdvice(c, need) : (UI.sel.length ? 'Tap ' + (need - UI.sel.length) + ' more card' + (need - UI.sel.length > 1 ? 's' : '') + '.' : STORY.planCards(need)));
   else if (!hintsOn()) { var cq = curveInfo(); previewSet(null); var tl = tradeLine(cq); setMsg(tl.t, tl.k); }
   else { var ci = previewSet(curveInfo()), tl2 = tradeLine(ci); setMsg(tl2.t, tl2.k); }
-  if (sgp && !sgDone) setMsg(sugWhy(c, sgp), 'good');
+  if (sgp && !sgDone && UI.gear !== sgp.gear) setMsg(sugWhy(c, sgp), 'good');
   if (!ready) previewSet(null);
   RACE.ph = UI.swap ? 'discard' : (UI.sel.length || UI.touchedGear) ? 'play' : 'shift'; RACE.spdT = UI.sel.length ? curveInfo().sp : 0;   /* the needle revs as you tap cards */
   if (!ready && need === 0) $('#goB').disabled = false;
@@ -226,10 +230,12 @@ function sugWhy(c, p) {   /* the suggested plan's reason, from the same numbers 
 }
 function legNew(seen, k) { if (UI.legG !== G) { UI.legG = G; UI.legId = Date.now() % 1e6; } var r = G.round + '|' + UI.legId; if (!seen[k]) seen[k] = []; if (seen[k].indexOf(r) < 0) { if (seen[k].length >= 4) return false; seen[k].push(r); lsSet('rr_leg', JSON.stringify(seen)); } return true; }
 function tradeLine(ci) {   /* F3: before Go, the trade-off in plain numbers: you'd go X, limit Y, costs Z heat */
-  var sp = 'Speed ' + (ci.uncertain ? 'about ' : '') + ci.sp, lim = ci.ks.length ? ci.ks[0].limit : 0;
+  var sp = 'Speed ' + (ci.uncertain ? 'about ' : '') + ci.sp, lim = ci.ks.length ? Math.min.apply(null, ci.ks.map(function (k) { return k.limit; })) : 0, c = you(), fl = total(G) - c.pos;
+  if (fl <= ci.sp + ci.adr) return { t: sp + ' · crosses the finish line! Go!', k: 'good' };
+  if (ci.ks.length > 1) sp += ' · ' + ci.ks.length + ' corners';
   if (ci.spin) return { t: sp + ' · limit ' + lim + ' · spin out!', k: 'warn' };
   if (ci.ks.length) return { t: sp + ' · limit ' + lim + (ci.burn ? ' · costs ' + ci.burn + ' heat' : ' · no heat. Go!'), k: ci.burn ? 'warn' : 'good' };
-  return { t: sp + (ci.next ? ' · corner ' + ci.next.limit + ' in ' + ci.next.d : '') + ' · safe. Go!', k: 'good' };
+  return { t: sp + (fl <= 14 ? ' · finish in ' + fl : ci.next ? ' · corner ' + ci.next.limit + ' in ' + ci.next.d : '') + ' · safe. Go!', k: 'good' };
 }
 function cardLegend(hand) {   /* F3: one plain line per dead card type in your hand, for the first rounds it is there (then the board gets the room back) */
   var h = '', seen = JSON.parse(lsGet('rr_leg') || '{}'), hasH = hand.indexOf('H') >= 0 && legNew(seen, 'H'), hasX = hand.indexOf('X') >= 0 && legNew(seen, 'X'); if (!hasH && !hasX) return '';
@@ -306,7 +312,7 @@ async function playEvents(ev) {
     else if (e.t === 'cool') { setMsg(who + ' cool' + (who === 'You' ? '' : 's') + ' ' + e.n + ' heat back into the engine.'); pop('+' + e.n + ' engine', UI.vis[e.car].p, '#8ce6ff'); await wait(750); }
     else if (e.t === 'play') { if (you && UI.ts) { UI.ts.n++; UI.ts.gs += c.gear; } var sx = stressNote(e); logSet(e.car, { cards: e.cards.map(function (x) { return x.card === 'X' ? 'Stress ' + x.v : x.upg ? UPG[x.upg].sn : x.v; }).join(' + '), sp: e.speed }); if (you) showPlayed(e); sfx('card'); setMsg(who + (who === 'You' ? ' play' : ' plays') + ': speed ' + e.speed + (sx ? ' · ' + sx : '') + '.'); if (sx && you) pop(sx, UI.vis[e.car].p, '#c9a6ff', null); await wait(you ? (sx ? 1500 : 1000) : 950); }
     else if (e.t === 'boost') { logSet(e.car, { sp: e.speed, out: 'boost +' + e.add }); sfx('boost'); setMsg(who + ' boost' + (who === 'You' ? '' : 's') + ': +' + e.add + ' from a flipped card.'); pop('Boost +' + e.add, UI.vis[e.car].p, '#ffd24a', 'fx-boost-flare'); await wait(800); }
-    else if (e.t === 'adr') { setMsg(e.used === 0 ? 'Last place: +1 cool-down. +1 speed skipped, it would burn heat.' : who + ' get' + (who === 'You' ? '' : 's') + ' adrenaline for being last: +1 speed.'); pop(e.used === 0 ? 'Adrenaline: cool +1' : 'Adrenaline +1', UI.vis[e.car].p, '#ffd24a'); await wait(800); }
+    else if (e.t === 'adr') { setMsg(e.used === 0 ? 'Adrenaline: +1 cool-down, no extra speed.' : who + ' get' + (who === 'You' ? '' : 's') + ' adrenaline: +1 speed.'); pop(e.used === 0 ? 'Adrenaline: cool +1' : 'Adrenaline +1', UI.vis[e.car].p, '#ffd24a'); await wait(800); }
     else if (e.t === 'move') { var d = Math.abs(e.to - e.from); setMsg(who + ' drive' + (who === 'You' ? '' : 's') + ' ' + d + ' space' + (d === 1 ? '' : 's') + '.'); if (d) sfx('engine'); await tween(e.car, e.to, Math.min(1500, 170 * d + 250)); if (d) { pop('+' + d + ' spaces', UI.vis[e.car].p, '#fff'); await wait(450); } }
     else if (e.t === 'slip') { logSet(e.car, { out: 'slipstream +' + (e.to - e.from) }); sfx('slip'); setMsg(who + ' slipstream' + (who === 'You' ? '' : 's') + ' +' + (e.to - e.from) + ': free spaces.'); pop('Slipstream +' + (e.to - e.from), UI.vis[e.car].p, '#8ce6ff', 'fx-slipstream-streaks'); await tween(e.car, e.to, 500); await wait(450); }
     else if (e.t === 'corner') { logSet(e.car, { out: e.cost ? '-' + e.cost + ' heat in a ' + e.limit : 'clean ' + e.limit }); if (you && UI.ts && e.cost) { UI.ts.ch += e.cost; if (!UI.ts.w || e.cost > UI.ts.w.cost) UI.ts.w = { cost: e.cost, sp: e.speed, lim: e.limit }; } if (e.cost) { if (you) sfx('burn'); setMsg(who + ' burn' + (who === 'You' ? '' : 's') + ' ' + e.cost + ' heat: over the limit.', 'warn'); pop('-' + e.cost + ' heat: ' + e.speed + ' in a ' + e.limit, UI.vis[e.car].p, '#ff6a3a', 'fx-heat-flame'); await wait(900); } else { if (you) sfx('clean'); setMsg(who + ' took the corner clean.', 'good'); pop('Clean: ' + e.speed + ' in a ' + e.limit, UI.vis[e.car].p, '#8cf0b4'); await wait(750); } }
@@ -314,7 +320,7 @@ async function playEvents(ev) {
     else if (e.t === 'finish') { setMsg(nm + ' crosses the line!', 'good'); banner(nm + ' crosses the line!', c.col, 'turn'); await wait(800); }
     else if (e.t === 'discard') { if (e.n) { setMsg(who + ' discard' + (who === 'You' ? '' : 's') + ' ' + e.n + ' card' + (e.n > 1 ? 's' : '') + ', then draw' + (who === 'You' ? '' : 's') + ' to 7.'); await wait(600); } }
     else if (e.t === 'stall') { logSet(e.car, { out: 'no move' }); setMsg(nm + ' has too few playable cards: no move, gear 1.', 'warn'); pop('No move', UI.vis[e.car].p, '#ff8f7a'); await wait(1000); }
-    else if (e.t === 'done') { var pl = rankList(G).indexOf(e.car) + 1; logSet(e.car, { pl: pl }); setMsg(nm + ' is now ' + ord(pl) + '.'); await wait(you ? 450 : 300); }
+    else if (e.t === 'done') { var pl = rankList(G).indexOf(e.car) + 1; logSet(e.car, { pl: pl }); setMsg((who === 'You' ? 'You are' : nm + ' is') + ' now ' + ord(pl) + '.'); await wait(you ? 450 : 300); }
     hud();
   }
   UI.rival = 0; UI.redraw();

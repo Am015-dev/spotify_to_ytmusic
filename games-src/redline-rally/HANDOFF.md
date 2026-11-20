@@ -103,3 +103,8 @@ Next: upgrade cards, weather and legends, sound, online, a second pass on AI (dr
 - Tutorial: 5 staged rounds, 15 taps, no forced spin (explained), bubbles avoid the line/gears/hand/Go (step.avoid). tut-test asserts it.
 - PC >= 1000x521: left standings panel, large centre track, right tray (line, gears, hand, Go); keys 1-4, Enter/Space, B. pc-proof.js.
 - Measured (375x667 touch, newcomer bot): taps/turn 4.4 -> 2.1; rival seconds/round 3.3 (max 4.0) -> 2.2 (max 3.0).
+- Cold play fixes (once): auto-pick never walks into a spin when the slowest cards of that gear are safe (pickSpins); trade line uses the
+  tightest corner's limit and says "N corners" / "finish in N" / "crosses the finish line"; heat shown without "/6" (it can go over);
+  stale Suggest line hidden once you hold the suggested gear; "You are now 2nd"; PC Go pinned to the bottom of the tray.
+- Cold verdict: could play, fun 3.5/5, would play again, ~2.2 taps/turn felt good. Open: speed dashboard can cover corner signs on PC,
+  result rows 4-5 sit under the sticky buttons at 1366x768, minimap labels small on phone.
