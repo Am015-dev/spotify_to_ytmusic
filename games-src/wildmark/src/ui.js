@@ -347,6 +347,7 @@ function renderDock() {
     var t = G.market.tiles[i], k = G.market.toks[i], fr = UI.free, sel = fr && (fr.ti === i), selk = fr && fr.ki === i, w = UI.wipe && UI.wipe.indexOf(i) >= 0;
     h += '<div class="pair' + (mine && !UI.free && !UI.wipe ? ' live' : '') + (gv && i === gb && !UI.free ? ' top' : '') + '" data-i="' + i + '">';
     if (gv && gv[i] != null && !UI.free) h += '<span class="gain' + (i === gb ? ' best' : gv[i] === 0 ? ' nil' : '') + '" title="Points this pair can add right now">' + (gv[i] > 0 ? 'up to +' + gv[i] : 'no points') + '</span>';
+    else if (hintsOn()) h += '<span class="gain ph" aria-hidden="true">up to +0</span>';   // F2: same height on every step (no layout shift)
     h += t ? '<button type="button" class="mt' + (sel ? ' sel' : '') + '" data-i="' + i + '" aria-label="' + esc(tileName(t)) + '"' + (mine && !UI.wipe ? '' : ' disabled') + '>' + mkTile(t, 30) + '</button>' : swap && G.hold && G.hold.ti === i ? '<button type="button" class="mt gone back" data-i="' + i + '" aria-label="Put the tile back">' + mkTile(G.hold.tile, 30) + '</button>' : '<span class="mt gone"></span>';
     h += k ? '<button type="button" class="mk' + (selk ? ' sel' : '') + (w ? ' wsel' : '') + '" data-i="' + i + '" aria-label="' + esc(WM.ANI_NAME[k]) + ' token"' + (mine ? '' : ' disabled') + '>' + mkTok(k) + '<i>' + esc(WM.ANI_NAME[k]) + '</i></button>' : swap && G.hold && G.hold.ki === i ? '<button type="button" class="mk gone back" data-i="' + i + '" aria-label="Put the animal back">' + mkTok(G.hold.tok) + '<i>Put back</i></button>' : '<span class="mk gone"></span>';
     h += '</div>';
@@ -359,8 +360,8 @@ function renderDock() {
       if (UI.wipe) a += '<button type="button" class="ab pri" id="wokB"' + (UI.wipe.length ? '' : ' disabled') + '>Replace ' + UI.wipe.length + '</button><button type="button" class="ab" id="cancelB">Cancel</button>';
       else if (UI.free) a += '<span class="hint1">Any tile, then any token</span><button type="button" class="ab" id="cancelB">Cancel</button>';
       else {
-        if (!G.used3 && !G.opts.no3 && WM.triple(G)) a += '<button type="button" class="ab" id="w3B">Sweep 3 ' + esc(WM.ANI_NAME[WM.triple(G)]) + '</button>';
-        if (me.acorns > 0) a += UI.acornMenu ? '<button type="button" class="ab" id="freeB">Free pick</button><button type="button" class="ab" id="wipeB">Replace animals</button><button type="button" class="ab" id="acornX">Cancel</button>' : '<button type="button" class="ab" id="acornB">Use acorn (' + me.acorns + ')</button>';
+        if (!G.used3 && !G.opts.no3 && WM.triple(G)) a += '<button type="button" class="ab" id="w3B">Sweep 3 ' + esc(WM.ANI_NAME[WM.triple(G)].toLowerCase()) + '</button>';
+        if (me.acorns > 0) a += UI.acornMenu ? '<button type="button" class="ab" id="freeB">Free pick</button><button type="button" class="ab" id="wipeB">Replace animals</button><button type="button" class="ab" id="acornX">Cancel</button>' : '<button type="button" class="ab" id="acornB" aria-label="Use an acorn (' + me.acorns + ' left)">Acorn (' + me.acorns + ')</button>';
       }
     } else if (G.stage === 'tile') {
       a += '<span class="held">' + mkTile(G.hold.tile, 24) + mkTok(G.hold.tok) + '</span>';
@@ -371,7 +372,7 @@ function renderDock() {
     }
   }
   if (G.stage !== 'pick') UI.acornMenu = false;
-  if (myTurn() && hintsOn() && UI.mode !== 'tutorial' && UI.mode !== 'coach' && !UI.wipe && !UI.free && !UI.acornMenu && !(G.stage === 'tile' && UI.ghost)) a += '<button type="button" class="ab whatB" id="whatB">What should I do?</button>';
+  if (myTurn() && hintsOn() && UI.mode !== 'tutorial' && UI.mode !== 'coach' && !UI.wipe && !UI.free && !UI.acornMenu && !(G.stage === 'tile' && UI.ghost)) a += '<button type="button" class="ab whatB" id="whatB" aria-label="What should I do?">Help me</button>';
   $('#acts').innerHTML = a;
   $('#acorn').innerHTML = '<button type="button" class="acn" id="acornCt" aria-label="Acorns: ' + G.seats[UI.view].acorns + '. Tap for what they do">' + mkTok('acorn') + '<b>' + G.seats[UI.view].acorns + '</b></button>';
 }

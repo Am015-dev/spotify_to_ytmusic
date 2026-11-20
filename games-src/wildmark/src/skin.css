@@ -398,7 +398,7 @@ button.tuthl{animation:tutp 1.1s ease-in-out 3;position:relative;z-index:8}
 /* R23: the turn banner rides over the top bar (never over the valley); placing a tile on a phone folds the market away so the valley gets the room */
 #turnban{position:fixed;top:calc(var(--gx-bar-h) / 2);z-index:60;font-size:18px;padding:6px 18px;white-space:nowrap;max-width:calc(100% - 16px);overflow:hidden;text-overflow:ellipsis}
 .wt{font-weight:700}
-@media (max-width:999px) and (orientation:portrait){html.wm-placing #mk{display:none}html.wm-placing #acts{margin-top:0}}
+/* F2: the market no longer folds away while placing: the dock and its button bar keep one size and place on every step */
 @media (max-width:999px) and (orientation:portrait) and (max-height:700px){.mt{height:46px}.mt svg{height:42px}.mk svg{width:36px!important;height:36px!important}.pair{gap:2px;padding:2px}#mk{gap:4px}#acts{margin-top:0;min-height:44px}.mk{padding:0 4px!important}.mk i{line-height:1!important}.gx-dock-body{padding-top:3px!important;padding-bottom:calc(3px + env(safe-area-inset-bottom,0px))!important}}
 @media (orientation:landscape) and (max-height:500px) and (max-width:999px){html body #mk{grid-template-columns:repeat(4,1fr)!important;gap:4px}html body .mt{height:56px}html body .mt svg{height:52px}.pair{gap:2px;padding:2px}}
 
@@ -417,3 +417,10 @@ html.wm-goal .gxh-bub{visibility:hidden}
 #rinset span{position:absolute;left:0;right:0;bottom:2px;text-align:center;font-size:12px;font-weight:800;color:#f3ead2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 #rinset .nwr{fill:none;stroke:#f2d27a;stroke-width:7}
 @keyframes wmInsetIn{from{opacity:0;transform:scale(.9)}to{opacity:1;transform:none}}
+/* F2: one fixed button bar: same height and place on every step, one row, the main button always at the right end */
+#acts{flex-wrap:nowrap;justify-content:flex-end;height:48px;min-height:48px;max-height:48px;overflow:hidden}
+#acts .held{margin-right:auto;flex:0 0 auto}
+#acts .ab{flex:0 1 auto;min-width:44px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#acts .hint1{margin-right:auto;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+.gain.ph{visibility:hidden}
+@media (max-width:999px){#acts .held svg{height:40px}}

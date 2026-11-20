@@ -34,7 +34,7 @@ function tutSteps() {
     { say: 'Settle the elk on its new tile.', hl: 'cell', ok: 'tok', done: turnDone },
     { wait: 1 },
     // turn 4: spend an acorn on a free pick, salmon runs (turn 6 uses the other power, Replace animals)
-    { r: 'acornSpend', say: 'You have an acorn. Tap Use acorn.', hl: '#acornB', ok: 'acorn', done: function () { return !!UI.acornMenu; } },
+    { r: 'acornSpend', say: 'You have an acorn. Tap the Acorn button.', hl: '#acornB', ok: 'acorn', done: function () { return !!UI.acornMenu; } },
     { say: 'Free pick takes any tile and any animal. Tap it.', hl: '#freeB', ok: 'freeB', done: function () { return !!UI.free; } },
     { r: 'salmon', say: 'Salmon score in runs. Tap the river tile.', hl: 'col:0', ok: 'freet:0', done: function () { return UI.free && UI.free.ti === 0 || G.stage === 'tile'; } },
     { say: 'Now tap the salmon from another column.', hl: 'tok:2', ok: 'freek:2', done: function () { return G.stage === 'tile'; } },
@@ -50,7 +50,7 @@ function tutSteps() {
     { say: 'Settle the hawk.', hl: 'cell', ok: 'tok', done: turnDone },
     { wait: 1 },
     // turn 6: fox neighbours
-    { say: 'Acorns can also swap market animals. Tap Use acorn.', hl: '#acornB', ok: 'acorn', done: function () { return !!UI.acornMenu; } },
+    { say: 'Acorns can also swap market animals. Tap the Acorn button.', hl: '#acornB', ok: 'acorn', done: function () { return !!UI.acornMenu; } },
     { r: 'acornReplace', say: 'Tap Replace animals.', hl: '#wipeB', ok: 'wipeB', done: function () { return !!UI.wipe; } },
     { say: 'Tap the salmon you do not need.', hl: 'tok:3', ok: 'wsel:3', done: function () { return !!UI.wipe && UI.wipe.indexOf(3) >= 0; } },
     { say: 'Tap Replace: a new animal comes from the bag.', hl: '#wokB', ok: 'wok', done: function () { return !UI.wipe; }, after: fixReplace },
