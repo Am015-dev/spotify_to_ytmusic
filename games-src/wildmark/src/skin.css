@@ -518,3 +518,16 @@ html body :is(.gxh-tt,.gxh-tx,.gxh-bd button,.gxt-say,.gxt-tt){font-size:16px!im
 }
 /* R107: market tiles and tokens are at least 48 px wide on short phones */
 @media (max-width:999px) and (orientation:portrait) and (max-height:700px){html body .mt{min-width:48px}html body .mk{min-width:48px}html body .mk svg{width:40px!important;height:40px!important}}
+#rs .rdet{margin-top:8px}#rs .rdet>summary{min-height:44px;display:flex;align-items:center;cursor:pointer;font-weight:700;font-size:16px;padding:0 8px;border-radius:10px;background:rgba(0,0,0,.08)}
+/* R107: instant feedback: a tap on a confirm / pick button presses it at once */
+.tapped{transform:scale(.96);filter:brightness(.85);transition:transform .08s,filter .08s}
+/* R107: the phone bar names its two helpers: bulb = "Tip" (one good move), switch = "Hints on / off" (previews and ratings) */
+@media (max-width:999px){
+  html body #bulbbtn::after{content:"Tip";font-size:14px}
+  html body #hintsB::after{content:"Hints on";font-size:14px;white-space:nowrap}
+  html body #hintsB:not(.on)::after{content:"Hints off"}
+  html body #hintsB,html body #bulbbtn{min-height:44px;padding:2px 1px}
+  html body #hintsB{min-width:58px}
+  html body .gx-bar h1{display:none}
+}
+#board.pvon #line{display:none}

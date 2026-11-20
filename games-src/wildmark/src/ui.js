@@ -16,6 +16,7 @@ function toastPlace(e) {   // in play, toasts sit at the bottom of the valley, j
   var pv = $('#pv'); if (pv && !pv.hidden && pv.offsetHeight) ln = pv;   // above the points strip when it shows
   var r = ln.getBoundingClientRect(); if (r.height && r.top > 200) { e.style.top = 'auto'; e.style.bottom = Math.round(innerHeight - r.top + 8) + 'px'; }
 }
+document.addEventListener('pointerdown', function (e) { var b = e.target.closest && e.target.closest('#okB, #backB, #rotB, #mk .pair, #acts .ab'); if (b) { b.classList.add('tapped'); setTimeout(function () { b.classList.remove('tapped'); }, 260); } }, true);   // R107: instant feedback
 function toast(t, ms) { if (G && !G.over && !hintsOn() && $('#start').hidden) return; if (G && !G.over && $('#start').hidden && !toast.now) { helper('toast', function () { toast.now = 1; toast(t, ms); toast.now = 0; }, ms || 2200, function () { $('#toast').classList.remove('on'); }, 2500); return; } var e = $('#toast'); if (document.querySelector('.gx-drawer.on, .gx-drawer[aria-hidden="false"]')) return; e.textContent = t; toastPlace(e); e.classList.add('on'); clearTimeout(toast.t); toast.t = setTimeout(function () { e.classList.remove('on'); }, ms || 2200); }
 // ---------------------------------------------------------------- sound (synth; music slots via gx-music when files exist)
 var SND = { ctx: null };
@@ -297,7 +298,7 @@ function edgeArrows() {
       if (!ok) return; placed.push([x, y]);
       h += '<button type="button" class="ea ea-' + k + '" data-c="' + a[2] + '" style="left:' + x.toFixed(0) + 'px;top:' + y.toFixed(0) + 'px" aria-label="' + L.length + ' more spot' + (L.length > 1 ? 's' : '') + ' this way">' + ({ l: '&#9664;', r: '&#9654;', t: '&#9650;', b: '&#9660;' })[k] + '<small>' + L.length + '</small></button>'; });
   }
-  host.innerHTML = h;
+  host.innerHTML = h; if (h && !UI.fast && hintsOn() && !UI.prefs.seenEdge && UI.mode !== 'coach' && UI.mode !== 'tutorial') { UI.prefs.seenEdge = 1; savePrefs(); toast('An arrow with a number: that many more places to build lie that way. Tap it to look.', 3200); }
 }
 // F3: a tap that just misses a small hex (late game, zoomed out) goes to the nearest glowing spot / ringed tile within a finger's reach
 function nearTarget(x, y) {
@@ -641,7 +642,7 @@ function showResult() {
   if (G.solo) { var best = UI.prefs.best || 0; title = 'You scored ' + sc[0].total + (UI.mode === 'quick' && sc[0].total > best ? ': new best!' : best ? ' (best ' + best + ')' : ''); if (UI.mode === 'quick' && sc[0].total > best) { UI.prefs.best = sc[0].total; savePrefs(); } } else if (G.winner === -2) title = 'A shared win'; else title = (G.winner === me && UI.humans === 1 ? 'You win!' : G.seats[G.winner].name + ' wins!');
   var rs = $('#rs'); rs.hidden = false;
   var camp = UI.mode === 'camp' && window.GXC && GXC.active();
-  rs.innerHTML = '<div class="rbox" data-art="' + (G.winner === 0 || G.solo ? 'result-win' : 'result-lose') + '"><h2 class="rbig">' + esc(title) + '</h2>' + standHTML(sc, me) + quickLine() + (typeof coachFinalHTML === 'function' ? coachFinalHTML() : '') + whyLine(sc, me) + '<div class="rbtn">' + (camp ? '<button type="button" class="big" id="campCont">Continue</button>' : '<button type="button" class="big" id="againB">Play again</button><button type="button" class="ab" id="titleB">Title</button>') + '</div>' + scoresHTML() + '</div>';
+  rs.innerHTML = '<div class="rbox" data-art="' + (G.winner === 0 || G.solo ? 'result-win' : 'result-lose') + '"><h2 class="rbig">' + esc(title) + '</h2>' + standHTML(sc, me) + quickLine() + (typeof coachFinalHTML === 'function' ? coachFinalHTML() : '') + whyLine(sc, me) + '<div class="rbtn">' + (camp ? '<button type="button" class="big" id="campCont">Continue</button>' : '<button type="button" class="big" id="againB">Play again</button><button type="button" class="ab" id="titleB">Title</button>') + '</div><details class="rdet"' + (innerWidth >= 720 && innerWidth > innerHeight ? '' : ' open') + '><summary>Score breakdown: how each point was won</summary>' + scoresHTML() + '</details></div>';
   try { if (!camp && window.GNS && GNS.result) GNS.result({ game: 'wildmark', mode: UI.mode === 'tutorial' || UI.mode === 'coach' ? 'tutorial' : G.solo ? 'solo' : 'vs', seats: G.seats.map(function (s, i) { return { name: s.name, me: i === 0, ai: s.ai || undefined }; }), winner: G.winner, scores: sc.map(function (x) { return x.total; }), turns: G.turns }); } catch (e) { }
   if (typeof coachEnd === 'function') coachEnd();
 }

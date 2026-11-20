@@ -8,7 +8,7 @@
 // loops      = the most distinct VISIBLE elements running an infinite animation in one sample (document.getAnimations() iterations Infinity that are
 //              running, plus CSS animation-iteration-count infinite on visible elements), over both paths
 // maxHelpers = the most helpers on screen at once: open bubbles (.gxh-bub.on, .gxt-bub), fingers (.gxh-finger, .gxt-fin, #finger), idle-nudge outlines
-//              (.nudge), the drag-start ring (.gxh-ring.from), and a highlight ring shown with no bubble. A bubble's own target ring is part of that bubble.
+//              (.nudge), step banner (#line .stepn), preview/verdict strip (#pv), #coach/#coachb, #toast.on, the drag-start ring (.gxh-ring.from), and a highlight ring shown with no bubble. A bubble's own target ring is part of that bubble.
 // Prints  <slug> loops=N maxHelpers=M  per game (details after two spaces), then the looping elements (selector + animation name) so they can be traced.
 // Never fails the build: it measures. Exit 0.
 const path = require('path'), fs = require('fs');
@@ -44,8 +44,8 @@ const SAMPLE = () => {
     if (!loops.has(el) && vis(el)) loops.set(el, name(el) + ' {' + s.animationName + '}');
   }
   const n = sel => [...document.querySelectorAll(sel)].filter(vis).length;
-  const bub = n('.gxh-bub.on,.gxt-bub'), fing = n('.gxh-finger,.gxt-fin,#finger'), nudge = n('.nudge'), from = n('.gxh-ring.from'), ring = n('.gxh-ring:not(.from),.gxt-ring');
-  return { loops: [...loops.values()], helpers: bub + fing + nudge + from + (!bub && ring ? 1 : 0), parts: { bub, fing, nudge, from, ring } };
+  const bub = n('.gxh-bub.on,.gxt-bub'), fing = n('.gxh-finger,.gxt-fin,#finger'), nudge = n('.nudge'), extra = n('#coach,#coachb,#toast.on,#pv:not([hidden]),#verdict,#line .stepn'), from = n('.gxh-ring.from'), ring = n('.gxh-ring:not(.from),.gxt-ring');
+  return { loops: [...loops.values()], helpers: bub + fing + nudge + from + extra + (!bub && ring ? 1 : 0), parts: { bub, fing, nudge, from, ring, extra } };
 };
 
 async function tapText(p, re) {   // the first visible button whose text or label matches re

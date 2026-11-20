@@ -153,12 +153,13 @@ function pvNegWhy(parts) { var w = null; (parts || []).forEach(function (x) { if
 function pvStrip(pv) {
   var e = $('#pv'); if (!e) { e = document.createElement('div'); e.id = 'pv'; e.setAttribute('aria-live', 'polite'); $('#board').appendChild(e); }
   var h = '';
-  if (!hintsOn() || UI.tut) { e.innerHTML = ''; e.hidden = true; return; }   // the guided tutorial keeps one sentence on screen: Rowan's
+  if (!hintsOn() || UI.tut) { e.innerHTML = ''; e.hidden = true; $('#board').classList.remove('pvon'); return; }   // the guided tutorial keeps one sentence on screen: Rowan's
   var ng = UI.negT && myTurn() && (G.stage === 'tok' || (G.stage === 'tile' && UI.ghost)) ? UI.negT : null;
   if (ng) h = '<div class="vd poor neg"><b>−' + Math.abs(ng.d) + '</b><span>' + esc(pvNegWhy(ng.parts)) + '</span></div>';   // F3: a red number on a ringed tile always says why, in one line
   else if (pv) h = '<div class="vd ' + (pv.d > 0 ? 'good' : pv.d < 0 ? 'poor' : 'okay') + '"><b>' + (pv.d > 0 ? '+' : '') + pv.d + '</b><span>' + esc(pv.what + ': ' + pvText(pv.parts)) + '</span></div>';
   else if (UI.verdict && UI.vdOn && !G.over && !(myTurn() && G.stage !== 'pick')) h = pvVerdictHTML();   // F3: shown only while the helper queue gives it the floor (the rival's news goes on the instruction line)
-  e.innerHTML = h; e.hidden = !h;
+  e.innerHTML = h; e.hidden = !h; $('#board').classList.toggle('pvon', !!h);   // R107: one helper at a time: while the preview / verdict strip shows, the step line and any toast step aside
+  if (h && pv) { var tt = $('#toast'); if (tt) tt.classList.remove('on'); }
   var ln = $('#line'), lh = ln && getComputedStyle(ln).display !== 'none' ? ln.offsetHeight : 0; e.style.bottom = (lh ? lh + 18 : 10) + 'px';   // sits just above the instruction line
   var te = $('#toast'); if (te && te.classList.contains('on')) toastPlace(te);
 }
