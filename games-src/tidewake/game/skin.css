@@ -200,3 +200,51 @@ html.ph #ps.fit1 .ps-goal i{margin:0 2px 0 4px}
 html.ph #ps.fit2 .ps-goal .race{overflow:hidden;text-overflow:ellipsis}
 /* R42: while a coach bubble or card is up, start marks next to it keep their dot but lose the tall touch area that reached over the bubble (pgClip) */
 #ov .opip.pickable.nearbub::after{display:none}
+
+/* R93 cold play: the status line and each warning on their own lines; warnings say what to do */
+html.ph .ps-turn .ps-tl{display:block}
+html.ph .ps-warn{display:block;margin:4px 0 0;padding:2px 8px;border-radius:8px;background:rgba(208,58,38,.22);border:1px solid rgba(255,140,110,.55);color:#ffe0d6;font:600 .88rem/1.25 var(--fb);text-align:left}
+html.ph .ps-warn b{color:#ffb199;font-weight:800}
+html.ph .ps-warn .wnn{font-weight:500;color:#f2d9cf}
+html.ph .ps-warn.box{background:rgba(217,162,27,.2);border-color:rgba(255,210,74,.6);color:#fff2c4}html.ph .ps-warn.box b{color:#ffd76a}
+html.ph .ps-stat .ps-warn{font-size:.85rem}
+html.ph .ps-warn .wg{display:none}html.ph #ps.fit2 .ps-warn .wn,html.ph #ps.fit2 .ps-warn .wnn{display:none}html.ph #ps.fit2 .ps-warn .wg{display:inline}
+@media (max-height:600px){html.ph-p .ps-warns .ps-warn{margin:0}html.ph-p .pb.pri.place{min-height:46px}html.ph-p .pt{width:52px;height:52px}html.ph-p .ps-line{font-size:.85rem}}
+/* the action row: Turn, Turn, a big Place tile, then the star hint and (i): fixed slots that never move or wrap */
+html.ph .ps-ctl{flex-wrap:nowrap}
+html.ph .pb.pri.place{min-height:52px;min-width:120px;font-size:1.1rem;padding:0 12px;flex:1 1 auto}
+html.ph-p .ps-ctl{flex:1 1 100%;justify-content:center}
+html.ph .pb.small.star{width:68px;padding:0 4px;white-space:nowrap;font-size:.92rem}
+html.ph .pb.small.sdet{width:44px;padding:0}
+html.ph .pb.ghost{visibility:hidden}
+html.ph .ps-line{text-align:left}
+html.ph .tf{display:inline-block;margin:1px 4px 1px 0;padding:0 6px;border-radius:8px;background:rgba(255,255,255,.08);border:1px solid rgba(207,233,228,.25);white-space:nowrap;font-weight:600}
+html.ph .tf b{color:#fff2c4}
+html.ph .tf.hot{border-color:rgba(255,140,110,.7);color:#ffc7b8}
+html.ph .tf.good{border-color:rgba(120,220,160,.6);color:#b8f2cc}
+html.ph .tf.star{border-color:#d9a21b;color:#ffd76a}
+html.ph .pt .bd.pct{min-width:34px;padding:0 4px;background:#24525a;font-size:13px;height:22px;line-height:18px}
+html.ph .pt .bd.pct.risk{background:#b8650f}
+html.ph .pt .bd.bst{left:-5px;right:auto;top:auto;bottom:-6px;background:#d9a21b}
+/* PC (>= 1024 wide, landscape): board in the middle at full height, captains + log on the left, your turn on the right */
+html.ph-l.ph-w .gx-app{grid-template-columns:var(--lw) var(--bs) minmax(0,1fr);grid-template-rows:var(--bar) minmax(0,1fr)}
+html.ph-w .gx-board{grid-column:2;grid-row:1/3}
+html.ph-w .gx-bar{grid-column:3;grid-row:1}
+html.ph-w .gx-dock{grid-column:3;grid-row:2}
+html.ph-w .pside:not([hidden]){grid-column:1;grid-row:1/3;display:flex;flex-direction:column;gap:12px;padding:14px 12px;overflow:auto;background:linear-gradient(#0f3a44,#0b2a33);color:#fff2c4;border-right:2px solid rgba(227,178,75,.35);min-width:0}
+html.ph-w .pside .ps-crews{grid-template-columns:1fr;margin:0}
+html.ph-w .pside .ps-goal,html.ph-w .pside .ps-feed{margin:0}
+html.ph-w #ps{max-width:none}
+html.ph-w .pt{width:var(--tw);height:var(--tw)}
+html.ph-w .ps-tiles{gap:14px}
+html.ph-w .ps-ctl{flex-wrap:wrap}
+html.ph-w .ps-ctl{gap:10px}html.ph-w .ps-ctl .pb.pri.place{order:5;flex:1 1 calc(100% - 64px);min-height:56px;font-size:20px}html.ph-w .ps-ctl .pb.zoom{order:6}
+@media (max-width:1500px){html.ph-w .ps-ctl .pb[data-a=rot] .lbl{display:none}html.ph-w .ps-ctl .pb[data-a=rot]{width:52px;padding:0}}
+html.ph-w .pb.small.star{width:96px;font-size:16px}
+html.ph-w .pside,html.ph-w .pside li,html.ph-w .pside b,html.ph-w .pside span{font-size:16px}
+@media (min-width:1024px){html.ph .ps-warn{font-size:16px!important}html.ph .tf{font-size:16px}html.ph .pt .bd.pct{font-size:14px!important;height:24px;line-height:20px}}
+html.ph-p .ps-ctl .pb .lbl{display:none}html.ph-p .ps-ctl .pb[data-a=rot]{width:46px;padding:0}
+html.ph-p .ps-main:has(.ps-tiles){position:relative}html.ph-p .ps-main:has(.ps-tiles) .pb.zoom{position:absolute;right:0;top:0}
+html.ph .ps-warns{display:flex;flex-direction:column;gap:3px}html.ph .ps-warns .ps-warn{margin:0}
+html.ph #pc [data-a=sunkok],html.ph #pc [data-a=coachok],html.ph #pc [data-ph=dismiss]{margin-top:12px}
+html.ph-w .pside .ps-crews .crew span,html.ph-w .pside .ps-crews .crew b{font-size:16px}

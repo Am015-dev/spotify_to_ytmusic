@@ -26,6 +26,11 @@ function tqbtn(h){if(!G||!G.q)return null;const i=G.q.opts.findIndex(o=>o.h===h)
 function tcalm(){return !!G&&UI.started&&!UI.busy}
 function tmine(turn){return tcalm()&&G.turn===turn&&G.cur===TS.me&&G.step==='act'&&!G.q}
 function tsel(t,r){UI.sel={t:t,r:r||0,s:0};render()}
+// what the bubble must never cover (R93 cold play: step 28's "Sunk!" card text and step 31's crew tiles were hidden under it): the card, the swap
+// panel, and for tile / Turn / Place steps the tile row, the facts line and the status. The tutor kit places the bubble clear of these and of the target.
+const TAVOID={card:'#pc .pc-in,#res .mph,#cards',swap:'#twswap',strip:'.ps-turn,.ps-tiles,.ps-line'};
+const TAVOID_STEP={edge:'strip',roll:'card',wake:'card',levsink:'card',swap:'swap',swap2:'swap',swap3:'swap',hand:'strip',turn:'strip',never:'strip',place:'strip',draw:'strip',chain:'strip',place3:'strip',turn2:'strip',turn2b:'strip',place2:'strip'};
+function tavoid(s){const k=TAVOID_STEP[s.id];if(!k)return null;const out=[];for(const e of document.querySelectorAll(TAVOID[k])){if(e.closest('[hidden]'))continue;const r=e.getBoundingClientRect();if(r.width>2&&r.height>2)out.push({left:r.left,top:r.top,right:r.right,bottom:r.bottom,width:r.width,height:r.height})}return out}
 // ---------------------------------------------------------------- the steps (say: 12 words or fewer; tap: tap the highlight to go on)
 // run: Cobalt and the sea may move while this step waits; hold: keep the roll card up until it is tapped
 const TUT_RULES=['goal','order','mark','reloc','roll','wake','levmove','six','hand','edge','turn','never','place','sail','calm','draw','chain','push','collide','place3','blocked','offboard','min3','turn2','turn2b','place2','levsink','swap','swap2','swap3','win'];
@@ -63,7 +68,7 @@ function tutSteps(){const ph=!!PH.on;const S=[
   {id:'swap3',say:'Swapped! Tap Keep this hand when you are done.',target:()=>tvis('#twswap [data-sw=keep]'),until:()=>!TSW.on,ready:()=>!!tvis('#twswap')},
   {id:'win',say:'Yours is the last junk afloat. You win the lantern!',target:()=>document.getElementById('board'),enter:()=>{TUTG.winT=Date.now()},until:()=>Date.now()-(TUTG.winT||Date.now())>3000,ready:()=>tcalm()&&!!G.over}   // R92 cold play: the result card covered the board, so a tap-the-board step looked frozen; it now moves on by itself
  ].filter(Boolean);
- return S.map(s=>({id:s.id,say:s.say,title:s.title,target:s.target,ready:s.ready,pad:4,
+ return S.map(s=>({id:s.id,say:s.say,title:s.title,target:s.target,ready:s.ready,pad:4,side:s.side,avoid:()=>tavoid(s),
    wait:{type:'event',match:()=>s.tap?TUTG.tap===s.id:!!(s.until&&s.until())},
    onEnter:()=>{TUTG.tap=null;TUTG.cur=s;TUTG.hold=!!s.hold;TUTG.freeze=!s.run;if(s.run)schedule();try{s.enter&&s.enter()}catch(e){console.error(e)}try{ovUpdate()}catch(e){}},
    onDone:()=>{TUTG.seen.push(s.id);TUTG.cur=null;TUTG.hold=false;try{s.done&&s.done()}catch(e){console.error(e)}TUTG.freeze=false;schedule();render()}}))}
