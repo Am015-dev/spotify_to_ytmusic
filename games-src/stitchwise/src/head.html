@@ -479,5 +479,22 @@ html.ph.swtut.swshort .gx-bar #tutb{font-size:13px!important;line-height:1.15!im
 html.swshort .qframe.art{padding:3px!important}
 html.swshort:not(.swplace) #pills .pstrip .st,html.swshort:not(.swplace) #pills .pstrip .st .bt{white-space:normal!important;flex-wrap:wrap!important;line-height:1.1!important;max-width:100%}html.swshort:not(.swplace) #pills .pstrip{overflow:hidden}
 html.swshort .offer .hand b{display:none}
+
+/* F2: turn reason line, time preview, placement suggestion, patch-row scroll cue */
+#trwhy,#tprev{display:flex;align-items:center;gap:6px;width:min(100%,560px);box-sizing:border-box;color:#fff8e8;font-size:13px;font-weight:700;line-height:1.2;text-shadow:0 1px 2px #000c;margin:0 0 15px;min-height:20px;cursor:pointer}
+#trwhy span,#tprev span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#tprev{background:#1d2a33e6;border-radius:10px;padding:5px 9px;margin:4px auto 0;cursor:default;text-shadow:none;width:auto;max-width:100%}
+#tprev span{white-space:normal}#tprev b{color:#ffd76a}
+#trwhy .trdot,#tprev .trdot{flex:0 0 12px;width:12px;height:12px;border-radius:50%;border:2px solid #fff;display:inline-block}
+#ofcue[hidden]{display:none}
+html.swshort #trwhy{margin-bottom:13px;font-size:12px;min-height:16px}
+#bd.wide #trwhy{margin-bottom:17px}
+#ghost.sug .gc{opacity:.55;border:2px dashed #fff;box-shadow:0 0 0 1px #0005}
+#ghost.sug .gc.hid{border:0;box-shadow:none}
+#ghost .sgl{position:absolute;left:50%;top:0;transform:translate(-50%,-100%);background:#1d2a33;color:#fff;font-size:12px;font-weight:800;line-height:1;padding:3px 6px;border-radius:6px;white-space:nowrap;box-shadow:0 1px 3px #0008}
+#ofcue{position:fixed;width:26px;pointer-events:none;z-index:4;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;background:linear-gradient(90deg,#fffaf000,#fffaf0f2 40%);color:#1d2a33;line-height:1;text-align:center}
+#ofcue b{font-size:14px;font-weight:900}#ofcue small{display:none}#ofcue i{font-style:normal;font-size:22px;font-weight:900;color:#a3405f}
+#ofcue.end{display:none}
+#ghost .sgl.lo{top:100%;transform:translate(-50%,3px)}
 </style>
 </head>

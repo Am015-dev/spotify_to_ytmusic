@@ -73,6 +73,25 @@ function trackHead() { // W484: say what the strip is, who is where, and what pa
   var dot = function (s) { return h('i.trdot', { style: 'background:' + (s === 0 ? 'var(--me)' : 'var(--opp)') }); };
   return h('div#trhead', { role: 'button', tabindex: '0', 'data-a': 'trhelp', 'aria-label': 'Time track: what passing a spot does' }, h('div.trl', h('b', 'Time track'), h('span', dot(0), nameOf(0) + ': ' + G.pos[0] + ' of ' + SW.TRACK), h('span', dot(1), nameOf(1) + ': ' + G.pos[1] + ' of ' + SW.TRACK)),
     h('div.trr', { html: 'Pass ' + btnIc() + ' = income. Pass ' + leaIc() + ' leather = free 1\u00D71.' })); }
+function swShort(s) { var n = nameOf(s); return UI.mode !== 'hot' && s === 0 ? 'You' : n.length <= 8 ? n : s ? 'Rival' : 'You'; }
+function whyDot(s) { return h('i.trdot', { style: 'background:' + (s === 0 ? 'var(--me)' : 'var(--opp)') }); }
+function turnWhy() { // F2: every turn, one line: whose turn and why (the token further back plays)
+  if (!G || G.over) return null; var s = swWho(G); if (s < 0) return null; var o = 1 - s, me = UI.mode !== 'hot' && isHuman(s), nm = swShort(s), a = G.pos[s], b = G.pos[o], lg = G.log || [], again = lg.length && lg[lg.length - 1][0] === s, txt;
+  var who = me ? 'your turn' : nm + '\u2019s turn'; if (again) who += ' again';
+  if (G.pend) txt = (me ? 'You passed' : nm + ' passed') + ' a leather spot: free 1\u00D71';
+  else if (b >= SW.TRACK) txt = swShort(o) + ' has finished: ' + who;
+  else if (a < b) txt = (me ? 'You\u2019re behind' : nm + ' is behind') + ' (' + a + ' vs ' + b + '): ' + who;
+  else if (!lg.length) txt = 'Both on ' + a + ': ' + (me ? 'you start' : nm + ' starts');
+  else txt = 'Level on ' + a + ': ' + (me ? 'you' : nm) + ' arrived last, so ' + who;
+  return txt; }
+function turnWhyEl() { var txt = turnWhy(); if (!txt) return null; var s = swWho(G); return h('div#trwhy', { 'data-a': 'trhelp', role: 'button', tabindex: '0', 'aria-label': txt + '. Tap for the time track.' }, whyDot(s), h('span', txt)); }
+function timePreview() { // F2: before you commit: where this patch's time puts you, and who plays next
+  var p = curPatch(); if (!p || G.over || G.pend) return null; var s = swWho(G), o = 1 - s, me = UI.mode !== 'hot', a = G.pos[s], to = Math.min(SW.TRACK, a + p.time), b = G.pos[o], on = swShort(o), nm = me ? 'You' : swShort(s), txt;
+  if (to > b) txt = nm + ' ' + a + ' \u2192 ' + to + ', past ' + on + ' (' + b + '): ' + on + ' plays next';
+  else if (to === b && b < SW.TRACK) txt = nm + ' ' + a + ' \u2192 ' + to + ', on top of ' + on + ': ' + (me ? 'you go' : nm + ' goes') + ' again';
+  else if (to === b) txt = nm + ' ' + a + ' \u2192 ' + to + ': the end for both';
+  else txt = nm + ' ' + a + ' \u2192 ' + to + ', still behind ' + on + ' (' + b + '): ' + (me ? 'you go' : nm + ' goes') + ' again';
+  return h('div#tprev', { 'aria-live': 'polite' }, whyDot(s), h('span', h('b', 'Time ' + p.time + ': '), txt)); }
 function trPhone() { return !UI.wide && innerWidth <= 600 && innerHeight > innerWidth; } /* R16: phone tags carry only the number (seat colour = who); full names live in the zoomed track sheet */
 function trackSheet() { // R16: tap the track for a big, readable sheet: every space 34px+, names in full, who moves next
   var old = $('#trsheet'); if (old) old.remove(); var nx = swWho(G), cols = 9, i, g = h('div.tsgrid', { style: 'grid-template-columns:repeat(' + cols + ',1fr)' });
@@ -93,7 +112,7 @@ function renderTrack() {
     if (i === SW.TRACK && !cell.querySelector('.bfin')) { var bi2 = artImg('icon-bonus', 'ic bfin'); if (bi2) { bi2.alt = 'Finish: 7x7 bonus is judged here'; cell.appendChild(bi2); } }
     if (rc[0] % 2) cell.classList.add('trv'); if (i < Math.min(G.pos[0], G.pos[1])) cell.classList.add('past'); t.appendChild(cell); }
   artBg(t, 'track-frame'); t.style.backgroundSize = 'cover';
-  [1, 0].forEach(function (s) { var k = h('div.tk.' + (s === 0 ? 'me' : 'opp'), { 'data-seat': s, title: nameOf(s) + ' at ' + G.pos[s] }, h('span.tkn', trPhone() ? (swWho(G) === s && !G.over ? '\u25B6 ' : '') + G.pos[s] : nameOf(s) + ' ' + G.pos[s] + '/' + SW.TRACK)); if (artHas(s === 0 ? 'token-me' : 'token-opp')) { artBg(k, s === 0 ? 'token-me' : 'token-opp'); k.style.backgroundSize = 'contain'; k.style.border = '0'; k.style.boxShadow = 'none'; } t.appendChild(k); });
+  [1, 0].forEach(function (s) { var k = h('div.tk.' + (s === 0 ? 'me' : 'opp'), { 'data-seat': s, title: nameOf(s) + ' at ' + G.pos[s] }, h('span.tkn', trPhone() ? (swWho(G) === s && !G.over ? '\u25B6 ' : '') + swShort(s) + ' ' + G.pos[s] : nameOf(s) + ' ' + G.pos[s] + '/' + SW.TRACK)); if (artHas(s === 0 ? 'token-me' : 'token-opp')) { artBg(k, s === 0 ? 'token-me' : 'token-opp'); k.style.backgroundSize = 'contain'; k.style.border = '0'; k.style.boxShadow = 'none'; } t.appendChild(k); });
   t.setAttribute('aria-label', 'Time track. ' + nameOf(0) + ' at ' + G.pos[0] + ' of 53, ' + nameOf(1) + ' at ' + G.pos[1] + '.');
   return t;
 }
@@ -106,8 +125,8 @@ function placeTokens() { var t = $('#track'); if (!t) return; var top = G.stamp[
   function tick() { var tt = $('#track'); if (!tt) return; var more = false; [0, 1].forEach(function (s) { var k = $('.tk[data-seat="' + s + '"]', tt); if (!k) return; k.classList.toggle('top', G.pos[0] === G.pos[1] && s === top); if (W[s]) { k.style.transition = 'left .12s, top .12s'; more = true; } at(k, curW(s), s); if (W[s] && !k._st) { k._st = 1; } }); tagFit(); if (more) { clearTimeout(UI.tm.walk); UI.tm.walk = setTimeout(tick, stp); } else { clearTimeout(UI.tm.tagfit); UI.tm.tagfit = setTimeout(tagFit, 260); } }
   tick(); setTimeout(tagFit, 0); clearTimeout(UI.tm.tagfit); UI.tm.tagfit = setTimeout(tagFit, 260); } /* R7: re-fit the name tags once the token transition has settled (no cut or overlapping tags) */
 function tagFit() { var t = $('#track'); if (!t) return; var tw = t.clientWidth, L = []; /* W484: name tags stay inside the track and never overlap each other */
-  $$('.tk', t).forEach(function (k) { var g = $('.tkn', k); if (!g) return; var kx = k.offsetLeft + k.offsetWidth / 2, ky = k.offsetTop, gw = g.offsetWidth; L.push({ g: g, kx: kx, ky: ky, gw: gw, me: k.dataset.seat === '0', l: kx - gw / 2 }); });
-  if (L.length === 2 && Math.abs(L[0].ky - L[1].ky) < 8) { L.sort(function (a, b) { return a.kx - b.kx || (a.me ? -1 : 1); }); var a = L[0], b = L[1], ov = a.l + a.gw + 3 - b.l; if (ov > 0) { a.l -= ov / 2; b.l += ov / 2; } if (a.l < 2) { b.l += 2 - a.l; a.l = 2; } if (b.l + b.gw > tw - 2) { a.l -= b.l + b.gw - tw + 2; b.l = tw - 2 - b.gw; } }
+  $$('.tk', t).forEach(function (k) { var g = $('.tkn', k); if (!g) return; var sl = parseFloat(k.style.left), st = parseFloat(k.style.top), kx = (isNaN(sl) ? k.offsetLeft : sl) + k.offsetWidth / 2, ky = isNaN(st) ? k.offsetTop : st, gw = g.offsetWidth; /* F2: the final spot, not the mid-walk one, so a tag is never left cut off */ L.push({ g: g, kx: kx, ky: ky, gw: gw, me: k.dataset.seat === '0', l: kx - gw / 2 }); });
+  if (L.length === 2 && Math.abs(L[0].ky - L[1].ky) < 22) { L.sort(function (a, b) { return a.kx - b.kx || (a.me ? -1 : 1); }); var a = L[0], b = L[1], ov = a.l + a.gw + 3 - b.l; if (ov > 0) { a.l -= ov / 2; b.l += ov / 2; } if (a.l < 2) { b.l += 2 - a.l; a.l = 2; } if (b.l + b.gw > tw - 2) { a.l -= b.l + b.gw - tw + 2; b.l = tw - 2 - b.gw; } }
   L.forEach(function (o) { o.l = Math.max(2, Math.min(tw - o.gw - 2, o.l)); o.g.style.left = '50%'; o.g.style.transform = 'translateX(' + Math.round(o.l - o.kx) + 'px)'; }); }
 function markLanding() {
   var t = $('#track'); if (!t || !G) return; $$('.tc.land,.tc.next', t).forEach(function (e) { e.classList.remove('land', 'next'); }); var s = swWho(G); if (s < 0) s = 0; var pos = G.pos[s], nx = null;
@@ -126,7 +145,7 @@ function render(fit) {
   artBg($('#board'), 'bg-table');
   var ps = UI.peek >= 0 && UI.mode !== 'hot' ? 0 : vs, pills = h('div#pills', strip(ps), strip(1 - ps)), sbar = scoreBar();
   qf.appendChild(q); if (UI.wide) { qc.appendChild(qf); sd.appendChild(pills); if (hintsOn()) sd.appendChild(sbar); } else { qc.appendChild(pills); qc.appendChild(qf); }
-  sd.appendChild(trackHead()); var tr = renderTrack(); sd.appendChild(tr);
+  sd.appendChild(trackHead()); var tw0 = UI.sel >= 0 && isHuman(swWho(G)) && !UI.tutorial ? timePreview() : UI.wide ? turnWhyEl() : null; if (tw0) { if (!UI.wide && document.documentElement.classList.contains('swplace')) qc.appendChild(tw0); else sd.appendChild(tw0); } var tr = renderTrack(); sd.appendChild(tr);
   if (UI.wide && !(UI.wide && hintsOn())) { var mcs = Math.max(14, Math.min(30, Math.floor(((innerHeight - 330) / 9)))), sv = UI.cs, svn = UI.newCells; UI.cs = mcs; UI.newCells = {}; var oq = quiltEl(os, 'opp'); UI.cs = sv; UI.newCells = svn; oq.removeAttribute('id'); oq.className = 'oppq'; oq.style.setProperty('--cs', mcs + 'px'); oq.style.backgroundImage = 'none'; oq.setAttribute('data-a', 'strip'); oq.setAttribute('data-seat', os); oq.setAttribute('role', 'button'); oq.setAttribute('aria-label', nameOf(os) + ' quilt, tap to enlarge'); sd.appendChild(h('div.oppwrap', h('span', os === 0 && UI.mode !== 'hot' ? 'Your quilt' : nameOf(os) + '\u2019s quilt'), oq)); } if (UI.wide && hintsOn()) { sd.appendChild(h('div#tinfo', trackInfo())); var om = h('button.oppmini', { type: 'button', 'data-a': 'strip', 'data-seat': os, 'aria-label': nameOf(os) + ' quilt, tap to enlarge' }, thumb(os), h('span', h('b', os === 0 && UI.mode !== 'hot' ? 'Your quilt' : nameOf(os) + '\u2019s quilt'), h('small', swScore(G, os).empty + ' empty squares \u00B7 score now ' + swScore(G, os).total))); sd.appendChild(om); } placeTokens(); markLanding();
   if (!fit && !UI.wide) { try { var bdE = $('#bd'), top = bdE.getBoundingClientRect().top, low = 0; Array.prototype.forEach.call(bdE.querySelectorAll('#qcol > *, #side > *'), function (e) { var r = e.getBoundingClientRect(); if (r.height) low = Math.max(low, r.bottom - top); }); /* R2: fit the quilt to the real free height, measured */
     var nc = UI.cs + Math.floor((bdE.clientHeight - low - (document.documentElement.classList.contains('swshort') ? 2 : 6)) / 9); if (low && nc !== UI.cs) { UI.csFit = Math.max(18, nc); UI.newCells = svNew; return render(true); } } catch (e) { } }
@@ -135,6 +154,7 @@ function render(fit) {
   var gl = $('#goalline'); if (gl) { gl.hidden = !UI.camp; if (UI.camp) gl.textContent = 'Goal: ' + UI.camp.goal.text + (UI.camp.twist ? ' \u00B7 ' + UI.camp.twist.text : ''); }
   try { if (typeof coachRender === 'function') coachRender(); } catch (e) { }
   try { if (typeof hlpRefresh === 'function') hlpRefresh(); } catch (e) { }
+  try { if (typeof cueFit === 'function') requestAnimationFrame(cueFit); } catch (e) { }
   try { if (typeof T2 !== 'undefined' && T2) t2Show(); } catch (e) { }   // W491 fix: the tutorial highlight survives every redraw (no unlit gap)
 }
 function patchShape(pid, cls, oc, cells) { var p = PATCHES[pid], c = cells || p.cells, w = 0, ht = 0; c.forEach(function (q) { if (q[0] > w) w = q[0]; if (q[1] > ht) ht = q[1]; }); var s = h('div.shape' + (cls ? '.' + cls : ''), { style: 'grid-template-columns:repeat(' + (w + 1) + ',' + oc + 'px);grid-template-rows:repeat(' + (ht + 1) + ',' + oc + 'px);--pc:' + pcol(pid) }), set = {}; c.forEach(function (q) { set[q[0] + ',' + q[1]] = 1; });
@@ -184,21 +204,22 @@ function renderDock() {
   var vs = $$('.offer[data-val]', box); if (vs.length) { var bst = vs.reduce(function (a, b) { return +b.dataset.val > +a.dataset.val ? b : a; }); bst.appendChild(h('span.badge', 'Best ' + sgn(+bst.dataset.val))); }
   if (!off.length) box.appendChild(h('div', 'No patches left.'));
   if (G.over) { pr.textContent = 'The fair is over.'; dh.textContent = 'Result'; ac.appendChild(h('button.btn.go', { type: 'button', 'data-a': 'result' }, 'See the result')); return; }
-  pr.classList.remove('w484q'); dh.textContent = hum && !G.pend && UI.sel >= 0 && !UI.coach ? 'Drag it on your quilt. Red stripes = no room.' : hum && !G.pend && UI.sel < 0 && !UI.coach ? 'Goal: fill your quilt. Most points wins.' : turnTracker(s); /* W484: the goal in plain words on your turn */
+  pr.classList.remove('w484q'); dh.textContent = hum && !G.pend && UI.sel >= 0 && !UI.coach ? (UI.placed === false ? 'Tap a spot, or use the dashed one.' : 'Drag to move. Rotate and Flip to fit.') : hum && !G.pend && UI.sel < 0 && !UI.coach ? 'Goal: fill your quilt. Most points wins.' : turnTracker(s); /* W484: the goal in plain words on your turn */
   if (G.pend) { pr.textContent = hum ? 'Free 1×1 patch! Tap any empty square on your quilt' : nameOf(s) + ' sews a free 1×1 patch'; if (hum) { box.style.display = 'none'; dt.textContent = T2 ? 'You passed a leather space. Sew the 1×1 patch into the single square gap.' : 'You passed a leather space on the track. The 1×1 patch is yours, sew it anywhere.'; } return; }
   box.style.display = '';
-  if (!hum) { pr.textContent = UI.cap || (nameOf(s) + ' is thinking…'); if (!UI.fast) pr.appendChild(h('small.skipn', ' Tap to skip')); return; }
+  if (!hum) { pr.textContent = UI.cap || (UI.mode !== 'hot' && !UI.tutorial && turnWhy()) || (nameOf(s) + ' is thinking…'); if (!UI.fast) pr.appendChild(h('small.skipn', ' Tap to skip')); return; }
   if (UI.sel >= 0) {
     var pid = off[UI.sel], p = PATCHES[pid], ok = ghostOk(), pv = patchValue(s, pid), gc = ok ? (curCells() || []).map(function (c) { return (UI.gy + c[1]) * 9 + UI.gx + c[0]; }) : [];
-    pr.textContent = hintsOn() ? (ok ? 'Sew it on: ' : 'Drag it onto your quilt: ') + 'worth ' + sgn(pv.net) : ok ? 'Good spot! Tap Sew it on' : 'Drag the patch onto your quilt';
+    pr.textContent = hintsOn() && UI.placed !== false ? (ok ? 'Sew it on: ' : 'Move it to a free spot: ') + 'worth ' + sgn(pv.net) : placeLine();
     dt.innerHTML = '<b>' + sgn(pv.pts) + '</b> for ' + pv.sq + ' squares \u00B7 <b>\u2212' + pv.cost + '</b> cost \u00B7 <b>+' + pv.incv + '</b> income \u00B7 time ' + p.time; if ((!UI.wide && UI.camp) || !hintsOn()) dt.innerHTML = '';
     ac.appendChild(h('button.btn.alt.sm', { type: 'button', 'data-a': 'rot', 'aria-label': 'Rotate' }, h('span', { html: '<svg viewBox="0 0 24 24"><path d="M20 12a8 8 0 1 1-3-6.2M20 4v5h-5"/></svg>' }), 'Rotate'));
     ac.appendChild(h('button.btn.alt.sm', { type: 'button', 'data-a': 'flip', 'aria-label': 'Flip' }, h('span', { html: '<svg viewBox="0 0 24 24"><path d="M12 3v18M8 7L3 12l5 5zM16 7l5 5-5 5z"/></svg>' }), 'Flip'));
-    ac.appendChild(h('button.btn.go.grow', { type: 'button', 'data-a': 'sew', disabled: ok ? null : 'disabled' }, 'Sew it on'));
+    if (UI.placed === false) ac.appendChild(h('button.btn.go.grow', { type: 'button', 'data-a': 'sugok' }, 'Use good spot')); /* F2: one tap takes the dashed suggestion */
+    else ac.appendChild(h('button.btn.go.grow', { type: 'button', 'data-a': 'sew', disabled: canSew() ? null : 'disabled' }, 'Sew it on'));
     ac.appendChild(h('button.btn.alt.sm', { type: 'button', 'data-a': 'cancel', 'aria-label': 'Cancel' }, 'Cancel'));
   } else {
     var nCan = off.filter(function (pid) { var q = PATCHES[pid]; return G.btn[s] >= q.cost && swPlacements(G.board[s], q).length > 0; }).length;
-    pr.textContent = !nCan ? 'No patch you can buy: tap Advance' : !G.owned[s].length ? 'Tap a glowing patch to buy it' : UI.again ? UI.again : 'Tap a glowing patch, or tap Advance'; pr.classList.toggle('w484q', !!nCan && !!G.owned[s].length && !UI.again && !UI.coach && !UI.wide); /* W484: phone hides the routine line after turn 1 (the glow says it) */
+    var first = !(G.log || []).some(function (l) { return l[0] === s; }), why = !UI.tutorial && !UI.coach && !UI.wide ? turnWhy() : ''; pr.textContent = !nCan ? 'No patch you can buy: tap Advance' : first && !G.owned[s].length ? 'Tap a glowing patch to buy it' : why ? why : UI.again ? UI.again : 'Tap a glowing patch, or tap Advance'; pr.classList.toggle('w484q', !why && !!nCan && !!G.owned[s].length && !UI.again && !UI.coach && !UI.wide); /* F2: phones: the prompt row says whose turn and why */ /* W484: phone hides the routine line after turn 1 (the glow says it) */
     var st = swAdvSteps(G, s), o = nameOf(1 - s);
     ac.appendChild(h('button.btn.adv.grow', { type: 'button', 'data-a': 'adv', title: 'Move your token just ahead of ' + o + ' and take ' + st + ' button' + (st === 1 ? '' : 's') }, 'Advance +' + st + ' button' + (st === 1 ? '' : 's')));
     dt.textContent = hintsOn() && (UI.wide || !UI.camp) ? UI.rate || trackInfo() : '';

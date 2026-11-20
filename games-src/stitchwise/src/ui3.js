@@ -28,7 +28,7 @@ function renderSetup(st) {
 }
 document.addEventListener('click', function (e) {
   var t = e.target.closest('[data-a]'); if (!t) return; var a = t.dataset.a;
-  if (a === 'trhelp') { if (G) trackSheet(); else toast('Time track: pass a button spot = income. Pass a leather patch = free 1\u00D71. Further back plays next.', 4000); } else if (a === 'trclose') { var ts = $('#trsheet'); if (ts) ts.remove(); } else if (a === 'offer') selectOffer(+t.dataset.k); else if (a === 'adv') doAdvance(); else if (a === 'rot') rotate(); else if (a === 'flip') flip(); else if (a === 'sew') confirmSew(); else if (a === 'cancel') cancelSel();
+  if (a === 'trhelp') { if (G) trackSheet(); else toast('Time track: pass a button spot = income. Pass a leather patch = free 1\u00D71. Further back plays next.', 4000); } else if (a === 'trclose') { var ts = $('#trsheet'); if (ts) ts.remove(); } else if (a === 'offer') selectOffer(+t.dataset.k); else if (a === 'adv') doAdvance(); else if (a === 'rot') rotate(); else if (a === 'flip') flip(); else if (a === 'sew') confirmSew(); else if (a === 'sugok') acceptSug(); else if (a === 'cancel') cancelSel();
   else if (a === 'strip') { if (G && !UI.coach) { t.classList.add('tapped'); setTimeout(function () { t.classList.remove('tapped'); }, 500); showScoreDrawer(); return; } var sd = +t.dataset.seat; if (sd !== viewSeat()) showOppQuilt(sd); else { t.classList.add('tapped'); setTimeout(function () { t.classList.remove('tapped'); }, 500); } }
   else if (a === 'resume') loadGame(); else if (a === 'quick' || a === 'start') showStart('setup'); else if (a === 'rules') { GX.show('rulesd'); }
   else if (a === 'story') storyOpen(); else if (a === 'learn') tutStart(); else if (a === 'goalok') closeGoal(); else if (a === 'whatdo') whatDo(); else if (a === 'skipmap') { coachSkipToMap(); } else if (a === 'result') showResult(); else if (a === 'again') { var lv = UI.lvl; newGame(UI.mode === 'hot' ? 'hot' : 'vs', { lvl: lv }); } else if (a === 'title') showStart(); else if (a === 'look') { $('#rs').hidden = true; }
@@ -80,13 +80,13 @@ function showResult(o) {
   [0, 1].forEach(function (s) {
     var q = quiltEl(s, 'rvq'); q.removeAttribute('id'); q.style.setProperty('--cs', UI.cs + 'px'); q.style.backgroundImage = 'none'; q.classList.remove('art');
     var qs = $$('.qc', q), emp = emptyIdx(s).map(function (i) { return qs[i]; }); emp.forEach(function (e) { e.classList.add('emp'); }); cells.push(emp);
-    var bt = h('b.rvn', '0'), tt = h('b.rvt', String(sc[s].btn + (sc[s].bonus ? 7 : 0))); tot.push(tt); pen.push(bt);
+    var bt = h('b.rvn', '0'), tt = h('b.rvt', String(sc[s].total)); tot.push(tt); pen.push(bt);
     cols.appendChild(h('div.rvcol' + (w === s ? '.win' : ''), { 'data-seat': s }, h('div.rvname', h('span.dot', { style: 'background:' + (s === 0 ? 'var(--me)' : 'var(--opp)') }), nameOf(s)), q,
       h('div.rvtally', h('div', { html: btnIc() + ' Buttons <b>' + sc[s].btn + '</b>' }), h('div', { html: bonusIc() + ' 7×7 bonus <b>' + (sc[s].bonus ? '+7' : '0') + '</b>' }), h('div.rvpen', 'Empty ', h('b.rvec', '0'), ' × -2 = ', bt), h('div.rvsum', 'Total ', tt))));
   });
   c.appendChild(h('div.rvhead', 'The quilts are done')); c.appendChild(cols); var ban = h('div.rvban'); c.appendChild(ban); var acts = h('div.rvacts'); c.appendChild(acts);
   rs.innerHTML = ''; rs.appendChild(c); UI.rsShown = true; UI.cs = saved; UI.newCells = saveNew; var seqId = ++UI.seq2;
-  var setTotals = function (s, n) { $('.rvec', $$('.rvcol', c)[s]).textContent = n; pen[s].textContent = n ? '-' + n * 2 : '0'; tot[s].textContent = sc[s].btn + (sc[s].bonus ? 7 : 0) - n * 2; };
+  var setTotals = function (s, n) { $('.rvec', $$('.rvcol', c)[s]).textContent = n; pen[s].textContent = n ? '-' + n * 2 : '0'; tot[s].textContent = sc[s].total; }; /* F2: the total is the final number from the start (it never counts down) */
   var finishUp = function () {
     if (seqId !== UI.seq2) return; [0, 1].forEach(function (s) { cells[s].forEach(function (e) { e.classList.add('x'); }); setTotals(s, sc[s].empty); });
     var A = sc[0].total, B = sc[1].total, title = hot ? nameOf(w) + ' wins!' : w === 0 ? 'You win!' : nameOf(1) + ' wins.';

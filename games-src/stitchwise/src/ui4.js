@@ -147,6 +147,18 @@ function ringStrip() {
   }
   if (L > 3) box.appendChild(h('span.ringend', { 'aria-hidden': 'true' }, '↻'));
   if (UI.ringSeen !== G.start + ':' + L) { UI.ringSeen = G.start + ':' + L; box.scrollLeft = 0; }
+  if (!box._cue) { box._cue = 1; box.addEventListener('scroll', function () { cueFit(); }, { passive: true }); addEventListener('resize', function () { setTimeout(cueFit, 50); }); }
+  requestAnimationFrame(cueFit);
+}
+function cueFit() { // F2: the patch row scrolls: a fade at the right edge and "N more" (tap = scroll on)
+  var box = $('#offers'), c = $('#ofcue'); if (!box) return; var rsv = $('#rs'), on = !!G && !G.over && !(rsv && !rsv.hidden) && !$('#start:not([hidden])') && box.classList.contains('ring') && box.style.display !== 'none' && !box.classList.contains('placing') && box.offsetParent && box.scrollWidth > box.clientWidth + 4;
+  if (!on) { if (c) c.hidden = true; return; } var par = document.body; if (!c) c = h('div#ofcue', { 'aria-hidden': 'true' }, h('b'), h('small', 'more'), h('i', '\u203A'));
+  if (c.parentNode !== par) par.appendChild(c);
+  var br = box.getBoundingClientRect(), pr = { top: 0, left: 0 }, r = br.right, all = $$('.offer', box), tot = all.length, right = 0, seen = 0;
+  all.forEach(function (o) { var q = o.getBoundingClientRect(); if (q.left + q.width / 2 > r) right++; else if (q.right > br.left + 4) seen++; });
+  var end = box.scrollLeft + box.clientWidth >= box.scrollWidth - 4; c.hidden = false; c.classList.toggle('end', end);
+  c.style.top = (br.top - pr.top) + 'px'; c.style.height = br.height + 'px'; c.style.left = (br.right - pr.left - 26) + 'px';
+  c.firstChild.textContent = String(right); c.title = right + ' more patches: swipe the row';
 }
 document.addEventListener('click', function (e) {
   var t = e.target.closest && e.target.closest('[data-a]'); if (!t || !G) return; var a = t.dataset.a;
@@ -191,7 +203,7 @@ function t2Steps() {
     { id: 'pay', rule: 'pay', say: 'Sew it on. You pay its 4 buttons.', target: sew, gap: 'h1', allow: function (a) { return a === 'sew' && t2AtGap(T2.h1); }, done: function () { return G.owned[0].length >= 1; } },
     { id: 'time', rule: 'time', say: 'It cost 2 time: you moved 2. Furthest back plays next.', btn: 'Watch', target: function () { return $('#tutb .t2b'); },
       onBtn: function () { UI.tutAi = true; schedule(); }, done: function () { return T2.pressed && t2Mine(); } },
-    advStep('advance', 'advance', 'Or Advance: jump just past Marden, +1 button per space.', function () { return G.log.some(function (l) { return l[0] === 0 && l[1] === 'adv'; }) && t2Mine(); }),
+    Object.assign(advStep('advance', 'advance', 'Or Advance: jump just past Marden, +1 button per space.', function () { return G.log.some(function (l) { return l[0] === 0 && l[1] === 'adv'; }); }), { eager: true }), /* F2: the line moves on the moment you tap Advance */
     advStep('income', 'income', 'Pass a gold spot: +1 button per button on your patches.', function () { return G.pos[0] > 41 && t2Mine(); }),
     advStep('leather', 'leather', 'First past the leather square gets a free 1x1 patch.', function () { return !!G.pend; }),
     { id: 'leather2', rule: 'leather', say: 'Tap the single gold gap to sew it.', target: function () { return $$('#quilt .qc')[T2.hl[1] * 9 + T2.hl[0]]; }, allow: function (a, k) { var ok = a === 'leather' && k === T2.hl[1] * 9 + T2.hl[0]; if (a === 'leather' && !ok) { var tt = $('#tutb .t2t'); if (tt) tt.textContent = 'That gap is for your next patch. Tap the single square.'; } return ok; }, done: function () { return G.board[0][T2.hl[1] * 9 + T2.hl[0]] === 100 && t2Mine(); } },
@@ -214,7 +226,7 @@ function t2Enter() { var st = t2Step(); T2.pressed = false; if (st.enter) st.ent
 function t2Next() { var st = t2Step(); if (!st || !st.btn || T2.pressed) return; T2.pressed = true; var b = $('#tutb .t2b'); if (b) b.disabled = true; if (st.onBtn) st.onBtn(); }
 function t2Tick() {
   if (!T2) { clearInterval(UI.t2iv); return; } var st = t2Step(); if (!st || !G) return;
-  if (!UI.busy && st.done()) { if (st.leave) st.leave(); if (G.over && st.id === 'end') return; if (T2.i < T2.steps.length - 1) { T2.i++; t2Enter(); } return; }
+  if ((!UI.busy || st.eager) && st.done()) { if (st.leave) st.leave(); if (G.over && st.id === 'end') return; if (T2.i < T2.steps.length - 1) { T2.i++; t2Enter(); } return; }
   t2Show();
 }
 function t2Show() {
