@@ -166,7 +166,7 @@ function newGame(mode,o){o=o||{};mode=mode||'me';UI.camp=o.camp||null;UI.campDon
   G=g;if(UI.camp&&typeof campApply==='function')campApply(UI.camp);resetUI();UI.coachDone={};UI.started=true;UI.holder=hn[0]!=null?hn[0]:0;
   UI.rs0=snapInf();UI.rsLog=0;
   try{localStorage.setItem('tb_played','1')}catch(e){}saveGame();hideStart();afterStart();return G}
-function resetUI(){UI.evq=[];UI.card=null;UI.pop=null;UI.popArg=null;UI.busy=false;UI.tip={};UI.seen={};UI.clashRes={};UI.placed=[];UI.sel={};UI.toast='';UI.lastLog=G?G.logN:0;UI.nowT=null;UI.moreOpen=false;UI.watchPaused=false;UI.passed=null;UI.lastShown=null;UI.mapReset=true}
+function resetUI(){UI.rush=0;UI.evq=[];UI.card=null;UI.pop=null;UI.popArg=null;UI.busy=false;UI.tip={};UI.seen={};UI.clashRes={};UI.placed=[];UI.sel={};UI.toast='';UI.lastLog=G?G.logN:0;UI.nowT=null;UI.moreOpen=false;UI.watchPaused=false;UI.passed=null;UI.lastShown=null;UI.mapReset=true}
 function saveGame(){try{if(NET.on||!G||G.over||!UI.cfg||UI.camp||UI.cfg.tutorial)return;localStorage.setItem('tb_save',JSON.stringify({v:1,G,cfg:UI.cfg,holder:UI.holder,guide:UI.guide,ai:UI.aiSeed,coach:UI.coachDone||{},tip:UI.tip,t:Date.now()}))}catch(e){}}
 function loadSave(){try{const s=localStorage.getItem('tb_save');return s?JSON.parse(s):null}catch(e){return null}}
 function clearSave(){try{localStorage.removeItem('tb_save')}catch(e){}}
@@ -188,15 +188,16 @@ function pump(){clearTimeout(_pumpT);_pumpT=0;if(!G||!UI.started)return;
   try{
     for(let guard=0;guard<4000;guard++){
       if(UI.card){renderAll();return}                       // a card (event, pass screen, coach) is waiting for Continue
-      if(UI.evq.length&&(vs()>=0||UI.mode==='watch')){const ev=UI.evq.shift();if(shouldShowEvent(ev)){showEvent(ev);renderAll();return}continue}
+      if(UI.evq.length&&(vs()>=0||UI.mode==='watch')){const ev=UI.evq.shift();if(UI.rush&&ev.t==='news'&&!ev.big&&!ev.keep)continue;if(shouldShowEvent(ev)){showEvent(ev);renderAll();return}continue}
       if(UI.evq.length){UI.evq.length=0}
       if(G.over){showOver();renderAll();return}
       if(!G.q){renderAll();return}
       const w=whoActs();
       if(w.ai.length){ // AI answers (simultaneous hidden decisions are collected in any order)
-        if(AIDELAY>0&&ANIM){renderAll();if(UI.mode==='watch'&&UI.watchPaused)return;_pumpT=setTimeout(()=>{aiStep(w);pump()},AIDELAY*(UI.mode==='watch'?1:.6)/UI.speed/(UI.cfg&&UI.cfg.tutorial?3:1));return}
+        if(AIDELAY>0&&ANIM&&!UI.rush){renderAll();if(UI.mode==='watch'&&UI.watchPaused)return;_pumpT=setTimeout(()=>{aiStep(w);pump()},AIDELAY*(UI.mode==='watch'?1:.15)/UI.speed/(UI.cfg&&UI.cfg.tutorial?3:1));return}
         aiStep(w);continue}
-      // only humans are pending
+      // only humans are pending: a skip-all ends here, at your own decision
+      UI.rush=0;
       const h=pickHumanSeat(w.hum);
       if(h==null){renderAll();return}               // pass-the-device card up
       if(typeof maybeTip==='function'&&maybeTip()){renderAll();return}

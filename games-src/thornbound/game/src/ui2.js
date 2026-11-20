@@ -37,9 +37,12 @@ function locHits(){const svg=MAP.m&&MAP.m.el;if(!svg||!svg.isConnected)return;co
     const r=h.getBoundingClientRect();let dx=0,dy=0;if(r.bottom>B.bottom)dy=-(r.bottom-B.bottom)/sy;if(r.top+dy*sy<B.top)dy=(B.top-r.top)/sy;
     if(r.right>B.right)dx=-(r.right-B.right)/sx;if(r.left+dx*sx<B.left)dx=(B.left-r.left)/sx;
     if(dx||dy){h.setAttribute('x',(x+dx).toFixed(2));h.setAttribute('y',(y+dy).toFixed(2))}}}
-function drawPanels(){const f=[];
-  REGBOX.forEach((b,r)=>{f.push('<g data-reg="'+r+'"><rect x="'+b.x+'" y="'+b.y+'" width="'+b.w+'" height="'+b.h+'" rx="34" fill="#f4e6b8" fill-opacity=".13" stroke="#e8c867" stroke-opacity=".55" stroke-width="3" stroke-dasharray="4 10" stroke-linecap="round"/>'+
-    '<text x="'+b.lab[0]+'" y="'+(b.lab[1]+(UI.phone&&r===0&&(UI.bs||360)<420?26:0))+'" text-anchor="middle" font-family="'+TBKit.fonts.display+'" font-weight="700" font-size="36" textLength="'+Math.min(262,REG[r].length*26)+'" lengthAdjust="spacingAndGlyphs" fill="#f6e6b4" fill-opacity=".85" stroke="#000" stroke-opacity=".6" stroke-width="3" paint-order="stroke">'+esc(REG[r].toUpperCase())+'</text></g>')});
+function drawPanels(){const f=[],pl=[];
+  REGBOX.forEach((b,r)=>{f.push('<g data-reg="'+r+'"><rect x="'+b.x+'" y="'+b.y+'" width="'+b.w+'" height="'+b.h+'" rx="34" fill="#f4e6b8" fill-opacity=".13" stroke="#e8c867" stroke-opacity=".55" stroke-width="3" stroke-dasharray="4 10" stroke-linecap="round"/></g>');
+    // the region's name on a dark plate (>= 7:1 on any art). It sits outside the tappable group, so a tap goes through to the region and no glow style touches it
+    const nm=REG[r].replace(/^The /,'').toUpperCase(),fs=Math.max(32,Math.ceil(15*1000/(UI.bs||360))),wd=Math.round(nm.length*fs*.72+34),ph=fs+18,cx=b.lab[0],cy=b.lab[1]+(UI.phone&&r===0&&(UI.bs||360)<420?26:0)-8;
+    pl.push('<g class="regname"><rect x="'+Math.round(cx-wd/2)+'" y="'+Math.round(cy-ph/2-fs*.1)+'" width="'+wd+'" height="'+ph+'" rx="14" fill="#1d120b" fill-opacity=".92" stroke="#e8c867" stroke-opacity=".85" stroke-width="2.5"/><text x="'+cx+'" y="'+Math.round(cy+fs*.32)+'" text-anchor="middle" font-family="'+TBKit.fonts.display+'" font-weight="700" font-size="'+fs+'" fill="#fff3c4">'+esc(nm)+'</text></g>')});
+  f.push('<g class="regplates" pointer-events="none">'+pl.join('')+'</g>');
   MAP.pan.innerHTML=f.join('')}
 function relayoutSlots(){const m=MAP.m;if(!m)return;const CP=!!UI.phone,sw=CP?44:38,sh=CP?62:54,gap=CP?6:6,n=G.np;
   for(let r=0;r<3;r++){const a=LOCID[2*r],b=LOCID[2*r+1],pa=m.locPos(a),S=STRIP[r];

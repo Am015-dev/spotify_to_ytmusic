@@ -13,9 +13,11 @@ body.in-start #pc,body.in-start #ppop,body.in-start #tbturn{visibility:hidden!im
 #tbturn .tbt-line.sm{font-size:14px;line-height:1.2}
 #tbturn .tbt-line.xs{font-size:14px;line-height:1.12;max-height:64px}
 /* F14: a long line on a short phone gets the room: the chip wraps to two short lines and the Goal button narrows (all text stays 14 px) */
-@media (max-height:620px){html:not(.bf-w) body #tbturn.tbxs{gap:6px;padding-left:8px;padding-right:8px}html:not(.bf-w) body #tbturn.tbxs .tbt-chip{max-width:60px;white-space:normal;line-height:1;padding:1px 5px;letter-spacing:0}html:not(.bf-w) body #tbturn.tbxs .tbt-line.xs{line-height:1.1;max-height:34px;letter-spacing:-.01em}html:not(.bf-w) body #tbturn.tbxs .tbt-goal{min-width:46px;padding:0 4px}}
+@media (max-height:620px){html:not(.bf-w) body #tbturn.tbxs{gap:6px;padding-left:8px;padding-right:8px}html:not(.bf-w) body #tbturn.tbxs .tbt-chip{max-width:60px;white-space:normal;line-height:1;padding:1px 5px;letter-spacing:0}html:not(.bf-w) body #tbturn.tbxs .tbt-line.xs{line-height:1.1;max-height:52px;letter-spacing:-.01em}html:not(.bf-w) body #tbturn.tbxs .tbt-goal{min-width:46px;padding:0 4px}}
 html.bf-w #tbturn{height:auto;min-height:72px}
-@media (max-height:620px){html:not(.bf-w) #tbturn{height:54px;padding:4px 10px}#tbturn .tbt-line{max-height:42px;font-size:15px;line-height:1.2}#tbturn .tbt-line.sm{font-size:14px;line-height:1.2}#tbturn .tbt-line.xs{max-height:46px;font-size:14px;line-height:1.08;letter-spacing:-.01em}#tbturn .tbt-chip{padding:5px 8px}}
+@media (max-height:620px){html:not(.bf-w) #tbturn{height:58px;padding:3px 8px}#tbturn .tbt-line{max-height:42px;font-size:15px;line-height:1.2}#tbturn .tbt-line.sm{font-size:14px;line-height:1.2}#tbturn .tbt-line.xs{max-height:52px;font-size:14px;line-height:1.1;letter-spacing:-.01em}#tbturn .tbt-chip{padding:5px 8px}}
+#tbturn .tbt-skip2{flex:0 0 auto;min-height:44px;min-width:52px;padding:0 7px;border-radius:8px;border:2px solid #8a7aa0;background:rgba(255,255,255,.08);color:#f6ecd2;font:700 14px Cinzel,Georgia,serif;cursor:pointer}
+#tbturn .tbt-line{max-height:none}
 #tbturn .tbt-term{display:inline-block;box-sizing:border-box;min-height:44px;min-width:44px;padding:13px 7px;margin:-13px -7px;text-align:center;vertical-align:baseline;line-height:inherit;border:0;background:none;color:inherit;font:inherit;text-decoration:underline dotted #f0c860 2px;text-underline-offset:3px;cursor:help}
 #tbturn .tbt-term:focus-visible{outline:2px solid #fff;outline-offset:2px;border-radius:3px}
 #tbturn .tbt-info{flex:0 0 auto;width:44px;height:44px;border-radius:50%;border:2px solid #f0c860;background:transparent;color:#f0c860;font:700 italic 18px Georgia,serif}
@@ -41,11 +43,12 @@ html.tb-dim .tb-loc:not(.glow){opacity:.45;transition:opacity .25s}
 @media (prefers-reduced-motion:reduce){#tbturn.pulse .tbt-chip{animation:none}}
 `;document.head.appendChild(css);
 let el=null;const strip=()=>{if(el&&el.isConnected)return el;const rv=document.getElementById('rivals');if(!rv)return null;el=document.createElement('div');el.id='tbturn';el.setAttribute('role','status');el.setAttribute('aria-live','polite');rv.parentNode.insertBefore(el,rv.nextSibling);
-  el.addEventListener('click',ev=>{const jt=ev.target.closest&&ev.target.closest('.tbt-term');if(jt){showTerm(jt.dataset.tbterm);return}const ib=ev.target.closest&&ev.target.closest('.tbt-info');if(ib){const id=+ib.dataset.tbinfo;UI.hand=null;openPop('card',{id,read:1});return}if(ev.target.closest&&ev.target.closest('.tbt-goal')){showGoal(false,true);return}if(ev.target.closest&&ev.target.closest('.tbt-skip')){skipTut();return}if(vNow){nextVoice();return}if(UI._tbHold){UI._tbHold=0;paint();try{pump()}catch(x){}return}if(UI.card&&UI.card.kind!=='pass'&&!(typeof tutHold==='function'&&tutHold(UI.card))){if(bfSkip())return}speedUp()});return el};
+  el.addEventListener('click',ev=>{if(ev.target.closest&&ev.target.closest('.tbt-skip2')){try{window.tbRush();window.tbTapAhead()}catch(x){}return;}const jt=ev.target.closest&&ev.target.closest('.tbt-term');if(jt){showTerm(jt.dataset.tbterm);return}const ib=ev.target.closest&&ev.target.closest('.tbt-info');if(ib){const id=+ib.dataset.tbinfo;UI.hand=null;openPop('card',{id,read:1});return}if(ev.target.closest&&ev.target.closest('.tbt-goal')){showGoal(false,true);return}if(ev.target.closest&&ev.target.closest('.tbt-skip')){skipTut();return}if(vNow){nextVoice();return}if(UI._tbHold){UI._tbHold=0;paint();try{pump()}catch(x){}return}if(UI.card&&UI.card.kind!=='pass'&&!(typeof tutHold==='function'&&tutHold(UI.card))){if(bfSkip())return}speedUp()});return el};
 function skipTut(){try{GXT.markDone('thornbound')}catch(e){}const pro=UI.coachPro;UI.coachOn=0;clearVoice();tutLeave();if(pro&&typeof GXC!=='undefined'){showStart();GXC.open()}else{UI.sv='setup';UI.cfgOpen=false;showStart();renderStart()}}
 function speedUp(){if(!G||G.over)return;if(window.tbTapAhead)window.tbTapAhead()}
-// read time (owner rule, 8 Nov 2026): a message stays at least 4 s plus 1 s per 10 words; a tap skips. Speed > 1 (player's choice) shortens it.
-const readMs=t=>{const w=String(t||'').trim().split(/\s+/).filter(Boolean).length;return Math.min(3000,1200+220*w)/Math.max(1,Math.min(UI.speed||1,4))/(UI.cfg&&UI.cfg.tutorial?3:1)};window.tbReadMs=readMs;
+// read time (owner, 20 Nov 2026): one rival step shows ~1.2-1.5 s, then the next one starts by itself; a tap on Skip plays the rest of the rivals' turn at once
+const readMs=t=>{const w=String(t||'').trim().split(/\s+/).filter(Boolean).length;return Math.min(1500,900+40*w)/Math.max(1,Math.min(UI.speed||1,4))/(UI.cfg&&UI.cfg.tutorial?3:1)/(UI.rush?3:1)};   // F16: one rival step reads in about 1.2-1.5 s (was up to 3 s); 'Skip all' plays the rest 3x faster
+window.tbReadMs=readMs;
 const poss=n=>String(n)+(/s$/i.test(n)?'\u2019':'\u2019s');
 const esc2=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 // ---- voice beats (a character speaks for ~2.4 s; never blocks a tap)
@@ -59,15 +62,16 @@ function paint(){const e=strip();if(!e)return;if(!G||!UI.started||UI.card&&UI.ca
   let html='',cls='',key='';
   if(vNow){const c=cast(vNow.who);key='v'+vNow.text;cls='voice';e.style.setProperty('--c',c.color);html='<span class="tbt-face" aria-hidden="true">'+esc2(c.emoji)+'</span><span class="tbt-line"><span class="sr">'+esc2(c.name)+': </span>'+esc2(vNow.text)+'</span>'}
   else if(false){const s=UI._tbCap.s;key='c'+UI._tbCap.t;e.style.setProperty('--c',fcol(s));html='<span class="tbt-chip rv">'+esc2(poss(shortName(s)))+' turn</span><span class="tbt-line">'+esc2(UI._tbCap.t)+'</span>'}
-  else if(UI.card&&UI.card.kind!=='pass'){const cm=cardMsg(UI.card);key='card'+cm.t;html='<span class="tbt-chip wt">'+(typeof tutHold==='function'&&tutHold(UI.card)?'Look':'Tap: next')+'</span><span class="tbt-line">'+esc2(shortT(cm.t))+'</span>'}
+  else if(UI.card&&UI.card.kind!=='pass'){const cm=cardMsg(UI.card);key='card'+cm.t;const hold=typeof tutHold==='function'&&tutHold(UI.card);const cs=(cm.s!=null&&cm.s>=0&&G.pl[cm.s])?cm.s:null;if(cs!=null)e.style.setProperty('--c',fcol(cs));const lab=hold?'Look':cs!=null?shortName(cs):(UI.card.kind==='event'?({bids:'Bids',clash:'Clash',summary:'Round'}[UI.card.ev.t]||'Update'):'News');
+    html='<span class="tbt-chip '+(cs!=null?'rv':'wt')+'">'+esc2(lab)+'</span><span class="tbt-line">'+jargon(esc2(cm.t))+'</span>'+(hold?'':'<button class="tbt-skip2" data-tbskip type="button" aria-label="Skip the rest of the rivals\u2019 turn">Skip</button>')}
   else if(G.over){key='over';html='<span class="tbt-chip">Game over</span><span class="tbt-line">The last round is done.</span>'}
   else if(G.q){const s=viewSeatForQ();
     if(s!=null){const k=G.q.kind;const ask=(ST().ask||{});const mph=(k==='menu'||G.q.t==='menu')?menuPhase(G.q):'';key='me'+k+(G.q.t||'')+mph+(UI.autCard!=null?'c':'');const line=mph?(UI.autCard!=null&&ask.menuAutumnCard?ask.menuAutumnCard:(ask['menu'+mph]||ask.menu)):ask[k];
-      const t=line||(typeof promptText==='function'?(t0=>/[.!?…]$/.test(t0)?t0:t0+'.')(String(promptText(G.q,s)).trim()):'Your move.');html='<span class="tbt-chip">Your turn</span><span class="tbt-line">'+jargon(esc2(t))+'</span>';
-      if(UI.hand!=null&&typeof cardLine==='function'){try{const ci=cinfo(UI.hand);key+='h'+UI.hand;html='<span class="tbt-chip">'+esc2(ci.strength)+'</span><span class="tbt-line"><b>'+esc2(ci.name)+'</b>: '+esc2(cardLine(UI.hand))+' Tap again or tap a spot.</span><button class="tbt-info" data-tbinfo="'+UI.hand+'" type="button" aria-label="Full text of '+esc2(ci.name)+'">i</button>'}catch(x){}}}
-    else{const w=whoActs();const a=w.ai[0];if(a!=null){key='ai'+a;e.style.setProperty('--c',fcol(a));const cp=UI._tbCap&&UI._tbCapT&&Date.now()-UI._tbCapT<5000?UI._tbCap:null;const cs=cp?cp.s:a;key='ai'+a+(cp?cp.t:'');e.style.setProperty('--c',fcol(cs));html='<span class="tbt-chip rv">'+esc2(poss(shortName(cs)))+' turn</span><span class="tbt-line">'+(cp?esc2(shortT(cp.t)):'Thinking\u2026 tap to hurry them.')+'</span>'}
+      const t=line||(typeof promptText==='function'?(t0=>/[.!?…]$/.test(t0)?t0:t0+'.')(String(promptText(G.q,s)).trim()):'Your move.');html='<span class="tbt-chip">Your turn</span><span class="tbt-line">'+jargon(esc2(eight(t)))+'</span>';
+      if(UI.hand!=null&&typeof cardLine==='function'){try{const ci=cinfo(UI.hand);key+='h'+UI.hand;html='<span class="tbt-chip">'+esc2(ci.strength)+'</span><span class="tbt-line"><b>'+esc2(ci.name)+'</b>: '+esc2(((l0,l1)=>eight(l1,Math.max(3,8-ci.name.split(/\s+/).length)))(0,one(cardLine(UI.hand))))+'</span><button class="tbt-info" data-tbinfo="'+UI.hand+'" type="button" aria-label="Full text of '+esc2(ci.name)+'">i</button>'}catch(x){}}}
+    else{const w=whoActs();const a=w.ai[0];if(a!=null){key='ai'+a;e.style.setProperty('--c',fcol(a));const cp=UI._tbCap&&UI._tbCapT&&Date.now()-UI._tbCapT<5000?UI._tbCap:null;const cs=cp?cp.s:a;key='ai'+a+(cp?cp.t:'');e.style.setProperty('--c',fcol(cs));html='<span class="tbt-chip rv">'+esc2(poss(shortName(cs)))+' turn</span><span class="tbt-line">'+(cp?esc2(eight(one(shortT(cp.t)))):esc2(shortName(a))+' is thinking\u2026')+'</span><button class="tbt-skip2" data-tbskip type="button" aria-label="Skip the rivals\u2019 turn">Skip</button>'}
       else{key='w';html='<span class="tbt-chip wt">Wait</span><span class="tbt-line">Waiting for the other players.</span>'}}}
-  if(!G.over&&!coachOn()&&UI.hand==null)html+='<button class="tbt-goal" data-tbgoal type="button" aria-label="Show the goal">Goal</button>';
+  if(!G.over&&!coachOn()&&UI.hand==null&&!/tbt-skip2/.test(html))html+='<button class="tbt-goal" data-tbgoal type="button" aria-label="Show the goal">Goal</button>';
   if(coachOn()&&!G.over)html+='<button class="tbt-skip" data-gxt-skip type="button" aria-label="Skip tutorial">Skip tutorial</button>';
   if(e.dataset.key!==key&&/^me/.test(key)&&UI.pop&&UI._popRival){try{closePop(true)}catch(x){}}   // an info card opened during the rival's turn must not cover your own move
   if(cls==='voice')e.removeAttribute('data-fa-skip');else e.setAttribute('data-fa-skip','');
@@ -75,15 +79,39 @@ function paint(){const e=strip();if(!e)return;if(!G||!UI.started||UI.card&&UI.ca
   if(e.dataset.key!==key){e.dataset.key=key;e.className=cls+(cls==='voice'?' pulse':'');e.innerHTML=html;try{const ln=e.querySelector('.tbt-line');if(ln&&tbLineOver(ln))ln.classList.add('sm');if(ln&&tbLineOver(ln)){ln.classList.add('xs');e.classList.add('tbxs')}}catch(x){}try{document.documentElement.classList.toggle('tb-dim',!!(UI.bf&&(UI.bf.kind==='herald'||UI.bf.kind==='location')&&!UI.card))}catch(x){}}
   else{try{document.documentElement.classList.toggle('tb-dim',!!(UI.bf&&(UI.bf.kind==='herald'||UI.bf.kind==='location')&&!UI.card))}catch(x){}}}
 // the full text of the message on screen (news, clash, bids, round end): shown whole in the strip, timed by its length
-function cardMsg(c){try{if(c.kind==='news'&&c.items&&c.items.length){if(c.big&&c.items.every(infK))return {t:newsHead(c.items[0],c.items)+'.',s:null};const s0=c.items[0].s;const it=c.items.filter((x,i)=>i===0||x.s!==s0).slice(0,3).map(x=>plain(x.text)).join(' ');return {t:it,s:c.items[0].s}}
+const one=t=>{t=String(t||'').trim();const m=t.match(/^.+?[.!?](?=\s|$)/);t=m?m[0]:t;
+  if(t.length>66)t=t.replace(/\s*\([^()]*(\([^()]*\)[^()]*)*\)\.?$/,'.');   // a long line drops its closing bracket note (the Log keeps it)
+  if(t.length>84){const i=t.lastIndexOf(': ');if(i>30)t=t.slice(0,i)+'.'}return t.replace(/place the Clash Markers: /,'set the Clash order: ').replace(/, then /g,', ').replace(/\bThe (Uplands|Tablelands|Sinks)\b/g,'$1')};window.tbOne=one;
+// a strip line is at most 8 words (owner rule): faction names go short, then the line is cut at its last clause or preposition (never an ellipsis); the Log keeps the full sentence
+const eight=(t,N)=>{N=N||8;t=String(t||'').trim();const wc=x=>x.replace(/[^a-zA-Z0-9'\u2019]+/g,' ').trim().split(' ').filter(Boolean).length;
+  try{G.pl.forEach((p,s)=>{const f=DD.FNAME&&DD.FNAME[p.fac];if(f&&t.indexOf(f)>=0)t=t.split(f).join(sideName(s))})}catch(e){}
+  if(wc(t)<=N)return t;t=t.replace(/ from the Great Road/,'').replace(/ the Tactic /,' Tactic ').replace(/\s*\([^()]*\)/g,'');if(wc(t)<=N)return t;
+  const w=t.split(/\s+/);let k=w.length-1;while(k>3&&wc(w.slice(0,k).join(' '))>N)k--;
+  for(let j=k;j>=3;j--){if(/^(to|into|from|in|on|at|with|for|and|or|then|while|but|so|because|after|before|of|by)$/i.test(w[j])||/[.!?,;:]$/.test(w[j-1]))return w.slice(0,j).join(' ').replace(/[,;:]$/,'')+(/[.!?]$/.test(w[j-1])?'':'.')}
+  return w.slice(0,k).join(' ').replace(/[,;:]$/,'')+'.'};window.tbEight=eight;   // a step is told in its first sentence (the log has the rest)
+function cardMsg(c){try{if(c.kind==='news'&&c.items&&c.items.length){if(c.items.every(infK)){const il=infLine(c.items);if(il)return {t:eight(il),s:c.big?null:c.items[0].s}}
+    const s0=c.items[0].s;const it=c.items.filter((x,i)=>i===0||x.s!==s0).slice(0,1).map(x=>eight(infK(x)?(infLine([x])||one(plain(x.text))):one(plain(x.text)))).join(' ');return {t:it,s:c.items[0].s}}
   if(c.kind==='event'){const e=c.ev;if(e.t==='bids')return {t:'Bids flip. The highest bid picks first.',s:null};if(e.t==='clash')return {t:UI._clashLine||('The Clash in '+REG[e.r]),s:null};if(e.t==='summary')return {t:e.last?'The last round is over.':'Round '+e.round+' is over.',s:null}}}catch(x){}
   return {t:'Tap anywhere to go on.',s:null}}
 // one line per game word, shown when the word is tapped (the first time it appears in a game)
 const JARGON={clash:['Clash','The fight in one region. Highest total Strength wins.'],herald:['Herald','Your envoy. Win its region to score its location, plus 1.'],
   govern:['Govern','An Autumn action: move a card with votes into a Council.'],council:['Council','Three Councils give a lasting bonus for the votes there.'],
-  favour:['Favour','A disc from the Meadow. It unlocks your faction\u2019s power.']};
-const JRE=/\b(Clash(?:es)?|Heralds?|Govern|Councils?|(?:Kingdom\u2019s |Kingdom's )?Favour)\b/g;
-function jkey(w){w=w.toLowerCase();return w.indexOf('clash')===0?'clash':w.indexOf('herald')===0?'herald':w.indexOf('govern')===0?'govern':w.indexOf('council')===0?'council':'favour'}
+  favour:['Favour','A disc from the Meadow. It unlocks your faction\u2019s power.'],
+  lore:['Lore','A second currency from Journey. It buys your faction\u2019s Site of Power cards.'],journey:['Journey','An Autumn action: send a hand card away to gain its Lore.'],
+  pledges:['Pledges','A Council. Cards Governed there bring your spent Supporters back.'],tactic:['Tactics','Your faction\u2019s special powers, mostly one use each.'],
+  active:['Active','A card of yours that is face up on the map this round.']};
+const JRE=/\b(Clash(?:es)?|Heralds?|Govern|Councils?|Lore|Journey|Pledges|Tactics?|Active|(?:Kingdom\u2019s |Kingdom's )?Favour)\b/g;
+function jkey(w){w=w.toLowerCase();for(const k of ['clash','herald','govern','council','lore','journey','pledges','tactic','active'])if(w.indexOf(k)===0)return k;return 'favour'}
+// the first time a game word shows up anywhere in the strip or the action row, its one plain line pops up for a few seconds (never blocks a tap; remembered)
+(function(){let seen={};try{seen=JSON.parse(localStorage.getItem('tb_terms')||'{}')||{}}catch(e){}
+  const st=document.createElement('style');st.textContent='#tbterm{position:fixed;left:50%;width:max-content;transform:translateX(-50%);z-index:58;max-width:min(92vw,520px);box-sizing:border-box;padding:9px 14px;border-radius:10px;background:rgba(20,12,26,.96);border:2px solid #f0c860;color:#fff3c4;font:600 15px/1.3 system-ui,sans-serif;pointer-events:none;text-align:center;box-shadow:0 6px 20px rgba(0,0,0,.6)}#tbterm[hidden]{display:none}#tbterm b{color:#f0c860}';document.head.appendChild(st);
+  const RE=[['lore',/\bLore\b/],['journey',/\bJourney\b/],['pledges',/\bPledges\b/],['tactic',/\bTactics?\b/],['active',/\bActive\b/],['govern',/\bGovern\b/],['council',/\bCouncils?\b/],['herald',/\bHeralds?\b/],['clash',/\bClash(es)?\b/],['favour',/\bFavour\b/]];
+  let el=null,until=0,t=0;const busy=()=>{try{return !G||!UI.started||G.over||UI.pop||(typeof GXT!=='undefined'&&GXT.active&&GXT.active())||(typeof GXCOACH!=='undefined'&&GXCOACH.running)||document.querySelector('#tbgoal,.gxh-bub.on,#start:not([hidden])')}catch(e){return true}};
+  const scan=()=>{if(busy()||Date.now()<until)return;const root=document.querySelector('#tbturn'),act=document.querySelector('#act');const txt=((root&&!root.hidden?root.textContent:'')+' '+(act?act.textContent:''));
+    for(const [k,re] of RE){if(seen[k]||!re.test(txt))continue;seen[k]=1;try{localStorage.setItem('tb_terms',JSON.stringify(seen))}catch(e){}
+      const j=JARGON[k];if(!j)continue;if(!el){el=document.createElement('div');el.id='tbterm';el.setAttribute('data-help','');el.setAttribute('role','status');document.body.appendChild(el)}
+      el.innerHTML='<b>'+esc2(j[0])+':</b> '+esc2(j[1]);el.hidden=false;const rb=root&&root.getBoundingClientRect();el.style.top=Math.round((rb&&rb.bottom||60)+6)+'px';until=Date.now()+6200;clearTimeout(t);t=setTimeout(()=>{if(el)el.hidden=true},6000);break}};
+  setInterval(scan,600);window.tbTermsSeen=()=>seen;window.tbTermsReset=()=>{seen={};try{localStorage.removeItem('tb_terms')}catch(e){}}})();
 function jargon(h){UI._jg=UI._jg||{};if(UI._jgG!==G){UI._jgG=G;UI._jg={}}const used={};
   return h.replace(JRE,w=>{const k=jkey(w);if(used[k]||(UI._jg[k]&&UI._jg[k]!==UI._jgKey))return w;used[k]=1;if(!UI._jg[k])UI._jg[k]=UI._jgKey;return '<button type="button" class="tbt-term" data-tbterm="'+k+'">'+w+'</button>'})}
 function showTerm(k){const j=JARGON[k],el=document.getElementById('gdef');if(!j||!el)return;el.innerHTML='<p><b>'+esc2(j[0])+'</b>: '+esc2(j[1])+'</p><button class="pp-x" data-a="gclose" aria-label="Close">'+(typeof ico==='function'?ico('x'):'x')+'</button>';el.hidden=false;el.setAttribute('role','dialog');try{sfx('tap')}catch(x){}}
@@ -211,9 +239,10 @@ window.tbStripPaint=()=>{try{paint()}catch(x){}};setInterval(()=>{try{if(G&&UI.s
 window.tbLineOver=function(ln){try{const L=ln.getBoundingClientRect(),w=document.createTreeWalker(ln,NodeFilter.SHOW_TEXT,null),rg=document.createRange();let n;
   while((n=w.nextNode())){if(!/\S/.test(n.nodeValue))continue;rg.selectNodeContents(n);for(const r of rg.getClientRects())if(r.width&&(r.bottom>L.bottom+1||r.top<L.top-1))return true}return false}catch(e){return ln.scrollHeight>ln.clientHeight+1}};
 // ---- tap guard (R64): a fast second tap must not fall through to the panel under an overlay that just closed.
-// For 350 ms after a tap closes any overlay (Goal card, message card, pop-up, glossary, a modal, or a hint bubble), a tap near that same spot
-// (a double-tap) is swallowed. Taps elsewhere on the screen still work at once.
-(function(){const MS=350,R=40,D=document,OV='#tbgoal,[aria-modal="true"],.gx-goal,.gxh-bub,#pc,#ppop,#gdef,#start';let until=0,at=null,down={t:-1e9,x:0,y:0};
+// For 450 ms after a tap closes any overlay (Goal card, message card, pop-up, glossary, a modal, or a hint bubble), a tap near that same spot
+// (a double-tap) is swallowed. Taps elsewhere on the screen still work at once. A tap on a tutorial's dim cell is never swallowed: the cell already
+// eats it and answers with a shake and a hint (F15).
+(function(){const MS=450,R=40,D=document,OV='#tbgoal,[aria-modal="true"],.gx-goal,.gxh-bub,#pc,#ppop,#gdef,#start';let until=0,at=null,down={t:-1e9,x:0,y:0};
   const gone=e=>!e.isConnected||e.hidden||(e.closest&&e.closest('[hidden]'))||(e.classList&&e.classList.contains('gxh-bub')&&!e.classList.contains('on'));
   const arm=()=>{const now=performance.now();if(now-down.t>600)return;until=now+MS;at={x:down.x,y:down.y}};
   let eaten=0;window.TBTAPGUARD={get eaten(){return eaten},get until(){return until},get at(){return at},arm,ms:MS,radius:R,get on(){return performance.now()<until}};
@@ -222,7 +251,7 @@ window.tbLineOver=function(ln){try{const L=ln.getBoundingClientRect(),w=document
   // the rest of the tap that closed the overlay is never touched
   let gest=false;const kill=e=>{if(e.cancelable)e.preventDefault();e.stopImmediatePropagation();e.stopPropagation()};
   window.addEventListener('pointerdown',e=>{if(e.isTrusted===false)return;const q=pt(e),now=performance.now();
-    gest=!!(at&&now<until&&q.x!=null&&Math.hypot(q.x-at.x,q.y-at.y)<=R);if(gest){eaten++;kill(e);return}down={t:now,x:q.x,y:q.y}},{capture:true,passive:false});
+    gest=!!(at&&now<until&&q.x!=null&&Math.hypot(q.x-at.x,q.y-at.y)<=R)&&!(e.target&&e.target.closest&&e.target.closest('.gxt-cell'));if(gest){eaten++;kill(e);return}down={t:now,x:q.x,y:q.y}},{capture:true,passive:false});
   for(const t of ['pointerup','mousedown','mouseup','touchstart','touchend','click','dblclick'])window.addEventListener(t,e=>{if(gest&&e.isTrusted!==false)kill(e)},{capture:true,passive:false});
   // a tap inside an overlay that closes it (checked right after the tap's own handlers ran)
   window.addEventListener('click',e=>{const o=e.target&&e.target.closest&&e.target.closest(OV);if(!o)return;setTimeout(()=>{if(gone(o))arm()},0)},true);

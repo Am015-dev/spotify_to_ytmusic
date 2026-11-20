@@ -49,7 +49,7 @@ async function playGame(browser,W,H,gi){
       const mb=document.querySelector('#mapbox svg').getBoundingClientRect();if(Hh>W&&mb.width<W*.8)o.bad.push('map only '+Math.round(mb.width)+'px wide on a '+W+'px screen');
       // covered buttons
       for(const e of document.querySelectorAll('#act .btn,#handw .hc,#handw .kcb,.gx-bar .gx-ibtn,#rivals .rv')){const r=e.getBoundingClientRect();if(!r.width||!r.height||e.closest('[hidden]'))continue;const x=r.left+Math.min(r.width/2,22),y=r.top+r.height/2;if(x<0||y<0||x>W||y>Hh)continue;
-        const h=document.elementFromPoint(x,y);if(!h||!(h===e||e.contains(h)||h.contains(e)||(h.closest&&h.closest('[data-help]'))))o.bad.push('covered '+(e.dataset.a||e.className)+' by '+(h?(h.id||h.className||h.tagName):'none'))}
+        const h=document.elementFromPoint(x,y);if(!h||!(h===e||e.contains(h)||h.contains(e)||(h.closest&&h.closest('[data-help]'))))o.bad.push('covered '+(e.dataset.a||e.className)+' by '+(h?(h.id||(typeof h.className==='string'?h.className:(h.className&&h.className.baseVal)||'')||h.tagName)+(h.closest&&h.closest('#handw .hc')?' (another hand card)':h.closest&&h.closest('#mapbox')?' (the map)':'')+' at '+Math.round(x)+','+Math.round(y)+' of '+W+'x'+Hh:'none'))}
       // hint = a legal move
       if(UI.bf&&UI.bf.rec){const s=viewSeatForQ();if(s!=null&&!legal(s).some(m=>m.k===UI.bf.rec.k))o.bad.push('hint is not a legal move: '+UI.bf.rec.k)}
       // help elements: inside the screen, never over the target or a glowing thing; with tips off, no bubble at all

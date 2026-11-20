@@ -18,10 +18,14 @@ function renderHand(){const el=$('#handw');if(!el)return;const s=vs();
   const quiet=!!(M&&M.rec&&M.rec.id==null);
   // one helper at a time: with a card selected only its target (region / bid spot) glows; with a suggested card only that card pulses
   const selH=UI.hand!=null&&ids0.includes(UI.hand);
-  const PAD=UI.desk?32:(UI.short&&!UI.land?8:16);const W=Math.max(160,(el.clientWidth||innerWidth)-8-2*PAD);const cw=cssPx('--cw',50),ch=Math.round(cw*1.4308);
-  const n=ids.length,step=n>1?Math.min(cw+6,(W-cw)/(n-1)):0;const tot=n>1?cw+step*(n-1):cw;const off=Math.max(0,(W-tot)/2);
+  const PAD=UI.desk?32:(UI.land?8:5);const W=Math.max(160,(el.clientWidth||innerWidth)-8-2*PAD);
+  const n=ids.length,GAP=UI.desk?12:3;let cw=cssPx('--cw',50);
+  if(n>1&&!UI.land)cw=Math.max(40,Math.min(cw,Math.floor((W-(n-1)*GAP)/n)));
+  else if(n>1&&UI.land&&!UI.desk)cw=Math.max(34,Math.min(cw,Math.floor(W-24*(n-1))));   // landscape phone: a narrow column, but every card keeps >= 24 px of itself visible   // the hand never overlaps: every card is as wide as the row allows (tap a card to see it enlarged)
+  const ch=Math.round(cw*1.4308);
+  const step=n>1?Math.min(cw+GAP,(W-cw)/(n-1)):0;const tot=n>1?cw+step*(n-1):cw;const off=Math.max(0,(W-tot)/2);
   let h='<div class="hand" role="list" aria-label="Your hand" style="height:'+(ch+24)+'px">';
-  ids.forEach((id,i)=>{if(!inHand.has(id))return;const on=UI.hand===id,pl=use.has(id);const mid=(n-1)/2,rot=n>1?(i-mid)*Math.min(3.6,22/n):0,ty=n>1?Math.round(Math.pow(Math.abs(i-mid)/Math.max(1,mid),2)*4):0;
+  ids.forEach((id,i)=>{if(!inHand.has(id))return;const on=UI.hand===id,pl=use.has(id);const mid=(n-1)/2,rot=n>1&&UI.desk?(i-mid)*Math.min(3.6,22/n):0,ty=n>1&&UI.desk?Math.round(Math.pow(Math.abs(i-mid)/Math.max(1,mid),2)*4):0;   // a flat row on phones: no card overlaps its neighbour, not even by a tilted corner
     h+='<button class="hc'+(on?' on':'')+(pl?((quiet||selH||(rcId!=null&&rcId!==id))?' pl':' glow pl'):'')+(rcId===id&&!selH?' rg':'')+(use.size&&!pl?' dim':'')+'" role="listitem" data-a="hand" data-id="'+id+'" data-owner="'+s+'" data-up="1" style="left:'+Math.round(PAD+off+i*step)+'px;width:'+cw+'px;height:'+ch+'px;z-index:'+(on?50:i+1)+';--rot:'+rot.toFixed(1)+'deg;--ty:'+ty+'px" aria-label="'+esc(cinfo(id).name)+', strength '+cinfo(id).strength+'. '+esc(cardLine(id))+'">'+cardEl(id,UI.desk?Math.min(cw,110):cw).outerHTML+cardBand(id)+'</button>'});
   h+='</div>';if(el._h!==h){el._h=h;el.innerHTML=h}}
 // bid resolution: the Great Road lies where the hand was; tap a glowing Kingdom Card to take it (a steal asks first)
@@ -31,7 +35,7 @@ function roadRowHTML(s,M){const mv=M.mv;const take=mv.filter(m=>m.t==='take'),st
   for(const m of take)if(m.dk!=null)items.push({kc:m.kc,m,deck:1});
   for(const m of steal)items.push({kc:m.kc,m,steal:1});
   if(!items.length)return '<div class="hand roadrow"></div>';
-  const W=Math.max(180,((UI.land?(($('#handw')||{}).clientWidth||innerWidth*.38):innerWidth))-12);const zone=cssPx('--ch',72)+24+(UI.land?0:roadX());let w=Math.max(34,Math.min(UI.land?60:72,Math.floor((zone-(innerHeight<600?40:34))/1.4308),Math.floor(W/items.length)-8));if(UI.desk)w=Math.max(70,Math.min(124,Math.floor((($('.gx-dock')||{}).clientWidth||W)/Math.max(4,items.length))-26));const rk=recK();
+  const W=Math.max(180,((UI.land?(($('#handw')||{}).clientWidth||innerWidth*.38):innerWidth))-12);const shortP=!UI.land&&!UI.desk&&innerHeight<620&&!(($('#act')||{}).childElementCount);const zone=cssPx('--ch',72)+24+(UI.land?0:roadX())+(shortP?44:0);let w=Math.max(34,Math.min(UI.land?60:72,Math.floor((zone-(shortP?60:innerHeight<600?40:34))/1.4308),Math.floor(W/items.length)-8));if(UI.desk)w=Math.max(70,Math.min(124,Math.floor((($('.gx-dock')||{}).clientWidth||W)/Math.max(4,items.length))-26));const rk=recK();
   return '<div class="hand roadrow" role="list" aria-label="The Great Road">'+items.map(it=>{const m=it.m;const rec=m&&rk===m.k;const col=it.steal?fcol(m.s2):'';
     const att=m?(it.steal&&!(typeof tutOn==='function'&&tutOn())?'data-a="confirm" data-k="'+esc(m.k)+'"':'data-a="mv" data-k="'+esc(m.k)+'"'):'data-a="kc" data-n="'+it.kc+'"';
     return '<button class="kcb'+(m?((rk&&!rec)?'':' glow'):' dim')+(rec?' rg':'')+(it.steal?' steal':'')+'" role="listitem" '+att+' data-n="'+it.kc+'" style="width:'+Math.max(w+4,Math.min(84,Math.floor(W/items.length)-6))+'px'+(col?';--fc:'+col:'')+'"'+' aria-label="'+esc((it.steal?'Steal ':m?'Take ':'')+TB.kingdomInfo(it.kc).name)+'">'+kcEl(it.kc,UI.desk?Math.min(w,110):w).outerHTML+'<span class="kn">'+esc(TB.kingdomInfo(it.kc).name)+'</span>'+(it.steal?'<i class="stl">'+ico('x')+'</i>':'')+'</button>'}).join('')+'</div>'}
@@ -40,9 +44,9 @@ function renderDeskRoad(){const el=$('#road');if(!el)return;
   if(!UI.desk||!G||!UI.V||isPassing()||G.over){if(UI.desk){el.hidden=true;el.innerHTML='';el._h=''}return}
   el.hidden=false;const s=vs(),M=UI.bf;const st=$('#barstat .st-t');const ins=st?st.textContent:'';
   let row;if(M&&M.kind==='bidRes')row=roadRowHTML(s,M);
-  else{const V=UI.V;const w=Math.max(70,Math.min(124,Math.floor((($('.gx-dock')||{}).clientWidth||600)/4)-30));
+  else{const V=UI.V;const pw=el.clientWidth||320,cols=pw>=520?4:2,ph=Math.max(180,(el.clientHeight||360)-40),rows=Math.ceil(4/cols);const w=Math.max(64,Math.min(124,Math.floor((pw-32-(cols-1)*14)/cols)-4,Math.floor((ph/rows-46)/1.43)));
     row='<div class="hand roadrow" role="list" aria-label="The Great Road">'+V.road.map(n=>n?'<button class="kcb" role="listitem" data-a="kc" data-n="'+n+'" style="width:'+(w+4)+'px" aria-label="'+esc(TB.kingdomInfo(n).name)+'">'+kcEl(n,Math.min(w,110)).outerHTML+'<span class="kn">'+esc(TB.kingdomInfo(n).name)+'</span></button>':'').join('')+'</div>'}
-  const h='<h4 class="dk-h">The Great Road</h4>'+row+(ins?'<p class="dk-ins">'+esc(ins)+'</p>':'');if(el._h!==h){el._h=h;el.innerHTML=h}}
+  const h='<h4 class="dk-h">The Great Road</h4>'+row;if(el._h!==h){el._h=h;el.innerHTML=h}}
 // ---------------------------------------------------------------- the seats: score, hand and the face-down bid, along the top
 function renderRivals(){const el=$('#rivals');if(!el)return;if(!G||!UI.V)return;const V=UI.V;
   const act=G.q?new Set(G.q.seats):new Set();const me=vs();const n=G.np;

@@ -44,6 +44,8 @@ const GLOSS=[
  ['lore',/\bLore\b/,'Lore','A second currency. You gain it with a Journey. Spend it on your faction\'s Site of Power cards. They give stronger cards and permanent powers.'],
  ['site of power',/\bSite of Power\b/,'Site of Power','Your faction\'s five extra cards, bought with Lore. Buy them all and leftover Lore becomes Influence at the end.'],
  ['govern',/\bGovern\b/,'Govern','An Autumn action, once a round. Move a hand card with votes into one of three Councils.'],
+ ['active',/\bActive\b/,'Active','A card of yours that is face up on the map this round and not Eliminated. Active cards fight in the Clash and can use Autumn powers. In Winter they go to your discard pile.'],
+ ['pledges',/\bPledges\b/,'Council of Pledges','One of the three Councils. Cards Governed here bring your spent Supporters back to you.'],
  ['journey',/\bJourney\b/,'Journey','An Autumn action, once a round. Send away a hand card that shows Lore. Gain that much Lore.'],
  ['council',/\bCouncils?\b/,'Council','Three Councils (Coin, Whispers, Pledges). Cards with votes placed there give you a lasting benefit every round.'],
  ['attrition',/\bAttrition\b/,'Attrition','Empty deck on a draw? Your discard pile becomes the new deck. Your hand size drops by one (never below 3).'],

@@ -3,7 +3,7 @@ function renderAll(){if(!G||!UI.started)return;
   try{UI.V=isClient()?G:TB.stripView(G,isPassing()?-1:vs())}catch(e){console.error('view '+e.message);return}  // a client's G is already its own stripped copy
   if(isPassing()){if(GX.open)GX.close();const bb=$('#boardbody');if(bb)bb.innerHTML='';if(UI.pop)closePop(true)}
   if(!(UI.card&&UI.card.kind==='event'))renderMap();else if(!MAP.m)renderMap();
-  renderCouncils();renderMain();renderBar();renderHand();renderDeskRoad();renderRivals();renderSpots();setHB();renderCard();renderPop();updateLive();
+  renderCouncils();renderMain();renderBar();renderHand();renderDeskRoad();renderRivals();try{const rv=$('#rivals');if(rv&&UI.desk)document.documentElement.style.setProperty('--rvh',rv.offsetHeight+'px');renderSideLog()}catch(e){}renderSpots();setHB();renderCard();renderPop();updateLive();
   document.documentElement.dataset.step=String(roadIdx());
   if(typeof bfAfter==='function')bfAfter();
   netAfter();
@@ -103,6 +103,11 @@ function afterStart(){closePop(true);GX.close();UI.mapReset=true;renderAll();pum
 function renderLog(){const el=$('#logbody');if(!el||!G)return;const L=G.log.slice().reverse();let h='<p class="small">Newest first. Tap an underlined word for its meaning. <button class="btn" data-a="logall">'+(UI.logAll?'Show key events only':'Show everything')+'</button></p><ol class="log">';
   let r=-1;for(const e of L){if(!UI.logAll&&e.c!=='big'&&e.c!=='warn'&&!(e.m&&['inf','steal','elim','kcsteal','tac','fav','inv'].includes(e.m.k)))continue;if(e.r!==r){r=e.r;h+='<li class="lr">Round '+r+'</li>'}h+='<li class="'+(e.c||'')+'"><i style="background:'+(e.s>=0?fcol(e.s):'#777')+'"></i>'+gloss(plain(e.t))+'</li>'}
   el.innerHTML=h+'</ol>'}
+// PC: the left panel keeps the story of the game in view (what rivals did, who scored and why)
+function renderSideLog(){const el=$('#sidelog');if(!el)return;if(!UI.desk||!G||!UI.started){el.hidden=true;return}el.hidden=false;
+  const L=G.log.slice(-60);let h='<h4>What happened</h4><ol>',r=-1;
+  for(const e of L){if(e.c!=='big'&&e.c!=='warn'&&!(e.m&&['inf','steal','elim','kcsteal','tac','fav','inv','move'].includes(e.m.k)))continue;if(e.r!==r){r=e.r;h+='<li class="lr">Round '+r+'</li>'}h+='<li><i style="background:'+(e.s>=0?fcol(e.s):'#777')+'"></i><span>'+esc(plain(e.t))+'</span></li>'}
+  h+='</ol>';if(el._h!==h){el._h=h;el.innerHTML=h;const o=el.querySelector('ol');if(o)o.scrollTop=o.scrollHeight}}
 function renderMenu(){const el=$('#setbody');if(!el)return;
   const seg=(a,cur,opts)=>'<div class="seg">'+opts.map(([v,l])=>'<button class="'+(String(cur)===String(v)?'on':'')+'" data-a="'+a+'" data-v="'+v+'">'+l+'</button>').join('')+'</div>';
   el.innerHTML=(NET.on?'<div class="mrow"><button class="btn pri" data-a="netopen">Online lobby</button>'+(isHost()?'<button class="btn" data-a="newgame">Change setup</button>':'')+'<button class="btn" data-a="netleave">Leave the room</button></div>':'<div class="mrow"><button class="btn pri" data-a="newgame">New game / main menu</button><button class="btn" data-a="savenow">Save now</button></div>')+
@@ -129,6 +134,7 @@ const RULES_HTML=()=>`<div class="rules">
 <p><b>Goal:</b> hold the most <b>Influence</b> when the last round ends. Ties go to the Favour holder.</p>
 <p><b>Simplified on purpose:</b> Your starting hand is 6 cards.</p>
 <p>The guided first game walks you through this once. Underlined words in the game can be tapped for their meaning.</p></div>
+<details><summary>Glossary: every word in the game</summary><dl>${['lore','active','govern','journey','pledges','tactic'].map(k=>GLOSS.find(g=>g[0]===k)).concat(GLOSS.filter(g=>!['lore','active','govern','journey','pledges','tactic'].includes(g[0]))).filter(Boolean).map(g=>'<dt>'+g[2]+'</dt><dd>'+g[3]+'</dd>').join('')}</dl></details>
 <details><summary>The full rules</summary>
 <h3>The goal</h3><p>You lead one of four factions competing for the throne. The game lasts a fixed number of rounds (4, 5 or 6). When the last round ends, the player with the most <b>Influence</b> wins. Ties go to whoever holds the Kingdom's Favour, then to the better place on the Order Track.</p>
 <h3>How a round goes</h3><ol class="rl">
@@ -150,7 +156,7 @@ const RULES_HTML=()=>`<div class="rules">
 <h3>Kept simple</h3><p>There is no solo mode and no advanced setup. Starting hand size is 6, and a few trait icons are read from the card text.</p>
 <h3>On this screen</h3><p>Tap a location or a region's card slots for details; tap a Council or the Favour chip for the Great Road and Councils. Tap a card in your hand for a large view and its actions. The dots in the top bar show the seven steps of a round. The gold button at the bottom of the panel is the suggestion of a strong computer player, and the line above it says why.</p>
 </details>
-<details><summary>Words used in the game</summary><dl>${GLOSS.map(g=>'<dt>'+g[2]+'</dt><dd>'+g[3]+'</dd>').join('')}</dl></details>
+
 </div>`;
 function setupDrawers(){
   GX.drawer('rulesd','How to play',(()=>{const d=document.createElement('div');d.innerHTML=RULES_HTML();return d})(),true);

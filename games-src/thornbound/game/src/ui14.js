@@ -54,3 +54,10 @@ document.addEventListener('click',e=>{if(!UI.pop||!G||!UI.started)return;const t
 // The first click after a press on a bubble is swallowed unless it is on the bubble itself. (Separate from the ui5 click-replay logic.)
 document.addEventListener('pointerdown',e=>{UI._bubT=(e.target&&e.target.closest&&e.target.closest('.gxh-bub'))?Date.now()+700:0},true);
 document.addEventListener('click',e=>{const t=UI._bubT;if(!t)return;UI._bubT=0;if(Date.now()<t&&!(e.target&&e.target.closest&&e.target.closest('.gxh-bub'))){e.stopPropagation();e.preventDefault()}},true);
+
+// ---- F16: a tap on a region always answers. The region lights up as SELECTED for a moment (a tap that cannot act yet also says why), and in the fight order the picked regions stay marked.
+(function(){const st=document.createElement('style');st.textContent='.tbx-pan g.rsel rect{stroke:#fff!important;stroke-width:9!important;stroke-opacity:1!important;stroke-dasharray:none!important;fill:#ffe9a0!important;fill-opacity:.4!important;animation:none!important}';document.head.appendChild(st);
+  const flash=(r,ms)=>{try{const g=MAP.pan&&MAP.pan.querySelector('[data-reg="'+r+'"]');if(!g)return;g.classList.add('rsel');clearTimeout(g._sT);g._sT=setTimeout(()=>{if(!(UI.ord||[]).includes(r))g.classList.remove('rsel')},ms||900)}catch(e){}};
+  const why=r=>{const M=UI.bf;if(!M||!M.kind)return 'Not now.';if(M.kind==='place'||M.kind==='tie')return UI.hand==null?'First tap a card in your hand, then tap a region.':'That card cannot go to '+REG[r]+'.';if(M.kind==='menu')return 'Pick a Supporter button first.';return 'Not now: finish the step above first.'};
+  const rt=regionTap;regionTap=function(r){const ok=rt.apply(this,arguments);flash(r);if(ok===false&&G&&UI.started&&!UI.card){try{const M=UI.bf;if(M&&M.kind&&viewSeatForQ()!=null)bfMsg(why(r))}catch(e){}}return ok};
+  const ah=applyHl;applyHl=function(){ah.apply(this,arguments);try{if(MAP.pan)MAP.pan.querySelectorAll('[data-reg]').forEach(g=>{g.classList.toggle('rsel',(UI.ord||[]).includes(+g.getAttribute('data-reg')))})}catch(e){}}})();
