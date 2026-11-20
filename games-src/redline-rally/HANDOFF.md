@@ -91,3 +91,15 @@ Next: upgrade cards, weather and legends, sound, online, a second pass on AI (dr
 - Boost question: plan line "Boost +1 to +4: spin-out risk 25%." from the speed cards left in your deck; the Suggested badge says why
   ("+3 spaces, safe at limit 5" / "50% spin: corner in 3, limit 4").
 - Gate: plan-cam-touch.js (car box inside the board at t+0, +250, +600 ms of every planning decision).
+
+## F4 (shelf/W572-redline-strict): taps, rival pace, short tutorial, PC side panels
+- Turn = gear (if it changes) + Go. Cards for the chosen gear are auto-picked (ui.js autoPick: the Suggest plan when it is that gear,
+  else ai.js autoPickPlan = the 'pro' planner limited to that gear); tap a card to swap it. Rules unchanged.
+- Boost: a toggle beside Go (off each turn) answers the react-step boost question after the reveal; skipped when a flip could spin you.
+- Discard step asked only with 2+ slow cards (speed <= 1), those pre-picked, Keep all default; otherwise all cards kept.
+- Rivals: rivalPace() keeps all rivals together ~2.2 s a round (max ~3 s); the panel shows a round log (cards, speed, corner/slip/spin, place).
+- Stress shows what it drew ("Stress drew 3", pop + log); heat line under the hand: engine heat, Heat cards, which gear clears how many.
+- Badges "Lap 1/2" (outlined) vs "3rd of 5" (gold); score line in spaces. Result: "Next race" box with 1-2 concrete tips (raceTips).
+- Tutorial: 5 staged rounds, 15 taps, no forced spin (explained), bubbles avoid the line/gears/hand/Go (step.avoid). tut-test asserts it.
+- PC >= 1000x521: left standings panel, large centre track, right tray (line, gears, hand, Go); keys 1-4, Enter/Space, B. pc-proof.js.
+- Measured (375x667 touch, newcomer bot): taps/turn 4.4 -> 2.1; rival seconds/round 3.3 (max 4.0) -> 2.2 (max 3.0).
