@@ -12,9 +12,9 @@
       { kind: 'fn', name: 'quilt cells are at least 24 px', fn: function () { var c = document.querySelector('.qc'); var w = c.getBoundingClientRect().width; return w >= 24 || 'cell ' + w; } },
       { kind: 'eq', name: 'buttons', a: function () { return +document.querySelector('.nb[data-seat="0"]').textContent; }, b: function () { return G.btn[0]; } }],
     mut: [{ name: 'buttons off by one', js: 'G.btn[0]+=1' }] });
-  GXS.add({ id: 'sw-place', name: 'Pick a patch and sew it on', ask: 'Tap a patch, then Sew it on', seed: 11, when: booted,
+  GXS.add({ id: 'sw-place', name: 'Pick a patch and sew it on', ask: 'Tap a patch, show the good spot, use it, then Sew it on', seed: 11, when: booted,
     setup: function () { window.__c0 = PATCHES.map(function (p) { return p.cost; }); window.__t0 = PATCHES.map(function (p) { return p.time; }); game({ setup: function (g) { g.btn[0] = 30; } }); },
-    checks: [{ kind: 'play', name: 'buy a patch', snap: function () { return { b: G.btn[0], n: G.owned[0].length, pos: G.pos[0] }; }, steps: [{ sel: '#offers .offer:not(.no)', until: function () { return UI.sel >= 0; }, max: 3 }, { sel: '[data-a=sew]', ready: function () { return !!q('[data-a=sew]'); } }],
+    checks: [{ kind: 'play', name: 'buy a patch', snap: function () { return { b: G.btn[0], n: G.owned[0].length, pos: G.pos[0] }; }, steps: [{ sel: '#offers .offer:not(.no)', until: function () { return UI.sel >= 0; }, max: 3 }, { sel: '[data-a=sugok]', ready: function () { return !!q('[data-a=sugok]'); } }, { sel: '[data-a=sugok]', ready: function () { return !!q('[data-a=sugok]') && UI.hint; } }, { sel: '[data-a=sew]', ready: function () { return !!q('[data-a=sew]:not([disabled])'); } }],
       idle: function () { return !UI.busy && G.owned[0].length === 1; }, verify: function (a, b) { var id = G.owned[0][0], c = window.__c0[id], tm = window.__t0[id], inc = tm >= 5 ? PATCHES[id].inc : 0; return (b.n === 1 && b.pos === a.pos + tm && b.b === a.b - c + inc) || 'owned ' + b.n + ' pos ' + b.pos + ' buttons ' + a.b + '->' + b.b + ' want cost ' + c; } }],
     mut: [{ name: 'free patches', js: 'PATCHES.forEach(function(p){p.cost=0})' }, { name: 'zero time', js: 'PATCHES.forEach(function(p){p.time=1})' }] });
   GXS.add({ id: 'sw-advance', name: 'Advance the time token', ask: 'Tap Advance. Do you gain buttons?', seed: 11, when: booted,

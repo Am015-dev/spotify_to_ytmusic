@@ -90,8 +90,9 @@ function hlpPhase() { if (!G || G.over || UI.busy || !UI.started || !isHuman(swW
 function whatDo() { var sg = hlpSuggest(); if (!sg) return; var t = sg.target && sg.target(); if (t) { t.classList.remove('flash'); void t.offsetWidth; t.classList.add('flash'); } var dt = $('#detail'); if (dt) dt.textContent = 'Try this: ' + sg.why; }
 function hlpSuggest() {
   if (!G || G.over || !isHuman(swWho(G)) || G.pend) return null; var m = aiMove(G, 'hard', function () { return .5; }), s = swWho(G);
-  if (m.t === 'buy') { var p = PATCHES[swOffer(G)[m.k]]; return { target: function () { return $$('#offers .offer')[m.k]; }, why: p.name + ' fits well and is worth ' + p.n * 2 + ' points of squares.' }; }
-  return { target: function () { return $('[data-a=adv]'); }, why: 'Advancing gets you buttons and the next turn.' };
+  if (m.t === 'buy') { var pid = swOffer(G)[m.k], p = PATCHES[pid], v = patchValue(s, pid); return { target: function () { return $$('#offers .offer')[m.k]; }, why: p.name + ': ' + p.n + ' squares filled' + (v.incv ? ', and it pays +' + p.inc + ' at ' + v.spots + ' paydays = ' + v.incv + ' buttons.' : '.') }; }
+  var nCan = swOffer(G).filter(function (pid) { var q = PATCHES[pid]; return G.btn[s] >= q.cost && swPlacements(G.board[s], q).length > 0; }).length; /* F3: say WHY advancing is right now */
+  return { target: function () { return $('[data-a=adv]'); }, why: (nCan ? 'These patches cost more than they give back. ' : 'Nothing here is affordable. ') + 'Advance: +' + swAdvSteps(G, s) + ' buttons now, and a richer pick next turn.' };
 }
 function hlpPhaseUpdate() { try { if (typeof GXH !== 'undefined' && !tutOn()) GXH.phase(hlpPhase()); } catch (e) { } }
 function hlpRefresh() { hlpPhaseUpdate(); }
@@ -134,10 +135,11 @@ if (document.readyState === 'loading') document.addEventListener('DOMContentLoad
 
 // ---------- the ring: spool (neutral token), the 3 on sale lifted, then every other patch clockwise
 function ringStrip() {
-  var box = $('#offers'); if (!box || !G || G.over || box.style.display === 'none' || box.classList.contains('placing')) return;
+  var box = $('#offers'); if (!box || !G || G.over || G.pend || box.style.display === 'none' || box.classList.contains('placing')) return;
   var L = G.ring.length; box.classList.add('ring');
   box.insertBefore(h('span.ntok', { title: 'The spool: only the 3 patches after it are for sale', 'aria-label': 'Spool. The 3 patches after it are for sale' }, h('i')), box.firstChild);
   var cs = document.documentElement.classList.contains('sm') ? 8 : 10;
+  if (L > 3 && document.documentElement.classList.contains('swpc')) box.appendChild(h('div.uphead', 'Coming later, not for sale yet')); /* F3 */
   for (var k = 3; k < L; k++) {
     var pid = G.ring[(G.start + k) % L], p = PATCHES[pid], bb = bbox(p.cells);
     var c = h('div.offer.up', { 'data-a': 'upnext', 'data-pid': pid, role: 'button', tabindex: '-1', 'aria-label': p.name + ', not for sale yet: ' + p.cost + ' buttons, ' + p.time + ' time, ' + p.inc + ' income' });
@@ -147,6 +149,18 @@ function ringStrip() {
   }
   if (L > 3) box.appendChild(h('span.ringend', { 'aria-hidden': 'true' }, '↻'));
   if (UI.ringSeen !== G.start + ':' + L) { UI.ringSeen = G.start + ':' + L; box.scrollLeft = 0; }
+  if (!box._cue) { box._cue = 1; box.addEventListener('scroll', function () { cueFit(); }, { passive: true }); addEventListener('resize', function () { setTimeout(cueFit, 50); }); }
+  requestAnimationFrame(cueFit);
+}
+function cueFit() { // F2: the patch row scrolls: a fade at the right edge and "N more" (tap = scroll on)
+  var box = $('#offers'), c = $('#ofcue'); if (!box) return; var rsv = $('#rs'), on = !!G && !G.over && !(rsv && !rsv.hidden) && !$('#start:not([hidden])') && box.classList.contains('ring') && box.style.display !== 'none' && !box.classList.contains('placing') && box.offsetParent && box.scrollWidth > box.clientWidth + 4;
+  if (!on) { if (c) c.hidden = true; return; } var par = document.body; if (!c) c = h('div#ofcue', { 'aria-hidden': 'true' }, h('b'), h('small', 'more'), h('i', '\u203A'));
+  if (c.parentNode !== par) par.appendChild(c);
+  var br = box.getBoundingClientRect(), pr = { top: 0, left: 0 }, r = br.right, all = $$('.offer', box), tot = all.length, right = 0, seen = 0;
+  all.forEach(function (o) { var q = o.getBoundingClientRect(); if (q.left + q.width / 2 > r) right++; else if (q.right > br.left + 4) seen++; });
+  var end = box.scrollLeft + box.clientWidth >= box.scrollWidth - 4; c.hidden = false; c.classList.toggle('end', end);
+  c.style.top = (br.top - pr.top) + 'px'; c.style.height = br.height + 'px'; c.style.left = (br.right - pr.left - 26) + 'px';
+  c.firstChild.textContent = String(right); c.title = right + ' more patches: swipe the row';
 }
 document.addEventListener('click', function (e) {
   var t = e.target.closest && e.target.closest('[data-a]'); if (!t || !G) return; var a = t.dataset.a;
@@ -185,21 +199,21 @@ function t2Steps() {
   var adv = function () { return $('[data-a=adv]'); }, sew = function () { return $('[data-a=sew]'); }, ghost = function () { return $('#ghost'); };
   var advStep = function (id, rule, say, done) { return { id: id, rule: rule, say: say, target: adv, allow: function (a) { return a === 'adv'; }, done: done }; };
   return [
-    { id: 'buy', rule: 'buy', say: 'Fill the 3 gold gaps. Only 3 patches are for sale: tap this.', target: t2Offer(1), allow: function (a, k) { return a === 'offer' && k === 1; }, done: function () { return UI.sel === 1; } },
+    { id: 'buy', rule: 'buy', say: 'Fill the 3 gold gaps. Patches cost buttons and time: tap this.', target: t2Offer(1), allow: function (a, k) { return a === 'offer' && k === 1; }, done: function () { return UI.sel === 1; } },
     { id: 'rotate', rule: 'rotate', say: 'Turn it to match the top gap. Tap Rotate.', target: function () { return $('[data-a=rot]'); }, allow: function (a) { return a === 'rot'; }, done: function () { return UI.o === T2.o1; } },
-    { id: 'place', rule: 'place', say: 'Drag the patch into the gold gap.', target: ghost, gap: 'h1', allow: function (a) { return a === 'rot' || a === 'flip'; }, done: function () { return t2AtGap(T2.h1); } },
-    { id: 'pay', rule: 'pay', say: 'Sew it on. You pay its ' + PATCHES[8].cost + ' buttons.', target: sew, gap: 'h1', allow: function (a) { return a === 'sew' && t2AtGap(T2.h1); }, done: function () { return G.owned[0].length >= 1; } },
+    { id: 'place', rule: 'place', say: 'Drag or tap the patch into the gold gap.', target: ghost, gap: 'h1', allow: function (a) { return a === 'rot' || a === 'flip'; }, done: function () { return t2AtGap(T2.h1); } },
+    { id: 'pay', rule: 'pay', say: 'Sew it on: pay ' + PATCHES[8].cost + ' buttons. Its button icon pays you later.', target: sew, gap: 'h1', allow: function (a) { return a === 'sew' && t2AtGap(T2.h1); }, done: function () { return G.owned[0].length >= 1; } },
     { id: 'time', rule: 'time', say: 'It cost ' + PATCHES[8].time + ' time: you moved ' + PATCHES[8].time + '. Furthest back plays next.', btn: 'Watch', target: function () { return $('#tutb .t2b'); },
       onBtn: function () { UI.tutAi = true; schedule(); }, done: function () { return T2.pressed && t2Mine(); } },
-    advStep('advance', 'advance', 'Or Advance: jump just past Marden, +1 button per space.', function () { return G.log.some(function (l) { return l[0] === 0 && l[1] === 'adv'; }) && t2Mine(); }),
-    advStep('income', 'income', 'Pass a gold spot: +1 button per button on your patches.', function () { return G.pos[0] > 41 && t2Mine(); }),
-    advStep('leather', 'leather', 'First past the leather square gets a free 1x1 patch.', function () { return !!G.pend; }),
+    Object.assign(advStep('advance', 'advance', 'Or Advance: jump just past Marden, earn 1 button per space.', function () { return G.log.some(function (l) { return l[0] === 0 && l[1] === 'adv'; }); }), { eager: true }), /* F2: the line moves on the moment you tap Advance */
+    advStep('income', 'income', 'Gold spot = payday: each button icon on your patches pays 1.', function () { return G.pos[0] > 41 && t2Mine(); }),
+    advStep('leather', 'leather', 'Brown leather square: first to pass it gets a free 1x1.', function () { return !!G.pend; }),
     { id: 'leather2', rule: 'leather', say: 'Tap the single gold gap to sew it.', target: function () { return $$('#quilt .qc')[T2.hl[1] * 9 + T2.hl[0]]; }, allow: function (a, k) { var ok = a === 'leather' && k === T2.hl[1] * 9 + T2.hl[0]; if (a === 'leather' && !ok) { var tt = $('#tutb .t2t'); if (tt) tt.textContent = 'That gap is for your next patch. Tap the single square.'; } return ok; }, done: function () { return G.board[0][T2.hl[1] * 9 + T2.hl[0]] === 100 && t2Mine(); } },
     { id: 'bonus', rule: 'bonus', say: 'First to fill a 7x7 square gets +7. Tap this patch.', target: t2Offer(1), allow: function (a, k) { return a === 'offer' && k === 1; }, done: function () { return UI.sel === 1; } },
     { id: 'flip', rule: 'flip', say: 'Mirror it to match the last gap. Tap Flip.', target: function () { return $('[data-a=flip]'); }, allow: function (a) { return a === 'flip'; }, done: function () { return UI.o === T2.o2; } },
-    { id: 'place2', rule: 'bonus', say: 'Drag it into the last gold gap.', target: ghost, gap: 'h2', allow: function (a) { return a === 'rot' || a === 'flip'; }, done: function () { return t2AtGap(T2.h2); } },
+    { id: 'place2', rule: 'bonus', say: 'Drag or tap it into the last gold gap.', target: ghost, gap: 'h2', allow: function (a) { return a === 'rot' || a === 'flip'; }, done: function () { return t2AtGap(T2.h2); } },
     { id: 'sew2', rule: 'bonus', say: 'Sew it on: your 7x7 square is full, +7.', target: sew, gap: 'h2', allow: function (a) { return a === 'sew' && t2AtGap(T2.h2); }, done: function () { return G.bonus === 0 && t2Mine(); } },
-    advStep('end', 'end', 'Game ends when both reach the end. Keep tapping Advance.', function () { return G.over; })
+    advStep('end', 'end', 'Game ends when both reach the end. Tap Advance to finish.', function () { return G.over; })
   ];
 }
 function tutStart(o) { // replaces the coached half-game: a guided first game, then a real one
@@ -214,7 +228,7 @@ function t2Enter() { var st = t2Step(); T2.pressed = false; if (st.enter) st.ent
 function t2Next() { var st = t2Step(); if (!st || !st.btn || T2.pressed) return; T2.pressed = true; var b = $('#tutb .t2b'); if (b) b.disabled = true; if (st.onBtn) st.onBtn(); }
 function t2Tick() {
   if (!T2) { clearInterval(UI.t2iv); return; } var st = t2Step(); if (!st || !G) return;
-  if (!UI.busy && st.done()) { if (st.leave) st.leave(); if (G.over && st.id === 'end') return; if (T2.i < T2.steps.length - 1) { T2.i++; t2Enter(); } return; }
+  if ((!UI.busy || st.eager) && st.done()) { if (st.leave) st.leave(); if (G.over && st.id === 'end') return; if (T2.i < T2.steps.length - 1) { T2.i++; t2Enter(); } return; }
   t2Show();
 }
 function t2Show() {

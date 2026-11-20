@@ -1387,7 +1387,7 @@
   {
    "id": "sw-place",
    "name": "Pick a patch and sew it on",
-   "ask": "Tap a patch, then Sew it on",
+   "ask": "Tap a patch, take the good spot, then Sew it on",
    "sizes": "all",
    "group": "UI",
    "mut": 2

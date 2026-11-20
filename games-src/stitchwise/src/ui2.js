@@ -3,13 +3,24 @@ function curPatch() { if (!G || UI.sel < 0) return null; var id = swOffer(G)[UI.
 function curCells() { var p = curPatch(); return p ? p.or[UI.o] : null; }
 function bbox(c) { var w = 0, ht = 0; c.forEach(function (q) { if (q[0] > w) w = q[0]; if (q[1] > ht) ht = q[1]; }); return [w + 1, ht + 1]; }
 function ghostOk() { var c = curCells(); return !!c && swFits(G.board[viewSeat()], c, UI.gx, UI.gy); }
+function canSew() { return UI.placed !== false && ghostOk(); }   // F2: Sew needs the player's own spot (a suggestion is only a dashed outline)
+function atSug() { return !!UI.sug && UI.o === UI.sug[0] && UI.gx === UI.sug[1] && UI.gy === UI.sug[2]; }
+function sugPlace(pid, seat) { // F2: a gentle suggestion: hug the edges and other patches, leave no pockets
+  var bd = G.board[seat].slice(), p = PATCHES[pid], best = null;
+  swPlacements(bd, p).forEach(function (pl) { var c = p.or[pl[0]], set = {}, touch = 0; c.forEach(function (q) { set[(pl[2] + q[1]) * 9 + pl[1] + q[0]] = 1; });
+    c.forEach(function (q) { var x = pl[1] + q[0], y = pl[2] + q[1]; [[1, 0], [-1, 0], [0, 1], [0, -1]].forEach(function (d) { var nx = x + d[0], ny = y + d[1]; if (nx < 0 || ny < 0 || nx > 8 || ny > 8) touch++; else if (!set[ny * 9 + nx] && bd[ny * 9 + nx] !== -1) touch++; }); });
+    Object.keys(set).forEach(function (i) { bd[i] = 50; }); var sc = aiHoles(bd) * 2 + touch; Object.keys(set).forEach(function (i) { bd[i] = -1; });
+    if (!best || sc > best[3]) best = [pl[0], pl[1], pl[2], sc]; });
+  return best; }
+function acceptSug() { if (UI.sel < 0 || !UI.sug || UI.busy) return; if (!UI.hint) { UI.hint = true; UI.o = UI.sug[0]; UI.gx = UI.sug[1]; UI.gy = UI.sug[2]; sfx('tick'); render(); return; } /* F4: first tap only shows the outline */ UI.o = UI.sug[0]; UI.gx = UI.sug[1]; UI.gy = UI.sug[2]; UI.placed = true; sfx('tick'); try { if (navigator.vibrate) navigator.vibrate(12); } catch (e) { } render(); }
 function clampG() { var c = curCells(); if (!c) return; var b = bbox(c); UI.gx = Math.max(0, Math.min(9 - b[0], UI.gx)); UI.gy = Math.max(0, Math.min(9 - b[1], UI.gy)); }
 function drawGhost() { try { markLanding(); } catch (e) { }
-  var old = $('#ghost'); if (old) old.remove(); var q = $('#quilt'), p = curPatch(); if (!q || !p || G.over || G.pend) return; clampG(); var c = curCells(), b = bbox(c), ok = ghostOk(), set = {}; c.forEach(function (x) { set[x[0] + ',' + x[1]] = 1; });
-  var cs = UI.cs, g = h('div#ghost.' + (ok ? 'ok' : 'bad'), { style: 'left:' + UI.gx * cs + 'px;top:' + UI.gy * cs + 'px;grid-template-columns:repeat(' + b[0] + ',' + cs + 'px);grid-template-rows:repeat(' + b[1] + ',' + cs + 'px);--pc:' + pcol(p.id), 'aria-hidden': 'true' });
+  var old = $('#ghost'); if (old) old.remove(); var q = $('#quilt'), p = curPatch(); if (!q || !p || G.over || G.pend) return; if (UI.placed === false && !UI.hint) return; clampG(); var c = curCells(), b = bbox(c), ok = ghostOk(), set = {}; c.forEach(function (x) { set[x[0] + ',' + x[1]] = 1; });
+  var cs = UI.cs, g = h('div#ghost.' + (ok ? 'ok' : 'bad') + (UI.placed === false ? '.sug' : ''), { style: 'left:' + UI.gx * cs + 'px;top:' + UI.gy * cs + 'px;grid-template-columns:repeat(' + b[0] + ',' + cs + 'px);grid-template-rows:repeat(' + b[1] + ',' + cs + 'px);--pc:' + pcol(p.id), 'aria-hidden': 'true' });
   var fab = artHas(fabricStem(p.id)) ? 'url(media/' + fabricStem(p.id) + '.webp)' : '', fsz = Math.max(b[0], b[1]) * cs;   // W491 fix: the ghost shows the patch's fabric, not a flat block
   for (var y = 0; y < b[1]; y++) for (var x = 0; x < b[0]; x++) { var gc = h('div.gc' + (set[x + ',' + y] ? '' : '.hid')); if (fab && set[x + ',' + y]) { gc.style.backgroundImage = fab; gc.style.backgroundSize = fsz + 'px ' + fsz + 'px'; gc.style.backgroundPosition = (-x * cs) + 'px ' + (-y * cs) + 'px'; } g.appendChild(gc); }
-  q.appendChild(g); var sew = $('[data-a=sew]'); if (sew) sew.disabled = !ok;
+  if (UI.placed === false) g.appendChild(h('span.sgl' + (UI.gy < 1 ? '.lo' : ''), 'Good spot?'));
+  q.appendChild(g); var sew = $('[data-a=sew]'); if (sew) sew.disabled = !canSew();
   // W470: legal squares glow (every square some legal spot of this turn of the patch would cover)
   var bd = G.board[viewSeat()], lg = {}; for (var yy = 0; yy + b[1] <= 9; yy++) for (var xx = 0; xx + b[0] <= 9; xx++) if (swFits(bd, c, xx, yy)) c.forEach(function (q2) { lg[(yy + q2[1]) * 9 + xx + q2[0]] = 1; });
   Array.prototype.forEach.call(q.querySelectorAll('.qc'), function (e, i) { e.classList.toggle('lg', !!lg[i]); });
@@ -19,19 +30,20 @@ function selectOffer(k) { if (!t2Allow('offer', k)) return; if (UI.cdAt && Date.
   var s = swWho(G); if (G.over || UI.busy || !isHuman(s) || G.pend) return; var pid = swOffer(G)[k], p = PATCHES[pid]; if (pid == null) return;
   if (!tutAct({ what: 'offer', k: k })) return;
   if (UI.sel === k) { showPatch(pid); return; }
-  if (G.btn[s] < p.cost) { sfx('bad'); var nd = p.cost - G.btn[s]; swNote('Need ' + nd + ' more button' + (nd === 1 ? '' : 's')); UI.sel = -1; render(); /* F4: a short inline note, never a sheet */ var ob = $$('#offers .offer')[k]; if (ob) { ob.classList.add('nope'); setTimeout(function () { ob.className = ob.className.replace(' nope', ''); }, 500); } return; }
-  if (!swPlacements(G.board[s], p).length) { sfx('bad'); swNote('No room on your quilt'); render(); return; }
-  UI.sel = k; sfx('pick'); var bp = UI.tutorial ? null : bestPlacement(pid, s);
-  if (bp) { UI.o = bp[0]; UI.gx = bp[1]; UI.gy = bp[2]; } else { UI.o = 0; var b = bbox(p.or[0]); UI.gx = Math.floor((9 - b[0]) / 2); UI.gy = Math.floor((9 - b[1]) / 2); }
+  if (G.btn[s] < p.cost) { sfx('bad'); var nd = p.cost - G.btn[s]; swFlash('Need ' + nd + ' more button' + (nd === 1 ? '' : 's') + ' for ' + p.name); UI.sel = -1; render(); /* F4: a short inline note, never a sheet */ var ob = $$('#offers .offer')[k]; if (ob) { ob.classList.add('nope'); setTimeout(function () { ob.className = ob.className.replace(' nope', ''); }, 500); } return; }
+  if (!swPlacements(G.board[s], p).length) { sfx('bad'); swFlash(p.name + ' has no room on your quilt'); render(); return; }
+  UI.sel = k; sfx('pick'); var bp = UI.tutorial ? null : sugPlace(pid, s); UI.sug = bp ? bp.slice(0, 3) : null; UI.placed = !bp; UI.hint = false; /* F4: the good spot is a hint: nothing shows until the player asks, then a dashed outline; the player still confirms it */
+  { UI.o = 0; var b = bbox(p.or[0]); UI.gx = Math.floor((9 - b[0]) / 2); UI.gy = Math.floor((9 - b[1]) / 2); }
   render();
 }
-function swNote(t) { UI.note = { t: t, until: Date.now() + 2600 }; clearTimeout(swNote.tm); swNote.tm = setTimeout(function () { UI.note = null; if (G) render(); }, 2700); }
+function swFlash(t) { UI.flash = { t: t, until: Date.now() + 2600 }; clearTimeout(swFlash.tm); swFlash.tm = setTimeout(function () { UI.flash = null; if (G) render(); }, 2700); }
 function showPatchSoft(pid, k) { var dt = $('#detail'); var p = PATCHES[pid]; if (dt) dt.innerHTML = '<b>' + p.name + '</b>: tap again to read it.'; UI.softK = k; }
-function cancelSel() { if (!t2Allow('cancel')) return; UI.sel = -1; render(); }
+function cancelSel() { if (!t2Allow('cancel')) return; UI.sel = -1; UI.placed = true; render(); }
 function xform(f) { var p = curPatch(), c = curCells(); if (!p) return; var b0 = bbox(c), cx = UI.gx + b0[0] / 2, cy = UI.gy + b0[1] / 2, n = swNorm(c.map(f)), k = JSON.stringify(n), idx = -1; p.or.forEach(function (o, i) { if (JSON.stringify(o) === k) idx = i; }); if (idx < 0) return; UI.o = idx; var b = bbox(n); UI.gx = Math.round(cx - b[0] / 2); UI.gy = Math.round(cy - b[1] / 2); clampG(); sfx('rot'); }
-function rotate() { if (!t2Allow('rot') || !tutAct({ what: 'rot' })) return; xform(function (q) { return [-q[1], q[0]]; }); snapNear(true); drawGhost(); renderDockLight(); }
-function flip() { if (!t2Allow('flip') || !tutAct({ what: 'flip' })) return; xform(function (q) { return [-q[0], q[1]]; }); snapNear(true); drawGhost(); renderDockLight(); }
-function renderDockLight() { var sew = $('[data-a=sew]'); if (sew) sew.disabled = !ghostOk(); }
+function rotate() { if (!t2Allow('rot') || !tutAct({ what: 'rot' })) return; UI.placed = true; xform(function (q) { return [-q[1], q[0]]; }); snapNear(true); render(); }
+function flip() { if (!t2Allow('flip') || !tutAct({ what: 'flip' })) return; UI.placed = true; xform(function (q) { return [-q[0], q[1]]; }); snapNear(true); render(); }
+function renderDockLight() { var sew = $('[data-a=sew]'); if (sew) sew.disabled = !canSew(); var pr = $('#prompt'); if (pr && UI.sel >= 0 && UI.placed && !hintsOn()) pr.textContent = placeLine(); }
+function placeLine() { return UI.placed === false ? 'Tap your quilt where it should go' : !ghostOk() ? 'Red: no room. Move it to a free spot' : atSug() ? 'Good spot! Tap Sew it on' : 'It fits! Tap Sew it on'; }
 function snapNear(soft) { // nearest valid anchor for the current orientation (then any orientation if none)
   var s = viewSeat(), p = curPatch(); if (!p) return false; if (soft && T2) return ghostOk(); /* tutorial: the player drags it in */ if (ghostOk()) return true; var best = null, bd = 1e9;
   var pl = swPlacements(G.board[s], p).filter(function (q) { return q[0] === UI.o; });
@@ -46,13 +58,18 @@ function leatherAt(ev) { // F1: hit padding: a tap lands on the nearest empty sq
   return best; }
 function cellAt(ev) { var q = $('#quilt'); if (!q) return null; var r = q.getBoundingClientRect(), cs = UI.cs, x = ev.clientX - r.left - q.clientLeft, y = ev.clientY - r.top - q.clientTop; return [Math.floor(x / cs), Math.floor(y / cs)]; }
 var DR = { on: false, moved: false };
+function tapPlace(c, wasSug) { // F2: a tap puts the patch on the tapped square (on the dashed suggestion = take it as shown)
+  var cc = curCells(); if (!cc) return; if (wasSug && UI.sug) { var p = curPatch(), sc = p.or[UI.sug[0]]; if (sc.some(function (q) { return UI.sug[1] + q[0] === c[0] && UI.sug[2] + q[1] === c[1]; })) { UI.o = UI.sug[0]; UI.gx = UI.sug[1]; UI.gy = UI.sug[2]; drawGhost(); return; } }
+  var b = bbox(cc); UI.gx = c[0] - Math.floor(b[0] / 2); UI.gy = c[1] - Math.floor(b[1] / 2); clampG();
+  if (!ghostOk()) { var best = null, bd = 1e9; swPlacements(G.board[viewSeat()], curPatch()).forEach(function (q) { if (q[0] !== UI.o) return; var cs2 = curPatch().or[q[0]]; if (!cs2.some(function (r) { return q[1] + r[0] === c[0] && q[2] + r[1] === c[1]; })) return; var d = Math.abs(q[1] - UI.gx) + Math.abs(q[2] - UI.gy); if (d < bd) { bd = d; best = q; } }); if (best) { UI.gx = best[1]; UI.gy = best[2]; } }
+  drawGhost(); }
 function bindQuilt() {
   var bd = $('#bd'); if (bd._b) return; bd._b = 1;
-  bd.addEventListener('pointerdown', function (ev) { try { if (UI.coach && UI.coach.line) { UI.coach.line = ''; coachRender(); } } catch (e) { } /* W470: any board touch closes Aunt Wren */ var q = ev.target.closest && (ev.target.closest('#quilt') || (G && G.pend ? ev.target.closest('.qframe') : null)); if (!q) return; if (G && G.pend && isHuman(swWho(G)) && !UI.busy) { var c = leatherAt(ev); if (c) doLeather(c[0], c[1]); return; }
+  bd.addEventListener('pointerdown', function (ev) { try { if (UI.coach && UI.coach.line) { UI.coach.line = ''; coachRender(); } } catch (e) { } /* W470: any board touch closes Aunt Wren */ var q = ev.target.closest && (ev.target.closest('#quilt') || (G && G.pend ? ev.target.closest('.qframe') : null)); if (!q) return; if (G && G.pend && isHuman(swWho(G)) && !UI.busy) { var c = leatherAt(ev); if (c) doLeather(c[0], c[1]); else { var pr = $('#prompt'); if (pr) { pr.textContent = 'That square is already covered: tap an empty one'; pr.classList.remove('flash'); void pr.offsetWidth; pr.classList.add('flash'); } try { var cc = cellAt(ev), qq = $$('#quilt .qc')[cc[1] * 9 + cc[0]]; if (qq) { qq.classList.remove('badtap'); void qq.offsetWidth; qq.classList.add('badtap'); } GX.toast('That square is already covered', { title: 'Tap an empty square', ms: 2400, kind: 'warn' }); } catch (e) { } sfx('bad'); } return; } /* F4: the tapped square flashes and a toast says why */ /* F3: no silent click */
     if (UI.sel < 0 || UI.busy) { var c2 = cellAt(ev), pid = c2 && G.board[viewSeat()][c2[1] * 9 + c2[0]]; if (pid >= 0 && pid < 99) showPatch(pid); return; }
-    DR.on = true; DR.moved = false; DR.touch = ev.pointerType === 'touch'; try { q.setPointerCapture(ev.pointerId); } catch (e) { } dragTo(ev); ev.preventDefault(); });
-  bd.addEventListener('pointermove', function (ev) { if (!DR.on) return; DR.moved = true; dragTo(ev); });
-  var up = function (ev) { if (!DR.on) return; DR.on = false; var ok = ghostOk(); if (!ok) { snapNear(false); drawGhost(); } tutAct({ what: 'drop', valid: ghostOk() }); renderDockLight(); sfx('tick'); try { if (ghostOk() && navigator.vibrate) navigator.vibrate(12); } catch (e) { } };
+    var wasSug = UI.placed === false, tc = cellAt(ev); UI.placed = true; DR.on = true; DR.moved = false; DR.touch = ev.pointerType === 'touch'; DR.c0 = tc; DR.sug = wasSug; DR.x0 = ev.clientX; DR.y0 = ev.clientY; try { q.setPointerCapture(ev.pointerId); } catch (e) { } if (!DR.touch) dragTo(ev); else { var g0 = $('#ghost'); if (g0) { g0.classList.remove('sug'); var l0 = $('.sgl', g0); if (l0) l0.remove(); } } ev.preventDefault(); });
+  bd.addEventListener('pointermove', function (ev) { if (!DR.on) return; if (!DR.moved && Math.abs(ev.clientX - DR.x0) + Math.abs(ev.clientY - DR.y0) < 8) return; /* F2: finger jitter is still a tap */ DR.moved = true; dragTo(ev); });
+  var up = function (ev) { if (!DR.on) return; DR.on = false; if (!DR.moved && DR.c0) tapPlace(DR.c0, DR.sug); var ok = ghostOk(); if (!ok) { snapNear(false); drawGhost(); } tutAct({ what: 'drop', valid: ghostOk() }); if (!T2) renderDock(); renderDockLight(); sfx('tick'); try { if (ghostOk() && navigator.vibrate) navigator.vibrate(12); } catch (e) { } };
   bd.addEventListener('pointerup', up); bd.addEventListener('pointercancel', up);
 }
 /* W484: drag a patch straight from its card onto the quilt (the benchmark app's first-turn gesture); a plain tap still selects */
@@ -64,10 +81,11 @@ document.addEventListener('pointerup', cdUp); document.addEventListener('pointer
 function dragTo(ev) { var c = cellAt(ev), cc = curCells(); if (!c || !cc) return; var b = bbox(cc); UI.gx = c[0] - Math.floor(b[0] / 2); UI.gy = c[1] - Math.floor(b[1] / 2) - (DR.touch ? 2 : 0); clampG(); var g = $('#ghost'); if (g) { var cs = UI.cs; g.style.left = UI.gx * cs + 'px'; g.style.top = UI.gy * cs + 'px'; var ok = ghostOk(); g.classList.toggle('ok', ok); g.classList.toggle('bad', !ok); } renderDockLight(); }
 document.addEventListener('keydown', function (e) { if (!G || UI.sel < 0 || GX.open || !UI.started) return; var k = e.key; if (k === 'r' || k === 'R') { rotate(); e.preventDefault(); } else if (k === 'f' || k === 'F') { flip(); e.preventDefault(); } else if (k === 'Enter') { confirmSew(); e.preventDefault(); } else if (k === 'Escape') { cancelSel(); } else if (k.indexOf('Arrow') === 0) { UI.gx += k === 'ArrowRight' ? 1 : k === 'ArrowLeft' ? -1 : 0; UI.gy += k === 'ArrowDown' ? 1 : k === 'ArrowUp' ? -1 : 0; clampG(); drawGhost(); e.preventDefault(); } });
 // ---------- moves
-function confirmSew() { if (UI.sel < 0 || UI.busy) return; if (!t2Allow('sew')) return; if (T2 && !ghostOk()) { sfx('bad'); return; } if (!ghostOk()) { snapNear(false); drawGhost(); if (!ghostOk()) { sfx('bad'); return; } } if (!tutAct({ what: 'buy', k: UI.sel })) return; var m = { t: 'buy', k: UI.sel, o: UI.o, x: UI.gx, y: UI.gy }; UI.sel = -1; act(m); }
-function doAdvance() { if (UI.busy || G.over || G.pend || !isHuman(swWho(G))) return; if (!t2Allow('adv')) return; if (!tutAct({ what: 'adv' })) return; UI.sel = -1; act({ t: 'adv' }); }
+function confirmSew() { if (UI.sel < 0 || UI.busy) return; if (!t2Allow('sew')) return; if (UI.placed === false) { acceptSug(); return; } if (T2 && !ghostOk()) { sfx('bad'); return; } if (!ghostOk()) { snapNear(false); drawGhost(); if (!ghostOk()) { sfx('bad'); return; } } if (!tutAct({ what: 'buy', k: UI.sel })) return; var m = { t: 'buy', k: UI.sel, o: UI.o, x: UI.gx, y: UI.gy }; UI.sel = -1; act(m); }
+function t2Fast() { /* F4: the tutorial ends with ONE tap: both players Advance to the end by the real rules */ var n = 0; while (G && !G.over && n++ < 120) { if (G.pend) { var s = swWho(G), c = G.board[s].indexOf(-1); swApply(G, c >= 0 ? { t: 'leather', x: c % 9, y: c / 9 | 0 } : { t: 'leather', skip: true }); } else swApply(G, { t: 'adv' }); } saveGame(); sfx('adv'); render(); afterMove(); }
+function doAdvance() { if (UI.busy || G.over || G.pend || !isHuman(swWho(G))) return; if (!t2Allow('adv')) return; { var st0 = T2 && t2Step(); if (st0 && st0.id === 'end') { UI.sel = -1; t2Fast(); return; } } if (!tutAct({ what: 'adv' })) return; UI.sel = -1; act({ t: 'adv' }); try { if (T2) t2Tick(); } catch (e) { } }
 function doLeather(x, y) { if (UI.busy || !t2Allow('leather', y * 9 + x) || !tutAct({ what: 'leather' })) return; act({ t: 'leather', x: x, y: y }); }
-function act(m) {
+function act(m) { UI.note = '';
   if (!G || G.over) return; if (isHuman(swWho(G)) && UI.mode !== 'hot' && (m.t === 'buy' || m.t === 'adv')) { try { UI.rate = rateMove(m); } catch (e) { UI.rate = ''; } } if (isHuman(swWho(G))) { UI.flavor = ''; var tb = $('#turnban'); if (tb) tb.classList.remove('on'); } var s = swWho(G), before = { pos: G.pos.slice(), btn: G.btn.slice(), bonus: G.bonus };
   var r = swApply(G, m); if (!r.ok) { sfx('bad'); toast('That move is not allowed (' + r.why + ').'); render(); return; }
   var evs = G.ev.slice(); evs.forEach(function (e) { if (e.k === 'place') e.cells.forEach(function (c) { UI.newCells[e.s + ':' + (c[1] * 9 + c[0])] = 1; }); });
@@ -83,17 +101,28 @@ function playEvents(evs, before, done) {
       var from = e.from, to = e.to; SW.BTN_SPOTS.forEach(function (b) { if (b > from && b <= to) { spots++; var tt = t + step * .6 * spots, seat = e.s, inc = G.inc[seat]; if (inc > 0) later(tt, function () { incomeMoment(seat, b, inc, spots); }); } });
       if (e.gain) later(t, function () { sfx('adv'); floatText('+' + e.gain + ' button' + (e.gain === 1 ? '' : 's') + ' for advancing', $('.pstrip[data-seat="' + e.s + '"]') || null, '#ffe9a0', true); }); t += step * .8 + step * .6 * spots;
     }
-    if (e.k === 'bonus') { later(t, function () { sfx('bonus'); toast(nameOf(e.s) + ' completed a 7×7 square: +7 bonus!', 2800); }); t += step; }
+    if (e.k === 'bonus') { later(t, function () { sfx('bonus'); payday(e.s, 7, '7\u00D77 bonus', (UI.mode !== 'hot' && e.s === 0 ? 'You' : nameOf(e.s)) + ' filled a 7\u00D77 block: +7'); }); t += step; }
   });
   later(t + step * .5, done);
 }
 function incomeMoment(seat, spot, inc, i) { // coins fly from the button spot to the buttons counter
   var cell = $('.tc[data-i="' + spot + '"]'), tgt = $('.nb[data-seat="' + seat + '"]'); if (!cell || !tgt) return; var a = cell.getBoundingClientRect(), b = tgt.getBoundingClientRect();
   for (var k = 0; k < Math.min(inc, 6); k++) { (function (k) { setTimeout(function () { sfx('coin', k); var c = h('div.coin'); c.style.left = (a.left + a.width / 2 - 9) + 'px'; c.style.top = (a.top + a.height / 2 - 9) + 'px'; c.style.setProperty('--dx', (b.left + b.width / 2 - a.left - a.width / 2) + 'px'); c.style.setProperty('--dy', (b.top - a.top) + 'px'); document.body.appendChild(c); setTimeout(function () { c.remove(); tgt.classList.remove('bump'); void tgt.offsetWidth; tgt.classList.add('bump'); }, 800); }, k * 90); })(k); }
-  floatText('+' + inc + ' button' + (inc === 1 ? '' : 's') + ': gold spot income', cell, '#ffe9a0', true); fxImg('fx-sparkle', a.left + a.width / 2, a.top + a.height / 2, 44);
+  payday(seat, inc); fxImg('fx-sparkle', a.left + a.width / 2, a.top + a.height / 2, 44);
 }
+function payday(seat, inc, ttl, txt) { // F3: the payday moment, said in words: "+5 from your patches"
+  var old = $('#payday'); if (old) old.remove(); var me = UI.mode !== 'hot' && seat === 0, p = h('div#payday' + (seat ? '.opp' : ''), { role: 'status' }, h('b', ttl || 'Payday'), h('span', txt || (me ? '+' + inc + ' from your patches' : nameOf(seat) + ' +' + inc + ' from patches')));
+  var pl = $('.pstrip[data-seat="' + seat + '"]'); document.body.appendChild(p); if (pl) { var r = pl.getBoundingClientRect(); p.style.left = Math.max(6, Math.min(innerWidth - p.offsetWidth - 6, r.left + r.width / 2 - p.offsetWidth / 2)) + 'px'; p.style.top = Math.min(innerHeight - 60, r.bottom + 6) + 'px'; }
+  var ni = $('.ni[data-seat="' + seat + '"]'); if (ni) { ni.classList.remove('bump'); void ni.offsetWidth; ni.classList.add('bump'); }
+  setTimeout(function () { p.remove(); }, amt(1900) || 1200); }
 function fxImg(stem, x, y, size) { var i = artImg(stem, 'fx'); if (!i) return; i.style.cssText = 'position:fixed;z-index:60;pointer-events:none;width:' + size + 'px;height:' + size + 'px;left:' + (x - size / 2) + 'px;top:' + (y - size / 2) + 'px;animation:flt 1s ease-out forwards'; document.body.appendChild(i); setTimeout(function () { i.remove(); }, 1100); }
-function afterMove() { if (G && !G.over && isHuman(swWho(G))) UI.rvPrev = -1; if (UI.coach) coachCheck(); render(); if (UI.mode === 'hot' && !G.over && !G.pend) toast(nameOf(swWho(G)) + ', your turn'); schedule(); }
+function explainOnce() { // F3: leather and the 7x7 bonus are explained where they first matter
+  if (!G || G.over || UI.tutorial || UI.coach || !isHuman(swWho(G))) return; UI.told = UI.told || {}; var me = swWho(G);
+  var nl = SW.LEATHER_SPOTS.filter(function (l, i) { return G.leather[i] === null && l > G.pos[me] && l - G.pos[me] <= 8; })[0];
+  if (nl && !UI.told.lea) { UI.told.lea = 1; UI.note = 'Brown track square = leather: first past gets a free 1\u00D71'; return; }
+  if (G.bonus === null && !UI.told.b7 && best7(G.board[me]) >= 24) { UI.told.b7 = 1; UI.note = 'First to fill a whole 7\u00D77 block: +7 points'; }
+}
+function afterMove() { if (G && !G.over && isHuman(swWho(G))) UI.rvPrev = -1; if (UI.coach) coachCheck(); render(); if (UI.mode === 'hot' && !G.over && !G.pend) toast(nameOf(swWho(G)) + ', your turn'); else explainOnce(); renderDock(); schedule(); }
 function sp(ms) { return amt(UI.fast ? ms * .3 : ms); }
 function banner(txt, sub, opp) { var b = $('#turnban'); if (!b) { b = h('div#turnban'); document.body.appendChild(b); } return; var ms = amt(4000); if (!ms) return; b.className = opp ? 'opp' : ''; b.textContent = txt; if (sub) b.appendChild(h('small', sub)); void b.offsetWidth; b.classList.add('on'); clearTimeout(banner.t); banner.t = setTimeout(function () { b.classList.remove('on'); }, ms); }
 function turnCheck() { // banner + plain line when the turn changes (or stays: the player further back plays again)
@@ -115,8 +144,8 @@ function aiStep() { // the rival's turn, one visible step at a time (caption, fl
   if (!amt(1)) return act(m);
   var pl = function (n, w) { return n + ' ' + w + (n === 1 ? '' : 's'); };
   if (m.t === 'buy') { var p = PATCHES[swOffer(G)[m.k]]; UI.cap = nm + ' buys ' + p.name + ' for ' + pl(p.cost, 'button'); UI.peek = s; render(); var o = $$('#offers .offer')[m.k]; if (o) o.classList.add('flash'); sfx('pick'); UI.busy++;
-    later(sp(420), function () { UI.peek = s; UI.cap = nm + ' sews it on and moves ' + pl(p.time, 'space'); UI.busy--; act(m); }); }
-  else if (m.t === 'adv') { var st = swAdvSteps(G, s); UI.cap = nm + ' advances ' + pl(st, 'space') + ' and takes ' + pl(st, 'button'); renderDock(); UI.busy++; later(sp(320), function () { UI.busy--; act(m); }); }
+    later(sp(420), function () { UI.peek = s; UI.cap = nm + ' sews it on and moves ' + pl(p.time, 'space') + ', to ' + Math.min(SW.TRACK, G.pos[s] + p.time); UI.busy--; act(m); }); }
+  else if (m.t === 'adv') { var st = swAdvSteps(G, s); UI.cap = nm + ' jumps just past ' + (UI.mode !== 'hot' && isHuman(1 - s) ? 'you' : nameOf(1 - s)) + ': +' + pl(st, 'button'); renderDock(); UI.busy++; later(sp(320), function () { UI.busy--; act(m); }); }
   else { UI.peek = s; UI.cap = nm + ' sews a free 1\u00D71 patch'; render(); UI.busy++; later(sp(450), function () { UI.busy--; act(m); }); }
 }
 document.addEventListener('pointerdown', function () { if (G && !G.over && !isHuman(swWho(G))) UI.fast = true; }, true);
