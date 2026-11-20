@@ -20,6 +20,8 @@ function syncRound(){try{if(MAP.m&&G){const r=shownRound();if(MAP._rn!==r+'/'+G.
 function renderBar(){const el=$('#barstat');if(!el)return;if(!G)return;const t=statusText();const r=shownRound();syncRound();
   el.innerHTML='<span class="st-r" aria-hidden="true">R'+r+'/'+G.rounds+'</span>'+(t.seat>=0&&G.pl[t.seat]?'<i class="st-d" style="background:'+fcol(t.seat)+'"></i>':'')+'<span class="st-t" role="status" aria-label="'+esc(t.text)+'">'+esc(t.text)+'</span>'}
 // the one status line (8 words or fewer): what to do now, or what the computer just did
+// a button label of at most 8 words that ends before a preposition, never an ellipsis
+function trim8(w){if(w.length<=8)return w.join(' ');for(let k=8;k>=3;k--)if(/^(to|into|from|in|on|at|next|with|for|and|or|then|of|by|so)$/i.test(w[k]))return w.slice(0,k).join(' ');return w.slice(0,8).join(' ')}
 function words8(x){x=String(x||'').replace(/\s+/g,' ').trim();const w=x.split(' ').filter(Boolean);if(w.length<=8)return x;const c=x.split(/(?<=[.?!:;])\s|\s\(/)[0];return c.split(' ').length>=3?c.replace(/[,:;]$/,''):w.join(' ')}   // never an ellipsis: a long line drops to its first clause
 function statusText(){const o=t=>({text:words8(t),seat:-1});
   if(!G)return o('');if(G.over)return o('The reign is over');
@@ -115,7 +117,7 @@ function watchControls(){return '<button class="btn" data-a="wpause" aria-presse
 function optBtn(m,cls,extra){const rec=recK()===m.k;return '<button class="opt'+(cls?' '+cls:'')+(rec?' rec':'')+'" data-a="mv" data-k="'+esc(m.k)+'">'+(extra||'')+'<span class="ot">'+esc(plain(m.label))+'</span>'+(rec?'<span class="rtag">'+ico('star')+'Suggested</span>':'')+'</button>'}
 function thumbFor(m){if(m.id!=null&&m.id>=0&&m.t!=='sel')return '<span class="th"'+(ownerOf(m.id)===vs()?' data-owner="'+ownerOf(m.id)+'" data-up="1"':'')+'>'+cardEl(m.id,44).outerHTML+'</span>';
   if(m.kc)return '<span class="th">'+kcEl(m.kc,44).outerHTML+'</span>';return ''}
-const pbtn=(m,txt,pulse)=>'<button class="btn pri'+(pulse?' pulse':'')+'" data-a="mv" data-k="'+esc(m.k)+'">'+esc(txt)+'</button>';
+const pbtn=(m,txt,pulse)=>'<button class="btn pri'+(pulse?' pulse':'')+'" data-a="mv" data-k="'+esc(m.k)+'">'+esc(trim8(String(txt).trim().split(/\s+/)))+'</button>';
 function recBtnText(m){const k=G.q.kind;if(!m)return '';
   if(k==='bid')return 'Bid '+cinfo(m.id).name+' ('+cinfo(m.id).strength+')';
   if(k==='herald')return 'Herald to '+LOCN[m.loc];
@@ -156,7 +158,7 @@ function renderMain(){const el=$('#main'),ft=$('#act');if(!el||!ft)return;const 
    case 'menu':{const done=mv.find(m=>m.t==='done');M.regs.forEach(r=>hr.push(r));if(rm&&rm.a==='supp'&&rm.p)recT.reg=rm.p.r;
      if(M.aut){if(UI.autCard!=null&&!M.use.has(UI.autCard))UI.autCard=null;if(UI.autCard!=null)f+='<div class="autc" role="group" aria-label="Autumn choices">'+autMoves(UI.autCard).map(m=>'<button class="btn pri" data-a="mv" data-k="'+esc(m.k)+'" data-aut="'+m.a+'">'+esc(autLabel(m))+'</button>').join('')+'</div>'}else UI.autCard=null;
      // hints on and the suggestion is a power: it is one tap, first in the tray (following the glow never skips it for Done)
-     if(rm&&rm.t==='act'&&rm.a!=='supp'){const w=recBtnText(rm).replace(/\s*\([^)]*\)/g,'').split(/\s+/);f+=pbtn(rm,w.join(' '),pulse)}
+     if(rm&&rm.t==='act'&&rm.a!=='supp'){const w=recBtnText(rm).replace(/\s*\([^)]*\)/g,'').split(/\s+/);f+=pbtn(rm,trim8(w),pulse)}
      if(done)f+='<button class="btn'+(rm&&rm.k===done.k?' pri'+(pulse?' pulse':''):'')+'" data-a="mv" data-k="'+esc(done.k)+'">'+esc(doneText())+'</button>';
      if(M.powers.length){const rp=rm&&rm.t==='act'&&rm.a!=='supp';f+='<button class="btn'+(rp?' pri'+(pulse?' pulse':''):'')+'" data-a="powers" aria-pressed="'+!!UI.sheetOpen+'">Powers <b>'+M.powers.length+'</b></button>';
        if(UI.sheetOpen||(rp&&UI.guide==='full'&&G.round>1&&false)){const r=menuHTML(s,mv,rm,pulse);h+='<div class="step" data-q="menu"><h3 class="st">'+esc(menuTitle(q))+'</h3>'+r.h+'</div>';sheet=true}}

@@ -18,9 +18,10 @@ function renderHand(){const el=$('#handw');if(!el)return;const s=vs();
   const quiet=!!(M&&M.rec&&M.rec.id==null);
   // one helper at a time: with a card selected only its target (region / bid spot) glows; with a suggested card only that card pulses
   const selH=UI.hand!=null&&ids0.includes(UI.hand);
-  const PAD=UI.desk?32:(UI.land?16:5);const W=Math.max(160,(el.clientWidth||innerWidth)-8-2*PAD);
+  const PAD=UI.desk?32:(UI.land?8:5);const W=Math.max(160,(el.clientWidth||innerWidth)-8-2*PAD);
   const n=ids.length,GAP=UI.desk?12:3;let cw=cssPx('--cw',50);
-  if(n>1&&!UI.land)cw=Math.max(40,Math.min(cw,Math.floor((W-(n-1)*GAP)/n)));   // the hand never overlaps: every card is as wide as the row allows (tap a card to see it enlarged)
+  if(n>1&&!UI.land)cw=Math.max(40,Math.min(cw,Math.floor((W-(n-1)*GAP)/n)));
+  else if(n>1&&UI.land&&!UI.desk)cw=Math.max(34,Math.min(cw,Math.floor(W-24*(n-1))));   // landscape phone: a narrow column, but every card keeps >= 24 px of itself visible   // the hand never overlaps: every card is as wide as the row allows (tap a card to see it enlarged)
   const ch=Math.round(cw*1.4308);
   const step=n>1?Math.min(cw+GAP,(W-cw)/(n-1)):0;const tot=n>1?cw+step*(n-1):cw;const off=Math.max(0,(W-tot)/2);
   let h='<div class="hand" role="list" aria-label="Your hand" style="height:'+(ch+24)+'px">';

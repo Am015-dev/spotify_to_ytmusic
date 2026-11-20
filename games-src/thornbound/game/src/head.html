@@ -601,4 +601,9 @@ html.desk .gx-bar h1{display:block}
 @media (max-height:620px) and (orientation:portrait){html:not(.bf-w) .gx-dock:has(#handw .roadrow):has(#act:empty) #act{min-height:0;height:0;padding:0;overflow:hidden}
 html:not(.bf-w) .gx-dock:has(#handw .roadrow):has(#act:empty) #handw{height:calc(var(--ch,72px) + 46px)}
 html:not(.bf-w) #handw .roadrow .kcb .kn{-webkit-line-clamp:2}}
+/* F16 landscape phone: the strip's words get their own full-width row under the chip and the buttons (the column is narrow) */
+html.ph.bf-w body #tbturn{flex-wrap:wrap;gap:3px 8px;height:auto;min-height:0;padding:4px 8px}
+html.ph.bf-w body #tbturn .tbt-line,html.ph.bf-w body #tbturn .tbt-line.sm,html.ph.bf-w body #tbturn .tbt-line.xs{flex:1 1 100%;order:5;max-height:none;font-size:14px;line-height:1.15}
+html.ph.bf-w body #tbturn .tbt-chip{max-width:none;margin-right:auto}
+html.ph.bf-w body #tbturn .tbt-goal,html.ph.bf-w body #tbturn .tbt-skip2,html.ph.bf-w body #tbturn .tbt-info,html.ph.bf-w body #tbturn .tbt-skip{order:2}
 </style></head>
