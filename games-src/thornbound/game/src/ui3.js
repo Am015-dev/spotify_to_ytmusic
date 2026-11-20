@@ -20,7 +20,7 @@ function syncRound(){try{if(MAP.m&&G){const r=shownRound();if(MAP._rn!==r+'/'+G.
 function renderBar(){const el=$('#barstat');if(!el)return;if(!G)return;const t=statusText();const r=shownRound();syncRound();
   el.innerHTML='<span class="st-r" aria-hidden="true">R'+r+'/'+G.rounds+'</span>'+(t.seat>=0&&G.pl[t.seat]?'<i class="st-d" style="background:'+fcol(t.seat)+'"></i>':'')+'<span class="st-t" role="status" aria-label="'+esc(t.text)+'">'+esc(t.text)+'</span>'}
 // the one status line (8 words or fewer): what to do now, or what the computer just did
-function words8(x){const w=String(x||'').replace(/\s+/g,' ').trim().split(' ').filter(Boolean);return w.length<=8?w.join(' '):w.slice(0,7).join(' ').replace(/[,:;.]$/,'')+'\u2026'}
+function words8(x){x=String(x||'').replace(/\s+/g,' ').trim();const w=x.split(' ').filter(Boolean);if(w.length<=8)return x;const c=x.split(/(?<=[.?!:;])\s|\s\(/)[0];return c.split(' ').length>=3?c.replace(/[,:;]$/,''):w.join(' ')}   // never an ellipsis: a long line drops to its first clause
 function statusText(){const o=t=>({text:words8(t),seat:-1});
   if(!G)return o('');if(G.over)return o('The reign is over');
   const c=UI.card;
@@ -156,7 +156,7 @@ function renderMain(){const el=$('#main'),ft=$('#act');if(!el||!ft)return;const 
    case 'menu':{const done=mv.find(m=>m.t==='done');M.regs.forEach(r=>hr.push(r));if(rm&&rm.a==='supp'&&rm.p)recT.reg=rm.p.r;
      if(M.aut){if(UI.autCard!=null&&!M.use.has(UI.autCard))UI.autCard=null;if(UI.autCard!=null)f+='<div class="autc" role="group" aria-label="Autumn choices">'+autMoves(UI.autCard).map(m=>'<button class="btn pri" data-a="mv" data-k="'+esc(m.k)+'" data-aut="'+m.a+'">'+esc(autLabel(m))+'</button>').join('')+'</div>'}else UI.autCard=null;
      // hints on and the suggestion is a power: it is one tap, first in the tray (following the glow never skips it for Done)
-     if(rm&&rm.t==='act'&&rm.a!=='supp'){const w=recBtnText(rm).replace(/\s*\([^)]*\)/g,'').split(/\s+/);f+=pbtn(rm,w.slice(0,4).join(' ')+(w.length>4?'\u2026':''),pulse)}
+     if(rm&&rm.t==='act'&&rm.a!=='supp'){const w=recBtnText(rm).replace(/\s*\([^)]*\)/g,'').split(/\s+/);f+=pbtn(rm,w.join(' '),pulse)}
      if(done)f+='<button class="btn'+(rm&&rm.k===done.k?' pri'+(pulse?' pulse':''):'')+'" data-a="mv" data-k="'+esc(done.k)+'">'+esc(doneText())+'</button>';
      if(M.powers.length){const rp=rm&&rm.t==='act'&&rm.a!=='supp';f+='<button class="btn'+(rp?' pri'+(pulse?' pulse':''):'')+'" data-a="powers" aria-pressed="'+!!UI.sheetOpen+'">Powers <b>'+M.powers.length+'</b></button>';
        if(UI.sheetOpen||(rp&&UI.guide==='full'&&G.round>1&&false)){const r=menuHTML(s,mv,rm,pulse);h+='<div class="step" data-q="menu"><h3 class="st">'+esc(menuTitle(q))+'</h3>'+r.h+'</div>';sheet=true}}
@@ -185,7 +185,7 @@ function promptText(q,s){const t=q.title||'';
     case 'applause':return 'Set the turn order';
     case 'clashOrder':return 'Choose the Clash order';
     default:if(q.t==='menu'){const ph=menuPhase(q);return ph==='Day'?'Use a power, or tap Done':'Use a power, or tap Done'}return shortT(plain(t))}}
-function shortT(x){let w=String(x||'').split(/\s+/).filter(Boolean);if(w.length>8){const f=String(x).split(/(?<=[.?!])\s+/)[0].split(/\s+/).filter(Boolean);if(f.length<=8)return f.join(' ')}return w.length<=8?w.join(' '):w.slice(0,7).join(' ').replace(/[,:;.]$/,'')+'...'}
+function shortT(x){x=String(x||'').trim().replace(/\s+/g,' ');const w=x.split(' ');if(w.length<=16)return x;const f=x.split(/(?<=[.?!])\s+/)[0];return f.split(' ').length>=4?f:x}   // never cut with '...': long lines drop to their first sentence, the strip wraps
 function placeProgress(){const me=vs();let n=0;for(const R of UI.V.reg)for(const id of R.down)if(id>=0&&ownerOf(id)===me)n++;
   const mv=me>=0?legal(me):[];const rs=[...new Set(mv.map(m=>m.r))];return 'card '+Math.min(3,n+1)+' of 3'+(rs.length===1?', for '+REG[rs[0]]:'')}
 function recLine(s,rm){if(!rm)return '';return '<p class="rec-l">'+ico('star')+'<span><b>Suggested:</b> '+esc(shortRec(rm))+' <span class="why2">'+gloss(UI._recWhy||'')+'</span></span></p>'}

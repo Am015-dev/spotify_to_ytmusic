@@ -91,7 +91,7 @@ function leaveActive(id){const m=G.cmod[id];if(m)m.tok=0}
 // every Influence change is booked in G.infl[seat][reason] (the end screen's breakdown) and logged with a cause (m.k 'inf' / 'steal')
 function book(seat,why,n){if(!G.infl)G.infl=G.pl.map(()=>({}));const L=G.infl[seat]||(G.infl[seat]={});L[why]=(L[why]||0)+n;if(!L[why])delete L[why]}
 function gainInf(seat,n,why,detail){if(n<=0)return 0;why=why||'other';G.pl[seat].inf+=n;stat('inf');const k='src:'+G.pl[seat].fac+':'+why;G.stats[k]=(G.stats[k]||0)+n;book(seat,why,n);
-  lg(nm(seat)+' gains '+n+' Influence ('+why+(detail?': '+detail:'')+').',seat,'',{k:'inf',s:seat,n,why});return n}
+  lg(nm(seat)+' gains '+n+' Influence ('+why+(detail?': '+detail:'')+').',seat,'',{k:'inf',s:seat,n,why,detail:detail||''});return n}
 function stealInf(thief,victim,n,why,detail){const a=Math.min(n,G.pl[victim].inf);if(a<=0)return 0;why=why||'Herald Reward';G.pl[victim].inf-=a;G.pl[thief].inf+=a;
   book(thief,why+': taken from rivals',a);book(victim,'Taken by rivals ('+why+')',-a);
   lg(nm(thief)+' steals '+a+' Influence from '+nm(victim)+' ('+why+(detail?': '+detail:'')+').',thief,'',{k:'steal',s:thief,v:victim,n:a,why});return a}

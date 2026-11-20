@@ -108,11 +108,11 @@ function bfSlot(r,s,old,nw){if(!ANIM||UI.noAnim||!nw||!nw.faceDown||(old&&old.co
 // ---------------------------------------------------------------- events played on the board (bids, clashes, round end): no panels, a tap skips
 function evDone(){const c=UI.card;if(!c||c.kind!=='event')return;clearTimeout(UI._evT);UI.card=null;UI._cardKey=null;UI.noAnim=false;UI._cp=null;UI._clashLine='';UI.mapReset=false;MAP.slotDirty=true;pump()}
 function bfSkip(){const c=UI.card;if(!c)return false;if(typeof tutHold==='function'&&tutHold(c))return false;if(c.kind==='event'){evDone();return true}if(c.kind==='news'){newsOk();return true}return false}
-const spd=()=>Math.max(1,Math.min(UI.speed||1,4))*(UI.cfg&&UI.cfg.tutorial?3:1);   // Learn to play runs the rival's turns 3x faster: no silent wait over ~3 s
+const spd=()=>Math.max(1,Math.min(UI.speed||1,4))*(UI.cfg&&UI.cfg.tutorial?3:1)*(UI.rush?3:1);   // Learn to play runs the rival's turns 3x faster: no silent wait over ~3 s
 function bfAuto(c,ms){clearTimeout(UI._evT);UI._evT=setTimeout(()=>{if(UI.card===c&&!(typeof tutHold==='function'&&tutHold(c)))evDone()},ANIM?ms/spd():0)}
 function bfEvent(c){const ev=c.ev;if(ev.t==='bids')bfBids(c);else if(ev.t==='clash')bfClash(c);else if(ev.t==='summary')bfSummary(c);else bfAuto(c,300)}
 function bfBids(c){const ev=c.ev;c.rank=ev.bids.slice().sort((a,b)=>a.str-b.str||ev.order.indexOf(b.seat)-ev.order.indexOf(a.seat)).map(b=>b.seat);c.revN=0;
-  const step=()=>{if(UI.card!==c)return;if(c.revN<c.rank.length){c.revN++;if(typeof sfx==='function')sfx('flip');renderRivals();setTimeout(step,ANIM?420/spd():0)}else bfAuto(c,1100)};
+  const step=()=>{if(UI.card!==c)return;if(c.revN<c.rank.length){c.revN++;if(typeof sfx==='function')sfx('flip');renderRivals();setTimeout(step,ANIM?420/spd():0)}else bfAuto(c,800)};
   renderBar();renderRivals();setTimeout(step,ANIM?350/spd():0)}
 function clashLine(ev){const me=vs(),w=ev.winner,reg=REG[ev.r];if(w<0)return 'Tie in '+reg;
   const best=Math.max(0,...ev.parts.filter(x=>x!==w).map(x=>ev.tot[x]));return (w===me?'You win ':sideName(w)+' wins ')+reg+', '+ev.tot[w]+' to '+best}
@@ -121,9 +121,9 @@ function elimLine(ev){const d=ev.dead||{};const me=vs();const o=Object.keys(d).m
 function bfClash(c){const ev=c.ev;UI.noAnim=true;UI.clashBrk=UI.clashBrk||{};UI.clashBrk[ev.r]={tot:ev.tot,brk:ev.brk,parts:ev.parts};
   const fin=()=>{if(UI.card!==c)return;UI.clashRes[ev.r]={winner:ev.winner,tot:ev.tot};try{drawOverlay()}catch(e){}UI._clashLine=clashLine(ev);renderBar();if(typeof sfx==='function')sfx(ev.winner<0?'tie':'win');try{const me=vs();bfBanner(ev.winner<0?'Tie':ev.winner===me?'You win!':sideName(ev.winner)+' win',REG[ev.r]+' \u00b7 '+ev.parts.map(x=>ev.tot[x]).sort((a,b)=>b-a).join(' to '),ev.winner<0?'#c8c0d8':fcol(ev.winner))}catch(x){}
     try{bfClashHit(ev.r,ev.winner<0?'#c8c0d8':fcol(ev.winner),ev.winner<0)}catch(x){}
-    const el=elimLine(ev);const hold=el?1500:1100;
+    const el=elimLine(ev);const hold=el?1300:900;
     if(el)setTimeout(()=>{if(UI.card===c){UI._clashLine=el;renderBar()}},900/spd());
-    bfAuto(c,hold+300)};
+    bfAuto(c,hold+200)};
   UI._clashLine='The Clash in '+REG[ev.r];renderBar();
   if(!ANIM){fin();return}
   const p=mapReveal(ev);Promise.resolve(p).then(()=>{if(UI.card===c)setTimeout(fin,150/spd())})}
@@ -143,13 +143,14 @@ function bfBanner(t,sub,col){try{if(!ANIM||UI.reduce)return;const bd=$('#board')
 function bfSummary(c){const ev=c.ev;renderBar();
   try{const me=vs(),d=ev.inf1[me]-ev.inf0[me];bfBanner(ev.round>=ev.rounds?'Final round over':'Round '+ev.round+' over',[me,...ev.inf1.map((v,s)=>s).filter(s=>s!==me)].map(s=>{const g=ev.inf1[s]-ev.inf0[s];return (s===me?'You':shortName(s))+' '+ev.inf1[s]+' ('+(g<0?'\u2212':'+')+Math.abs(g)+')'}).join(' \u00b7 '),'#f0c860')}catch(x){}
   if(ANIM)ev.inf1.forEach((v,s)=>{const d=v-ev.inf0[s];if(d){const r=seatPopRect(s);if(r)bfPopAt(r,(d>0?'+':'−')+Math.abs(d),fcol(s),s)}});
-  bfAuto(c,1400)}
+  bfAuto(c,1200)}
 // a tap on the board or the status line skips the narration
 // Every tap does something you can see (owner, 8 Nov): a narration card is skipped from anywhere on the table (board, strip, hand, dock),
 // a rival's step is played at once, and a tap that cannot act yet leaves a ring where it landed (and the step keeps it, see tutQueue).
 function tapRing(x,y){try{if(UI.reduce)return;const fx=$('#fx')||document.body;const r=document.createElement('div');r.className='tapring';r.style.cssText='left:'+(x-22)+'px;top:'+(y-22)+'px';fx.appendChild(r);setTimeout(()=>r.remove(),450)}catch(e){}}
 (function(){const st=document.createElement('style');st.textContent='.tapring{position:fixed;width:44px;height:44px;border-radius:50%;border:3px solid #f0c860;pointer-events:none;z-index:2147483000;animation:tapr .42s ease-out forwards}@keyframes tapr{from{transform:scale(.4);opacity:.95}to{transform:scale(1.25);opacity:0}}';document.head.appendChild(st)})();
-window.tbTapAhead=function(){if(!G||!UI.started||G.over)return false;if(UI.card&&(UI.card.kind==='event'||UI.card.kind==='news')){return bfSkip()}
+window.tbRush=function(){if(!G||!UI.started||G.over)return false;try{const w=whoActs();if(w.ai.length||UI.evq.length||UI.card&&(UI.card.kind==='event'||UI.card.kind==='news'))UI.rush=1}catch(e){}return !!UI.rush};
+window.tbTapAhead=function(){if(!G||!UI.started||G.over)return false;if(!(typeof tutHold==='function'&&UI.card&&tutHold(UI.card)))window.tbRush();if(UI.card&&(UI.card.kind==='event'||UI.card.kind==='news')){return bfSkip()}
   if(!UI.card&&G.q&&viewSeatForQ()==null){try{const w=whoActs();if(w.ai.length){UI._tbHold=0;clearTimeout(_pumpT);aiStep(w);pump();return true}}catch(e){}}return false};
 document.addEventListener('pointerdown',e=>{if(!G||!UI.started)return;const tg=e.target;if(!tg||!tg.closest)return;
   const cell=tg.closest('.gxt-cell');

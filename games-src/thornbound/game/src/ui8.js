@@ -46,10 +46,11 @@ function infK(it){return it.m&&(it.m.k==='inf'||it.m.k==='steal')}
 function showNews(first){const items=[first];if(first.big&&infK(first)){while(UI.evq.length&&items.length<4){const n=UI.evq[0];if(n.t!=='news'||!n.big||!infK(n))break;items.push(UI.evq.shift())}}
   if(!first.big){while(UI.evq.length&&items.length<4){const n=UI.evq[0];if(n.t!=='news'||n.big)break;items.push(UI.evq.shift())}}
   const c={kind:'news',items,big:first.big,id:(UI._nid=(UI._nid||0)+1)};UI.card=c;
+  try{if(ANIM)for(const x of items){const m=x.m;if(m&&m.k==='inf'&&m.n){const r=seatPopRect(m.s);if(r)bfPopAt(r,(m.n>0?'+':'\u2212')+Math.abs(m.n),fcol(m.s),m.s)}}}catch(e){}
   const dur=newsDur(c);
   clearTimeout(UI._nt);UI._nt=setTimeout(()=>{if(UI.card===c&&!(typeof tutHold==='function'&&tutHold(c))){UI.card=null;pump()}},dur)}
 // how long a news card stays: short for plain computer moves, longer when it changes Influence or your Clash (a tap always skips)
-function newsDur(c){const sp=Math.max(1,Math.min(UI.speed||1,4));if(c.big)return 1800/sp;const k=c.items.some(x=>x.keep);return Math.max(k?1300:600,500+300*c.items.length)/sp}
+function newsDur(c){const sp=Math.max(1,Math.min(UI.speed||1,4))*(UI.rush?3:1);if(c.big)return 1800/sp;const k=c.items.some(x=>x.keep);return Math.max(k?1300:1200,900+200*c.items.length)/sp}   // one readable step is about 1.2 s; a tap on 'Skip all' plays the rest at once
 function newsOk(){const c=UI.card;if(!c||c.kind!=='news')return;clearTimeout(UI._nt);UI.card=null;
   if(!c.big){UI.evq=UI.evq.filter(e=>!(e.t==='news'&&!e.big&&!e.keep))}   // a tap skips the rest of the narration (cards that touch you, Influence changes and moves in your Clash still come)
   pump()}
@@ -57,6 +58,17 @@ const NEWSHEAD={inf:'Influence',steal:'Influence stolen',elim:'Eliminated',kcste
 function newsHead(it,items){const me=vs();if(items&&items.length>1&&items.every(infK)){const d={};for(const x of items){const m=x.m;if(m.k==='inf')d[m.s]=(d[m.s]||0)+m.n;else{d[m.s]=(d[m.s]||0)+m.n;d[m.v]=(d[m.v]||0)-m.n}}
     return Object.keys(d).filter(s=>d[s]).sort((a,b)=>(b==me)-(a==me)).map(s=>(+s===me?'You':sideName(+s))+' '+(d[s]>0?'+':'\u2212')+Math.abs(d[s])).join(' \u00b7 ')+' Influence'}
   const m=it.m||{};if(m.k==='inf')return (m.n>0?'+':'−')+Math.abs(m.n)+' Influence';if(m.k==='steal')return m.v===me?'−'+m.n+' Influence: stolen':'+'+m.n+' Influence: stolen';return NEWSHEAD[m.k]||'What happened'}
+// every score change is told with its cause, one short line: "Court +4: claims Cairn Field +2, Herald on Ossuary +1, ..."
+function infWhy(m){const w=String(m.why||''),d=String(m.detail||'');if(LOCN.includes(w))return 'claims '+w;if(w==='Herald Reward')return d?d.replace(/^their Herald stands on /,'Herald on '):'its Herald’s location';
+  if(w==='Council of Coin')return 'cashes in Council votes';if(/^Doctrine of Tempests/.test(w))return 'most Supporters in '+(d.replace(/^most Supporters in /,'')||'a region');if(/Leftover Lore/.test(w))return 'leftover Lore';
+  return plain(w)+(d?' ('+d+')':'')}
+function infLine(items){const by={},order=[];const me=vs();let any=false;
+  for(const x of items){const m=x.m;if(!m)continue;if(m.k==='inf'){any=true;const s=m.s;if(!by[s]){by[s]=[];order.push(s)}by[s].push({n:m.n,w:infWhy(m)})}
+    else if(m.k==='steal'){any=true;const s=m.s;if(!by[s]){by[s]=[];order.push(s)}by[s].push({n:m.n,w:'steals from '+(m.v===me?'you':sideName(m.v))})}}
+  if(!any)return null;order.sort((a,b)=>(b===me)-(a===me));
+  return order.map(s=>{const L=by[s],tot=L.reduce((a,b)=>a+b.n,0);const nm=s===me?'You':sideName(s);
+    const why=L.length===1?L[0].w:L.map(y=>y.w+' '+(y.n>0?'+':'−')+Math.abs(y.n)).join(', ');
+    return nm+' '+(tot>=0?'+':'−')+Math.abs(tot)+': '+why}).join(' · ')+'.'}
 function renderNews(){const el=$('#news');if(el&&!el.hidden){el.hidden=true;el.innerHTML=''}}
 // ---------------------------------------------------------------- previews: what the Night step and the tally give if nobody else acts
 function preview(V){try{return TB.clashPreview(V||UI.V)}catch(e){return null}}

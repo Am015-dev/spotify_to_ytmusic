@@ -14,14 +14,14 @@ const [W,H]=(process.argv[2]||'375x553').split('x').map(Number);const sleep=ms=>
   const r=await p.evaluate(async()=>{const cut=[],seen=new Set();let checked=0;const T=document.getElementById('tbturn');
     const over=ln=>!!ln&&tbLineOver(ln);
     const probe=T.cloneNode(false);probe.id='tbturn';probe.style.cssText='position:fixed;left:0;top:-500px;width:'+T.offsetWidth+'px';
-    const fit=(chip,txt)=>{T.parentNode.appendChild(probe);T.id='tbturnX';probe.className='';probe.innerHTML='<span class="tbt-chip wt">'+chip+'</span><span class="tbt-line">'+txt+'</span><button class="tbt-goal" type="button">Goal</button>';const ln=probe.querySelector('.tbt-line');
+    const fit=(chip,txt,card)=>{T.parentNode.appendChild(probe);T.id='tbturnX';probe.className='';probe.innerHTML='<span class="tbt-chip wt">'+chip+'</span><span class="tbt-line">'+txt+'</span>'+(card?'<button class="tbt-skip2" type="button">Skip</button>':'<button class="tbt-goal" type="button">Goal</button>')+'';const ln=probe.querySelector('.tbt-line');
       if(over(ln))ln.classList.add('sm');if(over(ln)){ln.classList.add('xs');probe.classList.add('tbxs')}const o=over(ln);probe.remove();T.id='tbturn';return !o};
     let n=0;while(G.phase!=='over'&&n<3000){n++;const q=TB.pending(G);if(!q)break;
       if(q.seats.includes(0)){try{UI.card=null;UI.evq=[];renderAll();tbStripPaint()}catch(e){}const ln=T.querySelector('.tbt-line');const t=ln?ln.textContent:'';
         if(t&&!seen.has(t)){seen.add(t);checked++;if(over(ln))cut.push('turn: '+t)}
         UI._rk=null;const mv=legal(0);let m=null;try{m=getRec(0,mv)}catch(e){}TB.apply(G,m||mv[0])}else TB.AI.step(G,{humans:[0]})}
-    for(const e of G.log){let t='';try{t=shortT(cardMsg({kind:'news',ev:e}).t)}catch(x){try{t=shortT(plain(e.t))}catch(y){t=''}}if(!t||seen.has(t))continue;seen.add(t);checked++;
-      if(!fit('Tap: next',t.replace(/&/g,'&amp;').replace(/</g,'&lt;')))cut.push('card: '+t)}
+    for(const e of G.log){let t='';try{t=shortT(tbOne(plain(e.t)));if(e.m&&(e.m.k==='inf'||e.m.k==='steal')){const il=infLine([{m:e.m}]);if(il)t=il}}catch(x){t=""}if(!t||seen.has(t))continue;seen.add(t);checked++;
+      if(!fit('Court',t.replace(/&/g,'&amp;').replace(/</g,'&lt;'),1))cut.push('card: '+t)}
     return {checked,cut:cut.slice(0,15),ncut:cut.length}});
   console.log('lines checked '+r.checked+', cut off '+r.ncut);for(const c of r.cut)console.log('  CUT '+c);
   console.log('page errors '+errs.length+(errs[0]?' '+errs[0]:''));await b.close();const bad=r.ncut||errs.length||r.checked<20;console.log(bad?'linefit-test FAIL':'linefit-test PASS ('+W+'x'+H+')');process.exit(bad?1:0)})();

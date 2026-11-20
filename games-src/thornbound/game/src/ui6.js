@@ -24,7 +24,7 @@ function phApply(){const was=UI.phone,wasLand=UI.land;const on=phDetect();const 
     const mn=$('.gx-main'),rv=$('#rivals');const Hm=(mn&&mn.clientHeight)||(H-barH),rh=(rv&&rv.offsetHeight)||52;
     const th=(($('#tbturn')||{}).offsetHeight)||72,road=H<820?16:40;const hh=Math.min(Hm-rh-46-W-10,Hm-rh-th-46-Math.ceil(.57*H)-road);cw=Math.max(cw,Math.min(on?64:76,Math.floor((hh-24)/1.4308)))}   // a bigger hand only while the board keeps >=57% of the screen, Kingdom Card row (roadX) included
   if(UI.desk){ // desktop: the right column is the table; the hand gets big, readable cards
-    const R=W-Math.max(150,Math.min(H-barH,Math.round(W*.62)));cw=Math.max(66,Math.min(116,Math.floor((H-barH)*.125),Math.floor((R-48)/3.9)))}
+    cw=Math.max(64,Math.min(112,Math.floor((H-barH)*.115),Math.floor((W-80)/(8.6))))}   // the hand runs along the bottom of the whole window
   root.style.setProperty('--cw',cw+'px');root.style.setProperty('--ch',Math.round(cw*1.4308)+'px');root.style.setProperty('--barh',barH+'px');
   if(UI.land)root.style.setProperty('--bs',Math.max(150,Math.min(H-barH,Math.round(W*.62)))+'px');
   sizeMap();
