@@ -61,7 +61,7 @@ html.ph .opp.seat .sav{width:37px;height:37px}
 html.ph .opp.seat.paper{background:radial-gradient(120% 120% at 20% 0%,rgba(255,200,140,.18),transparent 55%),linear-gradient(#4a2415,#2a1209);box-shadow:inset 0 0 0 1px rgba(226,180,87,.45),0 3px 0 rgba(0,0,0,.4)}
 html.ph .opp.seat.active{box-shadow:inset 0 0 0 2px #ffd76a,0 0 0 2px #ffd76a,0 0 14px 4px rgba(255,190,70,.5)}
 html.ph .pile .lbl{display:none}
-html.ph .pile .card.xs{--w:calc(var(--sw)*.8)}
+html.ph .pile .card.xs{--w:max(44px,calc(var(--sw)*.8))}   /* the discard top card is a button: never under a 44 px finger (F17) */
 /* your strip: hero + gear, then the fan */
 html.ph .mine{display:grid;grid-template-columns:auto minmax(0,1fr);grid-template-areas:"top gear" "hand hand";align-items:center;gap:0 6px;padding:2px 2px 0;--hero:clamp(46px,7.2dvh,58px);background:none;border:0;box-shadow:none;border-radius:0;
   --hw:clamp(60px,min(10.5dvh,19vw),82px)}
@@ -319,7 +319,7 @@ html.ph-p .mine .hand:not(.row) .card:not(:last-child) :is(.cn,.gold){display:no
 /* PC: the price tag sits clear of the kind line */
 html:not(.ph) .card .aw .gold{translate:0 -8px}
 /* phone hand names: up to 3 lines, long words break, so no name is cut */
-html.ph-p .mine .hand .card .cn{-webkit-line-clamp:3!important;overflow-wrap:normal;word-break:normal;hyphens:none}
+html.ph-p .mine .hand .card .cn{-webkit-line-clamp:3!important;overflow-wrap:break-word;word-break:normal;hyphens:auto;text-overflow:ellipsis}   /* a word too long for the card is hyphenated (never cut mid-air), and a name still too long ends in an ellipsis: the type never drops under 11 px */
 
 /* portrait phone: while the card panel is open (it stops above the action bar, ui.js dkCardFit) the action bar stays on top and tappable */
 html.ph-p.dk-cardup:has(#dkCard.on) .gx-dock{position:relative;z-index:42;pointer-events:auto}
@@ -463,5 +463,16 @@ html.ph #prompt.bfq .acts.main .btn.pickchip{white-space:normal;line-height:1.1;
 html.ph #prompt.bfq>.acts.main{bottom:auto!important;top:auto!important}   /* the old sticky bottom:-12px pushed the relative buttons 12 px out of the dock */
 /* F16: the fight buttons span the whole table now: keep the pulsing Fight! (it scales up) inside the table edge */
 html.ph .arena:has(>.vs)>.fbtns{padding-left:7px!important;padding-right:7px!important;box-sizing:border-box}
+/* Cleric Resurrection (F17): the treasure it brings back (picture and name) beside the whole question, and the answers in a 3-wide grid of 44 px buttons */
+html.ph #prompt.bfq>.restq{order:-10;display:flex;align-items:center;gap:8px;margin:0;flex:none}
+html.ph #prompt .restq .restr{flex:0 0 auto;width:28px;height:40px;overflow:hidden;border-radius:4px;box-shadow:0 0 0 2px #ffd34d;position:relative}
+html.ph #prompt .restq .restr>.card{zoom:.4;pointer-events:none;margin:0}
+html.ph #prompt .restq .resw{min-width:0;text-align:left}
+html.ph #prompt .restq .resnm{font:800 14px/1.15 var(--title);color:#7a2a08;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+html.ph #prompt .restq p.say{color:#3a2410!important;text-shadow:none!important;font-family:var(--title)!important;font-weight:700!important;opacity:1!important;margin:0!important;text-align:left!important;font-size:14px!important;line-height:1.2!important;display:block!important;-webkit-line-clamp:unset!important;order:0!important}
+html.ph #prompt .acts.main.resg{display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr));gap:3px;flex-wrap:unset;padding:1px!important;overflow:hidden}
+html.ph #prompt .acts.main.resg.resg4{grid-template-columns:repeat(4,minmax(0,1fr))}
+html.ph #prompt .acts.main.resg .btn{min-height:44px;max-height:44px;min-width:0;width:auto;margin:0!important;padding:1px 3px!important;font-size:13px!important;line-height:1!important;white-space:normal;overflow:hidden;display:-webkit-box!important;-webkit-box-orient:vertical;-webkit-line-clamp:3;text-overflow:ellipsis;text-align:center;align-content:center;overflow-wrap:break-word}
+html.ph .bfdoor{min-width:44px;min-height:44px}   /* the door is the main button: never under a 44 px finger, however short the table (F17) */
 /* a very long hero name in the fight wraps to at most 3 lines, so it never runs into the kill/one-shot chips below it */
 html.ph .arena:has(>.vs) .score.hero .sl{display:-webkit-box!important;-webkit-box-orient:vertical;-webkit-line-clamp:3;line-clamp:3;overflow:hidden!important}

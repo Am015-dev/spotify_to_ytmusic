@@ -1,4 +1,5 @@
-// Fight-fit stress test: forces every fight shape at phone sizes and checks that every fight element lies inside the table.
+// Fight-fit stress test: forces every fight shape at phone sizes and checks that every fight element lies inside the table,
+// and that the hand (on screen in every fight) keeps its names at 11 px or more.
 //   node fightfit-test.js [sizes=375x553,360x640,375x667]   (needs doorkick.html: python3 build.py)
 // Shapes: 1-4 monsters x enhancers x your fight / rival fight x roll box x dock question (caught / loot / pick) x long names x kill chips.
 const PW = (() => { try { return require('playwright') } catch (e) { return require('/opt/node-tools/node_modules/playwright') } })();
@@ -6,9 +7,10 @@ const fs = require('fs'); const html = fs.readFileSync(__dirname + '/doorkick.ht
 const SIZES = (process.argv[2] || '375x553,360x640,375x667').split(',').map(s => s.split('x').map(Number));
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 const SHAPES = [];
-for (const n of [1, 2, 3, 4]) for (const enh of [0, 1]) for (const rival of [0, 1]) for (const roll of [0, 1]) for (const q of ['', 'rescue', 'loot', 'pick']) for (const longN of [0, 1]) {
+for (const n of [1, 2, 3, 4]) for (const enh of [0, 1]) for (const rival of [0, 1]) for (const roll of [0, 1]) for (const q of ['', 'rescue', 'loot', 'pick', 'res']) for (const longN of [0, 1]) {
   if (q === 'rescue' && (rival || !roll)) continue;          // only you get caught, and only after a roll
   if (q === 'loot' && !rival) continue;                       // you loot a dead rival's body
+  if (q === 'res' && (rival || roll)) continue;               // a Cleric who won with help resurrects a treasure (7 cards in hand: 8 options)
   if (longN && (enh + roll) % 2) continue;                    // keep the run short: long names on half the shapes
   SHAPES.push({ n, enh, rival, roll, q, longN, chips: (n + enh) % 2 });
 }
@@ -24,6 +26,8 @@ const STAGE = s => {
   if (s.roll) { cb.runs = cb.runs || []; G.lastRoll = { who, v: 3, mod: 1, ok: false, id: 900 + (window.__k = (window.__k || 0) + 1), what: 'run' }; }
   if (s.q === 'rescue') { cb.stage = 'run'; cb.runs = cb.mons.map(m => ({ w: 0, m: m.id, r: 3, ok: false, done: true, auto: false, pen: false })); G.q = { who: 0, kind: 'rescue', run: 0 }; }
   if (s.q === 'loot') { G.loot = { v: 1, pool: tr.slice(1, 4), ord: [0], i: 1 }; G.q = { who: 0, kind: 'pick', why: 'loot', opts: tr.slice(1, 4), cont: { k: 'loot', o: 0 }, text: `Loot one card from ${P(1).nm}'s body.` }; }
+  if (s.q === 'res') { const me = P(0), fr = ids.filter(i => !me.hand.includes(i) && cd(i).d === 'tr' && !tr.slice(0, 7).includes(i)); me.hand.length = Math.min(me.hand.length, 7 + (s.n === 4)); while (me.hand.length < 7 + (s.n === 4)) me.hand.push(fr.shift());   // 7 cards (8 answers), and 8 cards (9 answers) with 4 monsters if (s.longN) { const t = cd(me.hand[6]); t.n = 'Backstabber\'s Extraordinarily Long Shiv' }
+    cb.help = 1; const top = tr[6]; G.td.push(top); G.resW = { lv: 1, left: 1, res: [], stop: 0, nm: cd(mons[0]).n }; G.q = { who: 0, kind: 'pick', why: 'resTr', opts: ['draw', ...me.hand], cont: { k: 'resTr' }, text: `Resurrect ${cname(top)}? Pay a card, or draw.` }; }
   if (s.q === 'pick') { G.q = { who: 0, kind: 'pick', why: 'x', opts: ['hand', 'lvl', tr[5]], cont: {}, text: 'Bad Stuff: choose what you lose.' }; }
   render();
   // a toast and a note arrive mid-fight (an item that cannot be worn): neither may cover the readout
@@ -62,9 +66,19 @@ const CHECK = () => {
     if (ox > 1.5 && oy > 2) { bad.push(`overlap ${a.label} / ${b.label}`); i = texts.length; break } }
   // a toast never sits on the score readout or the pill
   for (const toast of document.querySelectorAll('#prompt .toast,.bfbub.note')) if (vis(toast)) { const tr = toast.getBoundingClientRect(); for (const e of ar.querySelectorAll('.sline,.vs .score')) { if (!vis(e)) continue; const r = e.getBoundingClientRect(); if (Math.min(tr.right, r.right) - Math.max(tr.left, r.left) > 1 && Math.min(tr.bottom, r.bottom) - Math.max(tr.top, r.top) > 1) { bad.push('toast covers ' + e.className.split(' ')[0]); break } } }
+  // ... nor on the rival strip (their names and levels)
+  for (const toast of document.querySelectorAll('.toast')) if (vis(toast)) { const tr = toast.getBoundingClientRect(); for (const e of document.querySelectorAll('.opps .opp,.opps .seat')) { if (!vis(e)) continue; const r = e.getBoundingClientRect(); if (Math.min(tr.right, r.right) - Math.max(tr.left, r.left) > 1 && Math.min(tr.bottom, r.bottom) - Math.max(tr.top, r.top) > 1) { bad.push('toast covers the rival strip'); break } } }
   // the dock question fits its dock: no hidden overflow, and its buttons end inside the screen
   const pr = document.getElementById('prompt'); if (pr && vis(pr)) { if (pr.scrollHeight > pr.clientHeight + 1) bad.push(`dock overflows ${pr.scrollHeight - pr.clientHeight}px`);
     for (const b of pr.querySelectorAll('.btn')) { if (!vis(b)) continue; const r = b.getBoundingClientRect(); if (r.bottom > innerHeight - 1) { bad.push(`dock button off screen "${b.textContent.trim().slice(0, 16)}"`); break } } }
+  // the hand stays on screen in every fight: each name you can see is >= 11 px and never cut without an ellipsis
+  for (const n of document.querySelectorAll('.mine .hand .card .cn')) { if (!vis(n)) continue; const r = n.getBoundingClientRect(); const hd = n.closest('.hand').getBoundingClientRect();
+    if (r.right < hd.left || r.left > hd.right || r.bottom < 0 || r.top > innerHeight) continue;   // scrolled out of the row: not on screen
+    const f = parseFloat(getComputedStyle(n).fontSize) * zoomOf(n); if (f < 10.95) { bad.push(`hand text ${f.toFixed(1)}px "${n.textContent.trim().slice(0, 14)}"`); break } }
+  // the Resurrection question: whole, with the treasure it brings back on show
+  if (G.q && G.q.why === 'resTr') { const say = pr && pr.querySelector('.restq'); if (!say || !/Pay a card/.test(say.textContent) || !say.querySelector('.resnm') || say.scrollHeight > say.clientHeight + 1 || say.scrollWidth > say.clientWidth + 1) bad.push(`resurrect question cut "${say ? say.textContent.trim().slice(0, 40) : '-'}"`);
+    if (!document.querySelector(`#prompt [data-rescard="${G.td[G.td.length - 1]}"]`)) bad.push('resurrected treasure not shown');
+    if (pr) for (const b of pr.querySelectorAll('.btn')) { const r = b.getBoundingClientRect(); if (vis(b) && (r.height < 43.5 || r.width < 43.5)) { bad.push(`resurrect button ${Math.round(r.width)}x${Math.round(r.height)}`); break } } }
   return bad;
 };
 (async () => {
