@@ -25,16 +25,17 @@ function plSay(who,text){const e=plEl('plreact','plreact');e.innerHTML='<i>'+who
 // "Teal scores 5 pts from palaces". Several parts: "You score 2 pts: palaces +5, coins \u22123" (the listed numbers add up to the headline).
 const PL_LAB={coins:'coins',advisors:'Advisors',sages:'Sages',crafters:'Crafters',djinns:'djinns',palms:'palms',palaces:'palaces',goods:'goods sets',items:'treasures',cities:'cities',tiles:'tiles held'};
 function plParts(a,b,hideItems){return Object.keys(PL_LAB).filter(k=>!(hideItems&&k==='items')&&a&&b&&(b[k]||0)!==(a[k]||0)).map(k=>[k,(b[k]||0)-(a[k]||0)]).sort((x,y)=>Math.abs(y[1])-Math.abs(x[1]))}
-function plWhy(i,d,a,b){const p=G.pl[i];const you=seatName(p)==='You';const n=Math.abs(d);
-  const head=(you?(d>0?'You score ':'You lose '):(p.nm+(d>0?' scores ':' loses ')))+n+' pt'+(n===1?'':'s');
-  const ps=plParts(a,b,online()&&p.i!==NET.mySeat&&!G.over);const sum=ps.reduce((t,x)=>t+x[1],0);if(!ps.length||sum!==d)return head;
-  if(ps.length===1){const [k,c]=ps[0];const m=Math.abs(c);
-    if(k==='coins')return head+(c<0?': spent ':': earned ')+m+' coin'+(m===1?'':'s');
-    if(k==='sages'&&c<0)return head+': used Sages';
-    if(k==='goods'&&c<0)return head+': goods sold';
-    if(k==='advisors'&&c<0)return head+(c<=-10?': lost the Advisor lead':': fewer Advisors');
-    return head+' from '+PL_LAB[k]}
-  return head+': '+ps.map(([k,c])=>PL_LAB[k]+' '+(c>0?'+':'\u2212')+Math.abs(c)).join(', ')}
+function plWhy(i,d,a,b){const p=G.pl[i];const you=seatName(p)==='You';const n=Math.abs(d);   // F3: every change names its sum, "+12: 3 Sages ×4"
+  const head=(you?'You ':plName(p.nm)+' ')+(d>0?'+':'\u2212')+n;
+  const ps=plParts(a,b,online()&&p.i!==NET.mySeat&&!G.over);const sum=ps.reduce((t,x)=>t+x[1],0);if(!ps.length||sum!==d)return head+' points';
+  const per={sages:hasDj(p,'hikma')?4:2,palaces:5,crafters:0};const one=(k,c)=>{const m=Math.abs(c),sg=c>0?'+':'\u2212';
+    if(k==='coins')return (c<0?'spent ':'')+m+' coin'+(m===1?'':'s')+(c<0?'':' (1 point each)');
+    if(per[k]&&m%per[k]===0){const q=m/per[k];const nm={sages:q>1?'Sages':'Sage',palaces:q>1?'palaces':'palace'}[k];return sg+q+' '+nm+' ×'+per[k]}
+    if(k==='goods'&&c<0)return 'goods sold '+sg+m;
+    if(k==='advisors'&&c<=-10)return 'lost the Advisor lead '+sg+m;
+    if(k==='advisors'&&c>=10)return 'Advisor lead '+sg+m;
+    return PL_LAB[k]+' '+sg+m};
+  return head+': '+ps.map(([k,c])=>one(k,c)).join(', ')}
 function plShort(t){return plName(String(t||'')).replace(/^[^\w—]+/,'').replace(/\.$/,'')}
 function plAfter(){if(!G){return}
   if(PL.seed!==G.seed){PL.seed=G.seed;PL.logN=G.logN;PL.tot=null;if(!G.tut&&!G.coach&&!G.over&&!(UI.camp))plBanner('Bid for turn order',LORE.quickIntro,'')}

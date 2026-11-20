@@ -10,7 +10,7 @@ const GD=(()=>{
   // who: 'me' = your highlighted move m; 'note' = Next (ms = Farid's moves played on Next); 'auto' = Farid's move played at once, no bubble
   const STEPS=[
    {id:'goal',who:'note',say:'Most points wins. Coins, land, people, goods and djinns score.'},
-   {id:'bid',who:'me',m:B(5),say:'Bid for turn order: dearer spots play first. Tap 1 coin.'},
+   {id:'bid',who:'me',m:B(5),say:'Bid for turn order: dearer spots play first. Tap the glowing 6th spot (1 coin).'},
    {id:'bidfree',who:'auto',ms:[B(6)]},
    {id:'markers',who:'me',m:B(7),say:'Farid took a free spot. You have two markers: take one too.'},
    {id:'order',who:'note',ms:[B(8)],say:'Same price: the later bidder plays first. Farid goes second.'},
@@ -20,7 +20,7 @@ const GD=(()=>{
    {id:'lastcolour',who:'me',m:D(27,'merchant'),say:'The last one must land on its own colour.'},
    {id:'traders',who:'me',m:{act:'tribe'},say:'Take all Traders; your camel claims the emptied tile. Collect goods.'},
    {id:'stall',who:'me',m:{act:'tile',take:[0]},say:'Stall: 3 coins buys a card. Take this Mystic; Mystics never score.'},
-   {id:'sell',who:'me',m:{act:'sell',kinds:['fish','pottery','silk','wheat']},say:'Four different goods sell for 13 coins. Sell them all.'},
+   {id:'sell',who:'me',m:{act:'sell',kinds:['fish','pottery','silk','wheat']},say:'Four different goods sell for 13 coins. Tap Sell all.'},
    {id:'done',who:'me',m:{act:'end'},say:'Selling is the last part of a turn. Tap End turn.'},
    {id:'sages',who:'note',ms:[S(11),D(10,'elder'),D(9,'elder'),D(8,'elder'),{act:'tribe'},{act:'tile',dj:'hikma',pay:{el:2,fk:0}},{act:'end'}],say:'Sages score 2 each. At a Shrine, two Sages summon a djinn.'},
    {id:'choose',who:'me',m:S(19),say:'Lift this mixed tile. You choose which colour drops where.'},
@@ -40,7 +40,7 @@ const GD=(()=>{
    {id:'s1',who:'me',m:D(28,'vizier'),say:'The Advisor drops here.'},
    {id:'s2',who:'me',m:D(22,'merchant'),say:'The Trader drops here.'},
    {id:'s3',who:'me',m:D(23,'assassin'),say:'The Shadow joins three Shadows. This lesson gives 3 camels (a real game 11). Last camel: final round.'},
-   {id:'shadows',who:'me',m:{act:'tribe',kill:{pl:1,c:'vizier',fk:0}},say:'One tile per Shadow, or a rival’s Advisor. Tap Farid’s glowing box.'},
+   {id:'shadows',who:'me',m:{act:'tribe',kill:{pl:1,c:'vizier',fk:0}},say:'One tile per Shadow, or a rival’s Advisor. Tap the rival panel at the top.'},
    {id:'noaction',who:'me',m:{act:'tile',skip:1},say:'A Shrine needs two Sages. You have none: skip it.'},
    {id:'done3',who:'me',m:{act:'end'},say:'Tap End turn.'},
    {id:'rival',who:'note',ms:[S(21),D(15,'assassin'),D(9,'merchant'),D(8,'vizier'),D(7,'builder'),{act:'tribe'},{act:'tile',dj:'nakhla',pay:{el:2,fk:0}},{act:'end'}],say:'Farid plays by the same rules: Masons, then another djinn.'},

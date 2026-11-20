@@ -1,7 +1,7 @@
 // ---------- computer players: plan the whole move (start, path, colour), then play it step by step ----------
 let AIPLAN=null;
-// easy = the default rival: picks any legal walk 9 times in 10, bids low and eases off once it leads by 2+; tuned (F1, newcomer-sim.js) so a newcomer who takes the hint half the time wins about 1 in 2
-const LVL={easy:{noise:1.5,depth:12000,bid:.1,ease:2,loose:.9,pool:1},normal:{noise:.6,depth:20000,bid:.3,ease:15,loose:.3,pool:.5},hard:{noise:0,depth:60000,bid:.35,ease:0}};
+// easy = the default rival: loose walks 9 in 10, eases off once ahead, tightens when 3+ behind (rubber band = close games); tuned (F3, touch-bench.js) so a newcomer who follows the starting-tile hint wins about 1 in 2 by a small margin
+const LVL={easy:{noise:1.5,depth:12000,bid:.1,ease:1,loose:.9,pool:1,chase:3,tight:.7},normal:{noise:.6,depth:20000,bid:.3,ease:4,loose:.7,pool:.7,chase:5,tight:.5},hard:{noise:0,depth:60000,bid:.35,ease:0}};
 function aiLead(p){if(!G||!G.pl)return 0;const s=scoreOf(p).total;let o=-1e9;for(const q of G.pl)if(q.i!==p.i)o=Math.max(o,scoreOf(q).total);return s-o}
 function aiNoise(p){const L=LVL[p.lv]||LVL.normal;if(p.__nz!=null)return p.__nz;return L.noise}
 function aiEase(p){const L=LVL[p.lv]||LVL.normal;if(!L.ease)return 0;const d=aiLead(p);return d>L.ease?Math.min(4,1+(d-L.ease)/10):0}
@@ -40,7 +40,7 @@ function aiAhead(p){const s=scoreOf(p).total;return G.pl.every(q=>q.i===p.i||sco
 function planTurn(p){const L=LVL[p.lv]||LVL.normal,cap=L.depth;const e=aiEase(p);p.__nz=aiNoise(Object.assign({},p,{__nz:null}))+e*2.5;let best=null,bv=-1e9;const all=[];
   for(const s of legalStarts())for(const o of outcomes(s,cap)){const v=evalOutcome(p,o);all.push([v,o]);if(v>bv){bv=v;best=o}}p.__nz=null;
   // a loose turn: any walk from the better half (more often while it leads), so the default rival makes human-sized mistakes
-  const lp=(L.loose||0)+(e?.15*e:0);if(lp&&all.length>3&&Math.random()<lp){all.sort((a,b)=>b[0]-a[0]);const h=all.slice(0,Math.max(2,Math.ceil(all.length*(L.pool||.5))));const pk=h[Math.floor(Math.random()*h.length)];best=pk[1];bv=pk[0]}return best&&Object.assign(best,{v:bv})}
+  let lp=(L.loose||0)+(e?.15*e:0);if(L.chase&&aiLead(p)<-L.chase)lp*=L.tight;if(lp&&all.length>3&&Math.random()<lp){all.sort((a,b)=>b[0]-a[0]);const h=all.slice(0,Math.max(2,Math.ceil(all.length*(L.pool||.5))));const pk=h[Math.floor(Math.random()*h.length)];best=pk[1];bv=pk[0]}return best&&Object.assign(best,{v:bv})}
 function bestTurnValue(p){const b=planTurn(Object.assign({},p,{lv:'hard'}));return b?b.v:0}
 // the next concrete move for side s
 function aiMove(s){if(G&&G.tut&&typeof tutAIMove==='function'){const tm=tutAIMove(s);if(tm)return tm}

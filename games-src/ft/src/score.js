@@ -35,11 +35,12 @@ function scTracker(){const ln=document.getElementById('line');if(!ln)return;cons
 function scPreview(){const ln=document.getElementById('line');if(!ln)return;const e=scEl('trk2','trk2',(document.getElementById('trk')||ln).nextSibling);if(!G||G.over||online()||G.coach||!G.pl[0].human){e.hidden=true;return}
   let txt='';const p=G.pl[0];
   if(scMine()&&G.step==='move'){scCompute();
-    if(!G.move){const one=UI.pick.length===1?SC.starts[UI.pick[0]]:null;if(one&&one.best)txt='★ Suggested start: +'+one.best.total+' ('+scText(one.best.parts)+' ('+tileName(G.board[one.best.o.e])+'))';else if(SC.bestTotal>=0)txt='★ Best start: +'+SC.bestTotal+' ('+SC.bestLabel+')'}   // F1: the line describes the one glowing tile
-    else{const k=G.move.path.length;let best=null;const tg=SC.hov!=null&&stepTargets().includes(SC.hov)?[SC.hov]:stepTargets();const sx=SC.starts[G.move.start];
-      if(sx)for(const nx of tg)for(const x of sx.outs)if(scPrefix(x,G.move.path,nx)&&(!best||x.total>best.total))best=x;
-      txt=best?(SC.hov!=null?'Here: ':'Best from here: ')+'+'+best.total+': '+scText(best.parts):'Keep walking. The last one must match its colour.'}}
+    if(!G.move){const one=hintsOn()&&UI.pick.length===1?SC.starts[UI.pick[0]]:null;   // F3: the hint names the start and why; the player plans the path
+      if(one&&one.best)txt='★ Start here: a walk can end on '+TILEDEF[G.board[one.best.o.e].k].n+' for +'+one.best.total+' ('+scText(one.best.parts)+')';else txt='Pick a tile. Its people walk one tile per drop.'}
+    else{const n=G.move.hand.length;txt=n>1?n+' to drop. Tap the tile to end on, or drop one by one.':'Last one: it must land on its own colour.'}}
   else if(G.phase==='bid'&&G.bidQueue[0]&&G.bidQueue[0].p===0)txt='Dearer spots play first. Each coin spent is a point lost.';
+  else if(scMine()&&G.step==='sell'&&p.res.length)txt='Coins are points at the end (1 each). Selling keeps your score the same but gives coins to bid with.';
+  else if(scMine()&&G.step==='tribe'&&G.act&&G.act.color==='assassin'){txt='Remove 1 person up to '+G.act.n+' tile'+(G.act.n>1?'s':'')+' away (each Mystic adds 1), or a rival’s Advisor, Sage or Crafter. Empty a tile to claim it.'+(hintsOn()?' ★ = best target.':'')}
   else if(scMine()&&G.act&&(G.step==='tribe'||G.step==='tile'||G.step==='sell')){const a=G.act;txt='You took '+a.n+' '+(a.n>1?MPLUR[a.color]:MNAME[a.color])+' on '+tileName(G.board[a.tile])+'. Finish the tile action to end your turn.'}
   e.hidden=!txt;e.textContent=txt}
 function scKey(){let k=document.getElementById('gainkey');const n=document.querySelectorAll('#grid .gain').length;if(!n){if(k)k.hidden=true;return}if(!k){k=document.createElement('div');k.id='gainkey';k.setAttribute('aria-hidden','true');k.setAttribute('data-help','');document.body.appendChild(k)}k.textContent='+N on a tile = points that walk can score · ★ = best';const g=document.getElementById('grid');if(g){const r=g.getBoundingClientRect();k.style.top=Math.round(r.bottom+2)+'px'}k.hidden=false}
@@ -47,7 +48,7 @@ function scBadges(hn){try{scBadgesIn(hn)}finally{const k=document.getElementById
 function scBadgesIn(hn){document.querySelectorAll('#grid .gain').forEach(x=>x.remove());document.querySelectorAll('#grid .sc-best').forEach(x=>x.classList.remove('sc-best'));
   if(!hn||G.coach||G.tut||!scMine()||G.step!=='move'||online())return;scCompute();const one=UI.pick.length===1?UI.pick[0]:null;const add=(i,v,star)=>{const el=tileEl(i);if(!el)return;const b=document.createElement('i');b.className='gain'+(star?' star':'');b.textContent=(star?'★':'')+'+'+v;b.setAttribute('data-help','');b.setAttribute('aria-hidden','true');el.appendChild(b)};
   if(!G.move){if(one!=null&&SC.starts[one]&&SC.starts[one].best){add(one,SC.starts[one].best.total,true);return}let bs=null;for(const s in SC.starts){const x=SC.starts[s].best;if(x&&(!bs||x.total>SC.starts[bs].best.total))bs=s}if(bs!=null)add(+bs,SC.starts[bs].best.total,true)}
-  else{const sx=SC.starts[G.move.start];if(!sx)return;let top=-1;const res={};for(const nx of stepTargets()){let b=null;for(const x of sx.outs)if(scPrefix(x,G.move.path,nx)&&(!b||x.total>b.total))b=x;if(b){res[nx]=b;top=Math.max(top,b.total)}}
+  else if(0){const sx=SC.starts[G.move.start];if(!sx)return;let top=-1;const res={};for(const nx of stepTargets()){let b=null;for(const x of sx.outs)if(scPrefix(x,G.move.path,nx)&&(!b||x.total>b.total))b=x;if(b){res[nx]=b;top=Math.max(top,b.total)}}
     if(one!=null&&res[one]){add(one,res[one].total,true);return}for(const nx in res)if(res[nx].total>=top&&top>0){add(+nx,res[nx].total,true);break}}}
 // ---- the score breakdown in the seat chips, the leader marked ----
 function scSeats(){if(!G||G.over||online()){return}const tot=G.pl.map(p=>shownTotal(p));const top=Math.max(...tot);const lead=tot.filter(v=>v===top).length===1?tot.indexOf(top):-1;
@@ -79,7 +80,7 @@ document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest
 (function(){const o=go;go=function(m){try{if(navigator.vibrate&&m&&(m.act==='step'||m.act==='start'||m.act==='tile'))navigator.vibrate(12)}catch(e){}return o.apply(this,arguments)}})();
 // only walks worth taking glow at the start of a turn (at least about half the best walk's points); the others stay tappable but quiet
 (function(){const oc=computePick;computePick=function(){oc.apply(this,arguments);try{
-  if(!G||G.over||G.tut||online()||(typeof gdStep==='function'&&gdStep())||G.phase!=='turn'||G.step!=='move'||G.move||G.q||UI.pendDj||UI.pendItem||!scMine()||UI.pick.length<4)return;
+  if(!hintsOn()||!G||G.over||G.tut||online()||(typeof gdStep==='function'&&gdStep())||G.phase!=='turn'||G.step!=='move'||G.move||G.q||UI.pendDj||UI.pendItem||!scMine()||UI.pick.length<4)return;
   scCompute();const top=SC.bestTotal;if(!(top>0))return;const keep=UI.pick.filter(i=>{const x=SC.starts[i];return x&&x.best&&x.best.total>=Math.max(3,top*.45)});if(keep.length)UI.pick=keep}catch(e){}}})();
 // R20: once a group is lifted, only drops that still lead to a good ending glow (at least 70% of the best ending still open from here)
 function scWalkOuts(){if(!G||!G.move||SC.key!==G.turn+'|'+G.round)return null;const sx=SC.starts[G.move.start];if(!sx)return null;const path=G.move.path;
@@ -88,7 +89,7 @@ function scWalkOuts(){if(!G||!G.move||SC.key!==G.turn+'|'+G.round)return null;co
 (function(){const oc=computePick;computePick=function(){oc.apply(this,arguments);try{
   if(!G||G.over||G.tut||online()||(typeof gdStep==='function'&&gdStep())||G.phase!=='turn'||G.step!=='move'||G.q||UI.pendDj||UI.pendItem||!scMine())return;
   if(!G.move){scCompute();return}
-  const good=scWalkOuts();if(!good)return;const n=G.move.path.length;const keep=UI.pick.filter(t=>good.some(x=>x.o.path[n]===t));if(keep.length)UI.pick=keep}catch(e){}}})();
+  /* F3: once lifted, every legal drop glows: the player plans the path (the hint names only the starting tile) */}catch(e){}}})();
 // which colour to drop on a step: keep the ending colour for the last drop, so the planned ending still works
 function scStepBest(ms){const good=scWalkOuts();if(!good||!G.move)return -1;const n=G.move.path.length;const hand=G.move.hand;
   let best=null;for(const x of good)if(x.o.path[n]===ms[0].tile&&(!best||x.total>best.total))best=x;if(!best)return -1;const c=best.o.c;
@@ -97,13 +98,12 @@ function scStepBest(ms){const good=scWalkOuts();if(!good||!G.move)return -1;cons
 // R38 row 6: the glow IS the hint. A newcomer who taps only what glows should win about half of the games on defaults.
 // Bid: only the suggested spot glows (the others stay tappable). Start: the suggested start plus the 2 best other starts glow.
 // Walk: on the suggested start the glow follows the suggested route (the planner's, not the points-now greedy one).
-function scGlowHint(){if(!G||G.over||G.tut||online()||(typeof gdStep==='function'&&gdStep())||G.q||UI.pendDj||UI.pendItem||typeof hlpAdvice!=='function')return;const hp=me();if(!hp||G.pl.filter(x=>x.human).length!==1)return;
+function scGlowHint(){if(!hintsOn()||!G||G.over||G.tut||online()||(typeof gdStep==='function'&&gdStep())||G.q||UI.pendDj||UI.pendItem||typeof hlpAdvice!=='function')return;const hp=me();if(!hp||G.pl.filter(x=>x.human).length!==1)return;
   if(G.phase==='bid'){if(!UI.pickSpot.length)return;const m=hlpAdvice();if(m&&m.act==='bid'&&UI.pickSpot.includes(m.spot))UI.pickSpot=[m.spot];return}
   if(G.phase!=='turn'||G.step!=='move'||G.cur!==hp.i)return;
   if(!G.move){const m=hlpAdvice();scCompute();const rk=Object.keys(SC.starts).map(Number).filter(s=>UI.pick.includes(s)&&SC.starts[s].best).sort((a,b)=>SC.starts[b].best.total-SC.starts[a].best.total);
     const keep=[];if(m&&m.act==='start'&&UI.pick.includes(m.tile))keep.push(m.tile);for(const s of rk){if(keep.length>=1)break;if(!keep.includes(s))keep.push(s)}if(keep.length)UI.pick=keep;return}
-  const pl=typeof HPL!=='undefined'?HPL.plan:null;if(!pl||pl.seed!==G.seed||pl.turn!==G.turn)return;const path=G.move.path,q=pl.o.path;if(q.length<=path.length||!path.every((x,i)=>x===q[i]))return;
-  const nx=q[path.length];if(UI.pick.includes(nx)||validMoves(hp.i).some(m=>m.act==='step'&&m.tile===nx))UI.pick=[nx]}
+  /* F3: no glow per drop */}
 (function(){const oc=computePick;computePick=function(){oc.apply(this,arguments);try{scGlowHint()}catch(e){}}})();
 // on a step with several colours the chooser lists the planned colour first, so the first glowing chip is the planned one
 // R38 row 5: on the steps where the market cannot be touched (Earn, Shadows, selling) a phone hides it, so the tiles keep >= 44 px

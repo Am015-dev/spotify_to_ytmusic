@@ -158,7 +158,8 @@ function hlpWhy(m,hp){let t='';
      else if(q.kind==='item')t='Keep the item worth most to you.';
      else if(q.kind==='djinn'&&q.cards&&DJ[q.cards[m.i]])t='Keep '+DJ[q.cards[m.i]].n+': worth '+DJ[q.cards[m.i]].vp+' points.';break}}
   return capW(t,15)}
-function hlpSuggest(){if(hlpBusy())return null;const hp=me();const m=hlpAdvice();if(!m)return null;
+function hlpSuggest(){if(hlpBusy())return null;const hp=me();const m=hlpAdvice();if(!m)return null;if(m.act==='step'&&!(typeof gdStep==='function'&&gdStep()))return null;   // F3: the hint names the start, the player plans the drops
+  
   const why=hlpWhy(m,hp);if(!why||!hlpEl(m))return null;
   return {why,key:JSON.stringify(m),target:()=>hlpEl(m),from:null}}
 // ---------------------------------------------------------------- wiring

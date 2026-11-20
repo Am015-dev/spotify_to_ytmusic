@@ -44,10 +44,10 @@ function lineText(){if(!G)return '';if(G.over){const hs=G.pl.filter(x=>x.human);
   if(G.q)return qLine(G.q);if(UI.pendDj||UI.pendItem)return 'Tap a glowing tile';
   if(G.phase==='bid'){const two=hp.markers>1;return 'Tap a glowing spot to bid'}
   switch(G.step){
-  case 'move':return !G.move?'Tap a glowing tile to lift people':G.move.hand.length===1?'Last one: land on its colour':'Tap a glowing tile to drop one';
-  case 'tribe':return {assassin:'Tap a glowing person to remove',builder:hp.fk?'Tap Earn to take your coins':'Tap Collect to take your coins',merchant:'Tap Collect to fetch goods',vizier:'Tap Collect: Advisors join you',elder:'Tap Collect: Sages join you',artisan:'Tap Collect: Crafters join you'}[G.act.color]||'';
+  case 'move':if(G.move&&typeof f3Mine==='function'){const f=f3Line();if(f)return f}return !G.move?'Tap a glowing tile to lift people':G.move.hand.length===1?'Last one: land on its colour':'Tap a glowing tile to drop one';
+  case 'tribe':return {assassin:'Shadow: remove one person in reach',builder:hp.fk?'Tap Earn to take your coins':'Tap Collect to take your coins',merchant:'Tap Collect to fetch goods',vizier:'Tap Collect: Advisors join you',elder:'Tap Collect: Sages join you',artisan:'Tap Collect: Crafters join you'}[G.act.color]||'';
   case 'tile':{const t=G.board[G.act.tile];return {village:UI.pick.length>1?'Tap a glowing tile for the palace':'Tap Build here',oasis:UI.pick.length>1?'Tap a glowing tile for the palm':'Tap Plant here',sacred:'Tap a djinn to summon, or Skip',small:'Buy a good for 3🪙',large:(UI.mkSel&&UI.mkSel.length===1?'One chosen. Pick one more good':'Pick two goods for 6🪙'),exchange:'Buy a good for 4🪙',workshop:'Commission an item, or Skip'}[t.k]||'Tap Skip to go on'}
-  case 'sell':return 'Sell goods, or tap End turn'}
+  case 'sell':return 'Sell goods for coins, or End turn'}
   return ''}
 // ---------- seats (the score race) ----------
 function E2(e,k){return `<i class="e2" data-i="${k}">${e}</i>`}
@@ -93,7 +93,8 @@ function powerChips(hp,vm){const pw=[...vm.filter(m=>m.act==='djinn'),...vm.filt
       h+=m.t>=0?`<button class="ab pw${UI.pendDj&&same(UI.pendDj,{k:m.k,pay:m.pay})?' on':''}" data-pw='${mvAttr({k:m.k,pay:m.pay})}'>✨ ${esc(DJ[m.k].n)} <small>${pay}</small></button>`:abtn(m,`✨ ${esc(DJ[m.k].n)} <small>${pay}</small>`,'pw')}
     else{const key='i'+m.k+(m.dj||'');if(seen.has(key))continue;seen.add(key);
       if(m.k==='flute'||m.k==='talisman')h+=`<button class="ab pw${UI.pendItem&&UI.pendItem.k===m.k?' on':''}" data-pi="${m.k}">${itemIc(m.k)} ${esc(ITEMS[m.k].n)}</button>`;else h+=abtn(m,`${itemIc(m.k)} ${esc(ITEMS[m.k].n)}${m.dj?' → '+esc(DJ[m.dj].n):''}`,'pw')}}
-  return `<div class="arow pws">${h}</div>`}
+  const n=seen.size;if(n<2||UI.pendDj||UI.pendItem||(typeof gdStep==='function'&&gdStep()))return `<div class="arow pws">${h}</div>`;   // F3: two or more powers fold into one Djinns (n) drawer
+  return `<div class="arow pws pwd"><button class="ab pw pwtog${UI.pwOpen?' on':''}" data-ui="pwtog" aria-expanded="${!!UI.pwOpen}">✨ Djinns (${n}) ${UI.pwOpen?'▾':'▸'}</button>${UI.pwOpen?h:''}</div>`}
 // builds the button area and sets UI.autoMove when the turn needs no decision from the player
 const gdOn=()=>typeof gdStep==='function'&&!!gdStep();   // the guided game shows a button for every step, never an automatic move
 function buildActs(){UI.autoMove=null;const hp=me();if(!G||G.over||!hp||UI.modal)return '';const vm=validMoves(hp.i);const by=a=>vm.filter(m=>m.act===a);let h='',main='';
@@ -118,9 +119,10 @@ function buildActs(){UI.autoMove=null;const hp=me();if(!G||G.over||!hp||UI.modal
     break}
   case 'sell':{const kinds=[...new Set(hp.res)];UI.sellSel=UI.sellSel.filter(k=>kinds.includes(k));const end=by('end')[0];
     if(!kinds.length&&!vm.filter(m=>m.act!=='end').length&&end&&!gdOn()){UI.autoMove=end;break}
-    if(UI.sellSel.length)main+=abtn({act:'sell',kinds:UI.sellSel.slice().sort()},`Sell +${sellValue(UI.sellSel.length)}🪙`,'');
+    if(UI.sellSel.length)main+=abtn({act:'sell',kinds:UI.sellSel.slice().sort()},`Sell ${UI.sellSel.length} +${sellValue(UI.sellSel.length)}🪙`,'');
+    else if(kinds.length>1)main+=abtn({act:'sell',kinds:kinds.slice().sort()},`Sell all ${kinds.length} kinds +${sellValue(kinds.length)}🪙`,'');   // F3: one button sells one of each kind
     main+=abtn(end,'End turn ▶','go');break}}
-  if(main)h+=`<div class="arow${main.indexOf('ab ern')>=0?' earn':''}">${main}</div>`;return h+pw}
+  if(main)h+=`<div class="arow${main.indexOf('ab ern')>=0?' earn':''}">${main}</div>`;if(G.step==='move'&&typeof f3Mine==='function')h=f3ActsHtml()+h;return h+pw}
 function renderActs(){const el=$('#acts');if(!el)return;const h=buildActs();if(el.dataset.h!==h){el.innerHTML=h;el.dataset.h=h}el.classList.toggle('empty',!h)}
 function renderMine(){const el=$('#mine');if(!el)return;const hp=me();let h='';
   if(G&&!G.over&&hp&&!UI.modal&&!G.q&&G.phase==='turn'&&G.step==='sell'){const kinds=[...new Set(hp.res)];UI.sellSel=UI.sellSel.filter(k=>kinds.includes(k));
@@ -129,10 +131,10 @@ function renderMine(){const el=$('#mine');if(!el)return;const hp=me();let h='';
 function renderLine(){const el=$('#line');if(!el)return;const t=lineText();if(el.textContent!==t)el.textContent=t;const hp=me();el.classList.toggle('mine',!!hp&&!G.over)}
 function renderChrome(){const c=$('#pchip');if(c&&G){const s=sideToAct();const t=G.over?'Game over':`Round ${G.round}`+(online()?' · online':'');if(c.textContent!==t)c.textContent=t}
   const sb=$('#speedbtn');if(sb)sb.innerHTML=ICON('fast')+'<span>'+({0.5:'slow',1:'normal',3:'fast'}[UI.speed]||'normal')+'</span>'}
-function render(){if(!G){renderModal();return}
+function render(){if(!G){renderModal();return}if(typeof f3Mine==='function')f3Turn();
   const prev=UI.snap&&UI.snap.seed===G.seed?UI.snap:null;if(me())UI.hurry=false;
   computePick();renderSeats();renderGrid();renderMarket();renderMine();renderActs();renderLine();renderChrome();renderPopups();renderModal();
-  if(typeof fit==='function')fit();if(typeof animate==='function')animate(prev);UI.snap=snapState();
+  if(typeof fit==='function')fit();if(typeof animate==='function')animate(prev);UI.snap=snapState();if(typeof f3Mine==='function')f3After();
   autoStep();if(typeof placeChz==='function')placeChz();if(typeof placeFinger==='function')placeFinger();overCheck();if(typeof hlpAfter==='function')hlpAfter()}
 function snapState(){return {seed:G.seed,tiles:G.board.map(t=>({m:t.m.slice(),hand:G.move&&G.move.at===t.i?G.move.hand.slice():[],camel:t.camel,tent:t.tent,palm:t.palm,pal:t.pal})),market:G.market.slice(),djRow:G.djRow.slice(),thRow:(G.thRow||[]).slice(),
   tot:G.pl.map(p=>shownTotal(p)),coins:G.pl.map(p=>p.coins),cur:G.cur,act:G.act?{color:G.act.color,tile:G.act.tile}:null,step:G.step,logN:G.logN}}
@@ -153,6 +155,7 @@ function onTile(i){const p=me();if(!p)return;if(UI.chz){const same=UI.chz.anchor
   if(UI.pendItem){const it=UI.pendItem;const ms=vm.filter(m=>m.act==='item'&&m.k===it.k);
     if(it.k==='flute'){const m=ms.find(m=>m.t===i);UI.pendItem=null;if(m)return go(m);return render()}
     if(it.k==='talisman'){if(it.from==null){if(ms.some(m=>m.from===i)){it.from=i;return render()}UI.pendItem=null;return render()}const m=ms.find(m=>m.from===it.from&&m.to===i);UI.pendItem=null;if(m)return go(m);return render()}}
+  if(G.step==='move'&&G.move&&typeof f3Mine==='function'&&f3TileTap(i))return;   // F3: tap where the walk ends: the whole path is planned, one more tap confirms
   if(G.step==='move'){if(!G.move){const m=vm.find(m=>m.act==='start'&&m.tile===i);if(m){UI.hurry=false;return go(m)}return nope()}
     const ok=vm.filter(m=>m.act==='step'&&m.tile===i);if(!ok.length)return nope();if(ok.length===1)return go(ok[0]);
     return pickChoose({tile:i},ok.map(m=>({html:mdotHtml(m.c),m})))}
@@ -172,7 +175,7 @@ function onMarket(j){const p=me();const el=document.querySelector(`[data-mk="${j
 function onDjinn(k,th){const p=me();const ak=th?'t:'+k:k;if(UI.chz&&UI.chz.anchor.dj===ak){UI.chz=null;return render()}if(p&&G.step==='tile'&&!G.q){const tm=validMoves(p.i).filter(m=>m.act==='tile'&&(th?m.thief===k:m.dj===k));
     if(tm.length===1)return go(tm[0]);if(tm.length>1){UI.chz={anchor:{dj:ak},opts:tm.map(m=>({html:`<span class="paychip">Pay ${m.pay.el} Sage${m.pay.el>1?'s':''}${m.pay.fk?' + 1 Mystic':''}</span>`,m}))};return render()}}
   const d=DJ[k];showTip(document.querySelector(th?`[data-th="${k}"]`:`[data-dj="${k}"]`),th?`<img class="tipart" src="media/thief-${k}.webp" alt=""><b>${esc(THIEVES[k].n)}</b><br>${esc(THIEVES[k].x)}`:`<img class="tipart" src="media/djinn-${k}.webp" alt=""><b>${esc(d.n)}</b> · ${d.vp} points<br>${esc(d.x)}`)}
-function go(m){UI.chz=null;UI.mkSel=[];UI.pendDj=null;UI.pendItem=null;clearTimeout(UI.autoT);if(online()&&isClient()){netSend(m);return}const s=sideToAct();const hu=s>=0&&P(s).human;const mine=!online()||s===NET.mySeat;
+function go(m){if(m&&m.act==='f3plan'){UI.chz=null;return f3Plan(m.o)}UI.chz=null;UI.mkSel=[];UI.pendDj=null;UI.pendItem=null;clearTimeout(UI.autoT);if(online()&&isClient()){netSend(m);return}const s=sideToAct();const hu=s>=0&&P(s).human;const mine=!online()||s===NET.mySeat;
   if(hu&&m.act==='start'){UI.moveSnap=JSON.stringify(G);UI.moveSteps=[m]}else if(hu&&m.act==='step'&&UI.moveSteps)UI.moveSteps.push(m);else if(m.act!=='djinn'&&m.act!=='item')UI.moveSnap=null;
   if(hu&&mine&&!G.tut&&typeof fingerUsed==='function')fingerUsed(m);
   const r=performMove(m,s);if(G&&!G.move)UI.moveSnap=G.step==='move'?UI.moveSnap:null;
@@ -202,15 +205,15 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape'&&(UI.pendDj||UI.pend
 function uiAct(a){if(online()){if(a==='new'||a==='start'){UI.modal='lobby';render();return}if(a==='undodrop'&&isClient()){netSend({act:'undodrop'});return}if(a==='continue')return}
   switch(a){case 'start':if(tutOffer('start'))return;beginGame();return;case 'quick':if(tutOffer('quick'))return;UI.setup.seats=['human','ai','ai','ai','ai'];beginGame();return;case 'goalgo':UI.modal=null;render();schedule();return;case 'more':UI.more=!UI.more;render();return;case 'tutgo':UI.modal=null;tutStart();return;case 'tutplay':{const nx=UI.offerNext||'quick';UI.modal=null;uiAct(nx);return}case 'continue':loadSaved();return;case 'new':openStart();return;case 'story':if(typeof GXC!=='undefined'&&window.CAMPAIGN){UI.modal=null;GX.close();render();storyOpen()}return;
   case 'again':UI.modal=null;beginGame();return;case 'closeover':UI.modal=null;render();return;
-  case 'ernm':UI.earnFk=Math.max(0,(UI.earnFk||0)-1);render();return;case 'ernp':UI.earnFk=(UI.earnFk||0)+1;render();return;
+  case 'f3go':f3Go();return;case 'f3x':F3.plan=null;render();return;case 'pwtog':UI.pwOpen=!UI.pwOpen;render();return;case 'ernm':UI.earnFk=Math.max(0,(UI.earnFk||0)-1);render();return;case 'ernp':UI.earnFk=(UI.earnFk||0)+1;render();return;
   case 'undodrop':{if(!UI.moveSnap||!UI.moveSteps)return;const steps=UI.moveSteps.slice(0,-1);G=JSON.parse(UI.moveSnap);UI.moveSteps=[];for(const m of steps){performMove(m,G.cur);UI.moveSteps.push(m)}if(!steps.length)UI.moveSnap=null;refresh();return}}}
 function openStart(){UI.modal='start';render()}
 function resetScene(){UI.camp=null;UI.snap=null;UI.chz=null;UI.pendDj=UI.pendItem=null;UI.mkSel=[];UI.sellSel=[];UI.moveSnap=null;UI.hurry=false}
 function beginGame(o){o=o||{};const s=UI.setup;UI.modal=null;UI.fx.length=0;UI.fxSeen=0;resetScene();const seats=s.seats.slice(0,s.np);
   newGame({np:s.np,seats,lv:s.lv.slice(0,s.np),ex:Object.assign({},s.ex,s.np===5?{sultan:true}:{}),mode:seats.every(x=>x==='ai')?'ai':'x'});UI.modal=null;refresh()}
 function loadSaved(){try{const g=JSON.parse(localStorage.getItem(SAVE));if(!g||!g.v)throw 0;G=g;UI.modal=null;resetScene();refresh()}catch(e){openStart()}}
-// ---------- the computer: one step at a time, about 0.6 s a drop; tap the table to hurry ----------
+// ---------- the computer: about 1.5 s per decision (one caption each), 0.4 s a drop; Skip or a tap on the table hurries it ----------
 const modalStops=()=>UI.modal&&UI.modal!=='lobby';
 let aiTimer=null;function schedule(){if(online()&&isClient())return;if(aiTimer||!G||G.over||UI.pause||modalStops()||tutHeld())return;const s=sideToAct();if(s<0||P(s).human)return;
-  const drop=G.step==='move'&&G.move;const base=drop?320:420;/* W497: a rival turn takes about 2-3 s; Skip or a tap on the table hurries it */const d=ANIM?Math.max(0,base/(UI.speed||1)*(UI.hurry?.12:1)):0;
+  const drop=G.step==='move'&&G.move&&G.move.drops.length;const lift=G.step==='move'&&G.move&&!G.move.drops.length;const watch=G.pl.some(p=>p.human);const base=!watch?420:drop?380:lift?1300:1500;   /* F3: one readable caption per rival decision (~1.5 s), drops quicker *//* W497: a rival turn takes about 2-3 s; Skip or a tap on the table hurries it */const d=ANIM?Math.max(0,base/(UI.speed||1)*(UI.hurry?.12:1)):0;
   aiTimer=setTimeout(()=>{aiTimer=null;if(!G||G.over||modalStops()||tutHeld()||(online()&&isClient()))return;const s2=sideToAct();if(s2<0||P(s2).human)return;const m=aiMove(s2);if(!m){console.error('AI has no move in '+G.phase+'/'+G.step);return}go(m)},d)}
