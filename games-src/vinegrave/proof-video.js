@@ -19,16 +19,16 @@ const sleep = ms => new Promise(r => setTimeout(r, ms));
     else { if (!(await tapSel('#rs [data-a=again], #rs .btn.go, .gxt-end .btn.go'))) await sleep(300); }
     await sleep(500);
   }
-  await sleep(1500); await p.evaluate(() => { const b = [...document.querySelectorAll('button')].find(x => /real game/i.test(x.textContent) && x.getBoundingClientRect().width); if (b) b.click(); });
-  await sleep(2500);
-  if (await p.evaluate(() => !G || G.phase !== 'play' || UI.mode === 'tutorial')) { await p.evaluate(() => { try { GX.close(); } catch (e) { } startGame('vs', { np: 2, lvl: 'easy' }); }); await sleep(1500); }
+  const tapText = async re => { const r = await p.evaluate(src => { const rx = new RegExp(src, 'i'); const e = [...document.querySelectorAll('button')].find(x => rx.test(x.textContent) && x.getBoundingClientRect().width && getComputedStyle(x).visibility !== 'hidden'); if (!e) return null; const q = e.getBoundingClientRect(); return { x: q.left + q.width / 2, y: q.top + q.height / 2 }; }, re.source); if (r) { await p.touchscreen.tap(r.x, r.y); return true; } return false; };
+  for (let k = 0; k < 12; k++) { await sleep(1200); if (await p.evaluate(() => G && G.phase === 'play' && UI.mode !== 'tutorial' && !document.querySelector('.gx-modal.on, #gxm-d[open]'))) break; (await tapText(/real game/)) || (await tapText(/start the expedition/)) || (await tapText(/^\s*play\s*$/)); }
   let n = 0; while (Date.now() - t0 < 182000) {
     const st = await p.evaluate(() => ({ my: typeof myTurn === 'function' && myTurn(), over: G && G.phase === 'over' }));
     if (st.over) break;
     if (st.my) {
+      if (await tapText(/start the expedition/)) { await sleep(1200); continue; }
       const done = (await tapSel('body.vg-sheet #qbox [data-a=mv]')) || (await tapSel('#gobtn')) || (await tapSel('#map .site.glow')) || (await tapSel('#row .cd.glow')) || (await tapSel('#hand .cd.glow')) || (await tapSel('#track.glow')) || (await tapSel('#passbtn'));
       n++; if (n === 6) await shot('03-real-game-375x667.png'); await sleep(1300);
-    } else { await sleep(700); }
+    } else { if (!(await tapText(/start the expedition|next round|continue/))) await sleep(700); }
   }
   await shot('04-after-3min-375x667.png');
   const v = p.video(); await ctx.close(); const src = await v.path(); fs.renameSync(src, path.join(dir, 'first-3min-375x667.webm')); fs.rmSync(tmp, { recursive: true, force: true });
