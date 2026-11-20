@@ -65,6 +65,9 @@ button:focus-visible, [tabindex]:focus-visible { outline: 3px solid var(--gold);
 .prov.glow .mkring { stroke: var(--gold); stroke-width: 5; fill: none; }
 .prov.sel .mkring { stroke: #fff; stroke-width: 5; fill: none; }
 .prov .hit { fill: transparent; }
+.prov:not(.glow) .hit { pointer-events: none; }
+.prov:not(.glow) { pointer-events: none; }
+.slot.canb { fill: #7fc46a; }
 .col { pointer-events: none; }
 .col.glow .halo { fill: rgba(226,180,79,.9); }
 .col.sel .halo { fill: #fff; }

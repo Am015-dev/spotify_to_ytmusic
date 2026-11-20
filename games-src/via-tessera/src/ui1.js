@@ -84,8 +84,10 @@ function renderMap() {
   L.slots.innerHTML = '';
   for (var rid in tg.slot) {
     var gg = GEO[rid], s = el('g', { 'class': 'slotg', 'data-r': rid }, L.slots);
-    el('circle', { 'class': 'slot glow', cx: gg.mx, cy: gg.my, r: 11 }, s);
-    el('text', { 'class': 'slotn', x: gg.mx, y: gg.my }, s).textContent = tg.slot[rid];
+    var canB = tg.slotB && tg.slotB[rid];
+    el('circle', { 'class': 'slot glow' + (canB ? ' canb' : ''), cx: gg.mx, cy: gg.my, r: canB ? 13 : 11 }, s);
+    if (canB) el('path', { d: 'M' + (gg.mx - 6) + ' ' + (gg.my + 1) + 'l6 -6 6 6v6h-12z', fill: '#2b2018', 'pointer-events': 'none' }, s);
+    else el('text', { 'class': 'slotn', x: gg.mx, y: gg.my }, s).textContent = tg.slot[rid];
     el('circle', { 'class': 'slothit glow', cx: gg.mx, cy: gg.my, r: 22, 'data-r': rid }, s);
   }
   // cities
@@ -136,7 +138,7 @@ function targets() {
   if (!pd) { ms.forEach(function (m) { if (m.t === 'play') t.cards[m.i] = 1; }); return t; }
   if (pd.h === 'arch-move') {
     ms.forEach(function (m) { if (m.t === 'mv') t.col[pi + ':' + m.k] = 1; });
-    if (UI.selCol != null) { var r = VT.reach(G, pi, UI.selCol, pd.steps); for (var rid in r) t.slot[rid] = r[rid]; }
+    if (UI.selCol != null) { var r = VT.reach(G, pi, UI.selCol, pd.steps); for (var rid in r) { t.slot[rid] = r[rid]; t.slotB = t.slotB || {}; t.slotB[rid] = canBuildFrom(G, pi, rid); } }
   } else if (pd.h === 'arch-build') {
     ms.forEach(function (m) { if (m.t === 'build') t.city[m.c] = { cost: VT.buildCost(G, pi, m.c) }; });
   } else if (pd.h === 'pref') {
@@ -147,6 +149,11 @@ function targets() {
   return t;
 }
 
+// would standing on this line let the player build (an unbuilt, affordable city at either end)?
+function canBuildFrom(G, pi, rid) {
+  var r = VT.ROUTE[rid], p = G.pl[pi];
+  return [r.a, r.b].some(function (cid) { var c = G.city[cid]; if (!c || c.h.indexOf(pi) >= 0 || p.houses.length >= D.HOUSES) return false; var cost = VT.buildCost(G, pi, cid); if (p.coins < cost.coins) return false; for (var g in cost.goods) if (p.goods[g] < cost.goods[g]) return false; return true; });
+}
 // ---------- camera ----------
 function boardBox() { var b = $('#board'); return { w: b.clientWidth || 375, h: b.clientHeight || 400 }; }
 function setView(v, anim) {
@@ -172,7 +179,7 @@ function animView(to) {
   var t0 = performance.now(); cancelAnimationFrame(camAnim);
   (function step(t) { var k = Math.min(1, (t - t0) / 420), e = 1 - Math.pow(1 - k, 3);
     setView({ x: from.x + (to.x - from.x) * e, y: from.y + (to.y - from.y) * e, w: from.w + (to.w - from.w) * e });
-    if (k < 1) camAnim = requestAnimationFrame(step); })(t0);
+    if (k < 1) camAnim = requestAnimationFrame(step); else if (typeof placeFinger === 'function') placeFinger(); })(t0);
 }
 function zoomBy(f, cx, cy) {
   var v = UI.view; if (!v) return; cx = cx == null ? v.x + v.w / 2 : cx; cy = cy == null ? v.y + v.h / 2 : cy;
@@ -239,7 +246,7 @@ function renderRace() {
   var h = '';
   G.pl.forEach(function (p, i) {
     var turn = G.phase === 'play' && VT.sideToAct(G) === i;
-    h += '<span class="chip' + (turn ? ' turn' : '') + '" title="' + esc(p.name) + ' points now"><span class="dot" style="background:' + PCOL[i] + '"></span>' + esc(p.name) + ' <b data-engine-score="' + i + '">' + VT.score(G, i).total + '</b></span>';
+    h += '<span class="chip' + (turn ? ' turn' : '') + '" role="button" tabindex="0" data-score="1" title="' + esc(p.name) + ' points now"><span class="dot" style="background:' + PCOL[i] + '"></span>' + esc(p.name) + ' <b data-engine-score="' + i + '">' + VT.score(G, i).total + '</b></span>';
   });
   $('#race').innerHTML = h;
   $('#mktn').textContent = G.disp.filter(function (x) { return x != null; }).length;

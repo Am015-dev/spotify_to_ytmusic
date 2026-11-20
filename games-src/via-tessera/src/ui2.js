@@ -22,7 +22,7 @@ function renderPrompt() {
   var h = pd.h;
   if (h === 'arch-move') {
     if (pd.steps <= 0) say('No steps left: build now');
-    else if (UI.selCol != null) say('Tap a glowing stop (' + word(pd.steps, 'step', 'steps') + ')');
+    else if (UI.selCol != null) say('Stops with a house let you build');
     else say('Move a cart or ship: ' + word(pd.steps, 'step', 'steps'));
     acts([{ t: 'Build ▸', glow: pd.steps <= 0, f: function () { UI.selCol = null; move({ t: 'mdone' }); } }]);
   } else if (h === 'arch-build') {
@@ -106,7 +106,7 @@ function move(m) {
   if (G.pend && G.pend.h !== 'buy' && G.pend.h !== 'merc') closeSheet();
   if (!G.pend && !(G.drop && G.drop.length)) closeSheet();
   render(); save();
-  if (G.pend && isHuman(VT.sideToAct(G))) frameTargets();
+  if (G.pend && isHuman(VT.sideToAct(G)) && (G.pend.h !== wasPend || m.t === 'play')) frameTargets();
   if (G.phase === 'end') { setTimeout(showResult, UI.fast ? 50 : 900); return; }
   if (!isHuman(VT.sideToAct(G))) setTimeout(runAI, UI.fast ? 30 : 450);
   else if (UI.mode === 'hot' && VT.sideToAct(G) !== pi) banner(G.pl[VT.sideToAct(G)].name + '’s turn');
@@ -146,16 +146,20 @@ function runAI() {
   if (!G || G.phase !== 'play') return;
   var pi = VT.sideToAct(G); if (isHuman(pi)) { render(); return; }
   UI.busy = true; render();
+  var keepView = UI.view && Object.assign({}, UI.view), start = snap(), acts0 = [];
   var step = function () {
     if (!G || G.phase !== 'play') { UI.busy = false; render(); return; }
     var p2 = VT.sideToAct(G);
-    if (isHuman(p2)) { UI.busy = false; render(); homeView(); return; }
+    if (isHuman(p2)) { UI.busy = false; render(); if (keepView) animView(keepView); recap(pi, start, acts0); return; }
     var m = VAI.choose(G, G.pl[p2].ai || UI.lvl), before = snap(), wasPend = G.pend && G.pend.h;
     // follow the action with the camera
     if (m.t === 'mv') { var col = G.pl[p2].cols[m.k], from = col.at.r != null ? { x: GEO[col.at.r].mx, y: GEO[col.at.r].my } : VT.CITY[col.at.c]; fitPoints([from, { x: GEO[m.r].mx, y: GEO[m.r].my }], 90, 420); }
     if (m.t === 'build') fitPoints([VT.CITY[m.c]], 120, 420);
     if (m.t === 'prov') fitPoints(D.CITIES.filter(function (c) { return c.p === m.p; }).concat([provPos(D.PROVS.filter(function (x) { return x.id === m.p; })[0])]), 90, 420);
+    if (m.t === 'play') acts0.push(D.CARDS[G.pl[p2].hand[m.i]].n);
+    if (m.t === 'build') acts0.push('house in ' + VT.CITY[m.c].n);
     VT.performMove(G, m);
+    if (m.t === 'buy') acts0.push('bought ' + D.CARDS[G.pl[p2].hand[G.pl[p2].hand.length - 1]].n);
     if (m.t === 'trade' && m.ops.length) banner(G.pl[p2].name + ' ' + m.ops.map(function (o) { return (o[1] > 0 ? 'buys ' : 'sells ') + Math.abs(o[1]) + ' ' + D.GOOD_NAME[o[0]]; }).join(', '));
     if (m.t === 'buy') banner(G.pl[p2].name + ' buys ' + D.CARDS[G.pl[p2].hand[G.pl[p2].hand.length - 1]].n);
     if (m.t === 'pcoins') banner(G.pl[p2].name + ' collects taxes');
@@ -189,7 +193,7 @@ function openMarket(buying) {
   G.disp.forEach(function (id, s) {
     if (id == null) { h += '<div class="mc"><div class="pile" style="width:76px;height:100px">bought</div></div>'; return; }
     var can = buying && pd && pd.left > 0 && VT.canBuyCard(G, pi, s, consul);
-    h += '<div class="mc ' + (buying ? (can ? 'can' : 'no') : '') + '">' + cardHTML(id, (can ? 'glow ' : '') + (hs === s ? 'hint' : ''), 'data-s="' + s + '"' + (buying && !can ? ' aria-disabled="true"' : '')) + '<div class="price">' + priceHTML(s, consul) + '</div><div class="note">' + esc(cardWhat(D.CARDS[id]).split(',')[0].split(' then')[0]) + '</div></div>';
+    h += '<div class="mc ' + (buying ? (can ? 'can' : 'no') : '') + '">' + cardHTML(id, (can ? 'glow ' : '') + (hs === s ? 'hint' : ''), 'data-s="' + s + '"' + (buying && !can ? ' aria-disabled="true"' : '')) + '<div class="price">' + priceHTML(s, consul) + '</div><div class="note">' + (buying && !can && pd && pd.left > 0 ? 'Need ' + esc(needText(pi, s, consul)) : esc(cardWhat(D.CARDS[id]).split(',')[0].split(' then')[0])) + '</div></div>';
   });
   h += '</div><div class="tsum"><span class="grow deckn">' + word(G.deck.length, 'card', 'cards') + ' left in the deck</span>' + (buying ? '<button type="button" class="btn alt" id="mdone">Done buying</button>' : '') + '</div>';
   openSheet(buying ? 'Buy a card' : 'Market', h);
@@ -198,11 +202,26 @@ function openMarket(buying) {
     b.onclick = function () {
       var s = +b.getAttribute('data-s');
       if (!buying) { banner(D.CARDS[G.disp[s]].n + ': ' + cardWhat(D.CARDS[G.disp[s]])); return; }
-      if (!VT.canBuyCard(G, pi, s, consul) || !G.pend || G.pend.left <= 0) { bump(b); return; }
+      if (!VT.canBuyCard(G, pi, s, consul) || !G.pend || G.pend.left <= 0) { bump(b); banner('Need ' + needText(pi, s, consul)); return; }
+      var nm = D.CARDS[G.disp[s]].n;
       move({ t: 'buy', s: s });
+      banner('Bought ' + nm + ': it is in your hand');
+      setTimeout(function () { var hd = $('#hand'); hd.scrollLeft = hd.scrollWidth; }, 60);
       if (G.pend && G.pend.h === 'buy' && isHuman(VT.sideToAct(G))) openMarket(true);
     };
   });
+}
+// what is missing to buy a market card (shown on the card and when tapped)
+function needText(pi, s, consul) {
+  var p = G.pl[pi], cost = VT.cardCost(G, s, consul), miss = [];
+  for (var g in cost.goods) { var d = cost.goods[g] - p.goods[g]; if (d > 0) miss.push(d + ' ' + D.GOOD_NAME[g]); }
+  if (!miss.length && cost.any) miss.push(cost.any + ' more good' + (cost.any > 1 ? 's' : ''));
+  return miss.join(' + ') || 'nothing';
+}
+// one line after the rival's turn: what they did and what it scored
+function recap(pi, start, list) {
+  var now = VT.score(G, pi).total, d = now - start[pi].score, txt = G.pl[pi].name + (d ? (d > 0 ? ' +' : ' ') + d + ': ' : ': ') + (list.length ? list.slice(0, 3).join(', ') : 'passed');
+  UI.lastRecap = txt; banner(txt);
 }
 function openTrade() {
   var pi = VT.sideToAct(G), p = G.pl[pi];

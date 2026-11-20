@@ -82,8 +82,8 @@ function showScoreNow() {
   if (!G) return;
   var sc = G.pl.map(function (p, i) { return VT.score(G, i); });
   drawer('Score so far', '<table class="sc-table"><thead><tr><th>Patron</th>' + G.pl.map(function (p) { return '<th>' + esc(p.name) + '</th>'; }).join('') + '</tr></thead><tbody>' +
-    D.GODS.map(function (gd) { return '<tr><td><span class="gi">' + icon(gd.icon) + gd.n + '</span></td>' + sc.map(function (s) { return '<td>' + s.by[gd.id].pts + '</td>'; }).join('') + '</tr>'; }).join('') +
-    '<tr class="tot"><td>Total</td>' + sc.map(function (s) { return '<td>' + s.total + '</td>'; }).join('') + '</tr></tbody></table><p class="small">Ends when the market is empty or someone builds 15 houses.</p>');
+    D.GODS.map(function (gd) { return '<tr><td><span class="gi">' + icon(gd.icon) + gd.n + '</span><br><span class="small">' + gd.rule + '</span></td>' + sc.map(function (s) { var b = s.by[gd.id]; return '<td>' + b.pts + (b.n ? '<br><span class="small">' + b.n + ' card' + (b.n > 1 ? 's' : '') + (b.each != null ? ' \u00D7 ' + b.each : '') + '</span>' : '') + '</td>'; }).join('') + '</tr>'; }).join('') +
+    '<tr class="tot"><td>Total</td>' + sc.map(function (s) { return '<td>' + s.total + '</td>'; }).join('') + '</tr></tbody></table>' + (UI.lastRecap ? '<p class="small">Last rival turn: ' + esc(UI.lastRecap) + '</p>' : '') + '<p class="small">More cards with a patron multiply its points.</p>');
 }
 function showLog() { drawer('What happened', '<div class="rules">' + (G ? G.log.slice(-30).reverse().map(function (l) { return '<p>' + esc(l) + '</p>'; }).join('') : '') + '</div>'); }
 function showRules() {
@@ -130,6 +130,7 @@ function boot() {
   $('#hand').addEventListener('click', onHandTap);
   $('#menub').onclick = showMenu; $('#homeb').onclick = showMenu;
   $('#mktb').onclick = function () { if (G) openMarket(!!(G.pend && G.pend.h === 'buy' && isHuman(VT.sideToAct(G)))); };
+  document.addEventListener('click', function (e) { if (e.target.closest('[data-score]') && G) showScoreNow(); });
   document.addEventListener('click', function (e) { if (e.target.closest('#pileb') && G) { var pp = G.pl[UI.mode === 'hot' ? Math.max(0, VT.sideToAct(G)) : 0]; drawer('Played cards', '<p class="small">They come back with the Herald.</p><div class="mrow">' + pp.disc.slice().reverse().map(function (id) { return cardHTML(id, '', 'tabindex="-1" disabled'); }).join('') + '</div>'); } });
   document.addEventListener('click', function (e) { if (e.target.closest('#storeb') && G) { var p = G.pl[UI.mode === 'hot' ? Math.max(0, VT.sideToAct(G)) : 0]; banner(VT.used(p) + ' of 12 spaces used'); } });
   var rl = function () { if (UI.view) setView(UI.view); placeFinger(); };
