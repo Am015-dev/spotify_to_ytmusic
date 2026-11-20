@@ -157,7 +157,7 @@ var UI = (function () {
     var cell = Math.max(40, Math.min(cellMax, Math.floor((avail - 18 - (3 * 66 + 16)) / 5)));
     document.documentElement.style.setProperty('--cell', cell + 'px');
     var ph = H - used - (cell * 5 + 18), rowH = Math.floor((ph - 12) / 3);
-    var ch = Math.max(44, Math.min(rowH, 118)), cw = Math.floor(Math.min((W - 5 * 4) / 6, ch * 0.8));
+    var ch = Math.max(44, Math.min(rowH, 118)), cw = Math.floor(Math.min((W - 5 * 4) / 6, ch < 70 ? ch * 1.3 : ch * 0.8));
     var r = document.documentElement.style; r.setProperty('--ch', ch + 'px'); r.setProperty('--cw', cw + 'px'); r.setProperty('--rg', Math.max(3, Math.min(10, (ph - ch * 3) / 4)) + 'px');
   }
 
