@@ -53,6 +53,7 @@ const [W, H] = (process.argv[2] || '375x667').split('x').map(Number), N = +(proc
       if (await T('#mk .stgoods.glow, #goods .gbtn.glow', 320)) continue;
       if (await T('#tabs .tab.has', 350)) continue;
       if (await T('#acts .btn', 400)) continue;
+      if (await T('#goods .wkc', 400)) continue;
       await page.waitForTimeout(150);
     }
     const res = await page.evaluate(() => ({ rs: !document.getElementById('rs').hidden, txt: (document.querySelector('#rs h2') || {}).textContent, vp: G && G.P.map(p => p.vp).join('-') }));

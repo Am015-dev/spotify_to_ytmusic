@@ -376,5 +376,36 @@ html.gx-noanim .fly,html.gx-reduce .fly{transition:none}
 html body .gx-bar #hintT span{display:inline!important;font-weight:800;margin-left:2px}
 html body .gx-bar #hintT{padding:4px 8px!important;min-width:44px}
 @media (max-width:640px) and (orientation:portrait) and (max-height:700px){#prompt:has(.starwhy){-webkit-line-clamp:3}}
+/* F2 (cold-play fixes): one full tile name on every label (two short lines when needed), roomier phone stalls and storage */
+html body .tilebtn.lab .tlab{font-size:13px!important;line-height:14px!important;padding:1px 4px!important;max-width:none!important;overflow:visible!important;text-overflow:clip!important;letter-spacing:0!important;bottom:-6px}
+html body .tilebtn.lab .tlab.two{white-space:normal;width:min-content;text-align:center}
+#mk.big:not(.six) .stall:not(.lane){position:relative;padding:5px 2px 9px;justify-content:center}
+#mk.big:not(.six) .stall:not(.lane) .sth{position:absolute;left:2px;top:2px;z-index:3}
+#mk.big:not(.six) .stall:not(.lane) .stgoods{position:absolute;left:0;top:50%;transform:translateY(-60%);flex-direction:column;gap:2px;min-height:0;z-index:6}
+#mk.big:not(.six) .stall:not(.lane) .stgoods.glow{left:0;right:0;top:0;bottom:0;transform:none;flex-direction:row;align-items:center;justify-content:center;background:rgba(20,14,10,.55);border-radius:10px}
+#mk.big:not(.six) .gchip{font-size:13px!important;line-height:17px;padding:0 4px}
+#mk.big:not(.six) .lane{padding:4px 4px 9px}
+html body #mk.big.six .gchip{font-size:13px!important}
+#dicerow .die.white{cursor:pointer}
+#goods .wkc{min-height:44px;min-width:44px;padding:0 5px;display:inline-flex;align-items:center;gap:2px;font-size:15px!important;white-space:nowrap;margin-left:auto}
+#goods .wkc+.wkc{margin-left:0}
+#goods .wkc b{display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;border-radius:6px;background:#fbf6ea;border:2px solid #2a2014;font-weight:900}
+#goods .wkc svg{width:18px;height:18px}#goods.many .gbtn{min-width:44px!important}
+#goods{flex-wrap:wrap;align-items:center}
+/* labels sit under the tile in the roomy 3-column market, so the tile picture stays visible */
+#mk.big:not(.six) .tilebtn.lab .tlab{top:calc(100% - 7px);bottom:auto}
+#mk.big:not(.six) .stall:not(.lane){padding-bottom:24px}
+#mk.big:not(.six) .lane{padding-bottom:24px}
+/* storage: bigger slots, readable names */
+@media (max-width:640px) and (orientation:portrait){#store{--hex:38px!important;gap:5px!important}#store .slot{width:50px!important;height:56px!important}}
+/* tip pop-ups: no empty picture box when a tip has no art */
+.gxh-pic:empty,.gxh-sp:empty{display:none!important}
+/* How to play opened from the title sits above the title card */
+html body .gx-scrim.on{z-index:55!important}
+html body .gx-drawer{z-index:56!important}
+@media (max-width:640px) and (orientation:portrait) and (max-height:600px){
+  #store{--hex:34px!important}#store .slot{width:48px!important;height:46px!important}
+  #prompt .starwhy{display:inline;margin-left:4px}#prompt,#prompt:has(.starwhy){-webkit-line-clamp:2!important}
+}
 </style>
 </head>

@@ -41,11 +41,10 @@ function musSync() { try { GXMUS.sync(); } catch (e) { } }
 /* ---------------- helpers ---------------- */
 var GLYPH = { castle: '🏰', mine: '⛏️', know: '📜', ship: '⛵', hall: '🏛️', carp: '🪚', chapel: '🔔', mkt: '🎪', inn: '🍺', mint: '🪙', tower: '🗼', store: '🌾', sheep: '🐑', goat: '🐐', pig: '🐖', goose: '🪿' };
 var GCOL = ['', '#f7f4ec', '#f6dc92', '#f3c27e', '#f0b0a0', '#c7dbf2', '#e6e6e6'];
-var SHORT = { hall: 'Moot Hall', carp: 'Joiner', chapel: 'Chapel', mkt: 'Fair', inn: 'Inn', mint: 'Mint', tower: 'Beacon', store: 'Granary' };
-function tlabel(t) { if (!t) return ''; if (t.t === 'bld') return SHORT[t.k] || VB.BLD[t.k].name.split(' ')[0]; if (t.t === 'pas') return t.n + ' ' + VB.ANIMALS[t.k]; return VB.COLNAME[t.t]; }
-function labelled(b, t) { b.appendChild(h('span.tlab', { text: tlabel(t), 'aria-hidden': 'true', 'data-short': t.t === 'bld' ? (TINY[t.k] || '') : '' })); b.classList.add('lab'); return b; }
-var TINY = { hall: 'Hall', store: 'Barn', chapel: 'Abbey', tower: 'Tower', carp: 'Saw' };   /* whole words for narrow stalls: a label is never cut mid-word */
-function fitLabels() { document.querySelectorAll('.tlab[data-short]').forEach(function (e) { var sh = e.getAttribute('data-short'); if (sh && e.scrollWidth > e.clientWidth + 1) e.textContent = sh; }); }
+/* one name per tile everywhere (F2): the stall/storage label is the tile's own name (data.js), wrapped onto two lines when needed */
+function tlabel(t) { return t ? VB.tileName(t) : ''; }
+function labelled(b, t) { var n = tlabel(t); b.appendChild(h('span.tlab' + (n.indexOf(' ') > 0 && n.length > 8 ? '.two' : ''), { text: n, 'aria-hidden': 'true' })); b.classList.add('lab'); return b; }
+function fitLabels() { }
 function glyph(t) { return t.t === 'bld' || t.t === 'pas' ? GLYPH[t.k] : GLYPH[t.t]; }
 var TERRAIN = { castle: 'tile-keep', mine: 'tile-mine', ship: 'tile-barge', know: 'tile-lore-k1', pas: 'tile-pas-sheep-2', bld: 'tile-bld-hall' };
 function hexEl(t, opt) {
@@ -139,7 +138,7 @@ function turnBanner() {
   var txt = isHuman(a) ? (hu > 1 ? G.seats[a].name + ', your turn' : 'Your turn') : G.seats[a].name + '\'s turn';
   var b = $('#tbanner'); if (!b) { b = h('div', { id: 'tbanner', 'aria-hidden': 'true' }); document.body.appendChild(b); }
   b.innerHTML = ''; b.appendChild(h('span', { text: txt })); b.appendChild(h('span.rds', {}, G.P[a].dice.map(function (v) { return h('span.rd', { text: v }); }))); b.style.setProperty('--sc', VB.SEATCOL[a] || '#2a2014');
-  try { var orr = $('#opp').getBoundingClientRect(); if (orr.height) { b.style.top = Math.round(orr.top + orr.height / 2) + 'px'; b.classList.add('top'); } else if (L.tiny) { var brr = ($('#tabs') || document.querySelector('.gx-bar')).getBoundingClientRect(); b.style.top = Math.round(brr.top + brr.height / 2) + 'px'; b.classList.add('top'); } } catch (e) { }   /* very short phones (no strip): over the top bar; it lets taps through */   /* sit over the rival strip: never over a glowing target */
+  try { var dh = document.querySelector('.gx-dock-head'), drr = dh && dh.getBoundingClientRect(); if (drr && drr.height && drr.top > 80) { b.style.top = Math.round(drr.top + drr.height / 2) + 'px'; b.classList.add('top'); } } catch (e) { }   /* F2: over the dock's title row; never over the score strip or a glowing target */   /* very short phones (no strip): over the top bar; it lets taps through */   /* sit over the rival strip: never over a glowing target */
   UI.hold = UI.fast ? 0 : Date.now() + animMs(isHuman(a) ? 900 : 500);
   if (UI.fast || QS.get('scn') || tutVoice()) return; b.classList.remove('on'); void b.offsetWidth; b.classList.add('on'); sfx('dice'); rollDice(b, G.P[a].dice);
 }
@@ -433,9 +432,10 @@ function legalTakeFor(d, slot) {
   if (top && top.t !== 'castle') return [];
   return movesWhere(function (m) { return m.k === 'take' && m.v === d && m.slot === slot; });
 }
+function WHITE_LINE() { return 'The dashed die is not yours: it shows which stall (' + G.white + ') got this round\'s new goods.'; }
 function costTip() {   /* the dark number on a tile has a legend the first time it shows in a game */
   if (UI.costTipDone || UI.mode === 'tutorial' || !myTurn() || (L.tabs && UI.tab !== 'market')) return; UI.costTipDone = true;
-  setTimeout(function () { lineSay('A number on a tile = workers it costs to take with your dice.', 4000); }, 50);
+  setTimeout(function () { lineSay('A worker badge on a tile = workers it costs to take with your dice. The button spends them for you.', 4000); }, UI.note ? 5200 : 50);
 }
 function renderMarket() {
   var mk = $('#mk'); mk.innerHTML = ''; var mt = myTurn(), top = pend();
@@ -522,7 +522,8 @@ function renderDock() {
     var bk = !p.used[i] && bumpOf(i), ev0 = bk ? wrap6(v + bk) : v;
     dr.appendChild(h('button.die' + (p.used[i] ? '.used' : '') + (UI.die === i ? '.sel' : '') + (bk ? '.bumped' : ''), { type: 'button', id: 'die-' + i, 'data-drag': p.used[i] || !mt ? null : 'die', 'data-idx': i, 'aria-label': 'Die ' + ev0 + (bk ? ' (rolled ' + v + ', moved by a worker)' : '') + (p.used[i] ? ' used' : ''), 'aria-pressed': UI.die === i ? 'true' : 'false', onclick: function () { tapDie(i); } }, [h('span', { text: ev0 }), bk ? h('span.bk', { text: (bk > 0 ? '+' : '') + bk }) : null]));
   });
-  dr.appendChild(h('span.die.white', { title: 'White die: this round\'s goods went to this stall', 'aria-label': 'White die ' + G.white, text: G.white }));
+  dr.appendChild(h('button.die.white', { type: 'button', id: 'whiteD', title: 'Spare die: not yours', 'aria-label': 'Spare die ' + G.white + ': not yours. It shows which stall got this round\'s new goods.', text: G.white, onclick: function () { lineSay(WHITE_LINE(), 4000); } }));
+  if (mt && !UI.whiteTipDone && UI.mode !== 'tutorial') { UI.whiteTipDone = true; setTimeout(function () { lineSay(WHITE_LINE(), 5000); }, 60); }
   /* storage */
   var st = $('#store'); st.innerHTML = '';
   for (var i = 0; i < VB.cap(p); i++) (function (i) {
@@ -544,7 +545,7 @@ function renderDock() {
   });
   /* resources */
   var rr = $('#resrow'); rr.innerHTML = '';
-  var RESTIP = { silver: 'Silver buys back-lane tiles. 1 point each at the end.', workers: 'Drag a worker onto a die to change it by one.', vp: 'Your points so far.', pos: 'Banner track. Barges move you up and first.' };
+  var RESTIP = { silver: 'Silver buys back-lane tiles. 1 point each at the end.', workers: 'Workers bend a die by one. A tile\'s button spends them for you, or drag one onto a die.', vp: 'Your points so far.', pos: 'Banner track. Barges move you up and first.' };
   function resTap(k) { return function () { toast(RESTIP[k], 2600); }; }
   rr.appendChild(h('span.res', { id: 'r-silver', title: 'Silver', 'aria-label': RESTIP.silver, onclick: resTap('silver'), 'data-engine': 'dockSeat().silver' }, [h('span.rw', { text: p.silver + ' silver' })]));
   var wl = p.workers - (mt ? bumpUsed() : 0);
@@ -560,7 +561,10 @@ function renderDock() {
     return;
   }
   var seen = {};
-  [0, 1].forEach(function (i) { if (p.used[i] || seen[p.dice[i]]) return; seen[p.dice[i]] = 1; ac.appendChild(h('button.btn.alt', { type: 'button', id: 'wk' + i, text: p.dice[i] + ' → ' + (2 + (p.know['wk+1'] ? 1 : 0)) + ' workers', 'aria-label': 'Swap your ' + p.dice[i] + ' for ' + (2 + (p.know['wk+1'] ? 1 : 0)) + ' workers', onclick: function () { doMove(pick(VB.validMoves(G).filter(function (m) { return m.k === 'workers' && m.die === i; }))); } })); });
+  var wkIn = portraitPhone() ? gd : ac, nW = 2 + (p.know['wk+1'] ? 1 : 0);
+  if (wkIn === gd && gt.length >= 3 && [0, 1].some(function (i) { return !p.used[i]; })) gd.classList.add('many');   /* room for the swap buttons on one row */   /* F2: phones put the swap buttons in the goods row, so the action row only holds End turn */
+  if (wkIn === gd) { var tp0 = gd.querySelector('.tip'); if (tp0) tp0.remove(); }
+  [0, 1].forEach(function (i) { if (p.used[i] || seen[p.dice[i]]) return; seen[p.dice[i]] = 1; wkIn.appendChild(h('button.btn.alt' + (wkIn === gd ? '.wkc' : ''), { type: 'button', id: 'wk' + i, html: wkIn === gd ? '<b>' + p.dice[i] + '</b> → ' + nW + ' ' + MEEPLE : null, text: wkIn === gd ? null : p.dice[i] + ' → ' + nW + ' workers', 'aria-label': 'Swap your ' + p.dice[i] + ' for ' + (2 + (p.know['wk+1'] ? 1 : 0)) + ' workers', onclick: function () { doMove(pick(VB.validMoves(G).filter(function (m) { return m.k === 'workers' && m.die === i; }))); } })); });
   if (p.used[0] && p.used[1]) { var eb = h('button.btn', { type: 'button', id: 'endB', text: 'End turn', onclick: function () { doMove({ k: 'end' }); } }); ac.appendChild(eb);
     requestAnimationFrame(function () { try { var r = eb.getBoundingClientRect(); if (r.bottom > innerHeight || r.top < 0) eb.scrollIntoView({ block: 'nearest' }); } catch (e) { } }); }   /* small phones: the dock body scrolls; never leave End turn below the fold */
 }
@@ -569,29 +573,30 @@ function storeLegal(i) {
   if (top && top.t === 'discard') return true;
   return VB.validMoves(G).some(function (m) { return m.k === 'place' && m.s === i && bumpOk(m); });
 }
+function WKBTN() { return '"→ 2 workers"'; }
 function promptText() {
   if (G.over) return 'Game over. Let\'s count the points.';
   var a = VB.actor(G); if (!isHuman(a)) return UI.cap || G.seats[a].name + ' is thinking...';
   var top = pend(), p = G.P[a];
-  if (top) return { castle: 'Your keep gives a free action. Any number works.', hall: 'Moot Hall: build one more tile now, any number.', grab: 'Pick any glowing tile. It is free.', store: 'Granary: sell one kind of goods for free.', ship: 'Barge: tap a glowing stall to load its goods.', discard: 'Storage is full. Tap a tile to throw away.' }[top.t];
+  if (top) return { castle: 'Keep: one free action. Tap any glowing tile, or Skip it.', hall: 'Moot Hall: tap a stored tile, then any glowing space. Or Skip.', grab: 'Tap any glowing tile, then Take it, free.', store: 'Granary: tap a goods kind, then Sell. Or Skip.', ship: 'Barge: tap a glowing stall\'s goods to load them. Or Skip.', discard: 'Storage is full. Tap a stored tile, then Throw this away.' }[top.t];
   if (UI.sel != null) { try { coach('preview'); } catch (e) { } return hints() ? 'Glowing spaces: +N scores now, 2/5 is region progress.' : 'Put it on a glowing space. Tap it again to cancel.'; }
   if (p.used[0] && p.used[1]) return 'Both dice used. Tap End turn.';
   var sm = UI.die == null && hints() ? hardMove() : null;   /* with hints on, the line names the same move as the star (R21: never two instructions) */
-  if (sm && (sm.k === 'take' || sm.k === 'grab') && !sm.w) return 'Drag your ' + sm.v + ' onto stall ' + sm.v + ' to take a tile.';
-  if (sm && sm.k === 'sell' && !sm.w) return 'Drag your ' + sm.v + ' onto your ' + sm.v + ' goods to sell.';
-  if (sm && sm.k === 'place') return 'Tap a stored tile, then a glowing space.';
-  if (sm && sm.k === 'buy') return 'The back lane sells a tile for silver.';
-  if (sm && sm.k === 'workers') return 'Swap a die for workers with the buttons below.';
-  if (sm && sm.w) return 'Drag a worker onto a die: one up or down.';
+  if (sm && (sm.k === 'take' || sm.k === 'grab') && !sm.w) return 'Tap the ★ tile in stall ' + sm.v + ', then Take to storage.';
+  if (sm && sm.k === 'sell' && !sm.w) return 'Tap your ' + sm.v + ' goods, then Sell.';
+  if (sm && sm.k === 'place') return 'Tap a glowing stored tile, then a glowing space.';
+  if (sm && sm.k === 'buy') return 'Tap a back-lane tile, then Buy.';
+  if (sm && sm.k === 'workers') return 'Tap the ' + WKBTN() + ' button: a die becomes workers.';
+  if (sm && sm.w) return 'Tap the ★ tile, then its button: it spends the workers for you.';
   var di = UI.die != null && !p.used[UI.die] ? UI.die : [0, 1].filter(function (i) { return !p.used[i]; }).sort(function (x, y) { return dieCan(y).length - dieCan(x).length; })[0];
   var v = effDie(di), vm = VB.validMoves(G).filter(function (m) { return m.die === di && bumpOk(m) && (bumpOf(di) || !m.w); });
   var tk = vm.some(function (m) { return m.k === 'take'; }), bd = vm.some(function (m) { return m.k === 'place'; }), sl = vm.some(function (m) { return m.k === 'sell'; });
-  if (tk && bd) return 'Drag your ' + v + ' to stall ' + v + ', or to a glowing ' + v + '.';
-  if (tk) return 'Drag your ' + v + ' onto stall ' + v + ' to take a tile.';
-  if (bd) return 'Drag your ' + v + ' onto a glowing ' + v + ' on your estate.';
-  if (sl) return 'Drag your ' + v + ' onto your ' + v + ' goods to sell.';
+  if (tk && bd) return 'Tap a glowing tile in stall ' + v + ' (then Take), or a glowing stored tile to build.';
+  if (tk) return 'Tap a glowing tile in stall ' + v + ', then Take to storage.';
+  if (bd) return 'Tap a glowing stored tile, then a glowing space.';
+  if (sl) return 'Tap your ' + v + ' goods, then Sell.';
   var any = VB.validMoves(G).some(function (m) { return (m.k === 'take' || m.k === 'place' || m.k === 'sell') && m.w > 0 && m.w <= p.workers; });
-  return any ? 'No match. Drag a worker onto a die to change it.' : 'Nothing fits. Swap a die for 2 workers.';
+  return any ? 'No match. Tap a tile with a worker badge, then its button: workers pay the difference.' : 'Nothing fits. Tap the ' + WKBTN() + ' button.';
 }
 function renderScores() {
   var b = $('#scorebody'); if (!b) return; b.innerHTML = '';
@@ -765,8 +770,16 @@ function doMove(m) {
     UI.busy = false; peekOff(); if (L.tabs && m.k === 'end') camReset(true);
     if (m.k === 'end') onTurnChange();
     save(); render(); schedule(); try { coachCheck(m, s, r.ev); } catch (e) { }
+    autoEnd(m, s);
     if (G.over) setTimeout(gameOver, Math.max(animMs(500), UI.fast ? 0 : (say.until || 0) - Date.now() + 300));
   });
+}
+function autoEnd(m, s) {   /* F2: both dice used and nothing else is legal (no back-lane buy, no free action): the turn ends by itself, one tap fewer */
+  if (!G || G.over || m.k === 'end' || UI.mode === 'tutorial' || !isHuman(s) || VB.actor(G) !== s || pend()) return;
+  var p = G.P[s]; if (!(p.used[0] && p.used[1])) return;
+  if (VB.validMoves(G).some(function (x) { return x.k !== 'end'; })) return;
+  var k = G.seq; lineSay('Both dice used: your turn ends.', 1200);
+  setTimeout(function () { if (G && G.seq === k && myTurn() && VB.actor(G) === s) doMove({ k: 'end' }); }, UI.fast ? 0 : 700);
 }
 function onTurnChange() {
   if (G.over) return; var a = VB.actor(G);
@@ -797,7 +810,7 @@ function startGame(o) {
   var n = o.n || 2, seats = [];
   for (var i = 0; i < n; i++) seats.push(i === 0 ? { name: o.myName || 'You', human: true } : { name: (o.names && o.names[i]) || VB.SEATNAME[i], human: !!(o.hot && o.hot[i]), ai: o.ai || 'normal', style: o.style || null });
   G = VB.newGame({ n: n, teams: !!o.teams, seed: o.seed, phases: o.phases || 5, rounds: o.rounds, seats: seats, bonus: o.bonus, noBlack: o.noBlack });
-  UI.view = 0; UI.sel = null; UI.die = null; UI.chain = 0; UI.busy = false; UI.costTipDone = false; UI.autoZ = null; UI.mode = o.mode || 'quick'; UI.camp = UI.mode === 'story'; UI.lastHuman = -1; UI.moveN = 0; UI.starN = 0;
+  UI.view = 0; UI.sel = null; UI.die = null; UI.chain = 0; UI.busy = false; UI.costTipDone = false; UI.whiteTipDone = false; UI.autoZ = null; UI.mode = o.mode || 'quick'; UI.camp = UI.mode === 'story'; UI.lastHuman = -1; UI.moveN = 0; UI.starN = 0;
   $('#start').hidden = true; $('#rs').hidden = true; $('#tv').hidden = true;
 
   UI.quick = false; UI.cap = ''; UI.pinTab = null; UI.tab = 'estate'; UI.bump = {}; FEEL.cam = { z: 1, x: 0, y: 0 }; save(); render(); musSync(); sfx('dice'); hintSync(); if (UI.mode === 'quick' && !UI.fast && !QS.get('scn')) showGoal(); else { if (UI.mode !== 'quick') toast(VB.PHASES[0] + ' begins', 1600); turnBanner(); } schedule();
@@ -895,16 +908,16 @@ function showSetup() {
 /* ---------------- rules / scores / menu drawers ---------------- */
 var RULES_HTML = '<div class="rules"><h3>How a turn works</h3><ol class="howturn">' +
   '<li>You roll two dice. Each die does one thing.</li>' +
-  '<li><b>Take</b>: drag a die onto the stall with its number.</li>' +
-  '<li><b>Build</b>: drag a stored tile onto a glowing space.</li>' +
+  '<li><b>Take</b>: tap a glowing tile in the stall with your die\'s number, then <b>Take to storage</b>.</li>' +
+  '<li><b>Build</b>: tap a stored tile, then a glowing space on your estate.</li>' +
   '<li>The space must match the tile colour and a die.</li>' +
   '<li>It must also touch land you already built.</li>' +
-  '<li>No match? Drag a worker onto a die: one up or down.</li>' +
-  '<li>Both dice used? Tap End turn.</li></ol>' +
-  '<p>You can also tap instead of dragging. Two fingers zoom the estate.</p>' +
+  '<li>No match? Workers bend a die one up or down. A tile\'s button spends them for you.</li>' +
+  '<li>Both dice used? Tap <b>End turn</b> (it ends by itself when nothing is left).</li></ol>' +
+  '<p>You can also drag dice and tiles. Two fingers zoom the estate.</p><p>The <b>dashed die</b> is not yours: it shows which stall got the round\'s new goods.</p>' +
   '<h3>Other things a die can do</h3>' +
   '<ul><li><b>Sell</b>: a die sells all your goods with its number. You get points and 1 silver.</li>' +
-  '<li><b>Hire</b>: swap any die for 2 workers.</li>' +
+  '<li><b>Hire</b>: tap a <b>→ 2 workers</b> button to swap a die for 2 workers.</li>' +
   '<li><b>Back lane</b>: once a turn, buy a tile there for 2 silver. No die needed.</li></ul>' +
   '<p>6 and 1 touch. A worker can turn a 6 into a 1.</p>' +
   '<h3>Tiles</h3><ul><li><b>Keep</b> (dark green): one free action, any number.</li><li><b>Mine</b> (grey): 1 silver after every season.</li>' +
@@ -914,7 +927,7 @@ var RULES_HTML = '<div class="rules"><h3>How a turn works</h3><ol class="howturn
   '<li><b>Barge</b> (blue): take one stall\'s goods. Move up the track.</li></ul>' +
   '<h3>Length and limits</h3><ul><li>A game is 5 seasons of 5 rounds.</li><li>Storage holds 3 tiles. A 4th makes you drop one.</li><li>You hold at most 3 kinds of goods.</li><li>The track sets turn order: higher goes first.</li></ul><h3>Points</h3><p>The light outlines on your estate mark regions. Fill every space in one to score it. Bigger regions pay more: 1 space pays 1, 8 spaces pay 36.</p><p>Season 1 adds 10 extra. Later seasons add 8, 6, 4, 2.</p>' +
   '<p>First to fill every space of one colour gets 5 to 7 points. Second gets 2 to 4.</p>' +
-  '<p>Each round the white die puts new goods on its stall.</p>' +
+  '<p>Each round the dashed (white) die puts new goods on its stall.</p>' +
   '<p>At the end: +1 per silver, +1 per unsold crate, +1 per 2 workers, plus lore. Most points wins. A tie goes to the emptier estate.</p>' +
   '<h3>Solo and teams</h3>' +
   '<p><b>Solo</b>: 25 rounds. You win only if you build all 37 spaces. <b>Teams</b> (4 players): partners share silver, workers and goods.</p>' +
@@ -950,13 +963,13 @@ function helpInit() {
   try {
     GXH.init({ game: 'vale-of-banners', defaultOn: true, avoid: '#acts button,.glow,.och', steps: {
       end: { target: function () { return $('#endB'); }, title: 'Done', text: 'Both dice used. Tap End turn.' },
-      'p-castle': { target: function () { return $('#mk'); }, title: 'Free action', text: 'Your keep gives a free action. Any number works.' },
-      'p-hall': { target: function () { return $('#store'); }, title: 'Build again', text: 'Moot Hall: build another stored tile now.' },
-      'p-ship': { target: function () { return $('#mk'); }, title: 'Barge', text: 'Load all goods from one stall.' }
+      'p-castle': { target: function () { return $('#mk'); }, title: 'Free action', text: 'Keep: tap any glowing tile for a free action, or tap Skip it.' },
+      'p-hall': { target: function () { return $('#store'); }, title: 'Build again', text: 'Moot Hall: tap a stored tile, then a glowing space. Or tap Skip.' },
+      'p-ship': { target: function () { return $('#mk'); }, title: 'Barge', text: 'Tap a glowing stall\'s goods to load them, or tap Skip.' }
     }, rules: [{ title: 'Dice', text: 'A die can take, build, sell or hire.' }, { title: 'Regions', text: 'Fill an outlined region. Early pays more.' }] });
     GXH.bulb({ el: '#bulbbtn', suggest: function () {
       if (!myTurn()) return null; var m = hardMove(); if (!m) return null;
-      var tgt = m.k === 'take' || m.k === 'grab' ? $('#mt-' + m.v + '-' + m.slot) : m.k === 'place' ? $('#st-' + m.s) : m.k === 'sell' ? $('#gd-' + m.v) : m.k === 'buy' ? $('#bl-' + m.slot) : m.k === 'end' ? $('#endB') : m.k === 'workers' ? $('#acts .btn') : $('#acts');
+      var tgt = m.k === 'take' || m.k === 'grab' ? $('#mt-' + m.v + '-' + m.slot) : m.k === 'place' ? $('#st-' + m.s) : m.k === 'sell' ? $('#gd-' + m.v) : m.k === 'buy' ? $('#bl-' + m.slot) : m.k === 'end' ? $('#endB') : m.k === 'workers' ? ($('#wk0') || $('#wk1')) : $('#acts');
       return { target: tgt || $('#dock'), why: starWhy(m) || VB.why(G, m) };
     }, rulesFor: helpPhase });
   } catch (e) { console.error(e); }

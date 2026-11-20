@@ -8,7 +8,7 @@ function fitMarket() {   /* phone tabs: shrink the stalls (or lay the six stalls
   [false, true].forEach(function (six) {
     if (best && best.fit) return;
     mk.classList.toggle('six', six); mk.style.gridTemplateColumns = six ? 'repeat(6,minmax(0,1fr))' : 'repeat(3,1fr)'; mk.style.gap = six ? '3px' : '6px';
-    var h0 = hx; mk.style.setProperty('--hex', h0 + 'px');
+    var h0 = six ? hx : Math.max(hx, Math.min(54, Math.floor(mk.clientWidth / 6) - 10)); mk.style.setProperty('--hex', h0 + 'px');   /* F2: the 3-column market may grow past the first guess */
     while (bottom() > limit && h0 > 30) { h0 -= 2; mk.style.setProperty('--hex', h0 + 'px'); }
     var r = { six: six, hex: h0, b: bottom() }; r.fit = r.b <= limit;
     if (!best || (r.fit && !best.fit) || (r.fit && best.fit && r.hex > best.hex) || (!r.fit && !best.fit && r.b < best.b)) best = r;   /* nothing fits: take the shorter layout */

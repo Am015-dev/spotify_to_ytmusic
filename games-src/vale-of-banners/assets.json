@@ -152,7 +152,7 @@
    "ratio": "1:1",
    "alpha": true,
    "wave": 2,
-   "slot": "Lore tile Merchant's Ledger (contain)",
+   "slot": "Lore tile Trade Ledger (contain)",
    "prompt": "A golden saffron-yellow tile showing an open ledger with a quill and a pair of silver coins. Top-down view of one flat hexagon game tile with a thick rounded rim, filling the picture, centred on a plain white background."
   },
   {
@@ -163,7 +163,7 @@
    "ratio": "1:1",
    "alpha": true,
    "wave": 2,
-   "slot": "Lore tile Weigher's Scale (contain)",
+   "slot": "Lore tile Weigh Scale (contain)",
    "prompt": "A golden saffron-yellow tile showing a brass balance scale with two pans. Top-down view of one flat hexagon game tile with a thick rounded rim, filling the picture, centred on a plain white background."
   },
   {
@@ -229,7 +229,7 @@
    "ratio": "1:1",
    "alpha": true,
    "wave": 2,
-   "slot": "Lore tile Smuggler's Wink (contain)",
+   "slot": "Lore tile Sly Wink (contain)",
    "prompt": "A golden saffron-yellow tile showing a hooded lantern and a small cask hidden behind a curtain. Top-down view of one flat hexagon game tile with a thick rounded rim, filling the picture, centred on a plain white background."
   },
   {
@@ -240,7 +240,7 @@
    "ratio": "1:1",
    "alpha": true,
    "wave": 2,
-   "slot": "Lore tile Charter of Guilds (contain)",
+   "slot": "Lore tile Guild Charter (contain)",
    "prompt": "A golden saffron-yellow tile showing a sealed charter scroll with a red wax seal and two crossed tools. Top-down view of one flat hexagon game tile with a thick rounded rim, filling the picture, centred on a plain white background."
   },
   {
@@ -251,7 +251,7 @@
    "ratio": "1:1",
    "alpha": true,
    "wave": 2,
-   "slot": "Lore tile Shepherd's Psalter (contain)",
+   "slot": "Lore tile Flock Psalter (contain)",
    "prompt": "A golden saffron-yellow tile showing a small book with a shepherd's crook and a lamb. Top-down view of one flat hexagon game tile with a thick rounded rim, filling the picture, centred on a plain white background."
   },
   {
@@ -273,7 +273,7 @@
    "ratio": "1:1",
    "alpha": true,
    "wave": 2,
-   "slot": "Lore tile Dockhand's Pact (contain)",
+   "slot": "Lore tile Dock Pact (contain)",
    "prompt": "A golden saffron-yellow tile showing two hands shaking over a mooring rope and bollard. Top-down view of one flat hexagon game tile with a thick rounded rim, filling the picture, centred on a plain white background."
   },
   {
@@ -317,7 +317,7 @@
    "ratio": "1:1",
    "alpha": true,
    "wave": 2,
-   "slot": "Lore tile Roll of the Moot (contain)",
+   "slot": "Lore tile Moot Roll (contain)",
    "prompt": "A golden saffron-yellow tile showing a scroll beside a tiny timber hall. Top-down view of one flat hexagon game tile with a thick rounded rim, filling the picture, centred on a plain white background."
   },
   {
@@ -328,7 +328,7 @@
    "ratio": "1:1",
    "alpha": true,
    "wave": 2,
-   "slot": "Lore tile Roll of the Joiners (contain)",
+   "slot": "Lore tile Joiner Roll (contain)",
    "prompt": "A golden saffron-yellow tile showing a scroll beside a tiny woodworker's mallet and plank. Top-down view of one flat hexagon game tile with a thick rounded rim, filling the picture, centred on a plain white background."
   },
   {
@@ -339,7 +339,7 @@
    "ratio": "1:1",
    "alpha": true,
    "wave": 2,
-   "slot": "Lore tile Roll of the Bells (contain)",
+   "slot": "Lore tile Bell Roll (contain)",
    "prompt": "A golden saffron-yellow tile showing a scroll beside a tiny bronze bell. Top-down view of one flat hexagon game tile with a thick rounded rim, filling the picture, centred on a plain white background."
   },
   {
@@ -350,7 +350,7 @@
    "ratio": "1:1",
    "alpha": true,
    "wave": 2,
-   "slot": "Lore tile Roll of the Fair (contain)",
+   "slot": "Lore tile Fair Roll (contain)",
    "prompt": "A golden saffron-yellow tile showing a scroll beside a tiny striped awning. Top-down view of one flat hexagon game tile with a thick rounded rim, filling the picture, centred on a plain white background."
   },
   {
@@ -361,7 +361,7 @@
    "ratio": "1:1",
    "alpha": true,
    "wave": 2,
-   "slot": "Lore tile Roll of the Drovers (contain)",
+   "slot": "Lore tile Drover Roll (contain)",
    "prompt": "A golden saffron-yellow tile showing a scroll beside a tiny hanging inn lantern. Top-down view of one flat hexagon game tile with a thick rounded rim, filling the picture, centred on a plain white background."
   },
   {
@@ -372,7 +372,7 @@
    "ratio": "1:1",
    "alpha": true,
    "wave": 2,
-   "slot": "Lore tile Roll of the Counters (contain)",
+   "slot": "Lore tile Counter Roll (contain)",
    "prompt": "A golden saffron-yellow tile showing a scroll beside a tiny stack of coins. Top-down view of one flat hexagon game tile with a thick rounded rim, filling the picture, centred on a plain white background."
   },
   {
@@ -383,7 +383,7 @@
    "ratio": "1:1",
    "alpha": true,
    "wave": 2,
-   "slot": "Lore tile Roll of the Beacons (contain)",
+   "slot": "Lore tile Beacon Roll (contain)",
    "prompt": "A golden saffron-yellow tile showing a scroll beside a tiny beacon flame. Top-down view of one flat hexagon game tile with a thick rounded rim, filling the picture, centred on a plain white background."
   },
   {
@@ -394,7 +394,7 @@
    "ratio": "1:1",
    "alpha": true,
    "wave": 2,
-   "slot": "Lore tile Roll of the Granaries (contain)",
+   "slot": "Lore tile Granary Roll (contain)",
    "prompt": "A golden saffron-yellow tile showing a scroll beside a tiny grain sack. Top-down view of one flat hexagon game tile with a thick rounded rim, filling the picture, centred on a plain white background."
   },
   {

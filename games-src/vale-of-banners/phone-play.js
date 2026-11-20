@@ -15,7 +15,7 @@ const [W, H] = (process.argv[2] || '375x667').split('x').map(Number), N = +(proc
       const x = r.left + r.width / 2, y = r.top + r.height / 2; if (x < 0 || y < 0 || x > innerWidth || y > innerHeight) continue; const hit = document.elementFromPoint(x, y); if (hit && (hit === e || e.contains(hit))) return { x, y }; } return null; }, sel);
     /* every displayed needed control: centre on screen, uncovered, and at least 44x44 touch box (or a 44 px wide cell) */
     const audit = () => page.evaluate(() => { const out = [], tb = document.getElementById('tbanner'), tr = tb && +getComputedStyle(tb).opacity > 0.05 ? tb.getBoundingClientRect() : null;
-      document.querySelectorAll('#acts .btn, #es .cell.glow, #store .tilebtn.glow, #goods .gbtn.glow, #mk .stgoods.glow').forEach(e => {
+      document.querySelectorAll('#acts .btn, #goods .wkc, #es .cell.glow, #store .tilebtn.glow, #goods .gbtn.glow, #mk .stgoods.glow').forEach(e => {
         const r = e.getBoundingClientRect(); if (!r.width || !r.height) return; let p = e; while (p) { if (getComputedStyle(p).display === 'none') return; p = p.parentElement; }
         const x = r.left + r.width / 2, y = r.top + r.height / 2, id = e.id || e.className.split(' ')[0];
         if (x < 0 || y < 0 || x > innerWidth || y > innerHeight || r.bottom > innerHeight + 1) { out.push(id + ' off-screen @' + Math.round(r.top) + '-' + Math.round(r.bottom)); return; }
@@ -46,6 +46,7 @@ const [W, H] = (process.argv[2] || '375x667').split('x').map(Number), N = +(proc
       if (await T('#mk .stgoods.glow, #goods .gbtn.glow', 320)) continue;
       if (await T('#tabs .tab.has', 350)) continue;
       if (await T('#acts .btn', 400)) continue;
+      if (await T('#goods .wkc', 400)) continue;   /* phones: the die-for-workers buttons sit in the goods row */
       await page.waitForTimeout(150);
     }
     const res = await page.evaluate(() => ({ rs: !document.getElementById('rs').hidden, txt: (document.querySelector('#rs h2') || {}).textContent, vp: G && G.P.map(p => p.vp).join('-') }));

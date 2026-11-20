@@ -21,7 +21,7 @@ const URL = 'file://' + path.join(__dirname, 'vale-of-banners.html') + '?fast=1'
         if (st.over) break;
         if (st.tv) { const b1 = page.locator('#tv .acts .btn:not(.alt)'); if (await b1.count()) await tap(b1.first()); else await tap(page.locator('#tvClose')); acts++; continue; }
         if (!st.mine) { await page.waitForTimeout(30); if (++idle > 4000) break; continue; } idle = 0;
-        for (const sel of ['#es .glow', '#endB', '#store .glow', '#mk .stgoods.glow', '#goods .glow', '#mk .tilebtn.glow', '#acts .btn.alt']) { const l = page.locator(sel); if (await l.count()) { await tap(l.first()); if (sel === '#endB') turns++; acts++; break; } }
+        for (const sel of ['#es .glow', '#endB', '#store .glow', '#mk .stgoods.glow', '#goods .glow', '#mk .tilebtn.glow', '#acts .btn.alt', '#goods .wkc']) { const l = page.locator(sel); if (await l.count()) { await tap(l.first()); if (sel === '#endB') turns++; acts++; break; } }
       }
       if (ch !== 'c1') await page.evaluate(() => UI.forceEnd());
       await page.waitForSelector('#campfin', { timeout: 20000 }).catch(() => { });

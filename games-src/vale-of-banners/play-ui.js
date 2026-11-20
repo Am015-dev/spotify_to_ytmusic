@@ -35,6 +35,7 @@ const only = process.argv[2];
       if (await T('#mk .stgoods.glow, #goods .gbtn.glow', 350)) continue;
       if (await T('#tabs .tab.has', 400)) continue;
       if (await T('#acts .btn', 450)) continue;
+      if (await T('#goods .wkc', 450)) continue;
       await page.waitForTimeout(200);
     }
     const res = await page.evaluate(() => ({ rs: !document.getElementById('rs').hidden, txt: (document.querySelector('#rs h2') || {}).textContent, vp: G && G.P.map(p => p.vp).join(' vs ') }));
