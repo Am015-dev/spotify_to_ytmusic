@@ -237,7 +237,7 @@ function pendUI(ms, hl, acts) {
       });
       return 'The Hunt strikes: ' + d.dmg + ' taint';
     case 'reveal': return regionPick(ms, 'to', hl, acts, 'Revealed: tap where the Company is seen');
-    case 'attack': return regionPick(ms.filter(function (m) { return m.t === 'atk'; }), 'to', hl, acts, 'Tap the enemy army to attack', ms.filter(function (m) { return m.t === 'cancel'; })[0]);
+    case 'attack': var at = ms.filter(function (m) { return m.t === 'atk'; }), mine = units(atWarPart(G, G.A[d.from] || {})); return regionPick(at, 'to', hl, acts, 'Attack: your ' + mine + ' vs ' + at.map(function (m) { return units(G.A[m.to]); }).join(' or '), ms.filter(function (m) { return m.t === 'cancel'; })[0]);
     case 'recruit': return recruitUI(ms, hl, acts);
     case 'amove': return twoStep(ms, 'mv', 'from', 'to', hl, acts, 'Tap an army to move', 'mvdone', 'Stop moving');
     case 'sep': return sepUI(ms, hl, acts);
@@ -266,7 +266,7 @@ function recruitUI(ms, hl, acts) {
   var rids = {}; recs.forEach(function (m) { rids[m.rid] = 1; }); Object.keys(rids).forEach(function (r) { hl.regions.push(r); });
   UI.tap = function (kind, rid) { if (!rids[rid]) return; var here = recs.filter(function (m) { return m.rid === rid; }); if (here.length === 1) apply(here[0]); else { UI.src = { kind: 'rec', rid: rid }; render(); } return true; };
   if (done) acts.push({ t: 'Done', s: 'muster no more', key: 'recdone', f: function () { apply(done); } });
-  return got.length ? 'Muster one more (another place)' : 'Tap a glowing town to muster';
+  return got.length ? 'One more unit: tap a glowing town' : 'Tap a glowing town to muster';
 }
 function twoStep(ms, t, srcKey, dstKey, hl, acts, text, doneT, doneLabel) {
   var mv = ms.filter(function (m) { return t ? m.t === t : (m.t === 'nz' || m.t === 'cm'); }), done = ms.filter(function (m) { return m.t === doneT; })[0];
@@ -322,6 +322,7 @@ function onMapTap(kind, rid, extra, ev, under) {
   if (kind === 't') kind = 'r';
   if (kind === 'co') kind = 'r';
   if (human(sideToAct(G)) && !UI.hold && UI.tap) { if (UI.tap(kind, rid, extra)) return; if (under && under !== rid && UI.tap('r', under)) return; }
+  if (human(sideToAct(G)) && !UI.hold && MV.hl && (MV.hl.regions || []).length) { toast('Not there: tap a red glowing place'); return; }
   if (kind === 'c') { charInfo(rid); return; }
   regionInfo(rid);
 }
@@ -332,7 +333,7 @@ function battleRender(ms) {
   h += '<div class="bside">' + armyBox(ar.att, B.as, 'Attacker', B.last && B.last.ra) + '<div class="bvs">vs</div>' + armyBox(ar.def, B.ds, 'Defender', B.last && B.last.rd) + '</div>';
   var note = '';
   if (B.last) note = sideName(B.as) + ' scores ' + B.last.hA + ', ' + sideName(B.ds) + ' scores ' + B.last.hD + (B.last.cards.att || B.last.cards.def ? ' · cards: ' + [B.last.cards.att, B.last.cards.def].filter(Boolean).map(function (c) { return CARD[c].cb.t; }).join(', ') : '');
-  h += '<div class="bnote">' + note + '</div>';
+  h += '<div class="bnote">' + note + '</div><div class="bnote" style="font-size:.92rem">Dice hit on 5 or 6' + (B.siege ? ' (attacker needs 6 at the walls)' : '') + '. Leaders re-roll misses.</div>';
   var acts = [];
   if (myTurn) {
     if (B.stage === 'acard' || B.stage === 'dcard') {
