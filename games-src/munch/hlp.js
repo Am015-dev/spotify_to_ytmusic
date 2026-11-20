@@ -195,9 +195,9 @@ function hlpForce(b){const cs=hlpCores(),T=hlpOwn(b);
     a.style.top='';a.style.visibility=side?'':'hidden';if(side)a.style.left=Math.round(Math.max(14,Math.min(c.r-c.l-26,(T.l+T.r)/2-c.l-6)))+'px'}
   return true}
 // a bulb bubble is never relaid out (the kit redraws it as a fresh bubble on every relayout, and it lands on the same glow again: that loops); move it ourselves, or hide it
-const _hlpRel=new WeakSet();
+const _hlpRel=new WeakSet();let _hlpRelT=0;
 function hlpUncover(){if(typeof GXH==='undefined'||!_hlpInit||!hlpCovers())return;
-  const bc=document.querySelector('.gxh-bub.on.gxh-bulbb')&&GXH.state().cur;if(!bc)GXH.relayout();else if(!_hlpRel.has(bc)){_hlpRel.add(bc);GXH.relayout()}if(!hlpCovers())return;   // a bulb help: one relayout, then never again
+  const bc=document.querySelector('.gxh-bub.on.gxh-bulbb')&&GXH.state().cur;if(!bc)GXH.relayout();else if(!_hlpRel.has(bc)&&Date.now()-_hlpRelT>6000){_hlpRel.add(bc);_hlpRelT=Date.now();GXH.relayout()}if(!hlpCovers())return;   // a bulb help: one relayout, then never again
   const cs=hlpCores();for(const b of hlpBubs())if(hlpBadAt(b,hlpBox(b),cs)&&!hlpForce(b))GXH.hide()}   // no spot at all on this screen: the glowing spots speak for themselves
 // cards slide and fan after a bubble appears: while one is up, check every frame (cheap: one query when a bubble is on)
 (function loop(){try{if(document.querySelector('.gxh-bub.on:not(.gxt-bub)'))hlpUncover()}catch(e){}try{for(const b of document.querySelectorAll('.gxh-bub.on'))hlpClamp(b)}catch(e){}requestAnimationFrame(loop)})();
