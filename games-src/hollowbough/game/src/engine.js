@@ -127,7 +127,7 @@ const resTotal = p => rsum(p.res);
 function resRecips(seat) { const r = []; for (let o = 0; o < G.np; o++) if (o !== seat && !P(o).passed) r.push(o); if (G.grim) r.push('G'); return r; }
 function cardRecips(seat) { const r = []; for (let o = 0; o < G.np; o++) if (o !== seat && !P(o).passed && P(o).hand.length < HAND) r.push(o); if (G.grim) r.push('G'); return r; }
 function giveCard(to, id) { if (to === 'G' || to == null || P(to).passed || P(to).hand.length >= HAND) G.discard.push(id); else P(to).hand.push(id); }
-function giveRes(from, to, r, n) { P(from).res[r] -= n; if (to !== 'G' && to != null) P(to).res[r] += n; }
+function giveRes(from, to, r, n) { P(from).res[r] -= n; if (to !== 'G' && to != null) { P(to).res[r] += n; lg(pn(from) + ' gives ' + pn(to) + ' ' + rtxt({ [r]: n }) + '.'); } }
 // choose a recipient (auto when only one), then continue with handler h and data d + {to}
 function pickRecip(seat, list, title, h, d) {
   if (list.length <= 1) { now(h, Object.assign({}, d, { to: list.length ? list[0] : null })); return; }

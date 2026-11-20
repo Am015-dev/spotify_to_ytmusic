@@ -108,3 +108,39 @@ html.sk .gx-drawer-head{padding-left:16px;padding-right:12px}
 .gxc-lab{font-size:14px!important}
 /* every mode: the bulb's ring pulses three times, then holds still */
 .gxh-ring:not(.from){animation-iteration-count:3}
+/* PLAY1 (20 Nov 2026): look sheet - tap shows what a move does and gives, one big button commits */
+#pc[data-card="look"]{position:fixed;inset:0;z-index:50;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;padding:0 8px 8px;box-sizing:border-box;background:rgba(20,12,6,.42);overflow:hidden}
+#pc[data-card="look"] .ph-head{position:absolute;left:-9999px}
+#pc[data-card="look"] .ph-body{flex:0 0 auto;height:auto;width:min(420px,100%);max-height:86%;overflow:auto;box-sizing:border-box;padding:14px 14px 12px;border-radius:18px;background:#f6ead0;color:#3b2a1c;border:2px solid #c9a35a;box-shadow:0 -6px 30px rgba(0,0,0,.45);animation:lkup .18s ease-out 1}
+@keyframes lkup{from{transform:translateY(24px);opacity:.4}to{transform:none;opacity:1}}
+.lk{display:flex;gap:12px;align-items:flex-start}
+.lk-art{flex:0 0 112px;width:112px}
+.lk-art .pvc{width:112px}
+.lk-tile{position:relative;width:112px;height:112px;border-radius:12px;overflow:hidden}
+.lk-season{display:flex;align-items:center;justify-content:center;height:96px}
+.lk-txt{flex:1 1 auto;min-width:0}
+.lk-what{margin:0 0 8px;font-size:16px;line-height:1.35}
+.lk-gain{margin:0;display:flex;flex-direction:column;gap:2px;padding:8px 10px;border-radius:10px;background:#e4f0d6;color:#21401a}
+.lk-gain span{font-size:13px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:#3d5c2c}
+.lk-gain b{font-size:18px;line-height:1.25}
+.lk-need{margin:0;padding:8px 10px;border-radius:10px;background:#f6d9d2;color:#6a1f14;font-size:16px;font-weight:700}
+#pc[data-card="look"] .cbtns{display:flex;gap:8px;padding:12px 0 0;flex-wrap:nowrap}
+#pc[data-card="look"] .cbtns .btn{flex:2 1 0!important;width:auto!important;min-width:0!important;min-height:52px;font-size:18px;white-space:nowrap}
+#pc[data-card="look"] .cbtns .btn.alt{flex:1 1 0!important;background:transparent;color:#5a3d22;border:2px solid #b08a5a;font-size:16px}
+.lkh{margin:0 0 2px;font-size:22px;line-height:1.15}
+.lks{margin:0 0 8px;font-size:14px;font-weight:700;color:#7a5a2a}
+/* Prepare is only a button when you can press it */
+#acts .btn.prep.dis{background:transparent!important;border:2px dashed rgba(246,234,208,.45)!important;box-shadow:none!important;color:#f6ead0;opacity:.9}
+#acts .btn.prep.dis img,#acts .btn.prep.dis svg{opacity:.55}
+/* the rival's move in one line, readable, then gone */
+#hbriv{position:fixed;left:50%;top:164px;z-index:45;transform:translate(-50%,-8px);max-width:min(92vw,420px);padding:10px 16px;border-radius:14px;background:rgba(28,48,78,.94);color:#fff;font-size:17px;font-weight:700;line-height:1.3;text-align:center;box-shadow:0 8px 24px rgba(0,0,0,.4);opacity:0;pointer-events:none;transition:opacity .2s,transform .2s}
+#hbriv.on{opacity:1;transform:translate(-50%,0)}
+#hbriv .me{margin-top:4px;color:#ffe08a}
+/* +N points rises once from your score */
+.hbpop{position:fixed;z-index:60;transform:translate(-50%,-50%);font-size:24px;font-weight:900;color:#ffd75e;text-shadow:0 2px 0 #5a3a10,0 0 12px rgba(0,0,0,.6);pointer-events:none;animation:hbpop 1.4s ease-out 1 forwards;white-space:nowrap}
+@keyframes hbpop{0%{opacity:0;transform:translate(-50%,-30%) scale(.6)}15%{opacity:1;transform:translate(-50%,-60%) scale(1.15)}70%{opacity:1;transform:translate(-50%,-140%) scale(1)}100%{opacity:0;transform:translate(-50%,-180%) scale(1)}}
+.hbbump{animation:hbbump .5s ease-out 1}
+@keyframes hbbump{40%{transform:scale(1.12)}}
+@media (prefers-reduced-motion:reduce){.hbpop,.hbbump,#pc[data-card="look"] .ph-body{animation-duration:.01s}}
+.lk-card{position:relative;width:112px;height:140px;border-radius:12px;border:3px solid var(--tc,#a67c52);background-size:cover;background-position:center;box-sizing:border-box;overflow:hidden}
+.lk-card svg{display:block}

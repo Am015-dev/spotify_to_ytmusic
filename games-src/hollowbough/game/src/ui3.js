@@ -20,6 +20,7 @@ function deadSay(tg) {
 }
 function onTarget(tg, el) {
   if (!G || UI.cards.length) return;
+  if (lookFirst(tg, el)) return;   // PLAY1: a tap shows what the move does and gives; the sheet's button commits
   if (/^x:/.test(tg) || UI.animBusy) { UI.sel = null; shake(el); if (/^x:/.test(tg) && !UI.animBusy) deadSay(tg); return; }
   const mm = myMoves();
   if (tg === 'pass') {
@@ -160,6 +161,7 @@ function fxLand(m, seat, src, preChip) {
 // ---- ghost finger: shows the first move (every move in the guided game)
 function fingerWanted() {
   if ((UI.cfg && UI.cfg.tutorial) || UI.noRec || !G || G.phase === 'over' || UI.cards.length || UI.animBusy) return false;
+  if (myActCount() >= 2) return false;   // PLAY1: one helper; the finger only on your first two moves (the look sheet explains, the bulb is on demand)
   if (UI.mode === 'guided') return true;
   if (typeof guideOn === 'function' && guideOn()) return true;   // R35: the finger shows by default in vs games too (hints off turns it off)
   if (UI.camp && UI.coach && UI.coach.level !== 'off' && UI.camp.hints) return true;
@@ -251,7 +253,7 @@ if (PV_ON) {
       if (ok && !/^x:/.test(tg)) {
         PV_FEEL.tick(16);
         if (dd.kind === 'worker') UI.pvDropAt = at; else { const r = frameRect(dd.src); if (r) dd.src.style.transform = `translate(${at.x + 20 - (r.x + r.w / 2)}px,${at.y + 20 - (r.y + r.h / 2)}px)`; }
-        onTarget(tg, el);
+        UI.lookSkip = true; onTarget(tg, el); UI.lookSkip = false;   // a drag is already a deliberate move: no look sheet
       } else if (ok || (el && tg && /^x:/.test(tg))) { onTarget(tg, el); if (pvTall() && dd.kind === 'card') pvSetTab(UI.pvMine && availW(G.players[Math.max(0, viewSeat())]) ? 'places' : 'meadow', true); }
       else if (pvTall() && dd.kind === 'card') render();
     };
@@ -261,3 +263,79 @@ if (PV_ON) {
   // a tap on a place or card I can use: a short tick, like a drop
   document.addEventListener('click', e => { const t = e.target.closest && e.target.closest('#bd.pv .glow[data-a="t"]'); if (t) PV_FEEL.tick(10); });
 }
+// ---- PLAY1 (20 Nov 2026): look before you commit
+// Owner on a phone: "unplayable and not fun", "confusing with the tap button". Cold play showed why:
+//  1. a tap committed at once, and what a card does was only behind a hidden long-press;
+//  2. no "what do I get" before a move;  3. finger, coach bubble and a big green (but dead) Prepare button all asked for taps;
+//  4. the rival's move flashed past in one second, and its gifts to you were never said;  5. scoring gave almost no payoff.
+// This part: tap = a look sheet (big art, what it does, what you get now, one Do-it button); Prepare says what it gives;
+// the finger only on your first two moves; a readable rival line; a one-shot "+N" over your score.
+const LOOK = { on: () => !!G && UI.started && !(UI.cfg && (UI.cfg.tutorial || UI.cfg.noLook)) && !/[?&](scn|nolook)=/.test(location.search) };
+const SEASON_GIVES = ['', '+1 worker. Your green cards pay.', '+1 worker. Take up to 2 meadow cards.', '+2 workers. Your green cards pay.'];
+function lookDelta(m) {
+  try {
+    const seat = HB.actor(G), W = HB.clone(G); const r = HB.apply(W, m); if (r && r.ok === false) return '';
+    const p = G.players[seat], q = W.players[seat], parts = [];
+    for (const k of HB.RES) { const d = q.res[k] - p.res[k]; if (d) parts.push((d > 0 ? '+' : '') + d + ' ' + rname(k, Math.abs(d))); }
+    const dp = HB.score(W, seat).total - score(seat).total; if (dp) parts.push((dp > 0 ? '+' : '') + dp + (Math.abs(dp) === 1 ? ' point' : ' points'));
+    const dc = q.hand.length - p.hand.length; if (dc > 0) parts.push('+' + dc + (dc > 1 ? ' cards' : ' card'));
+    if (W.q && W.q.who === seat) parts.push('then you choose');
+    return parts.join(', ');
+  } catch (e) { return ''; }
+}
+function lookCardArt(id) { const sp = spec(id), T = (HBKit.TYPES && HBKit.TYPES[sp.type]) || { c: '#a67c52' }; const a = pvArt(sp); a.classList.add('lk-card'); a.style.setProperty('--tc', T.c); a.appendChild(pvPts(sp.points || 0, 'pvc-pts')); return a; }
+function lookArtTile(kind, i) { const t = h('div.lk-tile.tile.t-' + kind, tileFace({ kind, i }, true)); return t; }
+function lookOpen(m, tg, el) {
+  const p = G.players[HB.actor(G)];
+  let title = '', what = '', art = null, go = 'Do it', sub = '';
+  if (m.type === 'play') {
+    const c = cdef(m.card); title = c.name; what = c.text || ''; art = lookCardArt(m.card);
+    sub = (TYPEN[c.type] || '') + ' · ' + c.pts + (c.pts === 1 ? ' point' : ' points'); go = 'Build it';
+  } else if (m.type === 'worker') {
+    const kind = m.k === 'event' ? (m.e === 'b' ? 'bev' : 'sev') : m.k, i = m.k === 'haven' || m.k === 'journey' ? 0 : m.i;
+    if (m.k === 'dest') { const c = cdef(m.c); title = c.name; what = c.text || ''; art = lookCardArt(m.c); }
+    else { const t = tileInfo(kind, i); title = t.name || 'Place'; what = (t.text || '').replace(/ Shared\.$/, ''); try { art = lookArtTile(kind, i); } catch (e) { art = null; } }
+    sub = m.k === 'event' ? 'Goal' : 'Send a worker'; go = m.k === 'event' ? 'Claim it' : 'Send worker';
+  } else if (m.type === 'prepare') {
+    const s = p.season + 1; title = 'Prepare for ' + SEASN[s]; sub = 'Your workers come home';
+    what = SEASON_GIVES[s] || ''; art = h('div.lk-season', seasonIcon(s, 64)); go = 'Prepare';
+  } else return false;
+  const gain = lookDelta(m);
+  UI.cards.unshift({ kind: 'look', m, title, sub, body: () => h('div.lk',
+    art ? h('div.lk-art', art) : null,
+    h('div.lk-txt', h('h3.lkh', title), sub ? h('p.lks', sub) : null, what ? h('p.lk-what', what) : null, gain ? h('p.lk-gain', h('span', 'What happens'), h('b', gain)) : null)),
+    buttons: [{ label: go, a: 'lookgo' }, { label: 'Not now', a: 'lookno', cls: 'alt' }] });
+  UI.lookEl = el || null; snd('click', { vol: .5 }); closePop(); render(); return true;
+}
+// a card you cannot pay for yet: the same sheet, with what is missing (instead of a toast that hides what the card does)
+function lookNeed(tg) {
+  const mm = /^x:([hm])(\d+)$/.exec(tg); if (!mm) return false;
+  const a = HB.actor(G), p = G.players[a]; if (!p || p.ai || G.q) return false;
+  const id = +mm[2], c = cdef(id), miss = [];
+  for (const r of HB.RES) { const n = (c.cost && c.cost[r] || 0) - (p.res[r] || 0); if (n > 0) miss.push(n + ' more ' + rname(r, n)); }
+  const why = miss.length ? 'You need ' + miss.join(' and ') + '.' : p.city.length >= HB.CITY ? 'Your city is full.' : 'You cannot build it right now.';
+  UI.cards.unshift({ kind: 'look', title: c.name, sub: (TYPEN[c.type] || '') + ' · ' + c.pts + (c.pts === 1 ? ' point' : ' points'),
+    body: () => h('div.lk', h('div.lk-art', lookCardArt(id)), h('div.lk-txt', h('h3.lkh', c.name), h('p.lks', (TYPEN[c.type] || '') + ' · ' + c.pts + (c.pts === 1 ? ' point' : ' points')), c.text ? h('p.lk-what', c.text) : null, h('p.lk-need', why))),
+    buttons: [{ label: 'OK', a: 'lookno' }] });
+  snd('click', { vol: .4 }); closePop(); render(); return true;
+}
+function lookFirst(tg, el) {
+  try {
+    if (!LOOK.on() || UI.animBusy || UI.lookSkip || tg === 'pass') return false;
+    if (/^x:[hm]\d+$/.test(tg)) return lookNeed(tg);
+    if (/^x:/.test(tg)) return false;
+    const ms = myMoves().filter(m => tgOf(m) === tg); return ms.length === 1 && lookOpen(ms[0], tg, el);
+  } catch (e) { console.warn('look', e); return false; }
+}
+// how many moves the human made this game (from the log, so a new game or a loaded save counts right)
+function myActCount() { if (!G) return 0; const me = G.players.filter(p => !p.ai).map(p => p.name); return G.log.filter(x => me.some(n => x.t.indexOf(n + ' places a worker') === 0 || x.t.indexOf(n + ' plays ') === 0 || x.t.indexOf(n + ' prepares') === 0)).length; }
+document.addEventListener('click', e => {
+  const b = e.target.closest && e.target.closest('[data-a="lookgo"],[data-a="lookno"]');
+  const pc = document.getElementById('pc');
+  if (!b) { if (pc && e.target === pc && pc.dataset.card === 'look') { UI.cards.shift(); render(); schedule(); } return; }   // tap outside the sheet = not now
+  const c = UI.cards[0]; if (!c || c.kind !== 'look') return;
+  UI.cards.shift();
+  if (b.dataset.a === 'lookgo' && c.m && G && myMoves().some(m => sameM(m, c.m))) { render(); actFrom(c.m, UI.lookEl); }
+  else { render(); schedule(); }
+  UI.lookEl = null;
+});

@@ -52,6 +52,7 @@ function render() {
   UI.mmc = null; renderBoard(); renderCard(); renderDrawers();
   if (NET.on) netRenderHook();
   if (typeof hlpAfter === 'function') hlpAfter();
+  p1After();
 }
 // ---- one-card-at-a-time queue
 function pushCard(c) { UI.cards.push(c); closePop(); render(); }
@@ -206,4 +207,48 @@ function loadSave() {
     kitNewGame();
     render(); schedule(); return true;
   } catch (e) { return false; }
+}
+// ---- a rival you can follow: each rival move in one plain line, held long enough to read; gifts to you are said out loud
+function rivLine(t, ai) {
+  let m;
+  for (const n of ai) {
+    if (t.indexOf(n + ' ') !== 0) continue;
+    if ((m = /places a worker: (.+)\.$/.exec(t))) return n + ' went to ' + m[1];
+    if ((m = /adds (.+) to their city\.$/.exec(t))) return n + ' built ' + m[1];
+    if ((m = /prepares for (\w+)/.exec(t))) return n + ' got ready for ' + m[1];
+    if (/ passes\.$/.test(t)) return n + ' is done for the year';
+    if ((m = /achieves (.+)\.$/.exec(t))) return n + ' claimed ' + m[1];
+    if ((m = /gives (.+)$/.exec(t)) && / You\b| you\b/.test(t)) return { me: n + ' gave you ' + m[1].replace(/^You /, '').replace(/\.$/, '') };
+    if ((m = /plants (.+) in You's city/.exec(t))) return { me: n + ' put ' + m[1] + ' in your city' };
+  }
+  return null;
+}
+function rivShow(lines) {
+  let e = document.getElementById('hbriv');
+  if (!e) { e = document.createElement('div'); e.id = 'hbriv'; e.setAttribute('role', 'status'); e.setAttribute('aria-live', 'polite'); document.body.appendChild(e); }
+  e.innerHTML = ''; lines.slice(-2).forEach(l => { const d = document.createElement('div'); if (typeof l === 'object') { d.className = 'me'; d.textContent = l.me; } else d.textContent = l; e.appendChild(d); });
+  e.classList.remove('on'); void e.offsetWidth; e.classList.add('on');
+  clearTimeout(UI.rivT); UI.rivT = setTimeout(() => e.classList.remove('on'), 2600);
+}
+// ---- a score you feel: "+N" rises once from your score when your total goes up
+function ptsPop(d) {
+  const v = Math.max(0, viewSeat()), c = document.querySelector('#bd [data-a="chip"][data-seat="' + v + '"]'); if (!c) return;
+  const r = c.getBoundingClientRect(); const f = document.createElement('div'); f.className = 'hbpop'; f.textContent = '+' + d + (d === 1 ? ' point' : ' points');
+  f.style.left = (r.left + r.width / 2) + 'px'; f.style.top = (r.top + r.height / 2) + 'px'; document.body.appendChild(f);
+  c.classList.remove('hbbump'); void c.offsetWidth; c.classList.add('hbbump');
+  setTimeout(() => f.remove(), 1500); try { snd('coin', { vol: .5 }); } catch (e) { }
+}
+// after each render: the rival's move in one line, and the score pop
+function p1After() {
+    try {
+      if (!G || !UI.started || (UI.cfg && UI.cfg.tutorial)) return;
+      const ai = G.players.filter(p => p.ai).map(p => p.name);
+      if (UI.rvN == null || G.logN < UI.rvN) { UI.rvN = G.logN; UI.lastPts = null; }   // a new game starts the count again
+      if (G.logN > UI.rvN) {
+        const fresh = G.log.filter(x => x.i > UI.rvN).map(x => rivLine(x.t, ai)).filter(Boolean); UI.rvN = G.logN;
+        if (fresh.length && humans().length) rivShow(fresh);
+      }
+      const v = viewSeat();
+      if (v >= 0 && G.phase !== 'over') { const t = score(v).total; if (UI.lastPts != null && t > UI.lastPts) ptsPop(t - UI.lastPts); UI.lastPts = t; }
+    } catch (e) { console.warn('p14', e); }
 }
