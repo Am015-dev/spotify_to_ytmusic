@@ -27,11 +27,11 @@ var VS = {
     granary: { n: 'Granary', fx: 'Sell one kind of goods now.' },
     belltower: { n: 'Bell Tower', fx: '+4 points now.' },
     joinery: { n: 'Joinery', fx: 'Take a town tile from any stall.' },
-    chapel: { n: 'Chapel', fx: 'Take a keep, quarry or lore tile from any stall.' },
-    fair: { n: 'Fair', fx: 'Take a barge or animal tile from any stall.' },
+    chapel: { n: 'Chapel', fx: 'Take a keep, quarry or lore tile.' },
+    fair: { n: 'Fair', fx: 'Take a barge or animal tile.' },
     hostel: { n: 'Hostel', fx: '+4 workers now.' },
     counting: { n: 'Counting House', fx: '+2 silver now.' },
-    guildhall: { n: 'Guildhall', fx: 'Place one more tile from storage, any die.' }
+    guildhall: { n: 'Guildhall', fx: 'Place one more tile, any die.' }
   },
   BKEYS: ['granary', 'belltower', 'joinery', 'chapel', 'fair', 'hostel', 'counting', 'guildhall'],
   ANIMALS: { sheep: 'Sheep', cow: 'Cows', pig: 'Pigs', hen: 'Hens' },
@@ -116,9 +116,9 @@ VS.tileName = function (t) {
 };
 VS.tileFx = function (t) {
   if (t.col === 'T') return VS.BUILD[t.k].fx;
-  if (t.col === 'F') return 'Scores ' + t.a + ', plus same animals in that pasture.';
+  if (t.col === 'F') return 'Scores ' + t.a + ', plus same kind in pasture.';
   if (t.col === 'L') return VS.LORE[t.a].fx;
-  return { K: 'Take one extra action with any die number.', B: 'Load goods from a stall. Move up the procession.', Q: 'Each chapter end: +1 silver.' }[t.col];
+  return { K: 'One extra action with any die number.', B: 'Load goods, and play earlier next round.', Q: '+1 silver at each chapter end.' }[t.col];
 };
 // all 9 estate boards of the original (colour layouts; the die numbers are the same on every board). Board 1 is the standard game.
 VS.LAYOUTS = { 1: ['FKKL', 'FFKLT', 'FFTLTT', 'BBBKBBB', 'TTQTTF', 'TQLTT', 'QLLT'],

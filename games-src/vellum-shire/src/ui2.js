@@ -90,7 +90,7 @@ function renderDock(tg) {
   }
   $('#detail').innerHTML = det; $('#acts').innerHTML = acts;
 }
-function shortFx(t) { var f = VS.tileFx(t); return f.split(' ').length <= 8 ? f : f.split(' ').slice(0, 8).join(' '); }
+function shortFx(t) { var f = VS.tileFx(t), w = f.split(' '); return w.length <= 8 ? f : w.slice(0, 7).join(' ').replace(/[,.:]$/, '') + '\u2026'; }
 // ---------- input
 function bindBoard() {
   document.addEventListener('click', function (e) {
