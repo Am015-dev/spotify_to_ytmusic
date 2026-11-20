@@ -19,12 +19,13 @@ function selectOffer(k) { if (!t2Allow('offer', k)) return; if (UI.cdAt && Date.
   var s = swWho(G); if (G.over || UI.busy || !isHuman(s) || G.pend) return; var pid = swOffer(G)[k], p = PATCHES[pid]; if (pid == null) return;
   if (!tutAct({ what: 'offer', k: k })) return;
   if (UI.sel === k) { showPatch(pid); return; }
-  if (G.btn[s] < p.cost) { sfx('bad'); toast('You need ' + (p.cost - G.btn[s]) + ' more button' + (p.cost - G.btn[s] === 1 ? '' : 's') + ' for ' + p.name + '. Advance to earn some.'); UI.sel = -1; render(); showPatchSoft(pid, k); var ob = $$('#offers .offer')[k]; if (ob) { ob.classList.add('nope'); setTimeout(function () { ob.className = ob.className.replace(' nope', ''); }, 500); } return; }
-  if (!swPlacements(G.board[s], p).length) { sfx('bad'); toast(p.name + ' does not fit anywhere on your quilt.'); return; }
+  if (G.btn[s] < p.cost) { sfx('bad'); var nd = p.cost - G.btn[s]; swNote('Need ' + nd + ' more button' + (nd === 1 ? '' : 's')); UI.sel = -1; render(); /* F4: a short inline note, never a sheet */ var ob = $$('#offers .offer')[k]; if (ob) { ob.classList.add('nope'); setTimeout(function () { ob.className = ob.className.replace(' nope', ''); }, 500); } return; }
+  if (!swPlacements(G.board[s], p).length) { sfx('bad'); swNote('No room on your quilt'); render(); return; }
   UI.sel = k; sfx('pick'); var bp = UI.tutorial ? null : bestPlacement(pid, s);
   if (bp) { UI.o = bp[0]; UI.gx = bp[1]; UI.gy = bp[2]; } else { UI.o = 0; var b = bbox(p.or[0]); UI.gx = Math.floor((9 - b[0]) / 2); UI.gy = Math.floor((9 - b[1]) / 2); }
   render();
 }
+function swNote(t) { UI.note = { t: t, until: Date.now() + 2600 }; clearTimeout(swNote.tm); swNote.tm = setTimeout(function () { UI.note = null; if (G) render(); }, 2700); }
 function showPatchSoft(pid, k) { var dt = $('#detail'); var p = PATCHES[pid]; if (dt) dt.innerHTML = '<b>' + p.name + '</b>: tap again to read it.'; UI.softK = k; }
 function cancelSel() { if (!t2Allow('cancel')) return; UI.sel = -1; render(); }
 function xform(f) { var p = curPatch(), c = curCells(); if (!p) return; var b0 = bbox(c), cx = UI.gx + b0[0] / 2, cy = UI.gy + b0[1] / 2, n = swNorm(c.map(f)), k = JSON.stringify(n), idx = -1; p.or.forEach(function (o, i) { if (JSON.stringify(o) === k) idx = i; }); if (idx < 0) return; UI.o = idx; var b = bbox(n); UI.gx = Math.round(cx - b[0] / 2); UI.gy = Math.round(cy - b[1] / 2); clampG(); sfx('rot'); }

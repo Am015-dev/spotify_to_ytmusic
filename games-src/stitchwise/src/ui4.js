@@ -134,7 +134,7 @@ if (document.readyState === 'loading') document.addEventListener('DOMContentLoad
 
 // ---------- the ring: spool (neutral token), the 3 on sale lifted, then every other patch clockwise
 function ringStrip() {
-  var box = $('#offers'); if (!box || !G || G.over || G.pend || box.style.display === 'none' || box.classList.contains('placing')) return;
+  var box = $('#offers'); if (!box || !G || G.over || box.style.display === 'none' || box.classList.contains('placing')) return;
   var L = G.ring.length; box.classList.add('ring');
   box.insertBefore(h('span.ntok', { title: 'The spool: only the 3 patches after it are for sale', 'aria-label': 'Spool. The 3 patches after it are for sale' }, h('i')), box.firstChild);
   var cs = document.documentElement.classList.contains('sm') ? 8 : 10;
@@ -188,8 +188,8 @@ function t2Steps() {
     { id: 'buy', rule: 'buy', say: 'Fill the 3 gold gaps. Only 3 patches are for sale: tap this.', target: t2Offer(1), allow: function (a, k) { return a === 'offer' && k === 1; }, done: function () { return UI.sel === 1; } },
     { id: 'rotate', rule: 'rotate', say: 'Turn it to match the top gap. Tap Rotate.', target: function () { return $('[data-a=rot]'); }, allow: function (a) { return a === 'rot'; }, done: function () { return UI.o === T2.o1; } },
     { id: 'place', rule: 'place', say: 'Drag the patch into the gold gap.', target: ghost, gap: 'h1', allow: function (a) { return a === 'rot' || a === 'flip'; }, done: function () { return t2AtGap(T2.h1); } },
-    { id: 'pay', rule: 'pay', say: 'Sew it on. You pay its 4 buttons.', target: sew, gap: 'h1', allow: function (a) { return a === 'sew' && t2AtGap(T2.h1); }, done: function () { return G.owned[0].length >= 1; } },
-    { id: 'time', rule: 'time', say: 'It cost 2 time: you moved 2. Furthest back plays next.', btn: 'Watch', target: function () { return $('#tutb .t2b'); },
+    { id: 'pay', rule: 'pay', say: 'Sew it on. You pay its ' + PATCHES[8].cost + ' buttons.', target: sew, gap: 'h1', allow: function (a) { return a === 'sew' && t2AtGap(T2.h1); }, done: function () { return G.owned[0].length >= 1; } },
+    { id: 'time', rule: 'time', say: 'It cost ' + PATCHES[8].time + ' time: you moved ' + PATCHES[8].time + '. Furthest back plays next.', btn: 'Watch', target: function () { return $('#tutb .t2b'); },
       onBtn: function () { UI.tutAi = true; schedule(); }, done: function () { return T2.pressed && t2Mine(); } },
     advStep('advance', 'advance', 'Or Advance: jump just past Marden, +1 button per space.', function () { return G.log.some(function (l) { return l[0] === 0 && l[1] === 'adv'; }) && t2Mine(); }),
     advStep('income', 'income', 'Pass a gold spot: +1 button per button on your patches.', function () { return G.pos[0] > 41 && t2Mine(); }),
