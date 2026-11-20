@@ -65,3 +65,54 @@ is full", clearer field and building tips, steady score pills. (Not done: two te
 
 ## Proof
 proof/first-3-min.webm (375x667, recorded before the tester's text fixes), proof/1-title.png, 2-settle-animal.png, 3-animal-card.png, 4-results.png
+
+# F2 fixer round (20 Nov 2026)
+
+## What changed
+1. Rival valley always visible. PC: every rival's valley sits live in a left panel with its score, landscape chips and cards; it plays its
+   turn there with blue rings. Phone: the rival's turn shows its valley under a blue "Rival's valley · playing now" banner; tapping a
+   rival's name opens it with a "Back to mine" button. Tap anywhere during the rival's turn to speed it up.
+2. Live score chips (trees, mountains, fields, buildings, river/islands, animals, spirit) for you and the leading rival, always on screen.
+   Every change flies "+N" from the hex into its chip with a reason ("Rival +5 buildings: 3 colours touch it", "+3 river: river 4 long").
+3. End countdown once the end is about 3 turns away: "~3 turns left: Rival has 11 empty hexes. End at 2." Then "Last round! This is
+   your final turn." Pouch end has its own line.
+4. Card planning: every card shows "Fits now", "Needs N tokens" or "No room left". The card sheet says what is missing ("Needs 3 fields,
+   1 trunk, 1 leaf: about 2 turns") and shows your valley with dashed hexes and "+1 field" labels; a held card does the same on the board.
+   Risky cards say why and the button becomes "Invite anyway". A tap on a dashed hex says what to build there.
+5. "Any order" beside your three tokens; "Tap a pocket: take all 3 tokens."
+6. Easy rival keeps the game close: careful (it uses the strongest planner) when behind the best human, loose when ahead. Easy is now the
+   default. Results add one line saying why you won or lost.
+7. Rules: see rules-notes.md "Fixer F2". Solo suns settled from the official rulebook text (+1 side A, +2 no spirit, +1 groups spirit,
+   +0 count spirit; the rulebook example is a test); 75 animal cubes added and asserted. Still unknowable: side B shape and hex counts,
+   which spirit card carries which icon, each card as printed (and so the track-length mix), what happens if cubes run out.
+8. PC (1366x768, 1920x1080, mouse): three columns, rivals left, your valley centre, your cards and the invite row right without tabs,
+   text >= 12 px, no page scroll. Phone layout kept (text >= 11 px, taps >= 44 px).
+
+## Balance (200 seeds, hint-follower = strongest planner vs Easy, 2 players)
+Hint-follower wins 103, Easy 90, 7 ties (51.5%). Median margin +1, median gap 8 points, 62% of games within 10. Average 81-78.
+
+## Gates
+build-all --quick PASS (8/8 scenarios); --full PASS twice (phone-check 6/6 sizes and rotations, rules sweep). rules-test 82/82 full.
+tut-check: tutorial completes with real taps. 0 infinite animations; text check: no text under 12 px on PC or 11 px on phone.
+
+## Cold play (independent tester, no history; phone by touch + PC by mouse), verdict as-is
+Could you play? Yes, both sessions, start to results. Phone tutorial was fine. Session 1 on the phone ended Rival 96, me 36 (default
+setting). Session 2 on PC ended Rival 59, me 38 (I found no Easy option, so I used the default). Nothing crashed or got stuck.
+Fun 3/5. The loop is pleasant: place a 3-tile set, settle animals, score. Pastel look and the pop-up "+N" score hints are lovely. But the
+rival's animal scores snowballed (animals 52 vs my 10) and I never saw how to stop it.
+Would you play again? Maybe once more, to learn animal cards properly. A newcomer losing 36-96 would probably not.
+Understood why? Only partly. The results table and the line "Its animals beat yours by 42" helped. But I didn't see how an animal's big
+score is earned, and I scored 0 buildings/fields in some games.
+Confused: the tutorial doesn't teach choosing animal cards; tiny number rows and "N tokens away" cryptic; "Settle animals?" when nothing
+can be settled; rival's turn about 8 s and not skippable; taps on dashed hexes silently did nothing; token order in the hand; "Can't build".
+Phone vs PC: phone board small, End turn moved when a banner appeared. PC much better: rival's board left, cards right, all readable and clickable.
+Most exciting: PC game tied 17-17 mid-game, then a jump to 38 with mountain peaks and a Butterfly.
+
+Fixed after that verdict (once): the default was Normal, now the close-game Easy (the tester lost to Normal both times); tap to speed up
+the rival; "All placed." only offers settling when an animal can move in; dashed-hex taps explain what to build; badges say "Needs N tokens"
+/ "No room left"; the pockets/hand row keeps a fixed height so End turn no longer moves; the tutorial's card step says to pick cards that
+fit ("Invite animals that need few tokens"). Not re-tested cold after these fixes. The 4/5 goal is not proven.
+
+## Proof
+proof/first-3-min.webm (375x667, final build), proof/1-title.png, 2-settle-animal.png, 3-animal-card.png, 4-results.png,
+proof/pc-1366x768.png, proof/pc-1920x1080.png (script: pcshot.js).

@@ -73,7 +73,7 @@ function act(m, how) {   // a human move
 function undo() { if (!UI.undo.length || UI.busy) return; G = JSON.parse(UI.undo.pop()); UI.sel = G.turn.hand.length ? { kind: 'tok', h: 0 } : null; render(); }
 function runAI() {
   if (!G || G.over) return; var s = E.seat(); if (!s.ai) return nextActor();
-  UI.busy = true; UI.rivalMark = {}; UI.lastAI = G.cur; var si = G.cur, ssel = UI.view === si ? '#map' : '#mini' + si; var plan = AI.plan(s.ai), i = 0, start = E.score(s).total, got = [], sc0all = E.score(s);
+  UI.busy = true; UI.skip = false; UI.rivalMark = {}; UI.lastAI = G.cur; var si = G.cur, ssel = UI.view === si ? '#map' : '#mini' + si; var plan = AI.plan(s.ai), i = 0, start = E.score(s).total, got = [], sc0all = E.score(s);
   (function stepAI() {
     if (!G || G.over) { UI.busy = false; return nextActor(); }
     if (i >= plan.length) { UI.busy = false; return nextActor(); }
@@ -87,14 +87,14 @@ function runAI() {
       UI.recap = s.name + ' +' + d + (why.length ? ': ' + why.map(function (q) { return q[0] + ' +' + q[1]; }).join(', ') : '') + (got.length ? ' (' + got.slice(0, 2).join(', ') + ')' : '') + '.';
       save(); if (!UI.fast) SND.card();
       if (UI.fast || G.over) { UI.busy = false; UI.view = G.over ? UI.view : G.cur; return nextActor(); }
-      render(); UI.aiT = setTimeout(function () { UI.busy = false; UI.rivalMark = null; UI.view = G.cur; nextActor(); }, Math.max(2000, AIDELAY * 3.4)); return;
+      render(); UI.aiT = setTimeout(function () { UI.busy = false; UI.rivalMark = null; UI.view = G.cur; nextActor(); }, UI.skip ? 1200 : Math.max(2000, AIDELAY * 3.4)); return;
     }
     if (m.t === 'place') { UI.flash = m.k; UI.miniFlash = si; UI.flashK = m.k; SND.place(); }
     if (m.t === 'take') { UI.lastPocket = m.i; SND.take(); }
     if (m.t === 'cube') { UI.flash = m.k; UI.miniFlash = si; UI.flashK = m.k; SND.animal(); }
     if (m.t === 'card') SND.card();
     render(); ssel = UI.view === si ? '#map' : '#mini' + si; if (m.k) flyGains(s, si, m.k, explain(s, b0, E.score(s), m.k, fx ? { name: E.card(fx.id).name.split(' ').pop() } : null), ssel); if (fx) settleFx(m.k, fx, s, ssel);
-    UI.aiT = setTimeout(stepAI, UI.fast ? 0 : Math.max(380, AIDELAY * (m.t === 'cube' ? 1.4 : 1)));
+    UI.aiT = setTimeout(stepAI, UI.fast ? 0 : UI.skip ? 90 : Math.max(380, AIDELAY * (m.t === 'cube' ? 1.4 : 1)));
   })();
 }
 function buzz(p) { try { if (GX.buzz) GX.buzz(p); } catch (e) { } }
@@ -298,7 +298,7 @@ function trackHTML(id, left) {
   return h + '</div>';
 }
 function spiritText(k) { return { fieldsBig: 'Fields: 2 each, 10 if 3+', fieldsAll: 'Every field group: 5', trees23: 'Trees 2-3 high: +4 each', trees331: 'Trees: 3 / 3 / 1 by height', buildGroups: 'Building groups: +4 each', buildGroups2: 'Groups of 2+ buildings: +6', mount23: 'Peaks 2-3 high: +4 each', mount331: 'Peaks: 3 / 3 / 1 by height', waterGroups: 'Water groups of 2+: +7', waterEach: 'Every water token: +2' }[k]; }
-function planBadge(pl) { if (!pl) return '<span class="rdy nob">Can\'t build</span>'; if (!pl.cost) return '<span class="rdy fitb">Fits now</span>'; return '<span class="rdy farb">' + pl.cost + ' token' + (pl.cost > 1 ? 's' : '') + ' away</span>'; }
+function planBadge(pl) { if (!pl) return '<span class="rdy nob">No room left</span>'; if (!pl.cost) return '<span class="rdy fitb">Fits now</span>'; return '<span class="rdy farb">Needs ' + pl.cost + ' token' + (pl.cost > 1 ? 's' : '') + '</span>'; }
 function cardHTML(id, o) {
   o = o || {}; var c = E.card(id);
   return '<button type="button" class="acard' + (c.pts ? '' : ' spirit') + (o.sel ? ' sel' : '') + (o.ready ? ' ready' : '') + (o.hint ? ' hint' : '') + (o.dim ? ' dim' : '') + (o.can || o.ready ? ' playable' : '') + '" ' + (o.attr || '') + ' aria-label="' + esc(c.name) + (o.ready ? ', home ready' : '') + '">' +
@@ -308,7 +308,7 @@ function cardHTML(id, o) {
 function renderHand() {
   var T = G.turn, h = '<div class="handrow">' + (T.hand.length > 1 ? '<span class="anyo">Any<br>order</span>' : '');
   T.hand.forEach(function (c, i) { var hint = UI.hintMove && UI.hintMove.t === 'place' && UI.hintMove.h === i; h += '<button type="button" class="htok' + (UI.sel && UI.sel.kind === 'tok' && UI.sel.h === i ? ' sel' : '') + (hint ? ' hint' : '') + '" data-h="' + i + '" aria-label="Place ' + ART.NAME[c] + '"><svg viewBox="0 0 40 40" aria-hidden="true">' + ART.defs('h' + i) + ART.token(c, 20, 20, 15, 'h' + i) + '</svg><span>' + ART.NAME[c] + '</span></button>'; });
-  if (!T.hand.length) h += '<span class="hn">All placed. Settle animals?</span>';
+  if (!T.hand.length) h += '<span class="hn">' + (E.moves().some(function (m) { return m.t === 'cube'; }) ? 'All placed. An animal can move in!' : 'All placed.') + '</span>';
   h += '<span class="sp"></span>';
   if (UI.undo.length) h += '<button type="button" class="btn ghostb" id="undoB">Undo</button>';
   var canEnd = E.legal({ t: 'end' }); h += '<button type="button" class="btn primary' + (canEnd ? ' go' : '') + '" id="endB"' + (canEnd ? '' : ' aria-disabled="true"') + '>End turn</button>';
@@ -336,7 +336,7 @@ function renderLine() {
   var t = '', T = G.turn, s = E.seat();
   if (G.over) t = 'The valley is finished.';
   else if (UI.busy && UI.recap) t = UI.recap;
-  else if (UI.busy || s.ai) t = s.name + '\'s turn: ' + (wide() && UI.view !== G.cur ? 'watch its valley on the left.' : 'blue rings show its moves.');
+  else if (UI.busy || s.ai) t = s.name + '\'s turn: ' + (wide() && UI.view !== G.cur ? 'watch its valley on the left.' : 'blue rings show its moves.') + ' Tap to speed up.';
   else if (UI.view !== G.cur) t = 'Your turn. Tap Back to mine.';
   else if (s.offer) t = 'Keep one spirit card.';
   else if (UI.sel && UI.sel.kind === 'card') t = $$('#map .glow').length ? 'Tap a glowing hex: the animal moves in.' : $$('#map .plan').length ? 'Not yet. Build the dashed hexes first.' : 'This habitat no longer fits your valley.';
@@ -372,6 +372,7 @@ function toast(t) { var e = $('#toast'); e.textContent = t; e.classList.add('on'
 function onTap(e) {
   var t = e.target;
   if (UI.dragged && Date.now() - UI.dragged < 400) return;
+  if (UI.busy && G && !G.over && E.seat().ai && !UI.skip && !t.closest('.gx-drawer,.gx-bar')) { UI.skip = true; toast('Speeding up the rival.'); return; }
   if (t.closest('#backB')) { UI.view = firstHuman(); UI.sel = null; render(); return; }
   var rc = t.closest('[data-rc]'); if (rc) { var pr = rc.dataset.rc.split(':'), so = G.seats[+pr[0]], rid = pr[1] === 'S' ? so.spirit.id : (so.cards[+pr[1]] || {}).id; if (rid) bigCard(null, rid, +pr[0]); return; }
   var seatB = t.closest('[data-seat]'); if (seatB) { if (UI.mode === 'tut' && TUT) { toast('Finish the lesson first.'); return; } var v = +seatB.dataset.seat; if (v === UI.view) { toast(v === firstHuman() ? 'This is your valley.' : 'Showing ' + G.seats[v].name + '.'); return; } UI.view = v; UI.sel = null; render(); toast(v === G.cur || v === firstHuman() ? 'Back to your valley.' : 'Showing ' + G.seats[v].name + '. Tap your name to return.'); return; }
@@ -386,7 +387,7 @@ function onTap(e) {
   if (hx && myTurn()) {
     var k = hx.dataset.k;
     if (UI.sel && UI.sel.kind === 'tok') { if (!act({ t: 'place', h: UI.sel.h, k: k })) { shake(hx); toast(whyNot(G.seats[UI.view], k, G.turn.hand[UI.sel.h])); } return; }
-    if (UI.sel && UI.sel.kind === 'card') { if (!act({ t: 'cube', ci: UI.sel.ci, k: k })) shake(hx); return; }
+    if (UI.sel && UI.sel.kind === 'card') { if (!act({ t: 'cube', ci: UI.sel.ci, k: k })) { shake(hx); var lb = hx.querySelector('.plab text'); toast(lb ? 'Build here first: ' + lb.textContent + '. Then the animal can move in.' : 'The animal can\'t live here. Try a glowing or dashed hex.'); } return; }
     if (G.turn.took < 0) { toast('First tap a pocket of tokens above.'); flashPockets(); }
     return;
   }
@@ -527,7 +528,7 @@ function fillRules() { var b = $('#rulesb'); if (!b) return; if (!b.dataset.f) {
 function showTitle() {
   clearTimeout(UI.aiT); UI.busy = false; hideOverlays(); document.documentElement.classList.remove('mf-play');
   var st = $('#start'); st.hidden = false; var hasSave = false; try { hasSave = !!localStorage.getItem('mf_save'); } catch (e) { }
-  var c = UI.setup || (UI.setup = { mode: 'quick', ai: 'normal', side: 'A', spirits: false, np: 2 });
+  var c = UI.setup || (UI.setup = { mode: 'quick', ai: 'easy', side: 'A', spirits: false, np: 2 });
   var deco = '<svg class="tdeco" viewBox="0 0 360 170" aria-hidden="true">' + ART.defs('t') +
     '<path d="M0,120 C60,80 120,130 180,95 C240,60 300,110 360,80 L360,170 L0,170Z" fill="#cfe5c4" filter="url(#tsh2)"/>' +
     '<path d="M0,140 C80,115 150,150 220,125 C280,105 320,135 360,120 L360,170 L0,170Z" fill="#a9d39a" filter="url(#tsh2)"/>' +

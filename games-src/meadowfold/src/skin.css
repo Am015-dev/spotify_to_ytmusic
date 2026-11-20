@@ -311,3 +311,6 @@ button{font:inherit;color:inherit}
 .whyw{font-weight:700;font-size:16px;margin:2px 0 8px;color:#2f5f86}
 .mini .hnum{font-size:15px}
 @media (min-width:1000px){.pvmap{max-height:320px}.bigc .bigrow .pat{max-height:170px}}
+@media (max-width:999px){#central{height:64px;min-height:64px;box-sizing:border-box}}
+@media (max-height:600px) and (max-width:999px) and (orientation:portrait){#central{height:54px;min-height:54px}}
+@media (max-width:999px){#map .hnum.hb{font-size:16px}#map .hbadge circle{r:11px}}
