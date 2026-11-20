@@ -83,7 +83,7 @@ function tutSteps() {
     go('go3', 3, 'Speed 3 takes the corner clean: tap Go.'),
     gear('gear3', 4, 3, 'Shifting two gears costs 1 heat: tap gear 3.', 'shift2'),
     go('go4', 4, 'Stress plays your deck\'s next speed card: tap Go.', 'stress'),
-    { id: 'slip', rule: 'slip', say: 'Right behind a car, slipstream gives 2 free spaces: tap it.', target: function () { return $('#slipY'); }, ready: pend('slip'), wait: { type: 'tap', match: function (a) { return a.what === 'slip'; } }, side: 'top', avoid: tutRects(['#msg']) },
+    { id: 'slip', rule: 'slip', say: 'Right behind a car, slipstream gives 2 extra spaces, no cards: tap it.', target: function () { return $('#slipY'); }, ready: pend('slip'), wait: { type: 'tap', match: function (a) { return a.what === 'slip'; } }, side: 'top', avoid: tutRects(['#msg']) },
     { id: 'disc', rule: 'discard', say: 'Drop slow cards to draw fresh ones: tap Drop.', target: function () { var b = $('#discY'); return b && !b.disabled ? b : null; }, ready: pend('disc'), wait: { type: 'tap', match: function (a) { return a.what === 'discgo'; } }, side: 'top', avoid: needQ },
     { id: 'boost', rule: 'boost', say: 'Boost: after your cards show, flip one more for 1 heat.', target: function () { return $('#boostT'); }, ready: tutPlan(5), wait: { type: 'tap', match: function (a) { return a.what === 'boost'; } }, side: 'top', avoid: need },
     go('go5', 5, 'Speed 7 plus the boost reaches the line: tap Go.'),
@@ -105,7 +105,8 @@ function chapterMenu() { tutStart(); }
 function hintWhy() {
   try {
     var c = you(), p = planOnce(), nm = p.idx.map(function (i) { var x = c.hand[i]; return x === 'X' ? 'the Stress card' : isSpeed(x) ? 'the ' + x : cardText(x).split(/[:.]/)[0].replace(/ card$/, ''); }); nm = nm.map(function (t) { return /^(Burst|Brake)/.test(t) ? 'the ' + t : t; });
-    return 'Take gear ' + p.gear + ' and play ' + (nm.length > 1 ? nm.slice(0, -1).join(', ') + ' and ' + nm[nm.length - 1] : nm[0]) + '. Tap the gold ones, then Go.';
+    var on = UI.gear === p.gear && p.idx.every(function (j) { return UI.sel.indexOf(j) >= 0; });   /* F6: the plan is picked for you at the start of each turn */
+    return 'Take gear ' + p.gear + ' and play ' + (nm.length > 1 ? nm.slice(0, -1).join(', ') + ' and ' + nm[nm.length - 1] : nm[0]) + (on ? '. Already picked: press Go.' : '. Tap the gold ones, then Go.');
   } catch (e) { return 'Tap Suggest: the gear and cards to play turn gold.'; }
 }
 function helpBoot() {
@@ -116,7 +117,7 @@ function helpBoot() {
     { title: 'Corners', text: 'Each corner has a speed limit. Every point you go over costs 1 heat from your engine. Too little heat in your engine to pay means a spin-out.' },
     { title: 'Heat', text: 'Heat you pay goes to your discard pile and comes back as dead cards in your hand. Gears 1 and 2 send heat back to the engine.' },
     { title: 'Stress', text: 'A Stress card is a gamble: it plays as a random card flipped.' },
-    { title: 'Slipstream and boost', text: 'End next to or right behind a car to glide 2 more spaces. Boost: pay 1 heat to flip an extra speed card.' },
+    { title: 'Slipstream and boost', text: 'End next to or right behind a car to glide 2 more spaces (no cards; a corner it carries you past still costs heat). Boost: pay 1 heat to flip an extra speed card.' },
     { title: 'Upgrades', text: 'With Upgrades on you draft 3 cards before the race. They are played like speed cards and add a bonus.' }
   ];
   GXH.init({ game: 'redline-rally', defaultOn: false, steps: {}, rules: R, top: function () { var dk = document.querySelector('.gx-dock'); if (innerHeight < 600 && dk) { var r = dk.getBoundingClientRect(); if (r.top > innerHeight * 0.3) return Math.ceil(r.top) + 4; } var b = document.querySelector('.gx-bar'), rb = b && b.getBoundingClientRect(); return rb && rb.bottom > 0 && rb.bottom < innerHeight / 2 ? Math.ceil(rb.bottom) + 4 : 6; } });   /* short phones: the Hint bubble stays over the dock, never over the board */

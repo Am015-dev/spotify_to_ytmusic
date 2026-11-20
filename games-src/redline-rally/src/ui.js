@@ -40,7 +40,7 @@ var PULSE = {};
 function pulse(key, now, period, lo, hi) { var p = PULSE[key]; if (!p) p = PULSE[key] = now; var t = (now - p) / period; if (t >= 3) return hi; return lo + (hi - lo) * (0.5 - 0.5 * Math.cos(t * 6.2832)); }
 function rulesFill() {
   var h = ('<h3>How a turn works</h3><p>The strip in the panel lights your phase. <b>Shift</b>: pick a gear. <b>Play</b>: pick the cards. <b>Move</b>. <b>React</b>: cooldown, then boost. <b>Slipstream</b>. <b>Corners</b>. <b>Discard</b>: throw away any cards that are not Heat or Stress, then draw back to 7. With Hints on, the track shows where you land.</p><ol class="turn5">' + STORY.turn.map(function (l) { return '<li>' + esc(l.replace(/^\d\. /, '')) + '</li>'; }).join('') + '</ol><h3>The rules in full</h3><p>Be first across the line after all laps. Each round you pick a <b>gear</b> and play that many cards. The total is your speed: you move that many spaces.</p>' +
-    '<h3>Each round</h3><ul><li><b>Gear 1-4</b>: shift one step free, or two steps for 1 heat. Gear = cards you play.</li><li><b>Corners</b> have a speed limit. Every point over costs 1 heat from your engine. Not enough heat? You spin out. You lose all engine heat. You stop behind the corner in gear 1. You get 1 Stress card, or 2 from gear 3 or 4.</li><li><b>Slipstream</b>: end next to or right behind another car and you may glide 2 more spaces. It does not count as speed.</li><li><b>Boost</b>: pay 1 heat to flip cards from your deck until a speed card shows, and add it.</li><li><b>Cooldown</b> (after your cards are shown): gear 1 sends up to 3 heat from your hand back to the engine, gear 2 sends 1.</li><li><b>Adrenaline</b>: the last car to move each round gets +1 speed (it counts at corners, and you may skip it) and +1 cooldown (the last two cars when 5 or more started).</li><li><b>Too few cards</b>: if your hand has fewer playable cards than your gear, you play them all, pay heat cards for the rest, do not move and drop to gear 1.</li><li><b>The finish</b>: no slipstream past the line. The race goes on until every car has finished; finishers are placed in the order they cross. Cars crossing in the same round: the one furthest past the line is ahead; on the same space, the one that got there first.</li></ul>' +
+    '<h3>Each round</h3><ul><li><b>Gear 1-4</b>: shift one step free, or two steps for 1 heat. Gear = cards you play.</li><li><b>Corners</b> have a speed limit. Every point over costs 1 heat from your engine. Not enough heat? You spin out. You lose all engine heat. You stop behind the corner in gear 1. You get 1 Stress card, or 2 from gear 3 or 4.</li><li><b>Slipstream</b>: end next to or right behind another car and you may glide 2 more spaces, no cards needed. It does not count as speed, but a corner it carries you past still costs heat at your speed.</li><li><b>Boost</b>: pay 1 heat to flip cards from your deck until a speed card shows, and add it.</li><li><b>Cooldown</b> (after your cards are shown): gear 1 sends up to 3 heat from your hand back to the engine, gear 2 sends 1.</li><li><b>Adrenaline</b>: the last car to move each round gets +1 speed (it counts at corners, and you may skip it) and +1 cooldown (the last two cars when 5 or more started).</li><li><b>Too few cards</b>: if your hand has fewer playable cards than your gear, you play them all, pay heat cards for the rest, do not move and drop to gear 1.</li><li><b>The finish</b>: no slipstream past the line. The race goes on until every car has finished; finishers are placed in the order they cross. Cars crossing in the same round: the one furthest past the line is ahead; on the same space, the one that got there first.</li></ul>' +
     '<h3>Cards</h3><ul><li>Speed 1, 2, 3, 4: three of each.</li><li>Stress (3): when played, flip your deck until a speed card shows and use it.</li><li>Heat (6 start in your engine): paying sends them to your discard pile. They clog your hand later and cannot be played.</li></ul>' +
     '<h3>Upgrades (optional)</h3><ul><li>Switch Upgrades on in setup. Before the race you pick 3 upgrade cards; they join your deck and are played like speed cards, each with a bonus (more cooling, higher corner limits, a big speed jump).</li></ul>' +
     '<h3>Starting upgrades (house values)</h3><ul><li>Every car shuffles a <b>Brake card</b> (speed 0), a <b>Burst card</b> (speed 5) and 1 extra heat card into its deck. The numbers are printed on the cards. A stress flip passes over them: it stops only on speed cards 1 to 4. Switch off in setup.</li></ul>' +
@@ -94,7 +94,8 @@ function you() { return G.cars[UI.seat]; }
 function planFor(ci) {
   if (ci == null) return startRound();
   UI.seat = ci; UI.focus = ci; var c = G.cars[ci];
-  UI.sel = []; UI.gear = c.gear; UI.boost = false; UI.pops = []; UI.boostWant = UI.boostWant || {}; UI.boostWant[ci] = false; UI.sel = autoPick(c, UI.gear);   /* last round's pops leave before you plan: only the move preview is on the track */
+  UI.sel = []; UI.gear = c.gear; UI.boost = false; UI.pops = []; UI.boostWant = UI.boostWant || {}; UI.boostWant[ci] = false; UI.sel = autoPick(c, UI.gear); UI.pre = null;
+  if (hintsOn() && UI.mode !== 'tutorial' && !G.hot) try { var p0 = planOnce(); if (p0 && p0.idx && p0.idx.length === needCards(c, p0.gear)) { UI.gear = p0.gear; UI.sel = p0.idx.slice(); UI.boostWant[ci] = !!p0.boost && c.eng - (Math.abs(p0.gear - c.gear) === 2 ? 1 : 0) >= 1; UI.pre = p0; } } catch (e) { }   /* F6: with Hints on, the Suggest plan (gear, cards, boost) is already picked: Go alone follows it, a gear tap changes it */   /* last round's pops leave before you plan: only the move preview is on the track */
   if (G.hot) { UI.lockModal = true; modal('<h2>Pass to ' + esc(c.name) + '</h2><p>Hide the other hands. Tap when it is your turn.</p><button class="big" id="rdy" style="width:100%">I am ' + esc(c.name.split(' ')[0]) + '</button>'); $('#mx').hidden = true; $('#rdy').onclick = function () { UI.lockModal = false; closeModal(); drawPlan(); }; return; }
   drawPlan(); camToPlan();
 }
@@ -118,6 +119,19 @@ function heatLine(c) {   /* F4: one line: your engine heat, the Heat cards in ha
   if (!hh) return t + ' · no Heat cards';
   var part = function (q) { var n = Math.min(hh, COOL[q] + adr); return '<span class="' + (g === q && n ? 'ok' : '') + '">gear ' + q + ' clears ' + n + '</span>'; };
   return t + ' · ' + hh + ' Heat card' + (hh > 1 ? 's' : '') + ': ' + part(1) + ', ' + part(2);
+}
+/* F6: the push-your-luck in one line: what one gear up and one gear down would do this turn (cards auto-picked for that gear) */
+function gearTrade(c) {
+  if (UI.mode === 'tutorial' || UI.swap || !needCards(c, UI.gear)) return '';
+  var opts = gearOpts(c), adr = adrenalineFor(G).indexOf(c.i) >= 0 ? 1 : 0, base = planSpeed(c, UI.sel).sp, out = [];
+  [UI.gear + 1, UI.gear - 1].forEach(function (g) {
+    var o = opts.filter(function (x) { return x.g === g; })[0]; if (!o) return; var idx = autoPick(c, g); if (!idx || idx.length !== needCards(c, g)) return;
+    var q = planSpeed(c, idx), sp = q.sp + adr, ks = cornersIn(G, c.pos, c.pos + sp), burn = 0, tight = 0; ks.forEach(function (k) { var b = Math.max(0, q.sp - k.limit - q.ul); burn += b; if (b) tight = tight ? Math.min(tight, k.limit) : k.limit; });
+    var d = q.sp - base, risk = burn > c.eng - o.cost ? 'spin risk at corner ' + tight : burn ? burn + ' heat at corner ' + tight : 'safe';
+    if (g <= 2 && c.hand.indexOf('H') >= 0 && risk === 'safe') risk = 'safe, cools heat';
+    out.push('Gear ' + g + ': ' + (d >= 0 ? '+' : '') + d + ' space' + (Math.abs(d) === 1 ? '' : 's') + ', ' + risk);
+  });
+  return out.length ? '<span class="gtr">' + out.join(' · ') + '</span>' : '';
 }
 function curveInfo() {   /* what the selected cards would do at the next corner */
   var c = you(), sp = 0, nx = 0, ul = 0; UI.sel.forEach(function (j) { var x = c.hand[j], u = upgId(x); if (u) { sp += UPG[u].sp; ul += UPG[u].lim; } else if (x === 'X') nx++; else sp += +x; });
@@ -148,7 +162,7 @@ function drawPlan() {
   c.hand.forEach(function (x, j) { var on = UI.sel.indexOf(j) >= 0; h += cardHtml(x, on, x === 'H' || (UI.swap && x === 'X'), j, x === 'H' ? '' : on ? '' : full ? 'dim' : tutOn() || sugShown() ? '' : 'glow'); });
   UI.boost = false;   /* boost is never planned: the toggle below is your answer to the boost question after the reveal (React step) */
   UI.boostWant = UI.boostWant || {}; var bw = !!UI.boostWant[c.i], bOk = c.eng - (Math.abs(UI.gear - c.gear) === 2 ? 1 : 0) >= 1; if (!bOk) bw = UI.boostWant[c.i] = false;
-  h += '</div>' + cardLegend(c.hand) + '<div class="heatl" id="heatl">' + heatLine(c) + '</div><div id="acts">' + (hintsOn() ? '<button id="sugB">Suggest</button>' : '') + '<button class="bo' + (bw ? ' on' : '') + '" id="boostT" aria-pressed="' + bw + '"' + (bOk ? '' : ' disabled') + ' title="After the cards show: pay 1 heat, flip one more speed card. Skipped if it could spin you out. Key B">Boost ' + (bw ? 'on' : 'off') + '<small>-1 heat, +1-4</small></button><button class="go" id="goB" title="Key Enter">Go!</button></div>';
+  h += '</div>' + cardLegend(c.hand) + '<div class="heatl" id="heatl">' + heatLine(c) + gearTrade(c) + '</div><div id="acts">' + (hintsOn() ? '<button id="sugB">Suggest</button>' : '') + '<button class="bo' + (bw ? ' on' : '') + '" id="boostT" aria-pressed="' + bw + '"' + (bOk ? '' : ' disabled') + ' title="After the cards show: pay 1 heat, flip one more speed card. Skipped if it could spin you out. Key B">Boost ' + (bw ? 'on' : 'off') + '<small>-1 heat, +1-4</small></button><button class="go" id="goB" title="Key Enter">Go!</button></div>';
   var hh = c.hand.filter(function (x) { return x === 'H'; }).length, pips = ''; for (var q = 0; q < ENGINE0; q++) pips += '<i class="pip' + (q < c.eng ? ' on' : '') + '"></i>';
   if (false) h += '<div class="chips tray" id="tray"><span class="eng" title="Engine heat: your fuel. Corners burn it."><em>Engine heat</em><span class="pips">' + pips + '</span><b data-engine="G.cars[' + c.i + '].eng">' + c.eng + '</b></span><span title="Heat cards stuck in your hand. Gear 1 or 2 cools them back."><em>Dead heat in hand</em> <b>' + hh + '</b></span>' + '</div>';
   p.innerHTML = h; artApply(p);
@@ -231,7 +245,7 @@ function sugWhy(c, p) {   /* the suggested plan's reason, from the same numbers 
 function legNew(seen, k) { if (UI.legG !== G) { UI.legG = G; UI.legId = Date.now() % 1e6; } var r = G.round + '|' + UI.legId; if (!seen[k]) seen[k] = []; if (seen[k].indexOf(r) < 0) { if (seen[k].length >= 4) return false; seen[k].push(r); lsSet('rr_leg', JSON.stringify(seen)); } return true; }
 function tradeLine(ci) {   /* F3: before Go, the trade-off in plain numbers: you'd go X, limit Y, costs Z heat */
   var sp = 'Speed ' + (ci.uncertain ? 'about ' : '') + ci.sp, lim = ci.ks.length ? Math.min.apply(null, ci.ks.map(function (k) { return k.limit; })) : 0, c = you(), fl = total(G) - c.pos, tt = ci.ks.slice().sort(function (a, b) { return a.limit - b.limit; })[0], cw = tt ? (ci.ks.length > 1 ? 'tightest limit ' : 'corner ' + Math.max(1, tt.p - c.pos) + ' ahead, limit ') : 'limit ';   /* F5: say which corner */
-  if (fl <= ci.sp + ci.adr) return { t: sp + ' · crosses the finish line! Go!', k: 'good' };
+  if (fl <= ci.sp + ci.adr) return { t: sp + ' · crosses the line (' + fl + ' away)! Spaces past it count too. Go!', k: 'good' };
   if (ci.ks.length > 1) sp += ' · ' + ci.ks.length + ' corners';
   if (ci.spin) return { t: sp + ' · ' + cw + lim + ' · spin out!', k: 'warn' };
   if (ci.ks.length) return { t: sp + ' · ' + cw + lim + (ci.burn ? ' · costs ' + ci.burn + ' heat' : ' · no heat. Go!'), k: ci.burn ? 'warn' : 'good' };
@@ -245,7 +259,9 @@ function cardLegend(hand) {   /* F3: one plain line per dead card type in your h
 }
 function commit() {
   if (tutOn() && !GXT.act({ type: 'tap', what: 'go' })) return; sfx('go');
-  var c = you(); if (!G.hot) rateStart(c); var plan = { gear: UI.gear, idx: UI.sel.slice(), boost: UI.boost }, e = submitPlan(G, c.i, plan);
+  var c = you(); if (!G.hot) rateStart(c); var plan = { gear: UI.gear, idx: UI.sel.slice(), boost: UI.boost }, sp0 = UI.pre;
+  if (UI.ts && sp0 && !G.hot) { if (UI.gear < sp0.gear) UI.ts.low = (UI.ts.low || 0) + 1; if (UI.gear > sp0.gear) UI.ts.high = (UI.ts.high || 0) + 1; }   /* F6: post-race tips compare you with the Suggest plan */
+  var e = submitPlan(G, c.i, plan);
   if (e) { setMsg('Not allowed: ' + e, 'warn'); return; } RACE.prev = null; RACE.rateKeep = 0;
   $('#panel').innerHTML = '<div class="reveal"><div class="cd back" data-art="card-back"></div><div class="cd back" data-art="card-back"></div></div>'; artApply($('#panel'));
   var nx = needPlans(G)[0]; if (nx != null) planFor(nx); else startRound();
@@ -307,6 +323,7 @@ async function playEvents(ev) {
     if (UI.mode === 'tutorial') coachEvent(e, you);
     if (e.car != null && e.car !== UI.lastCar && e.t !== 'done') { UI.lastCar = e.car; UI.skipStep = false; logRow(e.car); var dt0 = $('#dockt'); if (dt0) dt0.textContent = 'Round ' + G.round + ' · ' + (you && !G.hot ? 'your car moves' : nm + ' moves'); banner(you && !G.hot ? 'Your move' : nm + "'s turn", c.col, 'turn'); setMsg(you && !G.hot ? 'Your car goes now.' : nm + ' drives.'); if (!UI.rival) await wait(550); }
     if (you && !G.hot) { var ph = { shift: 'shift', play: 'play', move: 'move', cool: 'react', boost: 'react', slip: 'react', corner: 'react', spin: 'react', done: 'discard', stall: 'discard' }[e.t]; if (ph) RACE.ph = ph; } tracker();
+    if (you && !G.hot && RACE.start) { var rx = RACE.start.rx = RACE.start.rx || {}; if (e.t === 'play') rx.c = e.speed; else if (e.t === 'boost') rx.b = e.add; else if (e.t === 'adr' && e.used) rx.a = 1; else if (e.t === 'slip') rx.s = e.to - e.from; }   /* F6: where this round's spaces came from, for the rating line */
     if (e.t === 'play') RACE.spdT = e.speed; else if (e.t === 'boost') RACE.spdT = e.speed; else if (e.t === 'done') RACE.spdT = 0;
     if (e.t === 'shift') { setMsg(who + (who === 'You' ? ' shift' : ' shifts') + ' to gear ' + e.to + (e.cost ? ' (-1 heat)' : '') + '.'); await wait(700); }
     else if (e.t === 'cool') { setMsg(who + ' cool' + (who === 'You' ? '' : 's') + ' ' + e.n + ' heat back into the engine.'); pop('+' + e.n + ' engine', UI.vis[e.car].p, '#8ce6ff'); await wait(750); }
@@ -314,7 +331,7 @@ async function playEvents(ev) {
     else if (e.t === 'boost') { logSet(e.car, { sp: e.speed, out: 'boost +' + e.add }); sfx('boost'); setMsg(who + ' boost' + (who === 'You' ? '' : 's') + ': +' + e.add + ' from a flipped card.'); pop('Boost +' + e.add, UI.vis[e.car].p, '#ffd24a', 'fx-boost-flare'); await wait(800); }
     else if (e.t === 'adr') { setMsg(e.used === 0 ? 'Adrenaline: +1 cool-down, no extra speed.' : who + ' get' + (who === 'You' ? '' : 's') + ' adrenaline: +1 speed.'); pop(e.used === 0 ? 'Adrenaline: cool +1' : 'Adrenaline +1', UI.vis[e.car].p, '#ffd24a'); await wait(800); }
     else if (e.t === 'move') { var d = Math.abs(e.to - e.from); setMsg(who + ' drive' + (who === 'You' ? '' : 's') + ' ' + d + ' space' + (d === 1 ? '' : 's') + '.'); if (d) sfx('engine'); await tween(e.car, e.to, Math.min(1500, 170 * d + 250)); if (d) { pop('+' + d + ' spaces', UI.vis[e.car].p, '#fff'); await wait(450); } }
-    else if (e.t === 'slip') { logSet(e.car, { out: 'slipstream +' + (e.to - e.from) }); sfx('slip'); setMsg(who + ' slipstream' + (who === 'You' ? '' : 's') + ' +' + (e.to - e.from) + ': free spaces.'); pop('Slipstream +' + (e.to - e.from), UI.vis[e.car].p, '#8ce6ff', 'fx-slipstream-streaks'); await tween(e.car, e.to, 500); await wait(450); }
+    else if (e.t === 'slip') { logSet(e.car, { out: 'slipstream +' + (e.to - e.from) }); sfx('slip'); setMsg(who + ' slipstream' + (who === 'You' ? '' : 's') + ' +' + (e.to - e.from) + ' extra spaces.'); pop('Slipstream +' + (e.to - e.from), UI.vis[e.car].p, '#8ce6ff', 'fx-slipstream-streaks'); await tween(e.car, e.to, 500); await wait(450); }
     else if (e.t === 'corner') { logSet(e.car, { out: e.cost ? '-' + e.cost + ' heat in a ' + e.limit : 'clean ' + e.limit }); if (you && UI.ts && e.cost) { UI.ts.ch += e.cost; if (!UI.ts.w || e.cost > UI.ts.w.cost) UI.ts.w = { cost: e.cost, sp: e.speed, lim: e.limit }; } if (e.cost) { if (you) sfx('burn'); setMsg(who + ' burn' + (who === 'You' ? '' : 's') + ' ' + e.cost + ' heat: over the limit.', 'warn'); pop('-' + e.cost + ' heat: ' + e.speed + ' in a ' + e.limit, UI.vis[e.car].p, '#ff6a3a', 'fx-heat-flame'); await wait(900); } else { if (you) sfx('clean'); setMsg(who + ' took the corner clean.', 'good'); pop('Clean: ' + e.speed + ' in a ' + e.limit, UI.vis[e.car].p, '#8cf0b4'); await wait(750); } }
     else if (e.t === 'spin') { logSet(e.car, { out: 'SPIN OUT' }); sfx('spin'); setMsg(nm + ' spins out: not enough heat.', 'warn'); pop('SPIN: ' + e.speed + ' in a ' + e.limit, e.to, '#ff4d3a', 'fx-spinout-smoke'); raceSpin(e); var v = UI.vis[e.car]; v.rot = 1; await tween(e.car, e.to, 500); await wait(700); v.rot = 0; }
     else if (e.t === 'finish') { setMsg(nm + ' crosses the line!', 'good'); banner(nm + ' crosses the line!', c.col, 'turn'); await wait(800); }
@@ -385,8 +402,8 @@ function askSlip() {
   var p = G.pend, c = G.cars[p.car], cost = cornerCost(G, p.from, p.L1, p.speed, p.lim) - cornerCost(G, p.from, p.L0, p.speed, p.lim);
   var spin = cornerCost(G, p.from, p.L1, p.speed, p.lim) > c.eng;
   var sn = p.L1 - p.L0;
-  if (!tutOn() && (spin || !cost)) { setMsg(spin ? 'No slipstream: it would spin you out.' : 'Slipstream: ' + sn + ' free spaces.'); return wait(350).then(function () { return !spin; }); }   /* R3: free = taken, spin = skipped; asked only when it costs heat */
-  setPhase('react'); setMsg(spin ? 'Slipstream +' + sn + ' would spin you out' : cost ? 'Slipstream +' + sn + ' costs ' + cost + ' more heat' : 'Slipstream: ' + sn + ' free spaces');
+  if (!tutOn() && (spin || !cost)) { setMsg(spin ? 'No slipstream: it would spin you out.' : 'Slipstream: ' + sn + ' extra spaces, no heat.'); return wait(350).then(function () { return !spin; }); }   /* R3: free = taken, spin = skipped; asked only when it costs heat */
+  setPhase('react'); setMsg(spin ? 'Slipstream +' + sn + ' would spin you out' : cost ? 'Slipstream +' + sn + ' carries you past a corner: ' + cost + ' more heat' : 'Slipstream: ' + sn + ' extra spaces, no heat');
   $('#panel').innerHTML = '<div class="slipq"><button id="slipN">Stay</button><button class="y" id="slipY">Slipstream +' + sn + (spin ? ' (spin!)' : '') + (cost ? ' (-' + cost + ' heat)' : '') + '</button></div>';
   if (hintsOn() && UI.mode !== 'tutorial') sugMark(suggestSlip(G, c) ? '#slipY' : '#slipN');
   return new Promise(function (r0) { var res = function (v) { var q = $('#panel .slipq'); if (q) q.remove(); r0(v); }; $('#slipY').onclick = function () { if (tutOn() && !GXT.act({ type: 'tap', what: 'slip' })) return; res(true); }; $('#slipN').onclick = function () { if (tutOn() && !GXT.act({ type: 'tap', what: 'slipno' })) return; res(false); }; if (UI.fast) setTimeout(function () { res(!spin && cost === 0); }, 10); if (tutOn() && GXT.current() && GXT.current().id !== 'slip') { setMsg('No slipstream now: keep your heat.'); setTimeout(function () { res(false); }, 1400 * (window.AIDELAY || 1)); } });
@@ -403,9 +420,10 @@ function raceTips(me) {
   var t = [], s = me.stats, ts = UI.ts || { ch: 0, n: 0, gs: 0 };
   if (s.spins) t.push('You spun out ' + (s.spins > 1 ? s.spins + ' times' : 'once') + ': when the line says "spin out", take a lower gear first.');
   if (ts.ch >= 4) t.push('You burned ' + ts.ch + ' heat in corners' + (ts.w ? ' (worst: speed ' + ts.w.sp + ' in a ' + ts.w.lim + ')' : '') + ': brake a gear one turn earlier.');
-  if (me.eng >= 3 && t.length < 2) t.push('You finished with ' + me.eng + ' heat unused: switch Boost on for long straights.');
-  if (ts.n && ts.gs / ts.n < 2.6 && t.length < 2) t.push('Your average gear was ' + (ts.gs / ts.n).toFixed(1) + ': shift up to 3 or 4 on straights.');
-  if (!s.slips && t.length < 2) t.push('End your move next to a car to slipstream 2 free spaces.');
+  if (me.eng >= 3 && t.length < 2) t.push('You finished with ' + me.eng + ' heat unused: in the last lap spend it on a higher gear or Boost (the picked plan does).');
+  if ((ts.low || 0) >= 3 && t.length < 2) t.push(ts.low + ' turns you took a lower gear than the picked one: on straights the gold gear gains spaces.');
+  else if (!UI.hints && ts.n && ts.gs / ts.n < 2 && t.length < 2) t.push('Your average gear was ' + (ts.gs / ts.n).toFixed(1) + ': shift up to 3 or 4 on straights.');
+  if (!s.slips && t.length < 2) t.push('End your move next to a car to slipstream 2 extra spaces (no cards needed).');
   return t.slice(0, 2);
 }
 function showResult() {

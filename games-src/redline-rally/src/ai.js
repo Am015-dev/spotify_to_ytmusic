@@ -5,7 +5,7 @@ function combos(a, k) {
   return out;
 }
 function aiLvl(G, c) { return (c && c.lvl) || G.diff; }   /* per car level; 'pro' is the planner behind the Suggest button */
-var AIP = { easy: { noise: 3, hw: 1.8, mis: 0.2, misBy: 3, lift: 0.3 }, normal: { noise: 1.6, hw: 1.6, mis: 0.08, misBy: 2 }, hard: { noise: 0.3, hw: 1.25, look: 1 }, pro: { noise: 0.15, hw: 1.25, look: 1 } };
+var AIP = { easy: { noise: 3, hw: 1.8, mis: 0.2, misBy: 3, lift: 0.3 }, normal: { noise: 1.6, hw: 1.6, mis: 0.08, misBy: 2 }, hard: { noise: 0.3, hw: 1.25, look: 1 }, pro: { noise: 0.15, hw: 1.25, look: 1, end: 16 } };
 function aiP(G, c) { return AIP[aiLvl(G, c)] || AIP.normal; }
 function aiNoise(G, c) { return aiP(G, c).noise; }
 function heatW(c, extra, G) { return (G ? aiP(G, c).hw : 1.25) + (c.eng - extra <= 2 ? 0.9 : 0); }
@@ -16,6 +16,7 @@ function aiPlan(G, c, onlyG) {   /* onlyG: plan for this one gear (the player's 
   var lv = aiLvl(G, c), easy = lv === 'easy', P = aiP(G, c);
   var mis = P.mis && rnd(G) < P.mis ? P.misBy : 0;   /* rookies misjudge a corner now and then: this round they read every limit higher (spins, burnt heat). Easy often, Normal rarely */   /* easy rivals drive like careful rookies: never top gear, never boost (W496: a new player can reach the podium) */
   var lift = P.lift && rnd(G) < P.lift;   /* rookies sometimes hold their gear instead of shifting up */
+  var endF = P.end ? Math.max(0.2, Math.min(1, (total(G) - c.pos) / P.end)) : 1;   /* F6 Suggest: heat left at the flag is wasted, so near the finish it is worth less (spend it on speed and boost) */
   gearOpts(c).filter(function (go) { return onlyG == null || go.g === onlyG; }).filter(function (go) { return onlyG != null || !easy || (go.g <= 3 && (!lift || go.g <= c.gear)); }).forEach(function (go) {
     var k = needCards(c, go.g);
     combos(play, k).forEach(function (idx) {
@@ -25,10 +26,10 @@ function aiPlan(G, c, onlyG) {   /* onlyG: plan for this one gear (the player's 
         var sp = base + (boost ? avg : 0), safe = Math.ceil(sp + (nx || boost ? 1 : 0)), mv = Math.round(sp) + adr, L = c.pos + mv;
         var slipOk = others.some(function (o) { return o.pos % N === L % N || o.pos % N === (L + 1) % N; });
         var L2 = slipOk ? L + 2 : L, heat = cornerCost(G, c.pos, L2, safe, ul + mis), left = c.eng - cost, spin = heat > left;
-        var score = mv * (P.mv || 1) + (slipOk ? 1.4 : 0) - heatW(c, cost, G) * (cost + Math.min(heat, left)) - (spin ? 16 : 0);
+        var score = mv * (P.mv || 1) + (slipOk ? 1.4 : 0) - endF * heatW(c, cost, G) * (cost + Math.min(heat, left)) - (spin ? 16 : 0);
         var cw = P.cw || 1.6; score += go.g === 1 ? Math.min(handHeat, COOL[1]) * cw : go.g === 2 ? Math.min(handHeat, COOL[2]) * cw : 0;
         score += Math.min(handHeat, uc) * cw;
-        if (boost && c.eng <= 3) score -= 2;
+        if (boost && c.eng <= 3) score -= 2 * endF;
         if (P.look) score -= P.look * heatW(c, cost, G) * nextCornerRisk(G, c, idx, go.g, L2, avg, left - Math.min(heat, left));
         score += (rnd(G) - 0.5) * 2 * aiNoise(G, c);
         if (!best || score > best.s) best = { s: score, plan: { gear: go.g, idx: idx.slice(), boost: boost } };

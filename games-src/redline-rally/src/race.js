@@ -156,6 +156,9 @@ function rateRound() {
   else if (d >= b - 1 && ht <= 2) { k = 'good'; t = 'Good: ' + d + ' space' + (d === 1 ? '' : 's') + ' for ' + ht + ' heat.'; }
   else if (d < b - 2) { k = 'okay'; t = 'Okay: ' + d + ' space' + (d === 1 ? '' : 's') + '. The best play went about ' + b + '.'; }
   else { k = ht > 2 ? 'okay' : 'good'; t = (ht > 2 ? 'Okay: ' : 'Good: ') + d + ' space' + (d === 1 ? '' : 's') + ', ' + ht + ' heat burned.'; }
+  var rx = s.rx || {}, parts = [];   /* F6: explain spaces beyond the cards (boost flip, adrenaline, slipstream) and the finish line in one clause */
+  if (!sp && rx.c != null && (rx.b || rx.a || rx.s)) { parts.push(rx.c + ' cards'); if (rx.b) parts.push(rx.b + ' boost'); if (rx.a) parts.push('1 adrenaline'); if (rx.s) parts.push(rx.s + ' slipstream'); t = t.replace(/\.$/, '') + ' (' + parts.join(' + ') + ').'; }
+  if (!sp && c.pos >= total(G) && s.pos < total(G)) t = t.replace(/\.$/, '') + ': over the line, furthest past ranks first.';
   RACE.rate = t; RACE.rateK = k; RACE.start = null; RACE.rateShow = 1; tracker();
 }
 
@@ -199,7 +202,7 @@ function scoreWhy() {
 /* ---------- Play mode: one "Goal" card before turn 1 ---------- */
 function goalCard(then) {
   UI.lockModal = true;
-  modal('<h2>Goal: first across the line after ' + G.laps + ' lap' + (G.laps > 1 ? 's' : '') + '</h2><ul class="goal"><li><b>Gear = cards.</b> Gear 3 means you play 3 cards.</li><li><b>Add them up.</b> The total is how far you drive.</li><li><b>Corners burn heat.</b> Too fast for your heat? You spin.</li><li><b>Heat</b> is your engine fuel: corners and boosts spend it.</li><li><b>Stress</b> is a gamble: it plays as a random card flipped.</li><li><b>Slipstream:</b> end behind a car to glide 2 free spaces.</li></ul>' + (G.sup ? '<p class="wxl"><b>Brake</b> = speed 0, safe in corners. <b>Burst</b> = speed 5, one big push. Stuck? Tap <b>Suggest</b>.</p>' : '') +
+  modal('<h2>Goal: first across the line after ' + G.laps + ' lap' + (G.laps > 1 ? 's' : '') + '</h2><ul class="goal"><li><b>Gear = cards.</b> Gear 3 means you play 3 cards.</li><li><b>Add them up.</b> The total is how far you drive.</li><li><b>Corners burn heat.</b> Too fast for your heat? You spin.</li><li><b>Heat</b> is your engine fuel: corners and boosts spend it.</li><li><b>Stress</b> is a gamble: it plays as a random card flipped.</li><li><b>Slipstream:</b> end behind a car to glide 2 extra spaces, no cards (a corner on the way still costs heat).</li></ul>' + (G.sup ? '<p class="wxl"><b>Brake</b> = speed 0, safe in corners. <b>Burst</b> = speed 5, one big push. Stuck? Tap <b>Suggest</b>.</p>' : '') +
     (G.wx && G.wx !== 'dry' ? '<p class="wxl"><b>' + esc(WEATHER[G.wx].name) + ':</b> ' + esc(WEATHER[G.wx].txt) + '</p>' : '') + '<button class="big" id="goalB" style="width:100%">Start the race</button>');
   $('#mx').hidden = true; $('#goalB').onclick = function () { UI.lockModal = false; closeModal(); then(); };
 }
