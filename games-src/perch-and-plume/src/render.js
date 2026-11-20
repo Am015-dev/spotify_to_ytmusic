@@ -1,6 +1,6 @@
 // ===================== render.js: state, helpers, rendering (board, dock, hand, opponents, feeder, tray) =====================
 var G = null;
-var UI = { mode: 'vs', view: 0, sel: null, pend: null, gsDie: null, busy: false, fxOn: false, camp: null, hints: true, fast: false, keep: null, timers: [], started: 0, lastHuman: 0 };
+var UI = { rv: { seat: null, lines: [] }, mode: 'vs', view: 0, sel: null, pend: null, gsDie: null, busy: false, fxOn: false, camp: null, hints: true, fast: false, keep: null, timers: [], started: 0, lastHuman: 0 };
 var $ = function (s, r) { return (r || document).querySelector(s); };
 var $$ = function (s, r) { return [].slice.call((r || document).querySelectorAll(s)); };
 var B = PP.B, HABN = ['forest', 'grassland', 'wetland'], HABC = ['F', 'G', 'W'];
@@ -75,6 +75,9 @@ function render() {
   try { rateStart(); showRate(); } catch (e) { }
   try { if (window.GXH && GXH.phase) GXH.phase(helpPhase()); } catch (e) { }
   try { coachState(); } catch (e) { }
+  // F2: the 250 ms tap guard starts when a question (or a chosen bird) appears, changes or ends; the plain start of your turn is not guarded (its banner is the buffer)
+  try { var qk = qKey(); if (qk !== UI.qk) { var was = UI.qk && UI.qk.split('|')[2] !== '-', now = !!(G.q || UI.sel != null || UI.pend || UI.gsDie != null); UI.qk = qk; if (was || now) UI.qT = Date.now(); } } catch (e) { }
+  document.body.classList.toggle('q-egg', !!(G.q && G.q.h === 'egg' && myTurn()));
 }
 // live chapter goal: always visible during a story chapter, with the count and a tick once met
 var GOAL_LABEL = { forest: 'Forest birds', eggs: 'Eggs', birds: 'Birds played', goals: 'Round-goal points', bonus: 'Bonus points', score: 'Score', margin: 'Lead over the best rival' };
@@ -185,7 +188,7 @@ function renderDock(p, vs, cur) {
 // keep the step's buttons (Play / Other food / Cancel, Skip, No thanks) just under the sticky prompt, never scrolled out of sight
 function dockToActs() {   // the step's buttons and what glows in the panel sit just under the sticky prompt, so you never scroll to find them
   var db = $('#dockbody'), pr = $('#prompt'), ac = $('#acts'); if (!db || !ac || !myTurn() || db.scrollHeight <= db.clientHeight) return;
-  var r = db.getBoundingClientRect(), lim = r.top + (pr && pr.offsetHeight ? pr.offsetHeight + 6 : 0), els = [];
+  var r = db.getBoundingClientRect(), lim = pr && pr.offsetHeight ? Math.max(r.top + pr.offsetHeight, pr.getBoundingClientRect().bottom) + 6 : r.top, els = [];
   if (ac.children.length) els.push(ac);
   if (document.body.classList.contains('idle4')) { var a4 = $('#act4') || ac; els = [a4]; }   // choosing an action: only the 4 buttons matter, not a Best hand card below
   var g = els.length && document.body.classList.contains('idle4') ? null : db.querySelector('#hand .glow, #hand .sel, #acts .glow, #hand [data-legal]') || db.querySelector('#hand .bestc'); if (g) els.push(g); else if (!els.length) return;
@@ -208,9 +211,9 @@ function promptText(mine) {
   var n = Q.d && Q.d.n;
   switch (Q.h) {
     case 'die': return 'Tap a food die in the feeder to take it (' + n + ' left).';
-    case 'egg': return 'Tap a bird on your board to lay an egg on it (' + n + ' left).';
+    case 'egg': return 'Tap a bird to lay an egg (' + n + ' left).';
     case 'draw': return 'Tap a bird in the tray, or the deck, to take a card (' + n + ' left).';
-    case 'bonus': return Q.d.kind === 'card' ? 'Discard a card for 1 more food?' : Q.d.kind === 'food' ? 'Pay 1 food for 1 more egg?' : 'Pay 1 egg for 1 more card?';
+    case 'bonus': return Q.d.kind === 'card' ? 'Trade: tap a hand card to discard it for 1 more food.' : Q.d.kind === 'food' ? 'Trade: pay 1 food for 1 more egg?' : 'Trade: tap a bird with an egg to pay it for 1 more card.';
     case 'pwTuck': return B[G.pl[UI.view].board[Q.d.h][Q.d.c].id].n + ': tuck a card?';
     case 'pwTrade': return B[G.pl[UI.view].board[Q.d.h][Q.d.c].id].n + ': spend an egg?';
     case 'pwMay': return B[G.pl[UI.view].board[Q.d.h][Q.d.c].id].n + ': use it? Everyone gets one too.';
@@ -233,6 +236,7 @@ function actsHTML() {
   if (!Q) return '<button type="button" class="btn" data-a="cancel">Back</button>' + (UI.sel != null ? '<button type="button" class="btn" data-a="zoom" data-i="' + UI.sel + '">Read card</button>' : '');
   switch (Q.h) {
     case 'die': return PP.allSame(G) ? mvBtn({ t: 'reroll' }, 'Reroll the feeder') : '';
+    case 'egg': return Q.d.n >= 2 ? '<button type="button" class="btn eggall" data-a="eggall">' + eggIcon() + 'Lay all ' + Q.d.n + ' on the best birds</button>' : '';
     case 'bonus': return (Q.d.kind === 'food' ? PP.FOODS.filter(function (f) { return p.food[f]; }).map(function (f) { return mvBtn({ t: 'bonus', yes: true, f: f }, 'Pay ' + foodIcon(f)); }).join('') : '') + mvBtn({ t: 'bonus', yes: false }, 'No thanks') + alwaysBtn('bonus-' + Q.d.kind);
     case 'pwMay': return mvBtn({ t: 'use' }, 'Use it', 'pri') + mvBtn({ t: 'skip' }, 'Skip');
     case 'pwTuck': case 'pwTrade': return mvBtn({ t: 'skip' }, 'Skip') + alwaysBtn(Q.h);
@@ -288,7 +292,7 @@ function fitDock() {   // phones: the panel gets only the height the board leave
   if (window.innerWidth >= 1000 || window.innerWidth > window.innerHeight) { de.style.removeProperty('--gx-sheet-h'); return; }
   var top = m.getBoundingClientRect().top + (window.scrollY || 0), room = Math.floor(window.innerHeight - top - 3 * ROWMIN - 14);
   var H = window.innerHeight, def = H > 700 ? .57 * H - 144 : .45 * H;   // never taller than the head.html default for this height
-  de.style.setProperty('--gx-sheet-h', Math.floor(Math.max(150, Math.min(room, def))) + 'px');
+  de.style.setProperty('--gx-sheet-h', Math.floor(Math.max(144, Math.min(room, def))) + 'px');
 }
 window.addEventListener('resize', function () { try { fitMat(); } catch (e) { } });
 function fitMat() {   // slots keep a card-like shape: width from the row height, never wider than the screen allows
