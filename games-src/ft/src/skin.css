@@ -54,7 +54,7 @@ html.sp3 .own.cam{font-size:0;width:22px;height:22px;background:var(--pc) url(mo
 #summon{position:fixed;inset:0;z-index:120;pointer-events:none;display:grid;place-items:center;align-content:center;gap:2px;background:radial-gradient(circle at 50% 46%,rgba(60,24,8,.1),rgba(10,4,20,.72));animation:smIn .25s ease-out both}
 #summon.out{opacity:0;transition:opacity .3s}
 #summon{--sz:min(46vw,190px)}
-#summon .sm-lamp{width:var(--sz);height:var(--sz);background:url(models/lamp-turn.webp) 0 0/calc(24*var(--sz)) var(--sz) no-repeat;animation:smTurn 1.6s steps(24) infinite;filter:drop-shadow(0 8px 14px rgba(0,0,0,.6)) drop-shadow(0 0 18px rgba(255,200,90,.55))}
+#summon .sm-lamp{width:var(--sz);height:var(--sz);background:url(models/lamp-turn.webp) 0 0/calc(24*var(--sz)) var(--sz) no-repeat;animation:smTurn 1.6s steps(24) 3;filter:drop-shadow(0 8px 14px rgba(0,0,0,.6)) drop-shadow(0 0 18px rgba(255,200,90,.55))}
 @keyframes smTurn{to{background-position:calc(-24*var(--sz)) 0}}
 #summon .sm-smoke{position:absolute;left:50%;top:30%;width:min(60vw,260px);aspect-ratio:1;translate:-50% 0;border-radius:50%;background:radial-gradient(circle,rgba(190,140,255,.8),rgba(130,80,220,.4) 45%,rgba(90,40,180,0) 70%);filter:blur(8px);animation:smSmoke 1.7s ease-out both}
 @keyframes smSmoke{from{transform:translateY(60px) scale(.3);opacity:0}30%{opacity:.95}to{transform:translateY(-70px) scale(1.5);opacity:0}}
