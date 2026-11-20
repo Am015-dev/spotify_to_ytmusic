@@ -130,9 +130,7 @@ function applyCam() {
   c.lookAt(s.look);
 }
 function viewRegion() {
-  var x0 = -HALF - .12, x1 = HALF + .12, z0 = -HALF - .08, z1 = HALF + .1;
-  if (K.view && K.view.region) return K.view.region;
-  return [x0, x1, z0, z1];
+  var r = K.view && K.view.region || [-HALF - .1, HALF + .1, -HALF - .1, HALF + .1], p = K.w > 700 && .5; return [r[0] - p, r[1] + p, r[2] - p, r[3] + p];
 }
 /* fit the region on the ground into the viewport (minus reserved UI margins), keep tilt/yaw */
 function fitCam(immediate, focus) {
