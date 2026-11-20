@@ -101,9 +101,9 @@ async function run(browser,W,H,mode){const tag=W+'x'+H+' '+mode;const t0=Date.no
       if(!s.shown||!s.hole)return null;if(need==='in')return {x:s.hole.cx,y:s.hole.cy};
       const b=s.bubble;const inB=(x,y)=>b&&x>=b.left-10&&x<=b.right+10&&y>=b.top-10&&y<=b.bottom+10;
       for(const [fx,fy] of [[.5,.5],[.15,.45],[.85,.45],[.5,.3],[.2,.7],[.8,.7],[.5,.62],[.1,.2],[.9,.2],[.5,.9]]){const x=V.w*fx,y=V.h*fy;if(y>40&&!inside(x,y)&&!inB(x,y))return {x,y}}return null},need);
-    if(wp&&(guardOnce(s.id))){const before=await state();if(!before.shown||before.id!==s.id){continue}await p.touchscreen.tap(wp.x,wp.y);await sleep(140);const after=await state();totals.wrong++;
+    if(wp&&(guardOnce(s.id))){const before=await state();if(!before.shown||before.id!==s.id){continue}const g0=await p.evaluate(()=>window.TBTAPGUARD?TBTAPGUARD.eaten:0);await p.touchscreen.tap(wp.x,wp.y);await sleep(140);const after=await state();totals.wrong++;
       if(after.i!==before.i||after.count!==before.count)note(tag,id+': a wrong tap advanced the tutorial');
-      if(after.wrongs<=before.wrongs)note(tag,id+': a wrong tap did not shake the bubble');
+      if(after.wrongs<=before.wrongs){const g1=await p.evaluate(()=>window.TBTAPGUARD?TBTAPGUARD.eaten:0);note(tag,id+': a wrong tap did not shake the bubble (tap guard ate '+(g1-g0)+', at '+Math.round(wp.x)+','+Math.round(wp.y)+', shown for '+(Date.now()-(before.shownAt||Date.now()))+' ms)')}
       const hint=await p.evaluate(()=>{const b=document.querySelector('.gxt-bub');return b&&b.classList.contains('gxt-shake')&&b.querySelector('.gxh-tx').textContent});
       if(!hint||!/Tap/.test(hint))note(tag,id+': wrong tap gave no "Tap ..." hint ('+hint+')')}
     // "Skip tutorial": once, at step 3, tap it with a finger: everything goes away, the menu is back, the tutorial is not marked done
