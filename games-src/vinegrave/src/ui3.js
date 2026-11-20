@@ -9,6 +9,7 @@ function startGame(mode, o) {
   }
   G = VG.newGame({ np, seats, seed: o.seed, solo: !!o.solo, rivalLevel: o.rivalLevel || o.lvl, rivalName: o.rivalName, twist: o.twist || null, rounds: o.rounds });
   if (mode !== 'tutorial') UI.coachFree = false;   /* the coach belongs to the tutorial game only */
+  UI.flat = innerWidth < 1000 && innerHeight < 700; UI.whyL = {}; UI.rbase = null; UI.rcardDue = false;
   UI.mode = mode; UI.humans = seats.map((s, i) => s.ai ? -1 : i).filter(i => i >= 0); UI.view = UI.humans[0] || 0; UI.camp = o.camp || null;
   UI.prefs.played = UI.prefs.played || mode !== 'tutorial'; savePrefs();
   enterGame();
@@ -16,12 +17,13 @@ function startGame(mode, o) {
   return G;
 }
 function enterGame() {
+  { const rc = $('#rcard'); if (rc) rc.hidden = true; }
   $('#start').hidden = true; $('#rs').hidden = true; $('#pass').hidden = true; UI.started = true;
   try { GX.close(); } catch (e) { }
   if (window.GX && GX.undo) try { GX.undo.clear(); } catch (e) { }
   render(); musicSync(); UI.bannerFor = null;
   if (!UI.fast && UI.mode !== 'tutorial' && G.round === 1 && !G.log.some(l => /plays|digs|buys|discovers|passes/.test(l.t || ''))) { showGoal(); return; }
-  turnBanner(); goOn();
+  UI.rbase = scoreCats(); turnBanner(); goOn();
 }
 function goOn() {
   const s = VG.actor(G); if (!isHuman(s)) schedule(); else if (s !== UI.view && UI.humans.length > 1) showPass(s);
@@ -63,15 +65,40 @@ function campBest(id, sc) {
 }
 UIACT.look = () => closeRes();
 UIACT.iam = () => { UI.view = VG.actor(G); $('#pass').hidden = true; render(); };
-function showGoal() {   /* one card before turn 1: how you win in one sentence, three ways to score */
+function showGoal() {   /* F15: one card before turn 1: "How you score", the main point sources in 4 lines */
   const g = $('#goal') || document.body.appendChild(Object.assign(document.createElement('div'), { id: 'goal', className: 'ov' }));
   const q = V.STORY.quick.intro, flavour = UI.camp && UI.camp.twist ? UI.camp.twist.text : q[(G.rng >>> 0) % q.length];
-  g.innerHTML = `<div class="tbox gbox" role="dialog" aria-label="Goal"><h2 class="gl">${UI.camp ? esc(UI.camp.goal.text) : 'Most points after ' + G.rounds + ' rounds wins.'}</h2>
-    <ul class="gu"><li>${ic('up', 'research')}<span>Climb the research track. Higher rows score more.</span></li><li>${ic('idol', 'idol')}<span>Explore ruins. Idols are 3 points, guardians 5.</span></li><li>${ic('card', 'cards')}<span>Buy cards with coins or compasses. Dread cards cost 1.</span></li></ul>
-    <p class="gf">${esc(flavour)}</p><button type="button" class="tbtn" data-a="goalgo">Start the expedition</button></div>`;
+  g.innerHTML = `<div class="tbox gbox" role="dialog" aria-label="How you score"><h2 class="gl">${UI.camp ? esc(UI.camp.goal.text) : 'Most points after ' + G.rounds + ' rounds wins.'}</h2>
+    <p class="gh">How you score</p>
+    <ul class="gu"><li>${ic('up', 'research')}<span><b>Research:</b> climb the track. Your row is worth more points the higher you get (up to 9).</span></li><li>${ic('idol', 'idol')}<span><b>Ruins:</b> each idol is 3 points, each guardian you beat is 5.</span></li><li>${ic('card', 'cards')}<span><b>Cards:</b> artifacts with a star badge score at the end. Dread cards cost 1.</span></li><li>${ic('star', 'temple')}<span><b>Temple:</b> reach the top row to buy a big tile.</span></li></ul>
+    <p class="gf">After every round you see where each side's points came from. ${esc(flavour)}</p><button type="button" class="tbtn" data-a="goalgo">Start the expedition</button></div>`;
   g.hidden = false; UI.busy = true; render();
 }
-UIACT.goalgo = () => { const g = $('#goal'); if (g) g.hidden = true; UI.busy = false; render(); turnBanner(); goOn(); };
+function scoreCats() { const o = {}; G.p.forEach((p, i) => { o[i] = VG.score(G, i); }); if (G.rival) o[-2] = { research: V.GLASS_VP[Math.min(V.TOP, G.rival.rows)], cards: G.rival.vp, total: VG.rivalScore(G) }; return o; }
+function nextTip(mineW, rivW, me, cur) {   /* what to try next: the source the rival gained on that you did not, else the one you are missing */
+  const gain = (w, k) => new RegExp(CAT_W[k] + ' \\+').test(w || '');
+  if (rivW && gain(rivW, 'cards') && !gain(mineW, 'cards')) return 'Try next round: buy a card with a star badge, or beat a guardian (5 points).';
+  if (rivW && gain(rivW, 'research') && !gain(mineW, 'research')) return 'Try next round: climb the research track. Each row is points at the end.';
+  if (!gain(mineW, 'idols') && !cur[me].idols) return 'Try next round: explore a hidden ruin. Each idol is 3 points.';
+  if (!gain(mineW, 'research')) return 'Try next round: climb the research track. It is the steadiest source of points.';
+  if (!gain(mineW, 'cards')) return 'Try next round: buy an artifact with a star badge.';
+  return 'Good round. Keep climbing research and collecting idols.';
+}
+function showRoundCard(n) {
+  const cur = scoreCats(), base = UI.rbase || {}, me = UI.humans[0] || 0, d0 = { research: 0, cards: 0, total: 0 };
+  const rows = []; let mineW = '', rivW = '';
+  const row = (i, name) => { const a = cur[i], b = base[i] || d0, d = a.total - (b.total || 0); let w = catWhy(a, b); if (i === -2) w = w.replace('card points', 'guardians and cards'); if (i === me) mineW = w; if (i === -2) rivW = w;
+    return `<div class="rcrow${i === me ? ' me' : ''}"><span class="rcn">${esc(name)}</span><b class="rcd">${d >= 0 ? '+' : ''}${d}</b><span class="rcw">${esc(w || 'no new points')}</span><span class="rct">${a.total} in all</span></div>`; };
+  G.p.forEach((p, i) => rows.push(row(i, UI.humans.length === 1 && i === me ? 'You' : short(i))));
+  if (G.rival) rows.push(row(-2, rivalShort()));
+  const tip = UI.humans.length === 1 ? `<p class="gf">${esc(nextTip(mineW, rivW, me, cur))}</p>` : '';
+  const g = $('#rcard') || document.body.appendChild(Object.assign(document.createElement('div'), { id: 'rcard', className: 'ov' }));
+  g.innerHTML = `<div class="tbox gbox rcbox" role="dialog" aria-label="Round ${n} scored"><h2 class="gl">Round ${n} scored</h2><div class="rcrows">${rows.join('')}</div>${tip}<button type="button" class="tbtn" data-a="rcgo">Round ${n + 1}</button></div>`;
+  document.querySelectorAll('.vpop').forEach(e => e.remove()); g.hidden = false; UI.busy = true; UI.rcardDue = false;
+  clearTimeout(showRoundCard.t); if (navigator.webdriver) showRoundCard.t = setTimeout(() => { if (!g.hidden) UIACT.rcgo(); }, 4000);   /* scripted players only: a person reads it and taps on */
+}
+UIACT.rcgo = () => { clearTimeout(showRoundCard.t); const g = $('#rcard'); if (!g || g.hidden) return; g.hidden = true; UI.rbase = scoreCats(); UI.busy = false; render(); after(); };
+UIACT.goalgo = () => { const g = $('#goal'); if (g) g.hidden = true; UI.rbase = scoreCats(); UI.busy = false; render(); turnBanner(); goOn(); };
 function showPass(s) {
   const p = $('#pass'); p.innerHTML = `<div class="tbox"><h2 class="logo" style="font-size:28px">Pass the device</h2><p class="tag2">Hand it to ${esc(G.p[s].name)}. Your cards stay hidden.</p><button type="button" class="tbtn" data-a="iam">I am ${esc(G.p[s].name)}</button></div>`;
   p.hidden = false;

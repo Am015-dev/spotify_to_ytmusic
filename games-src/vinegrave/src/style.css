@@ -664,3 +664,33 @@ body.vg-b2 #extra.fl.fr{-webkit-mask-image:linear-gradient(90deg,transparent,#00
   body.vg-b2 #hand.many .cd{height:76px;max-height:76px;min-height:0;overflow:hidden}
   body.vg-b2 #hand.many .cd .cn{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden;letter-spacing:-.03em}
 }
+/* ---------- F15: score explanations, round card, goal card, legend ---------- */
+#opp{flex-wrap:wrap}
+#opp .why{flex:0 0 100%;order:9;margin:0;padding:1px 8px;font-size:12px;line-height:16px;font-weight:700;color:#f3e6bf;background:rgba(10,16,10,.72);border-radius:8px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+@media (max-width:999px) and (max-height:600px){#opp .why{display:none}}
+.gbox .gh{margin:2px 0 0;font:900 14px/1 var(--gx-font,Georgia,serif);letter-spacing:.12em;text-transform:uppercase;color:#d9a441}
+.gbox .gu li b{color:#ffd36a}
+.rcrows{display:flex;flex-direction:column;gap:6px}
+.rcrow{display:grid;grid-template-columns:auto auto 1fr;grid-template-areas:"n d t" "w w w";gap:2px 10px;align-items:baseline;padding:6px 8px;border-radius:10px;background:rgba(255,255,255,.07);font-size:15px}
+.rcrow.me{background:rgba(255,211,106,.14)}
+.rcn{grid-area:n;font-weight:800}.rcd{grid-area:d;font-size:20px;color:#ffd36a}.rct{grid-area:t;justify-self:end;font-size:14px;color:#c9c2a8}.rcw{grid-area:w;font-size:14px;color:#e9dfc0}
+#qbox .qhelp{margin:0 0 4px;font-size:13px;line-height:1.25}
+@media (max-height:640px){.gbox .gu{gap:4px}.gbox .gu li{font-size:14px;line-height:1.2}.gbox .gu .ic{width:22px;height:22px}.gbox .gl{font-size:19px}.rcrow{padding:4px 8px}}
+/* the market's legend stays on one line at PC width */
+@media (min-width:1000px){#row .tl{font-size:12px;letter-spacing:.02em}#row .tl .lx{text-transform:none;font-weight:700}}
+/* F15: 6+ cards in hand on a phone: two rows of 4, name in full (no picture, no effect line; tap a card to see it enlarged), never clipped */
+@media (max-width:999px){
+  body.vg-b2 #hand.many{flex-wrap:wrap;gap:4px;justify-content:center;padding-top:2px}
+  body.vg-b2 #hand.many .cd{flex:0 0 calc((100% - 12px) / 4);height:50px;max-height:50px;min-height:0;overflow:hidden;margin:0;transform:none;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:2px 4px}
+  body.vg-b2 #hand.many .cd .pic,body.vg-b2 #hand.many .cd .ef,body.vg-b2 #hand.many .cd .cost{display:none}
+  body.vg-b2 #hand.many .cd .cn{display:block;position:static;overflow:visible;font-size:13px;line-height:15px;letter-spacing:0;margin:0;width:auto;max-width:100%;text-align:center;white-space:normal;-webkit-line-clamp:none}
+  body.vg-b2 #hand.many .cd .tr{position:absolute;top:2px;right:2px;width:16px;height:16px}
+  body.vg-b2 #hand.many .cd .vp{top:2px;left:3px}
+  body.vg-b2 #hand.many .cd.sel{transform:translateY(-6px) scale(1.04)}
+}
+@media (max-width:380px){body.vg-b2 #hand.many .cd .cn{font-size:12px;letter-spacing:-.02em}body.vg-b2 #hand.many .cd{padding:2px 2px}}
+@media (max-width:999px){
+  body.vg-b2 #hand.many .cd{height:56px;max-height:56px;padding-top:14px;justify-content:flex-start}
+  body.vg-b2 #hand.many .cd .tr{top:0;right:2px;width:14px;height:14px}
+  body.vg-b2 #hand.many .cd .vp{top:0;left:2px;font-size:11px;line-height:13px;padding:0 3px}
+}

@@ -7,7 +7,8 @@ function refreshInsp() {
   if (I.kind === 'site') {
     const x = G.sites[I.x], hid = !x.tile;
     h += `<h3>${esc(siteName(x))}</h3><div class="irow"><div class="big"><div class="site l${x.lvl}${hid ? ' hid' : ''}"><span class="pic" data-art="${hid ? 'site-hidden-' + x.lvl : 'site-' + x.tile}"></span></div></div><div>`;
-    h += `<p>Travel: ${VG.siteCost(x).map(t => ic(t) + ' ' + V.TNAME[t]).join(' + ')}. Each card pays one icon.</p>`;
+    h += `<p>Travel to get here: ${VG.siteCost(x).map(t => ic(t) + ' ' + V.TNAME[t]).join(' + ')}. Each card you play pays one icon.</p>`;
+    if (VG.siteCost(x).indexOf('plane') >= 0) h += `<p class="sm"><b>Needs a Plane.</b> Pay with a card that shows a Plane, or give ${G.planeCost || 2} coins for one.</p>`;
     { const pl = VG.payPlan(G, UI.view, VG.siteCost(x)); if (pl) h += `<p class="sm">${esc(payWords(pl))}</p>`; }   /* F12: the full pay line lives here; the prompt keeps it short */
     h += hid ? `<p>Explore: pay ${V.DISC[x.lvl]} compasses and the travel.</p><p>You find an idol and loot. A guardian wakes.</p>` : `<p>Dig: get ${resWords(V.SITE[x.tile].rew)}.</p>`;
     if (x.occ !== -1) h += `<p>${esc(who(x.occ))} is here this round.</p>`;
@@ -19,7 +20,8 @@ function refreshInsp() {
   } else if (I.kind === 'row' || I.kind === 'hand') {
     const id = I.kind === 'row' ? G.row[I.x] : me.hand[I.x]; if (!id) return closeInsp(); const c = V.CARDS[id];
     h += `<h3>${esc(c.name)}</h3><div class="irow"><div class="big">${cardHTML(id, {})}</div><div><p><b>${c.t === 'item' ? 'Item' : c.t === 'art' ? 'Artifact' : c.t === 'fear' ? 'Dread' : 'Starting card'}</b>${c.t === 'item' ? ': costs ' + c.cost + ' ' + rw('coin', c.cost) : c.t === 'art' ? ': costs ' + c.cost + ' ' + rw('compass', c.cost) : ''}.</p><p>${esc(c.t === 'fear' ? 'It does nothing. It costs 1 point.' : c.text)}</p>`;
-    h += `<p class="sm">Or use it to pay one ${V.TNAME[c.tr]} of travel.</p>${c.vp ? `<p class="sm">Worth ${c.vp} ${Math.abs(c.vp) === 1 ? 'point' : 'points'} at the end.</p>` : ''}`;
+    h += `<p class="sm">Or use it to pay one ${V.TNAME[c.tr]} of travel.</p>${c.vp ? `<p class="sm">${ic('star', '')} Star badge: worth ${c.vp} ${Math.abs(c.vp) === 1 ? 'point' : 'points'} at the end.</p>` : ''}`;
+    if (I.kind === 'row' && c.t !== 'fear') { const k = c.t === 'item' ? 'coin' : 'compass', n = c.cost - (me.res[k] || 0); h += `<p class="sm">${n > 0 ? `<b>Need ${n}</b>: you are ${n} ${rw(k, n)} short. Earn ${n === 1 ? 'one' : 'them'} first (dig, play cards, climb research).` : 'You can afford it now.'}</p>`; }
     if (c.t === 'item') h += '<p class="sm">Bought items go under your deck.</p>'; if (c.t === 'art') h += '<p class="sm">Artifacts work at once when bought.</p><p class="sm">Played from your hand, they cost 1 tablet.</p>';
     h += `<p><button type="button" class="btn alt" data-a="cards" data-id="${id}">See all cards</button></p></div></div>`;
     L.forEach(m => { if (I.kind === 'row' && m.t === 'buy' && m.r === I.x) add(m, 'Buy it'); if (I.kind === 'hand' && m.t === 'play' && m.i === I.x) add(m, 'Play it' + (c.t === 'art' ? ' (1 tablet)' : '')); });
@@ -51,7 +53,7 @@ function whyNotSite(x) {
   if (x.occ !== -1) return 'Someone is already here.';
   if (!me.ex) return 'Both explorers are already out.';
   if (!x.tile && me.res.compass < V.DISC[x.lvl]) return 'You need ' + V.DISC[x.lvl] + ' compasses to explore.';
-  return 'You cannot pay this travel. 2 coins buy a Plane.';
+  return VG.siteCost(x).indexOf('plane') >= 0 ? 'Needs a Plane: play a Plane card, or pay ' + (G.planeCost || 2) + ' coins.' : 'You cannot pay this travel yet. Cards with the same icon pay it; 2 coins buy a Plane.';
 }
 // ---------------------------------------------------------------- input: tap selects (it lifts, the line says what it does), tap again does it; or drag it
 function act(m) { if (!m) return; if (!tutAct({ what: 'mv', m })) return; UI.sel = null; try { navigator.vibrate && navigator.vibrate(12); } catch (x) { } closeInsp(); doMove(m); }
@@ -119,17 +121,18 @@ function tutAct(x) { if (typeof GXT === 'undefined' || !GXT.active() || UI.mode 
 // ---------------------------------------------------------------- moves and the computer
 function doMove(m) {
   if (!G) return; const best = UI.mode === 'tutorial' && typeof coachOn === 'function' && coachOn() && !m.free && m.t !== 'ans' ? VAI.choose(G, 'hard') : null;
-  const s = VG.actor(G), b = snapS(s), F = fxBefore(m, s), sc0 = s >= 0 ? VG.score(G, s).total : 0, cap0 = m.t !== 'ans' ? moveCaption(m, s) : '', r = VG.apply(G, m);   /* F12: the caption is read before the move (a bought card leaves the market) */
+  const s = VG.actor(G), W = whyPre(), b = snapS(s), F = fxBefore(m, s), sc0 = s >= 0 ? VG.score(G, s).total : 0, cap0 = m.t !== 'ans' ? moveCaption(m, s) : '', r = VG.apply(G, m);   /* F12: the caption is read before the move (a bought card leaves the market) */
   if (!r.ok) { render(); return; }
   if (window.GXH) try { GXH.hide(); } catch (e) { }
-  const delay = showEvents(s);
+  const delay = showEvents(s), why = whyPost(W);
   save(); render(); actFx(m, s, F, b); if (best) coachMove(m, best);
   const dp = s >= 0 ? VG.score(G, s).total - sc0 : 0;   /* say where points come from, so a rival's jump is never a mystery */
-  if (!UI.fast && m.t !== 'ans' && (!m.free || dp)) $('#prompt').textContent = cap0 + (dp > 0 ? ` +${dp} ${dp === 1 ? 'point' : 'points'}.` : dp < 0 ? ` ${dp} ${dp === -1 ? 'point' : 'points'}.` : '');
+  if (!UI.fast && m.t !== 'ans' && (!m.free || dp)) $('#prompt').textContent = cap0 + (dp ? ' ' + why + '.' : '') + (G.rival && UI.whyL && UI.whyL[-2] && W.rt !== VG.rivalScore(G) ? ' ' + UI.whyL[-2] + '.' : '');
   UI.busy = true; setTimeout(() => { UI.busy = false; after(); }, UI.fast ? 0 : Math.max(500, Math.min(delay, 800)));
 }
 function after() {
   if (!G) return; render();
+  if (UI.rcardDue && G.phase === 'play' && !UI.fast && UI.mode !== 'tutorial') { showRoundCard(UI.rcardDue); return; }   /* F15: the round's points, per source, for you and the rival */
   if (G.phase === 'over') { clearSave(); setTimeout(() => { try { if (typeof CO !== 'undefined') { CO.q.length = 0; coachHide(); } } catch (x) { } showResult(); if (UI.mode === 'tutorial' && typeof coachScoreStart === 'function') try { coachScoreStart(); } catch (x) { console.warn(x); } }, UI.fast ? 0 : 900); return; }
   const s = VG.actor(G);
   if (!isHuman(s)) { schedule(); return; }
@@ -164,10 +167,10 @@ function aiStep() {
   if (!UI.fast) { $('#prompt').textContent = cap; $('#pacts').innerHTML = ''; if (el0) { document.querySelectorAll('.aimark').forEach(e => e.classList.remove('aimark')); el0.classList.add('aimark'); setTimeout(() => el0.classList.remove('aimark'), 1800); } rivalCap(cap); }
   turnWait(UI.fast ? 0 : UI.quick ? 260 : 600, () => {   /* step 1: show what the rival is about to do (caption + its target pulses) */
     if (G !== g0 || G.phase !== 'play' || VG.actor(G) !== s) { UI.busy = false; return; }
-    const b = snapS(s), F = m ? fxBefore(m, s) : {};
+    const b = snapS(s), W = whyPre(), F = m ? fxBefore(m, s) : {};
     const r = m ? VG.apply(G, m) : { ok: false };
     if (!r.ok) { const ms = VG.moves(G); VG.apply(G, ms.find(x => x.t === 'pass') || ms[ms.length - 1]); }
-    const d = showEvents(s); save(); render(); if (typeof coachRival === 'function') coachRival(m);
+    const d = showEvents(s); whyPost(W); save(); render(); if (typeof coachRival === 'function') coachRival(m);
     if (!UI.fast) { $('#prompt').textContent = cap; actFx(m, s, F, b); }
     turnWait(UI.fast ? 0 : UI.quick ? 420 : Math.min(Math.max(d, 1000), 1500), () => { UI.busy = false; rivalCap(''); after(); });   /* step 2: the result stays readable before the next step */
   });
@@ -203,18 +206,31 @@ function moveCaption(m, s) {
 }
 function snapS(s) { if (!G || s < 0 || !G.p[s]) return null; const p = G.p[s]; return { res: Object.assign({}, p.res), sc: VG.score(G, s) }; }
 const SC_WHY = { research: 'research', temple: 'temple tile', idols: 'idol', slots: 'shrine slot', guards: 'guardian', cards: 'card points', fear: 'Dread card' };
+/* F15: every score change says where it came from: "+6: idols +3, research +3" */
+const CAT_W = { research: 'research', temple: 'temple tile', idols: 'idols', slots: 'shrine slots', guards: 'guardians', cards: 'card points', fear: 'Dread cards' };
+function catWhy(a, b) { return Object.keys(CAT_W).filter(k => (a[k] || 0) !== (b[k] || 0)).map(k => { const d = (a[k] || 0) - (b[k] || 0); return CAT_W[k] + ' ' + (d > 0 ? '+' : '') + d; }).join(', '); }
+function rivalShort() { return G.rival ? G.rival.name.replace(/'s (expedition|crew)$/, '').replace(/ expedition$/, '') : 'Rival'; }
+function whyPre() { return { me: snapS(VG.actor(G)), s: VG.actor(G), rt: G.rival ? VG.rivalScore(G) : 0, n: G.log.length }; }
+function whyPost(w) {   /* after a move: remember the mover's points and the rival's, each with its cause (shown in the strip, the prompt and the round card) */
+  UI.whyL = UI.whyL || {}; let mine = '';
+  if (w.me && w.s >= 0) { const a = VG.score(G, w.s), dv = a.total - w.me.sc.total; if (dv) { const nm = w.s === UI.view && UI.humans.length === 1 ? 'You' : short(w.s); mine = (dv > 0 ? '+' : '') + dv + ': ' + catWhy(a, w.me.sc); UI.whyL[w.s] = nm + ' ' + mine; } }
+  if (G.rival) { const dr = VG.rivalScore(G) - w.rt; if (dr) { const ln = G.log.slice(w.n).filter(l => l.s === -2).map(l => l.t.replace(/^.*? (overcomes|discovers|climbs|studies|takes)/, '$1').replace(/\.$/, '')).join('; ');
+    UI.whyL[-2] = rivalShort() + ' ' + (dr > 0 ? '+' : '') + dr + (ln ? ': ' + ln : ''); } }
+  return mine;
+}
+function whyText() { return Object.keys(UI.whyL || {}).map(k => UI.whyL[k]).join('  ·  '); }
 function diffText(s, b) {
   if (!b || !G || s < 0) return null; const a = snapS(s), res = [];
   V.RES.forEach(k => { const d = a.res[k] - b.res[k]; if (d) res.push((d > 0 ? '+' : '') + d + ' ' + rw(k, Math.abs(d))); });
   const dv = a.sc.total - b.sc.total;
-  return { vp: dv ? (dv > 0 ? '+' : '') + dv + (Math.abs(dv) === 1 ? ' point' : ' points') : '', res: res.slice(0, 3).join('  '), neg: dv < 0 };
+  return { vp: dv ? (dv > 0 ? '+' : '') + dv + (Math.abs(dv) === 1 ? ' point' : ' points') : '', res: res.slice(0, 3).join('  '), neg: dv < 0, why: catWhy(a.sc, b.sc) };
 }
 function popAt(rect, t, n) {
   if (!rect || !t || (!t.vp && !t.res)) return;
   { const fx = document.getElementById('fx'); if (fx && !fx.hidden && (n || 0) < 12) { setTimeout(() => popAt(rect, t, (n || 0) + 1), 450); return; } }   /* never stack pills on the guardian card: they wait until it closes */
   if (yourTurnNow() && !t.mine) return;
   const e = document.createElement('div'); e.className = 'vpop' + (t.neg ? ' neg' : '') + (t.chip ? ' onchip' : ''); e.setAttribute('aria-hidden', 'true');
-  e.innerHTML = (t.vp ? `<b>${esc(t.vp)}</b>` : '') + (t.res ? `<span>${esc(t.res)}</span>` : '');
+  e.innerHTML = (t.vp ? `<b>${esc(t.vp)}</b>` : '') + (t.why ? `<span>${esc(t.why)}</span>` : '') + (t.res ? `<span>${esc(t.res)}</span>` : '');
   document.body.appendChild(e); const w = e.offsetWidth, x = Math.max(6, Math.min(innerWidth - w - 6, rect.left + rect.width / 2 - w / 2)), y = t.chip ? Math.max(2, rect.top + rect.height / 2 - e.offsetHeight / 2) : Math.max(60, Math.min(innerHeight - 70, rect.top + rect.height / 2 - 20));
   e.style.left = x + 'px'; e.style.top = y + 'px'; setTimeout(() => e.remove(), 1700);
 }
@@ -247,7 +263,7 @@ function actFx(m, s, F, b) {   /* after a move: pieces fly to where they go, the
   const d = diffText(s, b), late = m.t === 'dig' || m.t === 'disc' ? 900 : 560;
   if (d) setTimeout(() => {
     if (d.res) { if (s === UI.view) gainFly(b, tr); else popUnder(chipOf(s), { res: d.res }); }
-    if (d.vp) setTimeout(() => { popUnder(chipOf(s), { vp: d.vp, neg: d.neg }); tickPts(s, F.pts); }, d.res ? 450 : 0);
+    if (d.vp) setTimeout(() => { popUnder(chipOf(s), { vp: d.vp, neg: d.neg, why: d.why }); tickPts(s, F.pts); }, d.res ? 450 : 0);
   }, late);
 }
 /* the explorer walks the trail: in at the camp edge, up through the nearest site of each lower level, onto its site */
@@ -305,7 +321,7 @@ function showEvents(s) {
     if (e.k === 'beat') { wait = Math.max(wait, 2600); sfx.play('win'); const w = G.p[e.s].name; fxCard('guard', e.guard, (w === 'You' ? 'You beat ' : short(e.s) + ' beats ') + V.GUARD[e.guard].name + '!', ['+5 points and a boon.', 'Boon: ' + V.opText(V.GUARD[e.guard].boon) + '.'], true); }
     if (e.k === 'idolfind') { sfx.play('coin'); }
     if (e.k === 'fear') { sfx.play('fear'); note(G.log.filter(l => /Dread/.test(l.t)).slice(-1)[0].t, 2400); wait = Math.max(wait, 900); }
-    if (e.k === 'round') { note('Round ' + e.round + ' begins. The market shifts.', 2000); sfx.play('round'); wait = Math.max(wait, 1000); }
+    if (e.k === 'round') { if (!UI.fast && UI.mode !== 'tutorial' && G.phase === 'play') UI.rcardDue = e.round - 1; note('Round ' + e.round + ' begins. The market shifts.', 2000); sfx.play('round'); wait = Math.max(wait, 1000); }
     if (e.k === 'gain' || e.k === 'dig' || e.k === 'buy') sfx.play('coin');
     if (e.k === 'research') sfx.play('step');
     if (e.k === 'rival') note(G.log[G.log.length - 1].t, 1800);

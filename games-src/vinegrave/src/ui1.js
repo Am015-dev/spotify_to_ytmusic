@@ -108,7 +108,8 @@ const B2POS = {   /* [x%, y%] per level and slot, zig-zag so the trails wind */
 };
 function mapB2(gS, S) {
   const per = { 0: [], 1: [], 2: [] }; G.sites.forEach((x, i) => per[x.lvl].push(i));
-  const mh = document.getElementById('map') ? document.getElementById('map').clientHeight : 999, flat = mh > 0 && mh < 205;
+  if (UI.flat == null) UI.flat = innerWidth < 1000 && innerHeight < 700;   /* F15: decided once per game from the screen size, never from how tall the map is right now */
+  const flat = !!UI.flat;
   const pos = {}; [0, 1, 2].forEach(lv => per[lv].forEach((i, k) => { pos[i] = ((flat ? B2FLAT : B2POS)[lv][k] || [50, 50]); }));
   let path = ''; const line = (a, b) => { path += `M${a[0]} ${a[1]}L${b[0]} ${b[1]}`; };
   per[0].forEach((i, k) => { if (k) line(pos[per[0][k - 1]], pos[i]); const up = per[1][k]; if (up != null) line(pos[i], pos[up]); });
@@ -150,7 +151,8 @@ function render() {
     <span class="exs">${ex == null ? '' : [0, 1].map(k => pawnSVG(i, k < ex ? '' : 'out')).join('')}</span>${passed ? '<span class="tagout">out</span>' : ''}</button>`;
   $('#opp').className = 'n' + (G.p.length + (G.rival ? 1 : 0));
   $('#opp').innerHTML = G.p.map((p, i) => chip(i, i === UI.view && UI.humans.length === 1 ? 'You' : p.name.split(' ')[0] === 'Dr' ? p.name.split(' ')[1] : p.name.split(' ')[0], tots[i], p.ex, actor === i && G.phase === 'play', p.passed, lead === i)).join('')
-    + (G.rival ? chip(-2, G.rival.name.replace(/'s (expedition|crew)$/, ''), VG.rivalScore(G), null, false, false, false) : '');
+    + (G.rival ? chip(-2, G.rival.name.replace(/'s (expedition|crew)$/, ''), VG.rivalScore(G), null, false, false, false) : '')
+    + (typeof whyText === 'function' && whyText() && G.phase === 'play' ? `<div class="why" id="whyline" aria-live="off">${esc(whyText())}</div>` : '');
   // sites: deep ruins, ruins, camp (nearest your tray)
   const GL = glowSet(L, q), gl = m => GL.indexOf(m) >= 0 ? 1 : 2;   /* the strongest few moves glow; other legal ones get a faint ring (R29: following the glow scores well) */
   const gS = {}; L.forEach(m => { if (m.s != null && (m.t === 'dig' || m.t === 'disc' || m.t === 'beat')) gS[m.s] = Math.min(gS[m.s] || 2, gl(m)); });
@@ -170,7 +172,7 @@ function render() {
   const gR = {}; L.forEach(m => { if (m.t === 'buy') gR[m.r] = Math.min(gR[m.r] || 2, gl(m)); }); if (q && q.h === 'buy') VG.moves(G).forEach(m => { if (m.v != null) gR[m.v] = 1; });
   const canMain = myTurn() && !q && L.some(m => m.t !== 'pass' && !m.free);
   const needOf = id => { if (!canMain) return 0; const c = V.CARDS[id], k = c.t === 'item' ? 'coin' : 'compass', n = c.cost - (me.res[k] || 0); return n > 0 ? n : 0; };
-  $('#row').innerHTML = `<span class="tl">Market<span class="lx"> · coins or compasses</span></span><div class="cards">` + G.row.map((id, r) => { const n = id && !gR[r] ? needOf(id) : 0, kk = id && V.CARDS[id].t === 'item' ? 'coin' : 'compass'; return id ? mktHTML(id, { r, glow: gR[r], sel: S.k === 'row' && S.x === r, need: n ? '<span class="nw">need</span>' + n + ic(kk) : '', needT: n ? 'You need ' + n + ' more ' + rw(kk, n) + '.' : '' }) : '<span class="cd back" data-art="card-back" aria-hidden="true"></span>'; }).join('') + '</div>';
+  $('#row').innerHTML = `<span class="tl">Market<span class="lx"> · need N = how many more you must earn · ${'\u2605'}N = points at the end</span></span><div class="cards">` + G.row.map((id, r) => { const n = id && !gR[r] ? needOf(id) : 0, kk = id && V.CARDS[id].t === 'item' ? 'coin' : 'compass'; return id ? mktHTML(id, { r, glow: gR[r], sel: S.k === 'row' && S.x === r, need: n ? '<span class="nw">need</span>' + n + ic(kk) : '', needT: n ? 'You need ' + n + ' more ' + rw(kk, n) + '.' : '' }) : '<span class="cd back" data-art="card-back" aria-hidden="true"></span>'; }).join('') + '</div>';
   renderTray(L, q, me, actor);
   document.body.classList.toggle('vg-mine', myTurn() && G.phase === 'play');
   if (typeof artApply === 'function') artApply();
@@ -268,7 +270,7 @@ function trackWhy() {   /* why the research path cannot climb now: the missing g
 }
 function payShort(pl) {   /* ' + Bone Whistle + 2 coins' : what the travel costs you, in as few words as fit */
   if (!pl) return ''; const me = G.p[UI.view], n = pl.cards.length, parts = n === 1 ? [V.CARDS[me.hand[pl.cards[0]]].name] : n ? [n + ' cards'] : [];
-  if (pl.coins) parts.push(pl.coins + ' coins'); if ((pl.tv || []).length) parts.push('token'); if ((pl.boons || []).length) parts.push('boon');
+  if (pl.coins) parts.push(pl.coins + ' coins for a Plane'); if ((pl.tv || []).length) parts.push('token'); if ((pl.boons || []).length) parts.push('boon');
   return parts.length ? ' + ' + parts.join(' + ') : '';
 }
 function payWords(pl) {
@@ -280,7 +282,7 @@ function trackLine(m) {
   const me = G.p[UI.view];
   if (m.t === 'temple') { const t = V.TEMPLE[m.k]; return 'Temple tile, ' + t.vp + ' points. Pay ' + resWords(t.cost) + '.'; }
   const row = (m.k === 'g' ? me.glass : me.note) + 1, T = V.TRACK[row];
-  return (m.k === 'g' ? 'Magnifier' : 'Notebook') + ' to row ' + (row === V.TOP ? 'the temple' : row) + '. Pay ' + resWords(T.cost) + '.' + (Object.keys(T.bonus).length ? ' Get ' + resWords(T.bonus) + '.' : '') + (m.k === 'n' && V.ASST_REC.indexOf(row) >= 0 ? ' You hire an assistant.' : m.k === 'n' && V.ASST_UP.indexOf(row) >= 0 ? ' You upgrade an assistant.' : '');
+  return (m.k === 'g' ? 'Magnifier' : 'Notebook') + ' to row ' + (row === V.TOP ? 'the temple' : row) + '. Pay ' + resWords(T.cost) + '.' + (Object.keys(T.bonus).length ? ' Get ' + resWords(T.bonus) + '.' : '') + (m.k === 'g' && V.GLASS_VP[row] ? ' Scores ' + V.GLASS_VP[row] + ' at the end.' : '') + (m.k === 'n' && V.ASST_REC.indexOf(row) >= 0 ? ' You hire an assistant.' : m.k === 'n' && V.ASST_UP.indexOf(row) >= 0 ? ' You upgrade an assistant.' : '');
 }
 function trackChoices() { const ms = movesFor('track'); if (ms.length < 2) return ''; return `<div class="qchoices">${ms.map(m => mvBtn(m, esc(trackLine(m)), 'go')).join('')}</div>`; }
 function promptLine(L) {
@@ -304,7 +306,7 @@ function qHTML(q) {
   if (q.h === 'or') return `<div class="qchoices">${q.d.opts.map((o, i) => { const m = ms.find(x => x.v === i); const t = o.length ? esc(V.opText(o).replace(/^./, c => c.toUpperCase())) : 'Nothing'; return m ? mvBtn(m, t, 'go') : `<button type="button" class="btn" disabled>${t} (cannot pay)</button>`; }).join('')}</div>`;
   if (q.h === 'buy' || q.h === 'site') return mvBtn({ t: 'ans', v: null }, 'Skip', 'alt');
   if (q.h === 'tbon') return `<div class="qchoices">${ms.map(m => mvBtn(m, esc('Bonus: ' + V.resText(V.TBONUS[G.tb[m.v.b]]) + '.'), 'go')).join('')}</div>`;
-  if (q.h === 'asst') return `<div class="qchoices">${ms.map(m => { if (m.v.g != null) { const d = V.ASSTBY[G.aSt[m.v.g][0]]; return mvBtn(m, esc(d.name + ': ' + V.opText(d.s) + (d.main ? ' (your action)' : '') + '.'), 'go'); } const a = p.asst[m.v.u], d = V.ASSTBY[a.id]; return mvBtn(m, esc('Gold ' + d.name + ': ' + V.opText(d.gd) + '.'), 'go'); }).join('')}</div>`;
+  if (q.h === 'asst') return `<p class="qhelp">${p.asst && p.asst.length ? 'Upgrading makes one assistant stronger.' : 'An assistant is a helper: once a round it does the effect below, then rests.'}</p><div class="qchoices">${ms.map(m => { if (m.v.g != null) { const d = V.ASSTBY[G.aSt[m.v.g][0]]; return mvBtn(m, esc(d.name + ': ' + V.opText(d.s) + (d.main ? ' (your action)' : '') + '.'), 'go'); } const a = p.asst[m.v.u], d = V.ASSTBY[a.id]; return mvBtn(m, esc('Gold ' + d.name + ': ' + V.opText(d.gd) + '.'), 'go'); }).join('')}</div>`;
   return '';
 }
 function readMs(t, ms) { return Math.max(ms || 0, 4000 + 100 * String(t || '').split(/\s+/).filter(Boolean).length); }   /* 4 s + 1 s per 10 words, never less */
