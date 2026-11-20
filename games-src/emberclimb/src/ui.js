@@ -98,6 +98,7 @@
       switch (f.k) {
         case 'dmg': var bg = f.x !== 'blocked' && f.x !== 'poison' && f.n >= 12; fxAt(f.w, f.x === 'poison' ? 'fx-poison-cloud' : 'fx-slash'); if (f.x === 'str') fxAt(f.w, 'fx-fire-burst'); SFX(f.x === 'blocked' ? 'block' : bg ? 'crit' : 'hit'); if (f.x === 'blocked') popAt(f.w, 'Blocked', 'dmg'); else numAt(f.w, f.n, f.x === 'poison' ? 'poison' : 'dmg', f.x === 'poison' ? 'poison' : (UI.lastName || '')); if (bg) bigHit(el); shakeEl(el, bg ? 95 : 0); break;
         case 'hitme': var bh = f.x !== 'blocked' && (f.n >= 12 || bossF); if (f.x === 'burn' || f.x === 'str') fxAt(f.w, 'fx-fire-burst'); SFX(f.x === 'blocked' ? 'block' : bh ? 'crit' : 'hurt'); if (f.x === 'blocked') popAt(f.w, 'Blocked', 'dmg'); else numAt(f.w, f.n, 'dmg', f.x === 'spikes' ? 'spikes' : f.x === 'burn' ? 'burn' : ''); if (f.x === 'spikes') { toast('Spikes! Attacking it cost you ' + f.n + ' HP'); try { UI.coachReact && UI.coachReact('poor', 'spikes'); } catch (e) { } } if (bh) bigHit(el); shakeEl(el, bh ? 95 : 0); break;
+        case 'trig': { var nc = el && el.querySelector('.notechip'); if (nc) { nc.classList.remove('trig'); void nc.offsetWidth; nc.classList.add('trig'); setTimeout(function () { nc.classList.remove('trig'); }, 1100); } SFX('buff'); popAt(f.w, f.x, 'dmg'); break; }
         case 'hp': break;
         case 'blk': SFX('block'); fxAt(f.w, 'fx-block-burst'); numAt(f.w, f.n, 'blk', 'Block'); break;
         case 'heal': SFX('heal'); fxAt(f.w, 'fx-heal-sparkle'); numAt(f.w, f.n, 'heal', 'HP'); break;
@@ -106,7 +107,7 @@
           var d = h('div', 'ec-phase', null, [h('b', '', soon ? 'It splits!' : 'Slimes!'), h('span', '', soon ? ed.name + ' ' + (ed.splitSay || 'splits') + '. ' + n + ' slimes join at the start of next round. Finish your turn.' : n + ' slimes from the ' + ed.name + ' join the fight. Check their intents.')]);
           d.setAttribute('role', 'status'); document.body.appendChild(d); SFX('crit'); setTimeout(function () { if (d.parentNode) d.remove(); }, 3000); })(); break;
         case 'debuff': popAt(f.w, (f.x === 'poison' ? 'Poison' : f.x === 'vuln' ? 'Vulnerable' : 'Weak') + (f.n ? ' ' + f.n : ''), 'deb'); break;
-        case 'die': if (window.ANIM) { var d = h('div', 'pop die', '🎲 ' + f.n); d.appendChild(A('die-' + f.n, '', { noph: 1, cls: 'dieart' })); d.style.left = '40%'; d.style.top = '36%'; document.body.appendChild(d); setTimeout(function () { d.remove(); }, 1000); } break;
+        case 'die': if (window.ANIM) { var d = h('div', 'pop die big', null, [h('b', '', 'Rolled ' + f.n)]); d.insertBefore(A('die-' + f.n, '', { noph: 1, cls: 'dieart' }), d.firstChild); d.style.left = 'calc(50% - 80px)'; d.style.top = '30%'; document.body.appendChild(d); setTimeout(function () { d.remove(); }, 1600); } break;   // F3: a big centred die + 'Rolled N', held 1.5 s
         case 'act': if (f.x === 'atk' && el && window.ANIM) { el.classList.add('lunge'); setTimeout(function () { el.classList.remove('lunge'); }, 480); } break;
         case 'kill': popAt(f.w, 'Down!', 'dmg'); break;
         case 'relic': toast('Relic: ' + D.RELICS[f.x].name); break;
@@ -177,7 +178,7 @@
     el.appendChild(ct); el.appendChild(art);
     if (e.cost !== -1 && e.fl.indexOf('u') < 0) el.appendChild(h('div', 'cx', e.cost === 'X' ? 'X' : String(e.cost)));
     var kk = keyNum(e); if (kk) el.appendChild(h('div', 'ck k-' + kk[0], kk[1]));
-    var sb = o.str || 0, cb = h('div', 'cb'); E.lines(e, sb).forEach(function (l) { cb.appendChild(h('span', 'cl' + (sb && /^Deal \d/.test(l) ? ' stb' : ''), l)); }); el.appendChild(cb);
+    var sb = o.str || 0, cb = h('div', 'cb'), ln = E.lines(e, sb); ln.forEach(function (l) { cb.appendChild(h('span', 'cl' + (sb && /^Deal \d/.test(l) ? ' stb' : ''), l)); }); if (ln.length >= 4 || ln.join(' ').length > 52) el.classList.add('long'); el.appendChild(cb);   // F3: long rule text (die cards) gets a smaller lifted font so nothing is clipped
     // (the full-card gem/frame overlays are not drawn: they covered the card picture and its rule text)
     return el;
   }
@@ -296,7 +297,7 @@
       var b = g.b, ch = g.hs[b.cur >= 0 ? b.cur : 0]; ttl = b.ph === 'p' ? 'Your turn' : 'Enemy turn';
       var anyOk = b.ph === 'p' && ch.hand.some(function (c) { return E.canPlay(ch, c) && (E.cost(ch, c) <= ch.en || E.eff(c).cost === 'X'); });
       if (b.ph !== 'p') txt = UI.cap || 'The enemy is acting. Tap to speed up.';
-      else if (UI.sel >= 0 && needTarget()) txt = 'Now tap the glowing enemy to play ' + E.eff(ch.hand[UI.sel]).name + '.';
+      else if (UI.sel >= 0 && needTarget() && b.en.filter(function (e) { return !e.dead; }).length > 1) txt = 'Now tap the glowing enemy to play ' + E.eff(ch.hand[UI.sel]).name + '.';
       else if (UI.sel >= 0) txt = 'Tap ' + E.eff(ch.hand[UI.sel]).name + ' again to play it.';
       else if (anyOk) txt = 'Tap a glowing card to pick it. You have ' + ch.en + ' energy.';
       else txt = 'No more cards you can play. Tap End turn.';
@@ -395,10 +396,10 @@
     on(b, function () { UI.explain(P); });
     return b;
   }
-  UI.explain = function (P) {
+  UI.explain = function (P, ttl) {
     document.querySelectorAll('.itip, .itip-scrim').forEach(function (n) { n.remove(); });
     // R24: a real popup: a see-through scrim under it closes it on any tap (or Esc), so it never sits over the controls you tap next
-    var sc = h('div', 'itip-scrim'), t = h('div', 'itip'); t.setAttribute('role', 'dialog'); t.setAttribute('aria-modal', 'true'); t.appendChild(h('b', '', P.some(function (p) { return /^relic-/.test(p.s || ''); }) ? 'Relic' : 'Enemy intent'));
+    var sc = h('div', 'itip-scrim'), t = h('div', 'itip'); t.setAttribute('role', 'dialog'); t.setAttribute('aria-modal', 'true'); t.appendChild(h('b', '', P.some(function (p) { return /^relic-/.test(p.s || ''); }) ? 'Relic' : (ttl || 'Enemy intent')));
     P.forEach(function (p) { var r = h('div', 'irow', null, [IA(p.s, p.k), h('span', '', p.say)]); t.appendChild(r); });
     t.appendChild(h('i', '', 'Tap to close')); var xb = h('button', 'itip-x', '\u2715'); xb.type = 'button'; xb.setAttribute('aria-label', 'Close'); t.appendChild(xb);
     function close() { t.remove(); sc.remove(); document.removeEventListener('keydown', esc); }
@@ -475,7 +476,9 @@
       x.appendChild(h('div', 'nm', d.name));
       x.appendChild(h('div', 'bar', null, [h('i'), h('b', '', e.hp + '/' + e.mhp)])); x.querySelector('.bar i').style.width = (100 * e.hp / e.mhp) + '%';
       if (SG && e.blk) x.querySelector('.bar').appendChild(h('span', 'w485shield', String(e.blk)));
-      x.appendChild(stChips(e));
+      var scE = stChips(e), fn0 = D.foeNote && D.foeNote(e.id);
+      if (fn0 && !e.dead && !(d.keepBlk && e.mode) && !(d.sleep && !(e.asleep > 0))) { var ns = h('span', 'notechip', fn0.chip); ns.title = fn0.text; ns.setAttribute('role', 'button'); on(ns, function (ev) { if (ev && ev.stopPropagation) ev.stopPropagation(); UI.explain([{ k: 'unk', s: 'intent-unknown', t: '?', say: fn0.text }], d.name); }); scE.appendChild(ns); }
+      x.appendChild(scE);
       if (!e.dead) on(x, function () { onEnemy(i); });   // tap the enemy to play the lifted attack on it (restored: lost in the W420 rewrite; tools/tap-enemy.js guards it)
       var pv = PV && PV.en[i]; if (pv && !e.dead && (pv.dmg > 0 || pv.kill)) x.appendChild(h('div', 'w4pv' + (pv.kill ? ' kill' : ''), null, [h('b', '', (PV.rnd ? '~' : '') + '-' + (pv.kill ? pv.dmg : pv.hpLoss)), h('i', '', pv.kill ? 'kills' : pv.stripped ? pv.stripped + ' block off' : (whyMods(cur, cur.hand[UI.sel], e) || 'HP'))]));   // W420 value preview
       en.appendChild(x);
@@ -619,7 +622,8 @@
     an.onfinish = end; setTimeout(end, wt(820) + 400);
   }
   function onCard(i) {
-    var g = G(); if (g.b.ph !== 'p' || UI.busy) return; var cur = g.hs[g.b.cur], c = cur.hand[i];
+    var g = G(); if (g.b.ph !== 'p' || UI.busy) return; if (Date.now() < (UI.handLock || 0)) return;   // F3: the hand closes up after a play (~250 ms): taps in that window are ignored, so they never hit the wrong card
+    var cur = g.hs[g.b.cur], c = cur.hand[i];
     if (!tutOk({ type: 'tap', w: 'card', id: c.id })) return;
     if (!(E.canPlay(cur, c) && (E.eff(c).cost === 'X' || E.cost(cur, c) <= cur.en))) { UI.sel = i; render(); toast(E.eff(c).fl.indexOf('u') >= 0 ? 'Cannot play' : 'Not enough energy'); UI.sel = -1; return; }
     if (UI.sel !== i) { UI.sel = i; render(); return; }
@@ -634,7 +638,7 @@
       UI.busy = false; UI.sel = -1; g = G(); if (!g || !g.b || g.scr !== 'battle') { render(); return; }   // R1: the fight can end while the card flies
       var tg = ti != null ? g.b.en[ti] : null, wasV = tg && tg.st.vuln > 0, wasD = tg && tg.dead;
       try { var pv = E.previewPlay && E.previewPlay(g.b.cur, ci, ti); if (pv && UI.fs) pv.en.forEach(function (x) { UI.fs.over += x ? x.over : 0; }); } catch (x) { }
-      E.performMove(mv); render(); UI.lastName = ''; afterMove();
+      E.performMove(mv); UI.handLock = Date.now() + 260; render(); UI.lastName = ''; afterMove();
       try { if (UI.coachReact && tg) { if (!wasD && tg.dead) UI.coachReact('good', 'kill'); else if (wasV) UI.coachReact('good', 'double'); } } catch (e) { }
     });
   }
@@ -706,7 +710,7 @@
     if (!r.treasure && UI.fs && UI.fs.key === rk) s.appendChild(rateLine(g, UI.fs));   // W420 fight rating
     s.appendChild(h('div', 'chip', '● +' + r.gold + ' gold'));
     // R7: a taken potion / relic stays as a greyed "Taken" tile, so nothing below jumps under the next tap
-    if (r.pot) { var pb = on(h('button', 'item' + (r.took.pot ? ' taken' : ''), null, [A('pot-' + r.pot, D.POTIONS[r.pot].name, { ph: '#5a8a5a' }), h('span', '', (r.took.pot ? '\u2713 Taken: ' : '') + D.POTIONS[r.pot].name)]), function () { if (r.took.pot) return; E.performMove({ t: 'takepot' }); render(); }); if (r.took.pot) pb.disabled = true; pb.style.width = '140px'; s.appendChild(pb); }
+    if (r.pot) { var pb = on(h('button', 'item' + (r.took.pot ? ' taken' : ''), null, [A('pot-' + r.pot, D.POTIONS[r.pot].name, { ph: '#5a8a5a' }), h('span', '', (r.took.pot ? '\u2713 In your slots: ' : 'Tap to take: ') + D.POTIONS[r.pot].name)]), function () { if (r.took.pot) return; E.performMove({ t: 'takepot' }); render(); }); if (r.took.pot) pb.disabled = true; pb.style.width = '140px'; s.appendChild(pb); }
     if (r.relics) { var rl = h('div', 'picks'); r.relics.forEach(function (id, i) { if (!id) return; var tk = !!r.took['r' + i], gone = !tk && !!r.took.relic; var b = on(h('button', 'item' + (tk || gone ? ' taken' : ''), null, [A('relic-' + id, D.RELICS[id].name, { ph: '#8a6a2a' }), h('b', '', (tk ? '\u2713 ' : '') + D.RELICS[id].name), h('span', '', tk ? 'Taken: in your relic bar' : gone ? 'Not taken' : D.RELICS[id].t)]), function () { if (tk || gone) return; E.performMove({ t: 'relic', i: i }); render(); }); if (tk || gone) b.disabled = true; b.style.width = '130px'; rl.appendChild(b); }); s.appendChild(rl); }
     var act = h('div', 'rwact');   // R21: Skip + Continue in one row that sticks to the bottom of the reward, so it never falls below the fold
     Object.keys(r.cards).forEach(function (hi) {
@@ -784,7 +788,7 @@
   function event() {
     var g = G(), ev = D.EVENTS[g.evn.id], s = h('div', 'reward'); s.appendChild(A('bg-event', '', { cls: 'bg', kind: 'bg' }));
     s.appendChild(h('h2', '', ev.name)); s.appendChild(host('cast-teller', ev.q)); s.appendChild(A(ev.img || 'event-' + g.evn.id, ev.name, { cls: 'evart', ph: '#4a3a5a', kind: 'card' }));
-    if (g.evn.res) { s.appendChild(h('div', 'sub', g.evn.res)); var evl = on(h('button', 'btn', 'Continue'), function () { E.performMove({ t: 'leave' }); render(); }); evl.id = 'ev-leave'; s.appendChild(evl); }
+    if (g.evn.res) { s.appendChild(h('div', 'sub evres', g.evn.res)); s.querySelector('.evres').setAttribute('role', 'status'); var evl = on(h('button', 'btn', 'Continue'), function () { E.performMove({ t: 'leave' }); render(); }); evl.id = 'ev-leave'; s.appendChild(evl); }
     else {
       s.appendChild(h('div', 'sub', ev.q)); var o = h('div', 'opts');
       ev.o.forEach(function (x, i) { var b = on(h('button', 'btn alt', x.t), function () { E.performMove({ t: 'opt', i: i }); if (G().evn.pend) UI.ov = 'evpick'; render(); }); if (x.cost && g.gold < x.cost) b.disabled = true; o.appendChild(b); }); s.appendChild(o);

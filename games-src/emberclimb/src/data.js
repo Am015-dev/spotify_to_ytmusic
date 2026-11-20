@@ -227,13 +227,13 @@ var EC = (typeof EC !== 'undefined') ? EC : {};
     'whispering-well': { name: 'Whispering Well', q: 'Drink? Roll the die.', art: 'old stone well with blue mist and a coin', o: [{ t: 'Drink and roll', roll: [{ hp: -8 }, { gold: 40 }, { relic: 1 }] }, { t: 'Leave', do: {} }] },
     'stranded-caravan': { name: 'Stranded Caravan', q: 'A broken cart blocks the road.', art: 'wrecked merchant cart in a forest road', o: [{ t: 'Help: lose 8 HP, gain a card', do: { hp: -5, card: 1 } }, { t: 'Loot: +16 gold, Regret', do: { gold: 45, curse: 'regret' } }, { t: 'Leave', do: {} }] },
     'mirror-pool': { name: 'Mirror Pool', q: 'Your reflection offers a deal.', art: 'still dark pond reflecting a different sky', o: [{ t: 'Lose 8 HP: remove a card', do: { hp: -7, rem: 1 } }, { t: 'Gain 8 max HP, Doubt', do: { mhp: 6, curse: 'doubt' } }, { t: 'Step in: transform a card', do: { xform: 1 } }, { t: 'Leave', do: {} }] },
-    'first-ember': { img: 'event-ember-shrine', start: 1, name: 'The First Ember', q: 'A warm ember offers one gift.', art: 'small glowing ember floating over an open palm', o: [{ t: 'Gain 8 max HP', do: { mhp: 8 } }, { t: 'Take 32 gold', do: { gold: 100 } }, { t: 'Take a rare card', do: { rare: 1 } }, { t: 'Lose 8 HP: take a relic', do: { hp: -10, relic: 1 } }] },
-    'ash-library': { img: 'node-event', name: 'Ash Library', q: 'Half-burnt books line the walls.', art: 'tall scorched bookshelves with drifting pages', o: [{ t: 'Read: gain a card', do: { card: 1 } }, { t: 'Sleep here: heal 16', do: { heal: 12 } }, { t: 'Leave', do: {} }] },
-    'cursed-chest': { img: 'node-event', name: 'Cursed Chest', q: 'A chest hums with a dark tune.', art: 'iron-bound chest leaking purple smoke', o: [{ t: 'Open: a relic and Regret', do: { relic: 1, curse: 'regret' } }, { t: 'Leave', do: {} }] },
-    'herb-witch': { img: 'event-wandering-tinker', name: 'Herb Witch', q: 'An old woman stirs a pot.', art: 'smiling old woman stirring a bubbling green pot', o: [{ t: 'Buy 2 potions (16 gold)', do: { gold: -40, pot: 2 }, cost: 40 }, { t: 'Taste the stew: heal 8', do: { heal: 8 } }, { t: 'Leave', do: {} }] },
-    'forge-spirit': { img: 'event-ember-shrine', name: 'Forge Spirit', q: 'A spirit offers to hammer a card.', art: 'glowing figure of flame standing at an anvil', o: [{ t: 'Upgrade a card', do: { upg: 1 } }, { t: 'Lose 8 HP: +8 max HP', do: { hp: -6, mhp: 2 } }, { t: 'Leave', do: {} }] },
-    'golden-idol': { img: 'node-event', name: 'Golden Idol', q: 'A golden idol sits on a trap.', art: 'small golden idol on a stone plinth with cracks', o: [{ t: 'Grab it: +32 gold, Injury', do: { gold: 100, curse: 'injury' } }, { t: 'Grab carefully: +16 gold, -8 HP', do: { gold: 50, hp: -9 } }, { t: 'Leave', do: {} }] },
-    'kind-pilgrim': { img: 'event-stranded-caravan', name: 'Kind Pilgrim', q: 'A pilgrim shares the fire.', art: 'hooded pilgrim at a small campfire offering bread', o: [{ t: 'Rest: heal 8', do: { heal: 10 } }, { t: 'Trade stories: remove a card, -8 HP', do: { hp: -4, rem: 1 } }, { t: 'Leave', do: {} }] },
+    'first-ember': { start: 1, name: 'The First Ember', q: 'A warm ember offers one gift.', art: 'small glowing ember floating over an open palm', o: [{ t: 'Gain 8 max HP', do: { mhp: 8 } }, { t: 'Take 32 gold', do: { gold: 100 } }, { t: 'Take a rare card', do: { rare: 1 } }, { t: 'Lose 8 HP: take a relic', do: { hp: -10, relic: 1 } }] },
+    'ash-library': { name: 'Ash Library', q: 'Half-burnt books line the walls.', art: 'tall scorched bookshelves with drifting pages', o: [{ t: 'Read: gain a card', do: { card: 1 } }, { t: 'Sleep here: heal 16', do: { heal: 12 } }, { t: 'Leave', do: {} }] },
+    'cursed-chest': { name: 'Cursed Chest', q: 'A chest hums with a dark tune.', art: 'iron-bound chest leaking purple smoke', o: [{ t: 'Open: a relic and Regret', do: { relic: 1, curse: 'regret' } }, { t: 'Leave', do: {} }] },
+    'herb-witch': { name: 'Herb Witch', q: 'An old woman stirs a pot.', art: 'smiling old woman stirring a bubbling green pot', o: [{ t: 'Buy 2 potions (16 gold)', do: { gold: -40, pot: 2 }, cost: 40 }, { t: 'Taste the stew: heal 8', do: { heal: 8 } }, { t: 'Leave', do: {} }] },
+    'forge-spirit': { name: 'Forge Spirit', q: 'A spirit offers to hammer a card.', art: 'glowing figure of flame standing at an anvil', o: [{ t: 'Upgrade a card', do: { upg: 1 } }, { t: 'Lose 8 HP: +8 max HP', do: { hp: -6, mhp: 2 } }, { t: 'Leave', do: {} }] },
+    'golden-idol': { name: 'Golden Idol', q: 'A golden idol sits on a trap.', art: 'small golden idol on a stone plinth with cracks', o: [{ t: 'Grab it: +32 gold, Injury', do: { gold: 100, curse: 'injury' } }, { t: 'Grab carefully: +16 gold, -8 HP', do: { gold: 50, hp: -9 } }, { t: 'Leave', do: {} }] },
+    'kind-pilgrim': { name: 'Kind Pilgrim', q: 'A pilgrim shares the fire.', art: 'hooded pilgrim at a small campfire offering bread', o: [{ t: 'Rest: heal 8', do: { heal: 10 } }, { t: 'Trade stories: remove a card, -8 HP', do: { hp: -4, rem: 1 } }, { t: 'Leave', do: {} }] },
     'back-alley-gambler': { name: 'Back Alley Gambler', q: 'A grin and a pair of dice.', art: 'hooded gambler at a barrel table with dice', o: [{ t: 'Bet 8 gold and roll: 1-2 lose it, 3-4 keep it, 5 win 16, 6 win 32', roll: [{ gold: -30 }, { gold: -30 }, { gold: 0 }, { gold: 0 }, { gold: 60 }, { gold: 90 }], cost: 30 }, { t: 'Walk away', do: {} }] }
   };
   var NODES = { m: 'Monster', e: 'Elite', r: 'Rest', s: 'Shop', v: 'Event', t: 'Treasure', b: 'Boss' };
@@ -315,7 +315,18 @@ var EC = (typeof EC !== 'undefined') ? EC : {};
     };
     Object.keys(U).forEach(function (id) { if (CARDS[id]) CARDS[id].up = U[id]; });
   })();
-  EC.D = { GOLD: GOLD, SCALE: SCALE, CAPS: CAPS, EHP: EHP, CARDS: CARDS, ORDER: ORDER, H: H, ENEMIES: ENEMIES, ENC: ENC, ENCA: ENCA, ACTBOSS: ACTBOSS, RELICS: RELICS, POTIONS: POTIONS, EVENTS: EVENTS, NODES: NODES, needsTarget: needsTarget,
+  // Passive / trigger rules a foe carries (not part of its intent): one short chip on the foe, one full sentence for the popup and the Rules.
+  function foeNote(id) {
+    var d = ENEMIES[id]; if (!d) return null;
+    if (d.skillTax) return { chip: 'Skill: -' + d.skillTax * SCALE + ' HP', text: 'From its 2nd turn, every Skill you play costs you ' + d.skillTax * SCALE + ' HP. Attacks and Powers are free.' };
+    if (d.deathVuln) return { chip: 'Dies: you Vulnerable', text: 'When it dies, every hero becomes Vulnerable ' + d.deathVuln + '.' };
+    if (d.curl) return { chip: 'Curls: +' + d.curl * SCALE + ' Block', text: 'The first time it is hurt, it curls up and gains ' + d.curl * SCALE + ' Block.' };
+    if (d.split) return { chip: 'Splits when slain', text: 'When it dies it bursts into smaller foes next round.' };
+    if (d.keepBlk) return { chip: 'Keeps its Block', text: 'It keeps its Block between turns. Break the Block before its Mode Shift step and it turns defensive instead of attacking.' };
+    if (d.sleep) return { chip: 'Asleep: wakes if hurt', text: 'It sleeps until you hurt it, then it wakes and fights.' };
+    return null;
+  }
+  EC.D = { foeNote: foeNote, GOLD: GOLD, SCALE: SCALE, CAPS: CAPS, EHP: EHP, CARDS: CARDS, ORDER: ORDER, H: H, ENEMIES: ENEMIES, ENC: ENC, ENCA: ENCA, ACTBOSS: ACTBOSS, RELICS: RELICS, POTIONS: POTIONS, EVENTS: EVENTS, NODES: NODES, needsTarget: needsTarget,
     // Gentle (first climb) player-side numbers: max HP x hp, start with `pots` x `pot`, Rest heals `rest` (tabletop 3) x SCALE. Env GENTLE='{...}' overrides in the bench.
     GENTLE: (typeof process !== 'undefined' && process.env && process.env.GENTLE_CFG) ? JSON.parse(process.env.GENTLE_CFG) : { hp: 5, pots: 3, pot: 'healing-draught', rest: 8 } };
   if (typeof module !== 'undefined') module.exports = EC;

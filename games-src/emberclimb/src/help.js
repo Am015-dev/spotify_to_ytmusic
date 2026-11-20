@@ -12,6 +12,7 @@
     { title: 'Your turn', text: 'You draw 5 cards and have 3 energy each turn. Tap a card once to lift it, again to play it. Pick a target if asked.', pic: svg('turn') },
     { title: 'Read the intent', text: 'Enemies show what they will do next. Block cancels attacks. Out of energy? End your turn.', pic: svg('intent') },
     { title: 'Status effects', text: 'Vulnerable (max 3): takes double damage from the next attack. Weak (max 3): each of its hits deals 8 less damage. One is used up per attack; Weak against Vulnerable cancels both. Poison: 8 HP per token at end of turn, stays. Dice: 1-2 low, 3-4 middle, 5-6 high.', pic: svg('status') },
+    { title: 'Foe rules', text: 'Some foes have a rule of their own, shown as a purple chip under them. Tap the chip to read it; it flashes when it fires.\nThorn Brute: from its 2nd turn each Skill you play costs you ' + D.SCALE + ' HP.\nRust Tick: curls up (Block) when first hurt.\nGape Grub: its death makes you Vulnerable.\nGate Wyrm: keeps its Block; break it and it turns defensive.\nMire Behemoth: bursts into smaller foes when slain.\nSleeper Statue: wakes when hurt.', pic: svg('status') },
     { title: 'After a fight', text: 'Pick 1 of 3 new cards, or skip to keep your deck lean.', pic: svg('reward') },
     { title: 'Rest and shop', text: 'Campfires heal or upgrade a card. Shops sell cards, relics and potions for gold.', pic: svg('rest') },
     { title: 'Two heroes', text: 'Two heroes share the map and take turns. Pass the screen.', pic: svg('duo') },
