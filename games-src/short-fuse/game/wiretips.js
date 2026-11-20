@@ -38,7 +38,7 @@ function f4Explain(){if(!G||!UI.V||G.over||UI.brief||UI.tut||UI.coach||!UI.start
   setInterval(()=>{try{const k=keysEl();k.hidden=!(G&&UI.started&&!G.over&&!UI.brief&&!UI.tut)}catch(e){}},700);
   document.addEventListener('keydown',e=>{if(!G||!UI.started||G.over||e.ctrlKey||e.metaKey||e.altKey||(typeof GX!=='undefined'&&GX.open))return;const tg=e.target&&e.target.tagName;if(tg==='INPUT'||tg==='TEXTAREA'||tg==='SELECT')return;const V=UI.V;if(!V||V.seat<0||UI.brief)return;
     const mineTurn=decider()===V.seat&&!!V.legal;const k=e.key;
-    if(/^[0-9yY]$/.test(k)){const v=(k==='y'||k==='Y')?'Y':k==='0'?10:+k;const t=[...document.querySelectorAll('#mine .tile.glow')].find(x=>{const sl=G.st[+x.dataset.s]&&G.st[+x.dataset.s].w[+x.dataset.k];return sl&&sl.v===v});e.preventDefault();
+    if(/^[0-9yY]$/.test(k)){const v=(k==='y'||k==='Y')?'Y':k==='0'?10:+k;const t=[...document.querySelectorAll('#mine .tile.glow')].find(x=>{const sl=V.stands[+x.dataset.s]&&V.stands[+x.dataset.s].slots[+x.dataset.k];return sl&&sl.v===v});e.preventDefault();
       if(t)t.click();else if(mineTurn)toast(v==='Y'?'You hold no yellow wire to say':'You do not hold a '+v+' to say');else toast('Not your turn yet');return}
     if(k==='ArrowRight'||k==='ArrowLeft'||k==='ArrowDown'||k==='ArrowUp'){const w=wires();if(!w.length||!mineTurn)return;e.preventDefault();const d=(k==='ArrowRight'||k==='ArrowDown')?1:-1;kc=kc<0?(d>0?0:w.length-1):(kc+d+w.length)%w.length;ring();return}
     if(k==='Enter'||k===' '){if(e.target.closest&&e.target.closest('button,a'))return;
