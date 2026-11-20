@@ -251,15 +251,15 @@ function edgeArrows() {
   var bd = $('#board'); if (!bd) return; var host = $('#edgea'); if (!host) { host = document.createElement('div'); host.id = 'edgea'; bd.appendChild(host); }
   var h = ''; if (G && G.stage === 'tile' && UI.view === G.cur && !G.seats[G.cur].ai && !UI.ghost) {
     var sr = safeRect(), p = UI.pan, rr = SZ * p.z * 0.75, side = { l: [], r: [], t: [], b: [] };
-    var seen = [];   // spots on screen: an arrow never sits on one of them
-    WM.spots(G.seats[UI.view].env).forEach(function (c) { var q = pix(c), x = p.tx + q[0] * p.z, y = p.ty + q[1] * p.z;
+    var seen = [], part = [], placed = [];   // spots on screen (and partly on screen): an arrow never sits on one of them, nor on another arrow
+    WM.spots(G.seats[UI.view].env).forEach(function (c) { var q = pix(c), x = p.tx + q[0] * p.z, y = p.ty + q[1] * p.z; seen.push([x, y]);
       var hw = SZ * SQ3 / 2 * p.z - 2, hh = SZ * p.z * 0.75;   // any real part of the spot outside the safe area counts as hidden (the pointed tips may touch the edge)
-      if (x - hw < sr.l) side.l.push([x, y, c]); else if (x + hw > (y + hh < sr.zt ? sr.rw : sr.r)) side.r.push([x, y, c]); else if (y - hh < sr.t) side.t.push([x, y, c]); else if (y + hh > sr.b) side.b.push([x, y, c]); else seen.push([x, y]); });
-    function free(x, y) { return seen.every(function (v) { return v[0] < x - rr || v[0] > x + 44 + rr || v[1] < y - rr || v[1] > y + 44 + rr; }); }
+      if (x - hw < sr.l) side.l.push([x, y, c]); else if (x + hw > (y + hh < sr.zt ? sr.rw : sr.r)) side.r.push([x, y, c]); else if (y - hh < sr.t) side.t.push([x, y, c]); else if (y + hh > sr.b) side.b.push([x, y, c]); else seen.push([x, y]); if (x + hw > sr.l && x - hw < sr.r && y + hh > sr.t && y - hh < sr.b) part.push([x, y]); });
+    function free(x, y) { return placed.every(function (v) { return v[0] + 46 < x || v[0] > x + 46 || v[1] + 46 < y || v[1] > y + 46; }) && seen.concat(part).every(function (v) { return v[0] < x - rr || v[0] > x + 44 + rr || v[1] < y - rr || v[1] > y + 44 + rr; }); }
     Object.keys(side).forEach(function (k) { var L = side[k]; if (!L.length) return; var a = L[0], cx = (sr.l + sr.r) / 2, cy = (sr.t + sr.b) / 2;
       var x = k === 'l' ? sr.l : k === 'r' ? sr.r - 44 : Math.max(sr.l, Math.min(sr.r - 44, a[0] - 22)), y = k === 't' ? sr.t : k === 'b' ? sr.b - 44 : Math.max(sr.t, Math.min(sr.b - 44, a[1] - 22));
       for (var n = 0, ok = free(x, y); !ok && n < 12; n++) { var d = (n >> 1) * 24 + 24, sg = n % 2 ? -1 : 1; var nx = k === 'l' || k === 'r' ? x : Math.max(sr.l, Math.min(sr.r - 44, x + sg * d)), ny = k === 't' || k === 'b' ? y : Math.max(sr.t, Math.min(sr.b - 44, y + sg * d)); if (free(nx, ny)) { x = nx; y = ny; ok = true; } }
-      if (!ok) return;
+      if (!ok) return; placed.push([x, y]);
       h += '<button type="button" class="ea ea-' + k + '" data-c="' + a[2] + '" style="left:' + x.toFixed(0) + 'px;top:' + y.toFixed(0) + 'px" aria-label="' + L.length + ' more spot' + (L.length > 1 ? 's' : '') + ' this way">' + ({ l: '&#9664;', r: '&#9654;', t: '&#9650;', b: '&#9660;' })[k] + '<small>' + L.length + '</small></button>'; });
   }
   host.innerHTML = h;

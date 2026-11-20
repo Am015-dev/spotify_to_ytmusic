@@ -177,9 +177,9 @@ function goalShow() {
     '<li><b>Land</b>: each terrain scores 1 point per tile in your largest joined area' + (!riv ? ', +2 at 7 or more.' : G.np > 2 ? ', +3 if yours is the biggest, +1 for second.' : ', +2 if yours is the biggest.') + '</li>' +
     '<li><b>Acorns</b> from gold keystone tiles: 1 point each at the end.</li></ul>' +
     '<p class="g2">Each turn: take a tile with its animal, add the tile, place the animal. Tap Scores any time to see why.</p><button type="button" class="big" id="goalGo">Start</button></div>';
-  e.hidden = false;
+  e.hidden = false; document.documentElement.classList.add('wm-goal'); var tt = $('#toast'); if (tt) tt.classList.remove('on');
 }
-document.addEventListener('pointerdown', function (ev) { var e = $('#goal'); if (!e || e.hidden) return; if (ev.target.closest && ev.target.closest('.gcard') && ev.target.id !== 'goalGo') return; e.hidden = true; if (ev.target.id === 'goalGo') goalShow.eat = Date.now() + 700; }, true);
+document.addEventListener('pointerdown', function (ev) { var e = $('#goal'); if (!e || e.hidden) return; document.documentElement.classList.remove('wm-goal'); if (ev.target.closest && ev.target.closest('.gcard') && ev.target.id !== 'goalGo') return; e.hidden = true; if (ev.target.id === 'goalGo') goalShow.eat = Date.now() + 700; }, true);
 document.addEventListener('click', function (ev) { if (goalShow.eat && Date.now() < goalShow.eat) { goalShow.eat = 0; ev.stopImmediatePropagation(); ev.preventDefault(); } }, true);   // Start closes the card and does nothing else (no tap on the tile under it)   // never blocks: any tap outside the card (or Start) closes it and still acts
 document.addEventListener('click', function (ev) { var b = ev.target.closest && ev.target.closest('#hintsB'); if (!b) return; UI.prefs.hints = hintsOn() ? 0 : 1; savePrefs(); sfx('tap'); if (G) { render(); fitView(); } else hintsSync(); });
 
