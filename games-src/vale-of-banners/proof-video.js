@@ -21,8 +21,8 @@ const URL = 'file://' + path.join(__dirname, 'vale-of-banners.html'), OUT = path
     if (!st.mine) { await page.waitForTimeout(400); continue; }
     if (st.turn !== lastTurn) { lastTurn = st.turn; turns++; await page.waitForTimeout(900); }
     if (await T('#mk .tilebtn.bestt.glow', 1000)) continue;
-    if (await T('#store .tilebtn.glow', 1000)) continue;
     if (await T('#es .cell.best.glow, #es .cell.glow', 1200)) continue;
+    if (await T('#store .tilebtn.glow', 1000)) continue;
     if (await T('#goods .gbtn.glow', 1000)) continue;
     if (await T('#endB', 1200)) continue;
     if (await T('#mk .stall:not(.lane) .tilebtn.glow', 1000)) continue;

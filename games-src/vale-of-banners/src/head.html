@@ -411,5 +411,8 @@ html body .gx-drawer{z-index:56!important}
 /* a tile in hand (selected in storage) lifts with a gold ring, so it reads as picked up */
 #store .slot.sel{border:3px solid #ffd23a!important;box-shadow:0 0 0 2px #1d140a,0 0 12px 2px rgba(255,210,58,.75)}
 #store .slot.sel .tilebtn{transform:translateY(-3px)}
+/* beat cards (Turn over, Round N) sit below the score strip and view tabs, never over the scores */
+html body #beat{top:calc(var(--bartop,0px) + 168px)!important}
+#mk.big:not(.six) .tilebtn.lab .cost{right:0!important}
 </style>
 </head>

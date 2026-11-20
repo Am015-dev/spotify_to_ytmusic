@@ -664,6 +664,7 @@ function tapStore(i) {
   if (!tutOk({ what: 'store', s: i })) return;
   if (myTurn() && top && top.t === 'discard') { showTile(t, [{ label: 'Throw this away', fn: function () { doMove({ k: 'discard', s: i }); } }]); return; }
   var can = myTurn() && storeLegal(i);
+  if (can && UI.sel === i && UI.pre === i) { UI.pre = null; lineSay('Already in hand: tap a glowing space to build it. Tap the tile again to put it back.', 3500); return; }   /* F2: a first tap on a tile we picked up for you never drops it */
   if (can && (UI.sel === i)) { UI.sel = null; UI.pre = null; render(); return; }
   if (can) { UI.sel = i; UI.tab = 'estate'; UI.pinTab = null; render(); return; }
   var c = VB.CELLS.filter(function (x) { return x.col === t.t && !p.estate[x.i]; });
@@ -682,6 +683,7 @@ function tapCell(ci) {
 function tapGoods(g) {
   var lg = myTurn() ? movesWhere(function (m) { return m.k === 'sell' && m.v === g; }) : [];
   if (!tutOk({ what: 'goods', g: g })) return;
+  if (!myTurn()) return;   /* F2: a stray tap during the rival's turn opens nothing (it read as a wrong goods count) */
   var p = G.P[VB.actor(G)] || me(), n = p.goods[g] || 0;
   var tv = $('#tv'); tv.innerHTML = '';
   var c = h('div.card', { role: 'dialog', 'aria-label': VB.GOODS[g] });
