@@ -147,7 +147,7 @@ MV.flash = function (rid) { var f = document.getElementById('flash'); if (!f || 
 // ---------------------------------------------------------------- camera
 MV.apply = function () { var m = document.getElementById('map'); if (!m) return; m.style.transform = 'translate(' + MV.tx.toFixed(1) + 'px,' + MV.ty.toFixed(1) + 'px) scale(' + MV.k.toFixed(4) + ')'; var b = document.getElementById('board'); if (b) b.classList.toggle('zoomed-out', MV.k < 0.62); };
 MV.clamp = function () { var b = document.getElementById('board'), W = b.clientWidth, H = b.clientHeight; var mw = MAPW * MV.k, mh = MAPH * MV.k; MV.tx = mw <= W ? (W - mw) / 2 : Math.min(0, Math.max(W - mw, MV.tx)); MV.ty = mh <= H ? (H - mh) / 2 : Math.min(0, Math.max(H - mh, MV.ty)); };
-MV.fit = function () { var b = document.getElementById('board'); if (!b || !b.clientWidth) return; var W = b.clientWidth, H = b.clientHeight; MV.minK = Math.min(W / MAPW, H / MAPH) * 0.98; MV.k0 = Math.max(MV.minK, Math.min(W / MAPW, 1.2)); if (!MV.k || MV.k < MV.minK || MV.k > MV.maxK) MV.k = MV.k0; MV.clamp(); MV.apply(); };
+MV.fit = function () { var b = document.getElementById('board'); if (!b || !b.clientWidth) return; var W = b.clientWidth, H = b.clientHeight; MV.minK = Math.min(W / MAPW, H / MAPH) * 0.98; MV.k0 = Math.max(MV.minK, Math.min(W / MAPW * (W < 700 ? 1.22 : 1), 1.2)); if (!MV.k || MV.k < MV.minK || MV.k > MV.maxK) MV.k = MV.k0; MV.clamp(); MV.apply(); };
 MV.focus = function (rid, k, smooth) {
   var b = document.getElementById('board'); if (!b || !REG[rid]) return; if (k) MV.k = Math.max(MV.minK, Math.min(MV.maxK, k));
   var p = REG[rid]; MV.tx = b.clientWidth / 2 - p.x * MV.k; MV.ty = b.clientHeight / 2 - p.y * MV.k; MV.clamp();

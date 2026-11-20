@@ -175,6 +175,7 @@ body.scr-on .gx-app{visibility:hidden}
 #toast.on{opacity:1;transform:translateX(-50%)}
 #toast.g{background:var(--red)}
 .pop{position:absolute;font-family:var(--fell);font-size:1.25rem;color:var(--red);pointer-events:none;z-index:20;transition:transform 1s ease-out,opacity 1s;text-shadow:0 0 4px var(--paper),0 0 2px var(--paper)}
+@media (max-height:620px) and (orientation:portrait){#dock{gap:4px;padding-top:4px}#msg{font-size:1rem;min-height:1.2em}.act{flex-basis:22%;min-width:80px;min-height:44px;padding:2px 7px}.act small{display:none}.act b{font-size:.98rem;white-space:normal;line-height:1.05}.die{width:44px;height:44px}#drow{min-height:44px}#acts{min-height:44px;max-height:96px}}
 @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
 @media (orientation:landscape) and (max-height:500px){
  .gx-app{grid-template-columns:minmax(0,1fr) 300px;grid-template-rows:auto minmax(0,1fr)}

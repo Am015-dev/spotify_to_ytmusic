@@ -2,24 +2,28 @@
 // node ui-play.js [side=D] [turns=4] [url]   -> exit 1 if a move had no UI path or the page threw
 const path = require('path'), { chromium } = require(path.join(__dirname, '..', 'node_modules', 'playwright'));
 const side = process.argv[2] || 'D', TURNS = +(process.argv[3] || 4), url = process.argv[4] || 'file://' + path.join(__dirname, 'gloamwar.html');
+// proof mode: VIDEO=<dir> records a webm at 375x667, SECS=<n> stops after n seconds, SLOW=1 plays at human pace, SHOTS=<dir> saves screenshots of key moments
+const VIDEO = process.env.VIDEO, SECS = +(process.env.SECS || 0), SLOW = !!process.env.SLOW, SHOTS = process.env.SHOTS, T0 = Date.now(); let shotN = 0; const shotDone = {};
 (async () => {
-  const b = await chromium.launch(); const p = await b.newPage({ viewport: { width: 375, height: 667 }, hasTouch: true, isMobile: true });
+  const b = await chromium.launch(); const ctx = await b.newContext({ viewport: { width: 375, height: 667 }, hasTouch: true, isMobile: true, deviceScaleFactor: SHOTS ? 2 : 1, recordVideo: VIDEO ? { dir: VIDEO, size: { width: 375, height: 667 } } : undefined }); const p = await ctx.newPage();
+  const shot = async (k) => { if (!SHOTS || shotDone[k]) return; shotDone[k] = 1; await p.waitForTimeout(500); await p.screenshot({ path: path.join(SHOTS, (++shotN) + '-' + k + '.png') }); };
   const errs = []; p.on('pageerror', e => errs.push(e.message));
-  await p.goto(url + (url.includes('?') ? '&' : '?') + 'fast=1'); await p.waitForTimeout(500);
-  await p.tap(side === 'D' ? '#playD' : '#playG'); await p.waitForTimeout(600);
+  await p.goto(SLOW ? url : url + (url.includes('?') ? '&' : '?') + 'fast=1'); await p.waitForTimeout(SLOW ? 2500 : 500); await shot('title');
+  await p.tap(side === 'D' ? '#playD' : '#playG'); await p.waitForTimeout(SLOW ? 2500 : 600); await shot('map');
   let gaps = [], taps = 0, moves = 0;
-  const tapSel = async (sel) => { const e = await p.$(sel); if (!e) return false; await e.scrollIntoViewIfNeeded().catch(() => {}); const bb = await e.boundingBox(); if (!bb) return false; await p.touchscreen.tap(bb.x + bb.width / 2, bb.y + bb.height / 2); taps++; await p.waitForTimeout(140); return true; };
+  const tapSel = async (sel) => { const e = await p.$(sel); if (!e) return false; await e.scrollIntoViewIfNeeded().catch(() => {}); const bb = await e.boundingBox(); if (!bb) return false; if (SLOW) await p.waitForTimeout(650); await p.touchscreen.tap(bb.x + bb.width / 2, bb.y + bb.height / 2); taps++; await p.waitForTimeout(SLOW ? 700 : 140); if (SLOW && /mydice/.test(sel)) await shot('die'); if (SLOW && /sheet/.test(sel) === false && /act\[data-key="card"\]/.test(sel)) await shot('cards'); return true; };
   const tapRegion = async (rid) => {   // tap the region polygon at a visible interior point (pan there first)
     const pt = await p.evaluate(rid => { MV.focus(rid, null, false); const r = REG[rid], bd = document.getElementById('board').getBoundingClientRect();
       const cand = [[r.x, r.y], [r.x, r.y + 40], [r.x - 30, r.y + 30], [r.x + 30, r.y + 30], [r.x, r.y - 30]].concat(r.poly.map(q => [(q[0] + r.x) / 2, (q[1] + r.y) / 2])).concat(r.poly.map(q => [q[0] * 0.25 + r.x * 0.75, q[1] * 0.25 + r.y * 0.75]));
       for (const c of cand) { const x = bd.left + c[0] * MV.k + MV.tx, y = bd.top + c[1] * MV.k + MV.ty; const el = document.elementFromPoint(x, y), t = el && el.closest && el.closest('[data-tap]'); if (t) { const v = t.getAttribute('data-tap').split(':'); if (v[1] === rid) return { x, y }; } }
       return { x: bd.left + r.x * MV.k + MV.tx, y: bd.top + r.y * MV.k + MV.ty }; }, rid);
-    await p.touchscreen.tap(pt.x, pt.y); taps++; await p.waitForTimeout(140);
+    if (SLOW) await p.waitForTimeout(650); await p.touchscreen.tap(pt.x, pt.y); taps++; await p.waitForTimeout(SLOW ? 700 : 140);
   };
   const actKey = k => '#acts .act[data-key="' + k + '"]';
   for (let guard = 0; guard < 900; guard++) {
     const st = await p.evaluate(() => ({ win: !!G.win, turn: G.turn, me: sideToAct(G) === UI.side && !UI.hold, pend: G.pend && G.pend.h, stage: G.pend && G.pend.d && G.pend.d.stage }));
-    if (st.win || st.turn > TURNS) break;
+    if (st.win || st.turn > TURNS || (SECS && Date.now() - T0 > SECS * 1000)) break;
+    if (SLOW && st.pend === 'battle') await shot('battle');
     if (!st.me) { await p.waitForTimeout(120); continue; }
     const m = await p.evaluate(() => { const m = AI.move(G, 'normal'); return m; });
     const key0 = await p.evaluate(() => JSON.stringify([G.turn, G.phase, G.pend && G.pend.h, G.used, G.F, G.hand, G.pend && G.pend.d && G.pend.d.stage, G.pend && G.pend.d && (G.pend.d.n || G.pend.d.got || G.pend.d.i), Object.keys(G.A).length, G.log.length]));
@@ -71,5 +75,5 @@ const side = process.argv[2] || 'D', TURNS = +(process.argv[3] || 4), url = proc
   const end = await p.evaluate(() => ({ turn: G.turn, win: G.win, vp: [vpOf(G, 'D'), vpOf(G, 'G')], taint: G.F.taint }));
   console.log(`ui-play ${side}: ${moves} moves, ${taps} taps, ${gaps.length} without a UI path, page errors ${errs.length} | ${JSON.stringify(end)}`);
   gaps.slice(0, 12).forEach(g => console.log('  GAP', g)); errs.slice(0, 5).forEach(e => console.log('  ERR', e));
-  await b.close(); process.exit(gaps.length || errs.length ? 1 : 0);
+  await ctx.close(); await b.close(); process.exit(gaps.length || errs.length ? 1 : 0);
 })();

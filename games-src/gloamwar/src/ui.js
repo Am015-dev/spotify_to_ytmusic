@@ -364,10 +364,10 @@ function showTitle() { clearTimeout(UI.timer); try { if (window.GXT && GXT.activ
 function tutMenu() { try { $('#tutSlot').innerHTML = GXT.menuHTML({ game: 'gloamwar', first: !ls('gw-played'), cls: 'btn', launch: function () { startTutorial(); } }); } catch (e) { } }
 // ---------------------------------------------------------------- boot
 function crest() {
-  var s = '<circle cx="100" cy="100" r="92" fill="#eadbb4" stroke="#1f1812" stroke-width="4"/><circle cx="100" cy="100" r="82" fill="none" stroke="#1f1812" stroke-width="1.5"/>';
-  for (var i = 0; i < 24; i++) { var a = i / 24 * Math.PI * 2; s += '<line x1="' + (100 + Math.cos(a) * 60) + '" y1="' + (100 + Math.sin(a) * 60) + '" x2="' + (100 + Math.cos(a) * 80) + '" y2="' + (100 + Math.sin(a) * 80) + '" stroke="#9a2117" stroke-width="' + (i % 2 ? 1.5 : 3) + '"/>'; }
-  s += '<path d="M' + ICONS.crown.slice(1) + '" transform="translate(52,48) scale(.19)" fill="#1f1812"/>';
-  s += '<path d="' + ICONS.lantern + '" transform="translate(76,100) scale(.095)" fill="#9a2117"/>';
+  var s = '<circle cx="100" cy="100" r="94" fill="#eadbb4" stroke="#1f1812" stroke-width="4"/><circle cx="100" cy="100" r="86" fill="none" stroke="#1f1812" stroke-width="1.5"/><circle cx="100" cy="100" r="58" fill="#1f1812"/>';
+  for (var i = 0; i < 32; i++) { var a = i / 32 * Math.PI * 2, r1 = 60, r2 = i % 2 ? 76 : 84; s += '<path d="M' + (100 + Math.cos(a - 0.05) * r1).toFixed(1) + ',' + (100 + Math.sin(a - 0.05) * r1).toFixed(1) + ' L' + (100 + Math.cos(a) * r2).toFixed(1) + ',' + (100 + Math.sin(a) * r2).toFixed(1) + ' L' + (100 + Math.cos(a + 0.05) * r1).toFixed(1) + ',' + (100 + Math.sin(a + 0.05) * r1).toFixed(1) + 'Z" fill="' + (i % 2 ? '#1f1812' : '#9a2117') + '"/>'; }
+  s += '<path d="' + ICONS.lantern + '" transform="translate(66,70) scale(.133)" fill="#f2d98a"/>';
+  s += '<path d="' + ICONS.leader + '" transform="translate(78,40) scale(.086)" fill="#eadbb4"/>';
   $('#crest').innerHTML = s;
 }
 function boot() {

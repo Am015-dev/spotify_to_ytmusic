@@ -25,7 +25,7 @@ function posVal(G, s) {   // position value for side s (higher = better for s)
     var near = 0; r.adj.concat([r.id]).forEach(function (x) { var e = G.A[x]; if (e && armySide(e) === (mine ? o : s) && units(e)) near += strengthOf(e); });
     var nearAll = near; r.adj.forEach(function (x) { adj(x).forEach(function (y) { var e = G.A[y]; if (y !== r.id && r.adj.indexOf(y) < 0 && e && armySide(e) === (mine ? o : s) && units(e)) nearAll += strengthOf(e) * 0.35; }); });
     var press = Math.max(0, nearAll - def);
-    if (mine) { threat -= press * (sv + 0.2) * 1.6; var gu = units(armyAt(G, r.id, s) ? G.A[r.id] : null) + units(ia && armySide(G.IN[r.id]) === s ? G.IN[r.id] : null); threat += Math.min(gu, 4) * sv * 0.7 + (gu > 0 ? sv * 1.2 : 0); }
+    if (mine) { threat -= press * (sv + 0.2) * (s === 'G' ? 3 : 2.2); var gu = units(armyAt(G, r.id, s) ? G.A[r.id] : null) + units(ia && armySide(G.IN[r.id]) === s ? G.IN[r.id] : null); threat += Math.min(gu, 4) * sv * 0.7 + (gu > 0 ? sv * 1.2 : 0); }
     else threat += press * (sv + 0.2) * 1.6;
   });
   v += mil * 1.0 + threat;
