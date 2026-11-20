@@ -219,7 +219,7 @@ function sgRoster(){try{const c=(window.CAMPAIGN||{}).cast||{};return Object.key
 function sgPicOf(nm){const r=sgRoster().find(x=>x.nm===nm);return r?r.pic:null}
 function beginGame(){const o=UI.setup;UI.guideNote=null;UI.fx.length=0;UI.fxSeen=0;UI.recap=[];UI.sel=null;UI.tgt=null;UI.adv=null;UI.lastHuman=null;const seats=o.seats.slice(0,o.np);
   UI.modal=null;const RO=sgRoster();const ri=Math.max(0,RO.findIndex(r=>r.id===(o.rival||'tamsin')));let k=0;const names=seats.map((s,i)=>s==='ai'&&RO.length?RO[(ri+(k++))%RO.length].nm:PNAMES[i]);
-  newGame({np:o.np,seats,names,lv:o.lv.slice(0,o.np),ex:Object.assign({},o.ex),mode:seats.every(s=>s==='ai')?'ai':'x'});UI.modal='story';resetScene();refresh()}
+  newGame({np:o.np,seats,names,lv:o.lv.slice(0,o.np),ex:Object.assign({},o.ex),mode:seats.every(s=>s==='ai')?'ai':'x'});UI.modal=null;resetScene();refresh();try{schedule()}catch(e){}}   // W576: no second card after Begin
 function loadSaved(){try{const g=JSON.parse(localStorage.getItem(SAVE));if(!g||!g.v)throw 0;G=g;UI.modal=null;UI.recap=[];resetScene();refresh();if(g.campId&&typeof campResume==='function')campResume()}catch(e){openStart()}}
 function resetScene(){if(!V3.on)return;for(const k in V3.tiles)V3.scene.remove(V3.tiles[k].m);V3.tiles={};V3.lkey='';relayout()}
 // ---------- the computer ----------
