@@ -2,7 +2,7 @@
    easy = steady and cautious (2nd/3rd best moves, ends its round early; a newcomer who follows the prompt wins ~half) · normal = greedy · hard = greedy with better weights and planning for guardians / the temple. VAI.choose(G, level) -> move */
 (function (root) {
   var VG = (typeof module !== 'undefined' && module.exports) ? require('./engine.js') : root.VG, V = VG.V;
-  var EASY = { p0: 0.65, p1: 0.25, cap: 10, noise: 0 };   /* R29: with 'what glows is strong', a newcomer wins about half */   /* easy: P(best main move), P(2nd best), log steps per round before it passes */
+  var EASY = { p0: 0.75, p1: 0.2, cap: 26, noise: 0 }, NORMAL = { p0: 0.92, p1: 0.08, cap: 40, noise: 0 };   /* F14 (R93): easy lands ~6 points under a glow follower (it wins ~half); normal a few points stronger; hard ~90 */   /* R29: with 'what glows is strong', a newcomer wins about half */   /* easy: P(best main move), P(2nd best), log steps per round before it passes */
   if (typeof process !== 'undefined' && process.env && process.env.VG_EASY) { var ev0 = process.env.VG_EASY.split(',').map(Number); EASY.p0 = ev0[0]; EASY.p1 = ev0[1]; EASY.cap = ev0[2]; }
   var W = { coin: 0.45, compass: 0.4, tablet: 0.75, arrow: 0.6, jewel: 1.3 };
   function opVal(ops) {
@@ -60,17 +60,18 @@
         o.d += 0.5 * Math.max(0, value(H2, s, lvl) - v1);
       });
     }
-    var noise = lvl === 'novice' ? 4.5 : lvl === 'easy' ? EASY.noise : lvl === 'normal' ? 0.25 : 0;
+    var noise = lvl === 'novice' ? 4.5 : lvl === 'easy' ? EASY.noise : 0;
     if (!inner && noise) { var rr = function () { return VG.rng(G) - 0.5; }; out.forEach(function (o) { o.d += rr() * noise * 2; }); }
     out.sort(function (a, b) { return b.d - a.d; });
     var top = out[0];
     // easy: steady but beatable (R25: wild noise made it pass whole rounds and score 6-8). It often takes its 2nd or 3rd best main move
     // and, like a cautious explorer, ends its round after about EASY.cap logged steps
-    if (lvl === 'easy' && !inner) {
-      var mains = out.filter(function (o) { return !o.m.free && o.m.t !== 'pass'; }), r = VG.rng(G), k = r < EASY.p0 ? 0 : r < EASY.p0 + EASY.p1 ? 1 : 2;
+    if ((lvl === 'easy' || lvl === 'normal') && !inner) {
+      var EZ = lvl === 'easy' ? EASY : NORMAL;
+      var mains = out.filter(function (o) { return !o.m.free && o.m.t !== 'pass'; }), r = VG.rng(G), k = r < EZ.p0 ? 0 : r < EZ.p0 + EZ.p1 ? 1 : 2;
       if (mains.length && !(top.m.free && top.d > 0.2)) top = mains[Math.min(k, mains.length - 1)];
       var acts = G.log.filter(function (e) { return e.r === G.round && e.s === s; }).length;
-      if (top.d < -1.5 || (acts >= EASY.cap && !top.m.free)) { var pz = out.filter(function (o) { return o.m.t === 'pass'; })[0]; if (pz) top = pz; }
+      if (top.d < -1.5 || (acts >= EZ.cap && !top.m.free)) { var pz = out.filter(function (o) { return o.m.t === 'pass'; })[0]; if (pz) top = pz; }
       return top.m;
     }
     // free actions only when they help; otherwise prefer the best non-free main action

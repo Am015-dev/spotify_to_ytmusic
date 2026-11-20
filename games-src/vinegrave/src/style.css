@@ -664,3 +664,48 @@ body.vg-b2 #extra.fl.fr{-webkit-mask-image:linear-gradient(90deg,transparent,#00
   body.vg-b2 #hand.many .cd{height:76px;max-height:76px;min-height:0;overflow:hidden}
   body.vg-b2 #hand.many .cd .cn{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden;letter-spacing:-.03em}
 }
+/* F14 (R93 P5): a chooser with 2+ buttons is a bottom sheet over the hand; the island, the research track and the market stay visible.
+   The dock keeps its size, so the map never shrinks while you choose. */
+#qbox .qt{font-size:15px;line-height:18px;color:#3a2a12}
+#qbox .qt b{font-weight:800}
+@media (max-width:999px){
+  body.vg-sheet #qbox{position:fixed;left:0;right:0;bottom:0;z-index:60;max-height:min(46vh,300px);overflow-y:auto;overscroll-behavior:contain;margin:0;
+    border-radius:16px 16px 0 0;border-width:2px 0 0;padding:8px max(8px,env(safe-area-inset-left)) calc(10px + env(safe-area-inset-bottom,0px));box-shadow:0 -10px 28px rgba(0,0,0,.55)}
+  body.vg-sheet #qbox .qcards{padding:4px 2px 6px;scroll-padding:0 6px}
+  body.vg-sheet #qbox .qcards>.cd:first-child{margin-left:2px}
+  body.vg-sheet #qbox .qchoices .btn{min-height:44px;text-align:left;justify-content:flex-start}
+}
+/* F14 (R93 P4): at short phone heights the hand and market give the island room: the map stays at least 150 px tall in real play */
+@media (max-width:999px) and (max-height:600px){
+  body.vg-b2 #hand .cd{max-height:84px;overflow:hidden}
+  body.vg-b2 #hand .cd .cn{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden}
+  body.vg-b2 #row .cd.mc{--mh:44px}
+  body.vg-b2 #row .cd.mc .mef span{-webkit-line-clamp:3}
+  body.vg-b2 #opp .op{min-height:0;padding-top:1px;padding-bottom:1px}
+  body.vg-b2 #hand{padding-top:2px}
+}
+/* F14 (R93): research path map in the side column: each row = number + its 1-2 spaces, each space shows the bridge cost into it */
+#track .sps{display:flex;gap:2px;flex:1;min-width:0;align-self:stretch}
+#track .sp{flex:1 1 0;min-width:0;display:flex;align-items:center;justify-content:center;gap:1px;border-radius:5px;background:rgba(244,230,192,.14);position:relative;padding:0 1px;flex-wrap:nowrap;overflow:hidden}
+#track .sp .spc{display:flex;align-items:center;gap:0;flex:none}
+#track .sp .spc .ic{width:13px;height:13px;flex:none}
+#track .sp .spc b{font-size:11px;line-height:12px;font-weight:900;color:#fff3d6;margin-right:-1px}
+#track .sp .tm{display:flex;gap:1px;flex:none;min-height:0}
+#track .sp .tm i{width:11px;height:11px}
+#track .sp.bt::after{content:"";position:absolute;top:0;right:0;width:7px;height:7px;background:#f2c14e;border-radius:0 5px 0 5px;box-shadow:0 0 0 1px rgba(40,26,8,.6)}
+#track .sp.nx{background:rgba(255,211,106,.42);box-shadow:inset 0 0 0 2px var(--glow)}
+#track .tc .tn{flex:none}
+#track .tc .tas{display:none}
+@media (max-width:999px){
+  body.vg-b2 #bd{grid-template-columns:minmax(0,1fr) 84px}
+  body.vg-b2 .tc{flex-wrap:nowrap;justify-content:flex-start;align-items:stretch;gap:2px;padding:1px 2px}
+  body.vg-b2 .tc .tn{width:12px;font-size:12px;line-height:13px;align-self:center}
+  body.vg-b2 .tc .tn .star{width:12px;height:12px}
+  body.vg-b2 .tc .tm i{width:11px;height:11px;border-width:1.5px}
+  body.vg-sheet #qbox .qcards{justify-content:flex-start}
+  body.vg-sheet #qbox .qcards .cd{transform:none}
+}
+@media (max-width:999px){body.vg-b2 #track .tl{display:none!important}}
+@media (max-width:999px){body.vg-b2 #track::before{display:none}body.vg-b2 #track{padding-left:3px!important;padding-right:3px!important}body.vg-b2 #track .tcs{padding-left:0!important;margin-left:0!important}}
+#track .sp .tm{position:absolute;left:1px;top:50%;translate:0 -50%;z-index:1}
+#track .sp.one .tm{left:3px}

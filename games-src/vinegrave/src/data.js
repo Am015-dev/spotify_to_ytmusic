@@ -133,11 +133,11 @@
     ['thorn-palace', 'Thorn Palace', { arrow: 2, tablet: 2 }], ['star-pool', 'Star Pool', { jewel: 1, compass: 3 }]
   ];
   // ---- idols: found on a discovered site (immediate gift); 3 points each, also when set in a shrine slot (a one-time boon; each slot once per game). ----
-  var ID = [
-    ['idol-owl', 'Owl Idol', { coin: 2 }], ['idol-frog', 'Frog Idol', { compass: 2 }], ['idol-sun', 'Sun Idol', { tablet: 1 }], ['idol-snake', 'Snake Idol', { arrow: 1 }],
-    ['idol-moon', 'Moon Idol', { coin: 1, compass: 1 }], ['idol-boar', 'Boar Idol', { arrow: 1 }], ['idol-fish', 'Fish Idol', { coin: 2 }], ['idol-bat', 'Bat Idol', { compass: 2 }],
-    ['idol-cat', 'Lynx Idol', { tablet: 1 }], ['idol-bird', 'Heron Idol', { coin: 1, compass: 1 }], ['idol-ape', 'Ape Idol', { arrow: 1 }], ['idol-star', 'Star Idol', { jewel: 1 }],
-    ['idol-turtle', 'Turtle Idol', { coin: 2 }], ['idol-crane', 'Crane Idol', { compass: 2 }], ['idol-ram', 'Ram Idol', { arrow: 1 }], ['idol-moth', 'Moth Idol', { tablet: 1 }]
+  var ID = [   // 16 idol tiles in 4 kinds of 4 (kind = its gift). The kinds and gifts are ours [unverified]; the count is the box's.
+    ['idol-owl', 'Owl Idol', { coin: 2 }], ['idol-fish', 'Fish Idol', { coin: 2 }], ['idol-turtle', 'Turtle Idol', { coin: 2 }], ['idol-moon', 'Moon Idol', { coin: 2 }],
+    ['idol-frog', 'Frog Idol', { compass: 2 }], ['idol-bat', 'Bat Idol', { compass: 2 }], ['idol-crane', 'Crane Idol', { compass: 2 }], ['idol-bird', 'Heron Idol', { compass: 2 }],
+    ['idol-sun', 'Sun Idol', { tablet: 1 }], ['idol-cat', 'Lynx Idol', { tablet: 1 }], ['idol-moth', 'Moth Idol', { tablet: 1 }], ['idol-star', 'Star Idol', { tablet: 1 }],
+    ['idol-snake', 'Snake Idol', { arrow: 1 }], ['idol-boar', 'Boar Idol', { arrow: 1 }], ['idol-ape', 'Ape Idol', { arrow: 1 }], ['idol-ram', 'Ram Idol', { arrow: 1 }]
   ];
   // shrine slot boons (pick one when you set an idol)
   var SHRINE = [{ id: 'sh-coin', ops: [{ g: { coin: 3 } }], text: '3 coins' }, { id: 'sh-compass', ops: [{ g: { compass: 3 } }], text: '3 compasses' },
@@ -155,8 +155,29 @@
     { cost: { tablet: 1, arrow: 1 }, bonus: { compass: 3 } },
     { cost: { jewel: 1, tablet: 1 }, bonus: { arrow: 1 } }
   ];
-  // first-arrival rewards: only the FIRST magnifier to reach these rows takes the extra reward (every arrival still takes the row bonus)
-  var FIRST = { 2: { tablet: 1 }, 4: { coin: 2, arrow: 1 }, 6: { jewel: 1 }, 7: { tablet: 1, arrow: 1 } };
+  // ---- research PATH MAP (rulebook p.14-15): two starting spaces below row 1; each row has 1 or 2 spaces joined to the next row by bridges.
+  // You may only move into a space joined to yours; the cost is printed on the bridge (ours: every bridge into a space shows the same cost).
+  // The first token to reach a space with a research bonus tile takes it (the tile leaves the game); every arrival takes the ROW's effect
+  // (TRACK[r].bonus, plus the notebook's assistant symbols). Shape and tile spaces are ours to the original's structure; exact board
+  // geography, bridge costs and which spaces need 3-4 players are [unverified].
+  // sp: c = bridge cost into the space, np = fewest players for a bonus tile there, to = spaces joined in the next row (row 0 = start spaces).
+  var START_TO = [0, 1];
+  var PATH = [null,
+    [{ c: { tablet: 1 }, np: 2, to: [0, 1] }, { c: { compass: 1, coin: 1 }, np: 2, to: [1] }],
+    [{ c: { arrow: 1 }, np: 2, to: [0] }, { c: { tablet: 1, coin: 1 }, np: 3, to: [0, 1] }],
+    [{ c: { tablet: 1, coin: 1 }, np: 3, to: [0] }, { c: { arrow: 1, compass: 1 }, np: 2, to: [0] }],
+    [{ c: { jewel: 1 }, np: 2, to: [0, 1] }],
+    [{ c: { tablet: 2 }, np: 2, to: [0, 1] }, { c: { arrow: 1, coin: 2 }, np: 4, to: [1] }],
+    [{ c: { arrow: 1, jewel: 1 }, np: 4, to: [0] }, { c: { arrow: 2, tablet: 1 }, np: 2, to: [0] }],
+    [{ c: { tablet: 1, arrow: 1 }, np: 2, to: [0] }],
+    [{ c: { jewel: 1, tablet: 1 }, np: 9, to: [] }]
+  ];
+  for (var pr = 1; pr < PATH.length; pr++) TRACK[pr].cost = PATH[pr][0].c;   // TRACK[r].cost = the left space's cost (kept for older callers)
+  // 18 research bonus tiles (box count): shuffled, then dealt to the Lost Temple bonus stack (as many as players) and to the tile spaces for
+  // this player count (8 / 10 / 12 spaces at 2 / 3 / 4 players); the rest go back to the box. Tile values are ours [unverified].
+  var RBONUS = [{ coin: 2 }, { coin: 2 }, { compass: 2 }, { compass: 2 }, { tablet: 1 }, { tablet: 1 }, { tablet: 1 }, { arrow: 1 }, { arrow: 1 }, { arrow: 1 },
+    { jewel: 1 }, { jewel: 1 }, { coin: 1, compass: 1 }, { coin: 1, compass: 1 }, { tablet: 1, coin: 1 }, { arrow: 1, coin: 1 }, { coin: 3 }, { compass: 3 }];
+  var FIRST = {};   // retired (F14): first-arrival rewards now live on the research bonus tiles of the path map
   var DREAD_SUPPLY = 19;   // Dread cards in the box (2 start in each deck); when they run out, a fear tile worth -2 instead
   var NOTE_VP = [0, 1, 2, 4, 6, 9, 12, 15, 19], GLASS_VP = [0, 0, 1, 2, 3, 4, 6, 8, 10], TOP = 8;
   // temple tiles (bought with the research action once your glass is in the temple)
@@ -185,25 +206,41 @@
   // free-action (lightning) items: playing them does not use your main action (rulebook p.13: "some item effects are free actions"; which ones is ours)
   var FREE_ITEMS = ['machete', 'canteen', 'rope', 'lamp', 'whistle', 'kettle', 'brush', 'sling'];
   // Lost Temple bonus tiles: a stack of as many tiles as players; the magnifier reaching the temple picks one (rulebook p.14). Values are ours.
-  var TBONUS = [{ jewel: 1 }, { arrow: 2 }, { tablet: 2 }, { coin: 3, compass: 2 }, { jewel: 1, coin: 1 }, { arrow: 1, tablet: 1 }];
+  var TBONUS = RBONUS;   // the Lost Temple bonus stack is dealt from the same 18 research bonus tiles (rulebook setup 11)
   var TEMPLE = [{ vp: 11, cost: { tablet: 2, jewel: 1, arrow: 2 } }, { vp: 6, cost: { tablet: 2, jewel: 1 } }, { vp: 6, cost: { jewel: 1, arrow: 2 } }, { vp: 2, cost: { tablet: 2 } }, { vp: 2, cost: { jewel: 1 } }, { vp: 2, cost: { arrow: 2 } }];   // rulebook p.14 + setup: 1 x 11, 2 x 6, 3 x 2 stacks, each as many tiles as players; the 11 pays all three costs, a 6 two, a 2 one
   var TEMPLE_ARRIVE = [10, 8, 6, 4];   // magnifier points in the temple row, by order of arrival
   var GUARD_VP = 5, IDOL_VP = 3, IDOL_USED_VP = 3, IDOL_SLOT_VP = [1, 1, 1, 2], ROUNDS = 5, HAND = 5, ROW = 6, EXPL = 2;
   var START = [{ coin: 2, compass: 0 }, { coin: 1, compass: 1 }, { coin: 2, compass: 1 }, { coin: 1, compass: 2 }];   // by turn order (rulebook)
-  // ---- rival expedition (solo): one card per turn; each does the first thing it can. ----
+  // ---- rival expedition (solo), rulebook p.20-21: 15 rival action tiles. Each round the stack is 10 tiles: all 5 dig tiles plus ONE tile
+  // from each of the 5 green/red pairs (red = the more aggressive version). Your difficulty is how many red tiles you use (0-5).
+  // The rival starts every round, flips one tile per turn, never passes before all 10 are played, and never gains resources or Dread.
+  // arrow = its decision arrow (left/right tie-break), half of each. d5 = idle in round V. Which resource each dig tile shows, which tiles
+  // idle in round V, the rounds a discovered site gets a guardian, and how the research / guardian reds differ are ours [unverified].
   var RIVAL = [
-    { id: 'rv-camp', name: 'Pitch camp', text: 'Takes a free camp site.', a: 'camp' }, { id: 'rv-camp2', name: 'Pitch camp', text: 'Takes a free camp site.', a: 'camp' },
-    { id: 'rv-buyi', name: 'Raid the market', text: 'Takes the cheapest item: its points.', a: 'buyi' }, { id: 'rv-study2', name: 'Study', text: 'Climbs one research row.', a: 'study' },
-    { id: 'rv-study', name: 'Study', text: 'Climbs one research row.', a: 'study' }, { id: 'rv-buya', name: 'Loot a relic', text: 'Takes the cheapest artifact: its points.', a: 'buya' },
-    { id: 'rv-scout', name: 'Scout ahead', text: 'Discovers a site: 2 points; a guardian wakes.', a: 'scout' }, { id: 'rv-hunt', name: 'Hunt', text: 'Overcomes a waiting guardian: 4 points.', a: 'hunt' },
-    { id: 'rv-scout2', name: 'Scout ahead', text: 'Discovers a site: 2 points; a guardian wakes.', a: 'scout' }, { id: 'rv-hunt2', name: 'Hunt', text: 'Overcomes a waiting guardian: 4 points.', a: 'hunt' }
+    { id: 'rv-dig-coin', a: 'dig', res: 'coin', arrow: 'L', name: 'Dig for coins', text: 'Takes a site that gives coins.' },
+    { id: 'rv-dig-compass', a: 'dig', res: 'compass', arrow: 'R', name: 'Dig for compasses', text: 'Takes a site that gives compasses.' },
+    { id: 'rv-dig-tablet', a: 'dig', res: 'tablet', arrow: 'L', d5: 1, name: 'Dig for tablets', text: 'Takes a site that gives tablets.' },
+    { id: 'rv-dig-arrow', a: 'dig', res: 'arrow', arrow: 'R', d5: 1, name: 'Dig for arrowheads', text: 'Takes a site that gives arrowheads.' },
+    { id: 'rv-dig-jewel', a: 'dig', res: 'jewel', arrow: 'L', name: 'Dig for jewels', text: 'Takes a site that gives jewels.' },
+    { id: 'rv-disc-g', a: 'disc', pair: 'disc', red: 0, gr: [3, 4, 5], arrow: 'R', name: 'Scout ahead', text: 'Discovers a site (a guardian wakes from round 3).' },
+    { id: 'rv-disc-r', a: 'disc', pair: 'disc', red: 1, gr: [1, 2, 3, 4, 5], arrow: 'L', name: 'Scout hard', text: 'Discovers a site; a guardian always wakes.' },
+    { id: 'rv-res-g', a: 'res', pair: 'res', red: 0, arrow: 'R', name: 'Study', text: 'Climbs one research row and takes an assistant away.' },
+    { id: 'rv-res-r', a: 'res', pair: 'res', red: 1, asst: 1, arrow: 'L', name: 'Study hard', text: 'Climbs two research rows and takes an assistant away.' },
+    { id: 'rv-beat-g', a: 'beat', pair: 'beat', red: 0, arrow: 'R', name: 'Hunt', text: 'Overcomes a guardian where it camps, else studies.' },
+    { id: 'rv-beat-r', a: 'beat', pair: 'beat', red: 1, asst: 1, arrow: 'L', name: 'Hunt hard', text: 'Overcomes a guardian, else studies and takes an assistant.' },
+    { id: 'rv-item-g', a: 'item', pair: 'item', red: 0, arrow: 'R', name: 'Buy an item', text: 'Takes the item with the fewest points.' },
+    { id: 'rv-item-r', a: 'item', pair: 'item', red: 1, arrow: 'L', name: 'Raid the market', text: 'Takes the item with the most points.' },
+    { id: 'rv-art-g', a: 'art', pair: 'art', red: 0, arrow: 'R', name: 'Find a relic', text: 'Takes the artifact with the fewest points.' },
+    { id: 'rv-art-r', a: 'art', pair: 'art', red: 1, arrow: 'L', name: 'Loot a relic', text: 'Takes the artifact with the most points.' }
   ];
+  var RIVAL_RED = { easy: 0, steady: 1, normal: 3, hard: 5 };   // red tiles per difficulty
+  var RIVAL_IDOL = 3, RIVAL_IDOL_DUP = 2;   // each new kind of face-up idol 3; duplicates and face-down idols 2
   function mk(arr, t) { var o = {}; arr.forEach(function (r) { o[r[0]] = { id: r[0], t: t, name: r[1], cost: r[2], tr: r[3], vp: r[4], ops: r[5] }; }); return o; }
   var CARDS = Object.assign({}, BASIC, mk(I, 'item'), mk(A, 'art'));
   var GUARD = {}; GU.forEach(function (r) { GUARD[r[0]] = { id: r[0], name: r[1], cost: r[2], boon: r[3] }; });
   var SITE = {}; S1.forEach(function (r) { SITE[r[0]] = { id: r[0], lvl: 1, name: r[1], rew: r[2] }; }); S2.forEach(function (r) { SITE[r[0]] = { id: r[0], lvl: 2, name: r[1], rew: r[2] }; });
   CAMP.forEach(function (c) { SITE[c.id] = { id: c.id, lvl: 0, name: c.name, rew: c.rew }; });
-  var IDOL = {}; ID.forEach(function (r) { IDOL[r[0]] = { id: r[0], name: r[1], gift: r[2] }; });
+  var IDOL = {}; ID.forEach(function (r) { IDOL[r[0]] = { id: r[0], name: r[1], gift: r[2], kind: Object.keys(r[2]).join('+') }; });
   // plain-words text of an op list
   function opText(ops) {
     return (ops || []).map(function (o) {
@@ -284,7 +321,7 @@
   };
   var VD = { STORY: STORY, RES: RES, RNAME: RNAME, TRAVEL: TRAVEL, TNAME: TNAME, CARDS: CARDS, ITEMS: I.map(function (r) { return r[0]; }), ARTS: A.map(function (r) { return r[0]; }),
     GUARD: GUARD, GUARDS: GU.map(function (r) { return r[0]; }), SITE: SITE, CAMP: CAMP, SLOT1: SLOT1, SLOT2: SLOT2, DISC: DISC, S1: S1.map(function (r) { return r[0]; }), S2: S2.map(function (r) { return r[0]; }),
-    IDOL: IDOL, IDOLS: ID.map(function (r) { return r[0]; }), SHRINE: SHRINE, SLOTS: SLOTS, TRACK: TRACK, FIRST: FIRST, DREAD_SUPPLY: DREAD_SUPPLY, NOTE_VP: NOTE_VP, GLASS_VP: GLASS_VP, TOP: TOP, TEMPLE: TEMPLE, TEMPLE_ARRIVE: TEMPLE_ARRIVE, ASST: ASST, ASSTBY: ASST.reduce(function (o, a) { return (o[a.id] = a, o); }, {}), ASST_REC: ASST_REC, ASST_UP: ASST_UP, ASST_MAX: ASST_MAX, ASST_STACKS: ASST_STACKS, FREE_ITEMS: FREE_ITEMS, TBONUS: TBONUS,
-    GUARD_VP: GUARD_VP, IDOL_SLOT_VP: IDOL_SLOT_VP, IDOL_VP: IDOL_VP, IDOL_USED_VP: IDOL_USED_VP, ROUNDS: ROUNDS, HAND: HAND, ROW: ROW, EXPL: EXPL, START: START, RIVAL: RIVAL, opText: opText, resText: resText };
+    IDOL: IDOL, IDOLS: ID.map(function (r) { return r[0]; }), SHRINE: SHRINE, SLOTS: SLOTS, TRACK: TRACK, PATH: PATH, START_TO: START_TO, RBONUS: RBONUS, FIRST: FIRST, DREAD_SUPPLY: DREAD_SUPPLY, NOTE_VP: NOTE_VP, GLASS_VP: GLASS_VP, TOP: TOP, TEMPLE: TEMPLE, TEMPLE_ARRIVE: TEMPLE_ARRIVE, ASST: ASST, ASSTBY: ASST.reduce(function (o, a) { return (o[a.id] = a, o); }, {}), ASST_REC: ASST_REC, ASST_UP: ASST_UP, ASST_MAX: ASST_MAX, ASST_STACKS: ASST_STACKS, FREE_ITEMS: FREE_ITEMS, TBONUS: TBONUS,
+    GUARD_VP: GUARD_VP, IDOL_SLOT_VP: IDOL_SLOT_VP, IDOL_VP: IDOL_VP, IDOL_USED_VP: IDOL_USED_VP, ROUNDS: ROUNDS, HAND: HAND, ROW: ROW, EXPL: EXPL, START: START, RIVAL: RIVAL, RIVAL_RED: RIVAL_RED, RIVAL_IDOL: RIVAL_IDOL, RIVAL_IDOL_DUP: RIVAL_IDOL_DUP, opText: opText, resText: resText };
   if (typeof module !== 'undefined' && module.exports) module.exports = VD; else root.VD = VD;
 })(typeof window !== 'undefined' ? window : this);

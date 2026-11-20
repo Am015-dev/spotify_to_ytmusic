@@ -79,3 +79,20 @@ costs and effects are original, so print-and-play / workshop card lists were not
 - WRONG 1: a Boat card now pays a Boot (engine CAN table). Test: "WRONG 1: a Boat card pays a Boot".
 - MISSING 1: 4 shrine slots on each board (1, 1, 1, 2 points) score while empty; each set idol fills the next slot (V.IDOL_SLOT_VP, score().slots). Tests: "MISSING 1: ...". Everyone now starts at +3 (5 slot points, -2 Dread).
 - SIMPLIFIED items are listed in the rules drawer under "Simplified on purpose".
+
+## F14 (20 Nov 2026): structure matched to the original (see COMPONENTS.md)
+Checked against the original English rulebook text (components, setup, research, solo pages). Facts only.
+- Research track is now the PATH MAP: 2 start spaces, rows of 1-2 spaces joined by bridges, the cost on the bridge into each space,
+  18 research bonus tiles (first token to a space takes its tile; 8/10/12 spaces get one at 2/3/4 players; the Lost Temple stack of one per
+  player comes from the same 18). Every arrival still takes the row effect. Replaces the ladder and the old first-arrival rewards.
+- Buying an artifact: you MAY use its effect at once for free (engine move `nofx` keeps it unused). Rulebook p.12.
+- Level-II sites: a face-up and a face-down idol; discovering takes both, only the face-up gift (setup 8, p.10).
+- Solo rival rebuilt to the rulebook: 15 tiles = 5 dig + 5 green/red pairs (discover, research, guardian, item, artifact); 10 a round;
+  red count = difficulty (Easy 0, Steady 1, Normal 3, Hard 5); rival starts every round, never passes before its 10 tiles, no resources,
+  no Dread; item/artifact green = fewest points, red = most; idols 3 per new kind, 2 per duplicate or face-down; at the temple it takes a
+  6-point tile; research also removes the top assistant of the highest stack. Solo uses the 2-player setup (stacks of 2).
+- Idols: 16 in 4 kinds of 4 (needed for the rival's "new kind" scoring).
+- [unverified] (printed only in board/tile art, not in the rulebook text): the exact path geography and bridge costs, the bonus-tile and
+  idol gift values, idol-slot effects and empty-slot points, temple costs and arrival points, which resource each rival dig tile shows,
+  which rival tiles idle in round V, the rounds a rival-discovered site gets a guardian, and how the red research / guardian tiles differ.
+- Discovery costs (3 / 6 compasses) are kept from earlier notes [unverified].

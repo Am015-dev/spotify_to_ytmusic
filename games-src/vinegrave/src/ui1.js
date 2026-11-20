@@ -160,10 +160,17 @@ function render() {
   $('#map').classList.toggle('pawnsel', S.k === 'pawn');
   // research track: rows 0..8 left to right, the temple last
   const trG = GL.some(m => m.t === 'res' || m.t === 'temple'), trC = !trG && L.some(m => m.t === 'res' || m.t === 'temple');
+  /* F14 (R93): the research track is the original's PATH MAP: each row shows its 1-2 spaces with the cost of the bridge into them; a gold
+     corner = a bonus tile still there; your next legal spaces glow; tokens sit in their space */
+  const nxSp = {}; if (trG && myTurn()) L.forEach(m => { if (m.t === 'res') nxSp[((m.k === 'g' ? me.glass : me.note) + 1) + '_' + m.to] = 1; });
+  const costMini = c => Object.keys(c).map(k => (c[k] > 1 ? `<b>${c[k]}</b>` : '') + ic(k)).join('');
+  const tok = (r, j) => G.p.map((p, i) => (p.glass === r && (r === 0 || r === V.TOP || (p.gpos || 0) === j) ? `<i class="mg" style="--pc:${HEX[i]}" title="${esc(p.name)}: magnifier"></i>` : '') + (p.note === r && (r === 0 || (p.npos || 0) === j) ? `<i class="nb" style="--pc:${HEX[i]}" title="${esc(p.name)}: notebook"></i>` : '')).join('') + (G.rival && Math.min(V.TOP, G.rival.rows) === r && (r === 0 || r === V.TOP || (G.rival.pos || 0) === j) ? '<i class="mg" style="--pc:#9a9486"></i>' : '');
   let tr = ''; for (let r = 0; r <= V.TOP; r++) {
-    const mk = G.p.map((p, i) => (p.glass === r ? `<i class="mg" style="--pc:${HEX[i]}" title="${esc(p.name)}: magnifier"></i>` : '') + (p.note === r ? `<i class="nb" style="--pc:${HEX[i]}" title="${esc(p.name)}: notebook"></i>` : '')).join('') + (G.rival && Math.min(V.TOP, G.rival.rows) === r ? '<i class="mg" style="--pc:#9a9486"></i>' : '');
-    const nx = trG && myTurn() && (L.some(m => m.t === 'res' && m.k === 'g') && me.glass + 1 === r || L.some(m => m.t === 'res' && m.k === 'n') && me.note + 1 === r);
-    tr += `<span class="tc${r === V.TOP ? ' top' : ''}${nx ? ' nx' : ''}"><span class="tn">${r === V.TOP ? '<svg class="star" aria-label="temple"><use href="#s-star"/></svg>' : r}</span>${V.ASST_REC.indexOf(r) >= 0 ? '<span class="tas" aria-label="notebook here: hire an assistant" title="Notebook here: hire an assistant"><svg><use href="#s-meep"/></svg></span>' : ''}${V.ASST_UP.indexOf(r) >= 0 ? '<span class="tas gold" aria-label="notebook here: upgrade an assistant" title="Notebook here: upgrade an assistant"><svg><use href="#s-meep"/></svg></span>' : ''}<span class="tp">${V.GLASS_VP[r]}</span><span class="tm">${mk}</span></span>`;
+    const sps = r === 0 ? [null] : V.PATH[r];
+    const cells = sps.map((sp, j) => { const bt = r > 0 && r < V.TOP && G.rbt && G.rbt[r + '_' + j] != null, nx = nxSp[r + '_' + j];
+      return `<span class="sp${bt ? ' bt' : ''}${nx ? ' nx' : ''}${sps.length === 1 ? ' one' : ''}" data-sp="${j}"${sp ? ` aria-label="${esc('Row ' + r + (sps.length > 1 ? (j ? ' right' : ' left') : '') + ': costs ' + resWords(sp.c) + (bt ? ', bonus tile here' : ''))}"` : ''}>${sp ? `<span class="spc">${costMini(sp.c)}</span>` : ''}<span class="tm">${tok(r, j)}</span></span>`; }).join('');
+    const nx = Object.keys(nxSp).some(k => +k.split('_')[0] === r);
+    tr += `<span class="tc${r === V.TOP ? ' top' : ''}${nx ? ' nx' : ''}"><span class="tn">${r === V.TOP ? '<svg class="star" aria-label="temple"><use href="#s-star"/></svg>' : r}${V.ASST_REC.indexOf(r) >= 0 ? '<span class="tas" title="Notebook here: hire an assistant"><svg><use href="#s-meep"/></svg></span>' : ''}${V.ASST_UP.indexOf(r) >= 0 ? '<span class="tas gold" title="Notebook here: upgrade an assistant"><svg><use href="#s-meep"/></svg></span>' : ''}</span><span class="sps">${cells}</span><span class="tp">${V.GLASS_VP[r]}</span></span>`;
   }
   const tb = $('#track'); tb.innerHTML = `<span class="tl">Research</span><span class="tcs">${tr}</span>`; tb.classList.toggle('glow', trG); tb.classList.toggle('can', trC); tb.classList.toggle('sel', S.k === 'track'); tb.dataset.a = 'track';
   // market
@@ -181,7 +188,7 @@ function render() {
   { const tb = $('#track'); if (tb) tb.classList.toggle('nudge', !!(tb.classList.contains('glow') && myTurn() && !q && !UI.sel && G.phase === 'play')); }
   guidedGlow();
   if (typeof yourTurnNow === 'function' && yourTurnNow()) { if (typeof rivalCap === 'function') rivalCap(''); document.querySelectorAll('.vpop:not(.onchip)').forEach(e => e.remove()); }   /* F12: your turn starts with a clear board */
-  try { const mp = $('#map'); const qo = !$('#qbox').hidden; document.body.classList.toggle('vg-squeeze', !!(qo && mp && mp.clientHeight < 80)); } catch (x) { }   /* only a tall open chooser (exile) may squeeze the board away; dock buttons never do (F11) */
+  document.body.classList.remove('vg-squeeze');   /* F14 (R93): no chooser ever hides the board: 2+ button choosers are a bottom sheet (style.css .vg-sheet) */
 }
 setInterval(() => { if (typeof UI !== 'undefined' && UI.mode === 'tutorial') guidedGlow(); }, 250);   /* the tutor changes step without a render */
 /* guided tutorial step: only the step's target glows, so a tap on anything else is never a dead tap on a glowing piece */
@@ -212,7 +219,8 @@ function renderTray(L, q, me, actor) {
     if (bs.length === 1 && !t.querySelector('.cd')) { const b = bs[0];
       if (b.classList.contains('go')) { txt = b.textContent; b.textContent = { asst: me.apend > 0 ? 'Hire' : 'Upgrade', tbon: 'Take it' }[q.h] || 'Take it'; b.setAttribute('aria-label', txt); }
       if (!b.id) b.id = 'gobtn'; acts = b.outerHTML + acts; qh = ''; $('#prompt').textContent = txt; $('#pacts').innerHTML = acts; } }
-  qb.hidden = !qh; qb.innerHTML = qh;
+  if (qh) qh = `<div class="qt"><b>${esc(q ? qPrompt(q) : 'Research: pick a space.')}</b></div>` + qh;   /* F14 (R93 P5): on phones the chooser is a bottom sheet over the hand; its title says what to pick, the island and track stay in view */
+  qb.hidden = !qh; qb.innerHTML = qh; document.body.classList.toggle('vg-sheet', !!qh);
   const qc = qb.querySelector('.qcards'), qg = qc && qc.querySelector('.cd.glow'); if (qg) qc.scrollLeft = Math.max(0, qg.offsetLeft - qc.offsetLeft - 8);   /* the suggested card is in view (R29: cut at 375) */
   // your explorers (drag one onto a glowing site), then your goods in words
   const canGo = mine && !q && GL.some(m => m.t === 'dig' || m.t === 'disc');
@@ -258,13 +266,14 @@ function selInfo(S) {
     const pay = payShort(VG.payPlan(G, UI.view, VG.siteCost(x)));   /* F12 (R69 P2): two short lines at most; Details has the full pay line */
     if (m.t === 'disc') return { t: 'Explore: ' + V.DISC[x.lvl] + ' compasses' + pay + '. A guardian wakes!', go: m, label: 'Explore' };
     return { t: 'Dig: ' + resWords(V.SITE[x.tile].rew) + pay + '.', go: m, label: 'Dig' }; }
-  if (S.k === 'track') { if (!ms.length) return { t: trackWhy() }; return ms.length === 1 ? { t: trackLine(ms[0]), go: ms[0], label: ms[0].t === 'temple' ? 'Buy tile' : ms[0].k === 'g' ? 'Magnifier up' : 'Notebook up' } : { t: 'Research: pick what climbs.' }; }
+  if (S.k === 'track') { if (!ms.length) return { t: trackWhy() }; return ms.length === 1 ? { t: trackLine(ms[0]), go: ms[0], label: ms[0].t === 'temple' ? 'Buy tile' : ms[0].k === 'g' ? 'Magnifier up' : 'Notebook up' } : { t: 'Research: pick a space.' }; }
   return { t: '' };
 }
 function trackWhy() {   /* why the research path cannot climb now: the missing goods, in words */
   const me = G.p[UI.view], miss = c => { const o = {}; Object.keys(c).forEach(k => { if ((me.res[k] || 0) < c[k]) o[k] = c[k] - (me.res[k] || 0); }); return o; };
   if (me.glass >= V.TOP) { const t = V.TEMPLE.find((x, k) => G.temple[k] > 0); return t ? 'Temple tile: you need ' + resWords(miss(t.cost)) + ' more.' : 'No temple tiles left.'; }
-  return 'Next row costs ' + resWords(V.TRACK[me.glass + 1].cost) + '. You need ' + resWords(miss(V.TRACK[me.glass + 1].cost)) + ' more. Person marks: your notebook there hires an assistant.';
+  const nx = (me.glass === 0 ? V.START_TO : V.PATH[me.glass][me.gpos || 0].to).map(j => V.PATH[me.glass + 1][j].c);
+  return 'Next space costs ' + nx.map(c => resWords(c)).join(' or ') + '. You need ' + resWords(miss(nx[0])) + (nx.length > 1 ? ' (or ' + resWords(miss(nx[1])) + ')' : '') + ' more.';
 }
 function payShort(pl) {   /* ' + Bone Whistle + 2 coins' : what the travel costs you, in as few words as fit */
   if (!pl) return ''; const me = G.p[UI.view], n = pl.cards.length, parts = n === 1 ? [V.CARDS[me.hand[pl.cards[0]]].name] : n ? [n + ' cards'] : [];
@@ -279,8 +288,8 @@ function payWords(pl) {
 function trackLine(m) {
   const me = G.p[UI.view];
   if (m.t === 'temple') { const t = V.TEMPLE[m.k]; return 'Temple tile, ' + t.vp + ' points. Pay ' + resWords(t.cost) + '.'; }
-  const row = (m.k === 'g' ? me.glass : me.note) + 1, T = V.TRACK[row];
-  return (m.k === 'g' ? 'Magnifier' : 'Notebook') + ' to row ' + (row === V.TOP ? 'the temple' : row) + '. Pay ' + resWords(T.cost) + '.' + (Object.keys(T.bonus).length ? ' Get ' + resWords(T.bonus) + '.' : '') + (m.k === 'n' && V.ASST_REC.indexOf(row) >= 0 ? ' You hire an assistant.' : m.k === 'n' && V.ASST_UP.indexOf(row) >= 0 ? ' You upgrade an assistant.' : '');
+  const row = (m.k === 'g' ? me.glass : me.note) + 1, T = V.TRACK[row], j = m.to || 0, sp = V.PATH[row][j] || V.PATH[row][0], tile = G.rbt && G.rbt[row + '_' + j] != null ? V.RBONUS[G.rbt[row + '_' + j]] : null, side = V.PATH[row].length > 1 ? (j ? ' right' : ' left') : '';
+  return (m.k === 'g' ? 'Magnifier' : 'Notebook') + ' to row ' + (row === V.TOP ? 'the temple' : row + side) + '. Pay ' + resWords(sp.c) + '.' + (Object.keys(T.bonus).length || tile ? ' Get ' + resWords(Object.assign({}, T.bonus)) + (tile ? (Object.keys(T.bonus).length ? ' + bonus tile ' : 'bonus tile ') + resWords(tile) : '') + '.' : '') + (m.k === 'n' && V.ASST_REC.indexOf(row) >= 0 ? ' You hire an assistant.' : m.k === 'n' && V.ASST_UP.indexOf(row) >= 0 ? ' You upgrade an assistant.' : '');
 }
 function trackChoices() { const ms = movesFor('track'); if (ms.length < 2) return ''; return `<div class="qchoices">${ms.map(m => mvBtn(m, esc(trackLine(m)), 'go')).join('')}</div>`; }
 function promptLine(L) {
