@@ -21,6 +21,9 @@ document.addEventListener('click', function (e) {
     (function later() { if (UI.busy && n++ < 60) { setTimeout(later, 80); return; } var x = myTurn() && qKey() === qk0 && document.querySelector(sel); if (x && (!/^(bird|die|tray|hand|slot)$/.test(a) || x.hasAttribute('data-legal'))) x.click(); })();
     return;
   }
+  if (e.isTrusted && Date.now() - (UI.rvGone || 0) < 700 && /^(die|deck|tray|bird|hand|ract|a4)$/.test(a)) return;   // F2: the tap meant for the rival summary's button, which just closed
+  // F2: while a question waits, the feeder, deck and tray never open tips or the big card: a shake says "answer the question"
+  if (mine && Q && ((a === 'tray' && Q.h !== 'draw') || (a === 'deck' && Q.h !== 'draw') || (a === 'die' && Q.h !== 'die'))) { nope(t, 'Answer the question first'); return; }
   sfx('tap');
   if (a === 'zoom') { showCard(p.hand[i]); return; }
   if (a === 'die' && !(mine && Q && Q.h === 'die')) { toast('Feeder: ' + (G.feeder[i] === 'gs' ? 'grub or seed' : G.feeder[i]) + ' die. Get food takes dice from here.', 0, 1); return; }
@@ -214,9 +217,9 @@ function rvSummary(s, done) {
     '<p class="rvpts">' + (gain > 0 ? '+' + gain : gain) + (Math.abs(gain) === 1 ? ' point' : ' points') + ' this turn · ' + esc(nm) + ' ' + PP.scoreOf(G, s).total + ', you ' + PP.scoreOf(G, UI.view).total + '</p>' +
     '<div class="rvb"><button type="button" class="btn" data-rv="board">See ' + esc(nm) + '’s board</button><button type="button" class="btn pri" data-rv="ok">OK</button></div>';
   document.body.appendChild(d);
-  var tm = 0, fin = function () { if (!d.isConnected) return; dropEl(d); clearTimeout(tm); done(); };
-  d.addEventListener('click', function (e) { var b = e.target.closest('[data-rv]'); fin(); if (b && b.dataset.rv === 'board') openOpp(s); });
-  tm = setTimeout(fin, 2600); UI.timers.push(tm);
+  var tm = 0, fin = function (auto) { if (!d.isConnected) return; dropEl(d); clearTimeout(tm); if (auto === true) UI.rvGone = Date.now(); done(); };
+  d.addEventListener('click', function (e) { e.stopPropagation(); var b = e.target.closest('[data-rv]'); fin(); if (b && b.dataset.rv === 'board') openOpp(s); });
+  tm = setTimeout(function () { fin(true); }, 2600); UI.timers.push(tm);
 }
 function dropEl(x) { if (x && x.parentNode) x.parentNode.removeChild(x); }
 // "Your turn" / "<Rival>'s turn" banner; the turn waits for it (~1 s), a tap skips it

@@ -131,7 +131,7 @@ function renderDock(p, vs, cur) {
   setH($('#acts'), mine ? (idle ? act4HTML() : actsHTML()) : '');
   var have = PP.FOODS.filter(function (f) { return p.food[f]; });
   setH($('#foodrow'), '<span class="fl">Your food</span>' + (have.length ? have.map(function (f) { return '<span class="fd" aria-label="' + f + ' ' + p.food[f] + '">' + foodIcon(f) + '<b data-engine="G.pl[' + vs + '].food.' + f + '">' + p.food[f] + '</b><small>' + f + '</small></span>'; }).join('') : '<span class="fd none">none yet</span>') +
-    (p.bonus.length ? '<button type="button" class="fd bon" data-gx="goalsd" aria-label="Your secret bonus card">&#9733; bonus card</button>' : ''));
+    (p.bonus.length ? '<button type="button" class="fd bon" data-gx="goalsd" aria-label="Your secret bonus card, worth ' + PP.scoreOf(G, vs).bonus + ' points now. Tap to see what it wants">&#9733; Bonus card: ' + PP.scoreOf(G, vs).bonus + ' pts now</button>' : ''));
   var ok = {}; if (mine && (!Q || Q.h === 'play2')) PP.playable(G, vs, Q && Q.h === 'play2' ? Q.d.hab : null).forEach(function (x) { ok[x.i] = 1; });
   var hm = mine && !Q && bestOn() && UI.pickBird && UI.sel == null ? hintMove() : null, bp = hm && hm.t === 'play' ? { i: hm.i } : null;   // Best on a hand card only once you chose Play a bird
   var tuckQ = mine && Q && (Q.h === 'pwTuck' || Q.h === 'bonus');
@@ -180,7 +180,7 @@ function promptText(mine) {
     case 'die': return 'Tap a food die in the feeder to take it (' + n + ' left).';
     case 'egg': return 'Tap a bird to lay an egg (' + n + ' left).';
     case 'draw': return 'Tap a bird in the tray, or the deck, to take a card (' + n + ' left).';
-    case 'bonus': return Q.d.kind === 'card' ? 'Discard a card for 1 more food?' : Q.d.kind === 'food' ? 'Pay 1 food for 1 more egg?' : 'Pay 1 egg for 1 more card?';
+    case 'bonus': return Q.d.kind === 'card' ? 'Trade: tap a hand card to discard it for 1 more food.' : Q.d.kind === 'food' ? 'Trade: pay 1 food for 1 more egg?' : 'Trade: tap a bird with an egg to pay it for 1 more card.';
     case 'pwTuck': return B[G.pl[UI.view].board[Q.d.h][Q.d.c].id].n + ': tuck a card?';
     case 'pwTrade': return B[G.pl[UI.view].board[Q.d.h][Q.d.c].id].n + ': spend an egg?';
     case 'pwMay': return B[G.pl[UI.view].board[Q.d.h][Q.d.c].id].n + ': use it? Everyone gets one too.';
