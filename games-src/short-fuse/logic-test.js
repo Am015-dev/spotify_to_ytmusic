@@ -51,7 +51,7 @@ R('There are 26 info tokens: two for each value 1 to 12, plus two yellow.',()=>{
 R('There are 12 base equipment cards, one per value 1 to 12, each unlocking after the first 2 wires of its value are cut.',()=>{
   const base=['eq1','eq2','eq3','eq4','eq5','eq6','eq7','eq8','eq9','eq10','eq11','eq12'];
   exp(base.map(id=>E.EQUIP[id].v),[1,2,3,4,5,6,7,8,9,10,11,12],'unlock values');exp(base.map(id=>E.EQUIP[id].need),Array(12).fill(2),'wires needed')});
-R('There are 5 base character cards, one of them the Captain, and every one carries the Two-Prong Tester.',()=>{
+R('There are 5 base character cards, one of them the Captain, and every one carries the Two Prongs.',()=>{
   const ids=['ch_captain','ch_base1','ch_base2','ch_base3','ch_base4'];exp(ids.map(i=>E.CHARS[i].item),Array(5).fill('dd'),'personal items');
   exp(ids.filter(i=>E.CHARS[i].captain).length,1,'captain cards')});
 R('The campaign has 66 missions, and the 8 of the base box can be played with 2, 3, 4 or 5 players.',()=>{
@@ -63,8 +63,8 @@ R('Stands per player, 2 players: the Captain and the other player each take 2 st
 R('Stands per player, 3 players: the Captain takes 2 stands, each other player 1.',()=>{for(const cap of [0,1,2]){game(4,3,{captain:cap});const n=X.G.seats.map(s=>E.standsOf(s.i).length);const want=[1,1,1];want[cap]=2;exp(n,want,'captain seat '+cap)}});
 R('Stands per player, 4 and 5 players: everyone takes 1 stand.',()=>{for(const np of [4,5]){game(4,np);exp(X.G.seats.map(s=>E.standsOf(s.i).length),Array(np).fill(1),np+' players')}});
 R('There are 4 stands in a 2, 3 or 4 player game and 5 stands in a 5 player game.',()=>{for(const [np,n] of [[2,4],[3,4],[4,4],[5,5]]){game(4,np);exp(X.G.st.length,n,np+' players')}});
-R('Job 1 uses only the blue wires 1 to 7 (28 wires): no red and no yellow.',()=>{game(1,4);const all=X.G.st.flatMap(s=>s.w.map(x=>x.id));exp(all.length,28,'wires');
-  yes(all.every(id=>E.WIRES[id].c==='b'&&E.WIRES[id].v<=7),'only blue 1-7','other wires present')});
+R('Job 1 uses only the blue wires 1 to 5 (20 wires): no red and no yellow.',()=>{game(1,4);const all=X.G.st.flatMap(s=>s.w.map(x=>x.id));exp(all.length,20,'wires');
+  yes(all.every(id=>E.WIRES[id].c==='b'&&E.WIRES[id].v<=5),'only blue 1-5','other wires present')});
 R('Job 2 uses blue 1 to 9 plus 4 yellow wires drawn only from yellow 1.1 to 8.1 (40 wires).',()=>{game(2,4);const all=X.G.st.flatMap(s=>s.w.map(x=>x.id));exp(all.length,40,'wires');
   const ys=all.filter(id=>E.WIRES[id].c==='y').map(id=>E.WIRES[id].s);yes(ys.length===4&&ys.every(x=>x>=1.1&&x<=8.1),'4 yellows within 1.1..8.1',J(ys));yes(all.filter(id=>E.WIRES[id].c==='b').every(id=>E.WIRES[id].v<=9),'blue 1-9','higher blue')});
 R('Job 3 uses blue 1 to 11 plus 1 red wire drawn only from red 2.5 to 10.5 (45 wires).',()=>{game(3,4);const all=X.G.st.flatMap(s=>s.w.map(x=>x.id));exp(all.length,45,'wires');
@@ -235,7 +235,7 @@ R('Card 3 (Fork Tester): name a number and point at 3 wires on one teammate stan
 R('Card 3: if none of the 3 matches the fuse advances 1 and the teammate tags one of the three with its true value.',()=>{
   game(4,4);rig([[B(5,0),B(1)],[B(2),B(9),B(11)],[B(3)],[B(4)]]);ready('eq3');act(0);const d=X.G.dial;must({a:'dual',st:1,ks:[0,1,2],v:5,tool:'eq3'});ans();
   const tagged=sl(1).filter(x=>x.tok.length);exp([X.G.dial,tagged.length],[d-1,1],'[dial,tagged wires]');exp(tagged[0].tok[0].v,E.cv(tagged[0].id),'true value on the token')});
-R('Cards 3, 5 and the Two-Prong Tester can never name yellow.',()=>{game(4,4);rig([[YL(2),B(1)],[YL(6),B(2),B(3)],[B(3,1)],[B(4)]]);ready('eq3');act(0);no({a:'dual',st:1,ks:[0,1,2],v:'Y',tool:'eq3'},0)});
+R('Cards 3, 5 and the Two Prongs can never name yellow.',()=>{game(4,4);rig([[YL(2),B(1)],[YL(6),B(2),B(3)],[B(3,1)],[B(4)]]);ready('eq3');act(0);no({a:'dual',st:1,ks:[0,1,2],v:'Y',tool:'eq3'},0)});
 R('Card 4 (Chalk Mark): put an info token with the true value in front of one of your own blue wires (any player, any time).',()=>{game(4,4);rig(FOUR);ready('eq4');act(0);
   must({a:'eq',id:'eq4',s:2,k:0},2);exp(toks(2,0),['n:'+E.cv(sl(2)[0].id)],'token on the user\'s own wire')});
 R('Card 4: only on a blue wire of your own (not red, not yellow, not a teammate\'s).',()=>{game(4,4);rig([[B(9),RD(2),YL(3)],[B(4),B(10)],[B(11)],[B(12)]]);ready('eq4');act(0);
@@ -294,7 +294,7 @@ R('Long Grabber (11-11): point at a teammate\'s wire and take it unseen into you
   game(50,4);rig([[B(2),B(9)],[B(4),B(6),B(11)],[B(1)],[B(3)]]);ready('eq1111');act(0);must({a:'eq',id:'eq1111',ts:1,tk:K(1,B(6)),s:0},0);
   exp([sl(0).map(x=>x.id),sl(1).map(x=>x.id)],[[B(2),B(6),B(9)],[B(4),B(11)]],'[taker stand,victim stand]')});
 
-R('Card 10 can be combined with the Two-Prong Tester: two values against two wires; either value on either wire is a hit.',()=>{
+R('Card 10 can be combined with the Two Prongs: two values against two wires; either value on either wire is a hit.',()=>{
   game(4,4);rig([[B(9),B(2),B(1)],[B(5),B(2,1),B(10)],[B(11)],[B(12)]]);ready('eq10');act(0);const d=X.G.dial;must({a:'dual',st:1,ks:[K(1,B(5)),K(1,B(2,1))],v:9,v2:2,two:'eq10',tool:'dd'});
   exp([sl(1)[K(1,B(2,1))].cut,sl(0)[K(0,B(2))].cut,X.G.dial],[1,1,d],'[2 cut,own 2 cut,dial]')});
 R('Card 22 (Only-One Pin) may go on a wire that is already cut.',()=>{game(50,4);rig([[B(9),B(2,0)],[B(2,1),B(10)],[B(11)],[B(12)]]);sl(0)[K(0,B(9))].cut=1;ready('eq22');act(0);must({a:'eq',id:'eq22',s:0,k:K(0,B(9))},0)},{how:'"cut or not"'});
@@ -308,25 +308,25 @@ R('Card 11 (Hand-Off) cannot hand the turn to a player with no wires left.',()=>
 R('Card 7 (Spare Batteries) only works on characters whose personal item has been used.',()=>{game(4,4);rig(FOUR);ready('eq7');act(0);no({a:'eq',id:'eq7',who:[1]},0)});
 
 // =====================================================================================
-S('11. Characters: the Two-Prong Tester');
-R('Two-Prong Tester: name a number and point at 2 wires on one teammate\'s stand (they need not be adjacent); it works if at least one is that number.',()=>{
+S('11. Characters: the Two Prongs');
+R('Two Prongs: name a number and point at 2 wires on one teammate\'s stand (they need not be adjacent); it works if at least one is that number.',()=>{
   game(4,4);rig([[B(9),B(1)],[B(9,1),B(3),B(10)],[B(11)],[B(12)]]);act(0);const d=X.G.dial;must({a:'dual',st:1,ks:[K(1,B(9,1)),K(1,B(10))],v:9,tool:'dd'});exp([sl(1)[K(1,B(9,1))].cut,sl(0)[K(0,B(9))].cut,X.G.dial],[1,1,d],'[match cut,own cut,dial]')});
-R('Two-Prong Tester: if both wires match the teammate picks which one is cut, and says nothing more.',()=>{
+R('Two Prongs: if both wires match the teammate picks which one is cut, and says nothing more.',()=>{
   game(4,4);rig([[B(9),B(1)],[B(9,1),B(9,2),B(10)],[B(11)],[B(12)]]);act(0);must({a:'dual',st:1,ks:[0,1],v:9,tool:'dd'});exp([X.G.q&&X.G.q.who,X.G.q&&X.G.q.opts.length],[1,2],'[chooser,options]');
   ans((o,i)=>i===1);exp([sl(1)[0].cut,sl(1)[1].cut],[0,1],'the chosen wire only')});
-R('Two-Prong Tester: if neither matches the fuse advances 1 and the teammate puts ONE info token in front of ONE of the two wires of their choice.',()=>{
+R('Two Prongs: if neither matches the fuse advances 1 and the teammate puts ONE info token in front of ONE of the two wires of their choice.',()=>{
   game(4,4);rig([[B(9),B(1)],[B(2),B(3),B(10)],[B(11)],[B(12)]]);act(0);const d=X.G.dial;must({a:'dual',st:1,ks:[0,1],v:9,tool:'dd'});exp(X.G.q&&X.G.q.opts.length,2,'tag choices');ans();
   exp([X.G.dial,sl(1).filter(x=>x.tok.length).length],[d-1,1],'[dial,tagged wires]')});
-R('Two-Prong Tester: if exactly one pointed wire is red and the other is not the value, no explosion: the fuse advances 1 and the token goes on the non-red wire.',()=>{
+R('Two Prongs: if exactly one pointed wire is red and the other is not the value, no explosion: the fuse advances 1 and the token goes on the non-red wire.',()=>{
   game(4,4);rig([[B(9),B(1)],[RD(3),B(4),B(10)],[B(11)],[B(12)]]);act(0);const d=X.G.dial;must({a:'dual',st:1,ks:[0,1],v:9,tool:'dd'});if(X.G.q)ans();
   exp([!!X.G.over,X.G.dial,toks(1,K(1,B(4))),toks(1,K(1,RD(3)))],[false,d-1,['n:4'],[]],'[over,dial,token on non-red,token on red]')});
-R('Two-Prong Tester: if one pointed wire is red and the other matches, the cut simply works (no explosion).',()=>{
+R('Two Prongs: if one pointed wire is red and the other matches, the cut simply works (no explosion).',()=>{
   game(4,4);rig([[B(9),B(1)],[RD(3),B(9,1),B(10)],[B(11)],[B(12)]]);act(0);const d=X.G.dial;must({a:'dual',st:1,ks:[0,1],v:9,tool:'dd'});if(X.G.q)ans();
   exp([!!X.G.over,sl(1)[K(1,B(9,1))].cut,sl(1)[K(1,RD(3))].cut,X.G.dial],[false,1,0,d],'[over,match cut,red cut,dial]')});
-R('Two-Prong Tester: if both pointed wires are red the bomb explodes.',()=>{game(4,4);rig([[B(9),B(1)],[RD(3),RD(5),B(10)],[B(11)],[B(12)]]);act(0);must({a:'dual',st:1,ks:[0,1],v:9,tool:'dd'});exp(X.G.over&&X.G.over.win,false,'lost')});
-R('The Two-Prong Tester never names yellow.',()=>{game(4,4);rig([[YL(2),B(1)],[YL(3),B(4),B(10)],[B(11)],[B(12)]]);act(0);no({a:'dual',st:1,ks:[0,1],v:'Y',tool:'dd'},0)});
+R('Two Prongs: if both pointed wires are red the bomb explodes.',()=>{game(4,4);rig([[B(9),B(1)],[RD(3),RD(5),B(10)],[B(11)],[B(12)]]);act(0);must({a:'dual',st:1,ks:[0,1],v:9,tool:'dd'});exp(X.G.over&&X.G.over.win,false,'lost')});
+R('The Two Prongs never names yellow.',()=>{game(4,4);rig([[YL(2),B(1)],[YL(3),B(4),B(10)],[B(11)],[B(12)]]);act(0);no({a:'dual',st:1,ks:[0,1],v:'Y',tool:'dd'},0)});
 R('A personal item works once per mission (the character card turns face down).',()=>{game(4,4);rig([[B(9),B(9,3),B(1)],[B(9,1),B(9,2),B(10)],[B(11)],[B(12)]]);act(0);must({a:'dual',st:1,ks:[0,1],v:9,tool:'dd'});ans();act(0);no({a:'dual',st:1,ks:[1,2],v:9,tool:'dd'},0)});
-R('Two-Prong Tester: a teammate with 2 stands is probed on ONE stand at a time (both wires on the same stand).',()=>{game(4,2);rig([[B(9),B(1)],[B(2),B(3)],[B(9,1),B(10)],[B(9,2),B(11)]]);act(0);
+R('Two Prongs: a teammate with 2 stands is probed on ONE stand at a time (both wires on the same stand).',()=>{game(4,2);rig([[B(9),B(1)],[B(2),B(3)],[B(9,1),B(10)],[B(9,2),B(11)]]);act(0);
   must({a:'dual',st:3,ks:[0,1],v:9,tool:'dd'});exp([cutN(2),cutN(3)],[0,1],'[stand 3 cuts,stand 4 cuts] (the 11 was not touched)')},{how:'a single move names a single stand'});
 R('The new characters (Pocket Roll Call, Swap Bag, Fork Tester, Either-Or Meter) appear from mission 31, for non-captains only; the Captain keeps the Captain card.',()=>{
   game(38,4,{chars:{1:'ch_new1',2:'ch_new3',3:'ch_new4'}});exp(X.G.seats.map(s=>s.ch),['ch_captain','ch_new1','ch_new3','ch_new4'],'cards');

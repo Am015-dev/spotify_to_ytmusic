@@ -11,12 +11,12 @@
 //   validation token on the track when all four of a number are cut ................. crew2
 //   solo cut: you hold every wire left of a number (all four, or the last two) ...... solo (and Plum does one in crew1)
 //   equipment unlocks when two of its number are cut, then works once ................ hit (unlock), gear (use)
-//   personal tool: the Two-Prong Tester, once per job (used for the practice miss) ........... probe, wrong1b
+//   personal tool: the Two Prongs, once per job (used for the practice miss) ........... probe, wrong1b
 //   yellow wires: a yellow matches only a yellow, you must hold one to say "yellow" .. yellow1, yellow2
 //   red wires: tap yours; never point at one; a hand of only reds reveals itself ..... red, win
 // The staged job (never saved): three players (you = Amber, the foreman, then Teal, then Plum), 15 wires: blue 1, 6 and 7 (four each), yellows 1.1 and 6.1, red 6.5.
 //   You   : Y 6 6 6 R 7        Teal: 1 1 6 7        Plum: 1 1 Y 7 7      fuse 3 steps, one gear card (Fuse Pinch, unlocked by two 6s, its real value)
-//   T1 you hit Teal's token-2 · T2 Teal hits your token-3 · T3 Plum solo-cuts his 3s · T4 you use the Two-Prong Tester on Plum's 2nd and 3rd wires and miss (Plum tags the 1) · T5 Teal uses that token ·
+//   T1 you hit Teal's token-2 · T2 Teal hits your token-3 · T3 Plum solo-cuts his 3s · T4 you use the Two Prongs on Plum's 2nd and 3rd wires and miss (Plum tags the 1) · T5 Teal uses that token ·
 //   T6 Plum hits Teal's last 1 · T7 you use Fuse Pinch and cut the last yellow · T8 you solo your 6s, your red is revealed for you, defused.
 // The computer never moves by itself in here: the steps that say "the crew plays" run its scripted moves (tutMove) and wait for them.
 const TUT_GAME='short-fuse';
@@ -77,7 +77,7 @@ async function tutAct(seat,tok){const m=tutMove(seat);if(!m||!tutAlive(tok))retu
 async function tutCrew(){const tok=UI.tutTok;for(let n=0;n<8&&tutAlive(tok)&&!G.over;n++){const s=sideToAct();if(s<0||isHuman(s))break;if(!await tutAct(s,tok))break}}
 // ---------------------------------------------------------------- the steps
 const tutCalm=()=>!document.querySelector('#tb .snap,#tb .buzz,#tb.shake,#fuse .burn,#fuse .phew');   // the cut / miss animation is over: the spotlight does not move
-// review R1 (row 2): the Two-Prong Tester and red are taught by doing
+// review R1 (row 2): the Two Prongs and red are taught by doing
 const tutProbeIdx=()=>(TBL.items||[]).findIndex(x=>x.t==='tool'&&x.tool==='dd');
 const tutIsProbe=n=>n===tutProbeIdx();
 const tutProbeChip=()=>{const i=tutProbeIdx();const e=i>=0&&document.querySelector('#mine .chip[data-chip="'+i+'"]');return e&&e.getBoundingClientRect().width?e:null};
@@ -97,7 +97,7 @@ function tutSteps(){return tutStory([
  {id:'name',title:'Name a number',say:'Now say a number you hold. Tap one of your 6s. If Teal has a 6, you both cut.',target:()=>{const k=myTwoK();return k>=0?tileEl(G.st[0].w[k].u):null},
    wait:{type:'tap',match:a=>a.what==='tile'&&a.own&&cv(a.id)===6&&a.k===myTwoK()},ready:()=>tutMyTurn()&&tutSelTo(1,23)},
  {id:'hit',title:'A hit!',say:'Match! Both 6s are cut and Fuse Pinch unlocked. One cut per turn, then it passes clockwise.',target:tq('#gear .eqk'),wait:null,ready:()=>hitTxt()&&!G.over&&tutCalm()},
- {id:'probe',title:'Your Two-Prong Tester',ai:tutCrew,say:'Tap your Two-Prong Tester: it tests two wires at once.',target:tutProbeChip,
+ {id:'probe',title:'Your Two Prongs',ai:tutCrew,say:'Tap your Two Prongs: it tests two wires at once.',target:tutProbeChip,
    wait:{type:'tap',match:a=>a.what==='chip'&&tutIsProbe(a.n)},ready:()=>tutMyTurn()&&!UI.sel&&!!tutProbeChip()},
  {id:'wrong1',title:'A wrong guess',say:'No clue is sure here, so guess: tap Plum\'s second wire.',target:tutEl(2,3),
    wait:{type:'tap',match:a=>a.what==='tile'&&!a.own&&a.id===3},ready:()=>tutMyTurn()&&tutProbeSel(0)},

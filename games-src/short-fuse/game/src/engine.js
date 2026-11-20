@@ -271,7 +271,7 @@ function legalDual(seat,m){if(G.step!=='act'||seat!==G.actor||G.tfx.acted)return
   if(!targetsOK(seat,m.st))return 'pick a crewmate stand';if(!Array.isArray(m.ks)||!m.ks.length||new Set(m.ks).size!==m.ks.length)return 'pick wires';
   const tool=m.tool||null,two=m.two||null;
   if(tool&&!['dd','eq3','pt3','eq5'].includes(tool))return 'unknown probe';if(two&&!['eq10','pt10'].includes(two))return 'unknown probe';
-  if(tool==='dd'&&!itemOK(seat,'dd'))return 'Two-Prong Tester not available';if(tool==='pt3'&&!itemOK(seat,'pt3'))return 'probe not available';
+  if(tool==='dd'&&!itemOK(seat,'dd'))return 'Two Prongs not available';if(tool==='pt3'&&!itemOK(seat,'pt3'))return 'probe not available';
   if((tool==='eq3'||tool==='eq5')&&!eqOK(seat,tool))return 'card not available';
   if(two==='eq10'&&!eqOK(seat,'eq10'))return 'card not available';if(two==='pt10'&&!itemOK(seat,'pt10'))return 'probe not available';
   const ctx={tool:tool||two,kind:'dual',m};
@@ -288,7 +288,7 @@ function doDual(seat,m){const tool=m.tool||null,two=m.two||null;const vals=[m.v]
   hook('pay',seat,m.v,m);
   if(tool==='dd'||tool==='pt3')useItem(seat);if(two==='pt10')useItem(seat);if(tool==='eq3'||tool==='eq5')useEq(tool);if(two==='eq10')useEq('eq10');
   G.stats.dual++;const T=m.ks.map(k=>G.st[m.st].w[k]);const owner=ownerOf(m.st);
-  const tn=tool==='dd'?'Two-Prong Tester':tool==='eq3'||tool==='pt3'?'Fork Tester':tool==='eq5'?'Stand Scanner':'';
+  const tn=tool==='dd'?'Two Prongs':tool==='eq3'||tool==='pt3'?'Fork Tester':tool==='eq5'?'Stand Scanner':'';
   lg(`${SP(seat).nm} points at ${T.length>1?T.length+' wires':'a wire'} of ${SP(owner).nm} and says "${vals.map(VN).join(' or ')}"${tn?' ('+tn+(two?' + Two-Value':'')+')':two?' (Either-Or Meter)':''}.`);
   if((tool||two)&&hasRule(G.mission,'redTriple')&&T.some(sl=>isRed(sl.id))){explode(`${SP(seat).nm}'s probe pointed at a red wire (equipment cannot choose reds)`);return}
   const match=T.filter(sl=>vals.includes(cv(sl.id)));
@@ -906,6 +906,6 @@ function saveGame(){try{localStorage.setItem(SAVE,JSON.stringify(G))}catch(e){}}
 function loadGame(){try{const s=localStorage.getItem(SAVE);if(s){G=JSON.parse(s);return true}}catch(e){}return false}
 // real-time jobs: the UI calls tick(seconds) with real elapsed play time (pause it during narration); headless runs add opts.turnSec per turn
 function tick(dt){if(!G||G.over||G.phase!=='turn')return;G.clock+=dt;if(!G.q)hook('tick');flow();if(typeof refresh==='function'&&!UI.sim)refresh()}
-function describeMove(m){if(!m)return '';switch(m.a){case 'dual':return `dual cut ${VN(m.v)}${m.v2!=null?'/'+VN(m.v2):''} at ${SP(ownerOf(m.st)).nm} stand ${m.st+1} slot${m.ks.length>1?'s':''} ${m.ks.map(k=>k+1).join(',')}${m.tool?' with '+(m.tool==='dd'?'Two-Prong Tester':EQUIP[m.tool]?EQUIP[m.tool].n:'Fork Tester'):''}${m.own==='flip'?' using your flipped wire':''}`;
+function describeMove(m){if(!m)return '';switch(m.a){case 'dual':return `dual cut ${VN(m.v)}${m.v2!=null?'/'+VN(m.v2):''} at ${SP(ownerOf(m.st)).nm} stand ${m.st+1} slot${m.ks.length>1?'s':''} ${m.ks.map(k=>k+1).join(',')}${m.tool?' with '+(m.tool==='dd'?'Two Prongs':EQUIP[m.tool]?EQUIP[m.tool].n:'Fork Tester'):''}${m.own==='flip'?' using your flipped wire':''}`;
   case 'solo':return `solo cut ${VN(m.v)}${m.ep?' (Pair Snip)':''}${m.flip?' including your flipped wire':''}`;case 'reveal':return 'reveal your reds';case 'eq':return 'use '+EQUIP[m.id].n;case 'item':return 'use '+ITEMS[m.k].n;
   case 'multi':return `point at ${m.tg.length} wires (${m.kind})`;case 'q':return 'answer: '+(G.q&&G.q.opts[m.i]?G.q.opts[m.i].l:m.i);default:return m.a}}

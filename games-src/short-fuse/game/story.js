@@ -23,7 +23,7 @@ const STORY={
    name:[1,'brix','Say a number','Now tap your own 6 to say "6".'],
    hit:[1,'brix','Clean cut','Match: both 6s cut; one cut per turn, and Fuse Pinch unlocks.'],
    crew1:[2,'brix','Crew turns','One cut per turn, clockwise: Teal, then Plum, played theirs.'],
-   probe:[2,'brix','Two-Prong Tester','Crew played; tap your Two-Prong Tester: once per job, two wires.'],
+   probe:[2,'brix','Two Prongs','Crew played; tap your Two Prongs: once per job, two wires.'],
    wrong1:[2,'brix','A wrong guess','No clue is sure here, so guess: tap Plum\'s second wire.'],
    wrong1b:[2,'brix','Two wires','Now tap his third wire too: the probe covers both.'],
    wrong2:[2,'brix','Say a number','Say 6, a risky guess: nothing proves either is a 6.'],
@@ -59,7 +59,7 @@ STORY.coach={
  crew2:['brix','Crew teamwork','Your crew plays by the same rules. They guess from tokens and sort order too.'],
  check:['brix','All four done','All four are cut, so the green check goes up.'],
  gear:['brix','Gear unlocked','Fuse Pinch is ready. Tap it to restore one fuse step.'],
- probe:['brix','Two-Prong Tester','Your trick, once per job. Point at two wires and say one number. It hits if either matches.'],
+ probe:['brix','Two Prongs','Your trick, once per job. Point at two wires and say one number. It hits if either matches.'],
  yellow:['brix','Yellow wires','Quill loves yellow. A yellow only matches a yellow. You must hold one to say it.'],
  rmiss:['quill','Even they slip','Ha! Your crew burned a fuse step. Check the token it left.'],
  red:['quill','Never red','Never point at red. A hand of only reds shows itself.'],
@@ -68,4 +68,4 @@ STORY.coach={
 STORY.later={goal:'The goal: cut every wire together before the fuse runs out.',mine:'Your stand is face up to you, sorted low to high.',crew:'The crew\'s wires are hidden from you, and yours from them.',fuse:'A miss burns a fuse step. None left, or a red wire, and it explodes.',
  token:'Everyone starts by showing one wire with a token.',tokens2:'Tokens are clues the whole crew shares.',point:'A turn. Point at a crew wire, then name a number you hold.',hit:'A hit cuts both wires.',miss:'A miss burns the fuse. A token shows the true number.',
  solo:'Solo cut. If you hold every wire left of a number, cut them alone.',crew1:'The computer crew can solo cut too.',crew2:'The computer crew guesses from tokens and sort order.',check:'All four of a number cut? A green check goes up.',
- gear:'Gear cards unlock when two of their number are cut. One use each.',probe:'Two-Prong Tester: point at two wires, say one number, once per job.',yellow:'Yellow only matches yellow. You must hold one to say it.',red:'Never point at a red wire. A hand of only reds reveals itself.',rmiss:'A computer crewmate can miss too. The miss burns the fuse the same way.'};
+ gear:'Gear cards unlock when two of their number are cut. One use each.',probe:'Two Prongs: point at two wires, say one number, once per job.',yellow:'Yellow only matches yellow. You must hold one to say it.',red:'Never point at a red wire. A hand of only reds reveals itself.',rmiss:'A computer crewmate can miss too. The miss burns the fuse the same way.'};

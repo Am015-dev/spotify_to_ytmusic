@@ -189,7 +189,7 @@ function sampleMasks(K,Z){if(Z._masks)return Z._masks;const base=new Int32Array(
   if(!out.length)out.push(Int32Array.from(base));Z._masks=out;return out}
 function pHolds(masks,seat,mask){let n=0;for(const m of masks)if(m[seat]&mask)n++;return n/masks.length}
 function myTools(K){const me=K.seats[K.seat];const it=me.ch&&typeof CHARS!=='undefined'&&CHARS[me.ch]?CHARS[me.ch].item:null;return {dd:it==='dd'&&!me.chUsed&&!me.noItem&&!me.chDown}}
-// my best single dual cut (or Two-Prong Tester) of value v, from my own knowledge
+// my best single dual cut (or Two Prongs) of value v, from my own knowledge
 function bestFor(K,Z,v,tools){const code=CODE(v);const R=(K.tot[v]||0)-(K.cut[v]||0);const held=heldCounts(K)[v]||0;if(held&&held===R&&(R===2||R===4))return {p:1,pr:0,solo:1};
   const flipJob=K.rules.includes('flip');let best={p:0,pr:0};
   for(const st of K.stands){if(st.mine)continue;const cells=[];st.slots.forEach((x,k)=>{if(x.cut||(x.flip&&flipJob))return;cells.push([k,pAt(Z,st.i,k,code),pAt(Z,st.i,k,14)])});

@@ -1,9 +1,6 @@
 # Short Fuse research notes
 
-Our own notes and generators, written while researching the rules:
-- `card-notes.txt`: a paraphrase of every mission card's setup and special rules.
-- `gen/missions.py`, `gen/cards.py`: build `../missions.json`, `../equipment.json` and `../characters.json`.
-
-The official rulebook, FAQ, card scans and publisher pages aren't copied here, because they're the publisher's copyrighted files. Get them from the sources:
-- Rulebook PDF: (source kept in the private research repo)
-- Official FAQ files: (source kept in the private research repo)
+The rules research lives in `../rules-notes.md` (rules, component counts, every number) and `../sources.md`.
+The job list is our own design: `../game/tools/jobs_src.py` is its source and writes `../missions.json`.
+Card-by-card notes of the original's missions, gear and crew were deleted on 20 Nov 2026 (copy audit): we keep the rules
+and the component structure (`../COMPONENTS.md`), not the authored content.

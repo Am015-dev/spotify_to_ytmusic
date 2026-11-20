@@ -42,7 +42,7 @@ The catalogue page itself returns 403 to automated fetches and its XML API now n
 | "≠" token | 1 | for the different-pair equipment (#1) |
 | Surprise boxes | 5 | missions 9–19, 20–30, 31–42, 43–54, 55–66 |
 | Resealable bags | 8 | |
-| Hero standee | 1 | used only in mission 66 |
+| Hero standee | 1 | used only in job 64 (Bunker Raid) |
 | Rulebook | 1 | has 3 blank spots (A, B, C) where rule stickers from the boxes are stuck later |
 
 ### 1.2 Wire tiles [C]
@@ -89,7 +89,7 @@ Model it as an integer "fuse" counter:
 * Each "advance" step does fuse −= 1. **At fuse = 0 the bomb explodes.** So with N players the team survives N−1 advances, and the Nth one ends the game.
 * "Move back" steps do fuse += 1. The maximum is 6, the purple segment. **[G]**: we assume nothing can go past 6, and that ordinary missions cap at 5 as the TTS script does. The card text never says whether the rewind equipment can go past the starting segment, so allow it up to 6.
 
-This agrees with the Tabletop Simulator script (Brawlboxgaming): position = player count, −1 per mistake, 0 = "KABOOM", missions 41/55/60/62 set to 1, mission 51 with 5 players set to 6. An open-source implementation uses max = player count, which is the same thing. A review's phrase "as many mistakes as players" is consistent if "mistakes" counts the fatal one.
+This agrees with two independent implementations: position = player count, −1 per mistake, 0 = "KABOOM"; a job may start the fuse shorter or longer (our jobs 40, 42, 50, 59, 63). An open-source implementation uses max = player count, which is the same thing. A review's phrase "as many mistakes as players" is consistent if "mistakes" counts the fatal one.
 
 ---
 
@@ -295,11 +295,11 @@ Completing a challenge discards it and moves the dial back 1 (M55, M60).
 * **×1/×2/×3 tokens** (M24, M40): "this value appears 1/2/3 times on this stand, counting cut wires". A ×2 or ×3 token may sit on any of the wires of that value. These tokens never go in front of a red wire. With the sticky note they may tag a cut wire.
 * **X tokens** (M20, M35): mark the one unsorted wire at the far right of a stand. No equipment or personal item can target or detect that wire.
 
-### 8.5 Oxygen (M44, 49, 54, 63)
+### 8.5 Oxygen (our jobs 45, 48, 57, 61)
 
 Paying oxygen is a precondition for attempting a cut. Each mission uses its own economy; see the per-mission entries. Being unable to pay means skipping the turn and advancing the dial 1. If you can pay, you must play (FAQ M54/63). Voluntary passing is allowed in M44 and M49, and costs 1 dial step (FAQ).
 
-### 8.6 Robot (M43, 53, 59)
+### 8.6 Robot (our jobs 43, 49, 52)
 
 A standee moves along the 1–12 board track, or along a line of Number cards in M59. See each mission.
 

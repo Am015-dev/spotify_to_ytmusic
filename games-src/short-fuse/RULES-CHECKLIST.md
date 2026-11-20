@@ -12,7 +12,7 @@ Short Fuse adapts a real-time-free co-op bomb-defusal wire game, so the numbered
 3. In play every red counts as the same value "red" and every yellow as "yellow": a red 7.5 is never a 7.
 4. There are 26 info tokens: two for each value 1 to 12, plus two yellow.
 5. There are 12 base equipment cards, one per value 1 to 12, each unlocking after the first 2 wires of its value are cut.
-6. There are 5 base character cards, one of them the Captain, and every one carries the Two-Prong Tester.
+6. There are 5 base character cards, one of them the Captain, and every one carries the Two Prongs.
 7. The campaign has 66 missions, and the 8 of the base box can be played with 2, 3, 4 or 5 players.
 
 ## 2. Setup
@@ -21,7 +21,7 @@ Short Fuse adapts a real-time-free co-op bomb-defusal wire game, so the numbered
 9. Stands per player, 3 players: the Captain takes 2 stands, each other player 1.
 10. Stands per player, 4 and 5 players: everyone takes 1 stand.
 11. There are 4 stands in a 2, 3 or 4 player game and 5 stands in a 5 player game.
-12. Job 1 uses only the blue wires 1 to 7 (28 wires): no red and no yellow.
+12. Job 1 uses only the blue wires 1 to 5 (20 wires): no red and no yellow.
 13. Job 2 uses blue 1 to 9 plus 4 yellow wires drawn only from yellow 1.1 to 8.1 (40 wires).
 14. Job 3 uses blue 1 to 11 plus 1 red wire drawn only from red 2.5 to 10.5 (45 wires).
 15. Mission 4 uses all 48 blue wires plus 1 red and 2 yellow wires "x N" (51 wires) and puts N markers on the board, blank side up, showing exactly the values in play.
@@ -112,7 +112,7 @@ Short Fuse adapts a real-time-free co-op bomb-defusal wire game, so the numbered
 79. Card 2: a 2-stand player puts the incoming wire on the stand the outgoing wire left.
 80. Card 3 (Fork Tester): name a number and point at 3 wires on one teammate stand; it works if any of them matches. *(a two-wire attempt is rejected first)*
 81. Card 3: if none of the 3 matches the fuse advances 1 and the teammate tags one of the three with its true value.
-82. Cards 3, 5 and the Two-Prong Tester can never name yellow.
+82. Cards 3, 5 and the Two Prongs can never name yellow.
 83. Card 4 (Chalk Mark): put an info token with the true value in front of one of your own blue wires (any player, any time).
 84. Card 4: only on a blue wire of your own (not red, not yellow, not a teammate's).
 85. Card 5 (Stand Scanner): name a number and point at a teammate's whole stand; it works if any wire there matches.
@@ -141,7 +141,7 @@ Short Fuse adapts a real-time-free co-op bomb-defusal wire game, so the numbered
 105. Pair Snip (9-9): on your turn solo-cut 2 identical wires from your hand even if more of that value remain uncut elsewhere.
 106. Number Purge (10-10) is instant: it draws a random info token and everyone cuts every remaining wire of that value they hold.
 107. Long Grabber (11-11): point at a teammate's wire and take it unseen into your hand in sorted position; everyone sees where it left and arrived.
-108. Card 10 can be combined with the Two-Prong Tester: two values against two wires; either value on either wire is a hit.
+108. Card 10 can be combined with the Two Prongs: two values against two wires; either value on either wire is a hit.
 109. Card 22 (Only-One Pin) may go on a wire that is already cut. *("cut or not")*
 110. Pair Snip cuts exactly 2 identical wires even when you hold all 4 of the value.
 111. Blast Blanket with a probe: if every pointed wire is red nothing goes off, and no token is placed.
@@ -149,17 +149,17 @@ Short Fuse adapts a real-time-free co-op bomb-defusal wire game, so the numbered
 113. Card 11 (Hand-Off) cannot hand the turn to a player with no wires left.
 114. Card 7 (Spare Batteries) only works on characters whose personal item has been used.
 
-## 11. Characters: the Two-Prong Tester
+## 11. Characters: the Two Prongs
 
-115. Two-Prong Tester: name a number and point at 2 wires on one teammate's stand (they need not be adjacent); it works if at least one is that number.
-116. Two-Prong Tester: if both wires match the teammate picks which one is cut, and says nothing more.
-117. Two-Prong Tester: if neither matches the fuse advances 1 and the teammate puts ONE info token in front of ONE of the two wires of their choice.
-118. Two-Prong Tester: if exactly one pointed wire is red and the other is not the value, no explosion: the fuse advances 1 and the token goes on the non-red wire.
-119. Two-Prong Tester: if one pointed wire is red and the other matches, the cut simply works (no explosion).
-120. Two-Prong Tester: if both pointed wires are red the bomb explodes.
-121. The Two-Prong Tester never names yellow.
+115. Two Prongs: name a number and point at 2 wires on one teammate's stand (they need not be adjacent); it works if at least one is that number.
+116. Two Prongs: if both wires match the teammate picks which one is cut, and says nothing more.
+117. Two Prongs: if neither matches the fuse advances 1 and the teammate puts ONE info token in front of ONE of the two wires of their choice.
+118. Two Prongs: if exactly one pointed wire is red and the other is not the value, no explosion: the fuse advances 1 and the token goes on the non-red wire.
+119. Two Prongs: if one pointed wire is red and the other matches, the cut simply works (no explosion).
+120. Two Prongs: if both pointed wires are red the bomb explodes.
+121. The Two Prongs never names yellow.
 122. A personal item works once per mission (the character card turns face down).
-123. Two-Prong Tester: a teammate with 2 stands is probed on ONE stand at a time (both wires on the same stand). *(a single move names a single stand)*
+123. Two Prongs: a teammate with 2 stands is probed on ONE stand at a time (both wires on the same stand). *(a single move names a single stand)*
 124. The new characters (Pocket Roll Call, Swap Bag, Fork Tester, Either-Or Meter) appear from mission 31, for non-captains only; the Captain keeps the Captain card.
 125. The Pocket Roll Call character item works like card 8 (once per mission, any time).
 126. The Pocket Fork Tester item works like card 3 (3 wires, your turn, once per mission).

@@ -1,7 +1,7 @@
 // ===================== Short Fuse: texts for the page (all our own words) =====================
 // One short briefing per job for the mission board: who called the crew, and where.
 const BRIEFS={
-1:"Day one at the depot. Brix rolls in a practice charge. Seven blue numbers, no tricks.",
+1:"Day one at the depot. Brix rolls in a practice charge. Five blue numbers, no tricks.",
 2:"Same practice charge, now with yellow tape on four leads. Yellow only matches yellow.",
 3:"The trainers hide one red lead in the bundle. Touch it and the paint charge pops. Your first gear arrives.",
 4:"A real call-out under the old cinema. All the blues, a low red and two high yellows. Nothing new.",
@@ -53,7 +53,7 @@ const BRIEFS={
 50:"The crew plays dares to buy time. Meet one and the fuse turns back.",
 51:"Every finished number knocks a new rule into place. Do not get boxed in.",
 52:"A robot rolls along a road of numbers. It only goes forward.",
-53:"No tokens at all, but every two-prong tester works every turn.",
+53:"No tokens at all, but the Two Prongs work every single turn.",
 54:"Quirk cards again, and they move around the table.",
 55:"The tower's first floor is a giant abacus. Every cut is a sum.",
 56:"Every crew member gets one wire flipped blind to the far right.",
@@ -107,7 +107,7 @@ const RULE_DOC={
  robotFuse:['robot','Robot fuse','The robot is the fuse: it steps forward after cuts. At 12, boom.'],
  redTide:['drop','Red tide','Reds leak from the pile into hands during the job.'],
  challenges:['trophy','Dares','Meet a dare card to turn the fuse back one step.'],
- unlimitedDD:['probe','Probe party','Every Two-Prong Tester works every turn.'],
+ unlimitedDD:['probe','Probe party','Every Two Prongs card works every turn.'],
  robotLine:['robot','Robot guide','Move the robot forward along the number line. Then cut the value under it.'],
  meteor:['star','Meteors','Each finished meteor value turns the fuse back a step.'],
  hotPotato:['cards','Hot potato','Cut only values on your cards. Hand one card on after each turn.'],
@@ -116,7 +116,7 @@ const TOKFAM_DOC={par:'Info tokens show only EVEN or ODD.',cnt:'Count tokens (x1
 const INFO_DOC={rand:'Opening tokens are placed at random.',none:'No opening tokens.',neg:'Opening tokens say two values you do NOT hold.',false:'Opening tokens are false.'};
 // why the job was lost, in plain words, with a tip
 function lossHelp(why){why=String(why||'');
-  if(/fuse burnt/.test(why))return ['The fuse burnt down.','Every miss burns one step. The last step is the explosion. Point at wires the crew knows more about (tokens, sorted order). Use a Two-Prong Tester on a 50/50. Keep Fuse Pinch for the last step.'];
+  if(/fuse burnt/.test(why))return ['The fuse burnt down.','Every miss burns one step. The last step is the explosion. Point at wires the crew knows more about (tokens, sorted order). Use a Two Prongs on a 50/50. Keep Fuse Pinch for the last step.'];
   if(/pointed at.*red|red wire/.test(why))return ['Someone pointed at a red wire.','Red wires go off when pointed at. Watch the red markers on the track. They show which values a red sits between. A wire whose neighbours are close to a red value is risky.'];
   if(/clock|time ran out|bus ran out|flooded/.test(why))return ['Time ran out.','In timed jobs, quick certain cuts are worth more than careful 50/50s. Solo cuts and probes save turns.'];
   if(/robot reached 12/.test(why))return ['The robot reached the end.','Misses push the robot two spaces. Cutting the value it stands on pulls it back one.'];
@@ -164,7 +164,7 @@ const RULES_HTML=`
 <h3>No free talk</h3><p>You may not tell crewmates what you hold. The page enforces that. You can share only through moves, tokens and required answers.</p>
 <h3>The fuse</h3><p>It starts with one step per player. Some jobs start lower. It can never go above 6. A miss burns one step. At zero the bomb explodes.</p>
 <h3>Equipment</h3><p>From job 3, the board holds one locked gear card per player. Each card unlocks when two wires of its number are cut. Double cards need all four. It then works once. "Any time" cards work even when it is not your turn. Never use one in the middle of a question. "Your turn" cards are part of your action. Open <b>Gear</b> to read them all.</p>
-<h3>Crew cards and personal tools</h3><p>Everyone has a crew card with a personal tool. It is usually a <b>Two-Prong Tester</b>. Use it once per job. Point at two wires on one crewmate stand and say a number. It works if either matches. One red plus one other: no explosion. The token goes on the other wire. Both red: boom. From job 31, new crew members bring other tools.</p>
+<h3>Crew cards and personal tools</h3><p>Everyone has a crew card with a personal tool. It is usually a <b>Two Prongs</b>. Use it once per job. Point at two wires on one crewmate stand and say a number. It works if either matches. One red plus one other: no explosion. The token goes on the other wire. Both red: boom. From job 31, new crew members bring other tools.</p>
 <h3>Special jobs</h3><p>From job 9, most jobs add a twist. An order, a timer, limits, robots, oxygen... The <b>Job</b> button opens the job card. It shows each special rule as a picture and a line.</p>
 <h3>On this page</h3><ul><li>The <b>dock</b> is beside the board, or under it on a phone. It always says what the game is waiting for. It has a button for every option.</li>
 <li>Tap a <b>glowing wire</b> on the table to pick it. Then tap the value. Then tap the big button.</li>

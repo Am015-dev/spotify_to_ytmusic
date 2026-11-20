@@ -9,8 +9,8 @@ J=[]
 def job(n,nm,brief,text,rules=None,red=None,yel=None,two='auto',info=None,tok=None,audio=False,**s):
   J.append(dict(n=n,nm=nm,brief=brief,text=text,rules=rules or [],red=red,yel=yel,two=two,info=info,tok=tok,audio=audio,s=s))
 # ---------- depot training (1-3) and first call-outs (4-8) ----------
-job(1,'First Snip','Day one at the depot. Brix rolls in a practice charge. Seven blue numbers, no tricks.',
- 'Training. Blue wires 1 to 7 only, no gear. Learn the dual cut and the solo cut.',blue=7,eq={'n':0},two=None)
+job(1,'First Snip','Day one at the depot. Brix rolls in a practice charge. Five blue numbers, no tricks.',
+ 'Training. Blue wires 1 to 5 only, no gear. Learn the dual cut and the solo cut.',blue=5,eq={'n':0},two=None)
 job(2,'Yellow Tape','Same practice charge, now with yellow tape on four leads. Yellow only matches yellow.',
  'Blue 1 to 9, plus four yellow wires from 1.1 to 8.1. A yellow is just "yellow". To cut one, you must hold one. No gear.',
  yel=ex(4,cand=[1.1,8.1]),blue=9,eq={'n':0},two=None)
@@ -164,8 +164,8 @@ job(51,'Domino Rules','Every finished number knocks a new rule into place. Do no
 job(52,'Robot Road','A robot rolls along a road of numbers. It only goes forward.',
  'Number cards in a line with the robot on the 7. Move it forward, never back, to a value you hold. Then cut that value. Stuck: skip, burn a step, turn it round.',
  red=ex(1),rules=[{'k':'robotLine'}])
-job(53,'Probe Frenzy','No tokens at all, but every two-prong tester works every turn.',
- 'No info tokens at all. Every Two-Prong Tester works every turn. Base crew only.',
+job(53,'Probe Frenzy','No tokens at all, but the Two Prongs work every single turn.',
+ 'No info tokens at all. Every crew card\'s Two Prongs work every turn. Base crew only.',
  red=ex(1),yel=ex(2),info='none',tok='none',chars='base_only',eq={'ex':['eq4','eq7']},rules=[{'k':'unlimitedDD'}])
 job(54,'Quirk Swap','Quirk cards again, and they move around the table.',
  'Each player gets a restriction (A to E). Each round the crew may rotate them all. Burn a step to swap yours for a random F-L card. If nobody can play for a whole round, boom.',

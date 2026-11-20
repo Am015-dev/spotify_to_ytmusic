@@ -45,11 +45,11 @@
   {
    "number": 1,
    "name": "First Snip",
-   "brief": "Day one at the depot. Brix rolls in a practice charge. Seven blue numbers, no tricks.",
-   "text": "Training. Blue wires 1 to 7 only, no gear. Learn the dual cut and the solo cut.",
+   "brief": "Day one at the depot. Brix rolls in a practice charge. Five blue numbers, no tricks.",
+   "text": "Training. Blue wires 1 to 5 only, no gear. Learn the dual cut and the solo cut.",
    "setup": {
     "n": 1,
-    "blue": 7,
+    "blue": 5,
     "eq": {
      "n": 0
     }
@@ -1799,8 +1799,8 @@
   {
    "number": 53,
    "name": "Probe Frenzy",
-   "brief": "No tokens at all, but every two-prong tester works every turn.",
-   "text": "No info tokens at all. Every Two-Prong Tester works every turn. Base crew only.",
+   "brief": "No tokens at all, but the Two Prongs work every single turn.",
+   "text": "No info tokens at all. Every crew card's Two Prongs work every turn. Base crew only.",
    "setup": {
     "n": 53,
     "red": {
