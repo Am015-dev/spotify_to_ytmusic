@@ -190,7 +190,8 @@ function bfFlip(el,old){if(!bfAnimOK()||!el||!old)return;const r=bfR(el);if(!r)r
 function bfShow(k){const el=bfEl(k);if(el)el.classList.remove('hid');BF.hide.delete(k)}
 // floating numbers where points are earned or lost
 function bfPop(txt,at,cls,big){if(!at||!BF.fl)return;const d=document.createElement('div');d.className='bf-pop '+(cls||'');if(big)d.classList.add('big');d.textContent=txt;
-  d.style.left=(at.left+at.width/2)+'px';d.style.top=(at.top+at.height/2)+'px';BF.fl.appendChild(d);
+  d.style.left=(at.left+at.width/2)+'px';d.style.top=(at.top+at.height/2)+'px';BF.fl.appendChild(d);{const w=d.getBoundingClientRect().width,cx=at.left+at.width/2,vw=innerWidth;if(w>vw-8)d.style.fontSize='20px';const w2=d.getBoundingClientRect().width;d.style.left=Math.max(w2/2+4,Math.min(vw-w2/2-4,cx))+'px'}   // never cut off at a screen edge
+  
   if(!bfAnimOK()){setTimeout(()=>d.remove(),10);return}
   const wordy=/[a-z]{2}/i.test(txt);if(wordy){d.classList.add('wordy');d.animate([{transform:'translate(-50%,-50%) scale(.6)',opacity:0},{transform:'translate(-50%,-90%) scale(1)',opacity:1,offset:.06},{transform:'translate(-50%,-100%) scale(1)',opacity:1,offset:.92},{transform:'translate(-50%,-110%) scale(1)',opacity:0}],{duration:bfReadMs(txt),easing:'ease-out',fill:'forwards'}).finished.then(()=>d.remove(),()=>d.remove());return}
   bfTrack(d.animate([{transform:'translate(-50%,-50%) scale(.4)',opacity:0},{transform:'translate(-50%,-80%) scale(1.25)',opacity:1,offset:.25},{transform:'translate(-50%,-160%) scale(1)',opacity:0}],{duration:bfD(big?1500:1150),easing:'ease-out',fill:'forwards'})).finished.then(()=>d.remove(),()=>d.remove())}
@@ -210,7 +211,7 @@ function bfBanTap(){const d=BF.banOn;if(d&&d.__end&&Date.now()-(d.__t0||0)>0)d._
 function bfTurn(t){BF.say=t;try{bfDraw()}catch(e){}}   // the instruction line announces the turn (a floating pill failed the text-topmost check and covered the score chips)
 // one idea at a time, in two short lines at most, above the action (guided game only, each once)
 const BF_TIPS={nofit:'Red ✗ colours fit no rack.',slide:'Leftovers slid to the middle.',tiling:'Each full rack sends one tile to the wall!',chain:'Touching tiles score more!',
-  floor:'Extra tiles break: minus points.',sun:'☀ takes a floor space, but you start next.',bonus:'Full column +7 at the end!',
+  floor:'Extra tiles break: minus points.',sun:'Sun token: −1, you start next round.',bonus:'Full column +7 at the end!',
   end:'A full wall row ends the game.',keep:'Unfinished racks wait for next round.'};
 function bfTipSeen(k){try{return (localStorage.getItem('sgz_tips')||'').split(',').includes(k)}catch(e){return false}}
 function bfTipMark(k){try{const a=(localStorage.getItem('sgz_tips')||'').split(',').filter(Boolean);if(!a.includes(k)){a.push(k);localStorage.setItem('sgz_tips',a.join(','))}}catch(e){}}
@@ -270,9 +271,9 @@ async function bfTake(x){const S=BF.disp;const a=x.src<0?S.ctr:S.fac[x.src];if(!
   // 4. overflow crashes onto the breakage line
   const brk=got.filter(o=>o.brk);const pen=floorPenalty(p.floor.length)-floorPenalty(f0);
   if(brk.length||hadSun){if(focus){for(const o of brk){const el=o.to&&bfEl(o.to);if(el){el.classList.remove('crash');void el.offsetWidth;el.classList.add('crash')}}
-      const fr=bfR(bfQ('.bf-fl'));if(pen)bfPop(String(pen).replace('-','−'),fr,'bad',true);const me=bfQ('.bf-me');if(me&&brk.length){me.classList.remove('shake');void me.offsetWidth;me.classList.add('shake')}}
+      const fr=bfR(bfQ('.bf-fl'));if(pen)bfPop((brk.length?brk.length+' to floor ':'')+String(pen).replace('-','−'),fr,'bad',true);const me=bfQ('.bf-me');if(me&&brk.length){me.classList.remove('shake');void me.offsetWidth;me.classList.add('shake')}}
     else if(pen)bfChipPop(x.p,String(pen).replace('-','−'),'bad');
-    if(brk.length)sfx('floor');if(hadSun&&!UI.tut&&!bfTipSeen('sunfloor')){bfTipMark('sunfloor');BF.say=focus&&pl&&pl.human?'☀ The Sun token goes to your floor (−1)':`☀ The Sun token goes to ${pl.nm}'s floor (−1)`;bfDraw();await bfWaitR(1500)}
+    if(brk.length)sfx('floor');if(hadSun&&!UI.tut){const mine=focus&&pl&&pl.human,k=mine?'sunfloor':'sunrival';if(!bfTipSeen(k)){bfTipMark(k);BF.say=mine?'Sun token: −1, you start next round':`${pl.nm} took the Sun: −1, starts next round`;bfDraw();await bfWaitR(1900)}}
     if(hadSun){sfx('sun');if(focus)bfPop('☀ you start next round',bfR(bfSlot(sunKey)),'good');if(focus&&pl&&pl.human)bfTip('sun')}if(brk.length&&focus&&pl&&pl.human)bfTip('floor');await bfWait(focus?(brk.length?820:420):(brk.length?300:0))}
   else if(!focus){bfChipPop(x.p,x.line<5?'row '+(x.line+1)+(p.lines[x.line].length===cap(x.line)?' full':''):'',x.line<5?'':'bad');await bfWait(100)}
   if(focus&&pl&&pl.human)BF.seen.took=1}
@@ -373,7 +374,7 @@ function bfBoardHTML(S,p,hp){const pi=p.i,live=!BF.busy;const sel=live&&hp&&hp.i
 function bfProj(S,p){let pts=0;if(!S.ex.gray){const w=p.wall.map(r=>r.slice());for(let r=0;r<5;r++){const L=p.lines[r];if(L.length!==cap(r))continue;const lc=lineColour(L);if(lc<0)continue;const c=WALLCOL(lc,r);if(w[r][c]>=0)continue;pts+=adjPts2(w,r,c);w[r][c]=lc}}
   return Math.max(0,p.score+pts+floorPenalty(Math.min(7,p.floor.length)))}
 function bfTopHTML(S){const s=BF.busy?BF.actor:sideToAct();
-  return `<button class="bf-ib" data-bf="menu" aria-label="Menu">${IC('menu')}</button><div class="bf-chips">${S.pl.map(p=>`<button class="bf-chip${p.i===s?' cur':''}" data-bfchip="${p.i}" style="--pc:${PCOL[p.i]}" aria-label="${esc(p.nm)}: ${p.score} points">${(()=>{const pc=!isYou(p.i)&&typeof sgPicOf==='function'&&sgPicOf(p.nm);return pc?`<i class="pic" style="background-image:url(media/${pc})"></i>`:'<i></i>'})()}<b>${isYou(p.i)?'You':S.pl.length>=4?'':esc(p.nm)}</b>${S.markerIn===p.i?`<em>${bfSun()}</em>`:''}<span class="bf-sc" data-bfsc="${p.i}">★${p.score}</span>${(()=>{if(BF.busy||S.phase!=='offer'||G.over)return '';const v=bfProj(S,p);return v===p.score?'':`<span class="bf-pj ${v<p.score?'dn':'up'}">${v<p.score?'−'+(p.score-v):'+'+(v-p.score)}</span>`})()}</button>`).join('')}</div><span class="bf-sack" title="Tiles left in the clay sack" aria-label="${G.bag.length} tiles left in the sack"><i class="sg-back" aria-hidden="true"></i><b>${G.bag.length}</b></span><button class="bf-ib" data-gx="rulesd" aria-label="How to play">${IC('rules')}</button>`}
+  return `<button class="bf-ib" data-bf="menu" aria-label="Menu">${IC('menu')}</button><div class="bf-chips">${S.pl.map(p=>`<button class="bf-chip${p.i===s?' cur':''}" data-bfchip="${p.i}" style="--pc:${PCOL[p.i]}" aria-label="${esc(p.nm)}: ${p.score} points${S.markerIn===p.i?', has the Sun token: goes first next round':''}">${(()=>{const pc=!isYou(p.i)&&typeof sgPicOf==='function'&&sgPicOf(p.nm);return pc?`<i class="pic" style="background-image:url(media/${pc})"></i>`:'<i></i>'})()}<b>${isYou(p.i)?'You':S.pl.length>=4?'':esc(p.nm)}</b>${S.markerIn===p.i?`<em title="Sun token: goes first next round">${bfSun()}</em>`:''}<span class="bf-sc" data-bfsc="${p.i}">★${p.score}</span></button>`).join('')}</div><span class="bf-sack" title="Tiles left in the clay sack" aria-label="${G.bag.length} tiles left in the sack"><i class="sg-back" aria-hidden="true"></i><b>${G.bag.length}</b></span><button class="bf-ib" data-gx="rulesd" aria-label="How to play">${IC('rules')}</button>`}
 function bfWinLine(){if(!G.over)return '';const w=G.over.win.map(i=>P(i));const sc=G.over.scores.map(s=>s.s.total);const you=w.some(p=>isYou(p.i));
   return (you?(w.length>1?'You share the win':'You win'):w.map(p=>p.nm).join(' & ')+(w.length>1?' share it':' wins'))+' '+sc.slice(0,2).join(' to ')+'!'}
 function bfHintHTML(S,hp){let say='',chip='',tg='';const live=!BF.busy;
@@ -382,7 +383,7 @@ function bfHintHTML(S,hp){let say='',chip='',tg='';const live=!BF.busy;
   else if(hp&&G.phase==='wall')say='Tap a glowing wall space';
   else if(hp&&UI.sel){const a=UI.sel.src<0?G.ctr:G.fac[UI.sel.src]||[];const n=a.filter(t=>t===UI.sel.c||(t===PRISM&&UI.sel.j)).length;chip=`<span class="bf-n">${bfUse(UI.sel.c)}<b>×${n}</b></span>`;say=movesFor(UI.sel).every(m=>m.line===5)?'No room: tap the floor':'Tap a glowing rack';
     const nj=a.filter(t=>t===PRISM).length;if(UI.sel.c<NC&&nj)tg=`<button class="bf-pz${UI.sel.j?' on':''}" data-gxh-avoid data-bf="prism" aria-pressed="${!!UI.sel.j}" aria-label="Also take the prism tiles">${bfUse(PRISM)}${UI.sel.j?'✓':'✗'}</button>`}
-  else if(hp){const allBad=BF.tbl&&!BF.tbl.querySelector('.bf-t[role=button]:not(.nofit)');say=(G.pl.filter(q=>q.human).length>1&&!NET.on?hp.nm+': ':'')+(allBad?'Nothing fits: tap the floor':'Your turn: tap a colour');}
+  else if(hp){const allBad=BF.tbl&&!BF.tbl.querySelector('.bf-t[role=button]:not(.nofit)');say=(G.pl.filter(q=>q.human).length>1&&!NET.on?hp.nm+': ':'')+(allBad?'Nothing fits: tap any tile':'Your turn: tap a colour');}
   else{const s=sideToAct();say=s>=0?(NET.on&&P(s).human?'Waiting for '+P(s).nm+'…':P(s).nm+' is choosing…'):''}
   if(BF.tip){say=BF.tip;chip='';tg=''}
   return `<span class="bf-say${BF.tip?' bf-tipl':''}">${chip}<span>${esc(say)}</span></span>${tg}${UI.cmp&&UI.cmp.twist&&!G.over?`<button class="bf-bossb" data-gxh-avoid data-bf="boss" aria-label="Read the rule">${/^Rival/.test(UI.cmp.twist.text||'')?'Rival':'Boss'} rule ⓘ</button>`:''}${live&&hp&&!G.over&&!UI.tut?`<span class="bf-bw" data-gxh-avoid><button class="bf-ib bf-bulb gxh-bulb" id="bulbbtn" data-help type="button" aria-label="Hint: what should I do?"></button></span>`:''}${live&&G.over&&BF.resHide&&!UI.tut?`<button class="bf-b" data-gxh-avoid data-bf="res">Result</button>`:''}`}
@@ -427,6 +428,9 @@ function bfStray(){if(typeof tutOn==='function'&&tutOn())return true;if(UI.sel){
   return Date.now()-(BF.tAct||0)<900}
 document.addEventListener('pointerdown',e=>{if(e.target&&e.target.closest&&e.target.closest('.bf-table [data-k],[data-bfrow],.gxt-bub'))BF.tAct=Date.now()},true);
 function bfShake(el){if(!el)return;el.classList.remove('no');void el.offsetWidth;el.classList.add('no')}
+// no rack can take that colour: one tap sends it straight to the floor (a short line says so)
+function bfNoRoom(){if(UI.tut||!UI.sel||G.phase!=='offer'||BF.busy)return;const ms=movesFor(UI.sel);if(!ms.length||!ms.every(m=>m.line===5))return;
+  const fr=bfR(bfQ('.bf-fl'));if(fr)bfPop('No rack fits: to the floor',fr,'bad');go(ms[0])}
 function bfClick(e){if(BF.dragEnd&&Date.now()-BF.dragEnd<450&&!e.__bfdrag)return;const t=e.target;if(t.closest('[data-help]'))return;if(window.__hlpDown&&Date.now()-window.__hlpDown<700){window.__hlpDown=0;return}const a=t.closest('[data-bf]');if(a){e.preventDefault();return bfAct(a.dataset.bf)}
   if(t.closest('[data-a],[data-gx],[data-ui]')){if(BF.menu){BF.menu=false;setTimeout(()=>{if(!BF.busy)bfDraw()},0)}return}
   if(BF.busy){bfSpeedUp();BF.root.classList.toggle('tapfx');return}   // W466: a tap during the rival's move speeds it up (and shows it: the line gets a fast-forward mark)
@@ -444,7 +448,7 @@ function bfClick(e){if(BF.dragEnd&&Date.now()-BF.dragEnd<450&&!e.__bfdrag)return
   if(!tile&&e.clientX!=null&&t.closest('.bf-table')){let bd=1e9,best=null;for(const el of BF.tbl.querySelectorAll('[data-k]:not(.hid)')){const r=el.getBoundingClientRect();if(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom)continue;const v=bfR(el);const d=Math.hypot(v.left+v.width/2-e.clientX,v.top+v.height/2-e.clientY);if(d<bd){bd=d;best=el}}if(best)tile=best}   // F1: a tap inside a tile's 44px box (outside its drawing) still takes it
   const k=tile&&tile.dataset.k;
   if(k&&(k[0]==='f'||k[0]==='c')&&k!=='sun'){const s=slotSel(k);if(s){if(s.c<NC){const ar=s.src<0?G.ctr:G.fac[s.src];if(ar.includes(PRISM))s.j=UI.sel&&UI.sel.src===s.src&&UI.sel.c===s.c?UI.sel.j:1}
-      if(UI.sel&&UI.sel.src===s.src&&UI.sel.c===s.c){UI.sel=null;UI.tgt=null;UI.adv=null;sfx('click');upd();return}UI.sel=null;pickSel(s);return}}
+      if(UI.sel&&UI.sel.src===s.src&&UI.sel.c===s.c){UI.sel=null;UI.tgt=null;UI.adv=null;sfx('click');upd();return}UI.sel=null;pickSel(s);bfNoRoom();return}}
   const src=t.closest('[data-bfsrc]');if(src){const i=+src.dataset.bfsrc;const ar=i<0?G.ctr:G.fac[i];if(ar&&ar.length){const ks=[...new Set(ar)].filter(c=>c<NC);
       if(ks.length===1&&!(UI.sel&&UI.sel.src===i)){UI.sel=null;return pickSel({src:i,c:ks[0],j:ar.includes(PRISM)?1:0})}if(!ks.length&&!(UI.sel&&UI.sel.src===i)){UI.sel=null;return pickSel({src:i,c:PRISM,j:1})}}
     if(UI.sel&&UI.sel.src===i)return;}

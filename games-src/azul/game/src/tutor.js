@@ -33,7 +33,9 @@ function tutBuild(){UI.sel=null;UI.tgt=null;UI.adv=null;UI.hover=null;UI.fx.leng
 
 // ---------------------------------------------------------------- targets on the board-first table
 const tq=s=>typeof bfQ==='function'?bfQ(s):null;
-const tKiln=(src,c)=>()=>{const a=src<0?G.ctr:G.fac[src];const k=a?a.indexOf(c):-1;return k<0?null:tq(`[data-k="${src<0?'c':'f'+src}_${k}"]`)};
+// the glow hugs the drawn tile (never its 44px hit box, which cut the neighbours); you take every tile of that colour
+const tKiln=(src,c)=>()=>{const a=src<0?G.ctr:G.fac[src];const k=a?a.indexOf(c):-1;if(k<0)return null;const e=tq(`[data-k="${src<0?'c':'f'+src}_${k}"]`);const g=e&&(e.querySelector('svg')||e);if(!g)return null;
+  const r=g.getBoundingClientRect();if(r.width<2)return null;const w=Math.max(r.width,34),h=Math.max(r.height,34);return {left:r.left+r.width/2-w/2,top:r.top+r.height/2-h/2,width:w,height:h}};   // (at least 34px, so a small tile is still a fair touch)
 const tRack=r=>()=>tq(`[data-bfrow="${r}"] .bf-rack`);
 const tRow=r=>()=>tq(`[data-bfrow="${r}"]`);
 const tCell=(r,c)=>()=>tq(`[data-s="w0_${r}_${c}"]`);
@@ -47,7 +49,7 @@ function tutSteps(){
   // so the bubble sits in the strip between the table and the racks (rects are shrunk 6px: the kit adds 4px of margin back)
   const sh=e=>{if(!e)return null;const r=e.getBoundingClientRect();if(r.width<2)return null;const d=0,L=r.left+d,T=r.top+d,W=Math.max(1,r.width-2*d),H=Math.max(1,r.height-2*d);return {left:L,top:T,width:W,height:H,right:L+W,bottom:T+H,x:L,y:T,cx:L+W/2,cy:T+H/2}};
   const keepOff=()=>{const out=[];if(G&&(G.ctr.length||G.fac.some(a=>a.length)))out.push(sh(tq('.bf-table')));[0,1,2,3,4].forEach(r=>out.push(sh(tq(`[data-bfrow="${r}"]`))));out.push(sh(tq('.bf-fl')));return out.filter(Boolean)};
-  const pick=(src,c)=>({target:tKiln(src,c),ready:myTurn,avoid:()=>keepOff(),wait:{type:'tap',match:a=>a.k==='pick'&&a.src===src&&a.c===c}});
+  const pick=(src,c)=>({target:tKiln(src,c),pad:3,ready:myTurn,avoid:()=>keepOff(),wait:{type:'tap',match:a=>a.k==='pick'&&a.src===src&&a.c===c}});
   const move=line=>({target:tRack(line),ready:()=>myTurn()&&!!UI.sel,avoid:()=>keepOff(),wait:{type:'tap',match:a=>a.k==='move'&&a.line===line}});
   const look=(target,ready,o)=>Object.assign({target,ready,look:1,avoid:()=>keepOff(),wait:{type:'tap',match:a=>a.k==='look'}},o||{});
     const beat=(n,target,o)=>look(target,atBeat(n),Object.assign({at:n},o||{}));
@@ -59,9 +61,9 @@ function tutSteps(){
     S('rival','Tamsin took four snowflakes. Now tap a red in kiln 3.',pick(2,2)),
     S('blocked','Rack 3 is shut: its wall row has red. Tap rack 4.',move(3)),
     S('middle','Tap a yellow in the middle. First one there gets the Sun.',pick(-1,1)),
-    S('sun','Tap rack 3. The Sun token goes on your floor.',move(2)),
+    S('sun','Sun: −1 on your floor, you start next round. Tap rack 3.',move(2)),
     S('keep','Rack 3 is not full. It keeps its tiles for later.',look(tRack(2),myTurn)),
-    S('again','Tamsin’s leftovers joined the middle. Tap the two yellows.',pick(-1,1)),
+    S('again','Tamsin’s leftovers joined the middle. Tap a yellow: you take both.',pick(-1,1)),
     S('overflow','Rack 3 has one space. The extra yellow falls to the floor.',move(2)),
     S('floor','Floor tiles cost points: −1, −1, −2, −2, −2, −3, −3.',look(()=>tq('.bf-fl'),myTurn)),
     S('last','Tap the snowflake in the middle. It fits rack 1.',pick(-1,4)),
@@ -74,6 +76,11 @@ function tutSteps(){
     S('bonus','Bonus: full row +2, full column +7, all five snowflakes +10.',beat('bonus',()=>tq('.bf-me'))),
     S('win','Most points wins. A tie goes to the most full rows.',beat('final',()=>tq('.bf-me'))),
   ]}
+// what a wrong tap says, per step (never a generic line)
+const TUT_WRONG={goal:'Tap the glowing top wall row to go on.',take:'Tap the glowing red tiles in kiln 1.',rows:'Tap the glowing rack 2.',slide:'Tap the glowing middle to go on.',rival:'Tap the glowing red tiles in kiln 3.',
+  blocked:'Tap the glowing rack 4.',middle:'Tap the glowing yellow in the middle.',sun:'Tap the glowing rack 3.',keep:'Tap the glowing rack 3 to go on.',again:'Tap the glowing yellow in the middle.',
+  overflow:'Tap the glowing rack 3.',floor:'Tap the glowing floor to go on.',last:'Tap the glowing snowflake in the middle.',roundend:'Tap the glowing rack 1.',tiling:'Tap the glowing top row to go on.',
+  chain:'Tap the glowing tile to go on.',alone:'Tap the glowing tile to go on.',floorpen:'Tap the glowing floor to go on.',gameend:'Tap the glowing top row to go on.',bonus:'Tap your glowing board to go on.',win:'Tap your glowing board to go on.'};
 // the rules the guided game teaches, in order (one step each); tutor-e2e.js checks every one is shown by touch
 const TUT_RULES=['goal','take','rows','slide','rival','blocked','middle','sun','keep','again','overflow','floor','last','roundend','tiling','chain','alone','floorpen','gameend','bonus','win'];
 window.__tutSeen=[];
@@ -106,16 +113,16 @@ document.addEventListener('click',e=>{if(!tutOn()||typeof GXT==='undefined'||!GX
 function tutSetup(){try{GX.close()}catch(e){}try{GXH.hide()}catch(e){}
   clearTimeout(aiTimer);aiTimer=null;TUT.at=null;TUT.res=null;TUT.rvi=0;clearTimeout(TUT.rvWait);TUT.rvWait=0;clearInterval(TUT.tick);TUT.tick=setInterval(tutRivalTick,100);TUT.coach=UI.coach;UI.coach=false;UI.tut=1;UI.cg=0;UI.pause=false;window.__tutSeen=[];
   const m=document.getElementById('modal');if(m){m.hidden=true;m.innerHTML='';m.dataset.h=''}
-  window.__tutPh=1;phApply();bfApply();                                  // the board-first table, on any screen
+  document.documentElement.classList.add('sg-tut');window.__tutPh=1;phApply();bfApply();                                  // the board-first table, on any screen
   tutBuild()}
 function tutLeave(){tutRelease();clearInterval(TUT.tick);TUT.tick=0;clearTimeout(TUT.rvWait);TUT.rvWait=0;UI.tut=0;UI.cg=0;UI.coach=TUT.coach;UI.sel=null;UI.tgt=null;UI.adv=null;clearTimeout(aiTimer);aiTimer=null;
   try{if(GXT.running())GXT.stop()}catch(e){}
   try{bfSpeedUp()}catch(e){}BF.q.length=0;BF.gk='';BF.disp=null;BF.resHide=false;BF.menu=false;BF.peek=null;G=null;
-  try{GXH.hide()}catch(e){}window.__tutPh=0;phApply();bfApply();try{resetScene()}catch(e){}}
+  try{GXH.hide()}catch(e){}document.documentElement.classList.remove('sg-tut');window.__tutPh=0;phApply();bfApply();try{resetScene()}catch(e){}}
 // the real game that follows: you against an easy computer, a fresh deal
-function tutRealGame(){tutLeave();try{localStorage.setItem('sgz_guided','1')}catch(e){}UI.setup.np=2;UI.setup.seats=['human','ai'];UI.setup.lv=['easy','easy'];beginGame();UI.modal=null;refresh();try{schedule()}catch(e){}}
+function tutRealGame(){tutLeave();try{localStorage.setItem('sgz_guided','1')}catch(e){}UI.setup.np=2;UI.setup.seats=['human','ai'];UI.setup.lv=['easy','easy'];beginGame();UI.modal=null;refresh();try{GX.close()}catch(e){}try{BF.menu=false;BF.peek=null;BF.boss=false;BF.tAct=Date.now()+700}catch(e){}try{schedule()}catch(e){}}   // no rules card or pop-up right after the tutorial: a tap that finished it opens nothing
 function tutStart(o){if(typeof GXT==='undefined')return;TUT.pro=o&&o.prologue?o:null;const pro=TUT.pro;const first=window.CAMPAIGN&&window.CAMPAIGN.chapters&&window.CAMPAIGN.chapters[0];
-  const steps=tutSteps().map(s=>{const e=s.onEnter;return Object.assign(s,{onEnter:()=>{if(window.__tutSeen.indexOf(s.id)<0)window.__tutSeen.push(s.id);if(e)e()}})});
+  const steps=tutSteps().map(s=>{const e=s.onEnter;return Object.assign(s,{wrong:TUT_WRONG[s.id],onEnter:()=>{if(window.__tutSeen.indexOf(s.id)<0)window.__tutSeen.push(s.id);if(e)e()}})});
   const btns=pro?[first?{id:'chapter',label:'Start chapter 1'}:null,{id:'map',label:'Story map'},{id:'play',label:'Play a real game'}].filter(Boolean):[{id:'play',label:'Play a real game'}];
   GXT.start({game:TUT_GAME,setup:tutSetup,steps,endTitle:'You know the rules',endText:'Now a real game against the computer.',endButtons:btns,
     onDone:r=>{const c=r&&r.choice;if(c==='chapter'&&first){tutLeave();openStart();GXC.play(first.id)}else if(c==='map'&&typeof campOpen==='function'){tutLeave();campOpen()}else tutRealGame()},

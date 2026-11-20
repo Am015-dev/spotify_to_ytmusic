@@ -1,16 +1,9 @@
-# Cold play (F1, 2026-11-20 UTC)
+# Cold play (F3, 2026-11-20 UTC)
 
-A separate tester with no knowledge of the changes played the staged build at 375x667 by touch (tutorial, then a real game vs the easy rival). Verdict as given:
+A separate tester with no knowledge of the changes played the build at 375x667 by touch (tutorial, then one full game vs the easy rival, to the result). Verdict as given:
 
-- Could you play it? Yes. The tutorial showed me how to take tiles and fill racks, and I could make real moves against the computer rival afterwards.
-- Did you enjoy it? Somewhat. Taking tiles felt good, and the preview badges (+1, -2) on racks and the floor made choices easy to judge. I only played about 1.5 rounds, so I can't say how it holds up over a full game.
-- How far you got: Finished the tutorial (21 steps), then started a real 2-player game vs Tamsin (Easy). I played round 1 and most of round 2, and was 3 stars to Tamsin's 1. Not finished.
-- Problems:
-  1. In the tutorial, many steps show "Tamsin is choosing..." for 5-10 seconds with no sign of life. A tap on the tooltip changed the text to "Tap the glowing one" and unstuck it, which I only found by guessing.
-  2. Tutorial tooltips often covered what I needed to see. The floor tooltip hid rack 5. Early on, the "tap red" bubble sat over the kiln.
-  3. A tap in the top-left corner opened the menu, and a tap on the "You" pill opened a board popup. Both were accidental taps while trying to dismiss tooltips.
-  4. When a round ended, the wall scoring in the real game was too quick for me to follow. My score just jumped.
-  5. It wasn't obvious that the Sun token (the first-taker marker) goes to the floor.
-
-Video: first-3min-375x667.webm (fresh load, Begin, a real game by touch, 178 s, 30 takes, 0 errors).
-New visual baselines for approval: baselines-new/ (title, menu, board x phone, tablet, wide). The approved set in .baselines/ was not touched.
+- Could you play it? Yes, tutorial and a full 5-round game.
+- Fun: 3 out of 5. The preview of each choice made turns quick and clear; most turns the right move was obvious and the computer gave little pressure.
+- Play again? Maybe once, to try a harder computer; against this one, no.
+- Final score: tester won 35 to 27 (it was close until the last round; the rival lost 27 points to the floor).
+- Confusions: (fixed after this run) the "Nothing fits" prompt was cut off; the big "extra to the floor" banner ran off both screen edges. (not changed) the lightbulb reopens the rules card when it has no clear move; the rival's board is only found by tapping her name; red X marks on tiles are not explained; the rival's moves are quick; the game felt short.

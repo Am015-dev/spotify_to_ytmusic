@@ -2,7 +2,7 @@
 // easy: greedy on the immediate gain, with frequent slips
 // normal: greedy with the breakage cost and a look at the best take left for the next player
 // hard: two-ply lookahead (me, the next rival's best replies, my follow-up), which also rewards denial
-const LVL={easy:{slip:.3,top:4},normal:{alpha:.55},hard:{alpha:.6,K:10,roll:2}};
+const LVL={easy:{slip:.05,top:4,alpha:.55,k:.015},normal:{alpha:.55},hard:{alpha:.6,K:10,roll:2}};
 function aRand(n){return Math.floor(Math.random()*n)}
 function endNear(S){// will the game end after this round? (someone has a row one tile short with that rack complete or nearly)
   return S.pl.some(p=>p.wall.some((row,r)=>row.filter(v=>v>=0).length===4&&p.lines[r].length>=cap(r)-1))}
@@ -37,10 +37,13 @@ function cloneS(S){return {ex:S.ex,np:S.np,round:S.round,markerIn:S.markerIn,fac
 function emptyS(S){return !S.ctr.length&&S.fac.every(a=>!a.length)}
 function bestGain(S,seat,near){if(emptyS(S))return 0;let b=-1e9;for(const m of legalTakes(S,seat)){const g=gainOf(S,seat,m,near);if(g>b)b=g}return b}
 const strip=m=>({act:'take',src:m.src,c:m.c,j:m.j,line:m.line});
+// easy rival: a slip chance that grows when it leads (and shrinks when it trails), so a newcomer's games stay close; story rivals keep their fixed slip
+function easySlip(seat){const L=LVL.easy;if(G.campId||!L.k)return L.slip;const me=P(seat).score;let o=-1e9;for(const q of G.pl)if(q.i!==seat)o=Math.max(o,q.score);return Math.max(0,Math.min(.6,L.slip+L.k*(me-o)))}
 function aiTake(seat){const p=P(seat);const near=endNear(G);const lv=p.lv||'normal';const ms=candidates(G,seat,near);if(!ms.length)return null;
-  if(lv==='easy'){const L=LVL.easy;if(Math.random()<L.slip){const pool=Math.random()<.35?ms:ms.slice(0,L.top);return strip(pool[aRand(pool.length)])}return strip(ms[0])}
   const nx=(seat+1)%G.np;
-  if(lv==='normal'){const a=LVL.normal.alpha;let best=null,bv=-1e9;for(const m of ms.slice(0,14)){const S=cloneS(G);applyTake(S,seat,m);const v=m.g-a*bestGain(S,nx,near)+(Math.random()*.05);if(v>bv){bv=v;best=m}}return strip(best)}
+  if(lv==='easy'){const L=LVL.easy;if(Math.random()<easySlip(seat)){const pool=Math.random()<.35?ms:ms.slice(0,L.top);return strip(pool[aRand(pool.length)])}}   // easy = the normal look-ahead with now and then a slip
+  if(lv==='normal'||lv==='easy'){const a=lv==='easy'&&G.campId?0:LVL[lv].alpha;   // (story rivals keep the plain greedy easy)
+   let best=null,bv=-1e9;for(const m of ms.slice(0,14)){const S=cloneS(G);applyTake(S,seat,m);const v=m.g-a*bestGain(S,nx,near)+(Math.random()*.05);if(v>bv){bv=v;best=m}}return strip(best)}
   const H=LVL.hard;let best=null,bv=-1e9;const base=endValues(G,near);
   for(const m of ms.slice(0,H.K)){let tot=0;for(let k=0;k<H.roll;k++){const S=cloneS(G);applyTake(S,seat,m);rollout(S,nx,near,k);const ev=endValues(S,near);
       let opp=-1e9;for(let q=0;q<G.np;q++)if(q!==seat)opp=Math.max(opp,ev[q]-base[q]);tot+=(ev[seat]-base[seat])-H.alpha*opp}
