@@ -5,6 +5,8 @@
 //              ready?:()=>bool, onEnter?:()=>void, onNext?:()=>void, ai?:()=>void|Promise, side?:'top'|'bottom', wrong?:'text'}],
 //             live?:()=>el|[el] /* game controls kept tappable between steps, e.g. a roll card's Continue */,
 //             onDone:({choice:'play'|'story'|<your endButtons id>})=>void, endButtons?:[{id,label}] /* replaces Play/Story, e.g. a prologue: [{id:'chapter',label:'Start chapter 1'}] */, onExit?:()=>void, endTitle?, endText?, story?:true})
+//   finger?:true  shows the ghost finger next to the bubble for 3 taps (default: hidden, one helper at a time; it stays in the DOM with data-tx/ty)
+//   Calm (owner, Nov 2026): the step ring pulses 3 times, then rests; after ~8 s with no tap it pulses 3 more times once, then rests for good.
 //   GXT.act({type:'tap'|'drag'|'event', ...})   games call it from their input handlers BEFORE applying the action; false = not what this step asks (ignore it)
 //   GXT.active() GXT.current() GXT.state() GXT.skip() GXT.stop() GXT.relayout() GXT.lint(steps)
 //   GXT.status(game) GXT.menuHTML({game, first, cls, launch}) GXT.isDone(game) GXT.markDone(game) GXT.reset(game)
@@ -15,8 +17,8 @@
   var DIM = 'rgba(8,4,10,.62)';
   // gesture tracking: one press (pointer or key) is one gesture. A tap the tutorial accepted must not also count its own trailing
   // pointerup/click (e.g. a long press whose click lands on a Next button that appeared meanwhile), but a NEW press always counts.
-  var G = { id: 0, down: 0, upAt: 0 };
-  function gDown() { G.id++; G.down++; }
+  var G = { id: 0, down: 0, upAt: 0, at: 0 };
+  function gDown() { G.id++; G.down++; G.at = Date.now(); }
   function gUp() { if (G.down > 0) G.down--; G.upAt = Date.now(); }
   addEventListener('pointerdown', gDown, true); addEventListener('pointerup', gUp, true); addEventListener('pointercancel', gUp, true);
   addEventListener('keydown', function (e) { if (!e.repeat) gDown(); }, true); addEventListener('keyup', gUp, true);
@@ -98,18 +100,21 @@
     if (shield) hs.forEach(function (r) { add(cell(r.left, r.top, r.width, r.height, true)); });
   }
   function ring(r, cls) {
-    var e = mk('div', 'gxt-ring' + (cls ? ' ' + cls : ''));
+    var e = mk('div', 'gxt-ring' + (cls ? ' ' + cls : '')), now = Date.now();
+    // a redraw continues the step's pulses (3, then rest; one more 3 after ~8 s idle) instead of restarting them
+    if (!cls) { if (S.again) { e.classList.add('gxt-again'); e.style.animationDelay = -(now - S.again) + 'ms'; } else if (S.pulse0) e.style.animationDelay = -(now - S.pulse0) + 'ms'; else S.pulse0 = now; }
     e.style.cssText = 'left:' + Math.round(r.left) + 'px;top:' + Math.round(r.top) + 'px;width:' + Math.round(r.width) + 'px;height:' + Math.round(r.height) + 'px';
     return add(e);
   }
   function finger(fr, tr) {
-    var f = mk('div', 'gxt-fin', '<i></i><b></b>'); add(f); f.setAttribute('aria-hidden', 'true');
+    var show = !!(cfg && cfg.finger) && !S.fdone, f = mk('div', 'gxt-fin' + (show ? '' : ' gxt-off'), '<i></i><b></b>'); add(f); f.setAttribute('aria-hidden', 'true');
     f.dataset.tx = Math.round(tr.cx); f.dataset.ty = Math.round(tr.cy); if (fr) { f.dataset.fx = Math.round(fr.cx); f.dataset.fy = Math.round(fr.cy); }
     var a = fr || tr, b = tr, T = function (p, s) { return 'translate(' + Math.round(p.cx) + 'px,' + Math.round(p.cy) + 'px) scale(' + s + ')'; };
     var kf = fr ? [{ transform: T(a, 1.25), opacity: 0 }, { transform: T(a, 1), opacity: 1, offset: .14 }, { transform: T(a, .9), opacity: 1, offset: .28 }, { transform: T(b, .9), opacity: 1, offset: .72 }, { transform: T(b, 1.2), opacity: .9, offset: .86 }, { transform: T(b, 1.4), opacity: 0 }]
       : [{ transform: T(b, 1.3), opacity: 0 }, { transform: T(b, 1), opacity: 1, offset: .3 }, { transform: T(b, .85), opacity: 1, offset: .55 }, { transform: T(b, 1.35), opacity: 0 }];
     f.style.transform = T(b, 1);
-    if (!reduced()) { try { f.animate(kf, { duration: fr ? 2300 : 1500, iterations: Infinity, easing: 'ease-in-out' }); } catch (e) {} }
+    if (show && !reduced()) { try { var an = f.animate(kf, { duration: fr ? 2300 : 1500, iterations: 3, easing: 'ease-in-out' }); an.onfinish = function () { f.classList.add('gxt-off'); if (S) S.fdone = 1; }; } catch (e) {} }
+    else f.classList.add('gxt-off');
     return f;
   }
   function stepText(st, k) { var v = st[k]; try { if (typeof v === 'function') v = v(); } catch (e) { v = ''; } return v == null ? '' : String(v); }
@@ -198,7 +203,7 @@
   }
   function enter(i) {
     var st = cfg.steps[i]; if (!st) { finish(); return; }
-    S.i = i; S.step = st; S.count = 0; S.phase = 'pend'; S.key = ''; S.stable = 0; S.stable_k = ''; S.since = Date.now(); S.shown = false; S.misses = 0;
+    S.i = i; S.step = st; S.count = 0; S.phase = 'pend'; S.key = ''; S.stable = 0; S.stable_k = ''; S.since = Date.now(); S.shown = false; S.misses = 0; S.pulse0 = 0; S.again = 0; S.fdone = 0;
     mark(cfg.game, { open: 1, step: i });
     clearVisuals(); drawWaiting();
     try { if (st.onEnter) st.onEnter(); } catch (e) { console.warn('gxt onEnter', e); }
@@ -221,6 +226,10 @@
       if (!hs2) { if (++S.misses >= 3) { S.misses = 0; S.phase = 'pend'; S.stable = 0; S.stable_k = ''; clearVisuals(); drawWaiting(); } return; }
       S.misses = 0;
       if (moved(hs2, S.key)) draw();
+      // a waiting-for-tap step re-pulses its ring once after ~8 s with no tap, then rests for good
+      if (st.wait && st.wait.type !== 'event' && S.pulse0 && !S.again && Date.now() - Math.max(S.pulse0, G.at) > 8000) {
+        S.again = Date.now(); S.vis.forEach(function (e) { if (e.classList && e.classList.contains('gxt-ring') && !e.classList.contains('soft')) { e.style.animationDelay = ''; e.classList.add('gxt-again'); } });
+      }
     }
   }
   function advance() {

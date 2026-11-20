@@ -1,0 +1,145 @@
+{
+ "fxOn": true,
+ "samplerRain": [
+  {
+   "helpers": 1,
+   "inf": 4,
+   "infNames": "tw2pl,dashf,pulse2",
+   "active": 1
+  },
+  {
+   "helpers": 1,
+   "inf": 4,
+   "infNames": "tw2pl,dashf,pulse2",
+   "active": 1
+  },
+  {
+   "helpers": 1,
+   "inf": 4,
+   "infNames": "tw2pl,dashf,pulse2",
+   "active": 1
+  },
+  {
+   "helpers": 1,
+   "inf": 4,
+   "infNames": "tw2pl,dashf,pulse2",
+   "active": 1
+  }
+ ],
+ "afterRain": {
+  "active": 0,
+  "hidden": true
+ },
+ "ship": "s1",
+ "afterSpray": {
+  "active": 0,
+  "stats": {
+   "played": 2,
+   "frames": 205,
+   "skipped": 0,
+   "active": 0,
+   "costAvg": 0.2360975609853773,
+   "costP95": 0.39999999990686774,
+   "costMax": 0.9000000001396984
+  }
+ },
+ "menuBtn": true,
+ "noFlag": {
+  "on": false,
+  "played": false,
+  "canvas": false,
+  "menuBtn": false
+ },
+ "samplerOff": [
+  {
+   "helpers": 0,
+   "inf": 3,
+   "infNames": "tw2pl,dashf,pulse2",
+   "active": 0
+  },
+  {
+   "helpers": 0,
+   "inf": 3,
+   "infNames": "tw2pl,dashf,pulse2",
+   "active": 0
+  },
+  {
+   "helpers": 0,
+   "inf": 3,
+   "infNames": "tw2pl,dashf,pulse2",
+   "active": 0
+  },
+  {
+   "helpers": 0,
+   "inf": 3,
+   "infNames": "tw2pl,dashf,pulse2",
+   "active": 0
+  }
+ ],
+ "samplerOffWave": [
+  {
+   "helpers": 0,
+   "inf": 4,
+   "infNames": "tw2pl,dashf,pulse2",
+   "active": 0
+  },
+  {
+   "helpers": 0,
+   "inf": 4,
+   "infNames": "tw2pl,dashf,pulse2",
+   "active": 0
+  },
+  {
+   "helpers": 0,
+   "inf": 4,
+   "infNames": "tw2pl,dashf,pulse2",
+   "active": 0
+  },
+  {
+   "helpers": 0,
+   "inf": 4,
+   "infNames": "tw2pl,dashf,pulse2",
+   "active": 0
+  }
+ ],
+ "reduced": {
+  "played": false
+ },
+ "perfIdle": {
+  "frames": 90,
+  "avg": 16.67,
+  "p95": 16.8,
+  "max": 16.8,
+  "over20": 0
+ },
+ "perfRain": {
+  "frames": 118,
+  "avg": 17.09,
+  "p95": 16.8,
+  "max": 50,
+  "over20": 2
+ },
+ "perfSpray": {
+  "frames": 65,
+  "avg": 18.46,
+  "p95": 33.3,
+  "max": 33.4,
+  "over20": 7
+ },
+ "perfBoth": {
+  "frames": 118,
+  "avg": 16.95,
+  "p95": 16.8,
+  "max": 33.4,
+  "over20": 2
+ },
+ "fxCostThrottled": {
+  "played": 4,
+  "frames": 341,
+  "skipped": 0,
+  "active": 1,
+  "costAvg": 1.213782991211632,
+  "costP95": 2.5,
+  "costMax": 4.399999999906868
+ }
+}
