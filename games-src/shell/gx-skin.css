@@ -35,7 +35,8 @@ html.sk .gxc-node.locked .gxc-disc,html.sk .gxc-node.locked.a2 .gxc-disc,html.sk
 html.sk .gxc-node.boss .gxc-disc,html.sk .gxc-node.boss.a2 .gxc-disc,html.sk .gxc-node.boss.a3 .gxc-disc{background-image:url(media/ui-node-boss.webp);width:74px;height:74px;margin:-8px 0 0 0;box-shadow:none}
 html.sk .gxc-node.boss .gxc-disc::after,html.sk .gxc-lock{display:none}
 html.sk .gxc-node.boss .gxc-disc .gxc-pt{width:34px!important;height:34px!important;margin-top:8px}
-html.sk .gxc-node.next .gxc-disc{animation:sk-pulse 1.6s ease-in-out infinite}
+html.sk .gxc-node.next .gxc-disc{animation:sk-pulse 1.6s ease-in-out 3;filter:drop-shadow(0 4px 4px rgba(0,0,0,.35)) drop-shadow(0 0 5px rgba(255,214,90,.9))}
+@media (prefers-reduced-motion:reduce){html.sk .gxc-node.next .gxc-disc{animation:none}}
 @keyframes sk-pulse{0%,100%{filter:drop-shadow(0 4px 4px rgba(0,0,0,.35)) drop-shadow(0 0 0 rgba(255,214,90,.9))}50%{filter:drop-shadow(0 4px 4px rgba(0,0,0,.35)) drop-shadow(0 0 9px rgba(255,214,90,.95))}}
 html.sk .gxc-lab{font-size:13px;background:rgba(246,230,194,.94);color:#2a1d10}
 html.sk .gxc-node .gxc-stars{top:56px}
