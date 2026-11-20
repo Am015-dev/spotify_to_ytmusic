@@ -64,7 +64,7 @@ function aimCells(){const last=unkey(G.order[G.order.length-1]);const g=UI.legal
 function fitsAt(cells,c){const m=measure();let x0=1e9,y0=1e9,x1=-1e9,y1=-1e9;for(const [x,y] of cells){x0=Math.min(x0,x);x1=Math.max(x1,x);y0=Math.min(y0,y);y1=Math.max(y1,y)}return (x1-x0+1)*c<=m.W-24&&(y1-y0+1)*c<=m.H-topSafe()-botSafe()-12}
 // the camera keeps the whole valley in view when the tiles stay readable; otherwise the biggest readable patch around the newest tile
 const GLOWMIN=()=>PHONE()?44:54;   // R9: smallest cell that is still a 44px touch target; used so every glow fits on screen
-const CAMMIN=()=>PHONE()?46:64,CAMMAX=()=>PHONE()?84:(innerWidth>=1024?200:MAXC);   // R108: the phone view shows more of the valley (every glow is still 44 px or more)
+const CAMMIN=()=>PHONE()?54:64,CAMMAX=()=>PHONE()?84:(innerWidth>=1024?200:MAXC);   // R108: the phone view shows more of the valley (every glow is still 44 px or more)
 function valleyCells(extra,around){const all=G.order.map(unkey).concat(extra||[]);const cmin=CAMMIN();if(fitsAt(all,cmin))return all;
   const c=around||unkey(G.order[G.order.length-1]);const by=all.slice().sort((a,b)=>Math.hypot(a[0]-c[0],a[1]-c[1])-Math.hypot(b[0]-c[0],b[1]-c[1]));const out=[];
   for(const q of by){out.push(q);if(!fitsAt(out,cmin)){out.pop();if(out.length>=4)break}}return out.length?out:[c]}
@@ -102,7 +102,7 @@ function renderGlows(){const w=$('#world');for(const e of w.querySelectorAll('.g
     b.dataset.x=g.x;b.dataset.y=g.y;b.innerHTML='<svg viewBox="0 0 100 100"><use href="#gp"/></svg>';
     if(UI.hint&&UI.hint.x===g.x&&UI.hint.y===g.y&&UI.hint.r===UI.rot)b.classList.add('hintspot');if(UI.sel&&UI.sel.x===g.x&&UI.sel.y===g.y)b.classList.add('sel');
     try{const pv=prevCalc(g.x,g.y,UI.rot);if(pv.badge&&hintsOn()){b.insertAdjacentHTML('beforeend',`<span class="pvb ${pv.kind||''}">${esc(pv.badge)}</span>`);b._rk=pvRank(pv)}}catch(e){}
-    const gx=g.x,gy=g.y;b.addEventListener('pointerenter',e=>{if(e.pointerType==='mouse'&&hintsOn())pvShow(b,gx,gy)});b.addEventListener('pointerdown',()=>{if(hintsOn())pvShow(b,gx,gy)});
+    const gx=g.x,gy=g.y;b.addEventListener('pointerenter',e=>{if(e.pointerType==='mouse'&&hintsOn())pvShow(b,gx,gy)});b.addEventListener('pointerdown',e=>{if(e.pointerType==='mouse'&&hintsOn())pvShow(b,gx,gy)});
     b.addEventListener('pointerleave',()=>pvHide());b.addEventListener('pointercancel',()=>pvHide());
     b.addEventListener('click',()=>onGlow(g.x,g.y));w.appendChild(b)}layoutTags();clearTimeout(UI.egvT);UI.egvT=setTimeout(ensureGlowVisible,60)}
 // ---------- overlay: followers on the map, follower spots, ghost finger, pops (screen-sized items that follow the map) ----------
@@ -209,7 +209,7 @@ function hookDrag(b){if(!b||b._dg)return;b._dg=1;
   b.addEventListener('pointerup',end);b.addEventListener('pointercancel',end)}
 // F2: what the numbers on a follower spot mean, one line
 function figTip(){try{const ty=new Set((UI.figs||[]).map(b=>{const T=G.tiles[G.cur.k];return G.fd[find(T.s0+ +b._m.l)].ty}));
-  if(ty.has('M'))return 'Priory: 9 with all 8 neighbours; if open at the end, 1 + one per neighbour.';if(ty.has('F'))return 'Farmer: 3 per finished town, at end.';
+  if(ty.has('M'))return 'Priory: 9 if ringed, else 1+1 per neighbour.';if(ty.has('F'))return 'Farmer: 3 per finished town, at end.';
   if(ty.has('C'))return 'Town 2 per tile, road 1, when closed.';if(ty.has('R'))return 'Road: 1 point per tile when closed.'}catch(e){}return ''}
 function renderStatus(){let t='',tn='',rc='',tip='';const c=capNow(),sc=c&&UI.cap.score;
   if(sc&&!myTurn('place')){tn='Scoring';t=c}
@@ -222,7 +222,7 @@ function renderStatus(){let t='',tn='',rc='',tip='';const c=capNow(),sc=c&&UI.ca
     else if(me&&G.step==='place')t=G.cur.bonus?'Extra turn! Place your tile.':isRiver(G.cur.t)?'Place it to continue the river.':(UI.rots&&UI.rots.length>1?'Turn, then place on a glow.':'Place your tile on a glow.');
     else if(me){t='Add a follower, or Skip.';tip=figTip()}
     else t=c||'Tap the board to skip.'}
-  say(t,tn,rc,tip);{const e=$('#status'),h=e?e.offsetHeight:0;if(h!==UI._sh){UI._sh=h;if(G&&myTurn('place')&&!UI.tw&&!UI.aiFly&&!UI.user&&!document.querySelector('.gxh-bub')&&!WIDE()){const sr=e.getBoundingClientRect();if([...document.querySelectorAll('#world .glow')].some(g=>g.style.visibility!=='hidden'&&(r=>r.top<sr.bottom&&r.bottom>sr.top&&r.left<sr.right&&r.right>sr.left)(g.getBoundingClientRect()))){placeOverlay();camAim(300)}}}}}   // F2: a taller turn card (caption under the action line) re-frames the glows so none hides under it
+  say(t,tn,rc,tip);{const e=$('#status'),h=e?e.offsetHeight:0;if(h!==UI._sh){UI._sh=h;if(G&&myTurn('place')&&!UI.prev&&!UI.tw&&!UI.aiFly&&!UI.user&&!document.querySelector('.gxh-bub')&&!WIDE()){const sr=e.getBoundingClientRect();if([...document.querySelectorAll('#world .glow')].some(g=>g.style.visibility!=='hidden'&&(r=>r.top<sr.bottom&&r.bottom>sr.top&&r.left<sr.right&&r.right>sr.left)(g.getBoundingClientRect()))){placeOverlay();camAim(300)}}}}}   // F2: a taller turn card (caption under the action line) re-frames the glows so none hides under it
 // ---------- turn bookkeeping ----------
 function syncTurn(){if(!G||G.over||!G.cur)return;const key=G.turn+':'+G.step;if(key===UI.stepKey)return;UI.stepKey=key;
   if(myTurn('place')){UI.legal=legalPlacements(G.cur.t);UI.rots=[...new Set(UI.legal.map(g=>g.r))].sort();UI.hint=null;
@@ -341,7 +341,7 @@ function closeSheets(){const g=$('#goal'),m=$('#modal .scrim.side');if(!g&&!m)re
 // ---------- new game / continue ----------
 function beginGame(o){UI.camp=o&&o.camp?o.camp:null;if(o&&!o.camp||!o)o=o||setupOpts();UI.lastOpts=o;resetUI();DEFSEED=o.seed!=null?o.seed:null;newGame(o);$('#modal').innerHTML='';UI.humanTurns=0;refit(false);showGoal();}
 function showGoal(){const o=$('#goal');if(o)o.remove();if(UI.coach||UI.tut||UI.sim||!G||!human()||/[?&]scn=/.test(location.search))return;const d=document.createElement('section');d.id='goal';d.setAttribute('aria-label','Goal');
-  d.innerHTML='<h2>How you win</h2><p class="gwin">Have the most points when the last tile is laid.</p><ul><li>Put a follower on a road, town or priory.</li><li>Finish it, and you score. Towns pay double.</li><li>Unfinished roads, towns and priories score 1 per tile at the end.</li><li>Farmers in fields score at the very end, if they hold the most.</li></ul><button type="button" id="goalok">Got it, start</button>';
+  d.innerHTML='<h2>How you win</h2><p class="gwin">Have the most points when the last tile is laid.</p><ul><li>Put a follower on a road, town or priory.</li><li>Finish it, and you score. Towns pay double.</li><li>At the end: unfinished 1 per tile, farmers score.</li></ul><button type="button" id="goalok">Got it, start</button>';
   ($('#side')||$('#app')).prepend(d);$('#goalok').addEventListener('click',closeSheets);sheetPos()}
 function setupOpts(){const s=UI.setup,np=1+s.rivals,seats=[];for(let i=0;i<np;i++)seats.push(i?'ai':'human');return {np,seats,lv:seats.map(()=>s.lv),ex:{river:s.river,ic:s.ic,tb:s.tb}}}
 function resetUI(){UI.recap="";UI.rv=null;UI.rvLine="";UI.capQ=[];UI.cap=null;UI.capCur=0;clearTimeout(UI.capT);UI.fx.length=0;UI.fxSeen=0;UI.turn=-1;UI.stepKey='';UI.endShown=false;UI.handKey=null;UI.aiT&&clearTimeout(UI.aiT);UI.aiT=0;for(const k in UI.tl)UI.tl[k].remove();UI.tl={};for(const k in UI.mp)UI.mp[k].remove();UI.mp={};$('#ov').innerHTML='';UI.seenInit=false;UI.legal=[];UI.hint=null;UI.hintFig=null;closeMenu()}
