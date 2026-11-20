@@ -160,7 +160,7 @@ function heatSquares(g){const out=[];const rolls=Math.max(1,g.ships.filter(s=>s.
   for(const k in P){const per=Math.min(.95,16/36*P[k]),pc=Math.round((1-Math.pow(1-per,rolls))*100);if(pc<5)continue;const a=k.split(',').map(Number);out.push({x:a[0],y:a[1],pc})}return out}
 function ovUpdate(){if(!G||!UI.started||!kitOk()){ovApply([]);return}const D=[];const busy=UI.busy;const me=youSeat();const d=sideToAct();const myTurn=!busy&&!G.over&&d>=0&&G.seats[d].human&&!mustPass(d);
   const near=new Set();let dq=null;if(G.q&&G.q.kind==='doom'&&G.q.ctx&&G.q.ctx.cause&&G.q.ctx.cause.id!=null&&G.q.who===me)dq=G.q.ctx.cause.id;if(myTurn&&G.phase==='play'){const S=G.ships[d];if(S&&S.x!=null)for(const id of adjMons(G,S))near.add(id)}
-  if(myTurn&&G.phase==='play'&&!UI.tut&&!G.q)for(const h of heatSquares(G))D.push({k:'heat',id:'h'+h.x+','+h.y+':'+h.pc,wx:h.x-BC,wz:h.y-BC,pc:h.pc,lv:h.pc>=25?3:h.pc>=12?2:1});
+  if(myTurn&&G.phase==='play'&&!UI.tut&&!G.q)for(const h of heatSquares(G))D.push({k:'heat',id:'h'+h.x+','+h.y+':'+h.pc,wx:h.x-BC,wz:h.y-BC,pc:h.pc,lv:h.pc>=40?3:h.pc>=25?2:1});
   for(const k in KS.mons){const a=k.split(',').map(Number),id=+KS.mons[k].split(':')[0];D.push({k:'tag',id:'m'+id,wx:a[0]-BC,wy:.95,wz:a[1]-BC,t:levName(id),cls:'mon'+(UI.hiMon===id||UI.hov===id||dq===id?' hi':'')+(near.has(id)?' near':''),mon:id})}
   for(const k in KS.mael){const a=k.split(',').map(Number);D.push({k:'tag',id:'ma'+k,wx:a[0]-BC,wy:.5,wz:a[1]-BC,t:'Maelstrom',cls:'piece mael'})}
   for(const k in KS.gates){const a=k.split(',').map(Number);D.push({k:'tag',id:'g'+k,wx:a[0]-BC,wy:.55,wz:a[1]-BC,t:'Rift Gate',cls:'piece gate'})}
@@ -191,7 +191,7 @@ function ovApply(D){const sig=JSON.stringify(D);if(sig===OV.sig&&OV.items.length
       else if(ds.k==='ring')e.className='oring';
       else if(ds.k==='pip'){e.className='opip'+(ds.best?' best':'')+(ds.dim?' dim':'');if(!ds.dim&&ds.pk){e.className+=' pickable';e.setAttribute('role','button');e.setAttribute('aria-label','Start here: '+ds.t);try{const pe=TWKit.portEdge(ds.mx,ds.my,ds.me);if(pe&&pe.edge)e.className+=' e-'+pe.edge;if(pe&&(pe.edge==='left'||pe.edge==='right'))e.className+=' pv'}catch(_){}if(ds.zb)e.className+=' zoned';if(UI.tut||PH.on)e.dataset.ph='pip';else e.dataset.a='startmark';e.dataset.x=ds.mx;e.dataset.y=ds.my;e.dataset.e=ds.me}e.innerHTML=`<b>${esc(ds.t)}</b>${ds.best?'<u>best</u>':''}`}
       else if(ds.k==='zone'){e.className='ozone pickable z-'+ds.band;e.setAttribute('role','button');e.setAttribute('aria-label','Start marks on this square');e.dataset.ph='pip';e.dataset.x=ds.mx;e.dataset.y=ds.my}
-      else if(ds.k==='heat'){e.className='oheat l'+ds.lv;e.setAttribute('aria-hidden','true');e.innerHTML=`<span>${ds.pc}%</span>`}
+      else if(ds.k==='heat'){e.className='oheat l'+ds.lv;e.setAttribute('aria-hidden','true');e.innerHTML=ds.lv>1?`<span>${ds.pc}%</span>`:''}
       else if(ds.k==='mark'){e.className='omark';e.innerHTML=`<b>&#10006;</b><span>${esc(ds.t)}</span>`}
       root.appendChild(e);it.el=e}
     OV.items.push(it)}

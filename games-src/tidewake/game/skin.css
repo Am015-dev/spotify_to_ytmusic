@@ -250,3 +250,11 @@ html.ph #pc [data-a=sunkok],html.ph #pc [data-a=coachok],html.ph #pc [data-ph=di
 html.ph-w .pside .ps-crews .crew span,html.ph-w .pside .ps-crews .crew b{font-size:16px}
 .sunkwhy{margin:.3em 0;padding:0;list-style:none}.sunkwhy li{margin:.2em 0}
 #bulbbtn.spent{opacity:.7}
+/* F4: short landscape 700-1023 wide (910x512): the board fills the height on the left; tiles in a row on top, controls wrap below */
+@media (min-width:700px) and (max-width:1023px){
+  html.ph.ph-l .ps-main{flex-direction:column;align-items:stretch;gap:8px}
+  html.ph.ph-l .ps-tiles{flex-direction:row;gap:10px}
+  html.ph.ph-l .pt{width:78px;height:78px}
+  html.ph.ph-l .ps-ctl{width:auto;flex-wrap:wrap;gap:8px}
+  html.ph.ph-l .ps-ctl .pb.pri{flex:1 1 auto}
+}
