@@ -16,12 +16,13 @@
     future += p.houses.length * 5;
     future += VT.onBoard(p) * 1.5;
     p.houses.forEach(function (cid) { future += PRICE[G.city[cid].g] * 0.3; });
-    future += (p.hand.length + p.disc.length - D.START_HAND.length) * 3;
+    future += (p.hand.length + p.disc.length - D.START_HAND.length) * (G.deck.length === 0 ? 5 : 3);
     future += VT.nearCities(G, pi).filter(function (cid) { return G.city[cid].h.indexOf(pi) < 0; }).length * 0.5;
     if (VT.room(p) < 2) future -= 1.5;
     var hasTrib = p.hand.some(function (id) { return D.CARDS[id].act === 'trib'; });
     if (!hasTrib) future -= 1.2;
     if (p.hand.length === 0) future -= 6;
+    if (G.deck.length === 0) future += needBonus(G, pi);
     return s * (0.6 + 0.4 * phase) + future * (1 - 0.5 * phase) * w.look;
   };
 
@@ -87,8 +88,10 @@
   function needBonus(G, pi) {
     var p = G.pl[pi], b = 0;
     VT.nearCities(G, pi).forEach(function (cid) { if (G.city[cid].h.indexOf(pi) < 0 && p.houses.length < D.HOUSES) { var cost = VT.buildCost(G, pi, cid); var ok = p.coins >= cost.coins; for (var g in cost.goods) if (p.goods[g] < cost.goods[g]) ok = false; if (ok) b += 1.2; } });
-    G.disp.forEach(function (id, s) { if (id != null && VT.canBuyCard(G, pi, s, false)) b += 0.5; });
-    return Math.min(b, 4);
+    // late game: the market must empty for the game to end, so the leader wants goods for the last cards
+    var lead = VT.score(G, pi).total >= VT.score(G, 1 - pi).total, cardB = G.deck.length === 0 ? (lead || G.turn > 160 ? 4 : 1.5) : 0.5;
+    G.disp.forEach(function (id, s) { if (id != null && VT.canBuyCard(G, pi, s, false)) b += cardB; });
+    return Math.min(b, G.deck.length === 0 ? 9 : 4);
   }
 
   // choose the whole next step for the side to act (a 'play' or a sub-choice)
