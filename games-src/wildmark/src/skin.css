@@ -434,3 +434,5 @@ html.wm-goal .gxh-bub{visibility:hidden}
 .hintsw:not(.on) svg .knob{transform:translateX(-10px)}
 #bulbbtn,#hintsB{position:relative}
 @media (max-width:999px){#bulbbtn::after,#hintsB::after{position:absolute;left:0;right:0;bottom:1px;text-align:center;font-size:11px;font-weight:800;line-height:1;pointer-events:none;color:currentColor}#bulbbtn::after{content:"Hint"}#hintsB::after{content:"On"}#hintsB:not(.on)::after{content:"Off"}#bulbbtn svg,#hintsB svg{margin-top:-8px}}
+/* F2: the chip rows only catch taps on the chips themselves; the empty rest of the row lets taps reach the valley */
+#seats,#cards{pointer-events:none}#seats .seat,#cards .cc{pointer-events:auto}
