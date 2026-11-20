@@ -643,4 +643,12 @@ html body.ec-stage #stage.w24ls .en>.art,html body.ec-stage #stage.w24ls .w485fi
 html body.ec-stage #stage.w24ls .enemies.w24many .en>.art{max-width:min(70px,calc((100dvh - 300px) / 2))!important}
 .itip-scrim{position:fixed;inset:0;z-index:69;background:rgba(0,0,0,.18)}
 .itip-x{position:absolute;top:4px;right:4px;width:44px;height:44px;border:none;border-radius:50%;background:rgba(255,255,255,.08);color:#ffd9b0;font-size:20px;cursor:pointer}
+/* F1: foe fit (ui.js fitFoes): 3 foes share one row; art capped by measurement so nothing sits under the top bar or off screen */
+html body.ec-stage #stage .enemies.ecthree{min-width:0!important;flex:1 1 0!important}
+html body.ec-stage #stage .enemies.ecthree .en{flex:0 0 calc(33.3% - 2px)!important;max-width:calc(33.3% - 2px)!important;min-width:0!important}
+html body.ec-stage #stage .enemies.ecthree .intent{max-width:100%;min-width:0!important;overflow:hidden;justify-content:center}html body.ec-stage #stage .enemies.ecthree .intent>span{font-size:16px!important}html body.ec-stage #stage .enemies.ecthree .intent .art{width:22px!important;height:22px!important}
+html body.ec-stage #stage .enemies.ecthree .en .bar{width:96%}html body.ec-stage #stage .enemies.ecthree .en .nm{font-size:12px!important}
+html body.ec-stage #stage .enemies.w24many .en{flex:0 0 calc(33.3% - 2px)!important;max-width:calc(33.3% - 2px)!important}
+html body.ec-stage #stage .arena.ecfit .en>.art,html body.ec-stage #stage .arena.ecfit .w485fig .art{max-width:var(--fmax)!important;margin-left:auto!important;margin-right:auto!important}
+html body.ec-stage #stage .enemies.w24six .en .nm{display:none}html body.ec-stage #stage .enemies.w24six .intent{position:absolute!important;top:0;left:50%;transform:translateX(-50%);margin:0!important;z-index:5;background:rgba(10,7,5,.7)!important;border-radius:999px;max-width:100%;overflow:hidden;white-space:nowrap}html body.ec-stage #stage .enemies.w24six .intent>span{font-size:13px!important}
 </style></head>

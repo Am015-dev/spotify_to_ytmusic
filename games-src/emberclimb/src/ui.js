@@ -440,6 +440,19 @@
     if (PV && (PV.blk[i] > 0 || PV.heal[i] > 0)) p.appendChild(h('div', 'w4hb', PV.blk[i] > 0 ? '+' + PV.blk[i] + ' block' : '+' + PV.heal[i] + ' HP'));
     return p;
   }
+  // F1: measure the arena and shrink foe/hero art until no figure sits under the top bar or past a screen edge
+  function fitFoes(st) {
+    var ar = st.querySelector('.arena'); if (!ar) return;
+    var tb = st.querySelector('.w485top'), lim = (tb ? tb.getBoundingClientRect().bottom : st.getBoundingClientRect().top) + 2, vw = document.documentElement.clientWidth;
+    var figs = ar.querySelectorAll('.enemies .en, .hfig'), aw = 0;
+    for (var k = 0; k < 16; k++) {
+      var top = 1e9, left = 1e9, right = -1e9;
+      figs.forEach(function (f) { var r = f.getBoundingClientRect(); top = Math.min(top, r.top); left = Math.min(left, r.left); right = Math.max(right, r.right); });
+      if (top >= lim && left >= -0.5 && right <= vw + 0.5) break;
+      var aw0 = aw; aw = 0; ar.querySelectorAll('.en>.art, .w485fig .art').forEach(function (a) { aw = Math.max(aw, a.getBoundingClientRect().width); });
+      var cap = Math.max(40, Math.floor(aw * 0.88)); if (k && aw0 === aw) break; ar.style.setProperty('--fmax', cap + 'px'); ar.classList.add('ecfit'); if (cap <= 40) break;
+    }
+  }
   function needTarget() { var g = G(), h0 = g.hs[g.b.cur], c = h0.hand[UI.sel]; return c && E.eff(c).tgt; }
   function battle() {
     var g = G(), b = g.b, cur = g.hs[b.cur >= 0 ? b.cur : 0];
@@ -467,9 +480,9 @@
       var pv = PV && PV.en[i]; if (pv && !e.dead && (pv.dmg > 0 || pv.kill)) x.appendChild(h('div', 'w4pv' + (pv.kill ? ' kill' : ''), null, [h('b', '', (PV.rnd ? '~' : '') + '-' + (pv.kill ? pv.dmg : pv.hpLoss)), h('i', '', pv.kill ? 'kills' : pv.stripped ? pv.stripped + ' block off' : (whyMods(cur, cur.hand[UI.sel], e) || 'HP'))]));   // W420 value preview
       en.appendChild(x);
     });
-    if (SG) { en.style.setProperty('--n', nShow); if (nShow > 3) en.classList.add('w24many'); if (nShow > 4) en.classList.add('w24six'); }
+    if (SG) { en.style.setProperty('--n', nShow); if (nShow >= 3) en.classList.add('ecthree'); if (nShow > 3) en.classList.add('w24many'); if (nShow > 4) en.classList.add('w24six'); }
     var mid = h('div', 'mid');
-    if (SG) { var ar = h('div', 'arena' + (nShow > 3 ? ' w24many' : '')), hsd = h('div', 'hside'); hsd.style.setProperty('--n', g.hs.length); ar.appendChild(hsd); ar.appendChild(en); st.appendChild(ar); mid = hsd; } else st.appendChild(en);
+    if (SG) { var ar = h('div', 'arena' + (nShow >= 3 ? ' w24many' : '')), hsd = h('div', 'hside'); hsd.style.setProperty('--n', g.hs.length); ar.appendChild(hsd); ar.appendChild(en); st.appendChild(ar); mid = hsd; } else st.appendChild(en);
     g.hs.forEach(function (hh, i) {
       if (SG) { mid.appendChild(heroFig(g, b, hh, i, PV)); return; }
       var H = D.H[hh.k], p = h('div', 'heropan' + (b.cur === i && b.ph === 'p' ? ' act' : '') + (hh.dead ? ' dead' : ''));
@@ -519,6 +532,7 @@
       st.appendChild(so);
     }
     app.appendChild(st);
+    if (SG) fitFoes(st);   // F1: every foe fully on screen and never under the top bar (3 per row)
     var dk = b.turn + ':' + b.cur; if (b.ph === 'p' && UI.drawKey !== dk && !b.scry) { UI.drawKey = dk; dealIn(hand); }   // W420 draw animation
     if (PV && sl0()) { var bt = [], rr0 = sl0().getBoundingClientRect(), vw0 = document.documentElement.clientWidth; g.hs.forEach(function (x, k) { if (PV.blk[k] > 0) bt.push('+' + PV.blk[k] + ' block' + (g.hs.length > 1 ? ' ' + D.H[x.k].name.split(' ')[0] : '')); if (PV.heal[k] > 0) bt.push('+' + PV.heal[k] + ' HP'); });
       if (bt.length) { var fb = h('div', 'w4hbf', bt.join(', ')); st.appendChild(fb); var fw = fb.offsetWidth, rx = rr0.right + 8; if (rx + fw > vw0 - 8) rx = Math.max(8, rr0.left - 8 - fw); fb.style.left = rx + 'px'; fb.style.top = Math.max(8, rr0.top + 10) + 'px'; } }   // W420 block preview beside the lifted card

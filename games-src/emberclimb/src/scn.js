@@ -22,13 +22,24 @@
       { kind: 'tap', sel: '#end', name: 'End turn', state: snapBattle, expect: function (b, a) { return a.ph === 'e' || a.turn > b.turn || a.scr !== 'battle'; } }] });
   GXS.add({ id: 'ec-fight-two', name: 'Fight: two heroes', ask: 'Do both heroes show?', seed: 6, when: booted,
     setup: function () { fight(['s', 'm'], 6); }, checks: [{ kind: 'visible', sel: '.hfig, .heropan', name: 'hero panel' }, { kind: 'visible', sel: '#end', name: 'End turn button' }] });
-  function splitFight(heroes) { begin(heroes, 4); E().newGame({ heroes: heroes, seed: 4, boss: 'mire-behemoth' }); E().debug.boss(); E().debug.split(); UI.render(); }
+  function foesClear() {   // F1: the real split layout: each live foe's picture centre hits that foe, and nothing sits under the top bar
+    var tb = document.querySelector('#stage .w485top'), lim = tb ? tb.getBoundingClientRect().bottom - 1 : 0, bad = [];
+    var ens = document.querySelectorAll('#stage .enemies .en:not(.dead)'); if (ens.length < 3) return 'only ' + ens.length + ' foes shown';
+    ens.forEach(function (e) { var r = e.getBoundingClientRect(), a = e.querySelector(':scope>.art').getBoundingClientRect(), x = a.left + a.width / 2, y = a.top + a.height / 2, t = document.elementFromPoint(x, y);
+      if (r.top < lim) bad.push(e.getAttribute('data-w') + ' under the top bar'); if (r.left < 0 || r.right > innerWidth) bad.push(e.getAttribute('data-w') + ' off screen');
+      if (!t || !e.contains(t)) bad.push(e.getAttribute('data-w') + ' covered'); });
+    return bad.length ? bad.join(', ') : true; }
+  function splitFight(heroes) {   // F1: a real boss kill in a normal climb state: the Mire Behemoth drops to 0 from a played attack, then the round ends and it splits
+    begin(heroes, 4); E().newGame({ heroes: heroes, seed: 4, boss: 'mire-behemoth' }); E().debug.boss();
+    var g = G(), bi = g.b.en.findIndex(function (e) { return EC.D.ENEMIES[e.id].split; }); g.b.en[bi].hp = 1; g.b.en[bi].blk = 0;
+    var mv = E().validMoves().filter(function (m) { return m.t === 'play' && m.e === bi; })[0]; if (mv) E().performMove(mv);
+    g.hs.forEach(function () { if (G().b && G().b.ph === 'p') E().performMove({ t: 'end' }); }); E().settle(); UI.render(); }
   GXS.add({ id: 'ec-split', name: 'Boss split: every slime on screen', ask: 'Can you see and tap all three slimes?', seed: 4, when: booted, sizes: 'phone',
     setup: function () { splitFight(['w']); },
-    checks: [{ kind: 'visible', sel: '.en[data-w="e1"]', name: 'first slime' }, { kind: 'visible', sel: '.en[data-w="e2"]', name: 'second slime' }, { kind: 'visible', sel: '.en[data-w="e3"]', name: 'third slime' }] });
+    checks: [{ kind: 'visible', sel: '.en[data-w="e1"]', name: 'first slime' }, { kind: 'visible', sel: '.en[data-w="e2"]', name: 'second slime' }, { kind: 'visible', sel: '.en[data-w="e3"]', name: 'third slime' }, { kind: 'fn', name: 'every slime tappable, none under the top bar', fn: foesClear }] });
   GXS.add({ id: 'ec-split-two', name: 'Boss split, two heroes: six slimes', ask: 'Can you see all six slimes?', seed: 4, when: booted, sizes: 'phone',
     setup: function () { splitFight(['w', 's']); },
-    checks: [{ kind: 'visible', sel: '.en[data-w="e1"]', name: 'first slime' }, { kind: 'visible', sel: '.en[data-w="e6"]', name: 'sixth slime' }] });
+    checks: [{ kind: 'visible', sel: '.en[data-w="e1"]', name: 'first slime' }, { kind: 'visible', sel: '.en[data-w="e6"]', name: 'sixth slime' }, { kind: 'fn', name: 'every slime tappable, none under the top bar', fn: foesClear }] });
   GXS.add({ id: 'ec-reward', name: 'Reward: pick a card', ask: 'Pick one of three cards', seed: 7, when: booted,
     setup: function () { fight(['a'], 7); E().debug.win(); UI.render(); },
     checks: [{ kind: 'visible', sel: '.picks .card', name: 'reward card' },
