@@ -131,7 +131,7 @@ async function run(browser,W,H,mode){const tag=W+'x'+H+' '+mode;const t0=Date.no
   }
   // ---- the end
   // every core rule is taught, in this order, each as its own step (no "learn later" list)
-  const RULES=['goal','places','twig','stock','rival','resin','hand','build','city','prep','spring','berry','toad','free','event','forest','prep2','summer','inn','innbuy','bard','special','stack','haven','havenq','havendone','havenres','gossip','prep3','autumn','journey','road','journeyq','pass','score','bonus','end'];
+  const RULES=['goal','places','twig','stock','rival','resin','hand','build','city','prep','spring','berry','toad','free','event','forest','prep2','summer','lantern_rest','innbuy','ballad_finch','special','stack','haven','havenq','havendone','havenres','gossip','prep3','autumn','journey','road','journeyq','pass','score','bonus','end'];
   if(mode==='clean'){const miss=RULES.filter(r=>!seenIds.includes(r));if(miss.length)note(tag,'rule steps missing: '+miss.join(','));
     const ord=seenIds.filter(r=>RULES.includes(r));if(ord.join()!==RULES.filter(r=>ord.includes(r)).join())note(tag,'rule steps out of order: '+ord.join(','));
     const later=await p.evaluate(()=>!!document.querySelector('.hb-later'));if(later)note(tag,'a "learn later" list appeared')}
