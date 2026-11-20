@@ -7,7 +7,9 @@
 //  * edges are avoided; safe options for the next turn are counted from my remaining tiles (normal) and, for hard, also the odds that the tile I
 //    draw gives a safe option, plus a one-turn look-ahead and a push on rivals toward the edge
 // easy: often picks a random non-suicidal move, ignores monster risk. normal: 1-ply. hard: adds the look-ahead and rival pressure.
-const AILV={easy:{noise:30,rnd:.45,rk:0,mob:2,look:0,kill:250,push:0,draw:0},normal:{noise:4,rnd:.2,rk:420,mob:7,look:0,kill:320,push:0,draw:1},hard:{noise:0,rnd:0,rk:420,mob:7,look:0,kill:380,push:0,draw:1,mc:40}};
+// R92: Easy rivals also court leviathan risk (rk < 0: they sail into reach and start near leviathans), so a first-timer wins about half: rk in 3+ player games,
+// rk2 heads-up (newcomer sim, tools/newcomer.js). easyT = the old Easy, kept for the guided game (its rival's moves are part of the lesson).
+const AILV={easy:{noise:30,rnd:.45,rk:-200,rk2:-70,mob:2,look:0,kill:250,push:0,draw:0},easyT:{noise:30,rnd:.45,rk:0,mob:2,look:0,kill:250,push:0,draw:0},normal:{noise:4,rnd:.2,rk:420,mob:7,look:0,kill:320,push:0,draw:1},hard:{noise:0,rnd:0,rk:420,mob:7,look:0,kill:380,push:0,draw:1,mc:40}};
 let AISALT=12345;function setAiSeed(s){AISALT=s>>>0}
 function mkRng(seed){let a=seed>>>0;return ()=>{a=(a+0x6D2B79F5)|0;let t=Math.imul(a^a>>>15,a|1);t^=t+Math.imul(t^t>>>7,t|61);return ((t^t>>>14)>>>0)/4294967296}}
 function kHash(K){let h=AISALT^(K.seat*2654435761);const mix=x=>{h=Math.imul(h^x,2246822519)>>>0;h^=h>>>13};mix(K.turn);mix(K.sp);mix(K.mons.length);
@@ -102,7 +104,7 @@ function aiAnswer(K,seat,L,rng){const q=K.q;const opts=q.opts;const hand=K.hands
     default:return Math.floor(rng()*opts.length)}}
 function posVal(K,seat,r,L){if(r.st==='edge'||r.st==='mon')return -1000;if(r.st==='gate')return -200;const f=[r.x,r.y];const d=Math.min(f[0],f[1],BW-1-f[0],BW-1-f[1]);return -monRisk(K,f,r.on,L,null)*(L.rk||1)-(d===0?26:d===1?7:0)}
 let CAMP_PUSH=null;  // campaign twist 'harrier': {seat,v} makes that seat steer rivals toward the edge
-function decide(K,seat,lv){const L0=AILV[lv]||AILV.normal,L=CAMP_PUSH&&seat===CAMP_PUSH.seat?Object.assign({},L0,{push:CAMP_PUSH.v}):L0;const rng=mkRng(kHash(K));CUR_RNG=rng;MCC={};
+function decide(K,seat,lv){let L0=AILV[lv]||AILV.normal;if(lv==='easy'&&typeof TS!=='undefined'&&TS&&TS.on)L0=AILV.easyT;if(L0.rk2!=null&&K.ships.length===2)L0=Object.assign({},L0,{rk:L0.rk2});const L=CAMP_PUSH&&seat===CAMP_PUSH.seat?Object.assign({},L0,{push:CAMP_PUSH.v}):L0;const rng=mkRng(kHash(K));CUR_RNG=rng;MCC={};
   if(K.q){if(K.q.who!==seat)return null;return {a:'q',i:aiAnswer(K,seat,L,rng)}}
   const mv=genMoves(K,seat);if(!mv.length)return null;
   if(K.phase==='setup'){let best=mv[0],bs=-1e9;for(const m of mv){const sc=startScore(K,seat,m,L,rng);if(sc>bs){bs=sc;best=m}}return best}

@@ -37,7 +37,7 @@ function hlpPipExample(){try{const d=sideToAct();const info=startInfo(d);let bes
 const HLP_STEPS={
  start:{target:()=>hlpPipExample(),title:'Your start',text:'Tap a gold mark.',pic:()=>HP.mark()},
  lay:{target:hq('#ppop .ph-tiles','#ps .ps-tiles','#pin .hand'),title:'Lay a current',text:'Pick a tile, turn it, then tap Place. Your junk sails along the new line.',pic:()=>HP.tile()},
- nolay:{target:hq('#ps .ps-x .pb','#ps .ps-ctl .pb','#pin .row .btn','#main .row .btn'),title:'Nothing to lay',text:'No tile fits. Tap Pass, or use a Rift Gate or Deck Cannon if you have one.',pic:()=>HP.pass()},
+ nolay:{target:hq('#ps .ps-x .pb','#ps .ps-ctl .pb','#pin .row .btn','#main .row .btn'),title:'Nothing to lay',text:'You have no tiles. Tap Pass, or use a Rift Gate or Deck Cannon if you have one.',pic:()=>HP.pass()},
  doom:{target:hq('#pc [data-qkind] h4','#main [data-qkind] h4'),title:'Junk in danger',text:'A leviathan is about to sink you. Pick a rescue below, or Accept.',pic:()=>HP.lev()},
  cannon:{target:hq('#pc [data-qkind] h4','#main [data-qkind] h4'),title:'A Deck Cannon',text:'Keep it to shoot a leviathan later, or discard it and draw a different tile.',pic:()=>HP.cannon()},
  bonus:{target:hq('#pc [data-qkind] h4','#main [data-qkind] h4'),title:'Sunken crews\' tiles',text:'Swap one of your tiles for a sunken crew\'s tile, or keep your hand.',pic:()=>HP.swap()},
@@ -52,17 +52,17 @@ const HLP_RULES=[
  {phase:'start',title:'Corners are cramped',text:'A middle mark leaves room to turn. Near a corner you may run out of sea.',pic:()=>hpics([['edge','Edge = sunk'],['mark','Middle = room']])},
  {phase:'lay',title:'Lay and turn a tile',text:'Tap a tile, turn it with the arrows or a swipe, then tap Place. It joins your junk\'s line.',pic:()=>hpics([['tile','Pick'],'>',['rot','Turn'],'>',['tap','Place']])},
  {phase:'lay',title:'Your junk sails',text:'After you place, your junk sails along every connected current until the line ends. Rivals sail the same way.',pic:()=>hpics([['junk','Your junk'],'>',['line','Follows the line']])},
- {phase:'lay',title:'Edges and crashes sink',text:'Sail off the board, into a leviathan, or onto another junk\'s wake, and you sink. Check the red cross.',pic:()=>hpics([['edge','Edge'],['lev','Leviathan'],['crash','Crash']])},
- {phase:'lay',title:'Leviathans and waves',text:'Dice wake leviathans each turn; one that reaches you sinks you. A rogue wave capsizes junks that roll low.',pic:()=>hpics([['lev','Leviathan'],['wave','Rogue wave']])},
- {phase:'nolay',title:'No tile fits',text:'If you cannot lay a tile, you may pass. A Rift Gate or Deck Cannon can still help.',pic:()=>hpics([['tile','No tile'],'>',['pass','Pass']])},
+ {phase:'lay',title:'Edges and crashes sink',text:'Sailing off the board or into a leviathan sinks you. So does ending on another junk\'s wake, same way.',pic:()=>hpics([['edge','Edge'],['lev','Leviathan'],['crash','Crash']])},
+ {phase:'lay',title:'Leviathans and waves',text:'A roll of 6, 7 or 8 wakes the leviathans; one reaching you sinks you. Rogue waves capsize low rollers.',pic:()=>hpics([['lev','Leviathan'],['wave','Rogue wave']])},
+ {phase:'nolay',title:'No tiles in hand',text:'Every tile always fits, so you pass only with no tiles. A Rift Gate or Deck Cannon can still help.',pic:()=>hpics([['tile','No tile'],'>',['pass','Pass']])},
  {phase:'nolay',title:'Rift Gate',text:'A Rift Gate throws a junk to a rolled square. Use it to escape danger.',pic:()=>hpics([['gate','Rift Gate']])},
  {phase:'nolay',title:'Deck Cannon',text:'Fire a Deck Cannon at a leviathan next to your junk. It is removed from the board.',pic:()=>hpics([['cannon','Fire'],'>',['lev','Gone']])},
  {phase:'doom',title:'Sinking soon',text:'A leviathan is about to reach your junk. You get one chance to react before it happens.',pic:()=>hpics([['lev','Leviathan'],'>',['junk','Your junk']])},
- {phase:'doom',title:'Rescue options',text:'Fire a Deck Cannon, jump through a Rift Gate, or move to a safer square. Tap one.',pic:()=>hpics([['cannon','Cannon'],['gate','Gate']])},
+ {phase:'doom',title:'Rescue options',text:'Fire a Deck Cannon, jump through a Rift Gate, or move a blocked start along its edge. Tap one.',pic:()=>hpics([['cannon','Cannon'],['gate','Gate']])},
  {phase:'doom',title:'Or accept',text:'If nothing helps, tap Accept. Your junk sinks, but a rival must still outlast the others.',pic:()=>hpics([['crash','Accept'],'>',['crown','Others race on']])},
- {phase:'cannon',title:'A Deck Cannon',text:'Hold up to two. Fire one at a leviathan next to your junk, even on a rival\'s turn.',pic:()=>hpics([['cannon','Fire'],'>',['lev','Gone']])},
+ {phase:'cannon',title:'A Deck Cannon',text:'Hold up to two. Fire at a leviathan beside your junk; out of turn only when it would sink you.',pic:()=>hpics([['cannon','Fire'],'>',['lev','Gone']])},
  {phase:'cannon',title:'Keep or discard',text:'Keep it for later, or show it and discard it to draw a different tile.',pic:()=>hpics([['cannon','Keep'],['swap','Redraw']])},
- {phase:'bonus',title:'Elimination bonus',text:'When a junk sinks, its tiles go to a pool. You may swap yours for better ones.',pic:()=>hpics([['crash','Sunk'],'>',['swap','Swap']])},
+ {phase:'bonus',title:'Elimination bonus',text:'When YOUR tile sinks a rival, you may swap tiles with their hand. Otherwise their tiles go under the pile.',pic:()=>hpics([['crash','Sunk'],'>',['swap','Swap']])},
  {phase:'bonus',title:'Keep your hand',text:'Tap Keep your hand if your tiles are already good. Swapping is optional.',pic:()=>hpics([['tile','Your tiles'],['pass','No swap']])},
  {phase:'gate',title:'Rift Gate',text:'A rift throws a junk to a rolled square, and it lands on a tile you place.',pic:()=>hpics([['gate','Rift'],'>',['junk','New spot']])},
  {phase:'gate',title:'Choose the landing',text:'Pick a landing far from the edges and from leviathans, so your junk has room to sail.',pic:()=>hpics([['edge','Near edge'],['junk','Open sea']])}
@@ -112,7 +112,10 @@ function hlpInit(){if(_hlpInit||typeof GXH==='undefined')return;_hlpInit=true;
   GXH.init({game:'tidewake',defaultOn:true,steps:HLP_STEPS,rules:HLP_RULES,avoid:'.opip,.oring,#ps .pt,#ps .pb:not(.zoom),#ppop .pb,#ppop .ph-t,#pc .btn,#pin .hc,#pin .btn,#dockbody .btn'});
   GXH.bulb({el:'#bulbbtn',suggest:hlpSuggest,rulesFor:hlpPhase});
   const b=$('#bulbbtn');if(b)b.addEventListener('click',()=>{try{const c=GXH.state().cur;if(c&&c.kind==='bulb'&&G&&UI.started)UI.campHints=(UI.campHints||0)+1}catch(e){}})}
-function hlpAfter(){hlpInit();if(typeof GXH==='undefined'||HLP.quiet||UI.tut||!GXH.enabled()||document.querySelector('.gxt-end,.gxt-bub')||(typeof GXT!=='undefined'&&GXT.running&&GXT.running())||(typeof tutOn==='function'&&tutOn()))return;GXH.phase(hlpPhase())}
+function hlpAfter(){hlpInit();if(typeof GXH==='undefined'||HLP.quiet||UI.tut||!GXH.enabled()||document.querySelector('.gxt-end,.gxt-bub')||(typeof GXT!=='undefined'&&GXT.running&&GXT.running())||(typeof tutOn==='function'&&tutOn()))return;
+  // R92: the guided game already taught picking a start and laying a tile: after it, those two first-time bubbles are not repeated
+  const ph=hlpPhase();if((ph==='start'||ph==='lay')&&typeof GXT!=='undefined'&&typeof TUT_GAME!=='undefined'&&GXT.isDone(TUT_GAME)){const c=GXH.state().cur;if(c&&c.kind==='coach')GXH.phase(null);return}
+  GXH.phase(ph)}
 {const _r=render;render=function(){const r=_r.apply(this,arguments);try{hlpAfter()}catch(e){console.error(e)}return r};
  const _pa=phAfter;phAfter=function(){const r=_pa.apply(this,arguments);try{hlpAfter()}catch(e){console.error(e)}return r}}
 hlpInit();

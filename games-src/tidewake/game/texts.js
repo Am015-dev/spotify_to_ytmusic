@@ -20,14 +20,14 @@ const RULES_HTML=`
 <p>Some things happen out of turn. If your junk is about to be lost and you hold a <b>Deck Cannon</b> or the <b>Rift Gate</b>, you are asked what to do, even on someone else's turn. A human has a short timer for that choice; when it runs out the computer's best advice is used. If your junk is blocked at its start by a leviathan you may slide to another mark on the same edge.</p>
 <h3>Expansion pieces (Deepwater Perils, each can be switched on or off)</h3>
 <ul><li><b>Rift Gate</b> (1, shuffled into the current pile): play it instead of a current, or to escape a sinking. It stays on its square for the whole game. Junks and leviathans that touch it are thrown to a square rolled on the dice; a junk then picks a wake and a direction to ride from there.</li>
-<li><b>Rogue Wave</b> (1, in the leviathan pile, with a blue edge marker): a wave sweeps one whole row or column. Whenever a junk is in that line (by its own move or because the wave moved) the owner rolls a die and must reach the wave's strength (2, then 3, then 4 as it ages) or capsize. It moves one square each round and is gone when it leaves the board. Tiles are not harmed.</li>
+<li><b>Rogue Wave</b> (1, in the leviathan pile, with a blue edge marker): a wave sweeps one whole row or column. Whenever the active junk is in that line, or the moving wave passes over a junk, that junk's owner rolls a die and must reach the wave's strength (2, then 3, then 4 as it ages) or capsize. It moves one square each round and is gone when it leaves the board. Tiles are not harmed.</li>
 <li><b>Maelstrom</b> (1, in the leviathan pile): a whirlpool that moves only on turns when the leviathans stay still (a roll outside 6 to 8). One die: 1 to 4 moves it east, south, west or north, 5 and 6 do not move it. It destroys whatever it enters, leviathans included. A current it destroys leaves the game for good (it does not go back to the pile), along with any junks on it. It does not count towards the minimum of three.</li>
 <li><b>Deck Cannon</b> (5, shuffled into the current pile, two per hand at most): when you draw one you may keep it or show it and draw again. Fire it when a leviathan is about to sink your junk (even out of turn), or on your turn instead of a tile against a leviathan next to your front square. The leviathan goes to the bottom of its pile.</li></ul>
 <h3>Variants</h3>
 <ul><li><b>Solo:</b> one junk, six leviathans. Goal: survive until all ten leviathans have risen and are gone from the board (the top bar shows how many are still to rise).</li><li><b>Easy solo:</b> one junk; destroyed tiles are discarded, not recycled. <i>Our variant:</i> start with four leviathans and survive 24 turns, or play out the whole pile if that happens first.</li><li><b>Teams:</b> four, six or eight captains in two equal teams (every other seat). You may lay your tile in front of a teammate's junk. The last team afloat wins.</li></ul>
 <h3>Controls</h3>
 <p>Tap a tile in the panel (or press <b>1 2 3</b>), turn it with the turn buttons, <b>R</b> or <b>Q</b>, then press <b>Place</b> or <b>Enter</b>. Tap a gold mark on the edge to start. <b>Esc</b> closes popups.</p>
-<details class="guess"><summary>Our guesses (the published rules did not say)</summary><ul><li>Easy solo starts with four leviathans (our variant).</li><li>The board is 7 by 7 squares; the gold and blue numbers 1-6 run over columns and rows 1-6, so leviathans never rise on column 7 or row 7 (the gold-framed 6 by 6 area is where the dice can reach).</li><li>The 56 currents are the 35 different layouts plus 21 repeats we spread evenly (the real repeats are unknown).</li><li>The arrows on the leviathan tiles, their order numbers and gold tie-breakers are our own design.</li><li>Collisions: a junk "passing through" another is fine, but two junks forced to end on one wake in one direction both sink; head-on wakes sink both.</li><li>Rift Gate during another captain's turn is placed on a free square beside the doomed junk; Deck Cannon range on your own turn is the leviathans orthogonally next to your front square or tile.</li><li>Rogue Wave strength 2, then 3, then 4 from the fourth round.</li><li>Easy solo ends after 24 turns because a 6 by 6 board can never hold the whole pile.</li></ul></details>
+<details class="guess"><summary>Our guesses (the published rules did not say)</summary><ul><li>Easy solo starts with four leviathans (our variant).</li><li>The board is 7 by 7 squares; the gold and blue numbers 1-6 run over columns and rows 1-6, so leviathans never rise on column 7 or row 7 (the gold-framed 6 by 6 area is where the dice can reach).</li><li>The 56 currents are the 35 different layouts plus 21 repeats we spread evenly (the real repeats are unknown).</li><li>The arrows on the leviathan tiles, their order numbers and gold tie-breakers are our own design.</li><li>Collisions: a junk "passing through" another is fine, but two junks forced to end on one wake in one direction both sink.</li><li>Rift Gate during another captain's turn is placed on a free square beside the doomed junk; Deck Cannon range on your own turn is the leviathans orthogonally next to your front square or tile.</li><li>Rogue Wave strength 2, then 3, then 4 from the fourth round.</li><li>Easy solo ends after 24 turns because the 49 squares of the 7 by 7 board can never hold the whole pile of 56.</li></ul></details>
 <h3>Credits</h3><p>Names, card text and art are original. <button class="btn small" data-gx="credd">Full credits</button></p>`;
 const COACH=[
  {id:'start',t:'Welcome aboard',x:'You sail one junk; the last junk afloat wins. After this card, tap Best start (or an edge square, then a gold mark) to put your junk on the board.'},
@@ -56,7 +56,7 @@ const OSK_TEXT={
  lay:['Lay a current','Pick a tile, Turn it, Place it at your bow. SAFE floats; SINKS means off the chart.'],
  sail:['Well sailed!','Your junk rode the current to its end. Now draw back to three.'],
  chain:['Cobalt moves','{riv} laid a current. His tiles join yours. You can ride them.'],
- collide:['Mind his wake','Never stop on another junk\'s line. Two junks on one wake both sink.'],
+ collide:['Mind his wake','Never end on another junk\'s wake heading the same way: both junks sink.'],
  levmove:['The deep stirs','A leviathan swims one square along an arrow, or turns.'],
  levsink:['Leviathans bite','A leviathan entering your square sinks you. Stay clear of its arrows.'],
  cannon:['A Deck Cannon!','Keep it. If a leviathan would sink you, fire. It is gone.'],
@@ -67,7 +67,7 @@ const OSK_TEXT={
  good:['Good move!','{why}'],
  poor:['Careful','{why}'],
  end:['The lantern','{why}'],
- tie:['A shared fate','If the last junks sink together, it is a draw.'],
+ tie:['A shared fate','If the last junks sink together, they all share the win.'],
  more:['Teams and solo','Bigger games add more captains, teams, and a solo race.']
 };
 // rival comments (Osk on Cobalt's moves), picked in turn; {riv} {n}

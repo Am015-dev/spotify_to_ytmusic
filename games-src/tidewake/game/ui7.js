@@ -36,7 +36,7 @@ function phMini(card,rot,A){const ps=TWKit.rotate(BASE_PATHS[CUR_TYPE[card]],rot
 function phWhy(A){if(!A)return '';if(A.coll)return 'collision';if(A.st==='edge')return 'off the edge';if(A.st==='mon')return 'hits a monster';if(A.st==='gate')return 'Rift Gate';if(A.st==='ok')return (A.n||1)+(A.n>1?' currents':' current')+(A.mons&&A.mons.length?' · monster near':'');return ''}
 // why a tile cannot go down this way (R34: a tap on an X tile gave no sign): a short line in the strip
 function phCantMsg(m,seat){try{if(!m||m.a!=='place')return '';const A=analyse(knowledge(seat),seat,m);if(!A||!A.bad)return '';
-  return "Can't: "+(A.coll?'another junk is in the way':A.st==='mon'?'a leviathan is ahead':A.st==='edge'?'no room ahead':'that way sinks you')+'. Turn the tile.'}catch(e){return ''}}
+  return "Can't: "+(A.coll?'another junk is in the way':A.st==='mon'?'a leviathan is ahead':A.st==='edge'?'off the edge':'that way sinks you')+'. Turn the tile.'}catch(e){return ''}}
 function phCardNote(){if(!PH.on||!UI.sel||UI.busy)return;const d=sideToAct();PH.toast=phCantMsg({a:'place',t:UI.sel.t,r:UI.sel.r,s:UI.sel.s},d)}
 // ---------- what the player may do right now ----------
 function phPlaceCtx(){if(!G||!UI.started||G.over||UI.busy)return null;const d=sideToAct();if(d<0||!G.seats[d].human||mustPass(d))return null;if(NET.on&&d!==NET.mySeat)return null;if(G.q||G.phase!=='play'||G.step!=='act')return null;
@@ -49,7 +49,7 @@ function phTargets(c){const fr=[...new Set(c.pl.map(m=>m.s))];if(fr.length<2)ret
 function phZoomBtn(){const c3=$('#c3');if(!c3||c3.hidden)return '';return `<button class="pb zoom${PH.zoom?' on':''}" data-ph="zoom" aria-pressed="${PH.zoom}" aria-label="Zoom to my ship" title="Zoom to my ship">${PH_ICO.zoom}</button>`}
 function phHint(){if(UI.res&&UI.res.text){const w=String(UI.res.text).split(/\s+/);return esc(w.length<=18?w.join(' '):w.slice(0,17).join(' ').replace(/[,;:.]$/,'')+'…')}return ''}
 // ---------- the control strip ----------
-var tipOn=function(){try{return GXH.enabled()&&!GXH.seen('start')}catch(e){return false}};
+var tipOn=function(){try{return GXH.enabled()&&!GXH.seen('start')&&!(typeof GXT!=='undefined'&&GXT.isDone('tidewake'))}catch(e){return false}};
 function phStripHTML(){if(!G||!UI.started)return '';const d=sideToAct(),zb=phZoomBtn();
   if(G.over&&!UI.busy)return `<div class="ps-main"><div class="ps-stat"><b>Game over</b></div><div class="ps-ctl">${PH.ovHide===G.over?'<button class="pb pri" data-ph="showover">Result</button>':''}<button class="pb" data-a="again">Play again</button>${zb}</div></div>`;
   if(UI.busy){const now=UI.curTurn!=null&&G.seats[UI.curTurn]?UI.curTurn:d;return `<div class="ps-main"><div class="ps-stat">${G.over?'<b>The last moves play out</b>':now>=0?dot(now)+' '+phWhose(now)+dangerHTML():'The sea moves'}</div><div class="ps-ctl"><button class="pb" data-a="skip">${G.over?'Skip':humans().length===1&&!NET.on&&youSeat()>=0&&G.ships[youSeat()]&&!G.ships[youSeat()].alive?'See the result':humans().length===1&&!NET.on&&now!==youSeat()?'Skip to my turn':'Skip'}</button>${zb}</div></div>${phRivalFeed()||`<div class="ps-line">${phHint()}</div>`}`}
