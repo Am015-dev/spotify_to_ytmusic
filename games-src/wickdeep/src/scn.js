@@ -28,10 +28,11 @@
     mut: [{ name: 'moves ignored', js: 'WD.apply = function(G){ return G; }' }] });
   GXS.add({ id: 'wd-attack', name: 'Attack a monster', ask: 'Does the hit show a card flip?', seed: 8, when: booted,
     setup: function () {
-      fresh(1, null, 8); var h = G.figs[0]; G.hex['0,4'].open = true; G.rev[1] = true;
-      var m = { id: 'mx', kind: 'mon', team: 'm', type: 'rat', elite: false, pos: '1,4', hp: 9, max: 9, cond: {}, rnd: {}, num: 1 };
-      G.figs.push(m); h.pos = '1,3'; G.md.rat = G.md.rat || { fam: 'swarm', draw: [0, 1, 2, 3, 4, 5, 6, 7], disc: [], cur: null, resh: false };
-      toTurn(); var f = WD.fig(G, G.ask.id); f.pos = '1,3'; G.figs.forEach(function (o) { if (o.kind === 'hero' && o !== f) o.pos = '3,0'; }); WDUI.refresh(); return calm();
+      fresh(1, null, 8); toTurn(); var f = WD.fig(G, G.ask.id);
+      var adj = WD.nb(f.pos).filter(function (k) { return G.hex[k] && G.hex[k].t === 'f' && !WD.figAt(G, k); })[0];
+      G.figs.push({ id: 'mx', kind: 'mon', team: 'm', type: 'rat', elite: false, pos: adj, hp: 9, max: 9, cond: {}, rnd: {}, num: 1 });
+      G.md.rat = G.md.rat || { fam: 'swarm', draw: [0, 1, 2, 3, 4, 5, 6, 7], disc: [], cur: null, resh: false };
+      WDUI.refresh(); return calm();
     },
     checks: [{ kind: 'play', name: 'Hit 2 a monster', snap: function () { return { hp: (WD.fig(G, 'mx') || { hp: 0 }).hp, n: G.mamd.draw.length + G.mamd.disc.length }; },
       steps: [{ sel: function () { return document.querySelector('#tray .basic button.can[data-b="top"]'); } }, { sel: '#playbtn' }, { sel: '#hot .glow.atk', skip: function () { return !G.ask || G.ask.h !== 'target'; } }], idle: idle,
