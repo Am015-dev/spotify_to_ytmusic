@@ -230,6 +230,16 @@ function rivShow(lines) {
   e.classList.remove('on'); void e.offsetWidth; e.classList.add('on');
   clearTimeout(UI.rivT); UI.rivT = setTimeout(() => e.classList.remove('on'), 2600);
 }
+// PLAY2: each rival's score rise, with what caused it ("Bramble +4 points: built cards, a goal")
+function rivPts() {
+  const out = []; UI.rivSc = UI.rivSc || {};
+  G.players.forEach((p, s) => { if (!p.ai) return; const x = score(s), o = UI.rivSc[s]; UI.rivSc[s] = x;
+    if (!o || x.total <= o.total) return; const why = [];
+    if (x.cards > o.cards) why.push('cards built'); if (x.tokens > o.tokens) why.push('point tokens'); if (x.events > o.events) why.push('a goal');
+    if (x.journey > o.journey) why.push('the Journey'); if (x.bonus > o.bonus) why.push('purple end bonus');
+    out.push(p.name + ' +' + (x.total - o.total) + ' points' + (why.length ? ': ' + why.join(', ') : '')); });
+  return out;
+}
 // ---- a score you feel: "+N" rises once from your score when your total goes up
 function ptsPop(d) {
   const v = Math.max(0, viewSeat()), c = document.querySelector('#bd [data-a="chip"][data-seat="' + v + '"]'); if (!c) return;
@@ -246,6 +256,7 @@ function p1After() {
       if (UI.rvN == null || G.logN < UI.rvN) { UI.rvN = G.logN; UI.lastPts = null; }   // a new game starts the count again
       if (G.logN > UI.rvN) {
         const fresh = G.log.filter(x => x.i > UI.rvN).map(x => rivLine(x.t, ai)).filter(Boolean); UI.rvN = G.logN;
+        fresh.push(...rivPts());   // PLAY2: a rival's points always come with the reason
         if (fresh.length && humans().length) rivShow(fresh);
       }
       const v = viewSeat();

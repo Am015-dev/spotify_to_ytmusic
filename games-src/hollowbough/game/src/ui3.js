@@ -20,6 +20,7 @@ function deadSay(tg) {
 }
 function onTarget(tg, el) {
   if (!G || UI.cards.length) return;
+  if (!UI.lookSkip && UI.tabAutoAt && Date.now() - UI.tabAutoAt < 500) { shake(el); return; }   // PLAY2: the panel just changed under the finger
   if (lookFirst(tg, el)) return;   // PLAY1: a tap shows what the move does and gives; the sheet's button commits
   if (/^x:/.test(tg) || UI.animBusy) { UI.sel = null; shake(el); if (/^x:/.test(tg) && !UI.animBusy) deadSay(tg); return; }
   const mm = myMoves();
@@ -310,6 +311,10 @@ function lookOpen(m, tg, el) {
   } else if (m.type === 'prepare') {
     const s = p.season + 1; title = 'Prepare for ' + SEASN[s]; sub = 'Your workers come home';
     what = SEASON_GIVES[s] || ''; art = h('div.lk-season', seasonIcon(s, 64)); go = 'Prepare';
+  } else if (m.type === 'pass') {
+    title = 'Pass for the year'; sub = 'Your game ends here'; go = 'Pass';
+    what = 'You take no more turns. Your score so far is final. ' + (G.players.some((q, i) => i !== HB.actor(G) && !q.passed) ? 'The others keep playing until they pass.' : 'The game ends now.');
+    art = h('div.lk-season', seasonIcon(3, 64));
   } else if (m.type === 'choose') return choiceLook(m, el);
   else return false;
   const gain = lookDelta(m), plan = lookPlan(m);
@@ -333,7 +338,7 @@ function lookNeed(tg) {
 }
 function lookFirst(tg, el) {
   try {
-    if (!LOOK.on() || UI.animBusy || UI.lookSkip || tg === 'pass') return false;
+    if (!LOOK.on() || UI.animBusy || UI.lookSkip) return false;
     if (/^x:[hm]\d+$/.test(tg)) return lookNeed(tg);
     if (/^x:/.test(tg)) return false;
     const ms = myMoves().filter(m => tgOf(m) === tg); return ms.length === 1 && lookOpen(ms[0], tg, el);
@@ -370,12 +375,14 @@ document.addEventListener('click', e => {
   document.addEventListener('pointerdown', e => {
     UI.pressAt = Date.now();
     const t = e.target.closest && e.target.closest('#bd [data-a="t"]'), row = e.target.closest && e.target.closest(ROW);
-    pd = (t || row) ? { t, tg: t && t.dataset.t, row, sl: row ? row.scrollLeft : 0, x: e.clientX, y: e.clientY, at: Date.now() } : null;
+    const out = !(e.target.closest && e.target.closest('#bd'));   // a press outside the board (the help bubble's Got it hides on press)
+    pd = (t || row) ? { t, tg: t && t.dataset.t, row, sl: row ? row.scrollLeft : 0, x: e.clientX, y: e.clientY, at: Date.now() } : out ? { out: true, at: Date.now() } : null;
   }, true);
   document.addEventListener('click', e => {
     const p = pd; pd = null; if (!p || !e.isTrusted || Date.now() - p.at > 1500) return;
-    const moved = Math.hypot(e.clientX - p.x, e.clientY - p.y) > 14 || (p.row && Math.abs(p.row.scrollLeft - p.sl) > 10);
+    const moved = Math.hypot(e.clientX - p.x, e.clientY - p.y) > 14;   // the finger travelled: a swipe. (The row itself may slide on press: a half-hidden card is focused into view; that is still a tap on the pressed card.)
     const t = e.target.closest && e.target.closest('#bd [data-a="t"]');
+    if (p.out) { if (t) { e.stopImmediatePropagation(); e.preventDefault(); } return; }   // it fell through to a place under it: not a tap on that place
     if (moved && p.row) { e.stopImmediatePropagation(); e.preventDefault(); return; }   // the row was swiped: no card opens
     if (!p.tg || (t && t.dataset.t === p.tg)) return;   // the same card: nothing to fix
     // the board was redrawn (or the row slid) between press and release: answer the card that was pressed
@@ -551,6 +558,8 @@ function payoutCheck() {
     parts.length ? h('p.p2pay-big', parts.join(', ')) : null,
     greens.length && s.season !== 2 ? h('p.p2pay-from', 'From ' + greens.join(', ')) : null,
     s.season === 1 && greens.length ? h('p.p2pay-next', 'They pay again when you prepare for Autumn.') : null,
+    (() => { const sb = G.players.map((q, i) => ({ i, b: score(i).bonus || 0 })).filter(x => x.b > 0); return sb.length ? h('p.p2pay-next', 'Purple cards add points at the end: ' + sb.map(x => (x.i === s.seat ? 'you' : G.players[x.i].name) + ' +' + x.b).join(', ') + ' so far.') : null; })(),
+    s.season === 3 ? h('p.p2pay-next', 'Autumn: the Journey opens. Send a worker and discard cards for 2 to 5 points.') : null,
     ...rivals.map(i => h('p.p2pay-riv', pawn(i, 22), h('span', rivToward(i) + ' ' + score(i).total + ' points.'))),
     h('p.p2pay-you', 'You: ' + score(s.seat).total + (score(s.seat).total === 1 ? ' point.' : ' points.'))),
     buttons: btns });

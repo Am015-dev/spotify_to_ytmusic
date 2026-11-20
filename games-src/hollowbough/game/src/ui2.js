@@ -634,6 +634,7 @@ function pvMini(id, entry) {
 const PV_TABS = [['places', 'Places'], ['meadow', 'Meadow'], ['city', 'City'], ['goals', 'Goals']];
 function pvTall() { return !!document.querySelector('#bd.pv.tall'); }
 function pvSetTab(v, quiet) {
+  if (!quiet) UI.tabAutoAt = 0; else if (UI.pvTabShown && UI.pvTabShown !== v) UI.tabAutoAt = Date.now(); UI.pvTabShown = v;   // PLAY2: remember when the panel changed by itself
   UI.pvTab = v; const bd = $('#bd'); if (!bd || !bd.classList.contains('pv')) return;
   bd.querySelectorAll('.pv-panel').forEach(p => p.classList.toggle('on', p.dataset.p === v));
   bd.querySelectorAll('.pv-tab').forEach(t => { const on = t.dataset.v === v; t.classList.toggle('on', on); t.setAttribute('aria-selected', on ? 'true' : 'false'); });
