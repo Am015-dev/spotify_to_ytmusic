@@ -35,6 +35,8 @@ const srv = http.createServer((q, r) => { const u = decodeURIComponent(q.url.spl
     }
     if (st && st.me && !st.choice && st.ph === 'buy' && buys < 40) {
       const k = await p.evaluate(() => { const q = G.pl[G.active]; for (let i = 0; i < G.market.length; i++) if (canBuy(q, i)) return i; return -1 });
+      // F2: the shop is hidden while the dice resolve; wait for it instead of giving up the shop for the turn (it made this newcomer never buy)
+      if (k >= 0 && await p.evaluate(() => { const d = document.querySelector('[data-bf]'); return !!(d && d.dataset.bf === 'resolving') })) { await L.sleep(300); continue }
       if (k >= 0 && await L.tapSel(p, `#pshop [data-shop="${k}"], #buymini [data-card="${k}"]`)) { await L.sleep(400); await L.tapSel(p, `#obcard.on [data-obbuy="${k}"], #pshop [data-shop="${k}"], #buymini [data-card="${k}"]`); buys++; taps += 2; await L.sleep(900); continue }
       buys = 99;
     }

@@ -45,7 +45,15 @@ function storyScan(){if(!G)return;if(UI.sgid!==G.gid){UI.sgid=G.gid;UI.lseen=0;U
 function renderNews(){const n=document.getElementById('news'),m=document.getElementById('moment');if(!n)return;
   if(!G||UI.info){n.innerHTML='';m.classList.add('hidden');return}
   const last=UI.news&&UI.news[UI.news.length-1];n.innerHTML=last?`<button class="newsbtn" data-gx="dr-log" title="Open the chronicle">${esc(last)}</button>`:'';
-  if(UI.moment&&!(G&&G.winner)){m.classList.remove('hidden');m.style.setProperty('--mc',UI.moment.c||'#e63946');m.innerHTML=`<b>${esc(UI.moment.h)}</b><span>${esc(UI.moment.s)}</span>`}else{m.classList.add('hidden');m.innerHTML=''}}
+  if(UI.moment&&!(G&&G.winner)){m.classList.remove('hidden');m.style.setProperty('--mc',UI.moment.c||'#e63946');m.innerHTML=`<b>${esc(UI.moment.h)}</b><span>${esc(UI.moment.s)}</span>`;momPlace(m)}else{m.classList.add('hidden');m.innerHTML=''}}
+// F2: on a portrait phone the banner sits just under the board line and its recap, and never over the dice tray (375x553)
+function momPlace(m){const R=document.documentElement;m.style.top='';m.classList.remove('slim');R.classList.remove('mom-over');if(!R.classList.contains('ph-p')||m.classList.contains('hidden'))return;
+  const vis=e=>{if(!e||e.hidden)return null;const r=e.getBoundingClientRect();return r.height>0&&getComputedStyle(e).display!=='none'?r:null};
+  const lim=['#dice','#choice:not(.hidden)'].map(s=>vis(document.querySelector(s))).filter(Boolean).map(r=>r.top),cap=lim.length?Math.min(...lim)-4:innerHeight;
+  const place=sels=>{const top=Math.max(52,...sels.map(s=>vis(document.querySelector(s))).filter(Boolean).map(r=>r.bottom))+6;m.style.top=top+'px';return cap-top};
+  let room=place(['#bline','#bsub']);if(m.getBoundingClientRect().height<=room)return;
+  // no room under the recap: the knockout banner wins for its 4 s, the recap line steps aside
+  R.classList.add('mom-over');room=place(['#bline']);if(m.getBoundingClientRect().height>room)m.classList.add('slim')}
 // the resolve banner, with the reason things happened
 function storyBanner(R){const p=R.p;const out=[...R.out];
   if(R.forced==='city'||(R.yielders.length&&R.forced))out.push(`moves into Downtown 👑 +1★`);else if(R.forced==='bay')out.push('moves into the Harbor ⚓ +1★');

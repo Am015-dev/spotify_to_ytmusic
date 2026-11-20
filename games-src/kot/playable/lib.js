@@ -24,7 +24,7 @@ async function tapSel(p, sel, { text, nth = 0 } = {}) {
       out.push([x, y]);
     } return out[nth] || null
   }, { sel, text, nth });
-  if (!pt) return false; await p.mouse.click(pt[0], pt[1]); return true
+  if (!pt) return false; if (process.env.TOUCH) await p.touchscreen.tap(pt[0], pt[1]); else await p.mouse.click(pt[0], pt[1]); return true
 }
 // one decision of a human who only taps what is visible and on top
 async function step(p) {

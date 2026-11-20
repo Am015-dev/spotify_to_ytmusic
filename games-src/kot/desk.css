@@ -1,0 +1,43 @@
+/* F2 desktop layout: monsters left, board centre, turn + cards right (see desk.js) */
+html.cc-desk .gx-main{grid-template-columns:290px minmax(0,1fr) var(--gx-dock-w)}
+html.cc-desk .gx-app.gx-dock-min .gx-main{grid-template-columns:290px minmax(0,1fr) 0}
+html.cc-desk:not(.cc-game) .gx-main{grid-template-columns:0 minmax(0,1fr) var(--gx-dock-w)}
+html.cc-desk:not(.cc-game) #ccleft{visibility:hidden;padding:0;border:0}
+#ccleft{min-width:0;min-height:0;overflow:auto;box-sizing:border-box;padding:10px 10px 14px;background:linear-gradient(180deg,#2c1b42,#1f1430);border-right:3px solid #1a1320;display:flex;flex-direction:column;gap:8px}
+#ccleft h2,#marketwrap .ccmh{margin:0;align-self:flex-start;display:inline-block;padding:2px 12px;border-radius:999px;background:#1a1320;border:2px solid #ffd23f;font:400 20px/1.1 Bangers,Impact,sans-serif;letter-spacing:.05em;color:#ffd23f}
+#ccleft #monswrap{display:block}
+#ccleft .score{display:flex;flex-direction:column;gap:8px}
+#ccleft .mon{font-size:14px}
+#ccleft .mon .mc{font-size:13px;line-height:1.3}
+#ccleft .mon .cthumb{display:none}
+#ccleft.ccflash,#marketwrap.ccflash{animation:ccflash .9s ease-out 1}
+@keyframes ccflash{0%{box-shadow:inset 0 0 0 4px #ffd23f}100%{box-shadow:inset 0 0 0 0 transparent}}
+/* the small score list over the board repeats the left panel */
+html.cc-desk.cc-game #pchips,html.cc-desk.cc-game #ppstand{display:none!important}
+/* the cards for sale in the right panel, under your stats */
+html.cc-desk #dockbody #marketwrap{display:block;margin-top:10px}
+html.cc-desk #dockbody #marketwrap .ccmh{margin-bottom:8px}
+html.cc-desk #dockbody .market>p{color:inherit;opacity:.9}
+html.cc-desk #dockbody .market{display:grid;grid-template-columns:minmax(0,1fr);gap:6px}
+html.cc-desk #dockbody .market .pc{font-size:13px;min-width:0}
+html.cc-desk #dockbody .market .pc p{font-size:13px;line-height:1.3}
+html.cc-desk #dockbody .market>p{grid-column:1/-1;font-size:13px}
+html.cc-desk .gx-bar [data-gx="dr-market"],html.cc-desk #buymini [data-gx="dr-market"]{display:none}
+/* your own name in the right panel was cream on cream */
+html.cc-desk #youbox b.t{color:#1a1320!important}
+/* compact shop cards in the right panel: name, cost, kind and text (the art stays on the board tiles) */
+html.cc-desk #dockbody .market .pc .art{display:none}
+html.cc-desk #dockbody .market .pc .hd .nm{font-size:15px}
+html.cc-desk #dockbody .market .pc .ty{font-size:12px}
+/* one row per card: name and cost, then the effect with the Buy button beside it */
+html.cc-desk #dockbody .market .pc{display:grid;grid-template-columns:minmax(0,1fr) auto;column-gap:10px;row-gap:2px;align-items:center;padding:6px 10px;height:auto;min-height:0;aspect-ratio:auto}
+html.cc-desk #dockbody .market .pc .hd{grid-column:1/-1;display:flex;justify-content:space-between;align-items:center;gap:8px}
+html.cc-desk #dockbody .market .pc .ty{display:none}
+html.cc-desk #dockbody .market .pc p{grid-column:1;margin:0;min-height:0}
+html.cc-desk #dockbody .market .pc .buy{grid-column:2;grid-row:2;margin:0;min-height:40px;min-width:72px}
+/* your monster already has its card in the left panel */
+html.cc-desk.cc-game #youbox{display:none!important}
+html.cc-desk #dockbody .market .pc p{font-size:13px;line-height:1.25}
+/* bigger dice on a big screen */
+@media (min-height:900px){html.cc-desk #ob{--dw:74px}}
+html.cc-desk #dockbody .market>p{display:none}   /* the deck footnote read dark on the dark panel */

@@ -50,7 +50,9 @@ function bfLine(){const el=$bf('bline');if(!el)return;bfRecapWatch();const fl=!!
   const rv=!!(t&&G&&!G.winner&&!humanTurn()&&!NET.on&&!UI.choice&&!UI.intro&&!bfOut());
   if(!fl&&G&&humanTurn()&&G.phase==='roll'&&BF.spin&&bfNow()<BF.spin.end&&!UI.choice&&!UI.intro)t='Rolling the dice…';
   const rc=BF.recap&&t&&!G.tut&&(rv||(humanTurn()&&G.phase==='roll'&&G.rolls>=rerollsOf(cur())))?BF.recap:'';
-  if(el.textContent!==t)el.textContent=t;bfSub(rc,rv&&!BF.fast,el);el.classList.toggle('hid',!t);el.classList.toggle('flash',!!(BF.flash&&BF.flash.until>bfNow()))}
+  if(el.textContent!==t)el.textContent=t;bfSub(rc,rv&&!BF.fast,el);
+  {const poor=/^Not enough ⚡/.test(t);el.classList.toggle('poor',poor);document.querySelectorAll('[data-act="end"]').forEach(b=>b.classList.toggle('endnudge',poor))}   // F2: nothing affordable: the line turns gold and End turn glows
+  el.classList.toggle('hid',!t);el.classList.toggle('flash',!!(BF.flash&&BF.flash.until>bfNow()))}
 function bfFlash(t,ms){if(!document.documentElement.classList.contains('pp-hints')||(G&&G.tut))return;ms=Math.max(ms||0,4000+String(t).split(/\s+/).length*100);BF.flash={t,until:bfNow()+ms};bfLine();clearTimeout(BF.flashT);BF.flashT=setTimeout(bfLine,ms+20)}
 // ---- what the dice would do, shown on the board ----
 function bfMarks(){const el=$bf('bmarks');if(!el)return;
@@ -115,18 +117,21 @@ function bfPlay(k,e,orig){const c=BF.cap,a=c.a,m=/^([+-])(\d+)(♥|⚡|★)$/.ex
       land:()=>{if(!landed){landed=true;done()}else if(burst==='hit'&&typeof sfx==='function'){SND.last.clack=0;sfx('clack')}}})});
   BF.until=Math.max(BF.until,bfNow()+t+flights.length*70+bfTail(900))}
 // W500 pacing: a computer turn lands in about 2 s; a tap on the board makes the rest near-instant
-function bfTail(ms){return !G||humanTurn()?ms:BF.fast?120:Math.round(ms*.45)}
+function bfTail(ms){return !G||humanTurn()?ms:BF.fast?120:Math.round(ms*(G.mode==='solo'?.3:.45))}
 // ---- one-line recap of what each computer monster did on its turn ----
 function bfRecapWatch(){if(!G||G.winner||G.tut||NET.on){BF.rsA=-1;BF.recap='';return}const a=G.active;if(a===BF.rsA)return;
   const o=BF.rs;if(o&&G.pl[o.a]&&!G.pl[o.a].human){const q=G.pl[o.a],me=meSeat();
     const dv=q.vp-o.vp,de=q.en-o.en,dh=q.hp-o.hp[q.i];const g=[];if(dv>0)g.push(`+${dv}★`);if(de>0)g.push(`+${de}⚡`);if(dh>0)g.push(`+${dh}♥`);
     const hit=G.pl.filter(r=>r.i!==q.i&&o.hp[r.i]>r.hp).map(r=>[r.i===me?'you':mname(r),o.hp[r.i]-Math.max(0,r.hp)]);
-    BF.recap=bfShort(mname(q),[g.join(' '),G.city===q.i&&o.city!==q.i?'took 👑':''].filter(Boolean).join(' · '),hit,BF.bought||[])}
+    const r1=bfShort(mname(q),[g.join(' '),G.city===q.i&&o.city!==q.i?'took 👑':''].filter(Boolean).join(' · '),hit,BF.bought||[]);
+    // F2: the last two rival lines stay up together, so each one is readable for two turns (about 3 s), not one
+    BF.recaps=(BF.recaps||[]).concat(r1).slice(-2);BF.recap=BF.recaps.join('\n')}else if(o&&G.pl[o.a]&&G.pl[o.a].human){BF.recaps=[];BF.recap=''}
   BF.bought=[];BF.rsA=a;const q=G.pl[a];BF.rs=q?{a,vp:q.vp,en:q.en,hp:G.pl.map(r=>r.hp),city:G.city}:null}
 // the recap and the skip hint sit in their own small lines just under the board line (each one short)
 function bfSub(rc,sk,ln){let w=document.getElementById('bsub');if(!w){w=document.createElement('div');w.id='bsub';w.setAttribute('aria-live','polite');w.innerHTML='<div id="brecap"></div><div id="bskip">⏩ Tap to skip</div>';document.body.appendChild(w)}
   const r=w.firstChild,k=w.lastChild,on=!!(rc||sk)&&!!ln.textContent&&getComputedStyle(ln).display!=='none';if(r.textContent!==rc)r.textContent=rc;r.hidden=!rc;k.hidden=!sk;w.hidden=!on;
-  if(on){const b=ln.getBoundingClientRect();w.style.top=Math.round(b.bottom+4)+'px'}}
+  if(on){const b=ln.getBoundingClientRect();w.style.top=Math.round(b.bottom+4)+'px'}
+  const m=document.getElementById('moment');if(m&&typeof momPlace==='function')momPlace(m)}   // F2: the knockout banner re-fits under the recap
 // at most 8 words and one phone line: drop card names, then rival names
 function bfShort(name,g,hit,bought){const wc=s=>s.replace(/[^a-zA-Z0-9'’]+/g,' ').trim().split(' ').filter(x=>/[a-z][a-z]/i.test(x)).length;
   const mk=(h,b)=>`${name}: ${[g,h,b].filter(Boolean).join(' · ')||'nothing'}`;

@@ -151,10 +151,13 @@ function tutSteps(){
    ready:()=>myRoll()&&G.rolls===2&&G.dice.filter(d=>d.f==='3').length===4&&!inCity(0)},
  {id:'win20',title:'Twenty stars',say:'20 ★! You win when your turn ends. Tap End turn.',target:tEnd,wait:{type:'tap',match:isAct('end')},
    ready:()=>myBuy()&&P(0).vp>=20&&!G.winner},
- {id:'result',title:'You win',say:'First to 20 ★ and survive your turn, or last standing, wins. Now play for real.',target:tfirst('#modal .btn','#modal','#pchips','.gx-board'),wait:null,
+ {id:'result',title:'You win',say:'Hold 20 ★ to your turn\'s end, or outlast all. Play!',target:tfirst('#modal .btn','#modal','#pchips','.gx-board'),wait:null,
    ready:()=>!!(G&&G.winner&&UI.stats&&document.querySelector('#modal:not(.hidden)'))});
   // every rule the tutorial teaches, in order: TUT_RULES (tut-walk.js checks each one appears)
   return S}
+// F2: on the last step the result card's button sits in the spotlight; a tap on it finishes the tutorial (it used to do nothing)
+addEventListener('click',e=>{if(!(typeof G!=='undefined'&&G&&G.tut&&G.winner))return;const nb=document.querySelector('.gxt-next'),b=document.querySelector('#modal:not(.hidden) .btn');if(!nb||!b)return;
+  const r=b.getBoundingClientRect();if(e.clientX>=r.left&&e.clientX<=r.right&&e.clientY>=r.top&&e.clientY<=r.bottom){e.preventDefault();e.stopPropagation();nb.click()}},true);
 // ---------------------------------------------------------------- start, leave, hooks
 function tutRelease(){TUT.hold=false;try{schedule()}catch(e){}}
 function tutStart(o){tutStartScripted(o)}   // the guided first game: one sentence and one highlighted tap per step, then a real game

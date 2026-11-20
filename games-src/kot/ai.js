@@ -29,7 +29,7 @@ function aiYield(q,lost){
   if(has(q,'vjets')&&q.hp<=7)return true;
   return q.hp<=Math.max(YA,threat+YB)}
 // Easy (the newcomer default): flips some keeps, stops rolling early, often skips the shop
-var EZROLL=1,EZFLIP=.4,EZSKIP=.6,EZHIT=.4;
+var EZROLL=1,EZFLIP=.4,EZSKIP=.6,EZHIT=.3,EZLOW=.15,EZPAIR=.6;
 var tender=o=>!!o.human;   // a person (the sim swaps this for its newcomer bot)
 var PDY=0.2,PDW=0.55,PCL=0.24,HYOLD=true;
 // chance that q is knocked out before its next turn if it stays in the city
@@ -47,10 +47,13 @@ function aiBrainjack(q,roller){if(q.mb<=0&&!has(q,'m_evade'))return false;
   return mine.val+theirs.val*0.8>=thr}
 function aiWantsClaws(p){
   if(has(p,'nova'))return true;
-  if(inCity(p.i))return true;
+  // F2: an Easy rival rarely gangs up on a person: in Downtown it often lets its claws go when a person stands outside,
+  // and it almost never goes for the knockout on a person who is low
+  const ezP=p.lvl==='easy'?alive().filter(q=>q.i!==p.i&&tender(q)):[];
+  if(inCity(p.i)){const out=ezP.filter(q=>!inCity(q.i));if(!out.length)return true;if(out.some(q=>q.hp<=counts().C+2))return Math.random()<EZLOW;return Math.random()<EZHIT}
   const occ=[G.city,G.bay].filter(i=>i>=0).map(P);
   if(!occ.length)return false;
-  if(p.lvl==='easy'&&occ.some(tender))return Math.random()<EZHIT;   // F1: Easy rivals go easy on a person holding Downtown
+  if(p.lvl==='easy'&&occ.some(tender))return Math.random()<(occ.some(q=>tender(q)&&q.hp<=counts().C+2)?EZLOW:EZHIT);   // F1: Easy rivals go easy on a person holding Downtown
   const c=counts().C;
   if(occ.some(o=>o.hp<=c+2))return true;
   return p.hp>=5}
@@ -61,7 +64,7 @@ function aiMark(p){
   const claws=aiWantsClaws(p);
   const keepNum={};for(const f of ['1','2','3'])if(c[f]>=3)keepNum[f]=true;
   const pairs=['3','2','1'].filter(f=>c[f]===2&&!keepNum[f]);
-  if(pairs.length&&!(pairs[0]==='1'&&!has(p,'gourmand')&&c.C+c.E>=3))keepNum[pairs[0]]=true;
+  if(pairs.length&&!(pairs[0]==='1'&&!has(p,'gourmand')&&c.C+c.E>=3)&&!(p.lvl==='easy'&&Math.random()<EZPAIR))keepNum[pairs[0]]=true;   // F2: Easy chases star sets less
   if(has(p,'omni')&&c['1']&&c['2']&&c['3']){keepNum['1']=keepNum['2']=keepNum['3']=true}
   const needVP=20-p.vp;let hk=0;
   if(exOn('tower')&&inT&&c['1']>=2)keepNum['1']=true;
@@ -74,9 +77,12 @@ function aiMark(p){
     else if(d.f==='H'){k=hk<hw;if(k)hk++}
     d.k=k})}
 function curseBad(p){return exOn('curse')&&['k_ego','k_sand','k_hotep','k_set','k_build','k_ra','k_horus','k_false','k_sphinx','k_scribe','k_flood'].includes(G.curse)}
+// F2: an Easy rival whose dice would knock out a person rerolls its claws while it still can (a newcomer's loss should not come from a 1-heart pile-on)
+function ezMercy(p){if(p.lvl!=='easy')return false;const s=scoreDice(p,G.dice);if(!s.kill||!s.targets.some(q=>tender(q)&&q.hp<=s.dmg))return false;
+  let n=0;G.dice.forEach(d=>{if(d.f==='C'&&!noReroll(d)){if(d.k)d.k=false;n++}});return n>0&&Math.random()<1-EZLOW}
 function aiMarkLvl(p){if(p.lvl==='hard'||p.lvl==='hard0'){const sp=G.dice.filter(d=>d.t);const nd=G.dice.length-sp.length;
     if(sp.length||nd>7){const all=G.dice;sp.forEach(d=>{d.k=d.t==='b'?d.f!=='O':(d.f==='FA'||d.f==='FW'||(d.f==='FE'&&curseBad(p)))});G.dice=all.filter(d=>!d.t);
-      try{if(nd>7)aiMark(p);else if(p.lvl==='hard0'||nd>6)aiMarkHard0(p);else aiMarkHard(p)}finally{G.dice=all}return}}if(p.lvl==='hard0')aiMarkHard0(p);else if(p.lvl==='hard'&&!ANIM_FASTTEST)aiMarkHard(p);else{aiMark(p);if(p.lvl==='easy')G.dice.forEach(d=>{if(Math.random()<EZFLIP)d.k=!d.k})}}
+      try{if(nd>7)aiMark(p);else if(p.lvl==='hard0'||nd>6)aiMarkHard0(p);else aiMarkHard(p)}finally{G.dice=all}return}}if(p.lvl==='hard0')aiMarkHard0(p);else if(p.lvl==='hard'&&!ANIM_FASTTEST)aiMarkHard(p);else{aiMark(p);if(p.lvl==='easy'){const ck=G.dice.some(d=>d.f==='C'&&d.k);G.dice.forEach(d=>{if(Math.random()<EZFLIP&&!(d.f==='C'&&!ck))d.k=!d.k})}}}
 var ANIM_FASTTEST=false, HYB=1.5, HEW=0.75;
 function evalDice(p,dice){const s=scoreDice(p,dice);const c=countsOf(dice);const nc=countsOf(dice.filter(d=>!d.t));const inT=inCity(p.i);
   const need=winAt(p)-p.vp;const others=alive().filter(q=>q.i!==p.i);const lead=others.reduce((a,q)=>q.vp>a.vp?q:a,{vp:-1});
@@ -136,10 +142,10 @@ function aiMarkHard0(p){const dice=G.dice,n=dice.length,R=G.rolls,S=n>7?12:20;le
     const avg=tot/S;if(avg>best){best=avg;bm=m}}
   dice.forEach((d,k)=>d.k=!!(bm>>k&1))}
 function aiRollStep(p){
-  if(!G.aiMarked){aiMarkLvl(p);G.dice.forEach(d=>{if(noReroll(d))d.k=true});G.aiMarked=true;refresh();return}
+  if(!G.aiMarked){aiMarkLvl(p);G.dice.forEach(d=>{if(noReroll(d))d.k=true});G.aiMarked=true;if(!(ANIM&&rivalPace()<1)){refresh();return}}   // F2: a solo rival keeps and rerolls in one beat (the kept dice simply don't tumble)
   G.aiMarked=false;
   const free=G.dice.filter(d=>!d.k&&!noReroll(d)).length;
-  if(free&&G.rolls>0&&!(p.lvl==='easy'&&G.rolls<=EZROLL)){doReroll('roll');return}
+  if(free&&G.rolls>0&&!(p.lvl==='easy'&&G.rolls<=EZROLL&&!ezMercy(p))){doReroll('roll');return}
   if(free>=2&&p.cult>0&&!G.tf.uses.cr&&p.lvl!=='easy'){G.tf.uses.cr=1;useCult(p,'r');return}
   if(free>=2&&has(p,'smoke')&&p.tok.smoke>0){doReroll('smoke');return}
   if(free>=2&&has(p,'mind')&&p.en>=4){doReroll('mind');return}
@@ -184,7 +190,9 @@ function aiStep(){
   if(!G||G.winner||UI.choice||UI.busy)return;if(typeof NET!=='undefined'&&NET.on&&NET.role==='client')return;const p=cur();if(p.human)return;
   if(G.phase==='roll')aiRollStep(p);else if(G.phase==='buy')aiBuyStep(p)}
 function schedule(){if(!G||G.winner||UI.choice||UI.busy||UI.info||UI.rules||UI.pending||UI.paused||((UI.intro||(UI.coach>=0&&UI.freeze))&&!(typeof NET!=='undefined'&&NET.on)))return;if(typeof NET!=='undefined'&&(NET.role==='client'&&NET.on))return;if(!['roll','buy'].includes(G.phase)||isHuman(G.active))return;
-  UI.pending=true;setTimeout(()=>{UI.pending=false;aiStep()},ANIM?(G.phase==='roll'&&!G.aiMarked?AIDELAY*1.1:AIDELAY):0)}
+  UI.pending=true;setTimeout(()=>{UI.pending=false;aiStep()},ANIM?(G.phase==='roll'&&!G.aiMarked?AIDELAY*1.1:AIDELAY)*rivalPace():0)}
+// F2: in a solo game the rivals play brisker (about 1.5 s a turn at Normal) so the wait between your turns stays near 5 s; watch mode keeps the full pace
+var RPACE=.4;function rivalPace(){return G&&G.mode==='solo'?RPACE:1}
 function cardKeepValue(p,id){const C=CARDS[base(id)];return C.v!==undefined?C.v:3}
 function cardValue(p,id){const b=base(id),C=CARDS[b],oth=others(p);
   const lead=Math.max(0,...oth.map(q=>q.vp));const late=p.vp>=12||lead>=14;const vpv=late?2.2:1.5;

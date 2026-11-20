@@ -39,7 +39,7 @@ html.ph .pchip em{display:inline-block}
 /* the reroll: dice tumble in and land one by one */
 html.ph .die.bfroll{animation:bfTumble var(--land,.6s) cubic-bezier(.3,.6,.4,1.15) both}
 html.ph .die.bfroll svg{animation:bfFace var(--land,.6s) steps(1,end) both;animation-delay:inherit}
-@keyframes bfTumble{0%{transform:translateY(-28px) rotate(-560deg) scale(.9)}55%{transform:translateY(-8px) rotate(-120deg) scale(.96)}82%{transform:translateY(2px) rotate(8deg) scale(1)}100%{transform:none}}   /* W467: the tumble stays inside its own cell, so a rolling die never covers its neighbour */
+@keyframes bfTumble{0%{transform:translateY(-6px) rotate(-560deg) scale(.86)}55%{transform:translateY(-3px) rotate(-120deg) scale(.95)}82%{transform:translateY(2px) rotate(8deg) scale(1)}100%{transform:none}}   /* W467/F2: the tumble spins in place (6 px lift at most), so a rerolled die never looks like it swapped with a kept one */
 @keyframes bfFace{0%{opacity:.15}80%{opacity:.15}81%{opacity:1}100%{opacity:1}}
 @media (prefers-reduced-motion:reduce){html.ph .die.bfroll,html.ph .die.bfroll svg,html.ph .bm,html.ph .bm.hit{animation:none}}
 /* the ghost finger */
@@ -263,6 +263,14 @@ html.ph #bcity.on{display:block}
 /* W500: under the board line on a computer's turn: a one-line recap of the last computer turn + "Tap to skip" */
 #bsub{position:fixed;left:50%;transform:translateX(-50%);z-index:2147481999;max-width:calc(100vw - 24px);display:flex;flex-direction:column;align-items:center;gap:3px;pointer-events:none}
 #bsub[hidden],#bsub [hidden]{display:none!important}
-#brecap{max-width:100%;box-sizing:border-box;padding:3px 10px;border-radius:999px;background:rgba(26,19,32,.82);color:#ffe9a8;font:800 14px/1.2 Nunito,sans-serif;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#brecap{max-width:100%;box-sizing:border-box;padding:3px 10px;border-radius:999px;background:rgba(26,19,32,.82);color:#ffe9a8;font:800 14px/1.2 Nunito,sans-serif;white-space:pre;overflow:hidden;text-overflow:ellipsis}
 #bskip{padding:2px 10px;border-radius:999px;background:rgba(255,210,63,.92);color:#1a1320;font:900 14px/1.2 Nunito,sans-serif}
 html:not(.ph) #bsub,html.gxt-on #bsub,html.cc-over #bsub,html.cc-tut #bsub{display:none!important}
+/* F2: once a decision card is open (Stay or yield?), the rival's flying dice never pass over it */
+html:has(#choice:not(.hidden)) #bfx{visibility:hidden}
+#brecap{border-radius:12px;text-align:center}   /* F2: up to two rival lines */
+/* F2: "Not enough ⚡: End turn" is easy to miss: the line turns gold and End turn glows (3 pulses, then a steady ring) */
+html.ph #bline.poor,#bline.poor{background:#ffd23f;color:#1a1320}
+[data-act="end"].endnudge{box-shadow:0 0 0 3px #ffd23f,0 0 18px rgba(255,210,63,.9);animation:endNudge .6s ease-out 3}
+@keyframes endNudge{0%{transform:scale(1)}40%{transform:scale(1.07)}100%{transform:scale(1)}}
+@media (prefers-reduced-motion:reduce){[data-act="end"].endnudge{animation:none}}
