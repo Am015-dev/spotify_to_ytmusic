@@ -1,0 +1,80 @@
+{"taps":79,"fin":{"turn":43,"season":2,"score":22,"log":94},"errs":[]}
+0.1s title Play
+2.7s offer Play now
+5.4s sheet/card Start
+7.2s bubble Got it
+9.9s move Mixed Glade: 1 twig + 1 resin, 1 berry
+12.6s sheet/card Send worker
+14.4s move Brother Moss (in hand)
+17.1s sheet/card Build it
+19.0s move Pebble Bank: 1 pebble
+21.7s sheet/card Send worker
+23.6s bubble Got it
+26.3s sheet/card Build it
+28.2s move Prepare for Spring
+30.8s sheet/card Prepare
+32.7s sheet/card Continue
+34.5s move Mixed Glade: 1 twig + 1 resin, 1 berry
+37.2s sheet/card Send worker
+39.1s move Resin Pool: 2 resin
+41.8s sheet/card Send worker
+43.7s tab Meadow 8
+44.9s move Meadow card: Dovecote Depot
+47.5s sheet/card Build it
+49.4s tab City 3/15
+50.3s move Dovecote Depot
+53.0s sheet/card Send worker
+54.8s bubble Got it
+57.4s choice Bramble Allotment (in hand)
+60.1s sheet/card Confirm
+61.9s choice Ballad Finch (in hand)
+64.6s sheet/card Confirm
+66.5s choice Hoard Cellar (in hand)
+69.1s choice Done discarding (1 discarded)
+71.8s move Toppled Hall (in hand)
+74.5s sheet/card Build it
+76.3s choice Flintpit
+79.0s sheet/card Confirm
+80.9s move Haggle Magpie (in hand)
+83.6s sheet/card Build it
+85.4s bubble Got it
+88.1s choice Do not trade
+90.7s sheet/card Confirm
+92.6s move Mossgrave Glade (in hand)
+95.3s sheet/card Build it
+97.1s move Flintpit (in hand)
+99.8s sheet/card Build it
+101.7s move Prepare for Summer
+104.3s sheet/card Prepare
+106.5s choice Meadow card: Chronicle Owl
+109.4s choice Meadow card: Hoard Cellar
+112.0s sheet/card Continue
+113.9s move Mossgrave Glade
+116.5s sheet/card Send worker
+118.4s bubble Got it
+121.0s choice Reveal 4 from the top of the discard pile
+123.7s sheet/card Confirm
+125.6s choice Play Flintpit for free
+128.2s sheet/card Confirm
+130.1s move Kindling Glen: 2 twigs + 1 card, shared
+132.8s sheet/card Send worker
+134.7s move Chronicle Owl (in hand)
+137.4s sheet/card Build it
+139.2s move Visit Lantern Rest
+141.9s sheet/card Send worker
+143.8s choice Meadow card: Thistle Regent
+146.4s sheet/card Confirm
+148.6s move Meadow card: Parcel Dove
+151.3s sheet/card Build it
+153.1s choice Play Dewdrop Belfry for free
+155.8s sheet/card Confirm
+157.9s move Thistle Regent
+160.6s sheet/card Send worker
+162.7s choice Glowworm Playhouse (in hand)
+165.3s sheet/card Confirm
+167.2s move Quietstone Cloister (in hand)
+169.9s sheet/card Build it
+171.7s move Prepare for Autumn
+174.4s sheet/card Prepare
+176.2s bubble Got it
+178.9s choice Kindling Glen: 2 twigs + 1 card, shared
