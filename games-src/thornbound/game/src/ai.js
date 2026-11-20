@@ -236,6 +236,7 @@ const LV={easy:{noise:3,cunning:0.2,rnd:0.5},normal:{noise:0.6,cunning:1,rnd:0,s
 for(const k of ['easy']){LV[k].sup=1.5;LV[k].jb=0;LV[k].gb=0;LV[k].bidT=0;LV[k].hb=1;LV[k].kcw=1}
 // Easy (owner, Nov 2026): sensible play, weaker judgement; 'newcomer' models a careful first-time player for the balance test (never offered in the menu)
 Object.assign(LV.easy,{noise:5,cunning:0,rnd:0,lead:1,ease:3});   // F14: gentler default rival (a newcomer who follows the suggestions wins most games; Normal and Hard unchanged)
+Object.assign(LV.easy,{earlyR:2,earlyNoise:3,earlyRnd:0.45});   // F15: easier learning rounds (half-advice newcomer 45% instead of 18% in sugsim FOLLOW=0.5)
 LV.newcomer=Object.assign({},LV.normal,{noise:1.6,cunning:0.6});
 if(typeof globalThis!=='undefined'&&globalThis.TB_LV)for(const k in globalThis.TB_LV)Object.assign(LV[k]||(LV[k]={}),globalThis.TB_LV[k]);
 function policy(S,seat,lv,rng){const q=S.q;const mv=TB.moves(S,seat);if(mv.length<=1)return mv[0];
@@ -300,7 +301,10 @@ AI.choose=function(G,seat,level,opts){opts=opts||{};level=level||(G.pl[seat].ai)
   if(level==='easy'&&!LV.easy.rnd){   // Easy plays by the rules and sensibly (no random moves): looser judgement, and a rival far ahead of every human eases off
     const mv=TB.moves(G,seat);if(mv.length<=1)return mv[0];const hum=G.pl.map((p,i)=>i).filter(i=>!G.pl[i].ai||G.pl[i].asHuman);
     const lead=hum.length?G.pl[seat].inf-Math.max.apply(null,hum.map(i=>G.pl[i].inf)):0;const e=LV.easy;
-    const lv2=lead>=e.lead?Object.assign({},e,{noise:e.noise*e.ease,cunning:0}):e;
+    let lv2=lead>=e.lead?Object.assign({},e,{noise:e.noise*e.ease,cunning:0}):e;
+    // F15: rounds 1-2 are the newcomer's learning rounds: the rival's judgement is looser still and some of its moves are plain legal picks
+    if(G.round<=e.earlyR){lv2=Object.assign({},lv2,{noise:lv2.noise*e.earlyNoise,cunning:0});
+      if(rng()<e.earlyRnd){if(G.q.t==='menu'||G.q.kind==='menu'){const nm=mv.filter(m=>m.t==='done');if(nm.length&&rng()<0.5)return nm[0]}return mv[Math.floor(rng()*mv.length)]}}
     const S=TB.poison(G,seat,mkRng(viewSeed(G,seat,5)));return policy(S,seat,lv2,rng)}
   if(level==='easy'){const mv=TB.moves(G,seat);if(mv.length<=1)return mv[0];
     const S=TB.poison(G,seat,mkRng(viewSeed(G,seat,5)));
