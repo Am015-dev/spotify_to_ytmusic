@@ -6,7 +6,7 @@
 /* ===== Board-first shell (shared by every game on the shelf) =====
    The page never scrolls. The board fills what the bar and the dock leave; the dock is in flow (never over the board);
    everything else opens in a closable popup (drawer). Games theme it with the --gx-* variables. */
-:root{--gx-bar-h:52px;--gx-dock-w:clamp(300px,30vw,420px);--gx-bg:#10151c;--gx-bar:#0b1016;--gx-panel:#f4ecd8;--gx-ink:#231a10;--gx-line:rgba(0,0,0,.25);--gx-accent:#e0a948;--gx-shadow:0 20px 60px rgba(0,0,0,.5);--gx-radius:14px}
+:root{--gx-bar-h:52px;--gx-dock-w:clamp(300px,28vw,520px);--gx-bg:#10151c;--gx-bar:#0b1016;--gx-panel:#f4ecd8;--gx-ink:#231a10;--gx-line:rgba(0,0,0,.25);--gx-accent:#e0a948;--gx-shadow:0 20px 60px rgba(0,0,0,.5);--gx-radius:14px}
 html.gx,html.gx body{height:100%;margin:0;overflow:hidden;overscroll-behavior:none}
 .gx-app{position:fixed;inset:0;display:grid;grid-template-rows:auto minmax(0,1fr);background:var(--gx-bg)}
 .gx-bar{min-height:var(--gx-bar-h);display:flex;align-items:center;gap:6px;padding:4px 10px;padding-top:calc(4px + env(safe-area-inset-top,0px));overflow-x:auto;overflow-y:hidden;scrollbar-width:none;position:relative;z-index:6}
@@ -36,8 +36,9 @@ html.gx,html.gx body{height:100%;margin:0;overflow:hidden;overscroll-behavior:no
 .gx-drawer-head h2{margin:0;font-size:1.15rem;flex:1;min-width:0}
 .gx-x{appearance:none;border:0;background:transparent;font-size:1.6rem;line-height:1;cursor:pointer;color:inherit;min-width:44px;min-height:44px;border-radius:10px}
 .gx-drawer-body{flex:1;min-height:0;overflow:auto;padding:10px 12px 16px;overscroll-behavior:contain}
-/* narrow screens: the dock becomes a sheet under the board (still in flow), the drawers slide up from the bottom */
-@media (max-width:999px){
+/* phones (portrait, or anything under 720 px wide): the dock becomes a sheet under the board (still in flow), the drawers slide up
+   from the bottom. Any landscape window >= 720 px wide (a 1366 laptop at 150 % = 910x512) keeps the side dock: board left at full height. */
+@media (max-width:719px),(max-width:999px) and (orientation:portrait){
   .gx-main{grid-template-columns:minmax(0,1fr);grid-template-rows:minmax(0,1fr) auto}
   .gx-app.gx-dock-min .gx-main{grid-template-columns:minmax(0,1fr)}
   .gx-dock{max-height:var(--gx-sheet-h,40dvh);border-radius:var(--gx-radius) var(--gx-radius) 0 0;padding-bottom:env(safe-area-inset-bottom,0px)}
@@ -50,7 +51,9 @@ html.gx,html.gx body{height:100%;margin:0;overflow:hidden;overscroll-behavior:no
   .gx-drawer.wide{width:auto}
   .gx-hide-narrow{display:none!important}
 }
-@media (min-width:1000px){.gx-grab{display:none}}
+@media (min-width:1000px),(min-width:720px) and (orientation:landscape){.gx-grab{display:none}}
+/* big screens: popups grow with the screen instead of staying a phone-width column */
+@media (min-width:1280px) and (orientation:landscape){.gx-drawer{width:min(640px,36vw)}.gx-drawer.wide{width:min(1180px,calc(100vw - 16px))}}
 @media (prefers-reduced-motion:reduce){.gx-drawer,.gx-scrim{transition:none}}
 
 *{box-sizing:border-box}
@@ -932,6 +935,14 @@ html.kkend #beltz{background:#2f1f1a!important;border-top-color:#1c1210!importan
 }
 html.gx-reduce .gxc *,html.gx-noanim .gxc *{animation:none!important;transition:none!important}
 @media (prefers-reduced-motion:reduce){.gxc *{animation:none!important}}
+/* desktop: the campaign is a centred wide page, not a phone column */
+@media (min-width:1000px) and (orientation:landscape){
+  .gxc-screen{max-width:min(760px,64vw)}
+  .gxc-map-on .gxc-screen{max-width:min(960px,72vw)}
+  .gxc-path{max-width:min(860px,66vw)}
+  .gxc-sheet{max-width:min(760px,60vw)}
+  .gxc-lab{max-width:220px}
+}
 
 /* gx-help.css: coach bubbles, the lightbulb, the ghost finger and the rules cards (see gx-help.js and GX-KIT.md section 9).
    Everything the kit draws carries data-help. Override the look with the --gxh-* variables on :root. */
@@ -1075,7 +1086,15 @@ html.sk .gx-bar .gx-ibtn,html.sk .gx-bar{text-shadow:0 1px 2px rgba(0,0,0,.75)}
 html.sk .gxc-act b,html.sk .gxc-act small{text-shadow:0 1px 3px rgba(0,0,0,.9)}
 /* panels never swallow the art on phones: docks are capped, sheets slide not fade */
 @media (max-width:999px) and (orientation:portrait){.gx-dock{max-height:min(var(--gx-sheet-h,40dvh),44dvh)}}
-@media (max-width:999px) and (orientation:landscape){.gx-dock{max-height:min(var(--gx-sheet-h,40dvh),34dvh)}}
+@media (max-width:719px) and (orientation:landscape){.gx-dock{max-height:min(var(--gx-sheet-h,40dvh),34dvh)}}
+/* short desktop windows (landscape, 720-999 px wide): side dock, board at full height. This file loads last, so it also undoes
+   per-game "(max-width:999px)" sheet heights/rows; games in their own phone layout (html.ph) keep theirs. */
+@media (min-width:720px) and (max-width:999px) and (orientation:landscape){
+  html:not(.ph) body .gx-main{grid-template-columns:minmax(0,1fr) var(--gx-dock-w);grid-template-rows:minmax(0,1fr)}
+  html:not(.ph) body .gx-app.gx-dock-min .gx-main{grid-template-columns:minmax(0,1fr) 0}
+  html:not(.ph) body .gx-app .gx-dock,html:not(.ph) body .gx-app.gx-sheet-full .gx-dock{height:auto;max-height:none;border-radius:0}
+  html:not(.ph) body .gx-app.gx-dock-min .gx-dock{visibility:hidden}
+}
 /* calm motion: no looping pulses for people who asked for less, nothing flashes faster than ~1 Hz */
 @media (prefers-reduced-motion:reduce){
   html body :is(.gxh-ring,.gxt-ring,.gxc-node.next .gxc-disc,.gxh-bub,.gxt-bub){animation:none!important}
@@ -4062,10 +4081,24 @@ const GX={key:'gx',open:null,
     document.addEventListener('click',e=>{const t=e.target.closest('[data-gx]');if(!t)return;const a=t.dataset.gx;
       if(a==='dock')this.toggleDock();else if(a==='sheet')this.cycleSheet();else if(a==='close')this.close();else this.toggle(a)});
     document.addEventListener('keydown',e=>{if(e.key==='Escape'&&this.open){this.close();e.stopImmediatePropagation()}},true);
+    // keyboard basics: Enter/Space presses the focused control, or the main action when nothing is focused. Runs last (window, bubble)
+    // and only if the game did not handle the key itself (preventDefault); games can opt out with GX.noKeys=true.
+    window.addEventListener('keydown',e=>this.key1(e));
     // resize hook for boards
     const b=document.querySelector('.gx-board');if(b&&window.ResizeObserver)new ResizeObserver(()=>{for(const f of this._rs)try{f(b.clientWidth,b.clientHeight)}catch(e){}}).observe(b)},
   // a drawer is modal: the page behind it is inert and hidden from assistive tech, so nothing under the sheet is a live tap target
   bg(on){const a=this.app;if(!a)return;if(on){a.setAttribute('aria-hidden','true');a.inert=true}else{a.removeAttribute('aria-hidden');a.inert=false}},
+  PRIMARY:'[data-gx-primary],.gx-primary,.gxh-ok,.gxc-btn.go,button.pri,.btn.pri,.pb.pri,button.primary,.btn.primary,button.go,.btn.go',
+  key1(e){if(this.noKeys||e.defaultPrevented||e.repeat||e.ctrlKey||e.metaKey||e.altKey||(e.key!=='Enter'&&e.key!==' '))return;
+    const t=e.target;if(t&&t.closest&&t.closest('input,textarea,select,[contenteditable=""],[contenteditable="true"]'))return;
+    if(t&&t!==document.body&&t!==document.documentElement){if(t.matches('button,a[href],summary,input'))return; // native controls press themselves
+      if(t.matches('[role=button],[role=menuitem],[role=tab],[role=option],[tabindex]')){e.preventDefault();t.click()}return}
+    const b=this.primary();if(b){e.preventDefault();b.click()}},
+  // the main action: the first visible, enabled primary button (inside the open popup if there is one)
+  primary(){const root=this.open&&document.getElementById(this.open)||document;
+    for(const b of root.querySelectorAll(this.PRIMARY)){if(b.disabled||b.getAttribute('aria-disabled')==='true'||b.closest('[inert],[aria-hidden="true"],[hidden]'))continue;
+      const r=b.getBoundingClientRect();if(r.width<4||r.height<4||r.bottom<0||r.right<0||r.top>innerHeight||r.left>innerWidth)continue;
+      const s=getComputedStyle(b);if(s.visibility==='hidden'||s.pointerEvents==='none'||+s.opacity<.1)continue;return b}return null},
   _rs:[],onResize(f){this._rs.push(f)},
   boardSize(){const b=document.querySelector('.gx-board');return b?{w:b.clientWidth,h:b.clientHeight}:{w:innerWidth,h:innerHeight}},
   toggleDock(force){const min=force!=null?!force:!this.app.classList.contains('gx-dock-min');this.app.classList.toggle('gx-dock-min',min);this.app.classList.remove('gx-sheet-full');try{localStorage.setItem(this.key+'_dockmin',min?'1':'0')}catch(e){}},
