@@ -37,7 +37,7 @@ function swPassInc(G, s, from, to) { // income and leather for the spaces in (fr
   return { inc: got, lea: lea };
 }
 function swMoveTok(G, s, to, why) { // advance s's token to `to`, collecting income; may open a leather placement. Returns the income got.
-  var from = G.pos[s]; to = Math.min(to, SW.TRACK); var r = swPassInc(G, s, from, to); G.pos[s] = to; G.stamp[s] = ++G.tick; G.btn[s] += r.inc;
+  var from = G.pos[s]; to = Math.min(to, SW.TRACK); var r = swPassInc(G, s, from, to); G.pos[s] = to; G.stamp[s] = ++G.tick; G.btn[s] += r.inc; if (r.inc) { if (!G.paid) G.paid = [0, 0]; G.paid[s] += r.inc; } /* F3: payday totals, for the result's why-line */
   var ev = { k: 'move', s: s, from: from, to: to, inc: r.inc }; G.ev.push(ev);
   // every leather space passed is taken (usually one)
   SW.LEATHER_SPOTS.forEach(function (l, i) { if (l > from && l <= to && G.leather[i] === null) { G.leather[i] = s; G.pendQ = (G.pendQ || 0) + 1; } });

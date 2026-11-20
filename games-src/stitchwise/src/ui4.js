@@ -90,8 +90,9 @@ function hlpPhase() { if (!G || G.over || UI.busy || !UI.started || !isHuman(swW
 function whatDo() { var sg = hlpSuggest(); if (!sg) return; var t = sg.target && sg.target(); if (t) { t.classList.remove('flash'); void t.offsetWidth; t.classList.add('flash'); } var dt = $('#detail'); if (dt) dt.textContent = 'Try this: ' + sg.why; }
 function hlpSuggest() {
   if (!G || G.over || !isHuman(swWho(G)) || G.pend) return null; var m = aiMove(G, 'hard', function () { return .5; }), s = swWho(G);
-  if (m.t === 'buy') { var p = PATCHES[swOffer(G)[m.k]]; return { target: function () { return $$('#offers .offer')[m.k]; }, why: p.name + ' fits well and is worth ' + p.n * 2 + ' points of squares.' }; }
-  return { target: function () { return $('[data-a=adv]'); }, why: 'Advancing gets you buttons and the next turn.' };
+  if (m.t === 'buy') { var pid = swOffer(G)[m.k], p = PATCHES[pid], v = patchValue(s, pid); return { target: function () { return $$('#offers .offer')[m.k]; }, why: p.name + ': ' + p.n + ' squares filled' + (v.incv ? ', and it pays +' + p.inc + ' at ' + v.spots + ' paydays = ' + v.incv + ' buttons.' : '.') }; }
+  var nCan = swOffer(G).filter(function (pid) { var q = PATCHES[pid]; return G.btn[s] >= q.cost && swPlacements(G.board[s], q).length > 0; }).length; /* F3: say WHY advancing is right now */
+  return { target: function () { return $('[data-a=adv]'); }, why: (nCan ? 'These patches cost more than they give back. ' : 'Nothing here is affordable. ') + 'Advance: +' + swAdvSteps(G, s) + ' buttons now, and a richer pick next turn.' };
 }
 function hlpPhaseUpdate() { try { if (typeof GXH !== 'undefined' && !tutOn()) GXH.phase(hlpPhase()); } catch (e) { } }
 function hlpRefresh() { hlpPhaseUpdate(); }
@@ -197,15 +198,15 @@ function t2Steps() {
   var adv = function () { return $('[data-a=adv]'); }, sew = function () { return $('[data-a=sew]'); }, ghost = function () { return $('#ghost'); };
   var advStep = function (id, rule, say, done) { return { id: id, rule: rule, say: say, target: adv, allow: function (a) { return a === 'adv'; }, done: done }; };
   return [
-    { id: 'buy', rule: 'buy', say: 'Fill the 3 gold gaps. Only 3 patches are for sale: tap this.', target: t2Offer(1), allow: function (a, k) { return a === 'offer' && k === 1; }, done: function () { return UI.sel === 1; } },
+    { id: 'buy', rule: 'buy', say: 'Fill the 3 gold gaps. Patches cost buttons and time: tap this.', target: t2Offer(1), allow: function (a, k) { return a === 'offer' && k === 1; }, done: function () { return UI.sel === 1; } },
     { id: 'rotate', rule: 'rotate', say: 'Turn it to match the top gap. Tap Rotate.', target: function () { return $('[data-a=rot]'); }, allow: function (a) { return a === 'rot'; }, done: function () { return UI.o === T2.o1; } },
     { id: 'place', rule: 'place', say: 'Drag or tap the patch into the gold gap.', target: ghost, gap: 'h1', allow: function (a) { return a === 'rot' || a === 'flip'; }, done: function () { return t2AtGap(T2.h1); } },
-    { id: 'pay', rule: 'pay', say: 'Sew it on. You pay its 4 buttons.', target: sew, gap: 'h1', allow: function (a) { return a === 'sew' && t2AtGap(T2.h1); }, done: function () { return G.owned[0].length >= 1; } },
+    { id: 'pay', rule: 'pay', say: 'Sew it on: pay 4 buttons. Its button icon pays you later.', target: sew, gap: 'h1', allow: function (a) { return a === 'sew' && t2AtGap(T2.h1); }, done: function () { return G.owned[0].length >= 1; } },
     { id: 'time', rule: 'time', say: 'It cost 2 time: you moved 2. Furthest back plays next.', btn: 'Watch', target: function () { return $('#tutb .t2b'); },
       onBtn: function () { UI.tutAi = true; schedule(); }, done: function () { return T2.pressed && t2Mine(); } },
-    Object.assign(advStep('advance', 'advance', 'Or Advance: jump just past Marden, +1 button per space.', function () { return G.log.some(function (l) { return l[0] === 0 && l[1] === 'adv'; }); }), { eager: true }), /* F2: the line moves on the moment you tap Advance */
-    advStep('income', 'income', 'Pass a gold spot: +1 button per button on your patches.', function () { return G.pos[0] > 41 && t2Mine(); }),
-    advStep('leather', 'leather', 'First past the leather square gets a free 1x1 patch.', function () { return !!G.pend; }),
+    Object.assign(advStep('advance', 'advance', 'Or Advance: jump just past Marden, earn 1 button per space.', function () { return G.log.some(function (l) { return l[0] === 0 && l[1] === 'adv'; }); }), { eager: true }), /* F2: the line moves on the moment you tap Advance */
+    advStep('income', 'income', 'Gold spot = payday: each button icon on your patches pays 1.', function () { return G.pos[0] > 41 && t2Mine(); }),
+    advStep('leather', 'leather', 'Cream leather square: first to pass it gets a free 1x1.', function () { return !!G.pend; }),
     { id: 'leather2', rule: 'leather', say: 'Tap the single gold gap to sew it.', target: function () { return $$('#quilt .qc')[T2.hl[1] * 9 + T2.hl[0]]; }, allow: function (a, k) { var ok = a === 'leather' && k === T2.hl[1] * 9 + T2.hl[0]; if (a === 'leather' && !ok) { var tt = $('#tutb .t2t'); if (tt) tt.textContent = 'That gap is for your next patch. Tap the single square.'; } return ok; }, done: function () { return G.board[0][T2.hl[1] * 9 + T2.hl[0]] === 100 && t2Mine(); } },
     { id: 'bonus', rule: 'bonus', say: 'First to fill a 7x7 square gets +7. Tap this patch.', target: t2Offer(1), allow: function (a, k) { return a === 'offer' && k === 1; }, done: function () { return UI.sel === 1; } },
     { id: 'flip', rule: 'flip', say: 'Mirror it to match the last gap. Tap Flip.', target: function () { return $('[data-a=flip]'); }, allow: function (a) { return a === 'flip'; }, done: function () { return UI.o === T2.o2; } },

@@ -83,7 +83,7 @@ document.addEventListener('keydown', function (e) { if (!G || UI.sel < 0 || GX.o
 function confirmSew() { if (UI.sel < 0 || UI.busy) return; if (!t2Allow('sew')) return; if (UI.placed === false) { acceptSug(); return; } if (T2 && !ghostOk()) { sfx('bad'); return; } if (!ghostOk()) { snapNear(false); drawGhost(); if (!ghostOk()) { sfx('bad'); return; } } if (!tutAct({ what: 'buy', k: UI.sel })) return; var m = { t: 'buy', k: UI.sel, o: UI.o, x: UI.gx, y: UI.gy }; UI.sel = -1; act(m); }
 function doAdvance() { if (UI.busy || G.over || G.pend || !isHuman(swWho(G))) return; if (!t2Allow('adv')) return; if (!tutAct({ what: 'adv' })) return; UI.sel = -1; act({ t: 'adv' }); try { if (T2) t2Tick(); } catch (e) { } }
 function doLeather(x, y) { if (UI.busy || !t2Allow('leather', y * 9 + x) || !tutAct({ what: 'leather' })) return; act({ t: 'leather', x: x, y: y }); }
-function act(m) {
+function act(m) { UI.note = '';
   if (!G || G.over) return; if (isHuman(swWho(G)) && UI.mode !== 'hot' && (m.t === 'buy' || m.t === 'adv')) { try { UI.rate = rateMove(m); } catch (e) { UI.rate = ''; } } if (isHuman(swWho(G))) { UI.flavor = ''; var tb = $('#turnban'); if (tb) tb.classList.remove('on'); } var s = swWho(G), before = { pos: G.pos.slice(), btn: G.btn.slice(), bonus: G.bonus };
   var r = swApply(G, m); if (!r.ok) { sfx('bad'); toast('That move is not allowed (' + r.why + ').'); render(); return; }
   var evs = G.ev.slice(); evs.forEach(function (e) { if (e.k === 'place') e.cells.forEach(function (c) { UI.newCells[e.s + ':' + (c[1] * 9 + c[0])] = 1; }); });
@@ -99,17 +99,28 @@ function playEvents(evs, before, done) {
       var from = e.from, to = e.to; SW.BTN_SPOTS.forEach(function (b) { if (b > from && b <= to) { spots++; var tt = t + step * .6 * spots, seat = e.s, inc = G.inc[seat]; if (inc > 0) later(tt, function () { incomeMoment(seat, b, inc, spots); }); } });
       if (e.gain) later(t, function () { sfx('adv'); floatText('+' + e.gain + ' button' + (e.gain === 1 ? '' : 's') + ' for advancing', $('.pstrip[data-seat="' + e.s + '"]') || null, '#ffe9a0', true); }); t += step * .8 + step * .6 * spots;
     }
-    if (e.k === 'bonus') { later(t, function () { sfx('bonus'); toast(nameOf(e.s) + ' completed a 7×7 square: +7 bonus!', 2800); }); t += step; }
+    if (e.k === 'bonus') { later(t, function () { sfx('bonus'); payday(e.s, 7, '7\u00D77 bonus', (UI.mode !== 'hot' && e.s === 0 ? 'You' : nameOf(e.s)) + ' filled a 7\u00D77 block: +7'); }); t += step; }
   });
   later(t + step * .5, done);
 }
 function incomeMoment(seat, spot, inc, i) { // coins fly from the button spot to the buttons counter
   var cell = $('.tc[data-i="' + spot + '"]'), tgt = $('.nb[data-seat="' + seat + '"]'); if (!cell || !tgt) return; var a = cell.getBoundingClientRect(), b = tgt.getBoundingClientRect();
   for (var k = 0; k < Math.min(inc, 6); k++) { (function (k) { setTimeout(function () { sfx('coin', k); var c = h('div.coin'); c.style.left = (a.left + a.width / 2 - 9) + 'px'; c.style.top = (a.top + a.height / 2 - 9) + 'px'; c.style.setProperty('--dx', (b.left + b.width / 2 - a.left - a.width / 2) + 'px'); c.style.setProperty('--dy', (b.top - a.top) + 'px'); document.body.appendChild(c); setTimeout(function () { c.remove(); tgt.classList.remove('bump'); void tgt.offsetWidth; tgt.classList.add('bump'); }, 800); }, k * 90); })(k); }
-  floatText('+' + inc + ' button' + (inc === 1 ? '' : 's') + ': gold spot income', cell, '#ffe9a0', true); fxImg('fx-sparkle', a.left + a.width / 2, a.top + a.height / 2, 44);
+  payday(seat, inc); fxImg('fx-sparkle', a.left + a.width / 2, a.top + a.height / 2, 44);
 }
+function payday(seat, inc, ttl, txt) { // F3: the payday moment, said in words: "+5 from your patches"
+  var old = $('#payday'); if (old) old.remove(); var me = UI.mode !== 'hot' && seat === 0, p = h('div#payday' + (seat ? '.opp' : ''), { role: 'status' }, h('b', ttl || 'Payday'), h('span', txt || (me ? '+' + inc + ' from your patches' : nameOf(seat) + ' +' + inc + ' from patches')));
+  var pl = $('.pstrip[data-seat="' + seat + '"]'); document.body.appendChild(p); if (pl) { var r = pl.getBoundingClientRect(); p.style.left = Math.max(6, Math.min(innerWidth - p.offsetWidth - 6, r.left + r.width / 2 - p.offsetWidth / 2)) + 'px'; p.style.top = Math.min(innerHeight - 60, r.bottom + 6) + 'px'; }
+  var ni = $('.ni[data-seat="' + seat + '"]'); if (ni) { ni.classList.remove('bump'); void ni.offsetWidth; ni.classList.add('bump'); }
+  setTimeout(function () { p.remove(); }, amt(1900) || 1200); }
 function fxImg(stem, x, y, size) { var i = artImg(stem, 'fx'); if (!i) return; i.style.cssText = 'position:fixed;z-index:60;pointer-events:none;width:' + size + 'px;height:' + size + 'px;left:' + (x - size / 2) + 'px;top:' + (y - size / 2) + 'px;animation:flt 1s ease-out forwards'; document.body.appendChild(i); setTimeout(function () { i.remove(); }, 1100); }
-function afterMove() { if (G && !G.over && isHuman(swWho(G))) UI.rvPrev = -1; if (UI.coach) coachCheck(); render(); if (UI.mode === 'hot' && !G.over && !G.pend) toast(nameOf(swWho(G)) + ', your turn'); schedule(); }
+function explainOnce() { // F3: leather and the 7x7 bonus are explained where they first matter
+  if (!G || G.over || UI.tutorial || UI.coach || !isHuman(swWho(G))) return; UI.told = UI.told || {}; var me = swWho(G);
+  var nl = SW.LEATHER_SPOTS.filter(function (l, i) { return G.leather[i] === null && l > G.pos[me] && l - G.pos[me] <= 8; })[0];
+  if (nl && !UI.told.lea) { UI.told.lea = 1; UI.note = 'Cream track square = leather: first past gets a free 1\u00D71'; return; }
+  if (G.bonus === null && !UI.told.b7 && best7(G.board[me]) >= 30) { UI.told.b7 = 1; UI.note = 'First to fill a whole 7\u00D77 block: +7 points'; }
+}
+function afterMove() { if (G && !G.over && isHuman(swWho(G))) UI.rvPrev = -1; if (UI.coach) coachCheck(); render(); if (UI.mode === 'hot' && !G.over && !G.pend) toast(nameOf(swWho(G)) + ', your turn'); else explainOnce(); renderDock(); schedule(); }
 function sp(ms) { return amt(UI.fast ? ms * .3 : ms); }
 function banner(txt, sub, opp) { var b = $('#turnban'); if (!b) { b = h('div#turnban'); document.body.appendChild(b); } return; var ms = amt(4000); if (!ms) return; b.className = opp ? 'opp' : ''; b.textContent = txt; if (sub) b.appendChild(h('small', sub)); void b.offsetWidth; b.classList.add('on'); clearTimeout(banner.t); banner.t = setTimeout(function () { b.classList.remove('on'); }, ms); }
 function turnCheck() { // banner + plain line when the turn changes (or stays: the player further back plays again)

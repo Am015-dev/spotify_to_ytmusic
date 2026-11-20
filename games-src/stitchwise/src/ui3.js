@@ -34,7 +34,7 @@ document.addEventListener('click', function (e) {
   else if (a === 'story') storyOpen(); else if (a === 'learn') tutStart(); else if (a === 'goalok') closeGoal(); else if (a === 'whatdo') whatDo(); else if (a === 'skipmap') { coachSkipToMap(); } else if (a === 'result') showResult(); else if (a === 'again') { var lv = UI.lvl; newGame(UI.mode === 'hot' ? 'hot' : 'vs', { lvl: lv }); } else if (a === 'title') showStart(); else if (a === 'look') { $('#rs').hidden = true; }
   else if (a === 'campfin') { $('#rs').hidden = true; }
 });
-function showOppQuilt(seat) { var d = $('#oppd .gx-drawer-body') || null; var body = h('div', { style: 'display:flex;flex-direction:column;align-items:center;gap:8px' }); var saved = UI.cs; UI.cs = Math.min(34, Math.floor((Math.min(innerWidth, 420) - 60) / 9)); var q = quiltEl(seat, 'opp'); body.appendChild(q); var sc = swScore(G, seat); body.appendChild(h('div', { html: '<b>' + nameOf(seat) + '</b>: ' + G.btn[seat] + ' buttons, income ' + G.inc[seat] + ' per spot, ' + sc.empty + ' empty squares' })); UI.cs = saved;
+function showOppQuilt(seat) { var d = $('#oppd .gx-drawer-body') || null; var body = h('div', { style: 'display:flex;flex-direction:column;align-items:center;gap:8px' }); var saved = UI.cs; UI.cs = Math.min(34, Math.floor((Math.min(innerWidth, 420) - 60) / 9)); var q = quiltEl(seat, 'opp'); body.appendChild(q); var sc = swScore(G, seat); var o2 = 1 - seat, pd = G.paid || [0, 0]; body.appendChild(h('div.oppinfo', { html: '<b>' + nameOf(seat) + '</b>: ' + G.btn[seat] + ' buttons \u00B7 <b>income ' + G.inc[seat] + '</b> \u00B7 ' + sc.empty + ' empty' })); body.appendChild(h('div.oppwhy', (UI.mode !== 'hot' && o2 === 0 ? 'Your' : nameOf(o2) + '\u2019s') + ' income: ' + G.inc[o2] + '. Paydays so far paid ' + nameOf(seat) + ' ' + pd[seat] + ', ' + (UI.mode !== 'hot' && o2 === 0 ? 'you' : nameOf(o2)) + ' ' + pd[o2] + '.')); UI.cs = saved;
   q.style.setProperty('--cs', Math.min(34, Math.floor((Math.min(innerWidth, 420) - 60) / 9)) + 'px'); GX.drawer('oppd', nameOf(seat) + '’s quilt', body); var dr = $('#oppd .gx-drawer-body'); dr.innerHTML = ''; dr.appendChild(body); GX.show('oppd'); }
 // ---------- patch pictures
 function showPatch(pid) {
@@ -72,10 +72,13 @@ function bonusTileHtml() { var i = artImg('bonus-tile', 'ic'); if (!i) return ''
 function emptyIdx(seat) { var r = []; G.board[seat].forEach(function (p, i) { if (p === -1 || p === 99) r.push(i); }); return r; }
 function tieText(w) { return 'Tied on points: ' + nameOf(w) + ' reached the end first and wins the tie-break.'; }
 // the end of the game: both quilts side by side, empty squares counted down (-2 each), bonus, then the winner banner
+function whyLine(sc) { // F3: why you won or lost, from the two numbers that decide it: payday income and empty squares
+  var pd = G.paid || [0, 0], you = UI.mode !== 'hot' ? 'you' : nameOf(0);
+  return 'Paydays paid ' + you + ' ' + pd[0] + ', ' + nameOf(1) + ' ' + pd[1] + '. Empty squares cost ' + you + ' \u2212' + sc[0].empty * 2 + ', ' + nameOf(1) + ' \u2212' + sc[1].empty * 2 + '.'; }
 function showResult(o) {
   o = o || {}; try { GXH.hide(); } catch (e) { } var rs = $('#rs'); rs.hidden = false; rs.className = 'ov rsv'; var sc = [swScore(G, 0), swScore(G, 1)], w = swWinner(G), hot = UI.mode === 'hot';
   artBg(rs, 'bg-title'); var saved = UI.cs, saveNew = UI.newCells; UI.newCells = {}; var wide = innerWidth >= 700;
-  UI.cs = Math.max(13, Math.min(40, Math.floor(((Math.min(innerWidth, 900) - 60) / 2 - 16) / 9), Math.floor((innerHeight - (innerHeight < 500 ? 236 : 260) - (UI.coach ? 120 : 0)) / 9)));
+  UI.cs = Math.max(13, Math.min(40, Math.floor(((Math.min(innerWidth, 900) - 60) / 2 - 16) / 9), Math.floor((innerHeight - (innerHeight < 500 ? 236 : 296) - (UI.coach ? 120 : 0)) / 9)));
   var c = h('div.rv'), cols = h('div.rvcols'), cells = [], tot = [], pen = [];
   [0, 1].forEach(function (s) {
     var q = quiltEl(s, 'rvq'); q.removeAttribute('id'); q.style.setProperty('--cs', UI.cs + 'px'); q.style.backgroundImage = 'none'; q.classList.remove('art');
@@ -90,17 +93,17 @@ function showResult(o) {
   var finishUp = function () {
     if (seqId !== UI.seq2) return; [0, 1].forEach(function (s) { cells[s].forEach(function (e) { e.classList.add('x'); }); setTotals(s, sc[s].empty); });
     var A = sc[0].total, B = sc[1].total, title = hot ? nameOf(w) + ' wins!' : w === 0 ? 'You win!' : nameOf(1) + ' wins.';
-    ban.className = 'rvban on ' + (w === 0 || hot ? 'won' : 'lost'); try { artImg('result-win'); artImg('result-lose'); } catch (e) { } /* both ready for the next game */ var ra = artHas(w === 0 || hot ? 'result-win' : 'result-lose') ? '<img class="rvart" alt="" src="' + artUrl(w === 0 || hot ? 'result-win' : 'result-lose') + '">' : ''; ban.innerHTML = ra + '<div class="rvt1">' + title + '</div><div class="rvt2">' + nameOf(0) + ' ' + A + ' – ' + B + ' ' + nameOf(1) + '</div>' + (A === B ? '<div class="rvt3">' + tieText(w) + '</div>' : '');
-    var QS = ((window.CAMPAIGN || {}).story || {}).quick, WK = (((window.CAMPAIGN || {}).story || {}).final || {}).walk; if (!UI.coach && WK && UI.walkLine) { var a0 = sc[0], b0 = sc[1]; ban.appendChild(h('div.rvt3.walk', WK.replace('{b}', a0.btn).replace('{x}', a0.bonus ? 7 : 0).replace('{e}', a0.empty).replace('{t}', a0.total).replace('{ob}', b0.btn).replace('{ox}', b0.bonus ? 7 : 0).replace('{oe}', b0.empty).replace('{ot}', b0.total).replace('Marden', nameOf(1)))); } if (UI.coach) coachFinal(ban, w, A, B); else if (!UI.camp && !hot && QS) ban.appendChild(h('div.rvt3.wren', (A === B ? QS.tie : w === 0 ? QS.win : QS.lose).replace('{name}', nameOf(1))));
+    ban.className = 'rvban on ' + (w === 0 || hot ? 'won' : 'lost'); try { artImg('result-win'); artImg('result-lose'); } catch (e) { } /* both ready for the next game */ var ra = artHas(w === 0 || hot ? 'result-win' : 'result-lose') ? '<img class="rvart" alt="" src="' + artUrl(w === 0 || hot ? 'result-win' : 'result-lose') + '">' : ''; ban.innerHTML = ra + '<div class="rvt1">' + title + '</div><div class="rvt2">' + nameOf(0) + ' ' + A + ' – ' + B + ' ' + nameOf(1) + '</div>' + (A === B ? '<div class="rvt3">' + tieText(w) + '</div>' : ''); try { var wy = whyLine(sc); if (wy) ban.appendChild(h('div.rvt3.why', wy)); } catch (e) { }
+    var QS = ((window.CAMPAIGN || {}).story || {}).quick, WK = (((window.CAMPAIGN || {}).story || {}).final || {}).walk; if (!UI.coach && WK && UI.walkLine) { var a0 = sc[0], b0 = sc[1]; ban.appendChild(h('div.rvt3.walk', WK.replace('{b}', a0.btn).replace('{x}', a0.bonus ? 7 : 0).replace('{e}', a0.empty).replace('{t}', a0.total).replace('{ob}', b0.btn).replace('{ox}', b0.bonus ? 7 : 0).replace('{oe}', b0.empty).replace('{ot}', b0.total).replace('Marden', nameOf(1)))); } if (UI.coach) coachFinal(ban, w, A, B); else if (!UI.camp && !hot && QS && innerHeight >= 800) ban.appendChild(h('div.rvt3.wren', (A === B ? QS.tie : w === 0 ? QS.win : QS.lose).replace('{name}', nameOf(1))));
     $$('.rvcol', c).forEach(function (e) { e.classList.add('done'); }); acts.textContent = ''; sfx('fanfare');
     if (w === 0 || hot) { for (var k = 0; k < 18; k++) c.appendChild(h('i.cf', { style: 'left:' + (Math.random() * 100) + '%;background:' + PAL[k % PAL.length] + ';animation-delay:' + (Math.random() * .6) + 's' })); } else sfx('thud');
     if (o.after) { var cb = h('button.btn.go.grow', { type: 'button' }, 'Continue'); cb.onclick = function () { o.after(); }; acts.appendChild(cb); cb.focus(); }
     else if (UI.coach && UI.prologue) { acts.appendChild(h('button.btn.go.grow', { type: 'button', 'data-a': 'story' }, 'Start the Story')); acts.appendChild(h('button.btn.alt', { type: 'button', 'data-a': 'title' }, 'Title')); }
     else { acts.appendChild(h('button.btn.go.grow', { type: 'button', 'data-a': 'again' }, UI.coach ? 'Play a real game' : 'Play again')); acts.appendChild(h('button.btn.alt', { type: 'button', 'data-a': 'title' }, 'Title')); }
   };
-  var mx = Math.max(sc[0].empty, sc[1].empty), step = amt(1) ? Math.max(28, Math.min(110, Math.floor(2600 / Math.max(1, mx)))) : 0;
+  var mx = Math.max(sc[0].empty, sc[1].empty), step = amt(1) ? Math.max(20, Math.min(70, Math.floor(1200 / Math.max(1, mx)))) : 0;
   if (!step || o.instant) { finishUp(); return; }
-  var n = 0, skip = h('button.btn.alt.sm.rvskip', { type: 'button' }, 'Skip'); skip.onclick = function () { n = 1e9; }; acts.appendChild(skip);
+  var n = 0; c.addEventListener('pointerdown', function () { n = 1e9; }, { once: true }); /* F3: no Skip button: the count is short and a tap finishes it */
   var tick = function () {
     if (seqId !== UI.seq2) return; if (n >= mx) { setTimeout(finishUp, amt(250)); return; }
     [0, 1].forEach(function (s) { if (n < cells[s].length) { cells[s][n].classList.add('x'); setTotals(s, n + 1); } }); sfx('tick'); n++; setTimeout(tick, step);
