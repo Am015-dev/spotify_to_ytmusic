@@ -317,7 +317,7 @@ function rubyBoard(p) {   // the ruby-only screen: a zoomed cauldron, the drople
 // ---------- F2: the shop says what each chip does (a big sheet on the "i" button) and marks 1-2 chips that suit your bag now ----------
 const CWHAT = { G: ['green', 'greens'], B: ['blue', 'blues'], R: ['red', 'reds'], Y: ['yellow', 'yellows'], P: ['purple', 'purples'], O: ['orange', 'oranges'], K: ['moth', 'moths'] };
 function shopBook(c) { return c === 'O' ? D.BOOKS.O[0] : c === 'K' ? D.BOOKS.K[0] : D.BOOKS[c][G.sets[c]]; }
-function shopHave(p, c) { return p.bag.concat(p.hold || [], p.newChips || []).filter(x => x && x.c === c).length; }
+function shopHave(p, c) { return p.bag.concat(p.pot || [], p.hold || [], p.newChips || []).filter(x => x && x.c === c).length; }
 // up to two chips worth buying for this bag, each with a one-line reason
 function shopGood(p, q, sel) {
   const out = []; let keys = []; try { keys = CF.AI.shopChoice(G, p, q.d.coins, 'normal', () => 0.5) || []; } catch (e) { }
