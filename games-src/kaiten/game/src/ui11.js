@@ -157,7 +157,7 @@ if (typeof GXT !== 'undefined') { const r0 = GXT.running, s0 = GXT.state; GXT.ru
 function coachStop() { COACH.on = false; clearInterval(COACH.iv); clearTimeout(COACH.tm); COACH.q = []; COACH.cur = null; window.GXCOACH.running = false; guideHide(); }
 function coachSay(id, n) {
   if (COACH.seen[id] || !KK.STORY.coach[id]) return; COACH.seen[id] = 1; window.GXCOACH.explained.push(id);
-  const c = KK.STORY.coach[id]; COACH.q.push({ id, t: c.t.replace(/%n/g, n == null ? '' : n).replace(/%r/g, rivalName()), w: c.w }); coachPump();
+  const c = (G && G.np === 2 && KK.STORY.coach[id + '2p']) || KK.STORY.coach[id]; COACH.q.push({ id, t: c.t.replace(/%n/g, n == null ? '' : n).replace(/%r/g, rivalName()), w: c.w }); coachPump();
 }
 function rivalName() { return G ? pname(1) : 'Odile'; }
 function coachPump() {

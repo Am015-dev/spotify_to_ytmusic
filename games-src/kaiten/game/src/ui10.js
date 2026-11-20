@@ -15,10 +15,10 @@ const HLP_STEPS = {
   tally: { target: () => document.querySelector('#rs [data-a=rsnext]'), title: 'Round scored', text: 'Every set, roll race and nigiri was just counted. Tap for the next round.' }
 };
 const HLP_RULES = [
-  { phase: 'pick', title: 'Pick and pass', text: 'Everyone takes one dish at the same time. Then every hand passes to the next diner.', pic: HPIC.belt },
-  { phase: 'pick', title: 'Sets and buns', text: 'Two Prawns score 5, three Fish Slices 10. Steam Buns score 1, 3, 6, 10, then 15.', pic: () => HPIC.row(['tempura', 'sashimi', 'dumpling']) },
-  { phase: 'pick', title: 'Rolls and nigiri', text: 'Most roll icons score 6, second most 3. Nigiri score 1 to 3, tripled on Fire Paste.', pic: () => HPIC.row(['roll2', 'salmon', 'wasabi']) },
-  { phase: 'pick', title: 'Custard at the end', text: 'Custard Cups score only when the game ends: most scores 6, fewest loses 6.', pic: () => HPIC.card('pudding', 64) },
+  { title: 'Pick and pass', text: 'Everyone takes one dish at the same time. Then every hand passes to the next diner.', pic: HPIC.belt },
+  { title: 'Sets and buns', text: 'Two Prawns score 5, three Fish Slices 10. Steam Buns score 1, 3, 6, 10, then 15.', pic: () => HPIC.row(['tempura', 'sashimi', 'dumpling']) },
+  { title: 'Rolls and nigiri', text: 'Most roll icons score 6, second most 3. Nigiri score 1 to 3, tripled on Fire Paste.', pic: () => HPIC.row(['roll2', 'salmon', 'wasabi']) },
+  { title: 'Custard at the end', text: 'Custard Cups score only when the game ends: most scores 6, fewest loses 6 (not with 2 diners).', pic: () => HPIC.card('pudding', 64) },
   { phase: 'twin', title: 'Twin Sticks', text: 'Keep them on the table. On a later turn take two dishes from your hand at once.', pic: () => HPIC.card('chop', 64) },
   { phase: 'twin', title: 'How to use them', text: 'Tap the glowing sticks, then tap two dishes. The sticks return to the hand you pass.', pic: HPIC.belt },
   { phase: 'twin2', title: 'Two dishes', text: 'Tap two dishes from your hand. You take both, then the hand passes on.', pic: () => HPIC.row(['tempura', 'tempura']) },
@@ -64,7 +64,7 @@ let _hlpInit = false;
 function hlpInit() {
   if (_hlpInit || typeof GXH === 'undefined') return; _hlpInit = true;
   GXH.init({ game: 'kaiten-kitchen', defaultOn: false, steps: HLP_STEPS, rules: HLP_RULES, avoid: '#belt .hc[data-up="1"],#tbl .grp.usable,#rs .btn,#acts .btn,#labacts .lbtn' });
-  GXH.bulb({ el: '#bulbbtn', suggest: hlpSuggest, rulesFor: () => hlpPhase() || 'pick' });
+  GXH.bulb({ el: '#bulbbtn', suggest: hlpSuggest, rulesFor: hlpPhase });   // no '|| pick' fallback: the 450 ms tick calls GXH.phase(null) on a plain pick, which hides any bulb bubble tagged with a phase (R80 dead bulb). Phase null opens the plain-pick rules (phase-less cards below).
 }
 function hlpAfter() { hlpInit(); if (typeof GXH !== 'undefined') GXH.phase(hlpPhase()); }
 hlpInit(); setInterval(() => { try { hlpAfter(); } catch (e) { } }, 450);

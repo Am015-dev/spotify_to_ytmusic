@@ -152,25 +152,20 @@ function normalPick(G, seat) {
   return best.pick;
 }
 
-// ---------- easy: greedy with a lot of randomness ----------
+// ---------- easy: a fellow newcomer (R80, Nov 2026) ----------
+// Plays like a first-timer reading the green +N on the belt: takes the dish that scores the most points right now (ties at random),
+// and now and then just grabs a dish it likes. It never plans sets ahead, races custard or saves Twin Sticks, so a newcomer
+// who follows the +N plays it as an equal (bench: games-src/kaiten/game/bench-newplayer.js, "hint-follower" line).
 function easyPick(G, seat) {
-  const rng = mkRng(seedOf(G, seat, 11)), p = G.players[seat], h = p.hand, t = tc(p.table);
-  const vals = h.map(id => {
-    const k = key(id);
-    let v = 0;
-    switch (k) {
-      case 'tempura': v = t.tempura % 2 === 1 ? 5 : 1.5; break;
-      case 'sashimi': v = t.sashimi % 3 === 2 ? 10 : t.sashimi % 3 === 1 ? 3.5 : 2; break;
-      case 'dumpling': v = DUMP_F(t.dumpling + 1) - DUMP_F(t.dumpling) + 0.5; break;
-      case 'roll1': v = 1.2; break; case 'roll2': v = 2.2; break; case 'roll3': v = 3.2; break;
-      case 'salmon': case 'squid': case 'egg': v = NIG[k] * (t.u > 0 ? 3 : 1); break;
-      case 'wasabi': v = 2.2; break; case 'chop': v = 1.2; break; case 'pudding': v = 2; break;
-    }
-    return v + (rng() - 0.5) * 2.4;
-  });
-  let i = 0; if (rng() < 0.1) i = Math.floor(rng() * h.length); else for (let j = 1; j < h.length; j++) if (vals[j] > vals[i]) i = j;
-  if (h.length >= 2 && KK._.hasChop(p) && (h.length === 2 || rng() < 0.12)) { let j = i === 0 ? 1 : 0; for (let x = 0; x < h.length; x++) if (x !== i && vals[x] > vals[j]) j = x; return [Math.min(i, j), Math.max(i, j)]; }
-  return [i];
+  const rng = mkRng(seedOf(G, seat, 11)), h = G.players[seat].hand;
+  if (rng() < 0.12) return [Math.floor(rng() * h.length)];
+  const tab = G.players.map(q => q.table.map(e => ({ id: e.id, w: e.w }))), tot = t => KK.roundScores({ players: t.map(x => ({ table: x })) })[seat].total;
+  const base = tot(tab); let bi = 0, bv = -1e9;
+  for (let i = 0; i < h.length; i++) {
+    const t2 = tab.slice(); t2[seat] = tab[seat].map(e => ({ id: e.id, w: e.w })); KK._.place({ table: t2[seat] }, h[i]);
+    const v = tot(t2) - base + rng() * 0.6; if (v > bv) { bv = v; bi = i; }
+  }
+  return [bi];
 }
 
 // ---------- hard: determinized Monte Carlo with normal-level rollouts ----------

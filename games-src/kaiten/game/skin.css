@@ -75,6 +75,9 @@ html:not(.kkmy) #belt .hc{filter:saturate(.75) brightness(.9)}
 #stage.seq .pod.done,#stage.seq .pod.cur{opacity:1}
 #stage.seq .pod.cur{transform:scale(1.06)}
 #stage .sgain small{display:block;margin:2px auto 0;background:#2a1710;color:#fff3d6;-webkit-text-stroke:0;text-shadow:none;font-size:14px;font-weight:800;line-height:1.2;padding:2px 8px;border-radius:10px;white-space:nowrap;max-width:150px;overflow:hidden;text-overflow:ellipsis}
+/* R80: on phones and tablets the score and its reason stay inside the card: full card width, centred, the reason wraps (2-3 short lines) */
+@media (max-width:1023px){#stage .sgain{left:0;right:0;width:auto;transform:translateY(-50%);text-align:center;white-space:normal;animation-name:gainInM}#stage .sgain small{max-width:100%;box-sizing:border-box;white-space:normal;overflow:hidden;text-overflow:clip;font-size:12px;padding:2px 4px;border-radius:8px;overflow-wrap:anywhere}}
+@keyframes gainInM{from{opacity:0;transform:translateY(-10%) scale(.4)}to{opacity:1;transform:translateY(-50%) scale(1)}}
 /* the guide: a code-drawn portrait disc with the painted portrait over it */
 .kkport{position:relative;display:inline-flex;align-items:center;justify-content:center;border-radius:50%;border:2px solid #4a2a22;flex:none;overflow:hidden;font-style:normal}
 .kkport i{font-style:normal;font-size:60%}

@@ -48,7 +48,10 @@ function renderTable() {
   const L = layoutNums(np, hasMe, tblH0);
   const order = []; if (hasMe) { for (let k = 1; k < np; k++) order.push((f + k) % np); order.push(f); } else for (let k = 0; k < np; k++) order.push(k);
   tbl.style.setProperty('--cols', L.cols);
-  const meW = 1.35, rowsTpl = hasMe ? (L.orows ? 'repeat(' + L.orows + ',minmax(0,1fr)) minmax(0,' + meW + 'fr)' : 'minmax(0,1fr)') : 'repeat(' + L.orows + ',minmax(0,1fr))';
+  // R80: on a phone, when your own groups cannot fit one row (each tap target is at least 44 px), your row gets the height for two rows
+  let meW = 1.35;
+  if (hasMe && isPh() && L.orows) { const ngMe = groupsOf(f, tab, info).list.length + (pcs[f] ? 1 : 0), wMe = L.w - 16 - 150; if (ngMe * 50 > wMe) { const A = Math.max(120, L.h - (beltH || 150) - 10) - 6 * (L.orows + 1); meW = Math.max(1.35, Math.min(100 * L.orows / Math.max(40, A - 100), A / 46 - L.orows)); } }   // rivals keep >= 46 px rows
+  const rowsTpl = hasMe ? (L.orows ? 'repeat(' + L.orows + ',minmax(0,1fr)) minmax(0,' + meW + 'fr)' : 'minmax(0,1fr)') : 'repeat(' + L.orows + ',minmax(0,1fr))';
   tbl.style.gridTemplateRows = rowsTpl;
   const tblH = Math.max(120, L.h - (beltH || (L.ph ? 150 : 210)) - 10), tblW = L.w - 16;
   const nrow = L.orows + (hasMe ? meW : 0), rH = Math.max(44, (tblH - 6 * (L.orows + (hasMe ? 1 : 0))) / nrow);
@@ -75,13 +78,33 @@ function renderTable() {
     const sg = seatSig(s, tab, info, pcs, isMe, dm) + '|' + sigAll;
     const old = oldSeats[s];
     if (old && old.dataset.sg === sg) { els.push(old); continue; }
-    const e = seatEl(s, tab, info, pcs, isMe, dm); e.dataset.rk = s; e.dataset.sg = sg; els.push(e);
+    const e = seatEl(s, tab, info, pcs, isMe, dm); e.dataset.rk = s; e.dataset.sg = sg; e.__fit = { s, isMe, dm }; els.push(e);
   }
   let same = tbl.children.length === els.length; if (same) for (let i = 0; i < els.length; i++) if (tbl.children[i] !== els[i]) { same = false; break; }
   if (!same) tbl.replaceChildren(...els);
+  for (let i = 0; i < els.length; i++) if (els[i].__fit) { els[i] = fitSeat(els[i], tab, info, pcs); els[i].__fit = null; }
   if (UI.land && PX.on) for (const k of UI.land) PX.landSet.add(k);
   UI.land = null;
   if (!tbl.__ap) { tbl.__ap = 1; try { KIT.applyTable($('#bd'), 'day'); } catch (e) { } }
+}
+// R80: the size estimate above can be too wide (long tags like "2nd +1", the custard shelf), and an overflowing counter paints past
+// the screen edge and under the pick slot. Measure the real seat and rebuild it with smaller plates (then two rows) until it fits.
+function seatOver(e) {
+  const c = e.querySelector('.ctr'); if (!c || !c.children.length) return false;
+  const r = c.getBoundingClientRect(); if (r.width < 4) return false;
+  if (c.scrollWidth > c.clientWidth + 2 || c.scrollHeight > c.clientHeight + 2) return true;
+  for (const k of c.children) { const q = k.getBoundingClientRect(); if (q.right > r.right + 1 || q.left < r.left - 1 || q.bottom > r.bottom + 1) return true; }
+  return false;
+}
+function fitSeat(e, tab, info, pcs) {
+  const f = e.__fit; let dm = f.dm, n = 0;
+  while (n++ < 10 && seatOver(e)) {
+    if (dm.pd > 24) dm = Object.assign({}, dm, { pd: Math.max(24, dm.pd - 4), tight: true });
+    else if (!dm.wrap) dm = Object.assign({}, dm, { wrap: true, tight: true, pd: Math.max(24, f.dm.pd - 8) });
+    else { if (!f.dm.wrap) dm = Object.assign({}, dm, { wrap: false, pd: 24 }); else break; n = 99; }   // two rows did not fit either: smallest single row
+    const ne = seatEl(f.s, tab, info, pcs, f.isMe, dm); ne.dataset.rk = e.dataset.rk; ne.dataset.sg = e.dataset.sg; e.replaceWith(ne); e = ne;
+  }
+  return e;
 }
 function seatSig(s, tab, info, pcs, isMe, dm) {
   const p = G.players[s], fz = UI.fz && UI.fz.slots, sl = fz ? JSON.stringify(fz[s]) : (G.phase === 'pick' ? (p.picked ? 'p' : 'w') : 'x');
@@ -103,8 +126,10 @@ function seatEl(s, tab, info, pcs, isMe, dm) {
   const ctr = h('div.ctr');
   const land = UI.land || new Set();
   const gl = gs.list.slice(); if (isMe && twinReady()) gl.sort((x, y) => (y.k === 'chop') - (x.k === 'chop'));   // the glowing Twin Sticks come first, never scrolled out of the tray
+  const shf = pcs[s] || !isPh() ? shelfEl(s, pcs[s], dm.pd, land.has(s + '|pud')) : null;
+  if (shf && isPh() && dm.tight) { shf.classList.add('first'); ctr.appendChild(shf); }   // R80: a crowded phone counter shows custard first (next to the avatar), so it is never scrolled out of sight
   for (const g of gl) ctr.appendChild(grpEl(g, dm.pd, land.has(s + '|' + g.k)));
-  if (pcs[s] || !isPh()) ctr.appendChild(shelfEl(s, pcs[s], dm.pd, land.has(s + '|pud')));   // phones: the custard spot appears with the first cup (the dock lists custard)
+  if (shf && !shf.parentNode) ctr.appendChild(shf);   // phones: the custard spot appears with the first cup (the dock lists custard)
   if (!gs.list.length && !pcs[s] && !(s === viewSeat() && (G.players[s].picked || UI.busy))) ctr.insertBefore(h('span.none', G.phase === 'pick' ? 'Nothing served yet' : ''), ctr.firstChild);   // your tray drops the label once your dish is on its way
   el.appendChild(ctr);
   el.appendChild(slotEl(s, dm.sl, dm.cmp));

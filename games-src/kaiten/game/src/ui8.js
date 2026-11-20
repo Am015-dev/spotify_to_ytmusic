@@ -125,7 +125,7 @@ function stageClear() { const s = $('#stage'); if (s) s.remove(); }
 const cap1 = t => t ? t.charAt(0).toUpperCase() + t.slice(1) : '';
 function revealCaption(sd, l) {
   const me = sd === viewSeat(), nm = me ? 'You' : pname(sd), served = l ? l.served : 'a dish', d = l ? l.d : 0;
-  return (me ? 'Your turn' : pname(sd) + '\'s turn') + '|' + nm + (me ? ' serve ' : ' serves ') + served + '.' + (d > 0 ? ' +' + d : '');
+  return (me ? 'Your dish' : pname(sd) + '\'s dish') + '|' + nm + (me ? ' serve ' : ' serves ') + served + '.' + (d > 0 ? ' +' + d : '');
 }
 async function stageReveal(picks, tok, gains) {
   stageClear();
@@ -169,7 +169,7 @@ async function stageReveal(picks, tok, gains) {
     pods.forEach((q, j) => q.pod.classList.toggle('cur', j === i)); if (UI.fz) UI.fz.msg = revealCaption(p.s, l); renderDock();
     snd('cloche'); covers[i].lift({ delay: 0 });   // lifts overlap; the pause below is the pace
     const why = l ? l.why.map(w => w.replace(/^[+\u2212]\d+ /, '')).join(' and ') : '';
-    const g = h('div.sgain' + (d < 0 ? '.neg' : d === 0 ? '.z' : '') + '.cur', d > 0 ? '+' + d : d < 0 ? '\u2212' + -d : '+0', h('small', d !== 0 && why ? why : 'no points yet'));
+    const g = h('div.sgain' + (d < 0 ? '.neg' : d === 0 ? '.z' : '') + '.cur', d > 0 ? '+' + d : d < 0 ? '\u2212' + -d : '+0', d !== 0 && why ? h('small', why) : null);   // R80: no caption at +0, and the caption wraps inside the card (skin.css)
     p.host.appendChild(g); p.pod.classList.add('done'); if (d > 0) snd('coin', { vol: .5 });
     await wait(560 * stp); if (tok !== UI.seq) return stageClear();
   }

@@ -360,6 +360,8 @@ function pxStepParts(dt) {
   }
   PX.parts = keep;
 }
+// calm (owner, Nov 2026): a waiting Fire Paste pulses and flames for 3 beats (about 4.2 s) after it lands, then rests; nothing loops
+function pxBeat(o) { if (!(o.pulse || o.kind !== 'plate')) { o.p0 = 0; return false; } if (!o.p0) o.p0 = PX.t || 1e-6; return PX.t - o.p0 < 4.2; }
 // ambient life: steam over buns, flames on waiting Fire Paste, a glint on paste + nigiri
 function pxAmbient(dt) {
   const q = PXQ[PX.q]; if (!q.fx || pxRM()) return;
@@ -369,7 +371,7 @@ function pxAmbient(dt) {
     const isPlate = o.kind === 'plate', d = isPlate ? o.d : o.w, cx = o.x + d / 2, cy = isPlate ? o.y + d / 2 : o.y + o.w * .55;
     const type = o.type; if (!type) continue;
     if (type === 'dumpling' && Math.random() < step * 2.2 * q.fx) pxPart('puff', cx + (Math.random() - .5) * d * .4, cy - d * .25, { vx: (Math.random() - .5) * 8, vy: -26 - Math.random() * 14, life: 1.4, s0: d / 160, s1: d / 70, a0: .55 });
-    if (type === 'wasabi' && !o.on && (o.pulse || !isPlate) && Math.random() < step * 3 * q.fx) pxPart('flame', cx + (Math.random() - .5) * d * .45, cy - d * .12, { vx: (Math.random() - .5) * 10, vy: -34 - Math.random() * 20, life: .55, s0: d / 90, s1: d / 260, a0: .9, noFilter: true });
+    if (type === 'wasabi' && !o.on && pxBeat(o) && Math.random() < step * 3 * q.fx) pxPart('flame', cx + (Math.random() - .5) * d * .45, cy - d * .12, { vx: (Math.random() - .5) * 10, vy: -34 - Math.random() * 20, life: .55, s0: d / 90, s1: d / 260, a0: .9, noFilter: true });
     if (type === 'wasabi' && o.on && Math.random() < step * 1.2 * q.fx) pxPart('spark', cx + (Math.random() - .5) * d * .6, cy + (Math.random() - .5) * d * .6, { life: .7, s0: .1, s1: d / 110, a0: 1, rot: 2, noFilter: true });
   }
 }
@@ -407,7 +409,7 @@ function pxFrame(ts) {
     } else if (o.kind === 'plate') {
       if (!o.detached && !o.flying && !o.busy) { o.x += (o.tx - o.x) * kf; o.y += (o.ty - o.y) * kf; o.w += (o.d - o.w) * kf; if (Math.abs(o.x - o.tx) > .4 || Math.abs(o.y - o.ty) > .4) moving = true; }
       if (o.s != null && o.s < 1 && !o.busy && !o.detached) { o.s += (1 - o.s) * kf; o.a += (1 - o.a) * kf; moving = true; }
-      const d = o.w, c = o.c, sq = o.sq || 0, pul = o.pulse && q.fx && !snap ? 1 + .05 * Math.sin(PX.t * 4.5) : 1;
+      const d = o.w, c = o.c, sq = o.sq || 0, pul = o.pulse && q.fx && !snap && pxBeat(o) ? 1 + .05 * Math.sin((PX.t - o.p0) * 4.5) : 1;
       c.x = o.x + d / 2; c.y = o.y + d / 2; c.alpha = (o.dim ? .45 : 1) * (o.a == null ? 1 : o.a) * (o.vis === 0 && !o.flying ? 0 : 1); c.rotation = o.rot || 0;
       const sc = (o.s == null ? 1 : o.s) * pul;
       const nL = Math.max(1, o.layers - (o.hideTop ? 1 : 0));

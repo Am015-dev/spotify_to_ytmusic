@@ -144,7 +144,7 @@ function whyPick(ids) {
   if (NIG[x]) return c.wasabiUnused ? 'Your Fire Paste is waiting: this nigiri scores triple (+' + NIG[x] * 3 + ').' : 'A nigiri is worth ' + NIG[x] + ' point' + (NIG[x] > 1 ? 's' : '') + ' straight away.';
   if (x === 'wasabi') return 'Fire Paste triples the next nigiri you serve.';
   if (x === 'chop') return 'Twin Sticks let you serve two plates on a later turn.';
-  if (x === 'pudding') return 'Custard is kept to the end of the game: most scores +6, fewest loses 6.';
+  if (x === 'pudding') return 'Custard is kept to the end of the game: most scores +6' + (G && G.np === 2 ? ' (2 diners: no -6).' : ', fewest loses 6.');
   return '';
 }
 function logSince(i) { return G.log.filter(x => x.i > i).map(x => x.t); }
