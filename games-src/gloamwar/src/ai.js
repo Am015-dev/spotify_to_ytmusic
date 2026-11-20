@@ -89,7 +89,7 @@ function scoreTop(G, s, m, L) {
     case 'chide': return (F.road >= 0 ? 11 : 6.5) + waste;
     case 'csep': if (cs.length < 3 || G.turn < 2) return 0; return 2.8 + (cs.length - 3) * 0.6 + waste;
     case 'charmove': return 2 + waste;
-    case 'nzmove': var rr = riderRegions(G).indexOf(F.loc) >= 0; return (F.road < 0 && !rr && F.hid ? 6.2 : 1.2);
+    case 'nzmove': var rr = riderRegions(G).indexOf(F.loc) >= 0; return (F.road < 0 && !rr && F.hid ? 7.4 : 1.2);
     case 'dip': var p = G.pol[m.n]; return (s === 'G' ? 6 : 5) + (p.s === 1 ? 2.5 : 0) - (natSide(m.n) === 'D' && !p.a ? 1 : 0) + (m.n === 'sh' || m.n === 'au' ? 0.7 : 0) + waste;
     case 'recruit': var res = 0; NAT_ORDER.forEach(function (n) { if (natSide(n) === s && atWar(G, n)) res += G.R[n][0] + G.R[n][1]; }); return 4.2 + (s === 'G' ? 1.2 + Math.min(2.5, res / 10) : Math.min(1.5, res / 12)) + waste;
     case 'minion': return 10;
@@ -132,7 +132,7 @@ function aiPick(G, L) {
     return { t: 'cdone' };
   }
   if (G.phase === 'hunt') {
-    var hr = huntRange(G), want = F.road >= 0 ? 3 : gateDist(F.loc) - F.prog <= 3 ? 3 : 2; if (companions(G).length >= 5 && G.turn >= 3) want++; if (L === 'easy') want = Math.max(1, want - 1); if (G.turn === 1) want = Math.max(hr[0], 1);
+    var hr = huntRange(G), want = F.road >= 0 ? 9 : gateDist(F.loc) - F.prog <= 4 ? Math.max(3, companions(G).length - 1) : 2; if (companions(G).length >= 5 && G.turn >= 3) want++; if (L === 'easy') want = Math.max(1, want - 1); if (G.turn === 1) want = Math.max(hr[0], 1);
     return { t: 'hunt', n: Math.max(hr[0], Math.min(hr[1], want)) };
   }
   // action phase
@@ -145,7 +145,7 @@ function pendChoice(G, s, ms, L) {
     case 'discard': var worst = null, wv = 1e9; ms.forEach(function (m) { var v = cardVal(G, s, m.c) + (cardPre(G, s, CARD[m.c]) ? 1 : 0); if (v < wv) { wv = v; worst = m; } }); return worst;
     case 'damage':
       var ab = ms.filter(function (m) { return m.t === 'absorb'; });
-      if (ab.length && (F.taint + d.dmg >= 10 || d.dmg >= 3 && F.taint + d.dmg >= 6 || F.road >= 0 && d.dmg >= 2)) { var g = ab.filter(function (m) { return m.c !== 'random' && CHARS[m.c].lv <= d.dmg; })[0]; return g || ab[ab.length - 1]; }
+      if (ab.length && (F.taint + d.dmg >= 11 || d.dmg >= 3 && F.taint + d.dmg >= 9 || F.road >= 0 && d.dmg >= 3 && F.taint + d.dmg >= 8)) { var g = ab.filter(function (m) { return m.c !== 'random' && CHARS[m.c].lv <= d.dmg; })[0]; return g || ab[ab.length - 1]; }
       return { t: 'taint' };
     case 'reveal': var bestR = null, bv = 1e9; ms.forEach(function (m) { var v = gateDist(m.to) + (armyAt(G, m.to, 'G') ? 1.5 : 0) + (REG[m.to].set === 'strong' && controller(G, m.to) === 'G' ? 3 : 0); if (v < bv) { bv = v; bestR = m; } }); return bestR;
     case 'sep':
