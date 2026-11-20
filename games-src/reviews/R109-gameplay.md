@@ -1,5 +1,13 @@
 # R109 strict gameplay review: kaiten-kitchen
 
+> **[REVIEW R109] kaiten-kitchen: summary** (the report trigger to the orchestrator was refused, so the summary is here)
+> - Commit reviewed: 78de407c. Gates: --quick PASS and --full PASS (lab WARN 9/12; Fast button covered). Engine tests 81/81 and 90/90.
+> - Rules: the engine matches. 5 text issues: buns "always more" (ui10.js:45, ui1.js:154); custard line and Goal card leave out "fewest −6" (ui10.js:50, GOAL); bulb says "+3 now, next best +6" (ui10.js:51).
+> - Clutter: 0 loops. calm-audit maxHelpers=1, but the real tutorial steps 3 and 8 show 2 helpers.
+> - Rows: 8 / 7 / 8 / 6 / 6 / 7 / 7 / 8, average 7.1. **FAIL** (rows 4 and 5).
+> - Cold play: playable, fun "mostly", would play again. Quote: "rarely felt a real choice beyond following the hint".
+> - Top fixes: cream panel during the reveal; honest +N badges and a badge legend; one helper at a time; bun and custard texts; final table scrolls at 375x553 and PC text below 12 px.
+
 - Commit reviewed: `78de407c40cc3afc377e5890ce6b772513a249be` (origin/shelf/W581-kaiten-strict, F6 merge with F5 head)
 - Date: 20 Nov 2026 (UTC). Reviewer plays only and changes no game code.
 - Video: `games-src/reviews/R109-first-3-min-375x667.webm` (152 s: the whole 19-step tutorial, then a full real game by touch at 375x667)
