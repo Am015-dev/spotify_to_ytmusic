@@ -50,7 +50,8 @@ function animate(prev){const cur=snapState();if(!ANIM||!prev||document.hidden)re
   cur.tot.forEach((t,i)=>{const d=t-(prev.tot[i]||0);if(!d)return;const se=seatEl(i);if(!se)return;const ss=se.querySelector('.ss');if(ss){ss.classList.add('bump')}
     if(G&&G.over)return;if(G&&!G.coach&&!G.tut)return;   // R25: in Play the seat's labelled pop (playable.js) says it once; no second chip. No score chips over the result card; the chip sits under the seat, never over its name and coins
     const lab=(G&&G.pl[i]&&G.pl[i].human&&G.pl.filter(x=>x.human).length===1?'You':(G&&G.pl[i]?G.pl[i].nm:''))+' '+(d>0?'+':'−')+Math.abs(d)+(Math.abs(d)===1?' pt':' pts');   // every chip says whose points and that they are points
-    const sr=se.getBoundingClientRect();const at=tf&&i===actor?ctr(tf.getBoundingClientRect()):{x:sr.left+sr.width/2,y:sr.bottom+14};floatText(lab,at,d>0?'up':'dn')})}
+    const sr=se.getBoundingClientRect();const at={x:sr.left+sr.width/2,y:sr.bottom+14};   // F2: score chips start under the seat, never on the tiles
+   floatText(lab,at,d>0?'up':'dn')})}
 // the chooser lights its sensible option (the computer's own pick for you, or the best Shadow target); the rest stay tappable
 function chzBest(c){try{const hp=me();if(!hp)return 0;let adv=null;const cz=UI.chz;try{UI.chz=null;adv=typeof hlpAdvice==='function'?hlpAdvice():null}catch(e){}finally{UI.chz=cz}   // R38: the advice is read as if the chooser were shut, so the planned colour is the one marked best
   if(adv){const j=c.opts.findIndex(o=>same(o.m,adv));if(j>=0)return j}
@@ -59,9 +60,17 @@ function chzBest(c){try{const hp=me();if(!hp)return 0;let adv=null;const cz=UI.c
 function seatPoint(i){const se=seatEl(i);return se?ctr(se.getBoundingClientRect()):{x:innerWidth/2,y:20}}
 // ---------- the pop-over for a choice on a tile, a seat or a card ----------
 function placeChz(){const el=$('#chz');if(!el)return;const c=UI.chz;for(const q of document.querySelectorAll('.chzanc'))q.classList.remove('chzanc');document.documentElement.classList.remove('chzon');if(!c||!G){el.hidden=true;el.innerHTML='';return}
-  const bi=chzBest(c);el.innerHTML=c.opts.map((o,i)=>`<button class="chb${i===bi?' glow':''}" data-chz="${i}">${o.html}${i===bi&&c.opts.length>1?'<small class="chbest">best</small>':''}</button>`).join('');el.hidden=false;
+  const hn=(typeof hintsOn==='function'&&hintsOn())||(typeof gdStep==='function'&&!!gdStep());const bi=hn?chzBest(c):-1;   // F3: 'best' only with hints on
+  const tl=a0=>a0&&a0.tile!=null&&!(UI.chz&&UI.chz.dock===false);el.innerHTML=c.opts.map((o,i)=>`<button class="chb${i===bi?' glow':''}" data-chz="${i}">${o.html}${i===bi&&c.opts.length>1?'<small class="chbest">best</small>':''}</button>`).join('');el.hidden=false;
   const a=c.anchor;const ae=a.tile!=null?tileEl(a.tile):a.seat!=null?seatEl(a.seat):a.dj?document.querySelector(`[data-dj="${a.dj}"],[data-th="${String(a.dj).replace('t:','')}"]`):null;if(!ae){el.hidden=true;return}ae.classList.add('chzanc');document.documentElement.classList.add('chzon');   // R25: only the chooser and its tile stay lit
   const r=ae.getBoundingClientRect(),w=el.offsetWidth,h=el.offsetHeight;let x=r.left+r.width/2-w/2;x=Math.max(6,Math.min(innerWidth-w-6,x));let minY=50;for(const id of ['line','trk','trk2','coach','turnover']){const q=document.getElementById(id);if(q&&!q.hidden&&q.getClientRects().length){const b=q.getBoundingClientRect().bottom;if(b>minY)minY=b}}minY+=4;let y=r.top-h-8;if(y<minY)y=r.bottom+8;if(y+h>innerHeight-6)y=Math.max(minY,innerHeight-h-6);
+  // F3: a choice for a TILE never sits on the bazaar: below the grid (phone), beside it (PC), else in the gap above it
+  if(tl(a)){const g=document.getElementById('grid');const gr=g?g.getBoundingClientRect():null;
+    if(gr&&gr.width){if(innerHeight-gr.bottom>=h+8){y=gr.bottom+6;x=Math.max(6,Math.min(innerWidth-w-6,r.left+r.width/2-w/2))}
+      else if(innerWidth-gr.right>=w+16){x=gr.right+8;y=Math.max(minY,Math.min(innerHeight-h-6,r.top+r.height/2-h/2))}
+      else if(gr.left>=w+16){x=gr.left-w-8;y=Math.max(minY,Math.min(innerHeight-h-6,r.top+r.height/2-h/2))}
+      else if(gr.top-minY>=h+4){y=gr.top-h-4}
+      else{y=Math.max(minY,innerHeight-h-6)}}}
   el.style.left=x+'px';el.style.top=y+'px'}
 // ---------- the ghost finger: shows one real, legal move to the new player, and stays away after a few moves ----------
 const FING={n:0,max:10,key:'',t:null};try{FING.n=+localStorage.getItem('soq_fing')||0}catch(e){}

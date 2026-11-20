@@ -158,9 +158,13 @@ function hlpWhy(m,hp){let t='';
      else if(q.kind==='item')t='Keep the item worth most to you.';
      else if(q.kind==='djinn'&&q.cards&&DJ[q.cards[m.i]])t='Keep '+DJ[q.cards[m.i]].n+': worth '+DJ[q.cards[m.i]].vp+' points.';break}}
   return capW(t,15)}
-function hlpSuggest(){if(hlpBusy())return null;const hp=me();const m=hlpAdvice();if(!m)return null;
+function hlpSuggest(){if(hlpBusy())return null;const hp=me();const m=hlpAdvice();if(!m)return null;if(m.act==='step'&&!(typeof gdStep==='function'&&gdStep()))return hlpWalk();   // F3: during a walk the button names a good place to end; the player plans the drops
+  
   const why=hlpWhy(m,hp);if(!why||!hlpEl(m))return null;
   return {why,key:JSON.stringify(m),target:()=>hlpEl(m),from:null}}
+// asked for during a walk: the ending that takes the most people (ties: the most valuable tile)
+function hlpWalk(){try{if(typeof f3Mine!=='function'||!f3Mine())return null;let b=null;for(const o of f3Outs()){const v=o.n*10+(G.board[o.e].v||0);if(!b||v>b.v)b={o,v}}if(!b)return null;const o=b.o;const nm=o.n>1?MPLUR[o.c]:MNAME[o.c];
+  return {why:'Try ending here: take '+o.n+' '+nm+'. Tap this tile, then ✓.',key:'walk'+o.e+o.c,target:()=>tileEl(o.e),from:null}}catch(e){return null}}
 // ---------------------------------------------------------------- wiring
 let _hlpInit=false;
 function hlpInit(){if(_hlpInit||typeof GXH==='undefined')return;_hlpInit=true;

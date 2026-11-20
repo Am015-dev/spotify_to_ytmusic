@@ -241,3 +241,64 @@ html.short.mk-buy:not(.land) #mkt .mrow .mcard:not(.glow):not(.sel){display:none
 /* F1: your goods wrap on a phone instead of running off the right edge (power buttons keep their sliding row) */
 @media (max-width:700px){html body #mine{flex-wrap:wrap!important;overflow:visible!important;justify-content:center!important}}
 @media (max-width:700px){html body #acts .arow.pws .ab.pw{padding:0 8px!important}}
+/* F2 bidding: one big button per turn spot, naming its place and its price; taken spots name who holds them */
+html body #bd .bidt .spot{min-height:48px!important;height:auto!important;padding:0!important;justify-content:stretch!important;align-items:stretch!important;border-radius:10px!important}
+html body #bd .bidt .spot.shut{opacity:.55}
+html body #bd .bidt .sp-b{flex:1 1 auto;min-height:48px!important;height:auto!important;padding:2px 0!important;display:flex!important;flex-direction:column!important;align-items:center!important;justify-content:center!important;gap:1px;border-radius:10px}
+html body #bd .bidt .sp-b .ord,html body #bd .bidt .spot .ord{position:static!important;background:none!important;padding:0!important;border-radius:0!important;font:800 13px/1 var(--ff-b,system-ui)!important;color:inherit!important;text-transform:none!important;letter-spacing:.02em;align-self:center}
+html body #bd .bidt .sp-b .spc{font:900 17px/1.05 var(--ff-b,system-ui);white-space:nowrap}
+html body #bd .bidt .sp-b .spc i{font-size:12px!important;margin-right:2px}
+html body #bd .bidt .spot .sp-c{background:none!important;line-height:1.1!important;padding:0!important;font-size:14px!important;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+html body #bd .bidt .spot.taken .ord,html body #bd .bidt .spot.taken .sp-c{color:#fff!important;text-shadow:0 1px 2px rgba(0,0,0,.5)}
+html body #bd .bidt .spot:not(:has(.sp-b)){display:flex!important;flex-direction:column!important;align-items:center!important;justify-content:center!important;gap:2px!important}
+html body #bd .bidt .sp-b.dear{opacity:1!important;border-color:#b08a5a;background:linear-gradient(#fffaf0,#efe0c0)}
+html body #bd .bidt .sp-b.glow{border-color:#1f6a2a;box-shadow:0 0 0 2px rgba(31,106,42,.35)}
+html body #bd .bidt .spot:last-child{align-items:stretch!important}
+/* F2: the suggested tile's ★+N badge (top-left corner, inside the tile) */
+html body #grid .tile .why{position:absolute;left:1px;top:1px;z-index:4;padding:1px 4px;border-radius:7px;background:#1f6a2a;color:#fff;font:900 13px/1.15 var(--ff-b,system-ui);box-shadow:0 1px 2px rgba(0,0,0,.45);pointer-events:none;white-space:nowrap}
+/* F2 roomy phone board (portrait, up to 700 px wide): goods in ONE row of pictures (names stay in the tap label), thinner side margins,
+   so the tiles grow and the people on them are at least 16 px; the power buttons wrap instead of sliding sideways */
+@media (max-width:700px){
+ html:not(.land) body #bd.gx-board{padding-left:3px;padding-right:3px}
+ html:not(.land):not(.mr-off) body #mkt .mrow{display:grid!important;grid-template-columns:repeat(10,minmax(0,1fr))!important;flex-wrap:nowrap!important;overflow:visible!important;gap:2px!important;width:100%;box-sizing:border-box}
+ html:not(.land) body #mkt .mrow .mcard{height:42px!important;min-width:0!important;padding:0!important;background-position:center!important}
+ html:not(.land) body #mkt .mrow .mcard .mn{display:none!important}
+ html:not(.land) body #mkt .mrow .mcard .mi{font-size:20px!important}
+ html:not(.land) body #mkt .mrow .deckback{min-width:0!important;height:42px!important}
+ html:not(.land) body #mkt .mrow .deckback i{width:22px!important;height:30px!important}
+ html:not(.land).short.mk-buy body #mkt .mrow .mcard:not(.glow):not(.sel){display:flex!important}
+ html body #grid .tile .ms .mg .mp{--ms:max(16px,min(19px,calc((var(--cw) - 8px)/3)))!important}
+ html body #grid .tile .ms>.mp{--ms:max(16px,min(19px,calc((var(--cw) - 8px)/3.2)))!important}
+ html body #acts .arow.pws{flex-wrap:wrap!important;overflow:visible!important;justify-content:center!important;row-gap:4px}
+ html body #acts .arow.pws .ab.pw{flex:0 1 auto!important;white-space:normal!important;max-width:100%}
+}
+/* F2: the lamp (and the result model) sit beside the title; the title keeps clear of it */
+.mbox .hero3d canvas.t3d{width:64px!important;height:64px!important;top:-10px!important;right:0!important}
+.mbox .hero3d+h2{padding-right:66px;box-sizing:border-box}
+.mbox.start .hero3d canvas.t3d{top:4px!important;right:6px!important}   /* start: in the sky of the painted banner, well above the title */
+/* F3: readable numbers (phone >= 14 px, PC >= 16 px), status lines wrap instead of cutting off, the planned path, the djinn drawer */
+html body #bd #grid .tile .tv{font-size:15px!important;min-width:22px;height:22px;line-height:22px!important}
+html body #grid .tile .ms .mg b{font-size:14px!important}
+@media (min-width:1024px){html body #bd #grid .tile .tv{font-size:19px!important;min-width:32px;height:32px;line-height:32px!important}
+ html body #grid .tile .ms .mg{height:28px;padding:0 6px 0 2px;border-radius:14px}html body #grid .tile .ms .mg b{font-size:18px!important}html body #grid .tile .ms .mg .mp{--ms:22px}
+ html body #grid .tile .tn{font-size:16px!important}}
+html body #line{white-space:normal!important;text-overflow:clip!important;overflow:visible!important;line-height:1.15!important;padding:3px 4px}
+html body #trk2{white-space:normal!important;text-overflow:clip!important;overflow:visible!important;height:auto!important;max-height:none!important}
+#grid .tile.f3end{box-shadow:inset 0 0 0 3px rgba(255,214,90,.95),0 0 0 1px rgba(80,40,0,.6)!important}
+#grid .tile.f3last{box-shadow:inset 0 0 0 4px #ffd75a,0 0 12px 3px rgba(255,200,60,.9)!important}
+#grid .tile .f3num{position:absolute;left:3px;top:3px;z-index:6;min-width:26px;height:26px;border-radius:13px;background:#b8532b;color:#fff;font:900 16px/26px var(--ff-b,system-ui);text-align:center;box-shadow:0 0 0 2px #fff3c8,0 2px 6px rgba(0,0,0,.5);pointer-events:none;font-style:normal}
+#grid .tile .f3star,#seats .f3star{position:absolute;left:2px;top:2px;z-index:6;font-style:normal;font-size:20px;color:#ffd75a;text-shadow:0 0 3px #000,0 0 6px #000;pointer-events:none}
+html body #acts .arow.f3row{display:flex;gap:6px;justify-content:center}html body #acts .f3go{flex:1 1 auto;min-height:44px;font-weight:800}
+html body #acts .arow.pwd{flex-wrap:wrap}html body #acts .pwtog{min-height:40px}
+.trk .trk-r.f3end-tag{padding:1px 8px;border-radius:10px;background:#8a2b12;color:#fff3c8!important;white-space:nowrap}
+.f3shake{animation:shake .3s!important}.f3pulse{animation:f3p .7s ease 2!important}@keyframes f3p{50%{transform:scale(1.08);filter:brightness(1.3)}}
+#grid.dim .tile.f3end:not(.glow),#grid .tile.f3last{filter:saturate(.95) brightness(.97)!important}
+/* F3: the final score is never cut off: on a phone the result art and the summary bullets give way to the full table */
+@media (max-width:700px) and (max-height:820px){html body .mbox.over .endart,html body .mbox.over .hero3d,html body .mbox.over .prompt .story{display:none!important}}
+html body .mbox.over .prompt{overflow:auto!important;min-height:0}html body .mbox.over .prompt .tw{overflow:visible!important;height:auto!important;max-height:none!important;flex:0 0 auto!important}
+#grid .tile:has(.why) .gain{display:none!important}
+/* F3: while the rival plays, the status line keeps room for Skip at its right end */
+html.skipon body #line{padding-right:96px!important;box-sizing:border-box}html body #skipai{min-height:28px!important;line-height:1!important}
+
+/* F3 cold play: the moves log never takes a click from the buttons under it (PC) */
+html.land #feed{pointer-events:none}html.land #acts,html.land #mine{z-index:3}
