@@ -36,9 +36,11 @@ function helpInit() {
         var tg = bc === UI.ghost.c ? document.querySelector('#map .ghost') : document.querySelector('#map g.tgt[data-c="' + bc + '"]');
         return tg ? { target: tg, why: 'This tile scores the most for the ' + WM.ANI_NAME[G.hold.tok] + ' (' + (bd > 0 ? '+' + bd : '0') + ').' } : null;
       }
-      var plan = WM.AI.plan(WM.clone(G), 'hard');
+      var sa = G.seats[G.cur].acorns, plan; if (G.stage === 'pick') G.seats[G.cur].acorns = 0;   // the Tip is one plain tap on a column: no acorn swaps, so a newcomer can follow it exactly
+      try { if (G.stage === 'pick') plan = WM.AI.plan(G, 'hard'); } finally { G.seats[G.cur].acorns = sa; }
+      if (G.stage === 'pick') G._plan = plan;   // the same plan then drives the tile and animal tips: the three steps agree (planning on a copy lost ~25 points a game)
       if (G.stage === 'pick') { var i = plan.pick.t === 'take' ? plan.pick.i : plan.pick.ti; var t = document.querySelector('#mk .mt[data-i="' + i + '"]'); return t ? { target: t, why: plan.pick.t === 'free' ? 'Worth an acorn: it fits your patterns.' : 'Best fit for your patterns and habitats.' } : null; }
-      if (G.stage === 'tile') { var c = WM.AI.choose(WM.clone(G), 'hard'); var e = document.querySelector('#map [data-c="' + (c && c.c) + '"]'); return e ? { target: e, why: 'Joins matching edges and leaves good animal spots.' } : null; }
+      if (G.stage === 'tile') { var c = WM.AI.choose(WM.clone(G), 'hard'); UI.tipRot = c && c.t === 'place' ? { c: c.c, rot: c.rot, k: G.seats[G.cur].done } : null; var e = document.querySelector('#map [data-c="' + (c && c.c) + '"]'); return e ? { target: e, why: 'Joins matching edges and leaves good animal spots.' } : null; }
       if (G.stage === 'tok') { var m = WM.AI.choose(WM.clone(G), 'hard'); if (m.t === 'back') return { target: document.getElementById('backB'), why: 'No spot helps: returning keeps your patterns clean.' }; var e2 = document.querySelector('#map [data-c="' + m.c + '"]'); return e2 ? { target: e2, why: 'This spot scores the most for its card.' } : null; }
       return null;
     }

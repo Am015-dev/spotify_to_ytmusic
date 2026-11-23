@@ -209,7 +209,7 @@ function onMarket(kind, i) {
   if (!tutOK({ what: 'take', i: i })) return;
   take({ t: 'take', i: i });
 }
-function take(m) { hqDrop('banner'); hqDrop('toast'); UI.undo = WM.clone(G); sfx('tap'); pvTurnStart(m); UI.verdict = null; WM.apply(G, m); UI.ghost = null; render(); fitView(); }
+function take(m) { hqDrop('banner'); hqDrop('toast'); if (G._plan && JSON.stringify(G._plan.pick) !== JSON.stringify(m)) G._plan = null; UI.undo = WM.clone(G); sfx('tap'); pvTurnStart(m); UI.verdict = null; WM.apply(G, m); UI.ghost = null; render(); fitView(); }
 function onCell(c, isSpot) {
   var vx = G && G.seats[UI.view].env[c];
   if (G && myTurn() && quickTarget(c)) { if (!tutOK({ what: 'tok', c: c })) return; sfx('tap'); quickPlace(c); return; }
@@ -220,7 +220,8 @@ function onCell(c, isSpot) {
     if (UI.ghost && UI.ghost.c === c) { rotate(); return; }
     if (!isSpot) return;
     if (!tutOK({ what: 'spot', c: c })) return;
-    UI.ghost = { c: c, rot: bestRot(c) }; sfx('tap'); render(); return;
+    var tr = UI.tipRot && UI.tipRot.k === G.seats[G.cur].done ? UI.tipRot : null; if (!tr) { try { var tc = WM.AI.choose(WM.clone(G), 'hard'); tr = tc && tc.t === 'place' ? { c: tc.c, rot: tc.rot, k: G.seats[G.cur].done } : null; } catch (e) { tr = null; } UI.tipRot = tr; }
+    UI.ghost = { c: c, rot: tr && String(tr.c) === String(c) ? tr.rot : bestRot(c) }; sfx('tap'); render(); return;   // following the Tip: the tile opens turned the way the Tip meant
   }
   if (G.stage === 'tok') {
     var x = G.seats[G.cur].env[c]; if (x && (x.tok || x.a.indexOf(G.hold.tok) < 0) && !isSpot) { showBig('tile', x, x.tok); return; } if (!x || x.tok || x.a.indexOf(G.hold.tok) < 0) { toast(an(G.hold.tok).replace(/^a/, 'A') + ' needs an empty tile showing it.'); return; }
