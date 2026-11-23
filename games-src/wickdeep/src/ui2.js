@@ -99,9 +99,27 @@ function goalLine() {
 function renderGoal() { $('goalchip').textContent = goalLine(); }
 
 // ---------- glows for the current question ----------
+// the nearest closed door, when no monster is in sight: tells a first-timer where to walk
+function doorTarget() {
+  if (!G || !G.ask || UI.busy || G.done) return null;
+  var f = curFig() || E.liveHeroes(G)[UI.tab] || E.liveHeroes(G)[0]; if (!f || !f.pos) return null;
+  if (G.figs.some(function (m) { return m.team === 'm' && m.hp > 0 && m.pos && E.seen(G, m.pos); })) return null;
+  var best = null;
+  Object.keys(G.hex).forEach(function (k) { var h = G.hex[k]; if (h.t === 'door' && !h.open) { var d = E.dist(f.pos, k); if (!best || d < best.d) best = { k: k, d: d }; } });
+  return best;
+}
+function doorLine() {
+  var dt = doorTarget(); if (!dt || !G.ask) return '';
+  var A = G.ask, n = (UI.sel[(E.liveHeroes(G)[UI.tab] || {}).id] || []).length;
+  if (A.h === 'sel') return n === 0 ? 'Room clear! Pick 2 cards, then walk to the door (gold marker).' : '';
+  if (A.h === 'first' || A.h === 'second') return UI.pick ? '' : 'Play a Move half to walk to the door (gold marker).';
+  if (A.h === 'move') return A.hexes.indexOf(dt.k) >= 0 ? 'Tap the door hex to open it.' : 'Walk to the door: tap the brightest lit hex.';
+  return '';
+}
 function computeGlow() {
-  UI.glow = {}; UI.tglow = {}; UI.preview = null;
+  UI.glow = {}; UI.tglow = {}; UI.preview = null; UI.doorK = null; UI.doorBest = null;
   if (!G || !G.ask || UI.busy) return;
+  var dt0 = doorTarget(); if (dt0) UI.doorK = dt0.k;
   var A = G.ask, f = curFig();
   if (A.h === 'move' || A.h === 'summon') A.hexes.forEach(function (k) { UI.glow[k] = 'mv'; });
   if (A.h === 'target') A.ids.forEach(function (id) { var t = E.fig(G, id); UI.glow[t.pos] = 'atk'; UI.tglow[id] = previewHit(f, t, A.a); });
@@ -112,6 +130,7 @@ function computeGlow() {
     if (mv && f && !f.cond.imm) { var R = E.reach(G, f, mv.v, { jump: mv.jump, hero: 1 }); Object.keys(R).forEach(function (k) { if (k !== f.pos && !E.figAt(G, k) && G.hex[k].t !== 'o') UI.glow[k] = 'mv'; }); }
     else if (at && f) E.attackTargets(G, f, at).forEach(function (t) { UI.glow[t.pos] = 'atk'; });
   }
+  if (dt0) { var bd = 1e9; Object.keys(UI.glow).forEach(function (k) { if (UI.glow[k] === 'mv') { var d = k === dt0.k ? -1 : E.dist(k, dt0.k); if (d < bd) { bd = d; UI.doorBest = k; } } }); }
 }
 function previewHit(f, t, a) {
   var base = a.v + (t.cond.poi ? 1 : 0), sh = Math.max(0, E.shieldOf(G, t) - (a.pierce || 0)), d = Math.max(0, base - sh);
@@ -120,7 +139,7 @@ function previewHit(f, t, a) {
 
 // ---------- the dock ----------
 function setPrompt(text, btns) {
-  var tip = UI.tut ? coachLine() : '';
+  var tip = UI.tut ? coachLine() : doorLine();
   $('prompt').textContent = tip || text;
   var pb = $('pbtns'); pb.innerHTML = '';
   (btns || []).forEach(function (b) { var x = document.createElement('button'); x.type = 'button'; x.className = 'btn' + (b.cls ? ' ' + b.cls : ''); x.textContent = b.t; if (b.id) x.id = b.id; if (b.dis) x.disabled = true; x.addEventListener('click', b.fn); pb.appendChild(x); });
@@ -129,6 +148,8 @@ function renderDock() {
   // a hero/foe info card never replaces the prompt or its buttons: they stay, info goes in the tray with a Close button
   var pk = (UI.insp && !UI.insp.lesson && !UI.busy && G && !G.done) ? UI.insp : null; if (pk) UI.insp = null;
   renderDock0();
+  var lb = $('lesson');
+  if (lb) { lb.innerHTML = ''; var ls = UI.insp && UI.insp.lesson && !UI.busy && G && !G.done ? UI.insp : null; lb.hidden = !ls; if (ls) { var lt = document.createElement('div'); lt.className = 'lt'; lt.innerHTML = '<span class="lh">' + esc(ls.t) + '</span>' + ls.h; lb.appendChild(lt); var lx = document.createElement('button'); lx.type = 'button'; lx.className = 'btn go'; lx.id = 'inspx'; lx.textContent = 'Got it'; lx.addEventListener('click', closeInsp); lb.appendChild(lx); } }
   if (pk && !UI.insp && !UI.busy && G && !G.done) {
     UI.insp = pk; var tr = $('tray'); tr.innerHTML = ''; tr.className = '';
     var d = document.createElement('div'); d.className = 'inspd'; d.innerHTML = '<h4 class="it">' + esc(pk.t) + '</h4>' + pk.h; tr.appendChild(d);
@@ -140,7 +161,7 @@ function renderDock0() {
   if (!G) return;
   if (UI.tut && !UI.busy && !G.done && !UI.insp && G.ask && typeof nextLesson === 'function') { var ls = nextLesson(); if (ls) { UI.seen[ls.k] = 1; UI.insp = { t: ls.t, h: ls.h, lesson: 1 }; } }
   var lg = $('legend'); if (lg) { var showLg = !UI.legendOff && !UI.tut && G.round <= 1 && G.ask && (G.ask.h === 'sel' || G.ask.h === 'first') && !UI.insp; lg.hidden = !showLg; }
-  if (UI.insp && !UI.busy && !G.done) { setPrompt(UI.insp.t, [{ t: UI.insp.lesson ? 'Got it' : 'Close', cls: UI.insp.lesson ? 'go' : '', id: 'inspx', fn: closeInsp }]); var d = document.createElement('div'); d.className = 'inspd'; d.innerHTML = UI.insp.h; tray.appendChild(d); return; }
+  if (UI.insp && !UI.insp.lesson && !UI.busy && !G.done) { setPrompt(UI.insp.t, [{ t: 'Close', cls: '', id: 'inspx', fn: closeInsp }]); var d = document.createElement('div'); d.className = 'inspd'; d.innerHTML = UI.insp.h; tray.appendChild(d); return; }
   if (G.done) { setPrompt(G.done.won ? 'Victory!' : 'Defeat', [{ t: 'Continue', cls: 'go', fn: showResult }]); return; }
   var A = G.ask; if (!A || UI.busy) { setPrompt(UI.busy ? 'Watch the action…' : 'Your turn comes next…', []); return; }
   var f = curFig(), H = f ? D.HERO[f.cls] : null;

@@ -175,6 +175,8 @@ function drawNow() {
     hexPath(s.x, s.y, R * 0.9); CX.fillStyle = c === 'atk' ? 'rgba(220,70,50,.32)' : c === 'heal' ? 'rgba(120,220,110,.3)' : 'rgba(255,200,110,.24)'; CX.fill();
     CX.strokeStyle = c === 'atk' ? '#ff6a4a' : c === 'heal' ? '#9cff8a' : '#ffd98a'; CX.lineWidth = Math.max(2, R * 0.09); CX.stroke();
   });
+  if (UI.doorBest && UI.glow[UI.doorBest]) { var sb = toScreen(UI.doorBest); hexPath(sb.x, sb.y, R * 0.9); CX.fillStyle = 'rgba(255,217,138,.5)'; CX.fill(); CX.strokeStyle = '#fff3c4'; CX.lineWidth = Math.max(3, R * 0.14); CX.stroke(); }
+  if (UI.doorK) { var sd = toScreen(UI.doorK); hexPath(sd.x, sd.y, R * 1.05); CX.strokeStyle = '#ffd98a'; CX.lineWidth = Math.max(3, R * 0.14); CX.setLineDash([R * 0.25, R * 0.2]); CX.stroke(); CX.setLineDash([]); CX.font = '700 ' + Math.max(11, Math.round(R * 0.36)) + 'px Silkscreen, monospace'; CX.textAlign = 'center'; CX.textBaseline = 'middle'; CX.fillStyle = '#000'; CX.fillText('DOOR', sd.x + 1, sd.y - R * 1.25 + 1); CX.fillStyle = '#ffd98a'; CX.fillText('DOOR', sd.x, sd.y - R * 1.25); }
   if (UI.preview) { UI.preview.forEach(function (k, i) { var s = toScreen(k); CX.fillStyle = '#ffd98a'; CX.beginPath(); CX.arc(s.x, s.y, Math.max(2, R * 0.12), 0, 7); CX.fill(); }); }
   // figures (display state while animating)
   var figs = view ? view.list() : G.figs.filter(function (f) { return f.pos; });

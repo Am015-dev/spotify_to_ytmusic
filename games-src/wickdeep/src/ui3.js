@@ -225,15 +225,16 @@ function coachFoe(f) {
 function coachLine() {
   if (!G || !G.ask) return '';
   var A = G.ask, f = curFig(), fo = coachFoe(f), nm = fo ? figName(fo.m) : '';
-  var plan = !fo ? 'Pick 2 cards.' : fo.d <= 1 ? 'A ' + nm + ' is next to you. Pick 2 cards and hit it.' : 'A ' + nm + ' is in the room. Pick 2 cards: one to move, one to hit.';
+  var dl = doorLine();
+  var plan = !fo ? (dl || 'Pick 2 cards.') : fo.d <= 1 ? 'A ' + nm + ' is next to you. Pick 2 cards and hit it.' : 'A ' + nm + ' is in the room. Pick 2 cards: one to move, one to hit.';
   switch (A.h) {
     case 'sel': { var heroes = E.liveHeroes(G), h = heroes[UI.tab] || heroes[0], n = (UI.sel[h.id] || []).length; if (G.round > 2 && h.disc.length >= 2 && h.hand.length <= 3) return 'Low on cards? Rest to get them back.'; return n === 0 ? plan : n === 1 ? 'Pick one more card.' : 'Tap Ready.'; }
     case 'first': case 'second': {
       if (UI.pick) return 'Tap Play.';
-      if (!fo) return 'No foe in sight: play any half (a move heads for the door).';
+      if (!fo) return dl || 'No foe in sight: play any half (a move heads for the door).';
       return fo.d <= 1 ? 'The ' + nm + ' is next to you: play an attack half.' : 'The ' + nm + ' is ' + fo.d + ' hexes away: attack if a half reaches it, or move closer.';
     }
-    case 'move': return fo && fo.d > 1 ? 'Tap a lit hex closer to the ' + nm + '.' : 'Tap a lit hex to walk there.';
+    case 'move': if (dl) return dl; return fo && fo.d > 1 ? 'Tap a lit hex closer to the ' + nm + '.' : 'Tap a lit hex to walk there.';
     case 'target': return 'Tap the red foe. A flipped card adds luck.';
     case 'srest': return 'Rest: lose 1 random played card, get the rest back.';
     case 'lrest': return 'Pick a card to lose. Resting heals 2.';
