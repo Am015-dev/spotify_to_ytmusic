@@ -30,11 +30,11 @@
         ids.forEach(function (id) { take(Gx, id); }); me.board[0] = ids.map(function (id) { return { id: id, eggs: 0, cache: 0, tuck: 0 }; });
         Gx.feeder = ['seed', 'fish', 'berry', 'grub', 'rodent'];
       });
-      return GXS.wait(function () { return document.querySelector('.ract.glow'); });
+      return GXS.wait(function () { return document.querySelector('.ract[data-legal]'); });
     },
     mut: [{ name: 'browns never fire', js: 'var _o=PP.performMove;PP.performMove=function(G2,m,s){if(m.t==="act"){G2.pl[s].board[m.a==="food"?0:m.a==="eggs"?1:2]=G2.pl[s].board[m.a==="food"?0:m.a==="eggs"?1:2].map(function(x){return {id:PP.DATA.birds.find(function(b){return !b.pw&&b.h.indexOf("F")>=0}).id,eggs:x.eggs,cache:x.cache,tuck:x.tuck}})}return _o.apply(this,arguments)}' }],
     checks: [{ kind: 'play', name: 'forest action fires every bird', snap: function () { return { gain: PP.birds(G.pl[0]).reduce(function (a, x) { return a + x.s.eggs + x.s.cache; }, 0), cubes: G.pl[0].cubes }; },
-      steps: [{ sel: '.ract[data-h="0"]' }, { sel: '.die.glow', until: function () { return !G.q || G.q.h !== 'die'; }, max: 4, skip: function () { return !G.q || G.q.h !== 'die'; } }, { sel: '#acts [data-a="mv"]', skip: function () { return UI.gsDie == null; } }, { sel: '.die.glow', until: function () { return !G.q || G.q.h !== 'die'; }, max: 4, skip: function () { return !G.q || G.q.h !== 'die'; } }],
+      steps: [{ sel: '.ract[data-h="0"]' }, { sel: '.die[data-legal]', until: function () { return !G.q || G.q.h !== 'die'; }, max: 4, skip: function () { return !G.q || G.q.h !== 'die'; } }, { sel: '#acts [data-a="mv"]', skip: function () { return UI.gsDie == null; } }, { sel: '.die[data-legal]', until: function () { return !G.q || G.q.h !== 'die'; }, max: 4, skip: function () { return !G.q || G.q.h !== 'die'; } }],
       idle: settled, verify: function (b, a) { return a.gain - b.gain >= 4 && a.cubes === b.cubes - 1 || 'gain ' + (a.gain - b.gain) + ' cubes ' + b.cubes + '->' + a.cubes; } }]
   });
   GXS.add({
@@ -45,18 +45,18 @@
     },
     mut: [{ name: 'food not paid', js: 'var _p=PP.performMove;PP.performMove=function(G2,m,s){var f=JSON.stringify(G2.pl[s].food),r=_p.apply(this,arguments);if(m.t==="play")G2.pl[s].food=JSON.parse(f);return r}' }],
     checks: [{ kind: 'play', name: 'bird moves to the forest and food is paid', snap: function () { return { hand: G.pl[0].hand.length, forest: G.pl[0].board[0].length, food: PP.foodN(G.pl[0]) }; },
-      steps: [{ sel: '#act4 .a4-play' }, { sel: '#hand .bc.glow' }, { sel: '.slot.next.glow' }, { sel: '#acts [data-a="playgo"]' }],
+      steps: [{ sel: '#act4 .a4-play' }, { sel: '#hand .bc[data-legal]' }, { sel: '.slot.next[data-legal]' }, { sel: '#acts [data-a="playgo"]' }],
       idle: settled, verify: function (b, a) { return (a.hand === b.hand - 1 && a.forest === b.forest + 1 && a.food === b.food - 1) || JSON.stringify([b, a]); } }]
   });
   GXS.add({
     id: 'pp-eggs', name: 'Lay eggs in the grassland', ask: 'Do eggs appear on your birds?', seed: 13, ls: NOTIPS, when: booted,
     setup: function () {
       begin(13, function (Gx) { var me = Gx.pl[0], ids = PP.DATA.birds.filter(function (b) { return b.h.indexOf('G') >= 0 && PP.power(b.id).col !== 'brown' && PP.power(b.id).col !== 'pink' && b.e >= 3; }).slice(0, 2).map(function (b) { return b.id; }); ids.forEach(function (id) { take(Gx, id); }); me.board[1] = ids.map(function (id) { return { id: id, eggs: 0, cache: 0, tuck: 0 }; }); });
-      return GXS.wait(function () { return document.querySelector('.ract.glow'); });
+      return GXS.wait(function () { return document.querySelector('.ract[data-legal]'); });
     },
     mut: [{ name: 'eggs vanish', js: 'var _q=PP.performMove;PP.performMove=function(G2,m,s){var r=_q.apply(this,arguments);if(m.t==="egg")PP.birds(G2.pl[s]).forEach(function(x){x.s.eggs=0});return r}' }],
     checks: [{ kind: 'play', name: 'three eggs laid', snap: function () { return { eggs: PP.eggsOn(G.pl[0]) }; },
-      steps: [{ sel: '.ract[data-h="1"]' }, { sel: '#acts [data-a="mv"]', skip: function () { return !G.q || G.q.h !== 'bonus'; } }, { sel: '.bc[data-a="bird"].glow', until: function () { return !G.q || G.q.h !== 'egg'; }, max: 5 }],
+      steps: [{ sel: '.ract[data-h="1"]' }, { sel: '#acts [data-a="mv"]', skip: function () { return !G.q || G.q.h !== 'bonus'; } }, { sel: '.bc[data-a="bird"][data-legal]', until: function () { return !G.q || G.q.h !== 'egg'; }, max: 5 }],
       idle: settled, verify: function (b, a) { return a.eggs - b.eggs === 3 || 'eggs +' + (a.eggs - b.eggs); } }]
   });
   GXS.add({

@@ -28,7 +28,7 @@ async function pick(p, rnd) {
     const pop = document.getElementById('pop'); if (vis(pop)) return pop.querySelector('[data-a="popx"]') || pop;
     const ord = [one('#passgo'), one('#keepgo')]; for (const e of ord) if (e) return e;
     const acts = q('#acts button'); const playgo = acts.find(b => b.dataset.a === 'playgo'); if (playgo) return playgo;
-    const glows = q('.glow'); if (glows.length) {
+    const glows = q('[data-legal]'); if (glows.length) {
       const slot = glows.filter(e => e.matches('.slot')); if (slot.length) return slot[0];
       const hand = glows.filter(e => e.closest('#hand')); const rows = glows.filter(e => e.matches('.ract'));
       if (hand.length && rows.length) return rnd < 0.55 ? hand[Math.floor(rnd * 100) % hand.length] : rows[Math.floor(rnd * 100) % rows.length];

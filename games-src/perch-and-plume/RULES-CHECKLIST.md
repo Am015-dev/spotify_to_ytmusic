@@ -186,4 +186,4 @@ Source tags: **RB** official rulebook text (checked 8 Nov 2026), **APP** appendi
 ## Not testable here (known size differences, see rules-notes.md)
 
 - Roster: the original has 170 birds and 26 bonus cards; this game has 120 original birds and 18 bonus cards, and fewer power types. Goals are 12 tiles.
-- The solo rival is a simplified automa, not the original solo rules.
+- The solo rival follows the original solo rules (structure, actions, scoring, difficulty); card faces are this game's own.
