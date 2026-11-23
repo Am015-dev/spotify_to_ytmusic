@@ -691,6 +691,20 @@ html.short:not(.land) #trk{display:none!important}   /* the one-line prompt abov
 @media (min-width:1024px){.bidt .spot{min-height:60px;min-width:72px}.bidt .spot .sp-b{min-height:56px;min-width:68px;font-size:18px!important}.bidt .spot .sp-c{font-size:16px}.bidt .spot .ord{font-size:14px}}
 /* IPH (iPhone): djinn buttons at least 44 px tall; goods cards 44 px wide in skin.css */
 html:not(.land) .dcard{min-height:44px!important}
+/* Claims made obvious: owner-coloured border and tint, big camel, readable palms and palaces, one 0.8 s flash, one note line */
+.tile.owned{border-color:var(--oc);border-width:3px;box-shadow:inset 0 0 0 3px var(--oc),inset 0 0 0 40px color-mix(in srgb,var(--oc) 24%,transparent)}
+.tile .tk{right:2px;bottom:12px;gap:1px;flex-direction:row-reverse;flex-wrap:wrap;justify-content:flex-start;max-width:calc(100% - 4px)}
+.tile .own{width:30px;height:30px;font-size:19px;border-width:3px;box-shadow:0 0 0 2px var(--oc),0 2px 4px rgba(0,0,0,.6)}
+html.g3d .own.cam{background-size:44px}
+.tile .tok{font-size:20px;background:#fff6dc;border:2px solid var(--oc,#8a5a1e);border-radius:9px;padding:0 2px;text-shadow:none;box-shadow:0 1px 3px rgba(0,0,0,.45)}
+.tile .tok small{font-size:11px}
+.tile.cflash{animation:cflash var(--cf,.8s) ease-out 1 both;z-index:4}
+@keyframes cflash{0%{filter:brightness(1.9) saturate(1.5);transform:scale(1.08)}60%{filter:brightness(1.25)}100%{filter:none;transform:none}}
+#cnote,#clegend{position:fixed;left:50%;transform:translateX(-50%);z-index:62;pointer-events:none;max-width:94vw;box-sizing:border-box;opacity:0;visibility:hidden;transition:opacity .15s;font:800 14px/1.25 var(--ff-b,system-ui);text-align:center;border-radius:12px}
+#cnote{white-space:nowrap;background:#fff6dc;color:#2e1a0a;border:3px solid var(--pc,#8a5a1e);padding:4px 10px;box-shadow:0 3px 10px rgba(40,20,5,.4)}
+#clegend{white-space:nowrap;background:rgba(40,24,10,.92);color:#fff6dc;padding:4px 10px;font-weight:700;font-size:13px}
+#cnote.on,#clegend.on{opacity:1;visibility:visible}
+@media (prefers-reduced-motion:reduce){.tile.cflash{animation:none!important}}
 /* ===== GX skin: painted UI kit over the shared shell + campaign classes. Opt-in: nothing changes until gx-skin.js adds
    html.sk (after the kit files loaded). Kit files live in the game's media/ (ui-topbar, ui-iconbtn, ui-panel, ui-drawer-head,
    ui-button-cream/go/power, ui-row, ui-bubble, ui-node-*). Extra switches: html.sk-icons (icon-*.webp set), html.sk-map (story-map.webp),
@@ -5165,7 +5179,7 @@ function rnd(n){let t=(G.rng+=0x6D2B79F5);t=Math.imul(t^t>>>15,t|1);t^=t+Math.im
 function setSeed(s){DEFSEED=s>>>0;if(G)G.rng=s>>>0}
 function shuffle(a){for(let i=a.length-1;i>0;i--){const j=rnd(i+1);[a[i],a[j]]=[a[j],a[i]]}return a}
 function lg(t,c){G.logN=(G.logN||0)+1;G.log.unshift({t,r:G.round,c:c||'',i:G.logN});if(G.log.length>500)G.log.length=500}
-function fx(t,x){if(UI.sim)return;UI.fxN=(UI.fxN||0)+1;UI.fx.push({t,x,n:UI.fxN});if(UI.fx.length>40)UI.fx.shift()}
+function fx(t,x,p,w){if(UI.sim)return;UI.fxN=(UI.fxN||0)+1;UI.fx.push({t,x,n:UI.fxN,p,w});if(UI.fx.length>40)UI.fx.shift()}
 const P=i=>G.pl[i];
 // ---------- geometry (W×H grid, impassable tiles, mountains between tiles) ----------
 const wkey=(a,b)=>a<b?a+'_'+b:b+'_'+a;
@@ -5264,8 +5278,8 @@ function finishMove(e,c){const t=G.board[e];const p=P(G.cur);const n=t.m.filter(
 function claimTile(p,e,how){const t=G.board[e];if(t.camel!=null||t.tent!=null)return;
   if(how==='auto'&&p.tent&&p.human&&!UI.sim){ask(p.i,`Claim ${tileName(t)} with a camel or your tent?`,[{l:'🐪 A camel',h:'claim',d:{p:p.i,e,how:'camel'}},{l:'⛺ The tent (its tile plus 1 per nearby red tile)',h:'claim',d:{p:p.i,e,how:'tent'}}],{kind:'claim'});return}
   if(how==='auto'&&p.tent&&(!p.human||UI.sim)&&aiWantsTent(p,e))how='tent';
-  if(how==='tent'&&p.tent){p.tent=0;t.tent=p.i;lg(`⛺ ${p.nm} pitches the tent on ${tileName(t)}.`,'good');fx('camel',e);return}
-  if(p.camels<=0){lg(`${p.nm} has no camels left to claim ${tileName(t)}.`);return}t.camel=p.i;p.camels--;lg(`🐪 ${p.nm} claims ${tileName(t)}.`,'good');fx('camel',e);
+  if(how==='tent'&&p.tent){p.tent=0;t.tent=p.i;lg(`⛺ ${p.nm} pitches the tent on ${tileName(t)}.`,'good');fx('camel',e,p.i,'tent');return}
+  if(p.camels<=0){lg(`${p.nm} has no camels left to claim ${tileName(t)}.`);return}t.camel=p.i;p.camels--;lg(`🐪 ${p.nm} claims ${tileName(t)}.`,'good');fx('camel',e,p.i,'camel');
   if(p.camels===0&&!G.endTrig){G.endTrig=true;lg(`${p.nm} placed the last camel. The round finishes, then the game ends.`,'big')}}
 QH.claim=d=>claimTile(P(d.p),d.e,d.how);
 function owner(t){return t.camel!=null?t.camel:t.tent!=null?t.tent:null}
@@ -5314,8 +5328,8 @@ function doTile(m){const a=G.act;const p=P(G.cur);const t=G.board[a.tile];a.tile
   if(m.thief){payCost(p,m.pay);G.thRow.splice(G.thRow.indexOf(m.thief),1);p.thieves.push({k:m.thief,turn:G.turn});lg(`🦹 ${p.nm} hires the ${THIEVES[m.thief].n}.`,'big');return}
   if(m.take){const cost=t.k==='small'?3:t.k==='large'?6:4;p.coins-=cost;const got=m.take.slice().sort((x,y)=>y-x).map(j=>G.market.splice(j,1)[0]);for(const r of got)gainCard(p,r,1);lg(`${p.nm} buys ${got.map(r=>RNAME[r]).join(' and ')} for ${cost} coins.`,'good');fx('res');return}
   if(m.work){if(m.work==='art'){p.art--;G.bag.push('artisan')}else{p.fk-=2;G.rdisc.push('fakir','fakir')}p.items.push(G.items.shift());lg(`${p.nm} commissions an item at the Workshop.`,'good');return}}
-function placePalace(p,i,viaDj){if(SUP().pal<1){lg('The palace pieces have run out.');return}SUP().pal--;const t=G.board[i];t.pal++;lg(`🏰 ${p.nm} raises a palace on ${tileName(t)}.`,'good');fx('build',i);trig('palace',p.i)}
-function placePalm(p,i){if(SUP().palm<1){lg('The palm trees have run out.');return}SUP().palm--;const t=G.board[i];t.palm++;lg(`🌴 ${p.nm} plants a palm on ${tileName(t)}.`,'good');fx('build',i)}
+function placePalace(p,i,viaDj){if(SUP().pal<1){lg('The palace pieces have run out.');return}SUP().pal--;const t=G.board[i];t.pal++;lg(`🏰 ${p.nm} raises a palace on ${tileName(t)}.`,'good');fx('build',i,p.i,'pal');trig('palace',p.i)}
+function placePalm(p,i){if(SUP().palm<1){lg('The palm trees have run out.');return}SUP().palm--;const t=G.board[i];t.palm++;lg(`🌴 ${p.nm} plants a palm on ${tileName(t)}.`,'good');fx('build',i,p.i,'palm')}
 function gainDjinn(p,k){p.dj.push(k);G.stats.djinns++;lg(`✨ ${p.nm} summons ${DJ[k].n}.`,'big');fx('djinn',k);fx('summon',k);if(!UI.sim&&UI.fx.length)UI.fx[UI.fx.length-1].h=p.human?1:0;trig('djinn',p.i,{k})}
 // ---------- goods sale (end of turn, optional) ----------
 function sellValue(n){return SETVP[Math.min(n,9)]}
@@ -5917,7 +5931,7 @@ function refresh(){if(G&&!G.tut&&!G.coach&&!(typeof NET!=='undefined'&&NET.on)){
 function showSummon(k,tries){tries=tries||0;if(tries<12&&((typeof PLQB!=='undefined'&&PLQB)||(document.getElementById('coach')||{classList:{contains:()=>false}}).classList.contains('on'))){setTimeout(()=>showSummon(k,tries+1),700);return}const d=DJ[k];const hc=document.documentElement.classList;if(!d||!(hc.contains('sp3')||hc.contains('sk-dj')))return;let o=document.getElementById('summon');if(o)o.remove();o=document.createElement('div');o.id='summon';o.setAttribute('aria-live','polite');o.style.pointerEvents='none';   /* never blocks: the card is see-through to taps, and any tap anywhere closes it while the tap still reaches what was under it */
   const bye=()=>{document.removeEventListener('pointerdown',bye,true);o.classList.add('out');setTimeout(()=>o.remove(),300)};document.addEventListener('pointerdown',bye,true);
   o.innerHTML=`<i class="sm-smoke"></i>${hc.contains('sk-dj')?`<img class="sm-art" src="media/djinn-${k}.webp" alt="">`:'<i class="sm-lamp"></i>'}<b>${esc(d.n)}</b><span>${d.vp} points</span>`;document.body.appendChild(o);setTimeout(bye,ANIM?2200:300)}
-function playFx(){for(const f of UI.fx.slice(UI.fxSeen)){if(f.t==='summon'&&f.h)try{showSummon(f.x)}catch(e){}   /* only your own djinn gets the big card; the rival's is told on the line */const m={pick:'pick',drop:'drop',take:'take',camel:'camel',coins:'coins',res:'take',kill:'kill',djinn:'djinn',build:'build',bid:'bid',round:'round',win:'win',thief:'kill',item:'djinn'}[f.t];if(m&&typeof sfx==='function')sfx(m)}UI.fxSeen=UI.fx.length;if(UI.fx.length>30){UI.fx.splice(0,20);UI.fxSeen=UI.fx.length}}
+function playFx(){for(const f of UI.fx.slice(UI.fxSeen)){if(f.t==='camel'||f.t==='build')try{claimNote(f)}catch(e){}if(f.t==='summon'&&f.h)try{showSummon(f.x)}catch(e){}   /* only your own djinn gets the big card; the rival's is told on the line */const m={pick:'pick',drop:'drop',take:'take',camel:'camel',coins:'coins',res:'take',kill:'kill',djinn:'djinn',build:'build',bid:'bid',round:'round',win:'win',thief:'kill',item:'djinn'}[f.t];if(m&&typeof sfx==='function')sfx(m)}UI.fxSeen=UI.fx.length;if(UI.fx.length>30){UI.fx.splice(0,20);UI.fxSeen=UI.fx.length}}
 const online=()=>typeof NET!=='undefined'&&NET.on;
 const me=()=>{if(!G)return null;const s=sideToAct();if(online()&&s!==NET.mySeat)return null;return s>=0&&P(s).human?P(s):null};
 const mySeatP=()=>online()?(NET.mySeat>=0?P(NET.mySeat):null):null;
@@ -5969,8 +5983,9 @@ function mpHtml(c,h){return `<i class="mp${h?' h':''}" data-c="${c}"></i>`}
 function tileHtml(t){const d=TILEDEF[t.k],i=t.i;
   if(t.block)return `<div class="tile blk k-${t.k}" data-tile="${i}" aria-label="${esc(d.n)}"><i class="ti">${TICON[t.k]}</i><span class="tn">${TSHORT[t.k]}</span></div>`;
   const mv=G.move,cur=!!mv&&mv.at===i,glow=UI.pick.includes(i),own=owner(t);const hand=cur?mv.hand:[];const n=t.m.length+hand.length;
-  const cls=['tile',t.blue?'blue':'red','k-'+t.k,glow?'glow':'',cur?'cur':'',own!=null?'owned':''].filter(Boolean).join(' ');
-  return `<div class="${cls}" data-tile="${i}" data-n="${n}" role="button" style="${own!=null?'--oc:'+PCOL[own]:''}" aria-label="${esc(tileName(t))}">
+  const cf=UI.cflash&&UI.cflash.i===i&&UI.cflash.until>Date.now()?UI.cflash.until-Date.now():0;
+  const cls=['tile',t.blue?'blue':'red','k-'+t.k,glow?'glow':'',cur?'cur':'',own!=null?'owned':'',cf?'cflash':''].filter(Boolean).join(' ');
+  return `<div class="${cls}" data-tile="${i}" data-n="${n}" role="button" style="${own!=null?'--oc:'+PCOL[own]+';':''}${cf?'--cf:'+Math.round(cf)+'ms;':''}" aria-label="${esc(tileName(t))}">
    <i class="ti">${TICON[t.k]}</i><span class="tn">${TSHORT[t.k]}</span>${t.v?`<b class="tv">${t.v}</b>`:''}<i class="tc">${tileCoord(i)}</i>
    <div class="ms">${mgHtml(t.m)}${hand.map(c=>mpHtml(c,1)).join('')}</div>
    <div class="tk">${own!=null?`<b class="own${t.tent!=null?'':' cam'}" data-p="${own}" style="--pc:${PCOL[own]}">${t.tent!=null?'⛺':'🐪'}</b>`:''}${t.palm?`<span class="tok palm" data-n="${Math.min(3,t.palm)}">🌴${t.palm>1?'<small>×'+t.palm+'</small>':''}</span>`:''}${t.pal?`<span class="tok pal" data-n="${Math.min(3,t.pal)}">🏰${t.pal>1?'<small>×'+t.pal+'</small>':''}</span>`:''}</div></div>`}
@@ -7193,6 +7208,21 @@ function juice(prev,cur){if(!G||!prev||!cur)return;juMove(cur);if(!juOk()||G.ove
     for(let k=0;k<n;k++)flyEl('<i class="jcoin"></i>','jcn',{x:src.x+(k%3-1)*9,y:src.y+Math.floor(k/3)*8},to,{delay:k*30,dur:380,big:1.4,end2:.6,fade:true});
     try{if(SND.on&&typeof sfx==='function')sfx('coins')}catch(e){}})}
 (function(){if(typeof animate!=='function')return;const o=animate;animate=function(prev){o.apply(this,arguments);try{juice(prev,snapState())}catch(e){console.error(e)}}})();
+// ===================== Claims made obvious (iPhone report) =====================
+// A claim (camel or tent), a palm or a palace, yours or the rival's: the tile flashes once (0.8 s, finite) in the owner's colour and ONE line
+// says what happened. The first time only, a legend line tells what the marks on the board mean. Decoration only: never blocks a tap, never changes G.
+function claimNote(f){if(!G||UI.sim||G.over||f.p==null||f.x==null)return;const t=G.board[f.x],p=G.pl[f.p];if(!t||!p)return;const you=p.nm==='You'||(p.human&&G.pl.filter(q=>q.human).length===1);
+  const who=you?'You':p.nm,nm=TILEDEF[t.k].n,pl=tileCoord(t.i);let line;
+  if(f.t==='camel')line=f.w==='tent'?`${who} pitched the tent on ${nm} ${pl}: ${t.v} at end`:you?`You claimed ${nm} ${pl}: +${t.v} at end`:`${who} claimed ${nm} ${pl}: +${t.v} at end`;
+  else line=f.w==='pal'?`${who} raised a palace on ${nm} ${pl}: +5 at end`:`${who} planted a palm on ${nm} ${pl}: +3 at end`;
+  UI.cflash={i:t.i,until:Date.now()+800};
+  let el=document.getElementById('cnote');if(!el){el=document.createElement('div');el.id='cnote';el.setAttribute('role','status');el.setAttribute('data-help','');document.body.appendChild(el)}
+  el.style.setProperty('--pc',PCOL[p.i]);el.textContent=line;const g=document.getElementById('grid');if(g){const r=g.getBoundingClientRect();el.style.top=Math.max(4,r.top-40)+'px'}
+  el.classList.remove('on');void el.offsetWidth;el.classList.add('on');clearTimeout(UI.cnT);UI.cnT=setTimeout(()=>el.classList.remove('on'),2600);
+  let seen=0;try{seen=localStorage.getItem('soq_legend')}catch(e){}
+  if(!seen){try{localStorage.setItem('soq_legend','1')}catch(e){}let lg=document.getElementById('clegend');if(!lg){lg=document.createElement('div');lg.id='clegend';lg.setAttribute('data-help','');document.body.appendChild(lg)}
+    lg.innerHTML='🐪 = claimed (owner’s colour) · 🌴 +3 · 🏰 +5';const gr=g?g.getBoundingClientRect():null;const mk=document.getElementById('mkt'),mr=mk?mk.getBoundingClientRect():null;let tb=gr?gr.bottom:100;document.querySelectorAll('#grid .tile').forEach(x=>{tb=Math.max(tb,x.getBoundingClientRect().bottom)});lg.style.top=(tb+4)+'px';lg.classList.add('on');setTimeout(()=>lg.classList.remove('on'),5200)}
+  setTimeout(()=>{try{renderGrid()}catch(e){}},0)}
 
 </script><script>
 // ===================== plan the walk in one tap (F3), end-of-game warning, sale note, Shadow star, lesson wrong-tap feedback =====================

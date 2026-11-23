@@ -976,7 +976,7 @@ body:has(.gxh-bulbb) .bestb{display:none}
 @media (max-width:520px){#result .stand th,#result .stand td{padding:6px 2px;font-size:14px}#result .stand th:first-child,#result .stand td:first-child{max-width:64px;overflow:hidden;text-overflow:ellipsis}}
 #keepgo{box-shadow:0 -10px 14px 6px rgba(22,35,27,.85)}
 /* F3: bonus-card progress chip, birds that advance it, "Always skip" */
-#foodrow .fd.bon{max-width:100%;text-align:left;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:14px;flex:0 1 auto;min-width:0}
+#foodrow .fd.bon{min-width:44px;max-width:100%;text-align:left;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:14px;flex:0 1 auto;min-width:0}
 .bc.bonadv,.tcard.bonadv .bc{outline:3px solid #e0a948;outline-offset:-1px}
 .bc.bonadv .bk-nm::before{content:"\2605 ";color:#b8801f}
 .bonb{position:absolute;left:4px;top:4px;max-width:58%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;z-index:3;background:#e0a948;color:#2a2116;font:700 12px/1.2 system-ui,sans-serif;padding:3px 6px;border-radius:7px;font-style:normal;text-align:center;pointer-events:none}
@@ -4877,6 +4877,7 @@ function renderDock(p, vs, cur) {
   var wb = $('#whatbtn'); if (wb) wb.hidden = !(hintsOn() && UI.mode !== 'tutfree' && mine && !Q);
   hintsBtn();
   if (!mine || Q) UI.pickBird = false;
+  if (UI.pickBird && UI.sel == null && !UI.pend && !PP.playable(G, vs).length) UI.pickBird = false;   // nothing affordable: never strand the player on 'Pick a bird below' with nothing to tap
   var idle = mine && !Q && UI.sel == null && !UI.pend && UI.gsDie == null && !UI.pickBird;
   document.body.classList.toggle('idle4', !!idle);
   document.body.classList.toggle('deciding', !!(mine && Q));
@@ -5604,7 +5605,8 @@ document.addEventListener('click', function (e) {
       if (!tutGate({ type: 'tap', what: 'hand', i: i, id: p.hand[i] })) return;
       UI.sel = UI.sel === i ? null : i; render(); return;
     }
-    if (a === 'slot' && UI.sel != null) { if (!PP.playInfo(G, UI.view, p.hand[UI.sel], h)) return; if (!tutGate({ type: 'tap', what: 'slot', h: h })) return; UI.pend = { i: UI.sel, h: h, k: 0 }; render(); return; }
+    if (a === 'slot' && UI.sel == null) { toast(UI.pickBird ? 'Tap a bird in your hand first.' : 'Choose an action below first.', 0, 1); return; }
+    if (a === 'slot' && UI.sel != null) { if (!PP.playInfo(G, UI.view, p.hand[UI.sel], h)) { nope(t, 'Not here'); return; } if (!tutGate({ type: 'tap', what: 'slot', h: h })) return; UI.pend = { i: UI.sel, h: h, k: 0 }; render(); return; }
     if (a === 'bird') { if (UI.sel != null) nope(t, 'Tap a marked space'); else showCard(p.board[h][c].id, p.board[h][c]); return; }
     if (a === 'tray' && G.tray[i]) { if (UI.sel != null) nope(t, 'Tap a marked space'); else showCard(G.tray[i]); return; }
     return;

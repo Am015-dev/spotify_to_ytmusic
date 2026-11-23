@@ -1,6 +1,54 @@
 [
  {
   "date": "2026-11-23",
+  "game": "thornbound",
+  "title": "Clearer steps and rules",
+  "items": [
+   "Tutorial no longer gets stuck",
+   "Phase lines say what to do each step"
+  ],
+  "check": "Do the tutorial on iPhone to the end"
+ },
+ {
+  "date": "2026-11-23",
+  "game": "sands",
+  "title": "Claims are obvious",
+  "items": [
+   "Camel claims, palms and buildings are clearly marked, with a legend"
+  ],
+  "check": "Claim a tile on iPhone and look for the marks"
+ },
+ {
+  "date": "2026-11-23",
+  "game": "wildmark",
+  "title": "Tip quality and iPhone play",
+  "items": [
+   "A full game can be won by touch on iPhone",
+   "The Tip helper now gives usable advice"
+  ],
+  "check": "Play a full game on iPhone and follow the Tip"
+ },
+ {
+  "date": "2026-11-23",
+  "game": "perch",
+  "title": "Full game works on iPhone",
+  "items": [
+   "A whole game can be finished by touch with no stuck screens",
+   "Bonus chip is big enough to tap"
+  ],
+  "check": "Play a full game on your iPhone"
+ },
+ {
+  "date": "2026-11-23",
+  "game": "ochre",
+  "title": "Guided first game",
+  "items": [
+   "The game now tells you what to tap at every step of your first game"
+  ],
+  "check": "Start a new game on iPhone and follow the guide; you should never be unsure what to tap"
+ },
+ {
+  "date": "2026-11-23",
   "game": "twinthrones",
   "title": "Draft cards fit on iPhone",
   "items": [

@@ -1,666 +1,258 @@
 {
- "updated": "2026-11-21T00:26:12Z",
+ "updated": "2026-11-23T23:46:59Z",
  "live_base": "https://am015-dev.github.io/spotify_to_ytmusic/",
  "decisions": [
   {
-   "id": "kaiten-live",
-   "title": "Kaiten Kitchen: put the improved version live?",
-   "detail": "Passed its review: strict review R109 (rules exact, 0 errors in 7 games) + independent re-check of the two weak rows (both now 7). New: fair difficulty ladder (Easy -> Easy+ -> Normal), shorter 19-step tutorial, honest hints with a term legend, full PC layout incl. zoomed laptops, clear final score table. Testers: 3-3.5/5, 'would play again'. Small nits left (clumsy hint wording in places, one card 6 px clipped at 910x512).",
-   "video": "",
-   "video_label": "",
-   "try": "",
+   "id": "thornbound-rules",
+   "title": "Thornbound: 5 rule mismatches need your call",
+   "detail": "The worker found 5 places where the game and the rules notes disagree. Tell me for each: follow the rules notes, or keep the game as is.",
    "options": [
-    "Yes, put it live",
-    "No, keep working"
-   ]
-  },
-  {
-   "id": "game-night-tv",
-   "title": "Game Night TV (living-room highlights channel): put it live?",
-   "detail": "CH 3 on the room TV plays short trailers of all 22 games; tap for a full-screen Shorts-style player with 'Play this game'. Mainhattan channels unchanged. 296 automatic checks pass.",
-   "video": "tvshots/index.html",
-   "video_label": "See demo and screenshots",
-   "try": "",
-   "options": [
-    "Yes, put it live",
-    "No, change something"
+    "Follow the rules notes",
+    "Keep as is"
    ]
   }
  ],
  "notes": [
   {
-   "at": "23:07",
-   "text": "Cost note: the worker total does NOT include this orchestrator session (me). My session has cost $1,021 since 14 Oct, and every message re-reads about 760k tokens of history, so each of my turns is expensive. Fix: restart the orchestrator fresh with a short handoff (cuts that per-message cost by ~10x)."
-  },
-  {
-   "at": "22:26",
-   "text": "Cost counter reset at 2026-11-23T22:26:44Z. Workers and cost on this panel now count only from this moment. Before the reset: 166 workers, about $1,115 (20-21 Nov)."
-  },
-  {
-   "at": "00:27",
-   "text": "Sunglaze F6 finished (faster round-end scoring, 'why you lost' summary, 8 fixes). Tester 3/5, below the bar for a review, so it's paused. Kaiten Kitchen is the one game waiting for your yes."
-  },
-  {
-   "at": "00:00",
-   "text": "Kaiten Kitchen PASSED (R109 + re-check R109b: every row 7 or more). Waiting for your yes to put it live."
-  },
-  {
-   "at": "23:47",
-   "text": "Kaiten Kitchen F7 closed the review list (honest hint text, term legend, one helper at a time, correct bun/custard texts, final table fits small phones, PC text 13 px). One half-item left: the hand hides during the card flip. A short independent re-check of the two failing rows is running; if both reach 7, you get a 'go live?' decision."
-  },
-  {
-   "at": "23:24",
-   "text": "Reviews: Kaiten Kitchen R109 7.1, just short (2 rows at 6: unexplained badge terms, two helpers at once in the tutorial, a blank panel during the reveal, final table needs a scroll on small phones). Rules exact, 0 errors in 7 games. One short Sonnet fix on exactly that list, then a narrow re-check. Wildmark R110 6.9 (following the Tip doesn't win): dropped from focus, paused."
-  },
-  {
-   "at": "23:04",
-   "text": "Redline Rally design pass F6: the Suggest plan now races properly (a Suggest-only newcomer went from always last to 73% wins on Easy, now too strong), slipstream text matches the rule, finish-line move explained, phone results fit, gear risk/reward line each turn. Tester 3/5. Paused under the freeze."
-  },
-  {
-   "at": "23:02",
-   "text": "Perch and Plume F6: hint shows only on the first two turns, required taps glow like the tutorial, rival wait shows progress. The tester's scripted player got stuck at 'Pick a bird below' when no bird was affordable: possibly a dead end. Holding its strict review until Kaiten and Wildmark's reviews come back (usage is near the weekly limit)."
-  },
-  {
-   "at": "23:01",
-   "text": "Rampart and Vine F3: no legal spot hidden under buttons at 4 screen sizes (0 of 6,809), Easy about 50% for a newcomer, score texts corrected, tutorial keeps your pieces. Tester 3/5, would play again. Paused under the freeze."
-  },
-  {
-   "at": "22:56",
-   "text": "Thornbound now has its own content: 4 new factions, 51 kingdom cards, 20 sites, 16 tactics and more, balance within ~5 points (the strongest faction is a bit less dominant). Tester 3/5; the tutorial may get stuck at step 32 and the round recap doesn't show. Paused under the freeze."
-  },
-  {
-   "at": "22:10",
-   "text": "Wildmark F4: one helper at a time, zoomed-laptop layout, tutorial ends in a win, fast result that fits PC, 'Try next' tip after a loss. Tester 3.5/5, would probably play again. Now in its strict review (R110, Opus): the go-live gate."
-  },
-  {
-   "at": "22:03",
-   "text": "Cauldron Fair design pass F4: waits after you stop went from 2-8 s to under 1 s, one number per space, shop suggestions, our own fortunes and price tables. Tester 3/5: tense draw-or-stop, but a run of explosions feels hopeless and the shop isn't a real choice yet. Paused under the freeze."
-  },
-  {
-   "at": "22:02",
-   "text": "Vale of Banners design pass F4 (ran 2 h, over the limit): whole-turn hints, combo progress line, no late blowouts, plain labels, our own 8 building effects. Tester 3/5, but found a new problem: the first tap after loading often does nothing. Paused under the freeze; that tap bug is first if Vale resumes."
-  },
-  {
-   "at": "21:55",
-   "text": "Kaiten Kitchen F6 done (phone layout cleaned up, first-time tips). Tester 3/5, would probably play again. Now in its strict review (R109, Opus): the go-live gate. If it fails again, Kaiten leaves the focus list."
-  },
-  {
-   "at": "21:52",
-   "text": "Check-in: Stitchwise now has its own 33 patches (rewrite finished 21:09, $12); paused under the freeze. Running now: 4 focus-game fixers (Sunglaze, Kaiten, Wildmark, Perch) plus 5 that started before the freeze (Thornbound rewrite, Vale, Cauldron, Redline design passes, Rampart stopper fix). No new workers started."
-  },
-  {
-   "at": "21:47",
-   "text": "Ochre Horizon F2: company picks explained, one-tap tile placing with 'You get', clear Done vs Pass, PC map 40% larger, dead taps mostly gone. Tester 2.5-3/5. Paused under the freeze (new game, far from live)."
-  },
-  {
-   "at": "21:45",
-   "text": "Perch and Plume F5: 0 dead taps on phone and PC, shorter rival waits, clearer tutorial start. Tester 3/5: following the 'Best' hint loses badly (48-79) and targets don't glow in the real game. One last short Sonnet round on exactly that, then the strict review regardless."
-  },
-  {
-   "at": "21:39",
-   "text": "Emberclimb F6: full card texts in hand, correct HP/floor counts, readable reward chips, varied foes, a watchdog against stalled enemy turns. Tester 2.5/5: some new foes hit too hard, hand cards cut at the bottom. Paused under the freeze."
-  },
-  {
-   "at": "21:38",
-   "text": "Short Fuse now has its own 66 jobs (own names, stories, wire mixes; difficulty bands within a few points; Normal crew no longer carries you). Tester 3/5: jobs read well, but special rules hide behind a chip on the start card. Paused under the freeze. The live game still has the copied missions; getting the new jobs live needs one short UI fix plus a strict review (~$10)."
-  },
-  {
-   "at": "21:30",
-   "text": "Wickdeep F2: tutorial now has a first fight, hit/kill feedback, phone hand fits. Tester gave only 2/5 (lost at the first door, coach confusing on PC). Paused under the budget freeze (new game, far from live)."
-  },
-  {
-   "at": "21:28",
-   "text": "Tidewake design pass F4 finished: danger shading on the water before you place, one plain verdict per tile, an honest 'what would have saved you' line after a sink, bigger board on phone and zoomed laptops. Tester 3/5, 'losses felt earned, mostly'. Paused under the budget freeze."
-  },
-  {
-   "at": "21:27",
-   "text": "Kaiten Kitchen F5: zoomed-laptop tables no longer overlap, setup fits, clear final table with tie-break line. Tester 3.5/5. One last short Sonnet round (35 min cap) for 8 small phone/laptop layout bits, then the strict review."
-  },
-  {
-   "at": "21:22",
-   "text": "You approved the plan. Focus on 4 games closest to live: Sunglaze, Kaiten Kitchen, Wildmark, Perch and Plume. Each goes fixer -> strict review -> your yes -> live. Every other running worker finishes and gets no follow-up. No new workers until fewer than 6 are running, except these 4 games' reviews."
-  },
-  {
-   "at": "21:20",
-   "text": "Sands of Qamar F4 finished (rival turns 2-4 s, djinn end points shown, own point values and texts). Tester 3/5, path picking still unclear. Paused under the budget freeze: not close enough to live."
-  },
-  {
-   "at": "21:09",
-   "text": "Budget freeze: no new workers except ones that take a game live next or fix a visible problem on a live game; max 6 at once; Sonnet by default. Rewrite queue paused. Running workers finish."
-  },
-  {
-   "at": "21:06",
-   "text": "Visible-name scan done: no original game title, publisher or designer appears anywhere players can see. About 60 copied character/card names are still visible, mostly in Shipwreck Isle (5 names), plus a few in Twin Thrones, Nebula Aces, Perch and Plume and Redline Rally. They go into each game's next worker (Shipwreck and Twin Thrones get full content rewrites)."
-  },
-  {
-   "at": "21:05",
-   "text": "Emberclimb now has its own content: 101 cards with upgrades, act-1 foes and guardians, 19 relics, 9 potions (same counts, cost curve and HP bands; art unchanged). Tester 3/5, would play again; found 11 small bugs (e.g. hand cards show only their first line). Sonnet F6 fixes them. Thornbound's own-content rewrite (Opus) started in the free slot."
-  },
-  {
-   "at": "21:01",
-   "text": "Wickdeep F1: readable numbers, PC side layout, tutorial one idea at a time, 0 dead taps. Tester 3/5: the tutorial never reaches a monster. Sonnet F2: a real first fight in the tutorial with punchy hit feedback."
-  },
-  {
-   "at": "21:00",
-   "text": "Sunglaze F5: tester gave 4/5 on PC and 3.5 on phone (best so far), played both to the end, would play again. Short Sonnet F6 for round-end speed, a 'why you lost' summary and small leftovers; then it goes to a strict review."
-  },
-  {
-   "at": "20:59",
-   "text": "Original names hidden in data files removed from Thornbound, Hollowbough, Shipwreck Isle and Iron Meridian (merged, no player-visible change). Some original names may still show to players in a few live games (labels, help text): a Sonnet scan of what players can actually see is running; fixes for any visible ones come first and redeploy needs your yes."
-  },
-  {
-   "at": "20:57",
-   "text": "New game Ochre Horizon F1 (planet-building card game): one helper at a time, full move previews, tutorial teaches points vs rating and production, our own 5 milestones and 5 awards, PC layout; hint-follower wins 47% on Easy. Tester 3.5/5, won 92-74 on PC. Sonnet F2 for the company pick, one-step tile placing, Done vs Pass and dead taps."
-  },
-  {
-   "at": "20:56",
-   "text": "Perch and Plume F4: the stuck-tap stopper is fixed (a too-strict double-tap guard dropped real taps; random tapping now finishes 5/5 with 0 dead taps), hint and Best badge agree, tutorial 25 -> 12 steps, goal breakdown on the result screen. Tester 3/5, 'tutorial is the best part'. Short Sonnet F5 for leftovers and a cold check on the final build."
-  },
-  {
-   "at": "20:58",
-   "text": "PC layout fix is LIVE on 22 games (commit 6649ad1f): on any landscape screen 720 px or wider (incl. zoomed laptops like 910x512) the controls sit in a side panel and the board stays whole; Enter/Space press the main button. Phones unchanged. Checked live at 910x512, 1366x768, 1920x1080 and 375x667: 0 page errors. Cauldron Fair kept its old version (one zoom test failed; its F4 redesign will carry the fix). Before/after: pcshots/live-tidewake-910x512.png"
-  },
-  {
-   "at": "20:47",
-   "text": "Redline Rally F5: one speed number, dashboard never covers corner signs, PC results fully visible, corner named in the trade line. Tester 3/5: the 'Suggest' help is far too timid (gear 1-2, finishes last). Flat for several rounds, so an Opus design pass (F6): Suggest that races well, matching slipstream text, clear gear risk/reward each turn."
-  },
-  {
-   "at": "20:43",
-   "text": "Lantern Dive F2 (after the git-permission restart): job labels carry their rule, pop-ups stay on the table, shorter setup, 44 px drone cards, PC sizes all pass. Tester 3/5; reported a tutorial that jumps back from step 14 to 3 (to verify). Content is copied: queued for its own content rewrite, which will also fix that."
-  },
-  {
-   "at": "20:41",
-   "text": "Kaiten Kitchen F4: no difficulty cliff any more (Easy -> Easy+ -> Normal ladder; newcomer vs Easy 87% -> 58%), correct roll-race and custard texts, tutorial 27 -> 19 steps, zoomed-laptop setup fits. Tester 3/5. Short Sonnet F5 for the zoomed-laptop table overlap, clipped labels and a tie-break note."
-  },
-  {
-   "at": "20:39",
-   "text": "Tidewake F3: computers no longer sink themselves early (3-player: 51% -> 11% of games), risk numbers only on your picked tile, 3 hints per game, merged Sunk cards. Tester 3/5: tense, but turns feel samey and dice deaths random. Three rounds flat, so an Opus design pass (F4): show where each leviathan can strike before you place, one-line trade-offs, no match over before turn 4, bigger board on phone and zoomed laptops."
-  },
-  {
-   "at": "20:36",
-   "text": "New game Wickdeep (co-op tactical dungeon crawl, dark pixel art): built with all our own heroes, 116 ability cards, monsters, items and 25 maps; 439 rule checks pass. Its report was stuck on a permission check since 16:30, found it today. Tester 3.5/5, 'would play again'. Video on the Videos page. Sonnet fixer F1: readable numbers, PC layout, full tutorial."
-  },
-  {
-   "at": "20:34",
-   "text": "Rampart and Vine strict review R108: FAIL. Many legal spots are hidden under the top bar and buttons (dead taps), Easy too strong (newcomer won 1 of 9). Rules engine exact. Tester 3/5, 'would play again, mainly on PC'. Sonnet fixer F3 with a 0-hidden-spots gate. Sands of Qamar F3: tester 3.5/5, close games, 'nice puzzle'; Sonnet F4 for path picking, faster rival turns and our own versions of its partly copied djinns/tiles."
-  },
-  {
-   "at": "20:31",
-   "text": "Crown City Smash F2: Easy now winnable by touch (50% for a newcomer, was 0/3), dice stay put, rival waits 6.9 s -> 4.5 s, tutorial dead tap fixed, wide PC layout (tester: 'PC much clearer'). Tester 3/5. Content is copied: queued for its own content rewrite after Thornbound."
-  },
-  {
-   "at": "20:30",
-   "text": "Cauldron Fair cold test after F3: 3/5 again ('the push-your-luck meter is tense and clear', but long waits after you stop, repeated day summaries, busy board). Three rounds flat, so an Opus design pass (F4): near-instant rival turns, calm board, shop suggestions, plus our own versions of the partly copied ingredients/fortunes."
-  },
-  {
-   "at": "20:21",
-   "text": "Thornbound F16: rounds twice as fast (80 s -> 40 s), rivals play themselves with a Skip button, hand cards no longer overlap, PC layout. Tester 3/5, would play again. Content is copied, so it's next in the rewrite queue (after the name-leak cleanup)."
-  },
-  {
-   "at": "20:16",
-   "text": "Cauldron Fair F3: Easy now fair (sensible newcomer 85% -> 57% wins), no clipped labels, PC day report uses the width, every chip choice labelled. Its fresh-player check was blocked by a tool limit, so a separate cold tester (Sonnet) plays it now."
-  },
-  {
-   "at": "20:09",
-   "text": "Vale of Banners F3: 3/5 again (rival far too soft before, now fair at 58%), but 'fiddly bookkeeping, late game slid away'. Flat for several rounds, so an Opus design pass (F4): whole-turn hints, plain labels, combo progress, no late blowouts, the phone total-score bug. Emberclimb F5 design pass reached 3.5/5; its content is copied, so it's the 3rd Opus rewrite (with Short Fuse and Stitchwise)."
-  },
-  {
-   "at": "20:07",
-   "text": "Stitchwise F4: zoomed-laptop layout fixed, 'good spot' is now a hint you ask for, tutorial ends in one tap. Tester 3.5/5, never stuck. Its 33 patches copy the original's numbers, so an Opus worker now designs our own 33 patches (same balance) plus the tester's small layout nits."
-  },
-  {
-   "at": "20:04",
-   "text": "Perch and Plume strict review R106: FAIL. Random tapping on a phone got the game stuck (glowing moves stop responding), which counts as a stopper. Rules match, content is our own. Tester 3.5/5, would play again. Sonnet fixer F4: find and fix the stuck state first, then hint/badge disagreement, shorter tutorial, small-phone layout."
-  },
-  {
-   "at": "20:01",
-   "text": "Short Fuse F4: dead-tap stopper fixed, stable phone crew layout, full PC keyboard. Tester 3/5, won all 3 games, 'never felt danger'. Since its missions are copied, an Opus worker now writes our own 66 jobs (same rules and difficulty curve) and makes Normal less carried by the computer crew; the remaining small fixes follow after."
-  },
-  {
-   "at": "20:00",
-   "text": "You said yes to the PC layout fix: merged and deploying all games in one build now."
-  },
-  {
-   "at": "19:53",
-   "text": "Sunglaze design pass F4: rival's board always visible, picks say what they do to her ('Leaves 4 red: too many for Tamsin'), 'Try Normal' ladder after a win, 3-column PC. Tester 3.5/5 (was 3): 'playing against her, clearly'. Short Sonnet fixer F5 for 5 leftovers, then strict review."
-  },
-  {
-   "at": "19:51",
-   "text": "Wildmark strict review R107: 7.3, no stopper, no bugs in 6 games, rules engine exact. Fails on 2 helpers at once, the zoomed-laptop layout, a tutorial that ends in a scripted loss, and a slow result screen. Tester 3/5: 'could not tell what I should do differently'. Sonnet fixer F4 on it."
-  },
-  {
-   "at": "19:50",
-   "text": "Copied-content audit done: 11 games still copy the original's authored cards/missions/maps (worst: Shipwreck Isle, Crown City Smash, Short Fuse, Thornbound), 6 partly, 6 are our own. Six games also have original names hidden in data files: a cheap Haiku worker is removing those now. Plan: give each copied game its own new content like Doorkick (rules and structure unchanged), one Opus worker per game, worst first, max 3 at a time, each starting when that game's current fixer finishes. Rough cost ~$25 per game."
-  },
-  {
-   "at": "19:44",
-   "text": "Check-in: Videos page rebuilt: 78 videos across 38 games. Lantern Dive fixer and the copied-content audit were stuck on a git permission; restarted both with commit-in-small-steps instructions."
-  },
-  {
-   "at": "19:40",
-   "text": "Tidewake F2: big Place button, warnings say what to do, early 'hemmed in' warning, 3-column PC layout. Tester 3/5: 'lovely, easy to pick up', but the computers sink themselves early and the % numbers play the game for you. F3 (Sonnet): smarter computers with Easy still ~50%, risk shown only for your picked tile, limited hints."
-  },
-  {
-   "at": "19:35",
-   "text": "Redline Rally F4: taps per turn 4.4 -> 2.1, rival turns 3.3 s -> 2.2 s, tutorial 41 steps -> 15 taps, after-race tips, wide PC layout. Tester 3.5/5, never stuck, would play again. Short Sonnet fixer F5 for 5 small layout leftovers, then strict review."
-  },
-  {
-   "at": "19:33",
-   "text": "Doorkick Dungeon now has its own 168 cards (new names, ideas and numbers, same deck structure and balance: game length 44.0 -> 44.1 turns). Card sheet: games-src/munch/proof/card-sheet.jpg. Tester: 'short, funny, clear', would play again, loves meddling in fights. The live game still has the old copied cards, so it needs a redeploy; a Sonnet fixer (F19) first fixes the snags and PC layout, then I'll ask you."
-  },
-  {
-   "at": "19:28",
-   "text": "Cauldron Fair F2 done: shop explains each chip, rival line, faster pulls, wide PC layout. Fresh tester: 3/5, likes the draw-or-stop tension, would play again. Still clipped labels on the explode screen and Easy too easy (85% wins). Sonnet fixer F3 on it."
-  },
-  {
-   "at": "19:24",
-   "text": "Kaiten Kitchen strict review R105: 6.5. Cold tester 4/5, 'never stuck, would play again', hint bulb works. Fails on PC layout at a zoomed laptop size, a wrong roll-race message, and a difficulty jump after your first win. Sonnet fixer F4 on it."
-  },
-  {
-   "at": "19:17",
-   "text": "Rampart and Vine round 2: sheets never cover the board, numbers explained, '+N' points shown before features close, faster rival, PC side panel. Its cold tester got blocked by a permission check, so strict review R108 now plays it cold on phone and PC."
-  },
-  {
-   "at": "19:16",
-   "text": "Game Night TV is ready for your decision (top of this page): demo video and screenshots. Wildmark round 3: tester 4/5, lost by 1 point and wanted a rematch; now in strict review R107."
-  },
-  {
-   "at": "19:11",
-   "text": "Perch and Plume round 3: skip optional powers ('Always skip'), one message at a time, bonus-card progress with gold-edged birds, a 3-column PC layout. The tester only tapped 'Best', so its 3/5 isn't reliable; strict review R106 now plays with its own choices (phone + PC) and also checks the bird cards are our own design."
-  },
-  {
-   "at": "18:59",
-   "text": "Short Fuse review R104: failed on one reproducible dead tap (a glowing wire that ignores taps) plus contradictory 'red wire' texts. Tester 3.5/5, 'the deduction is good, cutting is satisfying'. Sonnet fixer F4 on the list (incl. PC centre and keys)."
-  },
-  {
-   "at": "18:58",
-   "text": "Stitchwise strict review R103: 7.0, just short. Rules match, calm screen, phone clean; tester 3.5/5 'would play again, quilts look lovely'. Only fails on the zoomed-laptop window (910x512) and a few small things. Quick Sonnet fix, then back to review."
-  },
-  {
-   "at": "18:55",
-   "text": "Vinegrave round 15: scoring card, round-end breakdowns, why-scores-moved line, hand in 2 rows. Tester 3/5 phone, 3.5 PC. Flat for many rounds, so a design pass: teach one idea per round in the first game, one-tap actions, plain words for every point source."
-  },
-  {
-   "at": "18:53",
-   "text": "Kaiten Kitchen round 3: score pops no longer cover names, roll cards show your standing, round summaries, hint says '+6 now, next best +3', full PC layout. Tester 3/5 (last one gave 4/5: testers vary), so it goes to strict review R105 for a firm verdict instead of another guess round."
-  },
-  {
-   "at": "18:47",
-   "text": "PC fix ready for your decision (top of this page): before/after screenshots show Tidewake going from unplayable to a full board with a side panel on a zoomed laptop window."
-  },
-  {
-   "at": "18:45",
-   "text": "Emberclimb round 4: HP cost per fight shown, readable hands, real PC layout (drag works). But fun flat at 3/5 for 4 rounds ('samey early, rewards feel small'). Decision: keep the tabletop's small numbers (rules identical) and make it FEEL strong: punchy hits, rewards that show how your deck improves, a campfire/shop before each elite. Design pass running."
-  },
-  {
-   "at": "18:38",
-   "text": "Needs you: two workers are stuck waiting for permission to save their work (git commit/push was blocked in their sessions): 'F2-lantern-dive' and 'COPYAUDIT'. Open them in your Claude sessions list and reply 'proceed' (or allow git commit/push), otherwise I'll redo them. Short Fuse round 3: 3.5/5, PC layout added; now in strict review R104."
-  },
-  {
-   "at": "18:36",
-   "text": "My mistake found: the new 'Vellum Shire' is an adaptation of the same original as Vale of Banners (already live). I stopped Vellum Shire work and folded its best ideas into Vale's next fixer. Vale round 2: one name per tile, fewer taps, stable phone market; tester 'mildly' fun, Gentle too soft. Round 3 (feel pass) + PC running."
-  },
-  {
-   "at": "18:35",
-   "text": "Stitchwise round 3: button economy taught, income shown as 'x3 paydays = 6', rival quilt visible, real PC layout. Tester 4/5: 'cheap patch now vs pricey patch that pays later is a real decision', would play again, understood why it won and lost. Now in strict review R103 (phone + PC)."
-  },
-  {
-   "at": "18:25",
-   "text": "Sunglaze round 3: tutorial cues fixed, no rack overflow, close games (newcomer wins 57%, avg margin 12). But fun stuck at 3/5 for 3 rounds, so per the cost rules it gets a design pass (Opus) instead of more polish: make reading and blocking the rival visible, show wall-points ahead, a Normal level to step up to, plus PC layout."
-  },
-  {
-   "at": "18:24",
-   "text": "PC audit done (23 games, mouse, 6 window sizes). At normal sizes none is unplayable (4 poor, 11 OK, 8 good). The real culprit: any window under 1000 px wide (e.g. a laptop at 150% zoom) switches to the phone layout, which breaks Tidewake and squeezes 5 others. One shared fix (side panel on any landscape screen) is being built and proven on 3 games with before/after shots for your yes; then it goes to all games in one deploy. Worst at normal sizes: Rampart, Doorkick, Vale, Stitchwise (their fixers get the notes)."
-  },
-  {
-   "at": "18:21",
-   "text": "Cauldron Fair round 1: 3 rule errors fixed, helpers on screen 13 -> 1, no endless animations, no dead taps. Tester 4/5, 'tense, charming, play again: yes', won 41-33. A cheap round explains shop chips + PC layout, then strict review."
-  },
-  {
-   "at": "18:20",
-   "text": "Your idea: a 'Game Night TV' highlights channel on the living-room TV of the live site. Short trailers of live games play on the TV screen; tap it for a full-screen Shorts-style player with a 'Play this game' button. Worker TV1 is building it on a branch; you'll get screenshots here for a yes before it goes live."
-  },
-  {
-   "at": "18:11",
-   "text": "Emberclimb round 3: hidden foe rules now shown and flashed, potion/relic 'disappearing' bug fixed (Continue skipped them), map has real choices (77% -> 46% one-way rooms), every event has its own picture. Tester 3/5, 'choices feel real'. Round 4 (Sonnet): HP feedback, hand text, PC layout."
-  },
-  {
-   "at": "18:07",
-   "text": "Vellum Shire round 1: the 'stuck mid-game' problem is fixed (glowing worker + 'Nothing fits' line), every tap 44px, you choose barge goods as in the original. Tester 3/5: 'pretty, well taught' but long and hard to follow the rival. Round 2 (Sonnet): fewer taps, quick rival, progress line, fair Easy, PC layout."
-  },
-  {
-   "at": "18:03",
-   "text": "Short Fuse round 2: tester 4/5, 'Yes, I'd play again', both jobs defused first try. Invented 'no progress = boom' rule now off by default. A cheap round fixes 4 small leftovers + PC layout, then strict review. Videos tab is now a Shorts-style feed."
-  },
-  {
-   "at": "17:58",
-   "text": "Kaiten Kitchen round 2: tester 'Fun: yes, would play again', no blockers. A cheap Sonnet round fixes 8 small leftovers + PC layout, then it goes to strict review. Videos on the panel can now be scrubbed/seeked."
-  },
-  {
-   "at": "17:55",
-   "text": "Important: review R98 found Doorkick Dungeon (live) copies the original's card pool one-for-one under new names. That breaks our rule (own cards, same structure). A worker is now designing our own 168 cards with the same structure and balance; then the UI fixes. A second worker audits every game for the same problem. Vinegrave: tester 2.5/5, didn't get the scoring -> fixer adds a scoring recap and breakdowns + PC."
-  },
-  {
-   "at": "17:51",
-   "text": "Perch and Plume round 2: real score line, no popups stealing taps, readable rival summary, Easy now close (newcomer 55%). Tester 'fairly fun', lost 60-61, 'Fern felt like a real opponent'. Rampart and Vine round 1: rules texts true, calm, fair Easy; tester 'somewhat' fun. Both on cheaper Sonnet fixers with PC layout."
-  },
-  {
-   "at": "17:50",
-   "text": "Cost rules from now on: Sonnet for list fixes, Opus only for 'make it fun' and reviews; workers aim for ~30 min; full tests once; strict review only after a 4/5 cold play. New 'Cost by game' table on the Workers tab. Lantern Dive R101: 6.8 ('half understood, more guessing than planning') -> Sonnet fixer with PC layout."
-  },
-  {
-   "at": "17:45",
-   "text": "Wildmark review R102: 6.8. Hint bulb works; tester 'mildly fun, close all game, I'd play again'. Fails on up to 4-5 helper messages at once and the late board needing panning. Round 3 + PC layout running."
-  },
-  {
-   "at": "17:42",
-   "text": "Meadowfold round 1 (after your No): two-button title, raised paper tiles, big animal move-in moments, rival recap. Still 3/5 from the tester, so I'm not bringing it back to you yet: round 2 shows the rival's valley and a live score breakdown, warns before the end, plus PC layout."
-  },
-  {
-   "at": "17:39",
-   "text": "Sands of Qamar round 2: clear bidding buttons, rival moves in ~1 s, bigger phone board. Tester 'somewhat' fun: the star hint plays for you, rival too weak (won 228-124), rival too fast to read. Round 3 + PC layout running."
-  },
-  {
-   "at": "17:38",
-   "text": "Redline Rally round 3: blank green map bug found (3 causes) and fixed; Suggest now only highlights, you make the move; races are closer. Tester fun 3/5 ('clever, tense finish') but ~6 taps a turn and a long tutorial. Round 4 + PC layout running."
-  },
-  {
-   "at": "17:38",
-   "text": "Tidewake round 1: tutorial no longer leaks a fixed seed into real games, 44px gold marks, 13 rule texts fixed, Easy fair (47-50%). Tester: 'art and mood lovely, real tension', but too much badge-following and a sudden unexplained loss. Round 2 + PC layout running."
-  },
-  {
-   "at": "17:23",
-   "text": "Ochre Horizon review R99: 6.5. Rules engine faithful; tester fun 3/5 ('looks good'), but stuck at 0 money early and up to 3 messages stacked at once. Fixer F1 on it, incl. own awards/milestones and PC layout."
-  },
-  {
-   "at": "17:22",
-   "text": "Thornbound polish done: wrong taps in the tutorial now get a clear hint, the hint bulb works in one tap, Easy is fair (newcomer 45%). Tester 6/10: 'deep, good-looking', but rival turns take too many taps. Next fixer: pace, bigger cards, PC layout."
-  },
-  {
-   "at": "17:16",
-   "text": "Stitchwise round 2: you now place patches yourself (real puzzle) and the time track says whose turn and why. Tester: 'mildly fun', didn't get the button economy. Round 3 teaches income up front, shows the rival's quilt, plus PC layout."
-  },
-  {
-   "at": "17:15",
-   "text": "Crown City Smash review R97: 7.4, closest yet. Only fails on Easy being too hard (a newcomer by touch lost 5/5) and slow rival turns. Tester: 'mostly fun, a quad of 3s feels great'. Round 2 fixer on it, incl. the PC layout."
-  },
-  {
-   "at": "17:13",
-   "text": "PC layouts (your request): an audit worker is playing every live game by mouse at 1366x768, 1920x1080 and 1280x720 and ranking what's unplayable, plus any shared cause one fix can solve. Next: fix the worst game first for your yes, then roll out. From now on every review also checks PC."
-  },
-  {
-   "at": "17:12",
-   "text": "Emberclimb round 2: tabletop-size numbers, real hero pick and branching map, fights now cost HP. Tester fun 3/5 ('every 1 HP matters') but an elite's hidden rule killed them unfairly, plus potion/relic bugs -> round 3 running."
-  },
-  {
-   "at": "17:10",
-   "text": "Sunglaze round 2: rival plays herself in the tutorial, no more stray-tap menus, scoring steps tile by tile. Tester: 'somewhat' enjoyed; 9 small leftovers -> round 3 running."
-  },
-  {
-   "at": "17:05",
-   "text": "Vellum Shire review R100 failed: tester called it 'charming, well taught' but got stuck mid-game when no move fit (no 'pass' cue), and some tiles are too small at 375x553. Fixer F1 on it."
-  },
-  {
-   "at": "17:04",
-   "text": "Hollowbough review R96: 7.0, just short (phone taps, one looping tree). Tester: 'pleasant, art is lovely, I'd play again'; newcomers won 6/9, all close. Rework 2 is running; its leftovers go to the next fixer."
-  },
-  {
-   "at": "17:04",
-   "text": "Wildmark round 2 done: steady camera, 3 taps a turn, every score change explained. Tester: 'mildly fun, a bit shallow'. Strict review R102 now (also checks Easy isn't too easy)."
-  },
-  {
-   "at": "17:01",
-   "text": "Got your 3 answers. Tidewake effects stay off. Twin Thrones and Meadowfold: new fixers now diagnose what still isn't fun (frame by frame + cold play) and fix it; you'll see them here again with new videos."
-  },
-  {
-   "at": "16:58",
-   "text": "Control panel up. Tap a decision or write to me below; your reply wakes me within a few seconds."
-  },
-  {
-   "at": "16:53",
-   "text": "Lantern Dive: best cold play of the older games ('failures felt fair'). Now in strict review R101."
-  },
-  {
-   "at": "16:48",
-   "text": "Hollowbough rework 1 done: playable, fun 3/5. Rework 2 (planning help, rival plan) running."
-  },
-  {
-   "at": "16:40",
-   "text": "New game Vellum Shire built: cold play fun 4/5. Strict review R100 running."
-  },
-  {
-   "at": "16:36",
-   "text": "New game Ochre Horizon built: fun 3/5. Strict review R99 running."
+   "at": "23:50",
+   "text": "Live now: Twin Thrones iPhone cards. Deploying next: Perch, Wildmark, Ochre, Thornbound, Sands claims. Sands paths needs a commit by hand."
   }
  ],
  "games": [
   {
    "slug": "pc-layout",
    "name": "PC layout for all games",
-   "live": false,
-   "stage": "waiting for you",
-   "step": "shared fix ready: before/after shots"
+   "live": true,
+   "stage": "live",
+   "step": "live (not changed today)"
   },
   {
    "slug": "tv",
    "name": "Game Night TV (living room)",
-   "live": false,
-   "stage": "waiting for you",
-   "step": "ready: demo + screenshots"
+   "live": true,
+   "stage": "live",
+   "step": "live (not changed today)"
   },
   {
    "slug": "copy-audit",
    "name": "Own-content audit (all games)",
-   "live": false,
-   "stage": "review",
-   "step": "checking every game for copied cards/scenarios"
+   "live": true,
+   "stage": "live",
+   "step": "live (not changed today)"
   },
   {
    "slug": "twin-thrones",
    "name": "Twin Thrones",
    "live": true,
-   "stage": "fixing",
-   "step": "rework 3 after your No"
+   "stage": "live",
+   "step": "iPhone draft cards fit, live 23:42 UTC"
   },
   {
    "slug": "meadowfold",
    "name": "Meadowfold",
-   "live": false,
-   "stage": "fixing",
-   "step": "round 2: aim 4/5, PC layout"
+   "live": true,
+   "stage": "live",
+   "step": "live (not changed today)"
   },
   {
    "slug": "hollowbough",
    "name": "Hollowbough",
    "live": true,
-   "stage": "fixing",
-   "step": "rework 2 + strict review R96"
+   "stage": "live",
+   "step": "live (not changed today)"
   },
   {
    "slug": "lantern-dive",
    "name": "Lantern Dive",
    "live": true,
-   "stage": "queued",
-   "step": "Next: own content rewrite (Opus) + tutorial rewind check"
+   "stage": "live",
+   "step": "live (not changed today)"
   },
   {
    "slug": "crown-city-smash",
    "name": "Crown City Smash",
    "live": true,
-   "stage": "queued",
-   "step": "Next: own content rewrite (Opus)"
+   "stage": "live",
+   "step": "live (not changed today)"
   },
   {
    "slug": "doorkick-dungeon",
    "name": "Doorkick Dungeon",
    "live": true,
-   "stage": "fixing",
-   "step": "F19: snags + PC on the new cards, then redeploy (your yes)"
+   "stage": "live",
+   "step": "live (not changed today)"
   },
   {
    "slug": "thornbound",
    "name": "Thornbound",
-   "live": true,
-   "stage": "paused",
-   "step": "Own content done; paused (tutorial step 32 to check)"
+   "live": false,
+   "stage": "review",
+   "step": "tutorial + phase lines done; 5 rule mismatches need your call"
   },
   {
    "slug": "redline-rally",
    "name": "Redline Rally",
    "live": true,
-   "stage": "paused",
-   "step": "Paused at 3/5"
+   "stage": "live",
+   "step": "live (not changed today)"
   },
   {
    "slug": "perch-and-plume",
    "name": "Perch and Plume",
-   "live": true,
-   "stage": "held",
-   "step": "Review on hold; check possible dead end first",
+   "live": false,
+   "stage": "building",
+   "step": "iPhone full game done, deploying",
    "focus": true
   },
   {
    "slug": "stitchwise",
    "name": "Stitchwise",
    "live": true,
-   "stage": "paused",
-   "step": "Own patches done; paused"
+   "stage": "live",
+   "step": "live (not changed today)"
   },
   {
    "slug": "cauldron-fair",
    "name": "Cauldron Fair",
    "live": true,
-   "stage": "paused",
-   "step": "Paused at 3/5"
+   "stage": "live",
+   "step": "live (not changed today)"
   },
   {
    "slug": "shipwreck-isle",
    "name": "Shipwreck Isle",
    "live": true,
-   "stage": "fixing",
-   "step": "fair food, published Easy variant"
+   "stage": "live",
+   "step": "live (not changed today)"
   },
   {
    "slug": "short-fuse",
    "name": "Short Fuse",
    "live": true,
-   "stage": "paused",
-   "step": "Own jobs done; paused (needs UI fix + review to go live)"
+   "stage": "live",
+   "step": "live (not changed today)"
   },
   {
    "slug": "kaiten-kitchen",
    "name": "Kaiten Kitchen",
    "live": true,
-   "stage": "ready",
-   "step": "Passed review; waiting for your yes",
+   "stage": "live",
+   "step": "passed review, live",
    "focus": true
   },
   {
    "slug": "nebula-aces",
    "name": "Nebula Aces",
    "live": true,
-   "stage": "fixing",
-   "step": "round 2: readable real game"
+   "stage": "live",
+   "step": "live (not changed today)"
   },
   {
    "slug": "final-approach",
    "name": "Final Approach",
    "live": true,
-   "stage": "fixing",
-   "step": "round 2: game not a form"
+   "stage": "live",
+   "step": "live (not changed today)"
   },
   {
    "slug": "emberclimb",
    "name": "Emberclimb",
    "live": true,
-   "stage": "paused",
-   "step": "Budget freeze: paused at 2.5/5"
+   "stage": "live",
+   "step": "live (not changed today)"
   },
   {
    "slug": "sunglaze",
    "name": "Sunglaze",
    "live": true,
-   "stage": "paused",
-   "step": "Paused at 3/5",
+   "stage": "live",
+   "step": "iPhone taps fixed, live",
    "focus": true
   },
   {
    "slug": "sands-of-qamar",
    "name": "Sands of Qamar",
-   "live": true,
-   "stage": "paused",
-   "step": "Budget freeze: paused at 3/5"
+   "live": false,
+   "stage": "review",
+   "step": "claims done (b9ee0aaf); walk paths worker blocked on a commit"
   },
   {
    "slug": "vale-of-banners",
    "name": "Vale of Banners",
    "live": true,
-   "stage": "paused",
-   "step": "Paused at 3/5; first-tap bug to fix first"
+   "stage": "live",
+   "step": "live (not changed today)"
   },
   {
    "slug": "wildmark",
    "name": "Wildmark",
-   "live": true,
-   "stage": "paused",
-   "step": "R110 6.9; paused",
+   "live": false,
+   "stage": "building",
+   "step": "Tip fix done, deploying",
    "focus": true
   },
   {
    "slug": "tidewake",
    "name": "Tidewake",
    "live": true,
-   "stage": "paused",
-   "step": "Budget freeze: paused at 3/5"
+   "stage": "live",
+   "step": "live (not changed today)"
   },
   {
    "slug": "rampart-and-vine",
    "name": "Rampart and Vine",
    "live": true,
-   "stage": "paused",
-   "step": "Paused at 3/5 (stopper fixed)"
+   "stage": "live",
+   "step": "live (not changed today)"
   },
   {
    "slug": "vinegrave",
    "name": "Vinegrave",
    "live": true,
-   "stage": "fixing",
-   "step": "design pass: teach one idea per round"
+   "stage": "live",
+   "step": "live (not changed today)"
   },
   {
    "slug": "ochre-horizon",
    "name": "Ochre Horizon (new)",
    "live": false,
-   "stage": "paused",
-   "step": "Budget freeze: paused at ~3/5"
+   "stage": "building",
+   "step": "guided first game done, deploying"
   },
   {
    "slug": "roman-trade",
    "name": "Roman trade game (new)",
-   "live": false,
-   "stage": "building",
-   "step": "builder at work"
+   "live": true,
+   "stage": "live",
+   "step": "live (not changed today)"
   },
   {
    "slug": "onyx-atelier",
    "name": "Onyx Atelier (new)",
-   "live": false,
-   "stage": "building",
-   "step": "builder at work"
+   "live": true,
+   "stage": "live",
+   "step": "live (not changed today)"
   },
   {
    "slug": "dungeon-crawler",
    "name": "Co-op dungeon crawler (new)",
-   "live": false,
-   "stage": "building",
-   "step": "builder at work"
+   "live": true,
+   "stage": "live",
+   "step": "live (not changed today)"
   },
   {
    "slug": "epic-war",
    "name": "Fantasy war game (new)",
-   "live": false,
-   "stage": "building",
-   "step": "builder at work"
+   "live": true,
+   "stage": "live",
+   "step": "live (not changed today)"
+  },
+  {
+   "slug": "wickdeep",
+   "name": "Wickdeep",
+   "live": true,
+   "stage": "live",
+   "step": "door guidance live (test.html)"
   }
  ]
 }
