@@ -34,3 +34,9 @@ Read CLAUDE.md first. Then only this file; rules.md and pending.md here have det
 
 ## Panel
 Private page: https://claude.ai/artifact/Uvk8A1d35KLNScFd8zogcs (republish games-src/orch/index.html with files panel.json + workers.json after each report). Cost counter reset 2026-11-23T22:26Z; worker cost since then ~$4. Old orchestrator session cost $1,021 total (not in the panel). Update workers.json by appending a record per finished worker to raw-sessions.jsonl and running `python3 mkworkers.py` (reads reset.txt).
+
+## Reports that arrived at the old session after the handoff (23:11-23:31)
+- twin-thrones cards: DONE 796cace6 on shelf/W595-twin-iph (0 clipped, --quick PASS) -> deploy.
+- ochre-horizon guided first game: DONE a623b263 on shelf/W563-new-mars (newcomer finishes 2 generations at 402x874) -> deploy (build.py, copy html).
+- sands claims: DONE b9ee0aaf on shelf/W575-sands-strict -> merge shelf/W596-sands-paths when it reports, then deploy.
+- thornbound: DONE 6837ead4 on shelf/W489-thornbound-rules (tutorial step 32 fixed, full iPhone game, 7 texts fixed) -> deploy. Decided: make the engine match the card TEXT for the 5 remaining mismatches (Reed Ambush vs Ward Towers ~engine.js:701, Pan Bulwark ~724, Hot Iron ~386, Pardon Scroll ~519, Glow Caves) + region tap areas >= 44 px: one short Sonnet worker.
