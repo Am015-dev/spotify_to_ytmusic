@@ -77,7 +77,7 @@ var COACH = {
   end: 'Game ends when all three gauges hit their goals.'
 };
 function coachShow(k) {
-  if (!UI.tut || UI.coachDone[k] || UI.scn) return;
+  if (!UI.tut || UI.coachDone[k] || UI.scn || (window.guideEnabled && guideEnabled())) return;
   if (HCUR && HCUR.coach || HQ.some(function (x) { return x.coach; })) return;   // one helper at a time
   if (k === 'turn') {
     var P = G.pl[0], playN = P.hand.filter(function (id) { return OH.playable(0, id); }).length;
