@@ -129,7 +129,7 @@ function tutSteps(){
    wait:{type:'tap',match:a=>a.what==='select'&&a.id===tutAutCard('journey')},ready:()=>tkind('menu')&&/Autumn/.test(G.q.title||'')&&UI.autCard==null&&tutAutCard('journey')!=null},
  {id:'journey',title:'Journey',say:'Journey trades the card for Lore. Lore buys stronger cards.',target:tfirst('#act .autc [data-aut=journey]'),
    wait:{type:'tap',match:a=>isMove(a,'menu')&&a.mv&&a.mv.a==='journey'},ready:()=>tkind('menu')&&/Autumn/.test(G.q.title||'')&&UI.autCard!=null&&!!document.querySelector('#act .autc [data-aut=journey]')},
- {id:'lore',title:'Spend Lore',say:'Two Lore: buy a Site of Power card. Tap the Reed Herald.',target:tutSiteOpt,
+ {id:'lore',title:'Spend Lore',say:'Journey gave 2 Lore, plus 1 from the start: 3 buys the Reed Herald. Tap it.',target:tutSiteOpt,
    wait:{type:'tap',match:a=>isMove(a,'siteBuy')},ready:()=>!!(G.q&&G.q.kind==='siteBuy'&&!UI.card&&tutSiteOpt())},
  {id:'lore2',title:'Bought',say:'Tap Done. The card joins your hand.',target:()=>{const m=UI.bf&&UI.bf.mv&&UI.bf.mv.find(x=>x.t==='seldone');return m?document.querySelector('#act [data-a=mv][data-k="'+CSS.escape(m.k)+'"]'):null},
    wait:{type:'tap',match:a=>isMove(a,'siteBuy')&&a.mv&&a.mv.t==='seldone'},ready:()=>!!(G.q&&G.q.kind==='siteBuy'&&!UI.card&&(G.q.chosen||[]).length)},
@@ -162,7 +162,7 @@ function tutStart(o){if(typeof GXT==='undefined'||window.TB_COACH_TUT){if(window
       showStart();UI.sv='setup';UI.cfgOpen=false;renderStart()},   // Play a real game: the setup screen, one tap from a real game
     onExit:()=>{tutLeave();showStart();if(pro&&window.CAMPAIGN&&typeof GXC!=='undefined')GXC.open()}})}   // Skip in the Story prologue: on to the chapter map
 // the staged deal: the seed's opening hand with the Ferry Trader (2 Lore, for the Lore buy) in place of the Heron Watch; the computer plays at x6 (animations cap at x4) so no wait is long
-function tutStage(){const P=G.pl[0],a=P.hand.indexOf(4),b=P.deck.indexOf(1);if(a>=0&&b>=0){P.hand[a]=1;P.deck[b]=4;const o=G.q&&G.q.o&&G.q.o[0];if(o)o.forEach(m=>{if(m.id===4){m.id=1;m.k='b:1';m.label='Bid with '+cinfo(1).name}})}
+function tutStage(){const P=G.pl[0];P.lore=Math.max(P.lore||0,1);/* the Reed Herald costs 3: a 2-Lore Journey plus this 1 pays it */const a=P.hand.indexOf(4),b=P.deck.indexOf(1);if(a>=0&&b>=0){P.hand[a]=1;P.deck[b]=4;const o=G.q&&G.q.o&&G.q.o[0];if(o)o.forEach(m=>{if(m.id===4){m.id=1;m.k='b:1';m.label='Bid with '+cinfo(1).name}})}
   if(UI._tutSpd==null)UI._tutSpd=UI.speed;UI.speed=6}
 // leave the staged game: nothing of it is saved, and the board goes quiet behind the menu
 function tutLeave(){if(UI._tutSpd!=null){UI.speed=UI._tutSpd;UI._tutSpd=null}clearTimeout(_pumpT);clearTimeout(UI._evT);clearTimeout(UI._nt);UI.started=false;UI.card=null;UI.evq=[];UI.hand=null;try{GXH.hide()}catch(e){}try{const f=$('#finger');if(f)f.hidden=true}catch(e){}}
