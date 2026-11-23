@@ -1,6 +1,6 @@
 // ===================== part 10: help (shell/gx-help.js): coach bubbles the first time, the lightbulb on demand =====================
 // Bubbles: once per phase (pick a colour / choose a row / choose a wall space), short, pointing at the board. The bulb: the game's own advice function
-// (adviceFor -> bestNetTake / bestWallCell, through bfAdvice) as a ghost finger plus a short why, and rules cards. No safe advice -> rules cards only.
+// (adviceFor -> bestNetTake / bestWallCell, through bfAdvice) as a ghost finger plus a short why, and rules cards. A close call falls back to the best take by the same numbers (hlpFallback), so the bulb always suggests a move.
 // Help lives on the board-first table (phone layout, also used by the tutorial on any screen); the old 3D desktop dock keeps its guide panel.
 const hT=(c,x,y,s)=>`<use href="#gz${c}" x="${x}" y="${y}" width="${s}" height="${s}"/>`;   // no nested <svg>: the kit's css sizes every svg inside a picture
 const hSVG=b=>`<svg viewBox="0 0 64 64" role="img" aria-hidden="true">${b}</svg>`;
@@ -23,37 +23,41 @@ const HLP_STEPS={
 const HLP_RULES=[
   {phase:'pick',title:'Take one colour',text:'Pick a kiln and a colour. You take every tile of that colour. The rest slide to the middle.',pic:HPIC.kiln},
   {phase:'pick',title:'The middle',text:'Taking from the middle first also takes the Sun token. It costs floor points, but you start next round.',pic:HPIC.middle},
-  {phase:'pick',title:'Round end',text:'When every kiln and the middle are empty, the round ends. Each full row sends one tile to your wall.',pic:HPIC.racks},
+  {phase:'pick',title:'Round end',text:'When every kiln and the middle are empty, the round ends. Each full rack sends one tile to your wall.',pic:HPIC.racks},
   {phase:'pick',title:'Game end',text:'A full wall row ends the game. Bonuses: row +2, column +7, all five of a colour +10.',pic:HPIC.bonus},
-  {phase:'rack',title:'One colour per row',text:'Row 3 holds three tiles of a single colour. You cannot mix colours in a row.',pic:HPIC.oneColour},
-  {phase:'rack',title:'Blocked rows',text:'A row is blocked if its wall row already has that colour. Blocked and full rows do not glow.',pic:HPIC.blocked},
+  {phase:'rack',title:'One colour per rack',text:'Rack 3 holds three tiles of a single colour. You cannot mix colours on a rack.',pic:HPIC.oneColour},
+  {phase:'rack',title:'Blocked racks',text:'A rack is blocked if its wall row already has that colour. Blocked and full racks do not glow.',pic:HPIC.blocked},
   {phase:'rack',title:'The floor',text:'Extra tiles fall to the floor. Floor spaces cost −1, −1, −2, −2, −2, −3, −3. You can also drop tiles there.',pic:HPIC.floor},
-  {phase:'rack',title:'Touching scores',text:'A lone tile scores 1. A touching tile scores its row line plus its column line.',pic:HPIC.wall},
+  {phase:'rack',title:'Touching scores',text:'A lone tile scores 1. A touching tile scores each line of 2+ tiles it joins: across, down, or both added.',pic:HPIC.wall},
   {phase:'wall',title:'Pick the space',text:'On the grey wall choose any empty space in the row. No colour may repeat in a row or column.',pic:HPIC.wall},
-  {phase:'wall',title:'Touching scores',text:'A lone tile scores 1. A touching tile scores its row line plus its column line.',pic:HPIC.wall},
-  {title:'The goal',text:'Fill your wall with tiles. Touching tiles score more. Most points wins.',pic:HPIC.goal}
+  {phase:'wall',title:'Touching scores',text:'A lone tile scores 1. A touching tile scores each line of 2+ tiles it joins: across, down, or both added.',pic:HPIC.wall},
+  {title:'The goal',text:'Most points wins. Touching tiles score more. A full wall row ends the game.',pic:HPIC.goal}
 ];
 // ---------------------------------------------------------------- which phase is the player in?
 function hlpPhase(){try{if(!BF.on||BF.busy||UI.tut||UI.modal||BF.menu||BF.peek!=null||BF.boss||!G||G.over||isClient())return null;
   const hp=me();if(!hp)return null;
   if(G.phase==='wall')return G.wt&&G.wt.q&&G.wt.q.p===hp.i?'wall':null;
   if(G.phase==='offer')return UI.sel?'rack':'pick';return null}catch(e){return null}}
-const capW=(t,n)=>{const w=String(t||'').replace(/\s+/g,' ').trim().split(' ');return w.length<=n?w.join(' '):''};
+const capW=(t,n)=>{const w=String(t||'').replace(/\s+/g,' ').trim().split(' ');return w.length<=n?w.join(' '):w.slice(0,n).join(' ').replace(/[,:;]$/,'')+'.'};
+// a close call still gets a suggestion (never the rules card): the best take by the same numbers, else the computer's pick
+function hlpFallback(hp){try{if(G.phase==='wall'){const q=G.wt&&G.wt.q;if(!q||q.p!==hp.i)return null;let b=q.cells[0],bv=-1;for(const c of q.cells){const v=adjPts2(hp.wall,q.r,c);if(v>bv){bv=v;b=c}}return {act:'wall',r:q.r,c:b}}
+  return bestNetTake(hp.i,true)||strip(candidates(G,hp.i,endNear(G))[0])}catch(e){return null}}
+function hlpDeny(m,hp){try{if(m.act!=='take'||G.np!==2)return '';const o=G.pl[(hp.i+1)%2];const w=rvNeeds(G,o).find(x=>x.c===m.c);if(!w)return '';const S=cloneS(G);applyTake(S,hp.i,m);return rvCount(S,m.c)<w.n?` It blocks ${o.nm}'s rack ${w.r+1}.`:''}catch(e){return ''}}
 // the "why" (<= 15 words), from the same move the advice function picked
 function hlpWhy(m,hp){try{
   if(m.act==='wall')return capW(`Column ${m.c+1} touches the most tiles: +${adjPts2(hp.wall,m.r,m.c)} now.`,15);
   const pv=preview(m,hp.i);let t;
   if(m.line===5)t='No better choice: every other move scores less this round.';
-  else if(pv.full&&pv.pts!=null)t=`Fills row ${m.line+1}: about +${pv.pts} when the round ends${pv.pen?`, minus ${-pv.pen} breakage`:''}.`;
-  else t=`Row ${m.line+1} grows to ${pv.cnt} of ${cap(m.line)}${pv.pen?`, costing ${-pv.pen} breakage`:' with nothing broken'}.`;
-  return capW(t,15)}catch(e){return ''}}
+  else if(pv.full&&pv.pts!=null)t=`Fills rack ${m.line+1}: about +${pv.pts} when the round ends${pv.pen?`, minus ${-pv.pen} floor`:''}.`;
+  else t=`Rack ${m.line+1} grows to ${pv.cnt} of ${cap(m.line)}${pv.pen?`, costing ${-pv.pen} floor`:' with nothing on the floor'}.`;
+  const d=hlpDeny(m,hp);return capW(t,15-(d?d.trim().split(/\s+/).length:0))+d}catch(e){return ''}}
 const hlpTile=m=>{const a=m.src<0?G.ctr:G.fac[m.src];if(!a)return null;const k=a.findIndex(t=>t===m.c);return k<0?null:bfEl((m.src<0?'c':'f'+m.src)+'_'+k)};
 // the plan for the bulb (and for the sweep): where the ghost finger goes
-function hlpPlan(){if(!BF.on||BF.busy||UI.tut||UI.modal||!G||G.over||isClient())return null;const hp=me();if(!hp)return null;const m=bfAdvice(hp);if(!m)return null;
+function hlpPlan(){if(!BF.on||BF.busy||UI.tut||UI.modal||!G||G.over||isClient())return null;const hp=me();if(!hp)return null;const m=bfAdvice(hp)||hlpFallback(hp);if(!m)return null;
   if(m.act==='wall'){const q=G.wt&&G.wt.q;if(!q||m.r!==q.r)return null;return {m,hp,target:()=>bfSlot(`w${hp.i}_${q.r}_${m.c}`),from:null}}
   if(m.act!=='take'||G.phase!=='offer')return null;
   const sel=UI.sel;
-  if(sel&&sel.src===m.src&&sel.c===m.c){if(!!sel.j!==!!m.j||!movesFor(sel).some(x=>x.line===m.line))return null;
+  if(sel&&sel.src===m.src&&sel.c===m.c&&!!sel.j===!!m.j&&movesFor(sel).some(x=>x.line===m.line)){
     return {m,hp,target:()=>m.line<5?bfQ(`[data-bfrow="${m.line}"] .bf-rack`):bfQ('.bf-fl'),from:()=>hlpTile(m)}}
   return {m,hp,target:()=>hlpTile(m),from:null}}
 function hlpSuggest(){const pl=hlpPlan();if(!pl)return null;const why=hlpWhy(pl.m,pl.hp);if(!why)return null;
