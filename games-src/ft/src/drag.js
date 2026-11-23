@@ -9,7 +9,7 @@ function drgGhost(){if(!DRG.ghost){const g=document.createElement('div');g.class
 document.addEventListener('pointerdown',e=>{
   if(e.button>0||!G||G.over||UI.modal||UI.chz||!me()||G.phase!=='turn'||G.step!=='move'||(G.q))return;
   const t=e.target.closest&&e.target.closest('#grid [data-tile]');if(!t)return;const i=+t.dataset.tile;
-  const ok=G.move?G.move.at===i:UI.pick.includes(i);if(!ok)return;
+  const ok=G.move?G.move.at===i:drgCan('start',i);if(!ok)return;
   DRG.pid=e.pointerId;DRG.on=true;DRG.from=i;DRG.x0=e.clientX;DRG.y0=e.clientY;DRG.moved=false;DRG.over=-1},true);
 document.addEventListener('pointermove',e=>{
   if(!DRG.on)return;
@@ -19,13 +19,16 @@ document.addEventListener('pointermove',e=>{
     if(!G.move){drgClear();return}}
   const g=drgGhost();g.style.left=e.clientX+'px';g.style.top=e.clientY+'px';
   const j=drgTile(e.clientX,e.clientY);if(j!==DRG.over){document.querySelectorAll('#grid .dragover').forEach(x=>x.classList.remove('dragover'));DRG.over=j;
-    if(j>=0&&UI.pick.includes(j)){const el=tileEl(j);if(el)el.classList.add('dragover');try{if(navigator.vibrate)navigator.vibrate(6)}catch(x){}}}
+    if(j>=0&&drgCan('step',j)){const el=tileEl(j);if(el)el.classList.add('dragover');try{if(navigator.vibrate)navigator.vibrate(6)}catch(x){}}}
   e.preventDefault()},true);
 function drgEnd(e){
   if(!DRG.on)return;const moved=DRG.moved;let j=-1;if(moved&&e.type==='pointerup')j=drgTile(e.clientX,e.clientY);
-  const ok=moved&&j>=0&&G&&G.move&&UI.pick.includes(j);try{document.documentElement.releasePointerCapture(DRG.pid)}catch(x){}drgClear();
+  const ok=moved&&j>=0&&G&&G.move&&drgCan('step',j);try{document.documentElement.releasePointerCapture(DRG.pid)}catch(x){}drgClear();
   if(moved)DRG.until=Date.now()+350;
   if(ok){onTile(j);requestAnimationFrame(()=>{const el=tileEl(j);if(el){el.classList.remove('snap');void el.offsetWidth;el.classList.add('snap')}})}}
 document.addEventListener('pointerup',drgEnd,true);document.addEventListener('pointercancel',drgEnd,true);
 document.addEventListener('click',e=>{if(Date.now()<DRG.until&&e.target.closest&&e.target.closest('#grid [data-tile]')){e.stopPropagation();e.preventDefault()}},true);
 window.GXDRAG=DRG;
+
+// F1: only the suggested tile glows, but every legal tile can still be dragged from / dropped on
+function drgCan(act,i){if(UI.pick.includes(i))return true;const p=me();return !!p&&validMoves(p.i).some(m=>m.act===act&&m.tile===i)}

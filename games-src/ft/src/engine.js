@@ -240,14 +240,14 @@ function performMove(m,s){if(s===undefined)s=sideToAct();let ok=validMoves(s).so
 // ---------- scoring ----------
 function lakeNear(i){return AROUND(i).some(j=>G.board[j].k==='lake')}
 function scoreOf(p){const s={coins:p.coins,advisors:0,sages:0,crafters:0,djinns:0,tiles:0,palms:0,palaces:0,goods:0,items:0,cities:0};
-  s.advisors=p.vz*(hasDj(p,'wazira')?3:1);for(const q of G.pl)if(q.i!==p.i&&q.vz<p.vz)s.advisors+=10;
-  s.sages=p.el*(hasDj(p,'hikma')?4:2);
-  if(G.ex.artisans){const most=G.pl.every(q=>q.art<=p.art);s.crafters=p.art*(most?3:2)+(hasDj(p,'sana')?2*p.art:0);
-    for(const k of p.items)if(ITEMS[k].kind==='precious')s.items+=ITEMS[k].vp+(hasDj(p,'jawhar')?3:0)}
-  for(const k of p.dj)s.djinns+=DJ[k].vp;if(hasDj(p,'majlis'))s.djinns+=5*p.dj.length;
-  let cities=0;for(const t of G.board){const own=owner(t);if(own!==p.i)continue;s.tiles+=t.v;const dbl=G.ex.sultan&&lakeNear(t.i)?2:1;s.palms+=t.palm*(hasDj(p,'nakhla')?5:3)*dbl;s.palaces+=t.pal*5*dbl;
+  s.advisors=p.vz*(hasDj(p,'wazira')?DJN.wazira:1);for(const q of G.pl)if(q.i!==p.i&&q.vz<p.vz)s.advisors+=10;
+  s.sages=p.el*(hasDj(p,'hikma')?DJN.hikma:2);
+  if(G.ex.artisans){const most=G.pl.every(q=>q.art<=p.art);s.crafters=p.art*(most?3:2)+(hasDj(p,'sana')?DJN.sana*p.art:0);
+    for(const k of p.items)if(ITEMS[k].kind==='precious')s.items+=ITEMS[k].vp+(hasDj(p,'jawhar')?DJN.jawhar:0)}
+  for(const k of p.dj)s.djinns+=DJ[k].vp;if(hasDj(p,'majlis'))s.djinns+=DJN.majlis*p.dj.length;
+  let cities=0;for(const t of G.board){const own=owner(t);if(own!==p.i)continue;s.tiles+=t.v;const dbl=G.ex.sultan&&lakeNear(t.i)?2:1;s.palms+=t.palm*(hasDj(p,'nakhla')?DJN.nakhla:3)*dbl;s.palaces+=t.pal*5*dbl;
     if(t.tent===p.i)s.tiles+=AROUND(t.i).filter(j=>!G.board[j].blue&&!G.board[j].block).length;if(t.k==='city')cities++}
-  if(cities)s.cities=5*cities*cities;
+  if(cities)s.cities=CITYVP(cities);
   s.goods=goodsBest(p);s.total=Object.values(s).reduce((a,b)=>a+b,0);return s}
 function goodsScore(res){const c={};for(const r of res)c[r]=(c[r]||0)+1;let tot=0;while(true){const kinds=Object.keys(c).filter(k=>c[k]>0);if(!kinds.length)break;tot+=SETVP[Math.min(kinds.length,9)];for(const k of kinds)c[k]--}return tot}
 // Zarifa: every 2 Mystics = 1 wild goods card; pick the kinds that score best
