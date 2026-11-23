@@ -6,15 +6,15 @@ var CMP_NAMES={c8:['Lumen','Lux']};
 function campLvlReset(){LVL.easy.slip=CMP_SLIP0;LVL.hard.K=CMP_LVL0.K;LVL.hard.roll=CMP_LVL0.roll;LVL.hard.alpha=CMP_LVL0.alpha}
 function campBossSeat(){return 1}
 function campMetrics(g){const p=g.pl[0];const b=endBonus(p);const rivals=g.pl.slice(1).map(q=>q.score);
-  return {won:!!(g.over&&g.over.win.includes(0)),score:p.score,margin:p.score-Math.max.apply(null,rivals),rounds:g.round,breakage:-p.st.floor,cols:b.cols,colours:b.colours,rows:b.rows}}
+  return {won:!!(g.over&&g.over.win.includes(0)),score:p.score,margin:p.score-Math.max.apply(null,rivals),rounds:g.round,floor:-p.st.floor,cols:b.cols,colours:b.colours,rows:b.rows}}
 function campIsWon(g,def){const m=campMetrics(g);if(!m.won)return false;const gl=def.goal||{};
-  if(gl.type==='score'&&m.score<gl.value)return false;if(gl.type==='custom'&&gl.value!=null&&m.breakage>gl.value)return false;return true}
+  if(gl.type==='score'&&m.score<gl.value)return false;if(gl.type==='custom'&&gl.value!=null&&m.floor>gl.value)return false;return true}
 // ---- twists (setup and scoring hooks) ----
 function campApplyTwist(def){const t=def.twist;campLvlReset();if(!t)return;const B=campBossSeat();const nm=def.opponent.name;
   if(t.id==='boss-sun'){G.first=G.cur=B;lg(`Boss rule: ${nm} holds the Sun token and takes first.`,'big')}
   else if(t.id==='boss-head-start'){P(B).score=t.param;lg(`Boss rule: ${nm} starts with ${t.param} points.`,'big')}
   else if(t.id==='boss-glazed-start'){let n=0;for(let r=0;r<t.param;r++){const k=G.bag.indexOf(0);if(k<0)break;G.bag.splice(k,1);P(B).wall[r][WALLCOL(0,r)]=0;n++}
-    lg(`Rival rule: ${nm} starts with ${n} Cobalt tile${n===1?'':'s'} already set.`,'big')}
+    lg(`Rival rule: ${nm} starts with ${n} blue tile${n===1?'':'s'} already set.`,'big')}
   else if(t.id==='boss-column-bonus'){G.camp={colBonus:t.param,seat:B}}
   else if(t.id==='boss-deep-sight'){LVL.hard.roll=t.param;LVL.hard.K=14;lg(`Boss rule: ${nm} studies every take twice as deep.`,'big')}}
 // scoring twist: after the normal ending, the boss earns extra points per complete column, then the winner is worked out again
@@ -27,13 +27,13 @@ var _campFinish=finish;finish=function(){const had=!!G.over;_campFinish.apply(th
 // ---- starting a chapter ----
 function campStart(def){if(CMP_RES){GXC.scene=CMP_RES.s;GXC.bossCard=CMP_RES.b;const g=CMP_RES.g;CMP_RES=null;campLvlReset();G=g;UI.cmp=def;CMP_OVER=0;UI.guideNote=null;UI.fx.length=0;UI.fxSeen=0;UI.recap=[];UI.sel=null;UI.tgt=null;UI.adv=null;UI.coach=!!def.hints;
     const cb=$('#coachbtn');if(cb)cb.classList.toggle('on',UI.coach);UI.modal=null;const t=def.twist;if(t&&t.id==='boss-deep-sight'){LVL.hard.roll=t.param;LVL.hard.K=14}
-    if(def.opponent.aiLevel==='easy'&&CMP_SLIP[def.id]!=null)LVL.easy.slip=Math.min(.9,CMP_SLIP[def.id]+(def.easy?.15:0));resetScene();refresh();clearInterval(CMP_FIN);CMP_FIN=setInterval(campWatch,400);return}
+    if(def.opponent.aiLevel==='easy')LVL.easy.slip=Math.min(.9,(CMP_SLIP[def.id]!=null?CMP_SLIP[def.id]:.3)+(CMP_SLIP[def.id]!=null&&def.easy?.15:0));resetScene();refresh();clearInterval(CMP_FIN);CMP_FIN=setInterval(campWatch,400);return}
   const s=def.setup||{};const np=Math.max(2,Math.min(4,s.np||2));const ex=Object.assign({gray:false,prism:false},s.ex||{});
   const lv=['normal'];for(let i=1;i<np;i++)lv.push(def.opponent.aiLevel||'normal');const names=['You'].concat(CMP_NAMES[def.id]||(np===2?[def.opponent.name]:[def.opponent.name+' 1',def.opponent.name+' 2']));
   UI.cmp=def;CMP_OVER=0;UI.guideNote=null;UI.fx.length=0;UI.fxSeen=0;UI.recap=[];UI.sel=null;UI.tgt=null;UI.adv=null;UI.lastHuman=null;
   UI.coach=!!def.hints;const cb=$('#coachbtn');if(cb)cb.classList.toggle('on',UI.coach);
   UI.modal=null;const seats=['human'];for(let i=1;i<np;i++)seats.push('ai');
-  newGame({np,seats,lv,names,ex,mode:'x'});G.campId=def.id;G.campEasy=!!def.easy;campApplyTwist(def);if(def.opponent.aiLevel==='easy'&&CMP_SLIP[def.id]!=null)LVL.easy.slip=Math.min(.9,CMP_SLIP[def.id]+(def.easy?.15:0));
+  newGame({np,seats,lv,names,ex,mode:'x'});G.campId=def.id;G.campEasy=!!def.easy;campApplyTwist(def);if(def.opponent.aiLevel==='easy')LVL.easy.slip=Math.min(.9,(CMP_SLIP[def.id]!=null?CMP_SLIP[def.id]:.3)+(CMP_SLIP[def.id]!=null&&def.easy?.15:0));
   try{localStorage.removeItem(SAVE)}catch(e){}resetScene();refresh();clearInterval(CMP_FIN);CMP_FIN=setInterval(campWatch,400)}
 // a saved story game resumes inside its chapter: GXC.play with its intro and boss card skipped, then campStart restores the saved state
 var CMP_RES=null;

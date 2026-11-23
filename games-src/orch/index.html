@@ -1,0 +1,154 @@
+<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Shelf control panel</title>
+<style>
+:root{--bg:#f6f3ee;--fg:#1d1b18;--mut:#6b655c;--card:#fff;--ln:#e3ddd3;--acc:#2f5d8a;--run:#2f7d4f;--done:#6b655c;--fail:#b3412e;--rev:#7a5bb5;--wait:#b07a12}
+@media(prefers-color-scheme:dark){:root{--bg:#141311;--fg:#ece7df;--mut:#a39c90;--card:#1e1c19;--ln:#33302b;--acc:#7fb0e0;--run:#5cc488;--done:#a39c90;--fail:#e3735e;--rev:#b39ae6;--wait:#e0b050}}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);font:14px/1.45 system-ui,sans-serif;padding:16px;max-width:1100px;margin-inline:auto}
+h1{font-size:22px;margin:0}h2{font-size:16px;margin:22px 0 8px}.m{color:var(--mut);font-size:13px;margin:2px 0 10px}
+nav.tabs{display:flex;gap:6px;flex-wrap:wrap;margin:12px 0 4px;position:sticky;top:0;background:var(--bg);padding:6px 0;z-index:2}
+nav.tabs button,nav.tabs a{padding:8px 14px;border:1px solid var(--ln);border-radius:18px;background:var(--card);color:var(--fg);font:inherit;font-size:13px;text-decoration:none;cursor:pointer;min-height:40px}
+nav.tabs button[aria-pressed=true]{border-color:var(--fg);font-weight:600}
+.badge{display:inline-block;min-width:18px;padding:0 6px;border-radius:9px;background:var(--wait);color:#fff;font-size:11px;margin-left:4px}
+.card{background:var(--card);border:1px solid var(--ln);border-radius:12px;padding:12px 14px;margin-bottom:10px}
+.dec{border-left:4px solid var(--wait)}.dec h3{margin:0 0 4px;font-size:15px}.dec p{margin:0 0 8px;color:var(--mut);font-size:13px}
+.btns{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.btn{padding:9px 14px;border-radius:10px;border:1px solid var(--ln);background:var(--card);color:var(--fg);font:inherit;font-size:14px;cursor:pointer;min-height:44px;text-decoration:none;display:inline-flex;align-items:center}
+.btn.pri{background:var(--acc);border-color:var(--acc);color:#fff}.btn:disabled{opacity:.5}
+.ans{font-size:13px;color:var(--run);font-weight:600}
+textarea,input[type=text]{width:100%;font:inherit;padding:10px;border-radius:10px;border:1px solid var(--ln);background:var(--card);color:var(--fg)}
+textarea{min-height:84px;resize:vertical}
+.feed div{padding:6px 0;border-bottom:1px solid var(--ln);font-size:13.5px}.feed b{color:var(--mut);font-weight:600;margin-right:6px;font-variant-numeric:tabular-nums}
+.feed .me{color:var(--acc)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:8px}
+.g{background:var(--card);border:1px solid var(--ln);border-radius:10px;padding:9px 11px;border-left:4px solid var(--done)}
+.g.waiting{border-left-color:var(--wait)}.g.fixing{border-left-color:var(--fail)}.g.review{border-left-color:var(--rev)}.g.building{border-left-color:var(--acc)}.g.done{border-left-color:var(--run)}
+.g b{display:block}.g span{color:var(--mut);font-size:12.5px}.g a{font-size:12.5px;color:var(--acc);margin-right:10px}
+.chips{display:flex;gap:6px;flex-wrap:wrap;margin:0 0 10px}.chip{font-size:12px;color:var(--mut);border:1px solid var(--ln);border-radius:12px;padding:2px 9px}
+.tot{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:8px;margin-bottom:12px}
+.tot div{background:var(--card);border:1px solid var(--ln);border-radius:10px;padding:8px 10px}.tot b{display:block;font-size:20px;font-variant-numeric:tabular-nums}.tot span{color:var(--mut);font-size:12px}
+.list{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:10px}
+.c{background:var(--card);border:1px solid var(--ln);border-left:4px solid var(--done);border-radius:10px;padding:10px 12px}
+.c.run{border-left-color:var(--run)}.c.fail{border-left-color:var(--fail)}.c.rev{border-left-color:var(--rev)}
+.c h3{margin:0 0 4px;font-size:15px}.c .t{color:var(--mut);font-size:12.5px;margin:0 0 6px}.c .s{font-size:13px;margin:0 0 8px}
+.row{display:flex;flex-wrap:wrap;gap:4px 12px;font-size:12px;color:var(--mut);font-variant-numeric:tabular-nums}.row b{color:var(--fg);font-weight:600}
+.pill{display:inline-block;font-size:11px;padding:1px 7px;border-radius:9px;border:1px solid currentColor;margin-right:6px;vertical-align:1px}
+.run .pill{color:var(--run)}.fail .pill{color:var(--fail)}.rev .pill{color:var(--rev)}.c:not(.run):not(.fail):not(.rev) .pill{color:var(--done)}
+.c .note{margin-top:8px}.c .note button{font-size:12px;min-height:32px;padding:4px 10px}
+.sub{display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap}.sub button{padding:6px 12px;border:1px solid var(--ln);border-radius:16px;background:var(--card);color:var(--fg);font:inherit;font-size:13px;cursor:pointer}
+.sub button[aria-pressed=true]{border-color:var(--fg);font-weight:600}
+.toast{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);background:var(--fg);color:var(--bg);padding:10px 16px;border-radius:10px;font-size:14px;opacity:0;transition:opacity .2s;pointer-events:none}
+.toast.on{opacity:1}
+[hidden]{display:none!important}
+</style>
+<h1>Shelf control panel</h1>
+<p class="m" id="upd">Loading…</p>
+<nav class="tabs">
+ <button data-tab="home" aria-pressed="true">Overview<span class="badge" id="decn" hidden></span></button>
+ <button data-tab="games" aria-pressed="false">Games</button>
+ <button data-tab="workers" aria-pressed="false">Workers</button>
+ <a href="videos.html">Videos</a>
+</nav>
+
+<section id="tab-home">
+ <h2>Waiting for you</h2>
+ <div id="decs"></div>
+ <h2>Message me</h2>
+ <div class="card">
+  <textarea id="msg" placeholder="Anything: a bug you saw, a change you want, a game to prioritise, stop a worker…"></textarea>
+  <div class="btns" style="margin-top:8px"><button class="btn pri" id="send">Send</button><span class="m" id="about" hidden></span></div>
+ </div>
+ <h2>Updates</h2>
+ <div class="card feed" id="feed"></div>
+</section>
+
+<section id="tab-games" hidden>
+ <p class="m">Where every game is in the pipeline: fixing → strict review (with a cold-play video) → waiting for your yes → live.</p>
+ <div class="chips" id="gchips"></div>
+ <div class="grid" id="glist"></div>
+</section>
+
+<section id="tab-workers" hidden>
+ <div class="sub"><button data-f="active" aria-pressed="true">Working now</button><button data-f="done" aria-pressed="false">Finished today</button><button data-f="all" aria-pressed="false">All</button></div>
+ <div class="tot" id="tot"></div>
+ <div class="list" id="list"></div>
+ <h2>Cost by game (today)</h2>
+ <div class="card" id="bygame"></div>
+</section>
+<div class="toast" id="toast"></div>
+
+<script>
+let P=null,W=null,IN=[],TAB='home',F='active',ABOUT='';
+try{TAB=localStorage.getItem('tab')||'home';F=localStorage.getItem('f')||'active'}catch(e){}
+const $=id=>document.getElementById(id);
+const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'})[c]);
+const fmtDur=ms=>{if(!(ms>0))ms=0;const m=Math.floor(ms/60000),h=Math.floor(m/60);return h?h+'h '+(m%60)+'m':m+'m'};
+const fmtN=n=>n==null?'–':n>=1e6?(n/1e6).toFixed(1)+'M':n>=1e3?Math.round(n/1e3)+'k':String(n);
+const hm=s=>s?new Date(s).toISOString().slice(11,16):'–';
+function toast(t){const e=$('toast');e.textContent=t;e.classList.add('on');setTimeout(()=>e.classList.remove('on'),2200)}
+async function post(o){const r=await fetch('api/reply',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(o)});if(!r.ok)throw 0;await loadInbox()}
+function answered(id){for(let i=IN.length-1;i>=0;i--)if(IN[i].kind==='decision'&&IN[i].about===id)return IN[i];return null}
+
+function renderHome(){
+ if(!P)return;
+ const open=P.decisions.filter(d=>!answered(d.id));
+ $('decn').textContent=open.length;$('decn').hidden=!open.length;
+ $('decs').innerHTML=P.decisions.length?P.decisions.map(d=>{const a=answered(d.id);
+  return `<div class="card dec"><h3>${esc(d.title)}</h3><p>${esc(d.detail)}</p><div class="btns">
+  ${d.video?`<a class="btn" href="${esc(d.video)}">${esc(d.video_label||'Watch video')}</a>`:''}${d.try?`<a class="btn" target="_blank" rel="noopener" href="${esc(P.live_base+d.try)}">Try it</a>`:''}
+  ${d.options.map((o,i)=>`<button class="btn ${i===0?'pri':''}" data-dec="${esc(d.id)}" data-ans="${esc(o)}">${esc(o)}</button>`).join('')}
+  ${a?`<span class="ans">You answered: ${esc(a.answer)} (${hm(a.at)})</span>`:''}</div></div>`}).join(''):'<p class="m">Nothing waiting for you.</p>';
+ const feed=[...P.notes.map(n=>({t:n.at,x:n.text,me:false})),...IN.filter(r=>r.kind!=='decision').map(r=>({t:hm(r.at),x:(r.about?'['+r.about+'] ':'')+r.text,me:true})),
+  ...IN.filter(r=>r.kind==='decision').map(r=>({t:hm(r.at),x:'Decision '+r.about+': '+r.answer+(r.text?' — '+r.text:''),me:true}))].sort((a,b)=>b.t.localeCompare(a.t));
+ $('feed').innerHTML=feed.map(f=>`<div class="${f.me?'me':''}"><b>${esc(f.t)}</b>${f.me?'You: ':''}${esc(f.x)}</div>`).join('')||'<div>No updates yet.</div>';
+}
+function renderGames(){
+ if(!P)return;const order={waiting:0,'waiting for you':0,review:1,fixing:2,building:3,live:4,done:4};
+ const st=g=>g.stage==='waiting for you'?'waiting':g.stage;
+ const c={};P.games.forEach(g=>c[st(g)]=(c[st(g)]||0)+1);
+ $('gchips').innerHTML=Object.entries(c).map(([k,v])=>`<span class="chip">${esc(k)}: ${v}</span>`).join('');
+ $('glist').innerHTML=[...P.games].sort((a,b)=>(order[st(a)]??9)-(order[st(b)]??9)).map(g=>`<div class="g ${esc(st(g))}"><b>${esc(g.name)}</b><span>${esc(g.stage)} · ${esc(g.step)}</span><div>
+ ${g.live?`<a target="_blank" rel="noopener" href="${esc(P.live_base+g.slug+'/')}">Play live</a>`:''}<a href="videos.html#${esc(g.slug)}">Videos</a><a href="#" data-about="${esc(g.name)}">Note</a></div></div>`).join('');
+}
+function renderWorkers(){
+ if(!W)return;
+ document.querySelectorAll('.sub button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.f===F));
+ const now=Date.now(),act=W.workers.filter(w=>w.bucket==='working');
+ const ws=W.workers.filter(w=>F==='all'||(F==='active'?w.bucket==='working':w.bucket!=='working'));
+ const sum=k=>W.workers.reduce((a,w)=>a+(w[k]||0),0);
+ $('tot').innerHTML=`<div><b>${act.length}</b><span>working now</span></div><div><b>${W.workers.length-act.length}</b><span>finished today</span></div>`+
+  `<div><b>$${sum('cost_usd').toFixed(0)}</b><span>cost reported so far</span></div><div><b>${fmtN(sum('tokens_out'))}</b><span>tokens written</span></div><div><b>${fmtN(sum('cache_read'))}</b><span>tokens re-read</span></div>`;
+ const cls=w=>w.bucket==='working'?'run':w.bucket==='failed'?'fail':w.bucket==='review_ready'?'rev':'';
+ const lab=w=>({working:'working',failed:'failed',review_ready:'ready',completed:'finished',blocked:'waiting'})[w.bucket]||w.bucket;
+ ws.sort((a,b)=>(b.bucket==='working')-(a.bucket==='working')||new Date(b.created)-new Date(a.created));
+ $('list').innerHTML=ws.length?ws.map(w=>{const end=w.bucket==='working'?now:new Date(w.updated).getTime();
+  return `<div class="c ${cls(w)}"><h3><span class="pill">${lab(w)}</span>${esc(w.tag)}</h3><p class="t">${esc(w.task)}</p>${w.summary?`<p class="s">${esc(w.summary)}</p>`:''}
+  <div class="row"><span>model <b>${esc(w.model||'–')}</b></span><span>started <b>${hm(w.created)}</b></span><span>time <b>${fmtDur(end-new Date(w.created))}</b></span><span>last activity <b>${hm(w.updated)}</b></span>
+  <span>tokens out <b>${fmtN(w.tokens_out)}</b></span><span>context <b>${fmtN(w.context_used)}</b></span><span>cost <b>${w.cost_usd!=null?'$'+w.cost_usd.toFixed(2):'–'}</b></span>${w.branch?`<span>branch <b>${esc(w.branch)}</b></span>`:''}</div>
+  <div class="note"><button class="btn" data-about="${esc(w.tag)}">Note about this worker</button></div></div>`}).join(''):'<p class="m">Nothing here.</p>';
+ const gg={};W.workers.forEach(w=>{const k=w.game||'other';gg[k]=gg[k]||{c:0,n:0,r:0};gg[k].c+=w.cost_usd||0;gg[k].n++;if(w.bucket==='working')gg[k].r++});
+ $('bygame').innerHTML='<div style="display:grid;grid-template-columns:1fr auto auto;gap:4px 14px;font-size:13px"><b>Game</b><b>Workers</b><b>Cost</b>'+Object.entries(gg).sort((a,b)=>b[1].c-a[1].c).map(([k,v])=>'<span>'+esc(k)+'</span><span>'+v.n+(v.r?' ('+v.r+' running)':'')+'</span><span>$'+v.c.toFixed(0)+'</span>').join('')+'</div><p class="m">Counts only workers that have reported usage; running ones add theirs when they finish a turn.</p>';
+}
+function render(){
+ document.querySelectorAll('nav.tabs button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.tab===TAB));
+ ['home','games','workers'].forEach(t=>$('tab-'+t).hidden=t!==TAB);
+ const u=[P&&('panel '+hm(P.updated)),W&&('workers '+hm(W.updated))].filter(Boolean).join(' · ');
+ $('upd').textContent=u?`Updated ${u} UTC. Replies reach me within seconds.`:'Loading…';
+ renderHome();renderGames();renderWorkers();
+}
+document.addEventListener('click',async e=>{
+ const t=e.target.closest('[data-tab],[data-f],[data-dec],[data-about]');if(!t)return;
+ if(t.dataset.tab){TAB=t.dataset.tab;try{localStorage.setItem('tab',TAB)}catch(x){}render();return}
+ if(t.dataset.f){F=t.dataset.f;try{localStorage.setItem('f',F)}catch(x){}renderWorkers();return}
+ if(t.dataset.about){e.preventDefault();ABOUT=t.dataset.about;$('about').textContent='About: '+ABOUT+' (tap to clear)';$('about').hidden=false;TAB='home';render();$('msg').focus();return}
+ if(t.dataset.dec){const note='';t.disabled=true;
+  try{await post({kind:'decision',about:t.dataset.dec,answer:t.dataset.ans,text:note||''});toast('Sent: '+t.dataset.ans+'. Add a note below if you like.')}catch(x){toast('Could not send; try again')}t.disabled=false}
+});
+$('about').addEventListener('click',()=>{ABOUT='';$('about').hidden=true});
+$('send').addEventListener('click',async()=>{const v=$('msg').value.trim();if(!v)return;$('send').disabled=true;
+ try{await post({kind:'message',about:ABOUT,text:v});$('msg').value='';ABOUT='';$('about').hidden=true;try{localStorage.removeItem('draft')}catch(x){}toast('Sent. I will reply in chat.')}catch(x){toast('Could not send; try again')}$('send').disabled=false});
+$('msg').addEventListener('input',()=>{try{localStorage.setItem('draft',$('msg').value)}catch(x){}});
+try{$('msg').value=localStorage.getItem('draft')||''}catch(x){}
+async function loadInbox(){try{IN=await (await fetch('api/inbox')).json()}catch(e){}render()}
+async function load(){try{P=await (await fetch('panel.json?'+Date.now())).json()}catch(e){}try{W=await (await fetch('workers.json?'+Date.now())).json()}catch(e){}await loadInbox()}
+load();setInterval(load,30000);
+</script>
