@@ -50,7 +50,8 @@ document.addEventListener('click', function (e) {
       if (!tutGate({ type: 'tap', what: 'hand', i: i, id: p.hand[i] })) return;
       UI.sel = UI.sel === i ? null : i; render(); return;
     }
-    if (a === 'slot' && UI.sel != null) { if (!PP.playInfo(G, UI.view, p.hand[UI.sel], h)) return; if (!tutGate({ type: 'tap', what: 'slot', h: h })) return; UI.pend = { i: UI.sel, h: h, k: 0 }; render(); return; }
+    if (a === 'slot' && UI.sel == null) { toast(UI.pickBird ? 'Tap a bird in your hand first.' : 'Choose an action below first.', 0, 1); return; }
+    if (a === 'slot' && UI.sel != null) { if (!PP.playInfo(G, UI.view, p.hand[UI.sel], h)) { nope(t, 'Not here'); return; } if (!tutGate({ type: 'tap', what: 'slot', h: h })) return; UI.pend = { i: UI.sel, h: h, k: 0 }; render(); return; }
     if (a === 'bird') { if (UI.sel != null) nope(t, 'Tap a marked space'); else showCard(p.board[h][c].id, p.board[h][c]); return; }
     if (a === 'tray' && G.tray[i]) { if (UI.sel != null) nope(t, 'Tap a marked space'); else showCard(G.tray[i]); return; }
     return;

@@ -154,6 +154,7 @@ function renderDock(p, vs, cur) {
   var wb = $('#whatbtn'); if (wb) wb.hidden = !(hintsOn() && UI.mode !== 'tutfree' && mine && !Q);
   hintsBtn();
   if (!mine || Q) UI.pickBird = false;
+  if (UI.pickBird && UI.sel == null && !UI.pend && !PP.playable(G, vs).length) UI.pickBird = false;   // nothing affordable: never strand the player on 'Pick a bird below' with nothing to tap
   var idle = mine && !Q && UI.sel == null && !UI.pend && UI.gsDie == null && !UI.pickBird;
   document.body.classList.toggle('idle4', !!idle);
   document.body.classList.toggle('deciding', !!(mine && Q));
