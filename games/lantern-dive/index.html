@@ -57,7 +57,7 @@ html.gx,html.gx body{height:100%;margin:0;overflow:hidden;overscroll-behavior:no
 @media (prefers-reduced-motion:reduce){.gx-drawer,.gx-scrim{transition:none}}
 
 *{box-sizing:border-box}
-:root{--ink:#e8f4ff;--ink2:#b9d2ee;--navy:#06142b;--deep:#0a2347;--panel:#0f2d57;--panel2:#143a6b;--line:rgba(160,205,255,.28);--gold:#ffd873;--gold2:#e0a31c;--coral:#e2607f;--tide:#3f82da;--kelp:#3fa86d;--star:#f1b82e;--ok:#35c27b;--bad:#e0583c;
+:root{--pick:#eaf7ff;--ink:#e8f4ff;--ink2:#b9d2ee;--navy:#06142b;--deep:#0a2347;--panel:#0f2d57;--panel2:#143a6b;--line:rgba(160,205,255,.28);--gold:#ffd873;--gold2:#e0a31c;--coral:#e2607f;--tide:#3f82da;--kelp:#3fa86d;--star:#f1b82e;--ok:#35c27b;--bad:#e0583c;
   --gx-bg:#06142b;--gx-bar:#06142b;--gx-panel:#0f2d57;--gx-ink:#e8f4ff;--gx-accent:#ffd873;--gx-dock-w:clamp(330px,30vw,410px);--gx-bar-h:48px;
   --font:'Nunito','Trebuchet MS','Segoe UI',system-ui,'DejaVu Sans',sans-serif;--hw:84px;--cw:76px;--dw:46px}
 html,body{font-family:var(--font);color:var(--ink);font-size:15px;-webkit-text-size-adjust:100%;-webkit-tap-highlight-color:transparent}
@@ -270,7 +270,7 @@ html.ph.ph-l .setup.scard{width:min(820px,100%)}
 html.ph .cfghead,html.ph .cfgfoot{display:flex}
 @media (prefers-reduced-motion:reduce){.tslot.turn,.hc.pk{animation:none}.emo{animation:none;opacity:1}}
 html.ldpx .hc.dim::before{display:none}
-html.ldpx #bd .hc svg.card,html.ldpx #bd .tc svg.card,html.ldpx #bd .dc svg.card{visibility:hidden}
+html.ldpx #bd .hc svg.card,html.ldpx #bd .tc svg.card{visibility:hidden}
 html.ldpx.lowtbl #bd{background-image:none}
 html.ldpx .hc{transition:none!important}
 html.ldpx #handz{background:none}
@@ -332,7 +332,7 @@ html .seat .nm,html .me .nm{background:rgba(2,18,42,.92);color:#fff;border-radiu
 /* seats */
 .seat{display:flex;flex-direction:column;align-items:stretch;gap:2px;padding:3px 3px 4px;border-radius:14px;background:rgba(6,24,52,.6);border:2px solid rgba(160,205,255,.22);color:inherit;font:inherit;text-align:left;cursor:pointer;min-width:0;min-height:44px}
 .seat.act{border-color:var(--gold);box-shadow:0 0 0 2px rgba(255,216,115,.4),0 0 16px rgba(255,216,115,.55)}
-.seat.glow,.me.glow{border-color:var(--gold);animation:seatglow 1.3s ease-in-out infinite}
+.seat.glow,.me.glow{border-color:var(--pick);box-shadow:0 0 0 2px rgba(150,225,255,.55),0 0 12px rgba(150,225,255,.45)}
 .seat.pend{border-color:rgba(255,216,115,.7);border-style:dashed}.seat.rdy,.me.rdy{border-color:var(--ok)}.me.pend{border-style:dashed;border-color:rgba(255,216,115,.7)}
 .seat .top{display:flex;align-items:center;gap:5px;min-width:0}
 .seat .top .nm{flex:1;min-width:0}
@@ -352,7 +352,7 @@ html .seat .nm,html .me .nm{background:rgba(2,18,42,.92);color:#fff;border-radiu
 .seat .jc .sm{width:13px;height:13px}.seat .jc .sm svg{width:8px;height:8px}
 .seat .jc.more{justify-content:center}
 .seat.drone{background:rgba(6,24,52,.45);padding:3px 4px 4px}
-.dhead{display:flex;align-items:center;gap:6px}
+.dhead{display:flex;align-items:center;gap:6px;flex-wrap:wrap}.seat.drone .top{flex-direction:row;align-items:center;gap:6px}.seat.drone .who{display:flex;flex-direction:row;align-items:center;gap:6px}.seat.drone .bdgs{flex-direction:row;gap:6px}
 .dseat{appearance:none;background:transparent;border:0;padding:0;margin:0;color:inherit;font:inherit;cursor:pointer;flex:0 0 auto;text-align:left}
 .seat .jobs.dj{flex:1;min-width:0;flex-direction:row;flex-wrap:wrap}.seat .jobs.dj .jc{width:auto;max-width:100%}
 .drow{display:flex;gap:4px;justify-content:center;padding:3px 2px 0;flex-wrap:nowrap}
@@ -360,7 +360,7 @@ html .seat .nm,html .me .nm{background:rgba(2,18,42,.92);color:#fff;border-radiu
 .dstack .dbk{position:absolute;left:0;bottom:0;width:100%;height:calc(100% - 9px);border-radius:6px;background:#1a3f77;border:2px solid #0b1f3a;opacity:.9}.dstack .dbk.none{opacity:0}
 .dstack .dc{position:absolute;left:0;top:0;width:100%;height:calc(var(--dw)*1.4);border:0;background:transparent;padding:0;cursor:default;border-radius:6px;touch-action:none}
 .dstack .dc.can{cursor:pointer}.dstack .dc.dim{opacity:.5}.dstack .dc.sel{transform:translateY(-6px)}
-.dc.glow::after{content:'';position:absolute;inset:-2px;border-radius:7px;border:3px solid var(--gold);box-shadow:0 0 12px rgba(255,216,115,.85);pointer-events:none;animation:glowp 1.3s ease-in-out infinite}
+.dc.glow::after{content:'';position:absolute;inset:-2px;border-radius:7px;border:3px solid var(--pick);box-shadow:0 0 10px rgba(150,225,255,.75);pointer-events:none}
 /* job tokens: the stamp lands on the token when the job is done or lost */
 .jc{position:relative}
 .stamp{position:absolute;right:-5px;top:-9px;width:24px;height:24px;border-radius:50%;border:3px solid;background:#fff;display:flex;align-items:center;justify-content:center;transform:rotate(-14deg);box-shadow:0 2px 5px rgba(0,0,0,.5);pointer-events:none;z-index:2}
@@ -370,7 +370,7 @@ html .seat .nm,html .me .nm{background:rgba(2,18,42,.92);color:#fff;border-radiu
 @keyframes stampin{0%{transform:scale(3.2) rotate(-50deg);opacity:0}60%{opacity:1}100%{transform:scale(1) rotate(-14deg)}}
 /* the trick */
 .tslot{position:absolute;transform:translate(-50%,-50%);border-radius:9px;border:2px dashed rgba(160,205,255,.28);display:flex;align-items:center;justify-content:center}
-.tslot.turn{border-color:var(--gold);box-shadow:0 0 14px 2px rgba(255,216,115,.5);animation:glowp 1.4s ease-in-out infinite}
+.tslot.turn{border-color:var(--gold);box-shadow:0 0 14px 2px rgba(255,216,115,.5);animation:glowp 1.4s ease-in-out 3}
 .tslot .tc{position:absolute;inset:0;border:0;padding:0;background:transparent;margin:0;cursor:default}
 .tslot .tc svg.card{width:100%;height:100%}
 .tslot.winner{box-shadow:0 0 18px 5px rgba(255,216,115,.85)}
@@ -383,7 +383,7 @@ html .seat .nm,html .me .nm{background:rgba(2,18,42,.92);color:#fff;border-radiu
 .lanrev{position:fixed;transform:translate(-50%,-50%);object-fit:contain;pointer-events:none;z-index:60;opacity:0;animation:lanrev 1.6s ease-out forwards;filter:drop-shadow(0 0 22px rgba(255,200,80,.85))}
 @keyframes lanrev{0%{opacity:0;transform:translate(-50%,-90%) scale(.5) rotate(-14deg)}25%{opacity:1;transform:translate(-50%,-50%) scale(1.05) rotate(8deg)}45%{transform:translate(-50%,-50%) scale(1) rotate(-5deg)}70%{opacity:1;transform:translate(-50%,-50%) scale(1) rotate(2deg)}100%{opacity:0;transform:translate(-50%,-60%) scale(.9)}}
 @media (prefers-reduced-motion:reduce){.lanrev{animation-duration:.01s}}
-#cenmark{position:absolute;transform:translate(-50%,-50%);pointer-events:none;opacity:.9;animation:glowp 1.8s ease-in-out infinite}#cenmark svg{display:block}
+#cenmark{position:absolute;transform:translate(-50%,-50%);pointer-events:none;opacity:.9;animation:glowp 1.8s ease-in-out 3}#cenmark svg{display:block}
 .fl{z-index:30;pointer-events:none;font-weight:900;font-size:28px;color:#fff3b0;text-shadow:0 2px 0 #0b1f3a,0 0 14px #ffb400;animation:rise 1.3s ease-out forwards}
 #bd>.fl:not(#pxc){position:absolute}
 @keyframes rise{0%{opacity:0;transform:translate(-50%,-30%) scale(.5)}20%{opacity:1;transform:translate(-50%,-70%) scale(1.25)}100%{opacity:0;transform:translate(-50%,-190%) scale(1)}}
@@ -394,14 +394,14 @@ html .seat .nm,html .me .nm{background:rgba(2,18,42,.92);color:#fff;border-radiu
 .jcard{min-width:0;overflow:hidden}
 .jcard b{font-size:14px;line-height:1.15;font-weight:900;overflow-wrap:break-word;word-break:normal}
 .jcard .dd{display:flex;gap:3px;align-items:center}.jcard .dd i{width:9px;height:9px;border-radius:50%;background:var(--gold2);border:1.5px solid #0b1f3a}
-.jcard.glow{box-shadow:0 0 0 4px var(--gold),0 0 20px rgba(255,216,115,.8);animation:jgl 1.3s ease-in-out infinite}
+.jcard.glow{box-shadow:0 0 0 3px var(--pick),0 0 14px rgba(150,225,255,.6)}
 @keyframes jgl{50%{transform:scale(1.045)}}
 .jfly{animation:none!important}
 .jcard.no{opacity:.5;cursor:default}.jcard.off{opacity:.9;cursor:default}
 .jcard .nocap{position:absolute;right:4px;top:4px;width:20px;height:20px;color:#a33}.jcard .nocap svg{width:100%;height:100%;stroke:currentColor;fill:none}
 /* buttons and bulbs on the table */
 #acts{position:absolute;left:58px;right:58px;bottom:6px;display:flex;gap:8px;flex-wrap:wrap;justify-content:center;z-index:6;pointer-events:none}
-#acts.wide{left:8px;right:8px}
+#acts.wide{left:8px;right:8px}#acts.line{left:calc(50% + var(--cw) / 2 + 8px);right:6px}#acts.line.lp{right:74px}
 #acts .btn{pointer-events:auto;min-height:48px;padding:0 6px;font-size:16px;box-shadow:0 4px 12px rgba(0,0,0,.55)}
 #acts.many .btn{min-width:48px;padding:4px 10px}
 #pile{position:absolute;right:8px;bottom:6px;z-index:6;display:flex}
@@ -411,6 +411,7 @@ html .seat .nm,html .me .nm{background:rgba(2,18,42,.92);color:#fff;border-radiu
 #table.drop{box-shadow:inset 0 0 0 3px rgba(255,216,115,.65),inset 0 0 30px rgba(255,216,115,.35)}
 /* my seat, along the bottom */
 #mine{flex:0 0 auto;display:flex;align-items:center;gap:6px;padding:3px 6px 0;min-height:48px}
+#mine{position:relative}#mine #bulbbtn{position:absolute;right:6px;top:3px;width:44px;height:44px;min-width:44px;border-radius:50%;padding:0;background:rgba(255,255,255,.1);border:2px solid var(--line);z-index:3}
 #mine .me{flex:0 0 auto;display:flex;align-items:center;gap:6px;cursor:pointer;background:rgba(6,24,52,.6);border:2px solid rgba(160,205,255,.25);border-radius:14px;padding:2px 8px 2px 4px;min-height:46px;min-width:46px;color:inherit;font:inherit}
 #mine .me.act{border-color:var(--gold);box-shadow:0 0 0 2px rgba(255,216,115,.4),0 0 14px rgba(255,216,115,.5)}
 #mine .me .av{width:36px;height:36px}
@@ -425,9 +426,9 @@ html.ph #mine .mjobs .jc{min-height:40px}
 #handz{touch-action:none}
 .hc{touch-action:none;-webkit-user-select:none;user-select:none}
 .hc.dim::before{content:'';position:absolute;inset:0;border-radius:8px;background:rgba(2,10,28,.5);z-index:2;pointer-events:none}
-.hc.glow::after{content:'';position:absolute;inset:-1px;border-radius:9px;border:3px solid rgba(255,216,115,.95);box-shadow:0 0 12px rgba(255,216,115,.85);pointer-events:none;animation:glowp 1.3s ease-in-out infinite}
+.hc.glow::after{content:'';position:absolute;inset:-1px;border-radius:9px;border:3px solid var(--pick);box-shadow:0 0 10px rgba(150,225,255,.75);pointer-events:none}
 .hc.drag{transition:none!important;z-index:100!important}
-.pspot{position:absolute;left:3px;top:-25px;width:clamp(22px,calc(var(--hw)*.5),30px);height:clamp(22px,calc(var(--hw)*.5),30px);z-index:5;cursor:pointer;filter:drop-shadow(0 0 5px rgba(60,220,140,.95));animation:glowp 1.2s ease-in-out infinite}
+.pspot{position:absolute;left:3px;top:-25px;width:clamp(22px,calc(var(--hw)*.5),30px);height:clamp(22px,calc(var(--hw)*.5),30px);z-index:5;cursor:pointer;filter:drop-shadow(0 0 5px rgba(60,220,140,.95));animation:glowp 1.2s ease-in-out 3}
 .pspot svg{width:100%;height:100%;pointer-events:none}
 .hc.r2 .pspot{top:auto;bottom:2px;left:2px}
 @keyframes glowp{50%{filter:brightness(1.25) drop-shadow(0 0 7px rgba(255,216,115,.9))}}
@@ -436,9 +437,9 @@ html.ph #mine .mjobs .jc{min-height:40px}
 #finger{position:fixed;left:0;top:0;z-index:60;pointer-events:none;width:34px;height:46px;margin:-5px 0 0 -13px;opacity:0}
 #finger svg{width:100%;height:100%;filter:drop-shadow(0 3px 4px rgba(0,0,0,.55))}
 #finger .fring{position:absolute;left:-3px;top:-12px;width:28px;height:28px;border-radius:50%;border:3px solid rgba(255,255,255,.9);opacity:0}
-#finger.tap.go{animation:fgtap 1.8s ease-in-out infinite}
-#finger.tap.go .fring{animation:fgring 1.8s ease-out infinite}
-#finger.drag.go{animation:fgdrag 2.2s ease-in-out infinite}
+#finger.tap.go{animation:fgtap 1.8s ease-in-out 3}
+#finger.tap.go .fring{animation:fgring 1.8s ease-out 3}
+#finger.drag.go{animation:fgdrag 2.2s ease-in-out 3}
 @keyframes fgtap{0%{opacity:0;transform:translate(0,14px)}15%{opacity:1;transform:translate(0,14px)}35%{transform:translate(0,0) scale(.92)}50%{transform:translate(0,0) scale(1)}85%{opacity:1}100%{opacity:0;transform:translate(0,0)}}
 @keyframes fgring{0%,33%{opacity:0;transform:scale(.4)}40%{opacity:.9}80%{opacity:0;transform:scale(1.6)}100%{opacity:0}}
 @keyframes fgdrag{0%{opacity:0;transform:translate(0,10px)}12%{opacity:1;transform:translate(0,0)}22%{transform:translate(0,0) scale(.92)}68%{opacity:1;transform:translate(0,calc(var(--dist,100px)*-1)) scale(.92)}84%{opacity:0;transform:translate(0,calc(var(--dist,100px)*-1)) scale(1)}100%{opacity:0}}
@@ -548,7 +549,7 @@ html.sk .btn.gxt-menu{border-image:url(media/ui-row-c.webp) 30 fill/12px 12px 12
 html.sk .gxh-arr{pointer-events:none;width:20px;height:14px;border:0;background:url(media/ui-bubble-tail.webp) center/contain no-repeat;transform:rotate(-20deg)}
 
 /* one instruction line: the help tip replaces the top line while it is showing */
-body:has(.gxh-bub.on) #prompt{visibility:hidden}
+body:has(.gxh-bub.on:not(.gxh-bulbb)) #prompt{visibility:hidden}   /* F1: a coach bubble replaces the line; the bulb answer (it points at the hand) keeps it */
 /* UI-BAR: help bubble button never covers its text; job chips wrap instead of cutting */
 @media (max-height:620px){.gxh-bub .gxh-tx{padding-right:84px}}
 .jc{white-space:normal;min-height:26px;padding-top:2px;padding-bottom:2px}
@@ -725,11 +726,20 @@ html.sk .gx-drawer-head button.gx-x{background:#0b1f3a!important;border-image:no
 #bd:not(.side) #mine{flex-wrap:wrap;row-gap:2px}
 #bd:not(.side) #mine .mjobs{flex:1 1 100%;flex-wrap:wrap;overflow:visible;padding:2px 2px 2px 2px;gap:4px}
 #bd:not(.side) #mine .mjobs:empty{display:none}
-#bd:not(.side) #mine .mjobs .jc{flex:1 1 auto;max-width:100%;min-height:34px}
+#bd:not(.side) #mine .mjobs .jc{flex:1 1 auto;max-width:100%;min-height:44px}
 #bd:not(.side) #mine .mjobs .jc .t{display:block;-webkit-line-clamp:unset;overflow:visible;white-space:normal}
 }
 /* R13: a crewmate's job chip wraps instead of clipping at 3 lines ("Exactly three Lanterns") */
 @media (max-width:520px){html .seat .jc .t{display:block;-webkit-line-clamp:unset;overflow:visible;white-space:normal}html .seat .jc{overflow:visible;height:auto}}
+/* F1: short phones: a seat's cards and tricks share one line (icon + number), so the trick keeps room above a two-row hand */
+html.ph-short .seat:not(.drone) .bdgs{flex-direction:row;align-items:center;justify-content:flex-start;gap:4px}html.ph-short .seat:not(.drone) .bdg .bl{display:none}
+/* F1: short phones: your seat, signal token and job chips share one row (44 px chips), so the table keeps over half the screen */
+html.ph-short #bd:not(.side) #mine{flex-wrap:nowrap}html.ph-short #bd:not(.side) #mine .mjobs{flex:1 1 0;min-width:0}
+html.ph-short #mine .me .who .nm,html.ph-short #mine .sigst .sgt{display:none}
+#mine:has(> #bulbbtn:not([hidden])){padding-right:56px}
+html.ph-short #bd:not(.side) #mine .mjobs{flex-wrap:nowrap}html.ph-short #bd:not(.side) #mine .mjobs .jc{flex:1 1 0;min-width:0}
+html.ph-short #bd:not(.side) #mine .mjobs:has(.jc:nth-child(3)){flex-wrap:wrap}html.ph-short #bd:not(.side) #mine .mjobs:has(.jc:nth-child(3)) .jc{flex:1 1 40%}
+html.ph-short #mine .me .bdg .bl{display:none}
 
 /* ===== GX campaign styles: chapter map, story scenes, boss card, result. Theme with the --gxc-* variables. ===== */
 :root{--gxc-bg:#1b1410;--gxc-paper:#efe0bd;--gxc-paper2:#e2cc9b;--gxc-ink:#2a1d10;--gxc-dim:rgba(42,29,16,.68);--gxc-line:rgba(60,38,14,.28);
@@ -3973,6 +3983,52 @@ fn mainFragment(
     ]
   });
 
+  // F1: two divers + the drone (seed 6: you are the Captain). Drive the game to a state with real moves (the computer's choice for you), no menus, tips off.
+  function two(until) {
+    try { GXH.setEnabled(false); } catch (e) { }
+    try { GX.close(); } catch (e) { }
+    try { ['vote', 'handover', 'volunteer', 'predict', 'murky', 'narc', 'clock', 'drone'].forEach(ruleMark); } catch (e) { }
+    AIDELAY = 120; UI.seed = 6; newGame('vs', { np: 2, mission: 5, kind: 'log', level: 'normal', noGoal: 1 }); try { UI.coach.level = 'off'; } catch (e) { }
+    try { GXH.setEnabled(false); GXH.hide(); } catch (e) { }
+    render();
+    var t0 = Date.now();
+    return new Promise(function (res, rej) {
+      (function step() {
+        if (Date.now() - t0 > 40000) return rej(new Error('two-diver state not reached: ' + G.phase));
+        if (UI.started && !UI.busy && !UI.cards.length && until()) return setTimeout(res, 900);
+        try {
+          var rd = document.querySelector('#acts [data-a="ready"]'); if (rd && !UI.busy) rd.click();
+          else if (UI.started && !UI.busy && iMustAct() && !until()) { var m = LD.AI.choose(G, viewSeat(), 'normal'); if (m) doMove(m); }
+        } catch (e) { }
+        setTimeout(step, 150);
+      })();
+    });
+  }
+  var over = function (a, b, m) { return a.left < b.right - m && a.right > b.left + m && a.top < b.bottom - m && a.bottom > b.top + m; };
+  GXS.add({
+    id: 'ld-two-jobs', name: 'Two divers: the job pool', ask: 'Can you see and tap every job?', seed: 6, when: booted,
+    setup: function () { return two(function () { return G.phase === 'assign' && myMoves().some(function (m) { return m.t === 'take'; }) && $('#pool .jcard.glow'); }); },
+    checks: [
+      { kind: 'visible', sel: '#pool .jcard.glow', name: 'job to take' },
+      { kind: 'fn', name: 'every job card is whole, inside the table and tappable', fn: function () { var T = $('#table').getBoundingClientRect(), bad = ''; [].forEach.call(document.querySelectorAll('#pool .jcard'), function (c, i) { var r = c.getBoundingClientRect(); if (r.top < T.top - 1 || r.bottom > T.bottom + 1 || r.left < -1 || r.right > innerWidth + 1) bad = bad || 'job ' + i + ' cut ' + [r.left, r.top, r.right, r.bottom].map(Math.round); var t = document.elementFromPoint(r.left + r.width / 2, r.top + r.height / 2); if (!t || t.closest('.jcard') !== c) bad = bad || 'job ' + i + ' covered by ' + (t && (t.className || t.tagName)); }); return !bad || bad; } },
+      { kind: 'fn', name: 'no seat covers a job card', fn: function () { var bad = ''; [].forEach.call(document.querySelectorAll('#opp .seat'), function (s) { var a = s.getBoundingClientRect(); [].forEach.call(document.querySelectorAll('#pool .jcard'), function (c) { if (over(a, c.getBoundingClientRect(), 2)) bad = bad || 'a seat covers a job'; }); }); return !bad || bad; } },
+      skin
+    ]
+  });
+  GXS.add({
+    id: 'ld-two-drone', name: 'Two divers: the drone plays', ask: 'Can you see the drone\'s cards?', seed: 6, when: booted,
+    setup: function () { return two(function () { return G.phase === 'play' && G.players[G.trick.turn].helper && ctlSeat(G.trick.turn) === viewSeat() && iMustAct(); }); },
+    checks: [
+      { kind: 'text', sel: '#prompt', re: /drone/i, name: 'prompt asks for a drone card' },
+      { kind: 'visible', sel: '#opp .dc.can', name: 'a playable drone card' },
+      { kind: 'fn', name: 'every face-up drone card shows its face', fn: function () { var cs = [].slice.call(document.querySelectorAll('#opp .dc')); if (!cs.length) return 'no drone cards'; for (var i = 0; i < cs.length; i++) { var sv = cs[i].querySelector('svg'); if (!sv) return 'card ' + i + ' has no picture'; var st = getComputedStyle(sv), r = sv.getBoundingClientRect(); if (st.visibility === 'hidden' || st.display === 'none' || +st.opacity < .5 || r.width < 20) return 'card ' + i + ' face hidden (' + st.visibility + ', ' + Math.round(r.width) + ' px)'; var t = document.elementFromPoint(r.left + r.width / 2, r.top + r.height * .3); if (!t || !cs[i].contains(t)) return 'card ' + i + ' covered by ' + (t && (t.className || t.tagName)); } return true; } },
+      { kind: 'fn', name: 'the drone row never covers the trick', fn: function () { var d = $('#opp .seat.drone').getBoundingClientRect(), bad = ''; [].forEach.call(document.querySelectorAll('.tslot'), function (t) { if (over(d, t.getBoundingClientRect(), 2)) bad = 'drone row over a trick slot'; }); return !bad || bad; } },
+      { kind: 'fn', name: 'trick cards >= 40 px wide', fn: function () { var t = $('.tslot'); var w = t && t.getBoundingClientRect().width; return w >= 40 || 'trick slot ' + Math.round(w) + ' px'; } },
+      { kind: 'tap', sel: '#opp .dc.can', name: 'tap plays the drone card', state: function () { return G.trick.plays.length + ':' + G.tricks.length; }, expect: function (a, b) { return a !== b || 'the drone card did not play'; } },
+      skin
+    ]
+  });
+
 })();
 
 </script>
@@ -5555,14 +5611,14 @@ const TASKS = [
   /* 4 */ J([2, 2, 2], 'Win fewer tricks than the Captain does.', { k: 'cmp', op: 'fewer', vs: 'cap', cap: 0 }),
   /* 5 */ J([4, 3, 3], 'Win exactly as many tricks as the Captain does.', { k: 'cmp', op: 'eq', vs: 'cap', cap: 0 }),
   /* 6 */ J([2, 3, 3], 'Win a trick where every card is below 7. No Lanterns.', { k: 'trick', p: 'lt', v: 7 }),
-  /* 7 */ J([2, 3, 4], 'Win a trick where every card is above 5.', { k: 'trick', p: 'gt', v: 5 }),
-  /* 8 */ J([2, 3, 3], 'Win a trick by playing a 6.', { k: 'with', v: 6 }),
-  /* 9 */ J([2, 3, 4], 'Win a trick by playing a 5.', { k: 'with', v: 5 }),
-  /* 10 */ J([3, 4, 5], 'Win a trick by playing a 3.', { k: 'with', v: 3 }),
+  /* 7 */ J([2, 3, 4], 'Win a trick where every card is above 5. No Lanterns.', { k: 'trick', p: 'gt', v: 5 }),
+  /* 8 */ J([2, 3, 3], 'Win a trick by playing a colour 6.', { k: 'with', v: 6 }),
+  /* 9 */ J([2, 3, 4], 'Win a trick by playing a colour 5.', { k: 'with', v: 5 }),
+  /* 10 */ J([3, 4, 5], 'Win a trick with a colour 3, not a Lantern.', { k: 'with', v: 3 }),
   /* 11 */ J([1, 2, 2], 'Win a 5 using your 7.', { k: 'with', v: 7, cp: 5 }),
   /* 12 */ J([3, 4, 5], 'Win an 8 using your 4.', { k: 'with', v: 4, cp: 8 }),
   /* 13 */ J([2, 3, 4], 'Win a 6 using your own 6.', { k: 'with', v: 6, cp: 6 }),
-  /* 14 */ J([3, 4, 5], 'Win a trick by playing a 2.', { k: 'with', v: 2 }),
+  /* 14 */ J([3, 4, 5], 'Win a trick with a colour 2, not a Lantern.', { k: 'with', v: 2 }),
   /* 15 */ J([1, 1, 1], 'Win the Coral 3.', { k: 'cards', cs: [card(CO, 3)] }),
   /* 16 */ J([1, 1, 1], 'Win the Sunstar 1.', { k: 'cards', cs: [card(SU, 1)] }),
   /* 17 */ J([1, 1, 1], 'Win the Tide 4.', { k: 'cards', cs: [card(TI, 4)] }),
@@ -5593,8 +5649,8 @@ const TASKS = [
   /* 42 */ J([2, 2, 2], 'Win no Coral cards.', { k: 'avoidc', cs: [CO] }),
   /* 43 */ J([2, 3, 4], 'Win a card of every colour. Lanterns do not count.', { k: 'allcol' }),
   /* 44 */ J([3, 4, 5], 'Win every card of at least one colour.', { k: 'onecol' }),
-  /* 45 */ J([2, 5, 6], 'Win a trick with only even numbers (2, 4, 6, 8).', { k: 'trick', p: 'even' }),
-  /* 46 */ J([2, 4, 5], 'Win a trick with only odd numbers (1, 3, 5, 7, 9).', { k: 'trick', p: 'odd' }),
+  /* 45 */ J([2, 5, 6], 'Win a trick with only even numbers (2, 4, 6, 8). No Lanterns.', { k: 'trick', p: 'even' }),
+  /* 46 */ J([2, 4, 5], 'Win a trick with only odd numbers (1, 3, 5, 7, 9). No Lanterns.', { k: 'trick', p: 'odd' }),
   /* 47 */ J([3, 3, 4], 'Win a trick over 23 (3 divers), 28 (4) or 31 (5). No Lanterns.', { k: 'trick', p: 'sumgt', th: [23, 28, 31] }),
   /* 48 */ J([3, 3, 4], 'Win a trick under 8 (3 divers), 12 (4) or 16 (5). No Lanterns.', { k: 'trick', p: 'sumlt', th: [8, 12, 16] }),
   /* 49 */ J([3, 3, 4], 'Win a trick that adds up to 22 or 23. No Lanterns.', { k: 'trick', p: 'sumeq', vs: [22, 23] }),
@@ -5645,7 +5701,7 @@ const TASKS = [
   /* 94 */ J([1, 1, 1], 'Win more Sunstar than Tide cards. Zero Tide is fine.', { k: 'morecol', a: SU, b: TI }),
   /* 95 */ J([1, 1, 1], 'Win more Coral than Kelp cards. Zero Kelp is fine.', { k: 'morecol', a: CO, b: KE })
 ];
-const SHORT = ['Most tricks', 'More than all others', 'Fewest tricks', 'More than Captain', 'Fewer than Captain', 'Same as Captain', 'Trick all below 7', 'Trick all above 5', 'Win with a 6', 'Win with a 5', 'Win with a 3', 'Win a 5 with a 7', 'Win an 8 with a 4', 'Win a 6 with a 6', 'Win with a 2',
+const SHORT = ['Most tricks', 'More than all others', 'Fewest tricks', 'More than Captain', 'Fewer than Captain', 'Tie Captain\'s tricks', 'Trick all below 7', 'Trick all above 5', 'Colour 6 wins', 'Colour 5 wins', 'Colour 3 wins', 'Your 7 wins a 5', 'Your 4 wins an 8', 'Your 6 wins a 6', 'Colour 2 wins',
   'Coral 3', 'Sunstar 1', 'Tide 4', 'Kelp 6', 'All four 3s', 'Three or more 5s', 'Three or more 9s', 'Two or more 7s', 'All four 9s', 'Exactly three 6s', 'Exactly two 9s', 'Tide 1, 2, 3', 'Tide 6 + Sunstar 7', 'Coral 5 + Sunstar 6', 'Kelp 5 + Tide 8', 'Tide 5 + Coral 8', 'Coral 9 + Sunstar 8', 'Coral 1 + Kelp 7', 'Sunstar 9 + Tide 7', 'Kelp 3, Sunstar 4+5', 'Kelp 2 in last trick',
   'One Coral, one Kelp', '7+ Sunstar cards', '5+ Coral cards', 'Exactly 2 Kelp', 'Exactly 2 Tide', 'Exactly 1 Coral', 'No Coral', 'One of each colour', 'A whole colour', 'Trick of evens', 'Trick of odds', 'High-total trick', 'Low-total trick', 'Trick of 22 or 23', 'Exactly one Lantern', 'Lantern 1 only', 'Lantern 2 only', 'Lantern 3', 'Exactly two Lanterns', 'Exactly three Lanterns', 'No Lanterns', 'Coral 7 by Lantern', 'Kelp 9 by Lantern',
   'Lead no Coral/Sun/Tide', 'Lead no Coral/Kelp', 'No Kelp', 'No Sunstar', 'No Coral or Tide', 'No Sunstar or Kelp', 'No 8s or 9s', 'No 9s', 'No 5s', 'No 1s', 'No 1s, 2s, 3s', 'None of first four', 'None of first three', 'None of first five', 'No tricks', 'Never two in a row', 'The last trick', 'First three tricks', 'First two tricks', 'The first trick', 'First and last', 'Only the last', 'Only the first', 'Exactly 1 trick', 'Exactly 2 tricks', '2 tricks in a row', '3 tricks in a row', 'Exactly 4 tricks', 'Exactly 3 in a row', 'Exactly 2 in a row', 'Predict (open)', 'Predict (secret)', 'Coral = Sunstar', 'Kelp = Sunstar in a trick', 'Coral = Tide in a trick', 'Sunstar over Tide', 'Coral over Kelp'];
@@ -5664,7 +5720,7 @@ const MISSIONS = [
   M(5, 'Five Chambers', 5, { brief: 'Check all five chambers of the base.' }),
   M(6, 'One Diver Swims Alone', 5, { sel: 'vote', rule: 'Agree on one diver to take every job. Do not talk about cards.', brief: 'A porthole opened too early. Fix it fast.' }),
   M(7, 'Mapping the Slope', 6, { brief: 'Your first real trip. Map the ground around the base.' }),
-  M(8, 'Share the Pearls', 6, { guess: 1, gap: { v: 9, gap: 2 }, rule: 'No diver may ever hold two more 9s than another diver.', brief: 'The pearls are running out. Share them fairly.' }),
+  M(8, 'Share the Pearls', 6, { guess: 1, gap: { v: 9, gap: 2 }, rule: 'No diver may ever win two more 9s than another diver.', brief: 'The pearls are running out. Share them fairly.' }),
   M(9, 'The Old Wreck', 7, { cmt: 'murky', rule: 'Murky water: show a card, but put the signal token beside it, spent side up.', brief: 'An old ship lies close by. Strong currents blur your signals.' }),
   M(10, 'The Inscription', 4, { sel: 'cmd', rule: 'The Captain takes every job, or hands them all to a willing diver. If handed over, signal before the first trick.', brief: 'Inside the wreck is a carved tablet, broken at the bottom.' }),
   M(11, 'Whispers', 8, { cmt: 'narc', rule: 'Deep narcosis: signal tokens sit in the middle, two fewer than divers. Anyone may take one between tricks and signal at once. One diver may signal many times.', brief: 'The base answered. Only you are surprised. Switch to a private channel.' }),
@@ -5676,8 +5732,8 @@ const MISSIONS = [
   M(17, 'The Singing Statues', 9, { sel: 'free', rule: 'Open briefing: talk about who takes which job. Never talk about cards. One diver may take all jobs.', brief: 'The statues are older than any record. Work as one team.' }),
   M(18, 'The Hollow', 9, { brief: 'The next chamber is close. Something feels wrong.' }),
   M(19, 'The Narrow Cave', 9, { sel: 'hard', rule: 'The Captain takes the hardest job first.', brief: 'A drone found a maze of tunnels. Some fit only one diver.' }),
-  M(20, 'The Labyrinth', 10, { cmt: 'unknown', gap: { v: 1, gap: 2 }, rule: 'Unknown waters: draw a colour card before dealing. 1-3 normal, 4-6 murky water, 7-9 deep narcosis. No diver may ever hold two more 1s than another diver.', brief: 'The tunnels keep forking. The radio keeps cutting out.' }),
-  M(21, 'Echoes', 10, { guess: 1, cmt: 'unknown', gap: { v: 1, gap: 2 }, rule: 'Unknown waters: draw a colour card first. 1-3 normal, 4-6 murky, 7-9 deep narcosis. No diver may ever hold two more 1s than another diver.', brief: 'The base computer finished its scan. It has named itself.' }),
+  M(20, 'The Labyrinth', 10, { cmt: 'unknown', gap: { v: 1, gap: 2 }, rule: 'Unknown waters: draw a colour card before dealing. 1-3 normal, 4-6 murky water, 7-9 deep narcosis. No diver may ever win two more 1s than another diver.', brief: 'The tunnels keep forking. The radio keeps cutting out.' }),
+  M(21, 'Echoes', 10, { guess: 1, cmt: 'unknown', gap: { v: 1, gap: 2 }, rule: 'Unknown waters: draw a colour card first. 1-3 normal, 4-6 murky, 7-9 deep narcosis. No diver may ever win two more 1s than another diver.', brief: 'The base computer finished its scan. It has named itself.' }),
   M(22, 'The Sunken Archive', 11, { cmt: 'unknown', rule: 'Unknown waters: draw a colour card first (1-3 normal, 4-6 murky, 7-9 deep narcosis).', brief: 'Rooms full of shelves. Nobody you know built them.' }),
   M(23, 'Single File', 11, { guess: 1, cmt: 'unknown', m23: 1, rule: 'Unknown waters: draw a colour card first. Signal just before trick 2. The first trick\'s winner must always have the most tricks.', brief: 'A narrow, dangerous bend. Follow the leader.' }),
   M(24, 'Cold Rations', 12, { cmt: 'unknown', rule: 'Unknown waters: draw a colour card first (1-3 normal, 4-6 murky, 7-9 deep narcosis).', brief: 'Not deep now, but it feels deep. Dinner is paste in a tube.' }),
@@ -5698,7 +5754,7 @@ const BLURBS = [
   { story: 'Sumi studies deep-sea fish. She signals the moment she sees something useful.', enjoy: 'Pick Sumi for a teammate who signals a lot.', lv: 'normal' },
   { story: 'Dag is new to diving and takes every job he can. He is cheerful about it.', enjoy: 'Pick Dag for a relaxed first dive.', lv: 'easy' }
 ];
-const HELPER = { name: 'Echo', story: 'Echo is the little drone that rides along on two-diver dives. Its cards lie face up in two rows. The Captain flies it.' };
+const HELPER = { name: 'Echo', story: 'Echo is the little drone that rides along on two-diver dives. Its 14 cards lie in pairs: 7 face up on top of 7 face down. The Captain flies it.' };
 const DATA = {
   // the staged tutorial's fixed deal (ui12 / tutor.js): you are the Captain (Lantern 4). Jobs: you "Win the Lantern 3", Dag "Win the first trick".
   tutorial: { tasks: [53, 78], hands: ['L4 L3 C2 C6 C9 K3 K5 K8 S1 S2 S4 S7 S9', 'L2 C4 C5 C7 T2 T4 T6 T9 K4 K7 S3 S5 S6', 'L1 C1 C3 C8 T1 T3 T5 T7 T8 K1 K2 K6 K9 S8'] },
@@ -7930,7 +7986,7 @@ function fingerTarget() {
 }
 function placeFinger() {
   const f = $('#finger'); if (!f) return;
-  const t = fingerTarget(); if (!t) { f.hidden = true; _fing = ''; return; }
+  const t = document.querySelector('.gxh-bub.on,.gxt-bub') ? null : fingerTarget(); if (!t) { f.hidden = true; _fing = ''; return; }   // F1: never beside an open bubble
   const el = document.querySelector(t.sel); if (!el) { f.hidden = true; return; }
   const r = el.getBoundingClientRect(); if (r.width < 4) { f.hidden = true; return; }
   const dist = t.kind === 'drag' ? Math.max(60, Math.min(170, r.top - ($('#table').getBoundingClientRect().top + 90))) : 0;
@@ -7969,6 +8025,18 @@ document.addEventListener('pointerdown', e => { if (UI.pop && !tutOn() && e.targ
   document.addEventListener('pointerup', end, true); document.addEventListener('pointercancel', end, true);
   window.addEventListener('click', e => { if (UI.noClickUntil && Date.now() < UI.noClickUntil) { e.stopPropagation(); e.preventDefault(); } }, true);
 })();
+// F1 calm: one helper at a time. A coach bubble, a bulb answer or a New-rule step (all added to <body>) hides the ghost finger; it comes back when they go.
+(function () {
+  if (typeof MutationObserver === 'undefined') return;
+  let busyT = 0;
+  new MutationObserver(() => {
+    if (busyT) return; busyT = setTimeout(() => { busyT = 0;
+      const f = $('#finger'); if (!f) return;
+      if (document.querySelector('.gxh-bub.on,.gxt-bub,#rstep')) { if (!f.hidden) { f.hidden = true; _fing = ''; } }
+      else if (f.hidden && G && UI.started) { try { placeFinger(); } catch (e) { } }
+    }, 30);
+  }).observe(document.body, { childList: true });
+})();
 // ===================== part 11: help (gx-help kit): coach bubbles the first time, the lightbulb on demand =====================
 // Bubbles: once per phase, short, pointing at the board. The bulb: the computer diver's own choice for you (LD.AI.choose, the same one that plays the
 // computer seats) + a short why + rules cards. Where the advisor has no safe call (signals, votes, passing) the bulb shows only the rules cards.
@@ -8003,12 +8071,12 @@ const HLP_STEPS = {
   jobsAsk: { target: hfirst('#acts .btn.go', '#acts .btn'), title: 'Your choice', text: 'Tap a button below. Each one says what happens next.', pic: () => HP.job() },
   vote: { target: hfirst('.seat.glow', '.me.glow'), title: 'Vote for a diver', text: 'Tap the diver who takes every job. You may pick yourself.', pic: () => HP.vote() },
   flare: { target: hfirst('#acts [data-a=dist]'), title: 'Distress flare?', text: 'Optional. Pass cards to a neighbour, or skip.', pic: () => HP.flare() },
-  pass: { target: hfirst('#hand .hc.glow', '#hand .hc'), title: 'Pass a card', text: 'Tap a colour card to pass to your neighbour. No Lanterns.', pic: () => HP.c(1, 5) },
+  pass: { target: () => hhull('#hand .hc.glow')() || hfirst('#hand .hc')(),   /* F1: the bubble points at the whole playable group, so it never sits on one of them */ title: 'Pass a card', text: 'Tap a colour card to pass to your neighbour. No Lanterns.', pic: () => HP.c(1, 5) },
   predict: { target: hfirst('#acts .btn'), title: 'Predict your tricks', text: 'Tap how many tricks you will win. You need exactly that many.', pic: () => HP.num('?') },
   signal: { target: hfirst('#acts [data-a=signal]', '#acts [data-a=nosig]'), title: 'Signal your crew', text: 'Tap Signal to show a card, or tap No signal.', pic: () => HP.ping('') },
-  lead: { target: hfirst('#hand .hc.glow', '#hand .hc'), title: 'You lead', text: 'Tap a glowing card to play it. Everyone follows its colour.', pic: () => HP.c(0, 7) },
-  follow: { target: hfirst('#hand .hc.glow', '#hand .hc'), title: 'Follow the colour', text: 'Play the led colour. Dim cards are blocked.', pic: () => HP.c(1, 6) },
-  free: { target: hfirst('#hand .hc.glow', '#hand .hc'), title: 'Play anything', text: 'You have none of that colour. Play any card. A Lantern wins the trick.', pic: () => HP.lan(2) },
+  lead: { target: () => hhull('#hand .hc.glow')() || hfirst('#hand .hc')(),   /* F1: the bubble points at the whole playable group, so it never sits on one of them */ title: 'You lead', text: 'Tap a glowing card to play it. Everyone follows its colour if they can.', pic: () => HP.c(0, 7) },
+  follow: { target: () => hhull('#hand .hc.glow')() || hfirst('#hand .hc')(),   /* F1: the bubble points at the whole playable group, so it never sits on one of them */ title: 'Follow the colour', text: 'Play the led colour. Dim cards are blocked.', pic: () => HP.c(1, 6) },
+  free: { target: () => hhull('#hand .hc.glow')() || hfirst('#hand .hc')(),   /* F1: the bubble points at the whole playable group, so it never sits on one of them */ title: 'Play anything', text: 'You have none of that colour. Play any card. A Lantern wins, unless a higher Lantern is played.', pic: () => HP.lan(2) },
   drone: { target: hfirst('#opp .dc.can', '#opp .dc'), title: 'Play for the drone', text: 'The drone is on your team. Tap one of its glowing cards.', pic: () => HP.drone() }
 };
 // ---------------------------------------------------------------- the rules cards (<= 20 words each, a picture each)
@@ -8024,19 +8092,19 @@ const HLP_RULES = [
   { phase: 'vote', title: 'Vote', text: 'Vote for the diver who takes every job. You may vote for yourself.', pic: () => hpics([['vote', 'Your vote'], '>', ['job', 'All jobs']]) },
   { phase: 'vote', title: 'No card talk', text: 'Talk about the plan. Never talk about your cards.', pic: () => hpics([['hand', 'Hidden'], ['cross', 'No talk']]) },
   { phase: 'flare', title: 'The distress flare', text: 'Optional. Before signals, every diver passes one colour card to a neighbour.', pic: () => hpics([['flare', 'Flare'], '>', ['c', 'Pass', 2, 5]]) },
-  { phase: 'flare', title: 'Left or right', text: 'Everyone passes the same way. You cannot pass Lanterns.', pic: () => hpics([['c', 'Left', 3, 3], ['lan', 'Never', 3]]) },
+  { phase: 'flare', title: 'Left or right', text: 'Everyone passes the same way. Two divers swap. No Lanterns.', pic: () => hpics([['c', 'Left', 3, 3], ['lan', 'Never', 3]]) },
   { phase: 'flare', title: 'It costs an attempt', text: 'The flare adds one attempt to the logbook. Skipping it is fine.', pic: () => hpics([['flare', 'Flare'], '>', ['num', 'Extra try', '+1']]) },
   { phase: 'pass', title: 'Pass a card', text: 'Pick a colour card to pass to your neighbour. You cannot pass Lanterns.', pic: () => hpics([['c', 'Pass', 2, 6], '>', ['vote', 'Neighbour']]) },
   { phase: 'pass', title: 'Pass to help', text: 'Pass a card their jobs need. Keep the cards yours need.', pic: () => hpics([['job', 'Their job'], '>', ['c', 'Give', 1, 8]]) },
   { phase: 'predict', title: 'An exact count', text: 'Win exactly the number of tricks you predicted.', pic: () => hpics([['num', 'Predict', 2], '>', ['tick', 'Exactly 2']]) },
   { phase: 'predict', title: 'Count your strength', text: 'High cards and Lanterns win tricks. Few of them? Predict low.', pic: () => hpics([['lan', 'Wins', 3], ['c', 'Wins', 0, 9], ['c', 'Loses', 0, 2]]) },
-  { phase: 'signal', title: 'The signal', text: 'Once per dive, show one colour card to the crew. It stays in your hand.', pic: () => hpics([['c', 'Your card', 1, 9], '>', ['ping', 'Shown', 'top']]) },
+  { phase: 'signal', title: 'The signal', text: 'Once per attempt, show one colour card to the crew. It stays in your hand.', pic: () => hpics([['c', 'Your card', 1, 9], '>', ['ping', 'Shown', 'top']]) },
   { phase: 'signal', title: 'Highest, lowest, only', text: 'Show only your highest, lowest or only card of a colour. The token says which.', pic: () => hpics([['ping', 'Highest', 'top'], ['ping', 'Only', 'mid'], ['ping', 'Lowest', 'bot']]) },
   { phase: 'signal', title: 'Between tricks only', text: 'Signal between tricks only. You cannot show Lanterns.', pic: () => hpics([['lan', 'Never', 2], ['ping', 'Between tricks', 'mid']]) },
   { phase: 'lead', title: 'Leading a trick', text: 'Lead any card. Everyone must follow its colour if they can.', pic: () => hpics([['c', 'You lead', 0, 5], '>', ['c', 'Follow', 0, 8]]) },
   { phase: 'lead', title: 'Who wins a trick', text: 'The highest card of the led colour wins. Other colours never win. The winner leads next.', pic: () => hpics([['c', 'Led', 2, 4], ['c', 'Higher', 2, 9], ['c', 'Never wins', 1, 9]]) },
   { phase: 'lead', title: 'Lanterns are trumps', text: 'A Lantern beats every colour. The highest Lantern wins.', pic: () => hpics([['c', 'Colour', 3, 9], ['lan', 'Beats it', 2]]) },
-  { phase: 'lead', title: 'Show a card (signal)', text: 'Once per dive, between tricks, show your highest, lowest or only card of a colour.', pic: () => hpics([['c', 'Colour card', 1, 9], '>', ['ping', 'Signal', 'top']]) },
+  { phase: 'lead', title: 'Show a card (signal)', text: 'Once per attempt, between tricks, show your highest, lowest or only card of a colour.', pic: () => hpics([['c', 'Colour card', 1, 9], '>', ['ping', 'Signal', 'top']]) },
   { phase: 'follow', title: 'Follow the colour', text: 'If you have the led colour, you must play it. Dim cards are blocked.', pic: () => hpics([['c', 'Led', 1, 4], '>', ['c', 'You play', 1, 7]]) },
   { phase: 'follow', title: 'You never have to win', text: 'Play low to let a teammate win.', pic: () => hpics([['c', 'Low', 1, 2], ['c', 'High', 1, 9]]) },
   { phase: 'follow', title: 'Lanterns are trumps', text: 'A Lantern beats every colour. The highest Lantern wins.', pic: () => hpics([['c', 'Colour', 1, 9], ['lan', 'Beats it', 1]]) },
@@ -8092,7 +8160,7 @@ function hlpPlan() {
   if (G.phase === 'play' && m.t === 'play') {
     const T = G.trick; if (G.players[T.turn].helper || ctlSeat(T.turn) !== v) return null;
     const card = () => document.querySelector('#hand .hc[data-id="' + m.c + '"]'), slot = () => document.querySelector('.tslot[data-seat="' + v + '"]') || document.querySelector('#felt');
-    return { m, from: card, to: slot, why: () => hlpPlayWhy(v, m.c) };
+    return { m, to: card, why: () => hlpPlayWhy(v, m.c) };   // F1: the bubble points at the card to play (in the hand), so it never sits on the trick it talks about
   }
   if (G.phase === 'assign' && m.t === 'take') {
     const el = () => document.querySelector('#pool [data-key="job' + m.i + '"]');
@@ -8105,6 +8173,7 @@ function hlpPlan() {
   return null;
 }
 function hlpSuggest() {
+  try { fingerDone(); } catch (e) { }   // F1: one helper at a time: the bulb's bubble replaces the ghost finger
   const p = hlpPlan(); if (!p || !p.to || !p.to()) return null;
   const why = p.why(); if (!why || capW(why, 15) === '') return null;
   return { why, key: p.m.t + ':' + (p.m.c !== undefined ? p.m.c : p.m.i !== undefined ? p.m.i : p.m.on), target: p.to, from: p.from && p.from() ? p.from : null };
@@ -8113,7 +8182,7 @@ function hlpSuggest() {
 let _hlpInit = false;
 function hlpInit() {
   if (_hlpInit || typeof GXH === 'undefined') return; _hlpInit = true;
-  GXH.init({ game: 'lantern-dive', defaultOn: false, steps: HLP_STEPS, rules: HLP_RULES, avoid: '.glow,#acts .btn,#opp .dc.can,.tc,#hand .hc,.me,.seat,.jcard,.gx-ibtn' });
+  GXH.init({ game: 'lantern-dive', defaultOn: false, tapFirst: true, steps: HLP_STEPS, rules: HLP_RULES, avoid: '.glow,.pspot,#acts .btn,#opp .dc.can,.tc,.tslot,#lead,#hand .hc,.jcard,.gx-bar' });
   GXH.bulb({ el: '#bulbbtn', suggest: hlpSuggest, rulesFor: hlpPhase });
   try { GXH.setEnabled(!!UI.prefs.hints); } catch (e) { }
   applyHints();
@@ -8125,7 +8194,7 @@ function applyHints() {
   document.documentElement.classList.toggle('hintsoff', !on);
 }
 function hintsToggle() { UI.prefs.hints = !UI.prefs.hints; savePrefs(); try { GXH.setEnabled(UI.prefs.hints); } catch (e) { } if (UI.coach && UI.mode !== 'tutorial') UI.coach.level = UI.prefs.hints ? 'light' : 'off'; applyHints(); }
-function hlpAfter() { applyHints(); hlpInit(); if (typeof GXH === 'undefined') return; GXH.phase(hlpPhase()); }
+function hlpAfter() { applyHints(); hlpInit(); if (typeof GXH === 'undefined') return; GXH.phase(UI.rstep ? null : hlpPhase()); }   // F1: one helper: no coach bubble while a New-rule step is up
 // ===================== part 12: the guided first dive (W504). Every core rule in order, one sentence (<= 12 words) + one highlighted tap per step. =====================
 // A fixed deal (data.js tutorial), the crewmates are scripted (TUT_AI) so every step happens exactly as told; a step's tap is the only input
 // that goes through (shell/gx-tutor.js spotlight). The kit's end card starts a real game. TUT_RULES maps every core rule to its step (tutor-test.js walks it).
@@ -8184,7 +8253,7 @@ const TUT_RULES = [
   ['flare', 'Distress flare: optional card pass, costs an attempt'],
   ['notrump', 'Lanterns (trumps) can never be signalled'],
   ['ping', 'Signal between tricks: highest, lowest or only card of a colour'],
-  ['pingonce', 'Each diver signals only once per dive'],
+  ['pingonce', 'Each diver signals only once per attempt'],
   ['readping', 'Reading a crewmate\'s signal token'],
   ['lead', 'The Captain leads trick one; the leader plays any card'],
   ['follow1', 'Everyone must follow the colour led if they can'],
@@ -8217,12 +8286,12 @@ function tutSteps() {
     tutLook('mine', 'Tap your job: win the trick that holds Lantern 3.', tutBox('#me .jcard, #me [data-a="job"], [data-a="job"][data-i="0"]'), () => G.tasks[1].owner === 1 && tutFree()),
     tutLook('theirs', 'Tap Dag. He took the other job: win trick one.', tutSeat(1), () => G.tasks[1].owner === 1 && tutFree()),
     tutNext('lose', 'One failed job fails the attempt. The crew then tries again.', tutBox('[data-a="job"]'), () => G.tasks[1].owner === 1 && tutFree()),
-    tutTap('flare', 'A flare swaps cards but costs an attempt. Skip it.', tq('#acts [data-a="dist"][data-on="false"]'), m => m.t === 'dist' && !m.on, () => G.phase === 'distress' && tutMy()),
+    tutTap('flare', 'A flare: everyone passes one card. It costs an attempt. Skip it.', tq('#acts [data-a="dist"][data-on="false"]'), m => m.t === 'dist' && !m.on, () => G.phase === 'distress' && tutMy()),
     tutLook('notrump', 'Tap your Lanterns. Trumps can never be signalled.', tutLan(), () => pl(0) && T().plays.length === 0 && tutMy() && !G.players[0].pingUsed && !UI.pingSel),
-    tutUi('ping', 'Signal once per dive, between tricks. Tap Signal.', tq('#acts [data-a="signal"]'), a => a.what === 'signal', () => pl(0) && T().plays.length === 0 && tutMy() && !G.players[0].pingUsed && !UI.pingSel),
+    tutUi('ping', 'Signal once per attempt, between tricks. Tap Signal.', tq('#acts [data-a="signal"]'), a => a.what === 'signal', () => pl(0) && T().plays.length === 0 && tutMy() && !G.players[0].pingUsed && !UI.pingSel),
     tutUi('pingpick', 'Only a highest, lowest or only colour card. Tap Kelp 3.', tutHand('K3'), a => a.what === 'pingsel' && a.c === tcard('K3'), () => UI.pingSel && UI.sel < 0 && tutFree()),
     tutTap('pingok', 'Kelp 3 is your lowest Kelp. Tap Show it.', tq('#acts [data-a="pingok"]'), m => m.t === 'ping' && m.c === tcard('K3'), () => UI.pingSel && UI.sel === tcard('K3') && tutFree()),
-    tutLook('pingonce', 'Tap your token. One signal per dive: yours is spent.', tutBox('#mine .sigst'), () => G.players[0].pingUsed && tutFree()),
+    tutLook('pingonce', 'Tap your token. One signal per attempt: yours is spent.', tutBox('#mine .sigst'), () => G.players[0].pingUsed && tutFree()),
     tutLook('readping', 'Tap Sumi. "8 high": Tide 8 is her highest Tide.', tutSeat(2), () => G.pings.some(p => p.seat === 2) && tutFree()),
     tutTap('lead', 'The Captain leads first. Lead Kelp 3, so Dag can win.', tutHand('K3'), m => m.t === 'play' && m.c === tcard('K3'), () => pl(0) && T().plays.length === 0 && G.pings.some(p => p.seat === 2) && tutMy()),
     tutLook('follow1', 'Tap Dag\'s card. Everyone must follow the colour led.', tq('#slots .tslot[data-seat="1"]'), () => pl(0) && T().plays.length === 2 && tutFree()),
@@ -8270,7 +8339,7 @@ const RULE_STEPS = [
   { id: 'handover', when: () => G.phase === 'assign' && G.as.mode === 'cmd', say: 'Captain keeps every job, or hands them all to a volunteer.', target: '#pool' },
   { id: 'volunteer', when: () => G.phase === 'assign' && (G.as.mode === 'vol' || G.as.mode === 'split'), say: 'Volunteers take every job. Say yes or no when asked.', target: '#pool' },
   { id: 'predict', when: () => G.phase === 'predict', say: 'Predict exactly how many tricks this job\'s owner will win.', target: '#acts' },
-  { id: 'murky', when: () => G.phase === 'play' && G.comm === 'murky', say: 'Murky water: a signal shows the card, but no token.', target: '#hand' },
+  { id: 'murky', when: () => G.phase === 'play' && G.comm === 'murky', say: 'Murky water: a signal puts the token beside the card with no mark.', target: '#hand' },
   { id: 'narc', when: () => G.phase === 'play' && G.comm === 'narc', say: 'Deep narcosis: shared tokens. Anyone may grab one between tricks.', target: '#hand' },
   { id: 'clock', when: () => G.phase === 'play' && !!G.clock, say: 'The clock is running. Finish every job before time runs out.', target: '#clk' },
   { id: 'drone', when: () => !!G.two && G.phase !== 'over', say: 'The drone is a third hand. The Captain plays its top cards.', target: '.seat.drone' }
@@ -8291,7 +8360,7 @@ function ruleBox(sel) {
 }
 function ruleStepShow(r) {
   const box = ruleBox(r.target); if (!box) return false;
-  UI.rstep = r.id;
+  UI.rstep = r.id; try { GXH.phase(null); } catch (e) { }   // F1: one helper: a queued coach bubble waits for this rule's OK
   const o = document.createElement('div'); o.id = 'rstep'; o.setAttribute('role', 'dialog'); o.setAttribute('aria-label', 'New rule'); o.dataset.rule = r.id;
   o.innerHTML = '<div class="rsh"></div><div class="rsb gxh-bub gxt-bub on"><div class="gxh-bd"><div class="gxh-tt">New rule</div><div class="gxh-tx"></div></div><div class="gxh-row2"><button type="button" class="gxh-ok rsok">OK</button></div></div>';
   o.querySelector('.gxh-tx').textContent = r.say;
@@ -8440,8 +8509,8 @@ function tableGeo() {
   const wideT = side && W >= 1100, seatW = side ? (wideT ? 190 : 132) : (line ? Math.floor((W - 12 - 6 * (k - 1)) / k) : row3 ? Math.min(300, Math.floor((W - 16 - 12) / 3)) : Math.round(Math.min(100, W * .26))), seatH = side ? (wideT ? 112 : 76) : (line ? Math.max(84, UI.lineSeatH || 0) : row3 ? (ph ? 150 : 118) : (small ? 100 : 116));
   const y0 = 4 + (boss ? (small || side ? 34 : 40) : 0), bottom = side ? 52 : (line ? 30 : 54);
   const geo = { W, H, k, side, small, compact, seatW, seatH, av, jr, boss, row3, line, seats: [], slots: [] };
-  const dw = Math.max(30, Math.min(small ? 38 : (ph ? 46 : 58), Math.floor((side ? Math.min(W * .4, 340) : W - 16) / 7) - 4)), droneW = side ? Math.min(W * .42, 340) : W - 8;
-  geo.dw = dw; geo.droneW = droneW; geo.dh = 44 + Math.round(dw * 1.4) + 14;
+  const dw = Math.max(30, Math.min(small ? 44 : (ph ? 46 : 58), Math.floor((side ? Math.min(W * .4, 340) : W - 16) / 7) - 4)), droneW = side ? Math.min(W * .42, 340) : W - 8;
+  geo.dw = dw; geo.droneW = droneW; geo.dh = (drone >= 0 && !side && UI.droneH) || (44 + Math.round(dw * 1.4) + 14);   // F1: the drone row's real height (measured in render) so nothing hides under it
   // trick area
   let top, zl = 0, zr = W;
   if (side) { top = y0; zl = seatW + 12; zr = W - seatW - 12; if (drone >= 0) zr = W - droneW - 12; } else top = y0 + (drone >= 0 ? Math.max(seatH, geo.dh) : seatH) + 4;
@@ -8468,6 +8537,14 @@ function tableGeo() {
     geo.cy = Math.round((y1 + y2) / 2); geo.ry = Math.round((y2 - y1) / 2); geo.rx = Math.round((k - 1) / 2 * (seatW + 6));
   } else
   for (let rel = 0; rel < n; rel++) { const th = rel * 2 * Math.PI / n; geo.slots.push([Math.round(cx - Math.sin(th) * rx), Math.round(cy + Math.cos(th) * ry - oy)]); }
+  if (drone >= 0 && !side && k === 2) {   // F1: two divers: the rival sits on the left under the drone row, the trick lies in one row on the right (big cards, never under the drone)
+    const x0 = seatW + 10, x1 = W - 6, gap = 8, rw = Math.max(30, Math.min(cwMax, Math.floor((x1 - x0 - 2 * gap) / 3), Math.floor((zoneH - 30) / 1.4)));
+    geo.drow = true; geo.cw = rw; geo.ch = Math.round(rw * 1.4); geo.pl = x0; geo.pr = x1; geo.cx = Math.round((x0 + x1) / 2); geo.cy = Math.round(top + Math.max(geo.ch / 2 + 4, (zoneH - 22) / 2));
+    geo.rx = rw + gap; geo.ry = Math.round(geo.ch / 2); geo.slots = [];
+    const order = [1, 0, 2];   // left to right: the diver after you, you, the drone
+    const xs = [geo.cx - (rw + gap), geo.cx, geo.cx + (rw + gap)];
+    for (let rel = 0; rel < n; rel++) geo.slots[rel] = [Math.round(xs[order.indexOf(rel)]), geo.cy];
+  }
   // seats: i = 1..k clockwise from you (left side first, then the top, then the right side)
   const L = seatW / 2 + 5, R = W - seatW / 2 - 5, mid = cy - seatH / 2 + 8;
   geo.L = L; geo.R = R; geo.mid = mid; geo.y0 = y0;
@@ -8488,12 +8565,12 @@ function seatSpots(geo, list) {
   }
   const kk = list.length;
   if (droneIdx >= 0) {
-    list.forEach((s, i) => { if (i === droneIdx) out[i] = sp(W / 2, y0, W - 8); else out[i] = sp(i < droneIdx ? L : R, mid, seatW); });
+    list.forEach((s, i) => { if (i === droneIdx) out[i] = sp(W / 2, y0, W - 8); else out[i] = sp(i < droneIdx || geo.drow ? L : R, mid, seatW); });
     return out;
   }
   if (geo.line) { list.forEach((s2, i) => { out[i] = sp(W / 2 + (i - (kk - 1) / 2) * (seatW + 6), y0, seatW); }); return out; }
   if (geo.row3) { list.forEach((s2, i) => { out[i] = sp(W / 2 + (i - 1) * (seatW + 8), y0, seatW); }); return out; }
-  if (kk === 2) { out[0] = sp(W * .24, y0); out[1] = sp(W * .76, y0); }
+  if (kk === 2) { out[0] = sp(geo.small ? L : W * .24, y0); out[1] = sp(geo.small ? R : W * .76, y0); }   // F1: a short table: seats to the edges, clear of the trick
   else if (kk === 3) { out[0] = sp(L, mid); out[1] = sp(W / 2, y0); out[2] = sp(R, mid); }
   else { out[0] = sp(L, mid + 18); out[1] = sp(W * .31, y0); out[2] = sp(W * .69, y0); out[3] = sp(R, mid + 18); }
   return out;
@@ -8523,9 +8600,16 @@ function renderFelt(v) {
   { const cm = $('#cenmark'); if (cm) { cm.innerHTML = ''; cm.hidden = G.phase !== 'distress'; if (!cm.hidden) { cm.style.left = geo.cx + 'px'; cm.style.top = geo.cy + 'px'; cm.innerHTML = KIT.flareSVG({ size: Math.min(110, geo.zoneH * .5), on: !!G.distress }); } } }
   if (!pool.hidden) {
     const mv = myMoves(), mineTurn = iMustAct() && assign && !UI.busy, free = G.tasks.filter(t => t.owner < 0).length;
-    const pw = Math.max(120, geo.pr - geo.pl);
-    pool.style.left = geo.pl + 'px'; pool.style.right = 'auto'; pool.style.width = pw + 'px'; pool.style.top = geo.top + 'px'; pool.style.height = geo.zoneH + 'px';
-    const cols = free <= 1 ? 1 : (pw < 260 ? 2 : (free <= 4 ? 2 : 3)), tw = Math.max(86, Math.min(pw >= 700 ? 230 : 150, Math.floor((pw - 4 - 8 * (cols - 1)) / cols)));
+    let pl = geo.pl, pr = geo.pr;
+    if (!geo.side && G.players.some(p => p.helper)) {   // F1: two divers: one rival seat on one side only, so the job pool takes the other side too
+      const T = $('#table').getBoundingClientRect(), rs = [...document.querySelectorAll('#opp .seat:not(.drone)')].map(e => e.getBoundingClientRect()).filter(r => r.bottom > T.top + geo.top);
+      if (rs.length && rs.every(r => r.right - T.left < geo.W / 2)) { pl = Math.max(...rs.map(r => r.right - T.left)) + 6; pr = geo.W - 6; }
+      else if (rs.length && rs.every(r => r.left - T.left > geo.W / 2)) { pl = 6; pr = Math.min(...rs.map(r => r.left - T.left)) - 6; }
+      else if (!rs.length) { pl = 6; pr = geo.W - 6; }
+    }
+    const pw = Math.max(120, pr - pl);
+    pool.style.left = pl + 'px'; pool.style.right = 'auto'; pool.style.width = pw + 'px'; pool.style.top = geo.top + 'px'; pool.style.height = geo.zoneH + 'px';
+    const cols = free <= 1 ? 1 : (pw < 260 ? 2 : (free <= 4 ? 2 : 3)), tw = Math.max(pw < 186 ? 76 : 86, Math.min(pw >= 700 ? 230 : 150, Math.floor((pw - 4 - 8 * (cols - 1)) / cols)));
     G.tasks.forEach((t, i) => {
       if (t.owner >= 0) return; const d = TASKS[t.id], can = mineTurn && mv.some(m => m.t === 'take' && m.i === i);
       const c = h('button.jcard' + (can ? '.glow' : (mineTurn && mv.some(m => m.t === 'take') ? '.no' : '.off')), { type: 'button', 'data-a': 'pool', 'data-i': i, 'data-key': 'job' + i, style: 'width:' + tw + 'px', 'aria-label': d.s + ', difficulty ' + jobDiff(i) + (can ? '' : ', not available') });
@@ -8559,6 +8643,7 @@ function renderLead(lead, pile, v) {
   if (geo && geo.line) { lead.style.left = Math.round(Math.max(48, geo.slots[0][0] - geo.cw * 1.25)) + 'px'; lead.style.top = geo.slots[0][1] + 'px'; }   // R5 line layout: beside your slot
   if (geo && geo.tight) { const tp = $('#tpad'), r = tp && tp.style.width ? { w: parseFloat(tp.style.width), h: parseFloat(tp.style.height) } : null;   // G4: no room in the middle: the colour led sits in the pad's top-left corner
     if (r) { lead.style.left = Math.round((geo.cx - r.w / 2 + 22 + geo.cx - geo.cw / 2) / 2) + 'px'; lead.style.top = Math.round(geo.cy + 10 - r.h / 2 + 34) + 'px'; } }
+  if (geo && geo.drow) { lead.style.left = geo.cx + 'px'; lead.style.top = Math.round(Math.min(geo.cy + geo.ch / 2 + 50, geo.top + geo.zoneH + 30)) + 'px'; }   // F1: under the trick row
   lead.classList.toggle('tight', !!(geo && geo.tight));
   if (G.phase === 'play' && G.trick && G.trick.plays.length) { const ls = G.trick.ls; lead.append(h('span', { html: KIT.emblemSVG(ls, 26) }), h('span', ls === 4 ? 'Lanterns (trump)' : D.suits[ls].name)); lead.classList.add('on'); }
   else lead.classList.remove('on');
@@ -8635,10 +8720,10 @@ function renderHand(v) {
   });
   // Layout (absolute): one row when every card keeps >= 44 px (and >= 55 % of its width) visible, else two rows. A tap in the middle of a card always lands on that card.
   const hw = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--hw')) || 60, W = Math.max(200, box.clientWidth - 12), n = hand.length, ch = hw * 1.4;
-  const short = document.documentElement.classList.contains('ph-short') || (box.parentNode.parentNode.classList.contains('side')), need = short ? 32 : Math.max(44, hw * .55), maxP = hw * 1.04;
+  const short = document.documentElement.classList.contains('ph-short') || (box.parentNode.parentNode.classList.contains('side')), need = box.parentNode.parentNode.classList.contains('side') ? 32 : Math.max(44, hw * .55), maxP = hw * 1.04;
   const pitchFor = m => m > 1 ? Math.min(maxP, (W - hw) / (m - 1)) : 0;
   const rows = n > 1 && pitchFor(n) < need && n >= 7 ? 2 : 1, per = rows === 2 ? Math.ceil(n / 2) : n, pitch = pitchFor(per);
-  const rowStep = Math.round(ch * .78), padTop = document.documentElement.classList.contains('ph-short') ? 14 : 20;
+  const rowStep = Math.max(44, Math.round(ch * .72)), padTop = document.documentElement.classList.contains('ph-short') ? 14 : 16;   // F1: >= 44 px of the back row shows; a little more table
   box.classList.toggle('two', rows === 2); box.style.setProperty('--rs', rowStep + 'px');
   box.style.height = Math.round(padTop + ch + (rows === 2 ? rowStep : 0) + 4) + 'px'; box.style.minHeight = box.style.height;
   btns.forEach((b, i) => {
@@ -8680,7 +8765,7 @@ function actModel(v) {
     case 'distress': {
       if (!must) { M.p = who === 'You' ? 'Use the flare?' : who + ' decides on the flare…'; return M; }
       M.cls = 'mine'; const lit = G.distress;
-      M.p = lit ? 'Pass cards again?' : 'Light the distress flare?';
+      M.p = lit ? 'Pass cards again?' : 'Light the flare? Pass 1 card, +1 attempt.';
       btn(lit ? 'No passing' : 'No flare', 'dist', { on: false, cls: 'alt' });
       const two = G.hn === 2; if (two) btn(lit ? 'Pass a card' : 'Light it', 'dist', { on: true, dir: 1, cls: 'alt' });
       else { btn('Pass left', 'dist', { on: true, dir: 1, cls: 'alt' }); btn('Pass right', 'dist', { on: true, dir: -1, cls: 'alt' }); }
@@ -8688,7 +8773,7 @@ function actModel(v) {
     }
     case 'pass': {
       if (!must || !mv.length) { M.p = 'Waiting for the others…'; return M; }
-      M.cls = 'mine'; M.p = 'Tap a card to pass it.'; return M;
+      M.cls = 'mine'; M.p = 'Pass a card your jobs do not need.'; return M;
     }
     case 'predict': {
       if (!must || !mv.length) { M.p = who + ' is predicting…'; return M; }
@@ -8729,7 +8814,8 @@ function renderActs(v) {
   pr.textContent = M.p || '';
   const tr = $('#table'); if (tr) tr.classList.toggle('myturn', M.cls === 'mine');
   { const pl = $('#pile'); ac.classList.toggle('wide', !(G.phase === 'play' && iMustAct() && !UI.busy ) && !(pl && pl.childNodes.length)); }
-  ac.classList.toggle('many', M.acts.length > 5); ac.innerHTML = '';
+  ac.classList.toggle('many', M.acts.length > 5); ac.classList.toggle('line', !!(UI.geo && UI.geo.line)); { const pl = $('#pile'); ac.classList.toggle('lp', !!(UI.geo && UI.geo.line && pl && pl.childNodes.length)); }   // F1: line layout: the buttons sit right of your slot, never on it
+   ac.innerHTML = '';
   M.acts.forEach(a => { const b = h('button.btn' + (a.cls ? '.' + a.cls : '') + (a.dis ? '.dis' : ''), { type: 'button', 'data-a': a.a, disabled: a.dis ? true : null }, a.label); for (const k of ['c', 'i', 'n', 'f', 'on', 'dir']) if (a[k] !== undefined) b.dataset[k] = a[k]; ac.append(b); });
 }
 function renderTip() { }   // no tip cards: play happens on the table
@@ -8739,11 +8825,17 @@ function render() {
   const v = viewSeat();
   if (UI.pingSel && !canSigNow(v)) { UI.pingSel = false; UI.sel = -1; }
   renderBar(); renderMine(v); renderHand(v);
+  { const bb = window._ldBulb || (window._ldBulb = $('#bulbbtn')), mine = $('#mine'), bd = $('#bd');   // F1: on a narrow phone the bulb sits at the right end of your row, so the turn line keeps the bar
+    if (bb && mine) { const low = innerWidth < 520 && !(bd && bd.classList.contains('side')); if (low && bb.parentNode !== mine) mine.append(bb); else if (!low && bb.parentNode === mine) { const t = $('#hintstog'); t && t.after(bb); } } }
   UI.geo = tableGeo(); if (UI.geo) { const r = document.documentElement.style; r.setProperty('--cw', UI.geo.cw + 'px'); r.setProperty('--dw', UI.geo.dw + 'px'); r.setProperty('--av', UI.geo.av + 'px'); r.setProperty('--seatw', UI.geo.seatW + 'px'); r.setProperty('--ch', UI.geo.ch + 'px'); }
   renderOpp(v);
   if (UI.geo && UI.geo.line) {   // the line layout needs the real seat height (names, job chips and signal chips can wrap): measure and lay out again once
     const hs = Array.from(document.querySelectorAll('#opp .seat')).map(e => e.offsetHeight), mh = hs.length ? Math.max(...hs) : 0;
     if (mh > UI.geo.seatH + 1 || (mh && mh < UI.geo.seatH - 8 && mh >= 84)) { UI.lineSeatH = mh; UI.geo = tableGeo(); const r = document.documentElement.style; r.setProperty('--cw', UI.geo.cw + 'px'); r.setProperty('--ch', UI.geo.ch + 'px'); r.setProperty('--seatw', UI.geo.seatW + 'px'); renderOpp(v); }
+  }
+  if (UI.geo && !UI.geo.side && G.players.some(p => p.helper)) {   // F1: the drone row can be taller than the guess (job chips): measure once and lay out again
+    const de = document.querySelector('#opp .seat.drone'), dh = de ? de.offsetHeight : 0;
+    if (dh && Math.abs(dh - UI.geo.dh) > 2) { UI.droneH = dh; UI.geo = tableGeo(); renderOpp(v); }
   }
   renderFelt(v); try { bossBar(); } catch (e) { console.error(e); }
   renderActs(v);
@@ -8773,6 +8865,8 @@ function resetUI(mode, cfg) {
   const st = $('#start'); if (st) st.hidden = true; const rs = $('#rs'); if (rs) { rs.hidden = true; rs.innerHTML = ''; } const pa = $('#pass'); if (pa) { pa.hidden = true; pa.innerHTML = ''; }
   try { GX.close(); } catch (e) { } closePop(); const pc = $('#pc'); if (pc) { pc.hidden = true; pc.innerHTML = ''; }
 }
+/* F2: the Goal pop-up shows until the first dive is logged, then never again */
+function goalKnown() { try { return Object.keys(Prog.load().done || {}).length > 0; } catch (e) { return false; } }
 function newGame(mode, o) {
   o = o || {};
   const opt = Object.assign({}, DEF, { mission: startDive() }, UI.opt || {}, o);
@@ -8799,7 +8893,7 @@ function newGame(mode, o) {
   UI.news = [];
   UI.coach = { level: mode === 'tutorial' || !UI.prefs.hints ? 'off' : 'light', seen: {}, keep: false };
   UI.said = {}; UI.dlg = null; try { drawDlg(); } catch (e) { }
-  if (mode === 'vs' && !NET.on && !o.noGoal) UI.dlg = { who: 'mara', title: 'Goal', lead: 'Finish every job card to win the dive together.', body: ['Each job belongs to one diver.', 'A job is met by the tricks that diver wins.', 'One broken job ends the attempt.'], btn: 'Dive' }, drawDlg();
+  if (mode === 'vs' && !NET.on && !o.noGoal && !goalKnown()) { UI.dlg = { who: 'mara', title: 'Goal', lead: 'Finish every job card to win the dive together.', body: ['Each job belongs to one diver.', 'A job is met by the tricks that diver wins.', 'One broken job ends the attempt.'], btn: 'Dive' }, drawDlg(); }
   placePrompt(); render(); sndMusic(); autosave(); schedule();
 }
 function tutorialStack() {
@@ -8968,7 +9062,9 @@ function floatAt(seat, text, cls) {
   try {
     const bd = $('#bd'), el = document.querySelector('[data-key="seat' + seat + '"]'); if (!bd || !el) return;
     const B = bd.getBoundingClientRect(), r = el.getBoundingClientRect(), f = h('div.fl' + (cls ? '.' + cls : ''), text);
-    f.style.left = Math.round(r.left - B.left + r.width / 2) + 'px'; f.style.top = Math.round(r.top - B.top + r.height / 2) + 'px'; bd.appendChild(f); setTimeout(() => f.remove(), 1500);
+    f.style.left = Math.round(r.left - B.left + r.width / 2) + 'px'; f.style.top = Math.round(r.top - B.top + r.height / 2) + 'px'; bd.appendChild(f);
+    /* F2: keep the pop-up 8 px inside the table edges (it is centred on its left) */
+    const fw = f.offsetWidth * .65 + 8, cx = Math.min(Math.max(r.left - B.left + r.width / 2, fw), B.width - fw); f.style.left = Math.round(cx) + 'px'; setTimeout(() => f.remove(), 1500);
   } catch (e) { }
 }
 // a job card taken from the table flies to the seat that took it
@@ -9099,9 +9195,9 @@ const TIPS = [
   { id: 'commander', when: () => G.phase === 'assign' && G.cap >= 0, title: () => G.cap === viewSeat() ? 'You are the Captain' : pname(G.cap) + ' is the Captain', body: () => (G.cap === viewSeat() ? 'You hold Lantern 4, so you pick a job first. You also lead the first trick.' : pname(G.cap) + ' holds Lantern 4, so picks a job first and leads the first trick.') + ' The gold badge on an avatar marks the Captain.' },
   { id: 'pickjob', when: () => G.phase === 'assign' && iMustAct() && UI.mode !== 'net' && !G.players[G.as.actor].helper && G.as.mode === 'draft', title: 'Pick a job', body: 'Tap a job card, then Take this job. Pick one your cards can do.' },
   { id: 'flare', when: () => G.phase === 'distress' && iMustAct(), title: 'Distress flare (optional)', body: 'Light it and everyone passes one card to a neighbour. It adds one attempt to the logbook. You can skip it.' },
-  { id: 'signal', when: () => G.phase === 'signal' && iMustAct(), title: 'Signal (optional)', body: 'Once per dive, show one card: your highest, lowest or only card of a colour. Or skip.' },
+  { id: 'signal', when: () => G.phase === 'signal' && iMustAct(), title: 'Signal (optional)', body: 'Once per attempt, show one card: your highest, lowest or only card of a colour. Or skip.' },
   { id: 'follow', when: () => G.phase === 'play' && iMustAct() && G.trick.plays.length > 0 && !G.players[G.trick.turn].helper && LD.playable(G, G.trick.turn).length < G.players[G.trick.turn].hand.length, title: 'Follow the colour', body: 'Play the led colour if you have it. Dim cards are blocked. You never have to win.' },
-  { id: 'nofollow', when: () => G.phase === 'play' && iMustAct() && G.trick.plays.length > 0 && G.trick.ls < 4 && !G.players[G.trick.turn].helper && !G.players[G.trick.turn].hand.some(c => suitOf(c) === G.trick.ls), title: 'None of that colour', body: 'Play anything. Other colours never win. A Lantern does.' },
+  { id: 'nofollow', when: () => G.phase === 'play' && iMustAct() && G.trick.plays.length > 0 && G.trick.ls < 4 && !G.players[G.trick.turn].helper && !G.players[G.trick.turn].hand.some(c => suitOf(c) === G.trick.ls), title: 'None of that colour', body: 'Play anything. Other colours never win. A Lantern does, unless a higher Lantern is played.' },
   { id: 'trump', when: () => G.phase === 'play' && G.trick.plays.some(p => suitOf(p.c) === 4) || (UI.fz && UI.fz.plays.some(p => suitOf(p.c) === 4)), title: 'Lanterns are trumps', body: 'A Lantern beats every colour. The highest Lantern wins.' },
   { id: 'jobdone', when: () => G.phase === 'play' && G.tasks.some((t, i) => jobSt(i) > 0) && !UI.busy, title: 'A job is done', body: 'A green tick means done. A red cross ends the attempt.' }
 ];
@@ -9212,6 +9308,10 @@ function showResult() {
   bt.append(h('button.btn.alt', { 'data-a': 'rsclose', type: 'button' }, 'Look at the table'));
   bt.append(h('button.btn.alt', { 'data-a': NET.on ? 'netopen' : 'menu', type: 'button' }, NET.on ? 'Lobby' : 'Menu'));
   box.append(bt); rs.append(box); snd(ok ? 'win' : 'lose');
+  if (!ok) {   /* F2: hold the fail result: the retry buttons wake after 1.2 s, so a blind tap cannot skip the reason */
+    const rb = [...bt.querySelectorAll('[data-a^=retry]')]; rb.forEach(b => { b.disabled = true; });
+    setTimeout(() => rb.forEach(b => { b.disabled = false; }), 1200);
+  }
 }
 function closeRS() { const rs = $('#rs'); if (rs) { rs.hidden = true; rs.innerHTML = ''; } UI.rsOpen = false; }
 function nextDive() {
@@ -9232,14 +9332,14 @@ function buildRules() {
   const ul = a => h('ul', ...a.map(t => h('li', t))), ol = a => h('ol', ...a.map(t => h('li', t)));
   sec('How a turn works', ol(['Read the line at the top. It says what to do now.', 'Glowing cards are playable. Dim cards are blocked.', 'Tap a glowing card. It slides to the table.', 'Each diver plays one card in turn.', 'The highest card of the led colour wins. A Lantern beats every colour.']));
   sec('The goal', h('p', 'You are a team of divers on a deep-sea expedition. Each dive lays out job cards. Every job is a condition on the tricks one diver wins. You win the dive together when every job is done, and you lose it together the moment one job cannot be done. Do not talk about your cards. Use signals instead.'));
-  sec('How a dive goes', ol(['Everyone gets a hand. The diver with Lantern 4 is the Captain.', 'Job cards are drawn until their numbers add up to the dive\'s difficulty. Use the number for your team size.', 'Take jobs one at a time. The Captain goes first, then clockwise, until none are left.', 'Optional: light the distress flare to pass cards.', 'Each diver may signal once. Then play the tricks. The Captain leads first. The winner of each trick leads next.', 'Every job done wins the dive. If one job cannot be met, the attempt is lost. Deal again.']));
-  sec('The cards', h('p', '40 cards: Coral, Tide, Kelp and Sunstar, numbered 1 to 9, plus Lanterns 1 to 4. Lanterns beat every colour. With 3 divers, one has 14 cards and one card is never played. 4 divers play 10 tricks. 5 divers play 8.'));
+  sec('How a dive goes', ol(['Everyone gets a hand. The diver with Lantern 4 is the Captain.', 'Job cards are drawn until their numbers add up to the dive\'s difficulty. Use the number for your team size.', 'Take jobs one at a time. The Captain goes first, then clockwise, until none are left. You may pass only if the divers after you can still take every job left.', 'Optional: light the distress flare to pass cards.', 'Play the tricks. Each diver may signal once per attempt, before the first trick or between two tricks. The Captain leads first. The winner of each trick leads next.', 'Every job done wins the dive. If one job cannot be met, the attempt is lost. Deal again.']));
+  sec('The cards', h('p', '40 cards: Coral, Tide, Kelp and Sunstar, numbered 1 to 9, plus Lanterns 1 to 4. Lanterns beat every colour. With 3 divers, one has 14 cards, 13 tricks are played and one card is never played. 4 divers play 10 tricks. 5 divers play 8.'));
   sec('A trick', ul(['The leader plays any card. Everyone must follow its colour if they can. Lanterns count as a colour. If you cannot follow, play anything.', 'A Lantern beats every colour. The highest Lantern wins. With no Lantern, the highest card of the led colour wins.', 'You are never forced to win.', 'Tap Last trick to see the previous trick. Only that one.']));
-  sec('Signals', ul(['Once per dive, each diver may show one colour card. It must be their highest, lowest or only card of that colour. The token says which: top, bottom or middle.', 'You cannot show Lanterns. Signal between tricks only. The mark stays, even if it stops being true.', 'Murky water: the shown card gets no mark. Deep narcosis: tokens share a pool, two fewer than divers. Anyone may use one between tricks. Unknown waters: draw a colour card first. 1-3 normal, 4-6 murky, 7-9 narcosis.']));
-  sec('Jobs', ul(['A job is done when it is met and cannot fail. A job breaks when it cannot be met.', 'Three jobs compare your tricks with the Captain\'s. The Captain cannot take them.', 'If both "first trick" and "first two tricks" are out and nobody can take both, swap one for a job of the same value.']));
-  sec('The distress flare', h('p', 'Before signals, the team may light the flare. Everyone passes one colour card left, or everyone right. It stays lit until the dive is won. The logbook counts one extra attempt. You may pass again each attempt.'));
-  sec('Special dives', ul(['Captain\'s call (dives 10, 13): the Captain takes all jobs or hands them to a willing diver. If handed over, signal before the first trick.', 'One diver takes all jobs. Dive 6: team vote. Dives 14, 15, 16: volunteer in turn, yes or no. Dive 26: two volunteers.', 'Open briefing (dives 17, 28-31, deep dives): talk about jobs. Never about cards.', 'Some dives add limits. Examples: no holding two more 9s than another diver, or never leading Coral. Each dive shows its rule when it starts.', 'Clock dives (14, 15, 16, 26): beat the clock, or skip it and use the other rule shown. Turn the clock on in setup.']));
-  sec('Two divers and the drone', h('p', 'With two divers, a drone joins as a third player. Its 14 cards lie in two rows: 7 face up, 7 face down. The Captain takes its jobs and plays its face-up cards. A face-down card turns up after the card on top is played.'));
+  sec('Signals', ul(['Once per attempt, each diver may show one colour card. It must be their highest, lowest or only card of that colour. The token says which: top, bottom or middle.', 'You cannot show Lanterns. Signal between tricks only. The mark stays, even if it stops being true.', 'Murky water: the shown card gets no mark. Deep narcosis: tokens share a pool, two fewer than divers. Anyone may use one between tricks. Unknown waters: draw a colour card first. 1-3 normal, 4-6 murky, 7-9 narcosis.']));
+  sec('Jobs', ul(['A job is done when it is met and cannot fail. A job breaks when it cannot be met.', 'Three jobs compare your tricks with the Captain\'s. The Captain and the drone cannot take them.', 'If both "first trick" and "first two tricks" are out and nobody can take both, swap one for a job of the same value.']));
+  sec('The distress flare', h('p', 'Before signals, the team may light the flare. Everyone passes one colour card left, or everyone right. With two divers, you swap one card. It stays lit until the dive is won. The logbook counts one extra attempt. You may pass again each attempt.'));
+  sec('Special dives', ul(['Captain\'s call (dives 10, 13): the Captain takes all jobs or hands them to a willing diver. If handed over, signal before the first trick.', 'One diver takes all jobs. Dive 6: team vote. Dives 14, 15, 16: volunteer in turn, yes or no. Dive 26: two volunteers.', 'Open briefing (dives 17, 28-31, deep dives): talk about jobs. Never about cards.', 'Some dives add limits. Examples: no winning two more 9s than another diver, or never leading Coral. Each dive shows its rule when it starts.', 'Clock dives (14, 15, 16, 26): beat the clock, or skip it and use the other rule shown. Turn the clock on in setup.']));
+  sec('Two divers and the drone', h('p', 'With two divers, a drone joins as a third player. Its 14 cards lie in two rows: 7 face up, 7 face down. The Captain takes its jobs and plays its face-up cards. A face-down card turns up when the trick with the card on top of it ends.'));
   sec('On your phone', ul(['Tap a card to lift it. Tap again, or press Play, to play it. Dim cards are blocked. Tap a diver or job for details.', 'The bottom panel says what to do now. The Hint button suggests a card and why.', 'Hot-seat: a screen hides hands between turns. Online: you see only your own cards. There is no chat, only signals and emotes.']));
   root.appendChild(h('div', { html: '<section class="credits-audio"><h3>Credits</h3><p>Art and music by Am015-dev. Sounds were trimmed, loudness-normalised and converted for this game. Online play uses Trystero (MIT). The painted table is drawn with PixiJS (MIT). Names, job text and art are original; the paintings are by Am015-dev.</p></section>' }));
   return root;
@@ -9263,7 +9363,7 @@ function buildRef() {
   } else {
     root.append(h('div.rcard', h('span', { style: 'width:56px;display:block', html: KIT.pingSVG({ size: 56 }) }), h('div.rt', h('b', 'Signal token (one per diver)'), h('div', 'Placed on a shown card. Top is highest, middle is only, bottom is lowest. Green is ready, red is spent.'))));
     root.append(h('div.rcard', h('span', { style: 'width:56px;display:block', html: KIT.pingSVG({ size: 56, spent: true }) }), h('div.rt', h('b', 'Spent signal'), h('div', 'Red after use. In murky water it sits beside the card.'))));
-    root.append(h('div.rcard', h('span', { style: 'width:56px;display:block', html: KIT.flareSVG({ size: 56, on: true }) }), h('div.rt', h('b', 'Distress flare (1)'), h('div', 'Light it before a dive. Everyone passes a card. It adds one attempt.'))));
+    root.append(h('div.rcard', h('span', { style: 'width:56px;display:block', html: KIT.flareSVG({ size: 56, on: true }) }), h('div.rt', h('b', 'Distress flare (1)'), h('div', 'Light it after the jobs are taken, before any signal. Everyone passes a card. It adds one attempt.'))));
     root.append(h('div.rcard', h('span', { style: 'width:56px;display:block', html: KIT.cmdSVG({ size: 56 }) }), h('div.rt', h('b', 'Captain badge (1)'), h('div', 'Goes to the diver with Lantern 4. They pick jobs first and lead first.'))));
     root.append(h('div.rcard', h('span', { style: 'width:56px;display:block', html: KIT.reminderSVG({ w: 40 }) }), h('div.rt', h('b', 'Reminder card (5)'), h('div', 'Sits in your hand while your signalled card is on the table.'))));
     root.append(h('div.rcard', h('span', { style: 'width:56px;display:block', html: KIT.droneSVG({ size: 56 }) }), h('div.rt', h('b', 'The drone (two divers)'), h('div', D.helper.story))));
@@ -9320,7 +9420,9 @@ function missionLine(o) {
 }
 function tableLine(o) { const nm = o.seats.map(c => D.names[c]); return 'You + ' + nameList(nm) + ' · ' + o.np + ' players' + (o.np === 2 ? ' + a drone' : ''); }
 function renderStart() {
-  const s = $('#start'); s.hidden = false; s.innerHTML = '';
+  const s = $('#start'); s.hidden = false;
+  const oc = s.querySelector('#cfg'), ocs = oc ? oc.scrollTop : 0, ows = s.scrollTop, odt = [...s.querySelectorAll('details.fold')].map(d => d.open); /* F2: a tap inside Configure keeps its scroll and folds */
+  s.innerHTML = '';
   const rs = $('#rs'); if (rs && !UI.rsOpen) { rs.hidden = true; }
   if (NET.on) { s.dataset.v = 'net'; netStartScreen(s); return; }
   if (!UI.sv) UI.sv = UI.onl ? 'online' : 'title';
@@ -9330,6 +9432,7 @@ function renderStart() {
   if (UI.sv === 'online') { s.appendChild(onlineEl()); return; }
   if (UI.sv === 'descent') { s.appendChild(descentEl()); return; }
   s.appendChild(setupEl());
+  try { const nc = s.querySelector('#cfg'); if (nc && ocs) nc.scrollTop = ocs; s.scrollTop = ows; s.querySelectorAll('details.fold').forEach((d, i) => { if (odt[i]) d.open = true; }); } catch (e) { }
 }
 // W479: the owner\'s painted crew and the real 3D lantern fill the title screen (the lantern <img> becomes the live .glb model when the device allows)
 const CAMP_CREW = [['brack', 'Brack'], ['bram', 'Bram'], ['dag', 'Dag'], ['nerea', 'Nerea'], ['sumi', 'Sumi'], ['echo', 'Echo']], CAMP_FOES = [['lampless', 'Lampless'], ['maze', 'Maze'], ['undertow', 'Undertow']];
@@ -9376,7 +9479,7 @@ function diveCfg(o) {
     const cur = Math.min(32, o.mission | 0 || p.cur || 1);
     out.push(h('p.ssub', missionLine(Object.assign({}, o, { mission: cur }))));
     const g = h('div.lgrid'); D.missions.forEach(m => { const dn = p.done[m.id], lock = m.id > Math.max(p.cur, 1) + 0 && false; g.append(h('button.lcell' + (cur === m.id ? '.cur' : '') + (dn ? '.dn' : ''), { 'data-a': 'pickdive', 'data-v': m.id, type: 'button' }, h('b', m.id + '. ' + m.name), h('span', (m.sel === 'fixed' ? 'Fixed jobs' : 'Difficulty ' + m.d) + (m.cmt !== 'normal' || m.timer ? ' · ' + (m.timer ? 'timed' : ({ murky: 'murky water', narc: 'narcosis', unknown: 'unknown waters', none: 'no signals' }[m.cmt] || m.cmt)) : '')), dn ? h('span.at', 'Done in ' + dn + ' attempt' + (dn === 1 ? '' : 's')) : (p.tries[m.id] ? h('span.at', p.tries[m.id] + ' failed') : null))); });
-    out.push(g);
+    out.push(h('details.fold', h('summary', 'All 32 dives'), g));
     if (m32done(p)) out.push(h('p.sm', 'All 32 dives logged. Deep Dive starts at difficulty 18.'));
   } else if (kind === 'free') {
     out.push(seg('Difficulty', 'd', [3, 5, 7, 9, 12, 15, 18], null), seg('Signalling', 'cmt', ['normal', 'murky', 'narc', 'unknown', 'none'], { normal: 'normal', murky: 'murky water', narc: 'narcosis', unknown: 'unknown waters', none: 'none' }));
@@ -9396,9 +9499,9 @@ function setupEl() {
   const sum = h('div.ssum', h('div.sfaces', o.seats.map(c => h('span', { html: avatarC(c, 64) }))), h('span.sline', missionLine(o) + ' · ' + tableLine(o)), h('button.btn.alt', { 'data-a': 'cfgopen', type: 'button', 'aria-expanded': open ? 'true' : 'false' }, 'Configure'));
   const cfg = h('div.cfg#cfg', { hidden: ph && !open ? true : null, role: ph ? 'dialog' : null, 'aria-label': ph ? 'Set up the dive' : null },
     ph ? h('div.cfghead', h('b', 'Set up the dive'), h('button.btn', { 'data-a': 'cfgclose', type: 'button' }, 'Done')) : null,
-    diveCfg(o),
     h('div.seg', h('span.lbl', 'Team size'), [2, 3, 4, 5].map(v => h('button.chipb' + (o.np === v ? '.on' : ''), { 'data-a': 'opt', 'data-k': 'np', 'data-v': v, type: 'button', 'aria-pressed': o.np === v ? 'true' : 'false' }, v))),
-    h('div.dgrid', [0, 1, 2, 3].map(c => dinerCard(c, o))),
+    diveCfg(o),
+    h('details.fold', h('summary', 'Your crew'), h('div.dgrid', [0, 1, 2, 3].map(c => dinerCard(c, o)))),
     ph ? h('div.cfgfoot', h('button.btn.go', { 'data-a': 'cfgclose', type: 'button' }, 'Done')) : null);
   // first visit (nothing in the logbook yet): the guided dive is the big button, so a player who taps the big button learns first
   const fresh = (() => { try { return !Object.keys(Prog.load().done || {}).length; } catch (e) { return false; } })();
@@ -9635,7 +9738,7 @@ async function pxTextures() {
   PX.tex.bub = mk(24, 24, (x, w, h) => { x.strokeStyle = 'rgba(220,244,255,.85)'; x.lineWidth = 2; x.beginPath(); x.arc(w / 2, h / 2, 9, 0, Math.PI * 2); x.stroke(); x.fillStyle = 'rgba(255,255,255,.7)'; x.beginPath(); x.arc(w / 2 - 3, h / 2 - 3, 2.4, 0, Math.PI * 2); x.fill(); });
   PX.tex.ring = mk(96, 96, (x, w, h) => { x.strokeStyle = 'rgba(255,224,130,.95)'; x.lineWidth = 6; x.beginPath(); x.arc(w / 2, h / 2, 40, 0, Math.PI * 2); x.stroke(); });
   PX.tex.cardShadow = mk(80, 108, (x, w, h) => { x.filter = 'blur(6px)'; x.fillStyle = 'rgba(0,6,20,.6)'; x.beginPath(); x.roundRect ? x.roundRect(12, 12, w - 24, h - 24, 8) : x.rect(12, 12, w - 24, h - 24); x.fill(); });
-  PX.tex.cardGlow = mk(96, 124, (x, w, h) => { x.filter = 'blur(8px)'; x.fillStyle = 'rgba(255,216,115,.95)'; x.beginPath(); x.roundRect ? x.roundRect(14, 14, w - 28, h - 28, 10) : x.rect(14, 14, w - 28, h - 28); x.fill(); });
+  PX.tex.cardGlow = mk(96, 124, (x, w, h) => { x.filter = 'blur(8px)'; x.fillStyle = 'rgba(225,244,255,.95)'; x.beginPath(); x.roundRect ? x.roundRect(14, 14, w - 28, h - 28, 10) : x.rect(14, 14, w - 28, h - 28); x.fill(); });
   PX.tex.handgrad = mk(4, 64, (x, w, h) => { const g = x.createLinearGradient(0, 0, 0, h); g.addColorStop(0, 'rgba(2,10,24,0)'); g.addColorStop(.3, 'rgba(2,10,24,.5)'); g.addColorStop(1, 'rgba(2,10,24,.6)'); x.fillStyle = g; x.fillRect(0, 0, w, h); });
   // caustics: soft light pools only (filled radial blobs, no outlines)
   PX.tex.caustic = mk(256, 256, (x, w, h) => { x.clearRect(0, 0, w, h); let s = 7; const r = () => { s = (s * 16807) % 2147483647; return s / 2147483647; }; for (let i = 0; i < 16; i++) { const cx = r() * w, cy = r() * h, rr = 22 + r() * 40; for (const [ox, oy] of [[0, 0], [w, 0], [-w, 0], [0, h], [0, -h]]) { const g = x.createRadialGradient(cx + ox, cy + oy, 0, cx + ox, cy + oy, rr); g.addColorStop(0, 'rgba(170,230,255,.16)'); g.addColorStop(1, 'rgba(170,230,255,0)'); x.fillStyle = g; x.beginPath(); x.ellipse(cx + ox, cy + oy, rr, rr * .7, 0, 0, 7); x.fill(); } } });
@@ -9735,7 +9838,7 @@ function pxSync() {
   const ent = UI.enter || ''; UI.enter = ''; const exit = UI.pxExit; UI.pxExit = null;
   pxPrewarm(); const fl = $('#felt'); if (fl) pxDrawFelt(pxRect(fl, B));
   const hz = $('#handz'); PX.handR = hz ? pxRect(hz, B) : null;
-  const els = [...document.querySelectorAll('#bd [data-px=card]')];
+  const els = [...document.querySelectorAll('#bd [data-px=card]')].filter(e => !e.classList.contains('dc'));   // F1: drone cards stay DOM pictures (their face-down card sits under them, above the canvas)
   let hi = 0;
   els.forEach(el => {
     const key = el.dataset.pk, R = pxRect(el, B), id = +el.dataset.id; seen.add(key);
@@ -9860,10 +9963,11 @@ function pxFrame(ts) {
     o.sp.width = w * sc; o.sp.height = h * sc; o.sp.alpha = tex ? 1 : 0;
     o.sp.tint = o.dim && !o.detached && o.layer === 'hand' ? 0xa9b8d0 : 0xffffff;
     o.sh.width = w * 1.25; o.sh.height = h * 1.18; o.sh.x = 3 + o.lift * 4; o.sh.y = 5 + o.lift * 8; o.sh.alpha = tex ? .55 + o.lift * .2 : 0;
-    const lan = o.id >= 36, pulse = .8 + .2 * Math.sin(PX.t * 3 + o.id);
+    if (o.gw && !o.gwT) o.gwT = PX.t; else if (!o.gw) o.gwT = 0;
+    const lan = o.id >= 36, pt = o.gwT ? PX.t - o.gwT : 99, pulse = pt < 6.28 ? .8 + .2 * Math.cos(pt * 3) : 1;   // F1 calm: the playable glow breathes 3 times, then rests
     o.gl.width = w * (o.pk ? 1.14 : 1.5); o.gl.height = h * (o.pk ? 1.1 : 1.35); o.gl.tint = o.pk ? 0x35c27b : 0xffffff; o.gl.alpha = tex ? (o.lift * (q.fx ? .9 : .6) + (o.pk ? .55 : 0) + (o.gw && !o.detached && o.layer === 'hand' ? .5 : 0)) * pulse : 0;
     o.lg.width = w * 1.9; o.lg.height = w * 1.9; o.lg.alpha = lan && q.fx && !o.dim ? .28 * pulse : 0;
-    if (o.lift > .01 && o.lift < .99) moving = true; if (o.pk || o.gw || (lan && q.fx)) moving = true;
+    if (o.lift > .01 && o.lift < .99) moving = true; if (o.pk || (o.gw && pt < 6.3)) moving = true;
   }
   PX.moving = moving;
   if (moving || PX.dirty || PerfHUDtesting()) { PX.dirty = false; try { PX.app.renderer.render(PX.app.stage); PX.frames = (PX.frames || 0) + 1; } catch (e) { pxOff('render: ' + (e && e.message)); } }
