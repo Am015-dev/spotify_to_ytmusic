@@ -462,3 +462,5 @@ html.short:not(.land) #trk{display:none!important}   /* the one-line prompt abov
 .ab[data-ui="undodrop"],.ab.ghost[data-act="undo"]{min-height:48px;font-size:16px;border:2px solid #8e3a1c;background:#fff6dc;color:#3b1c0e}
 .sch .dje{color:#5a2a8a;font-weight:800}
 @media (min-width:1024px){.bidt .spot{min-height:60px;min-width:72px}.bidt .spot .sp-b{min-height:56px;min-width:68px;font-size:18px!important}.bidt .spot .sp-c{font-size:16px}.bidt .spot .ord{font-size:14px}}
+/* IPH (iPhone): djinn buttons at least 44 px tall; goods cards 44 px wide in skin.css */
+html:not(.land) .dcard{min-height:44px!important}

@@ -260,8 +260,8 @@ html body #grid .tile .why{position:absolute;left:1px;top:1px;z-index:4;padding:
    so the tiles grow and the people on them are at least 16 px; the power buttons wrap instead of sliding sideways */
 @media (max-width:700px){
  html:not(.land) body #bd.gx-board{padding-left:3px;padding-right:3px}
- html:not(.land):not(.mr-off) body #mkt .mrow{display:grid!important;grid-template-columns:repeat(10,minmax(0,1fr))!important;flex-wrap:nowrap!important;overflow:visible!important;gap:2px!important;width:100%;box-sizing:border-box}
- html:not(.land) body #mkt .mrow .mcard{height:42px!important;min-width:0!important;padding:0!important;background-position:center!important}
+ html:not(.land):not(.mr-off) body #mkt .mrow{display:grid!important;grid-template-columns:repeat(9,minmax(0,1fr))!important;flex-wrap:nowrap!important;overflow:visible!important;gap:0!important;width:100%!important;box-sizing:border-box}
+ html:not(.land) body #mkt .mrow .mcard{height:46px!important;min-width:0!important;padding:0!important;background-position:center!important}
  html:not(.land) body #mkt .mrow .mcard .mn{display:none!important}
  html:not(.land) body #mkt .mrow .mcard .mi{font-size:20px!important}
  html:not(.land) body #mkt .mrow .deckback{min-width:0!important;height:42px!important}
@@ -302,3 +302,5 @@ html.skipon body #line{padding-right:96px!important;box-sizing:border-box}html b
 
 /* F3 cold play: the moves log never takes a click from the buttons under it (PC) */
 html.land #feed{pointer-events:none}html.land #acts,html.land #mine{z-index:3}
+
+html:not(.land) body #mkt .mrow .deckback{display:none!important}
