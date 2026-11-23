@@ -689,6 +689,8 @@ html.short:not(.land) #trk{display:none!important}   /* the one-line prompt abov
 .ab[data-ui="undodrop"],.ab.ghost[data-act="undo"]{min-height:48px;font-size:16px;border:2px solid #8e3a1c;background:#fff6dc;color:#3b1c0e}
 .sch .dje{color:#5a2a8a;font-weight:800}
 @media (min-width:1024px){.bidt .spot{min-height:60px;min-width:72px}.bidt .spot .sp-b{min-height:56px;min-width:68px;font-size:18px!important}.bidt .spot .sp-c{font-size:16px}.bidt .spot .ord{font-size:14px}}
+/* IPH (iPhone): djinn buttons at least 44 px tall; goods cards 44 px wide in skin.css */
+html:not(.land) .dcard{min-height:44px!important}
 /* ===== GX skin: painted UI kit over the shared shell + campaign classes. Opt-in: nothing changes until gx-skin.js adds
    html.sk (after the kit files loaded). Kit files live in the game's media/ (ui-topbar, ui-iconbtn, ui-panel, ui-drawer-head,
    ui-button-cream/go/power, ui-row, ui-bubble, ui-node-*). Extra switches: html.sk-icons (icon-*.webp set), html.sk-map (story-map.webp),
@@ -1007,8 +1009,8 @@ html body #grid .tile .why{position:absolute;left:1px;top:1px;z-index:4;padding:
    so the tiles grow and the people on them are at least 16 px; the power buttons wrap instead of sliding sideways */
 @media (max-width:700px){
  html:not(.land) body #bd.gx-board{padding-left:3px;padding-right:3px}
- html:not(.land):not(.mr-off) body #mkt .mrow{display:grid!important;grid-template-columns:repeat(10,minmax(0,1fr))!important;flex-wrap:nowrap!important;overflow:visible!important;gap:2px!important;width:100%;box-sizing:border-box}
- html:not(.land) body #mkt .mrow .mcard{height:42px!important;min-width:0!important;padding:0!important;background-position:center!important}
+ html:not(.land):not(.mr-off) body #mkt .mrow{display:grid!important;grid-template-columns:repeat(9,minmax(0,1fr))!important;flex-wrap:nowrap!important;overflow:visible!important;gap:0!important;width:100%!important;box-sizing:border-box}
+ html:not(.land) body #mkt .mrow .mcard{height:46px!important;min-width:0!important;padding:0!important;background-position:center!important}
  html:not(.land) body #mkt .mrow .mcard .mn{display:none!important}
  html:not(.land) body #mkt .mrow .mcard .mi{font-size:20px!important}
  html:not(.land) body #mkt .mrow .deckback{min-width:0!important;height:42px!important}
@@ -1049,6 +1051,8 @@ html.skipon body #line{padding-right:96px!important;box-sizing:border-box}html b
 
 /* F3 cold play: the moves log never takes a click from the buttons under it (PC) */
 html.land #feed{pointer-events:none}html.land #acts,html.land #mine{z-index:3}
+
+html:not(.land) body #mkt .mrow .deckback{display:none!important}
 /* ===== GX campaign styles: chapter map, story scenes, boss card, result. Theme with the --gxc-* variables. ===== */
 :root{--gxc-bg:#1b1410;--gxc-paper:#efe0bd;--gxc-paper2:#e2cc9b;--gxc-ink:#2a1d10;--gxc-dim:rgba(42,29,16,.68);--gxc-line:rgba(60,38,14,.28);
   --gxc-go:#c9662a;--gxc-go-ink:#fff8ec;--gxc-gold:#f2b93b;--gxc-a1:#4f8a4b;--gxc-a2:#c07a2c;--gxc-a3:#8e3b46;--gxc-road:#b98a52;--gxc-radius:16px;

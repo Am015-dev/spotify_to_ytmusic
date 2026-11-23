@@ -1,7 +1,7 @@
 // ---------- computer players: plan the whole move (start, path, colour), then play it step by step ----------
 let AIPLAN=null;
-// easy = the default rival: plays loose about half the time and eases off once it leads by 10+; tuned (R33) so a newcomer who taps only what glows wins about 1 in 2
-const LVL={easy:{noise:1.5,depth:12000,bid:.2,ease:10,loose:.5,pool:.6},normal:{noise:.6,depth:20000,bid:.3,ease:15,loose:.3,pool:.5},hard:{noise:0,depth:60000,bid:.35,ease:0}};
+// easy = the default rival: loose walks 9 in 10, eases off once ahead, tightens when 3+ behind (rubber band = close games); tuned (F3, touch-bench.js) so a newcomer who follows the starting-tile hint wins about 1 in 2 by a small margin
+const LVL={easy:{noise:2.2,depth:12000,bid:.1,ease:5,loose:1,pool:1,chase:6,tight:.4},normal:{noise:.6,depth:20000,bid:.3,ease:4,loose:.7,pool:.7,chase:5,tight:.5},hard:{noise:0,depth:60000,bid:.35,ease:0}};
 function aiLead(p){if(!G||!G.pl)return 0;const s=scoreOf(p).total;let o=-1e9;for(const q of G.pl)if(q.i!==p.i)o=Math.max(o,scoreOf(q).total);return s-o}
 function aiNoise(p){const L=LVL[p.lv]||LVL.normal;if(p.__nz!=null)return p.__nz;return L.noise}
 function aiEase(p){const L=LVL[p.lv]||LVL.normal;if(!L.ease)return 0;const d=aiLead(p);return d>L.ease?Math.min(4,1+(d-L.ease)/10):0}
@@ -14,10 +14,10 @@ function outcomes(s,cap){const t=G.board[s];const hand=t.m.slice();const saved=t
   rec(s,-1,L);t.m=saved;return Object.values(res)}
 function goodsGain(p,cards){const base=goodsBest(p);const q=Object.assign({},p,{res:p.res.concat(cards.filter(r=>r!=='fakir')),fk:p.fk+cards.filter(r=>r==='fakir').length});return goodsBest(q)-base+cards.filter(r=>r==='fakir').length*1.2}
 function djValue(p,k){const d=DJ[k];let v=d.vp;const left=Math.max(1,12-G.round*1.2);
-  if(d.cost)v+=Math.min(6,left*.6);if(k==='nakhla')v+=G.board.filter(t=>owner(t)===p.i).reduce((a,t)=>a+t.palm*2,0)+2;if(k==='wazira')v+=p.vz*2+2;if(k==='hikma')v+=p.el*2+2;if(k==='zarifa')v+=Math.floor(p.fk/2)*3;if(k==='majlis')v+=5*(p.dj.length+1);
+  if(d.cost)v+=Math.min(6,left*.6);if(k==='nakhla')v+=G.board.filter(t=>owner(t)===p.i).reduce((a,t)=>a+t.palm*2,0)+2;if(k==='wazira')v+=p.vz*2+2;if(k==='hikma')v+=p.el*2+2;if(k==='zarifa')v+=Math.floor(p.fk/2)*3;if(k==='majlis')v+=DJN.majlis*(p.dj.length+1);
   if(['harith','qasra','khanjar','tariq','amir'].includes(k))v+=left*.8;return v}
 function bestSummon(p){let b=null,bv=-1e9;for(const k of G.djRow)for(const pay of summonPays(p)){const cost=pay.el*2+pay.fk*1.5;const v=djValue(p,k)-cost;if(v>bv){bv=v;b={k,pay}}}return {b,v:bv}}
-function vizierValue(p,n){const others=G.pl.filter(q=>q.i!==p.i);let v=n*(hasDj(p,'wazira')?3:1);for(const q of others){const before=q.vz<p.vz,after=q.vz<p.vz+n;if(!before&&after)v+=10*(G.round>3?1:.7);else if(!after&&q.vz-p.vz<=n+2)v+=2}return v}
+function vizierValue(p,n){const others=G.pl.filter(q=>q.i!==p.i);let v=n*(hasDj(p,'wazira')?DJN.wazira:1);for(const q of others){const before=q.vz<p.vz,after=q.vz<p.vz+n;if(!before&&after)v+=10*(G.round>3?1:.7);else if(!after&&q.vz-p.vz<=n+2)v+=2}return v}
 function killValue(p,n,tile){let best=0;for(const q of G.pl){if(q.i===p.i||hasDj(q,'sadim'))continue;if(q.vz){const leader=G.pl.every(x=>x.vz<=q.vz);best=Math.max(best,leader?6:2)}if(q.el)best=Math.max(best,3+(q.el>=2?1:0))}
   for(const t of G.board){if(t.block||!t.m.length||MDIST(tile,t.i)>n+p.fk)continue;if(t.m.length===1&&t.camel==null&&t.tent==null)best=Math.max(best,tileWorth(t)-2)}return best}
 function evalOutcome(p,o){const t=G.board[o.e];let v=0;
@@ -25,10 +25,10 @@ function evalOutcome(p,o){const t=G.board[o.e];let v=0;
   const baseM=o.e===o.s?[]:t.m;const visitsE=o.path.slice(1,-1).filter(i=>i===o.e).length;const extraC=o.n-1-baseM.filter(x=>x===o.c).length;const remain=baseM.filter(x=>x!==o.c).length+Math.max(0,visitsE-extraC);
   const mine=owner(t)===p.i||(owner(t)==null&&remain<=0&&p.camels>0);const theirs=owner(t)!=null&&owner(t)!==p.i;
   if(owner(t)==null&&remain<=0&&p.camels>0)v+=tileWorth(t)+(t.k==='city'?6:0)+(G.endTrig?0:1)-(p.camels<=2&&!aiAhead(p)?6:0);
-  switch(o.c){case 'vizier':v+=vizierValue(p,o.n);break;case 'elder':v+=o.n*(hasDj(p,'hikma')?4:2)+(G.djRow.length?o.n*1.5:0);break;
+  switch(o.c){case 'vizier':v+=vizierValue(p,o.n);break;case 'elder':v+=o.n*(hasDj(p,'hikma')?DJN.hikma:2)+(G.djRow.length?o.n*1.5:0);break;
     case 'merchant':v+=goodsGain(p,G.market.slice(0,o.n));break;case 'builder':{const blues=AROUND(o.e).filter(i=>G.board[i].blue&&!G.board[i].block).length;v+=o.n*blues;break}
     case 'assassin':v+=killValue(p,o.n,o.e);break;case 'artisan':v+=o.n*2.6+(G.items.length?4:0);break}
-  switch(t.k){case 'village':v+=mine?5:theirs?-4:1;break;case 'oasis':v+=mine?(hasDj(p,'nakhla')?5:3):theirs?-2.5:1;break;
+  switch(t.k){case 'village':v+=mine?5:theirs?-4:1;break;case 'oasis':v+=mine?(hasDj(p,'nakhla')?DJN.nakhla:3):theirs?-2.5:1;break;
     case 'sacred':{const pe=Object.assign({},p,{el:p.el+(o.c==='elder'?o.n:0)});const s=bestSummon(pe);if(s.b)v+=Math.max(0,s.v);break}
     case 'small':if(p.coins>=3)v+=Math.max(0,Math.max(...G.market.slice(0,3).map(r=>goodsGain(p,[r])))-3);break;
     case 'large':if(p.coins>=6){const f=G.market.slice(0,6);let b=0;for(let x=0;x<f.length;x++)for(let y=x+1;y<f.length;y++)b=Math.max(b,goodsGain(p,[f[x],f[y]]));v+=Math.max(0,b-6)}break;
@@ -40,7 +40,7 @@ function aiAhead(p){const s=scoreOf(p).total;return G.pl.every(q=>q.i===p.i||sco
 function planTurn(p){const L=LVL[p.lv]||LVL.normal,cap=L.depth;const e=aiEase(p);p.__nz=aiNoise(Object.assign({},p,{__nz:null}))+e*2.5;let best=null,bv=-1e9;const all=[];
   for(const s of legalStarts())for(const o of outcomes(s,cap)){const v=evalOutcome(p,o);all.push([v,o]);if(v>bv){bv=v;best=o}}p.__nz=null;
   // a loose turn: any walk from the better half (more often while it leads), so the default rival makes human-sized mistakes
-  const lp=(L.loose||0)+(e?.15*e:0);if(lp&&all.length>3&&Math.random()<lp){all.sort((a,b)=>b[0]-a[0]);const h=all.slice(0,Math.max(2,Math.ceil(all.length*(L.pool||.5))));const pk=h[Math.floor(Math.random()*h.length)];best=pk[1];bv=pk[0]}return best&&Object.assign(best,{v:bv})}
+  let lp=(L.loose||0)+(e?.15*e:0);if(L.chase&&aiLead(p)<-L.chase)lp*=L.tight;if(lp&&all.length>3&&Math.random()<lp){all.sort((a,b)=>b[0]-a[0]);const h=all.slice(0,Math.max(2,Math.ceil(all.length*(L.pool||.5))));const pk=h[Math.floor(Math.random()*h.length)];best=pk[1];bv=pk[0]}return best&&Object.assign(best,{v:bv})}
 function bestTurnValue(p){const b=planTurn(Object.assign({},p,{lv:'hard'}));return b?b.v:0}
 // the next concrete move for side s
 function aiMove(s){if(G&&G.tut&&typeof tutAIMove==='function'){const tm=tutAIMove(s);if(tm)return tm}
