@@ -546,4 +546,14 @@ html,body{background:#3a1f0e}
 .strip .pts,.strip .who{position:relative}
 .strip .pts::before,.strip .who::before{content:"";position:absolute;left:-3px;right:-3px;top:50%;height:44px;transform:translateY(-50%)}
 #goal{position:relative}#goal::before{content:"";position:absolute;left:0;right:0;top:50%;height:44px;transform:translateY(-50%)}
+/* IPH: wonder cards grow to fit their full text; art keeps a fixed 16:9 shape, never squashed */
+#draft{display:flex;flex-wrap:wrap;align-content:flex-start;align-items:flex-start;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch}
+#draft .wcard{overflow:visible;height:auto;align-self:flex-start;flex:0 0 calc(50% - 4px);box-sizing:border-box;min-width:0}
+#draft .dnote{flex:1 1 100%}
+#draft .wcard>.art{flex:0 0 auto;height:0;padding-top:min(52%,120px);min-height:0;max-height:none;width:100%;box-sizing:border-box;position:relative;border-radius:8px 8px 0 0;overflow:hidden}
+#draft .wcard>.art img{position:absolute;left:0;top:0;width:100%;height:100%;object-fit:cover}
+#draft .wcard .chip .art{position:absolute;inset:0;display:block;flex:none;min-height:0;max-height:none;aspect-ratio:auto;width:auto;border:0;border-radius:inherit;background-size:contain}
+#draft .wcard>b,#draft .wcard>small{overflow:visible;white-space:normal;overflow-wrap:break-word}
+#draft .wcard .costs{flex-wrap:wrap;overflow:visible}
+.zcard{overflow:visible}
 </style></head>
