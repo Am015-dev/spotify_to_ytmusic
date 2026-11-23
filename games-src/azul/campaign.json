@@ -155,7 +155,7 @@
         "personality": "Dreamy glass artist; hoards prisms and finishes racks in one go.",
         "aiLevel": "normal", "aiStyle": "denying" },
       "setup": { "np": 2, "ex": { "gray": false, "prism": true } },
-      "twist": { "id": "boss-glazed-start", "param": 1, "text": "Rival rule: Iris starts with one Cobalt tile set in row 1." },
+      "twist": { "id": "boss-glazed-start", "param": 1, "text": "Rival rule: Iris starts with one blue tile set in wall row 1." },
       "goal": { "type": "score", "value": 30, "text": "Win with at least 30 points." },
       "hints": false,
       "stars": [
