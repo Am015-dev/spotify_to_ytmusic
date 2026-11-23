@@ -56,7 +56,9 @@ for(const [W,H] of SIZES){const tag=W+'x'+H,shots=process.env.SHOTS&&W===390&&H=
   if(shots&&!firstShot){firstShot=true;await sleep(500);await p.screenshot({path:path.join(SHOT,'first-turn.png')})}
   if(shots&&!midShot&&s.r>=3){midShot=true;await sleep(500);await p.screenshot({path:path.join(SHOT,'mid-game.png')})}
   const m=await p.evaluate(()=>{const m=aiMove(0);window.__mv=m;const a=m.src<0?G.ctr:G.fac[m.src];return {k:(m.src<0?'c':'f'+m.src)+'_'+a.indexOf(m.c),line:m.line}});
+  const turn0=await p.evaluate(()=>G.turn);
   if(!s.sel){if(!(await tapEl(`.bf-table [data-k="${m.k}"]`))){bad++;await sleep(200);continue}await sleep(200)}
+  if(await p.evaluate(t=>G.turn>t||!!G.over,turn0)){moves++;continue}   // nothing fits: the tile tap alone sent it to the floor
   const ok=await p.evaluate(()=>!!UI.sel&&UI.sel.src===window.__mv.src&&UI.sel.c===window.__mv.c);if(!ok){bad++;await p.evaluate(()=>{UI.sel=null});await sleep(150);continue}
   const t0=await p.evaluate(()=>G.turn);
   if(!(await tapEl(m.line<5?`[data-bfrow="${m.line}"] .bf-rack`:'.bf-fl'))){bad++;await sleep(200);continue}

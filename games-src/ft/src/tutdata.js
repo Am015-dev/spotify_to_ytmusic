@@ -8,7 +8,7 @@
 //  tiles           Stall (3 coins for a good), Hamlet (palace 5), Shrine (summon a djinn), Oasis (palm 3), Grand Bazaar (6 coins for 2 goods)
 //  goods / Mystics sets of different kinds score 1/3/7/13...; sell a set at the end of a turn; Mystics never score but boost Masons and Shadows
 //  computer        the computer plays by the same rules, one step at a time
-//  end             the last camel ends the game; score coins, Advisors, Sages, djinns, tiles with palms and palaces, goods
+//  end             the last camel ends the game at the end of that round; score coins, Advisors, Sages, djinns, tiles with palms and palaces, goods
 const TUT_SEED=20261009;
 // tile index = row*6+col (rows A-E, columns 1-6). The five stages of the lesson, all drawn on this one board:
 //   comp A  (turn 1) lifts Sages from L11 and walks 10, 9 to the Shrine on 8, takes the Sages, claims it and summons a djinn

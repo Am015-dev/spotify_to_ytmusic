@@ -42,12 +42,12 @@ function lineText(){if(!G)return '';if(G.over){const hs=G.pl.filter(x=>x.human);
   if(!hp){const nm=seatName(p);if(online()&&p.human)return `Waiting for ${nm}`;if(G.q)return `${nm} is choosing`;if(G.phase==='bid')return `${nm} is bidding`;return `${nm} is ${{move:G.move?'moving':'choosing',tribe:'collecting',tile:'acting',sell:'finishing'}[G.step]||'playing'}`}
   {const gs=typeof gdStep==='function'?gdStep():null;if(gs&&gs.who!=='me')return 'Tap Next to go on'}
   if(G.q)return qLine(G.q);if(UI.pendDj||UI.pendItem)return 'Tap a glowing tile';
-  if(G.phase==='bid'){const two=hp.markers>1;return 'Tap a glowing spot to bid'}
+  if(G.phase==='bid'){const two=hp.markers>1;return two?'Pick 2 turns: earlier costs more':'Pick your turn: earlier costs more (coins are points)'}   // F2: says what bidding is for, in one plain line
   switch(G.step){
-  case 'move':return !G.move?'Tap a glowing tile to lift people':G.move.hand.length===1?'Last one: land on its colour':'Tap a glowing tile to drop one';
-  case 'tribe':return {assassin:'Tap a glowing person to remove',builder:hp.fk?'Tap Earn to take your coins':'Tap Collect to take your coins',merchant:'Tap Collect to fetch goods',vizier:'Tap Collect: Advisors join you',elder:'Tap Collect: Sages join you',artisan:'Tap Collect: Crafters join you'}[G.act.color]||'';
+  case 'move':if(G.move&&typeof f3Mine==='function'){const f=f3Line();if(f)return f}return !G.move?'Tap a glowing tile to lift people':G.move.hand.length===1?'Last one: land on its colour':'Tap a glowing tile to drop one';
+  case 'tribe':return {assassin:'Shadow: remove one person in reach',builder:hp.fk?'Tap Earn to take your coins':'Tap Collect to take your coins',merchant:'Tap Collect to fetch goods',vizier:'Tap Collect: Advisors join you',elder:'Tap Collect: Sages join you',artisan:'Tap Collect: Crafters join you'}[G.act.color]||'';
   case 'tile':{const t=G.board[G.act.tile];return {village:UI.pick.length>1?'Tap a glowing tile for the palace':'Tap Build here',oasis:UI.pick.length>1?'Tap a glowing tile for the palm':'Tap Plant here',sacred:'Tap a djinn to summon, or Skip',small:'Buy a good for 3🪙',large:(UI.mkSel&&UI.mkSel.length===1?'One chosen. Pick one more good':'Pick two goods for 6🪙'),exchange:'Buy a good for 4🪙',workshop:'Commission an item, or Skip'}[t.k]||'Tap Skip to go on'}
-  case 'sell':return 'Sell goods, or tap End turn'}
+  case 'sell':return 'Sell goods for coins, or End turn'}
   return ''}
 // ---------- seats (the score race) ----------
 function E2(e,k){return `<i class="e2" data-i="${k}">${e}</i>`}
@@ -55,7 +55,7 @@ function pip(c,n){return n?`<span class="pp" title="${esc(MPLUR[c])}"><i class="
 function seatHtml(p){const a=sideToAct()===p.i&&!G.over;const kill=UI.pickSeat.includes(p.i);const nm=seatName(p);
   return `<div class="sch ${a?'actnow':''} ${kill?'glow':''}" data-seat="${p.i}" style="--pc:${PCOL[p.i]}" aria-label="${esc(nm)}, score ${shownTotal(p)}">
    <b class="sn">${esc(nm)}${!p.human?'<small>cpu</small>':''}</b><b class="ss"><i class="sti">★</i>${shownTotal(p)}</b>
-   <span class="s2"><span class="st">${E2('🪙','coin')}${p.coins}<em class="w"> coins</em></span><span class="st">${E2('🐪','camel')}${p.camels}<em class="w"> camel${p.camels===1?'':'s'} left</em></span>${p.tent?'<span class="st">⛺</span>':''}</span>
+   <span class="s2"><span class="st">${E2('🪙','coin')}${p.coins}<em class="w"> coins</em></span><span class="st">${E2('🐪','camel')}${p.camels}<em class="w"> camel${p.camels===1?'':'s'} left</em></span>${p.tent?'<span class="st">⛺</span>':''}${(()=>{const dj=scoreOf(p).djinns;return dj?`<span class="st dje" title="Djinn points, counted at the end">🧞+${dj}<em class="w"> at end</em></span>`:''})()}</span>
    <span class="s3">${pip('vizier',p.vz)}${pip('elder',p.el)}${G.ex.artisans?pip('artisan',p.art):''}${p.fk?`<span class="pp">🔮${p.fk}</span>`:''}${p.res.length?`<span class="pp">${E2('🧺','basket')}${p.res.length}</span>`:''}${p.dj.length?`<span class="pp">${E2('🧞','djinn')}${p.dj.length}</span>`:''}</span></div>`}
 function renderSeats(){const el=$('#seats');if(!el)return;const h=G.pl.map(seatHtml).join('');el.dataset.n=G.pl.length;el.innerHTML=h}
 // ---------- the bazaar ----------
@@ -84,16 +84,19 @@ function shortOpt(l){let t=String(l).replace(/\s*\(.*?\)/g,'').replace(/:.*$/,''
 function bidGood(hp,bm){const k=m=>m.spot+':'+(m.fk||0);const g=new Set();let adv=null;try{adv=typeof hlpAdvice==='function'?hlpAdvice():null}catch(e){}
   for(const m of bm){const pr=bidPrice(hp,m.spot,m.fk);if(pr===0||(pr<=Math.max(1,Math.floor(hp.coins*.06))&&adv&&adv.act==='bid'&&adv.spot===m.spot&&(adv.fk||0)===(m.fk||0)))g.add(k(m))}
   if(!g.size){let lo=1e9;for(const m of bm)lo=Math.min(lo,bidPrice(hp,m.spot,m.fk));bm.forEach(m=>{if(bidPrice(hp,m.spot,m.fk)===lo)g.add(k(m))})}return m=>g.has(k(m))}
-function trackHtml(hp,vm){const bm=vm.filter(m=>m.act==='bid');const good=bidGood(hp,bm);const done=new Set(G.bids.map(b=>b.spot));
-  const ord=['1st','2nd','3rd','4th','5th','6th','7th','8th','9th','10th','11th','12th'];
-  return `<div class="bidt${G.track.length>7?' two':''}" aria-label="Turn order">${G.track.map((t,s)=>{const b=G.bids.find(x=>x.spot===s);const mine=bm.filter(m=>m.spot===s);
-    return `<div class="spot ${b?'taken':''}" style="${b?'--pc:'+PCOL[b.mk.p]:''}"><small class="ord">${ord[s]}</small>${mine.map(m=>`<button class="sp-b ${good(m)?'glow':'dear'} ${m.fk?'fkv':''}" data-mv='${mvAttr(m)}' aria-label="${bidPrice(hp,s,m.fk)?bidPrice(hp,s,m.fk)+' coins':'free'}${m.fk?' with '+m.fk+' Mystic':''}">${m.fk?`<i>−${m.fk}🔮</i>${bidPrice(hp,s,m.fk)}🪙`:`${t.cost}🪙`}</button>`).join('')||`<span class="sp-c">${t.cost}🪙</span>`}${b?'<i class="mk"></i>':''}</div>`}).join('')}</div>`}
+function trackHtml(hp,vm){const bm=vm.filter(m=>m.act==='bid');const good=bidGood(hp,bm);
+  const ord=['1st','2nd','3rd','4th','5th','6th','7th','8th','9th','10th','11th','12th'];const cost=c=>c?c+'🪙':'free';
+  // F2: every spot is one big button that names its place in the turn order and its price; taken spots name who took them
+  return `<div class="bidt${G.track.length>7?' two':''}" aria-label="Turn order: earlier costs more">${G.track.map((t,s)=>{const b=G.bids.find(x=>x.spot===s);const mine=bm.filter(m=>m.spot===s);
+    const who=b?esc(seatName(P(b.mk.p))):'';
+    return `<div class="spot ${b?'taken':mine.length?'open':'shut'}" style="${b?'--pc:'+PCOL[b.mk.p]:''}">${mine.map(m=>{const pr=bidPrice(hp,s,m.fk);return `<button class="sp-b ${good(m)?'glow':'dear'} ${m.fk?'fkv':''}" data-mv='${mvAttr(m)}' aria-label="${ord[s]} in turn order, ${pr?pr+' coins':'free'}${m.fk?' with '+m.fk+' Mystic':''}"><small class="ord">${ord[s]}</small><b class="spc">${m.fk?`<i>−${m.fk}🔮</i>`:''}${cost(pr)}</b></button>`}).join('')||`<small class="ord">${ord[s]}</small><span class="sp-c">${b?who:cost(t.cost)}</span>`}${b?'<i class="mk"></i>':''}</div>`}).join('')}</div>`}
 function powerChips(hp,vm){const pw=[...vm.filter(m=>m.act==='djinn'),...vm.filter(m=>m.act==='item')];if(!pw.length)return '';const seen=new Set();let h='';
   for(const m of pw){if(m.act==='djinn'){const key=m.k+JSON.stringify(m.pay);if(seen.has(key))continue;seen.add(key);const pay='pay '+[m.pay.el?m.pay.el+' Sage'+(m.pay.el>1?'s':''):'',m.pay.fk?m.pay.fk+' Mystic'+(m.pay.fk>1?'s':''):''].filter(Boolean).join(' + ');
       h+=m.t>=0?`<button class="ab pw${UI.pendDj&&same(UI.pendDj,{k:m.k,pay:m.pay})?' on':''}" data-pw='${mvAttr({k:m.k,pay:m.pay})}'>✨ ${esc(DJ[m.k].n)} <small>${pay}</small></button>`:abtn(m,`✨ ${esc(DJ[m.k].n)} <small>${pay}</small>`,'pw')}
     else{const key='i'+m.k+(m.dj||'');if(seen.has(key))continue;seen.add(key);
       if(m.k==='flute'||m.k==='talisman')h+=`<button class="ab pw${UI.pendItem&&UI.pendItem.k===m.k?' on':''}" data-pi="${m.k}">${itemIc(m.k)} ${esc(ITEMS[m.k].n)}</button>`;else h+=abtn(m,`${itemIc(m.k)} ${esc(ITEMS[m.k].n)}${m.dj?' → '+esc(DJ[m.dj].n):''}`,'pw')}}
-  return `<div class="arow pws">${h}</div>`}
+  const n=seen.size;if(n<2||UI.pendDj||UI.pendItem||(typeof gdStep==='function'&&gdStep()))return `<div class="arow pws">${h}</div>`;   // F3: two or more powers fold into one Djinns (n) drawer
+  return `<div class="arow pws pwd"><button class="ab pw pwtog${UI.pwOpen?' on':''}" data-ui="pwtog" aria-expanded="${!!UI.pwOpen}">✨ Djinns (${n}) ${UI.pwOpen?'▾':'▸'}</button>${UI.pwOpen?h:''}</div>`}
 // builds the button area and sets UI.autoMove when the turn needs no decision from the player
 const gdOn=()=>typeof gdStep==='function'&&!!gdStep();   // the guided game shows a button for every step, never an automatic move
 function buildActs(){UI.autoMove=null;const hp=me();if(!G||G.over||!hp||UI.modal)return '';const vm=validMoves(hp.i);const by=a=>vm.filter(m=>m.act===a);let h='',main='';
@@ -118,9 +121,10 @@ function buildActs(){UI.autoMove=null;const hp=me();if(!G||G.over||!hp||UI.modal
     break}
   case 'sell':{const kinds=[...new Set(hp.res)];UI.sellSel=UI.sellSel.filter(k=>kinds.includes(k));const end=by('end')[0];
     if(!kinds.length&&!vm.filter(m=>m.act!=='end').length&&end&&!gdOn()){UI.autoMove=end;break}
-    if(UI.sellSel.length)main+=abtn({act:'sell',kinds:UI.sellSel.slice().sort()},`Sell +${sellValue(UI.sellSel.length)}🪙`,'');
+    if(UI.sellSel.length)main+=abtn({act:'sell',kinds:UI.sellSel.slice().sort()},`Sell ${UI.sellSel.length} +${sellValue(UI.sellSel.length)}🪙`,'');
+    else if(kinds.length>1)main+=abtn({act:'sell',kinds:kinds.slice().sort()},`Sell all ${kinds.length} kinds +${sellValue(kinds.length)}🪙`,'');   // F3: one button sells one of each kind
     main+=abtn(end,'End turn ▶','go');break}}
-  if(main)h+=`<div class="arow${main.indexOf('ab ern')>=0?' earn':''}">${main}</div>`;return h+pw}
+  if(main)h+=`<div class="arow${main.indexOf('ab ern')>=0?' earn':''}">${main}</div>`;if(G.step==='move'&&typeof f3Mine==='function')h=f3ActsHtml()+h;return h+pw}
 function renderActs(){const el=$('#acts');if(!el)return;const h=buildActs();if(el.dataset.h!==h){el.innerHTML=h;el.dataset.h=h}el.classList.toggle('empty',!h)}
 function renderMine(){const el=$('#mine');if(!el)return;const hp=me();let h='';
   if(G&&!G.over&&hp&&!UI.modal&&!G.q&&G.phase==='turn'&&G.step==='sell'){const kinds=[...new Set(hp.res)];UI.sellSel=UI.sellSel.filter(k=>kinds.includes(k));
@@ -129,10 +133,10 @@ function renderMine(){const el=$('#mine');if(!el)return;const hp=me();let h='';
 function renderLine(){const el=$('#line');if(!el)return;const t=lineText();if(el.textContent!==t)el.textContent=t;const hp=me();el.classList.toggle('mine',!!hp&&!G.over)}
 function renderChrome(){const c=$('#pchip');if(c&&G){const s=sideToAct();const t=G.over?'Game over':`Round ${G.round}`+(online()?' · online':'');if(c.textContent!==t)c.textContent=t}
   const sb=$('#speedbtn');if(sb)sb.innerHTML=ICON('fast')+'<span>'+({0.5:'slow',1:'normal',3:'fast'}[UI.speed]||'normal')+'</span>'}
-function render(){if(!G){renderModal();return}
+function render(){if(!G){renderModal();return}if(typeof f3Mine==='function')f3Turn();
   const prev=UI.snap&&UI.snap.seed===G.seed?UI.snap:null;if(me())UI.hurry=false;
   computePick();renderSeats();renderGrid();renderMarket();renderMine();renderActs();renderLine();renderChrome();renderPopups();renderModal();
-  if(typeof fit==='function')fit();if(typeof animate==='function')animate(prev);UI.snap=snapState();
+  if(typeof fit==='function')fit();if(typeof animate==='function')animate(prev);UI.snap=snapState();if(typeof f3Mine==='function')f3After();
   autoStep();if(typeof placeChz==='function')placeChz();if(typeof placeFinger==='function')placeFinger();overCheck();if(typeof hlpAfter==='function')hlpAfter()}
 function snapState(){return {seed:G.seed,tiles:G.board.map(t=>({m:t.m.slice(),hand:G.move&&G.move.at===t.i?G.move.hand.slice():[],camel:t.camel,tent:t.tent,palm:t.palm,pal:t.pal})),market:G.market.slice(),djRow:G.djRow.slice(),thRow:(G.thRow||[]).slice(),
   tot:G.pl.map(p=>shownTotal(p)),coins:G.pl.map(p=>p.coins),cur:G.cur,act:G.act?{color:G.act.color,tile:G.act.tile}:null,step:G.step,logN:G.logN}}
@@ -153,6 +157,7 @@ function onTile(i){const p=me();if(!p)return;if(UI.chz){const same=UI.chz.anchor
   if(UI.pendItem){const it=UI.pendItem;const ms=vm.filter(m=>m.act==='item'&&m.k===it.k);
     if(it.k==='flute'){const m=ms.find(m=>m.t===i);UI.pendItem=null;if(m)return go(m);return render()}
     if(it.k==='talisman'){if(it.from==null){if(ms.some(m=>m.from===i)){it.from=i;return render()}UI.pendItem=null;return render()}const m=ms.find(m=>m.from===it.from&&m.to===i);UI.pendItem=null;if(m)return go(m);return render()}}
+  if(G.step==='move'&&G.move&&typeof f3Mine==='function'&&f3TileTap(i))return;   // F3: tap where the walk ends: the whole path is planned, one more tap confirms
   if(G.step==='move'){if(!G.move){const m=vm.find(m=>m.act==='start'&&m.tile===i);if(m){UI.hurry=false;return go(m)}return nope()}
     const ok=vm.filter(m=>m.act==='step'&&m.tile===i);if(!ok.length)return nope();if(ok.length===1)return go(ok[0]);
     return pickChoose({tile:i},ok.map(m=>({html:mdotHtml(m.c),m})))}
@@ -172,7 +177,7 @@ function onMarket(j){const p=me();const el=document.querySelector(`[data-mk="${j
 function onDjinn(k,th){const p=me();const ak=th?'t:'+k:k;if(UI.chz&&UI.chz.anchor.dj===ak){UI.chz=null;return render()}if(p&&G.step==='tile'&&!G.q){const tm=validMoves(p.i).filter(m=>m.act==='tile'&&(th?m.thief===k:m.dj===k));
     if(tm.length===1)return go(tm[0]);if(tm.length>1){UI.chz={anchor:{dj:ak},opts:tm.map(m=>({html:`<span class="paychip">Pay ${m.pay.el} Sage${m.pay.el>1?'s':''}${m.pay.fk?' + 1 Mystic':''}</span>`,m}))};return render()}}
   const d=DJ[k];showTip(document.querySelector(th?`[data-th="${k}"]`:`[data-dj="${k}"]`),th?`<img class="tipart" src="media/thief-${k}.webp" alt=""><b>${esc(THIEVES[k].n)}</b><br>${esc(THIEVES[k].x)}`:`<img class="tipart" src="media/djinn-${k}.webp" alt=""><b>${esc(d.n)}</b> · ${d.vp} points<br>${esc(d.x)}`)}
-function go(m){UI.chz=null;UI.mkSel=[];UI.pendDj=null;UI.pendItem=null;clearTimeout(UI.autoT);if(online()&&isClient()){netSend(m);return}const s=sideToAct();const hu=s>=0&&P(s).human;const mine=!online()||s===NET.mySeat;
+function go(m){if(m&&m.act==='f3plan'){UI.chz=null;return f3Plan(m.o)}UI.chz=null;UI.mkSel=[];UI.pendDj=null;UI.pendItem=null;clearTimeout(UI.autoT);if(online()&&isClient()){netSend(m);return}const s=sideToAct();const hu=s>=0&&P(s).human;const mine=!online()||s===NET.mySeat;
   if(hu&&m.act==='start'){UI.moveSnap=JSON.stringify(G);UI.moveSteps=[m]}else if(hu&&m.act==='step'&&UI.moveSteps)UI.moveSteps.push(m);else if(m.act!=='djinn'&&m.act!=='item')UI.moveSnap=null;
   if(hu&&mine&&!G.tut&&typeof fingerUsed==='function')fingerUsed(m);
   const r=performMove(m,s);if(G&&!G.move)UI.moveSnap=G.step==='move'?UI.moveSnap:null;
@@ -195,22 +200,22 @@ document.addEventListener('click',e=>{const b=e.target.closest('button,[data-til
   if(d.ui)return uiAct(d.ui);
   switch(d.a){case 'snd':toggleSound();return;case 'mus':toggleMusic();return;case 'speed':UI.speed=UI.speed===1?3:UI.speed===3?.5:1;render();return;case 'pause':UI.pause=!UI.pause;render();schedule();return;case 'new':if(online()){UI.modal='lobby';render();return}openStart();return}});
 // a tap anywhere that is not a button, while the computer plays, hurries it along
-document.addEventListener('pointerdown',e=>{if(G&&!G.over&&!me()&&!UI.modal&&e.target.closest&&e.target.closest('#bd'))UI.hurry=true},true);
+document.addEventListener('pointerdown',e=>{if(G&&!G.over&&!me()&&!UI.modal&&e.target.closest&&e.target.closest('#bd')){UI.hurry=true;if(aiTimer){clearTimeout(aiTimer);aiTimer=null;setTimeout(schedule,0)}}},true);   // F3: the hurry starts now, not after the 1.5 s caption
 document.addEventListener('pointerdown',e=>{const tp=document.getElementById('tip');if(tp&&!tp.hidden&&!(e.target.closest&&e.target.closest('#tip')))tp.hidden=true},true);
 document.addEventListener('pointerdown',e=>{if(UI.chz&&!(e.target.closest&&e.target.closest('#chz,[data-tile],[data-seat],[data-dj],[data-th],[data-help]'))){UI.chz=null;if(G)render()}},true);
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&(UI.pendDj||UI.pendItem||UI.chz)){UI.pendDj=UI.pendItem=UI.chz=null;render()}});
 function uiAct(a){if(online()){if(a==='new'||a==='start'){UI.modal='lobby';render();return}if(a==='undodrop'&&isClient()){netSend({act:'undodrop'});return}if(a==='continue')return}
   switch(a){case 'start':if(tutOffer('start'))return;beginGame();return;case 'quick':if(tutOffer('quick'))return;UI.setup.seats=['human','ai','ai','ai','ai'];beginGame();return;case 'goalgo':UI.modal=null;render();schedule();return;case 'more':UI.more=!UI.more;render();return;case 'tutgo':UI.modal=null;tutStart();return;case 'tutplay':{const nx=UI.offerNext||'quick';UI.modal=null;uiAct(nx);return}case 'continue':loadSaved();return;case 'new':openStart();return;case 'story':if(typeof GXC!=='undefined'&&window.CAMPAIGN){UI.modal=null;GX.close();render();storyOpen()}return;
   case 'again':UI.modal=null;beginGame();return;case 'closeover':UI.modal=null;render();return;
-  case 'ernm':UI.earnFk=Math.max(0,(UI.earnFk||0)-1);render();return;case 'ernp':UI.earnFk=(UI.earnFk||0)+1;render();return;
+  case 'f3go':f3Go();return;case 'f3x':F3.plan=null;render();return;case 'pwtog':UI.pwOpen=!UI.pwOpen;render();return;case 'ernm':UI.earnFk=Math.max(0,(UI.earnFk||0)-1);render();return;case 'ernp':UI.earnFk=(UI.earnFk||0)+1;render();return;
   case 'undodrop':{if(!UI.moveSnap||!UI.moveSteps)return;const steps=UI.moveSteps.slice(0,-1);G=JSON.parse(UI.moveSnap);UI.moveSteps=[];for(const m of steps){performMove(m,G.cur);UI.moveSteps.push(m)}if(!steps.length)UI.moveSnap=null;refresh();return}}}
 function openStart(){UI.modal='start';render()}
 function resetScene(){UI.camp=null;UI.snap=null;UI.chz=null;UI.pendDj=UI.pendItem=null;UI.mkSel=[];UI.sellSel=[];UI.moveSnap=null;UI.hurry=false}
 function beginGame(o){o=o||{};const s=UI.setup;UI.modal=null;UI.fx.length=0;UI.fxSeen=0;resetScene();const seats=s.seats.slice(0,s.np);
   newGame({np:s.np,seats,lv:s.lv.slice(0,s.np),ex:Object.assign({},s.ex,s.np===5?{sultan:true}:{}),mode:seats.every(x=>x==='ai')?'ai':'x'});UI.modal=null;refresh()}
 function loadSaved(){try{const g=JSON.parse(localStorage.getItem(SAVE));if(!g||!g.v)throw 0;G=g;UI.modal=null;resetScene();refresh()}catch(e){openStart()}}
-// ---------- the computer: one step at a time, about 0.6 s a drop; tap the table to hurry ----------
+// ---------- the computer: about 1.5 s per decision (one caption each), 0.4 s a drop; Skip or a tap on the table hurries it ----------
 const modalStops=()=>UI.modal&&UI.modal!=='lobby';
 let aiTimer=null;function schedule(){if(online()&&isClient())return;if(aiTimer||!G||G.over||UI.pause||modalStops()||tutHeld())return;const s=sideToAct();if(s<0||P(s).human)return;
-  const drop=G.step==='move'&&G.move;const base=drop?320:420;/* W497: a rival turn takes about 2-3 s; Skip or a tap on the table hurries it */const d=ANIM?Math.max(0,base/(UI.speed||1)*(UI.hurry?.12:1)):0;
+  const drop=G.step==='move'&&G.move&&G.move.drops.length;const lift=G.step==='move'&&G.move&&!G.move.drops.length;const watch=G.pl.some(p=>p.human);const base=!watch?420:drop?150:lift?450:450;   /* F3: one readable caption per rival decision (~1.5 s), drops quicker; Skip or a tap on the table hurries it */const d=ANIM?Math.max(0,base/(UI.speed||1)*(UI.hurry?.12:1)):0;
   aiTimer=setTimeout(()=>{aiTimer=null;if(!G||G.over||modalStops()||tutHeld()||(online()&&isClient()))return;const s2=sideToAct();if(s2<0||P(s2).human)return;const m=aiMove(s2);if(!m){console.error('AI has no move in '+G.phase+'/'+G.step);return}go(m)},d)}

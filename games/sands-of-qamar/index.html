@@ -271,7 +271,7 @@ html.land .gx-bar .gx-ibtn>span{display:none}
 .tile.blk{background:repeating-linear-gradient(45deg,#8d7c68,#8d7c68 6px,#7d6c58 6px,#7d6c58 12px);border-color:#4a3e30;cursor:default}.tile.blk.k-lake{background:linear-gradient(#7fc4e8,#2f7fb5);border-color:#1d5b88}.tile.blk .tn{color:#fff}.tile.blk .ti{opacity:.6}
 .tile.cur{z-index:2;outline:3px solid #fff;outline-offset:-2px;box-shadow:0 0 0 2px #ff7a3a,0 4px 10px rgba(0,0,0,.4)}
 #grid.dim .tile:not(.glow):not(.blk){opacity:1;filter:saturate(.4) brightness(.7)}
-.tile.glow{outline:3px solid #ffd45a;outline-offset:-3px;animation:glowt 1.15s ease-in-out infinite;z-index:1}
+.tile.glow{outline:3px solid #ffd45a;outline-offset:-3px;animation:glowt 1.15s ease-in-out 3;z-index:1}
 @keyframes glowt{0%,100%{filter:brightness(1);outline-color:#ffd45a}50%{filter:brightness(1.12);outline-color:#fff6c2}}
 .tile.nope{animation:shake .3s}@keyframes shake{25%{transform:translateX(-3px)}75%{transform:translateX(3px)}}
 .mp{display:inline-block;position:relative;flex:0 0 auto;width:calc(var(--ms,18px)*var(--k,1));height:calc(var(--ms,18px)*var(--k,1)*1.18);--mc:#999}
@@ -279,7 +279,7 @@ html.land .gx-bar .gx-ibtn>span{display:none}
 .mp::before{bottom:0;width:100%;height:58%;border-radius:48% 48% 18% 18%/70% 70% 18% 18%}.mp::after{top:0;width:58%;height:46%;border-radius:50%;background:radial-gradient(circle at 35% 30%,rgba(255,255,255,.55),transparent 55%),var(--mc)}
 .mp[data-c=vizier]{--mc:#f2c230}.mp[data-c=elder]{--mc:#f4f1ea}.mp[data-c=merchant]{--mc:#3fa34d}.mp[data-c=builder]{--mc:#2f6fd6}.mp[data-c=assassin]{--mc:#d23a2e}.mp[data-c=artisan]{--mc:#9a5bd0}
 .mp.sm{--ms:9px;--k:1;vertical-align:-1px}.mp.lg{--ms:28px;--k:1}
-.mp.h{filter:drop-shadow(0 0 2px #fff) drop-shadow(0 0 4px #fff) drop-shadow(0 3px 2px rgba(0,0,0,.5));animation:bob 1s ease-in-out infinite}
+.mp.h{filter:drop-shadow(0 0 2px #fff) drop-shadow(0 0 4px #fff) drop-shadow(0 3px 2px rgba(0,0,0,.5));animation:bob 1s ease-in-out 3}
 @keyframes bob{50%{transform:translateY(-3px)}}
 .mp.fhid{visibility:hidden}
 .own{display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;border-radius:50%;background:var(--pc);color:#fff;border:2px solid #fff;box-shadow:0 1px 3px rgba(0,0,0,.55);font-size:11px;line-height:1}
@@ -288,7 +288,7 @@ html.land .gx-bar .gx-ibtn>span{display:none}
 .newc{animation:slidein .5s ease}@keyframes slidein{0%{opacity:0;transform:translateX(14px) scale(.8)}100%{opacity:1;transform:none}}
 .bump{animation:bump .55s ease;background:#fff9ea;border-radius:8px}@keyframes bump{40%{transform:scale(1.55)}}
 /* things that glow = things you can tap now */
-.glow{cursor:pointer}.sch.glow,.mcard.glow,.dcard.glow,.chb.glow,.sp-b.glow{animation:glowb 1.15s ease-in-out infinite}
+.glow{cursor:pointer}.sch.glow,.mcard.glow,.dcard.glow,.chb.glow,.sp-b.glow{animation:glowb 1.15s ease-in-out 3}
 @keyframes glowb{0%,100%{box-shadow:0 0 0 2px #ffd45a,0 0 8px 2px rgba(255,200,70,.7)}50%{box-shadow:0 0 0 3px #fff3b0,0 0 16px 5px rgba(255,205,80,.95)}}
 /* the pop-over for a choice */
 #chz{position:fixed;z-index:35;display:flex;gap:6px;padding:6px;background:#fff7e4;border:2px solid #b8532b;border-radius:14px;box-shadow:0 8px 24px rgba(0,0,0,.45)}
@@ -316,7 +316,7 @@ html.land .gx-bar .gx-ibtn>span{display:none}
 #finger{position:fixed;left:0;top:0;z-index:60;pointer-events:none;width:34px;height:46px;margin:-5px 0 0 -13px;opacity:0}
 #finger svg{width:100%;height:100%;filter:drop-shadow(0 3px 4px rgba(0,0,0,.55))}
 #finger .fring{position:absolute;left:-3px;top:-12px;width:28px;height:28px;border-radius:50%;border:3px solid rgba(255,255,255,.9);opacity:0}
-#finger.go{animation:fgtap 1.8s ease-in-out infinite}#finger.go .fring{animation:fgring 1.8s ease-out infinite}
+#finger.go{animation:fgtap 1.8s ease-in-out 3}#finger.go .fring{animation:fgring 1.8s ease-out 3}
 @keyframes fgtap{0%{opacity:0;transform:translate(0,14px)}15%{opacity:1;transform:translate(0,14px)}35%{transform:translate(0,0) scale(.92)}50%{transform:translate(0,0) scale(1)}85%{opacity:1}100%{opacity:0;transform:translate(0,0)}}
 @keyframes fgring{0%,33%{opacity:0;transform:scale(.4)}40%{opacity:.9}80%{opacity:0;transform:scale(1.6)}100%{opacity:0}}
 /* start and result screens */
@@ -616,7 +616,7 @@ html.land #feed:not([hidden]){display:flex;flex-direction:column;gap:6px;positio
 #feed .fd-dot{flex:0 0 12px;height:12px;border-radius:50%;margin-top:5px;border:2px solid #4a2a05;box-sizing:border-box}
 #coach.on~#feed,#turnover.on~#feed{display:none!important}
 /* the guided first game (guide.js): the one tap each step asks for glows; undo is hidden while guided */
-.gd-hl{outline:4px solid #ffcf3f!important;outline-offset:2px;box-shadow:0 0 0 7px rgba(255,207,63,.45),0 0 18px 6px rgba(255,180,40,.75)!important;animation:gdpulse .9s ease-in-out infinite alternate;z-index:6}
+.gd-hl{outline:4px solid #ffcf3f!important;outline-offset:2px;box-shadow:0 0 0 7px rgba(255,207,63,.45),0 0 18px 6px rgba(255,180,40,.75)!important;animation:gdpulse .9s ease-in-out 3 alternate;z-index:6}
 @keyframes gdpulse{from{outline-color:#ffcf3f}to{outline-color:#fff3b8}}
 @media (prefers-reduced-motion:reduce){.gd-hl{animation:none}}
 body.guiding [data-ui="undodrop"],body.guiding [data-mv*='"undo"']{display:none!important}
@@ -680,6 +680,17 @@ html.short:not(.land) #mkt .mrow>*{flex:0 0 auto}html.short:not(.land) #mkt .mro
 html.dj-off:not(.land) #mkt .drow,html.mr-off:not(.land) #mkt .mrow{display:none!important}
 html.short.bid-mk:not(.land) #mkt,html.short.pw-on:not(.land) #mkt .drow{display:none!important}
 html.short:not(.land) #trk{display:none!important}   /* the one-line prompt above says what to do; the score pop then lands on the scorer's seat chip */
+
+/* F4: walk clarity, PC bid buttons, end points */
+.tile[data-walk]::before{content:attr(data-walk);position:absolute;left:4px;top:4px;z-index:3;min-width:22px;height:22px;padding:0 5px;box-sizing:border-box;border-radius:11px;background:#3b1c0e;color:#fff6dc;font:800 14px/22px var(--ff-b,system-ui);text-align:center;pointer-events:none}
+.tile[data-walk="start"]::before{content:"start";font-size:12px}
+.tile.best.glow{outline:3px solid #ffd84a;outline-offset:-3px}
+.tile.best.glow::after{content:"★ planned";position:absolute;left:50%;bottom:3px;transform:translateX(-50%);z-index:3;padding:0 6px;border-radius:9px;background:#ffd84a;color:#3b1c0e;font:800 12px/18px var(--ff-b,system-ui);pointer-events:none}
+.ab[data-ui="undodrop"],.ab.ghost[data-act="undo"]{min-height:48px;font-size:16px;border:2px solid #8e3a1c;background:#fff6dc;color:#3b1c0e}
+.sch .dje{color:#5a2a8a;font-weight:800}
+@media (min-width:1024px){.bidt .spot{min-height:60px;min-width:72px}.bidt .spot .sp-b{min-height:56px;min-width:68px;font-size:18px!important}.bidt .spot .sp-c{font-size:16px}.bidt .spot .ord{font-size:14px}}
+/* IPH (iPhone): djinn buttons at least 44 px tall; goods cards 44 px wide in skin.css */
+html:not(.land) .dcard{min-height:44px!important}
 /* ===== GX skin: painted UI kit over the shared shell + campaign classes. Opt-in: nothing changes until gx-skin.js adds
    html.sk (after the kit files loaded). Kit files live in the game's media/ (ui-topbar, ui-iconbtn, ui-panel, ui-drawer-head,
    ui-button-cream/go/power, ui-row, ui-bubble, ui-node-*). Extra switches: html.sk-icons (icon-*.webp set), html.sk-map (story-map.webp),
@@ -792,7 +803,7 @@ html.sp3 .own.cam{font-size:0;width:22px;height:22px;background:var(--pc) url(mo
 #summon{position:fixed;inset:0;z-index:120;pointer-events:none;display:grid;place-items:center;align-content:center;gap:2px;background:radial-gradient(circle at 50% 46%,rgba(60,24,8,.1),rgba(10,4,20,.72));animation:smIn .25s ease-out both}
 #summon.out{opacity:0;transition:opacity .3s}
 #summon{--sz:min(46vw,190px)}
-#summon .sm-lamp{width:var(--sz);height:var(--sz);background:url(models/lamp-turn.webp) 0 0/calc(24*var(--sz)) var(--sz) no-repeat;animation:smTurn 1.6s steps(24) infinite;filter:drop-shadow(0 8px 14px rgba(0,0,0,.6)) drop-shadow(0 0 18px rgba(255,200,90,.55))}
+#summon .sm-lamp{width:var(--sz);height:var(--sz);background:url(models/lamp-turn.webp) 0 0/calc(24*var(--sz)) var(--sz) no-repeat;animation:smTurn 1.6s steps(24) 3;filter:drop-shadow(0 8px 14px rgba(0,0,0,.6)) drop-shadow(0 0 18px rgba(255,200,90,.55))}
 @keyframes smTurn{to{background-position:calc(-24*var(--sz)) 0}}
 #summon .sm-smoke{position:absolute;left:50%;top:30%;width:min(60vw,260px);aspect-ratio:1;translate:-50% 0;border-radius:50%;background:radial-gradient(circle,rgba(190,140,255,.8),rgba(130,80,220,.4) 45%,rgba(90,40,180,0) 70%);filter:blur(8px);animation:smSmoke 1.7s ease-out both}
 @keyframes smSmoke{from{transform:translateY(60px) scale(.3);opacity:0}30%{opacity:.95}to{transform:translateY(-70px) scale(1.5);opacity:0}}
@@ -948,6 +959,100 @@ html.short:not(.land) .mrow .mcard .mi{font-size:20px}
  html body #grid .tile .ms .mg .mp{--ms:min(18px,calc((var(--cw) - 11px)/3))!important}}
 @media (max-width:700px) and (max-height:700px){html body #grid .tile .ms .mg .mp{--ms:min(18px,calc((var(--cw) - 11px)/3),calc(var(--ch) - 25px))!important}}
 @media (max-width:700px) and (min-height:701px){html body #grid .tile .ms .mg .mp{--ms:min(18px,calc((var(--cw) - 11px)/3),calc(var(--ch) - 52px))!important}}
+/* F1 (R88 row 4/5), 375x553 and other short phones:
+   - a compact phase strip (Bid / Move / Take / Sell) stays; score news covers it for a moment instead of the seat chips
+   - the goods row fits the screen: 10 columns while it is only shown; while you buy, the cards wrap at 44x44 (the djinn row is hidden then)
+   - html.sq (set by fit() only when tiles would drop under 44 px) hides the djinn row and the turn card so tiles keep 44 px
+   - no text under 14 px; the result screen keeps its buttons below the table (no rows under them) */
+html.short:not(.land) #trk:not([hidden]){display:flex!important;padding:0 8px;min-height:0;margin:1px 0;font-size:14px;line-height:18px}
+html.short:not(.land) #trk .trk-r{display:none}html.short:not(.land) #trk .trk-w{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+html.short:not(.land) #trk .trk-p{margin-left:auto;flex:0 0 auto}html.short:not(.land) #trk .trk-p i{font-size:14px;padding:0 3px}
+html.short:not(.land):not(.mr-off) #mkt .mrow{display:grid!important;grid-template-columns:repeat(10,minmax(0,1fr))!important;overflow:visible!important;gap:2px!important;width:100%;box-sizing:border-box}
+html.short:not(.land) #mkt .mrow>*{min-width:0!important;width:auto!important}
+html.short:not(.land) #mkt .mrow .mcard{width:auto!important;min-width:0!important;height:44px!important;min-height:44px!important}
+html.short:not(.land) #mkt .mrow .mcard .mi{font-size:18px}
+html.short.mk-buy:not(.land):not(.mr-off) #mkt .mrow{display:flex!important;flex-wrap:wrap!important;justify-content:center;gap:3px!important}
+html.short.mk-buy:not(.land) #mkt .mrow>*{flex:0 0 auto!important}
+html.short.mk-buy:not(.land) #mkt .mrow .mcard{width:44px!important;min-width:44px!important}
+html.short.mk-buy:not(.land) #mkt .mrow .mcard.empty,html.short.mk-buy:not(.land) #mkt .mrow .deckback{display:none!important}
+html.sq:not(.land) #mkt .drow:not(:has(.glow)),html.sq:not(.land) #turnover{display:none!important}
+html body #grid .tile .ms .mg b{font-size:14px!important}
+html body #bd .spot .ord,html body .spot small.ord{font-size:14px!important;line-height:1!important}
+html body .ab.pw,html body #acts .arow.pws .ab.pw{font-size:14px!important}
+html.short .mbox.over .endart{display:none}
+.mbox.over .acts{position:static!important}
+html body .sp-b i{font-size:14px!important;font-style:normal}
+/* F1: the result screen: the buttons stay at the bottom, the score table scrolls above them (never under them) */
+html .mbox.over{display:flex!important;flex-direction:column;overflow:hidden!important}
+html .mbox.over>*{flex:0 0 auto}html .mbox.over .prompt{flex:1 1 auto;min-height:0;overflow:auto}
+html.short .mbox.over .prompt .story{display:none}
+html.short.mk-buy:not(.land) #mkt .mrow .mcard:not(.glow):not(.sel){display:none!important}   /* while buying, only the cards you can take: one row, tiles keep 44 px */
+/* F1: your goods wrap on a phone instead of running off the right edge (power buttons keep their sliding row) */
+@media (max-width:700px){html body #mine{flex-wrap:wrap!important;overflow:visible!important;justify-content:center!important}}
+@media (max-width:700px){html body #acts .arow.pws .ab.pw{padding:0 8px!important}}
+/* F2 bidding: one big button per turn spot, naming its place and its price; taken spots name who holds them */
+html body #bd .bidt .spot{min-height:48px!important;height:auto!important;padding:0!important;justify-content:stretch!important;align-items:stretch!important;border-radius:10px!important}
+html body #bd .bidt .spot.shut{opacity:.55}
+html body #bd .bidt .sp-b{flex:1 1 auto;min-height:48px!important;height:auto!important;padding:2px 0!important;display:flex!important;flex-direction:column!important;align-items:center!important;justify-content:center!important;gap:1px;border-radius:10px}
+html body #bd .bidt .sp-b .ord,html body #bd .bidt .spot .ord{position:static!important;background:none!important;padding:0!important;border-radius:0!important;font:800 13px/1 var(--ff-b,system-ui)!important;color:inherit!important;text-transform:none!important;letter-spacing:.02em;align-self:center}
+html body #bd .bidt .sp-b .spc{font:900 17px/1.05 var(--ff-b,system-ui);white-space:nowrap}
+html body #bd .bidt .sp-b .spc i{font-size:12px!important;margin-right:2px}
+html body #bd .bidt .spot .sp-c{background:none!important;line-height:1.1!important;padding:0!important;font-size:14px!important;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+html body #bd .bidt .spot.taken .ord,html body #bd .bidt .spot.taken .sp-c{color:#fff!important;text-shadow:0 1px 2px rgba(0,0,0,.5)}
+html body #bd .bidt .spot:not(:has(.sp-b)){display:flex!important;flex-direction:column!important;align-items:center!important;justify-content:center!important;gap:2px!important}
+html body #bd .bidt .sp-b.dear{opacity:1!important;border-color:#b08a5a;background:linear-gradient(#fffaf0,#efe0c0)}
+html body #bd .bidt .sp-b.glow{border-color:#1f6a2a;box-shadow:0 0 0 2px rgba(31,106,42,.35)}
+html body #bd .bidt .spot:last-child{align-items:stretch!important}
+/* F2: the suggested tile's ★+N badge (top-left corner, inside the tile) */
+html body #grid .tile .why{position:absolute;left:1px;top:1px;z-index:4;padding:1px 4px;border-radius:7px;background:#1f6a2a;color:#fff;font:900 13px/1.15 var(--ff-b,system-ui);box-shadow:0 1px 2px rgba(0,0,0,.45);pointer-events:none;white-space:nowrap}
+/* F2 roomy phone board (portrait, up to 700 px wide): goods in ONE row of pictures (names stay in the tap label), thinner side margins,
+   so the tiles grow and the people on them are at least 16 px; the power buttons wrap instead of sliding sideways */
+@media (max-width:700px){
+ html:not(.land) body #bd.gx-board{padding-left:3px;padding-right:3px}
+ html:not(.land):not(.mr-off) body #mkt .mrow{display:grid!important;grid-template-columns:repeat(9,minmax(0,1fr))!important;flex-wrap:nowrap!important;overflow:visible!important;gap:0!important;width:100%!important;box-sizing:border-box}
+ html:not(.land) body #mkt .mrow .mcard{height:46px!important;min-width:0!important;padding:0!important;background-position:center!important}
+ html:not(.land) body #mkt .mrow .mcard .mn{display:none!important}
+ html:not(.land) body #mkt .mrow .mcard .mi{font-size:20px!important}
+ html:not(.land) body #mkt .mrow .deckback{min-width:0!important;height:42px!important}
+ html:not(.land) body #mkt .mrow .deckback i{width:22px!important;height:30px!important}
+ html:not(.land).short.mk-buy body #mkt .mrow .mcard:not(.glow):not(.sel){display:flex!important}
+ html body #grid .tile .ms .mg .mp{--ms:max(16px,min(19px,calc((var(--cw) - 8px)/3)))!important}
+ html body #grid .tile .ms>.mp{--ms:max(16px,min(19px,calc((var(--cw) - 8px)/3.2)))!important}
+ html body #acts .arow.pws{flex-wrap:wrap!important;overflow:visible!important;justify-content:center!important;row-gap:4px}
+ html body #acts .arow.pws .ab.pw{flex:0 1 auto!important;white-space:normal!important;max-width:100%}
+}
+/* F2: the lamp (and the result model) sit beside the title; the title keeps clear of it */
+.mbox .hero3d canvas.t3d{width:64px!important;height:64px!important;top:-10px!important;right:0!important}
+.mbox .hero3d+h2{padding-right:66px;box-sizing:border-box}
+.mbox.start .hero3d canvas.t3d{top:4px!important;right:6px!important}   /* start: in the sky of the painted banner, well above the title */
+/* F3: readable numbers (phone >= 14 px, PC >= 16 px), status lines wrap instead of cutting off, the planned path, the djinn drawer */
+html body #bd #grid .tile .tv{font-size:15px!important;min-width:22px;height:22px;line-height:22px!important}
+html body #grid .tile .ms .mg b{font-size:14px!important}
+@media (min-width:1024px){html body #bd #grid .tile .tv{font-size:19px!important;min-width:32px;height:32px;line-height:32px!important}
+ html body #grid .tile .ms .mg{height:28px;padding:0 6px 0 2px;border-radius:14px}html body #grid .tile .ms .mg b{font-size:18px!important}html body #grid .tile .ms .mg .mp{--ms:22px}
+ html body #grid .tile .tn{font-size:16px!important}}
+html body #line{white-space:normal!important;text-overflow:clip!important;overflow:visible!important;line-height:1.15!important;padding:3px 4px}
+html body #trk2{white-space:normal!important;text-overflow:clip!important;overflow:visible!important;height:auto!important;max-height:none!important}
+#grid .tile.f3end{box-shadow:inset 0 0 0 3px rgba(255,214,90,.95),0 0 0 1px rgba(80,40,0,.6)!important}
+#grid .tile.f3last{box-shadow:inset 0 0 0 4px #ffd75a,0 0 12px 3px rgba(255,200,60,.9)!important}
+#grid .tile .f3num{position:absolute;left:3px;top:3px;z-index:6;min-width:26px;height:26px;border-radius:13px;background:#b8532b;color:#fff;font:900 16px/26px var(--ff-b,system-ui);text-align:center;box-shadow:0 0 0 2px #fff3c8,0 2px 6px rgba(0,0,0,.5);pointer-events:none;font-style:normal}
+#grid .tile .f3star,#seats .f3star{position:absolute;left:2px;top:2px;z-index:6;font-style:normal;font-size:20px;color:#ffd75a;text-shadow:0 0 3px #000,0 0 6px #000;pointer-events:none}
+html body #acts .arow.f3row{display:flex;gap:6px;justify-content:center}html body #acts .f3go{flex:1 1 auto;min-height:44px;font-weight:800}
+html body #acts .arow.pwd{flex-wrap:wrap}html body #acts .pwtog{min-height:40px}
+.trk .trk-r.f3end-tag{padding:1px 8px;border-radius:10px;background:#8a2b12;color:#fff3c8!important;white-space:nowrap}
+.f3shake{animation:shake .3s!important}.f3pulse{animation:f3p .7s ease 2!important}@keyframes f3p{50%{transform:scale(1.08);filter:brightness(1.3)}}
+#grid.dim .tile.f3end:not(.glow),#grid .tile.f3last{filter:saturate(.95) brightness(.97)!important}
+/* F3: the final score is never cut off: on a phone the result art and the summary bullets give way to the full table */
+@media (max-width:700px) and (max-height:820px){html body .mbox.over .endart,html body .mbox.over .hero3d,html body .mbox.over .prompt .story{display:none!important}}
+html body .mbox.over .prompt{overflow:auto!important;min-height:0}html body .mbox.over .prompt .tw{overflow:visible!important;height:auto!important;max-height:none!important;flex:0 0 auto!important}
+#grid .tile:has(.why) .gain{display:none!important}
+/* F3: while the rival plays, the status line keeps room for Skip at its right end */
+html.skipon body #line{padding-right:96px!important;box-sizing:border-box}html body #skipai{min-height:28px!important;line-height:1!important}
+
+/* F3 cold play: the moves log never takes a click from the buttons under it (PC) */
+html.land #feed{pointer-events:none}html.land #acts,html.land #mine{z-index:3}
+
+html:not(.land) body #mkt .mrow .deckback{display:none!important}
 /* ===== GX campaign styles: chapter map, story scenes, boss card, result. Theme with the --gxc-* variables. ===== */
 :root{--gxc-bg:#1b1410;--gxc-paper:#efe0bd;--gxc-paper2:#e2cc9b;--gxc-ink:#2a1d10;--gxc-dim:rgba(42,29,16,.68);--gxc-line:rgba(60,38,14,.28);
   --gxc-go:#c9662a;--gxc-go-ink:#fff8ec;--gxc-gold:#f2b93b;--gxc-a1:#4f8a4b;--gxc-a2:#c07a2c;--gxc-a3:#8e3b46;--gxc-road:#b98a52;--gxc-radius:16px;
@@ -4916,7 +5021,7 @@ const NetRoom=(()=>{
 
 </script>
 <script>
-// ---------- Sands of Qamar: components (numbers from the research in ../rules.md; names are original) ----------
+// ---------- Sands of Qamar: components (our own numbers and names) ----------
 const MNAME={vizier:'Advisor',elder:'Sage',merchant:'Trader',builder:'Mason',assassin:'Shadow',artisan:'Crafter'};
 const MPLUR={vizier:'Advisors',elder:'Sages',merchant:'Traders',builder:'Masons',assassin:'Shadows',artisan:'Crafters'};
 const MHELP={vizier:'Keep them. 1 point each, plus 10 per rival you outnumber.',elder:'Keep them. 2 points each; spend them to summon djinns.',
@@ -4934,24 +5039,24 @@ const TILEDEF={
   exchange:{n:'Spice Exchange',blue:false,x:'You may pay 4 coins for any 1 face-up goods card.'},
   ravine:{n:'Ravine',blue:false,x:'Impassable. Nothing may ever stand here.',block:1},
   lake:{n:'Great Lake',blue:true,x:'Impassable. Palms and palaces on tiles touching it score double.',block:1},
-  city:{n:'Wonder City',blue:true,x:'Worth more the more you hold: 5 / 20 / 45 / 80 / 125.'}};
-const TILESET=[['village',5,5],['sacred',6,4],['sacred',10,1],['sacred',12,1],['sacred',15,1],['oasis',8,6],['small',6,8],['large',4,4]];
+  city:{n:'Wonder City',blue:true,x:'Worth more the more you hold: 6 / 20 / 42 / 72 / 110.'}};
+const TILESET=[['village',5,6],['sacred',6,4],['sacred',10,1],['sacred',12,1],['sacred',15,1],['oasis',8,6],['small',6,7],['large',4,4]];
 const TILESET_ART=[['workshop',5,3],['exchange',10,2],['ravine',0,1]];
 const TILESET_WHIM=[['city',5,3,'blue'],['city',5,2,'red'],['lake',0,1]];
 function mkTiles(set,ex){const o=[];for(const [k,v,n,col] of set)for(let i=0;i<n;i++)o.push({k,v,blue:col?col==='blue':TILEDEF[k].blue,ex});return o}
 // goods (54 base): Mystics are the special cards
 const RNAME={ivory:'Ivory',jewels:'Jewels',gold:'Gold',papyrus:'Papyrus',silk:'Silk',spice:'Spice',fish:'Fish',wheat:'Wheat',pottery:'Pottery',fakir:'Mystic'};
 const RICON={ivory:'🦷',jewels:'💎',gold:'🥇',papyrus:'📜',silk:'🧣',spice:'🌶️',fish:'🐟',wheat:'🌾',pottery:'🏺',fakir:'🔮'};
-const RESOURCE_COUNT={ivory:2,jewels:2,gold:2,papyrus:4,silk:4,spice:4,fish:6,wheat:6,pottery:6,fakir:18};
-const SETVP=[0,1,3,7,13,21,30,40,50,60];
+const RESOURCE_COUNT={ivory:3,jewels:2,gold:1,papyrus:4,silk:4,spice:4,fish:5,wheat:6,pottery:7,fakir:18};
+const SETVP=[0,1,3,6,12,20,29,39,49,60];
 // turn-order track: cost per spot; several spots may share a cost ("stack" spots: a later bidder goes first)
-const BIDTRACK_STD=[18,12,8,5,3,1,0,0,0];const BIDTRACK_5=[18,12,8,5,5,3,3,1,1,0,0,0];
+const BIDTRACK_STD=[16,11,8,5,3,1,0,0,0];const BIDTRACK_5=[18,12,8,5,5,3,3,1,1,0,0,0];
 const CAMELS={2:11,3:8,4:8,5:8};
 // items (Artisans): 9 precious + 9 magic. The split per kind is an assumption (see rules-notes).
 const ITEMS={
-  gem5:{n:'Silver Bangle',kind:'precious',vp:5,cp:3,x:'Worth 5 points at the end.'},
+  gem5:{n:'Silver Bangle',kind:'precious',vp:4,cp:3,x:'Worth 4 points at the end.'},
   gem7:{n:'Jade Casket',kind:'precious',vp:7,cp:3,x:'Worth 7 points at the end.'},
-  gem9:{n:'Sun Diadem',kind:'precious',vp:9,cp:3,x:'Worth 9 points at the end.'},
+  gem9:{n:'Sun Diadem',kind:'precious',vp:10,cp:3,x:'Worth 10 points at the end.'},
   carpet:{n:'Wind Rug',kind:'magic',cp:2,x:'Your last person may land on any tile of its colour.'},
   lamp:{n:'Brass Lamp',kind:'magic',cp:2,x:'Take one face-up djinn for free.'},
   flute:{n:'Reed Pipe',kind:'magic',cp:2,x:'Before your move, bring up to 5 people from neighbouring tiles onto one tile.'},
@@ -4967,42 +5072,45 @@ const THIEVES={
   elder:{n:'White Cutpurse',x:'Each rival gives up a djinn; you take one of them.'},
   artisan:{n:'Purple Cutpurse',x:'Each rival gives up an item; you take one of them.'}};
 
+const CITYVP=c=>4*c*c+2*c;
+
 </script>
 <script>
-// ---------- djinns: 22 base + 3 promos + 2 Crafters + 1 Cutpurse djinn. Original names; effects follow the published cards. ----------
+// ---------- djinns: 22 base + 3 promos + 2 Crafters + 1 Cutpurse djinn. Our own names, point values and numbers. ----------
+const DJN={wazira:4,hikma:5,nakhla:4,majlis:4,jawhar:4,sana:3};
 // cost: null (always on) | 'EF' (1 Sage or 1 Mystic) | 'EEF' (1 Sage + 1 Sage-or-Mystic) | 'F' (1 Mystic) | 'F+' (1+ Mystics, bidding)
 const DJINNS=[
- {k:'zarifa',n:'Zarifa',vp:5,cost:null,x:'At the end, 2 Mystics count as 1 good.'},
- {k:'tamuz',n:'Tamuz',vp:8,cost:'EF',x:'Fill an empty tile from the bag.'},
- {k:'harith',n:'Harith',vp:6,cost:null,x:'Any djinn summoned: +1 coin (you), +2 (rival).'},
- {k:'sadim',n:'Sadim',vp:6,cost:null,x:'Shadows cannot take your Advisors or Sages (or Crafters).'},
- {k:'nuraya',n:'Nuraya',vp:6,cost:'EF',x:'Place a palace on any Hamlet.'},
- {k:'qirsh',n:'Qirsh',vp:4,cost:'EEF',x:'This turn your Masons earn double.'},
- {k:'wahha',n:'Wahha',vp:8,cost:'EF',x:'Plant a palm tree on any Oasis.'},
- {k:'burhan',n:'Burhan',vp:10,cost:'EF',x:'A palace may go on a nearby tile.'},
- {k:'nakhla',n:'Nakhla',vp:8,cost:null,x:'Each palm of yours scores 5, not 3.'},
- {k:'ghulam',n:'Ghulam',vp:8,cost:'EF',x:'Shadows take 2 people from one tile.'},
- {k:'wazira',n:'Wazira',vp:6,cost:null,x:'Your Advisors score 3 each instead of 1.'},
- {k:'sirra',n:'Sirra',vp:6,cost:null,x:'Shadows keep what they take.'},
- {k:'dalil',n:'Dalil',vp:6,cost:'F+',x:'Each Mystic cuts a bid by one spot.'},
- {k:'rawda',n:'Rawda',vp:10,cost:'EF',x:'A palm may go on a nearby tile.'},
- {k:'jamal',n:'Jamal',vp:4,cost:'EEF',x:'Put one of your camels on an empty tile.'},
- {k:'tariq',n:'Tariq',vp:6,cost:null,x:'Dropped on your tile: +1 coin (+2 rival).'},
- {k:'qasra',n:'Qasra',vp:6,cost:null,x:'Any palace placed: +1 coin (you), +2 (rival).'},
- {k:'khanjar',n:'Khanjar',vp:6,cost:null,x:'Shadows take a person: +1 coin (+2 rival).'},
- {k:'hikma',n:'Hikma',vp:6,cost:null,x:'Your Sages score 4 each instead of 2.'},
- {k:'ruya',n:'Ru’ya',vp:4,cost:'EEF',x:'Look at 3 djinns. Keep 1.'},
- {k:'suqra',n:'Suqra',vp:8,cost:'F',x:'Take the top card of the goods deck.'},
- {k:'fath',n:'Fath',vp:4,cost:'EEF',x:'Put a camel on a tile with only people.'},
+ {k:'zarifa',n:'Zarifa',vp:6,cost:null,x:'At the end, every 2 Mystics you hold count as 1 good.'},
+ {k:'tamuz',n:'Tamuz',vp:7,cost:'EF',x:'Drop 3 people from the bag onto any bare tile.'},
+ {k:'harith',n:'Harith',vp:5,cost:null,x:'Each time a djinn is summoned: you gain 1 coin if it is yours, 2 if it is a rival\'s.'},
+ {k:'sadim',n:'Sadim',vp:7,cost:null,x:'Shadows cannot remove your Advisors, Sages or Crafters.'},
+ {k:'nuraya',n:'Nuraya',vp:7,cost:'EF',x:'Build a palace on any Hamlet.'},
+ {k:'qirsh',n:'Qirsh',vp:5,cost:'EEF',x:'This turn your Masons pay out twice.'},
+ {k:'wahha',n:'Wahha',vp:7,cost:'EF',x:'Plant a palm on any Oasis.'},
+ {k:'burhan',n:'Burhan',vp:9,cost:'EF',x:'You may build a palace on a tile beside your finish.'},
+ {k:'nakhla',n:'Nakhla',vp:10,cost:null,x:`Each palm you hold is worth ${DJN.nakhla} points, not 3.`},
+ {k:'ghulam',n:'Ghulam',vp:9,cost:'EF',x:'When your Shadows strike this turn they remove 2 people: both from one tile, or 2 Advisors, Sages or Crafters of one rival.'},
+ {k:'wazira',n:'Wazira',vp:4,cost:null,x:`Each Advisor you keep is worth ${DJN.wazira} points, not 1.`},
+ {k:'sirra',n:'Sirra',vp:7,cost:null,x:'Whatever your Shadows remove pays you: an Advisor or Sage joins your tribe, a Trader gives you a goods card, a Mason pays 1 coin per nearby blue tile, a Crafter joins you with an item.'},
+ {k:'dalil',n:'Dalil',vp:5,cost:'F+',x:'Bidding: each Mystic you spend lets you jump one spot up the track.'},
+ {k:'rawda',n:'Rawda',vp:9,cost:'EF',x:'You may plant a palm on a tile beside your finish.'},
+ {k:'jamal',n:'Jamal',vp:5,cost:'EEF',x:'Place one of your camels on any bare tile.'},
+ {k:'tariq',n:'Tariq',vp:5,cost:null,x:'Whenever someone drops on a tile you hold: 1 coin to you if you drop, 2 if a rival does.'},
+ {k:'qasra',n:'Qasra',vp:7,cost:null,x:'Each palace built anywhere: 1 coin to you if it is yours, 2 if a rival\'s.'},
+ {k:'khanjar',n:'Khanjar',vp:7,cost:null,x:'Each time Shadows remove a person: 1 coin to you if yours, 2 if a rival\'s.'},
+ {k:'hikma',n:'Hikma',vp:4,cost:null,x:`Each Sage you keep is worth ${DJN.hikma} points, not 2.`},
+ {k:'ruya',n:'Ru’ya',vp:4,cost:'EEF',x:'Peek at 3 djinns and keep 1.'},
+ {k:'suqra',n:'Suqra',vp:7,cost:'F',x:'Take the top goods card from the deck.'},
+ {k:'fath',n:'Fath',vp:5,cost:'EEF',x:'Place a camel on a tile that holds only people.'},
  // promos
- {k:'amir',n:'Amir',vp:6,cost:null,set:'promos',x:'Advisors taken: +1 coin (you), +2 (rival).'},
- {k:'majlis',n:'Majlis',vp:0,cost:null,set:'promos',x:'At the end, +5 points per djinn you own.',assumed:'printed VP'},
- {k:'dukkan',n:'Dukkan',vp:0,cost:null,set:'promos',x:'Rival ends on a Bazaar: you take a good.'},
+ {k:'amir',n:'Amir',vp:5,cost:null,set:'promos',x:'Each time Advisors are taken: 1 coin to you if yours, 2 if a rival\'s.'},
+ {k:'majlis',n:'Majlis',vp:0,cost:null,set:'promos',x:`At the end, every djinn you own earns ${DJN.majlis} extra points.`,},
+ {k:'dukkan',n:'Dukkan',vp:0,cost:null,set:'promos',x:'When a rival finishes on a Bazaar you take a good.'},
  // Crafters expansion
- {k:'jawhar',n:'Jawhar',vp:6,cost:null,set:'artisans',x:'Each precious item you own scores 3 more.',assumed:'printed VP'},
- {k:'sana',n:'San’a',vp:6,cost:null,set:'artisans',x:'Each Crafter you keep scores 2 more.',assumed:'printed VP'},
+ {k:'jawhar',n:'Jawhar',vp:5,cost:null,set:'artisans',x:`Each precious item you hold earns ${DJN.jawhar} extra points.`,},
+ {k:'sana',n:'San’a',vp:5,cost:null,set:'artisans',x:`Each Crafter you keep earns ${DJN.sana} extra points.`,},
  // Cutpurse expansion
- {k:'hafiz',n:'Hafiz',vp:6,cost:null,set:'thieves',x:'Cutpurses cannot touch you.',assumed:'name and printed VP'}];
+ {k:'hafiz',n:'Hafiz',vp:5,cost:null,set:'thieves',x:'Cutpurses cannot touch you.'}];
 const DJ={};for(const d of DJINNS)DJ[d.k]=d;
 function DJINNS_FOR(ex){return DJINNS.filter(d=>!d.set||ex[d.set])}
 function hasDj(p,k){return p.dj.includes(k)}
@@ -5290,14 +5398,14 @@ function performMove(m,s){if(s===undefined)s=sideToAct();let ok=validMoves(s).so
 // ---------- scoring ----------
 function lakeNear(i){return AROUND(i).some(j=>G.board[j].k==='lake')}
 function scoreOf(p){const s={coins:p.coins,advisors:0,sages:0,crafters:0,djinns:0,tiles:0,palms:0,palaces:0,goods:0,items:0,cities:0};
-  s.advisors=p.vz*(hasDj(p,'wazira')?3:1);for(const q of G.pl)if(q.i!==p.i&&q.vz<p.vz)s.advisors+=10;
-  s.sages=p.el*(hasDj(p,'hikma')?4:2);
-  if(G.ex.artisans){const most=G.pl.every(q=>q.art<=p.art);s.crafters=p.art*(most?3:2)+(hasDj(p,'sana')?2*p.art:0);
-    for(const k of p.items)if(ITEMS[k].kind==='precious')s.items+=ITEMS[k].vp+(hasDj(p,'jawhar')?3:0)}
-  for(const k of p.dj)s.djinns+=DJ[k].vp;if(hasDj(p,'majlis'))s.djinns+=5*p.dj.length;
-  let cities=0;for(const t of G.board){const own=owner(t);if(own!==p.i)continue;s.tiles+=t.v;const dbl=G.ex.sultan&&lakeNear(t.i)?2:1;s.palms+=t.palm*(hasDj(p,'nakhla')?5:3)*dbl;s.palaces+=t.pal*5*dbl;
+  s.advisors=p.vz*(hasDj(p,'wazira')?DJN.wazira:1);for(const q of G.pl)if(q.i!==p.i&&q.vz<p.vz)s.advisors+=10;
+  s.sages=p.el*(hasDj(p,'hikma')?DJN.hikma:2);
+  if(G.ex.artisans){const most=G.pl.every(q=>q.art<=p.art);s.crafters=p.art*(most?3:2)+(hasDj(p,'sana')?DJN.sana*p.art:0);
+    for(const k of p.items)if(ITEMS[k].kind==='precious')s.items+=ITEMS[k].vp+(hasDj(p,'jawhar')?DJN.jawhar:0)}
+  for(const k of p.dj)s.djinns+=DJ[k].vp;if(hasDj(p,'majlis'))s.djinns+=DJN.majlis*p.dj.length;
+  let cities=0;for(const t of G.board){const own=owner(t);if(own!==p.i)continue;s.tiles+=t.v;const dbl=G.ex.sultan&&lakeNear(t.i)?2:1;s.palms+=t.palm*(hasDj(p,'nakhla')?DJN.nakhla:3)*dbl;s.palaces+=t.pal*5*dbl;
     if(t.tent===p.i)s.tiles+=AROUND(t.i).filter(j=>!G.board[j].blue&&!G.board[j].block).length;if(t.k==='city')cities++}
-  if(cities)s.cities=5*cities*cities;
+  if(cities)s.cities=CITYVP(cities);
   s.goods=goodsBest(p);s.total=Object.values(s).reduce((a,b)=>a+b,0);return s}
 function goodsScore(res){const c={};for(const r of res)c[r]=(c[r]||0)+1;let tot=0;while(true){const kinds=Object.keys(c).filter(k=>c[k]>0);if(!kinds.length)break;tot+=SETVP[Math.min(kinds.length,9)];for(const k of kinds)c[k]--}return tot}
 // Zarifa: every 2 Mystics = 1 wild goods card; pick the kinds that score best
@@ -5328,8 +5436,8 @@ function applyTwist(def){const tw=def&&def.twist&&def.twist.id,par=def&&def.twis
 <script>
 // ---------- computer players: plan the whole move (start, path, colour), then play it step by step ----------
 let AIPLAN=null;
-// easy = the default rival: plays loose about half the time and eases off once it leads by 10+; tuned (R33) so a newcomer who taps only what glows wins about 1 in 2
-const LVL={easy:{noise:1.5,depth:12000,bid:.2,ease:10,loose:.5,pool:.6},normal:{noise:.6,depth:20000,bid:.3,ease:15,loose:.3,pool:.5},hard:{noise:0,depth:60000,bid:.35,ease:0}};
+// easy = the default rival: loose walks 9 in 10, eases off once ahead, tightens when 3+ behind (rubber band = close games); tuned (F3, touch-bench.js) so a newcomer who follows the starting-tile hint wins about 1 in 2 by a small margin
+const LVL={easy:{noise:2.2,depth:12000,bid:.1,ease:5,loose:1,pool:1,chase:6,tight:.4},normal:{noise:.6,depth:20000,bid:.3,ease:4,loose:.7,pool:.7,chase:5,tight:.5},hard:{noise:0,depth:60000,bid:.35,ease:0}};
 function aiLead(p){if(!G||!G.pl)return 0;const s=scoreOf(p).total;let o=-1e9;for(const q of G.pl)if(q.i!==p.i)o=Math.max(o,scoreOf(q).total);return s-o}
 function aiNoise(p){const L=LVL[p.lv]||LVL.normal;if(p.__nz!=null)return p.__nz;return L.noise}
 function aiEase(p){const L=LVL[p.lv]||LVL.normal;if(!L.ease)return 0;const d=aiLead(p);return d>L.ease?Math.min(4,1+(d-L.ease)/10):0}
@@ -5342,10 +5450,10 @@ function outcomes(s,cap){const t=G.board[s];const hand=t.m.slice();const saved=t
   rec(s,-1,L);t.m=saved;return Object.values(res)}
 function goodsGain(p,cards){const base=goodsBest(p);const q=Object.assign({},p,{res:p.res.concat(cards.filter(r=>r!=='fakir')),fk:p.fk+cards.filter(r=>r==='fakir').length});return goodsBest(q)-base+cards.filter(r=>r==='fakir').length*1.2}
 function djValue(p,k){const d=DJ[k];let v=d.vp;const left=Math.max(1,12-G.round*1.2);
-  if(d.cost)v+=Math.min(6,left*.6);if(k==='nakhla')v+=G.board.filter(t=>owner(t)===p.i).reduce((a,t)=>a+t.palm*2,0)+2;if(k==='wazira')v+=p.vz*2+2;if(k==='hikma')v+=p.el*2+2;if(k==='zarifa')v+=Math.floor(p.fk/2)*3;if(k==='majlis')v+=5*(p.dj.length+1);
+  if(d.cost)v+=Math.min(6,left*.6);if(k==='nakhla')v+=G.board.filter(t=>owner(t)===p.i).reduce((a,t)=>a+t.palm*2,0)+2;if(k==='wazira')v+=p.vz*2+2;if(k==='hikma')v+=p.el*2+2;if(k==='zarifa')v+=Math.floor(p.fk/2)*3;if(k==='majlis')v+=DJN.majlis*(p.dj.length+1);
   if(['harith','qasra','khanjar','tariq','amir'].includes(k))v+=left*.8;return v}
 function bestSummon(p){let b=null,bv=-1e9;for(const k of G.djRow)for(const pay of summonPays(p)){const cost=pay.el*2+pay.fk*1.5;const v=djValue(p,k)-cost;if(v>bv){bv=v;b={k,pay}}}return {b,v:bv}}
-function vizierValue(p,n){const others=G.pl.filter(q=>q.i!==p.i);let v=n*(hasDj(p,'wazira')?3:1);for(const q of others){const before=q.vz<p.vz,after=q.vz<p.vz+n;if(!before&&after)v+=10*(G.round>3?1:.7);else if(!after&&q.vz-p.vz<=n+2)v+=2}return v}
+function vizierValue(p,n){const others=G.pl.filter(q=>q.i!==p.i);let v=n*(hasDj(p,'wazira')?DJN.wazira:1);for(const q of others){const before=q.vz<p.vz,after=q.vz<p.vz+n;if(!before&&after)v+=10*(G.round>3?1:.7);else if(!after&&q.vz-p.vz<=n+2)v+=2}return v}
 function killValue(p,n,tile){let best=0;for(const q of G.pl){if(q.i===p.i||hasDj(q,'sadim'))continue;if(q.vz){const leader=G.pl.every(x=>x.vz<=q.vz);best=Math.max(best,leader?6:2)}if(q.el)best=Math.max(best,3+(q.el>=2?1:0))}
   for(const t of G.board){if(t.block||!t.m.length||MDIST(tile,t.i)>n+p.fk)continue;if(t.m.length===1&&t.camel==null&&t.tent==null)best=Math.max(best,tileWorth(t)-2)}return best}
 function evalOutcome(p,o){const t=G.board[o.e];let v=0;
@@ -5353,10 +5461,10 @@ function evalOutcome(p,o){const t=G.board[o.e];let v=0;
   const baseM=o.e===o.s?[]:t.m;const visitsE=o.path.slice(1,-1).filter(i=>i===o.e).length;const extraC=o.n-1-baseM.filter(x=>x===o.c).length;const remain=baseM.filter(x=>x!==o.c).length+Math.max(0,visitsE-extraC);
   const mine=owner(t)===p.i||(owner(t)==null&&remain<=0&&p.camels>0);const theirs=owner(t)!=null&&owner(t)!==p.i;
   if(owner(t)==null&&remain<=0&&p.camels>0)v+=tileWorth(t)+(t.k==='city'?6:0)+(G.endTrig?0:1)-(p.camels<=2&&!aiAhead(p)?6:0);
-  switch(o.c){case 'vizier':v+=vizierValue(p,o.n);break;case 'elder':v+=o.n*(hasDj(p,'hikma')?4:2)+(G.djRow.length?o.n*1.5:0);break;
+  switch(o.c){case 'vizier':v+=vizierValue(p,o.n);break;case 'elder':v+=o.n*(hasDj(p,'hikma')?DJN.hikma:2)+(G.djRow.length?o.n*1.5:0);break;
     case 'merchant':v+=goodsGain(p,G.market.slice(0,o.n));break;case 'builder':{const blues=AROUND(o.e).filter(i=>G.board[i].blue&&!G.board[i].block).length;v+=o.n*blues;break}
     case 'assassin':v+=killValue(p,o.n,o.e);break;case 'artisan':v+=o.n*2.6+(G.items.length?4:0);break}
-  switch(t.k){case 'village':v+=mine?5:theirs?-4:1;break;case 'oasis':v+=mine?(hasDj(p,'nakhla')?5:3):theirs?-2.5:1;break;
+  switch(t.k){case 'village':v+=mine?5:theirs?-4:1;break;case 'oasis':v+=mine?(hasDj(p,'nakhla')?DJN.nakhla:3):theirs?-2.5:1;break;
     case 'sacred':{const pe=Object.assign({},p,{el:p.el+(o.c==='elder'?o.n:0)});const s=bestSummon(pe);if(s.b)v+=Math.max(0,s.v);break}
     case 'small':if(p.coins>=3)v+=Math.max(0,Math.max(...G.market.slice(0,3).map(r=>goodsGain(p,[r])))-3);break;
     case 'large':if(p.coins>=6){const f=G.market.slice(0,6);let b=0;for(let x=0;x<f.length;x++)for(let y=x+1;y<f.length;y++)b=Math.max(b,goodsGain(p,[f[x],f[y]]));v+=Math.max(0,b-6)}break;
@@ -5368,7 +5476,7 @@ function aiAhead(p){const s=scoreOf(p).total;return G.pl.every(q=>q.i===p.i||sco
 function planTurn(p){const L=LVL[p.lv]||LVL.normal,cap=L.depth;const e=aiEase(p);p.__nz=aiNoise(Object.assign({},p,{__nz:null}))+e*2.5;let best=null,bv=-1e9;const all=[];
   for(const s of legalStarts())for(const o of outcomes(s,cap)){const v=evalOutcome(p,o);all.push([v,o]);if(v>bv){bv=v;best=o}}p.__nz=null;
   // a loose turn: any walk from the better half (more often while it leads), so the default rival makes human-sized mistakes
-  const lp=(L.loose||0)+(e?.15*e:0);if(lp&&all.length>3&&Math.random()<lp){all.sort((a,b)=>b[0]-a[0]);const h=all.slice(0,Math.max(2,Math.ceil(all.length*(L.pool||.5))));const pk=h[Math.floor(Math.random()*h.length)];best=pk[1];bv=pk[0]}return best&&Object.assign(best,{v:bv})}
+  let lp=(L.loose||0)+(e?.15*e:0);if(L.chase&&aiLead(p)<-L.chase)lp*=L.tight;if(lp&&all.length>3&&Math.random()<lp){all.sort((a,b)=>b[0]-a[0]);const h=all.slice(0,Math.max(2,Math.ceil(all.length*(L.pool||.5))));const pk=h[Math.floor(Math.random()*h.length)];best=pk[1];bv=pk[0]}return best&&Object.assign(best,{v:bv})}
 function bestTurnValue(p){const b=planTurn(Object.assign({},p,{lv:'hard'}));return b?b.v:0}
 // the next concrete move for side s
 function aiMove(s){if(G&&G.tut&&typeof tutAIMove==='function'){const tm=tutAIMove(s);if(tm)return tm}
@@ -5426,7 +5534,7 @@ function aiAnswer(q){const p=P(q.who);switch(q.kind){
 //  tiles           Stall (3 coins for a good), Hamlet (palace 5), Shrine (summon a djinn), Oasis (palm 3), Grand Bazaar (6 coins for 2 goods)
 //  goods / Mystics sets of different kinds score 1/3/7/13...; sell a set at the end of a turn; Mystics never score but boost Masons and Shadows
 //  computer        the computer plays by the same rules, one step at a time
-//  end             the last camel ends the game; score coins, Advisors, Sages, djinns, tiles with palms and palaces, goods
+//  end             the last camel ends the game at the end of that round; score coins, Advisors, Sages, djinns, tiles with palms and palaces, goods
 const TUT_SEED=20261009;
 // tile index = row*6+col (rows A-E, columns 1-6). The five stages of the lesson, all drawn on this one board:
 //   comp A  (turn 1) lifts Sages from L11 and walks 10, 9 to the Shrine on 8, takes the Sages, claims it and summons a djinn
@@ -5505,7 +5613,7 @@ const RULES_HTML=`<div class="rules">
 <li><b>Bazaar Stall</b>: you may pay 3 coins for one of the first 3 goods. <b>Grand Bazaar</b>: 6 coins for two of the first 6.</li>
 </ul>
 <h3>5. Goods and Mystics</h3>
-<p>Goods score in sets of different kinds: 1, 3, 7, 13, 21, 30, 40, 50 or 60 points for 1 to 9 kinds. Build as many sets as you can. Mystics never score. They boost Masons and Shadows, or replace a Sage.</p>
+<p>Goods score in sets of different kinds: 1, 3, 6, 12, 20, 29, 39, 49 or 60 points for 1 to 9 kinds. Build as many sets as you can. Mystics never score. They boost Masons and Shadows, or replace a Sage.</p>
 <h3>6. The end</h3>
 <p>When someone places their last camel, the round is finished and the game ends. It also ends if no legal move is left on the board. Add up coins, people, tiles, palms, palaces, djinns, goods and extras. Equal scores share the win.</p>
 <h3>Expansions (switch them on at the start)</h3>
@@ -5839,12 +5947,12 @@ function lineText(){if(!G)return '';if(G.over){const hs=G.pl.filter(x=>x.human);
   if(!hp){const nm=seatName(p);if(online()&&p.human)return `Waiting for ${nm}`;if(G.q)return `${nm} is choosing`;if(G.phase==='bid')return `${nm} is bidding`;return `${nm} is ${{move:G.move?'moving':'choosing',tribe:'collecting',tile:'acting',sell:'finishing'}[G.step]||'playing'}`}
   {const gs=typeof gdStep==='function'?gdStep():null;if(gs&&gs.who!=='me')return 'Tap Next to go on'}
   if(G.q)return qLine(G.q);if(UI.pendDj||UI.pendItem)return 'Tap a glowing tile';
-  if(G.phase==='bid'){const two=hp.markers>1;return 'Tap a glowing spot to bid'}
+  if(G.phase==='bid'){const two=hp.markers>1;return two?'Pick 2 turns: earlier costs more':'Pick your turn: earlier costs more (coins are points)'}   // F2: says what bidding is for, in one plain line
   switch(G.step){
-  case 'move':return !G.move?'Tap a glowing tile to lift people':G.move.hand.length===1?'Last one: land on its colour':'Tap a glowing tile to drop one';
-  case 'tribe':return {assassin:'Tap a glowing person to remove',builder:hp.fk?'Tap Earn to take your coins':'Tap Collect to take your coins',merchant:'Tap Collect to fetch goods',vizier:'Tap Collect: Advisors join you',elder:'Tap Collect: Sages join you',artisan:'Tap Collect: Crafters join you'}[G.act.color]||'';
+  case 'move':if(G.move&&typeof f3Mine==='function'){const f=f3Line();if(f)return f}return !G.move?'Tap a glowing tile to lift people':G.move.hand.length===1?'Last one: land on its colour':'Tap a glowing tile to drop one';
+  case 'tribe':return {assassin:'Shadow: remove one person in reach',builder:hp.fk?'Tap Earn to take your coins':'Tap Collect to take your coins',merchant:'Tap Collect to fetch goods',vizier:'Tap Collect: Advisors join you',elder:'Tap Collect: Sages join you',artisan:'Tap Collect: Crafters join you'}[G.act.color]||'';
   case 'tile':{const t=G.board[G.act.tile];return {village:UI.pick.length>1?'Tap a glowing tile for the palace':'Tap Build here',oasis:UI.pick.length>1?'Tap a glowing tile for the palm':'Tap Plant here',sacred:'Tap a djinn to summon, or Skip',small:'Buy a good for 3🪙',large:(UI.mkSel&&UI.mkSel.length===1?'One chosen. Pick one more good':'Pick two goods for 6🪙'),exchange:'Buy a good for 4🪙',workshop:'Commission an item, or Skip'}[t.k]||'Tap Skip to go on'}
-  case 'sell':return 'Sell goods, or tap End turn'}
+  case 'sell':return 'Sell goods for coins, or End turn'}
   return ''}
 // ---------- seats (the score race) ----------
 function E2(e,k){return `<i class="e2" data-i="${k}">${e}</i>`}
@@ -5852,7 +5960,7 @@ function pip(c,n){return n?`<span class="pp" title="${esc(MPLUR[c])}"><i class="
 function seatHtml(p){const a=sideToAct()===p.i&&!G.over;const kill=UI.pickSeat.includes(p.i);const nm=seatName(p);
   return `<div class="sch ${a?'actnow':''} ${kill?'glow':''}" data-seat="${p.i}" style="--pc:${PCOL[p.i]}" aria-label="${esc(nm)}, score ${shownTotal(p)}">
    <b class="sn">${esc(nm)}${!p.human?'<small>cpu</small>':''}</b><b class="ss"><i class="sti">★</i>${shownTotal(p)}</b>
-   <span class="s2"><span class="st">${E2('🪙','coin')}${p.coins}<em class="w"> coins</em></span><span class="st">${E2('🐪','camel')}${p.camels}<em class="w"> camel${p.camels===1?'':'s'} left</em></span>${p.tent?'<span class="st">⛺</span>':''}</span>
+   <span class="s2"><span class="st">${E2('🪙','coin')}${p.coins}<em class="w"> coins</em></span><span class="st">${E2('🐪','camel')}${p.camels}<em class="w"> camel${p.camels===1?'':'s'} left</em></span>${p.tent?'<span class="st">⛺</span>':''}${(()=>{const dj=scoreOf(p).djinns;return dj?`<span class="st dje" title="Djinn points, counted at the end">🧞+${dj}<em class="w"> at end</em></span>`:''})()}</span>
    <span class="s3">${pip('vizier',p.vz)}${pip('elder',p.el)}${G.ex.artisans?pip('artisan',p.art):''}${p.fk?`<span class="pp">🔮${p.fk}</span>`:''}${p.res.length?`<span class="pp">${E2('🧺','basket')}${p.res.length}</span>`:''}${p.dj.length?`<span class="pp">${E2('🧞','djinn')}${p.dj.length}</span>`:''}</span></div>`}
 function renderSeats(){const el=$('#seats');if(!el)return;const h=G.pl.map(seatHtml).join('');el.dataset.n=G.pl.length;el.innerHTML=h}
 // ---------- the bazaar ----------
@@ -5881,16 +5989,19 @@ function shortOpt(l){let t=String(l).replace(/\s*\(.*?\)/g,'').replace(/:.*$/,''
 function bidGood(hp,bm){const k=m=>m.spot+':'+(m.fk||0);const g=new Set();let adv=null;try{adv=typeof hlpAdvice==='function'?hlpAdvice():null}catch(e){}
   for(const m of bm){const pr=bidPrice(hp,m.spot,m.fk);if(pr===0||(pr<=Math.max(1,Math.floor(hp.coins*.06))&&adv&&adv.act==='bid'&&adv.spot===m.spot&&(adv.fk||0)===(m.fk||0)))g.add(k(m))}
   if(!g.size){let lo=1e9;for(const m of bm)lo=Math.min(lo,bidPrice(hp,m.spot,m.fk));bm.forEach(m=>{if(bidPrice(hp,m.spot,m.fk)===lo)g.add(k(m))})}return m=>g.has(k(m))}
-function trackHtml(hp,vm){const bm=vm.filter(m=>m.act==='bid');const good=bidGood(hp,bm);const done=new Set(G.bids.map(b=>b.spot));
-  const ord=['1st','2nd','3rd','4th','5th','6th','7th','8th','9th','10th','11th','12th'];
-  return `<div class="bidt${G.track.length>7?' two':''}" aria-label="Turn order">${G.track.map((t,s)=>{const b=G.bids.find(x=>x.spot===s);const mine=bm.filter(m=>m.spot===s);
-    return `<div class="spot ${b?'taken':''}" style="${b?'--pc:'+PCOL[b.mk.p]:''}"><small class="ord">${ord[s]}</small>${mine.map(m=>`<button class="sp-b ${good(m)?'glow':'dear'} ${m.fk?'fkv':''}" data-mv='${mvAttr(m)}' aria-label="${bidPrice(hp,s,m.fk)?bidPrice(hp,s,m.fk)+' coins':'free'}${m.fk?' with '+m.fk+' Mystic':''}">${m.fk?`<i>−${m.fk}🔮</i>${bidPrice(hp,s,m.fk)}🪙`:`${t.cost}🪙`}</button>`).join('')||`<span class="sp-c">${t.cost}🪙</span>`}${b?'<i class="mk"></i>':''}</div>`}).join('')}</div>`}
+function trackHtml(hp,vm){const bm=vm.filter(m=>m.act==='bid');const good=bidGood(hp,bm);
+  const ord=['1st','2nd','3rd','4th','5th','6th','7th','8th','9th','10th','11th','12th'];const cost=c=>c?c+'🪙':'free';
+  // F2: every spot is one big button that names its place in the turn order and its price; taken spots name who took them
+  return `<div class="bidt${G.track.length>7?' two':''}" aria-label="Turn order: earlier costs more">${G.track.map((t,s)=>{const b=G.bids.find(x=>x.spot===s);const mine=bm.filter(m=>m.spot===s);
+    const who=b?esc(seatName(P(b.mk.p))):'';
+    return `<div class="spot ${b?'taken':mine.length?'open':'shut'}" style="${b?'--pc:'+PCOL[b.mk.p]:''}">${mine.map(m=>{const pr=bidPrice(hp,s,m.fk);return `<button class="sp-b ${good(m)?'glow':'dear'} ${m.fk?'fkv':''}" data-mv='${mvAttr(m)}' aria-label="${ord[s]} in turn order, ${pr?pr+' coins':'free'}${m.fk?' with '+m.fk+' Mystic':''}"><small class="ord">${ord[s]}</small><b class="spc">${m.fk?`<i>−${m.fk}🔮</i>`:''}${cost(pr)}</b></button>`}).join('')||`<small class="ord">${ord[s]}</small><span class="sp-c">${b?who:cost(t.cost)}</span>`}${b?'<i class="mk"></i>':''}</div>`}).join('')}</div>`}
 function powerChips(hp,vm){const pw=[...vm.filter(m=>m.act==='djinn'),...vm.filter(m=>m.act==='item')];if(!pw.length)return '';const seen=new Set();let h='';
   for(const m of pw){if(m.act==='djinn'){const key=m.k+JSON.stringify(m.pay);if(seen.has(key))continue;seen.add(key);const pay='pay '+[m.pay.el?m.pay.el+' Sage'+(m.pay.el>1?'s':''):'',m.pay.fk?m.pay.fk+' Mystic'+(m.pay.fk>1?'s':''):''].filter(Boolean).join(' + ');
       h+=m.t>=0?`<button class="ab pw${UI.pendDj&&same(UI.pendDj,{k:m.k,pay:m.pay})?' on':''}" data-pw='${mvAttr({k:m.k,pay:m.pay})}'>✨ ${esc(DJ[m.k].n)} <small>${pay}</small></button>`:abtn(m,`✨ ${esc(DJ[m.k].n)} <small>${pay}</small>`,'pw')}
     else{const key='i'+m.k+(m.dj||'');if(seen.has(key))continue;seen.add(key);
       if(m.k==='flute'||m.k==='talisman')h+=`<button class="ab pw${UI.pendItem&&UI.pendItem.k===m.k?' on':''}" data-pi="${m.k}">${itemIc(m.k)} ${esc(ITEMS[m.k].n)}</button>`;else h+=abtn(m,`${itemIc(m.k)} ${esc(ITEMS[m.k].n)}${m.dj?' → '+esc(DJ[m.dj].n):''}`,'pw')}}
-  return `<div class="arow pws">${h}</div>`}
+  const n=seen.size;if(n<2||UI.pendDj||UI.pendItem||(typeof gdStep==='function'&&gdStep()))return `<div class="arow pws">${h}</div>`;   // F3: two or more powers fold into one Djinns (n) drawer
+  return `<div class="arow pws pwd"><button class="ab pw pwtog${UI.pwOpen?' on':''}" data-ui="pwtog" aria-expanded="${!!UI.pwOpen}">✨ Djinns (${n}) ${UI.pwOpen?'▾':'▸'}</button>${UI.pwOpen?h:''}</div>`}
 // builds the button area and sets UI.autoMove when the turn needs no decision from the player
 const gdOn=()=>typeof gdStep==='function'&&!!gdStep();   // the guided game shows a button for every step, never an automatic move
 function buildActs(){UI.autoMove=null;const hp=me();if(!G||G.over||!hp||UI.modal)return '';const vm=validMoves(hp.i);const by=a=>vm.filter(m=>m.act===a);let h='',main='';
@@ -5915,9 +6026,10 @@ function buildActs(){UI.autoMove=null;const hp=me();if(!G||G.over||!hp||UI.modal
     break}
   case 'sell':{const kinds=[...new Set(hp.res)];UI.sellSel=UI.sellSel.filter(k=>kinds.includes(k));const end=by('end')[0];
     if(!kinds.length&&!vm.filter(m=>m.act!=='end').length&&end&&!gdOn()){UI.autoMove=end;break}
-    if(UI.sellSel.length)main+=abtn({act:'sell',kinds:UI.sellSel.slice().sort()},`Sell +${sellValue(UI.sellSel.length)}🪙`,'');
+    if(UI.sellSel.length)main+=abtn({act:'sell',kinds:UI.sellSel.slice().sort()},`Sell ${UI.sellSel.length} +${sellValue(UI.sellSel.length)}🪙`,'');
+    else if(kinds.length>1)main+=abtn({act:'sell',kinds:kinds.slice().sort()},`Sell all ${kinds.length} kinds +${sellValue(kinds.length)}🪙`,'');   // F3: one button sells one of each kind
     main+=abtn(end,'End turn ▶','go');break}}
-  if(main)h+=`<div class="arow${main.indexOf('ab ern')>=0?' earn':''}">${main}</div>`;return h+pw}
+  if(main)h+=`<div class="arow${main.indexOf('ab ern')>=0?' earn':''}">${main}</div>`;if(G.step==='move'&&typeof f3Mine==='function')h=f3ActsHtml()+h;return h+pw}
 function renderActs(){const el=$('#acts');if(!el)return;const h=buildActs();if(el.dataset.h!==h){el.innerHTML=h;el.dataset.h=h}el.classList.toggle('empty',!h)}
 function renderMine(){const el=$('#mine');if(!el)return;const hp=me();let h='';
   if(G&&!G.over&&hp&&!UI.modal&&!G.q&&G.phase==='turn'&&G.step==='sell'){const kinds=[...new Set(hp.res)];UI.sellSel=UI.sellSel.filter(k=>kinds.includes(k));
@@ -5926,10 +6038,10 @@ function renderMine(){const el=$('#mine');if(!el)return;const hp=me();let h='';
 function renderLine(){const el=$('#line');if(!el)return;const t=lineText();if(el.textContent!==t)el.textContent=t;const hp=me();el.classList.toggle('mine',!!hp&&!G.over)}
 function renderChrome(){const c=$('#pchip');if(c&&G){const s=sideToAct();const t=G.over?'Game over':`Round ${G.round}`+(online()?' · online':'');if(c.textContent!==t)c.textContent=t}
   const sb=$('#speedbtn');if(sb)sb.innerHTML=ICON('fast')+'<span>'+({0.5:'slow',1:'normal',3:'fast'}[UI.speed]||'normal')+'</span>'}
-function render(){if(!G){renderModal();return}
+function render(){if(!G){renderModal();return}if(typeof f3Mine==='function')f3Turn();
   const prev=UI.snap&&UI.snap.seed===G.seed?UI.snap:null;if(me())UI.hurry=false;
   computePick();renderSeats();renderGrid();renderMarket();renderMine();renderActs();renderLine();renderChrome();renderPopups();renderModal();
-  if(typeof fit==='function')fit();if(typeof animate==='function')animate(prev);UI.snap=snapState();
+  if(typeof fit==='function')fit();if(typeof animate==='function')animate(prev);UI.snap=snapState();if(typeof f3Mine==='function')f3After();
   autoStep();if(typeof placeChz==='function')placeChz();if(typeof placeFinger==='function')placeFinger();overCheck();if(typeof hlpAfter==='function')hlpAfter()}
 function snapState(){return {seed:G.seed,tiles:G.board.map(t=>({m:t.m.slice(),hand:G.move&&G.move.at===t.i?G.move.hand.slice():[],camel:t.camel,tent:t.tent,palm:t.palm,pal:t.pal})),market:G.market.slice(),djRow:G.djRow.slice(),thRow:(G.thRow||[]).slice(),
   tot:G.pl.map(p=>shownTotal(p)),coins:G.pl.map(p=>p.coins),cur:G.cur,act:G.act?{color:G.act.color,tile:G.act.tile}:null,step:G.step,logN:G.logN}}
@@ -5950,6 +6062,7 @@ function onTile(i){const p=me();if(!p)return;if(UI.chz){const same=UI.chz.anchor
   if(UI.pendItem){const it=UI.pendItem;const ms=vm.filter(m=>m.act==='item'&&m.k===it.k);
     if(it.k==='flute'){const m=ms.find(m=>m.t===i);UI.pendItem=null;if(m)return go(m);return render()}
     if(it.k==='talisman'){if(it.from==null){if(ms.some(m=>m.from===i)){it.from=i;return render()}UI.pendItem=null;return render()}const m=ms.find(m=>m.from===it.from&&m.to===i);UI.pendItem=null;if(m)return go(m);return render()}}
+  if(G.step==='move'&&G.move&&typeof f3Mine==='function'&&f3TileTap(i))return;   // F3: tap where the walk ends: the whole path is planned, one more tap confirms
   if(G.step==='move'){if(!G.move){const m=vm.find(m=>m.act==='start'&&m.tile===i);if(m){UI.hurry=false;return go(m)}return nope()}
     const ok=vm.filter(m=>m.act==='step'&&m.tile===i);if(!ok.length)return nope();if(ok.length===1)return go(ok[0]);
     return pickChoose({tile:i},ok.map(m=>({html:mdotHtml(m.c),m})))}
@@ -5969,7 +6082,7 @@ function onMarket(j){const p=me();const el=document.querySelector(`[data-mk="${j
 function onDjinn(k,th){const p=me();const ak=th?'t:'+k:k;if(UI.chz&&UI.chz.anchor.dj===ak){UI.chz=null;return render()}if(p&&G.step==='tile'&&!G.q){const tm=validMoves(p.i).filter(m=>m.act==='tile'&&(th?m.thief===k:m.dj===k));
     if(tm.length===1)return go(tm[0]);if(tm.length>1){UI.chz={anchor:{dj:ak},opts:tm.map(m=>({html:`<span class="paychip">Pay ${m.pay.el} Sage${m.pay.el>1?'s':''}${m.pay.fk?' + 1 Mystic':''}</span>`,m}))};return render()}}
   const d=DJ[k];showTip(document.querySelector(th?`[data-th="${k}"]`:`[data-dj="${k}"]`),th?`<img class="tipart" src="media/thief-${k}.webp" alt=""><b>${esc(THIEVES[k].n)}</b><br>${esc(THIEVES[k].x)}`:`<img class="tipart" src="media/djinn-${k}.webp" alt=""><b>${esc(d.n)}</b> · ${d.vp} points<br>${esc(d.x)}`)}
-function go(m){UI.chz=null;UI.mkSel=[];UI.pendDj=null;UI.pendItem=null;clearTimeout(UI.autoT);if(online()&&isClient()){netSend(m);return}const s=sideToAct();const hu=s>=0&&P(s).human;const mine=!online()||s===NET.mySeat;
+function go(m){if(m&&m.act==='f3plan'){UI.chz=null;return f3Plan(m.o)}UI.chz=null;UI.mkSel=[];UI.pendDj=null;UI.pendItem=null;clearTimeout(UI.autoT);if(online()&&isClient()){netSend(m);return}const s=sideToAct();const hu=s>=0&&P(s).human;const mine=!online()||s===NET.mySeat;
   if(hu&&m.act==='start'){UI.moveSnap=JSON.stringify(G);UI.moveSteps=[m]}else if(hu&&m.act==='step'&&UI.moveSteps)UI.moveSteps.push(m);else if(m.act!=='djinn'&&m.act!=='item')UI.moveSnap=null;
   if(hu&&mine&&!G.tut&&typeof fingerUsed==='function')fingerUsed(m);
   const r=performMove(m,s);if(G&&!G.move)UI.moveSnap=G.step==='move'?UI.moveSnap:null;
@@ -5992,30 +6105,31 @@ document.addEventListener('click',e=>{const b=e.target.closest('button,[data-til
   if(d.ui)return uiAct(d.ui);
   switch(d.a){case 'snd':toggleSound();return;case 'mus':toggleMusic();return;case 'speed':UI.speed=UI.speed===1?3:UI.speed===3?.5:1;render();return;case 'pause':UI.pause=!UI.pause;render();schedule();return;case 'new':if(online()){UI.modal='lobby';render();return}openStart();return}});
 // a tap anywhere that is not a button, while the computer plays, hurries it along
-document.addEventListener('pointerdown',e=>{if(G&&!G.over&&!me()&&!UI.modal&&e.target.closest&&e.target.closest('#bd'))UI.hurry=true},true);
+document.addEventListener('pointerdown',e=>{if(G&&!G.over&&!me()&&!UI.modal&&e.target.closest&&e.target.closest('#bd')){UI.hurry=true;if(aiTimer){clearTimeout(aiTimer);aiTimer=null;setTimeout(schedule,0)}}},true);   // F3: the hurry starts now, not after the 1.5 s caption
 document.addEventListener('pointerdown',e=>{const tp=document.getElementById('tip');if(tp&&!tp.hidden&&!(e.target.closest&&e.target.closest('#tip')))tp.hidden=true},true);
 document.addEventListener('pointerdown',e=>{if(UI.chz&&!(e.target.closest&&e.target.closest('#chz,[data-tile],[data-seat],[data-dj],[data-th],[data-help]'))){UI.chz=null;if(G)render()}},true);
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&(UI.pendDj||UI.pendItem||UI.chz)){UI.pendDj=UI.pendItem=UI.chz=null;render()}});
 function uiAct(a){if(online()){if(a==='new'||a==='start'){UI.modal='lobby';render();return}if(a==='undodrop'&&isClient()){netSend({act:'undodrop'});return}if(a==='continue')return}
   switch(a){case 'start':if(tutOffer('start'))return;beginGame();return;case 'quick':if(tutOffer('quick'))return;UI.setup.seats=['human','ai','ai','ai','ai'];beginGame();return;case 'goalgo':UI.modal=null;render();schedule();return;case 'more':UI.more=!UI.more;render();return;case 'tutgo':UI.modal=null;tutStart();return;case 'tutplay':{const nx=UI.offerNext||'quick';UI.modal=null;uiAct(nx);return}case 'continue':loadSaved();return;case 'new':openStart();return;case 'story':if(typeof GXC!=='undefined'&&window.CAMPAIGN){UI.modal=null;GX.close();render();storyOpen()}return;
   case 'again':UI.modal=null;beginGame();return;case 'closeover':UI.modal=null;render();return;
-  case 'ernm':UI.earnFk=Math.max(0,(UI.earnFk||0)-1);render();return;case 'ernp':UI.earnFk=(UI.earnFk||0)+1;render();return;
+  case 'f3go':f3Go();return;case 'f3x':F3.plan=null;render();return;case 'pwtog':UI.pwOpen=!UI.pwOpen;render();return;case 'ernm':UI.earnFk=Math.max(0,(UI.earnFk||0)-1);render();return;case 'ernp':UI.earnFk=(UI.earnFk||0)+1;render();return;
   case 'undodrop':{if(!UI.moveSnap||!UI.moveSteps)return;const steps=UI.moveSteps.slice(0,-1);G=JSON.parse(UI.moveSnap);UI.moveSteps=[];for(const m of steps){performMove(m,G.cur);UI.moveSteps.push(m)}if(!steps.length)UI.moveSnap=null;refresh();return}}}
 function openStart(){UI.modal='start';render()}
 function resetScene(){UI.camp=null;UI.snap=null;UI.chz=null;UI.pendDj=UI.pendItem=null;UI.mkSel=[];UI.sellSel=[];UI.moveSnap=null;UI.hurry=false}
 function beginGame(o){o=o||{};const s=UI.setup;UI.modal=null;UI.fx.length=0;UI.fxSeen=0;resetScene();const seats=s.seats.slice(0,s.np);
   newGame({np:s.np,seats,lv:s.lv.slice(0,s.np),ex:Object.assign({},s.ex,s.np===5?{sultan:true}:{}),mode:seats.every(x=>x==='ai')?'ai':'x'});UI.modal=null;refresh()}
 function loadSaved(){try{const g=JSON.parse(localStorage.getItem(SAVE));if(!g||!g.v)throw 0;G=g;UI.modal=null;resetScene();refresh()}catch(e){openStart()}}
-// ---------- the computer: one step at a time, about 0.6 s a drop; tap the table to hurry ----------
+// ---------- the computer: about 1.5 s per decision (one caption each), 0.4 s a drop; Skip or a tap on the table hurries it ----------
 const modalStops=()=>UI.modal&&UI.modal!=='lobby';
 let aiTimer=null;function schedule(){if(online()&&isClient())return;if(aiTimer||!G||G.over||UI.pause||modalStops()||tutHeld())return;const s=sideToAct();if(s<0||P(s).human)return;
-  const drop=G.step==='move'&&G.move;const base=drop?320:420;/* W497: a rival turn takes about 2-3 s; Skip or a tap on the table hurries it */const d=ANIM?Math.max(0,base/(UI.speed||1)*(UI.hurry?.12:1)):0;
+  const drop=G.step==='move'&&G.move&&G.move.drops.length;const lift=G.step==='move'&&G.move&&!G.move.drops.length;const watch=G.pl.some(p=>p.human);const base=!watch?420:drop?150:lift?450:450;   /* F3: one readable caption per rival decision (~1.5 s), drops quicker; Skip or a tap on the table hurries it */const d=ANIM?Math.max(0,base/(UI.speed||1)*(UI.hurry?.12:1)):0;
   aiTimer=setTimeout(()=>{aiTimer=null;if(!G||G.over||modalStops()||tutHeld()||(online()&&isClient()))return;const s2=sideToAct();if(s2<0||P(s2).human)return;const m=aiMove(s2);if(!m){console.error('AI has no move in '+G.phase+'/'+G.step);return}go(m)},d)}
 
 </script>
 <script>
 // ---------- UI part 2: fitting the grid, animating what changed between two renders, the chooser pop-over, the ghost finger ----------
-function fit(){const gw=$('#gw'),g=$('#grid');if(!gw||!g||!G)return;const W=G.W,H=G.H,gap=3;const bw=gw.clientWidth,bh=gw.clientHeight;if(bw<20||bh<20)return;
+function fit(){const gw=$('#gw'),g=$('#grid');if(!gw||!g||!G)return;const W=G.W,H=G.H,gap=3;const RR=document.documentElement;RR.classList.remove('sq');let bw=gw.clientWidth,bh=gw.clientHeight;if(bw<20||bh<20)return;
+  if(!RR.classList.contains('land')&&innerWidth<=700&&Math.floor((bh-(H-1)*gap)/H)<44){RR.classList.add('sq');bw=gw.clientWidth;bh=gw.clientHeight}   // F1: tiles keep 44 px on a short phone
   let cw=Math.floor((bw-(W-1)*gap)/W),ch=Math.floor((bh-(H-1)*gap)/H);ch=Math.min(ch,Math.round(cw*1.55));cw=Math.min(cw,Math.round(ch*1.6));
   g.style.width=(cw*W+(W-1)*gap)+'px';g.style.height=(ch*H+(H-1)*gap)+'px';
   const ms=Math.max(10,Math.min(26,Math.round(Math.min(cw*.27,(ch-27)/2.36))));g.style.setProperty('--ms',ms+'px');g.style.setProperty('--cw',cw+'px');g.style.setProperty('--ch',ch+'px');
@@ -6065,7 +6179,8 @@ function animate(prev){const cur=snapState();if(!ANIM||!prev||document.hidden)re
   cur.tot.forEach((t,i)=>{const d=t-(prev.tot[i]||0);if(!d)return;const se=seatEl(i);if(!se)return;const ss=se.querySelector('.ss');if(ss){ss.classList.add('bump')}
     if(G&&G.over)return;if(G&&!G.coach&&!G.tut)return;   // R25: in Play the seat's labelled pop (playable.js) says it once; no second chip. No score chips over the result card; the chip sits under the seat, never over its name and coins
     const lab=(G&&G.pl[i]&&G.pl[i].human&&G.pl.filter(x=>x.human).length===1?'You':(G&&G.pl[i]?G.pl[i].nm:''))+' '+(d>0?'+':'−')+Math.abs(d)+(Math.abs(d)===1?' pt':' pts');   // every chip says whose points and that they are points
-    const sr=se.getBoundingClientRect();const at=tf&&i===actor?ctr(tf.getBoundingClientRect()):{x:sr.left+sr.width/2,y:sr.bottom+14};floatText(lab,at,d>0?'up':'dn')})}
+    const sr=se.getBoundingClientRect();const at={x:sr.left+sr.width/2,y:sr.bottom+14};   // F2: score chips start under the seat, never on the tiles
+   floatText(lab,at,d>0?'up':'dn')})}
 // the chooser lights its sensible option (the computer's own pick for you, or the best Shadow target); the rest stay tappable
 function chzBest(c){try{const hp=me();if(!hp)return 0;let adv=null;const cz=UI.chz;try{UI.chz=null;adv=typeof hlpAdvice==='function'?hlpAdvice():null}catch(e){}finally{UI.chz=cz}   // R38: the advice is read as if the chooser were shut, so the planned colour is the one marked best
   if(adv){const j=c.opts.findIndex(o=>same(o.m,adv));if(j>=0)return j}
@@ -6074,9 +6189,17 @@ function chzBest(c){try{const hp=me();if(!hp)return 0;let adv=null;const cz=UI.c
 function seatPoint(i){const se=seatEl(i);return se?ctr(se.getBoundingClientRect()):{x:innerWidth/2,y:20}}
 // ---------- the pop-over for a choice on a tile, a seat or a card ----------
 function placeChz(){const el=$('#chz');if(!el)return;const c=UI.chz;for(const q of document.querySelectorAll('.chzanc'))q.classList.remove('chzanc');document.documentElement.classList.remove('chzon');if(!c||!G){el.hidden=true;el.innerHTML='';return}
-  const bi=chzBest(c);el.innerHTML=c.opts.map((o,i)=>`<button class="chb${i===bi?' glow':''}" data-chz="${i}">${o.html}${i===bi&&c.opts.length>1?'<small class="chbest">best</small>':''}</button>`).join('');el.hidden=false;
+  const hn=(typeof hintsOn==='function'&&hintsOn())||(typeof gdStep==='function'&&!!gdStep());const bi=hn?chzBest(c):-1;   // F3: 'best' only with hints on
+  const tl=a0=>a0&&a0.tile!=null&&!(UI.chz&&UI.chz.dock===false);el.innerHTML=c.opts.map((o,i)=>`<button class="chb${i===bi?' glow':''}" data-chz="${i}">${o.html}${i===bi&&c.opts.length>1?'<small class="chbest">best</small>':''}</button>`).join('');el.hidden=false;
   const a=c.anchor;const ae=a.tile!=null?tileEl(a.tile):a.seat!=null?seatEl(a.seat):a.dj?document.querySelector(`[data-dj="${a.dj}"],[data-th="${String(a.dj).replace('t:','')}"]`):null;if(!ae){el.hidden=true;return}ae.classList.add('chzanc');document.documentElement.classList.add('chzon');   // R25: only the chooser and its tile stay lit
   const r=ae.getBoundingClientRect(),w=el.offsetWidth,h=el.offsetHeight;let x=r.left+r.width/2-w/2;x=Math.max(6,Math.min(innerWidth-w-6,x));let minY=50;for(const id of ['line','trk','trk2','coach','turnover']){const q=document.getElementById(id);if(q&&!q.hidden&&q.getClientRects().length){const b=q.getBoundingClientRect().bottom;if(b>minY)minY=b}}minY+=4;let y=r.top-h-8;if(y<minY)y=r.bottom+8;if(y+h>innerHeight-6)y=Math.max(minY,innerHeight-h-6);
+  // F3: a choice for a TILE never sits on the bazaar: below the grid (phone), beside it (PC), else in the gap above it
+  if(tl(a)){const g=document.getElementById('grid');const gr=g?g.getBoundingClientRect():null;
+    if(gr&&gr.width){if(innerHeight-gr.bottom>=h+8){y=gr.bottom+6;x=Math.max(6,Math.min(innerWidth-w-6,r.left+r.width/2-w/2))}
+      else if(innerWidth-gr.right>=w+16){x=gr.right+8;y=Math.max(minY,Math.min(innerHeight-h-6,r.top+r.height/2-h/2))}
+      else if(gr.left>=w+16){x=gr.left-w-8;y=Math.max(minY,Math.min(innerHeight-h-6,r.top+r.height/2-h/2))}
+      else if(gr.top-minY>=h+4){y=gr.top-h-4}
+      else{y=Math.max(minY,innerHeight-h-6)}}}
   el.style.left=x+'px';el.style.top=y+'px'}
 // ---------- the ghost finger: shows one real, legal move to the new player, and stays away after a few moves ----------
 const FING={n:0,max:10,key:'',t:null};try{FING.n=+localStorage.getItem('soq_fing')||0}catch(e){}
@@ -6125,10 +6248,10 @@ function renderDjPop(){const b=$('#djbody');b.dataset.v=String(G.logN);const inG
 function refHtml(){const sec=(t,items)=>`<h3>${t}</h3><div class="cgrid">${items.map(i=>`<div class="card"><h4>${i.n}${i.c>1?` <small>×${i.c}</small>`:''}</h4>${i.art||(/^[^\x00-\x7f]/.test(i.n)?cardArt('good',i.n,{glyph:i.n.split(' ')[0],hue:30}):'')}${i.tag?`<div class="tag">${esc(i.tag)}</div>`:''}<p>${esc(i.x)}</p></div>`).join('')}</div>`;
   const tiles=[];for(const [k,v,n,col] of TILESET.concat(TILESET_ART,TILESET_WHIM)){const d=TILEDEF[k];tiles.push({art:cardArt('tile',d.n+v,{blue:col?col==='blue':d.blue,v,hue:30,img:['village','sacred','oasis','small','large','workshop','exchange','city'].includes(k)?'glyph-'+k:null,fit:'ct'}),n:d.n,c:n,tag:`${v?v+' points · ':''}${(col?col==='blue':d.blue)?'blue':'red'}${TILESET_ART.some(x=>x[0]===k)?' · Crafters':TILESET_WHIM.some(x=>x[0]===k)?' · Wonder Cities':''}`,x:d.x})}
   return sec('The tribes (and the Crafters)',Object.keys(MNAME).map(c=>({art:cardArt('tribe',c,{col:MCSS[c]||'#888',hue:35,img:'meeple-'+c,fit:'ct'}),n:`${MNAME[c]} (${c==='vizier'?'yellow':c==='elder'?'white':c==='merchant'?'green':c==='builder'?'blue':c==='assassin'?'red':'purple'})`,c:c==='artisan'?15:MEEPLE_COUNT[c],tag:c==='artisan'?'Crafters expansion':'meeples',x:MHELP[c]})))+
-   sec('Tiles',tiles)+sec('Goods cards',Object.keys(RESOURCE_COUNT).map(r=>({art:cardArt('good',r,{glyph:RICON[r],img:'good-'+r,fit:'ct'}),n:`${RICON[r]} ${RNAME[r]}`,c:RESOURCE_COUNT[r],tag:r==='fakir'?'special':'goods',x:r==='fakir'?'Adds 1 Mason or 1 Shadow range, pays for a Sage when summoning, pays djinn powers. Never part of a set.':'Collect sets of different kinds: 1, 3, 7, 13, 21, 30, 40, 50 or 60 points for 1–9 different kinds.'})))+
+   sec('Tiles',tiles)+sec('Goods cards',Object.keys(RESOURCE_COUNT).map(r=>({art:cardArt('good',r,{glyph:RICON[r],img:'good-'+r,fit:'ct'}),n:`${RICON[r]} ${RNAME[r]}`,c:RESOURCE_COUNT[r],tag:r==='fakir'?'special':'goods',x:r==='fakir'?'Adds 1 Mason or 1 Shadow range, pays for a Sage when summoning, pays djinn powers. Never part of a set.':'Collect sets of different kinds: 1, 3, 6, 12, 20, 29, 39, 49 or 60 points for 1–9 different kinds.'})))+
    sec('Djinns',DJINNS.map(d=>({art:cardArt('djinn',d.n,{img:'djinn-'+d.k}),n:d.n,tag:`${d.vp} points · ${d.cost?'power':'always on'}${d.set?' · '+{promos:'promo',artisans:'Crafters',thieves:'Cutpurses'}[d.set]:''}${d.assumed?' · '+d.assumed+' assumed':''}`,x:d.x})))+
    sec('Items (Crafters)',Object.entries(ITEMS).map(([k,i])=>({art:cardArt('item',i.n,{img:'item-'+k,fit:'ct'}),n:i.n,c:i.cp,tag:i.kind,x:i.x})))+sec('Cutpurses',Object.entries(THIEVES).map(([k,t])=>({art:cardArt('thief',t.n,{img:'thief-'+k,fit:'ct'}),n:t.n,tag:'Cutpurses expansion',x:t.x})))+
-   sec('Tokens and pieces',[{n:'🐪 Camels',tag:'11 each with 2 players, 8 with 3–5',x:'Mark the tiles you control. Placing your last camel ends the game at the end of the round.'},{n:'⛺ Tent',tag:'Crafters · 1 each',x:'Claim a tile with it instead of a camel: it scores the tile plus 1 for each red tile around it.'},{n:'🌴 Palm tree',x:'3 points to whoever holds the tile (5 with Nakhla; doubled next to the Great Lake).'},{n:'🏰 Palace',x:'5 points to whoever holds the tile (doubled next to the Great Lake).'},{n:'⛰ Mountains',tag:'Crafters',x:'Block moving between two tiles (not Shadow range).'},{n:'🪙 Coins',x:'1 point each at the end; pay for turn order and bazaar goods.'},{n:'Turn-order track',x:'Costs 0, 0, 0, 1, 3, 5, 8, 12, 18 (5 players: 0, 0, 0, 1, 1, 3, 3, 5, 5, 8, 12, 18).'}])}
+   sec('Tokens and pieces',[{n:'🐪 Camels',tag:'11 each with 2 players, 8 with 3–5',x:'Mark the tiles you control. Placing your last camel ends the game at the end of the round.'},{n:'⛺ Tent',tag:'Crafters · 1 each',x:'Claim a tile with it instead of a camel: it scores the tile plus 1 for each red tile around it.'},{n:'🌴 Palm tree',x:'3 points to whoever holds the tile (4 with Nakhla; doubled next to the Great Lake).'},{n:'🏰 Palace',x:'5 points to whoever holds the tile (doubled next to the Great Lake).'},{n:'⛰ Mountains',tag:'Crafters',x:'Block moving between two tiles (not Shadow range).'},{n:'🪙 Coins',x:'1 point each at the end; pay for turn order and bazaar goods.'},{n:'Turn-order track',x:'Costs 0, 0, 0, 1, 3, 5, 8, 12, 18 (5 players: 0, 0, 0, 1, 1, 3, 3, 5, 5, 8, 12, 18).'}])}
 // ---------- inline SVG icons (consistent line icons instead of emoji in the chrome) ----------
 const ICONS={bulb:'<path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-4 10.5c.8.8 1 1.6 1 2.5h6c0-.9.2-1.7 1-2.5A6 6 0 0 0 12 3z"/>',
  camel:'<path d="M3 19v-5.5C3 11.6 4 10.6 5.6 10.6 6.6 7.8 7.6 7 9 7s2.3 1.6 3.2 3.6h1.6l1.3-3.2c.4-1 1.1-1.4 2-1.4h1.4l1.5 1.7-1.6.6-1 3.9v3.3M6.5 14v5M16.5 14v5M10.5 14.4V19"/>',
@@ -6189,7 +6312,7 @@ function boot(){GX.init({key:'soq'});paintIcons();GX.onShow=id=>{if(id==='setd')
   campInit();soundBtns();UI.modal='start';render()}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot);else boot();
 
-function goalHtml(){return `<div class="mbox goal"><h2>Goal</h2><p class="lede">Finish with the most points when someone places their last camel.</p><ul class="goal-l"><li>Tap a spot to bid for turn order.</li><li>Walk your tribes over tiles.</li><li>Then sell goods for coins.</li></ul><div class="acts big"><button class="btn go big" data-ui="goalgo">Start playing</button></div></div>`}
+function goalHtml(){return `<div class="mbox goal"><h2>Goal</h2><p class="lede">Finish with the most points. The game ends at the end of the round in which someone places their last camel.</p><ul class="goal-l"><li>Tap a spot to bid for turn order.</li><li>Walk your tribes over tiles.</li><li>Then sell goods for coins.</li></ul><div class="acts big"><button class="btn go big" data-ui="goalgo">Start playing</button></div></div>`}
 
 </script>
 <script>
@@ -6254,7 +6377,7 @@ const HLP_RULES=[
  {phase:'collect',title:'Each colour acts',text:'Advisors and Sages are kept. Traders fetch goods. Masons earn coins. Shadows remove people. Crafters make items.',pic:()=>hpics([['meeple','vizier'],['meeple','merchant'],['meeple','builder'],['meeple','assassin']])},
  {phase:'collect',title:'Then the tile',text:'After the tribe, the tile you ended on has its own action: build, plant, summon or buy.',pic:()=>hpics([['meeple','merchant'],'>',['tile','small']])},
  {phase:'collect',title:'Optional powers',text:'Djinn and item chips are optional. Tap one, then a glowing target.',pic:()=>hpics([['chip','✨ Power'],'>',['tap']])},
- {phase:'mason',title:'Blue tiles pay',text:'Each Mason earns 1 coin per blue tile within one step.',pic:()=>hpics([['meeple','builder','×'],['tile','sacred','blue'],'>',['coin','+']])},
+ {phase:'mason',title:'Blue tiles pay',text:'Each Mason earns 1 coin per blue tile in the 3x3 around the landing tile: diagonals and the landing tile count.',pic:()=>hpics([['meeple','builder','×'],['tile','sacred','blue'],'>',['coin','+']])},
  {phase:'mason',title:'Mystic Mason',text:'Spending a Mystic card adds one Mason to the count, but the card is gone.',pic:()=>hpics([['goods','fakir'],'>',['meeple','builder','+1']])},
  {phase:'shadow',title:'Reach',text:'Shadows remove a nearby person, or a rival’s Advisor or Sage.',pic:()=>hpics([['meeple','assassin'],'>',['meeple','vizier','Rival']])},
  {phase:'shadow',title:'Empty tiles',text:'Empty a tile and your camel claims it.',pic:()=>hpics([['tile','small','Empty'],'>',['camel']])},
@@ -6268,8 +6391,8 @@ const HLP_RULES=[
  {phase:'shrine',title:'Summon a djinn',text:'Pay 2 Sages, or a Sage and a Mystic. Paid Sages stop scoring.',pic:()=>hpics([['meeple','elder','×2'],'>',['djinn']])},
  {phase:'shrine',title:'What a djinn gives',text:'Each djinn scores points and has a power.',pic:()=>hpics([['djinn'],'>',['pts','+'],['chip','Power']])},
  {phase:'shrine',title:'Not worth it?',text:'You may skip. Tap Skip if no djinn is worth the Sages you would spend.',pic:()=>hpics([['pass',null,'Skip']])},
- {phase:'goods',title:'Goods make sets',text:'Sets of different goods score 1, 3, 7, 13, 21 points.',pic:()=>hpics([['goods','gold'],['goods','silk'],['goods','spice'],'>',['pts',7]])},
- {phase:'goods',title:'What it costs',text:'Stall: 3 coins for one of the first 3. Bazaar: 6 coins for two. Exchange: 4 coins for any.',pic:()=>hpics([['tile','small','3'],['tile','large','6'],['tile','exchange','4']])},
+ {phase:'goods',title:'Goods make sets',text:'Sets of different goods score 1, 3, 6, 12, 20 points.',pic:()=>hpics([['goods','gold'],['goods','silk'],['goods','spice'],'>',['pts',7]])},
+ {phase:'goods',title:'What it costs',text:'Stall: 3 coins for one of the first 3. Grand Bazaar: 6 coins for 2 of the first 6. Exchange: 4 coins for any.',pic:()=>hpics([['tile','small','3'],['tile','large','6'],['tile','exchange','4']])},
  {phase:'goods',title:'Mystic cards',text:'Mystic cards boost Masons and Shadows and pay for djinns. They never join a set.',pic:()=>hpics([['goods','fakir']])},
  {phase:'workshop',title:'Items',text:'Pay 1 Crafter or 2 Mystics to take the top item. Items give points or one-off powers.',pic:()=>hpics([['meeple','artisan','×1'],'>',['icon','🪄',null,'#9a5bd0']])},
  {phase:'workshop',title:'Using items',text:'Tap an item chip to use it. You may use one item each turn.',pic:()=>hpics([['chip','🪄 Item'],'>',['tap']])},
@@ -6353,9 +6476,13 @@ function hlpWhy(m,hp){let t='';
      else if(q.kind==='item')t='Keep the item worth most to you.';
      else if(q.kind==='djinn'&&q.cards&&DJ[q.cards[m.i]])t='Keep '+DJ[q.cards[m.i]].n+': worth '+DJ[q.cards[m.i]].vp+' points.';break}}
   return capW(t,15)}
-function hlpSuggest(){if(hlpBusy())return null;const hp=me();const m=hlpAdvice();if(!m)return null;
+function hlpSuggest(){if(hlpBusy())return null;const hp=me();const m=hlpAdvice();if(!m)return null;if(m.act==='step'&&!(typeof gdStep==='function'&&gdStep()))return hlpWalk();   // F3: during a walk the button names a good place to end; the player plans the drops
+  
   const why=hlpWhy(m,hp);if(!why||!hlpEl(m))return null;
   return {why,key:JSON.stringify(m),target:()=>hlpEl(m),from:null}}
+// asked for during a walk: the ending that takes the most people (ties: the most valuable tile)
+function hlpWalk(){try{if(typeof f3Mine!=='function'||!f3Mine())return null;let b=null;for(const o of f3Outs()){const v=o.n*10+(G.board[o.e].v||0);if(!b||v>b.v)b={o,v}}if(!b)return null;const o=b.o;const nm=o.n>1?MPLUR[o.c]:MNAME[o.c];
+  return {why:'Try ending here: take '+o.n+' '+nm+'. Tap this tile, then ✓.',key:'walk'+o.e+o.c,target:()=>tileEl(o.e),from:null}}catch(e){return null}}
 // ---------------------------------------------------------------- wiring
 let _hlpInit=false;
 function hlpInit(){if(_hlpInit||typeof GXH==='undefined')return;_hlpInit=true;
@@ -6485,32 +6612,6 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
 // react = what she says right after the player does it (the payoff; shown for ~2.4 s as the next beat)
 const LORE={
   guide:{key:'hadiya',name:'Hadiya',face:'🧓'}, rival:{name:'Farid',face:'🧒'},
-  chapters:{goal:{n:1,t:'Empty Throne'},lift:{n:2,t:'First Walk'},advisors:{n:3,t:'Rival Moves'},score:{n:4,t:'The Count'}},
-  tut:{
-    goal:{say:'Most points wins the throne. Almost everything you own scores.'},
-    tribes:{say:'The tribes, three per tile. Each colour does something different.',react:'Farid grins. "I get the first walk!"'},
-    bid1:{say:'Pricey spots play first. Take the 5-coin spot.',react:'Five coins down. Bold, child.'},
-    bid2:{say:'You have two markers. Put the second on a free spot.',react:'A thrifty second caravan.'},
-    order:{say:'Play order: Farid, you, Farid, you. Watch Farid go first.'},
-    sages:{say:'Farid pays two Sages for a djinn. Sages are 2 points each.',react:'Farid: "A djinn! Beat that."'},
-    lift:{say:'Your turn, child. Tap the glowing tile to lift everyone on it.',react:'The Traders are in your hands.'},
-    drop:{say:n=>n<2?'Drop one person per tile. Never step straight back.':'Your last person must land on a Trader tile.',react:'The caravan arrives.'},
-    traders:{say:'Four Traders give four goods. Your camel claims the empty tile.',react:'Four goods and a camel. The market notices.'},
-    buy:{say:'Pay 3 coins for a good. Take the Mystic: it boosts Masons.',react:'A Mystic in your purse, a secret for later.'},
-    sell1:{say:'Sell goods in sets of different kinds. Pick all four.',react:'A fine, varied set.'},
-    sell2:{say:'Four different goods sell for 13 coins. Sell them.',react:'Thirteen coins. The throne feels closer!'},
-    advisors:{say:'Advisors score 1 each, plus 10 for beating a rival.',react:'Farid: "Advisors rule the court!"'},
-    lift2:{say:'The last walk, child. This tile holds two Advisors and a Mason. Lift them.',react:'Two Advisors and a Mason on the road.'},
-    dropA:{say:'Tap a tile, then pick which person stays there.',react:'Left a mark on the road.'},
-    dropB:{say:'Leave an Advisor here. The Mason must end on a Mason tile.',react:'One Advisor stays, one marches on.'},
-    dropC:{say:n=>n<2?'Leave the other Advisor on the next tile.':'The Mason landed on a Mason tile. You take all four.',react:'The Masons are yours!'},
-    masons:{say:b=>'Masons earn 1 coin per nearby blue tile ('+b+'). Mystic adds one.',react:'Coins pour in. Farid gasps.'},
-    palace:{say:'The Hamlet gets a palace worth 5 points to you.',react:'A palace rises on your land!'},
-    score:{say:(a,b)=>'Final count: you '+a+', Farid '+b+'. Everything you own scores.',react:()=>'The count is done.'},
-    others:{say:'Grand Bazaar: 2 goods for 6 coins. Oasis: a palm. Shrine: a djinn.'},
-    shadows:{say:'Red Shadows remove a nearby person, or a rival\'s Advisor or Sage.'},
-    end:{say:'A real game ends when someone places their last camel.'}
-  },
   endTitle:'You know the rules',
   endText:'Hadiya smiles: "Bid, walk, take a tribe, claim land, sell goods. You are ready, child."',
   endStory:'Hadiya smiles: "Bid, walk, take a tribe, claim land, sell goods. Now the real caravans come."',
@@ -6541,8 +6642,8 @@ LORE.coach={
   advisors:{say:'Advisors: 1 point each, plus 10 for beating a rival.',later:'Advisors: 1 each, plus 10 per rival with fewer.',rival:'Farid\'s Advisors: 10 bonus if he has more than you.'},
   shadows:{say:'Shadows remove a person in range, or a rival\'s Advisor or Sage.',later:'Shadows remove a person in range, or a rival\'s Advisor or Sage.',rival:'Farid\'s Shadows strike. Guard your Advisors.'},
   stall:{say:'Stall: pay 3 coins for one of the first three goods.',later:'Bazaar Stall: 3 coins for one of the first three goods.',rival:'Farid may buy one good for 3 coins.'},
-  bazaar:{say:'Grand Bazaar: pay 6 coins for two goods.',later:'Grand Bazaar: 6 coins for two goods.',rival:'Farid may buy two goods for 6 coins.'},
-  shrine:{say:'Shrine: pay 2 Sages to summon a djinn.',later:'Shrine: pay 2 Sages to summon a djinn.',rival:'Farid may pay Sages for a djinn.'},
+  bazaar:{say:'Grand Bazaar: pay 6 coins for 2 of the first 6 goods.',later:'Grand Bazaar: 6 coins for 2 of the first 6 goods.',rival:'Farid may buy 2 of the first 6 goods for 6 coins.'},
+  shrine:{say:'Shrine: pay 2 Sages, or 1 Sage and 1 Mystic, to summon a djinn.',later:'Shrine: 2 Sages, or 1 Sage and 1 Mystic, summon a djinn.',rival:'Farid may pay 2 Sages, or a Sage and a Mystic, for a djinn.'},
   hamlet:{say:'Hamlet: you raise a palace. It is worth 5 points.',later:'Hamlet: a palace, worth 5 points.',rival:'Farid raises a palace here: 5 points.'},
   oasis:{say:'Oasis: you plant a palm. It is worth 3 points.',later:'Oasis: a palm, worth 3 points.',rival:'Farid plants a palm here: 3 points.'},
   exchange:{say:'Spice Exchange: pay 4 coins for any good.',later:'Spice Exchange: 4 coins for any face-up good.',rival:'Farid may buy any good for 4 coins.'},
@@ -6553,9 +6654,9 @@ LORE.coach={
   palaces:{say:'Each palace on your tiles scores 5 points.',later:'Palaces are 5 points each for the tile holder.'},
   djinns:{say:'A djinn joined. Tap any djinn to read its power.',later:'Djinns have powers and score points; tap one to read it.'},
   rival:{say:'Farid follows the same rules. Tap the board to speed him up.',later:'The computer plays by the same rules.'},
-  end:{say:'Someone has one camel left. The last camel ends the game.',later:'The last camel laid ends the game.'}
+  end:{say:'Someone has one camel left. When the last camel is placed, the game ends at the end of that round.',later:'The last camel placed ends the game at the end of that round.'}
 };
-LORE.coachLater=['Story mode adds Crafters, Cutpurses and Wonder Cities.','No legal move? You pass. Equal scores share the win.'];
+LORE.coachLater=['Story mode adds Crafters, Cutpurses and Wonder Cities.','If no one can make a legal move, the game ends after the round. Equal scores share the win.'];
 
 </script>
 <script>
@@ -6567,35 +6668,36 @@ function plName(t){if(!G)return t;const hs=G.pl.filter(x=>x.human);if(hs.length=
   const V={lifts:'lift',bids:'bid',ends:'end',takes:'take',keeps:'keep',claims:'claim',pitches:'pitch',buys:'buy',sells:'sell',summons:'summon',plants:'plant',raises:'raise',hires:'hire',sends:'send',uses:'use',has:'have',finds:'find',brings:'bring',wins:'win'};
   return t.replace(/\bYou (lifts|bids|ends|takes|keeps|claims|pitches|buys|sells|summons|plants|raises|hires|sends|uses|has|finds|brings|wins)\b/g,(m,v)=>'You '+V[v])}
 function plBanner(title,sub,cls){return;   // Addendum 7: no toasts in Play; the coach and the tracker say it
-  const b=plEl('plban','plban');b.className='plban '+(cls||'');b.innerHTML='<b>'+esc(title)+'</b>'+(sub?'<small>'+esc(sub)+'</small>':'');void b.offsetWidth;b.classList.add('on');clearTimeout(PL.banT);PL.banT=setTimeout(()=>b.classList.remove('on'),ANIM?2200:200)}
+  const b=plEl('plban','plban');b.className='plban '+(cls||'');b.innerHTML='<b>'+esc(title)+'</b>'+(sub?'<small>'+esc(sub)+'</small>':'');void b.offsetWidth;b.classList.add('on');clearTimeout(PL.banT);PL.banT=setTimeout(()=>b.classList.remove('on'),ANIM?1300:200)}
 const PLQ=[];let PLQB=false;
 function plPop(i,d,why){if(G&&G.coach)return;   // in Learn to play the coach explains every change, one message at a time
-  PLQ.push([i,d,why]);while(PLQ.length>3)PLQ.shift();plPopNext()}
-function plPopNext(){if(PLQB||!PLQ.length)return;const cb=document.getElementById('coach'),to=document.getElementById('turnover');if((cb&&cb.classList.contains('on'))||(to&&to.classList.contains('on'))||document.getElementById('summon')){setTimeout(plPopNext,700);return}if(!G||G.over){PLQ.length=0;return}const [i,d,why]=PLQ.shift();if(G&&!G.over&&me()&&me().i!==i&&G.phase==='turn'){plPopNext();return}   // a rival's pop never lands during your own turn
+  PLQ.push([i,d,why]);while(PLQ.length>2)PLQ.shift();plPopNext()}
+function plPopNext(){if(PLQB||!PLQ.length)return;const cb=document.getElementById('coach'),to=document.getElementById('turnover');if((cb&&cb.classList.contains('on'))||(to&&to.classList.contains('on'))||document.getElementById('summon')){setTimeout(plPopNext,350);return}if(!G||G.over){PLQ.length=0;return}const [i,d,why]=PLQ.shift();if(G&&!G.over&&me()&&me().i!==i&&G.phase==='turn'){plPopNext();return}   // a rival's pop never lands during your own turn
   const s=typeof seatEl==='function'?seatEl(i):null;if(!s){plPopNext();return}const r=s.getBoundingClientRect();if(!r.width){plPopNext();return}
   const e=document.createElement('div');e.className='plpop '+(d>0?'up':'dn');e.setAttribute('data-help','');e.setAttribute('aria-hidden','true');
   e.innerHTML=why?'<span>'+esc(why)+'</span>':'<b>'+(d>0?'+':'\u2212')+Math.abs(d)+'</b>';document.body.appendChild(e);PLQB=true;
   // R38 row 4: the pop lives IN the score bar (it covers the step tracker, or the scorer's seat chip), never on the tile grid
   const bar=()=>{const t2=document.getElementById('trk');if(t2&&!t2.hidden){const q=t2.getBoundingClientRect();if(q.width>40&&q.height>8)return q}const s2=seatEl(i);return s2?s2.getBoundingClientRect():r};
   const place=()=>{const q=bar();e.style.left=Math.round(q.left)+'px';e.style.top=Math.round(q.top)+'px';e.style.width=Math.round(q.width)+'px';e.style.height=Math.max(22,Math.round(q.height))+'px'};
-  e.classList.add('inbar');place();const ms=ANIM?4000+String(why||'').split(' ').length*100+400:100;
+  e.classList.add('inbar');place();const ms=ANIM?1500+String(why||'').split(' ').length*70:100;
   const keep=setInterval(()=>{if(e.isConnected)place()},120);
   setTimeout(()=>{clearInterval(keep);e.remove();PLQB=false;plPopNext()},ms)}
-function plSay(who,text){const e=plEl('plreact','plreact');e.innerHTML='<i>'+who.face+'</i><span><b>'+esc(who.name)+'</b> '+esc(text)+'</span>';void e.offsetWidth;e.classList.add('on');clearTimeout(PL.reactT);PL.reactT=setTimeout(()=>e.classList.remove('on'),ANIM?2600:200)}
+function plSay(who,text){const e=plEl('plreact','plreact');e.innerHTML='<i>'+who.face+'</i><span><b>'+esc(who.name)+'</b> '+esc(text)+'</span>';void e.offsetWidth;e.classList.add('on');clearTimeout(PL.reactT);PL.reactT=setTimeout(()=>e.classList.remove('on'),ANIM?1600:200)}
 // R25: every score pop's number is the sum of the reasons it names. One part changed: "You lose 3 pts: spent 3 coins" /
 // "Teal scores 5 pts from palaces". Several parts: "You score 2 pts: palaces +5, coins \u22123" (the listed numbers add up to the headline).
 const PL_LAB={coins:'coins',advisors:'Advisors',sages:'Sages',crafters:'Crafters',djinns:'djinns',palms:'palms',palaces:'palaces',goods:'goods sets',items:'treasures',cities:'cities',tiles:'tiles held'};
 function plParts(a,b,hideItems){return Object.keys(PL_LAB).filter(k=>!(hideItems&&k==='items')&&a&&b&&(b[k]||0)!==(a[k]||0)).map(k=>[k,(b[k]||0)-(a[k]||0)]).sort((x,y)=>Math.abs(y[1])-Math.abs(x[1]))}
-function plWhy(i,d,a,b){const p=G.pl[i];const you=seatName(p)==='You';const n=Math.abs(d);
-  const head=(you?(d>0?'You score ':'You lose '):(p.nm+(d>0?' scores ':' loses ')))+n+' pt'+(n===1?'':'s');
-  const ps=plParts(a,b,online()&&p.i!==NET.mySeat&&!G.over);const sum=ps.reduce((t,x)=>t+x[1],0);if(!ps.length||sum!==d)return head;
-  if(ps.length===1){const [k,c]=ps[0];const m=Math.abs(c);
-    if(k==='coins')return head+(c<0?': spent ':': earned ')+m+' coin'+(m===1?'':'s');
-    if(k==='sages'&&c<0)return head+': used Sages';
-    if(k==='goods'&&c<0)return head+': goods sold';
-    if(k==='advisors'&&c<0)return head+(c<=-10?': lost the Advisor lead':': fewer Advisors');
-    return head+' from '+PL_LAB[k]}
-  return head+': '+ps.map(([k,c])=>PL_LAB[k]+' '+(c>0?'+':'\u2212')+Math.abs(c)).join(', ')}
+function plWhy(i,d,a,b){const p=G.pl[i];const you=seatName(p)==='You';const n=Math.abs(d);   // F3: every change names its sum, "+12: 3 Sages ×4"
+  const head=(you?'You ':plName(p.nm)+' ')+(d>0?'+':'\u2212')+n;
+  const ps=plParts(a,b,online()&&p.i!==NET.mySeat&&!G.over);const sum=ps.reduce((t,x)=>t+x[1],0);if(!ps.length||sum!==d)return head+' points';
+  const per={sages:hasDj(p,'hikma')?4:2,palaces:5,crafters:0};const one=(k,c)=>{const m=Math.abs(c),sg=c>0?'+':'\u2212';
+    if(k==='coins')return (c<0?'spent ':'')+m+' coin'+(m===1?'':'s')+(c<0?'':' (1 point each)');
+    if(per[k]&&m%per[k]===0){const q=m/per[k];const nm={sages:q>1?'Sages':'Sage',palaces:q>1?'palaces':'palace'}[k];return sg+q+' '+nm+' ×'+per[k]}
+    if(k==='goods'&&c<0)return 'goods sold '+sg+m;
+    if(k==='advisors'&&c<=-10)return 'lost the Advisor lead '+sg+m;
+    if(k==='advisors'&&c>=10)return 'Advisor lead '+sg+m;
+    return PL_LAB[k]+' '+sg+m};
+  return head+': '+ps.map(([k,c])=>one(k,c)).join(', ')}
 function plShort(t){return plName(String(t||'')).replace(/^[^\w—]+/,'').replace(/\.$/,'')}
 function plAfter(){if(!G){return}
   if(PL.seed!==G.seed){PL.seed=G.seed;PL.logN=G.logN;PL.tot=null;if(!G.tut&&!G.coach&&!G.over&&!(UI.camp))plBanner('Bid for turn order',LORE.quickIntro,'')}
@@ -6603,8 +6705,7 @@ function plAfter(){if(!G){return}
     if(e.c==='turn'){const m=/— (.+)'s turn —/.exec(e.t);const nm=m?m[1]:'';const mine=G.pl.some(p=>p.nm===nm&&p.human)&&G.pl.filter(p=>p.human).length===1;plBanner(mine?LORE.turn.you:nm+"'s turn",mine?'Tap a glowing tile to start':'Watch each step. Tap the board to speed up.',mine?'mine':'rival')}
     else if(e.c==='round'&&G.round>1)plBanner(LORE.turn.bid,'Dearer spots play earlier','')}}
   const tot=G.pl.map(p=>shownTotal(p)),parts=G.pl.map(p=>scoreOf(p));if(PL.tot&&PL.tot.length===tot.length&&PL.parts&&!G.over)tot.forEach((v,i)=>{const d=v-PL.tot[i];if(d&&G.phase!=='bid'&&!(G.log[0]&&/ bids? /.test(G.log[0].t)))plPop(i,d,plWhy(i,d,PL.parts[i],parts[i]))});PL.tot=tot;PL.parts=parts;
-  if(typeof tutOn==='function'&&tutOn()){const st=GXT.state();if(st&&st.shown&&st.id!==PL.lastId){const prev=PL.lastId;PL.lastId=st.id;const L=LORE.tut[prev];if(L&&L.react){const t=typeof L.react==='function'?L.react():L.react;const who=['sages','advisors'].includes(prev)?LORE.rival:LORE.guide;plSay(prev==='tribes'||prev==='sages'||prev==='advisors'?LORE.rival:LORE.guide,t)}}}
-  else PL.lastId=null}
+  PL.lastId=null}
 (function(){const o=render;render=function(){o.apply(this,arguments);try{plAfter()}catch(e){console.error(e)}}})();
 // the instruction line: the rival's turn is told step by step in plain words (the engine's own log line), the pick-who-stays popup says so
 // the rival's caption stays one short line: no bracketed detail, 8 words at most
@@ -6616,20 +6717,14 @@ function plCap(t){const w=String(t).replace(/\s*\([^)]*\)/g,'').trim().split(/\s
   return t}})();
 // the result speaks in the game's voice
 (function(){const o=overHtml;overHtml=function(){let h=o();try{const mp=viewP();const won=mp&&G.over.win.includes(mp.i);const tops=G.pl.map(x=>shownTotal(x)),gap=mp?Math.max(...tops)-shownTotal(mp):0,rel=gap/Math.max(1,Math.max(...tops));const a=won?LORE.win:(gap<=10||rel<=0.08)?LORE.loseClose:(rel>=0.35?LORE.loseFar:LORE.lose);const t=a[Math.abs(parseInt(G.seed,10)||G.logN||0)%a.length];h=h.replace('</h2>','</h2><p class="voice">'+esc(t)+'</p>');if(mp&&G.pl.filter(x=>x.human).length===1)h=h.split(mp.nm).join('You')}catch(e){}return h}})();
-// the tutorial as the prologue: the guide's and the rival's words replace the plain lessons (same ids, same targets, same waits)
-function tutStory(steps){return steps.map(s=>{const L=LORE.tut[s.id];if(!L)return s;const ch=LORE.chapters[s.id];const rival=['order','sages','advisors'].includes(s.id);const who=rival?LORE.rival:LORE.guide;
-  const say=()=>{const v=L.say;if(typeof v!=='function')return v;
-    if(s.id==='drop'||s.id==='dropC')return v(dropsDone());
-    if(s.id==='masons')return v(bluesAround(TUT_ME.t2.path[2][0]).length);
-    if(s.id==='score'){const sc=G.over?G.over.scores:[];const a=sc.find(x=>x.p===0),b=sc.find(x=>x.p===1);return v(a?a.s.total:0,b?b.s.total:0)}return ''};
-  return Object.assign({},s,{title:()=>ch?'Ch.'+ch.n+' '+ch.t:who.face+' '+who.name,say})})}
 
 // ---- W497: a visible Skip button while the computer plays (a tap on the table still works too) ----
 (function(){const r=render;render=function(){r.apply(this,arguments);try{let b=document.getElementById('skipai');
   const on=!!(G&&!G.over&&!UI.modal&&G.pl.some(p=>p.human)&&sideToAct()>=0&&!P(sideToAct()).human&&!online()&&!tutHeld()&&!UI.hurry);
   if(!b&&on){b=document.createElement('button');b.id='skipai';b.type='button';b.textContent='Skip \u25B6\u25B6';b.setAttribute('aria-label','Skip the rival turn');
     b.addEventListener('click',e=>{e.stopPropagation();UI.hurry=true;b.hidden=true;if(aiTimer){clearTimeout(aiTimer);aiTimer=null;schedule()}});document.body.appendChild(b)}
-  if(b){b.hidden=!on;const l=document.getElementById('line');if(on&&l){const q=l.getBoundingClientRect();if(q.height)b.style.top=Math.round(q.top+q.height/2-22)+'px'}}}catch(e){}}})();
+  document.documentElement.classList.toggle('skipon',on);   // F3: Skip sits INSIDE the status line (the line keeps room for it), never over the seat chips
+  if(b){b.hidden=!on;const pos=()=>{const l=document.getElementById('line');if(!b.hidden&&l){const q=l.getBoundingClientRect();if(q.height){const bh=Math.max(28,Math.round(q.height-2));b.style.height=bh+'px';b.style.top=Math.round(q.top+(q.height-bh)/2)+'px';b.style.right=Math.max(4,Math.round(innerWidth-q.right+2))+'px'}}};pos();if(on)requestAnimationFrame(pos)}}catch(e){}}})();   // placed again after the later render steps (seat chips grow)
 
 // ---- R25: nothing under an open sheet (drawer, menu, result) keeps its glow: it could not be tapped there, so it must not look tappable ----
 function plCover(){try{const cov=!!((typeof GX!=='undefined'&&GX.open)||document.querySelector('.gx-drawer.on')||(G&&UI.modal));const IN='.gx-drawer,#modal,.mbox,#chz';
@@ -6712,11 +6807,12 @@ function coachPages(){const sc=G.over.scores;const A=sc.find(x=>x.p===0),B=sc.fi
   const row=(l,x,y,why)=>`<div class="ce-r"><span>${l}</span><b>${x}</b><b>${y}</b><p>${why}</p></div>`;
   const hd='<div class="ce-h"><span></span><b>You</b><b>Farid</b></div>';
   const tiles=G.board.filter(t=>owner(t)===0).length,tilesB=G.board.filter(t=>owner(t)===1).length;
+  const pv=p=>hasDj(p,'nakhla')?DJN.nakhla:3,sv=p=>hasDj(p,'hikma')?DJN.hikma:2;
   const gs=p=>{const c={};for(const r of p.res)c[r]=(c[r]||0)+1;return Object.keys(c).length};
   const pages=[
    {t:'Coins and land',h:hd+row('Coins',a.coins,b.coins,'Every coin is a point.')+row('Land',a.tiles,b.tiles,'You hold '+tiles+' tile'+(tiles===1?'':'s')+', Farid '+tilesB+'. Each scores the number printed on it.')},
-   {t:'Palms and palaces',h:hd+row('Palms',a.palms,b.palms,'3 points per palm on a tile you hold. You: '+(a.palms/3)+' palm'+(a.palms===3?'':'s')+'.')+row('Palaces',a.palaces,b.palaces,'5 points per palace on a tile you hold. You: '+(a.palaces/5)+'.')},
-   {t:'People',h:hd+row('Sages',a.sages,b.sages,'2 points each. You have '+pa.el+', Farid '+pb.el+'.')+row('Advisors',a.advisors,b.advisors,'1 each, plus 10 for every rival with fewer. You have '+pa.vz+', Farid '+pb.vz+'.')},
+   {t:'Palms and palaces',h:hd+row('Palms',a.palms,b.palms,'Each palm on a tile you hold: '+pv(pa)+' points for you, '+pv(pb)+' for Farid'+(hasDj(pb,'nakhla')?' (his djinn Nakhla)':'')+'. You: '+(a.palms/pv(pa))+' palm'+(a.palms===pv(pa)?'':'s')+'.')+row('Palaces',a.palaces,b.palaces,'5 points per palace on a tile you hold. You: '+(a.palaces/5)+'.')},
+   {t:'People',h:hd+row('Sages',a.sages,b.sages,'Each Sage: '+sv(pa)+' points for you, '+sv(pb)+' for Farid'+(hasDj(pb,'hikma')?' (his djinn Hikma)':'')+'. You have '+pa.el+', Farid '+pb.el+'.')+row('Advisors',a.advisors,b.advisors,'1 each, plus 10 for every rival with fewer. You have '+pa.vz+', Farid '+pb.vz+'.')},
    {t:'Djinns and goods',h:hd+row('Djinns',a.djinns,b.djinns,'You hold '+pa.dj.length+', Farid '+pb.dj.length+'; each scores its own points.')+row('Goods',a.goods,b.goods,'Sets of different kinds score 1, 3, 7, 13. Your goods: '+pa.res.filter(r=>r!=='fakir').length+' cards in '+gs({res:pa.res.filter(r=>r!=='fakir')})+' kinds.')},
    {t:'The count',h:hd+[['Land',a.tiles,b.tiles],['Coins',a.coins,b.coins],['Palms',a.palms,b.palms],['Palaces',a.palaces,b.palaces],['Sages',a.sages,b.sages],['Advisors',a.advisors,b.advisors],['Djinns',a.djinns,b.djinns],['Goods',a.goods,b.goods]].filter(x=>x[1]||x[2]).map(x=>`<div class="ce-r ce-s"><span>${x[0]}</span><b>${x[1]}</b><b>${x[2]}</b></div>`).join('')+row('Total',a.total,b.total,esc(plName(G.winText)))}];   // R38 row 2: the last page shows how each total was made, source by source
   const later=Object.keys(LORE.coach).filter(id=>!COACH.seen[id]).slice(0,6).map(id=>'<li>'+esc(LORE.coach[id].later)+'</li>').concat(['Everything else is in How to play.']).map(x=>x.startsWith('<li>')?x:'<li>'+esc(x)+'</li>').join('');
@@ -6729,7 +6825,7 @@ function coachFinal(){COACH.done=true;coachHide();if(UI.modal)UI.modal=null;let 
       if(k==='next'){COACH.pg++;coachDraw()}else if(k==='back'){COACH.pg--;coachDraw()}
       else{try{GXT.markDone(TUT_GAME)}catch(x){}const story=UI.coachStory;tutLeave();if(k==='chapter'&&window.CAMPAIGN&&typeof GXC!=='undefined')GXC.play(window.CAMPAIGN.chapters[0].id);else if(k==='story'&&typeof GXC!=='undefined')GXC.open();else{UI.modal='start';render()}}});coachDraw()}}
 function coachDraw(){const o=document.getElementById('coachend');if(!o||!COACH.pages)return;const P_=COACH.pages,i=Math.max(0,Math.min(P_.length-1,COACH.pg)),pg=P_[i];
-  const voice=i===0?'<p class="ce-v"><i>'+LORE.guide.face+'</i><span><b>Hadiya</b> The game is over, child. Let us count it together.</span></p>':'';
+  const voice=i===0?'<p class="ce-v"><i>'+LORE.guide.face+'</i><span><b>Hadiya:</b> The game is over, child. Let us count it together.</span></p>':'';
   const btns=pg.last?(UI.coachStory&&window.CAMPAIGN?'<button class="btn go big" data-ce="chapter">Start chapter 1</button>':'<button class="btn go big" data-ce="play">Play a real game</button>')+(window.CAMPAIGN&&!UI.coachStory?'<button class="btn big" data-ce="story">Story mode</button>':''):'<button class="btn go big" data-ce="next">Next</button>';
   o.innerHTML='<div class="ce-box"><h2>'+esc(pg.t)+'</h2>'+voice+pg.h+'<div class="ce-a">'+(i>0?'<button class="btn" data-ce="back">Back</button>':'')+btns+'</div><small class="ce-d">'+(i+1)+' / '+P_.length+'</small></div>'}
 (function(){const o=render;render=function(){o.apply(this,arguments);try{coachAfter()}catch(e){console.error(e)}}})();
@@ -6755,7 +6851,7 @@ const GD=(()=>{
   // who: 'me' = your highlighted move m; 'note' = Next (ms = Farid's moves played on Next); 'auto' = Farid's move played at once, no bubble
   const STEPS=[
    {id:'goal',who:'note',say:'Most points wins. Coins, land, people, goods and djinns score.'},
-   {id:'bid',who:'me',m:B(5),say:'Bid for turn order: dearer spots play first. Tap 1 coin.'},
+   {id:'bid',who:'me',m:B(5),say:'Bid for turn order: dearer spots play first. Tap the glowing 6th spot (1 coin).'},
    {id:'bidfree',who:'auto',ms:[B(6)]},
    {id:'markers',who:'me',m:B(7),say:'Farid took a free spot. You have two markers: take one too.'},
    {id:'order',who:'note',ms:[B(8)],say:'Same price: the later bidder plays first. Farid goes second.'},
@@ -6765,7 +6861,7 @@ const GD=(()=>{
    {id:'lastcolour',who:'me',m:D(27,'merchant'),say:'The last one must land on its own colour.'},
    {id:'traders',who:'me',m:{act:'tribe'},say:'Take all Traders; your camel claims the emptied tile. Collect goods.'},
    {id:'stall',who:'me',m:{act:'tile',take:[0]},say:'Stall: 3 coins buys a card. Take this Mystic; Mystics never score.'},
-   {id:'sell',who:'me',m:{act:'sell',kinds:['fish','pottery','silk','wheat']},say:'Four different goods sell for 13 coins. Sell them all.'},
+   {id:'sell',who:'me',m:{act:'sell',kinds:['fish','pottery','silk','wheat']},say:'Four different goods sell for 13 coins. Tap Sell all.'},
    {id:'done',who:'me',m:{act:'end'},say:'Selling is the last part of a turn. Tap End turn.'},
    {id:'sages',who:'note',ms:[S(11),D(10,'elder'),D(9,'elder'),D(8,'elder'),{act:'tribe'},{act:'tile',dj:'hikma',pay:{el:2,fk:0}},{act:'end'}],say:'Sages score 2 each. At a Shrine, two Sages summon a djinn.'},
    {id:'choose',who:'me',m:S(19),say:'Lift this mixed tile. You choose which colour drops where.'},
@@ -6784,8 +6880,8 @@ const GD=(()=>{
    {id:'lift3',who:'me',m:S(29),say:'Lift these three. A Shadow will end on Shadows.'},
    {id:'s1',who:'me',m:D(28,'vizier'),say:'The Advisor drops here.'},
    {id:'s2',who:'me',m:D(22,'merchant'),say:'The Trader drops here.'},
-   {id:'s3',who:'me',m:D(23,'assassin'),say:'The Shadow joins three Shadows. Last camel: this is the final round.'},
-   {id:'shadows',who:'me',m:{act:'tribe',kill:{pl:1,c:'vizier',fk:0}},say:'One tile per Shadow, or a rival’s Advisor. Tap Farid’s glowing box.'},
+   {id:'s3',who:'me',m:D(23,'assassin'),say:'The Shadow joins three Shadows. This lesson gives 3 camels (a real game 11). Last camel: final round.'},
+   {id:'shadows',who:'me',m:{act:'tribe',kill:{pl:1,c:'vizier',fk:0}},say:'One tile per Shadow, or a rival’s Advisor. Tap the rival panel at the top.'},
    {id:'noaction',who:'me',m:{act:'tile',skip:1},say:'A Shrine needs two Sages. You have none: skip it.'},
    {id:'done3',who:'me',m:{act:'end'},say:'Tap End turn.'},
    {id:'rival',who:'note',ms:[S(21),D(15,'assassin'),D(9,'merchant'),D(8,'vizier'),D(7,'builder'),{act:'tribe'},{act:'tile',dj:'nakhla',pay:{el:2,fk:0}},{act:'end'}],say:'Farid plays by the same rules: Masons, then another djinn.'},
@@ -6868,12 +6964,12 @@ function scParts(p,o){const t=G.board[o.e],parts=[];
   const claim=owner(t)==null&&remain<=0&&p.camels>0,mine=claim||owner(t)===p.i;
   if(claim&&tileWorth(t)>0)parts.push([tileWorth(t),'tile '+TILEDEF[t.k].n]);
   switch(o.c){
-   case 'vizier':{parts.push([o.n*(hasDj(p,'wazira')?3:1),o.n+' Advisor'+(o.n>1?'s':'')]);for(const q of G.pl)if(q.i!==p.i&&q.vz<p.vz+o.n&&!(q.vz<p.vz))parts.push([10,'passing '+plName(q.nm)]);break}
-   case 'elder':parts.push([o.n*(hasDj(p,'hikma')?4:2),o.n+' Sage'+(o.n>1?'s':'')]);break;
+   case 'vizier':{parts.push([o.n*(hasDj(p,'wazira')?DJN.wazira:1),o.n+' Advisor'+(o.n>1?'s':'')]);for(const q of G.pl)if(q.i!==p.i&&q.vz<p.vz+o.n&&!(q.vz<p.vz))parts.push([10,'passing '+plName(q.nm)]);break}
+   case 'elder':parts.push([o.n*(hasDj(p,'hikma')?DJN.hikma:2),o.n+' Sage'+(o.n>1?'s':'')]);break;
    case 'merchant':{const cards=G.market.slice(0,o.n);const g=goodsGain(p,cards)-cards.filter(r=>r==='fakir').length*1.2;if(g>0)parts.push([Math.round(g),'goods sets']);break}
    case 'builder':{const blues=AROUND(o.e).filter(i=>G.board[i].blue&&!G.board[i].block).length;if(o.n*blues>0)parts.push([o.n*blues,o.n+' Mason coins']);break}
    case 'assassin':parts.push([0,'Shadows strike']);break}
-  if(mine&&t.k==='village')parts.push([5,'palace']);if(mine&&t.k==='oasis')parts.push([hasDj(p,'nakhla')?5:3,'palm']);
+  if(mine&&t.k==='village')parts.push([5,'palace']);if(mine&&t.k==='oasis')parts.push([hasDj(p,'nakhla')?DJN.nakhla:3,'palm']);
   return parts}
 const scTotal=ps=>ps.reduce((a,x)=>a+x[0],0);
 const scText=ps=>ps.filter(x=>x[0]>0||ps.length===1).map(x=>x[1]+' +'+x[0]).join(', ')||'no points';
@@ -6892,20 +6988,21 @@ function scTracker(){const ln=document.getElementById('line');if(!ln)return;cons
 function scPreview(){const ln=document.getElementById('line');if(!ln)return;const e=scEl('trk2','trk2',(document.getElementById('trk')||ln).nextSibling);if(!G||G.over||online()||G.coach||!G.pl[0].human){e.hidden=true;return}
   let txt='';const p=G.pl[0];
   if(scMine()&&G.step==='move'){scCompute();
-    if(!G.move){if(SC.bestTotal>=0)txt='★ Best start: +'+SC.bestTotal+' ('+SC.bestLabel+')'}
-    else{const k=G.move.path.length;let best=null;const tg=SC.hov!=null&&stepTargets().includes(SC.hov)?[SC.hov]:stepTargets();const sx=SC.starts[G.move.start];
-      if(sx)for(const nx of tg)for(const x of sx.outs)if(scPrefix(x,G.move.path,nx)&&(!best||x.total>best.total))best=x;
-      txt=best?(SC.hov!=null?'Here: ':'Best from here: ')+'+'+best.total+': '+scText(best.parts):'Keep walking. The last one must match its colour.'}}
+    if(!G.move){const one=hintsOn()&&UI.pick.length===1?SC.starts[UI.pick[0]]:null;   // F3: the hint names the start and why; the player plans the path
+      if(one&&one.best)txt='★ Start here: a walk can end on '+TILEDEF[G.board[one.best.o.e].k].n+' for +'+one.best.total+' ('+scText(one.best.parts)+')';else txt='Pick a tile. Its people walk one tile per drop.'}
+    else{const n=G.move.hand.length;txt=n>1?n+' to drop. Tap the tile to end on, or drop one by one.':'Last one: it must land on its own colour.'}}
   else if(G.phase==='bid'&&G.bidQueue[0]&&G.bidQueue[0].p===0)txt='Dearer spots play first. Each coin spent is a point lost.';
+  else if(scMine()&&G.step==='sell'&&p.res.length)txt='Coins are points at the end (1 each). Selling keeps your score the same but gives coins to bid with.';
+  else if(scMine()&&G.step==='tribe'&&G.act&&G.act.color==='assassin'){txt='Remove 1 person up to '+G.act.n+' tile'+(G.act.n>1?'s':'')+' away (each Mystic adds 1), or a rival’s Advisor, Sage or Crafter. Empty a tile to claim it.'+(hintsOn()?' ★ = best target.':'')}
   else if(scMine()&&G.act&&(G.step==='tribe'||G.step==='tile'||G.step==='sell')){const a=G.act;txt='You took '+a.n+' '+(a.n>1?MPLUR[a.color]:MNAME[a.color])+' on '+tileName(G.board[a.tile])+'. Finish the tile action to end your turn.'}
   e.hidden=!txt;e.textContent=txt}
 function scKey(){let k=document.getElementById('gainkey');const n=document.querySelectorAll('#grid .gain').length;if(!n){if(k)k.hidden=true;return}if(!k){k=document.createElement('div');k.id='gainkey';k.setAttribute('aria-hidden','true');k.setAttribute('data-help','');document.body.appendChild(k)}k.textContent='+N on a tile = points that walk can score · ★ = best';const g=document.getElementById('grid');if(g){const r=g.getBoundingClientRect();k.style.top=Math.round(r.bottom+2)+'px'}k.hidden=false}
-function scBadges(hn){try{scBadgesIn(hn)}finally{scKey()}}
+function scBadges(hn){try{scBadgesIn(hn)}finally{const k=document.getElementById('gainkey');if(k)k.hidden=true}}   // F1: one helper at a time: a single badge on the suggested tile, no legend
 function scBadgesIn(hn){document.querySelectorAll('#grid .gain').forEach(x=>x.remove());document.querySelectorAll('#grid .sc-best').forEach(x=>x.classList.remove('sc-best'));
-  if(!hn||!scMine()||G.step!=='move'||online())return;scCompute();const add=(i,v,star)=>{const el=tileEl(i);if(!el)return;const b=document.createElement('i');b.className='gain'+(star?' star':'');b.textContent=(star?'★':'')+'+'+v;b.setAttribute('data-help','');b.setAttribute('aria-hidden','true');el.appendChild(b)};
-  if(!G.move){const top=SC.bestTotal;for(const s in SC.starts){const x=SC.starts[s].best;if(x)add(+s,x.total,x.total>=top&&top>0)}}
-  else{const sx=SC.starts[G.move.start];if(!sx)return;let top=-1;const res={};for(const nx of stepTargets()){let b=null;for(const x of sx.outs)if(scPrefix(x,G.move.path,nx)&&(!b||x.total>b.total))b=x;if(b){res[nx]=b;top=Math.max(top,b.total)}}
-    for(const nx in res)add(+nx,res[nx].total,res[nx].total>=top&&top>0)}}
+  if(!hn||G.coach||G.tut||!scMine()||G.step!=='move'||online())return;scCompute();const one=UI.pick.length===1?UI.pick[0]:null;const add=(i,v,star)=>{const el=tileEl(i);if(!el)return;const b=document.createElement('i');b.className='gain'+(star?' star':'');b.textContent=(star?'★':'')+'+'+v;b.setAttribute('data-help','');b.setAttribute('aria-hidden','true');el.appendChild(b)};
+  if(!G.move){if(one!=null&&SC.starts[one]&&SC.starts[one].best){add(one,SC.starts[one].best.total,true);return}let bs=null;for(const s in SC.starts){const x=SC.starts[s].best;if(x&&(!bs||x.total>SC.starts[bs].best.total))bs=s}if(bs!=null)add(+bs,SC.starts[bs].best.total,true)}
+  else if(0){const sx=SC.starts[G.move.start];if(!sx)return;let top=-1;const res={};for(const nx of stepTargets()){let b=null;for(const x of sx.outs)if(scPrefix(x,G.move.path,nx)&&(!b||x.total>b.total))b=x;if(b){res[nx]=b;top=Math.max(top,b.total)}}
+    if(one!=null&&res[one]){add(one,res[one].total,true);return}for(const nx in res)if(res[nx].total>=top&&top>0){add(+nx,res[nx].total,true);break}}}
 // ---- the score breakdown in the seat chips, the leader marked ----
 function scSeats(){if(!G||G.over||online()){return}const tot=G.pl.map(p=>shownTotal(p));const top=Math.max(...tot);const lead=tot.filter(v=>v===top).length===1?tot.indexOf(top):-1;
   document.querySelectorAll('#seats .sch').forEach(el=>{const i=+el.dataset.seat,p=G.pl[i];if(!p)return;const s=scoreOf(p);el.classList.toggle('lead',i===lead);
@@ -6936,7 +7033,7 @@ document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest
 (function(){const o=go;go=function(m){try{if(navigator.vibrate&&m&&(m.act==='step'||m.act==='start'||m.act==='tile'))navigator.vibrate(12)}catch(e){}return o.apply(this,arguments)}})();
 // only walks worth taking glow at the start of a turn (at least about half the best walk's points); the others stay tappable but quiet
 (function(){const oc=computePick;computePick=function(){oc.apply(this,arguments);try{
-  if(!G||G.over||G.tut||online()||(typeof gdStep==='function'&&gdStep())||G.phase!=='turn'||G.step!=='move'||G.move||G.q||UI.pendDj||UI.pendItem||!scMine()||UI.pick.length<4)return;
+  if(!hintsOn()||!G||G.over||G.tut||online()||(typeof gdStep==='function'&&gdStep())||G.phase!=='turn'||G.step!=='move'||G.move||G.q||UI.pendDj||UI.pendItem||!scMine()||UI.pick.length<4)return;
   scCompute();const top=SC.bestTotal;if(!(top>0))return;const keep=UI.pick.filter(i=>{const x=SC.starts[i];return x&&x.best&&x.best.total>=Math.max(3,top*.45)});if(keep.length)UI.pick=keep}catch(e){}}})();
 // R20: once a group is lifted, only drops that still lead to a good ending glow (at least 70% of the best ending still open from here)
 function scWalkOuts(){if(!G||!G.move||SC.key!==G.turn+'|'+G.round)return null;const sx=SC.starts[G.move.start];if(!sx)return null;const path=G.move.path;
@@ -6945,7 +7042,7 @@ function scWalkOuts(){if(!G||!G.move||SC.key!==G.turn+'|'+G.round)return null;co
 (function(){const oc=computePick;computePick=function(){oc.apply(this,arguments);try{
   if(!G||G.over||G.tut||online()||(typeof gdStep==='function'&&gdStep())||G.phase!=='turn'||G.step!=='move'||G.q||UI.pendDj||UI.pendItem||!scMine())return;
   if(!G.move){scCompute();return}
-  const good=scWalkOuts();if(!good)return;const n=G.move.path.length;const keep=UI.pick.filter(t=>good.some(x=>x.o.path[n]===t));if(keep.length)UI.pick=keep}catch(e){}}})();
+  /* F3: once lifted, every legal drop glows: the player plans the path (the hint names only the starting tile) */}catch(e){}}})();
 // which colour to drop on a step: keep the ending colour for the last drop, so the planned ending still works
 function scStepBest(ms){const good=scWalkOuts();if(!good||!G.move)return -1;const n=G.move.path.length;const hand=G.move.hand;
   let best=null;for(const x of good)if(x.o.path[n]===ms[0].tile&&(!best||x.total>best.total))best=x;if(!best)return -1;const c=best.o.c;
@@ -6954,13 +7051,12 @@ function scStepBest(ms){const good=scWalkOuts();if(!good||!G.move)return -1;cons
 // R38 row 6: the glow IS the hint. A newcomer who taps only what glows should win about half of the games on defaults.
 // Bid: only the suggested spot glows (the others stay tappable). Start: the suggested start plus the 2 best other starts glow.
 // Walk: on the suggested start the glow follows the suggested route (the planner's, not the points-now greedy one).
-function scGlowHint(){if(!G||G.over||G.tut||G.coach||online()||(typeof gdStep==='function'&&gdStep())||G.q||UI.pendDj||UI.pendItem||typeof hlpAdvice!=='function')return;const hp=me();if(!hp||G.pl.filter(x=>x.human).length!==1)return;
+function scGlowHint(){if(!hintsOn()||!G||G.over||G.tut||online()||(typeof gdStep==='function'&&gdStep())||G.q||UI.pendDj||UI.pendItem||typeof hlpAdvice!=='function')return;const hp=me();if(!hp||G.pl.filter(x=>x.human).length!==1)return;
   if(G.phase==='bid'){if(!UI.pickSpot.length)return;const m=hlpAdvice();if(m&&m.act==='bid'&&UI.pickSpot.includes(m.spot))UI.pickSpot=[m.spot];return}
   if(G.phase!=='turn'||G.step!=='move'||G.cur!==hp.i)return;
   if(!G.move){const m=hlpAdvice();scCompute();const rk=Object.keys(SC.starts).map(Number).filter(s=>UI.pick.includes(s)&&SC.starts[s].best).sort((a,b)=>SC.starts[b].best.total-SC.starts[a].best.total);
-    const keep=[];if(m&&m.act==='start'&&UI.pick.includes(m.tile))keep.push(m.tile);for(const s of rk){if(keep.length>=3)break;if(!keep.includes(s))keep.push(s)}if(keep.length)UI.pick=keep;return}
-  const pl=typeof HPL!=='undefined'?HPL.plan:null;if(!pl||pl.seed!==G.seed||pl.turn!==G.turn)return;const path=G.move.path,q=pl.o.path;if(q.length<=path.length||!path.every((x,i)=>x===q[i]))return;
-  const nx=q[path.length];if(UI.pick.includes(nx)||validMoves(hp.i).some(m=>m.act==='step'&&m.tile===nx))UI.pick=[nx]}
+    const keep=[];if(m&&m.act==='start'&&UI.pick.includes(m.tile))keep.push(m.tile);for(const s of rk){if(keep.length>=1)break;if(!keep.includes(s))keep.push(s)}if(keep.length)UI.pick=keep;return}
+  /* F3: no glow per drop */}
 (function(){const oc=computePick;computePick=function(){oc.apply(this,arguments);try{scGlowHint()}catch(e){}}})();
 // on a step with several colours the chooser lists the planned colour first, so the first glowing chip is the planned one
 // R38 row 5: on the steps where the market cannot be touched (Earn, Shadows, selling) a phone hides it, so the tiles keep >= 44 px
@@ -6972,8 +7068,21 @@ function scGlowHint(){if(!G||G.over||G.tut||G.coach||online()||(typeof gdStep===
   R.classList.toggle('dj-off',after&&!UI.pickDj.length);R.classList.toggle('mr-off',after&&!UI.pickMk.length&&!(G.step==='tribe'&&G.act&&G.act.color==='merchant'))}catch(e){}}})();
 // R38 (375x553): a short phone hides the market while bidding, and the djinn row while djinn powers fill the button row
 (function(){const o=renderMarket;renderMarket=function(){o.apply(this,arguments);try{const hp=me(),R=document.documentElement;
-  R.classList.toggle('bid-mk',!!(G&&!G.over&&G.phase==='bid'));
+  R.classList.toggle('bid-mk',!!(G&&!G.over&&G.phase==='bid'));R.classList.toggle('mk-buy',!!(G&&!G.over&&UI.pickMk&&UI.pickMk.length));
   const pw=!!(G&&!G.over&&hp&&G.phase==='turn'&&!G.q&&!UI.pickDj.length&&validMoves(hp.i).some(m=>m.act==='djinn'||m.act==='item'));R.classList.toggle('pw-on',pw)}catch(e){}}})();
+// F2: the one glowing (suggested) tile says why: a ★+N badge on it, and the line names the reason ("Tap ★ for +9: 3 Advisors and a palm")
+function scWhy(){try{if(!hintsOn()||(G&&G.move)||!G||G.over||   /* F3: only with hints on, only for the start (the player plans the drops) */G.tut||G.coach||online()||(typeof gdStep==='function'&&gdStep())||G.q||UI.pendDj||UI.pendItem||G.phase!=='turn'||G.step!=='move'||UI.pick.length!==1)return null;
+  const hp=me();if(!hp||G.cur!==hp.i||G.pl.filter(x=>x.human).length!==1||!scMine())return null;const t=UI.pick[0];let best=null;
+  if(!G.move){scCompute();const sx=SC.starts[t];best=sx&&sx.best}
+  else{const sx=SC.key===G.turn+'|'+G.round?SC.starts[G.move.start]:null;if(sx)for(const x of sx.outs)if(scPrefix(x,G.move.path,t)&&(!best||x.total>best.total))best=x}
+  if(!best||best.total<=0)return null;
+  const lab=s=>s.replace(/^tile (.+)$/,'$1 tile').replace(/^(palm|palace)$/,'a $1').replace(/^goods sets$/,'goods').replace(/^Shadows strike$/,'a strike');
+  const ps=best.parts.filter(x=>x[0]>0).sort((a,b)=>b[0]-a[0]).slice(0,2).map(x=>lab(x[1]));if(!ps.length)return null;
+  let txt='+'+best.total+': '+ps.join(' and ');if(('Tap ★ for '+txt).split(/\s+/).length>8)txt='+'+best.total+': '+ps[0];
+  return {tile:t,total:best.total,txt}}catch(e){return null}}
+(function(){const o=lineText;lineText=function(){const t=o.apply(this,arguments);const w=scWhy();return w?'Tap ★ for '+w.txt:t}})();
+(function(){const o=renderGrid;renderGrid=function(){o.apply(this,arguments);const w=scWhy();if(!w)return;const e=document.querySelector('#grid .tile[data-tile="'+w.tile+'"]');
+  if(e&&!e.querySelector('.why'))e.insertAdjacentHTML('beforeend','<b class="why" aria-hidden="true">★+'+w.total+'</b>')}})();
 
 </script>
 <script>
@@ -6988,7 +7097,7 @@ function drgGhost(){if(!DRG.ghost){const g=document.createElement('div');g.class
 document.addEventListener('pointerdown',e=>{
   if(e.button>0||!G||G.over||UI.modal||UI.chz||!me()||G.phase!=='turn'||G.step!=='move'||(G.q))return;
   const t=e.target.closest&&e.target.closest('#grid [data-tile]');if(!t)return;const i=+t.dataset.tile;
-  const ok=G.move?G.move.at===i:UI.pick.includes(i);if(!ok)return;
+  const ok=G.move?G.move.at===i:drgCan('start',i);if(!ok)return;
   DRG.pid=e.pointerId;DRG.on=true;DRG.from=i;DRG.x0=e.clientX;DRG.y0=e.clientY;DRG.moved=false;DRG.over=-1},true);
 document.addEventListener('pointermove',e=>{
   if(!DRG.on)return;
@@ -6998,16 +7107,19 @@ document.addEventListener('pointermove',e=>{
     if(!G.move){drgClear();return}}
   const g=drgGhost();g.style.left=e.clientX+'px';g.style.top=e.clientY+'px';
   const j=drgTile(e.clientX,e.clientY);if(j!==DRG.over){document.querySelectorAll('#grid .dragover').forEach(x=>x.classList.remove('dragover'));DRG.over=j;
-    if(j>=0&&UI.pick.includes(j)){const el=tileEl(j);if(el)el.classList.add('dragover');try{if(navigator.vibrate)navigator.vibrate(6)}catch(x){}}}
+    if(j>=0&&drgCan('step',j)){const el=tileEl(j);if(el)el.classList.add('dragover');try{if(navigator.vibrate)navigator.vibrate(6)}catch(x){}}}
   e.preventDefault()},true);
 function drgEnd(e){
   if(!DRG.on)return;const moved=DRG.moved;let j=-1;if(moved&&e.type==='pointerup')j=drgTile(e.clientX,e.clientY);
-  const ok=moved&&j>=0&&G&&G.move&&UI.pick.includes(j);try{document.documentElement.releasePointerCapture(DRG.pid)}catch(x){}drgClear();
+  const ok=moved&&j>=0&&G&&G.move&&drgCan('step',j);try{document.documentElement.releasePointerCapture(DRG.pid)}catch(x){}drgClear();
   if(moved)DRG.until=Date.now()+350;
   if(ok){onTile(j);requestAnimationFrame(()=>{const el=tileEl(j);if(el){el.classList.remove('snap');void el.offsetWidth;el.classList.add('snap')}})}}
 document.addEventListener('pointerup',drgEnd,true);document.addEventListener('pointercancel',drgEnd,true);
 document.addEventListener('click',e=>{if(Date.now()<DRG.until&&e.target.closest&&e.target.closest('#grid [data-tile]')){e.stopPropagation();e.preventDefault()}},true);
 window.GXDRAG=DRG;
+
+// F1: only the suggested tile glows, but every legal tile can still be dragged from / dropped on
+function drgCan(act,i){if(UI.pick.includes(i))return true;const p=me();return !!p&&validMoves(p.i).some(m=>m.act===act&&m.tile===i)}
 
 </script>
 <script>
@@ -7038,6 +7150,7 @@ function feedPlace(e){if((typeof PLQB!=='undefined'&&PLQB)||document.querySelect
     // between the status rows above and the buttons below, never over either
   let top=0;for(const id of ['seats','line','trk','trk2','whatbtn']){const x=document.getElementById(id);if(x&&!x.hidden&&x.getClientRects().length){const r=x.getBoundingClientRect();if(r.bottom>top&&r.left>innerWidth*.6)top=r.bottom}}
   let bot=innerHeight;for(const id of ['acts','mine']){const x=document.getElementById(id);if(x&&!x.hidden&&x.getClientRects().length){const r=x.getBoundingClientRect();if(r.top<bot&&r.height>4&&r.left>innerWidth*.6)bot=r.top}}
+  for(const x of document.querySelectorAll('#acts button,#acts .arow,#mine button,#skipai')){if(x.hidden||!x.getClientRects().length)continue;const r=x.getBoundingClientRect();if(r.height>4&&r.right>innerWidth*.6&&r.top<bot)bot=r.top}   // F3: every button row counts (the path confirm row sits above the box)
   const h=bot-top-24;if(h<130){e.style.visibility='hidden';return}e.style.visibility='';e.style.top=(top+10)+'px';e.style.bottom='auto';e.style.maxHeight=h+'px';while(e.scrollHeight>e.clientHeight+1&&e.querySelectorAll('.fd-row').length>1)e.lastElementChild.remove()}
 function feedHtml(e,rows){
   const dot=t=>{for(const p of G.pl)if(t.indexOf(p.nm)>=0)return PCOL[p.i];return '#b0702a'};
@@ -7080,6 +7193,74 @@ function juice(prev,cur){if(!G||!prev||!cur)return;juMove(cur);if(!juOk()||G.ove
     for(let k=0;k<n;k++)flyEl('<i class="jcoin"></i>','jcn',{x:src.x+(k%3-1)*9,y:src.y+Math.floor(k/3)*8},to,{delay:k*30,dur:380,big:1.4,end2:.6,fade:true});
     try{if(SND.on&&typeof sfx==='function')sfx('coins')}catch(e){}})}
 (function(){if(typeof animate!=='function')return;const o=animate;animate=function(prev){o.apply(this,arguments);try{juice(prev,snapState())}catch(e){console.error(e)}}})();
+
+</script><script>
+// ===================== plan the walk in one tap (F3), end-of-game warning, sale note, Shadow star, lesson wrong-tap feedback =====================
+// Hooks live in ui.js (onTile, go, uiAct, buildActs, lineText, render). Rules are untouched: a planned path is played as normal legal step moves.
+// Rules are untouched: every drop of a planned path is a normal legal 'step' move, played one by one through go().
+const F3={plan:null,ends:null,key:'',warned:'',turn:-1,playing:false};
+const f3Mine=()=>!!G&&!G.over&&!online()&&G.phase==='turn'&&G.step==='move'&&!!G.move&&!G.q&&!UI.pendDj&&!UI.pendItem&&!G.tut&&!(typeof gdStep==='function'&&gdStep())&&!!me()&&G.cur===me().i&&G.move.hand.length>=2;
+const f3Key=()=>G&&G.move?G.turn+'|'+G.round+'|'+G.move.path.join(','):'';
+// every ending still reachable from the walk so far: {e,c,n,path} (same counting as the computer's outcomes())
+function f3Outs(){const mv=G.move;if(!mv)return[];const hc=handCounts(mv.hand);const res={};const path=mv.path.slice();const visits={};let nodes=0;
+  const rec=(at,prev,left)=>{if(nodes++>20000)return;for(const nx of ADJ(at)){if(nx===prev||G.board[nx].block)continue;path.push(nx);
+      if(left===1){const had=G.board[nx].m;for(const c in hc){const pre=had.filter(x=>x===c).length;const extra=Math.min(visits[nx]||0,hc[c]-1);if(pre||extra){const n=pre+extra+1;const key=nx+'|'+c;if(!res[key]||res[key].n<n)res[key]={e:nx,c,n,path:path.slice()}}}}
+      else{visits[nx]=(visits[nx]||0)+1;rec(nx,at,left-1);visits[nx]--}path.pop()}};
+  rec(mv.at,mv.prev,mv.hand.length);return Object.values(res)}
+// try the path on a copy: returns the legal step moves, or null
+function f3Try(o,wantFirst){const snap=JSON.stringify(G);const sim=UI.sim;UI.sim=1;const steps=[];let ok=false;
+  try{let k=0;while(G.move&&k++<40){const vm=validMoves(G.cur).filter(m=>m.act==='step');const nx=o.path[G.move.path.length];const here=vm.filter(m=>m.tile===nx);if(!here.length)break;
+      const last=G.move.hand.length===1;const cnt=G.move.hand.filter(x=>x===o.c).length;let m;
+      if(last)m=here.find(x=>x.c===o.c);else if(nx===o.e&&cnt>1)m=here.find(x=>x.c===o.c)||here[0];else m=wantFirst?(here.find(x=>x.c===o.c&&cnt>1)||here[0]):(here.find(x=>x.c!==o.c)||here[0]);
+      if(!m)break;const r=performMove(m,G.cur);if(!r.success)break;steps.push(m)}
+    ok=!G.move&&!!G.act&&G.act.tile===o.e&&G.act.color===o.c;if(ok)o.n=G.act.n}catch(e){ok=false}
+  G=JSON.parse(snap);UI.sim=sim;return ok?steps:null}
+function f3Ends(){const k=f3Key();if(F3.key===k&&F3.ends)return F3.ends;F3.key=k;F3.ends={};if(!f3Mine())return F3.ends;
+  for(const o of f3Outs()){(F3.ends[o.e]=F3.ends[o.e]||[]).push(o)}return F3.ends}
+function f3Plan(o){const steps=f3Try(o,false)||f3Try(o,true);if(!steps){toast('That path does not work. Try another tile.');return}
+  F3.plan={key:f3Key(),e:o.e,c:o.c,n:o.n,steps,path:steps.map(m=>m.tile)};render()}
+function f3Live(){return F3.plan&&F3.plan.key===f3Key()&&f3Mine()?F3.plan:null}
+function f3Go(){const pl=f3Live();if(!pl||F3.playing)return;F3.plan=null;F3.playing=true;const q=pl.steps.slice();
+  const tick=()=>{if(!q.length||!G||!G.move){F3.playing=false;return}const m=q.shift();if(!validMoves(G.cur).some(x=>same(x,m))){F3.playing=false;render();return}go(m);setTimeout(tick,ANIM?150:0)};tick()}
+// draw: numbered drops on the planned path, a soft ring on every tile where the walk can end
+function f3Draw(){document.querySelectorAll('#grid .f3num').forEach(x=>x.remove());document.querySelectorAll('#grid .f3end,#grid .f3last').forEach(x=>x.classList.remove('f3end','f3last'));
+  if(!f3Mine()||F3.playing)return;const pl=f3Live();
+  if(pl){pl.path.forEach((t,k)=>{const el=tileEl(t);if(!el)return;const b=document.createElement('i');b.className='f3num';b.textContent=String(k+1);b.setAttribute('aria-hidden','true');b.setAttribute('data-help','');el.appendChild(b)});const le=tileEl(pl.e);if(le)le.classList.add('f3last');return}
+  const ends=f3Ends();const st=new Set(UI.pick||[]);for(const k in ends){if(st.has(+k))continue;const el=tileEl(+k);if(el)el.classList.add('f3end')}}
+// ---------- the end is announced a round ahead; a sale says what coins are worth ----------
+function f3Warn(){if(!G||G.over||G.tut||G.coach||online())return;const t=document.getElementById('trk');const r=t&&t.querySelector('.trk-r');
+  const low=G.pl.reduce((a,p)=>p.camels<a.camels?p:a,G.pl[0]);const k=G.endTrig?'last':low.camels<=3?'soon':'';
+  if(r){r.textContent=k==='last'?'⏳ Last round':k==='soon'?'Round '+G.round+' · ends soon':'Round '+G.round;r.classList.toggle('f3end-tag',!!k)}
+  if(k&&F3.warned!==k+G.seed){F3.warned=k+G.seed;const who=seatName(low)==='You'?'You have':plName(low.nm)+' has';
+    const msg=k==='last'?'Last round! The game ends after this round.':who+' '+low.camels+' camel'+(low.camels===1?'':'s')+' left. The round with the last camel is the final one.';
+    const hs=G.pl.find(p=>p.human);try{if(hs)plPop(hs.i,1,msg)}catch(e){}}}
+function f3Sold(){if(!G||!G.log||!G.log.length)return;const e=G.log[0];if(!e||e.i===F3.soldN)return;if(/ sells? \d+ different goods for (\d+) coins/.test(e.t)){F3.soldN=e.i;const v=+RegExp.$1;const hp=me();
+    if(hp&&G.cur===hp.i)try{plPop(hp.i,1,'Sold for '+v+' coins. Same points: each coin is 1 point at the end.')}catch(x){}}}
+// the djinn drawer closes at every new turn
+function f3Turn(){if(G&&F3.turn!==G.turn){F3.turn=G.turn;UI.pwOpen=false;F3.plan=null}}
+// Shadows with hints on: a star on the best target
+function f3Shadow(){document.querySelectorAll('#grid .f3star,#seats .f3star').forEach(x=>x.remove());if(!G||G.over||!hintsOn()||G.step!=='tribe'||!G.act||G.act.color!=='assassin'||!me()||G.cur!==me().i||(typeof gdStep==='function'&&gdStep()))return;
+  const tr=validMoves(G.cur).filter(m=>m.act==='tribe'&&m.kill);if(!tr.length)return;const b=bestKill(me(),tr);if(!b||!b.kill)return;const el=b.kill.tile!=null?tileEl(b.kill.tile):document.querySelector('#seats [data-seat="'+b.kill.pl+'"]');
+  if(el){const s=document.createElement('i');s.className='f3star';s.textContent='★';s.setAttribute('aria-hidden','true');s.setAttribute('data-help','');el.appendChild(s)}}
+// ---------- the lesson: a wrong tap shakes and says what to tap ----------
+function f3Label(st){if(st.who!=='me')return 'Next ▶';const m=st.m;
+  if(m.act==='bid')return 'the glowing spot on the bid track';if(m.act==='start'||m.act==='step')return 'the glowing tile';if(m.act==='sell')return 'Sell all';if(m.act==='end')return 'End turn';
+  if(m.act==='tribe'&&m.kill&&m.kill.pl!=null)return 'the rival panel at the top';if(m.act==='tribe')return 'Collect';if(m.act==='djinn')return 'the glowing djinn power, then the tile';return 'the glowing button'}
+document.addEventListener('click',e=>{try{const st=typeof gdStep==='function'?gdStep():null;if(!st||GD.busy)return;const tgt=e.target.closest&&e.target.closest('[data-tile],[data-seat],[data-mk],[data-dj],[data-mv],[data-ui],[data-sell],[data-chz],[data-pw],.sp-b,#coach button');if(!tgt)return;
+  const hl=document.querySelector('.gd-hl');if(hl&&(hl===tgt||hl.contains(tgt)||tgt.contains(hl)))return;if(st.who==='note'&&tgt.closest('#coach'))return;if(tgt.closest('#chz')&&UI.chz)return;
+  tgt.classList.remove('f3shake');void tgt.offsetWidth;tgt.classList.add('f3shake');setTimeout(()=>tgt.classList.remove('f3shake'),400);
+  if(hl){hl.classList.remove('f3pulse');void hl.offsetWidth;hl.classList.add('f3pulse')}setTimeout(()=>{try{toast('Not that one. Tap '+f3Label(st)+'.')}catch(x){}},30)}catch(x){}},true);
+
+// called from ui.js
+function f3TileTap(i){if(F3.playing)return true;try{if(f3Mine()&&!UI.chz){const ends=f3Ends()[i];const vm=validMoves(G.cur);const stepHere=vm.some(m=>m.act==='step'&&m.tile===i);
+    if(ends&&ends.length&&!stepHere){const by={};for(const x of ends)if(!by[x.c]||by[x.c].n<x.n)by[x.c]=x;const cs=Object.values(by);
+      if(cs.length===1){f3Plan(cs[0]);return true}
+      pickChoose({tile:i},cs.map(x=>({html:mdotHtml(x.c)+'<small>take '+x.n+'</small>',m:{act:'f3plan',o:x}})));return true}
+    if(stepHere)F3.plan=null}}catch(e){console.error(e)}return false}
+function f3ActsHtml(){try{const pl=f3Live();if(pl){const nm=pl.n>1?MPLUR[pl.c]:MNAME[pl.c];
+    return `<div class="arow f3row"><button class="ab go f3go" data-ui="f3go">✓ Drop along path · take ${pl.n} ${esc(nm)}</button><button class="ab ghost" data-ui="f3x" aria-label="Clear the path">✕</button></div>`}}catch(e){}return ''}
+function f3Line(){try{if(F3.playing&&G&&G.move)return 'Dropping along the path…';if(f3Live())return 'Tap ✓ to drop along this path';if(f3Mine())return G.move.hand.length===2?'2 left: the last must land on its colour':'Tap where the walk ends, or drop one'}catch(e){}return ''}
+function f3After(){try{f3Draw();f3Warn();f3Sold();f3Shadow()}catch(e){console.error(e)}}
 
 </script>
 <script>
@@ -7131,7 +7312,7 @@ function m3Gallery(el){if(!el)return;['meeple','palm','palace','camel','lamp'].f
 // title and result card
 (function(){const o=renderModal;renderModal=function(){o.apply(this,arguments);try{const m=document.getElementById('modal');if(!m||m.hidden)return;
   if(UI.modal==='start'){const b=m.querySelector('.mbox.start');if(b&&!b.querySelector('.hero3d')){const h=document.createElement('div');h.className='hero3d';h.setAttribute('data-help','');b.insertBefore(h,b.firstChild);m3Show(h,'lamp',160)}}
-  if(UI.modal==='over'&&G&&G.over){const b=m.querySelector('.mbox.over');if(b&&!b.querySelector('.hero3d')){const won=viewP()&&G.over.win.includes(viewP().i);const h=document.createElement('div');h.className='hero3d';h.setAttribute('data-help','');b.insertBefore(h,b.firstChild);m3Show(h,won?'palace':'camel',160)}}}catch(e){console.error(e)}}})();
+  if(UI.modal==='over'&&G&&G.over){const b=m.querySelector('.mbox.over');if(b&&!b.querySelector('.hero3d')){const won=viewP()&&G.over.win.includes(viewP().i);const h=document.createElement('div');h.className='hero3d';h.setAttribute('data-help','');const t2=b.querySelector('h2');b.insertBefore(h,t2||b.firstChild);m3Show(h,won?'palace':'camel',160)}}}catch(e){console.error(e)}}})();
 if(document.readyState==='complete')setTimeout(m3Load,600);else addEventListener('load',()=>setTimeout(m3Load,600));
 
 </script>
