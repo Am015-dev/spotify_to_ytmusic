@@ -1,0 +1,32 @@
+GAUNTLET  games 300  levels normal  counts 2/3/4  time 24.4s
+errors 0   stalls 0   invariant violations 0
+
+== 2 players: 100 games ==
+avg rounds 5.00  avg decisions 224  avg winner score 21.5  avg score 16.1  avg margin 10.9  ties broken 5.0% (favour 0, order 5)
+fair share 50.0%
+  Salt Crown        win  62.7%   avg score 18.4   (51 seats)
+  Reedfolk          win  32.0%   avg score 13.6   (50 seats)
+  Ember Guild       win  56.0%   avg score 16.9   (50 seats)
+  Hollow Synod      win  49.0%   avg score 15.3   (49 seats)
+  seat index wins: 0:51.0%  1:49.0%
+  start-order position wins (1 = first on the track): 1:64.0%  2:36.0%
+
+== 3 players: 100 games ==
+avg rounds 5.00  avg decisions 329  avg winner score 17.1  avg score 10.3  avg margin 8.1  ties broken 3.0% (favour 0, order 3)
+fair share 33.3%
+  Salt Crown        win  36.0%   avg score 11.2   (75 seats)
+  Reedfolk          win  24.0%   avg score 9.4   (75 seats)
+  Ember Guild       win  36.0%   avg score 10.6   (75 seats)
+  Hollow Synod      win  37.3%   avg score 10.1   (75 seats)
+  seat index wins: 0:34.0%  1:37.0%  2:29.0%
+  start-order position wins (1 = first on the track): 1:30.0%  2:40.0%  3:30.0%
+
+== 4 players: 100 games ==
+avg rounds 5.00  avg decisions 422  avg winner score 15.8  avg score 8.2  avg margin 6.9  ties broken 10.0% (favour 1, order 9)
+fair share 25.0%
+  Salt Crown        win  19.0%   avg score 7.8   (100 seats)
+  Reedfolk          win  24.0%   avg score 8.0   (100 seats)
+  Ember Guild       win  29.0%   avg score 8.5   (100 seats)
+  Hollow Synod      win  28.0%   avg score 8.3   (100 seats)
+  seat index wins: 0:24.0%  1:28.0%  2:29.0%  3:19.0%
+  start-order position wins (1 = first on the track): 1:24.0%  2:21.0%  3:21.0%  4:34.0%

@@ -1,28 +1,28 @@
 {
   "game": "thornbound",
-  "title": "The Heir of the Heath",
+  "title": "The Heir of the Reeds",
   "version": 1,
   "cast": {
-    "ysolde": { "name": "Old Ysolde the Rune-Reader", "portrait": "camp-ysolde.webp", "emoji": "🪶", "color": "#2a9d8f" },
+    "ysolde": { "name": "Old Ysolde the Bog Chieftain", "portrait": "camp-ysolde.webp", "emoji": "🪶", "color": "#2a9d8f" },
     "tamsin": { "name": "Tamsin of the Gate", "portrait": "camp-tamsin.webp", "emoji": "🗝️", "color": "#3b6fc0" },
     "fennick": { "name": "Brother Fennick", "portrait": "camp-fennick.webp", "emoji": "🕯️", "color": "#8e5bb5" },
-    "halvard": { "name": "Seneschal Halvard Crane", "portrait": "camp-halvard.webp", "emoji": "🏰", "color": "#3b6fc0" },
+    "halvard": { "name": "Pan Steward Halvard Crane", "portrait": "camp-halvard.webp", "emoji": "🏰", "color": "#3b6fc0" },
     "quill": { "name": "Mother Quill", "portrait": "camp-quill.webp", "emoji": "🦉", "color": "#8e5bb5" },
     "rook": { "name": "Captain Rook Ashby", "portrait": "camp-rook.webp", "emoji": "⛴️", "color": "#c0392b" },
-    "sable": { "name": "Sable, the Masked Heir", "portrait": "camp-sable.webp", "emoji": "🎭", "color": "#c0392b" },
-    "ida": { "name": "Warden-General Ida Marsh", "portrait": "camp-ida.webp", "emoji": "🛡️", "color": "#3b6fc0" },
-    "orlen": { "name": "Orlen the Moth Priest", "portrait": "camp-orlen.webp", "emoji": "🦋", "color": "#8e5bb5" },
-    "stag": { "name": "The Pale Stag-King", "portrait": "camp-stag.webp", "emoji": "🦌", "color": "#8e5bb5" }
+    "sable": { "name": "Sable, the Ember Heir", "portrait": "camp-sable.webp", "emoji": "🎭", "color": "#c0392b" },
+    "ida": { "name": "Tide Marshal Ida Marsh", "portrait": "camp-ida.webp", "emoji": "🛡️", "color": "#3b6fc0" },
+    "orlen": { "name": "Orlen the Night Prior", "portrait": "camp-orlen.webp", "emoji": "🦋", "color": "#8e5bb5" },
+    "stag": { "name": "The Hierophant", "portrait": "camp-stag.webp", "emoji": "🦌", "color": "#8e5bb5" }
   },
   "acts": [
-    { "act": 1, "title": "Spring on the Heath", "blurb": "Learn one thing at a time. Clashes, Heralds, the Great Road, then Lore." },
+    { "act": 1, "title": "Spring in the Reeds", "blurb": "Learn one thing at a time. Clashes, Heralds, the Great Road, then Lore." },
     { "act": 2, "title": "Summer of Knives", "blurb": "Three rivals at the table. Councils, the Favour and Deadly agents." },
     { "act": 3, "title": "The Long Winter", "blurb": "The sharpest rivals. A boss rule in every crowning fight. Then the Throne." }
   ],
   "twists": [
     { "id": "boss-lore", "where": "setup", "how": "After TB.newGame returns, set G.pl[bossSeat].lore = param (default 2). Nothing else changes." },
     { "id": "boss-first", "where": "setup", "how": "Pass order [bossSeat, ...the other seats in random order] to TB.newGame. The boss starts first on the Order Track. Later rounds re-sort by Influence as normal." },
-    { "id": "boss-favour", "where": "setup", "how": "Right after TB.newGame returns, set G.fav = { h: bossSeat, u: 3 } so the boss starts holding the Favour disc with three uses instead of it lying on the Gleaning Meadow." },
+    { "id": "boss-favour", "where": "setup", "how": "Right after TB.newGame returns, set G.fav = { h: bossSeat, u: 3 } so the boss starts holding the Favour disc with three uses instead of it lying on the Market Cross." },
     { "id": "sharp-mind", "where": "ai", "how": "When the boss seat moves, call TB.AI.choose(G, bossSeat, 'hard', { budget: TB.AI.budgetMs * param }) so its rollouts get param times the normal thinking time (default 2)." }
   ],
   "chapters": [
@@ -32,7 +32,7 @@
       "intro": [
         { "who": "ysolde", "text": "Three regions, three fights each round. Put a card face-down by each one." },
         { "who": "ysolde", "text": "Cards flip. The bigger total takes the region and its Influence." },
-        { "who": "tamsin", "text": "I keep the Court's gate. Come and knock, little heir, if you dare." }
+        { "who": "tamsin", "text": "I keep the Crown's gate. Come and knock, little heir, if you dare." }
       ],
       "outro": [
         { "who": "ysolde", "text": "Big card where it matters, small card where it doesn't. That is the whole trick." }
@@ -58,7 +58,7 @@
       "intro": [
         { "who": "ysolde", "text": "Before the fights, stand your Herald on one Location. Everyone can see it." },
         { "who": "ysolde", "text": "Win that region and pick that Location. Gain +1 Influence, and 1 more from each rival there." },
-        { "who": "tamsin", "text": "I will stand mine on the Cairn Field. Two Influence! Who could resist?" }
+        { "who": "tamsin", "text": "I will stand mine on the Broken Shield. Two Influence! Who could resist?" }
       ],
       "outro": [
         { "who": "ysolde", "text": "Your Herald is a promise. Back it with your strongest card." }
@@ -84,7 +84,7 @@
       "intro": [
         { "who": "ysolde", "text": "Each spring you bid one card. The highest bid picks first from the Great Road." },
         { "who": "ysolde", "text": "A Kingdom Card works every round. The card you bid stays tucked under it." },
-        { "who": "fennick", "text": "The Choir collects what others leave behind. Bid low, friend. I'll wait." }
+        { "who": "fennick", "text": "The Synod collects what others leave behind. Bid low, friend. I'll wait." }
       ],
       "outro": [
         { "who": "fennick", "text": "Two banners on your board already. The road remembers you now." },
@@ -106,22 +106,22 @@
       "unlock": [ { "type": "portrait", "id": "fennick", "text": "Brother Fennick's portrait" } ]
     },
     {
-      "id": "c4", "act": 1, "title": "The Seneschal's Toll",
+      "id": "c4", "act": 1, "title": "The Pan Steward's Toll",
       "boss": true,
       "intro": [
         { "who": "ysolde", "text": "In autumn you may Journey. Send away a card with scrolls and gain that much Lore." },
         { "who": "ysolde", "text": "Spend Lore on your Site of Power. Those cards are stronger than anything you start with." },
-        { "who": "halvard", "text": "The heath pays toll to the Court. Every card you send away is one fewer to fight me." }
+        { "who": "halvard", "text": "The marsh pays toll to the Crown. Every card you send away is one fewer to fight me." }
       ],
       "outro": [
-        { "who": "halvard", "text": "The toll is waived. This once. The Court will remember your face." },
+        { "who": "halvard", "text": "The toll is waived. This once. The Crown will remember your face." },
         { "who": "ysolde", "text": "Spring is over. Now the other houses notice you." }
       ],
-      "opponent": { "name": "Seneschal Halvard Crane", "portrait": "camp-halvard.webp", "emoji": "🏰", "cast": "halvard",
-        "personality": "Stiff and careful. Defends the Cairn Field. Never wastes a strong card.",
+      "opponent": { "name": "Pan Steward Halvard Crane", "portrait": "camp-halvard.webp", "emoji": "🏰", "cast": "halvard",
+        "personality": "Stiff and careful. Defends the Broken Shield. Never wastes a strong card.",
         "aiLevel": "easy", "aiStyle": "nobility",
         "taunt": "Tolls are paid in full. Come back when your cards have grown teeth.",
-        "praise": "Well. A heath-born heir with a Site of Power. Pass, and be welcome." },
+        "praise": "Well. A marsh-born heir with a Site of Power. Pass, and be welcome." },
       "setup": { "np": 2, "length": "short", "faction": "clans", "seatFactions": ["clans", "nobility"], "seed": null },
       "twist": null,
       "goal": { "type": "custom", "value": 1, "text": "Win, and buy 1 or more Site of Power cards with Lore." },
@@ -133,7 +133,7 @@
       ],
       "easier": { "aiLevel": "easy", "twist": null, "setup": {}, "maxStars": 2, "text": "Halvard plays more loosely, leaving you time to Journey and buy." },
       "unlock": [
-        { "type": "portrait", "id": "halvard", "text": "Seneschal Halvard's portrait" },
+        { "type": "portrait", "id": "halvard", "text": "Pan Steward Halvard's portrait" },
         { "type": "act", "id": "2", "text": "Act 2: Summer of Knives" }
       ]
     },
@@ -142,7 +142,7 @@
       "boss": false,
       "intro": [
         { "who": "ysolde", "text": "Three houses at the table now. Each Council rewards cards with Votes on them." },
-        { "who": "ysolde", "text": "In autumn, Govern. Place a Vote card in the Council of Coin, Whispers or Pledges." },
+        { "who": "ysolde", "text": "In autumn, Govern. Place a Vote card in the Purse Council, Whispers or Pledges." },
         { "who": "quill", "text": "Votes are patient things, child. They pay long after the fighting is done." }
       ],
       "outro": [
@@ -167,7 +167,7 @@
       "id": "c6", "act": 2, "title": "The Meadow Favour",
       "boss": false,
       "intro": [
-        { "who": "ysolde", "text": "Win the Tablelands and take the Gleaning Meadow. That claims the Kingdom's Favour." },
+        { "who": "ysolde", "text": "Win the Tablelands and take the Market Cross. That claims the Kingdom's Favour." },
         { "who": "ysolde", "text": "The Favour gives your house a special action three times. It wins every tie." },
         { "who": "rook", "text": "My ferrymen already carry some Lore aboard. Catch us on the water if you can." }
       ],
@@ -193,15 +193,15 @@
       "id": "c7", "act": 2, "title": "Masks in the Sinks",
       "boss": true,
       "intro": [
-        { "who": "ysolde", "text": "The Lantern Rising hide Deadly agents. When one flips, enemy cards in that clash die." },
+        { "who": "ysolde", "text": "The Ember Guild hide Deadly agents. When one flips, enemy cards in that clash die." },
         { "who": "ysolde", "text": "Deadly fails if any of your Followers stands there. Low cards can guard high ones." },
         { "who": "sable", "text": "You will never see my knife. Only the empty place where your champion stood." }
       ],
       "outro": [
-        { "who": "sable", "text": "Unmasked by a heath-born upstart. My people will sing about it. Badly." },
+        { "who": "sable", "text": "Unmasked by a marsh-born upstart. My people will sing about it. Badly." },
         { "who": "ysolde", "text": "Summer ends. Winter brings the ones who want the Throne itself." }
       ],
-      "opponent": { "name": "Sable, the Masked Heir", "portrait": "camp-sable.webp", "emoji": "🎭", "cast": "sable",
+      "opponent": { "name": "Sable, the Ember Heir", "portrait": "camp-sable.webp", "emoji": "🎭", "cast": "sable",
         "personality": "Sly and theatrical. Bluffs with Ruses. Strikes with Deadly agents in the Sinks.",
         "aiLevel": "normal", "aiStyle": "uprising",
         "taunt": "Every mask you tore off had another under it. Better luck in the dark.",
@@ -226,19 +226,19 @@
       "id": "c8", "act": 3, "title": "The Warden's Wall",
       "boss": false,
       "intro": [
-        { "who": "ysolde", "text": "Winter. The Court sends its best, and she counts every card you play." },
+        { "who": "ysolde", "text": "Winter. The Crown sends its best, and she counts every card you play." },
         { "who": "ida", "text": "One rival, four rounds, no mercy. The wall has never fallen." },
         { "who": "ysolde", "text": "Just the two of you, and a short year. Everything you've learned, used at once." }
       ],
       "outro": [
         { "who": "ida", "text": "The wall stands. You simply walked around it. I'll report that honestly." }
       ],
-      "opponent": { "name": "Warden-General Ida Marsh", "portrait": "camp-ida.webp", "emoji": "🛡️", "cast": "ida",
+      "opponent": { "name": "Tide Marshal Ida Marsh", "portrait": "camp-ida.webp", "emoji": "🛡️", "cast": "ida",
         "personality": "Methodical and stubborn; samples every possible hand before she commits.",
         "aiLevel": "hard", "aiStyle": "nobility" },
       "setup": { "np": 2, "length": "short", "faction": "clans", "seatFactions": ["clans", "nobility"], "seed": null },
       "twist": null,
-      "goal": { "type": "win", "value": null, "text": "Win a short game (4 rounds) against the Warden-General." },
+      "goal": { "type": "win", "value": null, "text": "Win a short game (4 rounds) against the Tide Marshal." },
       "hints": false,
       "stars": [
         { "text": "Win the game", "test": { "k": "won" } },
@@ -246,20 +246,20 @@
         { "text": "Win by 4 or more", "test": { "k": "margin", "op": ">=", "v": 4 } }
       ],
       "easier": { "aiLevel": "normal", "twist": null, "setup": {}, "maxStars": 2, "text": "Ida thinks less deeply about each move." },
-      "unlock": [ { "type": "portrait", "id": "ida", "text": "Warden-General Ida's portrait" } ]
+      "unlock": [ { "type": "portrait", "id": "ida", "text": "Tide Marshal Ida's portrait" } ]
     },
     {
-      "id": "c9", "act": 3, "title": "Moths at the Ossuary",
+      "id": "c9", "act": 3, "title": "Moths at the Ash Heap",
       "boss": false,
       "intro": [
-        { "who": "orlen", "text": "The Choir has dreamt your every move. Twice over, and slowly." },
+        { "who": "orlen", "text": "The Synod has dreamt your every move. Twice over, and slowly." },
         { "who": "ysolde", "text": "Four houses now. Orlen thinks longer than anyone; give him nothing to read." },
-        { "who": "ysolde", "text": "Shrine and Ossuary keep your deck fresh. Attrition shrinks the careless hand." }
+        { "who": "ysolde", "text": "Shrine and Ash Heap keep your deck fresh. Attrition shrinks the careless hand." }
       ],
       "outro": [
-        { "who": "orlen", "text": "The dream was wrong. How... refreshing. The Stag-King will want to meet you." }
+        { "who": "orlen", "text": "The dream was wrong. How... refreshing. The Hierophant will want to meet you." }
       ],
-      "opponent": { "name": "Orlen the Moth Priest", "portrait": "camp-orlen.webp", "emoji": "🦋", "cast": "orlen",
+      "opponent": { "name": "Orlen the Night Prior", "portrait": "camp-orlen.webp", "emoji": "🦋", "cast": "orlen",
         "personality": "Dreamy and unhurried; recycles the Lost Pile and outlasts everyone.",
         "aiLevel": "hard", "aiStyle": "gathering" },
       "setup": { "np": 4, "length": "standard", "faction": "clans", "seatFactions": ["clans", "gathering", "nobility", "uprising"], "seed": null },
@@ -280,19 +280,19 @@
       "intro": [
         { "who": "stag", "text": "I have held the Favour since before your mother's mother. I will hold it at the end." },
         { "who": "ysolde", "text": "Six rounds, four houses. Ties go to the Favour, so take the Meadow or win clearly." },
-        { "who": "ysolde", "text": "Whatever happens, child of the heath: you got here. Now take the chair." }
+        { "who": "ysolde", "text": "Whatever happens, child of the marsh: you got here. Now take the chair." }
       ],
       "outro": [
         { "who": "stag", "text": "The thorns let you sit. They never let me. Rule kindly." },
-        { "who": "ysolde", "text": "The Heathbound sit the Throne. Tell it slowly; we'll be singing it for years." }
+        { "who": "ysolde", "text": "The Reedfolk sit the Throne. Tell it slowly; we'll be singing it for years." }
       ],
-      "opponent": { "name": "The Pale Stag-King", "portrait": "camp-stag.webp", "emoji": "🦌", "cast": "stag",
+      "opponent": { "name": "The Hierophant", "portrait": "camp-stag.webp", "emoji": "🦌", "cast": "stag",
         "personality": "Ancient and serene; hoards the Favour and wins on ties.",
         "aiLevel": "hard", "aiStyle": "gathering",
         "taunt": "The Favour stays where it has always been. Kneel, and try another winter.",
-        "praise": "The antlers bow. The Throne is yours, Heir of the Heath." },
+        "praise": "The antlers bow. The Throne is yours, Heir of the Reeds." },
       "setup": { "np": 4, "length": "extended", "faction": "clans", "seatFactions": ["clans", "gathering", "nobility", "uprising"], "seed": null },
-      "twist": { "id": "boss-favour", "param": null, "text": "Boss rule: the Stag-King starts holding the Kingdom's Favour (3 uses)." },
+      "twist": { "id": "boss-favour", "param": null, "text": "Boss rule: the Hierophant starts holding the Kingdom's Favour (3 uses)." },
       "goal": { "type": "score", "value": 20, "text": "Win a 6-round, 4-player game with at least 20 Influence." },
       "hints": false,
       "stars": [
@@ -302,7 +302,7 @@
       ],
       "easier": { "aiLevel": "normal", "twist": null, "setup": { "length": "standard" }, "maxStars": 2, "text": "Five rounds. The Favour starts on the Meadow. Rivals play at normal strength." },
       "unlock": [
-        { "type": "portrait", "id": "stag", "text": "The Pale Stag-King's portrait" },
+        { "type": "portrait", "id": "stag", "text": "The Hierophant's portrait" },
         { "type": "title", "id": "thornbound-sovereign", "text": "Title: Thornbound Sovereign" },
         { "type": "table", "id": "throne-hall", "text": "Throne Hall table" }
       ]

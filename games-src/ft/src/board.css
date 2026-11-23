@@ -464,3 +464,17 @@ html.short:not(.land) #trk{display:none!important}   /* the one-line prompt abov
 @media (min-width:1024px){.bidt .spot{min-height:60px;min-width:72px}.bidt .spot .sp-b{min-height:56px;min-width:68px;font-size:18px!important}.bidt .spot .sp-c{font-size:16px}.bidt .spot .ord{font-size:14px}}
 /* IPH (iPhone): djinn buttons at least 44 px tall; goods cards 44 px wide in skin.css */
 html:not(.land) .dcard{min-height:44px!important}
+/* Claims made obvious: owner-coloured border and tint, big camel, readable palms and palaces, one 0.8 s flash, one note line */
+.tile.owned{border-color:var(--oc);border-width:3px;box-shadow:inset 0 0 0 3px var(--oc),inset 0 0 0 40px color-mix(in srgb,var(--oc) 24%,transparent)}
+.tile .tk{right:2px;bottom:12px;gap:1px;flex-direction:row-reverse;flex-wrap:wrap;justify-content:flex-start;max-width:calc(100% - 4px)}
+.tile .own{width:30px;height:30px;font-size:19px;border-width:3px;box-shadow:0 0 0 2px var(--oc),0 2px 4px rgba(0,0,0,.6)}
+html.g3d .own.cam{background-size:44px}
+.tile .tok{font-size:20px;background:#fff6dc;border:2px solid var(--oc,#8a5a1e);border-radius:9px;padding:0 2px;text-shadow:none;box-shadow:0 1px 3px rgba(0,0,0,.45)}
+.tile .tok small{font-size:11px}
+.tile.cflash{animation:cflash var(--cf,.8s) ease-out 1 both;z-index:4}
+@keyframes cflash{0%{filter:brightness(1.9) saturate(1.5);transform:scale(1.08)}60%{filter:brightness(1.25)}100%{filter:none;transform:none}}
+#cnote,#clegend{position:fixed;left:50%;transform:translateX(-50%);z-index:62;pointer-events:none;max-width:94vw;box-sizing:border-box;opacity:0;visibility:hidden;transition:opacity .15s;font:800 14px/1.25 var(--ff-b,system-ui);text-align:center;border-radius:12px}
+#cnote{white-space:nowrap;background:#fff6dc;color:#2e1a0a;border:3px solid var(--pc,#8a5a1e);padding:4px 10px;box-shadow:0 3px 10px rgba(40,20,5,.4)}
+#clegend{white-space:nowrap;background:rgba(40,24,10,.92);color:#fff6dc;padding:4px 10px;font-weight:700;font-size:13px}
+#cnote.on,#clegend.on{opacity:1;visibility:visible}
+@media (prefers-reduced-motion:reduce){.tile.cflash{animation:none!important}}

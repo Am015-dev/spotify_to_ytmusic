@@ -32,7 +32,7 @@ const PX=(function(){
   let skd=0;
   function skinInit(){if(skd||UI.lowGfx||typeof GXSK==='undefined')return;skd=1;GXSK.init({});
     ['token-strength-green','token-strength-orange','token-strength-red'].forEach(f=>{const im=new Image();im.onload=()=>{TBP.tok[f.slice(15)]=1;if(typeof drawOverlay==='function'&&MAP&&MAP.m)try{drawOverlay()}catch(e){}};im.src='media/'+f+'.webp'});
-    const sh=new Image();sh.onload=()=>{window.TBP_SHIELD=1;try{if(MAP.m&&G)MAP.m.setRound(Math.max(1,G.round),G.rounds)}catch(e){}};sh.src='media/ui-round-shield-c.webp';
+    const sh=new Image();sh.onload=()=>{window.TBP_SHIELD=1;try{if(MAP.m&&G)(MAP._rn='',syncRound())}catch(e){}};sh.src='media/ui-round-shield-c.webp';
     [['clans','heath'],['gathering','choir'],['nobility','gilded'],['uprising','lantern']].forEach(([f,k])=>{const im=new Image();im.onload=()=>{R.classList.add('sk-e-'+k);try{if(typeof renderAll==='function'&&G)renderAll()}catch(e){}};im.src='media/emblem-'+f+'.webp'});
     ['influence','lore','pledge','supporter'].forEach(f=>{const im=new Image();im.onload=()=>R.classList.add('sk-i-'+f);im.src='media/icon-'+f+'.webp'});
     ['ui-sheet-head','ui-bubble-c'].forEach(f=>{const im=new Image();im.onload=()=>R.classList.add('sk-'+f.replace('ui-','').replace('-c',''));im.src='media/'+f+'.webp'})}

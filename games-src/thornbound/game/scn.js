@@ -3,6 +3,7 @@
   if (!window.GXS) return;
   var booted = function () { return typeof G !== 'undefined' && typeof newGame === 'function' && typeof UI !== 'undefined' && typeof renderAll === 'function' && typeof GXT !== 'undefined'; };
   var $ = function (s) { return document.querySelector(s); };
+  var tutRunning = function () { return (typeof GXCOACH !== 'undefined' && !!GXCOACH.running) || (typeof tutOn === 'function' && !!tutOn()); };
   // a 3-player game (you vs 2 computer houses), no menus, tips off, waiting at YOUR first decision
   function table(seed) {
     try { GXH.setEnabled(false); } catch (e) { }
@@ -24,8 +25,8 @@
     checks: [
       { kind: 'visible', sel: '#handw .hc', name: 'a hand card' },
       { kind: 'visible', sel: '#road .kcb', name: 'a Great Road card' },
-      { kind: 'fn', name: 'hand + road span >= 80% of the panel, no empty right side', fn: function () { var d = document.querySelector('.gx-dock').getBoundingClientRect(), h = ext('#handw .hc'), k = ext('#road .kcb'), l = Math.min(h[0], k[0]), r = Math.max(h[1], k[1]), f = (r - l) / d.width; if (f < .8) return 'span only ' + Math.round(f * 100) + '% of the panel'; if (d.right - r > d.width * .1) return 'empty right side: ' + Math.round(d.right - r) + ' px'; if (l - d.left > d.width * .1) return 'empty left side: ' + Math.round(l - d.left) + ' px'; return true; } },
-      { kind: 'fn', name: 'hand spans >= 80% of the panel', fn: function () { var d = document.querySelector('.gx-dock').getBoundingClientRect(), h = ext('#handw .hc'); return (h[1] - h[0]) / d.width >= .8 || 'hand is ' + Math.round((h[1] - h[0]) / d.width * 100) + '% of the panel'; } },
+      { kind: 'fn', name: 'PC layout: map in the centre at >= 70% of the height, hand along the bottom, Great Road in the right panel, scores in the left', fn: function () { var b = document.querySelector('#board').getBoundingClientRect(), h = ext('#handw .hc'), k = document.querySelector('#road').getBoundingClientRect(), rv = document.querySelector('#rivals').getBoundingClientRect(), hw = document.querySelector('#handw').getBoundingClientRect(); var m = document.querySelector('#mapbox').getBoundingClientRect(); if (m.height < innerHeight * .7) return 'map only ' + Math.round(m.height / innerHeight * 100) + '% of the height'; if (hw.bottom < innerHeight - 8) return 'hand not at the bottom'; if (rv.right > b.left + 4) return 'scores overlap the map'; if (k.left < b.right - 4) return 'Great Road is not in the right panel'; if (Math.abs((h[0] + h[1]) / 2 - innerWidth / 2) > innerWidth * .12) return 'hand is not centred'; return true; } },
+      { kind: 'fn', name: 'a side panel is not a phone column: both side panels are >= 250 px wide', fn: function () { var b = document.querySelector('#board').getBoundingClientRect(); return (b.left >= 250 && innerWidth - b.right >= 250) || 'panels ' + Math.round(b.left) + ' / ' + Math.round(innerWidth - b.right); } },
       { kind: 'fn', name: 'hand + road span >= 40% of the screen width', fn: function () { var h = ext('#handw .hc'), k = ext('#road .kcb'); return (Math.max(h[1], k[1]) - Math.min(h[0], k[0])) / innerWidth >= .4 || 'narrow'; } },
       { kind: 'fn', name: 'all card text >= 13 px', fn: function () { var bad = leafFonts('#handw').concat(leafFonts('#road')).filter(function (x) { return x.px < 13; }); return !bad.length || bad.length + ' texts under 13px, e.g. ' + bad[0].t + ' ' + bad[0].px + 'px'; } },
       { kind: 'fn', name: 'nothing clipped or off screen', fn: function () { var bad = [].filter.call(document.querySelectorAll('#handw .hc, #road .kcb'), function (e) { return !inView(e); }); if (bad.length) return bad.length + ' cards partly off screen'; var cl = [].filter.call(document.querySelectorAll('#road .kn'), function (e) { return e.scrollWidth > e.clientWidth + 2; }); return !cl.length || 'card name clipped: ' + cl[0].textContent; } },
@@ -34,16 +35,17 @@
   });
 
   GXS.add({
+    // the tutorial is the spotlight walk (GXT) since W489; the old coached game (GXCOACH) still counts
     id: 'tb-story-start', name: 'Story after Skip tutorial', ask: 'Skip tutorial: is the chapter map next?', seed: 6, when: function () { return booted() && typeof storyOpen === 'function' && typeof GXC !== 'undefined' && !!window.CAMPAIGN; },
     setup: function () {
       try { GXH.setEnabled(false); } catch (e) { }
       showStart(); storyOpen();   // what the Story button does: first time, the tutorial comes first
-      return GXS.wait(function () { return GXCOACH.running && document.querySelector('[data-gxt-skip]'); }, 10000).then(function () { return new Promise(function (r) { setTimeout(r, 500); }); });
+      return GXS.wait(function () { return tutRunning() && document.querySelector('[data-gxt-skip]'); }, 10000).then(function () { return new Promise(function (r) { setTimeout(r, 500); }); });
     },
     checks: [
-      { kind: 'fn', name: 'the tutorial opened first (not seen yet)', fn: function () { return GXCOACH.running || 'no tutorial'; } },
+      { kind: 'fn', name: 'the tutorial opened first (not seen yet)', fn: function () { return tutRunning() || 'no tutorial'; } },
       { kind: 'text', sel: '[data-gxt-skip]', re: /skip tutorial/i, name: 'Skip tutorial label' },
-      { kind: 'tap', sel: '[data-gxt-skip]', name: 'tap Skip tutorial', state: function () { return { tut: GXCOACH.running, map: !!document.querySelector('.gxc-map-on .gxc-map'), start: !document.getElementById('start').hidden && !document.querySelector('.gxc-map-on') }; },
+      { kind: 'tap', sel: '[data-gxt-skip]', name: 'tap Skip tutorial', state: function () { return { tut: tutRunning(), map: !!document.querySelector('.gxc-map-on .gxc-map'), start: !document.getElementById('start').hidden && !document.querySelector('.gxc-map-on') }; },
         expect: function (a, b) { return (!b.tut && b.map) || (b.tut ? 'tutorial still running' : b.start ? 'went back to the title screen, not the chapter map' : 'blank: no chapter map'); } },
       { kind: 'visible', sel: '.gxc-map-on .gxc-map', name: 'chapter map' },
       { kind: 'fn', name: 'map has chapter 1 to play, and no tutorial strip is left', fn: function () { var n = document.querySelectorAll('.gxc-map-on button, .gxc-map-on [data-ch]').length; return (n >= 2 && !document.querySelector('.gxt-top')) || (n < 2 ? 'chapter map is empty' : 'tutorial strip left over'); } },

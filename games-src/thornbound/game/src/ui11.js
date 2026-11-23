@@ -23,7 +23,7 @@ function hpics(items){return '<div class="gxh-pics">'+items.map(it=>it==='>'?'<s
 const hq=s=>()=>document.querySelector(s);
 const hfirst=(...sels)=>()=>{for(const s of sels){const e=document.querySelector(s);if(e&&e.getBoundingClientRect().width)return e}return null};
 const HLP_STEPS={
- bid:{target:hq('#handw'),title:'Make a secret bid',text:'Tap a card to bid it, then tap the glowing spot. The highest bid picks first.',pic:()=>HP.back()},
+ bid:{target:hq('#handw'),title:'Make a secret bid',text:'Tap a card, then the glowing spot. Highest bid picks first.',pic:()=>HP.back()},
  bidRes:{target:hq('#handw'),title:'Take a Kingdom Card',text:'Tap a glowing Kingdom Card for a lasting power. Or tap Keep my card.',pic:()=>HP.kc()},
  occupier:{target:hfirst('#handw'),title:'Tuck a card under',text:'Pick the hand card that sits under your new Kingdom Card. It cannot fight.',pic:()=>HP.back()},
  herald:{target:hfirst('.tb-loc.glow.rec .tb-ring','.tb-loc.glow .tb-ring'),title:'Place your Herald',text:'Tap a glowing location. Your Herald pays off only if you win that region.',pic:()=>HP.herald()},
@@ -97,10 +97,10 @@ function whyShort(M,m){const s=M.s,k=M.kind,q=G.q;let t='';
     else if(a==='supp'){const n=m.p.n;t='Send '+n+' Supporter'+(n>1?'s':'')+': +'+n+' Strength in '+REG[m.p.r]+'\'s first Clash.'}
     else if(a==='journey')t='A Journey gains Lore, which buys Site of Power cards.';
     else if(a==='govern')t='Votes into a Council give a lasting power.';
-    else if(a==='cmd:rally')t='Rally: the card returns to your hand in Winter.';
-    else if(a==='cmd:deploy')t='Deploy: the card stays on the map and fights next round.';
+    else if(a==='cmd:rally')t='Rally: your chosen Active cards return to your hand now.';
+    else if(a==='cmd:deploy')t='Deploy: the card goes face-up next to a region and stays Active.';
     else if(a==='council:oaths')t='Supporters come back to your board next round.';
-    else if(a.startsWith('t:'))t='This Tactic helps you most right now.';
+    else if(a.startsWith('t:')){const tn=tacName(a.slice(2));t=tn?'Play '+tn+': this Tactic helps you most now.':'This Tactic helps you most right now.'}
     else if(a.startsWith('fav:'))t='Use your Favour while you hold it.';
     else t='The best option at this step right now.'}
   else{const w=String(UI._recWhy||'').split(/(?<=[.!?:;])\s+/)[0].replace(/[.:;]$/,'.');t=w}
@@ -108,12 +108,97 @@ function whyShort(M,m){const s=M.s,k=M.kind,q=G.q;let t='';
 function hlpSuggest(){const M=UI.bf;if(!M||!M.kind||UI.card||UI.dragging||!M.sug)return null;
   const plan=()=>planFor(UI.bf,UI.bf.sug,{full:1});const p=planFor(M,M.sug,{full:1});if(!p||!p.toR)return null;
   const why=whyShort(M,M.sug);if(!why)return null;
-  return {why,key:M.sug.k,target:()=>{const q=plan();return (q&&q.toR)||p.toR},from:p.fromR?()=>{const q=plan();return (q&&q.fromR)||p.fromR}:null}}
+  // one lit target (R71): a two-step move (pick up a card, then put it somewhere) points at its first step only, the card; the spot lights after the pick-up
+  if(p.fromR)return {why,key:M.sug.k,target:()=>{const q=plan();return (q&&q.fromR)||(q&&q.toR)||p.fromR},from:null};
+  return {why,key:M.sug.k,target:()=>{const q=plan();return (q&&q.toR)||p.toR},from:null}}
+function tacName(id){try{for(const f in DD.TACTICS)for(const t of DD.TACTICS[f])if(t.id===id)return t.nm}catch(e){}return ''}
+// ---- one helper while the bulb's bubble is open (R64): target glows go off, and the bubble sits right next to the thing its finger shows
+const bulbOpenNow=()=>!!document.querySelector('.gxh-bulbb');
+(function(){let was=false;
+  function anchor(b){const ring=document.querySelector('.gxh-ring:not(.from)');if(!b||!ring||!b.classList.contains('on'))return;
+    const px=(e,k)=>parseFloat(e.style[k]);   // the set position, not the animated box (both pop in with a scale)
+    const R={left:px(ring,'left'),top:px(ring,'top'),width:px(ring,'width'),height:px(ring,'height')};R.right=R.left+R.width;R.bottom=R.top+R.height;
+    const B={left:px(b,'left'),top:px(b,'top'),width:b.offsetWidth,height:b.offsetHeight};B.right=B.left+B.width;B.bottom=B.top+B.height;if(!(R.width>0)||!B.width||isNaN(B.top))return;
+    const gapY=B.top>=R.bottom?B.top-R.bottom:R.top>=B.bottom?R.top-B.bottom:0;if(gapY<=18&&(B.bottom<=R.top+2||B.top>=R.bottom-2))return;   // already beside its target
+    const tb=document.getElementById('bulbbtn');const top=Math.max(6,tb&&tb.offsetWidth?tb.getBoundingClientRect().bottom+4:6),W=innerWidth,H=innerHeight,w=B.width,h=B.height,gap=10;
+    // never over a glowing target or a tray button (the same cores hlpUnblock keeps clear), nor over its own ring
+    const cores=[...document.querySelectorAll('.glow,.rglow,.rec,.rrec,#act .btn,#main .opt,#main [data-a=mv],#spots .bspot')].filter(e=>!e.closest('[data-help]')&&!e.closest('[hidden]')).map(e=>e.getBoundingClientRect()).filter(q=>q.width&&q.height&&q.right>0&&q.bottom>0&&q.left<W&&q.top<H).map(q=>{let cw=q.width,ch=q.height;const cx=q.left+cw/2,cy=q.top+ch/2;if(cw>56)cw=32;if(ch>56)ch=32;return {left:cx-cw/2-3,top:cy-ch/2-3,right:cx+cw/2+3,bottom:cy+ch/2+3}});
+    const hit=(a,c)=>a.left<c.right&&a.right>c.left&&a.top<c.bottom&&a.bottom>c.top;const ringBox={left:R.left-4,top:R.top-4,right:R.right+4,bottom:R.bottom+4};
+    let pick=null;for(const [yy,sd] of [[R.top-gap-h,'bottom'],[R.bottom+gap,'top']]){if(yy<top||yy+h>H-6)continue;
+      for(const xx of [R.left+R.width/2-w/2,6,W-w-6].map(v=>Math.max(6,Math.min(W-w-6,v)))){const c={left:xx,top:yy,right:xx+w,bottom:yy+h};if(hit(c,ringBox)||cores.some(k=>hit(c,k)))continue;pick={x:xx,y:yy,side:sd};break}if(pick)break}
+    if(!pick)return;const x=pick.x,y=pick.y,side=pick.side;b.dataset.tbAnch='1';b.style.left=Math.round(x)+'px';b.style.top=Math.round(y)+'px';
+    b.className=b.className.replace(/\bgxh-a-\w+/g,'').trim()+' gxh-a-'+side;const arr=b.querySelector('.gxh-arr');if(arr){arr.style.top='';arr.style.left=Math.round(Math.max(14,Math.min(w-26,R.left+R.width/2-x-6)))+'px'}}
+  function sync(){const on=bulbOpenNow();document.documentElement.classList.toggle('tb-bulbon',on);document.documentElement.classList.toggle('tb-bubon',!!document.querySelector('.gxh-bub.on'));if(on)anchor(document.querySelector('.gxh-bulbb'));
+    if(on!==was){was=on;try{applyHl()}catch(e){}}}
+  const go=()=>{new MutationObserver(sync).observe(document.body,{childList:true});setInterval(sync,250);sync()};if(document.body)go();else document.addEventListener('DOMContentLoaded',go)})();
+// while it is open only the map spot its finger points at keeps its glow class; the other locations and regions stop glowing
+(function(){const o=applyHl;applyHl=function(){if(!bulbOpenNow()||!MAP.m)return o.apply(this,arguments);const h=MAP.hl,hr=MAP.hlR,rc=MAP.rec;
+  const ring=document.querySelector('.gxh-ring:not(.from)'),q=ring&&ring.getBoundingClientRect(),cx=q?q.left+q.width/2:-1e4,cy=q?q.top+q.height/2:-1e4;
+  const inR=(e,pad)=>{if(!e)return false;const r=e.getBoundingClientRect();return r.width>0&&cx>=r.left-pad&&cx<=r.right+pad&&cy>=r.top-pad&&cy<=r.bottom+pad};
+  const keepL=(h||[]).filter(l=>inR(MAP.m.locEl(LOCID[l]),10));
+  const keepR=keepL.length?[]:(hr||[]).filter(r=>{const g=MAP.pan&&MAP.pan.querySelector('[data-reg="'+r+'"]');return inR(g&&g.querySelector('rect'),0)});
+  MAP.hl=keepL;MAP.hlR=keepR;MAP.rec={loc:keepL.includes(rc&&rc.loc)?rc.loc:undefined,reg:keepR.includes(rc&&rc.reg)?rc.reg:undefined};
+  try{return o.apply(this,arguments)}finally{MAP.hl=h;MAP.hlR=hr;MAP.rec=rc}}})();
 // ---------------------------------------------------------------- wiring
 let _hlpInit=false;
 function hlpInit(){if(_hlpInit||typeof GXH==='undefined')return;_hlpInit=true;
-  GXH.init({game:'thornbound',defaultOn:false,steps:HLP_STEPS,rules:HLP_RULES,avoid:'.kcb,.gx-board svg text,.glow,.rglow,.rec,.rrec,#act .btn,#main .opt,#main [data-a=mv],#spots .bspot'});
+  GXH.init({game:'thornbound',defaultOn:true,steps:HLP_STEPS,rules:HLP_RULES,avoid:'.kcb,.gx-board svg text,.glow,.rglow,.rec,.rrec,#act .btn,#main .opt,#main [data-a=mv],#spots .bspot'});
   GXH.bulb({el:'#bulbbtn',suggest:hlpSuggest,rulesFor:hlpPhase})}
+// F15: one tap on the bulb shows the tip. gx-help treats a bulb tap while any help is open as "close only"; when a coach bubble is open we close it first
+// (window capture runs before gx-help's document listener), so the same tap opens the bulb's tip. A tap on the bulb while its own tip is open still closes it.
+window.addEventListener('pointerdown',e=>{try{const b=document.getElementById('bulbbtn');if(!b||!e.target||!b.contains(e.target))return;
+  if(document.querySelector('.gxh-bub:not(.gxh-bulbb)')&&!document.querySelector('.gxh-bulbb'))GXH.hide()}catch(x){}},true);
+// hints On (the first game's default): every decision shows the suggestion and its finger; the bulb still explains the suggestion
+// (finger, why, How does this work?). Menu > Hints turns them off.
+function bulbState(){const b=$('#bulbbtn');if(!b)return;const on=UI.guide==='full'&&G&&UI.started;b.classList.toggle('on',!!on);b.setAttribute('aria-pressed',on?'true':'false');b.setAttribute('aria-label',on?'Hints are on. Tap to see why':'Hint: what should I do?')}
+// the note sits just above the pile chips / action row, over the lower map: never on the turn prompt, the score bar or the hand
+function bfMsgPlace(el){try{const vis=e=>{if(!e)return null;const r=e.getBoundingClientRect();return r.width&&r.height&&r.top>0&&r.top<innerHeight?r:null};
+  const a=vis($('#cstrip'))||vis($('#act'))||vis($('#handw'));const tt=vis($('#tbturn'));const top=tt?tt.bottom:0;const h=el.offsetHeight||48;
+  let y=a?a.top-h-8:innerHeight*.6;if(y<top+6)y=top+6;el.style.top=Math.round(y)+'px';el.style.bottom='auto'}catch(e){}}
+function bfMsg(t){toast(t);let el=$('#tbhmsg');if(!el){el=document.createElement('div');el.id='tbhmsg';el.setAttribute('role','status');document.body.appendChild(el)}el.textContent=t;el.hidden=false;bfMsgPlace(el);clearTimeout(bfMsg._t);bfMsg._t=setTimeout(()=>{el.hidden=true},2200)}
 function hlpAfter(){hlpInit();if(typeof GXH==='undefined')return;
-  const st=$('#start');const busy=!G||!UI.started||G.over||UI.card||UI.pop||UI.dragging||(typeof tutOn==='function'&&tutOn())||(st&&!st.hidden)||isPassing();
-  GXH.phase(busy?null:hlpPhase())}
+  const st=$('#start');const busy=!G||!UI.started||G.over||UI.card||UI.pop||UI.dragging||!!$('#tbgoal')||(typeof tutOn==='function'&&tutOn())||!!(UI.cfg&&UI.cfg.tutorial)||(st&&!st.hidden)||isPassing();
+  GXH.phase(busy?null:hlpPhase());if(busy&&UI.cfg&&UI.cfg.tutorial){try{GXH.hide()}catch(e){}}}   // the staged tutorial (and its end card) never shows the free-play coach
+(function(){const o=renderAll;renderAll=function(){const r=o.apply(this,arguments);try{bulbState()}catch(e){}return r}})();
+// a help bubble never covers a glowing tap spot: on a crowded phone the kit's spot search can settle on one (it also avoids all text);
+// then the bubble moves to the nearest spot clear of every glowing core and of its own rings (text under it is fine)
+function hlpUnblock(){if(typeof tutOn==='function'&&tutOn())return;const b=document.querySelector('.gxh-bub.on');if(!b||b.closest('.gxt-root')||b.classList.contains('gxt-bub'))return;const W=innerWidth,H=innerHeight;
+  const core=q=>{let w=q.width,h=q.height;const cx=q.left+w/2,cy=q.top+h/2;if(w>56)w=32;if(h>56)h=32;return {left:cx-w/2-3,top:cy-h/2-3,right:cx+w/2+3,bottom:cy+h/2+3}};
+  const cores=[...document.querySelectorAll('.glow,.rglow,.rec,.rrec,#act .btn,#main .opt,#main [data-a=mv],#spots .bspot')].filter(e=>!e.closest('[data-help]')&&!e.closest('[hidden]')).map(e=>e.getBoundingClientRect()).filter(q=>q.width&&q.height&&q.right>0&&q.bottom>0&&q.left<W&&q.top<H).map(core);
+  const rings=[...document.querySelectorAll('.gxh-ring')].map(e=>{const q=e.getBoundingClientRect();return {left:q.left-4,top:q.top-4,right:q.right+4,bottom:q.bottom+4,main:!e.classList.contains('from')}});
+  const hit=(a,c)=>a.left<c.right&&a.right>c.left&&a.top<c.bottom&&a.bottom>c.top;
+  const r=b.getBoundingClientRect();
+  if(b.dataset.tbAnch){if(!cores.some(c=>hit(r,c)))return;delete b.dataset.tbAnch}   // the bulb bubble stays beside its target unless a glowing target is now under it
+  const T=rings.find(x=>x.main)||rings[0]||{left:W/2,top:H/2,right:W/2,bottom:H/2};const tcx=(T.left+T.right)/2,tcy=(T.top+T.bottom)/2;
+  const bar=document.querySelector('.gx-bar');const top=bar?Math.ceil(bar.getBoundingClientRect().bottom)+4:6;
+  // labels (score track, round, region names, chips) stay readable: find the spot that covers the fewest of them (none if it can),
+  // trying the slim one-line bubble when the full one covers any
+  const txt=[];try{const rg=document.createRange(),tw=document.createTreeWalker(document.body,NodeFilter.SHOW_TEXT,null);let n;while((n=tw.nextNode())&&txt.length<400){if(!/\S/.test(n.nodeValue))continue;const e=n.parentElement;if(!e||e.closest('[data-help],[hidden],.gxh-bub,#tbturn,script,style'))continue;rg.selectNodeContents(n);const q=rg.getBoundingClientRect();if(q.width&&q.height&&q.right>0&&q.bottom>0&&q.left<W&&q.top<H)txt.push(q)}}catch(e){}
+  const curT=txt.filter(k=>hit(r,k)).length;if(!cores.some(c=>hit(r,c))&&!curT)return;
+  const search=(w,h)=>{let bb=null,bs=1e9;for(const x of [Math.max(6,Math.min(W-w-6,tcx-w/2)),6,Math.max(6,W-w-6)])for(let y=top;y<=H-h-6;y+=4){const c={left:x,top:y,right:x+w,bottom:y+h};
+    if(cores.some(k=>hit(c,k))||rings.some(k=>hit(c,k)))continue;const nt=txt.filter(k=>hit(c,k)).length;const d=nt*1000+Math.abs(x+w/2-tcx)*.5+Math.abs(y+h/2-tcy);if(d<bs){bs=d;bb=c}}return bb?{c:bb,s:bs}:null};
+  let w=r.width,h=r.height,res=search(w,h);
+  if((!res||res.s>=1000)&&!b.classList.contains('gxh-compact')){b.classList.add('gxh-compact');const r2=b.getBoundingClientRect();const res2=search(r2.width,r2.height);if(res2&&(!res||res2.s<res.s)){res=res2;w=r2.width;h=r2.height}else b.classList.remove('gxh-compact')}
+  if(res&&!cores.some(c=>hit(r,c))&&res.s>=curT*1000)return;
+  const best=res&&res.c;
+  if(!best)return;b.style.left=Math.round(best.left)+'px';b.style.top=Math.round(best.top)+'px';
+  const side=best.bottom<=T.top+2?'bottom':best.top>=T.bottom-2?'top':best.right<=T.left+2?'right':'left';
+  b.className=b.className.replace(/\bgxh-a-\w+/g,'').trim()+' gxh-a-'+side;const a=b.querySelector('.gxh-arr');
+  if(a){a.style.left=a.style.top='';if(side==='top'||side==='bottom')a.style.left=Math.round(Math.max(14,Math.min(w-26,tcx-best.left-6)))+'px';else a.style.top=Math.round(Math.max(14,Math.min(h-26,tcy-best.top-6)))+'px'}}
+function hlpTurnCover(){const b=document.querySelector('.gxh-bub.on'),t=document.getElementById('tbturn');let on=false;if(b&&t&&!(typeof tutOn==='function'&&tutOn())){const r=b.getBoundingClientRect(),q=t.getBoundingClientRect();on=r.left<q.right&&r.right>q.left&&r.top<q.bottom&&r.bottom>q.top}document.body.classList.toggle('tb-bubturn',on)}
+setInterval(()=>{hlpUnblock();hlpTurnCover()},60);
+try{new MutationObserver(()=>{if(document.querySelector('.gxh-bub.on'))hlpUnblock()}).observe(document.body,{childList:true,attributes:true,attributeFilter:['class','style'],subtree:false})}catch(e){}
+// the Goal card closes without a re-render: look again for a first-time bubble a moment later
+setInterval(()=>{if(G&&UI.started&&!G.over)try{hlpAfter()}catch(e){}},300);
+// a repaint after the bubble was placed (a card lifts, a region starts to glow) can put a glowing target under it: place it again once the screen has settled
+(function(){const o=renderAll;const AV='.glow,.rglow,.rec,.rrec,#act .btn,#main .opt,#main [data-a=mv],#spots .bspot';
+  const core=q=>{let w=q.width,h=q.height;const cx=q.left+w/2,cy=q.top+h/2;if(w>56)w=32;if(h>56)h=32;return {l:cx-w/2,t:cy-h/2,r:cx+w/2,b:cy+h/2}};
+  const check=()=>{try{const b=document.querySelector('.gxh-bub.on');if(!b)return;const r=b.getBoundingClientRect();
+    for(const e of document.querySelectorAll(AV)){if(e.closest('[data-help]')||e.closest('[hidden]'))continue;const q=e.getBoundingClientRect();if(!q.width||!q.height)continue;const c=core(q);
+      if(r.left<c.r&&r.right>c.l&&r.top<c.b&&r.bottom>c.t){GXH.relayout();return}}}catch(e){}};
+  renderAll=function(){const x=o.apply(this,arguments);if(typeof GXH!=='undefined'&&document.querySelector('.gxh-bub.on')){requestAnimationFrame(check);setTimeout(check,260)}return x}})();
+
+// no endless loops (R57): an animation started with Infinity iterations (the help kit's finger, rings) plays 3 times, then holds still
+(function(){let q=0;const cap=()=>{q=0;try{for(const a of document.getAnimations()){const e=a.effect,t=e&&e.getTiming();if(t&&t.iterations===Infinity)e.updateTiming({iterations:3,fill:'forwards'})}}catch(x){}};
+  const kick=()=>{if(!q){q=1;requestAnimationFrame(cap)}};
+  try{new MutationObserver(kick).observe(document.documentElement,{subtree:true,childList:true,attributes:true,attributeFilter:['class','hidden','style']});setInterval(kick,500)}catch(x){}})();
