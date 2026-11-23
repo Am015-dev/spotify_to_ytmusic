@@ -1,5 +1,15 @@
 [
  {
+  "date": "2026-11-23",
+  "game": "twinthrones",
+  "title": "Draft cards fit on iPhone",
+  "items": [
+   "Card cost rows are no longer cut off on the draft screen",
+   "Card art keeps its shape instead of stretching"
+  ],
+  "check": "On your iPhone, start a game and look at the draft cards: every cost row fully visible, art not squashed"
+ },
+ {
   "date": "2026-11-20",
   "game": "shelf",
   "title": "Better on PC and laptops",
