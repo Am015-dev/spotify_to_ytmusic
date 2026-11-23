@@ -233,15 +233,15 @@ AG.bidReveal=()=>{G.bidRev=true;G.step='bidreveal';G.bstr=[];
   if(ed.length)now('edict',{list:ed,i:0})};
 function edictIdx(s){return D.TACTICS[G.pl[s].fac].findIndex(t=>t.id==='nob_t3')}
 AG.edict=d=>{if(d.i>=d.list.length)return;const s=d.list[d.i];now('edict',{list:d.list,i:d.i+1});
-  askYN(s,'edict','Royal Audit: set every opponent\'s Bidding Strength to 0 this Round?','Use Royal Audit (then it is Exhausted)','Keep it',  'edict',{seat:s})};
+  askYN(s,'edict','Royal Audit: halve every opponent\'s Bidding Strength this Round?','Use Royal Audit (then it is Exhausted)','Keep it',  'edict',{seat:s})};
 PICKH.edict=(seat,opt,d)=>{if(!opt.yes)return;const i=edictIdx(seat);G.pl[seat].tac[i].ex=true;stat('t:nob_t3');
-  for(let s=0;s<G.np;s++)if(s!==seat)G.bstr[s]=G.pl[s].bid==null?-1:Math.floor(G.bstr[s]/2);lg(nm(seat)+' plays Royal Audit: every opponent\'s Bidding Strength is 0.',seat,'big')};
+  for(let s=0;s<G.np;s++)if(s!==seat)G.bstr[s]=G.pl[s].bid==null?-1:Math.floor(G.bstr[s]/2);lg(nm(seat)+' plays Royal Audit: every opponent\'s Bidding Strength is halved.',seat,'big')};
 AG.bidOrder=()=>{G.step='bidres';G.bq=G.order.filter(s=>G.pl[s].bid!=null).sort((a,b)=>G.bstr[b]-G.bstr[a]||pos(a)-pos(b));G.bfirst=true};
 function canSteal(seat,s2,j){const T=G.pl[s2].ks[j];if(!T||T.occ==null)return false;if(holds(seat,5))return false;
   const bid=G.pl[seat].bid;let mine=G.bstr[seat]+(holds(seat,9)?2:0);let theirs=strOf(T.occ)+(holds(s2,5)?3:0);if(cdef(bid).fx.includes('stealHalf'))theirs=Math.floor(theirs/2);return mine>theirs}
 function bidOpts(seat){const o=[];G.road.forEach((kc,i)=>{if(kc)o.push({t:'take',k:'gr:'+i,kc,i,label:'Take '+kname(kc)+' from the Great Road'})});
   if(G.pl[seat].sup.includes(34)){for(let i=0;i<Math.min(3,G.kdeck.length);i++)o.push({t:'take',k:'dk:'+i,kc:G.kdeck[i],dk:i,label:'Take '+kname(G.kdeck[i])+' from the top of the Kingdom Deck (Seer\'s Eye)'})}
-  for(const s2 of others(seat))for(let j=0;j<3;j++)if(canSteal(seat,s2,j)){const T=G.pl[s2].ks[j];o.push({t:'steal',k:'st:'+s2+':'+j,s2,j,kc:T.kc,label:'Steal '+kname(T.kc)+' from '+nm(s2)+' (their '+cname(T.occ)+' occupies it, Strength '+(strOf(T.occ)+(holds(s2,5)?5:0))+')'})}
+  for(const s2 of others(seat))for(let j=0;j<3;j++)if(canSteal(seat,s2,j)){const T=G.pl[s2].ks[j];o.push({t:'steal',k:'st:'+s2+':'+j,s2,j,kc:T.kc,label:'Steal '+kname(T.kc)+' from '+nm(s2)+' (their '+cname(T.occ)+' occupies it, Strength '+(strOf(T.occ)+(holds(s2,5)?3:0))+')'})}
   o.push({t:'return',k:'ret',label:'Take your bidding card back to your hand'});return o}
 AG.bidNext=()=>{if(!G.bq.length)return;const seat=G.bq.shift();
   if(G.bfirst){G.bfirst=false;if(holds(seat,5)){gainLore(seat,1,'Ward Towers');stat('kc5')}}
@@ -490,10 +490,10 @@ SELH.orderCards=(seat,ch,d)=>placeOrdered(seat,ch,d.where,d.draw);
 // ---------------------------------------------------------------- SPRING actions
 act('supp','spring',seat=>{const b=G.pl[seat].supp.b;if(!b)return[];const o=[];for(let r=0;r<NREG;r++)for(let n=1;n<=b;n++)o.push({id:r+'n'+n,p:{r,n},label:'Place '+n+' Supporter'+(n>1?'s':'')+' on '+regionName(r)});return o},
   (seat,p)=>{const s=G.pl[seat].supp;s.b-=p.n;s.r[p.r]+=p.n;lg(nm(seat)+' places '+p.n+' Supporter'+(p.n>1?'s':'')+' in '+regionName(p.r)+'.',seat)});
-tactic('nob_t1','spring',()=>[{label:'Salt Levy: your Supporters give 2 Strength. They stay on the Map in Winter'}],seat=>{G.rm.masonry.push(seat)});
+tactic('nob_t1','spring',()=>[{label:'Salt Levy: each of your Supporters gives +1 extra Strength (up to +3). They stay on the Map in Winter'}],seat=>{G.rm.masonry.push(seat)});
 tactic('nob_t2','spring',seat=>{const o=[];for(let r=0;r<NREG;r++)if(supOn(seat,r)>=2)o.push({id:r,p:{r},label:'Closed Gates: lock '+regionName(r)+'. Rivals cannot add, move or swap cards into it during its first Clash'});return o},(seat,p)=>{G.rm.lock[p.r]=seat});
 tactic('cln_t1','spring',()=>[{label:'Horn Call: you place Clash Markers. You earn Supporter and Active card bonuses'}],seat=>{G.rm.tempests=seat});
-tactic('upr_t1','spring',()=>[{label:'Hot Iron: your Heirs gain Deadly. Each elimination earns 1 Influence and 1 Lore'}],seat=>{G.rm.lanes.push(seat)});
+tactic('upr_t1','spring',()=>[{label:'Hot Iron: your Heirs gain Deadly. Each of your cards that Eliminates earns 2 Lore'}],seat=>{G.rm.lanes.push(seat)});
 tactic('upr_t3','spring',seat=>{const n=occCount(seat)>=2?2:1;if(!occCount(seat)||!others(seat).some(o=>G.pl[o].hand.length))return[];return [{label:'Work Stoppage: each opponent discards '+n+' card'+(n>1?'s':'')+' from hand'}]},seat=>{const n=occCount(seat)>=2?2:1;for(const o of others(seat))now('mpDiscard',{seat:o,n,by:seat})});
 AG.mpDiscard=d=>{const P=G.pl[d.seat];const n=Math.min(d.n,P.hand.length);if(!n)return;askSel(d.seat,'discardPick','Work Stoppage: discard '+n+' card'+(n>1?'s':'')+' from your hand.',P.hand.map(id=>({v:id,label:cardLbl(id)})),'discardDown',{why:'Work Stoppage from '+(d.by!=null?nm(d.by):'a rival')},{min:n,max:n})};
 tactic('upr_t4','spring',seat=>others(seat).some(o=>G.reg.filter(R=>R.down.some(id=>own(id)===o)).length>=2)?[{label:'False Orders: swap two face-down cards of a rival. Repeat on other rivals'}]:[],seat=>{now('forge',{seat,list:others(seat),i:0})});
@@ -503,8 +503,8 @@ AG.forge=d=>{if(d.i>=d.list.length||(G.used[d.seat+':forge']||0)>=2)return;const
   if(!op.length)return;op.push({k:'skip',skip:1,label:'Leave '+nm(o)+' alone'});askPick(d.seat,'forge','False Orders: swap two of '+nm(o)+'\'s face-down cards?',op,'forge',{o})};
 PICKH.forge=(seat,opt,d)=>{if(opt.skip)return;const A=G.reg[opt.a].down,B=G.reg[opt.b].down;const ia=A.findIndex(id=>own(id)===d.o),ib=B.findIndex(id=>own(id)===d.o);const x=A[ia];A[ia]=B[ib];B[ib]=x;G.used[seat+':forge']=(G.used[seat+':forge']||0)+1;for(const y of [A[ia],B[ib]])if(!G.peek[seat].includes(y))G.peek[seat].push(y);
   lg(nm(seat)+' swaps two of '+nm(d.o)+'\'s face-down cards.',seat)};
-tactic('gth_t2','spring',seat=>G.kdisc.length&&G.pl[seat].hand.length?[{label:'Alms Sifting: look at five random Kingdom Discard cards and acquire one'}]:[],seat=>{G.kdisc=shuffle(G.kdisc);const five=G.kdisc.slice(0,4);
-  askPick(seat,'gleaners','Alms Sifting: choose one of five random discarded Kingdom Cards to acquire. You will occupy it with a hand card.',five.map(kc=>({k:'k'+kc,kc,label:kname(kc)+': '+KCD(kc).txt})).concat([{k:'skip',skip:1,label:'Take none and gain 1 Lore'}]),'gleaners',{})});
+tactic('gth_t2','spring',seat=>G.kdisc.length&&G.pl[seat].hand.length?[{label:'Alms Sifting: look at four random Kingdom Discard cards and acquire one'}]:[],seat=>{G.kdisc=shuffle(G.kdisc);const five=G.kdisc.slice(0,4);
+  askPick(seat,'gleaners','Alms Sifting: choose one of four random discarded Kingdom Cards to acquire. You will occupy it with a hand card.',five.map(kc=>({k:'k'+kc,kc,label:kname(kc)+': '+KCD(kc).txt})).concat([{k:'skip',skip:1,label:'Take none and gain 1 Lore'}]),'gleaners',{})});
 PICKH.gleaners=(seat,opt)=>{if(opt.skip){gainLore(seat,1,'Alms Sifting');return}askPick(seat,'occupier','Choose the card from your hand that will occupy '+kname(opt.kc)+'.',G.pl[seat].hand.map(id=>({k:'c'+id,id,label:cardLbl(id)})),'gleanersOcc',{kc:opt.kc})};
 PICKH.gleanersOcc=(seat,opt,d)=>{removeFrom(G.kdisc,d.kc);lg(nm(seat)+' acquires '+kname(d.kc)+' from the Kingdom Discard.',seat,'big');acquireKC(seat,d.kc,opt.id)};
 act('hq:cln_hq2','spring',seat=>{const P=G.pl[seat];if(!hqHas(P,'cln_hq2')||usedK(seat,'hq:cln_hq2')||!P.supp.l)return[];return [0,1,2].map(r=>({id:r,p:{r},label:'Stilt Village: move up to three Supporters from the Lost Pile to '+regionName(r)}))},
@@ -624,7 +624,7 @@ PICKH.flank=(seat,opt,d)=>{const c=G.clash,from=c.r;if(holds(seat,39)&&cdef(d.ca
 PICKH.flankSupp=(seat,opt,d)=>{const s=G.pl[seat].supp;s.r[d.from]-=opt.n;s.r[d.to]+=opt.n;if(opt.n)lg(nm(seat)+' moves '+opt.n+' Supporter'+(opt.n>1?'s':'')+' with the Flank.',seat)};
 // DAY: tactics
 tactic('cln_t2','day',seat=>myClash(seat).filter(id=>['heir','captain','follower'].includes(eff(id).ar)).map(id=>({id,p:{card:id},label:'Hidden Fords: '+cname(id)+' gains Flank for the Round'})),(seat,p)=>{addGain(p.card,'c','flank','round')});
-tactic('upr_t2','day',seat=>myClash(seat).map(id=>({id,p:{card:id},label:'Smoke Exits: '+cname(id)+' gains Retreat until the end of this Clash'})),(seat,p)=>{addGain(p.card,'c','retreat','round')});
+tactic('upr_t2','day',seat=>myClash(seat).map(id=>({id,p:{card:id},label:'Smoke Exits: '+cname(id)+' gains Retreat for the Round'})),(seat,p)=>{addGain(p.card,'c','retreat','round')});
 tactic('gth_t1','day',seat=>{const c=G.clash;return supOn(seat,c.r)>=2&&G.lost.some(id=>own(id)===seat&&cdef(id).s<=6)?[{label:'Toll of Bells: send two Supporters here to the Lost Pile. Then bring a card back from the Lost Pile'}]:[]},seat=>{const c=G.clash;dropSupp(seat,c.r,2);G.pl[seat].supp.l+=2;
   askPick(seat,'starlight','Toll of Bells: choose a Lost Pile card to place here (Active).',G.lost.filter(id=>own(id)===seat&&cdef(id).s<=6).map(id=>({k:'c'+id,id,label:cardLbl(id)})),'starlight',{})});
 PICKH.starlight=(seat,opt)=>{const c=G.clash;detach(opt.id);G.reg[c.r].up.push(opt.id);(c.cards[seat]=c.cards[seat]||[]).push(opt.id);lg(nm(seat)+' returns '+cname(opt.id)+' from the Lost Pile to '+regionName(c.r)+'.',seat,'big')};
@@ -665,7 +665,7 @@ function doJourney(seat,id){const e=eff(id),fromBoard=regOf(id)>=0&&holds(seat,1
   if(holds(seat,18)){askPick(seat,'journeyDest','Cloud Dock: where does '+cname(id)+' go after the Journey?',[{k:'norm',deck:0,label:pf?'To your Discard Pile (Pathfinder)':'To the Lost Pile'},{k:'deck',deck:1,label:'Deck bottom, then draw 1'}],'journeyDest',{id,L,pf});return}
   finishJourney(seat,id,L,pf,0)}
 PICKH.journeyDest=(seat,opt,d)=>{if(opt.deck)stat('kc18');finishJourney(seat,d.id,d.L,d.pf,opt.deck);if(opt.deck)drawN(seat,1)};
-function finishJourney(seat,id,L,pf,deck){if(pf)stat('pathfinder');if(deck)toDeckBottom(id);else if(pf)toDisc(id);else toLost(id);
+function finishJourney(seat,id,L,pf,deck){const e0l=eff(id).l;if(pf)stat('pathfinder');if(deck)toDeckBottom(id);else if(pf)toDisc(id);else toLost(id);
   const to=deck?'the bottom of their deck':pf?'their Discard Pile (Pathfinder)':'the Lost Pile';
   if(deck)lg(nm(seat)+' Journeys with '+cname(id)+' and gains '+L+' Lore. The card goes to '+to+'.',seat,'big');else rmLog(nm(seat)+' Journeys with '+cname(id)+' and gains '+L+' Lore. The card goes to '+to+'.',seat,[id],pf?'disc':'lost','Journey','big');
   if(L>=2&&holds(seat,12)){gainInf(seat,1,'Glow Caves','Journey worth 2+ Lore');stat('kc12')}gainLore(seat,L)}
@@ -707,7 +707,7 @@ tactic('cln_t4','autumn',seat=>{const P=G.pl[seat];return P.hand.length<P.hs&&mu
   askSel(seat,'brine','Mud Recovery: choose Active or Discard cards to return (up to '+Math.min(4,P.hs-P.hand.length)+').',P.disc.map(id=>({v:id,label:cardLbl(id)+' (Discard Pile)'})).concat(G.lost.filter(id=>own(id)===seat).map(id=>({v:id,label:cardLbl(id)+' (Lost Pile)'}))),'brine',{},{min:0,max:Math.min(4,P.hs-P.hand.length)})});
 SELH.brine=(seat,ch)=>{for(const id of ch)toHand(seat,id);if(ch.length)lg(nm(seat)+' returns '+ch.length+' card'+(ch.length>1?'s':'')+' to their hand (Mud Recovery).',seat)};
 tactic('gth_t4','autumn',seat=>{const P=G.pl[seat];return cardsOfSeatActive(seat).concat(P.disc).length?[{label:'Ash Vigil: send Active/Discard cards to the Lost Pile for Lore'}]:[]},seat=>{const P=G.pl[seat];
-  askSel(seat,'offering','Ash Vigil: choose up to three Active or Discard Pile cards. Send them to the Lost Pile. Gain 1 Lore each.',cardsOfSeatActive(seat).map(id=>({v:id,label:cardLbl(id)+' (Active)'})).concat(P.disc.map(id=>({v:id,label:cardLbl(id)+' (Discard Pile)'}))),'offering',{},{min:0,max:4})});
+  askSel(seat,'offering','Ash Vigil: choose up to four Active or Discard Pile cards. Send them to the Lost Pile. Gain 1 Lore each.',cardsOfSeatActive(seat).map(id=>({v:id,label:cardLbl(id)+' (Active)'})).concat(P.disc.map(id=>({v:id,label:cardLbl(id)+' (Discard Pile)'}))),'offering',{},{min:0,max:4})});
 SELH.offering=(seat,ch)=>{for(const id of ch)toLost(id);if(ch.length){rmLog(nm(seat)+' sends '+ch.map(cname).join(', ')+' to the Lost Pile (Ash Vigil).',seat,ch,'lost','Ash Vigil');gainLore(seat,ch.length,'Ash Vigil')}
   };
 AG.offering2=d=>{const P=G.pl[d.seat];if(!P.disc.length||P.hand.length>=P.hs)return;askPick(d.seat,'offering2','Ash Vigil: you may return a Discard Pile card to your hand.',P.disc.map(id=>({k:'c'+id,id,label:cardLbl(id)})).concat([{k:'skip',skip:1,label:'Skip'}]),'offering2',{})};
