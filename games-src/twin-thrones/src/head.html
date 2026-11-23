@@ -540,4 +540,10 @@ html,body{background:#3a1f0e}
 @keyframes bvpop0{50%{transform:scale(1.05)}}
 @media (max-height:600px){#goal{display:none}}
 .card.v4 .nm.t3{font-size:12px;letter-spacing:-.04em}
+/* W595 phone touch targets: every tappable thing >= 44 px (hit area grown without moving the layout) */
+.tokrow .tok{flex:0 0 44px;width:44px;height:44px}
+.strip .wt{flex:0 0 44px;width:44px;min-width:44px;height:44px}
+.strip .pts,.strip .who{position:relative}
+.strip .pts::before,.strip .who::before{content:"";position:absolute;left:-3px;right:-3px;top:50%;height:44px;transform:translateY(-50%)}
+#goal{position:relative}#goal::before{content:"";position:absolute;left:0;right:0;top:50%;height:44px;transform:translateY(-50%)}
 </style></head>
