@@ -46,7 +46,6 @@ textarea{min-height:84px;resize:vertical}
  <button data-tab="home" aria-pressed="true">Overview<span class="badge" id="decn" hidden></span></button>
  <button data-tab="games" aria-pressed="false">Games</button>
  <button data-tab="workers" aria-pressed="false">Workers</button>
- <a href="videos.html">Videos</a>
 </nav>
 
 <section id="tab-home">
@@ -107,7 +106,7 @@ function renderGames(){
  const c={};P.games.forEach(g=>c[st(g)]=(c[st(g)]||0)+1);
  $('gchips').innerHTML=Object.entries(c).map(([k,v])=>`<span class="chip">${esc(k)}: ${v}</span>`).join('');
  $('glist').innerHTML=[...P.games].sort((a,b)=>(order[st(a)]??9)-(order[st(b)]??9)).map(g=>`<div class="g ${esc(st(g))}"><b>${esc(g.name)}</b><span>${esc(g.stage)} · ${esc(g.step)}</span><div>
- ${g.live?`<a target="_blank" rel="noopener" href="${esc(P.live_base+g.slug+'/')}">Play live</a>`:''}<a href="videos.html#${esc(g.slug)}">Videos</a><a href="#" data-about="${esc(g.name)}">Note</a></div></div>`).join('');
+ ${g.live?`<a target="_blank" rel="noopener" href="${esc(P.live_base+g.slug+'/')}">Play live</a>`:''}<a href="#" data-about="${esc(g.name)}">Note</a></div></div>`).join('');
 }
 function renderWorkers(){
  if(!W)return;
