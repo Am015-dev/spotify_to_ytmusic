@@ -156,17 +156,26 @@ body{background-color:var(--lac);background-image:
 #toast{position:fixed;left:50%;top:40%;transform:translate(-50%,-50%);z-index:62;pointer-events:none;font-family:var(--deco);font-size:26px;color:var(--gold2);text-shadow:0 2px 6px #000,0 0 18px rgba(216,180,90,.6);opacity:0;white-space:nowrap}
 #toast.on{animation:toast 1.3s ease-out}
 @keyframes toast{0%{opacity:0;transform:translate(-50%,-30%) scale(.8)}15%{opacity:1;transform:translate(-50%,-50%) scale(1.05)}75%{opacity:1}100%{opacity:0;transform:translate(-50%,-60%)}}
-#coach{position:fixed;left:8px;z-index:35;width:300px;box-sizing:border-box;background:#f1e3bf;color:#1d160a;border-radius:10px;padding:8px 12px;font-size:16px;line-height:1.3;font-weight:600;box-shadow:0 6px 18px rgba(0,0,0,.6);display:flex;gap:8px;align-items:center;pointer-events:none}
-#coach.res{background:#e3efd0}
-#coach::after{content:"";position:absolute;left:var(--ax,50%);margin-left:-10px;width:0;height:0;border:10px solid transparent}
-#coach.arr-up::after{top:-20px;border-bottom-color:#f1e3bf}#coach.arr-up.res::after{border-bottom-color:#e3efd0}
-#coach.arr-down::after{bottom:-20px;border-top-color:#f1e3bf}#coach.arr-down.res::after{border-top-color:#e3efd0}
-#coach.arr-l::after{left:-20px;top:var(--ay,50%);margin:-10px 0 0;border-right-color:#f1e3bf}#coach.arr-r::after{left:auto;right:-20px;top:var(--ay,50%);margin:-10px 0 0;border-left-color:#f1e3bf}
-#coachskip{position:fixed;right:8px;top:48px;z-index:36;min-height:44px;min-width:44px;font-size:13px;padding:2px 12px;background:#1d160a;color:var(--gold2)}
-#coach .t{flex:1 1 auto}
-#coach .btn{min-height:44px;min-width:44px;font-size:13px;padding:2px 10px;background:#1d160a;color:var(--gold2);pointer-events:auto}
-.finger{position:fixed;z-index:36;width:34px;height:34px;pointer-events:none;border-radius:50%;border:3px solid #fff;box-shadow:0 0 12px var(--gold2);animation:fing 1.2s ease-in-out 3}
-@keyframes fing{50%{transform:scale(.7)}}
+/* guide: floating window, never dims, never blocks (W645) */
+#coach{position:fixed;left:0;top:0;width:0;height:0;z-index:45}
+#coach .tmap{position:fixed;left:0;top:0;width:100vw;height:100vh;pointer-events:none;overflow:visible}
+#coach .tmap line{stroke:#f1d68c;stroke-width:1.5;stroke-dasharray:3 2}#coach .tmap circle{fill:#f1d68c}
+#coach .tlab{position:fixed;min-height:30px;padding:3px 9px;border-radius:15px;border:1px solid #1d160a;background:#f1e3bf;color:#1d160a;font:700 12px/1.1 inherit;font-family:inherit;white-space:nowrap;box-shadow:0 2px 6px rgba(0,0,0,.6);cursor:pointer}
+#coach .tlab.on{background:#f1d68c;outline:2px solid #fff}
+#coach .tring{position:fixed;display:none;pointer-events:none;border-radius:12px;border:3px solid #f1d68c;box-shadow:0 0 12px rgba(241,214,140,.8);animation:tpulse 1.4s ease-in-out infinite}
+@keyframes tpulse{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(1.06);opacity:.55}}
+#coach .twin{position:fixed;left:8px;top:60px;width:min(320px,calc(100vw - 16px));box-sizing:border-box;background:#f1e3bf;color:#1d160a;border-radius:12px;padding:6px 12px 10px;font-size:15px;line-height:1.3;box-shadow:0 6px 18px rgba(0,0,0,.6)}
+#coach .thead{display:flex;align-items:center;gap:4px;margin:0 -6px 2px 0;cursor:move;touch-action:none;user-select:none}
+#coach .tno{flex:1 1 auto;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:#6b5420}
+#coach .tb{min-width:36px;min-height:36px;border:0;border-radius:8px;background:#1d160a;color:#f1d68c;font:700 17px/1 inherit;font-family:inherit;padding:0}
+#coach .ttl{display:block;font-size:16px}
+#coach .tsay{margin:4px 0;font-weight:600}#coach .twhy{margin:0 0 4px;font-size:13px;color:#4a3a14}#coach .twhy:empty{display:none}
+#coach .tchk{list-style:none;margin:4px 0;padding:0;font-size:13px}#coach .tchk li{padding-left:22px;position:relative;margin:2px 0}
+#coach .tchk li::before{content:'';position:absolute;left:2px;top:1px;width:12px;height:12px;border:2px solid #6b5420;border-radius:3px}
+#coach .tchk li.ok{color:#4f6b1f}#coach .tchk li.ok::before{background:#6b8f2a;border-color:#6b8f2a}
+#coach .tfoot{display:flex;justify-content:flex-end}
+#coach .tfoot .btn{min-height:44px;font-size:14px;padding:2px 14px;background:#1d160a;color:#f1d68c}
+#coach .tchip{position:fixed;right:8px;bottom:8px;min-height:44px;padding:4px 14px;border-radius:22px;border:2px solid #1d160a;background:#f1e3bf;color:#1d160a;font:700 14px/1 inherit;font-family:inherit;box-shadow:0 4px 12px rgba(0,0,0,.6)}
 
 /* player portraits, panels, log, curved bar (W636) */
 .pbtn{flex:0 0 auto;border:0;background:none;padding:0;min-height:44px;min-width:56px;display:flex;align-items:center}

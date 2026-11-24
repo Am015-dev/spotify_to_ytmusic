@@ -17,3 +17,6 @@
 - [x] no action possible: refill is the only move
 - [x] wins: 20 points, 10 crowns, 10 points in one colour
 - [x] full games end; invariants (token, card, Favour, patron counts) after every move
+- [x] keep needs a gold on the board; keeping from the pyramid refills the slot (empty deck: stays empty)
+- [x] short bag: a refill places what is left in spiral order, then stops
+- [x] the 10-token limit is settled before the win check

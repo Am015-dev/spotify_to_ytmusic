@@ -98,6 +98,19 @@ function put(G, cells) { Object.keys(cells).forEach(s => { const i = G.bag.index
 { const P = { cards: [29, 30, 54], roy: [], att: {}, t: {} }; ok(E.points(P) === 14 && !E.winOf(P) && E.bestColour(P).v === 0, 'jewels with no colour count for points but for no colour'); }
 { const P = { cards: [], roy: [], att: {}, t: {} }; P.cards = [2, 12, 17, 23, 7]; const pts = P.cards.reduce((a, i) => a + C[i].pts, 0); ok(pts === 5 && !E.winOf(P), '5 points: no win'); }
 { const G = blank(); const P = G.pl[0]; P.cards = C.filter(c => c.pts >= 3 && !c.cr).map(c => c.id); put(G, { 0: 'r' }); E.performMove(G, { t: 'take', cells: [0] }); ok(G.over && G.over.winner === 0 && G.over.how === 'points', 'the win is checked at the end of your own turn'); }
+// ---- added by the rulebook diff (proof/RULES-DIFF.md)
+{ const G = blank(); put(G, { 0: 'r' }); ok(!E.validMoves(G).some(m => m.t === 'reserve'), 'keep: impossible with no gold on the board'); }
+{ const G = blank(); put(G, { 12: 'o' }); const id = G.pyr[1][0], dl = G.decks[1].length; E.performMove(G, { t: 'reserve', gold: 12, l: 1, i: 0 });
+  ok(G.pl[0].res[0] === id && G.pyr[1][0] !== id && G.pyr[1][0] !== null && G.decks[1].length === dl - 1, 'keep from the pyramid: the slot refills from its deck'); }
+{ const G = blank(); put(G, { 12: 'o' }); G.decks[2] = []; E.performMove(G, { t: 'reserve', gold: 12, l: 2, i: 0 }); ok(G.pyr[2][0] === null, 'empty deck: the slot stays empty'); }
+{ const G = blank(); const keep = G.bag.splice(0, 3); G.pl[1].t = { w: 0, u: 0, g: 0, r: 0, k: 0, p: 0, o: 0 }; keep.forEach(t => G.pl[1].t[t]++);
+  const left = G.bag.length; E.performMove(G, { t: 'refill' });
+  ok(G.bag.length === 0 && G.board.filter(Boolean).length === left && D.SPIRAL.slice(0, left).every(s => G.board[s]), 'short bag: refill places what is left, in spiral order, then stops'); }
+{ const G = blank(); const P = G.pl[0]; P.cards = C.filter(c => c.pts >= 3 && !c.cr).map(c => c.id); P.t.k = 4; P.t.w = 4; ['k', 'k', 'k', 'k', 'w', 'w', 'w', 'w'].forEach(c => G.bag.splice(G.bag.indexOf(c), 1));
+  put(G, { 0: 'r', 1: 'u', 2: 'g' }); E.performMove(G, { t: 'take', cells: [0, 1, 2] }); ok(G.pend && G.pend.h === 'disc' && !G.over, 'the 10-token limit is settled before the win check');
+  E.performMove(G, { t: 'disc', c: 'k' }); ok(G.over && G.over.winner === 0, 'then the win is checked'); }
+{ const G = blank(); put(G, { 0: 'o', 1: 'r' }); G.pl[0].res = [G.decks[0].pop(), G.decks[0].pop(), G.decks[0].pop()];
+  ok(E.validMoves(G).some(m => m.t === 'take') && !E.validMoves(G).some(m => m.t === 'reserve'), 'gold on the board but 3 kept: no keep'); }
 // the Rules panel and the guided first game say the rules in the same words (src/data.js TXT)
 { const T = D.TXT; ok(/20 points/.test(T.win) && /10 crowns/.test(T.win) && /10 points on jewels of one colour/.test(T.win), 'win text: 20 points, 10 crowns, 10 points in one colour');
   ok(/1 to 3/.test(T.take) && /never gold/.test(T.take) && /3 at most/.test(T.keep) && /3 crowns/.test(T.crowns) && /6/.test(T.crowns) && /10 tokens/.test(T.limit), 'rule text matches the engine numbers');
