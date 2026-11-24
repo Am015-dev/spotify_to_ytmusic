@@ -154,7 +154,14 @@ var UI = (function () {
     el.textContent = s;
   }
   function layout() {
-    var app = $('#app'), W = Math.min(app.clientWidth - 12, 548), H = app.clientHeight;
+    var app = $('#app'), wide = innerWidth >= 1000 && innerHeight >= 560; app.classList.toggle('wide', wide);
+    if (wide) { // PC: board big on the left, rival / jewels / you stacked on the right
+      var HH = app.clientHeight, cl = Math.max(52, Math.min(112, Math.floor((HH - 44 - 40) / 5))), st = document.documentElement.style; st.setProperty('--cell', cl + 'px');
+      var RW = app.clientWidth - (5 * cl + 10 + 14 + 190) - 64, usedR = $('#rival').offsetHeight + $('#me').offsetHeight + 24, phh = HH - 44 - usedR, rh = Math.floor((phh - 12) / 3);
+      var chh = Math.max(60, Math.min(rh, 150)), cww = Math.floor(Math.min((RW - 6 * 8) / 6, chh * 0.8));
+      st.setProperty('--ch', chh + 'px'); st.setProperty('--cw', cww + 'px'); st.setProperty('--rg', '8px'); return;
+    }
+    var W = Math.min(app.clientWidth - 12, 548), H = app.clientHeight;
     var used = $('#bar').offsetHeight + $('#rival').offsetHeight + $('#me').offsetHeight + 12;
     var avail = H - used, cellMax = Math.floor(Math.min((W - 90 - 16) / 5, 58));
     var cell = Math.max(40, Math.min(cellMax, Math.floor((avail - 18 - (3 * 66 + 16)) / 5)));

@@ -154,7 +154,7 @@ var OTUT = (function () {
     c.innerHTML = '<svg class="tmap" aria-hidden="true"></svg><div class="tlabels"></div><div class="tring" aria-hidden="true"></div>' +
       '<div class="twin" role="dialog" aria-label="Guide"><div class="thead"><span class="tno"></span><button class="tb" data-tq aria-label="Show the screen map">?</button>' +
       '<button class="tb" data-tmin aria-label="Minimise the guide">&#8211;</button><button class="tb" data-tx aria-label="Close the guide">&#215;</button></div>' +
-      '<b class="ttl"></b><p class="tsay"></p><p class="twhy"></p><ul class="tchk"></ul><div class="tfoot"><button class="btn" data-tnext></button></div></div>' +
+      '<b class="ttl"></b><p class="tsay"></p><p class="twhy"></p><div class="tleg"></div><ul class="tchk"></ul><div class="tfoot"><button class="btn" data-tnext></button></div></div>' +
       '<button class="tchip" data-tchip aria-label="Open the guide"></button>';
     document.body.appendChild(c);
     c.addEventListener('click', function (e) {
@@ -199,39 +199,28 @@ var OTUT = (function () {
   }
   // ---- map labels: each label sits near its part, clear of every other label and the window, with a leader line
   function layoutMap() {
-    var c = root(), lab = c.querySelector('.tlabels'), svg = c.querySelector('.tmap'), w = c.querySelector('.twin');
-    if (!T.mapOn) { lab.innerHTML = ''; svg.innerHTML = ''; return; }
+    var c = root(), lab = c.querySelector('.tlabels'), svg = c.querySelector('.tmap'), w = c.querySelector('.twin'), leg = c.querySelector('.tleg');
+    if (!T.mapOn) { lab.innerHTML = ''; svg.innerHTML = ''; leg.innerHTML = ''; return; }
     var W = innerWidth, H = innerHeight, items = MAP.map(function (m, i) { return { m: m, i: i, r: R(m.sel) }; }).filter(function (x) { return x.r; });
-    if (!lab.children.length) lab.innerHTML = items.map(function (x) { return '<button class="tlab" data-map="' + x.i + '">' + x.m.name + '</button>'; }).join('');
-    var placed = [], wr = w.style.display === 'none' ? null : R(w), small = items.filter(function (x) { return x.r.width * x.r.height < 9000; }).map(function (x) { return x.r; }), lines = '';
-    items.forEach(function (x) {
-      var el = lab.querySelector('[data-map="' + x.i + '"]'); if (!el) return;
-      el.classList.toggle('on', mapPick === x.i);
-      var bw = el.offsetWidth, bh = el.offsetHeight, r = x.r, cx = (r.left + r.right) / 2, cy = (r.top + r.bottom) / 2, best = null;
-      var big = r.width * r.height > 20000, cands = [];
-      [0, 14, 30, 48, 70, 96].forEach(function (d) {
-        cands.push([cx - bw / 2, r.bottom + d], [cx - bw / 2, r.top - d - bh], [r.right + d, cy - bh / 2], [r.left - d - bw, cy - bh / 2],
-          [r.right + d - bw, r.bottom + d], [r.left - d, r.bottom + d], [r.right + d - bw, r.top - d - bh], [r.left - d, r.top - d - bh]);
-      });
-      if (big) for (var fx = 0.15; fx < 0.9; fx += 0.175) for (var fy = 0.1; fy < 0.95; fy += 0.2) cands.push([r.left + r.width * fx - bw / 2, r.top + r.height * fy - bh / 2]);
-      cands.forEach(function (p, k) {
-        var b = { left: p[0], top: p[1], right: p[0] + bw, bottom: p[1] + bh };
-        if (b.left < 4 || b.right > W - 4 || b.top < 4 || b.bottom > H - 4) return;
-        if (placed.some(function (o) { return hit(b, o, 3); })) return;
-        if (wr && hit(b, wr, 4)) return;
-        var sc = Math.hypot((b.left + b.right) / 2 - cx, (b.top + b.bottom) / 2 - cy) * (big ? 0.2 : 1);
-        small.forEach(function (s) { if (s !== r && hit(b, s)) sc += 400; });
-        if (!best || sc < best.sc) best = { sc: sc, b: b };
-      });
-      if (!best) { el.style.display = 'none'; return; }
-      el.style.display = ''; el.style.left = Math.round(best.b.left) + 'px'; el.style.top = Math.round(best.b.top) + 'px'; placed.push(best.b);
-      var lx = (best.b.left + best.b.right) / 2, ly = (best.b.top + best.b.bottom) / 2;
-      var tx = Math.max(r.left + 3, Math.min(r.right - 3, lx)), ty = Math.max(r.top + 3, Math.min(r.bottom - 3, ly));
-      if (big && lx > r.left && lx < r.right && ly > r.top && ly < r.bottom) { tx = lx; ty = best.b.top - 6 < r.top ? ly : best.b.top - 6; }
-      var sx = Math.max(best.b.left, Math.min(best.b.right, tx)), sy = Math.max(best.b.top, Math.min(best.b.bottom, ty));
-      lines += '<line x1="' + sx + '" y1="' + sy + '" x2="' + tx + '" y2="' + ty + '"/><circle cx="' + tx + '" cy="' + ty + '" r="3"/>';
+    // the part names are a tidy list inside the window; only the part you pick gets ONE callout on the board
+    var lg = items.map(function (x) { return '<button class="tlab' + (mapPick === x.i ? ' on' : '') + '" data-map="' + x.i + '">' + x.m.name + '</button>'; }).join('');
+    if (leg.innerHTML !== lg) leg.innerHTML = lg;
+    lab.innerHTML = ''; svg.innerHTML = ''; svg.setAttribute('viewBox', '0 0 ' + W + ' ' + H);
+    var pk = items.filter(function (x) { return x.i === mapPick; })[0]; if (!pk) return;
+    var r = pk.r; lab.innerHTML = '<span class="tcall">' + pk.m.name + '</span>'; var el = lab.firstChild, bw = el.offsetWidth, bh = el.offsetHeight, wr = w.style.display === 'none' ? null : R(w), best = null;
+    var cx = (r.left + r.right) / 2, cy = (r.top + r.bottom) / 2, cands = [];
+    [8, 24, 48, 80].forEach(function (d) { cands.push([cx - bw / 2, r.bottom + d], [cx - bw / 2, r.top - d - bh], [r.right + d, cy - bh / 2], [r.left - d - bw, cy - bh / 2]); });
+    cands.push([cx - bw / 2, r.top + 6]);
+    cands.forEach(function (p) {
+      var b = { left: p[0], top: p[1], right: p[0] + bw, bottom: p[1] + bh };
+      if (b.left < 4 || b.right > W - 4 || b.top < 4 || b.bottom > H - 4) return;
+      if (wr && hit(b, wr, 4)) return;
+      var sc = Math.hypot((b.left + b.right) / 2 - cx, (b.top + b.bottom) / 2 - cy); if (!best || sc < best.sc) best = { sc: sc, b: b };
     });
-    svg.setAttribute('viewBox', '0 0 ' + W + ' ' + H); svg.innerHTML = lines;
+    if (!best) { el.style.display = 'none'; return; }
+    el.style.left = Math.round(best.b.left) + 'px'; el.style.top = Math.round(best.b.top) + 'px';
+    var lx = (best.b.left + best.b.right) / 2, ly = (best.b.top + best.b.bottom) / 2, tx = Math.max(r.left + 3, Math.min(r.right - 3, lx)), ty = Math.max(r.top + 3, Math.min(r.bottom - 3, ly));
+    svg.innerHTML = '<line x1="' + Math.max(best.b.left, Math.min(best.b.right, tx)) + '" y1="' + Math.max(best.b.top, Math.min(best.b.bottom, ty)) + '" x2="' + tx + '" y2="' + ty + '"/><circle cx="' + tx + '" cy="' + ty + '" r="4"/>';
   }
   function showMap(on) { T.mapOn = on; if (!on) mapPick = null; var lab = $('#coach .tlabels'); if (lab) lab.innerHTML = ''; paint(); }
 
@@ -258,7 +247,8 @@ var OTUT = (function () {
     var sh = R('#sheet') || R('.modal'); if (sh) avoid.push(sh);
     if (s.cells) s.cells.forEach(function (k) { var r = R('.cell[data-cell="' + k + '"]'); if (r) avoid.push(r); });
     var tb = R('#takebtn'); if (tb) avoid.push(tb);
-    if (T.mapOn) MAP.forEach(function (m) { var r = R(m.sel); if (r) soft.push(r); });
+    if (innerWidth >= 1000) { var bd = R('#board'); if (bd) avoid.push(bd); }   // PC: the guide never sits on the gem board
+    if (T.mapOn) { if (mapPick !== null) { var pr = R(MAP[mapPick].sel); if (pr) avoid.push(pr); } ['#board', '#pyr', '#me', '#side'].forEach(function (q) { var r = R(q); if (r) soft.push(r); }); }
     else ['#board', '#pyr', '#me', '#side'].forEach(function (q) { var r = R(q); if (r) soft.push(r); });
     if (!mini) placeWin(w, avoid, soft);
     layoutMap();
@@ -311,7 +301,7 @@ var OTUT = (function () {
     if (U.tut) { showMap(true); return; }
     var old = $('#coach'); if (old) old.remove();
     var c = document.createElement('div'); c.id = 'coach'; c.innerHTML = '<svg class="tmap" aria-hidden="true"></svg><div class="tlabels"></div>' +
-      '<div class="twin" role="dialog" aria-label="Screen map"><div class="thead"><span class="tno">Screen map</span><button class="tb" data-tx aria-label="Close the map">&#215;</button></div><p class="tsay">Tap any label to learn that part of the screen.</p></div>';
+      '<div class="twin" role="dialog" aria-label="Screen map"><div class="thead"><span class="tno">Screen map</span><button class="tb" data-tx aria-label="Close the map">&#215;</button></div><p class="tsay">Tap a part to see it on the board.</p><div class="tleg"></div></div>';
     document.body.appendChild(c);
     var saveT = T, pick = null; T = { mapOn: true };
     function draw() { var w = c.querySelector('.twin'); if (pick !== null) c.querySelector('.tsay').textContent = MAP[pick].name + ': ' + MAP[pick].say; mapPick = pick;
