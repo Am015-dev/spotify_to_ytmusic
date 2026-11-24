@@ -1,100 +1,187 @@
-// Meadowfold tutorial = a guided first game vs an Easy rival. Each step: one line (12 words max), only the taught move glows.
-// After the scripted two turns the real game goes on with the same board; the Hint button stays available.
+// Meadowfold tutorial: a floating lesson window over a real game vs an Easy rival.
+// Owner rules: never dim, never block taps, never make the suggested thing the only tappable one; a soft pulse ring marks the suggestion.
+// Starts with a labelled map of the screen (reopen with ?). Lessons follow the order of play; each ends when done or on Next.
 var TUT = null;
 function tutStart() {
   UI.mode = 'tut';
   newGame({ np: 2, humans: 1, ai: 'easy', side: 'A', spirits: false, seed: 11, seats: [{ name: 'You', ai: null }, { name: 'Rival', ai: 'easy' }] });
-  // scripted start: put the taught tokens and the duck card in place (counts stay exact: swap with the pouch)
+  // scripted first pocket and the duck card on show (counts stay exact: swapped with the pouch / pile)
   function give(i, cols) { G.central[i].forEach(function (c) { G.bag[c]++; }); G.central[i] = cols.map(function (c) { G.bag[c]--; return c; }); }
   give(0, ['leaf', 'water', 'mount']); give(1, ['mount', 'mount', 'trunk']);
   var di = G.row.indexOf(5); if (di < 0) { var dk = G.deck.indexOf(5); G.deck[dk] = G.row[0]; G.row[0] = 5; } else if (di) { G.row[di] = G.row[0]; G.row[0] = 5; }
-  TUT = { i: 0, sc0: 0 }; var tm = setInterval(function () { if (!TUT || UI.mode !== 'tut') return clearInterval(tm); tutShow(); }, 250);
-  UI.tab = 'row'; render();
+  TUT = { i: 0, done: {}, map: true, min: false, pos: null, info: null };
+  render(); tutMapOpen();
 }
+// say = one short sentence; why = the reason; on = move that completes it; sug = selector of the suggestion ring
 var TUT_STEPS = [
-  { say: 'Tap the glowing pocket to take 3 tokens.', ok: function (m) { return m.t === 'take' && m.i === 0; } },
-  { say: 'Place the leaves: a small tree.', sel: 'leaf', ok: function (m) { return m.t === 'place' && G0hand(m) === 'leaf' && m.k === '2,2'; }, only: '2,2' },
-  { say: 'Put the water beside the tree.', sel: 'water', ok: function (m) { return m.t === 'place' && G0hand(m) === 'water' && m.k === '1,1'; }, only: '1,1' },
-  { say: 'Grey is a mountain. Place it here.', sel: 'mount', ok: function (m) { return m.t === 'place' && m.k === '3,3'; }, only: '3,3' },
-  { say: 'Invite the duck: its card says Fits now.', tab: 'row', ok: function (m) { return m.t === 'card'; }, card: 0 },
-  { say: 'Its home is ready! Tap the duck.', tab: 'mine', ok: function (m) { return m.t === 'cube'; }, wantSel: true },
-  { say: 'Great! Tap End turn. The rival plays.', ok: function (m) { return m.t === 'end'; } },
-  { say: 'Take the pocket with two grey tokens.', ok: function (m) { return m.t === 'take'; }, pocketHas: 'mount' },
-  { say: 'Stack grey on grey: taller scores more.', sel: 'mount', ok: function (m) { return m.t === 'place' && m.k === '3,3'; }, only: '3,3' },
-  { say: 'Mountains score only beside another mountain.', sel: 'mount', ok: function (m) { return m.t === 'place' && m.k === '3,2'; }, only: '3,2' },
-  { say: 'Trunk now; leaves on top later.', sel: 'trunk', ok: function (m) { return m.t === 'place'; } },
-  { say: 'Finish the game. Invite animals that need few tokens.', end: true }
+  { id: 'pick', title: 'Take a pocket', say: 'Tap any pocket in the tray to take its 3 tokens.', why: 'Every turn starts this way; the pocket refills afterwards.', on: 'take', sug: '.pocket.glow' },
+  { id: 'place', title: 'Place all 3 tokens', say: 'Tap a token in your hand, then a glowing hex. Place all three.', why: 'You must place every token you took, in any order.', on: 'place3', sug: '#map .hx.glow' },
+  { id: 'stack', title: 'Stacking', say: 'Grey stacks up to 3. Leaves go on 0-2 trunks. Red goes on one grey, trunk or red. Blue and yellow stay flat.', why: 'Taller trees and peaks score more; flat tiles shape rivers and fields.', sug: '#map' },
+  { id: 'card', title: 'Take an animal card', say: 'Open Animals and take one card (once per turn, at most 4 unfinished).', why: 'Cards are your animals; each shows the habitat it wants.', on: 'card', sug: '#railRow' },
+  { id: 'cube', title: 'Settle an animal', say: 'When a card says Home ready, tap it in My cards, then the glowing hex.', why: 'Its habitat matches (any rotation): the animal moves onto its home hex.', on: 'cube', sug: '#railMine' },
+  { id: 'animal', title: 'How an animal scores', say: 'Each settled animal uncovers a number; the card scores the highest one showing.', why: 'Settle the same card again for a bigger number. One animal per hex; nothing stacks on it.', sug: '#railMine' },
+  { id: 'end', title: 'End your turn', say: 'Tap End turn when your hand is empty.', why: 'The pocket refills, the animal row refills to 5 and the rival plays.', on: 'end', sug: '#endB' },
+  { id: 'land', title: 'Landscape points', say: 'Trees 1/3/7, peaks 1/3/7 if touching a peak, 5 per field group of 2+, 5 per building with 3 colours around.', why: 'Every hex can earn points, so plan shapes, not single tiles.', sug: '#railScore' },
+  { id: 'water', title: 'River (side A) or islands (side B)', say: 'Side A: the longest river path scores 2, 5, 8, 11, 15, then +4 per hex. Side B: 5 per island.', why: 'Water links your valley; see Scoring for the full table.', sug: '#railScore' },
+  { id: 'spirit', title: 'Spirits (variant)', say: 'With spirits on, keep 1 of 2 on turn one; settle it for its bonus.', why: 'A spirit is a big end-game goal; its cube is not an animal cube.', sug: '#railMine' },
+  { id: 'over', title: 'End of game', say: 'When the pouch runs dry or a player has 2 or fewer empty hexes, the round finishes.', why: 'Everyone gets equal turns. Most points wins; a tie goes to most animals on the board.', sug: '#barstat' },
+  { id: 'practice', title: 'Practice game', say: '', why: 'Finish this game. The line below always says what to do now.', practice: true, sug: null }
 ];
-function G0hand(m) { return m && m.h != null && TUT && TUT.lastHand ? TUT.lastHand[m.h] : null; }
-function tutCur() { return TUT && TUT_STEPS[TUT.i]; }
-window.tutAllow = function (m) {
-  var st = tutCur(); if (!st || st.end || UI.mode !== 'tut') return true;
-  if (G.cur !== 0) return true;
-  TUT.lastHand = G.turn.hand.slice();
-  if (m.t === 'take' && st.pocketHas) return m.i === 0 && st.ok(m);
-  if (st.only && m.t === 'place' && m.k !== st.only) return false;
-  if (st.sel && m.t === 'place' && G.turn.hand[m.h] !== st.sel) return false;
-  return st.ok(m);
-};
-// ---- guide bubble: sits next to the thing it points at, arrow touching it, on the side that covers no choice ----
-function tq(sel) { return sel ? document.querySelector(sel) : null; }
-function tHit(a, b) { return a.left < b.right && a.right > b.left && a.top < b.bottom && a.bottom > b.top; }
-function tutTarget(st) {
-  var tk = tq('#takeB'); if (tk && getComputedStyle(tk).visibility === 'visible') return { sel: '#takeB', say: 'Tap Invite. The duck joins you.' };
-  if (st.end) return { sel: '#railScore', say: st.say + ' Scoring shows how points work.', btn: 'Got it' };
-  if (st.pocketHas || TUT.i === 0) return { sel: '.pocket.glow', say: st.say };
-  if (st.card !== undefined) return UI.pp === 'dock' && UI.tab === 'row' ? { sel: '.acard[data-row="0"]', say: st.say } : { sel: '#railRow', say: 'Tap Animals: see who can move in.' };
-  if (TUT.i === 5) return UI.sel && UI.sel.kind === 'card' ? { sel: '#map .hx.glow', say: 'Tap the glowing hex to settle it.' } : UI.pp === 'dock' && UI.tab === 'mine' ? { sel: '.acard.ready', say: st.say } : { sel: '#railMine', say: 'The duck is ready! Tap My cards.' };
-  if (TUT.i === 6) return { sel: '#endB', say: st.say };
-  return { sel: '#map .hx.glow', say: st.say };
+// ---- HUD map: every element with a label, a leader line and a one-sentence explanation ----
+var TUT_MAP = [
+  ['#barstat', 'Players', 'Your score and the rival’s; tap a strip to see that valley.'],
+  ['#hintB', 'Hint', 'Suggests a good move for this moment.'],
+  ['[data-gx="rulesd"]', 'Rules', 'The full rules, any time.'],
+  ['[data-gx="setd"]', 'Menu', 'New game, sound, restart.'],
+  ['#tutQ', 'Help ?', 'Reopens this map and the lesson window.'],
+  ['#railRow', 'Animals', 'The 5 animal cards you can take this turn.'],
+  ['#railMine', 'My cards', 'Your cards: which homes are ready and what they score.'],
+  ['#railScore', 'Scoring', 'How every landscape and animal scores, with your points.'],
+  ['#railTot', 'Totals', 'Full score table for every player.'],
+  ['#map', 'Your valley', 'Place tokens on the hexes; glowing hexes are legal.'],
+  ['#central', 'Tray', 'Pockets of 3 tokens; after taking one, your hand and End turn.']
+];
+function tq(s) { return s ? document.querySelector(s) : null; }
+function tVis(e) { if (!e) return null; var r = e.getBoundingClientRect(); return r.width > 2 && r.height > 2 && getComputedStyle(e).visibility !== 'hidden' ? r : null; }
+function tHit(a, b, m) { m = m || 0; return a.left < b.right + m && a.right + m > b.left && a.top < b.bottom + m && a.bottom + m > b.top; }
+function tutQBtn() {
+  if (tq('#tutQ')) return; var b = document.createElement('button'); b.type = 'button'; b.id = 'tutQ'; b.className = 'gx-ibtn'; b.setAttribute('aria-label', 'Help: screen map'); b.textContent = '?';
+  var bar = tq('.gx-bar'), h = tq('#hintB'); if (bar && h) bar.insertBefore(b, h); else document.body.appendChild(b);
+  b.onclick = function () { if (!TUT) { TUT = { i: TUT_STEPS.length - 1, done: {}, map: true, min: false, pos: null, info: null, free: true }; } TUT.min = false; tutMapOpen(); };
 }
-function tutBubble(text, sel, res, btn) {
-  var c = document.getElementById('tbub'); if (!c) { c = document.createElement('div'); c.id = 'tbub'; document.body.appendChild(c); }
-  c.classList.toggle('res', !!res); c.innerHTML = '<span class="t">' + esc(text) + '</span>' + (btn ? '<button type="button" class="tskip" id="tutok">' + btn + '</button>' : '');
-  TUT.anchor = sel; var W = innerWidth, H = innerHeight, A = 10;
-  var te = tq(sel) || tq('#map'), t = te.getBoundingClientRect();
-  c.style.width = Math.min(300, W - 16) + 'px'; c.style.left = '0px'; c.style.top = '0px';
-  var bw = c.offsetWidth, bh = c.offsetHeight, cx = (t.left + t.right) / 2, cy = (t.top + t.bottom) / 2, left = Math.max(8, Math.min(W - 8 - bw, cx - bw / 2));
-  var choices = [t]; if (!res) document.querySelectorAll('.pocket.glow, #map .hx.glow, .acard.ready, #endB.go, #takeB').forEach(function (e) { var r = e.getBoundingClientRect(); if (r.width && getComputedStyle(e).visibility === 'visible') choices.push(r); });
-  var cand = [{ d: 'below', top: t.bottom + A, left: left, pen: 0 }, { d: 'above', top: t.top - A - bh, left: left, pen: 0 },
-    { d: 'right', top: cy - bh / 2, left: t.right + A, pen: 1 }, { d: 'left', top: cy - bh / 2, left: t.left - A - bw, pen: 1 }], best = null;
-  cand.forEach(function (k) {
-    var box = { left: k.left, right: k.left + bw, top: k.top, bottom: k.top + bh }, sc = k.pen;
-    if (box.top < 4) sc += 1000 + 4 - box.top; if (box.bottom > H - 4) sc += 1000 + box.bottom - H + 4; if (box.left < 6) sc += 1000; if (box.right > W - 6) sc += 1000;
-    choices.forEach(function (r) { if (tHit(box, r)) sc += 100; });
-    k.sc = sc; if (!best || sc < best.sc) best = k;
+function tutMapOpen() { if (!TUT) return; TUT.map = true; TUT.info = null; tutQBtn(); tutMapDraw(); tutWin(); }
+function tutMapClose() { if (!TUT) return; TUT.map = false; TUT.info = null; var m = tq('#tmap'); if (m) m.remove(); if (TUT.free) { tutEnd(); return; } tutWin(); render(); }
+function tutMapDraw() {
+  var old = tq('#tmap'); if (old) old.remove(); if (!TUT || !TUT.map || UI.pp) return;   // labels step aside while a panel is open
+  var W = innerWidth, H = innerHeight, o = document.createElement('div'); o.id = 'tmap'; document.body.appendChild(o);
+  var svg = '<svg class="tml" width="' + W + '" height="' + H + '">', placed = [], tg = [];
+  TUT_MAP.forEach(function (m) { var r = tVis(tq(m[0])); if (r) tg.push({ m: m, r: r }); });
+  tg.forEach(function (t) {
+    var b = document.createElement('button'); b.type = 'button'; b.className = 'tlab'; b.textContent = t.m[1]; b.dataset.k = t.m[0]; o.appendChild(b);
+    var bw = b.offsetWidth, bh = b.offsetHeight, r = t.r, cx = (r.left + r.right) / 2, cy = (r.top + r.bottom) / 2, best = null;
+    var big = r.width > W * .45 || r.height > H * .35;
+    var pts = big ? [[cx - bw / 2, cy - bh / 2], [cx - bw / 2, r.top + 8], [r.left + 8, cy - bh / 2], [cx - bw / 2, r.bottom - bh - 8]] : [];
+    for (var d = 10; d <= 150; d += 14) pts.push([cx - bw / 2, r.bottom + d], [cx - bw / 2, r.top - d - bh], [r.left - d - bw, cy - bh / 2], [r.right + d, cy - bh / 2], [r.left - d - bw, r.bottom + d], [r.right + d, r.bottom + d], [r.left - bw, r.top - d - bh], [r.right, r.top - d - bh]);
+    pts.forEach(function (p, i) {
+      var x = Math.max(4, Math.min(W - bw - 4, p[0])), y = Math.max(4, Math.min(H - bh - 4, p[1])), box = { left: x, top: y, right: x + bw, bottom: y + bh }, sc = i * .01;
+      placed.forEach(function (q) { if (tHit(box, q, 4)) sc += 1000; });
+      tg.forEach(function (q) { if (q !== t && q.r.width < W * .45 && q.r.height < H * .35 && tHit(box, q.r)) sc += 50; });
+      if (!big && tHit(box, r)) sc += 30;
+      if (!best || sc < best.sc) best = { x: x, y: y, sc: sc, box: box };
+    });
+    placed.push(best.box); b.style.left = best.x + 'px'; b.style.top = best.y + 'px';
+    var lx = best.x + bw / 2, ly = best.y + bh / 2, ex = Math.max(r.left + 4, Math.min(r.right - 4, lx)), ey = Math.max(r.top + 4, Math.min(r.bottom - 4, ly));
+    if (big) { ex = lx; ey = ly + bh; }
+    svg += '<line x1="' + lx + '" y1="' + ly + '" x2="' + ex + '" y2="' + ey + '"/><circle cx="' + ex + '" cy="' + ey + '" r="4"/>';
+    b.onclick = function (ev) { ev.stopPropagation(); TUT.info = t.m; $$('#tmap .tlab').forEach(function (x) { x.classList.toggle('on', x === b); }); tutWin(); };
   });
-  c.style.left = best.left + 'px'; c.style.top = Math.max(4, Math.min(H - bh - 4, best.top)) + 'px';
-  c.className = (res ? 'res ' : '') + { below: 'arr-up', above: 'arr-down', right: 'arr-l', left: 'arr-r' }[best.d];
-  c.style.setProperty('--ax', Math.max(18, Math.min(bw - 18, cx - best.left)) + 'px'); c.style.setProperty('--ay', Math.max(14, Math.min(bh - 14, cy - parseFloat(c.style.top))) + 'px');
-  var ok = document.getElementById('tutok'); if (ok) ok.onclick = function () { tutHide(); TUT = null; render(); };
+  o.insertAdjacentHTML('afterbegin', svg + '</svg>');
 }
-function tutHide() { var c = document.getElementById('tbub'); if (c) c.remove(); var l = document.getElementById('line'); if (l) l.classList.remove('tutoff'); }
-window.tutBubbleAnchor = function () { var c = document.getElementById('tbub'); return c ? { sel: TUT && TUT.anchor, res: c.classList.contains('res'), text: c.textContent } : null; };
+window.tutMapBoxes = function () { return $$('#tmap .tlab').map(function (b) { var r = b.getBoundingClientRect(); return { k: b.dataset.k, l: r.left, t: r.top, r: r.right, b: r.bottom }; }); };
+// ---- the floating window ----
+function tutCur() { return TUT && TUT_STEPS[TUT.i]; }
+function todo() {   // plain "what to do now" for the practice game
+  if (!G || G.over) return 'Game over: see the results.';
+  if (G.cur !== firstHuman() || UI.busy) return 'The rival is playing. Watch its valley change.';
+  var T = G.turn, s = E.seat();
+  if (T.took < 0) return 'Take a pocket from the tray.';
+  if (T.hand.length) return 'Place your ' + T.hand.length + ' token' + (T.hand.length > 1 ? 's' : '') + ': tap one, then a glowing hex.';
+  if (E.moves().some(function (m) { return m.t === 'cube'; })) return 'An animal can move in: open My cards and tap the card that says Home ready.';
+  if (!T.tookCard && E.active(s) < 4 && G.row.length) return 'Optional: take an animal card from Animals. Then tap End turn.';
+  return 'Tap End turn.';
+}
+function tutWin() {
+  var w = tq('#twin'); if (!TUT) { if (w) w.remove(); return; }
+  if (!w) { w = document.createElement('div'); w.id = 'twin'; w.setAttribute('role', 'dialog'); w.setAttribute('aria-label', 'Lesson'); document.body.appendChild(w); tutDrag(w); }
+  var st = tutCur(), h;
+  if (TUT.min) {
+    w.className = 'min'; w.innerHTML = '<button type="button" class="tchip" id="twMax">' + (TUT.map ? 'Screen map' : 'Lesson ' + (TUT.i + 1) + ': ' + esc(st.title)) + '</button>';
+  } else if (TUT.map) {
+    w.className = '';
+    h = '<div class="twh"><b>Your screen</b><span class="sp"></span><button type="button" class="twb" id="twMin" aria-label="Minimise">&#8211;</button><button type="button" class="twb" id="twX" aria-label="Close">&times;</button></div>';
+    h += '<p class="tws">' + (TUT.info ? '<b>' + esc(TUT.info[1]) + ':</b> ' + esc(TUT.info[2]) : 'Tap any label to learn what it does. Everything still works while this is open.') + '</p>';
+    h += '<div class="twf"><span class="sp"></span><button type="button" class="btn primary" id="twGo">' + (TUT.free ? 'Close map' : 'Start lessons') + '</button></div>';
+    w.innerHTML = h;
+  } else {
+    w.className = '';
+    var say = st.practice ? todo() : st.say;
+    h = '<div class="twh"><b>' + (TUT.i + 1) + '/' + TUT_STEPS.length + ' ' + esc(st.title) + '</b><span class="sp"></span><button type="button" class="twb" id="twMin" aria-label="Minimise">&#8211;</button><button type="button" class="twb" id="twX" aria-label="Close">&times;</button></div>';
+    h += '<p class="tws" id="twSay">' + esc(say) + '</p><p class="twy">Why: ' + esc(st.why) + '</p>';
+    h += '<ol class="twc">' + TUT_STEPS.map(function (x, i) { return '<li class="' + (TUT.done[x.id] ? 'ok' : '') + (i === TUT.i ? ' cur' : '') + '">' + esc(x.title) + '</li>'; }).join('') + '</ol>';
+    h += '<div class="twf">' + (TUT.i ? '<button type="button" class="btn ghostb" id="twBack">Back</button>' : '') + '<span class="sp"></span>' + (st.practice ? '' : '<button type="button" class="btn primary" id="twNext">Next</button>') + '</div>';
+    w.innerHTML = h;
+  }
+  var on = function (id, f) { var e = tq('#' + id); if (e) e.onclick = function (ev) { ev.stopPropagation(); f(); }; };
+  on('twMax', function () { TUT.min = TUT.autoMin = false; tutWin(); });
+  on('twMin', function () { TUT.min = true; tutWin(); });
+  on('twX', function () { if (TUT.map && !TUT.free) { tutMapClose(); return; } tutEnd(); });
+  on('twGo', function () { tutMapClose(); });
+  on('twNext', function () { tutDone(true); });
+  on('twBack', function () { TUT.i = Math.max(0, TUT.i - 1); tutWin(); render(); });
+  tutPlace(w); tutRing();
+}
+function tutPlace(w) {   // keep clear of what the lesson explains (and of the map labels), unless the player dragged it
+  var W = innerWidth, H = innerHeight, bw = w.offsetWidth, bh = w.offsetHeight;
+  if (TUT.pos) { w.style.left = Math.max(0, Math.min(W - bw, TUT.pos[0])) + 'px'; w.style.top = Math.max(0, Math.min(H - bh, TUT.pos[1])) + 'px'; return; }
+  var st = tutCur(), avoid = [];
+  if (TUT.map) { if (TUT.info) { var ri = tVis(tq(TUT.info[0])); if (ri) avoid.push([ri, 40]); } $$('#tmap .tlab').forEach(function (b) { avoid.push([b.getBoundingClientRect(), 200]); }); var rc = tVis(tq('#central')); if (rc) avoid.push([rc, 200]); }
+  else if (st && st.sug) { var e = tq('.tsug') || tq(st.sug), r = tVis(e); if (r && r.width < innerWidth * .6) avoid.push([r, 400]); ['.pocket.glow', '#endB', '#tray', '#central'].forEach(function (s) { var r2 = tVis(tq(s)); if (r2) avoid.push([r2, 200]); }); }
+  [['#dock.on', 300], ['#scorep.on', 300], ['.gx-drawer[open]', 300], ['#rail', 40], ['#topbar', 40], ['#map', 2]].forEach(function (a) { var r3 = tVis(tq(a[0])); if (r3) avoid.push([r3, a[1]]); });
+  var spots = [[8, H - bh - 8], [W - bw - 8, H - bh - 8], [8, 64], [W - bw - 8, 64], [(W - bw) / 2, H - bh - 8], [(W - bw) / 2, 64], [8, (H - bh) / 2], [W - bw - 8, (H - bh) / 2], [(W - bw) / 2, (H - bh) / 2], [(W - bw) / 2, H * .3]], best = null;
+  spots.forEach(function (p, i) {
+    var box = { left: p[0], top: p[1], right: p[0] + bw, bottom: p[1] + bh }, sc = i * .1;
+    avoid.forEach(function (a) { if (tHit(box, a[0])) { var ix = Math.min(box.right, a[0].right) - Math.max(box.left, a[0].left), iy = Math.min(box.bottom, a[0].bottom) - Math.max(box.top, a[0].top); sc += a[1] + ix * iy / 400; } });
+    if (!best || sc < best.sc) best = { p: p, sc: sc };
+  });
+  w.style.left = Math.max(0, best.p[0]) + 'px'; w.style.top = Math.max(0, best.p[1]) + 'px';
+  // a panel fills the screen: fold to a chip so the window never covers it; unfold when it closes
+  var panel = tq('#dock.on, #scorep.on');
+  if (panel && best.sc >= 300 && !TUT.min) { TUT.min = TUT.autoMin = true; tutWin(); }
+  else if (!panel && TUT.autoMin) { TUT.min = TUT.autoMin = false; tutWin(); }
+}
+function tutDrag(w) {
+  var d = null;
+  w.addEventListener('pointerdown', function (e) { if (!e.target.closest('.twh') || e.target.closest('button')) return; var r = w.getBoundingClientRect(); d = [e.clientX - r.left, e.clientY - r.top]; try { w.setPointerCapture(e.pointerId); } catch (x) { } });
+  w.addEventListener('pointermove', function (e) { if (!d) return; TUT.pos = [e.clientX - d[0], e.clientY - d[1]]; tutPlace(w); });
+  w.addEventListener('pointerup', function () { d = null; });
+}
+function tutRing() {   // a soft pulse ring on the suggestion; never the only tappable thing
+  $$('.tsug').forEach(function (e) { e.classList.remove('tsug'); });
+  var st = tutCur(); if (!TUT || TUT.map || !st || !st.sug || st.practice || !G || G.cur !== 0 || UI.busy) return;
+  var sel = st.sug;
+  if (st.id === 'card' && UI.pp === 'dock' && UI.tab === 'row') sel = '.acard.playable';
+  if (st.id === 'cube') sel = UI.sel && UI.sel.kind === 'card' ? '#map .hx.glow' : UI.pp === 'dock' && UI.tab === 'mine' ? '.acard.ready' : '#railMine';
+  if (st.id === 'place' && !(UI.sel && UI.sel.kind === 'tok')) sel = '.htok';
+  var e = tq(sel), w = tq('#twin');
+  if (sel === '#map .hx.glow' && w) {   // suggest a glowing hex the window does not cover
+    var wr = w.getBoundingClientRect(); e = Array.prototype.slice.call(document.querySelectorAll(sel)).filter(function (x) { return !tHit(x.getBoundingClientRect(), wr); })[0] || e;
+  }
+  if (e) e.classList.add('tsug');
+}
+function tutDone(next) {
+  var st = tutCur(); if (!st) return; TUT.done[st.id] = 1;
+  if (TUT.i < TUT_STEPS.length - 1) TUT.i++;
+  TUT.pos = TUT.pos; tutWin(); if (next) render();
+}
+function tutEnd() { $$('.tsug').forEach(function (e) { e.classList.remove('tsug'); }); var w = tq('#twin'), m = tq('#tmap'); if (w) w.remove(); if (m) m.remove(); TUT = null; if (G) render(); }
+// ---- hooks called by ui.js ----
+window.tutAllow = function () { return true; };   // every legal tap works during the tutorial
 window.tutAfter = function (m) {
-  var st = tutCur(); if (!st || UI.mode !== 'tut') return;
-  var me = G.seats[0], d = E.score(me).total - (TUT.sc0 || 0); TUT.sc0 = E.score(me).total;
-  var r = { take: ['You took 3 tokens: +0 points, ' + G.turn.hand.length + ' left to place', '#central'], place: ['Placed: +' + d + ' points, ' + G.turn.hand.length + ' left to place', '#map [data-k="' + m.k + '"]'],
-    card: ['You invited it: ' + me.cards.length + ' of 4 cards kept', '#railMine'], cube: ['Animal settled: +' + d + ' points', '#map [data-k="' + m.k + '"]'], end: ['Turn over: the rival plays', '#barstat'] }[m.t];
-  if (r) TUT.res = { text: r[0], sel: r[1], until: m.t === 'end' ? Infinity : Date.now() + 1800 };
-  if (r && m.t !== 'end') setTimeout(function () { if (TUT) tutShow(); }, 1850);
-  if (!st.end) TUT.i++;
-  render();
+  var st = tutCur(); if (!st || UI.mode !== 'tut' || st.practice) return;
+  var hit = st.on === m.t || (st.on === 'place3' && m.t === 'place' && !G.turn.hand.length);
+  if (!hit) { var k = TUT_STEPS.findIndex(function (x, i) { return i > TUT.i && (x.on === m.t || (x.on === 'place3' && m.t === 'place' && !G.turn.hand.length)); }); if (k < 0) return; }
+  if (hit) tutDone(false);
 };
-window.tutRender = function () { var st = tutCur(); tutShow(); if (st && UI.mode === 'tut' && G && !G.over && !st.end && G.cur === 0 && !UI.busy) tutFix(); };
-function tutShow() {
-  var line = document.getElementById('line'), st = tutCur();
-  if (!st || UI.mode !== 'tut' || !G || G.over) { tutHide(); return false; }
-  line.classList.add('tutoff');
-  if (TUT.res && Date.now() < TUT.res.until && !(TUT.res.until === Infinity && G.cur === 0 && !UI.busy)) { if (!tq(TUT.res.sel)) TUT.res.sel = '#map'; tutBubble(TUT.res.text, TUT.res.sel, true); return false; }
-  TUT.res = null;
-  if (G.cur !== 0 || UI.busy) { var c0 = document.getElementById('tbub'); if (c0) c0.remove(); return false; }
-  var tg = tutTarget(st); tutBubble(tg.say, tg.sel, false, tg.btn); return !st.end;
-}
-function tutFix() {
-  var st = tutCur();
-  if (st.pocketHas && !TUT.fixed) { TUT.fixed = 1; if (G.bag.mount >= 2 && G.bag.trunk >= 1) { G.central[0].forEach(function (c) { G.bag[c]++; }); G.central[0] = ['mount', 'mount', 'trunk']; G.bag.mount -= 2; G.bag.trunk--; setTimeout(render, 0); } }
-  // select the taught token / tab so only the taught move glows
-  if (st.sel && UI.sel && UI.sel.kind === 'tok' && G.turn.hand[UI.sel.h] !== st.sel) { var h = G.turn.hand.indexOf(st.sel); if (h >= 0) { UI.sel = { kind: 'tok', h: h }; setTimeout(render, 0); } }
-  if (st.tab && UI.tab !== st.tab) { UI.tab = st.tab; setTimeout(render, 0); }
+window.tutRender = function () {
+  if (!TUT) return; tutQBtn();
+  if (UI.mode !== 'tut' && !TUT.free) { tutEnd(); return; }
+  if (TUT.map) tutMapDraw();
+  var say = tq('#twSay'), st = tutCur();
+  if (say && st && st.practice) say.textContent = todo(); else if (!tq('#twin')) tutWin();
+  setTimeout(function () { var w = tq('#twin'); if (w && TUT) tutPlace(w); }, 0); tutRing();
 };
+window.tutState = function () { return TUT ? { i: TUT.i, id: tutCur().id, map: TUT.map, min: TUT.min, done: Object.keys(TUT.done) } : null; };
+window.addEventListener('resize', function () { if (TUT) { if (TUT.map) tutMapDraw(); tutWin(); } });
+setTimeout(tutQBtn, 0);
+// panels open without a full render: re-place the window after every tap (and after the slide-in)
+document.addEventListener('click', function () { [0, 300].forEach(function (t) { setTimeout(function () { var w = tq('#twin'); if (w && TUT) { if (TUT.map && TUT.lastPP !== UI.pp) { TUT.lastPP = UI.pp; tutMapDraw(); } tutPlace(w); tutRing(); } }, t); }); });
