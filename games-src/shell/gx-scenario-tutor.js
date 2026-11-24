@@ -2,11 +2,11 @@
 // small, stacked position with ONE objective; the player makes real moves and learns the rule from the consequence. A floating
 // objective card never dims and never blocks taps. Needs gx-scenario-tutor.css. ES5, no dependencies. Docs: shell/GXST.md.
 // (Global is GXST because GXS is already the ?scn= test registry in gx-scenario.js.)
-//   GXST.init({game, scenarios:[...], storageKey?, settled?:()=>bool, keepClear?:[selectors], qParent?, phoneSlot?:{after,before,avoid:[selectors]}, keepPlace?:bool})   GXST.picker() GXST.start(id) GXST.retry()
+//   GXST.init({game, scenarios:[...], pickerButtons?:[{label,fn,cls?}], storageKey?, settled?:()=>bool, keepClear?:[selectors], qParent?, phoneSlot?:{after,before,avoid:[selectors]}, keepPlace?:bool})   GXST.picker() GXST.start(id) GXST.retry()
 //   GXST.next() GXST.hint() GXST.close() GXST.state()      events: window 'gxst' CustomEvent, detail.type =
 //   picker | start | hint | win | fail | retry | close
 //   scenario: {id, title, rule, goal, setup(), success()->bool, fail()->false|'message', par?, moves?()->n, hints:[nudge, {say, target}],
-//              debrief, solve?(api) (tests only)}
+//              debrief, chapter? (picker group header), solve?(api) (tests only)}
 (function () {
   'use strict';
   var D = document, C = null, S = null, W = null, R = null, Q = null, tick = 0, drag = null;
@@ -53,11 +53,13 @@
       W.appendChild(mk('p', 'gxst-say', 'Short games on the real board. Each one teaches one rule.'));
       var ol = mk('ol', 'gxst-list');
       C.scenarios.forEach(function (x, i) {
+        if (x.chapter && (i === 0 || C.scenarios[i - 1].chapter !== x.chapter)) ol.appendChild(mk('li', 'gxst-ch', x.chapter));
         var li = mk('li'), b = btn('gxst-pick' + (i === firstOpen() ? ' rec' : ''), null, 'Lesson ' + (i + 1) + ': ' + x.title, function () { GXST.start(x.id); });
         b.setAttribute('data-id', x.id); b.appendChild(mk('span', 'gxst-n', String(i + 1))); b.appendChild(mk('span', 'gxst-t', x.title)); b.appendChild(mk('span', 'gxst-st', starTxt(S.best[x.id] || 0)));
         li.appendChild(b); ol.appendChild(li);
       });
       W.appendChild(ol);
+      (C.pickerButtons || []).forEach(function (pb) { ft.appendChild(btn('gxst-btn' + (pb.cls ? ' ' + pb.cls : ''), pb.label, pb.aria || pb.label, pb.fn)); });
     } else if (S.phase === 'play') {
       W.appendChild(mk('p', 'gxst-goal', txt(s.goal)));
       if (S.hint) { var h = s.hints[S.hint - 1]; W.appendChild(mk('p', 'gxst-hint', typeof h === 'string' ? h : h.say)); }

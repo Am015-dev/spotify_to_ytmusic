@@ -30,3 +30,6 @@
 .gxst-q{min-height:44px;padding:0 12px;font-weight:700;cursor:pointer}
 .gxst-q.gxst-qfix{position:fixed;left:8px;bottom:8px;z-index:var(--gxst-z);border-radius:22px;background:var(--gxst-head);color:var(--gxst-on);border:2px solid var(--gxst-on)}
 @media (prefers-reduced-motion:reduce){.gxst-ring{animation:none;opacity:1}}
+
+.gxst-list .gxst-ch{list-style:none;font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;opacity:.7;margin:8px 0 2px;padding:0 2px}
+.gxst-list .gxst-ch:first-child{margin-top:0}

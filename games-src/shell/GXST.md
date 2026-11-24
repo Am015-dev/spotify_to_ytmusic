@@ -5,6 +5,7 @@ from the consequence. Spec and authoring checklist: orch/TUTORIAL-SPEC.md. Globa
 - `GXST.init({game, scenarios, storageKey?, settled?, keepClear?, qParent?})` once; adds a `Lessons` button (into `.gx-bar`, or `qParent`, else fixed bottom-left).
   `settled()` returns true when the game is idle (animations done); results are judged only then. `phoneSlot` = {after, before, avoid}: on phones (<600px) the minimised chip sits just under `after` or just above `before` (fewest `avoid` items covered), in its own band. `keepClear` = selectors the card keeps off (board areas the lesson is about). `goal` may be a function.
 - Scenario: `{id, title, rule, goal, setup()->Promise?, success()->bool, fail()->false|'message', par?, moves?(), hints:[nudge, {say, target}], debrief}`.
+- Optional: scenario `chapter` (picker group header, e.g. Basics / Building), init `pickerButtons:[{label,fn}]` (picker footer, e.g. a Rules window).
 - `GXST.picker()` `GXST.start(id|index)` `GXST.retry()` `GXST.next()` `GXST.hint()` `GXST.close()` `GXST.active()` (running scenario or null).
 - Card: never dims, never blocks taps outside itself; drag by header (saved), `-` chip, `x` close. Win/fail are the same small card.
 - Stars: 3 - hints used (- 1 if moves() > par), min 1. Storage `localStorage['gxst-'+game] = {best, pos}`.
