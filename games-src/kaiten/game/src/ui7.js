@@ -28,7 +28,7 @@ async function pxInit() {
     for (const pref of want) {
       try {
         const a = new PIXI.Application();
-        await a.init({ canvas: cv, backgroundAlpha: 0, antialias: false, resolution: PX.res, autoDensity: true, preference: pref, autoStart: false, sharedTicker: false, width: Math.max(16, bd.clientWidth), height: Math.max(16, bd.clientHeight), powerPreference: 'low-power', failIfMajorPerformanceCaveat: false, hello: false });
+        await a.init({ canvas: cv, backgroundAlpha: 0, antialias: false, resolution: PX.res, autoDensity: true, preference: pref, autoStart: false, sharedTicker: false, width: Math.max(16, bd.clientWidth), height: Math.max(16, bd.clientHeight), powerPreference: 'low-power', failIfMajorPerformanceCaveat: false, preserveDrawingBuffer: true, hello: false });   // keep the last frame: the table renders on demand, and without this a compositor pass can show an empty board
         if (pref === 'webgl' && a.renderer && a.renderer.type !== undefined && a.renderer.name && !/webgl/i.test(a.renderer.name)) { }
         app = a; PX.kind = (a.renderer && a.renderer.name) || pref; break;
       } catch (e) { PX.err += pref + ': ' + (e && e.message || e) + '; '; }
@@ -111,7 +111,7 @@ function pxBack(w) {
 }
 // ---- the layout read: one pass over the DOM after each render ----
 let pxQueued = false;
-function pxDirty() { if (!PX.on || pxQueued) return; pxQueued = true; requestAnimationFrame(() => { pxQueued = false; try { pxSync(); } catch (e) { console.error(e); } }); }
+function pxDirty() { if (!PX.on || pxQueued) return; pxQueued = true; requestAnimationFrame(() => { pxQueued = false; try { pxSync(); const parked = performance.now() - (PX.loopT || 0) > 120; if (PX.dirty || parked) pxFrame(performance.now()); if (parked && (PX.moving || pxMoving())) pxDirty(); } catch (e) { console.error(e); } }); }   // draw now: the idle-frame saver can park the main loop until the next input, which left the table blank
 function pxResize(force) {
   if (!PX.app) return; const bd = $('#bd'); const w = Math.max(16, bd.clientWidth), h = Math.max(16, bd.clientHeight);
   if (force || w !== PX.w || h !== PX.h) { PX.w = w; PX.h = h; try { PX.app.renderer.resize(w, h, PX.res); } catch (e) { } PX.dirty = true; }
@@ -376,7 +376,7 @@ function pxAmbient(dt) {
 // ---- the frame ----
 function pxLoop() {
   const PH = window.PerfHUD && PerfHUD.live ? PerfHUD : null;
-  const tick = ts => { PX.raf = (PH ? PH.raf : requestAnimationFrame)(tick); try { pxFrame(ts); } catch (e) { console.error(e); } };
+  const tick = ts => { PX.raf = (PH ? PH.raf : requestAnimationFrame)(tick); PX.loopT = performance.now(); try { pxFrame(ts); } catch (e) { console.error(e); } };
   PX.raf = (PH ? PH.raf : requestAnimationFrame)(tick);
 }
 function pxMoving() { return PX.tweens.length > 0 || [...PX.objs.values()].some(o => !o.detached && (Math.abs(o.x - o.tx) > .5 || Math.abs(o.y - o.ty) > .5 || Math.abs(o.w - (o.kind === 'plate' ? o.d : o.tw)) > .5)); }
@@ -430,7 +430,7 @@ function pxPerfReg() {
       getLevel: () => PX.q, isAuto: () => gfxPref() === 'auto',
       setLevel: (l, why) => { if (why === 'apply') setGfx(l); else { PX.autoQ = l; pxApplyQ(); } try { if (GX.open === 'setd') renderMenu(); } catch (e) { } },
       basePR: () => { const d = window.devicePixelRatio || 1; return Math.min((PXQ[PX.q] || PXQ.high).pr, d); }, onPixelRatio: v => pxSetRes(v),
-      isAnimating: () => !!UI.busy || !!PX.tweens.length || !!PX.parts.length, idleMode: PX.on ? 'throttle' : 'demand', idleFps: 10 });
+      isAnimating: () => !!UI.busy || !!PX.tweens.length || !!PX.parts.length || (PX.on && pxMoving()), idleMode: PX.on ? 'throttle' : 'demand', idleFps: 10 });
   } catch (e) { }
 }
 // share of painted (non-transparent) pixels in the canvas: the table is never blank

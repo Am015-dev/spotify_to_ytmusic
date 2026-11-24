@@ -200,3 +200,6 @@ html.ph #ps.fit1 .ps-goal i{margin:0 2px 0 4px}
 html.ph #ps.fit2 .ps-goal .race{overflow:hidden;text-overflow:ellipsis}
 /* R42: while a coach bubble or card is up, start marks next to it keep their dot but lose the tall touch area that reached over the bubble (pgClip) */
 #ov .opip.pickable.nearbub::after{display:none}
+
+/* lessons: on a phone the danger panel drops its warning line so the lesson card docks below it, clear of the answers */
+html.ph.twl #pc .prompt.alert .warn-l{display:none}
