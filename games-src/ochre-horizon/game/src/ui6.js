@@ -34,7 +34,8 @@ function guideNow() {
   if (G.phase === 'setup') {
     var st = UI.setup || {};
     if (st.step === 1) return { t: 'Tap Keep all 10', w: GD_IDEA.keep, sel: ['#mKeep'], nm: 'Keep all 10' };
-    return { t: 'Tap Open Charter', w: GD_IDEA.corp, sel: ['#mb [data-corp="c00"]'], nm: 'Open Charter' };
+    if (st.sel === 'c00' || (!st.sel && $('mCorpGo') && !$('mCorpGo').disabled)) return { t: 'Tap Confirm', w: GD_IDEA.corp, sel: ['#mCorpGo'], nm: 'Confirm' };
+    return { t: 'Select Open Charter', w: GD_IDEA.corp, sel: ['#mb [data-corp="c00"]'], nm: 'Open Charter' };
   }
   if (G.phase === 'research' || G.phase === 'draft') {
     if (G.phase === 'draft') return { t: 'Tap a card to keep it', w: 'The rest go to the rival.', sel: ['#mb [data-dr]'], nm: 'a card' };

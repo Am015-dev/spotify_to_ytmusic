@@ -3,15 +3,6 @@
 <div id="gdB" role="status" aria-live="polite" data-side="below"><span id="gdT"></span><button type="button" id="gdM" aria-label="More detail" aria-expanded="false">?</button><span id="gdW"></span><i class="ar"></i></div>
 <div id="gdR" role="status" aria-live="polite" data-side="below"><span id="gdRT"></span><i class="ar"></i></div>
 <div id="app" class="gx-app">
-  <div id="top">
-    <button class="ib" id="bmenu" aria-label="Menu"></button>
-    <div id="gen" aria-label="Generation">Gen<b>1</b></div>
-    <button class="sc you" id="syou" aria-label="Your score"><span class="tr" id="trYou">20</span><span class="lb"><span class="nm" id="nmYou">You</span><br><span id="vpYou">TR 20</span></span></button>
-    <button class="sc riv" id="sriv" aria-label="Rival details"><span class="lb"><span class="nm" id="nmRiv">Rival</span><br><span id="vpRiv">TR 20</span></span><span class="tr" id="trRiv">20</span></button>
-  </div>
-  <div id="glob">
-    <div class="gauge" id="gTemp"></div><div class="gauge" id="gOxy"></div><div class="gauge" id="gOcean"></div>
-  </div>
   <div id="bw" class="gx-board">
     <svg id="board" aria-label="Map of Ochre"></svg>
     <div id="hint"><span id="hintt">Pick your company</span></div>
@@ -19,12 +10,21 @@
     <div id="zoom"><button id="zin" aria-label="Zoom in"></button><button id="zout" aria-label="Zoom out"></button><button id="zfit" aria-label="Fit map"></button></div>
     <div id="confirm"><button id="confirmb">Place here</button></div>
   </div>
-  <div id="res"></div>
-  <div id="bar">
-    <button class="main" id="bCards"><span>Cards</span><small id="bCardsS">0 in hand</small></button>
-    <button id="bProj"><span>Projects</span><small>& goals</small></button>
-    <button id="bAct"><span>Actions</span><small id="bActS">0 ready</small></button>
-    <button class="pass" id="bPass"><span id="bPassT">Pass</span><small id="bPassS">end round</small></button>
+  <div id="top">
+    <div class="tl"><button class="ib" id="bmenu" aria-label="Menu"></button><button class="ib" id="blog" aria-label="Game log">Log</button></div>
+    <nav id="tabs3" aria-label="Board panels"><button id="tMile" data-pn="mile">Milestones</button><button id="bProj" data-pn="std"><span class="lg">Standard projects</span><span class="sm">Projects</span></button><button id="tAward" data-pn="award">Awards</button></nav>
+  </div>
+  <div id="strips">
+    <button class="sc riv" id="sriv" aria-label="Rival details"><span class="lb"><span class="nm" id="nmRiv">Rival</span><span class="sub" id="vpRiv">TR 20</span></span><span class="tr" id="trRiv">20</span></button>
+    <div class="strip you"><button class="sc you" id="syou" aria-label="Your score"><span class="lb"><span class="nm" id="nmYou">You</span><span class="sub" id="vpYou">TR 20</span></span><span class="tr" id="trYou">20</span></button>
+      <div class="turnrow"><span id="actL">Waiting</span><button class="pass" id="bPass"><span id="bPassT">Pass</span><small id="bPassS">end round</small></button></div></div>
+  </div>
+  <div id="glob" role="button" tabindex="0" aria-label="Planet gauges: tap to expand"><div id="gen" aria-label="Generation">Gen<b>1</b></div><div class="gauge" id="gTemp"></div><div class="gauge" id="gOxy"></div><div class="gauge" id="gOcean"></div></div>
+  <div id="bbar">
+    <button id="corpB" aria-label="Your company"><span class="ci"></span><span class="cn" id="corpN">Company</span></button>
+    <div id="res"></div>
+    <button id="bCards" aria-label="Your hand"><span class="fan" id="fan"></span><span class="hc"><b id="handN">0</b><small id="bCardsS">0 in hand</small></span></button>
+    <div id="ctrs"><button id="cPlayed" data-pn="played"><b id="nPlayed">0</b><small>Cards played</small></button><button id="cTags" data-pn="tags"><b id="nTags">0</b><small>Tags</small></button><button id="cVP" data-pn="vp"><b id="nVP">0</b><small>VP</small></button><button id="bAct"><b id="nAct">0</b><small id="bActS">Actions</small></button><button id="cEff" data-pn="effects"><b id="nEff">0</b><small>Effects</small></button></div>
   </div>
 </div>
 <aside id="rpanel" aria-label="Rival"></aside>
