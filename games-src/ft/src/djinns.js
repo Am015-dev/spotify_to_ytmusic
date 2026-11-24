@@ -1,5 +1,5 @@
 // ---------- djinns: 22 base + 3 promos + 2 Crafters + 1 Cutpurse djinn. Our own names, point values and numbers. ----------
-const DJN={wazira:4,hikma:5,nakhla:4,majlis:4,jawhar:4,sana:3};
+const DJN={wazira:3,hikma:4,nakhla:5,majlis:4,jawhar:4,sana:3};
 // cost: null (always on) | 'EF' (1 Sage or 1 Mystic) | 'EEF' (1 Sage + 1 Sage-or-Mystic) | 'F' (1 Mystic) | 'F+' (1+ Mystics, bidding)
 const DJINNS=[
  {k:'zarifa',n:'Zarifa',vp:6,cost:null,x:'At the end, every 2 Mystics you hold count as 1 good.'},

@@ -1,4 +1,4 @@
-// ---------- Sands of Qamar: components (our own numbers and names) ----------
+// ---------- Sands of Qamar: components (rulebook numbers, our own names) ----------
 const MNAME={vizier:'Advisor',elder:'Sage',merchant:'Trader',builder:'Mason',assassin:'Shadow',artisan:'Crafter'};
 const MPLUR={vizier:'Advisors',elder:'Sages',merchant:'Traders',builder:'Masons',assassin:'Shadows',artisan:'Crafters'};
 const MHELP={vizier:'Keep them. 1 point each, plus 10 per rival you outnumber.',elder:'Keep them. 2 points each; spend them to summon djinns.',
@@ -16,24 +16,24 @@ const TILEDEF={
   exchange:{n:'Spice Exchange',blue:false,x:'You may pay 4 coins for any 1 face-up goods card.'},
   ravine:{n:'Ravine',blue:false,x:'Impassable. Nothing may ever stand here.',block:1},
   lake:{n:'Great Lake',blue:true,x:'Impassable. Palms and palaces on tiles touching it score double.',block:1},
-  city:{n:'Wonder City',blue:true,x:'Worth more the more you hold: 6 / 20 / 42 / 72 / 110.'}};
-const TILESET=[['village',5,6],['sacred',6,4],['sacred',10,1],['sacred',12,1],['sacred',15,1],['oasis',8,6],['small',6,7],['large',4,4]];
+  city:{n:'Wonder City',blue:true,x:'Worth more the more you hold: 5 / 20 / 45 / 80 / 125.'}};
+const TILESET=[['village',5,5],['sacred',6,4],['sacred',10,1],['sacred',12,1],['sacred',15,1],['oasis',8,6],['small',6,8],['large',4,4]];
 const TILESET_ART=[['workshop',5,3],['exchange',10,2],['ravine',0,1]];
 const TILESET_WHIM=[['city',5,3,'blue'],['city',5,2,'red'],['lake',0,1]];
 function mkTiles(set,ex){const o=[];for(const [k,v,n,col] of set)for(let i=0;i<n;i++)o.push({k,v,blue:col?col==='blue':TILEDEF[k].blue,ex});return o}
 // goods (54 base): Mystics are the special cards
 const RNAME={ivory:'Ivory',jewels:'Jewels',gold:'Gold',papyrus:'Papyrus',silk:'Silk',spice:'Spice',fish:'Fish',wheat:'Wheat',pottery:'Pottery',fakir:'Mystic'};
 const RICON={ivory:'🦷',jewels:'💎',gold:'🥇',papyrus:'📜',silk:'🧣',spice:'🌶️',fish:'🐟',wheat:'🌾',pottery:'🏺',fakir:'🔮'};
-const RESOURCE_COUNT={ivory:3,jewels:2,gold:1,papyrus:4,silk:4,spice:4,fish:5,wheat:6,pottery:7,fakir:18};
-const SETVP=[0,1,3,6,12,20,29,39,49,60];
+const RESOURCE_COUNT={ivory:2,jewels:2,gold:2,papyrus:4,silk:4,spice:4,fish:6,wheat:6,pottery:6,fakir:18};
+const SETVP=[0,1,3,7,13,21,30,40,50,60];
 // turn-order track: cost per spot; several spots may share a cost ("stack" spots: a later bidder goes first)
-const BIDTRACK_STD=[16,11,8,5,3,1,0,0,0];const BIDTRACK_5=[18,12,8,5,5,3,3,1,1,0,0,0];
+const BIDTRACK_STD=[18,12,8,5,3,1,0,0,0];const BIDTRACK_5=[18,12,8,5,5,3,3,1,1,0,0,0];
 const CAMELS={2:11,3:8,4:8,5:8};
 // items (Artisans): 9 precious + 9 magic. The split per kind is an assumption (see rules-notes).
 const ITEMS={
-  gem5:{n:'Silver Bangle',kind:'precious',vp:4,cp:3,x:'Worth 4 points at the end.'},
+  gem5:{n:'Silver Bangle',kind:'precious',vp:5,cp:3,x:'Worth 5 points at the end.'},
   gem7:{n:'Jade Casket',kind:'precious',vp:7,cp:3,x:'Worth 7 points at the end.'},
-  gem9:{n:'Sun Diadem',kind:'precious',vp:10,cp:3,x:'Worth 10 points at the end.'},
+  gem9:{n:'Sun Diadem',kind:'precious',vp:9,cp:3,x:'Worth 9 points at the end.'},
   carpet:{n:'Wind Rug',kind:'magic',cp:2,x:'Your last person may land on any tile of its colour.'},
   lamp:{n:'Brass Lamp',kind:'magic',cp:2,x:'Take one face-up djinn for free.'},
   flute:{n:'Reed Pipe',kind:'magic',cp:2,x:'Before your move, bring up to 5 people from neighbouring tiles onto one tile.'},
@@ -49,4 +49,4 @@ const THIEVES={
   elder:{n:'White Cutpurse',x:'Each rival gives up a djinn; you take one of them.'},
   artisan:{n:'Purple Cutpurse',x:'Each rival gives up an item; you take one of them.'}};
 
-const CITYVP=c=>4*c*c+2*c;
+const CITYVP=c=>5*c*c;

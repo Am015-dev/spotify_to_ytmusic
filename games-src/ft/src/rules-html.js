@@ -34,7 +34,7 @@ const RULES_HTML=`<div class="rules">
 <li><b>Bazaar Stall</b>: you may pay 3 coins for one of the first 3 goods. <b>Grand Bazaar</b>: 6 coins for two of the first 6.</li>
 </ul>
 <h3>5. Goods and Mystics</h3>
-<p>Goods score in sets of different kinds: 1, 3, 6, 12, 20, 29, 39, 49 or 60 points for 1 to 9 kinds. Build as many sets as you can. Mystics never score. They boost Masons and Shadows, or replace a Sage.</p>
+<p>Goods score in sets of different kinds: 1, 3, 7, 13, 21, 30, 40, 50 or 60 points for 1 to 9 kinds. Build as many sets as you can. Mystics never score. They boost Masons and Shadows, or replace a Sage.</p>
 <h3>6. The end</h3>
 <p>When someone places their last camel, the round is finished and the game ends. It also ends if no legal move is left on the board. Add up coins, people, tiles, palms, palaces, djinns, goods and extras. Equal scores share the win.</p>
 <h3>Expansions (switch them on at the start)</h3>
