@@ -1,5 +1,5 @@
 {
- "updated": "2026-11-24T01:11:19Z",
+ "updated": "2026-11-24T01:19:34Z",
  "live_base": "https://am015-dev.github.io/spotify_to_ytmusic/",
  "decisions": [
   {
@@ -13,6 +13,10 @@
   }
  ],
  "notes": [
+  {
+   "at": "01:20",
+   "text": "ABOUT THE COST: the dollar figure is only an estimate of API price for the sessions I can read. It is a LOWER BOUND: (1) workers still running show $0 until they finish a turn; (2) the old orchestrator's spend after 22:26 UTC is not included (it cost $1,025.71 in total over several weeks; about $4.7 of that was added between 23:10 and 00:18); (3) the last 7 finished workers are counted at $0. Your plan's weekly % is computed by Anthropic from tokens and plan weights, not from these dollars, and I cannot read it from here. Your own Claude usage page is the true number."
+  },
   {
    "at": "01:14",
    "text": "Workers finished (not yet live): Wickdeep redesign, Ochre guide, Gloamwar, Onyx Atelier, Meadowfold, Thornbound tutorial. Still working: Via Tessera, Twin Thrones rules. Credits group B was blocked and needs a rerun. A fresh full rebuild of all games is running; nothing new is live until it passes my own phone and PC check. Costs of the newest finished workers are not counted yet."
