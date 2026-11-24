@@ -9,7 +9,7 @@ const fs = require('fs'), path = require('path');
 const html = fs.readFileSync(path.join(__dirname, 'tidewake.html'));
 const SIZES = (process.argv[2] || '402x874,1366x768').split(',').map(s => s.split('x').map(Number));
 const PROOF = path.join(__dirname, '..', 'proof'); fs.mkdirSync(PROOF, { recursive: true });
-const sleep = ms => new Promise(r => setTimeout(r, ms)); const probs = [];
+const sleep = ms => new Promise(r => setTimeout(r, ms)); const probs = []; const T0 = Date.now(), lap = m => process.env.LAP && console.log('  ' + ((Date.now() - T0) / 1000).toFixed(1) + 's ' + m);
 // the scripted solutions: tile t turned r times; start marks; question answers (q:'fire' picks the option whose label has the word)
 const SOLVE = {
   mark: [{ mark: [3, 6, 4] }], lay: [{ t: 2, r: 1 }], chain: [{ t: 2, r: 1 }], push: [{ t: 2, r: 1 }], wake: [{ t: 0, r: 0 }],
@@ -26,7 +26,7 @@ async function run(b, W, H) {
   const p = await ctx.newPage(); p.setDefaultTimeout(15000);
   p.on('pageerror', e => note('PAGE ERROR ' + e.message));
   p.on('console', m => { if (m.type() === 'error' && !/net::|Failed to load|favicon/.test(m.text())) note('console error ' + m.text().slice(0, 140)); });
-  await p.goto('https://gns.test/?2d=1');
+  lap('open'); await p.goto('https://gns.test/?2d=1');
   await p.waitForFunction(() => window.GXST && GXST.state() && window.TWL, null, { timeout: 30000 });
   await p.evaluate(() => { try { AIDELAY = 40; UI.speed = 8; TWKit.setSpeed(8); } catch (e) { } window.__ev = []; addEventListener('gxst', e => __ev.push(e.detail.type + ':' + (e.detail.id || ''))); GXST.picker(); });
   const st = () => p.evaluate(() => GXST.state());
@@ -51,16 +51,17 @@ async function run(b, W, H) {
     { const pt = await p.evaluate(([x, y]) => { const q = hproj(x - BC, y - BC + .5); return q ? { x: q.x, y: q.y } : null; }, [x, y]); if (pt) { await p.touchscreen.tap(pt.x, pt.y); await sleep(300); } }
     await tap('[data-a=startmark][data-x="' + x + '"][data-y="' + y + '"][data-e="' + e + '"]'); await sleep(250);
   };
-  const answer = async re => { await myTurn(); const i = await p.evaluate(re => { const o = G.q && G.q.opts; if (!o) return -1; return o.findIndex(x => new RegExp(re).test(x.l)); }, re.source); if (i < 0) return false; await tap('[data-a=q][data-i="' + i + '"]'); if (await p.evaluate(() => !!(G.q && G.q.who === 0 && GXST.state().phase === 'play'))) await tap('[data-a=q][data-i="' + i + '"]'); return true; };
+  const qUp = () => p.waitForFunction(() => GXST.state().phase !== 'play' || (G.q && G.q.who === 0), null, { timeout: 8000 }).catch(() => { });
+  const answer = async re => { await qUp(); const i = await p.evaluate(re => { const o = G.q && G.q.opts; if (!o) return -1; return o.findIndex(x => new RegExp(re).test(x.l)); }, re.source); if (i < 0) return false; await tap('[data-a=q][data-i="' + i + '"]'); await sleep(150); if (await p.evaluate(i => !!(G.q && G.q.who === 0 && GXST.state().phase === 'play' && document.querySelector('[data-a=q][data-i="' + i + '"]')), i)) await tap('[data-a=q][data-i="' + i + '"]'); return true; };
   // a question that needs a sensible answer (gate flow): take the first option that rides to an open end / places a tile, never "Accept"
-  const answerAny = async () => { for (let k = 0; k < 6; k++) { await sleep(300); await myTurn(); const i = await p.evaluate(() => { const o = G.q && G.q.who === 0 && G.q.opts; if (!o) return -2; const j = o.findIndex(x => /open end/.test(x.l)); return j >= 0 ? j : o.findIndex(x => !/Accept/.test(x.l)); }); if (i === -2) return; await tap('[data-a=q][data-i="' + i + '"]'); } };
+  const answerAny = async () => { for (let k = 0; k < 6; k++) { await sleep(200); await qUp(); const i = await p.evaluate(() => { const o = G.q && G.q.who === 0 && G.q.opts; if (!o) return -2; const j = o.findIndex(x => /open end/.test(x.l)); return j >= 0 ? j : o.findIndex(x => !/Accept/.test(x.l)); }); if (i === -2) return; if (await p.$('[data-a=q][data-i="' + i + '"]')) await tap('[data-a=q][data-i="' + i + '"]'); } };
   const playGame = async () => {
     for (let k = 0; k < 40; k++) {
       await myTurn(); const s = await st(); if (s.phase !== 'play') return;
       const mv = await p.evaluate(() => { if (G.q) return { q: 1 }; return sideToAct() === 0 ? aiMove(0, 'hard') : null; });
       if (!mv) { await sleep(200); continue; }
       if (mv.q) { await answerAny(); continue; }
-      if (mv.a === 'place') await place(mv.t, mv.r); else { await p.evaluate(m => act(m, 0), mv); await sleep(300); }
+      await p.evaluate(m => act(m, 0), mv); await sleep(250);   // the short game: engine moves (taps are proven in the other lessons)
     }
   };
   const solve = async id => {
@@ -71,12 +72,13 @@ async function run(b, W, H) {
     if (!(await phase('win', id === 'game' ? 60000 : 15000))) { const s = await st(); note(id + ': scripted solution did not win (phase ' + s.phase + (s.msg ? ', ' + s.msg : '') + ')'); }
   };
   const wrong = async id => {
-    const w = WRONG[id]; if (w.mark) await markTap(...w.mark); else if (w.q) await answer(w.q); else await place(w.t, w.r);
+    const w = WRONG[id]; lap('wrong start'); if (w.mark) await markTap(...w.mark); else if (w.q) await answer(w.q); else await place(w.t, w.r);
+    lap('wrong played');
     if (!(await phase('fail', 20000))) { note(id + ': a wrong move did not fail ' + JSON.stringify(await p.evaluate(() => ({ q: !!G.q, busy: UI.busy, ag: G.ag.length, side: sideToAct(), alive: G.ships[0].alive, n: TWL.L.n, ph: GXST.state().phase })))); return false; }
     const s = await st(); if (!/\w{4}/.test(s.msg)) note(id + ': fail has no message'); return true;
   };
   const ids = Object.keys(SOLVE).filter(k => !process.env.ONLY || process.env.ONLY.split(',').indexOf(k) >= 0);
-  // 1) picker
+  lap('ready'); // 1) picker
   let s = await st();
   const n = await p.evaluate(() => document.querySelectorAll('.gxst-pick').length);
   if (s.phase !== 'picker' || n !== s.count || n < 6) note('picker shows ' + n + ' of ' + s.count + ' lessons');
@@ -105,7 +107,7 @@ async function run(b, W, H) {
         await sleep(500);
       }
     }
-    await solve(id); s = await st();
+    lap(id + ' wrong+retry done'); await solve(id); s = await st(); lap(id + ' solved');
     if (s.phase === 'win' && s.stars !== 3 && !(id === 'lay')) note(id + ': clean solve gave ' + s.stars + ' stars');
     if (id === 'game') await p.screenshot({ path: path.join(PROOF, 'lessons-' + tag + '-win.png') });
   }

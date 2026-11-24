@@ -47,7 +47,7 @@
     try { kitReset(); kitSync(); } catch (e) { }
     if (sp.bow) flow();
     render(); schedule();
-    return until(function () { return !UI.busy && !G.ag.length && (sideToAct() === 0 || G.over); }, 12000).then(function () { return new Promise(function (r) { setTimeout(r, 900); }); });
+    return until(function () { return !UI.busy && (G.q && G.q.who === 0 || !G.ag.length && (sideToAct() === 0 || G.over)); }, 12000).then(function () { return new Promise(function (r) { setTimeout(r, 400); }); });
   }
   // ---- each lesson's wrong answer says why, in the engine's own words
   var why = function () { var o = me().out || '', c = G.ships[COB].out || ''; if (!me().alive) return o; return c; };
@@ -144,7 +144,7 @@
   var go = function () {
     if (!ready()) { setTimeout(go, 200); return; }
     hook();
-    GXST.init({ game: 'tidewake', scenarios: lessons, keepClear: ['#board', '[data-a=card]', '[data-ph=pcard]', '[data-a=rot]', '[data-a=place]', '[data-a=q]', '[data-a=startmark]', '#cards', '#pc', '.prompt'], settled: function () { return !!G && UI.started && !UI.busy && !G.ag.length && (G.over || sideToAct() === 0); } });
+    GXST.init({ game: 'tidewake', scenarios: lessons, keepClear: ['.gx-bar', '#board', '[data-a=card]', '[data-ph=pcard]', '[data-a=rot]', '[data-a=place]', '[data-a=q]', '[data-a=startmark]', '#cards', '#pc', '.prompt'], settled: function () { return !!G && UI.started && !UI.busy && (G.q && G.q.who === 0 || !G.ag.length && (G.over || sideToAct() === 0)); } });
   };
   setTimeout(go, 300);
 })();
