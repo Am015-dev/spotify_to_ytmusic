@@ -15,9 +15,9 @@ mus = sorted(os.path.splitext(os.path.basename(f))[0] for f in glob.glob(os.path
 pre = 'window.VG_ASSETS=' + json.dumps({'items': [{k: i[k] for k in ('stem', 'kind', 'w', 'h', 'ratio', 'alpha', 'wave')} for i in man['items']]}, separators=(',', ':')) + ';window.VG_HAVE=' + json.dumps(have) + ';window.VG_MUSIC=' + json.dumps(mus) + ';\n'
 SH = lambda f: os.path.join(SP, 'shell', f)
 SRC = {'gx-scenario.js': SH('gx-scenario.js'), 'scn.js': os.path.join(S, 'scn.js'), 'shell.js': SH('shell.js'), 'gx-kit.js': SH('gx-kit.js'), 'gx-viewport.js': SH('gx-viewport.js'),
-       'gx-help.js': SH('gx-help.js'), 'gx-tutor.js': SH('gx-tutor.js'), 'gx-campaign.js': SH('gx-campaign.js'), 'campaign-data.js': None, 'gameaudio.js': os.path.join(SP, 'audio', 'gameaudio.js'),
+       'gx-help.js': SH('gx-help.js'), 'gx-tutor.js': SH('gx-tutor.js'), 'gx-scenario-tutor.js': SH('gx-scenario-tutor.js'), 'lessons.js': os.path.join(D, 'lessons.js'), 'gx-campaign.js': SH('gx-campaign.js'), 'campaign-data.js': None, 'gameaudio.js': os.path.join(SP, 'audio', 'gameaudio.js'),
        'gx-music.js': SH('gx-music.js'), 'data.js': os.path.join(S, 'data.js'), 'engine.js': os.path.join(S, 'engine.js'), 'ai.js': os.path.join(S, 'ai.js'), 'art.js': os.path.join(S, 'art.js'), 'ui.js': os.path.join(D, 'ui.js')}
-css = '\n'.join(rd(SH(f)) for f in ('shell.css', 'gx-kit.css', 'gx-campaign.css', 'gx-help.css', 'gx-tutor.css')) + '\n' + rd(os.path.join(S, 'style.css'))
+css = '\n'.join(rd(SH(f)) for f in ('shell.css', 'gx-kit.css', 'gx-campaign.css', 'gx-help.css', 'gx-tutor.css', 'gx-scenario-tutor.css')) + '\n' + rd(os.path.join(S, 'style.css'))
 h = rd(os.path.join(S, 'head.html')).replace('/*CSS*/', css)
 body = rd(os.path.join(S, 'body.html'))
 for f, p in SRC.items():
