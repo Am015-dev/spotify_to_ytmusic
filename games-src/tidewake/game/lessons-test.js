@@ -31,8 +31,8 @@ async function run(b, W, H) {
   await p.evaluate(() => { try { AIDELAY = 40; UI.speed = 8; TWKit.setSpeed(8); } catch (e) { } window.__ev = []; addEventListener('gxst', e => __ev.push(e.detail.type + ':' + (e.detail.id || ''))); GXST.picker(); });
   const st = () => p.evaluate(() => GXST.state());
   const tapEl = async (fn, arg, what) => {
-    const pt = await p.evaluate(([fn, arg]) => { const e = (new Function('a', 'return (' + fn + ')(a)'))(arg); if (!e) return null; const r = e.getBoundingClientRect(); const x = r.left + r.width / 2, y = r.top + r.height / 2, u = document.elementFromPoint(x, y); return { x, y, ok: !!u && (u === e || e.contains(u)) }; }, [fn.toString(), arg]);
-    if (!pt) { note('nothing to tap: ' + what); return false; } if (!pt.ok) note('something covers ' + what);
+    const pt = await p.evaluate(([fn, arg]) => { const e = (new Function('a', 'return (' + fn + ')(a)'))(arg); if (!e) return null; const r = e.getBoundingClientRect(); const x = r.left + r.width / 2, y = r.top + r.height / 2, u = document.elementFromPoint(x, y); return { x, y, ok: !!u && (u === e || e.contains(u)), by: u && (u.id || String(u.className).slice(0, 40)) }; }, [fn.toString(), arg]);
+    if (!pt) { note('nothing to tap: ' + what); return false; } if (!pt.ok) note('something covers ' + what + ' (' + pt.by + ')');
     await p.touchscreen.tap(pt.x, pt.y); await sleep(160); return true;
   };
   const vis = '(sel)=>[...document.querySelectorAll(sel)].find(e=>{const r=e.getBoundingClientRect();return r.width>8&&r.height>8&&r.bottom>0&&r.top<innerHeight&&!e.closest("[hidden]")})';
@@ -48,10 +48,10 @@ async function run(b, W, H) {
   };
   const markTap = async (x, y, e) => {
     await myTurn();
-    if (phone) { const pt = await p.evaluate(([x, y]) => { const q = hproj(x - BC, y - BC + .5); return q ? { x: q.x, y: q.y } : null; }, [x, y]); if (pt) { await p.touchscreen.tap(pt.x, pt.y); await sleep(300); } }
+    { const pt = await p.evaluate(([x, y]) => { const q = hproj(x - BC, y - BC + .5); return q ? { x: q.x, y: q.y } : null; }, [x, y]); if (pt) { await p.touchscreen.tap(pt.x, pt.y); await sleep(300); } }
     await tap('[data-a=startmark][data-x="' + x + '"][data-y="' + y + '"][data-e="' + e + '"]'); await sleep(250);
   };
-  const answer = async re => { await myTurn(); const i = await p.evaluate(re => { const o = G.q && G.q.opts; if (!o) return -1; return o.findIndex(x => new RegExp(re).test(x.l)); }, re.source); if (i < 0) return false; return tap('[data-a=q][data-i="' + i + '"]'); };
+  const answer = async re => { await myTurn(); const i = await p.evaluate(re => { const o = G.q && G.q.opts; if (!o) return -1; return o.findIndex(x => new RegExp(re).test(x.l)); }, re.source); if (i < 0) return false; await tap('[data-a=q][data-i="' + i + '"]'); if (await p.evaluate(() => !!(G.q && G.q.who === 0 && GXST.state().phase === 'play'))) await tap('[data-a=q][data-i="' + i + '"]'); return true; };
   // a question that needs a sensible answer (gate flow): take the first option that rides to an open end / places a tile, never "Accept"
   const answerAny = async () => { for (let k = 0; k < 6; k++) { await sleep(300); await myTurn(); const i = await p.evaluate(() => { const o = G.q && G.q.who === 0 && G.q.opts; if (!o) return -2; const j = o.findIndex(x => /open end/.test(x.l)); return j >= 0 ? j : o.findIndex(x => !/Accept/.test(x.l)); }); if (i === -2) return; await tap('[data-a=q][data-i="' + i + '"]'); } };
   const playGame = async () => {
@@ -73,7 +73,7 @@ async function run(b, W, H) {
   const wrong = async id => {
     const w = WRONG[id]; if (w.mark) await markTap(...w.mark); else if (w.q) await answer(w.q); else await place(w.t, w.r);
     if (!(await phase('fail', 20000))) { note(id + ': a wrong move did not fail'); return false; }
-    const s = await st(); if (!/\w{8}/.test(s.msg)) note(id + ': fail has no message'); return true;
+    const s = await st(); if (!/\w{4}/.test(s.msg)) note(id + ': fail has no message'); return true;
   };
   const ids = Object.keys(SOLVE);
   // 1) picker

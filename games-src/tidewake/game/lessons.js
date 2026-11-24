@@ -95,7 +95,7 @@
       fail: function () { return did() && !me().alive ? 'You accepted your fate. A Deck Cannon destroys the leviathan that sinks you.' : false; },
       hints: ['You hold a Deck Cannon. A question asks what to do.', { say: 'Choose to fire the Deck Cannon.', target: function () { return tqbtn('dCannon'); } }],
       debrief: 'The cannon destroyed the leviathan. Keep one for emergencies.' },
-    { id: 'gate', title: 'Rift Gate', rule: 'A Rift Gate saves a junk that is about to be lost: it is thrown to a random square and rides a wake from there.', par: 3,
+    { id: 'gate', title: 'Rift Gate', rule: 'A Rift Gate saves a junk that is about to be lost: it is thrown to a random square and rides a wake from there.', par: 5,
       goal: 'A leviathan blocks your bow. Escape through the Rift Gate.',
       setup: function () { return stack({ exp: { rift: 1 }, bow: 1, ships: [{ x: 3, y: 4, e: 5, on: [3, 5] }, { x: 6, y: 0, e: 1 }], bd: [[3, 5, 0, 0]], mons: [{ id: 0, x: 3, y: 4 }, { id: 3, x: 5, y: 1 }, { id: 6, x: 0, y: 0 }, { id: 7, x: 6, y: 5 }], hands: [[56, 4, 3], [8, 9, 10]] }); },
       success: function () { return did() && me().alive && G.gates.length > 0 && !G.q; },
@@ -109,7 +109,7 @@
       fail: function () { return did() && !me().alive ? 'You crossed the wave\'s row and rolled a 1. It needs 2: your junk capsized.' : false; },
       hints: ['The wave sweeps the whole row of its marker. Your first tile heads that way.', { say: 'Turn a tile so you sail sideways, along the bottom row.', target: function () { return T(1); } }],
       debrief: 'Crossing the wave\'s row costs a roll. Staying out of it is free.' },
-    { id: 'game', title: 'Short game', rule: 'Last junk afloat wins. Use everything you learned.', par: 99,
+    { id: 'game', title: 'Short game', rule: 'Last junk afloat wins. Use everything you learned.',
       goal: 'Win a short game against Cobalt.',
       setup: function () { return stack({ first: 1, ships: [{ x: 1, y: 6, e: 5 }, { x: 5, y: 0, e: 1 }], mons: [{ id: 0, x: 2, y: 2 }, { id: 4, x: 4, y: 4 }, { id: 8, x: 5, y: 2 }, { id: 9, x: 0, y: 3 }], hands: [[1, 4, 8], [2, 3, 9]], turn: 1 }); },
       success: function () { return !!G.over && G.over.win.indexOf(0) >= 0; },
@@ -142,7 +142,7 @@
   var go = function () {
     if (!ready()) { setTimeout(go, 200); return; }
     hook();
-    GXST.init({ game: 'tidewake', scenarios: lessons, keepClear: ['#board', '[data-a=card]', '[data-ph=pcard]', '[data-a=rot]', '[data-a=place]', '[data-a=q]', '[data-a=startmark]'], settled: function () { return !!G && UI.started && !UI.busy && !G.ag.length && (G.over || sideToAct() === 0); } });
+    GXST.init({ game: 'tidewake', scenarios: lessons, keepClear: ['#board', '[data-a=card]', '[data-ph=pcard]', '[data-a=rot]', '[data-a=place]', '[data-a=q]', '[data-a=startmark]', '#cards', '#pc', '.prompt'], settled: function () { return !!G && UI.started && !UI.busy && !G.ag.length && (G.over || sideToAct() === 0); } });
   };
   setTimeout(go, 300);
 })();
