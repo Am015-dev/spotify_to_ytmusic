@@ -320,3 +320,24 @@ Still weak: build-all --quick fails on pre-existing issues (11px "Forest" in per
 ## W767 stitchwise no-scroll HUD (shelf/W767-stitchwise-hud)
 Done: the dock's long scrolling strip of every upcoming patch (the owner's "scroll up and down") is now one "Next +N" chip that opens All patches, which shows the live sale order (first 3 = for sale, gold). 3 offers fit with no scroll on phone and PC; PC offer cards are compact rows; PC text >= 16px (track head, bar chips, start menu, result tally); closed windows display:none. Gate: stitchwise/noscroll-test.js (402x874, 1366x768, plus 402x720 and 1366x640 browser heights, every phase) PASS. Sheets --strict 0 flags: stitchwise/proof/w767-*-sheet.jpg.
 Integrator: visual baselines title + board diff (expected, layout changed): re-approve with --approve-visual after the owner sees the sheets. Pre-existing fails, also on the parent: scenarios pc menu + sw-zoom (open window covers the dock, settings chips overlap).
+## W742 crown-city-smash visual (24 Nov 2026) - branch shelf/W742-vis-crown
+Done: dice faces never blank (tumble keeps the face visible; star faces now show a star behind the digit, so no bare white tiles); phone board repacked so the city, round panel, harbor and seats fill the top (about 1.7x larger) instead of an empty sunburst (art.js, phone only).
+NOT done (pc, R14 item 3): dice tray still a full-width green bar with dice at its left, 5 "0 cards" empty slots still shown, left player list still 8-9px. Next worker: board.css/onboard.css at >=1024px, centre dice at 56px+, hide empty card slots, 16px list.
+Gate not met: pc sheet still has dead-space/small-text cells; baselines pull failed (no origin/ui-baselines in the shallow clone), so build-all showed 12/15 on missing snapshots only. lessons-test PASS phone 26s, pc 16s.
+## W734 hollowbough scenario lessons (branch shelf/W734-scn-hollowbough)
+Done: 8 GXST lessons (game/src/lessons.js), build.py/body.html wiring, game/lessons-test.js (PASS both sizes, ~9 s each).
+Next: lesson card covers the top HUD on phone and some meadow/places on desktop (tune keepClear, one attempt made and reverted); add Haven/event/Autumn lessons;
+retire the unreachable GXT tour in ui12.js and its tests (tutor-test.js, learn-touch.js).
+## W744 wickdeep scenario lessons (all 7 pass)
+- All 7 lessons pass (scripted win + wrong-move fail for pick/shield/retal) at 402x874 and 1366x768, ~9 s total, stable 4/4 runs. Hint twice draws the ring.
+- Fixes: crab/ghoul used monster card 0 (init 9/11, shield +1) so they acted first; now card 7 (late). Retal judged at the ranged hit (no new round). Test: door/coin pick the door/coin glow, coin plays the second half (Holdfast top) so the turn ends; retal wrong = move in + melee.
+- Lessons hide the game's coach bubble, goal chip and results screen (showResult) while active; an invisible #wdl-zone over figures/door/coin is in keepClear, so the card stays off the pieces.
+- Shots: SHOTS=<dir> on lessons-test.js writes one PNG per step (play, hint, fail, win) plus picker and rules.
+- Still weak: phone win/fail cards can overlap the (inactive) tray; Rules dialog body looks empty in shots (pre-existing, not lessons); card text and cards under 13 px (game-wide).
+
+## W732 wickdeep scenario lessons (partial)
+- Hang cause (found, fixed): test-side. 4th hand card sits off-screen in the horizontal tray (needs scrollIntoView before tap); step regexes used "Attack N" but halves read "Hit N"; `#playbtn` only exists on a pick (optional); real-time waits (15-20 s each) replaced by turbo + 3 s caps.
+- Real game bug fixed (ui2.js doMove): tapping the two cards in non-hand order was refused ("Not now"). The first-tapped card leads, so both orders are now legal.
+- Test now runs in ~30 s for both sizes (was hanging past 60 s). pick, halves, finish PASS. Still failing in lessons-test.js (script-side, not game): shield solve (crab ends hp 1: check which half is tapped), retal wrong/solve, door, coin (turn stays in 'second' ask: play the second half or ENGINE step), hint-twice ring not found, atk glow missing in retal. Only 7 lessons exist, not 10.
+- Run: cd games-src && python3 wickdeep/build.py && DBG=1 PW_DIR=$(npm root -g)/playwright node wickdeep/lessons-test.js
+- Start screenshots removed from the branch; test writes none.

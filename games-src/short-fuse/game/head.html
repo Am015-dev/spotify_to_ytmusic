@@ -170,5 +170,8 @@ kbd{font:800 .85rem var(--fb);border:2px solid var(--ink);border-radius:6px;padd
 /*TABLE_CSS*/
 /*W663 contrast plates*/html body .gx-drawer-body li,html body .rules li,html body .row>button.btn>b{background:#1b1208!important;color:#fff4d8!important;opacity:1!important;text-shadow:none!important;border-radius:6px;padding:1px 6px;box-shadow:none!important;background-image:none!important}
 /*W663 nested*/html body #rulesbody li *{color:inherit!important;background:none!important;box-shadow:none!important;padding:0}
+/* drawers: children never fade in from hidden, so a panel is never captured or seen empty */
+.gx-drawer.on,.gx-drawer.on .gx-drawer-head,.gx-drawer.on .gx-drawer-body,.gx-drawer.on .gx-drawer-body *{visibility:visible;transition:none}
+.gx-drawer{transition:none}
 </style>
 </head>

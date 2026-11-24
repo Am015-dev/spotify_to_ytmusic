@@ -277,7 +277,14 @@ function renderDock() {
     }
     }
   }
-  renderSel(); renderActs(); renderCheat();
+  renderSel(); renderActs(); renderCheat(); renderRecent();
+}
+// PC dock: the last three things that happened, so the tall panel tells the story of the meal instead of ending in a blank
+function renderRecent() {
+  const r = $('#recent'); if (!r) return; const L = (G.log || []).slice(-3).reverse(), sg = L.map(e => e.i).join(',') + '|' + (isPh() ? 1 : 0);
+  if (r.dataset.sg === sg) return; r.dataset.sg = sg; r.replaceChildren();
+  if (isPh() || !L.length) return;
+  r.appendChild(h('div.rh', 'Last moves')); for (const e of L) r.appendChild(h('div.ri', h('span.lt', 'R' + e.round + '.' + e.turn), ' ' + e.t));
 }
 function renderCheat() { const c = $('#cheat'); if (c) c.replaceChildren(); }   // no scoring cheat sheet: the trays show what scores
 function renderSel() {
