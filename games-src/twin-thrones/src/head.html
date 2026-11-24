@@ -583,6 +583,16 @@ html,body{background:#3a1f0e}
 #pyr .card.v4.rowm .pr{top:var(--nmh,27px);right:1px;max-width:52%;overflow:hidden;justify-content:flex-end;gap:1px;height:22px}
 #pyr .card.v4.rowm .e1,#pyr .card.v4.rowm .e1.sh,#pyr .card.v4.rowm .e1.vp,#pyr .card.v4.rowm .e1.sc{height:21px;font-size:13px;padding:0 3px 0 1px;gap:0}
 #pyr .card.v4.rowm .tx,#pyr .card.v4.rowm .or{font-size:13px;padding:1px 3px}
+/* W611: effect chips are never clipped (the +1 badge was cut 3px) and never sit under the price chip */
+#pyr .card.v4.rowm .ef,#pyr .card.v4.flat .ef{overflow:visible;min-height:24px;height:auto;padding:1px 0;box-sizing:border-box}
+#pyr .card.v4.rowm .ef{max-width:46%}#pyr .card.v4.rowm .pr{max-width:52%;z-index:3}
+#pyr .card.v4.rowm .pr .fr{font-size:12px;padding:0 5px;line-height:21px}
+#pyr .card.v4.rowm.sm .pr .fr{font-size:11px;padding:0 3px;letter-spacing:-.02em}#pyr .card.v4.rowm.sm .e1{font-size:12px;padding:0 2px 0 1px}#pyr .card.v4.rowm.sm .e1 .art{width:14px;height:14px;flex-basis:14px}
+/* overlapped (cov) rows: the strip under the name is ONE line; the price of a card you cannot take yet is not shown (a hidden card's text must not sit under the row below) */
+#pyr .card.v4.rowm.cov .pr{display:none}
+#pyr .card.v4.rowm.cov .ef{flex-wrap:nowrap;max-width:calc(100% - 4px);height:22px;min-height:0}
+#pyr .card.v4.flat .ef,#pyr .card.v4.rowm .ef{z-index:2}
+#pyr .card.v4 .e1.has-art,#pyr .card.v4 .tx{position:relative;z-index:1}
 #pyr .card.v4.rowm .e1 .art{width:16px;height:16px;flex-basis:16px}
 #pyr .card.v4.rowm .pr .c1,#pyr .card.v4.rowm .pr .fr{height:21px;font-size:13px;padding:0 3px 0 1px;gap:0}
 #pyr .card.v4.rowm .c1 .art{width:15px;height:15px}
