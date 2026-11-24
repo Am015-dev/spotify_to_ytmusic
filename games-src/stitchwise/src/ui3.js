@@ -84,22 +84,23 @@ function showResult(o) {
     cols.appendChild(h('div.rvcol' + (w === s ? '.win' : ''), { 'data-seat': s }, h('div.rvname', h('span.dot', { style: 'background:' + (s === 0 ? 'var(--me)' : 'var(--opp)') }), nameOf(s)), q,
       h('div.rvtally', h('div', { html: btnIc() + ' Buttons <b>' + sc[s].btn + '</b>' }), h('div', { html: bonusIc() + ' 7×7 bonus <b>' + (sc[s].bonus ? '+7' : '0') + '</b>' }), h('div.rvpen', 'Empty ', h('b.rvec', '0'), ' × -2 = ', bt), h('div.rvsum', 'Total ', tt))));
   });
-  c.appendChild(h('div.rvhead', 'The quilts are done')); c.appendChild(cols); var ban = h('div.rvban'); c.appendChild(ban); var acts = h('div.rvacts'); c.appendChild(acts);
+  c.appendChild(h('div.rvhead', 'The quilts are done')); var ban = h('div.rvban'); c.appendChild(ban); var acts = h('div.rvacts'); c.appendChild(acts);
+  var det = h('details.rvdet', UI.coach ? { open: '' } : {}, h('summary', 'Details')); det.appendChild(cols); c.appendChild(det);
   rs.innerHTML = ''; rs.appendChild(c); UI.rsShown = true; UI.cs = saved; UI.newCells = saveNew; var seqId = ++UI.seq2;
   var setTotals = function (s, n) { $('.rvec', $$('.rvcol', c)[s]).textContent = n; pen[s].textContent = n ? '-' + n * 2 : '0'; tot[s].textContent = sc[s].btn + (sc[s].bonus ? 7 : 0) - n * 2; };
   var finishUp = function () {
     if (seqId !== UI.seq2) return; [0, 1].forEach(function (s) { cells[s].forEach(function (e) { e.classList.add('x'); }); setTotals(s, sc[s].empty); });
-    var A = sc[0].total, B = sc[1].total, title = hot ? nameOf(w) + ' wins!' : w === 0 ? 'You win!' : nameOf(1) + ' wins.';
-    ban.className = 'rvban on ' + (w === 0 || hot ? 'won' : 'lost'); try { artImg('result-win'); artImg('result-lose'); } catch (e) { } /* both ready for the next game */ var ra = artHas(w === 0 || hot ? 'result-win' : 'result-lose') ? '<img class="rvart" alt="" src="' + artUrl(w === 0 || hot ? 'result-win' : 'result-lose') + '">' : ''; ban.innerHTML = ra + '<div class="rvt1">' + title + '</div><div class="rvt2">' + nameOf(0) + ' ' + A + ' – ' + B + ' ' + nameOf(1) + '</div>' + (A === B ? '<div class="rvt3">' + tieText(w) + '</div>' : '');
+    var A = sc[0].total, B = sc[1].total, by = A === B ? '' : ' by ' + Math.abs(A - B), title = hot ? nameOf(w) + ' wins' + by + '!' : w === 0 ? 'You win' + by + '!' : nameOf(1) + ' wins' + by + '.', ws = sc[w], hl = [['Buttons', ws.btn], ['7x7 bonus', ws.bonus ? 7 : 0], ['Empty squares', -2 * ws.empty]].filter(function (x) { return x[1]; }).slice(0, 3).map(function (x) { return '<li>' + x[0] + ' <b>' + (x[1] > 0 ? '+' : '') + x[1] + '</b></li>'; }).join('');
+    ban.className = 'rvban on ' + (w === 0 || hot ? 'won' : 'lost'); try { artImg('result-win'); artImg('result-lose'); } catch (e) { } /* both ready for the next game */ var ra = artHas(w === 0 || hot ? 'result-win' : 'result-lose') ? '<img class="rvart" alt="" src="' + artUrl(w === 0 || hot ? 'result-win' : 'result-lose') + '">' : ''; ban.innerHTML = ra + '<div class="rvt1">' + title + '</div><div class="rvt2">' + nameOf(0) + ' ' + A + ' – ' + B + ' ' + nameOf(1) + '</div><ul class="rvhl">' + hl + '</ul>' + (A === B ? '<div class="rvt3">' + tieText(w) + '</div>' : '');
     var QS = ((window.CAMPAIGN || {}).story || {}).quick, WK = (((window.CAMPAIGN || {}).story || {}).final || {}).walk; if (!UI.coach && WK && UI.walkLine) { var a0 = sc[0], b0 = sc[1]; ban.appendChild(h('div.rvt3.walk', WK.replace('{b}', a0.btn).replace('{x}', a0.bonus ? 7 : 0).replace('{e}', a0.empty).replace('{t}', a0.total).replace('{ob}', b0.btn).replace('{ox}', b0.bonus ? 7 : 0).replace('{oe}', b0.empty).replace('{ot}', b0.total).replace('Marden', nameOf(1)))); } if (UI.coach) coachFinal(ban, w, A, B); else if (!UI.camp && !hot && QS) ban.appendChild(h('div.rvt3.wren', (A === B ? QS.tie : w === 0 ? QS.win : QS.lose).replace('{name}', nameOf(1))));
     $$('.rvcol', c).forEach(function (e) { e.classList.add('done'); }); acts.textContent = ''; sfx('fanfare');
     if (w === 0 || hot) { for (var k = 0; k < 18; k++) c.appendChild(h('i.cf', { style: 'left:' + (Math.random() * 100) + '%;background:' + PAL[k % PAL.length] + ';animation-delay:' + (Math.random() * .6) + 's' })); } else sfx('thud');
     if (o.after) { var cb = h('button.btn.go.grow', { type: 'button' }, 'Continue'); cb.onclick = function () { o.after(); }; acts.appendChild(cb); cb.focus(); }
     else if (UI.coach && UI.prologue) { acts.appendChild(h('button.btn.go.grow', { type: 'button', 'data-a': 'story' }, 'Start the Story')); acts.appendChild(h('button.btn.alt', { type: 'button', 'data-a': 'title' }, 'Title')); }
-    else { acts.appendChild(h('button.btn.go.grow', { type: 'button', 'data-a': 'again' }, UI.coach ? 'Play a real game' : 'Play again')); acts.appendChild(h('button.btn.alt', { type: 'button', 'data-a': 'title' }, 'Title')); }
+    else { acts.appendChild(h('button.btn.go.grow', { type: 'button', 'data-a': 'again' }, UI.coach ? 'Play a real game' : 'Play again')); acts.appendChild(h('button.btn.alt', { type: 'button', 'data-a': 'title' }, 'Menu')); }
   };
   var mx = Math.max(sc[0].empty, sc[1].empty), step = amt(1) ? Math.max(28, Math.min(110, Math.floor(2600 / Math.max(1, mx)))) : 0;
-  if (!step || o.instant) { finishUp(); return; }
+  if (!step || o.instant || !UI.coach) { finishUp(); return; }
   var n = 0, skip = h('button.btn.alt.sm.rvskip', { type: 'button' }, 'Skip'); skip.onclick = function () { n = 1e9; }; acts.appendChild(skip);
   var tick = function () {
     if (seqId !== UI.seq2) return; if (n >= mx) { setTimeout(finishUp, amt(250)); return; }

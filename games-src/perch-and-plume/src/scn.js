@@ -67,8 +67,8 @@
       UI.busy = false; render(); gameOver();
       return GXS.wait(function () { return !document.getElementById('result').hidden; });
     },
-    checks: [{ kind: 'visible', sel: '#again', name: 'Play again' }, { kind: 'visible', sel: '.stand', name: 'score table' },
-      { kind: 'eq', name: 'your total', a: function () { return GXS.num('.stand [data-engine="G.final[0].total"]'); }, b: function () { return G.final[0].total; } }]
+    checks: [{ kind: 'visible', sel: '#again', name: 'Play again' }, { kind: 'visible', sel: '#result .hbig', name: 'big score' }, { kind: 'visible', sel: '#result .hl li', name: 'a highlight' }, { kind: 'visible', sel: '#result details summary', name: 'Details toggle' }, { kind: 'visible', sel: '#totitle', name: 'Menu' },
+      { kind: 'eq', name: 'winner total', a: function () { return GXS.num('#result .hbig b'); }, b: function () { return Math.max.apply(null, G.final.map(function (x) { return x.total; })); } }]
   });
   GXS.add({
     id: 'pp-story', name: 'Story map opens', ask: 'Does the story map show 3 acts?', seed: 2, when: booted,
