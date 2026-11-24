@@ -189,3 +189,9 @@ html:not(.ph) #prompt .tip{font-size:16px}
 html.sk .gx-ibtn.gxst-q{padding:0 14px}
 html.ph .gx-bar .gx-ibtn.gxst-q{font-size:0;padding:0;width:44px}
 html.ph .gx-bar .gx-ibtn.gxst-q::before{content:"?";font-size:22px;font-weight:700;line-height:1;color:var(--sk-cream)}
+/* end screen: headline, portrait, one score, 3 highlights, 2 buttons; stats behind Details */
+.dlg.end{text-align:center}.end-head{font-size:30px;margin:4px 0 0}.end-by{font-size:17px;margin:2px 0 6px}
+.end-score{margin:0;display:flex;justify-content:center;align-items:baseline;gap:8px}.end-score b{font-size:48px;line-height:1}.end-score span{font-size:16px}
+.end-hi{list-style:none;margin:6px 0 10px;padding:0;font-size:17px}.end-hi li{padding:2px 0}.end-hi b{font-size:20px}
+.end-acts{display:flex;gap:10px;justify-content:center}.end-acts .btn{min-height:48px;font-size:17px;flex:1;max-width:200px}
+.end-det{margin-top:10px;text-align:left}.end-det>summary{min-height:44px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px;font-weight:700}

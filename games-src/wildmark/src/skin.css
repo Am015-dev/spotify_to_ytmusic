@@ -601,3 +601,4 @@ html body .gx-set-nav{flex-wrap:wrap;overflow-x:visible}
   #rs .rbox{max-width:760px}
 }
 html body .gxc-lock{font-size:13px!important;text-indent:-99px;overflow:visible;clip-path:circle(50%);white-space:nowrap;line-height:18px}   /* W684: lock glyph hidden by indent, not a 0 px font */
+#rs .rmargin{margin:0 0 6px;font-size:18px;text-align:center}
