@@ -119,7 +119,9 @@ function applyHl(){const m=MAP.m;if(!m)return;const sel=null;m.highlight(MAP.hl.
   if(MAP.pan)MAP.pan.querySelectorAll('[data-reg]').forEach(g=>{const r=+g.getAttribute('data-reg');const on=(MAP.hlR||[]).includes(r);g.classList.toggle('rglow',on);g.classList.toggle('rrec',on&&MAP.rec.reg===r)});
   drawSelName()}
 // Phones: the kit's name banners are hidden (they were clipped and overlapped the region labels and reward coins). A tapped location shows its name here instead, in a spot with nothing else: below the circle in the top row and the upper half of the side columns, above it in the lower half.
-function drawSelName(){const g=MAP.sg;if(!g)return;if(UI.phone||(UI.bs||0)>=250){g.innerHTML='';return} // W754: every location already carries its own name tagif(!UI.phone||UI.pop!=='loc'||!UI.popArg||UI.popArg.l==null){g.innerHTML='';return}
+function drawSelName(){const g=MAP.sg;if(!g)return;if(UI.phone||(UI.bs||0)>=250){g.innerHTML='';return}
+// W754: every location already carries its own name tag
+if(!UI.phone||UI.pop!=='loc'||!UI.popArg||UI.popArg.l==null){g.innerHTML='';return}
   const l=UI.popArg.l,P=LOCPOS[l],name=LOCN[l],fs=34,words=name.split(' ');let lines=[name];if(name.length>9&&words.length>1){const h=Math.ceil(words.length/2);lines=[words.slice(0,h).join(' '),words.slice(h).join(' ')]}
   const wd=Math.max(...lines.map(t=>t.length))*fs*.66+30,ht=lines.length*(fs+8)+14,below=l<2||l===2||l===4;let cx=P[0];cx=Math.max(wd/2+8,Math.min(1000-wd/2-8,cx));const top=below?P[1]+60:P[1]-60-ht;
   g.innerHTML='<g><rect x="'+Math.round(cx-wd/2)+'" y="'+Math.round(top)+'" width="'+Math.round(wd)+'" height="'+ht+'" rx="14" fill="#1d120b" fill-opacity=".92" stroke="#e8c867" stroke-width="3"/>'+lines.map((t,i)=>'<text x="'+Math.round(cx)+'" y="'+Math.round(top+7+(i+1)*(fs+8)-6)+'" text-anchor="middle" font-family="'+TBKit.fonts.display+'" font-weight="700" font-size="'+fs+'" fill="#f6e6b4">'+esc(t)+'</text>').join('')+'</g>'}
