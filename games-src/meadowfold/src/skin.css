@@ -507,3 +507,48 @@ body,.gx-app{background:#9cc7a4 radial-gradient(ellipse 70% 55% at 50% 48%,#cfe8
   .gx-drawer :is(p,li,small,span,div,button,output,label,summary,td,th,a){font-size:max(16px,1em)}
   .gx-set :is(button,span,div,small,output,label){font-size:max(16px,1em)}
 }
+/* card strip on the table (W685): face-up animal cards + your cards, always visible; replaces the tile-game style animal rail button */
+#railRow{display:none!important}
+#strip{grid-area:strip;flex:0 0 auto;display:flex;gap:10px;overflow-x:auto;overflow-y:hidden;padding:2px 8px 4px;scrollbar-width:none;position:relative;z-index:5}
+#strip .sgrp{flex:0 0 auto;display:flex;flex-direction:column;min-width:0}
+#strip .sg-mine{order:-1}
+#strip h3{margin:0 0 3px 2px;font-size:14px;font-weight:700;color:#24331f;white-space:nowrap;text-shadow:0 1px 0 rgba(255,255,255,.6)}
+#strip h3 em{font-style:normal;font-size:13px;background:#fffaf0;color:#4a3b2e;border-radius:999px;padding:1px 7px;margin-left:4px}
+#strip .srow{display:flex;gap:6px;align-items:stretch}
+#strip .acard{width:124px;min-height:0;padding:4px 4px 5px;gap:3px;border-radius:12px;background:#fffaf0;border:2px solid #fff}
+#strip .acard.spirit{background:#f1e8fb}
+#strip .acard.ready{background:#fff3c4;border-color:#e0b93c}
+#strip .acard.dim{opacity:1}
+#strip .acard .ahead{width:100%;justify-content:flex-start}
+#strip .ahead .nm{font-size:14px!important;color:#3d3026;line-height:1.1;max-height:none;overflow:visible;overflow-wrap:anywhere}
+#strip .rdy{position:static;transform:none;margin-top:auto;align-self:center}
+#strip .acard .pat{width:112px;height:56px}
+#strip .slot,#strip .slot i{font-size:15px!important;min-width:22px;height:22px;line-height:22px;border-radius:5px}
+#strip .slot{color:#2e241b}
+#strip .rdy,#strip .acard .track.sp{font-size:13px!important}
+#strip .hn,#strip .donec{font-size:14px!important;color:#3d3026;background:#fffaf0;border-radius:10px;padding:8px 10px;align-self:center}
+.slot i{color:#5e4e40}
+@media (max-width:759px){
+  #topbar{min-height:104px}
+}
+@media (min-width:760px) and (max-width:1099px){
+  #board{grid-template-rows:auto auto minmax(0,1fr) auto;grid-template-areas:"top rail" "strip rail" "map rail" "tray rail"}
+}
+@media (min-width:1100px){
+  #board{grid-template-columns:624px minmax(0,1fr) 96px;grid-template-rows:auto minmax(0,1fr) auto;grid-template-areas:"top top rail" "strip map rail" "strip tray rail"}
+  #topbar{padding-right:10px}
+  #strip{flex-direction:column;overflow-y:auto;overflow-x:hidden;padding:6px 6px 10px 12px;gap:8px}
+  #strip .sg-mine{order:0}
+  #strip .srow{flex-wrap:wrap}
+  #strip .acard{width:146px}
+  #strip .acard .pat{width:130px;height:62px}
+  #strip h3,#strip .ahead .nm,#strip .hn,#strip .donec{font-size:16px!important}
+  #strip h3 em,#strip .rdy,#strip .acard .track.sp{font-size:16px!important}
+  #strip .slot,#strip .slot i{font-size:16px!important}
+}
+#strip h3{align-self:flex-start}
+#strip .spg{flex:0 0 auto;align-self:stretch;margin-top:21px;width:48px;min-height:44px;border-radius:14px;border:2px solid #fff;background:#fffaf0;color:#3d3026;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;box-shadow:var(--sh)}
+#strip .spg b{font-size:14px}
+#strip .spg svg{width:24px;height:24px;fill:none;stroke:#3d3026;stroke-width:2.6;stroke-linecap:round;stroke-linejoin:round}
+@media (max-width:759px){#strip{justify-content:center}#strip .acard{width:150px}#strip .acard .pat{width:136px;height:60px}#strip .srow{min-height:150px}}
+@media (min-width:760px){.pp:not(.on),.gx-drawer:not(.on){display:none}}   /* closed side panels leave the layout (were parked off-canvas) */

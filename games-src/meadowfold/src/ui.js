@@ -100,6 +100,7 @@ function runAI() {
 function buzz(p) { try { if (GX.buzz) GX.buzz(p); } catch (e) { } }
 
 // ---------- rendering ----------
+window.addEventListener('resize', function () { if (G) render(); });
 function render() {
   if (!G) return;
   renderBar(); renderCentral(); renderEnd(); renderMap(); renderRail(); renderScorep(); renderDock(); renderLine();
@@ -361,6 +362,17 @@ function renderHand() {
   var canEnd = E.legal({ t: 'end' }); h += '<button type="button" class="btn primary' + (canEnd ? ' go' : '') + '" id="endB"' + (canEnd ? '' : ' aria-disabled="true"') + '>End turn</button>';
   $('#central').innerHTML = h + '</div>';
 }
+function renderStrip(rowH, mineH, rowL, mineL) {   // the cards on the table; phone: pages of 2 cards (no sideways overflow)
+  var sp = $('#strip'); if (!sp) return;
+  var cut = function (h) { return h.split(/(?=<button type="button" class="acard)|(?=<span class="(?:hn|donec)")/).filter(Boolean); };
+  var grp = function (cls, l, a) { return '<div class="sgrp ' + cls + '"><h3>' + l + '</h3><div class="srow">' + a.join('') + '</div></div>'; };
+  if (!window.matchMedia('(max-width:759px)').matches) { sp.innerHTML = grp('sg-row', rowL, cut(rowH)) + grp('sg-mine', mineL, cut(mineH)); return; }
+  var items = cut(mineH).filter(function (h) { return h.indexOf('<button') === 0; }).map(function (h) { return ['m', h]; }).concat(cut(rowH).map(function (h) { return ['r', h]; })), pages = [], cur = [];
+  items.forEach(function (it) { if (cur.length === 2 || (cur.length && cur[0][0] !== it[0])) { pages.push(cur); cur = []; } cur.push(it); }); if (cur.length) pages.push(cur);
+  var n = pages.length; UI.sp = ((UI.sp || 0) % n + n) % n; var pg = pages[UI.sp];
+  sp.innerHTML = grp(pg[0][0] === 'm' ? 'sg-mine' : 'sg-row', pg[0][0] === 'm' ? mineL : rowL, pg.map(function (x) { return x[1]; })) +
+    (n > 1 ? '<button type="button" class="spg" id="spNext" aria-label="More cards, page ' + (UI.sp + 1) + ' of ' + n + '"><b>' + (UI.sp + 1) + '/' + n + '</b><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg></button>' : '');
+}
 function renderDock() {
   var T = G.turn, s = G.seats[UI.view], mine = myTurn(), h = '', cs = E.seat(), both = false;
   var act = s.cards.length + (s.spirit && !s.spirit.placed ? 1 : 0);
@@ -376,7 +388,9 @@ function renderDock() {
   if (both) h = '<h2 class="dh">' + mineL + '</h2><div class="cards">' + mineH + '</div><h2 class="dh">' + rowL + '</h2><div class="cards">' + rowH + '</div>';
   else h = '<div class="tabs" role="tablist"><button type="button" role="tab" class="tab' + (UI.tab === 'row' ? ' on' : '') + '" data-tab="row" aria-selected="' + (UI.tab === 'row') + '">' + rowL + '</button>' +
     '<button type="button" role="tab" class="tab' + (UI.tab === 'mine' ? ' on' : '') + '" data-tab="mine" aria-selected="' + (UI.tab === 'mine') + '">' + mineL + '</button></div><div class="cards">' + (UI.tab === 'row' ? rowH : mineH) + '</div>';
-  $('#dockbody').innerHTML = h; UI.justCard = null;
+  $('#dockbody').innerHTML = h;
+  renderStrip(rowH, mineH, 'Animals to invite' + (canTake ? ' <em>take 1</em>' : ''), mineL);
+  UI.justCard = null;
 }
 var TOKEN_TIP = { water: 'Water: a longer river scores more.', mount: 'Mountain: stack up to 3, beside another.', trunk: 'Trunk: put leaves on it later.', leaf: 'Leaves: a tree. Taller trees score more.', field: 'Fields: each group of 2+ scores 5.', build: 'Building: 5 if 3 colours touch it.' };
 function renderLine() {
@@ -431,6 +445,7 @@ function onTap(e) {
   var p = t.closest('[data-pocket]'); if (p) { if (myTurn()) act({ t: 'take', i: +p.dataset.pocket }); return; }
   var ht = t.closest('[data-h]'); if (ht && myTurn()) { UI.sel = { kind: 'tok', h: +ht.dataset.h }; SND.card(); render(); return; }
   var tb = t.closest('[data-tab]'); if (tb) { var same = UI.tab === tb.dataset.tab; UI.tab = tb.dataset.tab; render(); if (same) bump('[data-tab="' + UI.tab + '"]'); return; }
+  if (t.closest('#spNext')) { UI.sp = (UI.sp || 0) + 1; render(); return; }
   var rw = t.closest('[data-row]'); if (rw) { bigCard(+rw.dataset.row); return; }
   var ci = t.closest('[data-ci]'); if (ci && myTurn()) { var v = ci.dataset.ci === 'S' ? 'S' : +ci.dataset.ci; UI.sel = (UI.sel && UI.sel.kind === 'card' && UI.sel.ci === v) ? null : { kind: 'card', ci: v }; if (UI.sel && UI.pp === 'dock') { UI.pp = null; document.documentElement.removeAttribute('data-pp'); syncPanels(); } render(); if (UI.sel && !$$('#map .glow').length) { var pl = planFor(G.seats[UI.view], ci.dataset.ci === 'S' ? G.seats[UI.view].spirit.id : G.seats[UI.view].cards[v].id); toast(pl ? 'Needs ' + planText(pl) + '. See the dashed hexes.' : 'This habitat no longer fits.'); } return; }
   if (ci) { var sv = G.seats[UI.view], cid = ci.dataset.ci === 'S' ? sv.spirit.id : (sv.cards[+ci.dataset.ci] || {}).id; if (cid) bigCard(null, cid); return; }
@@ -506,7 +521,7 @@ function bigCard(i, idOnly, owner) {
     '<div class="bigacts">' + (can ? '<button type="button" class="btn ' + (warn ? 'ghostb' : 'primary') + '" id="takeB">' + (warn ? 'Invite anyway' : 'Invite this animal') + '</button>' : '') + (mine && G.solo && E.legal({ t: 'swap', i: i }) ? '<button type="button" class="btn ghostb" id="swapB">Swap for a new card</button>' : '') + '</div>' +
     '<div class="bigrow">' + cardSVG(id, null, true) + '<svg class="pvmap" viewBox="' + mv.vb + '" role="img" aria-label="Where it fits on ' + whose + '">' + mv.html + '</svg></div>' + trackHTML(id, c.pts ? c.pts.length : 0) +
     '<p class="trk">Each animal you settle uncovers the next number. You score the highest one showing.</p>';
-  GX.drawer('bigd', c.pts ? 'Animal card' : 'Spirit card', b, false); GX.show('bigd');
+  GX.drawer('bigd', c.pts ? 'Animal card' : 'Spirit card', b, false); GX.show('bigd'); if (window.tutRender) tutRender();
   $$('#board .glow, #dock .playable').forEach(function (e) { e.classList.toggle('glow', false); e.classList.toggle('playable', false); });   // the sheet covers them; glows return on close
   var tk = $('#takeB'); if (tk) tk.onclick = function () { GX.close(); act({ t: 'card', i: i }); };
   var sw = $('#swapB'); if (sw) sw.onclick = function () { GX.close(); act({ t: 'swap', i: i }); };

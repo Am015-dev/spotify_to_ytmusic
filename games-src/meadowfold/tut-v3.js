@@ -40,7 +40,7 @@ async function run(W, H) {
   for (let i = 0; i < 3; i++) { await tap('.htok'); await tap('#map .hx.glow'); }
   await lesson('stack', 3); await tap('#twNext');
   await lesson('card', 4);
-  await tap('#railRow'); await tap('.acard.playable'); if (await p.$('#takeB')) await tap('#takeB');
+  await tap('#strip .acard.playable'); if (await p.$('#takeB')) await tap('#takeB');
   await lesson('cube', 5);
   if (await p.evaluate(() => E.moves().some(m => m.t === 'cube'))) { await tap('#railMine'); await tap('.acard.ready'); await tap('#map .hx.glow'); } else await tap('#twNext');
   await lesson('animal', 6); await tap('#twNext');
