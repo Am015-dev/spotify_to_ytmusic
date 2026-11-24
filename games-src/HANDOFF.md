@@ -306,3 +306,8 @@ Live fix: original-name phrase removed from shelf blurb + sands page (15:2x).
 - Content rule finding: doorkick-dungeon (live) copied the original card pool 1:1 (R98). F18 (Opus) redesigning our own 168 cards; then UI fixes; redeploy needs owner yes. COPYAUDIT running over all games.
 - Closest to done: short-fuse (4/5, F3 polish+PC then review), kaiten-kitchen (4/5-ish, F3 polish+PC then review), crown-city-smash (R97 7.4, F2), perch-and-plume (F3), lantern-dive (F2).
 - Pending: approve baselines (sunglaze, rampart: proof/baselines-new) before deploy; hollowbough R96 list after PLAY2; calm-audit doesn't count #coach/#toast.
+
+## W734 hollowbough scenario lessons (branch shelf/W734-scn-hollowbough)
+Done: 8 GXST lessons (game/src/lessons.js), build.py/body.html wiring, game/lessons-test.js (PASS both sizes, ~9 s each).
+Next: lesson card covers the top HUD on phone and some meadow/places on desktop (tune keepClear, one attempt made and reverted); add Haven/event/Autumn lessons;
+retire the unreachable GXT tour in ui12.js and its tests (tutor-test.js, learn-touch.js).
