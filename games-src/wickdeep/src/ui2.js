@@ -334,7 +334,9 @@ function snapView() {
 function doMove(mv) {
   if (UI.busy || !G || G.done) return;
   closeInsp();
-  var legal = E.validMoves(G).some(function (x) { return JSON.stringify(x) === JSON.stringify(mv); });
+  var key = function (x) { return x && x.t === 'sel' && x.cards ? JSON.stringify(Object.assign({}, x, { cards: x.cards.slice().sort() })) : JSON.stringify(x); };
+  var match = E.validMoves(G).filter(function (x) { return key(x) === key(mv); })[0], legal = !!match;
+  if (match && mv.t === 'sel') mv = match;   // the pick order of two cards never makes a legal pick illegal
   if (!legal) { toast('Not now'); return; }
   UI.view = snapView(); UI.pick = null;
   try { E.apply(G, mv); } catch (e) { console.error(e); toast('Oops: ' + e.message); UI.view = null; refresh(); return; }

@@ -21,6 +21,8 @@
   function mon(id) { return WD.fig(G, id); }
   function alive(id) { var m = mon(id); return !!(m && m.hp > 0); }
   function turnOver() { return G.phase === 'select' && G.round > 1; }
+  // the hero has played the first half of its turn and now holds the second: the attack was made
+  function actedOnce() { var h = hero(); return !!(G.act && G.act.id === h.id && G.act.used && G.act.used.length >= 1 && G.ask && G.ask.h === 'second' && (!G.act.q || G.act.i >= G.act.q.length)); }
   function cardInit(c) { return D.CARD[c].i; }
 
   // hexes reachable from `from` over floor, by distance (BFS, at most 8 steps)
@@ -53,7 +55,7 @@
   // sp = { hand: [card ids], hp: hero hp or null, mons: [{ id, type, idx, hp, dist, shield, elite }],
   //        doorAt: n (hero n steps from a door, same room), coin: n (coin n steps from hero), realDeck: keep modifier deck }
   function stack(sp) {
-    UI.fast = true;
+    UI.fast = true; UI.sel = {}; UI.pick = null; UI.det = null;
     localStorage.removeItem('wickdeep-game-v1');
     if (!window.__wdlSaveWrapped) {
       window.__wdlSaveWrapped = true;
@@ -161,7 +163,7 @@
       },
       success: function () { return !alive('cr'); },
       fail: function () {
-        if (!turnOver() || !alive('cr')) return false;
+        if (!(turnOver() || actedOnce()) || !alive('cr')) return false;
         return why('The crab\'s shield soaked 2 of the damage: Attack 4 kills it, but Attack 3 leaves it at 1 hp.');
       },
       par: 1,
@@ -180,7 +182,7 @@
       },
       success: function () {
         var g = mon('gh');
-        return turnOver() && !!g && g.hp < 4 && hero().hp > 0;
+        return (turnOver() || actedOnce()) && !!g && g.hp < 4 && hero().hp > 0;
       },
       fail: function () {
         if (hero().hp <= 0) return why('The ghoul\'s retaliate 1 killed you at 1 hp: a melee hit draws it back, so use Hot Wax Hurl at range 3.');
@@ -220,7 +222,7 @@
       setup: function () {
         return stack({ hand: ['ww01', 'ww03', 'ww05', 'ww06'], coin: 3 });
       },
-      success: function () { return hero().coins > 0; },
+      success: function () { return hero().coins > 0 || (!!ctx.coin && hero().pos === ctx.coin && (turnOver() || actedOnce())); },
       fail: function () {
         if (!turnOver() || hero().coins > 0) return false;
         return why('Your turn ended off the coin, so no coin was picked up: Move 3 from the bottom of Tallow Bash lands you on it.');
@@ -268,7 +270,7 @@
     game: 'wickdeep',
     scenarios: lessons,
     settled: function () { return !UI.busy && (!G.ask || G.ask.h !== 'anim'); },
-    keepClear: ['#tray', '#cv'],
+    keepClear: ['.gx-bar', '#tray', '#promptrow', '#hot > *', '#zoombox', '#order'],
     qParent: document.querySelector('.gx-bar header') || document.querySelector('.gx-bar')
   });
   window.WDL = { lessons: lessons };

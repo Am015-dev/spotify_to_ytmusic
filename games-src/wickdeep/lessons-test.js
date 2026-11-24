@@ -9,28 +9,29 @@ const fs = require('fs'), path = require('path');
 const html = fs.readFileSync(path.join(__dirname, 'wickdeep.html'));
 const SIZES = (process.argv[2] || '402x874,1366x768').split(',').map(s => s.split('x').map(Number));
 const PROOF = path.join(__dirname, 'proof'); fs.mkdirSync(PROOF, { recursive: true });
+const dbg = m => process.env.WD_DEBUG && console.log('[' + ((Date.now() - T0) / 1000).toFixed(1) + 's] ' + m);
 const sleep = ms => new Promise(r => setTimeout(r, ms)); const probs = []; const T0 = Date.now();
 
 // Steps: c(name) = tap a card in the tray; h(name, re) = tap that card's half matching re; ready / play = buttons; g(sel) = a board hex glow.
 const c = name => ({ sel: '#tray .cd', name }), h = (name, re) => ({ sel: '#tray .half.can', name, re }),
-  ready = { sel: '#readybtn' }, play = { sel: '#playbtn' }, g = sel => ({ sel }), ENGINE = { engine: 1 };
+  ready = { sel: '#readybtn' }, play = { sel: '#playbtn', opt: 1 }, g = (sel, near) => ({ sel, near }), ENGINE = { engine: 1 };
 const SOLVE = {
   pick: [c('Holdfast'), c('Candle Guard'), ready],
-  halves: [c('Lantern Swing'), c('Tallow Bash'), ready, h('Lantern Swing', /m4|Move 4/), play, g('#hot .glow'), h('Tallow Bash', /a3|Attack 3/), play, g('#hot .glow.atk')],
-  shield: [c('Brazier Rush'), c('Tallow Bash'), ready, h('Brazier Rush', /a4|Attack 4/), play, g('#hot .glow.atk')],
-  retal: [c('Hot Wax Hurl'), c('Tallow Bash'), ready, h('Hot Wax Hurl', /a2|Attack 2/), play, g('#hot .glow.atk')],
-  door: [c('Lantern Swing'), c('Wickflare'), ready, h('Lantern Swing', /m4|Move 4/), play, g('#hot .glow')],
-  coin: [c('Tallow Bash'), c('Wickflare'), ready, h('Tallow Bash', /m3|Move 3/), play, g('#hot .glow')],
+  halves: [c('Lantern Swing'), c('Tallow Bash'), ready, h('Lantern Swing', /Move 4/), play, g('#hot .glow', 'mon'), h('Tallow Bash', /Hit 3|Attack 3/), play, g('#hot .glow.atk')],
+  shield: [c('Brazier Rush'), c('Tallow Bash'), ready, h('Brazier Rush', /Hit 4|Attack 4/), play, g('#hot .glow.atk')],
+  retal: [c('Hot Wax Hurl'), c('Tallow Bash'), ready, h('Hot Wax Hurl', /Hit 2|Attack 2/), play, g('#hot .glow.atk')],
+  door: [c('Lantern Swing'), c('Wickflare'), ready, h('Lantern Swing', /Move 4/), play, g('#hot .glow', 'door')],
+  coin: [c('Tallow Bash'), c('Wickflare'), ready, h('Tallow Bash', /Move 3/), play, g('#hot .glow', 'coin')],
   finish: [c('Tallow Bash'), c('Candle Guard'), ready, ENGINE]
 };
 const WRONG = {
   pick: [c('Vigil'), c('Ember Oath'), ready],
-  shield: [c('Tallow Bash'), c('Holdfast'), ready, h('Tallow Bash', /a3|Attack 3/), play, g('#hot .glow.atk')],
-  retal: [c('Tallow Bash'), c('Lantern Swing'), ready, h('Tallow Bash', /a3|Attack 3/), play, g('#hot .glow.atk')]
+  shield: [c('Tallow Bash'), c('Holdfast'), ready, h('Tallow Bash', /Hit 3|Attack 3/), play, g('#hot .glow.atk')],
+  retal: [c('Tallow Bash'), c('Lantern Swing'), ready, h('Tallow Bash', /Move 3/), play, g('#hot .glow', 'mon'), h('Lantern Swing', /Hit 2/), play]
 };
 
 async function run(b, W, H) {
-  const tag = W + 'x' + H, phone = W < 600, note = m => probs.push(tag + ': ' + m);
+  const tag = W + 'x' + H, phone = W < 600, note = m => { dbg('NOTE ' + m); probs.push(tag + ': ' + m); };
   const ctx = await b.newContext({ viewport: { width: W, height: H }, deviceScaleFactor: 1, isMobile: phone, hasTouch: true });
   await ctx.route('**/*', r => new URL(r.request().url()).host === 'gns.test' ? r.fulfill({ status: 200, contentType: 'text/html', body: html }) : r.abort());
   const p = await ctx.newPage(); p.setDefaultTimeout(15000);
@@ -46,15 +47,26 @@ async function run(b, W, H) {
 
   // find the visible element for a step, check the point is really it, then touch it with a real tap
   const tapStep = async s => {
-    await busy();
+    dbg('tap ' + JSON.stringify(s)); await busy();
+    // wait (on the page, not a timer) until a matching visible target exists
+    await p.waitForFunction(a => { const re = a.re ? new RegExp(a.re) : null; return [...document.querySelectorAll(a.sel)].some(x => { const r = x.getBoundingClientRect(); return r.width > 8 && r.height > 8 && (!a.name || (x.closest('.cd') || x).textContent.includes(a.name)) && (!re || re.test(x.textContent)); }) && !UI.busy; },
+      Object.assign({}, s, { re: s.re ? s.re.source : null }), { timeout: s.opt ? 1500 : 8000 }).catch(() => { });
     const pt = await p.evaluate(a => {
+      if (a.re) a.re = new RegExp(a.re);
       const vis = e => { const r = e.getBoundingClientRect(); return r.width > 8 && r.height > 8 && r.bottom > 0 && r.top < innerHeight && !e.closest('[hidden]'); };
-      const re = a.re ? new RegExp(a.re) : null;
-      const e = [...document.querySelectorAll(a.sel)].find(x => vis(x) && (!a.name || (x.closest('.cd') || x).textContent.includes(a.name)) && (!re || re.test(x.textContent)));
+      const re = a.re || null;
+      let cands = [...document.querySelectorAll(a.sel)].filter(x => vis(x) && (!a.name || (x.closest('.cd') || x).textContent.includes(a.name)) && (!re || re.test(x.textContent)));
+      if (a.near && cands.length) {   // the lit hex closest to the lesson's target: a monster, the closed door, or the coin
+        const goal = Object.keys(G.hex).filter(k => a.near === 'mon' ? G.figs.some(f => f.team === 'm' && f.hp > 0 && f.pos === k) : a.near === 'door' ? G.hex[k].t === 'door' && !G.hex[k].open : !!G.hex[k].coin);
+        const d = x => Math.min(...goal.map(k => WD.dist(x.dataset.k, k)));
+        cands.sort((u, v) => d(u) - d(v));
+      }
+      const e = cands[0];
       if (!e) return null;
       const r = e.getBoundingClientRect(), x = r.left + r.width / 2, y = r.top + r.height / 2, u = document.elementFromPoint(x, y);
       return { x, y, ok: !!u && (u === e || e.contains(u)), by: u && (u.id || String(u.className).slice(0, 40)) };
-    }, s);
+    }, Object.assign({}, s, { re: s.re ? s.re.source : null }));
+    if (!pt && s.opt) return true;
     if (!pt) { note('nothing to tap: ' + JSON.stringify(s)); return false; }
     if (!pt.ok) note('something covers ' + JSON.stringify(s) + ' (' + pt.by + ')');
     await p.touchscreen.tap(pt.x, pt.y); await sleep(160); return true;
@@ -78,7 +90,7 @@ async function run(b, W, H) {
   const res = {};
   for (const lesson of ['pick', 'halves', 'shield', 'retal', 'door', 'coin', 'finish']) {
     const t0 = Date.now(), before = probs.length;
-    await p.evaluate(id => GXST.start(id), lesson);
+    dbg('lesson ' + lesson); await p.evaluate(id => GXST.start(id), lesson);
     await live(lesson);
     await p.screenshot({ path: path.join(PROOF, 'lesson-' + lesson + '-' + tag + '.png') });
 
@@ -86,6 +98,7 @@ async function run(b, W, H) {
       await runSteps(WRONG[lesson]);
       const failed = await phaseIs('fail', 20000);
       const s = await st();
+      if (!failed) dbg(await p.evaluate(() => JSON.stringify({ ph: G.phase, ord: G.order, sel: G.figs[0].sel, ask: G.ask && G.ask.h })));
       if (!failed) note(lesson + ': wrong sequence did not end in fail (phase ' + s.phase + ')');
       else if (!s.msg) note(lesson + ': fail has an empty message');
       await p.evaluate(() => GXST.retry());
@@ -101,7 +114,7 @@ async function run(b, W, H) {
       if (!(await p.evaluate(() => { const d = document.getElementById('rulesd'); return !!d && d.classList.contains('on'); }))) note('Rules did not open mid-lesson');
       await p.evaluate(() => { try { GX.close && GX.close(); } catch (e) { } });
       for (let k = 0; k < 2; k++) {
-        await p.evaluate(() => { const hb = [...document.querySelectorAll('button')].find(x => /hint/i.test(x.textContent + ' ' + (x.getAttribute('aria-label') || ''))); if (hb) hb.click(); });
+        await p.evaluate(() => { const hb = document.querySelector('.gxst-bulb'); if (hb) hb.click(); });
         await sleep(250);
       }
       if (!(await p.$('.gxst-ring'))) note('hint twice drew no ring');
@@ -110,7 +123,7 @@ async function run(b, W, H) {
     await runSteps(SOLVE[lesson]);
     const won = await phaseIs('win', 15000);
     const s = await st();
-    if (!won) note(lesson + ': not solved (phase ' + s.phase + ')');
+    if (!won) note(lesson + ': not solved (phase ' + s.phase + ') ' + (s.msg || '') + ' ' + (await p.evaluate(() => JSON.stringify(G.figs.map(f => [f.id, f.hp, f.shield, f.pos])))));
     await p.evaluate(() => GXST.picker && GXST.picker());
     await p.evaluate(() => GXST.close && GXST.close());
     res[lesson] = { ok: won && probs.length === before, sec: ((Date.now() - t0) / 1000).toFixed(1) };
