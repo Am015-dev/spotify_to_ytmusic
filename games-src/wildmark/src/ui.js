@@ -320,7 +320,7 @@ function nearTarget(x, y) {
 }
 function panTo(c) { var q = pix(c), sr = safeRect(), p = UI.pan; p.tx = (sr.l + sr.r) / 2 - q[0] * p.z; p.ty = (sr.t + sr.b) / 2 - q[1] * p.z; applyPan(); }
 function applyPan() { var v = $('#vp'); if (v) v.setAttribute('transform', 'translate(' + UI.pan.tx.toFixed(1) + ',' + UI.pan.ty.toFixed(1) + ') scale(' + UI.pan.z.toFixed(3) + ')'); clearTimeout(UI.eaT); UI.eaT = setTimeout(edgeArrows, 60); }
-function zoomAt(f, cx, cy) { var p = UI.pan, z = Math.max(0.3, Math.min(2.6, p.z * f)); f = z / p.z; p.tx = cx - (cx - p.tx) * f; p.ty = cy - (cy - p.ty) * f; p.z = z; applyPan(); }
+function zoomAt(f, cx, cy) { var p = UI.pan, z = Math.max(0.3, Math.min(3.5, p.z * f));   /* W684: room to zoom in past the 2.5 auto-fit */ f = z / p.z; p.tx = cx - (cx - p.tx) * f; p.ty = cy - (cy - p.ty) * f; p.z = z; applyPan(); }
 (function wirePan() {
   var pts = {}, start = null, moved = false;
   function svgXY(e) { var r = $('#board').getBoundingClientRect(); return [e.clientX - r.left, e.clientY - r.top]; }
