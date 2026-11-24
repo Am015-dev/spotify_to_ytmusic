@@ -99,3 +99,8 @@ Source merged but NOT deployed: vale (W704) + doorkick (W700) at 04392461 -> pho
 Reviewer R13 (shelf/R13-review REVIEW-R13.md): ochre 0 (no lessons) -> W725; thornbound lessons not live (W722 deploys); twin/emberclimb end->title, Lessons button 0x0, ?lessons=1, show-me ring -> W726 (waits for W722); tidewake phone + >60 s tests -> W727.
 Redos: W721 vinegrave, W723 perch, W724 wildmark (no cheapag). Running from 15:33/15:39 round: W701 nebula (1b5f03f5 pushed), W705 shipwreck, W706 redline, W708 hollowbough, W709 final-approach, W710 wickdeep, W713 via-tessera, W714 meadowfold (ca260ae0), W715 gloamwar, W716 sands, W717/W718 HUD diet (Opus), W719 contrast, W720 stitchwise.
 Merge plan: after W722 lands, one Sonnet integrator per 2-4 pushed branches; shared shell changes -> one build-all. cheapag: one-file fixes only.
+
+## 16:04 UTC HANDOFF to new orchestrator
+Since 15:56: What's new entries added for today's deploys (daa0737fe); briefs now require add-update.py on every deploy. New workers: W725 ochre scenario tutorial, W726 shared tutor fixes (waits for W722), W727 tidewake phone + test speed, W728 nebula fix (from W701), W729 final-approach fix (from W709, card covers dice tray). Pending merges: W714 meadowfold scenarios (ca260ae0), others as they push. W722 (Opus regression fix + deploy of vale/doorkick/crown/thornbound/rampart) is the gate before any new integrator.
+Cost data for owner: cheapag on feature work W707 $1.22, W712 $1.5, W709 $1.9, INT16 $1.2 (2/4 jobs failed); Sonnet session cost readable from get_session usage.cost_usd (W711 $0.61 at 147k tokens). Decision: cheapag only for one-file fixes.
+Live check URL form: https://am015-dev.github.io/spotify_to_ytmusic/<slug>/ (games/ is the site root).
