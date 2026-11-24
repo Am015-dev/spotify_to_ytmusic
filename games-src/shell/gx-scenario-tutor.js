@@ -51,6 +51,7 @@
     var vw = innerWidth, vh = innerHeight, w = Q.offsetWidth || 72, h = Q.offsetHeight || 44, bs = D.querySelectorAll(QSEL), rs = [], i;
     for (i = 0; i < bs.length; i++) { if (bs[i] === Q || (W && W.contains(bs[i]))) continue; var q = vis(bs[i]); if (q) rs.push(q); }
     var wr = W && vis(W); if (wr) rs.push(wr);
+    (C.keepClear || []).forEach(function (sel) { var a; try { a = D.querySelectorAll(sel); } catch (e) { a = []; } for (var j = 0; j < a.length; j++) { if (a[j] === Q || a[j].contains(Q)) continue; var kr = vis(a[j]); if (kr) rs.push(kr); } });
     var cs = [[8, vh - h - 8], [vw - w - 8, vh - h - 8], [vw - w - 8, 8], [8, 8], [vw / 2 - w / 2, vh - h - 8], [vw / 2 - w / 2, 8], [vw - w - 8, 76], [8, 76], [vw / 2 - w / 2, 76]], best = null;
     function cost(c) { var b = { left: c[0], top: c[1], right: c[0] + w, bottom: c[1] + h }, n = 0; for (var k = 0; k < rs.length; k++) if (hit(b, rs[k])) n++; return n; }
     var cur = Q.getAttribute('data-pos'), cc = cur ? JSON.parse(cur) : null;
