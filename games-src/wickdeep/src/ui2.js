@@ -334,7 +334,8 @@ function snapView() {
 function doMove(mv) {
   if (UI.busy || !G || G.done) return;
   closeInsp();
-  var legal = E.validMoves(G).some(function (x) { return JSON.stringify(x) === JSON.stringify(mv); });
+  var rev = mv.t === 'sel' && mv.cards ? { t: 'sel', id: mv.id, cards: mv.cards.slice().reverse() } : null; // the card tapped first leads: either tap order is legal
+  var legal = E.validMoves(G).some(function (x) { var j = JSON.stringify(x); return j === JSON.stringify(mv) || (rev && j === JSON.stringify(rev)); });
   if (!legal) { toast('Not now'); return; }
   UI.view = snapView(); UI.pick = null;
   try { E.apply(G, mv); } catch (e) { console.error(e); toast('Oops: ' + e.message); UI.view = null; refresh(); return; }
