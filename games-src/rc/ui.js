@@ -34,7 +34,7 @@ function openGfx(){const p=$('#gfxpop'),b=$('#gfxbtn');renderGfx();p.hidden=fals
 function closeGfx(){const p=$('#gfxpop');if(p&&!p.hidden){p.hidden=true;const b=$('#gfxbtn');if(b)b.setAttribute('aria-expanded','false')}}
 // ---------- top-level render ----------
 function render(){if(typeof netPill==='function')netPill();if(!G){renderModal();renderStory();renderRoadmap();return}msgCheck();wizSync();renderRoadmap();withView(()=>{renderHud();renderMap2D()});renderStep();renderPanel();renderStory();renderModal();
-  const pb=$('#pausebtn');if(pb){pb.hidden=!allAI()||(typeof NET!=='undefined'&&NET.on);pb.textContent=UI.pause?'▶ Resume':'⏸ Pause'}setBtn($('#speedbtn'),'fast',({0.5:'slow',1:'normal',3:'fast'}[UI.speed]||'normal'));gfxBtn()}
+  const pb=$('#pausebtn');if(pb){pb.hidden=!allAI()||(typeof NET!=='undefined'&&NET.on);pb.textContent=UI.pause?'Resume':'Pause'}setBtn($('#speedbtn'),'fast',({0.5:'slow',1:'normal',3:'fast'}[UI.speed]||'normal'));gfxBtn()}
 {const r0=render;render=function(){r0();if(typeof PHO!=='undefined')PHO.sync()}}
 const RLAB={food:'food',pfood:'dry food',wood:'wood',fur:'fur'};
 const RTIP={food:' Food: each castaway eats 1 at night; what is left spoils overnight',pfood:' Dry food: eaten like food, but it never spoils',wood:' Wood: pays for building, the roof and palisade, and warmth in snow',fur:' Fur: can pay for the shelter, roof or palisade instead of wood'};
@@ -230,6 +230,7 @@ document.addEventListener('click',e=>{const pr=e.target.closest&&e.target.closes
   if(d.diff){const s=UI.setup;s.diff=d.diff;s.items={easy:4,standard:2,hard:1}[d.diff];if(d.diff==='easy'){s.dog=true;s.friday=true}render();return}
   if(d.opt&&b.type==='checkbox'){UI.setup[d.opt]=b.checked;return}
   switch(d.a){
+  case 'status':if(typeof openStatus==='function')openStatus();return;
   case 'go':tryStart(!!d.force);return;
   case 'goback':UI.confirm=null;render();return;
   case 'next':storyNext();return;case 'skip':storySkip();return;

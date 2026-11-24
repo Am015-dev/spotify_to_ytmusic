@@ -96,26 +96,41 @@ function turnBanner(){const st=PHO.st;if(st==='plan'||st==='plan2')return ['you'
 function resStrip(){let o=null;try{withView(()=>{o={f:food(),need:eatersNeed(),w:G.res.wood,low:(()=>{let m=99;for(const c of G.chars){if(c.npc&&G.scen!=='stranded'||c.dead)continue;m=Math.min(m,CHARS[c.k].die-c.w)}return m===99?0:m})(),sh:hasShelter(),mo:G.morale,d:G.round,r:G.rounds}})}catch(e){}if(!o)return '';
   const sv=d=>`<svg class="rci" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">${d}</svg>`;
   const c=(bad,ic,t,lab)=>`<span class="${bad?'bad':''}" title="${lab}" aria-label="${lab}">${sv(ic)}${t}</span>`;
-  return c(false,'<circle cx="12" cy="12" r="4.2"/><path d="M12 2.5v2.6M12 18.9v2.6M2.5 12h2.6M18.9 12h2.6M5.3 5.3l1.8 1.8M16.9 16.9l1.8 1.8M5.3 18.7l1.8-1.8M16.9 7.1l1.8-1.8"/>',`<b>${o.d}</b><small>/${o.r}</small>`,`Day ${o.d} of ${o.r}`)
-   +c(o.f<o.need,'<path d="M7 9c0-3 2.4-4.6 5-4.6S17 6 17 9c0 3.2-1.2 5.2-2.3 6.3-.5.5-.7 1.1-.7 1.9v1.8h-4v-1.8c0-.8-.2-1.4-.7-1.9C8.2 14.2 7 12.2 7 9z"/><path d="M12 4.400V2.5"/>',`<b>${o.f}</b><small>eat ${o.need}</small>`,`Food ${o.f}, the camp eats ${o.need} a night`)
+  const warn=o.low<=3||!o.sh;
+  return c(o.f<o.need,'<path d="M7 9c0-3 2.4-4.6 5-4.6S17 6 17 9c0 3.2-1.2 5.2-2.3 6.3-.5.5-.7 1.1-.7 1.9v1.8h-4v-1.8c0-.8-.2-1.4-.7-1.9C8.2 14.2 7 12.2 7 9z"/><path d="M12 4.400V2.5"/>',`<b>${o.f}</b><small>eat ${o.need}</small>`,`Food ${o.f}, the camp eats ${o.need} a night`)
    +c(false,'<path d="M4 8c0-1.7 1.3-3 3-3h10c1.7 0 3 1.3 3 3s-1.3 3-3 3H7c-1.7 0-3-1.3-3-3z"/><path d="M4 16c0-1.7 1.3-3 3-3h10c1.7 0 3 1.3 3 3s-1.3 3-3 3H7c-1.7 0-3-1.3-3-3z"/>',`<b>${o.w}</b>`,`Wood ${o.w}`)
-   +c(o.low<=3,'<path d="M12 20.500s-8-4.7-8-10.500C4 7 6.2 5 8.7 5c1.5 0 2.6.7 3.3 1.800C12.7 5.7 13.8 5 15.3 5 17.8 5 20 7 20 10c0 5.8-8 10.5-8 10.500z"/>',`<b>${o.low}</b>`,`Life of the weakest castaway: ${o.low}`)
-   +c(!o.sh,'<path d="M3 20h18M12 4 4.5 20M12 4l7.5 16M9.5 20l2.5-6 2.5 6"/>','',o.sh?'Shelter built':'No shelter: everyone is hurt each night')}
+   +`<button class="bfst ${warn?'bad':''}" data-a="status" type="button" aria-label="Day ${o.d} of ${o.r}. Camp, goal and castaways${warn?': something needs care':''}">${sv(BFP.flag)}<b>${o.d}</b><small>/${o.r}</small>${warn?'<i class="dot"></i>':''}</button>`}
+// the camp window: goal, day, each castaway's life and the camp, opened from the flag in the strip (nothing of this is on the board)
+function statusHtml(){let h='';withView(()=>{const S=SCENARIOS[G.scen]||{};const g=typeof goalShort==='function'?goalShort():'';const need=eatersNeed(),f=food();
+  const bar=(v,m,cl)=>`<span class="sbar ${cl||''}"><i style="width:${Math.max(0,Math.min(100,Math.round(100*v/m)))}%"></i></span>`;
+  h+=`<div class="sgoal"><h3>Your goal</h3><p>${E(S.x||'Survive until rescue.')}</p>${g?`<p class="sg2">Now: ${E(g)}</p>`:''}<p class="sg3">Day <b>${G.round}</b> of ${G.rounds}. If anyone dies, everyone loses.</p></div>`;
+  h+=`<h3>Castaways</h3><div class="screw">${G.chars.filter(c=>!c.dead&&(!c.npc||G.scen==='stranded')).map(c=>{const m=CHARS[c.k].die,l=m-c.w;return `<div class="sc"><span class="scn">${E(cname(c))}</span>${bar(l,m,l<=3?'bad':'')}<small>${l} life left${c.det?`, ${c.det} determination`:''}</small></div>`}).join('')}</div>`;
+  const it=(ok,t)=>`<li class="${ok?'ok':'no'}">${t}</li>`;
+  h+=`<h3>Camp</h3><ul class="scamp">${it(hasShelter(),hasShelter()?'Shelter built: no night wound':'No shelter: everyone takes 1 wound each night')}${it(G.camp.roof>0,'Roof '+G.camp.roof+': stops '+G.camp.roof+' cloud'+(G.camp.roof===1?'':'s'))}${it(G.camp.pal>0,'Palisade '+G.camp.pal+': blocks storms and beasts')}${it(G.weapon>0,'Weapon '+G.weapon+': hunts beasts up to strength '+G.weapon)}${it(f>=need,'Food '+f+', tonight the camp eats '+need)}${it(G.morale>=0,'Morale '+G.morale+(G.morale<0?': the first player loses determination each morning':''))}</ul>`;
+  h+=`<p class="smore"><button class="btn ghost" data-gx="campd">Skills and items</button> <button class="btn ghost" data-gx="rulesd">All rules</button></p>`});return h}
+function openStatus(){const el=document.createElement('div');el.className='statbody';el.innerHTML=statusHtml();const d=GX.drawer('statd','Camp and goal',el);GX.show('statd')}
 BF.paint=function(){if(G&&R.dataset.scen!==G.scen)R.dataset.scen=G.scen;const rs=q('#bfres');if(rs&&G){const h=resStrip();if(rs.dataset.h!==h){rs.dataset.h=h;rs.innerHTML=h}}const lb=q('#phlabel');if(!lb||!BF.on)return;const s=BF.status();const bn=turnBanner();const key=bn[0]+'|'+bn[1]+'|'+s;if(lb.dataset.k===key)return;lb.dataset.k=key;
   lb.innerHTML=(bn[1]?`<small class="bfb ${bn[0]}">${E(bn[1])}</small>`:'')+`<span class="bft">${E(s)}</span>`};
 // ---------- the tray: your pawns and one big button ----------
 function badActs(){const o=new Set();try{const pb=planProblems();for(const a of G.plan.acts){const l=actLabel(a);if(pb.some(m=>m.indexOf(l)===0))o.add(a.id)}}catch(e){}return o}
 function tokHtml(p,cur,bad){const a=G.plan.acts.find(x=>x.pw.includes(p.id));const nm=pawnLabel(p);
   return `<span class="bfpc">`+`<button class="bfpw ${cur&&cur.id===p.id?'on':''} ${a?'set':''} ${a&&bad&&bad.has(a.id)?'bad':''}" style="--pc:${pcol(p.id)}" data-pawn="${p.id}" title="${E(pawnNice(p))}" aria-label="${E(pawnNice(p))}${a?': '+E(actLabel(a))+' (tap to change)':', no job yet'}"">${(()=>{const k=p.c!=null&&P(p.c)?P(p.c).k:p.f?'friday':null;return k?`<img class="bfpic" src="media/camp-${k}.webp" alt="" onerror="this.remove()">`:''})()}<b class="ico">${pawnIcon(p)}</b>${p.id.endsWith('_1')?'<sub>2</sub>':''}${a?`<u>${AI(a.type)}</u>`:''}</button><em class="bfpn">${E(nm)}${a?`<br><i>${E((TNAME[a.type]||a.type).replace('Arrange the camp','Camp').replace('Face a threat','Threat'))}</i>`:''}</em></span>`}
+const BFI=(d,n)=>`<svg class="bfi" viewBox="0 0 24 24" width="${n||24}" height="${n||24}" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">${d}</svg>`;
+const BFP={ff:'<path d="M4 6l7 6-7 6zM12 6l7 6-7 6z"/>',skip:'<path d="M5 6l8 6-8 6zM17 6v12"/>',pause:'<path d="M8 5v14M16 5v14"/>',play:'<path d="M7 5l12 7-12 7z"/>',
+ sun:'<circle cx="12" cy="12" r="4.2"/><path d="M12 2.5v2.6M12 18.9v2.6M2.5 12h2.6M18.9 12h2.6M5.3 5.3l1.8 1.8M16.9 16.9l1.8 1.8M5.3 18.7l1.8-1.8M16.9 7.1l1.8-1.8"/>',
+ rain:'<path d="M7 15a4 4 0 0 1 .5-8 5 5 0 0 1 9.5 1.500A3.300 3.300 0 0 1 17 15z"/><path d="M9 18l-1 2.500M13 18l-1 2.500M17 18l-1 2.500"/>',
+ snow:'<path d="M12 3v18M4.200 7.500l15.600 9M4.200 16.500l15.600-9"/>',storm:'<path d="M7 14a4 4 0 0 1 .5-8 5 5 0 0 1 9.5 1.500A3.300 3.300 0 0 1 17 14z"/><path d="M12.500 14l-2 4h3l-2 4"/>',
+ wait:'<path d="M7 3h10M7 21h10M8 3c0 5 8 5 8 9s-8 4-8 9M16 3c0 5-8 5-8 9"/>',ask:'<path d="M9 9a3 3 0 1 1 4.200 2.700c-.8.4-1.200 1-1.200 1.800V15M12 19h.01"/>',
+ flag:'<path d="M5 21V4M5 4h11l-2 4 2 4H5"/>'};
 function trayHtml(st){
   if(st==='story'){const i=storyIdx();if(i<0)return '';const b=UI.beats[i];const last=i>=UI.beats.length-1;const qq=last&&humanQ()?G.q:null;
     if(qq&&posQ())return '';if(qq){const n=qq.opts.length;return `<div class="bf-opts n${n}">${qq.opts.map((o,j)=>`<button class="btn opt" data-ans="${j}">${optHtml(o.l)}</button>`).join('')}</div>`}
     const nextL=b.kind==='daysum'&&!last?`Start day ${b.data.round+1} ▶`:last?(G.over?'See how it ended ▶':'Plan the day ▶'):'Continue ▶';
-    return `<div class="bf-main"><button class="gx-ibtn bf-s ${UI.auto?'on':''}" data-a="auto" aria-pressed="${!!UI.auto}" aria-label="Play by itself">⏩</button><button class="btn go" data-a="next">${nextL}</button>${i<UI.beats.length-2?'<button class="gx-ibtn bf-s" data-a="skip" aria-label="Skip ahead">⏭</button>':''}</div>`}
+    return `<div class="bf-main"><button class="gx-ibtn bf-s ${UI.auto?'on':''}" data-a="auto" aria-pressed="${!!UI.auto}" aria-label="Play by itself">${BFI(BFP.ff)}</button><button class="btn go" data-a="next">${nextL}</button>${i<UI.beats.length-2?'<button class="gx-ibtn bf-s" data-a="skip" aria-label="Skip ahead">${BFI(BFP.skip)}</button>':''}</div>`}
   if(st==='plan'||st==='plan2'){const cur=curPawn();const pb=planProblems();
     if(UI.confirm&&planOpen())return `<div class="bf-main"><button class="gx-ibtn bf-s" data-a="suggest" aria-label="Plan it for me" title="Plan it for me"><svg viewBox="0 0 24 24" width="26" height="26" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 19 16 8M14 6l4 4M19 3v3M17.5 4.500h3M7 4v2.500M5.8 5.200h2.4"/></svg></button><button class="btn ghost" data-a="goback">Go back</button><button class="btn go" data-a="go" data-force="1">Start anyway ▶</button></div>`;
     return `<div class="pawnrow bf-pw" aria-label="Your pawns">${(()=>{const bd=badActs();return wizPawns().map(p=>tokHtml(p,cur,bd)).join('')})()}</div><div class="bf-main"><button class="gx-ibtn bf-s" data-a="suggest" aria-label="Plan it for me" title="Plan it for me"><svg viewBox="0 0 24 24" width="26" height="26" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 19 16 8M14 6l4 4M19 3v3M17.5 4.500h3M7 4v2.500M5.8 5.200h2.4"/></svg></button><button class="btn go ${pb.length?'dim':''}" data-a="go">Start day ▶</button></div>`}
-  if(allAI()&&!G.over)return `<div class="bf-main"><button class="gx-ibtn bf-s" data-a="pause" aria-label="Pause">${UI.pause?'▶':'⏸'}</button><button class="gx-ibtn bf-s" data-a="speed" aria-label="Speed">⏩</button></div>`;
+  if(allAI()&&!G.over)return `<div class="bf-main"><button class="gx-ibtn bf-s" data-a="pause" aria-label="Pause">${BFI(UI.pause?BFP.play:BFP.pause)}</button><button class="gx-ibtn bf-s" data-a="speed" aria-label="Speed">${BFI(BFP.ff)}</button></div>`;
   return ''}
 // ---------- chips on the island: the plan, then the day's jobs ----------
 function actPos(a){let p=null;try{p=pawnSpot(a)}catch(e){}return p!=null&&MAP[p]?p:G.camp.pos}
@@ -156,10 +171,10 @@ BF.beatFx=function(i){const b=UI.beats[i];if(!b||!G)return;const d=b.data||{};le
     if(b.kind==='daysum'){const x=daySumData(i);arr=x.A&&x.B?deltas(x.A,x.B).slice(0,6):[]}
     else if(!['intro','plan','dawn','go'].includes(b.kind)&&i>0)arr=deltas(beatState(i-1),B);
     let k=0,t=0;
-    if(b.kind==='act'&&d.dice){const dd=d.dice;BF.pop(pos,'','dice',0,k++);BF.pop(pos,dd.s?'✔':'✖',dd.s?'good big':'bad big',380,k++);if(dd.w)BF.pop(pos,'','bad big',700,k++);if(dd.q)BF.pop(pos,'❓','big',1000,k++);t=1100}
+    if(b.kind==='act'&&d.dice){const dd=d.dice;BF.pop(pos,'','dice',0,k++);BF.pop(pos,dd.s?'✔':'✖',dd.s?'good big':'bad big',380,k++);if(dd.w)BF.pop(pos,'','bad big',700,k++);if(dd.q)BF.pop(pos,'?','big',1000,k++);t=1100}
     arr.forEach((x,j)=>{BF.pop(pos,x.t,x.c,t+j*240,k+j);if(x.fly)BF.fly(pos,x.fly,x.up,t+j*240+350)})}catch(e){console.error(e)}}
 // a pending choice with dice shows the dice on the island too
-BF.qFx=function(){const qq=G.q;if(!qq||qq.kind!=='dice'||!qq.dice)return;const dd=qq.dice;const pos=G.camp.pos;BF.pop(pos,'','dice',0,0);BF.pop(pos,dd.s?'✔':'✖',dd.s?'good big':'bad big',380,1);if(dd.w)BF.pop(pos,'','bad big',700,2);if(dd.q)BF.pop(pos,'❓','big',1000,3)};
+BF.qFx=function(){const qq=G.q;if(!qq||qq.kind!=='dice'||!qq.dice)return;const dd=qq.dice;const pos=G.camp.pos;BF.pop(pos,'','dice',0,0);BF.pop(pos,dd.s?'✔':'✖',dd.s?'good big':'bad big',380,1);if(dd.w)BF.pop(pos,'','bad big',700,2);if(dd.q)BF.pop(pos,'?','big',1000,3)};
 
 // ---------- gains fly to the resource row, losses fly away ----------
 BF.fly=function(id,icon,up,delay){if(!BF.on||!q('#bfov'))return;const p=tilePt(id),chip=q('#phchip');if(!p||!chip||!chip.getBoundingClientRect().width)return;const cr=chip.getBoundingClientRect();
@@ -171,11 +186,11 @@ BF.rain=function(pos,r,s,storm){const ov=q('#bfov');if(!ov||!BF.on)return;const 
   const w=document.createElement('div');w.className='bfrain';w.style.left=Math.round(p.x-60)+'px';w.style.top=Math.round(p.y-120)+'px';
   let h='';for(let i=0;i<n;i++)h+=`<i style="left:${(i*37)%120}px;animation-delay:${(i*83)%600}ms">${s&&!r?'❄':''}</i>`;w.innerHTML=h+(storm?'<b>⚡</b>':'');ov.appendChild(w);setTimeout(()=>w.remove(),2400)};
 // ---------- the event / weather card flips onto the board ----------
-const CARDICON={event:'',threat:'⏳',adventure:'',mystery:'❓',fight:''};const TYICON={book:'',build:'',explore:'',gather:'',wreck:''};
+const CARDICON={event:'',threat:BFI(BFP.wait,22),adventure:'',mystery:BFI(BFP.ask,22),fight:''};const TYICON={book:'',build:'',explore:'',gather:'',wreck:''};
 BF.cardClear=function(){const c=q('#bfcard');if(c)c.remove()};
 BF.card=function(i){BF.cardClear();const b=UI.beats[i];const ov=q('#bfov');if(!b||!ov||!BF.on)return;const k=b.kind;if(!['event','threat','adventure','mystery','fight','weather'].includes(k))return;const d=b.data||{};
   let ic=CARDICON[k]||'',cls=k,pos=G.camp.pos;
-  try{if(k==='weather'){const w=(viewState()||G).lastWx;const r=w&&w.rain||0,s=w&&w.snow||0;ic=w&&w.storm?'⛈️':r?''.repeat(Math.min(3,r)):s?'❄️'.repeat(Math.min(3,s)):'☀️';BF.rain(pos,r,s,w&&w.storm);if(w&&w.storm)cls+=' storm'}
+  try{if(k==='weather'){const w=(viewState()||G).lastWx;const r=w&&w.rain||0,s=w&&w.snow||0;ic=w&&w.storm?BFI(BFP.storm,22):r?BFI(BFP.rain,22).repeat(Math.min(3,r)):s?BFI(BFP.snow,22).repeat(Math.min(3,s)):BFI(BFP.sun,22);BF.rain(pos,r,s,w&&w.storm);if(w&&w.storm)cls+=' storm'}
     else if(d.card!=null&&CARD[d.card]){const c=CARD[d.card];const ti=c.icon&&TYICON[c.icon];ic=(CARDICON[k]||'')+(ti?ti:'')}}catch(e){}
   const el=document.createElement('div');el.id='bfcard';el.className='bfcard '+cls;el.setAttribute('role','button');el.setAttribute('aria-label',w8(capFor(i))+' (hold for the full text)');
   let scene='';try{if(k==='weather'){const w=(viewState()||G).lastWx||{};scene=w.storm?'gale':w.snow?'winter':w.rain?'rain':'horizon'}

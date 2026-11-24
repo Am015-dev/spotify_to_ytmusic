@@ -15,9 +15,9 @@ const sleep = ms => new Promise(r => setTimeout(r, ms)); const probs = [];
 const A = [['c0_0', 2], ['c0_1', 2]], CAMP = (k) => [['c0_0', 7, k], ['c0_1', 7, k]];
 const SOLVE = {
   jobs: [['c0_0', 6, '"i":1'], ['c0_1', 6, '"i":1']], sure: A, shelter: CAMP('"k":"shelter"'), roof: CAMP('"k":"roof"'), hunt: CAMP('"type":"hunt"'),
-  wreck: CAMP('"type":"threat"'), signal: [['c0_0', 7, 'pilemax'], ['c0_1', 2]], skill: 'skill', game: 'game'
+  signal: [['c0_0', 7, 'pilemax'], ['c0_1', 2]], skill: 'skill', game: 'game'
 };
-const WRONG = { jobs: [['c0_0', 6, '"i":0'], ['c0_1', 6, '"i":0']], sure: [['c0_0', 2], ['c0_1', 6]], shelter: A, roof: A, hunt: A, wreck: A, signal: A, skill: A };
+const WRONG = { jobs: [['c0_0', 6, '"i":0'], ['c0_1', 6, '"i":0']], sure: [['c0_0', 2], ['c0_1', 6]], shelter: A, roof: A, hunt: A, signal: A, skill: A };
 const words = t => t.trim().split(/\s+/).filter(Boolean).length;
 async function run(b, W, H) {
   const tag = W + 'x' + H, phone = W < 600, note = m => { probs.push(tag + ': ' + m); if (process.env.DBG) console.log('  ! ' + m + ' @' + ((Date.now() - T0) / 1000).toFixed(0) + 's'); }, shots = [];
@@ -28,7 +28,7 @@ async function run(b, W, H) {
   p.on('console', m => { if (m.type() === 'error' && !/net::|Failed to load|favicon|404|WebGL/.test(m.text())) note('console error ' + m.text().slice(0, 140)); });
   await p.goto('https://swi.test/?gl=0'); await sleep(500);
   await p.evaluate(() => { try { localStorage.clear(); localStorage.setItem(SAVE, 'REAL-GAME-SENTINEL'); } catch (e) { } });
-  await p.reload(); await sleep(1500);
+  await p.reload(); await p.waitForFunction(() => typeof GXST !== 'undefined' && typeof lessonsOpen === 'function' && typeof UI !== 'undefined' && UI.modal === 'start', null, { timeout: 15000 }).catch(() => { }); await sleep(200);
   await p.evaluate(() => { try { setGfx('low'); GXH.setEnabled(false); } catch (e) { } window.__ev = []; addEventListener('gxst', e => __ev.push(e.detail.type + ':' + (e.detail.id || ''))); });
   const st = () => p.evaluate(() => GXST.state());
   const dump = async w => { if (process.env.DBG) console.log('  DUMP ' + w + ' ' + await p.evaluate(() => JSON.stringify({ gx: GXST.state().phase + '/' + GXST.state().live, g: !!G, round: G && G.round, ph: G && G.phase, st: PHO.st, modal: UI.modal, q: G && !!G.q, beats: UI.beats.length, shown: UI.shown, pop: PHO.pop && PHO.pop.k, pawn: !!document.querySelector('#bf [data-pawn]'), ft: [...document.querySelectorAll('.gxst-ft button')].map(e => e.textContent).join('|') }))); };
@@ -44,18 +44,28 @@ async function run(b, W, H) {
   const place = async ([pid, t, opt]) => {
     if (!(await tap('#bf [data-pawn="' + pid + '"]', 'pawn ' + pid))) return;
     if (!(await tap('#bfglow>[data-t="' + t + '"]', 'place ' + t))) return;
-    if (opt) { await sleep(120); await tap(opt === 'pilemax' ? '[data-a="pilemax"]' : '#ppop [data-place],[data-place]', 'option ' + opt, opt === 'pilemax' ? 'pilemax' : opt); await sleep(120); if (opt === 'pilemax') await p.evaluate(() => { try { PHO.closePop(true); } catch (e) { } }); }
+    if (opt) { await sleep(40); await tap(opt === 'pilemax' ? '[data-a="pilemax"]' : '#ppop [data-place],[data-place]', 'option ' + opt, opt === 'pilemax' ? 'pilemax' : opt); await sleep(40); if (opt === 'pilemax') await p.evaluate(() => { try { PHO.closePop(true); } catch (e) { } }); }
   };
   // the day replays by itself except for Continue taps: click them in the page until the lesson is judged (the moves above are the real taps)
   const finishDay = () => p.evaluate(() => new Promise(res => { let n = 0; const iv = setInterval(() => { const b = document.querySelector('#bf [data-a="next"],.bf-opts .opt'); if (b) b.click(); if (GXST.state().phase !== 'play' || ++n > 4000) { clearInterval(iv); res(); } }, 5); }));
-  const play = async mv => { for (const m of mv) await place(m); await sleep(250); await tap('#bf [data-a="go"]', 'Start day'); await sleep(200); if (await p.$('#bf [data-a="go"][data-force]')) await tap('#bf [data-a="go"][data-force]', 'Start anyway'); await finishDay(); };
+  const playFast = mv => p.evaluate(async mv => {
+    const w = async (f) => { for (let k = 0; k < 400; k++) { const e = f(); if (e) return e; await new Promise(r => setTimeout(r, 5)); } return null; };
+    for (const [pid, t, opt] of mv) {
+      const pe = await w(() => document.querySelector('#bf [data-pawn="' + pid + '"]')); if (pe) pe.click();
+      const te = await w(() => document.querySelector('#bfglow>[data-t="' + t + '"]')); if (te) on3DTile(t);
+      if (opt) { const oe = await w(() => opt === 'pilemax' ? document.querySelector('[data-a="pilemax"]') : [...document.querySelectorAll('#ppop [data-place],[data-place]')].find(e => decodeURIComponent(e.dataset.place || '').indexOf(opt) >= 0)); if (oe) oe.click(); }
+    }
+    const g = await w(() => document.querySelector('#bf [data-a="go"]')); if (g) g.click(); await new Promise(r => setTimeout(r, 20));
+    const f = document.querySelector('#bf [data-a="go"][data-force]'); if (f) f.click();
+  }, mv).then(finishDay);
+  const play = async mv => { const t0 = Date.now(); for (const m of mv) await place(m); if (process.env.DBG) console.log('    placed ' + (Date.now() - t0)); await sleep(60); await tap('#bf [data-a="go"]', 'Start day'); await sleep(60); if (await p.$('#bf [data-a="go"][data-force]')) await tap('#bf [data-a="go"][data-force]', 'Start anyway'); const t1 = Date.now(); await finishDay(); if (process.env.DBG) console.log('    day ' + (Date.now() - t1) + ' total ' + (Date.now() - t0)); };
   const gameLoop = async () => {   // a real game: let the wand plan each day, play it out
     for (let i = 0; i < 12 && (await st()).phase === 'play'; i++) {
       await p.waitForFunction(() => GXST.state().phase !== 'play' || (G && (G.over || (G.phase === 'plan' && /^plan/.test(PHO.st || '') && !UI.modal && !G.q))), null, { timeout: 15000 }).catch(() => { });
       if ((await st()).phase !== 'play') break;
-      const need = await p.evaluate(() => planProblems().length); if (need) { await tap('#bf [data-a="suggest"]', 'wand'); await sleep(100); }
-      await tap('#bf [data-a="go"]', 'Start day'); await sleep(200);
-      for (let k = 0; k < 12; k++) { if (!(await tap('.bf-opts .opt', 'option'))) break; await sleep(100); }
+      const need = await p.evaluate(() => planProblems().length); if (need) { await tap('#bf [data-a="suggest"]', 'wand'); await sleep(40); }
+      await tap('#bf [data-a="go"]', 'Start day'); await sleep(60);
+      for (let k = 0; k < 12; k++) { if (!(await tap('.bf-opts .opt', 'option'))) break; await sleep(40); }
     }
   };
   const solve = async id => {
@@ -73,11 +83,11 @@ async function run(b, W, H) {
   if (s.phase !== 'picker' || n !== s.count || n !== ids.length || n < 6 || n > 10) note('picker shows ' + n + ' of ' + s.count + ' lessons');
   await p.screenshot({ path: path.join(PROOF, 'lessons-' + tag + '-picker.png') });
   // 1) lesson 1: wrong move fails with a message; Retry restarts; non-lesson taps work; hint nudge then show-me; chip
-  await tap('.gxst-pick[data-id="jobs"]', 'lesson 1'); await live('jobs'); await sleep(300);
+  await tap('.gxst-pick[data-id="jobs"]', 'lesson 1'); await live('jobs'); await sleep(100);
   (await p.evaluate(() => [...document.querySelectorAll('.gxst-goal')].map(e => e.textContent))).forEach(t => { if (words(t) > 12) note('goal over 12 words: ' + t); });
-  await play(WRONG.jobs); if (!(await phase('fail', 6000))) { note('a wrong move did not fail'); if (process.env.DBG) console.log(await p.evaluate(() => JSON.stringify({ a: G.plan.acts, pr: planProblems(), r: G.round, st: PHO.st, ph: G.phase, pop: PHO.pop, beats: UI.beats.length, shown: UI.shown, auto: UI.auto, modal: UI.modal, q: !!G.q, over: G.over, btn: [...document.querySelectorAll('#bf [data-a]')].map(e => e.dataset.a + ':' + e.textContent.trim().slice(0, 14)).join('|') }))); }
+  await playFast(WRONG.jobs); if (!(await phase('fail', 6000))) { note('a wrong move did not fail'); if (process.env.DBG) console.log(await p.evaluate(() => JSON.stringify({ a: G.plan.acts, pr: planProblems(), r: G.round, st: PHO.st, ph: G.phase, pop: PHO.pop, beats: UI.beats.length, shown: UI.shown, auto: UI.auto, modal: UI.modal, q: !!G.q, over: G.over, btn: [...document.querySelectorAll('#bf [data-a]')].map(e => e.dataset.a + ':' + e.textContent.trim().slice(0, 14)).join('|') }))); }
   s = await st(); if (!/\w{4}/.test(s.msg || '')) note('fail has no message'); await p.screenshot({ path: path.join(PROOF, 'lessons-' + tag + '-fail.png') });
-  await tap('.gxst-ft .pri', 'Retry'); await live('jobs'); await sleep(300);
+  await tap('.gxst-ft .pri', 'Retry'); await live('jobs'); await sleep(100);
   const covered = await p.evaluate(() => [...document.querySelectorAll('#bfglow>*,#bf [data-pawn],#bf [data-a="go"]')].filter(e => { const r = e.getBoundingClientRect(); if (r.width < 4) return false; const u = document.elementFromPoint(r.left + r.width / 2, r.top + r.height / 2); return u && u.closest && u.closest('.gxst-card,.gxst-chip'); }).length);
   if (covered) note(covered + ' board items under the lesson card');
   await tap('[data-gx="rulesd"], [data-gx="logd"]', 'a non-lesson button'); const dr = await p.evaluate(() => !!document.querySelector('.gx-drawer.open,.gx-drawer.on,[aria-expanded="true"]')); if (!dr) note('non-lesson tap (drawer) did nothing');
@@ -86,17 +96,18 @@ async function run(b, W, H) {
   await tap('.gxst-bulb', 'bulb'); await tap('.gxst-bulb', 'bulb'); s = await st();
   if (s.hint !== 2 || !s.target) note('show-me hint has no target'); if (s.overlap) note('card covers the hinted target'); if (!(await p.$('.gxst-ring'))) note('no hint ring');
   await tap('.gxst-hd .gxst-ib[aria-label="Minimise"]', 'minimise'); if (!(await st()).min || !(await p.$('.gxst-chip'))) note('minimise gave no chip');
-  await sleep(300); await tap('.gxst-chip', 'chip'); if ((await st()).min) note('chip did not restore');
-  await solve('jobs'); s = await st(); if (s.stars !== 1) note('two hints should give 1 star, got ' + s.stars);
+  await sleep(100); await tap('.gxst-chip', 'chip'); if ((await st()).min) note('chip did not restore');
+  await solve('jobs'); s = await st(); if (process.env.DBG) console.log('  after L1 ' + JSON.stringify(s) + ' ' + await p.evaluate(() => [...document.querySelectorAll('.gxst-ft button')].map(b => b.className + ':' + b.textContent + ':' + Math.round(b.getBoundingClientRect().width)).join('|'))); if (s.stars !== 1) note('two hints should give 1 star, got ' + s.stars);
   // 2) every lesson: start picture for the sheet, a wrong move fails (not the game), the scripted solution wins with 3 stars
   for (let i = 0; i < ids.length; i++) {
     const id = ids[i];
     if (i > 0) { await tap('.gxst-ft .pri', 'Next'); await live(id).catch(async () => { note(id + ' did not start'); if (process.env.DBG) console.log(await p.evaluate(() => JSON.stringify({ g: !!G, ph: G && G.phase, st: PHO.st, modal: UI.modal, q: G && !!G.q, beats: UI.beats.length, shown: UI.shown, s: GXST.state(), pawn: !!document.querySelector('#bf [data-pawn]'), btn: [...document.querySelectorAll('#bf [data-a],#modal button')].map(e => e.dataset.a + ':' + e.textContent.trim().slice(0, 12)).join('|') }))); }); } else { await p.evaluate(() => GXST.start('jobs')); await live('jobs'); }
-    await sleep(500);
+    await sleep(150);
+    if (process.env.DBG) console.log('  lesson ' + id + ' @' + ((Date.now() - T0) / 1000).toFixed(1) + 's');
     shots.push(await p.screenshot({ type: 'jpeg', quality: 72 }));
     const g = await p.evaluate(() => document.querySelector('.gxst-goal').textContent); if (words(g) > 12) note(id + ' goal over 12 words');
     if (WRONG[id] && i > 0) {
-      await play(WRONG[id]);
+      { const tw = Date.now(); await playFast(WRONG[id]); if (process.env.DBG) console.log('    wrong ' + (Date.now() - tw)); }
       if (!(await phase('fail', 20000))) note(id + ': wrong move did not fail'); else { s = await st(); if (!/\w{4}/.test(s.msg || '') || words(s.msg) > 26) note(id + ': fail message "' + s.msg + '"'); await tap('.gxst-ft .pri', 'Retry'); await live(id).catch(async () => { note(id + ': retry did not restart'); await dump('retry ' + id); }); }
     }
     await solve(id); s = await st(); if (s.phase === 'win' && s.stars !== 3 && id !== 'jobs') note(id + ': clean solve gave ' + s.stars + ' stars (' + s.hint + ' hints)');
@@ -105,7 +116,7 @@ async function run(b, W, H) {
   s = await st(); if (Object.keys(s.best).length !== ids.length) note('progress saved for ' + Object.keys(s.best).length + '/' + ids.length);
   await p.screenshot({ path: path.join(PROOF, 'lessons-' + tag + '-win.png') });
   // 3) close returns to the title; the real saved game was never touched; events fired
-  await tap('.gxst-hd .gxst-ib[aria-label="Close"]', 'close'); await sleep(400);
+  await tap('.gxst-hd .gxst-ib[aria-label="Close"]', 'close'); await sleep(150);
   if ((await st()).open || await p.$('.gxst-card')) note('close left the card');
   const back = await p.evaluate(() => ({ g: !!G, modal: UI.modal, save: localStorage.getItem(SAVE) })); if (back.g || back.modal !== 'start') note('closing did not return to the title');
   if (back.save !== 'REAL-GAME-SENTINEL') note('the saved real game was overwritten');

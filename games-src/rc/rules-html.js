@@ -1,5 +1,6 @@
 // ---------- How to play (an original summary of the rules as this game applies them) ----------
 const RULES_HTML=`<h2>How to play</h2>
+<div class="rgoal"><h3>Your goal</h3><p><b>Win:</b> finish the scenario's goal before the last day ends (Marooned: build Fire and a 15-wood signal pile, then the ship sees you on day 10, 11 or 12).</p><p><b>Lose:</b> any castaway dies (Friday aside), or the last day ends without the goal.</p><p><b>Every night:</b> each castaway eats 1 food or takes 2 wounds; without a shelter each takes 1 more wound.</p></div>
 <h3>How a turn works</h3>
 <ol class="turn5"><li><b>The island acts.</b> An event card, morale and the camp's food and wood arrive. Read each scene, then tap Continue.</li>
 <li><b>You plan.</b> Tap a pawn, then a glowing place on the island to send it to work there.</li>
@@ -7,7 +8,7 @@ const RULES_HTML=`<h2>How to play</h2>
 <li><b>Tap Start day.</b> The jobs play out one by one: you see each result as it happens.</li>
 <li><b>Weather and night.</b> Everyone eats 1 food. Without a shelter everyone is wounded. Survive until rescue.</li></ol>
 <h3>Simplified here, on purpose</h3>
-<ul><li>Scenarios 4, 5 and 7 are not offered (they need lava, village fights and a bonus sheet).</li><li>The first wreckage is always the food crates; the random-wreckage variant is not offered.</li><li>You may pick any castaways. The board game limits two-player and solo games to the Carpenter, Cook and Explorer.</li><li>Healing and moving camp at night are optional prompts; skills are used from the Camp tab. The rules timing is the same.</li></ul>
+<ul><li>Scenarios 4, 5 and 7 are not offered (they need lava, village fights and a bonus sheet).</li><li>On a Hard island the first wreckage is drawn at random (crates, sea chest or dinghy); otherwise it is the food crates.</li><li>You may pick any castaways. The board game limits two-player and solo games to the Carpenter, Cook and Explorer.</li><li>Healing and moving camp at night are optional prompts; skills are used from the Camp tab. The rules timing is the same.</li></ul>
 <p>You are castaways on a wild island. Everyone wins or loses together. Finish the scenario's goal before the last round ends, and keep every castaway alive: if anyone dies (Friday aside), you all lose.</p>
 <h3>A round, in six phases</h3>
 <ol><li><b>Event</b> (not in round 1). Draw an event card: its effect happens now, and the card becomes a <b>threat</b> in the right-hand slot. The older threat slides left; a threat pushed off the left slot fires its <i>if ignored</i> effect. Cards with a book icon trigger the scenario's book effect; the others put a "?" marker on the build, gather or explore action.</li>

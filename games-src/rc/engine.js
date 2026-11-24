@@ -40,7 +40,7 @@ function newGame(o){o=o||{};const seed=DEFSEED!=null?DEFSEED:Math.floor(Math.ran
   // decks
   const book=shuffle(EVENTS.filter(e=>e.icon==='book').flatMap(e=>Array(e.cp||1).fill(e.k))),advE=shuffle(EVENTS.filter(e=>e.icon!=='book').flatMap(e=>Array(e.cp||1).fill(e.k)));
   const half=Math.ceil(S.rounds/2);const nb=o.diff==='easy'?Math.max(1,half-2):o.diff==='hard'?half+2:half;G.diff=o.diff||'standard';G.ev.deck=shuffle(book.slice(0,nb).concat(advE.slice(0,2*half-nb)));
-  G.ev.threat=[null,'crates'];
+  G.ev.threat=[null,(o.wreck==='random'||o.diff==='hard')?WRECKS[Math.floor(rnd()*WRECKS.length)].k:'crates'];   // rule: random wreckage variant (Hard island, or o.wreck='random'); otherwise the food crates
   for(const d of ['build','gather','explore'])G.adv[d]=shuffle(ADVENTURES.filter(a=>a.deck===d).flatMap(a=>Array(a.cp||1).fill(a.k)));
   G.mys.deck=shuffle(MYSTERIES.flatMap(m=>Array(m.cp||1).fill(m.k)));
   G.beast=shuffle(BEASTS.map(b=>b.k));
