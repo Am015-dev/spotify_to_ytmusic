@@ -72,6 +72,7 @@ var OST = (function () {
     var h = document.createElement('b'); h.textContent = 'Chapter ' + n + ' · ' + def.goal.text; el.appendChild(h);
     var p = document.createElement('span'); p.textContent = def.tip && m.turns < 3 ? def.tip : prog; el.appendChild(p);
     el.classList.toggle('bad', g.key === 'kept' && m.kept > 0 || g.key === 'turns' && m.turns > g.max);
+    UI.layout();   // places the card under the title
   }
   function over(G) {
     var c = camp(); U().camp = null; render();
