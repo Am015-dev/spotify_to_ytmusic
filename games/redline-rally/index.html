@@ -121,26 +121,21 @@ html body .gxc-node .gxc-disc{color:#fff!important;background:#2e1c0c!important}
 .gb{display:flex;flex-direction:column;align-items:center;justify-content:center;line-height:1;padding:2px 0}
 .gb b{font-size:21px}.gb small{font-size:14px;font-weight:700;color:#c9d3e6;margin-top:2px}.gb.on small{color:#ffe6a0}.gb.glow{box-shadow:0 0 0 2px #ffc23a}
 :root{--ch:calc(var(--cw)*1.55)}
-@media (max-height:600px) and (max-width:499px){:root{--ch:calc(var(--cw)*1.3)}}   /* short phones: lower cards give the board more room */
 #hand{min-height:var(--ch)}
 .cd{height:var(--ch)}
 .cd .k{position:absolute;left:0;right:0;top:2px;font-size:14px;line-height:1.1;text-align:center;font-weight:800}
 .cd .v{top:calc(var(--ch)*.24);display:flex;align-items:center;justify-content:center;font-size:calc(var(--cw)*.62)}
 .cd .t{bottom:2px;left:-2px;right:-2px;font-size:14px;line-height:1.1;font-weight:700;white-space:nowrap;letter-spacing:-.02em}
 .cd.H .t,.cd.X .t{color:#e8dcff}
-:root:has(.gxh-bub.on) #banner.rate,:root:has(.gxh-bub.on) #trk .rate{display:none!important}
-.cd.glow{animation:cdGlow 1.4s ease-in-out 3}
+.cd.glow{animation:cdGlow 1.4s ease-in-out infinite}
 @keyframes cdGlow{0%,100%{box-shadow:0 0 0 0 rgba(255,194,58,0)}50%{box-shadow:0 0 0 3px rgba(255,194,58,.85)}}
-.cd.dim{opacity:.72;filter:saturate(.75)}
+.cd.dim{opacity:.5;filter:saturate(.6)}
 .cd.flip{animation:cdFlip .38s ease-out}
 @keyframes cdFlip{from{transform:rotateY(90deg) scale(.8);opacity:0}to{transform:none;opacity:1}}
-#acts .go.glow{animation:goGlow 1.2s ease-in-out 3}
+#acts .go.glow{animation:goGlow 1.2s ease-in-out infinite}
 @keyframes goGlow{0%,100%{box-shadow:0 3px 0 #6e1209,0 0 0 0 rgba(255,194,58,0)}50%{box-shadow:0 3px 0 #6e1209,0 0 0 5px rgba(255,194,58,.8)}}
 .reveal{min-height:var(--ch)}
 .who{text-align:center;font-weight:900;font-size:16px;margin:2px 0 4px}
-/* F3: the Suggest plan is shown, never played: gold ring on the gear and the cards; a plain line for Heat and Stress cards */
-.gb.sg,.cd.sg{outline:3px solid #ffd24a;outline-offset:2px}.cd.sg.sel,.gb.sg.on{outline-color:#8cf0b4}
-.legend{display:flex;flex-direction:column;gap:1px;font-size:13px;line-height:1.3;color:#c9d3e6;text-align:center;margin:2px 0 4px}.legend b{color:#fff}
 .tray .eng{gap:6px}.tray em{font-style:normal;color:#d5deee}
 .pips{display:inline-flex;gap:3px}.pip{width:12px;height:12px;border-radius:50%;border:2px solid #ff9b5a;background:transparent}.pip.on{background:#ff7a3a}
 .turn5{margin:4px 0 10px 20px;padding:0}.turn5 li{margin:4px 0;font-size:16px}
@@ -148,7 +143,7 @@ html body .gxc-node .gxc-disc{color:#fff!important;background:#2e1c0c!important}
 @media (prefers-reduced-motion:reduce){.cd.glow,#acts .go.glow{animation:none}.cd.glow{box-shadow:0 0 0 2px #ffc23a}}
 .gxt-n{display:none}.gxt-dots i{width:5px;height:5px}
 @media (max-width:600px){#panel{min-height:0}}
-@media (max-width:999px) and (max-height:520px) and (orientation:landscape){html .gx-main{grid-template-columns:minmax(0,1fr) 330px!important;grid-template-rows:minmax(0,1fr)!important}html .gx-dock{max-height:none!important;border-radius:0!important}html .gx-app.gx-dock-min .gx-main{grid-template-columns:minmax(0,1fr) 0!important}}
+@media (max-width:999px) and (max-height:520px){html .gx-main{grid-template-columns:minmax(0,1fr) 330px!important;grid-template-rows:minmax(0,1fr)!important}html .gx-dock{max-height:none!important;border-radius:0!important}html .gx-app.gx-dock-min .gx-main{grid-template-columns:minmax(0,1fr) 0!important}}
 @media (min-width:900px){:root{--cw:72px}#gears .gl,.cd .k,.cd .t,.gb small,.tray em,.who,#banner,.turn5 li{font-size:16px}#msg{font-size:18px}}
 #coach{position:absolute;left:8px;right:8px;bottom:8px;z-index:6;display:none;align-items:center;gap:8px;padding:8px 10px;border-radius:14px;background:#f3e9cf;color:#1b1710;border:2px solid #c9a24a;box-shadow:0 4px 14px rgba(0,0,0,.55);font-size:15px;line-height:1.3}
 #coach.on{display:flex;animation:bnIn2 .3s ease-out}@keyframes bnIn2{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
@@ -186,13 +181,12 @@ table.champ tr.you td{color:var(--gold);font-weight:700}
 #rulesbody b{color:inherit}
 
 #modal .sheet>.row:last-child{position:sticky;bottom:-1px;z-index:2;background:var(--panel);padding:8px 0 4px;margin-bottom:0!important}
-@media (max-width:600px){.pod3 .p1 .blk{height:50px}.pod3 .p2 .blk{height:36px}.pod3 .p3 .blk{height:26px}.pod3 .blk{font-size:18px;padding-top:3px}.stand{padding:3px 6px;margin:3px 0;gap:8px}.stand .pt{width:30px;height:30px}.stand>div{display:flex;align-items:baseline;gap:8px;min-width:0}.stand>div b{white-space:nowrap}.stand small{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:13px}.podium{padding:30px 12px 26px}}
+@media (max-width:600px){.pod3 .p1 .blk{height:50px}.pod3 .p2 .blk{height:36px}.pod3 .p3 .blk{height:26px}.pod3 .blk{font-size:18px;padding-top:3px}.stand{padding:4px 6px;margin:4px 0}.stand .pt{width:34px;height:34px}.podium{padding:30px 12px 26px}}
 @media (min-width:1280px){#game{--gx-dock-w:clamp(470px,44vw,620px)}html #game{--cw:68px}}
 body:has(.gx-drawer.on) #gxscn-tag{display:none}   /* the ?scn= test tag must not sit on top of the open rules drawer */
 @media (min-width:1000px){html body .gx-drawer{bottom:0;border-bottom-left-radius:0;border-bottom-right-radius:0}}   /* lines scrolled below the drawer end over its own panel, not over the dark page */
 #trk .score{display:flex;width:100%;align-items:center;justify-content:space-between;gap:8px;min-height:44px;margin:0 0 4px;padding:3px 10px;border-radius:8px;border:1px solid #3b4a68;background:#1d2636;color:var(--ink);font-weight:800;font-size:14px;text-align:left}
 #trk .score i{font-style:normal;font-weight:700;color:var(--gold);font-size:14px}
-#hintT[hidden]{display:none!important}   /* one hint control: the lightbulb */
 #hintT.on{border-color:var(--gold);color:var(--gold)}
 ul.goal{margin:6px 0 12px 18px;padding:0}ul.goal li{margin:6px 0;font-size:16px;line-height:1.35}.wxl{font-size:15px;color:#8ce6ff}
 @media (min-width:900px){#trk .score,#trk .score i{font-size:16px}}
@@ -211,40 +205,19 @@ ul.goal{margin:6px 0 12px 18px;padding:0}ul.goal li{margin:6px 0;font-size:16px;
 #hand.dropz::before{content:"Drop here to play";position:absolute;left:4px;right:4px;bottom:calc(100% + 4px);height:40px;display:flex;align-items:center;justify-content:center;border:2px dashed var(--gold);border-radius:12px;color:var(--gold);font-weight:800;font-size:15px;background:rgba(20,16,4,.82);z-index:4;pointer-events:none}
 #hand.dropon::before{background:rgba(255,194,58,.28);color:#fff}
 .cd.snap{animation:cdSnap .22s ease-out}@keyframes cdSnap{0%{transform:translateY(-30px) scale(1.12)}100%{transform:translateY(-12px)}}
-/* F4 PC (owner): use the width. Left panel: score, phases, standings; centre: the track, large; right panel: the line, gears, hand, Go.
-   The dock and its body become layout-only (display:contents) so their children sit straight in the three-column grid. */
+/* PC: the board fills the screen; hand, gears and Go are one bottom dock (no cropped board, no empty side panel) */
 @media (min-width:1000px) and (min-height:521px){
-  html #game .gx-main{grid-template-columns:clamp(250px,19vw,330px) minmax(0,1fr) clamp(360px,27vw,470px)!important;grid-template-rows:auto minmax(0,1fr)!important;grid-template-areas:"left board msg" "left board panel"!important}
-  html #game .gx-board{grid-area:board;min-width:0;min-height:0}
-  html #game .gx-dock{display:contents}
-  html #game .gx-dock-head,html #game .gx-reopen{display:none!important}
-  html #game .gx-dock-body{display:contents}
-  html #game #trk{grid-area:left;margin:0;padding:12px 12px 10px;background:#121a28;border-right:2px solid #324059;overflow:auto;min-height:0}
-  html #game #msg{grid-area:msg;margin:10px 12px 0;border-radius:10px;text-align:left;justify-content:flex-start;min-height:52px}
-  html #game #panel{grid-area:panel;display:flex;flex-direction:column;align-items:stretch;justify-content:flex-start;gap:10px;padding:10px 12px 14px;overflow:auto;min-height:0;border-left:0}
-  html #game .gx-main>aside,html #game #panel{background:#121a28}
-  html #game #gears{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;background:none;padding:0}html #game #gears .gl{display:none}
-  html #game .gb{min-height:58px}
-  html #game #hand{display:flex;flex-wrap:wrap;justify-content:center;gap:6px}
-  html #game #acts{display:flex;flex-wrap:wrap;gap:8px;margin-top:auto;position:sticky;bottom:0;background:#121a28;padding-top:6px}html #game #acts .go{flex:1 1 100%;order:-1;min-height:64px;font-size:24px}html #game #acts .bo,html #game #acts #sugB{flex:1 1 0;min-height:48px;font-size:16px}
-  html #game #trk .phs{flex-wrap:wrap}
-  html #game .rlog .rl{font-size:16px;padding:6px 10px}html #game .rlog .rl small{font-size:14px}
+  html #game .gx-main{grid-template-columns:minmax(0,1fr)!important;grid-template-rows:minmax(0,1fr) auto!important}
+  html #game .gx-dock{border-left:0;border-top:2px solid #324059;max-height:none;width:auto}
+  html #game .gx-dock-head{display:none}
+  html #game .gx-dock-body{display:grid;grid-template-columns:minmax(300px,360px) minmax(0,1fr);grid-template-areas:"trk panel" "msg panel";align-items:center;column-gap:18px;padding:8px 18px 10px;overflow:visible}
+  html #game #trk{grid-area:trk;margin:0}html #game #msg{grid-area:msg;border:0;border-radius:10px;justify-content:flex-start;text-align:left}
+  html #game #panel{grid-area:panel;display:grid;grid-template-columns:auto minmax(0,1fr) 250px;grid-template-areas:"gears hand acts" "tray tray tray";align-items:center;gap:6px 16px;padding:0}
+  html #game #gears{grid-area:gears;display:grid;grid-template-columns:auto 84px 84px;grid-template-rows:auto auto;gap:6px}html #game #gears .gl{grid-row:1/3;width:58px;max-width:none}html #game #gears{background-position:left center;background-size:auto 80%}
+  html #game #hand{grid-area:hand;flex-wrap:nowrap}html #game #acts{grid-area:acts;flex-wrap:wrap}html #game #acts .go{flex:1 1 100%;order:-1;min-height:60px}html #game #acts .bo,html #game #acts .swapb{flex:1 1 0}
+  html #game #tray{grid-area:tray}
+  html #game #panel:not(:has(#gears)){display:flex;flex-direction:row;flex-wrap:wrap;align-items:center;justify-content:center}
 }
-/* F4: lap and place badges look different: lap = outlined grey with its flag, place = solid gold */
-.gx-bar .pill.lapb{background:transparent;border:2px solid #5b6a86;color:#dfe6f3}.gx-bar .pill.lapb b{color:#fff}
-.gx-bar .pill.placeb{background:var(--gold);color:#1a1405;border:2px solid var(--gold)}.gx-bar .pill.placeb b{color:#1a1405}.gx-bar .pill.placeb .ic{filter:brightness(0)}
-/* F4: heat line, boost toggle, round log, standings, end tips */
-.heatl{font-size:14px;line-height:1.3;color:#e6ecf7;text-align:center;padding:4px 8px;border-radius:8px;background:#1a2232;margin:2px 0}.heatl b{color:#ffb27a}.heatl .ok{color:#8cf0b4;font-weight:800;text-decoration:underline}.heatl .gtr{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:13px;color:#cfd8ea;margin-top:1px}
-#acts .bo{display:flex;flex-direction:column;align-items:center;justify-content:center;line-height:1.05}#acts .bo small{font-size:12px;font-weight:700;color:#c9d3e6}#acts .bo.on{color:var(--gold)}
-.rlog{display:flex;flex-direction:column;gap:3px;margin-top:6px;width:100%}
-.rlog .rl{display:grid;grid-template-columns:10px minmax(48px,auto) 1fr auto auto;align-items:center;gap:6px;font-size:14px;padding:3px 8px;border-radius:8px;background:#1a2232;color:#e6ecf7}
-.rlog .rl i{width:10px;height:18px;border-radius:3px}.rlog .rl.me{outline:2px solid var(--gold)}.rlog .rl em{font-style:normal;color:#8cf0b4;font-weight:700}.rlog .rl em.bad{color:#ff9a7a}.rlog .rl small{color:#aab6cc;font-size:13px}
-.stl-h{margin:12px 0 4px;font-weight:900;font-size:15px;color:#aab6cc;text-transform:uppercase;letter-spacing:.06em}
-.stand-l{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:4px}
-.stand-l li{display:grid;grid-template-columns:34px 10px 1fr;grid-template-rows:auto auto;column-gap:8px;align-items:center;padding:6px 8px;border-radius:8px;background:#1a2232}
-.stand-l li .n{grid-row:1/3;font-weight:900;font-size:18px;color:#fff}.stand-l li i{grid-row:1/3;width:10px;height:30px;border-radius:3px}.stand-l li b{font-size:16px}.stand-l li small{font-size:13px;color:#aab6cc}
-.stand-l li.me{outline:2px solid var(--gold)}.stand-l li.me b{color:var(--gold)}
-.tips{margin:8px 0 6px;padding:8px 12px;border-radius:10px;background:#1a2232;border-left:4px solid var(--gold);text-align:left}.tips b{display:block;font-size:14px;color:var(--gold);text-transform:uppercase;letter-spacing:.05em}.tips p{margin:4px 0;font-size:15px;line-height:1.35}
 /* W496: 375px phones: the top bar fits (Menu stayed 7px past the edge); podium title readable over the art */
 @media (max-width:389px){.gx-bar .pill .pw{display:none}.gx-bar .pill{padding:3px 5px}}
 button.pill#posChip{font:inherit;color:inherit;border:0;min-height:44px;cursor:pointer}
@@ -263,8 +236,6 @@ button.pill#posChip{font:inherit;color:inherit;border:0;min-height:44px;cursor:p
 @media (max-width:600px){.podium h2{margin-top:44px}}
 /* R19: the 375x667 result card fits without scrolling, so Race again never sits over a row */
 @media (max-width:600px) and (max-height:760px){.podium{padding:10px 10px 10px}.podium h2{margin-top:8px;font-size:20px}.podium .ic{display:none!important}.pod3{margin:4px auto 2px}.pod3 .p1 .blk{height:34px}.pod3 .p2 .blk{height:26px}.pod3 .p3 .blk{height:20px}.pod3 .blk{font-size:16px;padding-top:1px}.podium .rl{font-size:15px;margin-top:4px}.stand{margin:3px 0;padding:3px 6px}.stand .pt{width:30px;height:30px}#modal .sheet{padding:12px 12px 8px}}
-/* F5: short PC windows (1366x768): the result card is compact so all five rows show above the buttons */
-@media (min-width:601px) and (max-height:860px){.podium{padding:10px 12px}.podium h2{margin-top:8px;font-size:22px}.podium .ic{display:none!important}.pod3{margin:4px auto 2px}.pod3 .p1 .blk{height:34px}.pod3 .p2 .blk{height:26px}.pod3 .p3 .blk{height:20px}.pod3 .blk{font-size:16px;padding-top:1px}.podium .rl{font-size:15px;margin-top:4px}.stand{margin:3px 0;padding:3px 8px}.stand .pt{width:32px;height:32px}#modal .sheet{padding:12px 14px 8px}}
 /* ===== Board-first shell (shared by every game on the shelf) =====
    The page never scrolls. The board fills what the bar and the dock leave; the dock is in flow (never over the board);
    everything else opens in a closable popup (drawer). Games theme it with the --gx-* variables. */
@@ -659,9 +630,9 @@ html body :is(.gxh-ring,.gxt-ring){animation-duration:1.6s}
 <div id="game" class="gx-app" hidden>
   <header class="gx-bar">
     <h1>Redline Rally</h1>
-    <span class="pill lapb" title="Laps done of the race"><i class="ic hud f-lap" data-art="icon-lap"></i><b id="tLap">Lap 1/2</b></span><button type="button" class="pill placeb" id="posChip" aria-label="Your place in the race: tap for standings"><i class="ic hud f-place" data-art="icon-place"></i><b id="tPos">1st of 5</b></button><span class="pill" id="tTrk"></span>
+    <span class="pill"><i class="ic hud f-lap" data-art="icon-lap"></i><span class="pw">Lap </span><b id="tLap">1/2</b></span><button type="button" class="pill" id="posChip" aria-label="Standings"><i class="ic hud f-place" data-art="icon-place"></i><span class="pw">Place </span><b id="tPos">1/5</b><span class="pw"> &#9662;</span></button><span class="pill" id="tTrk"></span>
     <span class="gx-sp"></span>
-    <button class="gx-ibtn" id="hintT" type="button" hidden aria-pressed="false" title="Hints: move preview, ratings and What should I do?"><span>Hints</span></button>
+    <button class="gx-ibtn" id="hintT" type="button" aria-pressed="false" title="Hints: move preview, ratings and What should I do?"><span>Hints</span></button>
     <button class="gx-ibtn gxh-bulb" id="bulbbtn" data-help type="button" aria-label="Hint: what should I do?" title="Hint"></button>
     <button class="gx-ibtn" data-gx="rulesd" aria-expanded="false" aria-label="Rules"><span>Rules</span></button>
     <button class="gx-ibtn" id="sndB" data-snd aria-label="Sound"></button>
@@ -2812,7 +2783,7 @@ var STORY = {
   guide: 'Coach Mara',
   rival: 'Kit Marlow',
   /* the five lines at the top of Help */
-  turn: ['1. Pick a gear: it is how many cards you play.', '2. Tap that many cards. Their numbers add up to your speed.', '3. Press Go. Your car drives that many spaces.', '4. Corners have a speed limit. Go over it and you burn engine heat.', '5. Everyone plans at once, then the cars move one at a time, leader first.'],
+  turn: ['1. Pick a gear: it is how many cards you play.', '2. Tap that many cards. Their numbers add up to your speed.', '3. Press Go. Your car drives that many spaces.', '4. Corners have a speed limit. Go over it and you burn engine heat.', '5. Then every rival takes a turn, one car at a time.'],
   /* quick game */
   quickIntro: ['Lights out. Brake smart, burn little, cross first.', 'Rain is coming. One clean lap wins.', 'Heat is fuel. Spend it where it counts.'],
   quickWin: ['You took the flag with fuel to spare.', 'Chequered flag, and it is yours.'],
@@ -2822,6 +2793,43 @@ var STORY = {
   planGear: 'Pick a gear, then tap cards.',
   planCards: function (n) { return 'Tap ' + n + ' card' + (n > 1 ? 's' : '') + ': they add up to speed.'; },
   planGo: 'Press Go!',
+  /* tutorial: Prologue "The Sunline Seat". Each step: t = who speaks, s = the story reason + what to do (no "click"), r = the reaction shown next */
+  tutTitle: 'Prologue: The Sunline Seat',
+  chapters: ['Chapter 1: Your first turn', 'Chapter 2: The wet corner', 'Chapter 3: Heat is fuel', 'Chapter 4: Cool down, catch up', 'Chapter 5: Tuck in behind Kit', 'Chapter 6: The line'],
+  tut: {
+    meet: { s: 'Rookie, I am Coach Mara. Kit Marlow wants your seat at Sunline. Win one lap and it stays yours.' },
+    gear: { s: 'First lesson. Your gear is how many cards you play. Take gear 2.' },
+    cards: { s: 'Two cards, two numbers: the sum is your speed. Play the 3 and the 2.' },
+    go1: { s: 'Speed 5 puts you five spaces up the road. Floor it!' },
+    watch1: { s: 'Smooth launch! Kit, Juno and you each drive in turn. That is every round.' },
+    corner: { s: 'Rain on the corner ahead: the speed limit is 5. Every point over burns a heat from your engine.' },
+    push: { s: 'Try it the bold way. Play the 4 and the 3.' },
+    read: { s: 'Speed 7 is 2 over the limit: two heat burned. Too pricey right now.' },
+    brake: { s: 'Brake instead. Play the two 2s: speed 4 stays under the limit.' },
+    go2: { s: 'Speed 4 sails through clean. Hit Go.' },
+    watch2: { s: 'Clean corner, full engine. That is how you save fuel.' },
+    gamble: { s: 'Kit is pulling away. Corner limit 4 ahead. Spend one heat to catch him: play the 3 and the 2.' },
+    go3: { s: 'Speed 5, one over the limit. One heat is a fair price. Go!' },
+    watch3: { s: 'Caught him! One heat spent. Watch the engine dots: that is your fuel.' },
+    deadcards: { s: 'Spent heat comes back later as dead Heat cards in your hand. They cannot be played.' },
+    gear1: { s: 'Gear 1 cools your engine: heat cards go back to the engine. Take gear 1.' },
+    stress: { s: 'The purple card is Stress: a mystery speed, flipped from your deck. Play it.' },
+    adr: { s: 'You are last, so you get adrenaline: one extra space and one extra cool-down. Free help.' },
+    go4: { s: 'Stress card, mystery speed, plus adrenaline. Go!' },
+    watch4: { s: 'Heat back in the engine and the pack in sight. Good work.' },
+    tuck: { s: 'Kit is just ahead. Stop right behind him and you can slipstream: two free spaces.' },
+    gear3: { s: 'Shifting two gears costs one heat. Worth it: take gear 3.' },
+    cards3: { s: 'Three cards this time: play the two 2s and the 1.' },
+    go5: { s: 'Speed 5 should tuck you right behind Kit. Go!' },
+    slip: { s: 'You are on his bumper! Take the slipstream: two free spaces.' },
+    watch5: { s: 'Slingshot! Kit never saw it coming.' },
+    finale: { s: 'The line is close. Gear 2, then boost: one heat for an extra flipped card.' },
+    gear2: { s: 'Take gear 2.' },
+    cards2: { s: 'Play the 2 and the 1.' },
+    boost: { s: 'Now boost: it pays one heat and flips an extra speed card.' },
+    go6: { s: 'Everything you have. Go!' },
+    result: { s: 'First over the line wins. Finishing order is by distance, ties go to whoever arrived first.' }
+  },
   tutEndTitle: 'The seat is yours',
   tutEndText: 'Gear, cards, corners, heat, slipstream, boost. Kit wants a rematch.',
   /* result lines in the game's voice (Quick game) */
@@ -3250,19 +3258,18 @@ function combos(a, k) {
   return out;
 }
 function aiLvl(G, c) { return (c && c.lvl) || G.diff; }   /* per car level; 'pro' is the planner behind the Suggest button */
-var AIP = { easy: { noise: 3, hw: 1.8, mis: 0.2, misBy: 3, lift: 0.3 }, normal: { noise: 1.6, hw: 1.6, mis: 0.08, misBy: 2 }, hard: { noise: 0.3, hw: 1.25, look: 1 }, pro: { noise: 0.15, hw: 1.25, look: 1, end: 16 } };
+var AIP = { easy: { noise: 10, hw: 2.4, mis: 0.8, misBy: 5, lift: 0.97 }, normal: { noise: 1.6, hw: 1.6, mis: 0.08, misBy: 2 }, hard: { noise: 0.3, hw: 1.25, look: 1 }, pro: { noise: 0.15, hw: 1.25, look: 1 } };
 function aiP(G, c) { return AIP[aiLvl(G, c)] || AIP.normal; }
 function aiNoise(G, c) { return aiP(G, c).noise; }
 function heatW(c, extra, G) { return (G ? aiP(G, c).hw : 1.25) + (c.eng - extra <= 2 ? 0.9 : 0); }
-function aiPlan(G, c, onlyG) {   /* onlyG: plan for this one gear (the player's card auto-pick) */
+function aiPlan(G, c) {
   var N = T(G).N, avg = avgSpeed(c), best = null, handHeat = c.hand.filter(function (x) { return x === 'H'; }).length;
   var play = []; c.hand.forEach(function (x, j) { if (x !== 'H') play.push(j); });
   var adr = G.adr.indexOf(c.i) >= 0 ? 1 : 0, others = G.cars.filter(function (o) { return o !== c; });
   var lv = aiLvl(G, c), easy = lv === 'easy', P = aiP(G, c);
   var mis = P.mis && rnd(G) < P.mis ? P.misBy : 0;   /* rookies misjudge a corner now and then: this round they read every limit higher (spins, burnt heat). Easy often, Normal rarely */   /* easy rivals drive like careful rookies: never top gear, never boost (W496: a new player can reach the podium) */
   var lift = P.lift && rnd(G) < P.lift;   /* rookies sometimes hold their gear instead of shifting up */
-  var endF = P.end ? Math.max(0.2, Math.min(1, (total(G) - c.pos) / P.end)) : 1;   /* F6 Suggest: heat left at the flag is wasted, so near the finish it is worth less (spend it on speed and boost) */
-  gearOpts(c).filter(function (go) { return onlyG == null || go.g === onlyG; }).filter(function (go) { return onlyG != null || !easy || (go.g <= 3 && (!lift || go.g <= c.gear)); }).forEach(function (go) {
+  gearOpts(c).filter(function (go) { return !easy || (go.g <= 3 && (!lift || go.g <= c.gear)); }).forEach(function (go) {
     var k = needCards(c, go.g);
     combos(play, k).forEach(function (idx) {
       var base = 0, nx = 0, ul = 0, uc = 0; idx.forEach(function (j) { var x = c.hand[j], u = upgId(x); if (u) { base += UPG[u].sp; ul += UPG[u].lim; uc += UPG[u].cool; } else if (x === 'X') { base += avg; nx++; } else base += +x; });
@@ -3271,10 +3278,10 @@ function aiPlan(G, c, onlyG) {   /* onlyG: plan for this one gear (the player's 
         var sp = base + (boost ? avg : 0), safe = Math.ceil(sp + (nx || boost ? 1 : 0)), mv = Math.round(sp) + adr, L = c.pos + mv;
         var slipOk = others.some(function (o) { return o.pos % N === L % N || o.pos % N === (L + 1) % N; });
         var L2 = slipOk ? L + 2 : L, heat = cornerCost(G, c.pos, L2, safe, ul + mis), left = c.eng - cost, spin = heat > left;
-        var score = mv * (P.mv || 1) + (slipOk ? 1.4 : 0) - endF * heatW(c, cost, G) * (cost + Math.min(heat, left)) - (spin ? 16 : 0);
+        var score = mv * (P.mv || 1) + (slipOk ? 1.4 : 0) - heatW(c, cost, G) * (cost + Math.min(heat, left)) - (spin ? 16 : 0);
         var cw = P.cw || 1.6; score += go.g === 1 ? Math.min(handHeat, COOL[1]) * cw : go.g === 2 ? Math.min(handHeat, COOL[2]) * cw : 0;
         score += Math.min(handHeat, uc) * cw;
-        if (boost && c.eng <= 3) score -= 2 * endF;
+        if (boost && c.eng <= 3) score -= 2;
         if (P.look) score -= P.look * heatW(c, cost, G) * nextCornerRisk(G, c, idx, go.g, L2, avg, left - Math.min(heat, left));
         score += (rnd(G) - 0.5) * 2 * aiNoise(G, c);
         if (!best || score > best.s) best = { s: score, plan: { gear: go.g, idx: idx.slice(), boost: boost } };
@@ -3307,8 +3314,6 @@ function aiBoost(G, c) {   /* react step: boost only if the committed plan wante
   return heat <= c.eng - 1;
 }
 /* Suggest: plans the player's own hand from the player's seat with the strongest planner ('pro'), on a copy of the game */
-/* F4: the cards the planner would play in the gear you picked (no boost: boost is its own toggle) */
-function autoPickPlan(G, c, g) { var g2 = JSON.parse(JSON.stringify(G)), c2 = g2.cars[c.i]; c2.lvl = 'pro'; c2.human = false; g2.adr = g2.adr || []; var p = aiPlan(g2, c2, g); return p && p.gear === g ? (p.idx || []) : null; }
 function suggestPlan(G, c) { var g2 = JSON.parse(JSON.stringify(G)), c2 = g2.cars[c.i]; c2.lvl = 'pro'; c2.human = false; return aiPlan(g2, c2); }
 function suggestBoost(G, c) { var c2 = JSON.parse(JSON.stringify(c)); c2.lvl = 'pro'; c2.plan = { boost: true }; return aiBoost(G, c2); }
 function suggestSlip(G, c) { var q = G.pend; if (!q || q.t !== 'slip') return false; var c2 = JSON.parse(JSON.stringify(c)); c2.lvl = 'pro'; return aiSlip(G, c2, q.from, q.L0, q.L1, q.speed, q.lim); }
@@ -3457,15 +3462,12 @@ function showTitle() { try { GX.close(); } catch (e) { } $('#title').hidden = fa
 function modal(html) { var m = $('#modal'); m.innerHTML = '<div class="sheet"><button class="xb" aria-label="Close" id="mx">✕</button>' + html + '</div>'; m.hidden = false; $('#mx').onclick = closeModal; m.onclick = function (e) { if (e.target === m && !UI.lockModal) closeModal(); }; artApply(m); }
 function closeModal() { var m = $('#modal'); m.hidden = true; m.innerHTML = ''; m.onclick = null; }
 document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && !$('#modal').hidden && !UI.lockModal) closeModal(); });
-/* canvas pulse that runs 3 cycles per target, then holds still (calm bar: no endless motion) */
-var PULSE = {};
-function pulse(key, now, period, lo, hi) { var p = PULSE[key]; if (!p) p = PULSE[key] = now; var t = (now - p) / period; if (t >= 3) return hi; return lo + (hi - lo) * (0.5 - 0.5 * Math.cos(t * 6.2832)); }
 function rulesFill() {
-  var h = ('<h3>How a turn works</h3><p>The strip in the panel lights your phase. <b>Shift</b>: pick a gear. <b>Play</b>: pick the cards. <b>Move</b>. <b>React</b>: cooldown, then boost. <b>Slipstream</b>. <b>Corners</b>. <b>Discard</b>: throw away any cards that are not Heat or Stress, then draw back to 7. With Hints on, the track shows where you land.</p><ol class="turn5">' + STORY.turn.map(function (l) { return '<li>' + esc(l.replace(/^\d\. /, '')) + '</li>'; }).join('') + '</ol><h3>The rules in full</h3><p>Be first across the line after all laps. Each round you pick a <b>gear</b> and play that many cards. The total is your speed: you move that many spaces.</p>' +
-    '<h3>Each round</h3><ul><li><b>Gear 1-4</b>: shift one step free, or two steps for 1 heat. Gear = cards you play.</li><li><b>Corners</b> have a speed limit. Every point over costs 1 heat from your engine. Not enough heat? You spin out. You lose all engine heat. You stop behind the corner in gear 1. You get 1 Stress card, or 2 from gear 3 or 4.</li><li><b>Slipstream</b>: end next to or right behind another car and you may glide 2 more spaces, no cards needed. It does not count as speed, but a corner it carries you past still costs heat at your speed.</li><li><b>Boost</b>: pay 1 heat to flip cards from your deck until a speed card shows, and add it.</li><li><b>Cooldown</b> (after your cards are shown): gear 1 sends up to 3 heat from your hand back to the engine, gear 2 sends 1.</li><li><b>Adrenaline</b>: the last car to move each round gets +1 speed (it counts at corners, and you may skip it) and +1 cooldown (the last two cars when 5 or more started).</li><li><b>Too few cards</b>: if your hand has fewer playable cards than your gear, you play them all, pay heat cards for the rest, do not move and drop to gear 1.</li><li><b>The finish</b>: no slipstream past the line. The race goes on until every car has finished; finishers are placed in the order they cross. Cars crossing in the same round: the one furthest past the line is ahead; on the same space, the one that got there first.</li></ul>' +
+  var h = ('<h3>How a turn works</h3><p>The strip in the panel lights your phase. <b>Shift</b>: pick a gear. <b>Play</b>: pick the cards. <b>Move</b>. <b>React</b>: cooldown, boost, slipstream, corners. <b>Discard</b>: draw back to 7. With Hints on, the track shows where you land.</p><ol class="turn5">' + STORY.turn.map(function (l) { return '<li>' + esc(l.replace(/^\d\. /, '')) + '</li>'; }).join('') + '</ol><h3>The rules in full</h3><p>Be first across the line after all laps. Each round you pick a <b>gear</b> and play that many cards. The total is your speed: you move that many spaces.</p>' +
+    '<h3>Each round</h3><ul><li><b>Gear 1-4</b>: shift one step free, or two steps for 1 heat. Gear = cards you play.</li><li><b>Corners</b> have a speed limit. Every point over costs 1 heat from your engine. Not enough heat? You spin out. You lose all engine heat. You stop behind the corner in gear 1. You get 1 Stress card, or 2 from gear 3 or 4.</li><li><b>Slipstream</b>: end next to or right behind another car and you may glide 2 more spaces. It does not count as speed.</li><li><b>Boost</b>: pay 1 heat to flip cards from your deck until a speed card shows, and add it.</li><li><b>Cooldown</b> (after your cards are shown): gear 1 sends up to 3 heat from your hand back to the engine, gear 2 sends 1.</li><li><b>Adrenaline</b>: the last car to move each round gets +1 move and +1 cooldown (the last two cars when 5 or more started).</li><li><b>Too few cards</b>: if your hand has fewer playable cards than your gear, you play them all, pay heat cards for the rest, do not move and drop to gear 1.</li><li><b>The finish</b>: no slipstream past the line. The race goes on until every car has finished; finishers are placed in the order they cross. Cars crossing in the same round: the one furthest past the line is ahead; on the same space, the one that got there first.</li></ul>' +
     '<h3>Cards</h3><ul><li>Speed 1, 2, 3, 4: three of each.</li><li>Stress (3): when played, flip your deck until a speed card shows and use it.</li><li>Heat (6 start in your engine): paying sends them to your discard pile. They clog your hand later and cannot be played.</li></ul>' +
     '<h3>Upgrades (optional)</h3><ul><li>Switch Upgrades on in setup. Before the race you pick 3 upgrade cards; they join your deck and are played like speed cards, each with a bonus (more cooling, higher corner limits, a big speed jump).</li></ul>' +
-    '<h3>Starting upgrades (house values)</h3><ul><li>Every car shuffles a <b>Brake card</b> (speed 0), a <b>Burst card</b> (speed 5) and 1 extra heat card into its deck. The numbers are printed on the cards. A stress flip passes over them: it stops only on speed cards 1 to 4. Switch off in setup.</li></ul>' +
+    '<h3>Starting upgrades (house values)</h3><ul><li>Every car shuffles a <b>Brake card</b> (speed 0), a <b>Burst card</b> (speed 5) and 1 extra heat card into its deck. The printed rules give no numbers for these, so these are this game\'s own fair values. A stress flip skips them. Switch off in setup.</li></ul>' +
     '<h3>Weather (optional, house rules)</h3><ul><li><b>Rain</b>: corner limits 1 lower (never below 2).</li><li><b>Heatwave</b>: every car starts with 1 heat card in its discard.</li><li><b>Tailwind</b>: slipstream carries you 3 spaces.</li></ul>' +
     '<h3>Championship (house values)</h3><ul><li>Three tracks in a row with the same drivers. Points per place: 9, 6, 4, 3, 2, 1. Ties: more wins, then the better place in the last race.</li></ul>' +
     '<h3>Simplified on purpose</h3><ul><li>Stress and heat cards never run out (the printed game has a limited reserve).</li><li>Three original tracks.</li></ul><p>Brake and keep your heat, or push and burn it. Heat comes back around.</p><div id="howTut">' + tutBtn('ghostb', { launch: function () { GX.close(); closeModal(); tutStart(); } }) + '</div>');
@@ -3480,7 +3482,7 @@ function startGame(o) {
   G = newGame({ track: s.track, laps: s.laps, n: s.hum + s.opp, humans: s.hum, diff: s.diff, seed: o && o.seed != null ? o.seed : UI.seedArg, upg: !!s.upg, climit: s.climit, lowheat: s.lowheat, cmp: s.cmp, wx: o && (o.tut || o.cmp) ? 'dry' : wx, sup: !(o && o.tut) && s.sup !== false });
   if (s.hum === 1) { G.cars[0].name = 'You'; G.cars[0].drv = ''; }   /* the player is "You", never a named driver (the story's rival Kit must be someone else) */
   if (o && o.tut) { [['kit', 'Kit Marlow'], ['juno', 'Juno Vega']].forEach(function (d, k) { G.cars[k + 1].drv = d[0]; G.cars[k + 1].name = d[1]; }); }
-  window.G = G; UI.ts = { ch: 0, w: null, n: 0, gs: 0 }; UI.seat = 0; UI.sel = []; UI.boost = false; UI.busy = false; UI.pops = [];
+  window.G = G; UI.seat = 0; UI.sel = []; UI.boost = false; UI.busy = false; UI.pops = [];
   UI.vis = G.cars.map(function (c) { return { p: c.pos, rot: 0, glow: 0 }; });
   UI.focus = 0; var blb = $('#bulbbtn'); if (blb) blb.hidden = !hintsOn(); $('#title').hidden = true; $('#game').hidden = false; closeModal();
   $('#tTrk').textContent = TK[G.track].name;
@@ -3516,44 +3518,9 @@ function you() { return G.cars[UI.seat]; }
 function planFor(ci) {
   if (ci == null) return startRound();
   UI.seat = ci; UI.focus = ci; var c = G.cars[ci];
-  UI.sel = []; UI.gear = c.gear; UI.boost = false; UI.pops = []; UI.boostWant = UI.boostWant || {}; UI.boostWant[ci] = false; UI.sel = autoPick(c, UI.gear); UI.pre = null;
-  if (hintsOn() && UI.mode !== 'tutorial' && !G.hot) try { var p0 = planOnce(); if (p0 && p0.idx && p0.idx.length === needCards(c, p0.gear)) { UI.gear = p0.gear; UI.sel = p0.idx.slice(); UI.boostWant[ci] = !!p0.boost && c.eng - (Math.abs(p0.gear - c.gear) === 2 ? 1 : 0) >= 1; UI.pre = p0; } } catch (e) { }   /* F6: with Hints on, the Suggest plan (gear, cards, boost) is already picked: Go alone follows it, a gear tap changes it */   /* last round's pops leave before you plan: only the move preview is on the track */
+  UI.sel = []; UI.gear = c.gear; UI.boost = false; UI.pops = [];   /* last round's pops leave before you plan: only the move preview is on the track */
   if (G.hot) { UI.lockModal = true; modal('<h2>Pass to ' + esc(c.name) + '</h2><p>Hide the other hands. Tap when it is your turn.</p><button class="big" id="rdy" style="width:100%">I am ' + esc(c.name.split(' ')[0]) + '</button>'); $('#mx').hidden = true; $('#rdy').onclick = function () { UI.lockModal = false; closeModal(); drawPlan(); }; return; }
   drawPlan(); camToPlan();
-}
-/* F4: the cards for the gear you pick are chosen for you (the planner's best for that gear; the Suggest plan when it is that gear).
-   Tap a card to swap it. A normal turn is: gear (if it changes), Go. */
-function autoPick(c, g) {
-  var need = needCards(c, g); if (!need) return [];
-  if (UI.mode === 'tutorial' && typeof tutPick === 'function') { var tp = tutPick(c, g); if (tp) return tp; }
-  var idx = null; try { var sp = planOnce(); if (sp && sp.gear === g && sp.idx) idx = sp.idx.slice(); } catch (e) { }
-  if (!idx) try { idx = autoPickPlan(G, c, g); } catch (e) { idx = null; }
-  if (idx && idx.length === need && pickSpins(c, g, idx)) {   /* F4 cold play: never auto-pick a spin when the slowest cards of that gear are safe */
-    var slow = c.hand.map(function (x, j) { return { j: j, v: x === 'H' ? 99 : x === 'X' ? 2.4 : upgId(x) ? UPG[upgId(x)].sp : +x }; }).filter(function (o) { return o.v < 99; }); slow.sort(function (a, b) { return a.v - b.v; });
-    var lo = slow.slice(0, need).map(function (o) { return o.j; }); if (!pickSpins(c, g, lo)) idx = lo; }
-  if (!idx || idx.length !== need) { idx = []; var vals = c.hand.map(function (x, j) { return { j: j, v: x === 'H' ? -9 : x === 'X' ? 2.4 : upgId(x) ? UPG[upgId(x)].sp : +x }; }).filter(function (o) { return o.v > -9; }); vals.sort(function (a, b) { return b.v - a.v; }); idx = vals.slice(0, need).map(function (o) { return o.j; }); }
-  return idx;
-}
-function pickSpins(c, g, idx) { var q = planSpeed(c, idx), adr = G.adr && G.adr.indexOf(c.i) >= 0 ? 1 : 0, sp = q.sp + (q.nx ? 1 : 0), ks = cornersIn(G, c.pos, c.pos + sp + adr), burn = 0; ks.forEach(function (k) { burn += Math.max(0, sp - k.limit - q.ul); }); return burn > c.eng - (Math.abs(g - c.gear) === 2 ? 1 : 0); }
-function heatLine(c) {   /* F4: one line: your engine heat, the Heat cards in hand and which gear clears how many (the gear you picked in green) */
-  var hh = c.hand.filter(function (x) { return x === 'H'; }).length, adr = G.adr && G.adr.indexOf(c.i) >= 0 ? 1 : 0, g = UI.gear;
-  var t = '<b>Engine heat ' + c.eng + '</b>';
-  if (!hh) return t + ' · no Heat cards';
-  var part = function (q) { var n = Math.min(hh, COOL[q] + adr); return '<span class="' + (g === q && n ? 'ok' : '') + '">gear ' + q + ' clears ' + n + '</span>'; };
-  return t + ' · ' + hh + ' Heat card' + (hh > 1 ? 's' : '') + ': ' + part(1) + ', ' + part(2);
-}
-/* F6: the push-your-luck in one line: what one gear up and one gear down would do this turn (cards auto-picked for that gear) */
-function gearTrade(c) {
-  if (UI.mode === 'tutorial' || UI.swap || !needCards(c, UI.gear)) return '';
-  var opts = gearOpts(c), adr = adrenalineFor(G).indexOf(c.i) >= 0 ? 1 : 0, base = planSpeed(c, UI.sel).sp, out = [];
-  [UI.gear + 1, UI.gear - 1].forEach(function (g) {
-    var o = opts.filter(function (x) { return x.g === g; })[0]; if (!o) return; var idx = autoPick(c, g); if (!idx || idx.length !== needCards(c, g)) return;
-    var q = planSpeed(c, idx), sp = q.sp + adr, ks = cornersIn(G, c.pos, c.pos + sp), burn = 0, tight = 0; ks.forEach(function (k) { var b = Math.max(0, q.sp - k.limit - q.ul); burn += b; if (b) tight = tight ? Math.min(tight, k.limit) : k.limit; });
-    var d = q.sp - base, risk = burn > c.eng - o.cost ? 'spin risk at corner ' + tight : burn ? burn + ' heat at corner ' + tight : 'safe';
-    if (g <= 2 && c.hand.indexOf('H') >= 0 && risk === 'safe') risk = 'safe, cools heat';
-    out.push('Gear ' + g + ': ' + (d ? (d > 0 ? '+' : '') + d + ' space' + (Math.abs(d) === 1 ? '' : 's') : 'same speed') + ', ' + risk);
-  });
-  return out.length ? '<span class="gtr">' + out.join(' · ') + '</span>' : '';
 }
 function curveInfo() {   /* what the selected cards would do at the next corner */
   var c = you(), sp = 0, nx = 0, ul = 0; UI.sel.forEach(function (j) { var x = c.hand[j], u = upgId(x); if (u) { sp += UPG[u].sp; ul += UPG[u].lim; } else if (x === 'X') nx++; else sp += +x; });
@@ -3581,28 +3548,23 @@ function drawPlan() {
   for (var g = 1; g <= GEARS; g++) { var o = go.filter(function (x) { return x.g === g; })[0]; h += '<button class="gb' + (UI.gear === g ? ' on' : '') + (o ? '' : ' off') + '" data-g="' + g + '" ' + (o ? '' : 'disabled') + ' aria-label="Gear ' + g + ': play ' + g + ' card' + (g > 1 ? 's' : '') + (o && o.cost ? ', costs 1 heat' : '') + '"><b>' + g + '</b><small>' + (o && o.cost ? '-1 heat' : g + (g > 1 ? ' cards' : ' card')) + '</small></button>'; }
   h += '</div><div id="hand">';
   var needNow = needCards(c, UI.gear), full = UI.sel.length >= needNow;
-  c.hand.forEach(function (x, j) { var on = UI.sel.indexOf(j) >= 0; h += cardHtml(x, on, x === 'H' || (UI.swap && x === 'X'), j, x === 'H' ? '' : on ? '' : full ? 'dim' : tutOn() || sugShown() ? '' : 'glow'); });
-  UI.boost = false;   /* boost is never planned: the toggle below is your answer to the boost question after the reveal (React step) */
-  UI.boostWant = UI.boostWant || {}; var bw = !!UI.boostWant[c.i], bOk = c.eng - (Math.abs(UI.gear - c.gear) === 2 ? 1 : 0) >= 1; if (!bOk) bw = UI.boostWant[c.i] = false;
-  h += '</div>' + (UI.legH = cardLegend(c.hand)) + '<div class="heatl" id="heatl">' + heatLine(c) + (UI.legH ? '' : gearTrade(c)) + '</div><div id="acts">' + (hintsOn() ? '<button id="sugB">Suggest</button>' : '') + '<button class="bo' + (bw ? ' on' : '') + '" id="boostT" aria-pressed="' + bw + '"' + (bOk ? '' : ' disabled') + ' title="After the cards show: pay 1 heat, flip one more speed card. Skipped if it could spin you out. Key B">Boost ' + (bw ? 'on' : 'off') + '<small>-1 heat, +1-4</small></button><button class="go" id="goB" title="Key Enter">Go!</button></div>';
+  c.hand.forEach(function (x, j) { var on = UI.sel.indexOf(j) >= 0; h += cardHtml(x, on, x === 'H' || (UI.swap && x === 'X'), j, x === 'H' ? '' : on ? '' : full ? 'dim' : tutOn() ? '' : 'glow'); });
+  UI.boost = false;   /* boost is never planned: it is offered after the reveal (React step) */
+  h += '</div><div id="acts">' + (hintsOn() ? '<button id="sugB">Suggest</button>' : '') + '<button class="go" id="goB">Go!</button></div>';
   var hh = c.hand.filter(function (x) { return x === 'H'; }).length, pips = ''; for (var q = 0; q < ENGINE0; q++) pips += '<i class="pip' + (q < c.eng ? ' on' : '') + '"></i>';
-  if (false) h += '<div class="chips tray" id="tray"><span class="eng" title="Engine heat: your fuel. Corners burn it."><em>Engine heat</em><span class="pips">' + pips + '</span><b data-engine="G.cars[' + c.i + '].eng">' + c.eng + '</b></span><span title="Heat cards stuck in your hand. Gear 1 or 2 cools them back."><em>Dead heat in hand</em> <b>' + hh + '</b></span>' + '</div>';
+  if (hintsOn()) h += '<div class="chips tray" id="tray"><span class="eng" title="Engine heat: your fuel. Corners burn it."><em>Engine heat</em><span class="pips">' + pips + '</span><b data-engine="G.cars[' + c.i + '].eng">' + c.eng + '</b></span><span title="Heat cards stuck in your hand. Gear 1 or 2 cools them back."><em>Dead heat in hand</em> <b>' + hh + '</b></span>' + '</div>';
   p.innerHTML = h; artApply(p);
-  var sgp = sugShown(), sgDone = sgp && sgp.gear === UI.gear && sgp.idx.length === UI.sel.length && sgp.idx.every(function (j) { return UI.sel.indexOf(j) >= 0; });
-  if (sgp) { var gb0 = p.querySelector('.gb[data-g="' + sgp.gear + '"]'); if (gb0) gb0.classList.add('sg'); sgp.idx.forEach(function (j) { var cb = p.querySelector('.cd[data-i="' + j + '"]'); if (cb) cb.classList.add('sg'); }); }
-  p.querySelectorAll('.gb').forEach(function (b) { b.onclick = function () { if (tutOn() && !GXT.act({ type: 'tap', what: 'gear', g: +b.getAttribute('data-g') })) return; sfx('gear'); UI.touchedGear = 1; UI.gear = +b.getAttribute('data-g'); UI.sel = autoPick(c, UI.gear); if (c.eng - (Math.abs(UI.gear - c.gear) === 2 ? 1 : 0) < 1) UI.boost = false; drawPlan(); }; });
+  p.querySelectorAll('.gb').forEach(function (b) { b.onclick = function () { if (tutOn() && !GXT.act({ type: 'tap', what: 'gear', g: +b.getAttribute('data-g') })) return; sfx('gear'); UI.touchedGear = 1; UI.gear = +b.getAttribute('data-g'); UI.sel = UI.sel.slice(0, needCards(c, UI.gear)); if (c.eng - (Math.abs(UI.gear - c.gear) === 2 ? 1 : 0) < 1) UI.boost = false; drawPlan(); }; });
   p.querySelectorAll('.cd').forEach(function (b) { b.onclick = function () { var j = +b.getAttribute('data-i'); if (c.hand[j] === 'H') { setMsg('Heat cards cannot be played.', 'warn'); return; } var k = UI.sel.indexOf(j);
     if (tutOn()) { if (k >= 0 || !GXT.act({ type: 'tap', what: 'card', i: j })) return; }
     sfx('card'); UI.note = upgId(c.hand[j]) ? UPG[upgId(c.hand[j])].name + ': ' + UPG[upgId(c.hand[j])].txt : ''; if (k >= 0) UI.sel.splice(k, 1); else { if (UI.sel.length >= needCards(c, UI.gear)) UI.sel.shift(); UI.sel.push(j); } drawPlan(); }; });
   p.querySelectorAll('.cd').forEach(function (b) { cardDrag(b); });
   if (UI.snapI != null) { var sn = p.querySelector('.cd[data-i="' + UI.snapI + '"]'); if (sn) sn.classList.add('snap'); UI.snapI = null; }
   if ($('#sugB')) $('#sugB').onclick = function () { if (tutOn() && !GXT.act({ type: 'tap', what: 'suggest' })) return; sfx('tap'); suggest(); }; $('#goB').onclick = commit;
-  if ($('#boostT')) $('#boostT').onclick = function () { if (tutOn() && !GXT.act({ type: 'tap', what: 'boost' })) return; sfx('tap'); UI.boostWant[c.i] = !UI.boostWant[c.i]; drawPlan(); };
   var ready = UI.sel.length === need; $('#goB').disabled = !ready; $('#goB').classList.toggle('glow', ready);
   if (!ready) setMsg(need === 0 ? 'Only heat cards: press Go.' : UI.sel.length === 0 && !UI.touchedGear ? planAdvice(c, need) : (UI.sel.length ? 'Tap ' + (need - UI.sel.length) + ' more card' + (need - UI.sel.length > 1 ? 's' : '') + '.' : STORY.planCards(need)));
-  else if (!hintsOn()) { var cq = curveInfo(); previewSet(null); var tl = tradeLine(cq); setMsg(tl.t, tl.k); }
-  else { var ci = previewSet(curveInfo()), tl2 = tradeLine(ci); setMsg(tl2.t, tl2.k); }
-  if (sgp && !sgDone && UI.gear !== sgp.gear) setMsg(sugWhy(c, sgp), 'good');
+  else if (!hintsOn()) { var cq = curveInfo(); previewSet(null); setMsg('Speed ' + cq.sp + (cq.uncertain ? '?' : '') + (cq.spin ? ': you would spin out!' : cq.burn ? ': corner burns ' + cq.burn + ' heat.' : '. Press Go.'), cq.spin || cq.burn ? 'warn' : ''); }
+  else { var ci = previewSet(curveInfo()); var sp = 'Speed ' + ci.sp + (ci.uncertain ? '?' : ''); if (UI.note && /upgrade|:/.test(UI.note) && UI.sel.some(function (j) { return upgId(c.hand[j]); })) sp += ' (' + UI.note.split(':')[0].replace(/ card$/, '') + ')'; var core = (ci.spin ? sp + ': you would spin out!' : ci.burn ? sp + ': the corner burns ' + ci.burn + ' heat' : ci.ks.length ? sp + ': the corner is safe' : ci.next ? sp + ': road clear, corner in ' + ci.next.d : sp + ': road clear') + (ci.slip && !ci.spin ? ', slipstream likely' : ''); if (!ci.spin && core.split(/\s+/).length <= 5) core += '. ' + STORY.planGo; setMsg(core, ci.spin ? 'warn' : ci.burn ? 'warn' : 'good'); }
   if (!ready) previewSet(null);
   RACE.ph = UI.swap ? 'discard' : (UI.sel.length || UI.touchedGear) ? 'play' : 'shift'; RACE.spdT = UI.sel.length ? curveInfo().sp : 0;   /* the needle revs as you tap cards */
   if (!ready && need === 0) $('#goB').disabled = false;
@@ -3617,13 +3579,13 @@ function cardFace(x, big) {   /* one card face: type label (top), the key number
   var u = upgId(x);
   if (u) return '<span class="k">' + esc(UPG[u].sn) + '</span><span class="v">' + UPG[u].sp + '</span><span class="t">move ' + UPG[u].sp + '</span>';
   if (x === 'H') return '<span class="k">Heat</span><span class="v">' + FLAME + '</span><span class="t">dead</span>';
-  if (x === 'X') return '<span class="k">Stress</span><span class="v">?</span><span class="t">1 to 4</span>';
+  if (x === 'X') return '<span class="k">Stress</span><span class="v">?</span><span class="t">random</span>';
   return '<span class="k">Speed</span><span class="v">' + x + '</span><span class="t">move ' + x + '</span>';
 }
 function cardText(x) {
   var u = upgId(x); if (u) return UPG[u].name + ': ' + UPG[u].txt;
   if (x === 'H') return 'Heat card: a dead card, it cannot be played.';
-  if (x === 'X') return 'Stress card: plays the next speed card of your deck (1 to 4); you see what it drew.';
+  if (x === 'X') return 'Stress card: flips a random speed card from your deck.';
   return 'Speed ' + x + ': moves you ' + x + ' spaces.';
 }
 function swapMode(c) {   /* optional rulebook step: throw away speed cards you do not want (once per round), then draw back to a full hand */
@@ -3644,46 +3606,18 @@ function boostOdds(G, c) {   /* R24: what a boost flip can add (the speed cards 
   if (!q || !vals.length) return { line: 'Boost? 1 heat: add the next speed card.', spin: 0, yes: '', no: '' };
   var spins = 0, lo = 9, hi = 0, sum = 0; vals.forEach(function (v) { lo = Math.min(lo, v); hi = Math.max(hi, v); sum += v; if (cornerCost(G, q.from, landing(G, c, q.from + sp + v), sp + v, q.lim) > c.eng - 1) spins++; });
   var pct = Math.round(spins / vals.length * 100), avg = Math.round(sum / vals.length), L0 = landing(G, c, q.from + sp), nc = nextCorner(L0), d = nc ? nc.d : 99;
-  var inR = nc && d <= hi, rng = '+' + (lo === hi ? lo : lo + ' to +' + hi) + ' speed', all = spins === vals.length;   /* F3: plain words, no odds that could contradict the suggestion */
-  var line = 'Boost: ' + rng + (all ? ', would spin you out' : spins ? ', may overshoot the corner' : inR ? ', corner stays safe' : '');
-  return { line: line, spin: spins, all: all, pct: pct,
-    yes: !inR ? 'no corner in reach' : 'safe at limit ' + nc.limit,
-    no: spins ? 'keeps heat, no overshoot' : 'save heat for later corners' };
+  var inR = nc && d <= hi, line = 'Boost +' + (lo === hi ? lo : lo + ' to +' + hi) + ': spin-out risk ' + pct + '%.';   /* every text <= 8 words (phone-check) */
+  return { line: line, spin: spins, pct: pct,
+    yes: '+' + avg + ' spaces, ' + (!inR ? 'no corner in reach' : (spins ? 'Boost: ' + pct + '% spin' : 'safe') + ' at limit ' + nc.limit),
+    no: spins ? 'No boost: safe, keeps heat' : 'save heat for later corners' };
 }   /* Hints on: the Suggest planner's answer to boost / slipstream */
-/* one plan per hand and board: the Hint text, its highlight and Suggest all read this same answer */
-function planOnce() { var c = you(), k = G.round + '|' + c.pos + '|' + c.gear + '|' + c.eng + '|' + c.hand.join(',') + '|' + G.cars.map(function (x) { return x.pos; }).join(','); if (!UI.pk || UI.pk.k !== k || UI.pk.g !== G) UI.pk = { k: k, g: G, p: suggestPlan(G, c) }; return UI.pk.p; }
-function suggest() {   /* F3: Suggest SHOWS the plan (gold gear and cards, why in one line); the player taps them and presses Go */
-  planOnce(); UI.sugK = UI.pk.k; UI.boost = false; drawPlan();
-}
-function sugShown() { return hintsOn() && UI.sugK && UI.pk && UI.pk.g === G && UI.sugK === UI.pk.k && planOnce() && UI.sugK === UI.pk.k ? UI.pk.p : null; }
-function planSpeed(c, idx) { var sp = 0, nx = 0, ul = 0; idx.forEach(function (j) { var x = c.hand[j], u = upgId(x); if (u) { sp += UPG[u].sp; ul += UPG[u].lim; } else if (x === 'X') nx++; else sp += +x; }); return { sp: Math.round(sp + nx * avgSpeed(c)), nx: nx, ul: ul }; }
-function sugWhy(c, p) {   /* the suggested plan's reason, from the same numbers the preview uses (<= 8 words, numbers free) */
-  var q = planSpeed(c, p.idx), ks = cornersIn(G, c.pos, c.pos + q.sp), burn = 0, lim = 0; ks.forEach(function (k) { burn += Math.max(0, q.sp - k.limit - q.ul); lim = lim || k.limit; });
-  var hh = c.hand.filter(function (x) { return x === 'H'; }).length, cool = p.gear <= 2 ? Math.min(hh, COOL[p.gear] || 0) : 0, nc = nextCorner(c.pos), head = 'Tap gold: gear ' + p.gear + ', speed ' + (q.nx ? 'about ' : '') + q.sp;
-  if (cool) return head + ' · cools ' + cool + ' Heat';
-  if (ks.length) return head + ' · limit ' + lim + (burn ? ', costs ' + burn + ' heat' : ', no heat');
-  return head + (nc ? ' · corner ' + nc.limit + ' in ' + nc.d : ' · road clear');
-}
-function legNew(seen, k) { if (UI.legG !== G) { UI.legG = G; UI.legId = Date.now() % 1e6; } var r = G.round + '|' + UI.legId; if (!seen[k]) seen[k] = []; if (seen[k].indexOf(r) < 0) { if (seen[k].length >= 4) return false; seen[k].push(r); lsSet('rr_leg', JSON.stringify(seen)); } return true; }
-function tradeLine(ci) {   /* F3: before Go, the trade-off in plain numbers: you'd go X, limit Y, costs Z heat */
-  var sp = 'Speed ' + (ci.uncertain ? 'about ' : '') + ci.sp, lim = ci.ks.length ? Math.min.apply(null, ci.ks.map(function (k) { return k.limit; })) : 0, c = you(), fl = total(G) - c.pos, tt = ci.ks.slice().sort(function (a, b) { return a.limit - b.limit; })[0], cw = tt ? (ci.ks.length > 1 ? 'tightest limit ' : 'corner ' + Math.max(1, tt.p - c.pos) + ' ahead, limit ') : 'limit ';   /* F5: say which corner */
-  if (fl <= ci.sp + ci.adr) return { t: sp + ' · crosses the line (' + fl + ' away)! Spaces past it count too. Go!', k: 'good' };
-  if (ci.ks.length > 1) sp += ' · ' + ci.ks.length + ' corners';
-  if (ci.spin) return { t: sp + ' · ' + cw + lim + ' · spin out!', k: 'warn' };
-  if (ci.ks.length) return { t: sp + ' · ' + cw + lim + (ci.burn ? ' · costs ' + ci.burn + ' heat' : ' · no heat. Go!'), k: ci.burn ? 'warn' : 'good' };
-  return { t: sp + (fl <= 14 ? ' · finish in ' + fl : ci.next ? ' · corner ' + ci.next.limit + ' in ' + ci.next.d : '') + ' · safe. Go!', k: 'good' };
-}
-function cardLegend(hand) {   /* F3: one plain line per dead card type in your hand, for the first rounds it is there (then the board gets the room back) */
-  var h = '', seen = JSON.parse(lsGet('rr_leg') || '{}'), hasH = hand.indexOf('H') >= 0 && legNew(seen, 'H'), hasX = hand.indexOf('X') >= 0 && legNew(seen, 'X'); if (!hasH && !hasX) return '';
-  if (hasH) h += '<span><b>Heat</b> cards can\'t be played.</span>';
-  if (hasX) h += '<span><b>Stress</b> = the next speed card of your deck (1-4).</span>';
-  return '<div class="legend">' + h + '</div>';
+function suggest() {
+  var c = you(), p = suggestPlan(G, c);   /* plans your own hand from your seat with the strongest planner */
+  UI.gear = p.gear; UI.sel = p.idx.slice(); UI.boost = false; drawPlan();   /* boost is offered after the reveal; Suggest marks its advice there */
 }
 function commit() {
   if (tutOn() && !GXT.act({ type: 'tap', what: 'go' })) return; sfx('go');
-  var c = you(); if (!G.hot) rateStart(c); var plan = { gear: UI.gear, idx: UI.sel.slice(), boost: UI.boost }, sp0 = UI.pre;
-  if (UI.ts && sp0 && !G.hot) { if (UI.gear < sp0.gear) UI.ts.low = (UI.ts.low || 0) + 1; if (UI.gear > sp0.gear) UI.ts.high = (UI.ts.high || 0) + 1; }   /* F6: post-race tips compare you with the Suggest plan */
-  var e = submitPlan(G, c.i, plan);
+  var c = you(); if (!G.hot) rateStart(c); var plan = { gear: UI.gear, idx: UI.sel.slice(), boost: UI.boost }, e = submitPlan(G, c.i, plan);
   if (e) { setMsg('Not allowed: ' + e, 'warn'); return; } RACE.prev = null; RACE.rateKeep = 0;
   $('#panel').innerHTML = '<div class="reveal"><div class="cd back" data-art="card-back"></div><div class="cd back" data-art="card-back"></div></div>'; artApply($('#panel'));
   var nx = needPlans(G)[0]; if (nx != null) planFor(nx); else startRound();
@@ -3695,7 +3629,7 @@ function setMsg(t, cls) { var m = $('#msg'); m.textContent = t; m.className = cl
 function hud() {
   if (!G) return; var order = rankList(G), h = G.cars.filter(function (c) { return c.human; })[0] || G.cars[0], me = G.cars[UI.seat] || h;
   var lap = Math.min(G.laps, Math.floor(me.pos / T(G).N) + 1);
-  $('#tLap').textContent = 'Lap ' + lap + '/' + G.laps; $('#tPos').textContent = ord(order.indexOf(me.i) + 1) + ' of ' + G.cars.length;
+  $('#tLap').textContent = lap + '/' + G.laps; $('#tPos').textContent = (order.indexOf(me.i) + 1) + '/' + G.cars.length;
 }
 function banner(txt, col, kind) {
   var b = $('#banner'); if (!b) return; if (!txt) { b.className = ''; b.textContent = ''; return; }
@@ -3703,7 +3637,7 @@ function banner(txt, col, kind) {
 }
 async function runResolve() {
   var g0 = G; hud(); UI.lastCar = -1; UI.skipStep = false;
-  UI.rlog = []; UI.rlogR = G.round; $('#panel').innerHTML = ''; banner('Everyone has chosen', null, 'round'); setMsg('One car at a time, leader first. Tap: faster.'); await wait(300);
+  banner('Everyone has chosen', null, 'round'); setMsg('One car at a time. Tap: faster.'); await wait(550);
   while (G.phase === 'resolve') {
     var ev = resolveNext(G); await playEvents(ev); if (G !== g0) return;
     while (G.pend) {   /* the human's questions in rulebook order: boost (react, after the reveal), slipstream, discard (after moving) */
@@ -3711,7 +3645,7 @@ async function runResolve() {
       if (pt === 'boost') { var ub = await askBoost(); if (G !== g0) return; ev = boostChoice(G, ub); }
       else if (pt === 'disc') { var dc = await askDiscard(); if (G !== g0) return; ev = discardChoice(G, G.pend.car, dc); if (typeof ev === 'string') ev = discardChoice(G, G.pend.car, []); }
       else { var use = await askSlip(); if (G !== g0) return; ev = slipChoice(G, use); }
-      $('#panel').innerHTML = logHtml(); await playEvents(ev); if (G !== g0) return;
+      await playEvents(ev); if (G !== g0) return;
     }
   }
   UI.busy = false; banner(''); RACE.spdT = 0; rateRound();
@@ -3722,7 +3656,7 @@ async function runResolve() {
 function carName(i) { return G.cars[i].human ? G.cars[i].name.split(' ')[0] : G.cars[i].name.split(' ')[0]; }
 function tween(i, to, ms) {
   var v = UI.vis[i], from = v.p; if (window.ANIM === false || UI.fast || ms <= 0 || from === to) { v.p = to; return Promise.resolve(); }
-  ms = ms * (window.AIDELAY || 1) * (UI.rival ? UI.rival * 1.7 : Math.max(UI.mode === 'tutorial' && G.round === 3 ? 0.1 : 0.5, UI.pace || 1)) * (UI.skipStep ? 0.12 : 1); var n = Math.max(1, Math.round(Math.abs(to - from))), dir = to > from ? 1 : -1, last = 0;
+  ms = ms * (window.AIDELAY || 1) * (UI.rival ? Math.max(UI.mode === 'tutorial' && G.round === 3 ? 0.1 : 0.24, UI.rival) : Math.max(UI.mode === 'tutorial' && G.round === 3 ? 0.1 : 0.5, UI.pace || 1)) * (UI.skipStep ? 0.12 : 1); var n = Math.max(1, Math.round(Math.abs(to - from))), dir = to > from ? 1 : -1, last = 0;
   return new Promise(function (res) { var t0 = performance.now(); (function f(now) {   /* space by space: each space eases in and out, a tick on every space */
     var k = Math.min(1, (now - t0) / ms), x = k * n, i = Math.floor(x), fr = x - i, e = fr < .5 ? 2 * fr * fr : 1 - Math.pow(-2 * fr + 2, 2) / 2; if (i >= n) { i = n; e = 0; }
     if (i > last) { last = i; if (G.cars[UI.focus] && G.cars[UI.focus].human) sfx('tick'); }
@@ -3740,81 +3674,81 @@ async function playEvents(ev) {
       _x = 0, nm = e.car != null ? carName(e.car) : '', you = e.car != null && c.human, who = you && !G.hot ? 'You' : nm;
     if (e.car != null) UI.focus = e.car;
     /* brisk rivals: a computer car's whole turn plays in about 1.2 s (tap anywhere: faster still); your own move keeps its full pace */
-    UI.rival = e.car != null && !you ? (UI.mode === 'tutorial' ? (G.round === 3 ? 0.12 : 0.4) : rivalPace()) : 0;   /* F4: all rivals together in about 2.5 s a round */
+    UI.rival = e.car != null && !you ? (UI.mode === 'tutorial' ? (G.round === 3 ? 0.12 : 0.4) : 0.16) : 0;   /* R19: about 0.7 s per rival car */
     if (UI.rival && (e.t === 'shift' || e.t === 'cool' || e.t === 'done')) { hud(); continue; }   /* rival bookkeeping steps show in the HUD only */
     if (UI.mode === 'tutorial') coachEvent(e, you);
-    if (e.car != null && e.car !== UI.lastCar && e.t !== 'done') { UI.lastCar = e.car; UI.skipStep = false; logRow(e.car); var dt0 = $('#dockt'); if (dt0) dt0.textContent = 'Round ' + G.round + ' · ' + (you && !G.hot ? 'your car moves' : nm + ' moves'); banner(you && !G.hot ? 'Your move' : nm + "'s turn", c.col, 'turn'); setMsg(you && !G.hot ? 'Your car goes now.' : nm + ' drives.'); if (!UI.rival) await wait(550); }
+    if (e.car != null && e.car !== UI.lastCar && e.t !== 'done') { UI.lastCar = e.car; UI.skipStep = false; $('#panel').innerHTML = '<div class="who" style="color:' + COLS[c.col].hex + '">' + esc(nm) + ' ' + (you && !G.hot ? 'go' : 'drives') + '</div>'; var dt0 = $('#dockt'); if (dt0) dt0.textContent = 'Round ' + G.round + ' · ' + (you && !G.hot ? 'your car moves' : nm + ' moves'); banner(you && !G.hot ? 'Your move' : nm + "'s turn", c.col, 'turn'); setMsg(you && !G.hot ? 'Your car goes now.' : 'Watch ' + nm + ' play.'); await wait(550); }
     if (you && !G.hot) { var ph = { shift: 'shift', play: 'play', move: 'move', cool: 'react', boost: 'react', slip: 'react', corner: 'react', spin: 'react', done: 'discard', stall: 'discard' }[e.t]; if (ph) RACE.ph = ph; } tracker();
-    if (you && !G.hot && RACE.start) { var rx = RACE.start.rx = RACE.start.rx || {}; if (e.t === 'play') rx.c = e.speed; else if (e.t === 'boost') rx.b = e.add; else if (e.t === 'adr' && e.used) rx.a = 1; else if (e.t === 'slip') rx.s = e.to - e.from; }   /* F6: where this round's spaces came from, for the rating line */
     if (e.t === 'play') RACE.spdT = e.speed; else if (e.t === 'boost') RACE.spdT = e.speed; else if (e.t === 'done') RACE.spdT = 0;
     if (e.t === 'shift') { setMsg(who + (who === 'You' ? ' shift' : ' shifts') + ' to gear ' + e.to + (e.cost ? ' (-1 heat)' : '') + '.'); await wait(700); }
     else if (e.t === 'cool') { setMsg(who + ' cool' + (who === 'You' ? '' : 's') + ' ' + e.n + ' heat back into the engine.'); pop('+' + e.n + ' engine', UI.vis[e.car].p, '#8ce6ff'); await wait(750); }
-    else if (e.t === 'play') { if (you && UI.ts) { UI.ts.n++; UI.ts.gs += c.gear; } var sx = stressNote(e); logSet(e.car, { cards: e.cards.map(function (x) { return x.card === 'X' ? 'Stress ' + x.v : x.upg ? UPG[x.upg].sn : x.v; }).join(' + '), sp: e.speed }); if (you) showPlayed(e); sfx('card'); setMsg(who + (who === 'You' ? ' play' : ' plays') + ': speed ' + e.speed + (sx ? ' · ' + sx : '') + '.'); if (sx && you) pop(sx, UI.vis[e.car].p, '#c9a6ff', null); await wait(you ? (sx ? 1500 : 1000) : 950); }
-    else if (e.t === 'boost') { logSet(e.car, { sp: e.speed, out: 'boost +' + e.add }); sfx('boost'); setMsg(who + ' boost' + (who === 'You' ? '' : 's') + ': +' + e.add + ' from a flipped card.'); pop('Boost +' + e.add, UI.vis[e.car].p, '#ffd24a', 'fx-boost-flare'); await wait(800); }
-    else if (e.t === 'adr') { setMsg(e.used === 0 ? 'Adrenaline: +1 cool-down, no extra speed.' : who + ' get' + (who === 'You' ? '' : 's') + ' adrenaline: +1 speed.'); pop(e.used === 0 ? 'Adrenaline: cool +1' : 'Adrenaline +1', UI.vis[e.car].p, '#ffd24a'); await wait(800); }
+    else if (e.t === 'play') { showPlayed(e); sfx('card'); setMsg(who + (who === 'You' ? ' play' : ' plays') + ': speed ' + e.speed + '.'); await wait(you ? 1000 : 950); }
+    else if (e.t === 'boost') { sfx('boost'); setMsg(who + ' boost' + (who === 'You' ? '' : 's') + ': +' + e.add + ' from a flipped card.'); pop('Boost +' + e.add, UI.vis[e.car].p, '#ffd24a', 'fx-boost-flare'); await wait(800); }
+    else if (e.t === 'adr') { setMsg(e.used === 0 ? 'Last place: +1 cool-down. +1 speed skipped, it would burn heat.' : who + ' get' + (who === 'You' ? '' : 's') + ' adrenaline for being last: +1 speed.'); pop(e.used === 0 ? 'Adrenaline: cool +1' : 'Adrenaline +1', UI.vis[e.car].p, '#ffd24a'); await wait(800); }
     else if (e.t === 'move') { var d = Math.abs(e.to - e.from); setMsg(who + ' drive' + (who === 'You' ? '' : 's') + ' ' + d + ' space' + (d === 1 ? '' : 's') + '.'); if (d) sfx('engine'); await tween(e.car, e.to, Math.min(1500, 170 * d + 250)); if (d) { pop('+' + d + ' spaces', UI.vis[e.car].p, '#fff'); await wait(450); } }
-    else if (e.t === 'slip') { logSet(e.car, { out: 'slipstream +' + (e.to - e.from) }); sfx('slip'); setMsg(who + ' slipstream' + (who === 'You' ? '' : 's') + ' +' + (e.to - e.from) + ' extra spaces.'); pop('Slipstream +' + (e.to - e.from), UI.vis[e.car].p, '#8ce6ff', 'fx-slipstream-streaks'); await tween(e.car, e.to, 500); await wait(450); }
-    else if (e.t === 'corner') { logSet(e.car, { out: e.cost ? '-' + e.cost + ' heat in a ' + e.limit : 'clean ' + e.limit }); if (you && UI.ts && e.cost) { UI.ts.ch += e.cost; if (!UI.ts.w || e.cost > UI.ts.w.cost) UI.ts.w = { cost: e.cost, sp: e.speed, lim: e.limit }; } if (e.cost) { if (you) sfx('burn'); setMsg(who + ' burn' + (who === 'You' ? '' : 's') + ' ' + e.cost + ' heat: over the limit.', 'warn'); pop('-' + e.cost + ' heat: ' + e.speed + ' in a ' + e.limit, UI.vis[e.car].p, '#ff6a3a', 'fx-heat-flame'); await wait(900); } else { if (you) sfx('clean'); setMsg(who + ' took the corner clean.', 'good'); pop('Clean: ' + e.speed + ' in a ' + e.limit, UI.vis[e.car].p, '#8cf0b4'); await wait(750); } }
-    else if (e.t === 'spin') { logSet(e.car, { out: 'SPIN OUT' }); sfx('spin'); setMsg(nm + ' spins out: not enough heat.', 'warn'); pop('SPIN: ' + e.speed + ' in a ' + e.limit, e.to, '#ff4d3a', 'fx-spinout-smoke'); raceSpin(e); var v = UI.vis[e.car]; v.rot = 1; await tween(e.car, e.to, 500); await wait(700); v.rot = 0; }
+    else if (e.t === 'slip') { sfx('slip'); setMsg(who + ' slipstream' + (who === 'You' ? '' : 's') + ' +' + (e.to - e.from) + ': free spaces.'); pop('Slipstream +' + (e.to - e.from), UI.vis[e.car].p, '#8ce6ff', 'fx-slipstream-streaks'); await tween(e.car, e.to, 500); await wait(450); }
+    else if (e.t === 'corner') { if (e.cost) { if (you) sfx('burn'); setMsg(who + ' burn' + (who === 'You' ? '' : 's') + ' ' + e.cost + ' heat: over the limit.', 'warn'); pop('-' + e.cost + ' heat: ' + e.speed + ' in a ' + e.limit, UI.vis[e.car].p, '#ff6a3a', 'fx-heat-flame'); await wait(900); } else { if (you) sfx('clean'); setMsg(who + ' took the corner clean.', 'good'); pop('Clean: ' + e.speed + ' in a ' + e.limit, UI.vis[e.car].p, '#8cf0b4'); await wait(750); } }
+    else if (e.t === 'spin') { sfx('spin'); setMsg(nm + ' spins out: not enough heat.', 'warn'); pop('SPIN: ' + e.speed + ' in a ' + e.limit, e.to, '#ff4d3a', 'fx-spinout-smoke'); raceSpin(e); var v = UI.vis[e.car]; v.rot = 1; await tween(e.car, e.to, 500); await wait(700); v.rot = 0; }
     else if (e.t === 'finish') { setMsg(nm + ' crosses the line!', 'good'); banner(nm + ' crosses the line!', c.col, 'turn'); await wait(800); }
     else if (e.t === 'discard') { if (e.n) { setMsg(who + ' discard' + (who === 'You' ? '' : 's') + ' ' + e.n + ' card' + (e.n > 1 ? 's' : '') + ', then draw' + (who === 'You' ? '' : 's') + ' to 7.'); await wait(600); } }
-    else if (e.t === 'stall') { logSet(e.car, { out: 'no move' }); setMsg(nm + ' has too few playable cards: no move, gear 1.', 'warn'); pop('No move', UI.vis[e.car].p, '#ff8f7a'); await wait(1000); }
-    else if (e.t === 'done') { var pl = rankList(G).indexOf(e.car) + 1; logSet(e.car, { pl: pl }); setMsg((who === 'You' ? 'You are' : nm + ' is') + ' now ' + ord(pl) + '.'); await wait(you ? 450 : 300); }
+    else if (e.t === 'stall') { setMsg(nm + ' has only heat cards: no move, gear 1.', 'warn'); pop('No move', UI.vis[e.car].p, '#ff8f7a'); await wait(1000); }
+    else if (e.t === 'done') { var pl = rankList(G).indexOf(e.car) + 1; setMsg(nm + ' is now ' + ord(pl) + '.'); await wait(450); }
     hud();
   }
   UI.rival = 0; UI.redraw();
 }
-function rivalPace() { var n = G.order.filter(function (i) { return !G.cars[i].human; }).length; return Math.min(0.13, 0.55 / Math.max(1, n)); }
-function stressNote(e) { var xs = e.cards.filter(function (x) { return x.card === 'X'; }); if (!xs.length) return ''; return 'Stress drew ' + xs.map(function (x) { return x.v; }).join(' and ') + (xs.length > 1 ? '' : ''); }
-/* F4: this round, one line per car that has moved (name, cards, speed, what happened, place): readable even at rival speed */
-function logRow(ci) { if (!UI.rlog || UI.rlogR !== G.round) { UI.rlog = []; UI.rlogR = G.round; } if (!UI.rlog.some(function (r) { return r.car === ci; })) UI.rlog.push({ car: ci }); logPaint(); }
-function logSet(ci, o) { if (!UI.rlog) return; var r = UI.rlog.filter(function (x) { return x.car === ci; })[0]; if (!r) return; for (var k in o) { if (k === 'out' && r.out && o.out) r.out += ', ' + o.out; else r[k] = o[k]; } logPaint(); }
-function logHtml() {
-  if (!UI.rlog || !UI.rlog.length) return ''; var h = '<div class="rlog" aria-label="This round">';
-  UI.rlog.forEach(function (r) { var c = G.cars[r.car], me = c.human && !G.hot; h += '<div class="rl' + (me ? ' me' : '') + '"><i style="background:' + COLS[c.col].hex + '"></i><b>' + esc(me ? 'You' : carName(r.car)) + '</b><span>' + (r.cards != null ? esc(String(r.cards)) + ' = <b>' + r.sp + '</b>' : '…') + '</span><em class="' + (/SPIN|heat/.test(r.out || '') ? 'bad' : '') + '">' + esc(r.out || '') + '</em>' + (r.pl ? '<small>' + ord(r.pl) + '</small>' : '') + '</div>'; });
-  return h + '</div>';
-}
-function logPaint() { var p = $('#panel'); if (!p || G.phase !== 'resolve' || G.pend) return; var ex = p.querySelector('.rlog'); if (ex) ex.outerHTML = logHtml(); else p.insertAdjacentHTML('beforeend', logHtml()); }
 function showPlayed(e) {
   var h = '<div class="who" style="color:' + COLS[G.cars[e.car].col].hex + '">' + esc(carName(e.car) === 'You' ? 'You play' : carName(e.car) + ' plays') + '</div><div class="reveal">'; e.cards.forEach(function (x) {
     var stem = x.upg ? 'card-upgrade-' + x.upg : x.card === 'X' ? 'card-stress' : 'card-speed-' + x.card, v = x.v;
-    h += '<div class="cd flip ' + (x.upg ? 'U' : x.card === 'X' ? 'X' : 's' + x.card) + '" data-art="' + stem + '"><span class="k">' + (x.upg ? esc(UPG[x.upg].sn) : x.card === 'X' ? 'Stress' : 'Speed') + '</span><span class="v">' + v + '</span><span class="t">' + (x.card === 'X' ? 'drew ' + v : 'move ' + v) + '</span></div>';
+    h += '<div class="cd flip ' + (x.upg ? 'U' : x.card === 'X' ? 'X' : 's' + x.card) + '" data-art="' + stem + '"><span class="k">' + (x.upg ? esc(UPG[x.upg].sn) : x.card === 'X' ? 'Stress' : 'Speed') + '</span><span class="v">' + v + '</span><span class="t">' + (x.card === 'X' ? 'flipped' : 'move ' + v) + '</span></div>';
   });
-  h += '</div><div class="chips"><span>Total speed <b>' + e.speed + '</b></span></div>' + logHtml(); $('#panel').innerHTML = h; artApply($('#panel'));
+  h += '</div><div class="chips"><span>Total speed <b>' + e.speed + '</b></span></div>'; $('#panel').innerHTML = h; artApply($('#panel'));
 }
 function qTimer() {}   /* R19: a player's choice is never answered on a timer; the question waits for a tap */
-function askBoost() {   /* React step (rulebook): after your cards are revealed you may pay 1 heat to boost. F4: answered by the Boost toggle you set before Go
-     (no extra tap); a boost that could spin you out is skipped and the line says so */
-  var p = G.pend, bc = G.cars[p.car], want = !!(UI.boostWant && UI.boostWant[bc.i]); if (UI.boostWant) UI.boostWant[bc.i] = false;
-  if (!want) return Promise.resolve(false);
-  var bo = boostOdds(G, bc); setPhase('react');
-  if (bo.spin) { setMsg('Boost skipped: a flip could spin you out.', 'warn'); return wait(700).then(function () { return false; }); }
-  return Promise.resolve(true);
+function askBoost() {   /* React step (rulebook): after your cards are revealed you may pay 1 heat to boost, once per turn. Asked only when legal (1+ engine heat). */
+  var p = G.pend, bc = G.cars[p.car], q2 = bc.pl2;
+  /* tutorial: a question the current step does not teach is never shown (its buttons would sit under the tutorial layer as dead taps) */
+  if (tutOn() && !(GXT.current() && GXT.current().id === 'boost')) return Promise.resolve(false);
+  var av = Math.round(avgSpeed(bc)), L0 = q2 ? landing(G, bc, q2.from + p.speed) : 0, risk = !!q2 && cornerCost(G, q2.from, landing(G, bc, q2.from + p.speed + 4), p.speed + 4, q2.lim) > bc.eng - 1;
+  /* a real choice only: if even the smallest flip (1) would spin you, boosting can only hurt, so the question is not asked */
+  var spin1 = !!q2 && cornerCost(G, q2.from, landing(G, bc, q2.from + p.speed + 1), p.speed + 1, q2.lim) > bc.eng - 1;   /* R19: always offered (a legal choice), marked when any flip would spin you */
+  var nc = q2 ? nextCorner(L0 - 1) : null, sug = hintsOn() && UI.mode !== 'tutorial' ? suggestBoost(G, bc) : false;
+  var bo = boostOdds(G, bc); if (sug && bo.pct > 10) sug = false;   /* R27: never suggest a boost with more than a 10% spin-out risk */
+   /* R24: the plan line shows the spin-out risk before you choose, and the badge says why */
+  setPhase('react'); setMsg(bo.line, bo.spin ? 'warn' : '');   /* <= 8 words (phone-check) */
+  var old = $('#bq'); if (old) old.remove();
+  $('#panel').insertAdjacentHTML('beforeend', '<div class="slipq" id="bq"><button id="boostN">No boost</button><button class="y' + (risk ? ' risk' : '') + '" id="boostY">Boost -1 heat' + (spin1 ? ' (spins you)' : risk ? ' (risky)' : '') + '</button></div>');
+  if (hintsOn() && UI.mode !== 'tutorial') sugMark(sug ? '#boostY' : '#boostN', sug ? bo.yes : bo.no);
+  return new Promise(function (res) {
+    var fin = function (v) { if (UI.qHalt) { UI.qHalt(); UI.qHalt = null; } var q = $('#bq'); if (q) q.remove(); res(v); };   /* an answered question leaves the screen at once */
+    $('#boostY').onclick = function () { if (tutOn() && !GXT.act({ type: 'tap', what: 'boost' })) return; sfx('boost'); fin(true); };
+    $('#boostN').onclick = function () { if (tutOn() && !GXT.act({ type: 'tap', what: 'boostno' })) return; fin(false); };
+    qTimer(BOOSTMS, 'No boost', '#boostN', function () { fin(false); });   /* no boost by itself; the hint marks Boost when it is the better play */
+    if (UI.fast) setTimeout(function () { fin(false); }, 10);
+  });
 }
 var BOOSTMS = 1500, DISCMS = 1500;
-function slowCards(c) { var o = []; c.hand.forEach(function (x, j) { if (x === 'H' || x === 'X') return; var u = upgId(x), v = u ? UPG[u].sp : +x; if (v <= 1) o.push(j); }); return o; }
-function askDiscard() {   /* discard step, right after moving: throw away speed cards you do not want, then draw back to 7.
-     F4: asked only when it matters (2+ slow cards: speed 1 or less), those are picked for you; Keep all is the default. Otherwise everything is kept. */
-  var c = G.cars[G.pend.car], slow = slowCards(c), tutDisc = tutOn() && GXT.current() && /^disc/.test(GXT.current().id);
-  if (tutOn() && !tutDisc) return Promise.resolve([]);   /* not taught yet: no dead buttons */
-  if (!tutOn() && slow.length < 2) return Promise.resolve([]);
-  var sel = slow.slice(), done = null;
+function askDiscard() {   /* discard step, right after moving: throw away speed cards you do not want, then draw back to 7 */
+  if (tutOn() && !(GXT.current() && /^disc/.test(GXT.current().id))) return Promise.resolve([]);   /* not taught yet: no dead buttons */
+  var c = G.cars[G.pend.car], sel = [], done = null;
+  /* rulebook: every round, after moving, you may discard any cards except Heat and Stress. Nothing is pre-selected; Keep all (or the countdown) skips */
   setPhase('discard');
   var paint = function () {
-    var h = '<div id="hand">';
+    var h = '<div class="who">Discard step</div><div id="hand">';
     c.hand.forEach(function (x, j) { h += cardHtml(x, sel.indexOf(j) >= 0, x === 'H' || x === 'X', j, ''); });
-    h += '</div><div class="slipq"><button class="y" id="discN">Keep all</button>' + (sel.length ? '<button id="discY">Drop ' + sel.length + ', draw ' + sel.length + '</button>' : '') + '</div>';
+    h += '</div><div class="slipq">' + (sel.length ? '<button id="discN">Keep all</button><button class="y" id="discY">Discard ' + sel.length + '</button>' : '<button class="y" id="discN">Keep all</button>') + '</div>';
     $('#panel').innerHTML = h; artApply($('#panel'));
-    setMsg(sel.length ? 'Drop ' + sel.length + ' slow card' + (sel.length > 1 ? 's' : '') + ' and draw new ones?' : 'Tap cards to drop, or keep all.');
+    setMsg(sel.length ? 'Throw away ' + sel.length + ', then draw back to 7.' : 'Drop unwanted cards, or keep all.');
     document.querySelectorAll('#panel .cd').forEach(function (b) { var j = +b.getAttribute('data-i'); b.onclick = function () {
       if (c.hand[j] === 'H' || c.hand[j] === 'X') { setMsg('Heat and Stress cards stay in your hand.', 'warn'); return; }
       var k = sel.indexOf(j); if (tutOn() && (k >= 0 || !GXT.act({ type: 'tap', what: 'dcard', i: j }))) return;
       sfx('card'); if (k >= 0) sel.splice(k, 1); else sel.push(j); paint(); }; });
-    if ($('#discY')) $('#discY').onclick = function () { if (tutOn() && !GXT.act({ type: 'tap', what: 'discgo' })) return; sfx('card'); done(sel.slice()); };
+    if ($('#discY')) $('#discY').onclick = function () { if (tutOn() && !GXT.act({ type: 'tap', what: 'discgo' })) return; done(sel.slice()); };
     $('#discN').onclick = function () { if (tutOn() && !GXT.act({ type: 'tap', what: 'discno' })) return; done([]); };
   };
   return new Promise(function (res) {
-    done = function (v) { var q = $('#panel .slipq'); if (q) q.remove(); res(v); }; paint();
+    done = function (v) { if (UI.qHalt) { UI.qHalt(); UI.qHalt = null; } var q = $('#panel .slipq'); if (q) q.remove(); res(v); }; paint();
+    qTimer(DISCMS, 'Keep all', '#discN', function () { done([]); });   /* keeps everything by itself unless you touch the hand */
     if (UI.fast) setTimeout(function () { res([]); }, 10);
   });
 }
@@ -3824,8 +3758,8 @@ function askSlip() {
   var p = G.pend, c = G.cars[p.car], cost = cornerCost(G, p.from, p.L1, p.speed, p.lim) - cornerCost(G, p.from, p.L0, p.speed, p.lim);
   var spin = cornerCost(G, p.from, p.L1, p.speed, p.lim) > c.eng;
   var sn = p.L1 - p.L0;
-  if (!tutOn() && (spin || !cost)) { setMsg(spin ? 'No slipstream: it would spin you out.' : 'Slipstream: ' + sn + ' extra spaces, no heat.'); return wait(350).then(function () { return !spin; }); }   /* R3: free = taken, spin = skipped; asked only when it costs heat */
-  setPhase('react'); setMsg(spin ? 'Slipstream +' + sn + ' would spin you out' : cost ? 'Slipstream +' + sn + ' carries you past a corner: ' + cost + ' more heat' : 'Slipstream: ' + sn + ' extra spaces, no heat');
+  if (!tutOn() && (spin || !cost)) { setMsg(spin ? 'No slipstream: it would spin you out.' : 'Slipstream: ' + sn + ' free spaces.'); return wait(350).then(function () { return !spin; }); }   /* R3: free = taken, spin = skipped; asked only when it costs heat */
+  setPhase('react'); setMsg(spin ? 'Slipstream +' + sn + ' would spin you out' : cost ? 'Slipstream +' + sn + ' costs ' + cost + ' more heat' : 'Slipstream: ' + sn + ' free spaces');
   $('#panel').innerHTML = '<div class="slipq"><button id="slipN">Stay</button><button class="y" id="slipY">Slipstream +' + sn + (spin ? ' (spin!)' : '') + (cost ? ' (-' + cost + ' heat)' : '') + '</button></div>';
   if (hintsOn() && UI.mode !== 'tutorial') sugMark(suggestSlip(G, c) ? '#slipY' : '#slipN');
   return new Promise(function (r0) { var res = function (v) { var q = $('#panel .slipq'); if (q) q.remove(); r0(v); }; $('#slipY').onclick = function () { if (tutOn() && !GXT.act({ type: 'tap', what: 'slip' })) return; res(true); }; $('#slipN').onclick = function () { if (tutOn() && !GXT.act({ type: 'tap', what: 'slipno' })) return; res(false); }; if (UI.fast) setTimeout(function () { res(!spin && cost === 0); }, 10); if (tutOn() && GXT.current() && GXT.current().id !== 'slip') { setMsg('No slipstream now: keep your heat.'); setTimeout(function () { res(false); }, 1400 * (window.AIDELAY || 1)); } });
@@ -3835,18 +3769,8 @@ function askSlip() {
 function loseLine() {   /* the line fits the place you got: podium praise, or one concrete tip */
   var me = G.cars.filter(function (c) { return c.human; })[0], k = me ? G.rank.indexOf(me.i) + 1 : 0;
   if (G.hot || !k) return pickLine(STORY.quickLose);
-  return k <= 3 ? 'You made the podium in ' + ord(k) + '.' : 'You finished ' + ord(k) + '.';   /* F4: the concrete tips sit in the Next race box below */
-}
-/* F4: one or two concrete tips from how you raced (heat burned in corners, spins, slipstreams, unused heat, low gears) */
-function raceTips(me) {
-  var t = [], s = me.stats, ts = UI.ts || { ch: 0, n: 0, gs: 0 };
-  if (s.spins) t.push('You spun out ' + (s.spins > 1 ? s.spins + ' times' : 'once') + ': when the line says "spin out", take a lower gear first.');
-  if (ts.ch >= 4) t.push('You burned ' + ts.ch + ' heat in corners' + (ts.w ? ' (worst: speed ' + ts.w.sp + ' in a ' + ts.w.lim + ')' : '') + ': brake a gear one turn earlier.');
-  if (me.eng >= 3 && t.length < 2) t.push('You finished with ' + me.eng + ' heat unused: in the last lap spend it on a higher gear or Boost.');
-  if ((ts.low || 0) >= 3 && t.length < 2) t.push(ts.low + ' turns you took a lower gear than the picked one: on straights the gold gear gains spaces.');
-  else if (!UI.hints && ts.n && ts.gs / ts.n < 2 && t.length < 2) t.push('Your average gear was ' + (ts.gs / ts.n).toFixed(1) + ': shift up to 3 or 4 on straights.');
-  if (!s.slips && t.length < 2) t.push('End your move next to a car to slipstream 2 extra spaces (no cards needed).');
-  return t.slice(0, 2);
+  if (k <= 3) return 'You made the podium in ' + ord(k) + '. ' + (me.stats.spins ? 'One cleaner corner and it is yours.' : me.stats.heat >= 6 ? 'Burn less heat in corners and it is yours.' : 'Shift up sooner on the straights and it is yours.');
+  return 'You finished ' + ord(k) + '. Gear down before corners and keep heat for the last lap.';
 }
 function showResult() {
   if (typeof GXC !== 'undefined' && GXC.active && GXC.active() && UI.cmpDef) { var wc = G.cars[G.rank[0]]; sfx(wc.human ? 'win' : 'lose'); return GXC.finish(G); }
@@ -3855,26 +3779,23 @@ function showResult() {
   UI.lockModal = true; var rows = '', me = G.cars.filter(function (c) { return c.human; });
   G.rank.forEach(function (ci, k) {
     var c = G.cars[ci], col = COLS[c.col].hex;
-    rows += '<div class="stand' + (c.human ? ' you' : '') + '"><span class="n">' + (k + 1) + '</span><span class="pt" style="border-color:' + col + '" data-art="portrait-' + c.drv + '">' + (c.drv ? c.name[0] : '★') + '</span><div style="flex:1"><b>' + esc(c.name) + '</b><small>Heat ' + c.stats.heat + ' · spins ' + c.stats.spins + ' · slipstreams ' + c.stats.slips + '</small></div></div>';
+    rows += '<div class="stand' + (c.human ? ' you' : '') + '"><span class="n">' + (k + 1) + '</span><span class="pt" style="border-color:' + col + '" data-art="portrait-' + c.drv + '">' + (c.drv ? c.name[0] : '★') + '</span><div style="flex:1"><b>' + esc(c.name) + '</b><small>Heat burned ' + c.stats.heat + ' · spin-outs ' + c.stats.spins + ' · slipstreams ' + c.stats.slips + '</small></div></div>';
   });
   var w = G.cars[G.rank[0]]; sfx(w.human ? 'win' : 'lose');
   var line = UI.mode === 'tutorial' ? (w.human ? 'You beat Kit to the line. Coach Mara is grinning: the Sunline seat is yours.' : 'Kit took the flag, but you learned every trick. Coach Mara: "Again. You are close."') : w.human ? STORY.resultWin + ' ' + pickLine(STORY.quickWin) : STORY.resultLose(w.name.split(' ')[0]) + ' ' + loseLine();
-  modal('<div class="podium" data-art="bg-podium"><h2>' + (w.human ? 'You win!' : esc(w.name) + ' wins') + '</h2><i class="ic" data-art="ui-trophy" style="width:36px;height:36px"></i>' + podiumHtml(G.rank) + '<p class="rl">' + esc(line) + '</p></div>' + rows + (me[0] && !G.hot ? '<div class="tips"><b>Next race</b>' + raceTips(me[0]).map(function (x) { return '<p>' + esc(x) + '</p>'; }).join('') + '</div>' : '') + '<div class="row" style="margin-top:10px"><button class="big" id="again">Race again</button><button class="ghostb" id="home">Title</button></div>');
+  modal('<div class="podium" data-art="bg-podium"><h2>' + (w.human ? 'You win!' : esc(w.name) + ' wins') + '</h2><i class="ic" data-art="ui-trophy" style="width:36px;height:36px"></i>' + podiumHtml(G.rank) + '<p class="rl">' + esc(line) + '</p></div>' + rows + '<div class="row" style="margin-top:10px"><button class="big" id="again">Race again</button><button class="ghostb" id="home">Title</button></div>');
   $('#mx').hidden = true; $('#again').onclick = function () { UI.lockModal = false; startGame(); }; $('#home').onclick = function () { UI.lockModal = false; showTitle(); };
 }
 
 /* ================= canvas ================= */
 var cv, cx, dpr = 1, trackCache = {};
 function sizeCanvas() {
-  cv = cv || $('#cv'); cx = cx || cv.getContext('2d'); var r = $('#cvw').getBoundingClientRect(); if (r.width < 2 || r.height < 2) return;   /* F3: a hidden or collapsed board keeps the last real size (0 x 0 broke the camera) */ dpr = Math.min(2, window.devicePixelRatio || 1);
+  cv = cv || $('#cv'); cx = cx || cv.getContext('2d'); var r = $('#cvw').getBoundingClientRect(); dpr = Math.min(2, window.devicePixelRatio || 1);
   cv.width = Math.max(2, Math.round(r.width * dpr)); cv.height = Math.max(2, Math.round(r.height * dpr)); UI.W = r.width; UI.H = r.height;
   UI.cam.s = Math.max(UI.H < 330 ? 0.62 : 0.75, Math.min(1.3, Math.min(UI.W, UI.H * 1.3) / 420));   /* close camera: cars ~90-100 px (R9) */
   UI.cam.s = Math.max(UI.cam.s, UI.W / 2000, UI.H / 1200);   /* never show beyond the 2000x1200 board */
   UI.camBase = UI.cam.s;
   if (UI.camPlan && G) { var pf = planFrame(); if (pf) { UI.cam.x = pf.x; UI.cam.y = pf.y; UI.cam.s = pf.s; camClamp(UI.cam, UI.W, UI.H); } }   /* R24: a resize while you plan keeps your car framed */
-  /* F3 flat-green fix: setting cv.width clears the canvas. The dock changes height at every turn change, so the board was resized after
-     this frame's draw and the browser painted one blank (plain green) frame. Redraw at once so no blank frame is ever shown. */
-  if (G && cx && !UI.drawing && performance.now) drawFrame(performance.now());
 }
 function planFrame() {   /* R19: while you plan, the camera frames your car and the next corner sign (with its limit), plus the move preview; returns {x, y, s} or null */
   if (!G || G.phase !== 'plan' || UI.busy || !G.cars[UI.seat] || !G.cars[UI.seat].human || G.cars[UI.seat].fin) return null;
@@ -3882,22 +3803,17 @@ function planFrame() {   /* R19: while you plan, the camera frames your car and 
   if (nc) { var q = tk.at(((c.pos + nc.d) % tk.N) * tk.seg); pts.push({ x: q.x + Math.sin(q.a) * 98, y: q.y - Math.cos(q.a) * 98 }); }
   if (RACE.prev && RACE.prev.car === c.i) pts.push(tk.space(c.pos + RACE.prev.L, 0));
   var x0 = 1e9, y0 = 1e9, x1 = -1e9, y1 = -1e9; pts.forEach(function (p) { x0 = Math.min(x0, p.x); y0 = Math.min(y0, p.y); x1 = Math.max(x1, p.x); y1 = Math.max(y1, p.y); });
-  var sh = UI.H < 260, top = sh ? 30 : 50, W = Math.max(120, UI.W), H = Math.max(80, UI.H - (H0dash()) - top), m = sh ? 50 : 90, base = UI.camBase || UI.cam.s;   /* top: the message pill and the minimap sit over the board's top edge */
-  /* F3 flat-green fix: on a short board (375x553 with a tall dock, or the browser bar showing) the fit went to ~0 or below 0, so the whole
-     track was drawn microscopic or mirrored off screen (a plain green frame). The zoom now has a floor, and when the corner does not fit
-     at that floor the frame stays on your car and leans toward the corner as far as the car stays on screen. */
-  var fit = Math.min(base, (W - 40) / (x1 - x0 + 2 * m), (H - 40) / (y1 - y0 + 2 * m)), floor = Math.min(base, 0.2), s = Math.max(fit, floor);
-  var mx = (x0 + x1) / 2, my = (y0 + y1) / 2, car = pts[0];
-  if (fit < floor) { var hx = Math.max(0, W / 2 / s - 60), hy = Math.max(0, H / 2 / s - 40); mx = car.x + Math.max(-hx, Math.min(hx, mx - car.x)); my = car.y + Math.max(-hy, Math.min(hy, my - car.y)); }
-  return { x: mx, y: my - top / 2 / s, s: s, corner: nc ? (c.pos + nc.d) % tk.N : -1 };
+  var top = 50, W = UI.W, H = UI.H - (H0dash()) - top, m = 90, base = UI.camBase || UI.cam.s;   /* top: the message pill and the minimap sit over the board's top edge */
+  var s = Math.min(base, (W - 40) / (x1 - x0 + 2 * m), (H - 40) / (y1 - y0 + 2 * m));
+  s = Math.max(s, Math.min(W / 2000, H / 1200)); return { x: (x0 + x1) / 2, y: (y0 + y1) / 2 - top / 2 / s, s: s, corner: nc ? (c.pos + nc.d) % tk.N : -1 };
 }
-function camClamp(cam, W, H) { if (!(cam.s > 0.05) || !isFinite(cam.s)) cam.s = UI.camBase > 0.05 ? UI.camBase : 0.5; if (!isFinite(cam.x)) cam.x = 1000; if (!isFinite(cam.y)) cam.y = 600; W = Math.max(1, W); H = Math.max(1, H); cam.x = W / cam.s >= 2000 ? 1000 : Math.max(W / 2 / cam.s, Math.min(2000 - W / 2 / cam.s, cam.x)); cam.y = H / cam.s >= 1200 ? 600 : Math.max(H / 2 / cam.s, Math.min(1200 - H / 2 / cam.s, cam.y)); }
+function camClamp(cam, W, H) { cam.x = W / cam.s >= 2000 ? 1000 : Math.max(W / 2 / cam.s, Math.min(2000 - W / 2 / cam.s, cam.x)); cam.y = H / cam.s >= 1200 ? 600 : Math.max(H / 2 / cam.s, Math.min(1200 - H / 2 / cam.s, cam.y)); }
 function camToPlan() {   /* R24: called the moment the planning panel is drawn, so the very first frame you plan on already shows your car */
   cvFit(); var pf = planFrame(); if (!pf) return; var cam = UI.cam; cam.x = pf.x; cam.y = pf.y; cam.s = pf.s; camClamp(cam, UI.W, UI.H);
   UI.camCut = performance.now(); UI.camPlan = true; UI.camVK = UI.W + 'x' + UI.H;
 }
-function H0dash() { return dashH(UI.W, UI.H); }   /* F5: the dashboard owns a strip below the board on every size, so it never covers a corner sign */
-function cvFit() { if (G && $('#cvw')) { var r = $('#cvw').getBoundingClientRect(); if (r.width >= 2 && r.height >= 2 && (Math.abs(r.width - (UI.W || 0)) > .5 || Math.abs(r.height - (UI.H || 0)) > .5 || dpr !== Math.min(2, window.devicePixelRatio || 1))) sizeCanvas(); } }
+function H0dash() { return UI.H < 420 ? dashH(UI.W, UI.H) : 0; }
+function cvFit() { if (G && $('#cvw')) { var r = $('#cvw').getBoundingClientRect(); if (Math.abs(r.width - (UI.W || 0)) > .5 || Math.abs(r.height - (UI.H || 0)) > .5 || dpr !== Math.min(2, window.devicePixelRatio || 1)) sizeCanvas(); } }
 window.addEventListener('resize', cvFit); window.addEventListener('orientationchange', function () { setTimeout(cvFit, 120); });
 if (window.ResizeObserver) { var cvRO = new ResizeObserver(cvFit); document.addEventListener('DOMContentLoaded', function () { var w = $('#cvw'); if (w) cvRO.observe(w); }); if (document.readyState !== 'loading') { var w0 = $('#cvw'); if (w0) cvRO.observe(w0); } }
 function carXY(i, p) {
@@ -3935,11 +3851,8 @@ function drawCar(c, p, ang, rot, hi) {
   cx.restore();
 }
 function rr(x, y, w, h, r) { cx.beginPath(); cx.moveTo(x + r, y); cx.arcTo(x + w, y, x + w, y + h, r); cx.arcTo(x + w, y + h, x, y + h, r); cx.arcTo(x, y + h, x, y, r); cx.arcTo(x, y, x + w, y, r); cx.closePath(); }
-function frame(now) { requestAnimationFrame(frame); drawFrame(now); }
-function drawFrame(now) {
-  if (!G || $('#game').hidden || !cx || UI.drawing) return; UI.drawing = true; try { drawFrame0(now); } finally { UI.drawing = false; }
-}
-function drawFrame0(now) {
+function frame(now) {
+  requestAnimationFrame(frame); if (!G || $('#game').hidden || !cx) return;
   cvFit(); var W = UI.W, H = UI.H, cam = UI.cam, tk = T(G); UI.spinT = (now % 600) / 600;
   var dt = Math.min(200, Math.max(0, now - (UI.camT || now))); UI.camT = now;
   var pf = planFrame(), tgt = pf || (RACE.prev && G.phase === 'plan' ? T(G).space((G.cars[RACE.prev.car].pos + RACE.prev.L) / 2, 0) : carXY(UI.focus, UI.vis[UI.focus].p)), k = (UI.fast || window.ANIM === false) ? 1 : pf ? 1 - Math.exp(-dt / 70) : 0.12;
@@ -3949,15 +3862,13 @@ function drawFrame0(now) {
   cam.x += (tgt.x - cam.x) * k; cam.y += (tgt.y - cam.y) * k;
   var sT = pf ? pf.s : (UI.camBase || cam.s); cam.s += (sT - cam.s) * k; UI.planCorner = pf ? pf.corner : -1; camClamp(cam, W, H);   /* zoomed out past the board (planning frame): centred, grass around */
   cx.setTransform(dpr, 0, 0, dpr, 0, 0); cx.fillStyle = '#245c37'; cx.fillRect(0, 0, W, H);
-  var shk = camShake(now), dOff = dashH(W, H) / 2;   /* 0 when the dashboard lives in the dock (dashOff) */ cx.save(); cx.translate(W / 2 + shk, H / 2 - dOff + shk * 0.5);   /* short boards: your car sits in the middle of the part above the dashboard */ cx.scale(cam.s, cam.s); cx.translate(-cam.x, -cam.y);
+  var shk = camShake(now), dOff = H < 420 ? dashH(W, H) / 2 : 0;   /* 0 when the dashboard lives in the dock (dashOff) */ cx.save(); cx.translate(W / 2 + shk, H / 2 - dOff + shk * 0.5);   /* short boards: your car sits in the middle of the part above the dashboard */ cx.scale(cam.s, cam.s); cx.translate(-cam.x, -cam.y);
   if (!artDraw(cx, 'track-' + G.track, 0, 0, 2000, 1200, 'cover')) cx.drawImage(trackLayer(G.track), 0, 0, 2000, 1200);
   cx.drawImage(sceneryLayer(G.track), 0, 0, 2000, 1200);
   /* corner signs */
-  var signT = cx.getTransform(), signs = [];   /* F6: sign positions on screen, so the minimap can step aside */
   tk.list.forEach(function (kk) {
     var q = tk.at(kk.idx * tk.seg), sx = q.x + Math.sin(q.a) * 98, sy = q.y - Math.cos(q.a) * 98, nx = kk.idx === UI.planCorner, z = nx ? Math.max(1, 0.62 / cam.s) : 1, r = 36 * z;   /* the next corner keeps a readable size while the camera is zoomed out */
-    signs.push({ p: signT.transformPoint(new DOMPoint(sx, sy)), e: signT.transformPoint(new DOMPoint(sx + r + 10 * z, sy)) });
-    if (nx) { cx.save(); cx.globalAlpha = pulse('cs' + kk.idx + 'r' + G.round, now, 1600, 0.4, 0.9); cx.lineWidth = 7 * z; cx.strokeStyle = '#ffd24a'; cx.beginPath(); cx.arc(sx, sy, r + 9 * z, 0, 7); cx.stroke(); cx.restore(); }
+    if (nx) { cx.save(); cx.globalAlpha = 0.55 + 0.35 * Math.sin(now / 260); cx.lineWidth = 7 * z; cx.strokeStyle = '#ffd24a'; cx.beginPath(); cx.arc(sx, sy, r + 9 * z, 0, 7); cx.stroke(); cx.restore(); }
     if (!artDraw(cx, 'ui-corner-sign', sx - r, sy - r, 2 * r, 2 * r, 'contain')) { cx.fillStyle = '#fff'; cx.beginPath(); cx.arc(sx, sy, 34 * z, 0, 7); cx.fill(); cx.lineWidth = 8 * z; cx.strokeStyle = '#d8281d'; cx.stroke(); }
     cx.fillStyle = '#111'; cx.font = '900 ' + Math.round(38 * z) + 'px sans-serif'; cx.textAlign = 'center'; cx.textBaseline = 'middle'; cx.fillText(climit(G, kk.limit), sx, sy + 2 * z);
   });
@@ -3979,10 +3890,7 @@ function drawFrame0(now) {
   var popT = cx.getTransform();   /* pops are drawn after the minimap, in screen space, kept inside the board (W496: no clipped pop) */
   cx.restore();
   /* minimap */
-  var mw = W < 520 ? Math.min(84, W * 0.24) : Math.min(110, W * 0.3), mh = mw * 0.6, mx = W - mw - 6, my = 6, sc = mw / 2000;   /* F6: smaller on phones */
-  var bInv = cx.getTransform().inverse(), sgS = signs.map(function (o) { var a = bInv.transformPoint(o.p), b = bInv.transformPoint(o.e); return { x: a.x, y: a.y, r: Math.hypot(b.x - a.x, b.y - a.y) }; });
-  var hits = function (x, y) { return sgS.some(function (o) { return o.x + o.r > x - 4 && o.x - o.r < x + mw + 4 && o.y + o.r > y - 4 && o.y - o.r < y + mh + 4; }); };
-  if (hits(mx, my)) { var yb = H - dashH(W, H) - mh - 8; if (!hits(mx, yb)) my = yb; else if (!hits(6, yb)) { mx = 6; my = yb; } }   /* F6: never over a corner sign: drop to the bottom right, else bottom left */
+  var mw = Math.min(110, W * 0.3), mh = mw * 0.6, mx = W - mw - 6, my = 6, sc = mw / 2000;
   cx.fillStyle = 'rgba(8,12,20,.93)'; rr(mx - 3, my - 3, mw + 6, mh + 6, 8); cx.fill();   /* opaque: scenery no longer shows through the minimap */
   cx.beginPath(); tk.dense.forEach(function (p, i) { if (i) cx.lineTo(mx + p[0] * sc, my + p[1] * sc); else cx.moveTo(mx + p[0] * sc, my + p[1] * sc); }); cx.closePath(); cx.strokeStyle = '#8b97ad'; cx.lineWidth = 3; cx.stroke();
   G.cars.forEach(function (c) { var q = tk.space(UI.vis[c.i].p, 0); cx.fillStyle = COLS[c.col].hex; cx.beginPath(); cx.arc(mx + q.x * sc, my + q.y * sc, c.human ? 3.6 : 2.6, 0, 7); cx.fill(); if (c.human) { cx.strokeStyle = '#fff'; cx.lineWidth = 1.2; cx.stroke(); } });
@@ -3991,7 +3899,7 @@ function drawFrame0(now) {
     var ms = o.hold ? 300 : now - o.t, age = ms / POPMS; if (age > 1 || age < 0) return; var q = tk.space(o.p, 0), wy = q.y - 50 - Math.min(1, ms / 400) * 30;
     var sp = inv.transformPoint(popT.transformPoint(new DOMPoint(q.x, wy))), fs = Math.max(20, Math.min(30, 34 * zoom)), ah = fs * 2;
     cx.font = '900 ' + fs + 'px sans-serif'; var tw = cx.measureText(o.txt).width + 10, x = Math.max(6 + tw / 2, Math.min(W - 6 - tw / 2, sp.x)), y = Math.max(fs + 8 + (o.stem ? ah : 0), Math.min(H - 8, sp.y));
-    var hw2 = Math.max(tw, o.stem ? ah * 1.4 : 0) / 2; y = Math.min(y, H - dashH(W, H) - 6); y = Math.max(y, fs + 6 + (o.stem ? ah : 0));   /* never on the dashboard or its corner signs; F5: and never cut off at the top */
+    var hw2 = Math.max(tw, o.stem ? ah * 1.4 : 0) / 2; y = Math.min(y, H - dashH(W, H) - 6);   /* never on the dashboard or its corner signs */
     if (x + hw2 > mx - 4 && y - fs - (o.stem ? ah : 0) < my + mh + 6) y = my + mh + 10 + fs + (o.stem ? ah : 0);   /* never on the minimap (text or its picture) */
     cx.globalAlpha = age < 0.75 ? 1 : Math.max(0, 1 - (age - 0.75) / 0.25);
     if (o.stem) artDraw(cx, o.stem, x - ah * 0.7, y - fs - ah, ah * 1.4, ah, 'contain');
@@ -4016,14 +3924,6 @@ function boot() {
   var q = new URLSearchParams(location.search); if (q.get('seed')) UI.seedArg = +q.get('seed');
   artLoad(); showTitle();
   document.addEventListener('pointerdown', function () { if (UI.busy) UI.skipStep = true; }, true);
-  /* F4 PC keys: 1-4 gear, Enter or Space Go, B boost, Space/Enter also skips rival turns */
-  document.addEventListener('keydown', function (ev) {
-    if (!G || $('#game').hidden || ev.ctrlKey || ev.metaKey || ev.altKey || /INPUT|TEXTAREA|SELECT/.test((ev.target || {}).tagName || '')) return;
-    if (!$('#modal').hidden) return; var k = ev.key, b = null;
-    if (UI.busy && (k === ' ' || k === 'Enter')) { UI.skipStep = true; ev.preventDefault(); return; }
-    if (/^[1-4]$/.test(k)) b = $('.gb[data-g="' + k + '"]:not([disabled])'); else if (k === 'Enter' || k === ' ') b = $('#goB:not([disabled])') || $('#panel .slipq button.y'); else if (k === 'b' || k === 'B') b = $('#boostT:not([disabled])');
-    if (b) { ev.preventDefault(); b.click(); }
-  });
 }
 /* test hooks */
 UI.sim = function (n) { for (var i = 0; i < (n || 1); i++) { if (!G || G.over) return; if (G.phase === 'plan') { G.cars.forEach(function (c) { if (!c.plan) c.plan = aiPlan(G, c); }); startResolve(G); } while (G.phase === 'resolve') { if (G.pend) slipChoice(G, true); else resolveNext(G); } } };
@@ -4101,7 +4001,7 @@ function raceWorld(now) {
   /* path dots and ghost car at the landing space */
   var c = G.cars[pv.car]; cx.fillStyle = 'rgba(255,255,255,.75)';
   for (var p = c.pos + 1; p <= pv.L; p++) { var q2 = tk.space(p, 0); cx.beginPath(); cx.arc(q2.x, q2.y, 7, 0, 7); cx.fill(); }
-  var g = tk.space(pv.spin ? pv.stop : pv.L, 0); cx.save(); cx.globalAlpha = pulse('gh' + pv.car + ':' + pv.L + ':' + G.round, now, 1100, 0.4, 0.75); cx.translate(g.x, g.y); cx.rotate(g.a);
+  var g = tk.space(pv.spin ? pv.stop : pv.L, 0); cx.save(); cx.globalAlpha = 0.5 + 0.25 * Math.sin(now / 180); cx.translate(g.x, g.y); cx.rotate(g.a);
   cx.strokeStyle = pv.spin ? '#ff3b30' : '#fff'; cx.lineWidth = 5; cx.setLineDash([10, 8]); rr(-40, -20, 80, 40, 9); cx.stroke(); cx.setLineDash([]); cx.restore();
   var lb = (pv.spin ? 'SPIN' : pv.burn ? '-' + pv.burn + ' heat' : 'safe') + (pv.slip && !pv.spin ? ' · slip +' + slipN(G) : '');   /* one label at the ghost car, not two */
   cx.font = '900 30px sans-serif'; cx.textAlign = 'center'; cx.textBaseline = 'bottom'; cx.lineWidth = 7; cx.strokeStyle = '#000'; cx.fillStyle = pv.spin ? '#ff5a4a' : pv.burn ? '#ffb347' : '#8cf0b4';
@@ -4114,9 +4014,9 @@ function dashOff(W, H) { return W < 500 && H < 420; }   /* short phone boards (3
 function dashH(W, H) { return H > 240 && !dashOff(W, H) ? dashR(W, H) * 2 + 18 : 0; }
 function raceHud(now, W, H) {
   if (!G) return; var c = G.cars[UI.focus] || G.cars[0];
-  RACE.spd += (RACE.spdT - RACE.spd) * ((UI.fast || window.ANIM === false) ? 1 : 0.25); if (Math.abs(RACE.spdT - RACE.spd) < 0.4) RACE.spd = RACE.spdT;   /* F5: one source of truth: the needle snaps onto the number */
+  RACE.spd += (RACE.spdT - RACE.spd) * ((UI.fast || window.ANIM === false) ? 1 : 0.08);
   /* leaderboard, top-left */
-  var rk = rankList(G), fs = W < 500 ? 13 : 15, showLb = hintsOn() && W >= 500 && !pcWide();   /* F4: PC has a standings side panel */   /* phones: standings live in the Place chip (tap it), nothing over the track */
+  var rk = rankList(G), fs = W < 500 ? 13 : 15, showLb = hintsOn() && W >= 500;   /* phones: standings live in the Place chip (tap it), nothing over the track */
   if (showLb) { rh = fs + 7, bw = W < 500 ? 104 : 150, n = rk.length;
   var lx = W - bw - 6, ly = H - (rh * n + 10) - 6; if (H < 260) ly = 6; cx.fillStyle = 'rgba(8,12,20,.78)'; rr(lx, ly, bw, rh * n + 10, 8); cx.fill();
   cx.font = '800 ' + fs + 'px sans-serif'; cx.textBaseline = 'middle';
@@ -4134,7 +4034,7 @@ function raceHud(now, W, H) {
     cx.lineWidth = R * 0.18; cx.lineCap = 'butt'; cx.strokeStyle = '#2a3140'; cx.beginPath(); cx.arc(ox, oy, R * 0.86, a0, a1); cx.stroke();
     cx.strokeStyle = f > 0.7 ? '#ff4d3a' : f > 0.45 ? '#ffb347' : '#3ddc84'; cx.beginPath(); cx.arc(ox, oy, R * 0.86, a0, a0 + (a1 - a0) * f); cx.stroke();
     var na = a0 + (a1 - a0) * f; cx.strokeStyle = '#fff'; cx.lineWidth = 3; cx.lineCap = 'round'; cx.beginPath(); cx.moveTo(ox, oy); cx.lineTo(ox + Math.cos(na) * R * 0.7, oy + Math.sin(na) * R * 0.7); cx.stroke();
-    cx.fillStyle = '#fff'; cx.textAlign = 'center'; cx.textBaseline = 'middle'; cx.font = '900 ' + Math.round(R * 0.5) + 'px sans-serif'; cx.fillText(String(Math.round(RACE.spdT)), ox, oy + R * 0.42);
+    cx.fillStyle = '#fff'; cx.textAlign = 'center'; cx.textBaseline = 'middle'; cx.font = '900 ' + Math.round(R * 0.5) + 'px sans-serif'; cx.fillText(String(Math.round(RACE.spd)), ox, oy + R * 0.42);
     cx.font = '700 ' + Math.max(10, Math.round(R * 0.28)) + 'px sans-serif'; cx.fillStyle = '#9aa6bb'; cx.fillText('SPEED', ox, oy - R * 0.28);
     /* gear lever: H-gate 1-2 / 3-4, the knob sits in the current gear */
     var gx = bx + R * 2 + 18, gw = R * 1.1, gy = by + 8 + R * 0.26, gh = R * 2 - 4 - R * 0.52, gear = (G.phase === 'plan' && c.i === UI.seat && !c.plan && !UI.busy) ? UI.gear : c.gear;   /* lever follows the gear you pick */
@@ -4183,7 +4083,6 @@ function previewSet(ci) {
 }
 
 /* ---------- turn tracker: round, lap, phase, cards left; plus the last round's rating ---------- */
-function pcWide() { return innerWidth >= 1000 && innerHeight >= 521; }
 function setPhase(ph) { RACE.ph = ph; tracker(); }
 function tracker() {
   var d = document.getElementById('trk'); if (!d) { var body = document.querySelector('.gx-dock-body'); if (!body) return; d = document.createElement('div'); d.id = 'trk'; body.insertBefore(d, body.firstChild); }
@@ -4191,18 +4090,13 @@ function tracker() {
   var mine = G.phase === 'plan' || (curCar(G) && curCar(G).i === me.i) || G.pend;
   var dt = document.getElementById('dockt'); if (dt) dt.textContent = 'Round ' + G.round + ' · Lap ' + lap + '/' + G.laps + ' · Deck ' + me.deck.length + ' · Discard ' + me.disc.length + (G.wx && G.wx !== 'dry' ? ' · ' + WEATHER[G.wx].name : '');
   var rk = rankList(G), pl = rk.indexOf(me.i) + 1, ld = G.cars[rk[0]], gap = ld.pos - me.pos, nm = function (c) { return c.human && !G.hot ? 'You' : c.name.split(' ')[0]; };
-  var lead2 = rk[1] != null ? me.pos - G.cars[rk[1]].pos : 0, spc = function (n) { return n + ' space' + (n === 1 ? '' : 's'); }, sc = pl === 1 ? 'You lead' + (rk[1] != null ? (lead2 > 0 ? ' ' + nm(G.cars[rk[1]]) + ' by ' + spc(lead2) : ', level with ' + nm(G.cars[rk[1]])) : '') : 'You ' + ord(pl) + ' of ' + rk.length + ' · ' + (gap > 0 ? nm(ld) + ' is ' + spc(gap) + ' ahead' : ld.fin ? nm(ld) + ' finished first' : 'level with ' + nm(ld));
+  var lead2 = rk[1] != null ? me.pos - G.cars[rk[1]].pos : 0, sc = pl === 1 ? 'You lead' + (rk[1] != null ? (lead2 > 0 ? ' by ' + lead2 + ' over ' + nm(G.cars[rk[1]]) : ', level with ' + nm(G.cars[rk[1]])) : '') : 'You ' + ord(pl) + ' of ' + rk.length + ' · ' + (gap > 0 ? nm(ld) + ' leads by ' + gap : ld.fin ? nm(ld) + ' finished first' : 'level with ' + nm(ld));
   var h = '<button type="button" class="score" id="scoreL" title="Race order: tap for why">' + esc(sc) + '<i>why?</i></button><ol class="phs" aria-label="Your turn phases">';
   if (UI.W && dashOff(UI.W, UI.H)) {   /* short boards: the dashboard as one dock line, the board stays clear */
     var ph = PHASES.filter(function (p) { return p[0] === RACE.ph; })[0], nc = nextCorner(me.pos), gr = G.phase === 'plan' && me.i === UI.seat && !me.plan ? UI.gear : me.gear;
     h += '<li class="dm">Gear <b>' + gr + '</b></li><li class="dm' + (me.eng <= 1 ? ' hot' : '') + '">Heat <b>' + me.eng + '</b></li>' + (nc ? '<li class="dm">Corner <b class="sgn">' + nc.limit + '</b> in ' + nc.d + '</li>' : '') + (mine && ph ? '<li class="on">' + ph[1] + '</li>' : '');
   } else PHASES.forEach(function (p) { h += '<li class="' + (mine && RACE.ph === p[0] ? 'on' : '') + '">' + p[1] + '</li>'; });
   h += '</ol>';
-  if (pcWide()) {   /* F4: PC side panel: the standings, with the gap in spaces */
-    h += '<div class="stl-h">Standings</div><ol class="stand-l">'; rk.forEach(function (ci, k) { var x = G.cars[ci], lp = Math.min(G.laps, Math.floor(x.pos / T(G).N) + 1), gp = k ? ld.pos - x.pos : 0;
-      h += '<li class="' + (x.human && !G.hot ? 'me' : '') + '"><span class="n">' + ord(k + 1) + '</span><i style="background:' + COLS[x.col].hex + '"></i><b>' + esc(nm(x)) + '</b><small>' + (x.fin ? 'finished' : !k ? 'leader' : gp ? gp + ' behind' : 'level') + ' · lap ' + lp + ' · gear ' + x.gear + '</small></li>'; });
-    h += '</ol>';
-  }
   d.innerHTML = h; var sb = document.getElementById('scoreL'); if (sb) sb.onclick = scoreWhy;
 }
 /* the computer's best plan for this hand, as a yardstick for the round rating */
@@ -4212,14 +4106,11 @@ function rateStart(c) {
 }
 function rateRound() {
   var s = RACE.start; if (!s || !G || !G.cars[s.ci]) { RACE.start = null; return; } var c = G.cars[s.ci], d = c.pos - s.pos, ht = c.stats.heat - s.heat, sp = c.stats.spins > s.spins, b = RACE.best ? RACE.best.sp : d, k, t;
-  if (!G.hot && UI.mode === 'tutorial' && !sp) { k = 'good'; t = 'Good: ' + d + ' space' + (d === 1 ? '' : 's') + ', just as planned.'; }   /* a scripted tutorial move is the right play */
+  if (!G.hot && UI.mode === 'tutorial' && !sp) { k = 'good'; t = 'Good: ' + d + ' spaces, just as planned.'; }   /* a scripted tutorial move is the right play */
   else if (sp) { k = 'poor'; t = 'Poor: you spun out. Brake earlier next time.'; }
-  else if (d >= b - 1 && ht <= 2) { k = 'good'; t = 'Good: ' + d + ' space' + (d === 1 ? '' : 's') + ' for ' + ht + ' heat.'; }
-  else if (d < b - 2) { k = 'okay'; t = 'Okay: ' + d + ' space' + (d === 1 ? '' : 's') + '. The best play went about ' + b + '.'; }
-  else { k = ht > 2 ? 'okay' : 'good'; t = (ht > 2 ? 'Okay: ' : 'Good: ') + d + ' space' + (d === 1 ? '' : 's') + ', ' + ht + ' heat burned.'; }
-  var rx = s.rx || {}, parts = [];   /* F6: explain spaces beyond the cards (boost flip, adrenaline, slipstream) and the finish line in one clause */
-  if (!sp && rx.c != null && (rx.b || rx.a || rx.s)) { parts.push(rx.c + ' cards'); if (rx.b) parts.push(rx.b + ' boost'); if (rx.a) parts.push('1 adrenaline'); if (rx.s) parts.push(rx.s + ' slipstream'); t = t.replace(/\.$/, '') + ' (' + parts.join(' + ') + ').'; }
-  if (!sp && c.pos >= total(G) && s.pos < total(G)) t = t.replace(/\.$/, '') + ': over the line, furthest past ranks first.';
+  else if (d >= b - 1 && ht <= 2) { k = 'good'; t = 'Good: ' + d + ' spaces for ' + ht + ' heat.'; }
+  else if (d < b - 2) { k = 'okay'; t = 'Okay: ' + d + ' spaces. The best play went about ' + b + '.'; }
+  else { k = ht > 2 ? 'okay' : 'good'; t = (ht > 2 ? 'Okay: ' : 'Good: ') + d + ' spaces, ' + ht + ' heat burned.'; }
   RACE.rate = t; RACE.rateK = k; RACE.start = null; RACE.rateShow = 1; tracker();
 }
 
@@ -4263,7 +4154,7 @@ function scoreWhy() {
 /* ---------- Play mode: one "Goal" card before turn 1 ---------- */
 function goalCard(then) {
   UI.lockModal = true;
-  modal('<h2>Goal: first across the line after ' + G.laps + ' lap' + (G.laps > 1 ? 's' : '') + '</h2><ul class="goal"><li><b>Gear = cards.</b> Gear 3 means you play 3 cards.</li><li><b>Add them up.</b> The total is how far you drive.</li><li><b>Corners burn heat.</b> Too fast for your heat? You spin.</li><li><b>Heat</b> is your engine fuel: corners and boosts spend it.</li><li><b>Stress</b> is a gamble: it plays as a random card flipped.</li><li><b>Slipstream:</b> end behind a car to glide 2 extra spaces, no cards (a corner on the way still costs heat).</li></ul>' + (G.sup ? '<p class="wxl"><b>Brake</b> = speed 0, safe in corners. <b>Burst</b> = speed 5, one big push. Stuck? Tap <b>Suggest</b>.</p>' : '') +
+  modal('<h2>Goal: first across the line after ' + G.laps + ' lap' + (G.laps > 1 ? 's' : '') + '</h2><ul class="goal"><li><b>Gear = cards.</b> Gear 3 means you play 3 cards.</li><li><b>Add them up.</b> The total is how far you drive.</li><li><b>Corners burn heat.</b> Too fast with no heat? You spin.</li></ul>' + (G.sup ? '<p class="wxl"><b>Brake</b> = speed 0, safe in corners. <b>Burst</b> = speed 5, one big push. Stuck? Tap <b>Suggest</b>.</p>' : '') +
     (G.wx && G.wx !== 'dry' ? '<p class="wxl"><b>' + esc(WEATHER[G.wx].name) + ':</b> ' + esc(WEATHER[G.wx].txt) + '</p>' : '') + '<button class="big" id="goalB" style="width:100%">Start the race</button>');
   $('#mx').hidden = true; $('#goalB').onclick = function () { UI.lockModal = false; closeModal(); then(); };
 }
@@ -4362,21 +4253,17 @@ function stackCards(c, want, top) {
   shuffle(G, pool); c.deck = pool.concat(tp.slice().reverse()); c.hand = hand; c.disc = [];
   while (c.hand.length < HAND && c.deck.length) c.hand.push(c.deck.shift());
 }
-/* each round (F4: 5 rounds, about 16 taps, no forced spin-out): your space, gear, engine heat, hand, deck top, the gear the step asks for and
-   the cards it auto-picks for that gear (pickG / pick); the rivals' spaces and the two cards they play (always gear 2). Positions follow on
-   from the previous round exactly, so nothing jumps (corners: space 10 limit 5, space 15 limit 4; finish at 30). */
+/* each round: your space, gear, engine heat, hand, deck top; the rivals' spaces and the two cards they play (always gear 2). Positions follow on from the
+   previous round exactly, so nothing jumps (corners: space 10 limit 5, space 15 limit 4; finish at 30). */
 var TUT_CH = [
-  { pos: 0, gear: 1, eng: 6, hand: ['1', '3', '2', '4', '1', '2', '3'], pickG: 2, pick: ['3', '2'], kit: [3, ['2', '2']], juno: [2, ['2', '1']] },   /* 3+2, +1 adrenaline (you move last) */
-  { pos: 6, gear: 2, eng: 6, hand: ['1', '4', '2', '4', '1', '2', '3'], pickG: 2, pick: ['4', '4'], kit: [7, ['3', '2']], juno: [5, ['2', '1']] },   /* 8 in a limit-5 corner: burn 3, said why */
-  { pos: 14, gear: 2, eng: 3, hand: ['H', 'H', 'H', '4', '2', '1', '3'], pickG: 1, pick: ['3'], kit: [12, ['4', '2']], juno: [9, ['1', '1']] },   /* 3 heat left before a limit 4: gear 1, clean, cools 3 */
-  { pos: 17, gear: 1, eng: 6, hand: ['2', '4', '1', '3', '1', 'X', '3'], top: ['1'], pickG: 3, pick: ['2', '1', 'X'], kit: [18, ['2', '2']], juno: [12, ['2', '1']] },   /* 1 -> 3 for 1 heat, Stress draws a 1, behind Kit: slipstream; then discard */
-  { pos: 23, gear: 3, eng: 5, hand: ['1', '4', '3', '1', '2', '3', '4'], top: ['3'], pickG: 3, pick: ['4', '2', '1'], kit: [22, ['1', '1']], juno: [16, ['2', '1']] }   /* 4+2+1 and a boost: finish */
+  { pos: 0, gear: 1, eng: 6, hand: ['1', '3', '2', '4', '1', '2', '3'], kit: [3, ['2', '2']], juno: [2, ['2', '1']] },   /* you start last: adrenaline */
+  { pos: 6, gear: 2, eng: 6, hand: ['1', '4', '2', '4', '1', '2', '3'], kit: [7, ['3', '2']], juno: [5, ['2', '1']] },   /* 4+4 = 8 in a limit-5 corner: burn 3 */
+  { pos: 14, gear: 2, eng: 3, hand: ['1', '4', '2', '4', '2', '1', '3'], kit: [12, ['2', '2']], juno: [9, ['1', '1']] },   /* 4+4 into the limit-4 corner with 3 heat: spin out */
+  { pos: 14, gear: 1, eng: 0, hand: ['H', 'H', 'H', 'H', 'H', 'H', 'X'], kit: [16, ['2', '3']], juno: [12, ['2', '1']] },   /* the spin's Stress card is the one playable card; gear 2 needs two: stall */
+  { pos: 14, gear: 1, eng: 0, hand: ['H', 'X', 'H', 'H', 'H', 'H', '2'], top: ['2'], kit: [21, ['1', '1']], juno: [16, ['2', '1']] },   /* gear 1 + stress: cool down, adrenaline */
+  { pos: 17, gear: 1, eng: 4, hand: ['2', '4', '1', '3', '1', '4', '3'], kit: [23, ['1', '1']], juno: [19, ['2', '1']] },   /* gear 1 -> 3 for 1 heat, beside Juno: slipstream, then discard */
+  { pos: 24, gear: 3, eng: 3, hand: ['1', '4', '3', '1', '2', '3', '4'], top: ['3'], kit: [25, ['1', '1']], juno: [22, ['2', '1']] }   /* 4+2+1, boost after the reveal: finish */
 ];
-function tutPick(c, g) {   /* the cards the step wants for the gear it asks for (ui.js autoPick) */
-  var ch = TUT_CH[G.round - 1]; if (!ch || ch.pickG !== g) return null; var used = [], out = [];
-  ch.pick.forEach(function (v) { for (var j = 0; j < c.hand.length; j++) if (c.hand[j] === v && used.indexOf(j) < 0) { used.push(j); out.push(j); return; } });
-  return out.length === needCards(c, g) ? out : null;
-}
 function tutStageRound(r) {
   var ch = TUT_CH[r - 1]; if (!ch || !G || G.cars[0].fin) return;
   var c = G.cars[0];
@@ -4404,75 +4291,89 @@ function tutLeave(skipped) {
   closeModal(); if (skipped) showTitle();
 }
 /* targets */
-function tutPlan(r) { return function () { return !!G && G.phase === 'plan' && G.round === r && !UI.busy && !G.pend && !!$('#goB'); }; }
-function tutSpot() {   /* a small box over the next corner sign on the board, so the bubble points at it and sits beside it */
-  var w = $('#cvw'), s = $('#tutSpot'); if (!w || !G) return null; if (!s) { s = document.createElement('div'); s.id = 'tutSpot'; w.appendChild(s); }
-  var me = G.cars[UI.seat], nc = nextCorner(me.pos), tk = T(G), cam = UI.cam; if (!nc) return null;
-  var a = tk.at(((me.pos + nc.d) % tk.N) * tk.seg), q = { x: a.x + Math.sin(a.a) * 98, y: a.y - Math.cos(a.a) * 98 }, dO = dashH(UI.W, UI.H) / 2;
-  var x = Math.max(24, Math.min(UI.W - 24, (q.x - cam.x) * cam.s + UI.W / 2)), y = Math.max(24, Math.min(UI.H - 24, (q.y - cam.y) * cam.s + UI.H / 2 - dO));
-  s.style.cssText = 'position:absolute;pointer-events:none;width:48px;height:48px;left:' + (x - 24) + 'px;top:' + (y - 24) + 'px'; return s;
+function tutCardV(v) {   /* the first not-yet-picked card of value v in your hand */
+  var c = G && G.cars[UI.seat]; if (!c) return null;
+  for (var j = 0; j < c.hand.length; j++) if (c.hand[j] === v && UI.sel.indexOf(j) < 0) return document.querySelector('#hand .cd[data-i="' + j + '"]');
+  return null;
 }
-function tutRects(sels) { return function () { return sels.map(function (q) { var e = $(q); return e && e.offsetParent !== null ? e.getBoundingClientRect() : null; }).filter(Boolean); }; }
+function tutPlan(r) { return function () { return !!G && G.phase === 'plan' && G.round === r && !UI.busy && !G.pend && !!$('#goB'); }; }
+function tutIsCard(v) { return function (a) { var c = G.cars[UI.seat]; return a.what === 'card' && c.hand[a.i] === v; }; }
 /* one rule per step, in turn order. rule = the rule id the tutorial test checks; every step is one short sentence and one tap */
-var TUT_RULES = ['goal', 'gear', 'speed', 'corner', 'burn', 'spin', 'cooldown', 'shift2', 'stress', 'slip', 'discard', 'boost', 'finish'];
+var TUT_RULES = ['goal', 'gear', 'speed', 'reveal', 'order', 'adrenaline', 'space', 'corner', 'engine', 'burn', 'spin', 'heatcards', 'stall', 'cooldown', 'stress', 'shift2', 'slip', 'discard', 'boost', 'finish'];
 function tutSteps() {
-  /* F4: the bubble never covers what the player needs now: the line, gears, hand and Go (avoid) */
-  var need = tutRects(['#msg', '#scoreL', '#gears', '#acts', '#hand']), needQ = tutRects(['#msg', '#scoreL', '#panel .slipq', '#panel #hand']);
-  var gear = function (id, r, g, say, rule) { return { id: id, rule: rule, say: say, target: function () { return document.querySelector('.gb[data-g="' + g + '"]'); }, ready: tutPlan(r), wait: { type: 'tap', match: function (a) { return a.what === 'gear' && a.g === g; } }, wrong: 'Tap gear ' + g + '.', side: 'top', avoid: need }; };
-  var go = function (id, r, say, rule) { return { id: id, rule: rule, say: say, target: function () { var b = $('#goB'); return b && !b.disabled ? b : null; }, ready: tutPlan(r), wait: { type: 'tap', match: function (a) { return a.what === 'go'; } }, side: 'top', avoid: need }; };
-  var info = function (id, r, say, rule, tg) { return { id: id, rule: rule, say: say, target: tg, ready: tutPlan(r), wait: null, side: 'top', avoid: need }; };
+  var cv = function () { return $('#cvw'); }, eng = function () { return $('#tray .eng') || $('#tray'); };
+  var card = function (id, r, v, say, rule) { return { id: id, rule: rule, say: say, target: function () { return tutCardV(v); }, ready: tutPlan(r), wait: { type: 'tap', match: tutIsCard(v) }, wrong: 'Tap the glowing card.', side: 'top' }; };
+  var gear = function (id, r, g, say, rule) { return { id: id, rule: rule, say: say, target: function () { return document.querySelector('.gb[data-g="' + g + '"]'); }, ready: tutPlan(r), wait: { type: 'tap', match: function (a) { return a.what === 'gear' && a.g === g; } }, wrong: 'Tap gear ' + g + '.', side: 'top' }; };
+  var go = function (id, r, say, rule) { return { id: id, rule: rule, say: say, target: function () { var b = $('#goB'); return b && !b.disabled ? b : null; }, ready: tutPlan(r), wait: { type: 'tap', match: function (a) { return a.what === 'go'; } }, side: 'top' }; };
+  var info = function (id, r, say, rule, tg) { return { id: id, rule: rule, say: say, target: tg || cv, ready: tutPlan(r), wait: null, side: 'bottom' }; };
   var pend = function (t) { return function () { return !!G && !!G.pend && G.pend.t === t; }; };
   return [
-    info('goal', 1, 'Race one lap: the first car over the line wins.', 'goal', function () { return $('#trk .score') || $('#msg'); }),
-    gear('gear', 1, 2, 'Your gear is how many cards you play: tap gear 2.', 'gear'),
-    go('go1', 1, 'Best cards are picked for you, 3 + 2: tap Go.', 'speed'),
-    info('corner', 2, 'This sign is the corner\'s speed limit: 5.', 'corner', tutSpot),
-    go('go2', 2, 'Speed 8 in a 5 burns 3 engine heat: tap Go.', 'burn'),
-    info('spin', 3, 'Only 3 heat left: 4+ over a limit spins you out.', 'spin', function () { return $('#heatl'); }),
-    gear('gear1', 3, 1, 'Gear 1 is slow but cools 3 Heat cards: tap it.', 'cooldown'),
-    go('go3', 3, 'Speed 3 takes the corner clean: tap Go.'),
-    gear('gear3', 4, 3, 'Shifting two gears costs 1 heat: tap gear 3.', 'shift2'),
-    go('go4', 4, 'Stress plays your deck\'s next speed card: tap Go.', 'stress'),
-    { id: 'slip', rule: 'slip', say: 'Behind a car, slipstream adds 2 spaces, no cards: tap it.', target: function () { return $('#slipY'); }, ready: pend('slip'), wait: { type: 'tap', match: function (a) { return a.what === 'slip'; } }, side: 'top', avoid: tutRects(['#msg', '#scoreL']) },
-    { id: 'disc', rule: 'discard', say: 'Drop slow cards to draw fresh ones: tap Drop.', target: function () { var b = $('#discY'); return b && !b.disabled ? b : null; }, ready: pend('disc'), wait: { type: 'tap', match: function (a) { return a.what === 'discgo'; } }, side: 'top', avoid: needQ },
-    { id: 'boost', rule: 'boost', say: 'Boost: after your cards show, flip one more for 1 heat.', target: function () { return $('#boostT'); }, ready: tutPlan(5), wait: { type: 'tap', match: function (a) { return a.what === 'boost'; } }, side: 'top', avoid: need },
-    go('go5', 5, 'Speed 7 plus the boost reaches the line: tap Go.'),
-    { id: 'finish', rule: 'finish', say: 'You won, and the others race on until all finish.', target: function () { return $('#trk .score') || $('#msg'); }, ready: function () { return !!UI.tutOver; }, wait: null, side: 'bottom', avoid: tutRects(['#msg']) }
+    info('goal', 1, 'Race one lap; the first car over the line wins.', 'goal'),
+    gear('gear', 1, 2, 'Your gear is how many cards you play, so tap gear 2.', 'gear'),
+    card('c13', 1, '3', 'Tap the 3, since card numbers add up to your speed.', 'speed'),
+    card('c12', 1, '2', 'Tap the 2 for speed 5, which drives 5 spaces.'),
+    go('go1', 1, 'Tap Go: everyone plays at once, then cars move.', 'reveal'),
+    info('order', 2, 'Cars moved one by one, the leader first.', 'order'),
+    info('adr', 2, 'Moving last gave you adrenaline: +1 speed and +1 cooldown.', 'adrenaline'),
+    info('space', 2, 'Two cars fit per space, so a full space stops you behind.', 'space'),
+    info('corner', 2, 'The corner sign ahead is its speed limit: 5.', 'corner'),
+    info('engine', 2, 'Your engine holds 6 heat, and speeding through corners burns it.', 'engine', eng),
+    info('bb', 2, 'Your deck also holds Brake (speed 0) and Burst (speed 5).', null),
+    card('c24', 2, '4', 'Tap a 4.'),
+    card('c24b', 2, '4', 'Tap the other 4 for speed 8, three over the limit.'),
+    go('go2', 2, 'Tap Go: each point over the limit burns 1 heat.', 'burn'),
+    card('c34', 3, '4', 'Tap a 4.'),
+    card('c34b', 3, '4', 'Tap the other 4: speed 8 into a limit-4 corner.'),
+    go('go3', 3, 'Tap Go: with too little heat to pay, you spin out.', 'spin'),
+    info('spun', 4, 'Spun out: stopped before the corner, gear 1, plus a Stress card.', null),
+    { id: 'heatcard', rule: 'heatcards', say: 'Spent heat comes back as dead Heat cards you cannot play.', target: function () { return tutCardV('H'); }, ready: tutPlan(4), wait: null, side: 'top' },
+    gear('g42', 4, 2, 'Tap gear 2, though you hold just one playable card.', 'stall'),
+    card('c43', 4, 'X', 'Tap the Stress card, your only card that is not heat.'),
+    go('go4', 4, 'Tap Go: too few cards means a stall, no move.'),
+    gear('gear1', 5, 1, 'Stay in gear 1: it cools up to 3 heat cards.', 'cooldown'),
+    card('c5x', 5, 'X', 'Tap the Stress card: it flips a random speed card.', 'stress'),
+    go('go5', 5, 'Tap Go and watch your heat cards cool down.'),
+    info('cooled', 6, 'Cooled: heat went back into your engine.', null, eng),
+    gear('gear3', 6, 3, 'Shifting two gears costs 1 heat, so tap gear 3.', 'shift2'),
+    card('c62', 6, '2', 'Tap the 2.'),
+    card('c61', 6, '1', 'Tap a 1.'),
+    card('c61b', 6, '1', 'Tap the other 1: speed 4, plus 1 for adrenaline.'),
+    go('go6', 6, 'Tap Go to pull up right beside Juno.'),
+    { id: 'slip', rule: 'slip', say: 'Next to a car, slipstream gives 2 free spaces: tap it.', target: function () { return $('#slipY'); }, ready: pend('slip'), wait: { type: 'tap', match: function (a) { return a.what === 'slip'; } }, side: 'top' },
+    { id: 'disc', rule: 'discard', say: 'Discard any card but Heat or Stress after moving: tap a 3.', target: function () { var c = G.cars[UI.seat]; for (var j = 0; j < c.hand.length; j++) if (c.hand[j] === '3') return document.querySelector('#panel .cd[data-i="' + j + '"]'); return null; }, ready: pend('disc'), wait: { type: 'tap', match: function (a) { return a.what === 'dcard' && G.cars[UI.seat].hand[a.i] === '3'; } }, side: 'top' },
+    { id: 'discgo', say: 'Tap Discard 1 to draw to 7; Keep all skips this step.', target: function () { var b = $('#discY'); return b && !b.disabled ? b : null; }, ready: pend('disc'), wait: { type: 'tap', match: function (a) { return a.what === 'discgo'; } }, side: 'top' },
+    card('c74', 7, '4', 'Tap the 4.'),
+    card('c72', 7, '2', 'Tap the 2.'),
+    card('c71', 7, '1', 'Tap the 1 for speed 7.'),
+    go('go7', 7, 'Tap Go: your cards show first, then you may boost.'),
+    { id: 'boost', rule: 'boost', say: 'After the reveal, boost once: pay 1 heat, flip, add the card.', target: function () { return $('#boostY'); }, ready: pend('boost'), wait: { type: 'tap', match: function (a) { return a.what === 'boost'; } }, side: 'top' },
+    { id: 'finish', rule: 'finish', say: 'You won, and the others race on until all finish.', target: cv, ready: function () { return !!UI.tutOver; }, wait: null, side: 'bottom' }
   ];
 }
 function tutStart(o) {
   closeModal(); UI.cmpDef = null; UI.tutOver = false; o = o || {};
   GXT.start({
     game: TUT_GAME, setup: function () { UI.mode = 'tutorial'; startGame({ track: 'practice', laps: 1, opp: 2, hum: 1, diff: 'easy', seed: 12, tut: true }); },
-    steps: tutSteps(), story: true, endTitle: 'You know every rule', endText: 'Now a real race on a full grid. The Suggest plan is picked for you: press Go, or change the gear.',
+    steps: tutSteps(), story: true, endTitle: 'You know every rule', endText: 'Now a real race against four rivals. Tap Suggest any time you are unsure.',
     onDone: function (r) { tutLeave(false); if (r && r.choice === 'story' && typeof GXC !== 'undefined') GXC.open(); else if (o.then) o.then(); else startGame(); },
     onExit: function () { tutLeave(true); }
   });
 }
 function chapterMenu() { tutStart(); }
 /* help drawer: rules cards through the shared help kit (lightbulb in the top bar: suggested move, "How does this work?" opens the cards) */
-/* Hint text: the move itself (gear and cards from the strongest planner), not a generic tip */
-function hintWhy() {
-  try {
-    var c = you(), p = planOnce(), nm = p.idx.map(function (i) { var x = c.hand[i]; return x === 'X' ? 'the Stress card' : isSpeed(x) ? 'the ' + x : cardText(x).split(/[:.]/)[0].replace(/ card$/, ''); }); nm = nm.map(function (t) { return /^(Burst|Brake)/.test(t) ? 'the ' + t : t; });
-    var on = UI.gear === p.gear && p.idx.every(function (j) { return UI.sel.indexOf(j) >= 0; });   /* F6: the plan is picked for you at the start of each turn */
-    return 'Take gear ' + p.gear + ' and play ' + (nm.length > 1 ? nm.slice(0, -1).join(', ') + ' and ' + nm[nm.length - 1] : nm[0]) + (on ? '. Already picked: press Go.' : '. Tap the gold ones, then Go.');
-  } catch (e) { return 'Tap Suggest: the gear and cards to play turn gold.'; }
-}
 function helpBoot() {
   if (typeof GXH === 'undefined') return;
   var R = [
-    { title: 'How a turn works', text: 'Pick a gear (cards to play). Tap that many cards: they add up to your speed. Press Go. Mind the corner limits. Cars then move one at a time, leader first.' },
+    { title: 'How a turn works', text: 'Pick a gear (cards to play). Tap that many cards: they add up to your speed. Press Go. Mind the corner limits. Then each rival drives in turn.' },
     { title: 'Gear and cards', text: 'Your gear is how many cards you play. Shift one gear free, or two gears for 1 heat. The cards add up to your speed.' },
-    { title: 'Corners', text: 'Each corner has a speed limit. Every point you go over costs 1 heat from your engine. Too little heat in your engine to pay means a spin-out.' },
+    { title: 'Corners', text: 'Each corner has a speed limit. Every point you go over costs 1 heat from your engine. No heat left means a spin-out.' },
     { title: 'Heat', text: 'Heat you pay goes to your discard pile and comes back as dead cards in your hand. Gears 1 and 2 send heat back to the engine.' },
-    { title: 'Stress', text: 'A Stress card is a gamble: it plays as a random card flipped.' },
-    { title: 'Slipstream and boost', text: 'End next to or right behind a car to glide 2 more spaces (no cards; a corner it carries you past still costs heat). Boost: pay 1 heat to flip an extra speed card.' },
+    { title: 'Slipstream and boost', text: 'End next to or right behind a car to glide 2 more spaces. Boost: pay 1 heat to flip an extra speed card.' },
     { title: 'Upgrades', text: 'With Upgrades on you draft 3 cards before the race. They are played like speed cards and add a bonus.' }
   ];
-  GXH.init({ game: 'redline-rally', defaultOn: false, steps: {}, rules: R, top: function () { var dk = document.querySelector('.gx-dock'); if (innerHeight < 600 && dk) { var r = dk.getBoundingClientRect(); if (r.top > innerHeight * 0.3) return Math.ceil(r.top) + 4; } var b = document.querySelector('.gx-bar'), rb = b && b.getBoundingClientRect(); return rb && rb.bottom > 0 && rb.bottom < innerHeight / 2 ? Math.ceil(rb.bottom) + 4 : 6; } });   /* short phones: the Hint bubble stays over the dock, never over the board */
+  GXH.init({ game: 'redline-rally', defaultOn: false, steps: {}, rules: R });
   GXH.bulb({ el: '#bulbbtn', rulesFor: function () { return null; }, suggest: function () {
-    if (!G || G.phase !== 'plan' || !$('#sugB')) return null; try { if (!sugShown()) suggest(); } catch (e) { }   /* F3: the bulb shows the same gold plan as Suggest, never plays it */ return { target: function () { return $('.gb[data-g="' + planOnce().gear + '"]') || $('#sugB'); }, why: hintWhy() };
+    if (!G || G.phase !== 'plan' || !$('#sugB')) return null; return { target: function () { return $('#sugB'); }, why: 'Tap Suggest and the computer picks a gear and cards for you. Then tap Go.' };
   } });
 }
 

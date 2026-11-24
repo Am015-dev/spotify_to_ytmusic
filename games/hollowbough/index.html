@@ -1240,7 +1240,7 @@ svg{display:block}
 .gx-dock{display:none}
 #barprompt{display:block;flex:1;min-width:0}
 #prompt{font-size:calc(14px*var(--gx-text,1));line-height:1.2;font-weight:700;color:#f6ecd6;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
-#prompt.mine{color:#ffe08a}
+#prompt.flintpit{color:#ffe08a}
 body:has(.gxh-bub.on) #prompt{visibility:hidden}  /* one instruction line: the tip bubble replaces the caption while it shows */
 #fx{position:absolute;inset:0;pointer-events:none;overflow:hidden;z-index:30}
 .fxp{position:absolute;left:0;top:0;display:flex;align-items:center;gap:2px;pointer-events:none;will-change:transform,opacity;filter:drop-shadow(0 1px 2px rgba(0,0,0,.6))}
@@ -2303,7 +2303,7 @@ const GX={key:'gx',open:null,
     if (a.name) S.appendChild(el('p', 'gx-about-n', a.name + (a.version ? ' · ' + a.version : '')));
     if (a.text) { var p = el('p', 'gx-small'); p.textContent = a.text; S.appendChild(p); }
     var links = el('div', 'gx-links');
-    [['credits.html', 'Credits & licences'], ['privacy.html', 'Privacy'], ['terms.html', 'Terms'], ['reference.html', 'All cards on the shelf']].forEach(function (l) {
+    [['privacy.html', 'Privacy'], ['terms.html', 'Terms'], ['reference.html', 'All cards on the shelf']].forEach(function (l) {
       var x = el('a', 'gx-chip', l[1]); x.href = shelf + l[0]; x.target = '_blank'; x.rel = 'noopener'; links.appendChild(x);
     });
     S.appendChild(links);
@@ -4325,7 +4325,7 @@ const HAT = {
   postal: () => pa('M38.5 20 Q38 10 50 10 Q62 10 61.5 20Z', '#3d5f98') + pa('M37 20 Q45 25 62 20 L62 18 L38 18Z', '#2d4572') + `<circle cx="50" cy="14.5" r="2.2" fill="#f0c43a" stroke-width=".4"/>`,
   wander: () => ell(50, 19, 18, 3.4, '#8a6a46') + pa('M40 19 Q42 7 50 5 Q58 7 60 19Z', '#9a7a52') + rc(40, 15.5, 20, 2.6, '#c2503a', 0, NS0) + `<path d="M58 8 Q66 4 68 10 Q64 8 60 12Z" fill="#e8c24a" stroke-width=".4"/>`,
   bonnet: () => pa('M37 28 C34 14 44 10 50 10 C58 10 66 14 63 28 C60 20 56 18 50 18 C44 18 40 20 37 28Z', '#f0e6d0') + `<path d="M40 20 Q50 14 60 20" stroke="#7a4a8a" stroke-width="1.6" fill="none"/>`,
-  monk: () => HAT.hood('#8a6a48'),
+  brother_moss: () => HAT.hood('#8a6a48'),
   doc: () => rc(40, 8, 20, 11, '#3a6f8a', 3) + `<circle cx="50" cy="13.5" r="3.2" fill="#e8f0f2" stroke-width=".5"/><path d="M50 11.5 v4 M48 13.5 h4" stroke="#c2364c" stroke-width=".9"/>`,
   none: () => ''
 };
@@ -4379,7 +4379,7 @@ const CRIT = {
   turtle_teacher: ['turtle', 'indoor', 'teal', 'mortar', 'ruler', ['glasses']],
   bat_doctor:     ['bat', 'night', 'cream', 'doc', 'bag', ['mirror']],
   toad_undertaker:['toad', 'dusk', 'black', 'tophat', 'shovel', []],
-  hedgehog_monk:  ['hedgehog', 'indoor', 'brown', 'monk', 'candle', []],
+  hedgehog_monk:  ['hedgehog', 'indoor', 'brown', 'brother_moss', 'candle', []],
   mouse_fool:     ['mouse', 'dusk', 'yellow', 'jester', 'bells', []],
   shrew_sweeper:  ['shrew', 'autumn', 'grey', 'cap', 'broom', ['apron']],
   squirrel_woodcarver: ['squirrel', 'autumn', 'tan', 'cap', 'carve', ['apron']],
@@ -4390,7 +4390,7 @@ const CRIT = {
   fox_peddler:    ['fox', 'autumn', 'blue', 'cap', 'pack', ['scarf']],
   mole_historian: ['mole', 'indoor', 'grey', 'none', 'scroll', ['glasses']],
   bat_bard:       ['bat', 'night', 'red', 'feather', 'lute', []],
-  turtle_monk:    ['turtle', 'stone', 'brown', 'monk', 'candle', []],
+  turtle_monk:    ['turtle', 'stone', 'brown', 'brother_moss', 'candle', []],
   toad_shopkeeper:['toad', 'indoor', 'green', 'bonnet', 'scales', ['apron']],
   beetle_woodcarver:['beetle', 'autumn', 'tan', 'none', 'carve', ['apron']],
   pigeon_ranger:  ['pigeon', 'winter', 'green', 'hood', 'bow', []],
@@ -4430,37 +4430,37 @@ const flag = (x, y, c) => `<path d="M${x} ${y} v-9" stroke="${INK}" stroke-width
 const barrel = (x, y, s) => ell(x, y, 3.2 * s, 3.8 * s, '#b07a44') + `<path d="M${x - 3.1 * s} ${y - 1.2 * s} q${3.1 * s} 1.4 ${6.2 * s} 0 M${x - 3.1 * s} ${y + 1.2 * s} q${3.1 * s} 1.4 ${6.2 * s} 0" stroke="#5a3a1e" stroke-width=".5" fill="none"/>`;
 const gold = '#e6b83a';
 const CONS = {
-  farm: ['meadow', () => { let s = ''; for (let i = 0; i < 6; i++) s += pg([4 + i * 2, 54 - i * 1.5 + 6, 52 + i * 3, 54 - i * 1.5 + 6, 54 + i * 3, 56 - i * 1.5 + 6, 2 + i * 2, 56 - i * 1.5 + 6].map((v, k) => k % 2 ? v - 5 : v), i % 2 ? '#c9a24a' : '#d8b95c', ' stroke-width=".3"'); s += box(56, 30, 26, 20, '#c2493a') + roof(56, 20, 26, 12, '#8a3a2c') + door(65, 38, 8, 12, '#f0e2c0') + `<path d="M65 38 L73 50 M73 38 L65 50" stroke="#8a3a2c" stroke-width=".5"/>` + win(61, 24, 4, 4, '#f6ecd6'); for (let i = 0; i < 7; i++) s += `<path d="M${8 + i * 6} 53 q-1 -5 .5 -8 M${8 + i * 6} 53 q2 -4 1 -7" stroke="#e0b030" stroke-width=".7" fill="none"/>`; s += `<path d="M40 52 L40 38 M34 42 L46 42" stroke="#6a4a2a" stroke-width="1"/>` + ell(40, 36, 2.6, 2.6, '#e6c88a') + pg([36, 44, 44, 44, 45, 50, 35, 50], '#6a8fb0', ' stroke-width=".4"'); return s; }],
-  mine: ['stone', () => blob(50, 40, 44, 22, '#8a7766', .95, rng('mn')) + pa('M12 62 Q14 30 50 24 Q86 30 88 62Z', '#8f7b68') + pa('M34 56 V40 Q50 28 66 40 V56Z', '#2b2220') + box(32, 38, 3, 20, '#8a6240', ' stroke-width=".4"') + box(65, 38, 3, 20, '#8a6240', ' stroke-width=".4"') + box(30, 36, 40, 3.6, '#a37a52', ' stroke-width=".4"') + `<path d="M50 38 v6" stroke="${INK}" stroke-width=".4"/>` + `<circle cx="50" cy="46" r="2.4" fill="#ffd36a"/><circle cx="50" cy="46" r="6" fill="#ffd36a" fill-opacity=".25" stroke="none"/>` + [[16, 50], [24, 44], [78, 48], [84, 54]].map(p => ell(p[0], p[1], 4, 3, '#a9a39a', null, ' stroke-width=".4"')).join('') + `<path d="M62 58 L82 58 L80 66 L64 66Z" fill="#6a5a50" stroke-width=".6" transform="translate(-4 -6)"/>` + [[64, 49], [69, 48], [74, 49]].map(p => ell(p[0], p[1], 3, 2.4, '#9ca3a8', null, ' stroke-width=".4"')).join('') + `<circle cx="64" cy="61" r="2" fill="#4a3a30"/><circle cx="76" cy="61" r="2" fill="#4a3a30"/>`],
+  bramble_allotment: ['meadow', () => { let s = ''; for (let i = 0; i < 6; i++) s += pg([4 + i * 2, 54 - i * 1.5 + 6, 52 + i * 3, 54 - i * 1.5 + 6, 54 + i * 3, 56 - i * 1.5 + 6, 2 + i * 2, 56 - i * 1.5 + 6].map((v, k) => k % 2 ? v - 5 : v), i % 2 ? '#c9a24a' : '#d8b95c', ' stroke-width=".3"'); s += box(56, 30, 26, 20, '#c2493a') + roof(56, 20, 26, 12, '#8a3a2c') + door(65, 38, 8, 12, '#f0e2c0') + `<path d="M65 38 L73 50 M73 38 L65 50" stroke="#8a3a2c" stroke-width=".5"/>` + win(61, 24, 4, 4, '#f6ecd6'); for (let i = 0; i < 7; i++) s += `<path d="M${8 + i * 6} 53 q-1 -5 .5 -8 M${8 + i * 6} 53 q2 -4 1 -7" stroke="#e0b030" stroke-width=".7" fill="none"/>`; s += `<path d="M40 52 L40 38 M34 42 L46 42" stroke="#6a4a2a" stroke-width="1"/>` + ell(40, 36, 2.6, 2.6, '#e6c88a') + pg([36, 44, 44, 44, 45, 50, 35, 50], '#6a8fb0', ' stroke-width=".4"'); return s; }],
+  flintpit: ['stone', () => blob(50, 40, 44, 22, '#8a7766', .95, rng('mn')) + pa('M12 62 Q14 30 50 24 Q86 30 88 62Z', '#8f7b68') + pa('M34 56 V40 Q50 28 66 40 V56Z', '#2b2220') + box(32, 38, 3, 20, '#8a6240', ' stroke-width=".4"') + box(65, 38, 3, 20, '#8a6240', ' stroke-width=".4"') + box(30, 36, 40, 3.6, '#a37a52', ' stroke-width=".4"') + `<path d="M50 38 v6" stroke="${INK}" stroke-width=".4"/>` + `<circle cx="50" cy="46" r="2.4" fill="#ffd36a"/><circle cx="50" cy="46" r="6" fill="#ffd36a" fill-opacity=".25" stroke="none"/>` + [[16, 50], [24, 44], [78, 48], [84, 54]].map(p => ell(p[0], p[1], 4, 3, '#a9a39a', null, ' stroke-width=".4"')).join('') + `<path d="M62 58 L82 58 L80 66 L64 66Z" fill="#6a5a50" stroke-width=".6" transform="translate(-4 -6)"/>` + [[64, 49], [69, 48], [74, 49]].map(p => ell(p[0], p[1], 3, 2.4, '#9ca3a8', null, ' stroke-width=".4"')).join('') + `<circle cx="64" cy="61" r="2" fill="#4a3a30"/><circle cx="76" cy="61" r="2" fill="#4a3a30"/>`],
   refinery: ['autumn', () => box(14, 34, 34, 22, '#a3a09a') + roof(12, 24, 38, 10, '#8a4a3a') + door(26, 42, 8, 14) + box(40, 14, 6, 16, '#8a5a46') + smoke(44, 12) + `<path d="M58 36 Q58 62 72 62 Q86 62 86 36Z" fill="#4a4448"/>` + box(56, 33, 32, 3, '#6a6468') + pa('M60 36 Q72 41 84 36 Q72 33 60 36Z', '#e8a826', NS0) + `<path d="M64 41 q1 6 0 12 M78 41 q-1 6 0 12" stroke="#e8a826" stroke-width="1.2" fill="none" stroke-linecap="round"/>` + `<path d="M72 33 q-2 -4 0 -7 q2 3 0 7Z" fill="#e8a826" stroke-width=".4"/>` + barrel(52, 56, 1.1) + ell(90, 58, 3, 3, '#e8a826', .9, ' stroke-width=".4"') + `<path d="M14 62 Q50 66 86 62" stroke="#e8a826" stroke-width="1.4" fill="none" stroke-opacity=".6"/>`],
   barge: ['meadow', () => rc(-2, 44, 104, 20, '#8bbbd0', 0, NS0) + [0, 1, 2, 3, 4].map(i => `<path d="M${6 + i * 22} ${50 + (i % 2) * 6} q4 -3 8 0 q4 3 8 0" stroke="#fff" stroke-width=".7" fill="none" stroke-opacity=".8"/>`).join('') + pa('M12 42 L88 42 L80 56 L20 56Z', '#9a6a40') + `<path d="M16 46 L84 46" stroke="#5a3a1e" stroke-width=".5"/>` + [0, 1, 2, 3, 4, 5].map(i => `<path d="M${24 + i * 9} ${40 - (i % 3)} l-8 -${10 + (i % 2) * 3} M${26 + i * 8} 41 l-6 -9" stroke="#7a5230" stroke-width="2.2" stroke-linecap="round"/>`).join('') + rc(24, 30, 52, 2, '#c9a46a', 0, ' stroke-width=".4"' ) + `<path d="M84 44 L96 20" stroke="#6a4a2a" stroke-width="1.2"/><path d="M60 58 q10 4 20 0" stroke="#fff" stroke-width=".8" fill="none" stroke-opacity=".7"/>`],
   store: ['meadow', () => box(20, 28, 60, 28, '#e8c98f') + roof(18, 18, 64, 10, '#8a4a3a') + [0, 1, 2, 3, 4, 5].map(i => pa(`M${22 + i * 9.2} 30 h9.2 v6 q-4.6 4 -9.2 0Z`, i % 2 ? '#f6ecd6' : '#c2493a', ' stroke-width=".4"')).join('') + door(46, 40, 9, 16) + box(24, 40, 17, 10, '#cfe8f0', ' stroke-width=".5"') + box(60, 46, 14, 10, '#b98a5a') + [64, 68, 72].map((x, i) => `<circle cx="${x}" cy="${45}" r="2.4" fill="${['#c9374f', '#e8a826', '#6aa04c'][i]}" stroke-width=".4"/>`).join('') + `<path d="M82 24 V38" stroke="${INK}" stroke-width=".6"/>` + `<circle cx="82" cy="40" r="3.6" fill="#e3b23e"/><circle cx="82" cy="40" r="1.4" fill="#b88224" stroke="none"/>`],
-  inn: ['dusk', () => box(18, 30, 64, 28, '#d9a86a') + box(18, 30, 64, 4, '#b88a4a', ' stroke-width=".3"') + roof(14, 14, 72, 16, '#8a3a2c') + box(66, 8, 7, 12, '#8a5a46') + smoke(69, 8) + [0, 1, 2].map(i => win(26 + i * 15, 36, 8, 10) + win(26 + i * 15, 17.5, 0.01, 0.01)).join('') + door(68, 42, 9, 16) + win(58, 20, 7, 8, '#ffd36a') + win(30, 20, 7, 8, '#ffd36a') + `<path d="M50 30 V37" stroke="${INK}" stroke-width=".5"/>` + rc(46, 37, 8, 7, '#e6b04a', 1.2) + `<path d="M46 40 q-3 1 0 3" stroke="${INK}" stroke-width=".6" fill="none"/>`],
-  chapel: ['meadow', () => box(30, 32, 40, 24, '#e8e0d0') + roof(28, 22, 44, 10, '#6a5a78') + box(44, 12, 12, 24, '#efe6d6') + pg([42, 14, 50, 0, 58, 14], '#6a5a78') + `<circle cx="50" cy="9" r="0.001"/>` + `<path d="M50 -6 V2 M47 -3 H53" stroke="${INK}" stroke-width=".8"/>` + win(46.5, 18, 7, 9, '#2f2a44') + `<circle cx="50" cy="42" r="4" fill="#f0c4d8" stroke-width=".5"/><path d="M50 38 v8 M46 42 h8" stroke="#6a8fb0" stroke-width=".5"/>` + door(44, 44, 12, 12) + tree(20, 56, 1.4) + tree(82, 56, 1.1, '#7aa869')],
-  monastery: ['stone', () => box(8, 36, 52, 20, '#d8cdb4') + [0, 1, 2, 3, 4, 5].map(i => pa(`M${10 + i * 8.5} 56 V46 a4 4 0 0 1 8 0 V56Z`, '#6a5a48', ' stroke-width=".4"')).join('') + roof(6, 28, 56, 8, '#a8603c') + box(62, 16, 16, 40, '#e0d4ba') + roof(60, 6, 20, 10, '#a8603c') + win(67, 22, 6, 9, '#2f2a44') + win(67, 36, 6, 9, '#ffd36a') + `<path d="M70 -2 v8 M67 1 h6" stroke="${INK}" stroke-width=".7"/>` + box(80, 44, 16, 12, '#7aa869', ' stroke-width=".4"') + [84, 90].map(x => tree(x, 44, .7, '#4f8f5a')).join('')],
-  palace: ['dusk', () => box(8, 34, 84, 22, '#efe6d2') + box(34, 24, 32, 32, '#f6eedb') + pa('M34 24 Q50 -2 66 24Z', gold) + `<path d="M50 -4 V4" stroke="${INK}" stroke-width=".6"/>` + flag(50, 4, '#c2364c') + [14, 22, 72, 80].map(x => box(x - 3, 24, 6, 32, '#e6dcc6', ' stroke-width=".4"') + pg([x - 4, 24, x, 14, x + 4, 24], '#8a8fc0')).join('') + [0, 1, 2].map(i => win(40 + i * 8, 36, 5, 10, '#ffd36a')).join('') + door(46, 44, 8, 12, '#7a4a2c') + [-1, 0, 1, 2, 3].map(i => box(36 + i * 6, 56, 8, 2, '#d9ceb6', ' stroke-width=".3"')).join('') + [14, 22, 72, 80].map(x => win(x - 1.4, 34, 3, 6, '#ffd36a')).join('')],
-  castle: ['stone', () => stones(24, 28, 52, 30, '#aeb4b4') + battle(24, 28, 52, '#aeb4b4') + [10, 74].map(x => stones(x, 14, 16, 44, '#bcc0bc') + battle(x, 14, 16, '#bcc0bc') + win(x + 6, 24, 4, 8, '#2f2a44')).join('') + pa('M42 58 V42 Q50 32 58 42 V58Z', '#3a2f2c') + [43.5, 47, 50.5, 54].map(x => `<path d="M${x} 38 V58" stroke="#6a5a50" stroke-width=".5"/>`).join('') + flag(18, 14, '#c2364c') + flag(82, 14, '#3d78b5') + win(48, 33, 4, 6, '#ffd36a')],
-  theatre: ['indoor', () => rc(10, 8, 80, 52, '#8a2f3c', 0, ' stroke-width=".6"') + pa('M10 8 Q50 22 90 8 V16 Q50 30 10 16Z', '#b0414e') + pa('M10 8 Q22 30 24 60 H10Z', '#a23a46', ' stroke-width=".6"') + pa('M90 8 Q78 30 76 60 H90Z', '#a23a46', ' stroke-width=".6"') + rc(10, 52, 80, 10, '#a8703c', 0, ' stroke-width=".5"') + ell(50, 44, 18, 6, '#ffe8a0', .35, NS0) + `<path d="M34 20 Q50 12 66 20" stroke="${gold}" stroke-width="1.2" fill="none"/>` + `<g transform="translate(40 36)"><circle r="5.4" fill="#f6ecd6" stroke-width=".5"/><path d="M-3 -1 q1.4 -1.4 2.8 0 M1 -1 q1.4 -1.4 2.8 0 M-3 2 q3 3 6 0" stroke="${INK}" stroke-width=".6" fill="none"/></g><g transform="translate(60 36)"><circle r="5.4" fill="#d9c2a0" stroke-width=".5"/><path d="M-3 -1 q1.4 -1.4 2.8 0 M1 -1 q1.4 -1.4 2.8 0 M-3 3 q3 -3 6 0" stroke="${INK}" stroke-width=".6" fill="none"/></g>`],
-  school: ['meadow', () => box(20, 30, 60, 26, '#d96b52') + roof(18, 20, 64, 10, '#6a5a50') + box(44, 10, 12, 14, '#f0e2c0') + pg([43, 12, 50, 4, 57, 12], '#6a5a50') + `<path d="M50 14 q-3 5 0 8 q3 -3 0 -8Z" fill="${gold}" stroke-width=".4"/>` + [0, 1, 2].map(i => win(24 + i * 8, 36, 5, 9)).join('') + [0, 1].map(i => win(60 + i * 8, 36, 5, 9)).join('') + door(45, 40, 10, 16) + rc(24, 47, 6, 4, '#6a8fb0', 0, ' stroke-width=".3"') + `<g transform="translate(70 44)" font-family="${FONT}" font-size="5" font-weight="700" fill="#f6ecd6" stroke="none"><rect x="-8" y="-2" width="16" height="10" fill="#2f4a3a" stroke="${INK}" stroke-width=".4"/><text x="0" y="5" text-anchor="middle">ABC</text></g>`.replace('translate(70 44)', 'translate(14 50)')],
+  lantern_rest: ['dusk', () => box(18, 30, 64, 28, '#d9a86a') + box(18, 30, 64, 4, '#b88a4a', ' stroke-width=".3"') + roof(14, 14, 72, 16, '#8a3a2c') + box(66, 8, 7, 12, '#8a5a46') + smoke(69, 8) + [0, 1, 2].map(i => win(26 + i * 15, 36, 8, 10) + win(26 + i * 15, 17.5, 0.01, 0.01)).join('') + door(68, 42, 9, 16) + win(58, 20, 7, 8, '#ffd36a') + win(30, 20, 7, 8, '#ffd36a') + `<path d="M50 30 V37" stroke="${INK}" stroke-width=".5"/>` + rc(46, 37, 8, 7, '#e6b04a', 1.2) + `<path d="M46 40 q-3 1 0 3" stroke="${INK}" stroke-width=".6" fill="none"/>`],
+  candlewick_shrine: ['meadow', () => box(30, 32, 40, 24, '#e8e0d0') + roof(28, 22, 44, 10, '#6a5a78') + box(44, 12, 12, 24, '#efe6d6') + pg([42, 14, 50, 0, 58, 14], '#6a5a78') + `<circle cx="50" cy="9" r="0.001"/>` + `<path d="M50 -6 V2 M47 -3 H53" stroke="${INK}" stroke-width=".8"/>` + win(46.5, 18, 7, 9, '#2f2a44') + `<circle cx="50" cy="42" r="4" fill="#f0c4d8" stroke-width=".5"/><path d="M50 38 v8 M46 42 h8" stroke="#6a8fb0" stroke-width=".5"/>` + door(44, 44, 12, 12) + tree(20, 56, 1.4) + tree(82, 56, 1.1, '#7aa869')],
+  quietstone_cloister: ['stone', () => box(8, 36, 52, 20, '#d8cdb4') + [0, 1, 2, 3, 4, 5].map(i => pa(`M${10 + i * 8.5} 56 V46 a4 4 0 0 1 8 0 V56Z`, '#6a5a48', ' stroke-width=".4"')).join('') + roof(6, 28, 56, 8, '#a8603c') + box(62, 16, 16, 40, '#e0d4ba') + roof(60, 6, 20, 10, '#a8603c') + win(67, 22, 6, 9, '#2f2a44') + win(67, 36, 6, 9, '#ffd36a') + `<path d="M70 -2 v8 M67 1 h6" stroke="${INK}" stroke-width=".7"/>` + box(80, 44, 16, 12, '#7aa869', ' stroke-width=".4"') + [84, 90].map(x => tree(x, 44, .7, '#4f8f5a')).join('')],
+  gildenfern_court: ['dusk', () => box(8, 34, 84, 22, '#efe6d2') + box(34, 24, 32, 32, '#f6eedb') + pa('M34 24 Q50 -2 66 24Z', gold) + `<path d="M50 -4 V4" stroke="${INK}" stroke-width=".6"/>` + flag(50, 4, '#c2364c') + [14, 22, 72, 80].map(x => box(x - 3, 24, 6, 32, '#e6dcc6', ' stroke-width=".4"') + pg([x - 4, 24, x, 14, x + 4, 24], '#8a8fc0')).join('') + [0, 1, 2].map(i => win(40 + i * 8, 36, 5, 10, '#ffd36a')).join('') + door(46, 44, 8, 12, '#7a4a2c') + [-1, 0, 1, 2, 3].map(i => box(36 + i * 6, 56, 8, 2, '#d9ceb6', ' stroke-width=".3"')).join('') + [14, 22, 72, 80].map(x => win(x - 1.4, 34, 3, 6, '#ffd36a')).join('')],
+  stonecrown_keep: ['stone', () => stones(24, 28, 52, 30, '#aeb4b4') + battle(24, 28, 52, '#aeb4b4') + [10, 74].map(x => stones(x, 14, 16, 44, '#bcc0bc') + battle(x, 14, 16, '#bcc0bc') + win(x + 6, 24, 4, 8, '#2f2a44')).join('') + pa('M42 58 V42 Q50 32 58 42 V58Z', '#3a2f2c') + [43.5, 47, 50.5, 54].map(x => `<path d="M${x} 38 V58" stroke="#6a5a50" stroke-width=".5"/>`).join('') + flag(18, 14, '#c2364c') + flag(82, 14, '#3d78b5') + win(48, 33, 4, 6, '#ffd36a')],
+  ballad_finch_pair: ['indoor', () => rc(10, 8, 80, 52, '#8a2f3c', 0, ' stroke-width=".6"') + pa('M10 8 Q50 22 90 8 V16 Q50 30 10 16Z', '#b0414e') + pa('M10 8 Q22 30 24 60 H10Z', '#a23a46', ' stroke-width=".6"') + pa('M90 8 Q78 30 76 60 H90Z', '#a23a46', ' stroke-width=".6"') + rc(10, 52, 80, 10, '#a8703c', 0, ' stroke-width=".5"') + ell(50, 44, 18, 6, '#ffe8a0', .35, NS0) + `<path d="M34 20 Q50 12 66 20" stroke="${gold}" stroke-width="1.2" fill="none"/>` + `<g transform="translate(40 36)"><circle r="5.4" fill="#f6ecd6" stroke-width=".5"/><path d="M-3 -1 q1.4 -1.4 2.8 0 M1 -1 q1.4 -1.4 2.8 0 M-3 2 q3 3 6 0" stroke="${INK}" stroke-width=".6" fill="none"/></g><g transform="translate(60 36)"><circle r="5.4" fill="#d9c2a0" stroke-width=".5"/><path d="M-3 -1 q1.4 -1.4 2.8 0 M1 -1 q1.4 -1.4 2.8 0 M-3 3 q3 -3 6 0" stroke="${INK}" stroke-width=".6" fill="none"/></g>`],
+  acorn_academy: ['meadow', () => box(20, 30, 60, 26, '#d96b52') + roof(18, 20, 64, 10, '#6a5a50') + box(44, 10, 12, 14, '#f0e2c0') + pg([43, 12, 50, 4, 57, 12], '#6a5a50') + `<path d="M50 14 q-3 5 0 8 q3 -3 0 -8Z" fill="${gold}" stroke-width=".4"/>` + [0, 1, 2].map(i => win(24 + i * 8, 36, 5, 9)).join('') + [0, 1].map(i => win(60 + i * 8, 36, 5, 9)).join('') + door(45, 40, 10, 16) + rc(24, 47, 6, 4, '#6a8fb0', 0, ' stroke-width=".3"') + `<g transform="translate(70 44)" font-family="${FONT}" font-size="5" font-weight="700" fill="#f6ecd6" stroke="none"><rect x="-8" y="-2" width="16" height="10" fill="#2f4a3a" stroke="${INK}" stroke-width=".4"/><text x="0" y="5" text-anchor="middle">ABC</text></g>`.replace('translate(70 44)', 'translate(14 50)')],
   museum: ['meadow', () => pg([10, 28, 50, 8, 90, 28], '#efe6d2') + rc(10, 28, 80, 4, '#d9ceb6', 0) + [0, 1, 2, 3, 4].map(i => box(16 + i * 15, 32, 6, 22, '#f6eedb', ' stroke-width=".4"')).join('') + box(8, 54, 84, 4, '#d9ceb6') + box(4, 58, 92, 4, '#c9bea6') + `<circle cx="50" cy="22" r="3.6" fill="${gold}" stroke-width=".5"/>` + `<path d="M46 22 h8 M50 18 v8" stroke="${INK}" stroke-width=".4"/>` + ell(34, 46, 5, 6, '#cf8f50', null, ' stroke-width=".5"') + `<path d="M66 40 q4 -8 8 0 q-2 8 -4 8 q-4 -2 -4 -8Z" fill="#e6dcc6" stroke-width=".5"/>`],
-  university: ['dusk', () => stones(24, 24, 52, 34, '#c4b49a') + [8, 76].map(x => stones(x, 16, 16, 42, '#d3c4a8') + pg([x - 1, 16, x + 8, 4, x + 17, 16], '#46749f') + win(x + 5, 24, 6, 12, '#ffd36a')).join('') + pg([34, 24, 50, 2, 66, 24], '#46749f') + `<circle cx="50" cy="16" r="5" fill="#f6ecd6" stroke-width=".5"/><path d="M50 12 v4 h3" stroke="${INK}" stroke-width=".5" fill="none"/>` + flag(50, 2, '#c2364c') + door(44, 42, 12, 16) + [30, 66].map(x => win(x, 34, 6, 10, '#ffd36a')).join('') + `<path d="M40 40 h20" stroke="${gold}" stroke-width=".8"/>`],
-  cemetery: ['night', () => rc(0, 48, 100, 16, '#27403e', 0, NS0) + [[14, 50, 1], [34, 54, 1.1], [62, 52, .9], [84, 54, 1.1]].map((g, i) => pa(`M${g[0] - 5 * g[2]} ${g[1] + 8} V${g[1]} a${5 * g[2]} ${5 * g[2]} 0 0 1 ${10 * g[2]} 0 V${g[1] + 8}Z`, '#a9b0ae') + (i % 2 ? `<path d="M${g[0]} ${g[1] - 3} v5 M${g[0] - 2} ${g[1]} h4" stroke="#6a706e" stroke-width=".6"/>` : `<path d="M${g[0] - 2} ${g[1] - 1} q2 -2 4 0" stroke="#6a706e" stroke-width=".5" fill="none"/>`)).join('') + `<path d="M4 50 V30 M4 30 q22 -16 44 0" stroke="#2a2a2e" stroke-width="1.4" fill="none"/>` + `<g stroke="#2a2a2e" stroke-width=".5">${[8, 14, 20, 26, 32, 38, 44].map(x => `<path d="M${x} 50 V${34 - Math.sin((x - 4) / 44 * 3.14) * 6}"/>`).join('')}</g>` + `<path d="M82 52 V28 M82 30 q-10 8 -8 24 M82 30 q8 6 10 24 M82 32 q-4 10 -2 20" stroke="#4a6a4a" stroke-width="1.6" fill="none" stroke-linecap="round"/>` + [[74, 38], [76, 46], [90, 40], [88, 48]].map(p => ell(p[0], p[1], 1, 3, '#6a9a62', .9, NS0)).join('') + `<circle cx="56" cy="40" r="1.4" fill="#fff6b0" stroke="none"/><circle cx="56" cy="40" r="4" fill="#fff6b0" fill-opacity=".25" stroke="none"/>`],
-  ruins: ['stone', () => stones(14, 36, 20, 22, '#b3ad9e') + pa('M14 36 V28 L20 30 L24 24 L30 30 L34 28 V36Z', '#b3ad9e') + [48, 62].map((x, i) => box(x, 22 + i * 12, 7, 36 - i * 12, '#cfc8b6', ' stroke-width=".5"') + box(x - 1, 22 + i * 12, 9, 3, '#bdb6a4', ' stroke-width=".4"')).join('') + pa('M62 40 l8 -2 l1 7 l-6 3Z', '#cfc8b6') + [[76, 54], [84, 56], [70, 58]].map(p => ell(p[0], p[1], 4, 2.6, '#a9a396', null, ' stroke-width=".4"')).join('') + `<path d="M14 40 q4 6 2 12 M52 24 q-4 8 0 16 M66 44 q4 4 2 12 M24 34 q6 2 8 8" stroke="#5f9560" stroke-width="1.8" fill="none" stroke-linecap="round"/>` + [[16, 46], [53, 32], [67, 50], [28, 38]].map(p => ell(p[0], p[1], 2, 1.2, '#6aa860', .95, NS0)).join('') + `<circle cx="26" cy="52" r="1.2" fill="#f3b6c4" stroke="none"/>`],
+  lorewood_college: ['dusk', () => stones(24, 24, 52, 34, '#c4b49a') + [8, 76].map(x => stones(x, 16, 16, 42, '#d3c4a8') + pg([x - 1, 16, x + 8, 4, x + 17, 16], '#46749f') + win(x + 5, 24, 6, 12, '#ffd36a')).join('') + pg([34, 24, 50, 2, 66, 24], '#46749f') + `<circle cx="50" cy="16" r="5" fill="#f6ecd6" stroke-width=".5"/><path d="M50 12 v4 h3" stroke="${INK}" stroke-width=".5" fill="none"/>` + flag(50, 2, '#c2364c') + door(44, 42, 12, 16) + [30, 66].map(x => win(x, 34, 6, 10, '#ffd36a')).join('') + `<path d="M40 40 h20" stroke="${gold}" stroke-width=".8"/>`],
+  mossgrave_glade: ['night', () => rc(0, 48, 100, 16, '#27403e', 0, NS0) + [[14, 50, 1], [34, 54, 1.1], [62, 52, .9], [84, 54, 1.1]].map((g, i) => pa(`M${g[0] - 5 * g[2]} ${g[1] + 8} V${g[1]} a${5 * g[2]} ${5 * g[2]} 0 0 1 ${10 * g[2]} 0 V${g[1] + 8}Z`, '#a9b0ae') + (i % 2 ? `<path d="M${g[0]} ${g[1] - 3} v5 M${g[0] - 2} ${g[1]} h4" stroke="#6a706e" stroke-width=".6"/>` : `<path d="M${g[0] - 2} ${g[1] - 1} q2 -2 4 0" stroke="#6a706e" stroke-width=".5" fill="none"/>`)).join('') + `<path d="M4 50 V30 M4 30 q22 -16 44 0" stroke="#2a2a2e" stroke-width="1.4" fill="none"/>` + `<g stroke="#2a2a2e" stroke-width=".5">${[8, 14, 20, 26, 32, 38, 44].map(x => `<path d="M${x} 50 V${34 - Math.sin((x - 4) / 44 * 3.14) * 6}"/>`).join('')}</g>` + `<path d="M82 52 V28 M82 30 q-10 8 -8 24 M82 30 q8 6 10 24 M82 32 q-4 10 -2 20" stroke="#4a6a4a" stroke-width="1.6" fill="none" stroke-linecap="round"/>` + [[74, 38], [76, 46], [90, 40], [88, 48]].map(p => ell(p[0], p[1], 1, 3, '#6a9a62', .9, NS0)).join('') + `<circle cx="56" cy="40" r="1.4" fill="#fff6b0" stroke="none"/><circle cx="56" cy="40" r="4" fill="#fff6b0" fill-opacity=".25" stroke="none"/>`],
+  toppled_hall: ['stone', () => stones(14, 36, 20, 22, '#b3ad9e') + pa('M14 36 V28 L20 30 L24 24 L30 30 L34 28 V36Z', '#b3ad9e') + [48, 62].map((x, i) => box(x, 22 + i * 12, 7, 36 - i * 12, '#cfc8b6', ' stroke-width=".5"') + box(x - 1, 22 + i * 12, 9, 3, '#bdb6a4', ' stroke-width=".4"')).join('') + pa('M62 40 l8 -2 l1 7 l-6 3Z', '#cfc8b6') + [[76, 54], [84, 56], [70, 58]].map(p => ell(p[0], p[1], 4, 2.6, '#a9a396', null, ' stroke-width=".4"')).join('') + `<path d="M14 40 q4 6 2 12 M52 24 q-4 8 0 16 M66 44 q4 4 2 12 M24 34 q6 2 8 8" stroke="#5f9560" stroke-width="1.8" fill="none" stroke-linecap="round"/>` + [[16, 46], [53, 32], [67, 50], [28, 38]].map(p => ell(p[0], p[1], 2, 1.2, '#6aa860', .95, NS0)).join('') + `<circle cx="26" cy="52" r="1.2" fill="#f3b6c4" stroke="none"/>`],
   postoffice: ['meadow', () => box(24, 30, 48, 26, '#7fa4c8') + roof(22, 18, 52, 12, '#4a6a98') + door(42, 40, 10, 16, '#f0e2c0') + `<circle cx="47" cy="46" r="0.01"/>` + win(28, 36, 6, 8) + win(62, 36, 6, 8) + rc(78, 38, 8, 14, '#c2364c', 2) + `<path d="M80 41 h4" stroke="${INK}" stroke-width=".8"/>` + `<path d="M78 52 v6 M86 52 v6" stroke="#6a4a2a" stroke-width="1"/>` + rc(36, 21, 22, 6, '#f6ecd6', 1, ' stroke-width=".4"') + `<path d="M36 21 L47 25 L58 21" fill="none" stroke="${INK}" stroke-width=".4"/>` + ell(20, 58, 5, 3.2, '#a1aab4', null, ' stroke-width=".4"') + `<circle cx="16" cy="55" r="2.4" fill="#a1aab4" stroke-width=".4"/><path d="M13.6 55 l-2 .6 l2 .6Z" fill="#e7a14a" stroke="none"/>` + rc(22, 54, 4, 3, '#fbf4e0', 0, ' stroke-width=".3"')],
   fairground: ['dusk', () => pg([24, 40, 50, 12, 76, 40], '#c2493a') + [0, 1, 2, 3].map(i => pg([24 + i * 13, 40, 50, 12, 37 + i * 13, 40], i % 2 ? '#f6ecd6' : '#c2493a', ' stroke-width=".3"')).join('') + box(24, 40, 52, 16, '#efe0c0') + `<path d="M24 40 q6.5 5 13 0 q6.5 5 13 0 q6.5 5 13 0 q6.5 5 13 0" fill="#c2493a" stroke-width=".4"/>` + flag(50, 14, '#f0c43a') + `<path d="M4 20 Q50 34 96 20" stroke="${INK}" stroke-width=".5" fill="none"/>` + [12, 26, 40, 60, 74, 88].map((x, i) => pg([x - 2, 24 + Math.sin(i) * 2, x + 2, 24 + Math.sin(i) * 2, x, 30 + Math.sin(i) * 2], ['#f0c43a', '#3d78b5', '#c2493a', '#4a9a6e'][i % 4], ' stroke-width=".3"')).join('') + door(45, 42, 10, 14, '#4a2e22') + `<circle cx="86" cy="42" r="10" fill="none" stroke="#6a4a2a" stroke-width="1.4"/><path d="M86 32 V52 M76 42 H96 M79 35 L93 49 M93 35 L79 49" stroke="#6a4a2a" stroke-width=".6"/>` + [[86, 32], [96, 42], [86, 52], [76, 42]].map((p, i) => rc(p[0] - 2, p[1] - 1.5, 4, 3.4, ['#c2493a', '#3d78b5', '#f0c43a', '#4a9a6e'][i], 1, ' stroke-width=".3"')).join('')],
-  courthouse: ['meadow', () => pg([12, 26, 50, 6, 88, 26], '#ecdfc3') + rc(12, 26, 76, 4, '#d9ceb6') + [0, 1, 2, 3, 4].map(i => box(18 + i * 14, 30, 6, 24, '#f4ead2', ' stroke-width=".4"')).join('') + box(10, 54, 80, 3, '#d9ceb6') + box(6, 57, 88, 4, '#c9bea6') + `<g stroke="${INK}" stroke-width=".5"><path d="M50 12 v12 M40 16 h20"/><path d="M40 16 l-3 6 h6Z M60 16 l-3 6 h6Z" fill="${gold}"/></g>` + door(45, 40, 10, 14, '#6a4a30')],
+  mosswood_assize: ['meadow', () => pg([12, 26, 50, 6, 88, 26], '#ecdfc3') + rc(12, 26, 76, 4, '#d9ceb6') + [0, 1, 2, 3, 4].map(i => box(18 + i * 14, 30, 6, 24, '#f4ead2', ' stroke-width=".4"')).join('') + box(10, 54, 80, 3, '#d9ceb6') + box(6, 57, 88, 4, '#c9bea6') + `<g stroke="${INK}" stroke-width=".5"><path d="M50 12 v12 M40 16 h20"/><path d="M40 16 l-3 6 h6Z M60 16 l-3 6 h6Z" fill="${gold}"/></g>` + door(45, 40, 10, 14, '#6a4a30')],
   clocktower: ['dusk', () => stones(38, 18, 24, 40, '#c9b89c') + pg([35, 18, 50, -4, 65, 18], '#46749f') + `<circle cx="50" cy="28" r="9" fill="#fbf4e0" stroke-width=".8"/><path d="M50 28 V21 M50 28 L55 31" stroke="${INK}" stroke-width=".9" stroke-linecap="round"/>` + [0, 1, 2, 3].map(i => ln(50 + Math.sin(i * 1.571) * 7, 28 - Math.cos(i * 1.571) * 7, 50 + Math.sin(i * 1.571) * 8, 28 - Math.cos(i * 1.571) * 8, INK, .6)).join('') + win(46, 40, 8, 10, '#ffd36a') + door(45, 48, 10, 10) + box(34, 56, 32, 4, '#a89a82') + [[18, 54], [80, 52]].map(p => tree(p[0], p[1], 1.3, '#6a9a62')).join('') + flag(50, -4, '#c2364c')],
-  lookout: ['meadow', () => rc(46, 30, 8, 30, '#7a5638', 1) + [[32, 52, 2.2], [68, 50, 1.9]].map(p => tree(p[0], p[1] + 8, p[2], '#6aa05a')).join('') + ell(50, 22, 28, 9, '#79ad66') + ell(50, 18, 22, 7, '#8dc276', .8, NS0) + box(36, 24, 28, 3, '#a8703c', ' stroke-width=".4"') + box(38, 14, 24, 10, '#c49a62') + [0, 1, 2, 3, 4].map(i => `<path d="M${40 + i * 5} 14 v10" stroke="#7a5230" stroke-width=".4"/>`).join('') + roof(36, 6, 28, 8, '#8a4a3a') + `<path d="M50 30 L44 62 M50 30 L56 62" stroke="#7a5638" stroke-width=".6"/>` + [36, 44, 52].map((y, i) => ln(46 + i * 0, y, 54, y, '#7a5638', .9)).join('') + `<g transform="translate(66 18) rotate(-24)"><rect width="12" height="3.2" fill="#c9a24a" stroke-width=".5"/><rect x="10" y="-.8" width="4" height="4.8" fill="#8a6240" stroke-width=".4"/></g>` + flag(50, 6, '#f0c43a')],
-  crane: ['stone', () => stones(14, 44, 30, 14, '#b0a898') + box(60, 46, 14, 12, '#c9bea6') + `<path d="M30 58 V16 M20 58 L30 24 M40 58 L30 24" stroke="#8a5a36" stroke-width="2" fill="none"/>` + `<path d="M14 18 L82 12" stroke="#7a4a2c" stroke-width="2.6" stroke-linecap="round"/>` + `<path d="M30 16 L14 18 M30 16 L70 12" stroke="#c9a46a" stroke-width=".5"/>` + `<circle cx="68" cy="12.6" r="2.4" fill="#7d858c" stroke-width=".6"/>` + `<path d="M68 15 V30" stroke="#6a4a2a" stroke-width=".8"/>` + box(62, 30, 14, 9, '#cfc8b6') + `<path d="M62 34 h14" stroke="#000" stroke-opacity=".15" stroke-width=".4"/>` + `<path d="M12 18 q-3 4 0 8" stroke="#6a4a2a" stroke-width=".8" fill="none"/>` + box(8, 24, 8, 6, '#6a5a50') + flag(30, 16, '#c2493a')],
-  storehouse: ['autumn', () => box(10, 28, 80, 28, '#b8854e') + roof(8, 14, 84, 14, '#7a4a30') + [0, 1, 2, 3, 4, 5, 6, 7, 8].map(i => `<path d="M${14 + i * 8.5} 28 V56" stroke="#7a4a2c" stroke-width=".4" stroke-opacity=".7"/>`).join('') + box(34, 32, 32, 24, '#8a5a36') + `<path d="M50 32 V56 M34 32 L50 56 M66 32 L50 56" stroke="#5a3a1e" stroke-width=".6"/>` + [[18, 56, 1.2], [26, 54, 1], [78, 55, 1.2], [86, 56, 1]].map(b => barrel(b[0], b[1], b[2])).join('') + ell(72, 59, 5, 2.8, '#e0c88a', null, ' stroke-width=".4"') + win(46, 16, 8, 8, '#2f2a44')],
-  dungeon: ['night', () => stones(8, 12, 84, 50, '#6a7078') + pa('M26 62 V30 Q50 4 74 30 V62Z', '#1c1a22') + [32, 38, 44, 50, 56, 62, 68].map(x => `<path d="M${x} ${62}V${22 + Math.abs(x - 50) * .5}" stroke="#6a6468" stroke-width="1.4"/>`).join('') + `<path d="M26 44 H74 M26 54 H74" stroke="#6a6468" stroke-width="1.2"/>` + [[44, 40], [58, 40]].map(p => `<circle cx="${p[0]}" cy="${p[1]}" r="1.6" fill="#ffd36a" stroke="none"/><circle cx="${p[0]}" cy="${p[1]}" r="3.4" fill="#ffd36a" fill-opacity=".25" stroke="none"/>`).join('') + [14, 86].map(x => rc(x - 1, 30, 2, 12, '#8a6240', 0, ' stroke-width=".4"') + `<path d="M${x} 28 q-3 -4 0 -8 q3 4 0 8Z" fill="#f6a830" stroke-width=".4"/><circle cx="${x}" cy="26" r="7" fill="#ffb84a" fill-opacity=".25" stroke="none"/>`).join('') + `<path d="M10 14 q4 6 0 12 M90 14 q-4 6 0 12" stroke="#2a2a2e" stroke-width=".8" fill="none"/>`],
+  spyglass_perch: ['meadow', () => rc(46, 30, 8, 30, '#7a5638', 1) + [[32, 52, 2.2], [68, 50, 1.9]].map(p => tree(p[0], p[1] + 8, p[2], '#6aa05a')).join('') + ell(50, 22, 28, 9, '#79ad66') + ell(50, 18, 22, 7, '#8dc276', .8, NS0) + box(36, 24, 28, 3, '#a8703c', ' stroke-width=".4"') + box(38, 14, 24, 10, '#c49a62') + [0, 1, 2, 3, 4].map(i => `<path d="M${40 + i * 5} 14 v10" stroke="#7a5230" stroke-width=".4"/>`).join('') + roof(36, 6, 28, 8, '#8a4a3a') + `<path d="M50 30 L44 62 M50 30 L56 62" stroke="#7a5638" stroke-width=".6"/>` + [36, 44, 52].map((y, i) => ln(46 + i * 0, y, 54, y, '#7a5638', .9)).join('') + `<g transform="translate(66 18) rotate(-24)"><rect width="12" height="3.2" fill="#c9a24a" stroke-width=".5"/><rect x="10" y="-.8" width="4" height="4.8" fill="#8a6240" stroke-width=".4"/></g>` + flag(50, 6, '#f0c43a')],
+  pulley_lift: ['stone', () => stones(14, 44, 30, 14, '#b0a898') + box(60, 46, 14, 12, '#c9bea6') + `<path d="M30 58 V16 M20 58 L30 24 M40 58 L30 24" stroke="#8a5a36" stroke-width="2" fill="none"/>` + `<path d="M14 18 L82 12" stroke="#7a4a2c" stroke-width="2.6" stroke-linecap="round"/>` + `<path d="M30 16 L14 18 M30 16 L70 12" stroke="#c9a46a" stroke-width=".5"/>` + `<circle cx="68" cy="12.6" r="2.4" fill="#7d858c" stroke-width=".6"/>` + `<path d="M68 15 V30" stroke="#6a4a2a" stroke-width=".8"/>` + box(62, 30, 14, 9, '#cfc8b6') + `<path d="M62 34 h14" stroke="#000" stroke-opacity=".15" stroke-width=".4"/>` + `<path d="M12 18 q-3 4 0 8" stroke="#6a4a2a" stroke-width=".8" fill="none"/>` + box(8, 24, 8, 6, '#6a5a50') + flag(30, 16, '#c2493a')],
+  hoard_cellar: ['autumn', () => box(10, 28, 80, 28, '#b8854e') + roof(8, 14, 84, 14, '#7a4a30') + [0, 1, 2, 3, 4, 5, 6, 7, 8].map(i => `<path d="M${14 + i * 8.5} 28 V56" stroke="#7a4a2c" stroke-width=".4" stroke-opacity=".7"/>`).join('') + box(34, 32, 32, 24, '#8a5a36') + `<path d="M50 32 V56 M34 32 L50 56 M66 32 L50 56" stroke="#5a3a1e" stroke-width=".6"/>` + [[18, 56, 1.2], [26, 54, 1], [78, 55, 1.2], [86, 56, 1]].map(b => barrel(b[0], b[1], b[2])).join('') + ell(72, 59, 5, 2.8, '#e0c88a', null, ' stroke-width=".4"') + win(46, 16, 8, 8, '#2f2a44')],
+  thornhold_cells: ['night', () => stones(8, 12, 84, 50, '#6a7078') + pa('M26 62 V30 Q50 4 74 30 V62Z', '#1c1a22') + [32, 38, 44, 50, 56, 62, 68].map(x => `<path d="M${x} ${62}V${22 + Math.abs(x - 50) * .5}" stroke="#6a6468" stroke-width="1.4"/>`).join('') + `<path d="M26 44 H74 M26 54 H74" stroke="#6a6468" stroke-width="1.2"/>` + [[44, 40], [58, 40]].map(p => `<circle cx="${p[0]}" cy="${p[1]}" r="1.6" fill="#ffd36a" stroke="none"/><circle cx="${p[0]}" cy="${p[1]}" r="3.4" fill="#ffd36a" fill-opacity=".25" stroke="none"/>`).join('') + [14, 86].map(x => rc(x - 1, 30, 2, 12, '#8a6240', 0, ' stroke-width=".4"') + `<path d="M${x} 28 q-3 -4 0 -8 q3 4 0 8Z" fill="#f6a830" stroke-width=".4"/><circle cx="${x}" cy="26" r="7" fill="#ffb84a" fill-opacity=".25" stroke="none"/>`).join('') + `<path d="M10 14 q4 6 0 12 M90 14 q-4 6 0 12" stroke="#2a2a2e" stroke-width=".8" fill="none"/>`],
   elderheart: ['meadow', () => { let s = ell(50, 55, 40, 7, '#7aa869', .9, NS0); s += `<circle cx="50" cy="26" r="30" fill="${gold}" fill-opacity=".25" stroke="none"/>`; s += pa('M42 62 Q46 48 44 36 Q43 30 38 24 L42 24 Q47 28 48 32 Q50 22 49 12 L53 12 Q52 22 52 32 Q54 28 58 24 L62 24 Q57 30 56 36 Q54 48 60 62Z', '#8a6240'); s += `<path d="M46 56 q2 -10 0 -18 M54 58 q-2 -10 1 -20" stroke="#5a3a1e" stroke-width=".5" fill="none"/>`; const r = rng('ev'); [[50, 14, 15, 11], [34, 20, 12, 9], [66, 20, 12, 9], [26, 30, 9, 7], [74, 30, 9, 7], [50, 26, 16, 10]].forEach((b, i) => { s += ell(b[0], b[1], b[2], b[3], ['#79b25e', '#5f9a52', '#8cc46a'][i % 3]); }); for (let i = 0; i < 16; i++) s += `<ellipse cx="${f1(20 + r() * 60)}" cy="${f1(8 + r() * 28)}" rx="1.8" ry="1" fill="${['#f0c43a', '#fff0a0', '#f3b6c4'][i % 3]}" stroke="none" transform="rotate(${f1(r() * 180)} 50 20)"/>`; s += `<circle cx="50" cy="38" r="3" fill="#fff6b0"/><circle cx="50" cy="38" r="7" fill="#fff6b0" fill-opacity=".3" stroke="none"/>`; return s; }],
   windmill: ['autumn', () => pa('M38 58 L42 24 H58 L62 58Z', '#e0d2b2') + pg([39, 24, 50, 12, 61, 24], '#a8603c') + door(46, 46, 8, 12) + win(46, 32, 8, 8, '#ffd36a') + `<g transform="translate(50 20)"><circle r="2" fill="#6a4a2a"/>${[0, 90, 180, 270].map(a => `<g transform="rotate(${a + 20})"><path d="M0 0 L0 -20" stroke="#7a5638" stroke-width="1"/><path d="M1 -6 h8 v13 h-8Z" fill="#f6ecd6" stroke-width=".5"/><path d="M1 -2 h8 M1 2 h8" stroke="${INK}" stroke-width=".25"/></g>`).join('')}</g>` + [[18, 54, 1.2], [84, 52, 1]].map(p => tree(p[0], p[1] + 6, p[2], '#d9843a')).join('')]
 };
 function construction(key) {
   const [bg, fn] = CONS[key];
   let s = scene(bg, key);
-  if (!['barge', 'theatre', 'dungeon', 'cemetery'].includes(key) && key !== 'elderheart') s += ell(50, 59, 44, 4, '#2f3a2a', .16, NS0);
+  if (!['barge', 'ballad_finch_pair', 'thornhold_cells', 'mossgrave_glade'].includes(key) && key !== 'elderheart') s += ell(50, 59, 44, 4, '#2f3a2a', .16, NS0);
   return s + fn();
 }
 // ---------- art registry + card ----------
@@ -4759,7 +4759,7 @@ root.HBKit = HB;
 <script>
 // Generated by game/gen-data.py from cards.json. Do not edit by hand.
 // Internal `key` fields are for code only; show `name`/`text` to players.
-(function(g){var HB=g.HB=g.HB||{};HB.DATA={"game":"Hollowbough","cards":[{"key":"architect","name":"Master Lathwright","text":"At the end of the game, score 1 point per resin and per pebble you still hold, to a maximum of 6.","copies":2,"type":"prosperity","color":"purple","kind":"critter","unique":true,"cost":{"berry":4},"pts":2,"linked":"crane"},{"key":"bard","name":"Ballad Finch","text":"Sing away up to 5 cards from your hand and take a point token for each.","copies":2,"type":"traveler","color":"tan","kind":"critter","unique":true,"cost":{"berry":3},"pts":0,"linked":"theater"},{"key":"barge_toad","name":"Reedpunt Toad","text":"Gain 2 twigs for every Bramble Allotment in your city.","copies":3,"type":"production","color":"green","kind":"critter","unique":false,"cost":{"berry":2},"pts":1,"linked":"twig_barge"},{"key":"chip_sweep","name":"Tinder Chipmunk","text":"Re-run one other production card in your own city.","copies":3,"type":"production","color":"green","kind":"critter","unique":false,"cost":{"berry":3},"pts":2,"linked":"resin_refinery"},{"key":"doctor","name":"Poultice Badger","text":"Spend up to 3 berries and take a point token for each one spent.","copies":2,"type":"production","color":"green","kind":"critter","unique":true,"cost":{"berry":4},"pts":4,"linked":"university"},{"key":"fool","name":"Mudpie Jester","text":"Plant this prankster in a rival village; it takes one of their spaces and costs them 2 points.","copies":2,"type":"traveler","color":"tan","kind":"critter","unique":true,"cost":{"berry":3},"pts":-2,"linked":"fair_grounds"},{"key":"historian","name":"Chronicle Owl","text":"Whenever you play another card, draw 1 card afterwards.","copies":3,"type":"governance","color":"blue","kind":"critter","unique":true,"cost":{"berry":2},"pts":1,"linked":"clock_tower"},{"key":"husband","name":"Goodman Vole","text":"Shares a space with one Goodwife. If paired and you own an Allotment, gain any 1 resource on play and every production.","copies":4,"type":"production","color":"green","kind":"critter","unique":false,"cost":{"berry":3},"pts":2,"linked":"farm"},{"key":"innkeeper","name":"Hostler Hedgehog","text":"When you play a Critter you may send this hedgehog away to cut 3 berries off its price.","copies":3,"type":"governance","color":"blue","kind":"critter","unique":true,"cost":{"berry":1},"pts":1,"linked":"inn"},{"key":"judge","name":"Gavel Marten","text":"When playing any card, pay one required resource with a different resource of your choice.","copies":2,"type":"governance","color":"blue","kind":"critter","unique":true,"cost":{"berry":3},"pts":2,"linked":"courthouse"},{"key":"king","name":"Bramble Sovereign","text":"End of game: 1 point per basic event and 2 points per special event you achieved.","copies":2,"type":"prosperity","color":"purple","kind":"critter","unique":true,"cost":{"berry":6},"pts":4,"linked":"castle"},{"key":"miner_mole","name":"Echo Mole","text":"Mimic any one production card in a rival village, as though it were theirs.","copies":3,"type":"production","color":"green","kind":"critter","unique":false,"cost":{"berry":3},"pts":1,"linked":"mine"},{"key":"monk","name":"Brother Moss","text":"Give up to 2 berries to a rival and take 2 point tokens for each. Opens the second Cloister slot.","copies":2,"type":"production","color":"green","kind":"critter","unique":true,"cost":{"berry":1},"pts":0,"linked":"monastery"},{"key":"peddler","name":"Haggle Magpie","text":"Swap up to 2 of your resources for any 2 resources from the supply.","copies":3,"type":"production","color":"green","kind":"critter","unique":false,"cost":{"berry":2},"pts":1,"linked":"ruins"},{"key":"postal_pigeon","name":"Parcel Dove","text":"Reveal 2 cards; you may play one worth up to 3 base points free; discard the other.","copies":3,"type":"traveler","color":"tan","kind":"critter","unique":false,"cost":{"berry":2},"pts":0,"linked":"post_office"},{"key":"queen","name":"Thistle Regent","text":"Send a worker here to play any card worth up to 3 base points from hand or meadow without paying.","copies":2,"type":"destination","color":"red","kind":"critter","unique":true,"cost":{"berry":5},"pts":4,"linked":"palace"},{"key":"ranger","name":"Trailwarden Fox","text":"Relocate one of your deployed workers to another legal spot. Opens the second Thornhold cell.","copies":2,"type":"traveler","color":"tan","kind":"critter","unique":true,"cost":{"berry":2},"pts":1,"linked":"dungeon"},{"key":"shepherd","name":"Crook Shrew","text":"Gain 3 berries plus 1 point token per token on your Shrine. If bought with berries, they go to a rival.","copies":2,"type":"traveler","color":"tan","kind":"critter","unique":true,"cost":{"berry":3},"pts":1,"linked":"chapel"},{"key":"shopkeeper","name":"Tallyshop Mouse","text":"Gain 1 berry whenever you play another Critter.","copies":3,"type":"governance","color":"blue","kind":"critter","unique":true,"cost":{"berry":2},"pts":1,"linked":"general_store"},{"key":"teacher","name":"Slate Schoolmarm","text":"Draw 2 cards, keep one, and hand the other to a rival.","copies":3,"type":"production","color":"green","kind":"critter","unique":false,"cost":{"berry":2},"pts":2,"linked":"school"},{"key":"undertaker","name":"Hollow Sexton","text":"Clear 3 meadow cards, refill, then take 1 meadow card. Opens the second Mossgrave Glade plot.","copies":2,"type":"traveler","color":"tan","kind":"critter","unique":true,"cost":{"berry":2},"pts":1,"linked":"cemetery"},{"key":"wanderer","name":"Footsore Drifter","text":"Draw 3 cards. Does not use up a city space.","copies":3,"type":"traveler","color":"tan","kind":"critter","unique":false,"cost":{"berry":2},"pts":1,"linked":"lookout"},{"key":"wife","name":"Goodwife Vole","text":"Shares a space with a Goodman; if paired, worth 3 extra points at the end.","copies":4,"type":"prosperity","color":"purple","kind":"critter","unique":false,"cost":{"berry":2},"pts":2,"linked":"farm"},{"key":"woodcarver","name":"Whittle Beaver","text":"Spend up to 3 twigs and take a point token for each.","copies":3,"type":"production","color":"green","kind":"critter","unique":false,"cost":{"berry":2},"pts":2,"linked":"storehouse"},{"key":"castle","name":"Stonecrown Keep","text":"End of game: 1 point per common construction in your city.","copies":2,"type":"prosperity","color":"purple","kind":"construction","unique":true,"cost":{"twig":2,"resin":3,"pebble":3},"pts":4,"linked":"king"},{"key":"cemetery","name":"Mossgrave Glade","text":"A worker settles here forever; reveal 4 cards from deck or discard pile and play one free, discarding the rest.","copies":2,"type":"destination","color":"red","kind":"construction","unique":true,"cost":{"pebble":2},"pts":0,"linked":"undertaker"},{"key":"chapel","name":"Candlewick Shrine","text":"Add a point token here, then draw 2 cards for every token now on the Shrine.","copies":2,"type":"destination","color":"red","kind":"construction","unique":true,"cost":{"twig":2,"resin":1,"pebble":1},"pts":2,"linked":"shepherd"},{"key":"clock_tower","name":"Dewdrop Belfry","text":"Place 3 tokens here when built. Before recalling workers each season, spend one to repeat a basic or forest spot you occupy. Leftover tokens score.","copies":3,"type":"governance","color":"blue","kind":"construction","unique":true,"cost":{"twig":3,"pebble":1},"pts":0,"linked":"historian"},{"key":"courthouse","name":"Mosswood Assize","text":"Gain 1 twig, resin or pebble each time you build another construction.","copies":2,"type":"governance","color":"blue","kind":"construction","unique":true,"cost":{"twig":1,"resin":1,"pebble":2},"pts":2,"linked":"judge"},{"key":"crane","name":"Pulley Lift","text":"When building a Construction, dismantle this lift to cut 3 resources of your choice off the price.","copies":3,"type":"governance","color":"blue","kind":"construction","unique":true,"cost":{"pebble":1},"pts":1,"linked":"architect"},{"key":"dungeon","name":"Thornhold Cells","text":"Lock one of your Critters beneath this card to cut 3 resources off the price of a card. Opens a second cell with a Trailwarden.","copies":2,"type":"governance","color":"blue","kind":"construction","unique":true,"cost":{"resin":1,"pebble":2},"pts":0,"linked":"ranger"},{"key":"ever_tree","name":"Elderheart Oak","text":"End of game: 1 point per purple card in your city (itself included). Can house any one Critter for free.","copies":2,"type":"prosperity","color":"purple","kind":"construction","unique":true,"cost":{"twig":3,"resin":3,"pebble":3},"pts":5,"linked":"any"},{"key":"fair_grounds","name":"Midsummer Green","text":"Draw 2 cards.","copies":3,"type":"production","color":"green","kind":"construction","unique":true,"cost":{"twig":1,"resin":2,"pebble":1},"pts":3,"linked":"fool"},{"key":"farm","name":"Bramble Allotment","text":"Gain 1 berry.","copies":8,"type":"production","color":"green","kind":"construction","unique":false,"cost":{"twig":2,"resin":1},"pts":1,"linked":null},{"key":"general_store","name":"Cranny Market","text":"Gain 1 berry, or 2 berries if you own any Allotment.","copies":3,"type":"production","color":"green","kind":"construction","unique":false,"cost":{"resin":1,"pebble":1},"pts":1,"linked":"shopkeeper"},{"key":"inn","name":"Lantern Rest","text":"Send a worker to play a meadow card for 3 fewer resources. Rivals may visit too and pay you 1 point.","copies":3,"type":"destination","color":"red","kind":"construction","unique":false,"cost":{"twig":2,"resin":1},"pts":2,"linked":"innkeeper"},{"key":"lookout","name":"Spyglass Perch","text":"Copy any one basic or forest spot, even if it is occupied.","copies":2,"type":"destination","color":"red","kind":"construction","unique":true,"cost":{"twig":1,"resin":1,"pebble":1},"pts":2,"linked":"wanderer"},{"key":"mine","name":"Flintpit","text":"Gain 1 pebble.","copies":3,"type":"production","color":"green","kind":"construction","unique":false,"cost":{"twig":1,"resin":1,"pebble":1},"pts":2,"linked":"miner_mole"},{"key":"monastery","name":"Quietstone Cloister","text":"A worker settles here forever: give 2 resources to a rival and take 4 point tokens.","copies":2,"type":"destination","color":"red","kind":"construction","unique":true,"cost":{"twig":1,"resin":1,"pebble":1},"pts":1,"linked":"monk"},{"key":"palace","name":"Gildenfern Court","text":"End of game: 1 point per unique construction, itself included.","copies":2,"type":"prosperity","color":"purple","kind":"construction","unique":true,"cost":{"twig":2,"resin":3,"pebble":3},"pts":4,"linked":"queen"},{"key":"post_office","name":"Dovecote Depot","text":"Give a rival 2 cards, discard any others you like, then refill your hand from the deck. Visitors pay you 1 point.","copies":3,"type":"destination","color":"red","kind":"construction","unique":false,"cost":{"twig":1,"resin":2},"pts":2,"linked":"postal_pigeon"},{"key":"resin_refinery","name":"Amber Still","text":"Gain 1 resin.","copies":3,"type":"production","color":"green","kind":"construction","unique":false,"cost":{"resin":1,"pebble":1},"pts":1,"linked":"chip_sweep"},{"key":"ruins","name":"Toppled Hall","text":"Raze one of your constructions, build here in its place, regain its exact cost, and draw 2 cards.","copies":3,"type":"traveler","color":"tan","kind":"construction","unique":false,"cost":{},"pts":0,"linked":"peddler"},{"key":"school","name":"Acorn Academy","text":"End of game: 1 point per common critter.","copies":2,"type":"prosperity","color":"purple","kind":"construction","unique":true,"cost":{"twig":2,"resin":2},"pts":2,"linked":"teacher"},{"key":"storehouse","name":"Hoard Cellar","text":"Each production adds a stack (3 twigs, 2 resin, 1 pebble or 2 berries) to this card; send a worker to haul it all away.","copies":3,"type":"production","color":"green","kind":"construction","unique":false,"cost":{"twig":1,"resin":1,"pebble":1},"pts":2,"linked":"woodcarver"},{"key":"theater","name":"Glowworm Playhouse","text":"End of game: 1 point per unique critter.","copies":2,"type":"prosperity","color":"purple","kind":"construction","unique":true,"cost":{"twig":3,"resin":1,"pebble":1},"pts":3,"linked":"bard"},{"key":"twig_barge","name":"Kindling Raft","text":"Gain 2 twigs.","copies":3,"type":"production","color":"green","kind":"construction","unique":false,"cost":{"twig":1,"pebble":1},"pts":1,"linked":"barge_toad"},{"key":"university","name":"Lorewood College","text":"Disband one of your cards, regain its exact cost, plus any 1 resource and 1 point.","copies":2,"type":"destination","color":"red","kind":"construction","unique":true,"cost":{"resin":1,"pebble":2},"pts":3,"linked":"doctor"}],"forest":[{"key":"forest_berry_thicket","name":"Berry Thicket","text":"Gain 2 berries and draw 1 card."},{"key":"forest_foragers_crossing","name":"Foragers Crossing","text":"Gain any 2 resources (twig/resin/pebble/berry, mix allowed)."},{"key":"forest_rummage_hollow","name":"Rummage Hollow","text":"Discard any number of cards, then draw 2 for each one discarded (limit 8)."},{"key":"forest_echoing_meadow","name":"Echoing Meadow","text":"Repeat any one basic location and also draw 1 card."},{"key":"forest_quarry_burrow","name":"Quarry Burrow","text":"Gain 1 pebble and draw 3 cards."},{"key":"forest_mixed_glade","name":"Mixed Glade","text":"Gain 1 twig, 1 resin and 1 berry."},{"key":"forest_bumper_bramble","name":"Bumper Bramble","text":"Gain 3 berries."},{"key":"forest_sapwell_copse","name":"Sapwell Copse","text":"Gain 2 resin and 1 twig."},{"key":"forest_postbag_clearing","name":"Postbag Clearing","text":"Draw 2 cards and gain any 1 resource."},{"key":"forest_barter_stump","name":"Barter Stump","text":"Discard up to 3 cards; gain 1 resource of your choice for each."},{"key":"forest_meadow_bazaar","name":"Meadow Bazaar","text":"Take 2 meadow cards; you may immediately play one of them for 1 fewer resource."}],"basic":[{"key":"basic_berry_patch","name":"Berry Patch","text":"Gain 1 berry. Shared.","gain":{"berry":1},"draw":0,"pts":0,"shared":true},{"key":"basic_dewberry_nook","name":"Dewberry Nook","text":"Gain 1 berry and draw 1 card.","gain":{"berry":1},"draw":1,"pts":0,"shared":false},{"key":"basic_amber_weep","name":"Amber Weep","text":"Gain 1 resin and draw 1 card. Shared.","gain":{"resin":1},"draw":1,"pts":0,"shared":true},{"key":"basic_pebble_bank","name":"Pebble Bank","text":"Gain 1 pebble.","gain":{"pebble":1},"draw":0,"pts":0,"shared":false},{"key":"basic_twig_heap","name":"Twig Heap","text":"Gain 3 twigs.","gain":{"twig":3},"draw":0,"pts":0,"shared":false},{"key":"basic_gossip_glade","name":"Gossip Glade","text":"Draw 2 cards and take 1 point token. Shared.","gain":{},"draw":2,"pts":1,"shared":true},{"key":"basic_resin_pool","name":"Resin Pool","text":"Gain 2 resin.","gain":{"resin":2},"draw":0,"pts":0,"shared":false},{"key":"basic_kindling_glen","name":"Kindling Glen","text":"Gain 2 twigs and draw 1 card. Shared.","gain":{"twig":2},"draw":1,"pts":0,"shared":true}],"haven":{"key":"haven","name":"Barter Burrow","text":"Discard any number of cards from your hand; gain 1 resource of your choice for every 2 discarded. Shared."},"journey":[{"points":5,"discard":5,"shared":false,"name":"Long Road 5"},{"points":4,"discard":4,"shared":false,"name":"Long Road 4"},{"points":3,"discard":3,"shared":false,"name":"Long Road 3"},{"points":2,"discard":2,"shared":true,"name":"Long Road 2"}],"journeyName":"The Long Road","basicEvents":[{"key":"bev_harvest_gathering","name":"Harvest Gathering","need":{"production":4},"pts":3,"text":"Needs 4 production (green) in your city. Worth 3 points."},{"key":"bev_wayfarers_fair","name":"Wayfarers' Fair","need":{"destination":3},"pts":3,"text":"Needs 3 destination (red) in your city. Worth 3 points."},{"key":"bev_elders_council","name":"Elders Council","need":{"governance":3},"pts":3,"text":"Needs 3 governance (blue) in your city. Worth 3 points."},{"key":"bev_wanderers_moot","name":"Wanderers' Moot","need":{"traveler":3},"pts":3,"text":"Needs 3 traveler (tan) in your city. Worth 3 points."}],"specialEvents":[{"key":"sev_grand_market_scheme","name":"Grand Market Scheme","text":"Hand up to 3 resources to rivals and take 2 point tokens for each, immediately.","req":["shopkeeper","post_office"],"colors":null,"pts":0,"score":null},{"key":"sev_hurry_scurry_dash","name":"Hurry-Scurry Dash","text":"Return one of your deployed workers to hand at once. Worth 4 points.","req":["chip_sweep","clock_tower"],"colors":null,"pts":4,"score":{"flat":4}},{"key":"sev_night_of_sparklers","name":"Night of Sparklers","text":"Stack up to 3 of your twigs here; each is worth 2 points at the end.","req":["lookout","miner_mole"],"colors":null,"pts":0,"score":{"per_twig_on_event":2}},{"key":"sev_lost_parchments_unearthed","name":"Lost Parchments Unearthed","text":"Reveal 5 cards; keep any in hand or tuck any under this event (1 point each at the end).","req":["historian","ruins"],"colors":null,"pts":0,"score":{"per_card_beneath":1}},{"key":"sev_acorn_bandits_seized","name":"Acorn Bandits Seized","text":"Tuck up to 2 Critters from your city under this event; each is worth 3 points.","req":["courthouse","ranger"],"colors":null,"pts":0,"score":{"per_critter_beneath":3}},{"key":"sev_marsh_fever_remedy","name":"Marsh Fever Remedy","text":"Pay 2 berries and discard 2 cards from your city. Worth 6 points.","req":["undertaker","barge_toad"],"colors":null,"pts":6,"score":{"flat":6}},{"key":"sev_wingborne_healers","name":"Wingborne Healers","text":"Worth 3 points for every Goodman Vole and Goodwife Vole pair in every city, yours and rivals.","req":["doctor","postal_pigeon"],"colors":null,"pts":0,"score":{"per_husband_wife_pair_in_all_cities":3}},{"key":"sev_commencement_of_pupils","name":"Commencement of Pupils","text":"Tuck up to 3 Critters from your hand under this event; each is worth 2 points.","req":["teacher","university"],"colors":null,"pts":0,"score":{"per_critter_beneath":2}},{"key":"sev_counsel_for_scoundrels","name":"Counsel for Scoundrels","text":"Worth 3 points per prisoner in your Thornhold Cells at game end.","req":["monk","dungeon"],"colors":null,"pts":0,"score":{"per_dungeon_prisoner":3}},{"key":"sev_pilgrims_trail","name":"Pilgrims Trail","text":"Worth 3 points per worker in your Quietstone Cloister at game end.","req":["monastery","wanderer"],"colors":null,"pts":0,"score":{"per_worker_in_monastery":3}},{"key":"sev_resident_minstrel","name":"Resident Minstrel","text":"Stack up to 3 of your berries here; each is worth 2 points.","req":["inn","bard"],"colors":null,"pts":0,"score":{"per_berry_on_event":2}},{"key":"sev_gilded_shrine_vault","name":"Gilded Shrine Vault","text":"Immediately draw 1 card and gain 1 resource per token on your Shrine; also 2 points per token at game end.","req":["woodcarver","chapel"],"colors":null,"pts":0,"score":{"per_token_on_chapel":2}},{"key":"sev_vigil_of_remembrance","name":"Vigil of Remembrance","text":"Worth 3 points per worker buried in your Mossgrave Glade.","req":["cemetery","shepherd"],"colors":null,"pts":0,"score":{"per_cemetery_worker":3}},{"key":"sev_toll_holiday","name":"Toll Holiday","text":"Run all your production cards now. Worth 3 points.","req":["judge","queen"],"colors":null,"pts":3,"score":{"flat":3}},{"key":"sev_grand_hollow_games","name":"Grand Hollow Games","text":"Requires at least 2 cards of each of the five colors in your city. Worth 9 points.","req":[],"colors":{"production":2,"traveler":2,"governance":2,"prosperity":2,"destination":2},"pts":9,"score":{"flat":9}},{"key":"sev_change_of_proprietors","name":"Change of Proprietors","text":"Stack up to 3 of your resources here; berry/twig = 1 point, resin/pebble = 2 points each at the end.","req":["peddler","general_store"],"colors":null,"pts":0,"score":{"per_resource_on_event":{"berry":1,"twig":1,"resin":2,"pebble":2}}}],"components":{"workers_total":24,"workers_per_player":6,"resources":{"berry":30,"twig":30,"resin":25,"pebble":20},"point_tokens":{"1pt":20,"3pt":10},"occupied_tokens":20,"basic_event_tiles":4,"special_event_cards":16,"forest_cards":11,"deck_cards":128,"die":"1 eight-sided die (solo)","other":["1 game board","1 Elderheart Oak piece","1 victory (scoring) card"]},"soloName":"Old Grimbeard","soloLevels":["Grumpy","Gruff","Ghastly"]};if(typeof module==='object'&&module.exports)module.exports=HB.DATA;})(typeof globalThis!=='undefined'?globalThis:this);
+(function(g){var HB=g.HB=g.HB||{};HB.DATA={"game":"Hollowbough","cards":[{"key":"master_lathwright","name":"Master Lathwright","text":"At the end of the game, score 1 point per resin and per pebble you still hold, to a maximum of 6.","copies":2,"type":"prosperity","color":"purple","kind":"critter","unique":true,"cost":{"berry":4},"pts":2,"linked":"pulley_lift"},{"key":"ballad_finch","name":"Ballad Finch","text":"Sing away up to 5 cards from your hand and take a point token for each.","copies":2,"type":"traveler","color":"tan","kind":"critter","unique":true,"cost":{"berry":3},"pts":0,"linked":"glowworm_playhouse"},{"key":"reedpunt_toad","name":"Reedpunt Toad","text":"Gain 2 twigs for every Bramble Allotment in your city.","copies":3,"type":"production","color":"green","kind":"critter","unique":false,"cost":{"berry":2},"pts":1,"linked":"kindling_raft"},{"key":"tinder_chipmunk","name":"Tinder Chipmunk","text":"Re-run one other production card in your own city.","copies":3,"type":"production","color":"green","kind":"critter","unique":false,"cost":{"berry":3},"pts":2,"linked":"amber_still"},{"key":"poultice_badger","name":"Poultice Badger","text":"Spend up to 3 berries and take a point token for each one spent.","copies":2,"type":"production","color":"green","kind":"critter","unique":true,"cost":{"berry":4},"pts":4,"linked":"lorewood_college"},{"key":"mudpie_jester","name":"Mudpie Jester","text":"Plant this prankster in a rival village; it takes one of their spaces and costs them 2 points.","copies":2,"type":"traveler","color":"tan","kind":"critter","unique":true,"cost":{"berry":3},"pts":-2,"linked":"midsummer_green"},{"key":"chronicle_owl","name":"Chronicle Owl","text":"Whenever you play another card, draw 1 card afterwards.","copies":3,"type":"governance","color":"blue","kind":"critter","unique":true,"cost":{"berry":2},"pts":1,"linked":"dewdrop_belfry"},{"key":"goodman_vole","name":"Goodman Vole","text":"Shares a space with one Goodwife. If paired and you own an Allotment, gain any 1 resource on play and every production.","copies":4,"type":"production","color":"green","kind":"critter","unique":false,"cost":{"berry":3},"pts":2,"linked":"bramble_allotment"},{"key":"hostler_hedgehog","name":"Hostler Hedgehog","text":"When you play a Critter you may send this hedgehog away to cut 3 berries off its price.","copies":3,"type":"governance","color":"blue","kind":"critter","unique":true,"cost":{"berry":1},"pts":1,"linked":"lantern_rest"},{"key":"gavel_marten","name":"Gavel Marten","text":"When playing any card, pay one required resource with a different resource of your choice.","copies":2,"type":"governance","color":"blue","kind":"critter","unique":true,"cost":{"berry":3},"pts":2,"linked":"mosswood_assize"},{"key":"bramble_sovereign","name":"Bramble Sovereign","text":"End of game: 1 point per basic event and 2 points per special event you achieved.","copies":2,"type":"prosperity","color":"purple","kind":"critter","unique":true,"cost":{"berry":6},"pts":4,"linked":"stonecrown_keep"},{"key":"echo_mole","name":"Echo Mole","text":"Mimic any one production card in a rival village, as though it were theirs.","copies":3,"type":"production","color":"green","kind":"critter","unique":false,"cost":{"berry":3},"pts":1,"linked":"flintpit"},{"key":"brother_moss","name":"Brother Moss","text":"Give up to 2 berries to a rival and take 2 point tokens for each. Opens the second Cloister slot.","copies":2,"type":"production","color":"green","kind":"critter","unique":true,"cost":{"berry":1},"pts":0,"linked":"quietstone_cloister"},{"key":"haggle_magpie","name":"Haggle Magpie","text":"Swap up to 2 of your resources for any 2 resources from the supply.","copies":3,"type":"production","color":"green","kind":"critter","unique":false,"cost":{"berry":2},"pts":1,"linked":"toppled_hall"},{"key":"parcel_dove","name":"Parcel Dove","text":"Reveal 2 cards; you may play one worth up to 3 base points free; discard the other.","copies":3,"type":"traveler","color":"tan","kind":"critter","unique":false,"cost":{"berry":2},"pts":0,"linked":"dovecote_depot"},{"key":"thistle_regent","name":"Thistle Regent","text":"Send a worker here to play any card worth up to 3 base points from hand or meadow without paying.","copies":2,"type":"destination","color":"red","kind":"critter","unique":true,"cost":{"berry":5},"pts":4,"linked":"gildenfern_court"},{"key":"trailwarden_fox","name":"Trailwarden Fox","text":"Relocate one of your deployed workers to another legal spot. Opens the second Thornhold cell.","copies":2,"type":"traveler","color":"tan","kind":"critter","unique":true,"cost":{"berry":2},"pts":1,"linked":"thornhold_cells"},{"key":"crook_shrew","name":"Crook Shrew","text":"Gain 3 berries plus 1 point token per token on your Shrine. If bought with berries, they go to a rival.","copies":2,"type":"traveler","color":"tan","kind":"critter","unique":true,"cost":{"berry":3},"pts":1,"linked":"candlewick_shrine"},{"key":"tallyshop_mouse","name":"Tallyshop Mouse","text":"Gain 1 berry whenever you play another Critter.","copies":3,"type":"governance","color":"blue","kind":"critter","unique":true,"cost":{"berry":2},"pts":1,"linked":"cranny_market"},{"key":"slate_schoolmarm","name":"Slate Schoolmarm","text":"Draw 2 cards, keep one, and hand the other to a rival.","copies":3,"type":"production","color":"green","kind":"critter","unique":false,"cost":{"berry":2},"pts":2,"linked":"acorn_academy"},{"key":"hollow_sexton","name":"Hollow Sexton","text":"Clear 3 meadow cards, refill, then take 1 meadow card. Opens the second Mossgrave Glade plot.","copies":2,"type":"traveler","color":"tan","kind":"critter","unique":true,"cost":{"berry":2},"pts":1,"linked":"mossgrave_glade"},{"key":"footsore_drifter","name":"Footsore Drifter","text":"Draw 3 cards. Does not use up a city space.","copies":3,"type":"traveler","color":"tan","kind":"critter","unique":false,"cost":{"berry":2},"pts":1,"linked":"spyglass_perch"},{"key":"goodwife_vole","name":"Goodwife Vole","text":"Shares a space with a Goodman; if paired, worth 3 extra points at the end.","copies":4,"type":"prosperity","color":"purple","kind":"critter","unique":false,"cost":{"berry":2},"pts":2,"linked":"bramble_allotment"},{"key":"whittle_beaver","name":"Whittle Beaver","text":"Spend up to 3 twigs and take a point token for each.","copies":3,"type":"production","color":"green","kind":"critter","unique":false,"cost":{"berry":2},"pts":2,"linked":"hoard_cellar"},{"key":"stonecrown_keep","name":"Stonecrown Keep","text":"End of game: 1 point per common construction in your city.","copies":2,"type":"prosperity","color":"purple","kind":"construction","unique":true,"cost":{"twig":2,"resin":3,"pebble":3},"pts":4,"linked":"bramble_sovereign"},{"key":"mossgrave_glade","name":"Mossgrave Glade","text":"A worker settles here forever; reveal 4 cards from deck or discard pile and play one free, discarding the rest.","copies":2,"type":"destination","color":"red","kind":"construction","unique":true,"cost":{"pebble":2},"pts":0,"linked":"hollow_sexton"},{"key":"candlewick_shrine","name":"Candlewick Shrine","text":"Add a point token here, then draw 2 cards for every token now on the Shrine.","copies":2,"type":"destination","color":"red","kind":"construction","unique":true,"cost":{"twig":2,"resin":1,"pebble":1},"pts":2,"linked":"crook_shrew"},{"key":"dewdrop_belfry","name":"Dewdrop Belfry","text":"Place 3 tokens here when built. Before recalling workers each season, spend one to repeat a basic or forest spot you occupy. Leftover tokens score.","copies":3,"type":"governance","color":"blue","kind":"construction","unique":true,"cost":{"twig":3,"pebble":1},"pts":0,"linked":"chronicle_owl"},{"key":"mosswood_assize","name":"Mosswood Assize","text":"Gain 1 twig, resin or pebble each time you build another construction.","copies":2,"type":"governance","color":"blue","kind":"construction","unique":true,"cost":{"twig":1,"resin":1,"pebble":2},"pts":2,"linked":"gavel_marten"},{"key":"pulley_lift","name":"Pulley Lift","text":"When building a Construction, dismantle this lift to cut 3 resources of your choice off the price.","copies":3,"type":"governance","color":"blue","kind":"construction","unique":true,"cost":{"pebble":1},"pts":1,"linked":"master_lathwright"},{"key":"thornhold_cells","name":"Thornhold Cells","text":"Lock one of your Critters beneath this card to cut 3 resources off the price of a card. Opens a second cell with a Trailwarden.","copies":2,"type":"governance","color":"blue","kind":"construction","unique":true,"cost":{"resin":1,"pebble":2},"pts":0,"linked":"trailwarden_fox"},{"key":"elderheart_oak","name":"Elderheart Oak","text":"End of game: 1 point per purple card in your city (itself included). Can house any one Critter for free.","copies":2,"type":"prosperity","color":"purple","kind":"construction","unique":true,"cost":{"twig":3,"resin":3,"pebble":3},"pts":5,"linked":"any"},{"key":"midsummer_green","name":"Midsummer Green","text":"Draw 2 cards.","copies":3,"type":"production","color":"green","kind":"construction","unique":true,"cost":{"twig":1,"resin":2,"pebble":1},"pts":3,"linked":"mudpie_jester"},{"key":"bramble_allotment","name":"Bramble Allotment","text":"Gain 1 berry.","copies":8,"type":"production","color":"green","kind":"construction","unique":false,"cost":{"twig":2,"resin":1},"pts":1,"linked":null},{"key":"cranny_market","name":"Cranny Market","text":"Gain 1 berry, or 2 berries if you own any Allotment.","copies":3,"type":"production","color":"green","kind":"construction","unique":false,"cost":{"resin":1,"pebble":1},"pts":1,"linked":"tallyshop_mouse"},{"key":"lantern_rest","name":"Lantern Rest","text":"Send a worker to play a meadow card for 3 fewer resources. Rivals may visit too and pay you 1 point.","copies":3,"type":"destination","color":"red","kind":"construction","unique":false,"cost":{"twig":2,"resin":1},"pts":2,"linked":"hostler_hedgehog"},{"key":"spyglass_perch","name":"Spyglass Perch","text":"Copy any one basic or forest spot, even if it is occupied.","copies":2,"type":"destination","color":"red","kind":"construction","unique":true,"cost":{"twig":1,"resin":1,"pebble":1},"pts":2,"linked":"footsore_drifter"},{"key":"flintpit","name":"Flintpit","text":"Gain 1 pebble.","copies":3,"type":"production","color":"green","kind":"construction","unique":false,"cost":{"twig":1,"resin":1,"pebble":1},"pts":2,"linked":"echo_mole"},{"key":"quietstone_cloister","name":"Quietstone Cloister","text":"A worker settles here forever: give 2 resources to a rival and take 4 point tokens.","copies":2,"type":"destination","color":"red","kind":"construction","unique":true,"cost":{"twig":1,"resin":1,"pebble":1},"pts":1,"linked":"brother_moss"},{"key":"gildenfern_court","name":"Gildenfern Court","text":"End of game: 1 point per unique construction, itself included.","copies":2,"type":"prosperity","color":"purple","kind":"construction","unique":true,"cost":{"twig":2,"resin":3,"pebble":3},"pts":4,"linked":"thistle_regent"},{"key":"dovecote_depot","name":"Dovecote Depot","text":"Give a rival 2 cards, discard any others you like, then refill your hand from the deck. Visitors pay you 1 point.","copies":3,"type":"destination","color":"red","kind":"construction","unique":false,"cost":{"twig":1,"resin":2},"pts":2,"linked":"parcel_dove"},{"key":"amber_still","name":"Amber Still","text":"Gain 1 resin.","copies":3,"type":"production","color":"green","kind":"construction","unique":false,"cost":{"resin":1,"pebble":1},"pts":1,"linked":"tinder_chipmunk"},{"key":"toppled_hall","name":"Toppled Hall","text":"Raze one of your constructions, build here in its place, regain its exact cost, and draw 2 cards.","copies":3,"type":"traveler","color":"tan","kind":"construction","unique":false,"cost":{},"pts":0,"linked":"haggle_magpie"},{"key":"acorn_academy","name":"Acorn Academy","text":"End of game: 1 point per common critter.","copies":2,"type":"prosperity","color":"purple","kind":"construction","unique":true,"cost":{"twig":2,"resin":2},"pts":2,"linked":"slate_schoolmarm"},{"key":"hoard_cellar","name":"Hoard Cellar","text":"Each production adds a stack (3 twigs, 2 resin, 1 pebble or 2 berries) to this card; send a worker to haul it all away.","copies":3,"type":"production","color":"green","kind":"construction","unique":false,"cost":{"twig":1,"resin":1,"pebble":1},"pts":2,"linked":"whittle_beaver"},{"key":"glowworm_playhouse","name":"Glowworm Playhouse","text":"End of game: 1 point per unique critter.","copies":2,"type":"prosperity","color":"purple","kind":"construction","unique":true,"cost":{"twig":3,"resin":1,"pebble":1},"pts":3,"linked":"ballad_finch"},{"key":"kindling_raft","name":"Kindling Raft","text":"Gain 2 twigs.","copies":3,"type":"production","color":"green","kind":"construction","unique":false,"cost":{"twig":1,"pebble":1},"pts":1,"linked":"reedpunt_toad"},{"key":"lorewood_college","name":"Lorewood College","text":"Disband one of your cards, regain its exact cost, plus any 1 resource and 1 point.","copies":2,"type":"destination","color":"red","kind":"construction","unique":true,"cost":{"resin":1,"pebble":2},"pts":3,"linked":"poultice_badger"}],"forest":[{"key":"forest_berry_thicket","name":"Berry Thicket","text":"Gain 2 berries and draw 1 card."},{"key":"forest_foragers_crossing","name":"Foragers Crossing","text":"Gain any 2 resources (twig/resin/pebble/berry, mix allowed)."},{"key":"forest_rummage_hollow","name":"Rummage Hollow","text":"Discard any number of cards, then draw 2 for each one discarded (limit 8)."},{"key":"forest_echoing_meadow","name":"Echoing Meadow","text":"Repeat any one basic location and also draw 1 card."},{"key":"forest_quarry_burrow","name":"Quarry Burrow","text":"Gain 1 pebble and draw 3 cards."},{"key":"forest_mixed_glade","name":"Mixed Glade","text":"Gain 1 twig, 1 resin and 1 berry."},{"key":"forest_bumper_bramble","name":"Bumper Bramble","text":"Gain 3 berries."},{"key":"forest_sapwell_copse","name":"Sapwell Copse","text":"Gain 2 resin and 1 twig."},{"key":"forest_postbag_clearing","name":"Postbag Clearing","text":"Draw 2 cards and gain any 1 resource."},{"key":"forest_barter_stump","name":"Barter Stump","text":"Discard up to 3 cards; gain 1 resource of your choice for each."},{"key":"forest_meadow_bazaar","name":"Meadow Bazaar","text":"Take 2 meadow cards; you may immediately play one of them for 1 fewer resource."}],"basic":[{"key":"basic_berry_patch","name":"Berry Patch","text":"Gain 1 berry. Shared.","gain":{"berry":1},"draw":0,"pts":0,"shared":true},{"key":"basic_dewberry_nook","name":"Dewberry Nook","text":"Gain 1 berry and draw 1 card.","gain":{"berry":1},"draw":1,"pts":0,"shared":false},{"key":"basic_amber_weep","name":"Amber Weep","text":"Gain 1 resin and draw 1 card. Shared.","gain":{"resin":1},"draw":1,"pts":0,"shared":true},{"key":"basic_pebble_bank","name":"Pebble Bank","text":"Gain 1 pebble.","gain":{"pebble":1},"draw":0,"pts":0,"shared":false},{"key":"basic_twig_heap","name":"Twig Heap","text":"Gain 3 twigs.","gain":{"twig":3},"draw":0,"pts":0,"shared":false},{"key":"basic_gossip_glade","name":"Gossip Glade","text":"Draw 2 cards and take 1 point token. Shared.","gain":{},"draw":2,"pts":1,"shared":true},{"key":"basic_resin_pool","name":"Resin Pool","text":"Gain 2 resin.","gain":{"resin":2},"draw":0,"pts":0,"shared":false},{"key":"basic_kindling_glen","name":"Kindling Glen","text":"Gain 2 twigs and draw 1 card. Shared.","gain":{"twig":2},"draw":1,"pts":0,"shared":true}],"haven":{"key":"haven","name":"Barter Burrow","text":"Discard any number of cards from your hand; gain 1 resource of your choice for every 2 discarded. Shared."},"journey":[{"points":5,"discard":5,"shared":false,"name":"Long Road 5"},{"points":4,"discard":4,"shared":false,"name":"Long Road 4"},{"points":3,"discard":3,"shared":false,"name":"Long Road 3"},{"points":2,"discard":2,"shared":true,"name":"Long Road 2"}],"journeyName":"The Long Road","basicEvents":[{"key":"bev_harvest_gathering","name":"Harvest Gathering","need":{"production":4},"pts":3,"text":"Needs 4 production (green) in your city. Worth 3 points."},{"key":"bev_wayfarers_fair","name":"Wayfarers' Fair","need":{"destination":3},"pts":3,"text":"Needs 3 destination (red) in your city. Worth 3 points."},{"key":"bev_elders_council","name":"Elders Council","need":{"governance":3},"pts":3,"text":"Needs 3 governance (blue) in your city. Worth 3 points."},{"key":"bev_wanderers_moot","name":"Wanderers' Moot","need":{"traveler":3},"pts":3,"text":"Needs 3 traveler (tan) in your city. Worth 3 points."}],"specialEvents":[{"key":"sev_grand_market_scheme","name":"Grand Market Scheme","text":"Hand up to 3 resources to rivals and take 2 point tokens for each, immediately.","req":["tallyshop_mouse","dovecote_depot"],"colors":null,"pts":0,"score":null},{"key":"sev_hurry_scurry_dash","name":"Hurry-Scurry Dash","text":"Return one of your deployed workers to hand at once. Worth 4 points.","req":["tinder_chipmunk","dewdrop_belfry"],"colors":null,"pts":4,"score":{"flat":4}},{"key":"sev_night_of_sparklers","name":"Night of Sparklers","text":"Stack up to 3 of your twigs here; each is worth 2 points at the end.","req":["spyglass_perch","echo_mole"],"colors":null,"pts":0,"score":{"per_twig_on_event":2}},{"key":"sev_lost_parchments_unearthed","name":"Lost Parchments Unearthed","text":"Reveal 5 cards; keep any in hand or tuck any under this event (1 point each at the end).","req":["chronicle_owl","toppled_hall"],"colors":null,"pts":0,"score":{"per_card_beneath":1}},{"key":"sev_acorn_bandits_seized","name":"Acorn Bandits Seized","text":"Tuck up to 2 Critters from your city under this event; each is worth 3 points.","req":["mosswood_assize","trailwarden_fox"],"colors":null,"pts":0,"score":{"per_critter_beneath":3}},{"key":"sev_marsh_fever_remedy","name":"Marsh Fever Remedy","text":"Pay 2 berries and discard 2 cards from your city. Worth 6 points.","req":["hollow_sexton","reedpunt_toad"],"colors":null,"pts":6,"score":{"flat":6}},{"key":"sev_wingborne_healers","name":"Wingborne Healers","text":"Worth 3 points for every Goodman Vole and Goodwife Vole pair in every city, yours and rivals.","req":["poultice_badger","parcel_dove"],"colors":null,"pts":0,"score":{"per_husband_wife_pair_in_all_cities":3}},{"key":"sev_commencement_of_pupils","name":"Commencement of Pupils","text":"Tuck up to 3 Critters from your hand under this event; each is worth 2 points.","req":["slate_schoolmarm","lorewood_college"],"colors":null,"pts":0,"score":{"per_critter_beneath":2}},{"key":"sev_counsel_for_scoundrels","name":"Counsel for Scoundrels","text":"Worth 3 points per prisoner in your Thornhold Cells at game end.","req":["brother_moss","thornhold_cells"],"colors":null,"pts":0,"score":{"per_dungeon_prisoner":3}},{"key":"sev_pilgrims_trail","name":"Pilgrims Trail","text":"Worth 3 points per worker in your Quietstone Cloister at game end.","req":["quietstone_cloister","footsore_drifter"],"colors":null,"pts":0,"score":{"per_worker_in_monastery":3}},{"key":"sev_resident_minstrel","name":"Resident Minstrel","text":"Stack up to 3 of your berries here; each is worth 2 points.","req":["lantern_rest","ballad_finch"],"colors":null,"pts":0,"score":{"per_berry_on_event":2}},{"key":"sev_gilded_shrine_vault","name":"Gilded Shrine Vault","text":"Immediately draw 1 card and gain 1 resource per token on your Shrine; also 2 points per token at game end.","req":["whittle_beaver","candlewick_shrine"],"colors":null,"pts":0,"score":{"per_token_on_chapel":2}},{"key":"sev_vigil_of_remembrance","name":"Vigil of Remembrance","text":"Worth 3 points per worker buried in your Mossgrave Glade.","req":["mossgrave_glade","crook_shrew"],"colors":null,"pts":0,"score":{"per_cemetery_worker":3}},{"key":"sev_toll_holiday","name":"Toll Holiday","text":"Run all your production cards now. Worth 3 points.","req":["gavel_marten","thistle_regent"],"colors":null,"pts":3,"score":{"flat":3}},{"key":"sev_grand_hollow_games","name":"Grand Hollow Games","text":"Requires at least 2 cards of each of the five colors in your city. Worth 9 points.","req":[],"colors":{"production":2,"traveler":2,"governance":2,"prosperity":2,"destination":2},"pts":9,"score":{"flat":9}},{"key":"sev_change_of_proprietors","name":"Change of Proprietors","text":"Stack up to 3 of your resources here; berry/twig = 1 point, resin/pebble = 2 points each at the end.","req":["haggle_magpie","cranny_market"],"colors":null,"pts":0,"score":{"per_resource_on_event":{"berry":1,"twig":1,"resin":2,"pebble":2}}}],"components":{"workers_total":24,"workers_per_player":6,"resources":{"berry":30,"twig":30,"resin":25,"pebble":20},"point_tokens":{"1pt":20,"3pt":10},"occupied_tokens":20,"basic_event_tiles":4,"special_event_cards":16,"forest_cards":11,"deck_cards":128,"die":"1 eight-sided die (solo)","other":["1 game board","1 Elderheart Oak piece","1 victory (scoring) card"]},"soloName":"Old Grimbeard","soloLevels":["Grumpy","Gruff","Ghastly"]};if(typeof module==='object'&&module.exports)module.exports=HB.DATA;})(typeof globalThis!=='undefined'?globalThis:this);
 
 </script>
 <script>
@@ -4900,7 +4900,7 @@ function cityCount(p, excl) {
   let n = 0;
   for (const e of p.city) {
     if (excl && excl.has(e.id)) continue;
-    if (key(e.id) === 'wanderer') continue;
+    if (key(e.id) === 'footsore_drifter') continue;
     if (e.pair != null && !(excl && excl.has(e.pair))) { if (e.id < e.pair) n++; continue; }
     n++;
   }
@@ -4910,13 +4910,13 @@ function colorCount(city, color) { let n = 0; for (const e of city) if (def(e.id
 function placeInCity(seat, id) {
   const p = P(seat), k = key(id);
   const e = { id, occ: false, tok: 0, w: 0, stock: null, pris: [], pair: null };
-  if (k === 'husband' || k === 'wife') {
-    const pk = k === 'husband' ? 'wife' : 'husband';
+  if (k === 'goodman_vole' || k === 'goodwife_vole') {
+    const pk = k === 'goodman_vole' ? 'goodwife_vole' : 'goodman_vole';
     const o = p.city.find(x => key(x.id) === pk && x.pair == null);
     if (o) { e.pair = o.id; o.pair = id; }
   }
-  if (k === 'storehouse') e.stock = newRes();
-  if (k === 'clock_tower') e.tok = 3;
+  if (k === 'hoard_cellar') e.stock = newRes();
+  if (k === 'dewdrop_belfry') e.tok = 3;
   p.city.push(e);
   return e;
 }
@@ -4971,14 +4971,14 @@ function scoreOf(seat) {
     const c = def(e.id); cards += c.pts; toks += e.tok;
     let b = 0;
     switch (c.key) {
-      case 'architect': b = Math.min(6, p.res.resin + p.res.pebble); break;
-      case 'king': b = nb + 2 * so.length; break;
-      case 'castle': b = p.city.filter(x => def(x.id).kind === 'construction' && !def(x.id).unique).length; break;
-      case 'palace': b = p.city.filter(x => def(x.id).kind === 'construction' && def(x.id).unique).length; break;
-      case 'school': b = p.city.filter(x => def(x.id).kind === 'critter' && !def(x.id).unique).length; break;
-      case 'theater': b = p.city.filter(x => def(x.id).kind === 'critter' && def(x.id).unique).length; break;
-      case 'ever_tree': b = p.city.filter(x => def(x.id).color === 'purple').length; break;
-      case 'wife': b = e.pair != null ? 3 : 0; break;
+      case 'master_lathwright': b = Math.min(6, p.res.resin + p.res.pebble); break;
+      case 'bramble_sovereign': b = nb + 2 * so.length; break;
+      case 'stonecrown_keep': b = p.city.filter(x => def(x.id).kind === 'construction' && !def(x.id).unique).length; break;
+      case 'gildenfern_court': b = p.city.filter(x => def(x.id).kind === 'construction' && def(x.id).unique).length; break;
+      case 'acorn_academy': b = p.city.filter(x => def(x.id).kind === 'critter' && !def(x.id).unique).length; break;
+      case 'glowworm_playhouse': b = p.city.filter(x => def(x.id).kind === 'critter' && def(x.id).unique).length; break;
+      case 'elderheart_oak': b = p.city.filter(x => def(x.id).color === 'purple').length; break;
+      case 'goodwife_vole': b = e.pair != null ? 3 : 0; break;
     }
     if (b) { bonus += b; det.push({ card: e.id, bonus: b }); }
   }
@@ -4997,10 +4997,10 @@ function sevScore(seat, ev) {
   if (s.per_card_beneath) return s.per_card_beneath * ev.tuck.length;
   if (s.per_critter_beneath) return s.per_critter_beneath * ev.tuck.length;
   if (s.per_husband_wife_pair_in_all_cities) { let n = 0; for (const q of G.players) n += pairCount(q); if (G.grim) { /* his cards carry no pairs */ } return s.per_husband_wife_pair_in_all_cities * n; }
-  if (s.per_dungeon_prisoner) { let n = 0; for (const e of p.city) if (key(e.id) === 'dungeon') n += e.pris.length; return s.per_dungeon_prisoner * n; }
-  if (s.per_worker_in_monastery) { let n = 0; for (const pl of p.dep) if (pl.k === 'dest' && pl.perm && pl.c >= 0 && key(pl.c) === 'monastery') n++; return s.per_worker_in_monastery * n; }
-  if (s.per_cemetery_worker) { let n = 0; for (const pl of p.dep) if (pl.k === 'dest' && pl.perm && pl.c >= 0 && key(pl.c) === 'cemetery') n++; return s.per_cemetery_worker * n; }
-  if (s.per_token_on_chapel) { let n = 0; for (const e of p.city) if (key(e.id) === 'chapel') n += e.tok; return s.per_token_on_chapel * n; }
+  if (s.per_dungeon_prisoner) { let n = 0; for (const e of p.city) if (key(e.id) === 'thornhold_cells') n += e.pris.length; return s.per_dungeon_prisoner * n; }
+  if (s.per_worker_in_monastery) { let n = 0; for (const pl of p.dep) if (pl.k === 'dest' && pl.perm && pl.c >= 0 && key(pl.c) === 'quietstone_cloister') n++; return s.per_worker_in_monastery * n; }
+  if (s.per_cemetery_worker) { let n = 0; for (const pl of p.dep) if (pl.k === 'dest' && pl.perm && pl.c >= 0 && key(pl.c) === 'mossgrave_glade') n++; return s.per_cemetery_worker * n; }
+  if (s.per_token_on_chapel) { let n = 0; for (const e of p.city) if (key(e.id) === 'candlewick_shrine') n += e.tok; return s.per_token_on_chapel * n; }
   if (s.per_resource_on_event) { const m = s.per_resource_on_event; let n = 0; for (const r of RES) n += (m[r] || 0) * ev.stock[r]; return n; }
   return 0;
 }
@@ -5085,8 +5085,8 @@ function destCap(owner, e) {
   const k = key(e.id);
   if (owner === 'G') return 1;
   const p = P(owner);
-  if (k === 'cemetery') return 1 + (hasKey(p, 'undertaker') ? 1 : 0);
-  if (k === 'monastery') return 1 + (hasKey(p, 'monk') ? 1 : 0);
+  if (k === 'mossgrave_glade') return 1 + (hasKey(p, 'hollow_sexton') ? 1 : 0);
+  if (k === 'quietstone_cloister') return 1 + (hasKey(p, 'brother_moss') ? 1 : 0);
   return 1;
 }
 function locLabel(l) {
@@ -5115,13 +5115,13 @@ function locOpts(seat) {
   for (let o = 0; o < G.np; o++) {
     for (const e of P(o).city) {
       const c = def(e.id);
-      if (!(c.color === 'red' || c.key === 'storehouse')) continue;
-      if (o !== seat && !(c.key === 'inn' || c.key === 'post_office')) continue;
+      if (!(c.color === 'red' || c.key === 'hoard_cellar')) continue;
+      if (o !== seat && !(c.key === 'lantern_rest' || c.key === 'dovecote_depot')) continue;
       if (!destOK(seat, o, e)) continue;
       out.push({ k: 'dest', o, c: e.id, label: c.name + (o !== seat ? ' in ' + pn(o) + "'s city" : '') + ' - ' + c.text });
     }
   }
-  if (G.grim) for (const id of G.grim.city) { const k = key(id); if (k !== 'inn' && k !== 'post_office') continue; const e = { id }; if (destOK(seat, 'G', e)) out.push({ k: 'dest', o: 'G', c: id, label: cn(id) + ' in ' + DATA.soloName + "'s city - " + def(id).text }); }
+  if (G.grim) for (const id of G.grim.city) { const k = key(id); if (k !== 'lantern_rest' && k !== 'dovecote_depot') continue; const e = { id }; if (destOK(seat, 'G', e)) out.push({ k: 'dest', o: 'G', c: id, label: cn(id) + ' in ' + DATA.soloName + "'s city - " + def(id).text }); }
   G.bev.forEach((e, i) => { if (e.o === -1 && evOK(seat, 'b', i)) out.push({ k: 'event', e: 'b', i, label: 'Claim ' + DATA.basicEvents[e.k].name + ' - ' + DATA.basicEvents[e.k].text }); });
   G.sev.forEach((e, i) => { if (e.o === -1 && evOK(seat, 's', i)) out.push({ k: 'event', e: 's', i, label: 'Claim ' + DATA.specialEvents[e.k].name + ' - ' + DATA.specialEvents[e.k].text }); });
   return out;
@@ -5130,13 +5130,13 @@ function destOK(seat, owner, e) {
   const p = P(seat), k = key(e.id);
   if (destOcc(e.id) >= destCap(owner, e)) return false;
   switch (k) {
-    case 'inn': return innCands(seat).length > 0;
-    case 'post_office': return p.hand.length >= 2;
-    case 'queen': return queenCands(seat).length > 0;
-    case 'cemetery': case 'chapel': case 'lookout': return true;
-    case 'monastery': return resTotal(p) >= 2 && resRecips(seat).length > 0;
-    case 'university': return p.city.some(x => x.id !== e.id);
-    case 'storehouse': return !!e.stock && rsum(e.stock) > 0;
+    case 'lantern_rest': return innCands(seat).length > 0;
+    case 'dovecote_depot': return p.hand.length >= 2;
+    case 'thistle_regent': return queenCands(seat).length > 0;
+    case 'mossgrave_glade': case 'candlewick_shrine': case 'spyglass_perch': return true;
+    case 'quietstone_cloister': return resTotal(p) >= 2 && resRecips(seat).length > 0;
+    case 'lorewood_college': return p.city.some(x => x.id !== e.id);
+    case 'hoard_cellar': return !!e.stock && rsum(e.stock) > 0;
   }
   return false;
 }
@@ -5161,19 +5161,19 @@ function occTargets(p, id) {
   if (c.kind !== 'critter') return out;
   const e1 = p.city.find(e => key(e.id) === c.linked && !e.occ);
   if (e1) out.push(e1.id);
-  const e2 = p.city.find(e => key(e.id) === 'ever_tree' && !e.occ);
+  const e2 = p.city.find(e => key(e.id) === 'elderheart_oak' && !e.occ);
   if (e2) out.push(e2.id);
   return out;
 }
-function foolTargets(seat) { const t = []; for (let o = 0; o < G.np; o++) if (o !== seat && cityCount(P(o)) < CITY && !hasKey(P(o), 'fool')) t.push(o); return t; }
+function foolTargets(seat) { const t = []; for (let o = 0; o < G.np; o++) if (o !== seat && cityCount(P(o)) < CITY && !hasKey(P(o), 'mudpie_jester')) t.push(o); return t; }
 // can card id be placed into seat's city, after the entries in excl (a Set) have been removed?
 function placeable(seat, id, excl) {
   const p = P(seat), k = key(id), c = def(id);
   if (c.unique && p.city.some(e => key(e.id) === k && !(excl && excl.has(e.id)))) return false;
-  if (k === 'fool') return G.grim ? true : foolTargets(seat).length > 0;
-  if (k === 'ruins') return p.city.some(e => def(e.id).kind === 'construction' && key(e.id) !== 'ruins' && !(excl && excl.has(e.id)));
-  if (k === 'wanderer') return true;
-  if (k === 'husband' || k === 'wife') { const pk = k === 'husband' ? 'wife' : 'husband'; if (p.city.some(e => key(e.id) === pk && e.pair == null && !(excl && excl.has(e.id)))) return true; }
+  if (k === 'mudpie_jester') return G.grim ? true : foolTargets(seat).length > 0;
+  if (k === 'toppled_hall') return p.city.some(e => def(e.id).kind === 'construction' && key(e.id) !== 'toppled_hall' && !(excl && excl.has(e.id)));
+  if (k === 'footsore_drifter') return true;
+  if (k === 'goodman_vole' || k === 'goodwife_vole') { const pk = k === 'goodman_vole' ? 'goodwife_vole' : 'goodman_vole'; if (p.city.some(e => key(e.id) === pk && e.pair == null && !(excl && excl.has(e.id)))) return true; }
   return cityCount(p, excl) < CITY;
 }
 function judgeSwaps(res, cost) {
@@ -5184,14 +5184,14 @@ function judgeSwaps(res, cost) {
 function dungeonPrisoners(seat, id) {
   const p = P(seat), out = [];
   for (const d of p.city) {
-    if (key(d.id) !== 'dungeon') continue;
-    const cap = 1 + (hasKey(p, 'ranger') ? 1 : 0);
+    if (key(d.id) !== 'thornhold_cells') continue;
+    const cap = 1 + (hasKey(p, 'trailwarden_fox') ? 1 : 0);
     for (const e of p.city) {
       if (def(e.id).kind !== 'critter') continue;
-      const capAfter = 1 + (p.city.some(x => key(x.id) === 'ranger' && x.id !== e.id) ? 1 : 0);
+      const capAfter = 1 + (p.city.some(x => key(x.id) === 'trailwarden_fox' && x.id !== e.id) ? 1 : 0);
       if (d.pris.length >= Math.min(cap, capAfter)) continue;
       if (!placeable(seat, id, new Set([e.id]))) continue;
-      out.push({ dungeon: d.id, prisoner: e.id });
+      out.push({ thornhold_cells: d.id, prisoner: e.id });
     }
   }
   return out;
@@ -5204,10 +5204,10 @@ function howOptions(seat, id) {
   if (plainOK && canPay) out.push({ how: 'pay' });
   if (plainOK) for (const v of occTargets(p, id)) out.push({ how: 'occupy', via: v });
   if (!free0) {
-    if (c.kind === 'critter' && cost.berry > 0) { const ih = p.city.find(e => key(e.id) === 'innkeeper'); if (ih && afford(p.res, Object.assign(plain(cost), { berry: Math.max(0, cost.berry - 3) }), 0) && placeable(seat, id, new Set([ih.id]))) out.push({ how: 'innkeeper', via: ih.id }); }
-    if (c.kind === 'construction') { const cr = p.city.find(e => key(e.id) === 'crane'); if (cr && afford(p.res, cost, 3) && placeable(seat, id, new Set([cr.id]))) out.push({ how: 'crane', via: cr.id }); }
-    if (afford(p.res, cost, 3) && dungeonPrisoners(seat, id).length) out.push({ how: 'dungeon' });
-    if (!canPay && plainOK && hasKey(p, 'judge') && judgeSwaps(p.res, cost).length) out.push({ how: 'judge' });
+    if (c.kind === 'critter' && cost.berry > 0) { const ih = p.city.find(e => key(e.id) === 'hostler_hedgehog'); if (ih && afford(p.res, Object.assign(plain(cost), { berry: Math.max(0, cost.berry - 3) }), 0) && placeable(seat, id, new Set([ih.id]))) out.push({ how: 'hostler_hedgehog', via: ih.id }); }
+    if (c.kind === 'construction') { const cr = p.city.find(e => key(e.id) === 'pulley_lift'); if (cr && afford(p.res, cost, 3) && placeable(seat, id, new Set([cr.id]))) out.push({ how: 'pulley_lift', via: cr.id }); }
+    if (afford(p.res, cost, 3) && dungeonPrisoners(seat, id).length) out.push({ how: 'thornhold_cells' });
+    if (!canPay && plainOK && hasKey(p, 'gavel_marten') && judgeSwaps(p.res, cost).length) out.push({ how: 'gavel_marten' });
   }
   return out;
 }
@@ -5231,10 +5231,10 @@ function playLabel(seat, id, from, h) {
   switch (h.how) {
     case 'pay': return 'Play ' + c.name + ' ' + src + ' (pay ' + rtxt(c.cost) + ')';
     case 'occupy': return 'Play ' + c.name + ' ' + src + ' free (occupy ' + cn(h.via) + ')';
-    case 'innkeeper': return 'Play ' + c.name + ' ' + src + ' (send away ' + cn(h.via) + ' to cut 3 berries)';
-    case 'crane': return 'Play ' + c.name + ' ' + src + ' (dismantle ' + cn(h.via) + ' to cut 3 resources)';
-    case 'dungeon': return 'Play ' + c.name + ' ' + src + ' (lock a critter beneath ' + CARDS[CIDX.dungeon].name + ', cut 3 resources)';
-    case 'judge': return 'Play ' + c.name + ' ' + src + ' (swap one resource using the judge)';
+    case 'hostler_hedgehog': return 'Play ' + c.name + ' ' + src + ' (send away ' + cn(h.via) + ' to cut 3 berries)';
+    case 'pulley_lift': return 'Play ' + c.name + ' ' + src + ' (dismantle ' + cn(h.via) + ' to cut 3 resources)';
+    case 'thornhold_cells': return 'Play ' + c.name + ' ' + src + ' (lock a critter beneath ' + CARDS[CIDX.thornhold_cells].name + ', cut 3 resources)';
+    case 'gavel_marten': return 'Play ' + c.name + ' ' + src + ' (swap one resource using the judge)';
   }
   return 'Play ' + c.name;
 }
@@ -5308,7 +5308,7 @@ function finish() {
 function placeAt(seat, loc) {
   const p = P(seat), pl = {}; for (const k in loc) if (k !== 'label') pl[k] = loc[k];
   if (pl.k === 'journey') pl.perm = true;
-  if (pl.k === 'dest') { const kk = key(pl.c); if (kk === 'cemetery' || kk === 'monastery') pl.perm = true; }
+  if (pl.k === 'dest') { const kk = key(pl.c); if (kk === 'mossgrave_glade' || kk === 'quietstone_cloister') pl.perm = true; }
   p.dep.push(pl);
   now('locFx', { seat, loc: pl });
 }
@@ -5408,28 +5408,28 @@ H.pay = d => {
     case 'occupy': { const e = ent(p, d.via); e.occ = true; lg(p.name + ' plays ' + c.name + ' free, occupying ' + cn(d.via) + '.'); now('afterPay', d); return; }
     case 'free': lg(p.name + ' plays ' + c.name + ' for free.'); now('afterPay', d); return;
     case 'pay': lg(p.name + ' plays ' + c.name + '.'); now('payRem', Object.assign({}, d, { rem: cost })); return;
-    case 'innkeeper': {
+    case 'hostler_hedgehog': {
       const e = removeFromCity(d.seat, d.via); G.discard.push(e.id); lg(p.name + ' sends ' + cn(e.id) + ' away to cut the price of ' + c.name + '.');
       cost.berry = Math.max(0, (cost.berry || 0) - 3); if (!cost.berry) delete cost.berry; now('payRem', Object.assign({}, d, { rem: cost })); return;
     }
-    case 'crane': { const e = removeFromCity(d.seat, d.via); G.discard.push(e.id); lg(p.name + ' dismantles ' + cn(e.id) + ' to build ' + c.name + '.'); now('waive', Object.assign({}, d, { rem: cost, n: 3 })); return; }
-    case 'dungeon': {
+    case 'pulley_lift': { const e = removeFromCity(d.seat, d.via); G.discard.push(e.id); lg(p.name + ' dismantles ' + cn(e.id) + ' to build ' + c.name + '.'); now('waive', Object.assign({}, d, { rem: cost, n: 3 })); return; }
+    case 'thornhold_cells': {
       const cands = dungeonPrisoners(d.seat, d.id);
-      ask(d.seat, 'prisoner', 'Choose a critter to lock beneath the dungeon', cands.map(x => ({ label: 'Lock ' + cn(x.prisoner), card: x.prisoner, h: 'imprison', d: Object.assign({}, d, { dungeon: x.dungeon, prisoner: x.prisoner, rem: cost }) })));
+      ask(d.seat, 'prisoner', 'Choose a critter to lock beneath the dungeon', cands.map(x => ({ label: 'Lock ' + cn(x.prisoner), card: x.prisoner, h: 'imprison', d: Object.assign({}, d, { thornhold_cells: x.thornhold_cells, prisoner: x.prisoner, rem: cost }) })));
       return;
     }
-    case 'judge': {
+    case 'gavel_marten': {
       const sw = judgeSwaps(p.res, cost);
-      ask(d.seat, 'judge', 'Choose which resource to swap', sw.map(x => ({ label: 'Pay 1 ' + rn(x.to, 1) + ' instead of 1 ' + rn(x.from, 1), h: 'payRem', d: Object.assign({}, d, { rem: x.cost }) })));
+      ask(d.seat, 'gavel_marten', 'Choose which resource to swap', sw.map(x => ({ label: 'Pay 1 ' + rn(x.to, 1) + ' instead of 1 ' + rn(x.from, 1), h: 'payRem', d: Object.assign({}, d, { rem: x.cost }) })));
       return;
     }
-    case 'inn': lg(p.name + ' plays ' + c.name + ' from the meadow.'); now('waive', Object.assign({}, d, { rem: cost, n: 3 })); return;
+    case 'lantern_rest': lg(p.name + ' plays ' + c.name + ' from the meadow.'); now('waive', Object.assign({}, d, { rem: cost, n: 3 })); return;
     case 'bazaar': lg(p.name + ' plays ' + c.name + '.'); now('waive', Object.assign({}, d, { rem: cost, n: 1 })); return;
   }
   throw new Error('bad how ' + d.how);
 };
 H.imprison = d => {
-  const dn = ent(P(d.seat), d.dungeon); const e = removeFromCity(d.seat, d.prisoner);
+  const dn = ent(P(d.seat), d.thornhold_cells); const e = removeFromCity(d.seat, d.prisoner);
   dn.pris.push(e.id); lg(P(d.seat).name + ' locks ' + cn(e.id) + ' beneath ' + cn(dn.id) + '.');
   now('waive', Object.assign({}, d, { n: 3 }));
 };
@@ -5447,7 +5447,7 @@ H.payRem = d => {
   const p = P(d.seat), rem = plain(d.rem || {});
   payRes(d.seat, rem);
   if (rsum(rem)) lg(p.name + ' pays ' + rtxt(rem) + '.');
-  if (key(d.id) === 'shepherd' && rsum(rem)) {
+  if (key(d.id) === 'crook_shrew' && rsum(rem)) {
     const rc = resRecips(d.seat);
     if (rc.length) { pickRecip(d.seat, rc, 'Choose who receives the berries you paid', 'shepherdPaid', { seat: d.seat, rem }); }
     now('afterPay', d);
@@ -5460,7 +5460,7 @@ H.afterPay = d => { if (d.from === 'meadow') refill(); now('place', d); };
 H.place = d => {
   const s = d.seat, id = d.id, k = key(id), p = P(s);
   G.limbo.splice(G.limbo.indexOf(id), 1);
-  if (k === 'fool') {
+  if (k === 'mudpie_jester') {
     if (G.grim) {
       G.discard.push(id); lg(p.name + ' plays ' + cn(id) + ' and dismisses a card from ' + DATA.soloName + "'s city."); use('fx:fool'); use('solo:fool');
       const gr = G.grim;
@@ -5473,10 +5473,10 @@ H.place = d => {
     pickRecip(s, t, 'Choose whose city to plant the jester in', 'foolDo', { seat: s, id });
     return;
   }
-  if (k === 'ruins') {
-    const tg = p.city.filter(e => def(e.id).kind === 'construction' && key(e.id) !== 'ruins');
+  if (k === 'toppled_hall') {
+    const tg = p.city.filter(e => def(e.id).kind === 'construction' && key(e.id) !== 'toppled_hall');
     G.limbo.push(id);
-    ask(s, 'ruins', 'Choose a construction to raze', tg.map(e => ({ label: 'Raze ' + cn(e.id) + ' (regain ' + rtxt(def(e.id).cost) + ')', card: e.id, h: 'ruinsDo', d: { seat: s, id, target: e.id } })));
+    ask(s, 'toppled_hall', 'Choose a construction to raze', tg.map(e => ({ label: 'Raze ' + cn(e.id) + ' (regain ' + rtxt(def(e.id).cost) + ')', card: e.id, h: 'ruinsDo', d: { seat: s, id, target: e.id } })));
     return;
   }
   placeInCity(s, id);
@@ -5509,9 +5509,9 @@ H.afterPlay = d => {
   for (const e of p.city) {
     if (e.id === d.id) continue;
     const k = key(e.id);
-    if (k === 'historian') list.push(e.id);
-    else if (k === 'shopkeeper' && c.kind === 'critter' && d.own) list.push(e.id);
-    else if (k === 'courthouse' && c.kind === 'construction') list.push(e.id);
+    if (k === 'chronicle_owl') list.push(e.id);
+    else if (k === 'tallyshop_mouse' && c.kind === 'critter' && d.own) list.push(e.id);
+    else if (k === 'mosswood_assize' && c.kind === 'construction') list.push(e.id);
   }
   if (list.length) now('trig', { seat: d.seat, list });
   if (G.grim && !d.noGrim) now('grimPlay', { fromSeat: d.seat, id: d.id });
@@ -5525,39 +5525,39 @@ H.trig = d => {
 H.trigPick = d => { now('trigRun', { seat: d.seat, id: d.id }); now('trig', { seat: d.seat, list: d.list.filter(x => x !== d.id) }); };
 H.trigRun = d => {
   const k = key(d.id); use('fx:' + k);
-  if (k === 'historian') now('draw', { seat: d.seat, n: 1 });
-  else if (k === 'shopkeeper') gain(d.seat, { berry: 1 });
-  else if (k === 'courthouse') ask(d.seat, 'resource', 'Choose a resource from the Mosswood Assize', ['twig', 'resin', 'pebble'].map(r => ({ label: 'Take 1 ' + rn(r, 1), res: r, h: 'gainOne', d: { seat: d.seat, r, n: 1 } })));
+  if (k === 'chronicle_owl') now('draw', { seat: d.seat, n: 1 });
+  else if (k === 'tallyshop_mouse') gain(d.seat, { berry: 1 });
+  else if (k === 'mosswood_assize') ask(d.seat, 'resource', 'Choose a resource from the Mosswood Assize', ['twig', 'resin', 'pebble'].map(r => ({ label: 'Take 1 ' + rn(r, 1), res: r, h: 'gainOne', d: { seat: d.seat, r, n: 1 } })));
 };
 
 // ================= production / on-play effects =================
-const farmCount = co => kcount(cityEntries(co), 'farm');
+const farmCount = co => kcount(cityEntries(co), 'bramble_allotment');
 const PROD = {
-  farm: s => gain(s, { berry: 1 }),
-  general_store: (s, co) => gain(s, { berry: 1 + (farmCount(co) > 0 ? 1 : 0) }),
-  mine: s => gain(s, { pebble: 1 }),
-  resin_refinery: s => gain(s, { resin: 1 }),
-  twig_barge: s => gain(s, { twig: 2 }),
-  fair_grounds: s => now('draw', { seat: s, n: 2 }),
-  husband: (s, co, eid) => { const e = cityEntries(co).find(x => x.id === eid); if (e && e.pair != null && farmCount(co) > 0) now('gainAny', { seat: s, n: 1 }); },
-  barge_toad: (s, co) => gain(s, { twig: 2 * farmCount(co) }),
-  chip_sweep: (s, co, eid, ch) => now('chipPick', { seat: s, ch: (ch || []).concat(['s' + eid]), self: eid }),
-  doctor: s => now('payPts', { seat: s, res: 'berry', left: 3 }),
-  woodcarver: s => now('payPts', { seat: s, res: 'twig', left: 3 }),
-  monk: s => { const rc = resRecips(s); if (rc.length && P(s).res.berry > 0) pickRecip(s, rc, 'Choose who receives the berries', 'monkGive', { seat: s, left: 2 }); },
-  peddler: s => now('peddle', { seat: s, left: 2, paid: 0 }),
-  miner_mole: (s, co, eid, ch) => now('molePick', { seat: s, ch: (ch || []).concat(['m' + co + ':' + eid]) }),
-  teacher: s => now('teach', { seat: s }),
-  storehouse: (s, co, eid) => now('stock', { seat: s, eid }),
+  bramble_allotment: s => gain(s, { berry: 1 }),
+  cranny_market: (s, co) => gain(s, { berry: 1 + (farmCount(co) > 0 ? 1 : 0) }),
+  flintpit: s => gain(s, { pebble: 1 }),
+  amber_still: s => gain(s, { resin: 1 }),
+  kindling_raft: s => gain(s, { twig: 2 }),
+  midsummer_green: s => now('draw', { seat: s, n: 2 }),
+  goodman_vole: (s, co, eid) => { const e = cityEntries(co).find(x => x.id === eid); if (e && e.pair != null && farmCount(co) > 0) now('gainAny', { seat: s, n: 1 }); },
+  reedpunt_toad: (s, co) => gain(s, { twig: 2 * farmCount(co) }),
+  tinder_chipmunk: (s, co, eid, ch) => now('chipPick', { seat: s, ch: (ch || []).concat(['s' + eid]), self: eid }),
+  poultice_badger: s => now('payPts', { seat: s, res: 'berry', left: 3 }),
+  whittle_beaver: s => now('payPts', { seat: s, res: 'twig', left: 3 }),
+  brother_moss: s => { const rc = resRecips(s); if (rc.length && P(s).res.berry > 0) pickRecip(s, rc, 'Choose who receives the berries', 'monkGive', { seat: s, left: 2 }); },
+  haggle_magpie: s => now('peddle', { seat: s, left: 2, paid: 0 }),
+  echo_mole: (s, co, eid, ch) => now('molePick', { seat: s, ch: (ch || []).concat(['m' + co + ':' + eid]) }),
+  slate_schoolmarm: s => now('teach', { seat: s }),
+  hoard_cellar: (s, co, eid) => now('stock', { seat: s, eid }),
 };
-const SIMPLE = { farm: 1, general_store: 1, mine: 1, resin_refinery: 1, twig_barge: 1, barge_toad: 1, husband: 1 };
+const SIMPLE = { bramble_allotment: 1, cranny_market: 1, flintpit: 1, amber_still: 1, kindling_raft: 1, reedpunt_toad: 1, goodman_vole: 1 };
 const ONPLAY = {
-  bard: s => now('dLoop', { seat: s, max: 5, min: 0, count: 0, then: { h: 'thPts', d: { seat: s, per: 1 } }, title: 'Discard up to 5 cards (1 point token each)' }),
-  postal_pigeon: s => now('pigeon', { seat: s }),
-  ranger: s => now('rangerPick', { seat: s }),
-  shepherd: s => { gain(s, { berry: 3 }); let t = 0; for (const e of P(s).city) if (key(e.id) === 'chapel') t += e.tok; if (t) { P(s).pts += t; lg(P(s).name + ' takes ' + t + ' point token(s).'); } },
-  undertaker: s => now('undDisc', { seat: s, left: 3 }),
-  wanderer: s => now('draw', { seat: s, n: 3 }),
+  ballad_finch: s => now('dLoop', { seat: s, max: 5, min: 0, count: 0, then: { h: 'thPts', d: { seat: s, per: 1 } }, title: 'Discard up to 5 cards (1 point token each)' }),
+  parcel_dove: s => now('pigeon', { seat: s }),
+  trailwarden_fox: s => now('rangerPick', { seat: s }),
+  crook_shrew: s => { gain(s, { berry: 3 }); let t = 0; for (const e of P(s).city) if (key(e.id) === 'candlewick_shrine') t += e.tok; if (t) { P(s).pts += t; lg(P(s).name + ' takes ' + t + ' point token(s).'); } },
+  hollow_sexton: s => now('undDisc', { seat: s, left: 3 }),
+  footsore_drifter: s => now('draw', { seat: s, n: 3 }),
 };
 function activateProduction(seat, ids) { now('prodAll', { seat, rest: ids || P(seat).city.filter(e => def(e.id).color === 'green').map(e => e.id) }); }
 H.prodAll = d => {
@@ -5582,7 +5582,7 @@ H.molePick = d => {
   const opts = [], seen = {};
   const scan = (co) => {
     for (const e of cityEntries(co)) {
-      const c = def(e.id); if (c.color !== 'green' || c.key === 'storehouse' || !PROD[c.key]) continue;
+      const c = def(e.id); if (c.color !== 'green' || c.key === 'hoard_cellar' || !PROD[c.key]) continue;
       const tag = 'm' + co + ':' + e.id; if (d.ch.indexOf(tag) >= 0) continue;
       const sig = co + c.key + (e.pair != null ? 'p' : ''); if (seen[sig]) continue; seen[sig] = 1;
       opts.push({ label: 'Copy ' + c.name + " in " + pn(co) + "'s city: " + c.text, card: e.id, h: 'moleGo', d: { seat: d.seat, co, id: e.id, ch: d.ch } });
@@ -5592,7 +5592,7 @@ H.molePick = d => {
   if (G.grim) scan('G');
   ask(d.seat, 'mole', 'Choose a production card to mimic', opts);
 };
-H.moleGo = d => { use('fx:' + key(d.id) + ':mimicked'); const k = key(d.id); if (k === 'chip_sweep') PROD.chip_sweep(d.seat, d.seat, -1, d.ch.concat(['m' + d.co + ':' + d.id])); else PROD[k](d.seat, d.co, d.id, d.ch.concat(['m' + d.co + ':' + d.id])); };
+H.moleGo = d => { use('fx:' + key(d.id) + ':mimicked'); const k = key(d.id); if (k === 'tinder_chipmunk') PROD.tinder_chipmunk(d.seat, d.seat, -1, d.ch.concat(['m' + d.co + ':' + d.id])); else PROD[k](d.seat, d.co, d.id, d.ch.concat(['m' + d.co + ':' + d.id])); };
 H.payPts = d => {
   const p = P(d.seat);
   if (d.left <= 0 || p.res[d.res] < 1) return;
@@ -5666,14 +5666,14 @@ H.rangerPick = d => {
     if (alt.length) opts.push({ label: 'Move the worker at ' + locLabel(pl), h: 'rangerTo', d: { seat: d.seat, j } });
   });
   opts.push({ label: 'Do not move a worker', h: 'noop' });
-  ask(d.seat, 'ranger', 'Choose a deployed worker to relocate', opts);
+  ask(d.seat, 'trailwarden_fox', 'Choose a deployed worker to relocate', opts);
 };
 const sameLoc = (a, b) => a.k === b.k && a.i === b.i && a.c === b.c && a.e === b.e;
 H.rangerTo = d => {
   const p = P(d.seat), saved = p.dep.splice(d.j, 1)[0];
   const alt = locOpts(d.seat).filter(l => !sameLoc(l, saved));
   if (!alt.length) { p.dep.splice(d.j, 0, saved); return; }
-  ask(d.seat, 'ranger', 'Choose where to place the worker', alt.map(l => ({ label: 'Move to ' + l.label, h: 'rangerPlace', d: { seat: d.seat, loc: l } })));
+  ask(d.seat, 'trailwarden_fox', 'Choose where to place the worker', alt.map(l => ({ label: 'Move to ' + l.label, h: 'rangerPlace', d: { seat: d.seat, loc: l } })));
 };
 H.rangerPlace = d => { lg(P(d.seat).name + ' relocates a worker to ' + locLabel(d.loc) + '.'); placeAt(d.seat, d.loc); };
 H.undDisc = d => {
@@ -5689,38 +5689,38 @@ function destFx(s, l) {
   const k = key(l.c); use('visit:' + k);
   if (l.o !== s) { if (l.o === 'G') G.grim.pts++; else P(l.o).pts++; lg(pn(s) + ' pays ' + pn(l.o) + ' 1 point token to visit.'); }
   switch (k) {
-    case 'inn': now('innPick', { seat: s }); break;
-    case 'post_office': {
+    case 'lantern_rest': now('innPick', { seat: s }); break;
+    case 'dovecote_depot': {
       const rc = cardRecips(s);
       pickRecip(s, rc, 'Choose which rival receives your cards', 'poGive', { seat: s, left: 2 });
       break;
     }
-    case 'queen': {
+    case 'thistle_regent': {
       const c = queenCands(s);
-      ask(s, 'queen', 'Choose a card worth up to 3 points to play for free', c.map(x => ({ label: 'Play ' + cn(x.id) + ' for free (' + (x.from === 'hand' ? 'from hand' : 'from the meadow') + ')', card: x.id, h: 'queenGo', d: { seat: s, id: x.id, from: x.from } })));
+      ask(s, 'thistle_regent', 'Choose a card worth up to 3 points to play for free', c.map(x => ({ label: 'Play ' + cn(x.id) + ' for free (' + (x.from === 'hand' ? 'from hand' : 'from the meadow') + ')', card: x.id, h: 'queenGo', d: { seat: s, id: x.id, from: x.from } })));
       break;
     }
-    case 'cemetery': ask(s, 'cemetery', 'Reveal four cards from the deck or the discard pile?', [
+    case 'mossgrave_glade': ask(s, 'mossgrave_glade', 'Reveal four cards from the deck or the discard pile?', [
       { label: 'Reveal 4 from the deck', h: 'cemReveal', d: { seat: s, src: 'deck' } },
       { label: 'Reveal 4 from the top of the discard pile', h: 'cemReveal', d: { seat: s, src: 'discard' } }]); break;
-    case 'chapel': e.tok++; lg(P(s).name + ' adds a point token to the shrine (' + e.tok + ').'); now('draw', { seat: s, n: 2 * e.tok }); break;
-    case 'lookout': now('copyLoc', { seat: s }); break;
-    case 'monastery': {
+    case 'candlewick_shrine': e.tok++; lg(P(s).name + ' adds a point token to the shrine (' + e.tok + ').'); now('draw', { seat: s, n: 2 * e.tok }); break;
+    case 'spyglass_perch': now('copyLoc', { seat: s }); break;
+    case 'quietstone_cloister': {
       const rc = resRecips(s); pickRecip(s, rc, 'Choose which rival receives your resources', 'cloGive', { seat: s, left: 2 }); P(s).pts += 4; lg(P(s).name + ' takes 4 point tokens.'); break;
     }
-    case 'university': {
+    case 'lorewood_college': {
       const p = P(s);
-      ask(s, 'university', 'Choose a card to disband', p.city.filter(x => x.id !== l.c).map(x => ({ label: 'Disband ' + cn(x.id) + ' (regain ' + rtxt(def(x.id).cost) + ')', card: x.id, h: 'uniGo', d: { seat: s, id: x.id, uni: l.c } })));
+      ask(s, 'lorewood_college', 'Choose a card to disband', p.city.filter(x => x.id !== l.c).map(x => ({ label: 'Disband ' + cn(x.id) + ' (regain ' + rtxt(def(x.id).cost) + ')', card: x.id, h: 'uniGo', d: { seat: s, id: x.id, uni: l.c } })));
       break;
     }
-    case 'storehouse': { const t = e.stock; gain(s, t); lg(P(s).name + ' hauls away ' + rtxt(t) + '.'); e.stock = newRes(); break; }
+    case 'hoard_cellar': { const t = e.stock; gain(s, t); lg(P(s).name + ' hauls away ' + rtxt(t) + '.'); e.stock = newRes(); break; }
   }
 }
 H.innPick = d => {
   const c = innCands(d.seat);
-  ask(d.seat, 'inn', 'Choose a meadow card to play for 3 fewer resources', c.map(id => ({ label: 'Play ' + cn(id) + ' (cost ' + rtxt(def(id).cost) + ', minus 3)', card: id, h: 'innGo', d: { seat: d.seat, id } })));
+  ask(d.seat, 'lantern_rest', 'Choose a meadow card to play for 3 fewer resources', c.map(id => ({ label: 'Play ' + cn(id) + ' (cost ' + rtxt(def(id).cost) + ', minus 3)', card: id, h: 'innGo', d: { seat: d.seat, id } })));
 };
-H.innGo = d => startPlay(d.seat, d.id, 'meadow', 'inn');
+H.innGo = d => startPlay(d.seat, d.id, 'meadow', 'lantern_rest');
 H.queenGo = d => startPlay(d.seat, d.id, d.from, 'free');
 H.poGive = d => {
   const p = P(d.seat);
@@ -5740,7 +5740,7 @@ H.cemReveal = d => {
   const opts = [];
   for (const id of a) if (placeable(d.seat, id, null)) opts.push({ label: 'Play ' + cn(id) + ' for free', card: id, h: 'cemPlay', d: { seat: d.seat, a, id } });
   opts.push({ label: 'Play none (discard all)', h: 'cemNone', d: { a } });
-  ask(d.seat, 'cemetery', 'Choose a revealed card to play for free', opts);
+  ask(d.seat, 'mossgrave_glade', 'Choose a revealed card to play for free', opts);
 };
 H.cemNone = d => { for (const id of d.a) { G.limbo.splice(G.limbo.indexOf(id), 1); G.discard.push(id); } };
 H.cemPlay = d => { for (const id of d.a) if (id !== d.id) { G.limbo.splice(G.limbo.indexOf(id), 1); G.discard.push(id); } startPlay(d.seat, d.id, 'limbo', 'free'); };
@@ -5773,7 +5773,7 @@ const EVFX = {
   sev_marsh_fever_remedy: (s, ev, i) => { P(s).res.berry -= 2; now('cityDisc', { seat: s, left: 2 }); },
   sev_commencement_of_pupils: (s, ev, i) => { ev.hid = true; now('gradTuck', { seat: s, i, left: 3 }); },
   sev_resident_minstrel: (s, ev, i) => now('stackN', { seat: s, i, r: 'berry' }),
-  sev_gilded_shrine_vault: s => { let t = 0; for (const e of P(s).city) if (key(e.id) === 'chapel') t += e.tok; if (t) { now('draw', { seat: s, n: t }); now('gainAny', { seat: s, n: t }); } },
+  sev_gilded_shrine_vault: s => { let t = 0; for (const e of P(s).city) if (key(e.id) === 'candlewick_shrine') t += e.tok; if (t) { now('draw', { seat: s, n: t }); now('gainAny', { seat: s, n: t }); } },
   sev_toll_holiday: s => activateProduction(s),
   sev_change_of_proprietors: (s, ev, i) => now('stackAny', { seat: s, i, left: 3 }),
 };
@@ -5843,7 +5843,7 @@ H.cityDiscDo = d => { const e = removeFromCity(d.seat, d.id); G.discard.push(e.i
 // ================= seasons =================
 H.prepare = d => { now('prepClock', d); now('prepRecall', d); };
 H.prepClock = d => {
-  const p = P(d.seat), t = p.city.find(e => key(e.id) === 'clock_tower' && e.tok > 0);
+  const p = P(d.seat), t = p.city.find(e => key(e.id) === 'dewdrop_belfry' && e.tok > 0);
   if (!t) return;
   const opts = [], seen = {};
   for (const pl of p.dep) { if (pl.perm || (pl.k !== 'basic' && pl.k !== 'forest')) continue; const tg = pl.k + pl.i; if (seen[tg]) continue; seen[tg] = 1; opts.push({ label: 'Spend a token: repeat ' + locLabel(pl), h: 'clockUse', d: { seat: d.seat, loc: { k: pl.k, i: pl.i }, tower: t.id } }); }
@@ -5868,9 +5868,9 @@ H.grimPlay = d => {
   use('solo:roll');
   if (id < 0) { lg(DATA.soloName + ' rolls ' + (slot + 1) + ' but finds no card.'); return; }
   const k = key(id);
-  if (k === 'fool') {
+  if (k === 'mudpie_jester') {
     const p = P(0);
-    if (cityCount(p) >= CITY || hasKey(p, 'fool')) { lg(DATA.soloName + ' rolls ' + (slot + 1) + ' (' + cn(id) + ') but cannot place it.'); return; }
+    if (cityCount(p) >= CITY || hasKey(p, 'mudpie_jester')) { lg(DATA.soloName + ' rolls ' + (slot + 1) + ' (' + cn(id) + ') but cannot place it.'); return; }
     G.meadow[slot] = -1; placeInCity(0, id); lg(DATA.soloName + ' plants ' + cn(id) + ' in your city.'); refill(); return;
   }
   G.meadow[slot] = -1; gr.city.push(id); lg(DATA.soloName + ' rolls ' + (slot + 1) + ' and plays ' + cn(id) + '.'); refill();
@@ -6015,25 +6015,25 @@ const GFLOOR = [4, 10, 16, 25];
 const EVV = { sev_grand_market_scheme: 6, sev_hurry_scurry_dash: 5.5, sev_night_of_sparklers: 5, sev_lost_parchments_unearthed: 4, sev_acorn_bandits_seized: 3.5, sev_marsh_fever_remedy: 2.5, sev_wingborne_healers: 3, sev_commencement_of_pupils: 4.5, sev_counsel_for_scoundrels: 3, sev_pilgrims_trail: 4, sev_resident_minstrel: 5, sev_gilded_shrine_vault: 5, sev_vigil_of_remembrance: 4, sev_toll_holiday: 6, sev_grand_hollow_games: 9, sev_change_of_proprietors: 5 };
 const EVX = { sev_counsel_for_scoundrels: 2, sev_pilgrims_trail: 2.5, sev_vigil_of_remembrance: 2.5, sev_wingborne_healers: 1 };
 const remProd = p => p.season === 0 ? 2 : p.season < 3 ? 1 : 0;
-const farms = p => { let n = 0; for (const e of p.city) if (key(e.id) === 'farm') n++; return n; };
+const farms = p => { let n = 0; for (const e of p.city) if (key(e.id) === 'bramble_allotment') n++; return n; };
 const costVal = c => { let v = 0; for (const r of RES) v += (c[r] || 0) * RV[r]; return v; };
 function extraVal(k, e, p, rem) {
   const nf = farms(p), fut = p.season < 3 ? 3 : 1.2, vis = p.season < 3 ? 1 : 0.6;
   switch (k) {
-    case 'farm': return 0.5 * rem;
-    case 'general_store': return (0.5 + (nf ? 0.5 : 0)) * rem;
-    case 'mine': return 0.8 * rem; case 'resin_refinery': return 0.55 * rem; case 'twig_barge': return 0.6 * rem;
-    case 'barge_toad': return 0.6 * nf * rem + 0.2;
-    case 'fair_grounds': return 1.4 * rem;
-    case 'husband': return e.pair != null && nf ? 0.55 * rem : 0;
-    case 'chip_sweep': return 0.8 * rem; case 'doctor': return 1.3 * rem; case 'woodcarver': return 1.1 * rem;
-    case 'monk': return 1.6 * rem; case 'peddler': return 0.4 * rem; case 'teacher': return 0.8 * rem; case 'miner_mole': return 0.9 * rem;
-    case 'storehouse': { let s = 0; if (e.stock) for (const r of RES) s += e.stock[r] * RV[r]; return 1.0 * rem + s * 0.9; }
-    case 'historian': return 0.7 * fut; case 'shopkeeper': return 0.5 * fut; case 'courthouse': return 0.5 * fut * 0.7;
-    case 'judge': return 1.5; case 'crane': return 1.4; case 'dungeon': return 1.4; case 'innkeeper': return 1.1;
-    case 'clock_tower': return e.tok * 0.6;
-    case 'chapel': return 1.5 * vis; case 'inn': return 1.8 * vis; case 'post_office': return 1.0 * vis; case 'queen': return 2.5 * vis;
-    case 'cemetery': return 3.0 * vis; case 'lookout': return 1.8 * vis; case 'monastery': return 3.0 * vis; case 'university': return 1.5 * vis;
+    case 'bramble_allotment': return 0.5 * rem;
+    case 'cranny_market': return (0.5 + (nf ? 0.5 : 0)) * rem;
+    case 'flintpit': return 0.8 * rem; case 'amber_still': return 0.55 * rem; case 'kindling_raft': return 0.6 * rem;
+    case 'reedpunt_toad': return 0.6 * nf * rem + 0.2;
+    case 'midsummer_green': return 1.4 * rem;
+    case 'goodman_vole': return e.pair != null && nf ? 0.55 * rem : 0;
+    case 'tinder_chipmunk': return 0.8 * rem; case 'poultice_badger': return 1.3 * rem; case 'whittle_beaver': return 1.1 * rem;
+    case 'brother_moss': return 1.6 * rem; case 'haggle_magpie': return 0.4 * rem; case 'slate_schoolmarm': return 0.8 * rem; case 'echo_mole': return 0.9 * rem;
+    case 'hoard_cellar': { let s = 0; if (e.stock) for (const r of RES) s += e.stock[r] * RV[r]; return 1.0 * rem + s * 0.9; }
+    case 'chronicle_owl': return 0.7 * fut; case 'tallyshop_mouse': return 0.5 * fut; case 'mosswood_assize': return 0.5 * fut * 0.7;
+    case 'gavel_marten': return 1.5; case 'pulley_lift': return 1.4; case 'thornhold_cells': return 1.4; case 'hostler_hedgehog': return 1.1;
+    case 'dewdrop_belfry': return e.tok * 0.6;
+    case 'candlewick_shrine': return 1.5 * vis; case 'lantern_rest': return 1.8 * vis; case 'dovecote_depot': return 1.0 * vis; case 'thistle_regent': return 2.5 * vis;
+    case 'mossgrave_glade': return 3.0 * vis; case 'spyglass_perch': return 1.8 * vis; case 'quietstone_cloister': return 3.0 * vis; case 'lorewood_college': return 1.5 * vis;
   }
   return 0;
 }
@@ -6041,14 +6041,14 @@ const pe = { pair: null, tok: 0, stock: null };
 function projBonus(k, p) {
   const cc = (pred) => { let n = 0; for (const e of p.city) if (pred(def(e.id))) n++; return n; };
   switch (k) {
-    case 'castle': return cc(c => c.kind === 'construction' && !c.unique) + 2;
-    case 'palace': return cc(c => c.kind === 'construction' && c.unique) + 2;
-    case 'school': return cc(c => c.kind === 'critter' && !c.unique) + 2;
-    case 'theater': return cc(c => c.kind === 'critter' && c.unique) + 2;
-    case 'ever_tree': return cc(c => c.color === 'purple') + 2;
-    case 'king': return 3;
-    case 'architect': return Math.min(6, p.res.resin + p.res.pebble) + 1;
-    case 'wife': return p.city.some(e => key(e.id) === 'husband' && e.pair == null) ? 3 : 1.2;
+    case 'stonecrown_keep': return cc(c => c.kind === 'construction' && !c.unique) + 2;
+    case 'gildenfern_court': return cc(c => c.kind === 'construction' && c.unique) + 2;
+    case 'acorn_academy': return cc(c => c.kind === 'critter' && !c.unique) + 2;
+    case 'glowworm_playhouse': return cc(c => c.kind === 'critter' && c.unique) + 2;
+    case 'elderheart_oak': return cc(c => c.color === 'purple') + 2;
+    case 'bramble_sovereign': return 3;
+    case 'master_lathwright': return Math.min(6, p.res.resin + p.res.pebble) + 1;
+    case 'goodwife_vole': return p.city.some(e => key(e.id) === 'goodman_vole' && e.pair == null) ? 3 : 1.2;
   }
   return 0;
 }
@@ -6137,13 +6137,13 @@ function quickQ(W, seat) {
     case 'spend': return 0;
     case 'trade': { let bi = o.length - 1, bv = 0.12; o.forEach((x, i) => { if (!x.res) return; const gain = Math.max(...RES.map(r => resGain(W, seat, r))) - RV[x.res] * 0.8; if (gain > bv) { bv = gain; bi = i; } }); return bi; }
     case 'stock': return argmax(x => { const k = Object.keys(x.d.o)[0]; return x.d.o[k] * RV[k]; });
-    case 'meadow': case 'inn': case 'queen': case 'cemetery': case 'pigeon': case 'bazaar': {
+    case 'meadow': case 'lantern_rest': case 'thistle_regent': case 'mossgrave_glade': case 'pigeon': case 'bazaar': {
       return argmax(x => { if (x.card === undefined) return x.label && /deck/.test(x.label) ? 0.3 : x.label && /discard pile/.test(x.label) ? 0.2 : x.label && /Stop|Do not|none|neither/.test(x.label) ? -0.5 : 0; const c = def(x.card); return cardVal(W, p, x.card) - costVal(c.cost) * (q.kind === 'meadow' ? 0.3 : 1) * 0.9; });
     }
     case 'clear': return argmax(x => -cardVal(W, W.players[(seat + 1) % W.players.length], x.card) + 0.1 * cardVal(W, p, x.card));
     case 'prisoner': return argmax(x => -cardVal(W, p, x.card) - def(x.card).pts);
-    case 'ruins': return argmax(x => costVal(def(x.card).cost) - def(x.card).pts - extraVal(key(x.card), pe, p, remProd(p)));
-    case 'university': return argmax(x => costVal(def(x.card).cost) - def(x.card).pts - extraVal(key(x.card), pe, p, remProd(p)) - projBonus(key(x.card), p));
+    case 'toppled_hall': return argmax(x => costVal(def(x.card).cost) - def(x.card).pts - extraVal(key(x.card), pe, p, remProd(p)));
+    case 'lorewood_college': return argmax(x => costVal(def(x.card).cost) - def(x.card).pts - extraVal(key(x.card), pe, p, remProd(p)) - projBonus(key(x.card), p));
     case 'cityDisc': return argmax(x => -(def(x.card).pts + extraVal(key(x.card), pe, p, remProd(p)) + projBonus(key(x.card), p)));
     case 'banish': return argmax(x => def(x.card).pts + (def(x.card).color === 'purple' ? 1 : 0));
     case 'teach': return argmax(x => hv(x.card));
@@ -6157,7 +6157,7 @@ function quickQ(W, seat) {
     case 'chip': case 'mole': return argmax(x => extraVal(key(x.card), pe, p, 1));
     case 'copy': return argmax(x => locVal(W, seat, x.d.loc));
     case 'clock': return argmax(x => x.d && x.d.loc ? locVal(W, seat, x.d.loc) - 0.5 : 0.3);
-    case 'ranger': {
+    case 'trailwarden_fox': {
       if (o.length === 1) return 0;
       if (o[0].h === 'rangerPlace') return argmax(x => locVal(W, seat, x.d.loc));
       let bi = o.length - 1, bv = 0.3;
@@ -6979,9 +6979,9 @@ const HBS = {
     forest:  { title: 'The forest', say: 'Tap Bumper Bramble for 3 berries. Forest places give more.', react: 'Three berries!' },
     prep2:   { ch: 4, title: 'Summer comes', say: 'Workers out again. Tap Prepare for Summer.', react: 'Summer! One more worker.' },
     summer:  { title: 'Summer cards', say: 'Summer lets you take 2 meadow cards. Tap two cards.', react: 'Two new cards.' },
-    inn:     { title: 'Your Inn', say: 'Send a worker to your Inn. Meadow cards cost 3 less.' },
+    lantern_rest:     { title: 'Your Inn', say: 'Send a worker to your Inn. Meadow cards cost 3 less.' },
     innbuy:  { title: 'Buy at the Inn', say: n => 'Tap ' + n + '. It costs 3 berries, minus 3: free!', react: 'Free! The Inn paid for it.' },
-    bard:    { title: 'Keep your cards', say: 'This card trades cards for points. Keep yours: tap Done.' },
+    ballad_finch:    { title: 'Keep your cards', say: 'This card trades cards for points. Keep yours: tap Done.' },
     special: { title: 'Special events', say: (a, n) => a + ' plus ' + n + ' unlock this special event. Tap it.', react: 'Claimed! Only one player gets it.' },
     stack:   { title: 'Berries for points', say: 'Each berry you leave here scores 2. Tap Place 3.', react: 'Six points of berries!' },
     haven:   { title: 'The Haven', say: 'Tap the Haven. Two cards there become one good.' },
@@ -7013,11 +7013,11 @@ const RESK = ['twig', 'resin', 'pebble', 'berry'];
 const SEAS = ['winter', 'spring', 'summer', 'autumn'];
 const SEASN = ['Winter', 'Spring', 'Summer', 'Autumn'];
 // data card key -> kit art key
-const ART = { architect: 'beetle_architect', bard: 'hedgehog_bard', barge_toad: 'toad_shopkeeper', chip_sweep: 'shrew_sweeper', doctor: 'bat_doctor', fool: 'mouse_fool', historian: 'owl_historian', husband: 'mouse_farmer', innkeeper: 'frog_innkeeper', judge: 'frog_judge', king: 'badger_king', miner_mole: 'mole_miner', monk: 'hedgehog_monk', peddler: 'rabbit_peddler', postal_pigeon: 'pigeon_postal', queen: 'rabbit_queen', ranger: 'shrew_ranger', shepherd: 'badger_harvester', shopkeeper: 'squirrel_shopkeeper', teacher: 'turtle_teacher', undertaker: 'toad_undertaker', wanderer: 'fox_wanderer', wife: 'hedgehog_farmer', woodcarver: 'squirrel_woodcarver',
-  castle: 'castle', cemetery: 'cemetery', chapel: 'chapel', clock_tower: 'clocktower', courthouse: 'courthouse', crane: 'crane', dungeon: 'dungeon', ever_tree: 'elderheart', fair_grounds: 'fairground', farm: 'farm', general_store: 'store', inn: 'inn', lookout: 'lookout', mine: 'mine', monastery: 'monastery', palace: 'palace', post_office: 'postoffice', resin_refinery: 'refinery', ruins: 'ruins', school: 'school', storehouse: 'storehouse', theater: 'theatre', twig_barge: 'barge', university: 'university' };
+const ART = { master_lathwright: 'beetle_architect', ballad_finch: 'hedgehog_bard', reedpunt_toad: 'toad_shopkeeper', tinder_chipmunk: 'shrew_sweeper', poultice_badger: 'bat_doctor', mudpie_jester: 'mouse_fool', chronicle_owl: 'owl_historian', goodman_vole: 'mouse_farmer', hostler_hedgehog: 'frog_innkeeper', gavel_marten: 'frog_judge', bramble_sovereign: 'badger_king', echo_mole: 'mole_miner', brother_moss: 'hedgehog_monk', haggle_magpie: 'rabbit_peddler', parcel_dove: 'pigeon_postal', thistle_regent: 'rabbit_queen', trailwarden_fox: 'shrew_ranger', crook_shrew: 'badger_harvester', tallyshop_mouse: 'squirrel_shopkeeper', slate_schoolmarm: 'turtle_teacher', hollow_sexton: 'toad_undertaker', footsore_drifter: 'fox_wanderer', goodwife_vole: 'hedgehog_farmer', whittle_beaver: 'squirrel_woodcarver',
+  stonecrown_keep: 'stonecrown_keep', mossgrave_glade: 'mossgrave_glade', candlewick_shrine: 'candlewick_shrine', dewdrop_belfry: 'clocktower', mosswood_assize: 'mosswood_assize', pulley_lift: 'pulley_lift', thornhold_cells: 'thornhold_cells', elderheart_oak: 'elderheart', midsummer_green: 'fairground', bramble_allotment: 'bramble_allotment', cranny_market: 'store', lantern_rest: 'lantern_rest', spyglass_perch: 'spyglass_perch', flintpit: 'flintpit', quietstone_cloister: 'quietstone_cloister', gildenfern_court: 'gildenfern_court', dovecote_depot: 'postoffice', amber_still: 'refinery', toppled_hall: 'toppled_hall', acorn_academy: 'acorn_academy', hoard_cellar: 'hoard_cellar', glowworm_playhouse: 'ballad_finch_pair', kindling_raft: 'barge', lorewood_college: 'lorewood_college' };
 const TYPEN = { traveler: 'Traveler', production: 'Production', destination: 'Destination', governance: 'Governance', prosperity: 'Prosperity' };
 const TYPEHELP = { traveler: 'Acts once when played.', production: 'Acts when played, then again every Spring and Autumn.', destination: 'A place where you can send a worker.', governance: 'Gives a lasting bonus or discount.', prosperity: 'Scores bonus points at the end.' };
-const spec = id => { const c = HB.cardOf(id); return { key: c.key, art: ART[c.key] || 'farm', name: c.name, type: c.type, kind: c.kind, unique: c.unique, cost: c.cost, points: c.pts, text: c.text }; };
+const spec = id => { const c = HB.cardOf(id); return { key: c.key, art: ART[c.key] || 'bramble_allotment', name: c.name, type: c.type, kind: c.kind, unique: c.unique, cost: c.cost, points: c.pts, text: c.text }; };
 const cdef = id => HB.cardOf(id);
 const cname = id => HB.cardName(id);
 const esc = s => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
@@ -7540,7 +7540,7 @@ function trayChip(m, i, tg) {
     const c = cdef(m.card);
     if (m.how === 'pay') inner = [costEl(c.cost, 20)];
     else if (m.how === 'occupy') inner = [h('b', 'free'), cardEl(m.via, 26)];
-    else inner = [h('b', ({ innkeeper: 'Inn −3', crane: 'Crane −3', dungeon: 'Cells −3', judge: 'Swap' })[m.how] || 'Play'), m.via != null ? cardEl(m.via, 26) : null];
+    else inner = [h('b', ({ hostler_hedgehog: 'Inn −3', pulley_lift: 'Crane −3', thornhold_cells: 'Cells −3', gavel_marten: 'Swap' })[m.how] || 'Play'), m.via != null ? cardEl(m.via, 26) : null];
   } else if (m.type === 'worker' && m.k === 'journey') inner = [ic('road', 22), h('b', D.journey[m.i].points)];
   else if (m.type === 'choose') {
     if (m.card !== undefined && effQ()) inner = [h('b', cname(m.card)), h('span.eff', effLine(m.card))];
@@ -7597,7 +7597,7 @@ function renderActs(mm, qm, qShown) {
 function renderPrompt() {
   const pr = $('#prompt'); if (!pr || !G) return;
   pr.textContent = promptText();
-  pr.classList.toggle('mine', !!(G.phase !== 'over' && !G.players[HB.actor(G)].ai && (!NET.on || HB.actor(G) === viewSeat())));
+  pr.classList.toggle('flintpit', !!(G.phase !== 'over' && !G.players[HB.actor(G)].ai && (!NET.on || HB.actor(G) === viewSeat())));
 }
 function renderBar() { }
 function renderDock() { renderPrompt(); }
@@ -7620,7 +7620,7 @@ function promptText() {
 // the line for a pending decision: plain, whole, 12 words at most (wraps to 2 lines in the bar; the long wording stays in the log)
 function qShort(q) {
   if (q.kind === 'discard') { const d = q.opts[0] && q.opts[0].d, c = (d && d.count) || 0, mx = d && d.max; if (c || (mx && mx < 9)) { const mn = (d && d.min) || 0, ex = mn && mn === mx; return c + (mx && mx < 9 ? ' of ' + mx : '') + ' discarded. ' + (ex ? 'Tap ' + (mx - c) + ' more.' : c >= mn ? 'Tap more, or Done.' : 'Tap ' + (mn - c) + ' more.'); } }   // a running count before Done
-  const m = ({ discard: 'Tap cards to discard, then tap Done.', resource: 'Pick the resource you want to gain.', meadow: 'Tap a meadow card to take it.', production: 'Pick which green card works next.', ruins: 'Raze a building for its cost back.', recipient: 'Pick the rival who gets it.', give: 'Pick what to give away.', stack: 'Pick how many to put here.', trigger: 'Pick which effect goes first.', queen: 'Play a card worth up to 3 free.', inn: 'Play a meadow card 3 cheaper.', university: 'Remove a card for its cost back.', cemetery: 'Reveal 4 from the deck or discards?', copy: 'Tap a place to copy its reward.', prisoner: 'Tap a critter to lock in the cells.', clear: 'Tap a meadow card to clear away.', recall: 'Tap a worker to bring back to you.', ranger: 'Pick a worker, then where it goes.', tuck: 'Tuck a critter under the goal.', cityDisc: 'Tap a city card to discard.', banish: 'Tap a card to remove from the game.', teach: 'Keep one; your rival gets the other.', pigeon: 'Play a shown card free, or skip.', waive: 'Pick resources to leave off the cost.', judge: 'Pick a resource in the cost to swap.', spend: 'Spend goods for tokens, or stop.', trade: 'Trade up to 2 goods for any 2.', bazaar: 'Play one card you took for 1 less?', scroll: 'Keep it, or tuck it for 1 point?', clock: 'Belfry: repeat a place, or skip.', mole: 'Pick a rival green card to copy.', chip: 'Pick a green card to run again.', stock: 'Pick a stack for the cellar.' })[q.kind];
+  const m = ({ discard: 'Tap cards to discard, then tap Done.', resource: 'Pick the resource you want to gain.', meadow: 'Tap a meadow card to take it.', production: 'Pick which green card works next.', toppled_hall: 'Raze a building for its cost back.', recipient: 'Pick the rival who gets it.', give: 'Pick what to give away.', stack: 'Pick how many to put here.', trigger: 'Pick which effect goes first.', thistle_regent: 'Play a card worth up to 3 free.', lantern_rest: 'Play a meadow card 3 cheaper.', lorewood_college: 'Remove a card for its cost back.', mossgrave_glade: 'Reveal 4 from the deck or discards?', copy: 'Tap a place to copy its reward.', prisoner: 'Tap a critter to lock in the cells.', clear: 'Tap a meadow card to clear away.', recall: 'Tap a worker to bring back to you.', trailwarden_fox: 'Pick a worker, then where it goes.', tuck: 'Tuck a critter under the goal.', cityDisc: 'Tap a city card to discard.', banish: 'Tap a card to remove from the game.', teach: 'Keep one; your rival gets the other.', pigeon: 'Play a shown card free, or skip.', waive: 'Pick resources to leave off the cost.', gavel_marten: 'Pick a resource in the cost to swap.', spend: 'Spend goods for tokens, or stop.', trade: 'Trade up to 2 goods for any 2.', bazaar: 'Play one card you took for 1 less?', scroll: 'Keep it, or tuck it for 1 point?', clock: 'Belfry: repeat a place, or skip.', mole: 'Pick a rival green card to copy.', chip: 'Pick a green card to run again.', stock: 'Pick a stack for the cellar.' })[q.kind];
   const n = qLeft(q), t = m || wordsCap(q.title, 12);
   return n > 1 ? t.replace(/[.?]$/, '') + ': ' + n + ' left.' : t;
 }
@@ -7839,7 +7839,7 @@ function pvRender() {
       const short = PV_BOARD[fk] || (kind === 'haven' ? '2 cards for any 1' : [w.main.replace(/ \+ /g, ', '), (w.sub || '').replace(/\s*·?\s*shared/, '')].filter(Boolean).join(', '));
       const parts = short.split(', '); e.appendChild(h('span.pv-tin', h('span.pv-sw', h('b', parts.length < 2 ? short : parts.flatMap((t, j) => j ? [' ', h('span.pv-it', t + (j < parts.length - 1 ? ',' : ''))] : [h('span.pv-it', t + (parts.length > 1 ? ',' : ''))])))));   // each item stays whole on its line
       if (sh) e.appendChild(h('span.pv-shtag', 'shared'));
-      if (kind === 'haven' && HBKit.paintedHref) { const ph = HBKit.paintedHref('general_store'); if (ph) { e.style.setProperty('--pa', 'url("' + ph + '")'); e.classList.add('pv-painted'); } }   // the haven has no painting of its own: the trading post card fits it
+      if (kind === 'haven' && HBKit.paintedHref) { const ph = HBKit.paintedHref('cranny_market'); if (ph) { e.style.setProperty('--pa', 'url("' + ph + '")'); e.classList.add('pv-painted'); } }   // the haven has no painting of its own: the trading post card fits it
     } else
     e.appendChild(h('span.pv-tin', h('span.pv-sico', ic(w.ico, small ? 22 : 26)), h('span.pv-sw', h('b', w.main), w.sub ? h('span', w.sub) : null)));
     const legal = tg && okw.has(tg);
@@ -8065,7 +8065,7 @@ function shake(el) { if (!el) return; el.classList.remove('shk'); void el.offset
 function deadSay(tg) {
   try {
     const a = HB.actor(G), p = G.players[a]; if (!p || p.ai || (typeof NET !== 'undefined' && NET.on && a !== viewSeat())) return;
-    if (G.q) { toast(G.q.kind === 'meadow' || G.q.kind === 'clear' || G.q.kind === 'inn' ? 'Tap a meadow card, not your hand' : 'Finish the choice first'); return; }
+    if (G.q) { toast(G.q.kind === 'meadow' || G.q.kind === 'clear' || G.q.kind === 'lantern_rest' ? 'Tap a meadow card, not your hand' : 'Finish the choice first'); return; }
     const m = /^x:([hm])(\d+)$/.exec(tg);
     if (m) {
       const id = +m[2], c = cdef(id), cost = c.cost || {}, miss = [];
@@ -8753,7 +8753,7 @@ function kitSettings() {
       if (typeof hlpInit === 'function') { hlpInit(); if (typeof GXH !== 'undefined') S.appendChild(GXH.settingsRow({ rowClass: 'gx-row', btnClass: 'gx-sb' })); }
       S.appendChild(GX.row('Hints', GX.onoff(!!UI.hints, v => { UI.hints = !!v; try { localStorage.setItem('hb_hints', v ? '1' : '0'); } catch (x) { } UI.gtop = null; UI.recKey = ''; render(); }, 'Hints'), 'Finger on the best move, previews and ratings'));
     },
-    about: { name: 'Hollowbough', version: 'preview', text: 'A woodland city-building game. Art and music by Am015-dev.' }
+    about: { name: 'Hollowbough', version: 'preview', text: 'A woodland city-building game.' }
   });
 }
 // ---- component reference
@@ -8992,7 +8992,7 @@ const HP = {
   cost: () => costEl({ twig: 2, berry: 1 }, 24),
   card: () => cardEl(firstCardId(), 40)
 };
-function firstCardId() { try { for (let i = 0; i < HB.NCARDS; i++) if (HB.cardKey(i) === 'architect') return i; } catch (e) { } return 0; }
+function firstCardId() { try { for (let i = 0; i < HB.NCARDS; i++) if (HB.cardKey(i) === 'master_lathwright') return i; } catch (e) { } return 0; }
 function hnode(x) { try { const n = typeof x === 'function' ? x() : x; return n && n.outerHTML ? n.outerHTML : String(n || ''); } catch (e) { return ''; } }
 function hpics(items) { return '<div class="gxh-pics">' + items.map(it => it === '>' ? '<span class="gxh-ar">&rarr;</span>' : '<figure>' + hnode(it[0]) + (it[1] ? '<figcaption>' + it[1] + '</figcaption>' : '') + '</figure>').join('') + '</div>'; }
 // ---------------------------------------------------------------- where each bubble points
@@ -9069,7 +9069,7 @@ function hlpWhy(m, a) {
     else if (m.k === 'dest') t = (m.o === a ? 'Use ' + cname(m.c) + ' in your city.' : 'Visit ' + cname(m.c) + ': you use its power. Its owner gets a point token.');
   } else if (m.type === 'play') {
     const nm = cname(m.card), pts = cdef(m.card).pts;
-    if (HB.cardKey(m.card) === 'fool') t = 'Plant ' + nm + ' in a rival city: it costs them 2 points.';
+    if (HB.cardKey(m.card) === 'mudpie_jester') t = 'Plant ' + nm + ' in a rival city: it costs them 2 points.';
     else if (m.how === 'pay') t = 'Build ' + nm + ': you can afford it' + (pts ? ', and it scores ' + pts + (pts === 1 ? ' point.' : ' points.') : '.');
     else if (m.how === 'occupy') t = 'Play ' + nm + ' free into its matching building.';
     else t = 'Play ' + nm + ' the cheaper way.';
@@ -9185,20 +9185,20 @@ function tutTake(g, key, avoid) {
 function tutStage(g) {
   const p = g.players[0], out = [];
   while (p.hand.length) g.discard.push(p.hand.pop());
-  for (const k of ['mine', 'twig_barge', 'resin_refinery', 'farm', 'wife']) { const id = tutTake(g, k, out); p.hand.push(id); out.push(id); }
-  for (const k of ['inn', 'post_office', 'lookout']) { const id = tutTake(g, k, out); HB._.withG(g, () => HB._.placeInCity(0, id)); out.push(id); }
+  for (const k of ['flintpit', 'kindling_raft', 'amber_still', 'bramble_allotment', 'goodwife_vole']) { const id = tutTake(g, k, out); p.hand.push(id); out.push(id); }
+  for (const k of ['lantern_rest', 'dovecote_depot', 'spyglass_perch']) { const id = tutTake(g, k, out); HB._.withG(g, () => HB._.placeInCity(0, id)); out.push(id); }
   // Bramble starts with a small city of her own too, so the demo ends close (you just ahead), not 22 to 1
-  for (const k of ['castle', 'farm', 'mine', 'twig_barge', 'architect']) { const id = tutTake(g, k, out); HB._.withG(g, () => HB._.placeInCity(1, id)); out.push(id); }
-  const toad = tutTake(g, 'barge_toad', out); const old = g.meadow[2]; if (old >= 0) g.discard.push(old); g.meadow[2] = toad; out.push(toad);
-  const bard = tutTake(g, 'bard', out); const o5 = g.meadow[5]; if (o5 >= 0) g.discard.push(o5); g.meadow[5] = bard; TUT_BARD = bard;   // bought at the Inn in Summer
+  for (const k of ['stonecrown_keep', 'bramble_allotment', 'flintpit', 'kindling_raft', 'master_lathwright']) { const id = tutTake(g, k, out); HB._.withG(g, () => HB._.placeInCity(1, id)); out.push(id); }
+  const toad = tutTake(g, 'reedpunt_toad', out); const old = g.meadow[2]; if (old >= 0) g.discard.push(old); g.meadow[2] = toad; out.push(toad);
+  const bard = tutTake(g, 'ballad_finch', out); const o5 = g.meadow[5]; if (o5 >= 0) g.discard.push(o5); g.meadow[5] = bard; TUT_BARD = bard;   // bought at the Inn in Summer
   { const mk = D.specialEvents.findIndex(e => e.key === 'sev_resident_minstrel'), j = g.sev.findIndex(e => e.k === mk); if (j > 0) g.sev[j].k = g.sev[0].k; g.sev[0].k = mk; }   // Inn + that card = this special event
   g.forest = [6, 1, 5];   // Bumper Bramble, Foragers Crossing, Mixed Glade
   g.nolog = false;
 }
 const tutId = k => { const h = G && G.players[0].hand.find(id => HB.cardKey(id) === k); return h == null ? -1 : h; };
-const tutToad = () => G.meadow.find(id => id >= 0 && HB.cardKey(id) === 'barge_toad');
+const tutToad = () => G.meadow.find(id => id >= 0 && HB.cardKey(id) === 'reedpunt_toad');
 let TUT_BARD = -1; const tutBard = () => TUT_BARD;
-const tutInn = () => { const e = G && G.players[0].city.find(c => HB.cardKey(c.id) === 'inn'); return e ? e.id : -1; };
+const tutInn = () => { const e = G && G.players[0].city.find(c => HB.cardKey(c.id) === 'lantern_rest'); return e ? e.id : -1; };
 // a pending choice of mine: the index of the first option that passes f, and its button
 const myQ = kind => !!G && !!G.q && G.q.who === 0 && (!kind || G.q.kind === kind) && !UI.cards.length && !UI.animBusy;
 const qIdx = f => (G && G.q ? G.q.opts.findIndex(f) : -1);
@@ -9258,31 +9258,31 @@ function tutSteps() {
     { id: 'rival', title: S.rival.title, say: () => tsay('rival', pname(1)), target: () => { const e = document.querySelector('#bd .tile[data-k="basic"][data-i="3"]'); return e && e.getBoundingClientRect().width ? e : null; }, wait: null,
       ready: () => G.players[1].dep.length === 1 && myTurn() },
     { id: 'resin', title: S.resin.title, say: tsay('resin'), target: tgEl('w:basic:6'), wait: tapIs('w:basic:6'), ready: () => myTurn() && !!tgEl('w:basic:6')() },
-    { id: 'hand', title: S.hand.title, say: tsay('hand'), target: tq('#bd .strip.hand'), wait: null, ready: () => myTurn() && !!tgEl('p:hand:' + tutId('farm'))() },
-    { id: 'build', title: S.build.title, say: tsay('build'), target: () => tutHandRect('p:hand:' + tutId('farm')), wait: tapIs(() => 'p:hand:' + tutId('farm')),
-      ready: () => myTurn() && !!tgEl('p:hand:' + tutId('farm'))() },
+    { id: 'hand', title: S.hand.title, say: tsay('hand'), target: tq('#bd .strip.hand'), wait: null, ready: () => myTurn() && !!tgEl('p:hand:' + tutId('bramble_allotment'))() },
+    { id: 'build', title: S.build.title, say: tsay('build'), target: () => tutHandRect('p:hand:' + tutId('bramble_allotment')), wait: tapIs(() => 'p:hand:' + tutId('bramble_allotment')),
+      ready: () => myTurn() && !!tgEl('p:hand:' + tutId('bramble_allotment'))() },
     { id: 'city', title: S.city.title, say: () => tsay('city', HB.cityCount(G, 0)), target: tq('#bd .strip.city'), wait: null,
-      ready: () => !!G && G.players[0].city.some(e => HB.cardKey(e.id) === 'farm') && !UI.cards.length },
+      ready: () => !!G && G.players[0].city.some(e => HB.cardKey(e.id) === 'bramble_allotment') && !UI.cards.length },
     { id: 'prep', title: S.prep.title, say: tsay('prep'), target: tgEl('prep'), wait: tapIs('prep'),
       ready: () => myTurn() && !!tgEl('prep')() },
     { id: 'spring', title: S.spring.title, say: () => tsay('spring', G.players[0].workers, G.players[0].res.berry), target: tq('#bd .resrow'), wait: null,
       ready: () => !!G && G.players[0].season === 1 && !UI.cards.length },
     { id: 'berry', title: S.berry.title, say: tsay('berry'), target: tgEl('w:basic:0'), wait: tapIs('w:basic:0'), ready: () => myTurn() && !!tgEl('w:basic:0')() },
     { id: 'toad', title: S.toad.title, say: tsay('toad'), target: () => { const id = tutToad(); return id == null ? null : tgEl('p:meadow:' + id)(); },
-      wait: { type: 'tap', match: a => /^p:meadow:/.test(a.tg || '') && HB.cardKey(+a.tg.split(':')[2]) === 'barge_toad' }, ready: () => myTurn() && tutToad() != null && !!tgEl('p:meadow:' + tutToad())() },
-    { id: 'free', title: S.free.title, say: tsay('free'), target: () => tutHandRect('p:hand:' + tutId('wife')), wait: tapIs(() => 'p:hand:' + tutId('wife')),
-      ready: () => myTurn() && !!tgEl('p:hand:' + tutId('wife'))() },
+      wait: { type: 'tap', match: a => /^p:meadow:/.test(a.tg || '') && HB.cardKey(+a.tg.split(':')[2]) === 'reedpunt_toad' }, ready: () => myTurn() && tutToad() != null && !!tgEl('p:meadow:' + tutToad())() },
+    { id: 'free', title: S.free.title, say: tsay('free'), target: () => tutHandRect('p:hand:' + tutId('goodwife_vole')), wait: tapIs(() => 'p:hand:' + tutId('goodwife_vole')),
+      ready: () => myTurn() && !!tgEl('p:hand:' + tutId('goodwife_vole'))() },
     { id: 'event', title: S.event.title, say: tsay('event'), target: tgEl('w:bev:1'), wait: tapIs('w:bev:1'),
       ready: () => myTurn() && !!tgEl('w:bev:1')() },
     { id: 'forest', title: S.forest.title, say: tsay('forest'), target: tgEl('w:forest:0'), wait: tapIs('w:forest:0'), ready: () => myTurn() && !!tgEl('w:forest:0')() },
     { id: 'prep2', title: S.prep2.title, say: tsay('prep2'), target: tgEl('prep'), wait: tapIs('prep'), ready: () => myTurn() && G.players[0].season === 1 && !!tgEl('prep')() },
     { id: 'summer', title: S.summer.title, say: tsay('summer'), target: qEl(o => o.card !== undefined && o.card !== tutBard()), wait: { type: 'tap', times: 2, match: a => /^q:/.test(a.tg || '') && qTap(o => o.card !== undefined && o.card !== tutBard()).match(a) },
       ready: () => !!G && !!G.q && HB.actor(G) === 0 && !UI.cards.length && !UI.animBusy && !!tq('#bd [data-t^="q:"]')() },
-    { id: 'inn', title: S.inn.title, say: tsay('inn'), target: () => tgEl('d:' + tutInn())(), wait: tapIs(() => 'd:' + tutInn()),
+    { id: 'lantern_rest', title: S.lantern_rest.title, say: tsay('lantern_rest'), target: () => tgEl('d:' + tutInn())(), wait: tapIs(() => 'd:' + tutInn()),
       ready: () => myTurn() && G.players[0].season === 2 && !!tgEl('d:' + tutInn())() },
     { id: 'innbuy', title: S.innbuy.title, say: () => tsay('innbuy', cname(tutBard())), target: qEl(o => o.card === tutBard()), wait: qTap(o => o.card === tutBard()),
-      ready: () => myQ('inn') && !!qEl(o => o.card === tutBard())() },
-    { id: 'bard', title: S.bard.title, say: tsay('bard'), target: qEl(isDone), wait: qTap(isDone), ready: () => myQ('discard') && !!qEl(isDone)() },
+      ready: () => myQ('lantern_rest') && !!qEl(o => o.card === tutBard())() },
+    { id: 'ballad_finch', title: S.ballad_finch.title, say: tsay('ballad_finch'), target: qEl(isDone), wait: qTap(isDone), ready: () => myQ('discard') && !!qEl(isDone)() },
     { id: 'special', title: S.special.title, say: () => tsay('special', cname(tutInn()), cname(tutBard())), target: tgEl('w:sev:0'), wait: tapIs('w:sev:0'), ready: () => myTurn() && !!tgEl('w:sev:0')() },
     { id: 'stack', title: S.stack.title, say: tsay('stack'), target: qEl((o, i) => i === 0), wait: qTap(o => o === G.q.opts[0]), ready: () => myQ('stack') && !!qEl((o, i) => i === 0)() },
     { id: 'haven', title: S.haven.title, say: tsay('haven'), target: tgEl('w:haven'), wait: tapIs('w:haven'), ready: () => myTurn() && !!tgEl('w:haven')() },
@@ -9314,7 +9314,7 @@ function tutSteps() {
   // reaction beat after each action, and the next step waits until it has been read
   L.forEach(st => {
     const r = HBS.steps[st.id].react, rd = st.ready; UI.tutLog = UI.tutLog || [];
-    const tab = { twig: 'places', places: 'places', resin: 'places', rival: 'places', berry: 'places', forest: 'places', toad: 'meadow', event: 'goals', city: 'city', summer: 'meadow', haven: 'places', journey: 'goals', inn: 'city', innbuy: 'meadow', special: 'goals', gossip: 'places' }[st.id];
+    const tab = { twig: 'places', places: 'places', resin: 'places', rival: 'places', berry: 'places', forest: 'places', toad: 'meadow', event: 'goals', city: 'city', summer: 'meadow', haven: 'places', journey: 'goals', lantern_rest: 'city', innbuy: 'meadow', special: 'goals', gossip: 'places' }[st.id];
     if (st.id === 'goal') st.avoid = () => ['#bd .resrow', '#bd .pv-tabs', '#bd .strip.hand'].map(q => document.querySelector(q)).filter(Boolean).map(e => e.getBoundingClientRect()).filter(r => r.width);   // step 1 talks about the score chips: keep goods, tabs and hand clear
     if (tab) st.avoid = () => { const pn = document.querySelector('#bd .pv-panel.on'); return pn ? [pn.getBoundingClientRect()] : null; };   // the bubble keeps the board it talks about visible
     st.onEnter = () => { UI.tutLog.push(st.id); UI.tutTab = tab || null; if (tab) { UI.pvTab = tab; try { pvSetTab(tab, true); } catch (e) { } } };
@@ -9396,7 +9396,7 @@ const COACH = [
   { id: 'rival', when: (p, r) => r.dep.length >= 1 && p.dep.length >= 1, say: (p, r) => r.name + ' sent a worker. A place without the Shared mark holds one worker. It is closed to you.', later: 'A place without the Shared mark holds one worker.' },
   { id: 'hand', when: (p) => myTurnC() && p.hand.length > 0 && p.dep.length >= 1, say: () => 'Your hand holds plans. Glowing ones are affordable. Pay the price to build. City holds 15, hand holds 8.', later: 'Hand holds 8, city holds 15. Glowing cards are affordable.' },
   { id: 'build', when: (p) => p.city.length > 3, say: () => 'A building! It stays in your city. Green cards pay again in Spring and Autumn.', later: 'Cards stay in your city. Green cards pay in Spring and Autumn.' },
-  { id: 'free', when: (p) => !!p.hand.find(id => HB.cardKey(id) === 'wife') && p.city.some(e => HB.cardKey(e.id) === 'farm') && myTurnC(), say: () => 'The Goodwife fits your Allotment. She moves in free. Play her from your hand.', later: 'A critter moves into its matching building free.' },
+  { id: 'free', when: (p) => !!p.hand.find(id => HB.cardKey(id) === 'goodwife_vole') && p.city.some(e => HB.cardKey(e.id) === 'bramble_allotment') && myTurnC(), say: () => 'The Goodwife fits your Allotment. She moves in free. Play her from your hand.', later: 'A critter moves into its matching building free.' },
   { id: 'meadow', when: (p) => myTurnC() && p.dep.length >= 2 && p.res.berry >= 1, say: () => 'Anyone can buy from the meadow. Critters cost berries. The meadow refills.', later: 'The meadow holds 8 cards for anyone. Critters cost berries.' },
   { id: 'event', when: (p) => myTurnC() && p.season >= 1, say: () => 'Flags are events. Build what one needs, then claim it for three points. Only one player can.', later: 'Events: build what they need, claim first, 3 points.' },
   { id: 'prep', when: (p) => !p.passed && p.season < 3 && p.workers - p.dep.length === 0 && myTurnC(), say: p => 'All workers are out. Prepare: they come home and you gain ' + (p.season === 2 ? 'two more' : 'one more') + '. ' + (p.season === 1 ? 'Summer: take up to 2 meadow cards.' : 'Green cards pay.'), later: 'Prepare: workers come home. Spring and Autumn: green cards pay. Summer: take up to 2 meadow cards.' },
@@ -9408,7 +9408,7 @@ const COACH = [
 // rules that need a situation we cannot count on: told at the end
 const COACH_TALE = 1e9;   // the first game plays the whole year (R21: ending it after 14 actions left the rival with 4 cards); the cut-off code stays for a future short mode
 const COACH_LATER = [
-  { id: 'inn', later: 'The Inn and Post Office are open. You play a rival\'s open card. They get a point.' },
+  { id: 'lantern_rest', later: 'The Inn and Post Office are open. You play a rival\'s open card. They get a point.' },
   { id: 'haven', later: 'The Haven turns two discarded cards into one resource.' },
   { id: 'longroad', later: 'The Long Road opens in Autumn only.' },
   { id: 'special', later: 'Each special event needs two named cards in your city.' },
@@ -9614,7 +9614,7 @@ try { UI.hints = localStorage.getItem('hb_hints') === '1'; } catch (e) { UI.hint
 function hintsActive() { return !!(UI.hints || (UI.cfg && UI.cfg.coached)); }
 function goalCard() {
   // a painted goal card over the board: art, three short lines, Start
-  const src = typeof HB_ART !== 'undefined' && HB_ART.ever_tree ? HB_ART.ever_tree : null;   // the great tree painting
+  const src = typeof HB_ART !== 'undefined' && HB_ART.elderheart_oak ? HB_ART.elderheart_oak : null;   // the great tree painting
   UI.cards.unshift({ kind: 'goal', title: 'Your goal', sub: 'Win the Elderheart Oak', body: () => h('div.hb-goal', src ? h('img.hb-goal-art', { src, alt: '', draggable: 'false' }) : null,
     h('div.hb-goal-k', 'Your goal'), h('h2.hb-goal-t', 'Win the Elderheart Oak'),
     h('ul.goal', h('li', 'Build a city of critters and buildings.'), h('li', 'Cards, tokens and events all score points.'), h('li', 'Most points after Autumn wins.'))), buttons: [{ label: 'Start', a: 'cont' }] }); render();

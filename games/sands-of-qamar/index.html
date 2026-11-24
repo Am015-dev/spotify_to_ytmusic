@@ -705,6 +705,16 @@ html.g3d .own.cam{background-size:44px}
 #clegend{white-space:nowrap;background:rgba(40,24,10,.92);color:#fff6dc;padding:4px 10px;font-weight:700;font-size:13px}
 #cnote.on,#clegend.on{opacity:1;visibility:visible}
 @media (prefers-reduced-motion:reduce){.tile.cflash{animation:none!important}}
+
+/* Claims, phone-clear (owner report 24 Nov): solid owner ribbon on every claimed tile, strong tint + outline, persistent legend with counts */
+.tile.owned{border-width:4px;box-shadow:inset 0 0 0 2px #fff,inset 0 0 0 60px color-mix(in srgb,var(--oc) 42%,transparent),0 0 0 2px var(--oc)}
+.tile .ob{position:absolute;left:0;right:0;top:0;z-index:5;display:block;height:20px;line-height:20px;text-align:center;background:var(--pc);color:#fff;font:900 13px/20px var(--ff-b,system-ui);letter-spacing:.04em;border-bottom:2px solid #fff;white-space:nowrap;overflow:hidden;pointer-events:none;text-shadow:0 1px 1px rgba(0,0,0,.5)}
+.tile .own{width:34px;height:34px}
+#cleg{display:flex;flex-wrap:wrap;gap:4px;justify-content:center;align-items:center;padding:3px 4px;pointer-events:none;font:800 13px/1.2 var(--ff-b,system-ui);color:#2e1a0a}
+#cleg .lc{display:inline-flex;align-items:center;gap:4px;min-height:26px;padding:0 8px;border-radius:13px;background:#fff6dc;border:3px solid var(--pc)}
+#cleg .lc i{font-style:normal;display:inline-grid;place-items:center;width:22px;height:22px;border-radius:50%;background:var(--pc);font-size:13px}
+#cleg .ln{border-color:#8a5a1e;font-weight:700}
+html .tile.owned .tv{top:23px!important;right:3px!important}
 /* ===== GX skin: painted UI kit over the shared shell + campaign classes. Opt-in: nothing changes until gx-skin.js adds
    html.sk (after the kit files loaded). Kit files live in the game's media/ (ui-topbar, ui-iconbtn, ui-panel, ui-drawer-head,
    ui-button-cream/go/power, ui-row, ui-bubble, ui-node-*). Extra switches: html.sk-icons (icon-*.webp set), html.sk-map (story-map.webp),
@@ -1067,6 +1077,17 @@ html.skipon body #line{padding-right:96px!important;box-sizing:border-box}html b
 html.land #feed{pointer-events:none}html.land #acts,html.land #mine{z-index:3}
 
 html:not(.land) body #mkt .mrow .deckback{display:none!important}
+/* path picker: a docked row in the action area (never floats over the goods row or the board) */
+html body #acts .arow.f3opts{display:flex;gap:6px;justify-content:center;flex-wrap:nowrap}
+html body #acts .ab.f3opt{flex:1 1 0;min-width:44px;max-width:96px;min-height:44px;padding:2px 6px;display:flex;align-items:center;justify-content:center;gap:4px;background:#fff7e4;border:2px solid #b8532b;color:#3a1c08;border-radius:12px}
+html body #acts .ab.f3opt b{font:900 17px/1 var(--ff-b,system-ui);color:#b8532b}
+html body #acts .ab.f3opt small{font-size:13px;font-weight:700;white-space:nowrap}
+html body #acts .ab.f3opt .mp{flex:0 0 auto}
+html body #acts .ab.f3opt.on{background:#b8532b;color:#fff3c8;box-shadow:0 0 0 3px #ffd75a}html body #acts .ab.f3opt.on b{color:#ffd75a}
+html body #acts .ab.f3x{flex:0 0 48px;min-width:48px;min-height:44px}
+#grid .tile .f3num.f3alt{background:#fff7e4;color:#b8532b;box-shadow:0 0 0 2px #b8532b;left:auto;right:3px;top:auto;bottom:24px;min-width:24px;height:24px;line-height:24px;font-size:14px;opacity:.95}
+#grid .tile.f3end{box-shadow:inset 0 0 0 4px rgba(255,214,90,.98),0 0 0 2px rgba(80,40,0,.7)!important;animation:f3ring 1.2s ease-in-out infinite alternate}
+@keyframes f3ring{to{filter:brightness(1.12)}}
 /* ===== GX campaign styles: chapter map, story scenes, boss card, result. Theme with the --gxc-* variables. ===== */
 :root{--gxc-bg:#1b1410;--gxc-paper:#efe0bd;--gxc-paper2:#e2cc9b;--gxc-ink:#2a1d10;--gxc-dim:rgba(42,29,16,.68);--gxc-line:rgba(60,38,14,.28);
   --gxc-go:#c9662a;--gxc-go-ink:#fff8ec;--gxc-gold:#f2b93b;--gxc-a1:#4f8a4b;--gxc-a2:#c07a2c;--gxc-a3:#8e3b46;--gxc-road:#b98a52;--gxc-radius:16px;
@@ -1397,7 +1418,7 @@ html body :is(.gxh-ring,.gxt-ring){animation-duration:1.6s}
     <div id="seats"></div>
     <div id="line" aria-live="polite" data-fa-skip></div>
     <button id="whatbtn" class="btn sm" type="button" data-help hidden>What should I do?</button>
-    <div id="table" data-board><div id="gw"><div id="grid"></div><div id="chz" hidden></div></div><div id="mkt"></div><div id="mine"></div><div id="acts"></div></div>
+    <div id="table" data-board><div id="gw"><div id="grid"></div><div id="chz" hidden></div></div><div id="cleg" aria-label="Who owns what"></div><div id="mkt"></div><div id="mine"></div><div id="acts"></div></div>
   </main>
 </div>
 </div>
@@ -5988,8 +6009,10 @@ function tileHtml(t){const d=TILEDEF[t.k],i=t.i;
   return `<div class="${cls}" data-tile="${i}" data-n="${n}" role="button" style="${own!=null?'--oc:'+PCOL[own]+';':''}${cf?'--cf:'+Math.round(cf)+'ms;':''}" aria-label="${esc(tileName(t))}">
    <i class="ti">${TICON[t.k]}</i><span class="tn">${TSHORT[t.k]}</span>${t.v?`<b class="tv">${t.v}</b>`:''}<i class="tc">${tileCoord(i)}</i>
    <div class="ms">${mgHtml(t.m)}${hand.map(c=>mpHtml(c,1)).join('')}</div>
-   <div class="tk">${own!=null?`<b class="own${t.tent!=null?'':' cam'}" data-p="${own}" style="--pc:${PCOL[own]}">${t.tent!=null?'⛺':'🐪'}</b>`:''}${t.palm?`<span class="tok palm" data-n="${Math.min(3,t.palm)}">🌴${t.palm>1?'<small>×'+t.palm+'</small>':''}</span>`:''}${t.pal?`<span class="tok pal" data-n="${Math.min(3,t.pal)}">🏰${t.pal>1?'<small>×'+t.pal+'</small>':''}</span>`:''}</div></div>`}
-function renderGrid(){const g=$('#grid');if(!g)return;g.style.setProperty('--W',G.W);g.style.setProperty('--H',G.H);g.classList.toggle('dim',UI.pick.length>0);g.innerHTML=G.board.map(tileHtml).join('')}
+   ${own!=null?`<b class="ob" style="--pc:${PCOL[own]}">${t.tent!=null?'⛺':'🐪'} ${esc(ownLbl(own))}</b>`:''}<div class="tk">${own!=null?`<b class="own${t.tent!=null?'':' cam'}" data-p="${own}" style="--pc:${PCOL[own]}">${t.tent!=null?'⛺':'🐪'}</b>`:''}${t.palm?`<span class="tok palm" data-n="${Math.min(3,t.palm)}">🌴${t.palm>1?'<small>×'+t.palm+'</small>':''}</span>`:''}${t.pal?`<span class="tok pal" data-n="${Math.min(3,t.pal)}">🏰${t.pal>1?'<small>×'+t.pal+'</small>':''}</span>`:''}</div></div>`}
+function ownLbl(i){const p=G.pl[i];return (p.nm==='You'||(p.human&&G.pl.filter(q=>q.human).length===1)?'YOU':p.nm).toUpperCase().slice(0,6)}
+function renderLegend(){const el=$('#cleg');if(!el)return;const n=G.pl.map(()=>0);G.board.forEach(t=>{const o=owner(t);if(o!=null)n[o]++});el.innerHTML=G.pl.map(p=>`<span class="lc" style="--pc:${PCOL[p.i]}"><i>🐪</i><b>${esc(ownLbl(p.i))}</b> owns ${n[p.i]}</span>`).join('')+'<span class="lc ln">Camel = tile claimed · 🌴+3 · 🏰+5</span>'}
+function renderGrid(){const g=$('#grid');if(!g)return;renderLegend();g.style.setProperty('--W',G.W);g.style.setProperty('--H',G.H);g.classList.toggle('dim',UI.pick.length>0);g.innerHTML=G.board.map(tileHtml).join('')}
 function renderMarket(){const el=$('#mkt');if(!el)return;const tk=G.step==='tribe'&&G.act&&G.act.color==='merchant'&&G.phase==='turn'?G.act.n:0;
   let h='<div class="mrow" aria-label="Goods market">';for(let j=0;j<9;j++){const r=G.market[j];
     h+=r?`<button class="mcard ${UI.pickMk.includes(j)?'glow':''} ${UI.mkSel.includes(j)?'sel':''} ${j<tk?'mtake':''}" data-mk="${j}" data-r="${r}" style="--gi:url(media/good-${r}.webp)" aria-label="${esc(RNAME[r])}"><span class="mi">${RICON[r]}</span><span class="mn">${esc(RNAME[r])}</span></button>`:'<span class="mcard empty"></span>'}
@@ -7213,12 +7236,12 @@ function juice(prev,cur){if(!G||!prev||!cur)return;juMove(cur);if(!juOk()||G.ove
 // says what happened. The first time only, a legend line tells what the marks on the board mean. Decoration only: never blocks a tap, never changes G.
 function claimNote(f){if(!G||UI.sim||G.over||f.p==null||f.x==null)return;const t=G.board[f.x],p=G.pl[f.p];if(!t||!p)return;const you=p.nm==='You'||(p.human&&G.pl.filter(q=>q.human).length===1);
   const who=you?'You':p.nm,nm=TILEDEF[t.k].n,pl=tileCoord(t.i);let line;
-  if(f.t==='camel')line=f.w==='tent'?`${who} pitched the tent on ${nm} ${pl}: ${t.v} at end`:you?`You claimed ${nm} ${pl}: +${t.v} at end`:`${who} claimed ${nm} ${pl}: +${t.v} at end`;
+  if(f.t==='camel')line=f.w==='tent'?`${who} pitched the tent on ${nm} ${pl}: +${t.v} at end`:`🐪 ${who} spent a camel: ${you?'claimed':'claimed'} ${nm} ${pl} (+${t.v})`;
   else line=f.w==='pal'?`${who} raised a palace on ${nm} ${pl}: +5 at end`:`${who} planted a palm on ${nm} ${pl}: +3 at end`;
   UI.cflash={i:t.i,until:Date.now()+800};
   let el=document.getElementById('cnote');if(!el){el=document.createElement('div');el.id='cnote';el.setAttribute('role','status');el.setAttribute('data-help','');document.body.appendChild(el)}
   el.style.setProperty('--pc',PCOL[p.i]);el.textContent=line;const g=document.getElementById('grid');if(g){const r=g.getBoundingClientRect();el.style.top=Math.max(4,r.top-40)+'px'}
-  el.classList.remove('on');void el.offsetWidth;el.classList.add('on');clearTimeout(UI.cnT);UI.cnT=setTimeout(()=>el.classList.remove('on'),2600);
+  el.classList.remove('on');void el.offsetWidth;el.classList.add('on');clearTimeout(UI.cnT);UI.cnT=setTimeout(()=>el.classList.remove('on'),3800);
   let seen=0;try{seen=localStorage.getItem('soq_legend')}catch(e){}
   if(!seen){try{localStorage.setItem('soq_legend','1')}catch(e){}let lg=document.getElementById('clegend');if(!lg){lg=document.createElement('div');lg.id='clegend';lg.setAttribute('data-help','');document.body.appendChild(lg)}
     lg.innerHTML='🐪 = claimed (owner’s colour) · 🌴 +3 · 🏰 +5';const gr=g?g.getBoundingClientRect():null;const mk=document.getElementById('mkt'),mr=mk?mk.getBoundingClientRect():null;let tb=gr?gr.bottom:100;document.querySelectorAll('#grid .tile').forEach(x=>{tb=Math.max(tb,x.getBoundingClientRect().bottom)});lg.style.top=(tb+4)+'px';lg.classList.add('on');setTimeout(()=>lg.classList.remove('on'),5200)}
@@ -7228,15 +7251,15 @@ function claimNote(f){if(!G||UI.sim||G.over||f.p==null||f.x==null)return;const t
 // ===================== plan the walk in one tap (F3), end-of-game warning, sale note, Shadow star, lesson wrong-tap feedback =====================
 // Hooks live in ui.js (onTile, go, uiAct, buildActs, lineText, render). Rules are untouched: a planned path is played as normal legal step moves.
 // Rules are untouched: every drop of a planned path is a normal legal 'step' move, played one by one through go().
-const F3={plan:null,ends:null,key:'',warned:'',turn:-1,playing:false};
+const F3={opts:null,plan:null,ends:null,key:'',warned:'',turn:-1,playing:false};
 const f3Mine=()=>!!G&&!G.over&&!online()&&G.phase==='turn'&&G.step==='move'&&!!G.move&&!G.q&&!UI.pendDj&&!UI.pendItem&&!G.tut&&!(typeof gdStep==='function'&&gdStep())&&!!me()&&G.cur===me().i&&G.move.hand.length>=2;
 const f3Key=()=>G&&G.move?G.turn+'|'+G.round+'|'+G.move.path.join(','):'';
 // every ending still reachable from the walk so far: {e,c,n,path} (same counting as the computer's outcomes())
 function f3Outs(){const mv=G.move;if(!mv)return[];const hc=handCounts(mv.hand);const res={};const path=mv.path.slice();const visits={};let nodes=0;
   const rec=(at,prev,left)=>{if(nodes++>20000)return;for(const nx of ADJ(at)){if(nx===prev||G.board[nx].block)continue;path.push(nx);
-      if(left===1){const had=G.board[nx].m;for(const c in hc){const pre=had.filter(x=>x===c).length;const extra=Math.min(visits[nx]||0,hc[c]-1);if(pre||extra){const n=pre+extra+1;const key=nx+'|'+c;if(!res[key]||res[key].n<n)res[key]={e:nx,c,n,path:path.slice()}}}}
+      if(left===1){const had=G.board[nx].m;for(const c in hc){const pre=had.filter(x=>x===c).length;const extra=Math.min(visits[nx]||0,hc[c]-1);if(pre||extra){const n=pre+extra+1;const key=nx+'|'+c;const ps=path.join('>');const arr=res[key]||(res[key]=[]);if(!arr.some(x=>x.ps===ps)){arr.push({e:nx,c,n,path:path.slice(),ps});if(arr.length>3){arr.sort((a,b)=>b.n-a.n);arr.pop()}}}}}
       else{visits[nx]=(visits[nx]||0)+1;rec(nx,at,left-1);visits[nx]--}path.pop()}};
-  rec(mv.at,mv.prev,mv.hand.length);return Object.values(res)}
+  rec(mv.at,mv.prev,mv.hand.length);return [].concat(...Object.values(res))}
 // try the path on a copy: returns the legal step moves, or null
 function f3Try(o,wantFirst){const snap=JSON.stringify(G);const sim=UI.sim;UI.sim=1;const steps=[];let ok=false;
   try{let k=0;while(G.move&&k++<40){const vm=validMoves(G.cur).filter(m=>m.act==='step');const nx=o.path[G.move.path.length];const here=vm.filter(m=>m.tile===nx);if(!here.length)break;
@@ -7247,15 +7270,20 @@ function f3Try(o,wantFirst){const snap=JSON.stringify(G);const sim=UI.sim;UI.sim
   G=JSON.parse(snap);UI.sim=sim;return ok?steps:null}
 function f3Ends(){const k=f3Key();if(F3.key===k&&F3.ends)return F3.ends;F3.key=k;F3.ends={};if(!f3Mine())return F3.ends;
   for(const o of f3Outs()){(F3.ends[o.e]=F3.ends[o.e]||[]).push(o)}return F3.ends}
-function f3Plan(o){const steps=f3Try(o,false)||f3Try(o,true);if(!steps){toast('That path does not work. Try another tile.');return}
-  F3.plan={key:f3Key(),e:o.e,c:o.c,n:o.n,steps,path:steps.map(m=>m.tile)};render()}
+// every way to end on tile e: the best route of each colour first, then other routes, at most 4 (A-D)
+function f3Opts(list){const by={};for(const x of list)if(!by[x.c]||by[x.c].n<x.n)by[x.c]=x;const first=Object.values(by).sort((a,b)=>b.n-a.n);const rest=list.filter(x=>!first.includes(x)).sort((a,b)=>b.n-a.n);return first.concat(rest).slice(0,4)}
+function f3Plan(o,opts){const steps=f3Try(o,false)||f3Try(o,true);if(!steps){toast('That path does not work. Try another tile.');return}
+  F3.opts=opts&&opts.length>1?opts:null;F3.plan={key:f3Key(),e:o.e,c:o.c,n:o.n,steps,path:steps.map(m=>m.tile),o};render()}
 function f3Live(){return F3.plan&&F3.plan.key===f3Key()&&f3Mine()?F3.plan:null}
 function f3Go(){const pl=f3Live();if(!pl||F3.playing)return;F3.plan=null;F3.playing=true;const q=pl.steps.slice();
   const tick=()=>{if(!q.length||!G||!G.move){F3.playing=false;return}const m=q.shift();if(!validMoves(G.cur).some(x=>same(x,m))){F3.playing=false;render();return}go(m);setTimeout(tick,ANIM?150:0)};tick()}
 // draw: numbered drops on the planned path, a soft ring on every tile where the walk can end
-function f3Draw(){document.querySelectorAll('#grid .f3num').forEach(x=>x.remove());document.querySelectorAll('#grid .f3end,#grid .f3last').forEach(x=>x.classList.remove('f3end','f3last'));
+function f3Draw(){document.querySelectorAll('#grid .f3num,#grid .f3alt').forEach(x=>x.remove());document.querySelectorAll('#grid .f3end,#grid .f3last').forEach(x=>x.classList.remove('f3end','f3last'));
   if(!f3Mine()||F3.playing)return;const pl=f3Live();
-  if(pl){pl.path.forEach((t,k)=>{const el=tileEl(t);if(!el)return;const b=document.createElement('i');b.className='f3num';b.textContent=String(k+1);b.setAttribute('aria-hidden','true');b.setAttribute('data-help','');el.appendChild(b)});const le=tileEl(pl.e);if(le)le.classList.add('f3last');return}
+  if(pl){pl.path.forEach((t,k)=>{const el=tileEl(t);if(!el)return;const b=document.createElement('i');b.className='f3num';b.textContent=String(k+1);b.setAttribute('aria-hidden','true');b.setAttribute('data-help','');el.appendChild(b)});const le=tileEl(pl.e);if(le)le.classList.add('f3last');
+    if(F3.opts){const at={};F3.opts.forEach((x,i)=>{if(x.ps===pl.o.ps)return;x.path.forEach(t=>{if(t!==pl.e&&!pl.path.includes(t))(at[t]=at[t]||new Set()).add(String.fromCharCode(65+i))})});
+      for(const t in at){const el=tileEl(+t);if(!el)continue;const b=document.createElement('i');b.className='f3num f3alt';b.textContent=[...at[t]].join('');b.setAttribute('aria-hidden','true');b.setAttribute('data-help','');el.appendChild(b)}}
+    return}
   const ends=f3Ends();const st=new Set(UI.pick||[]);for(const k in ends){if(st.has(+k))continue;const el=tileEl(+k);if(el)el.classList.add('f3end')}}
 // ---------- the end is announced a round ahead; a sale says what coins are worth ----------
 function f3Warn(){if(!G||G.over||G.tut||G.coach||online())return;const t=document.getElementById('trk');const r=t&&t.querySelector('.trk-r');
@@ -7267,7 +7295,7 @@ function f3Warn(){if(!G||G.over||G.tut||G.coach||online())return;const t=documen
 function f3Sold(){if(!G||!G.log||!G.log.length)return;const e=G.log[0];if(!e||e.i===F3.soldN)return;if(/ sells? \d+ different goods for (\d+) coins/.test(e.t)){F3.soldN=e.i;const v=+RegExp.$1;const hp=me();
     if(hp&&G.cur===hp.i)try{plPop(hp.i,1,'Sold for '+v+' coins. Same points: each coin is 1 point at the end.')}catch(x){}}}
 // the djinn drawer closes at every new turn
-function f3Turn(){if(G&&F3.turn!==G.turn){F3.turn=G.turn;UI.pwOpen=false;F3.plan=null}}
+function f3Turn(){if(G&&F3.turn!==G.turn){F3.turn=G.turn;UI.pwOpen=false;F3.plan=null;F3.opts=null}}
 // Shadows with hints on: a star on the best target
 function f3Shadow(){document.querySelectorAll('#grid .f3star,#seats .f3star').forEach(x=>x.remove());if(!G||G.over||!hintsOn()||G.step!=='tribe'||!G.act||G.act.color!=='assassin'||!me()||G.cur!==me().i||(typeof gdStep==='function'&&gdStep()))return;
   const tr=validMoves(G.cur).filter(m=>m.act==='tribe'&&m.kill);if(!tr.length)return;const b=bestKill(me(),tr);if(!b||!b.kill)return;const el=b.kill.tile!=null?tileEl(b.kill.tile):document.querySelector('#seats [data-seat="'+b.kill.pl+'"]');
@@ -7284,12 +7312,19 @@ document.addEventListener('click',e=>{try{const st=typeof gdStep==='function'?gd
 // called from ui.js
 function f3TileTap(i){if(F3.playing)return true;try{if(f3Mine()&&!UI.chz){const ends=f3Ends()[i];const vm=validMoves(G.cur);const stepHere=vm.some(m=>m.act==='step'&&m.tile===i);
     if(ends&&ends.length&&!stepHere){const by={};for(const x of ends)if(!by[x.c]||by[x.c].n<x.n)by[x.c]=x;const cs=Object.values(by);
-      if(cs.length===1){f3Plan(cs[0]);return true}
-      pickChoose({tile:i},cs.map(x=>({html:mdotHtml(x.c)+'<small>take '+x.n+'</small>',m:{act:'f3plan',o:x}})));return true}
-    if(stepHere)F3.plan=null}}catch(e){console.error(e)}return false}
-function f3ActsHtml(){try{const pl=f3Live();if(pl){const nm=pl.n>1?MPLUR[pl.c]:MNAME[pl.c];
-    return `<div class="arow f3row"><button class="ab go f3go" data-ui="f3go">✓ Drop along path · take ${pl.n} ${esc(nm)}</button><button class="ab ghost" data-ui="f3x" aria-label="Clear the path">✕</button></div>`}}catch(e){}return ''}
-function f3Line(){try{if(F3.playing&&G&&G.move)return 'Dropping along the path…';if(f3Live())return 'Tap ✓ to drop along this path';if(f3Mine())return G.move.hand.length===2?'2 left: the last must land on its colour':'Tap where the walk ends, or drop one'}catch(e){}return ''}
+      const os=f3Opts(ends);f3Plan(os[0],os);return true}
+    if(stepHere){F3.plan=null;F3.opts=null}}}catch(e){console.error(e)}return false}
+function f3ActsHtml(){try{const pl=f3Live();if(pl){const nm=pl.n>1?MPLUR[pl.c]:MNAME[pl.c];let h='';
+    if(F3.opts)h+=`<div class="arow f3opts" role="group" aria-label="Choose a path">`+F3.opts.map((x,i)=>`<button class="ab f3opt${x.ps===pl.o.ps&&x.c===pl.c?' on':''}" data-f3opt="${i}" aria-label="Path ${String.fromCharCode(65+i)}: take ${x.n} ${esc(MNAME[x.c])}"><b>${String.fromCharCode(65+i)}</b>${mdotHtml(x.c)}<small>take ${x.n}</small></button>`).join('')+`</div>`;
+    return h+`<div class="arow f3row"><button class="ab go f3go" data-ui="f3go">✓ Drop along path · take ${pl.n} ${esc(nm)}</button><button class="ab ghost f3x" data-ui="f3x" aria-label="Clear the path">✕</button></div>`}}catch(e){}return ''}
+// tap a path chip (A-D): the board shows that path
+document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest('[data-f3opt]');if(!b||!F3.opts)return;e.stopPropagation();const i=+b.getAttribute('data-f3opt');const o=F3.opts[i];if(o)f3Plan(o,F3.opts)},true);
+function f3Line(){try{if(F3.playing&&G&&G.move)return 'Dropping along the path…';if(f3Live())return F3.opts?'Pick a path, then tap ✓':'Tap ✓ to drop along this path';if(f3Mine())return 'Tap a ringed tile where it ends'}catch(e){}return ''}
+// the 'who stays on this tile' chooser sits in the action row at the bottom, never over the goods row or the board
+function f3DockChz(){const el=document.getElementById('chz');if(!el||el.hidden||!UI.chz||!G||G.step!=='move'||!G.move||!UI.chz.opts.every(o=>!o.m||o.m.act==='step'))return;
+  const ac=document.getElementById('acts');if(!ac)return;const r=ac.getBoundingClientRect();if(!r.width)return;const h=52;const S=(k,v)=>el.style.setProperty(k,v,'important');
+  S('left','6px');S('right','6px');S('width','auto');S('top',Math.min(innerHeight-h-2,r.top)+'px');S('padding','2px 6px');S('height',h+'px');S('justify-content','center');S('align-items','center');S('box-sizing','border-box');S('bottom','auto');S('box-shadow','0 0 0 3px #ffd75a')}
+{const pc=placeChz;placeChz=function(){pc.apply(this,arguments);try{f3DockChz()}catch(e){}}}
 function f3After(){try{f3Draw();f3Warn();f3Sold();f3Shadow()}catch(e){console.error(e)}}
 
 </script>
