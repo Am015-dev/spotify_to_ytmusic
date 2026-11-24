@@ -2,7 +2,7 @@
 var CAMPSAVE=null;
 function campOn(){return !!(UI.camp&&typeof GXC!=='undefined'&&GXC.active())}
 function campLine(){try{if(typeof GXC==='undefined'||!window.CAMPAIGN)return '';const p=GXC.progress(),ch=window.CAMPAIGN.chapters,n=ch.filter(c=>p.ch[c.id]&&p.ch[c.id].beaten).length;return n?n+' of '+ch.length+' chapters done':'Ten chapters, three bosses'}catch(e){return ''}}
-function campStartBtn(){if(typeof GXC==='undefined'||!window.CAMPAIGN)return '';return `<button class="btn camp" data-camp="open">📖 Story mode<small>${esc(campLine())}</small></button>`}
+function campStartBtn(){if(typeof GXC==='undefined'||!window.CAMPAIGN)return '';return `<button class="btn camp" data-camp="open"> Story mode<small>${esc(campLine())}</small></button>`}
 function campMe(){return G?G.pl.find(p=>p.human):null}
 function campMyIdx(){const m=campMe();return m?m.i:0}
 /* called inside newGame, after the table is built and before the first turn */

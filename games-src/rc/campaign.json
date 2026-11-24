@@ -3,23 +3,23 @@
   "title": "The Log of the Gull's Wake",
   "version": 1,
   "cast": {
-    "log":       { "name": "The Ship's Log", "portrait": "camp-log.webp", "emoji": "📓", "color": "#7a5a34" },
-    "carpenter": { "name": "The Carpenter", "portrait": "camp-carpenter.webp", "emoji": "🪚", "color": "#8a5a2b" },
-    "cook":      { "name": "The Cook", "portrait": "camp-cook.webp", "emoji": "🍲", "color": "#b5462e" },
-    "explorer":  { "name": "The Explorer", "portrait": "camp-explorer.webp", "emoji": "🧭", "color": "#2f6f6a" },
-    "soldier":   { "name": "The Soldier", "portrait": "camp-soldier.webp", "emoji": "🛡️", "color": "#4b5563" },
-    "friday":    { "name": "Friday", "portrait": "camp-friday.webp", "emoji": "🧑🏾", "color": "#a0702a" },
-    "ada":       { "name": "Ada", "portrait": "camp-ada.webp", "emoji": "🧕", "color": "#3f6fa8" },
-    "hunger":    { "name": "Gnawing Hunger", "portrait": "camp-hunger.webp", "emoji": "🦴", "color": "#9c7a3c" },
-    "rain":      { "name": "The Long Rain", "portrait": "camp-rain.webp", "emoji": "🌧️", "color": "#4a6a8a" },
-    "prowlers":  { "name": "The Night Prowlers", "portrait": "camp-prowlers.webp", "emoji": "🐆", "color": "#5b4a2e" },
-    "horizon":   { "name": "The Empty Horizon", "portrait": "camp-horizon.webp", "emoji": "🌅", "color": "#c9853a" },
-    "whisper":   { "name": "The Whispering Fog", "portrait": "camp-whisper.webp", "emoji": "🌫️", "color": "#7d8a94" },
-    "altar":     { "name": "The Altar Shadows", "portrait": "camp-altar.webp", "emoji": "🕯️", "color": "#5a2d4a" },
-    "shroud":    { "name": "The Grey Shroud", "portrait": "camp-shroud.webp", "emoji": "👁️", "color": "#3b3f4a" },
-    "gale":      { "name": "The Autumn Gale", "portrait": "camp-gale.webp", "emoji": "🌪️", "color": "#36506b" },
-    "winter":    { "name": "The Lean Season", "portrait": "camp-winter.webp", "emoji": "❄️", "color": "#6f8fa8" },
-    "undertow":  { "name": "The Undertow", "portrait": "camp-undertow.webp", "emoji": "🌊", "color": "#1f4e6e" }
+    "log":       { "name": "The Ship's Log", "portrait": "camp-log.webp", "emoji": "", "color": "#7a5a34" },
+    "carpenter": { "name": "The Carpenter", "portrait": "camp-carpenter.webp", "emoji": "", "color": "#8a5a2b" },
+    "cook":      { "name": "The Cook", "portrait": "camp-cook.webp", "emoji": "", "color": "#b5462e" },
+    "explorer":  { "name": "The Explorer", "portrait": "camp-explorer.webp", "emoji": "", "color": "#2f6f6a" },
+    "soldier":   { "name": "The Soldier", "portrait": "camp-soldier.webp", "emoji": "", "color": "#4b5563" },
+    "friday":    { "name": "Friday", "portrait": "camp-friday.webp", "emoji": "", "color": "#a0702a" },
+    "ada":       { "name": "Ada", "portrait": "camp-ada.webp", "emoji": "", "color": "#3f6fa8" },
+    "hunger":    { "name": "Gnawing Hunger", "portrait": "camp-hunger.webp", "emoji": "", "color": "#9c7a3c" },
+    "rain":      { "name": "The Long Rain", "portrait": "camp-rain.webp", "emoji": "", "color": "#4a6a8a" },
+    "prowlers":  { "name": "The Night Prowlers", "portrait": "camp-prowlers.webp", "emoji": "", "color": "#5b4a2e" },
+    "horizon":   { "name": "The Empty Horizon", "portrait": "camp-horizon.webp", "emoji": "", "color": "#c9853a" },
+    "whisper":   { "name": "The Whispering Fog", "portrait": "camp-whisper.webp", "emoji": "", "color": "#7d8a94" },
+    "altar":     { "name": "The Altar Shadows", "portrait": "camp-altar.webp", "emoji": "", "color": "#5a2d4a" },
+    "shroud":    { "name": "The Grey Shroud", "portrait": "camp-shroud.webp", "emoji": "", "color": "#3b3f4a" },
+    "gale":      { "name": "The Autumn Gale", "portrait": "camp-gale.webp", "emoji": "", "color": "#36506b" },
+    "winter":    { "name": "The Lean Season", "portrait": "camp-winter.webp", "emoji": "", "color": "#6f8fa8" },
+    "undertow":  { "name": "The Undertow", "portrait": "camp-undertow.webp", "emoji": "", "color": "#1f4e6e" }
   },
   "acts": [
     { "act": 1, "title": "Washed Ashore", "blurb": "Eat, build a roof, look around, and light the signal fire." },
@@ -42,7 +42,7 @@
       "outro": [
         { "who": "log", "text": "Three nights, three meals, nobody lost. The beach almost feels like a camp." }
       ],
-      "opponent": { "name": "Gnawing Hunger", "portrait": "camp-hunger.webp", "emoji": "🦴", "cast": "hunger",
+      "opponent": { "name": "Gnawing Hunger", "portrait": "camp-hunger.webp", "emoji": "", "cast": "hunger",
         "personality": "Quiet and patient. It only bites at night, and only if the food pile is empty.",
         "aiLevel": "easy", "aiStyle": "starvation" },
       "setup": { "scen": "marooned", "chars": ["carpenter", "cook"], "friday": true, "dog": true, "items": 4, "diff": "easy" },
@@ -67,7 +67,7 @@
       "outro": [
         { "who": "carpenter", "text": "Walls and a floor. The rain can drum on it all it likes." }
       ],
-      "opponent": { "name": "The Long Rain", "portrait": "camp-rain.webp", "emoji": "🌧️", "cast": "rain",
+      "opponent": { "name": "The Long Rain", "portrait": "camp-rain.webp", "emoji": "", "cast": "rain",
         "personality": "Grey and steady. Ruins food and wood that sits above the roof.",
         "aiLevel": "easy", "aiStyle": "weather" },
       "setup": { "scen": "marooned", "chars": ["carpenter", "cook"], "friday": true, "dog": true, "items": 4, "diff": "easy" },
@@ -92,7 +92,7 @@
       "outro": [
         { "who": "log", "text": "A river, a ridge, a grove of good timber. And tracks we will not follow alone." }
       ],
-      "opponent": { "name": "The Night Prowlers", "portrait": "camp-prowlers.webp", "emoji": "🐆", "cast": "prowlers",
+      "opponent": { "name": "The Night Prowlers", "portrait": "camp-prowlers.webp", "emoji": "", "cast": "prowlers",
         "personality": "Curious and hungry. They wait at the edge of every new tile you uncover.",
         "aiLevel": "easy", "aiStyle": "beasts" },
       "setup": { "scen": "marooned", "chars": ["carpenter", "cook"], "friday": true, "dog": true, "items": 4, "diff": "easy" },
@@ -118,7 +118,7 @@
         { "who": "log", "text": "The ship turned. But her captain swore she'd seen grey fog wrap the island like a hand." },
         { "who": "log", "text": "She took our letters and promised to return. Then she sailed. The fog came in that night." }
       ],
-      "opponent": { "name": "The Empty Horizon", "portrait": "camp-horizon.webp", "emoji": "🌅", "cast": "horizon",
+      "opponent": { "name": "The Empty Horizon", "portrait": "camp-horizon.webp", "emoji": "", "cast": "horizon",
         "personality": "Calm and vast. It never attacks; it simply lets the days run out.",
         "aiLevel": "easy", "aiStyle": "time-pressure",
         "taunt": "Day twelve is over. Nothing on the water but me.",
@@ -145,7 +145,7 @@
       "outro": [
         { "who": "carpenter", "text": "Two crosses up, and the fog thinned a hand's width. It can be beaten." }
       ],
-      "opponent": { "name": "The Whispering Fog", "portrait": "camp-whisper.webp", "emoji": "🌫️", "cast": "whisper",
+      "opponent": { "name": "The Whispering Fog", "portrait": "camp-whisper.webp", "emoji": "", "cast": "whisper",
         "personality": "Sly. Book events bring fog onto tiles, and fog makes every action there cost one more pawn.",
         "aiLevel": "normal", "aiStyle": "fog" },
       "setup": { "scen": "hexed", "chars": ["carpenter", "cook"], "friday": true, "dog": false, "items": 2, "diff": "standard" },
@@ -170,7 +170,7 @@
       "outro": [
         { "who": "explorer", "text": "Old tools, a bell, a blade. The temple gave more than it took. This time." }
       ],
-      "opponent": { "name": "The Altar Shadows", "portrait": "camp-altar.webp", "emoji": "🕯️", "cast": "altar",
+      "opponent": { "name": "The Altar Shadows", "portrait": "camp-altar.webp", "emoji": "", "cast": "altar",
         "personality": "Greedy and theatrical. Totems reveal the temple, a wounding altar and hideouts full of fog.",
         "aiLevel": "normal", "aiStyle": "totems" },
       "setup": { "scen": "hexed", "chars": ["carpenter", "cook", "explorer"], "friday": false, "dog": false, "items": 2, "diff": "standard" },
@@ -196,7 +196,7 @@
         { "who": "log", "text": "The fifth cross went up at dusk. The fog lifted like a curtain, and out on the reef we saw her:" },
         { "who": "ada", "text": "Hello the shore! I've been on this rock for days. Please, a boat!" }
       ],
-      "opponent": { "name": "The Grey Shroud", "portrait": "camp-shroud.webp", "emoji": "👁️", "cast": "shroud",
+      "opponent": { "name": "The Grey Shroud", "portrait": "camp-shroud.webp", "emoji": "", "cast": "shroud",
         "personality": "Old, cold and certain. It spreads fog, wakes the altar, and lets the clock do the rest.",
         "aiLevel": "normal", "aiStyle": "curse",
         "taunt": "Ten days, and still the island is mine. Lie down in the fog.",
@@ -223,7 +223,7 @@
       "outro": [
         { "who": "log", "text": "The ship came, but the sea was too high to land. She dropped crates and a promise: spring." }
       ],
-      "opponent": { "name": "The Autumn Gale", "portrait": "camp-gale.webp", "emoji": "🌪️", "cast": "gale",
+      "opponent": { "name": "The Autumn Gale", "portrait": "camp-gale.webp", "emoji": "", "cast": "gale",
         "personality": "Loud and wasteful. More book events, more storms, and nothing kept dry for long.",
         "aiLevel": "hard", "aiStyle": "storms" },
       "setup": { "scen": "marooned", "chars": ["carpenter", "cook"], "friday": true, "dog": false, "items": 1, "diff": "hard" },
@@ -249,7 +249,7 @@
         { "who": "cook", "text": "A roof, a fence, a full larder, and three small voices arguing over the last fish." },
         { "who": "log", "text": "Spring is close. Ada is not. It's time to build a boat." }
       ],
-      "opponent": { "name": "The Lean Season", "portrait": "camp-winter.webp", "emoji": "❄️", "cast": "winter",
+      "opponent": { "name": "The Lean Season", "portrait": "camp-winter.webp", "emoji": "", "cast": "winter",
         "personality": "Thrifty and grim. Halves your harvest, turns land to waste and counts every mouth.",
         "aiLevel": "hard", "aiStyle": "scarcity" },
       "setup": { "scen": "settlers", "chars": ["carpenter", "cook", "soldier"], "friday": false, "dog": false, "items": 1, "diff": "hard" },
@@ -275,7 +275,7 @@
         { "who": "ada", "text": "I watched your smoke every day. I knew you would come." },
         { "who": "log", "text": "The Lifeboat cleared the reef at dawn. Last entry from the island. We are going home." }
       ],
-      "opponent": { "name": "The Undertow", "portrait": "camp-undertow.webp", "emoji": "🌊", "cast": "undertow",
+      "opponent": { "name": "The Undertow", "portrait": "camp-undertow.webp", "emoji": "", "cast": "undertow",
         "personality": "Cold, slow and relentless. Storms knock down your palisade while the clock runs on Ada.",
         "aiLevel": "hard", "aiStyle": "drowning",
         "taunt": "The rock is empty now. The sea keeps what it takes.",

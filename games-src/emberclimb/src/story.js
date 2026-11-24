@@ -2,8 +2,8 @@
 // Original names only. Tutorial entries: say = story reason + what to do (max 2 short lines), react = what the guide says after it is done.
 window.EC_STORY = {
   cast: {
-    guide: { name: 'Warden Ashgrove', role: 'last keeper of the Cinder Tower', emoji: '🔥', color: '#c8472b' },
-    rival: { name: 'The Gatekeeper', role: 'iron lord who wants the tower sealed', emoji: '🚪', color: '#7a6a5a' }
+    guide: { name: 'Warden Ashgrove', role: 'last keeper of the Cinder Tower', emoji: '', color: '#c8472b' },
+    rival: { name: 'The Gatekeeper', role: 'iron lord who wants the tower sealed', emoji: '', color: '#7a6a5a' }
   },
   // the tutorial is the prologue: Garrick's first climb, the night the Gatekeeper starts to close the summit gate
   prologue: {

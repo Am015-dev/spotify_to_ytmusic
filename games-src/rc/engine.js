@@ -86,7 +86,7 @@ const FN={};
 // ---------- wounds, determination, morale ----------
 function whoList(who,ctx){if(who==='all')return living();if(who==='first')return [firstC()];if(who==='actor')return ctx&&ctx.actor!=null&&ctx.actor>=0?[P(ctx.actor)]:(ctx&&ctx.actor===-1?[]:[firstC()]);if(who==='sp')return ctx.sp!=null?[P(ctx.sp)]:[];if(typeof who==='number')return [P(who)];return [firstC()]}
 function wound(c,n,why){if(!c||c.dead||n<=0)return;if(c==='fri'){return}
-  for(let k=0;k<n;k++){c.w++;G.lastWound={who:c.i,why:why||''};G.stats.wounds++;if(CHARS[c.k].arrows.includes(c.w)&&!c.cov.includes(c.w)){morale(-1,true)}if(c.w>=CHARS[c.k].die){c.dead=true;lg(`☠ ${c.nm} dies${why?' ('+why+')':''}. The castaways have lost.`,'bad');G.over={win:false,why:`${c.nm} died.`};fx('lose');return}}
+  for(let k=0;k<n;k++){c.w++;G.lastWound={who:c.i,why:why||''};G.stats.wounds++;if(CHARS[c.k].arrows.includes(c.w)&&!c.cov.includes(c.w)){morale(-1,true)}if(c.w>=CHARS[c.k].die){c.dead=true;lg(` ${c.nm} dies${why?' ('+why+')':''}. The castaways have lost.`,'bad');G.over={win:false,why:`${c.nm} died.`};fx('lose');return}}
   lg(`${c.nm} takes ${n} wound${n>1?'s':''}${why?' ('+why+')':''}.`,'bad');fx('wound',c.i)}
 function friWound(n){if(!G.fri||G.fri.dead)return;G.fri.w+=n;if(G.fri.w>=FRIDAY.die){G.fri.dead=true;lg('Friday is killed. The others carry on.','bad')}else lg(`Friday takes ${n} wound${n>1?'s':''}.`,'bad')}
 function heal(c,n){if(!c||c.dead)return 0;const h=Math.min(n,c.w);c.w-=h;if(h){lg(`${c.nm} heals ${h} wound${h>1?'s':''}.`,'good');fx('heal',c.i)}return h}
@@ -266,7 +266,7 @@ function invWhy(k,forC){const I=invReq(k);if(!I)return 'unknown';if(has(k)&&!I.m
 function invCost(k){const I=invReq(k);return I.alt?I.alt[0]:(I.r||{})}
 // defer: an item made during the Action phase goes to the future space; it works from the end of the phase (rulebook: Building)
 function completeInv(k,builder,free,defer){const I=invReq(k);if(I.multi){SC().built&&SC().built(k,builder);return}
-  G.stats.built++;lg(`🔨 ${I.n} is made${free?' (for free)':''}!`,'big');fx('build');if(defer){(G.inv.pending=G.inv.pending||[]).push({k})}else{G.inv.built[k]=1;doInv(k)}
+  G.stats.built++;lg(` ${I.n} is made${free?' (for free)':''}!`,'big');fx('build');if(defer){(G.inv.pending=G.inv.pending||[]).push({k})}else{G.inv.built[k]=1;doInv(k)}
   if(I.kind==='personal'&&builder!=null)gainDet(P(builder),2)}
 function doInv(k){switch(k){case 'bricks':case 'fire':roofPal('pal',1);break;case 'wall':case 'moat':roofPal('pal',2);break;case 'knife':weapon(1);break;case 'bow':case 'spear':weapon(3);break;case 'sling':weapon(2);break;
   case 'dam':gain('pfood',2,{});break;case 'snare':G.map[G.camp.pos].tok.c_food=1;break;case 'hatchet':G.map[G.camp.pos].tok.c_wood=1;break;
@@ -305,7 +305,7 @@ function boostOpts(c){const o=[];const it=G.items.find(i=>i.k==='pistol'&&i.uses
   if(c&&c.k==='soldier'&&!c.used.rage&&!c.noSkills&&c.det>=3)o.push({k:'rage',l:'Battle Rage (+3, 3 determination)'});
   if(G.kept.m_saber)o.push({k:'saber',l:'Cutlass (+3, you take 1 wound)'});if(G.kept.m_rifle)o.push({k:'m_rifle',l:'Old Musket (+3, one use)'});if(G.kept.e_surprise)o.push({k:'e_surprise',l:'Hidden Blade (+3, one use)'});if(G.kept.ritualknife)o.push({k:'ritualknife',l:'Ritual Knife (+3, you take 1 wound)'});if(G.kept.sc_pistol)o.push({k:'sc_pistol',l:'Old Pistol (+3, one use)'});return o}
 FN.fight2=f=>{const fr=f.fr;const b=fr.beast;const c=fr.who>=0?P(fr.who):null;const str=fr.str;const wpn=G.weapon+(fr.boost||0);let short=Math.max(0,str-wpn);
-  lg(`⚔ ${c?c.nm:'The castaways'} fight${c?'s':''} ${b.n}: strength ${str} vs weapon ${wpn}.`,'big');fx('fight',fr.who);
+  lg(` ${c?c.nm:'The castaways'} fight${c?'s':''} ${b.n}: strength ${str} vs weapon ${wpn}.`,'big');fx('fight',fr.who);
   if(short&&G.kept.m_helmet){short--;lg('The iron helmet takes a blow.','good')}
   if(short&&c)wound(c,short,b.n);else if(short&&!c)for(const x of living())wound(x,short,b.n);
   if(G.over)return;

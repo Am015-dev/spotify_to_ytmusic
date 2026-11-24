@@ -68,7 +68,7 @@ function daySumHtml(i){const {r,A,B}=daySumData(i);const S=SCENARIOS[G.scen];con
 function dayWhy(r){const hurt={},food=[];const cnt={};
   for(const l of G.log.slice().reverse()){if(l.r!==r)continue;let m=/^(.+?) takes (\d+) wounds? \((.+)\)\./.exec(l.t);
     if(m){const k=m[1]+'|'+m[3];cnt[k]=(cnt[k]||0)+(+m[2]);continue}
-    m=/^☠ (.+?) dies \((.+)\)/.exec(l.t);if(m){const k=m[1]+'|'+m[2];cnt[k]=(cnt[k]||0)+1;continue}
+    m=/^ (.+?) dies \((.+)\)/.exec(l.t);if(m){const k=m[1]+'|'+m[2];cnt[k]=(cnt[k]||0)+1;continue}
     if((m=/^Everyone eats \((\d+) food\)/.exec(l.t)))food.push(`eaten ${m[1]}`);
     else if((m=/^(\d+) food spoils/.exec(l.t)))food.push(`${m[1]} spoiled overnight`);
     else if((m=/(\d+) food and \d+ wood are ruined/.exec(l.t)))food.push(`${m[1]} ruined by rain`);

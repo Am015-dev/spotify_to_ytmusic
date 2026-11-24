@@ -93,7 +93,7 @@ function finish(){if(G.over)return;for(const p of G.pl){const b=endBonus(p);p.st
     if(b.rows+b.cols+b.colours)lg(`${p.nm} earns end bonuses: ${b.rows} row${b.rows===1?'':'s'} (+${p.st.rows}), ${b.cols} column${b.cols===1?'':'s'} (+${p.st.cols}), ${b.colours} full colour${b.colours===1?'':'s'} (+${p.st.colours}).`,'good')}
   const sc=G.pl.slice().sort((a,b)=>b.score-a.score||b.fr-a.fr);const top=sc[0];const winners=sc.filter(p=>p.score===top.score&&p.fr===top.fr);
   G.over={scores:sc.map(p=>({p:p.i,s:Object.assign({total:p.score,fr:p.fr},p.st)})),win:winners.map(w=>w.i),tie:sc.filter(p=>p.score===top.score).length>1};G.winner=winners.map(w=>w.nm).join(' & ');
-  G.winText=`${G.winner} ${winners.length>1?'share the win':'wins'} with ${top.score} points${G.over.tie&&winners.length===1?' (more finished rows breaks the tie)':''}.`;G.phase='over';G.wt=null;lg('🏆 '+G.winText,'big');fx('win')}
+  G.winText=`${G.winner} ${winners.length>1?'share the win':'wins'} with ${top.score} points${G.over.tie&&winners.length===1?' (more finished rows breaks the tie)':''}.`;G.phase='over';G.wt=null;lg(' '+G.winText,'big');fx('win')}
 // ---------- the API ----------
 function sideToAct(){if(!G||G.over)return -1;if(G.phase==='offer')return G.cur;if(G.phase==='wall'&&G.wt&&G.wt.q)return G.wt.q.p;return -1}
 function validMoves(s){if(!G||G.over)return[];if(s===undefined)s=sideToAct();if(s<0||s!==sideToAct())return[];

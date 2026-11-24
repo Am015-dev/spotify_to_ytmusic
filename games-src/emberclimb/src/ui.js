@@ -43,7 +43,7 @@
   UI.goalCard = goalCard;
   // the room's host (owner portraits): a face and one line of speech under the room title
   function host(stem, line) { var d = h('div', 'host'); d.appendChild(A(stem, '', { noph: 1, cls: 'hostpic', kind: 'portrait' })); d.appendChild(h('p', '', line)); return d; }
-  var GLY = { atk: '⚔', def: '🛡', buf: '✦', deb: '☠', sleep: '💤', big: '⚔' };
+  var GLY = { atk: '', def: '', buf: '✦', deb: '', sleep: '', big: '' };
   var TONE = { w: '#a8431f', s: '#2f7a46', a: '#2f6fa8', m: '#a8861c', n: '#777', z: '#555' };
   // ---------- helpers
   function G() { return E.G(); }
@@ -106,7 +106,7 @@
           var d = h('div', 'ec-phase', null, [h('b', '', soon ? 'It splits!' : 'Slimes!'), h('span', '', soon ? ed.name + ' ' + (ed.splitSay || 'splits') + '. ' + n + ' slimes join at the start of next round. Finish your turn.' : n + ' slimes from the ' + ed.name + ' join the fight. Check their intents.')]);
           d.setAttribute('role', 'status'); document.body.appendChild(d); SFX('crit'); setTimeout(function () { if (d.parentNode) d.remove(); }, 3000); })(); break;
         case 'debuff': popAt(f.w, (f.x === 'poison' ? 'Poison' : f.x === 'vuln' ? 'Vulnerable' : 'Weak') + (f.n ? ' ' + f.n : ''), 'deb'); break;
-        case 'die': if (window.ANIM) { var d = h('div', 'pop die', '🎲 ' + f.n); d.appendChild(A('die-' + f.n, '', { noph: 1, cls: 'dieart' })); d.style.left = '40%'; d.style.top = '36%'; document.body.appendChild(d); setTimeout(function () { d.remove(); }, 1000); } break;
+        case 'die': if (window.ANIM) { var d = h('div', 'pop die', ' ' + f.n); d.appendChild(A('die-' + f.n, '', { noph: 1, cls: 'dieart' })); d.style.left = '40%'; d.style.top = '36%'; document.body.appendChild(d); setTimeout(function () { d.remove(); }, 1000); } break;
         case 'act': if (f.x === 'atk' && el && window.ANIM) { el.classList.add('lunge'); setTimeout(function () { el.classList.remove('lunge'); }, 480); } break;
         case 'kill': popAt(f.w, 'Down!', 'dmg'); break;
         case 'relic': toast('Relic: ' + D.RELICS[f.x].name); break;
@@ -119,11 +119,11 @@
   function keyNum(e) {
     var o = e.ops || [], i, k;
     for (i = 0; i < o.length; i++) { k = o[i][0];
-      if (k === 'dmg' || k === 'all' || k === 'dmgx') return ['a', '⚔' + o[i][1]];
-      if (k === 'hit') return ['a', '⚔' + o[i][1] + '×' + o[i][2]];
-      if (k === 'blk') return ['b', '🛡' + o[i][1]];
-      if (k === 'poison' || k === 'poisonAll') return ['p', '☠' + o[i][1]];
-      if (k === 'shiv') return ['a', '🗡×' + o[i][1]]; }
+      if (k === 'dmg' || k === 'all' || k === 'dmgx') return ['a', '' + o[i][1]];
+      if (k === 'hit') return ['a', '' + o[i][1] + '×' + o[i][2]];
+      if (k === 'blk') return ['b', '' + o[i][1]];
+      if (k === 'poison' || k === 'poisonAll') return ['p', '' + o[i][1]];
+      if (k === 'shiv') return ['a', '×' + o[i][1]]; }
     return null;
   }
   // tap-hold on a hand card (about 0.45 s) shows the whole card big; the click that follows is swallowed
@@ -206,7 +206,7 @@
   UI.render = render;
   setInterval(function () { try { var fr = !!(UI.tutFree && UI.tutFree()); document.body.classList.toggle('ec-free', fr); var eb = document.getElementById('end'); if (fr && eb && eb.disabled) eb.disabled = false; if (UI.mode !== 'title') tutEvt(); } catch (e) { } }, 200);   // guide free-play steps hide the bubble (the dock line instructs)
   function tutOk(a) { try { if (UI.tutFree && UI.tutFree()) return true; var ok = !(window.GXT && GXT.active()) || GXT.act(a); if (!ok) { toast('Do the glowing step first'); var dm = document.getElementById('dockmsg'); if (dm) dm.textContent = 'Do the glowing step first.'; } return ok; } catch (e) { return true; } }
-  function muteBtn() { var b = on(h('button', 'chip tap', SND.on ? '🔊' : '🔇'), function () { SND.toggle(); toast(SND.on ? 'Sound on' : 'Sound off'); render(); }); b.setAttribute('aria-label', SND.on ? 'Sound on: tap to mute' : 'Sound off: tap to unmute'); b.id = 'mute'; return b; }
+  function muteBtn() { var b = on(h('button', 'chip tap', SND.on ? 'Sound' : 'Muted'), function () { SND.toggle(); toast(SND.on ? 'Sound on' : 'Sound off'); render(); }); b.setAttribute('aria-label', SND.on ? 'Sound on: tap to mute' : 'Sound off: tap to unmute'); b.id = 'mute'; return b; }
   function tutBtn(cls) { try { var first = !GXT.status('emberclimb').seen && !localStorage.getItem('emberclimb.save'); var w = h('div'); w.innerHTML = GXT.menuHTML({ game: 'emberclimb', first: first, cls: cls || 'btn alt', launch: function () { UI.ov = null; UI.tutStart(); } }); return w.firstChild; } catch (e) { return null; } }
   function title() {
     if (UI.sub === 'quick') return quick();
@@ -315,7 +315,7 @@
     if (g.scr === 'battle' && window.innerWidth >= 1024) { var hd = g.hs[g.b && g.b.cur >= 0 ? g.b.cur : 0], cnt = {}, ord = []; hd.deck.forEach(function (c) { if (!cnt[c.id]) { cnt[c.id] = 0; ord.push(c); } cnt[c.id]++; }); var dp = h('div', 'pcinfo pcdeck', null, [h('b', '', 'Your deck (' + hd.deck.length + ')')]), dg = h('div', 'pcdg'); ord.forEach(function (c) { var t = h('div', 'pcdc', null, [A(c.id, '', { cls: 'pcda', kind: 'card', noph: 1 }), h('span', '', D.CARDS[c.id].name + (cnt[c.id] > 1 ? ' x' + cnt[c.id] : ''))]); dg.appendChild(t); }); dp.appendChild(dg); a.parentNode.appendChild(dp); }
     UI.endBtn = null;
   }
-  var NODEG = { m: '⚔', e: '💀', r: '🔥', s: '🛒', v: '?', t: '🎁', b: '👑' }, NODEN = { m: 'node-monster', e: 'node-elite', r: 'node-rest', s: 'node-shop', v: 'node-event', t: 'node-treasure', b: 'node-boss' };
+  var NODEG = { m: '', e: '', r: '', s: '', v: '?', t: '', b: '' }, NODEN = { m: 'node-monster', e: 'node-elite', r: 'node-rest', s: 'node-shop', v: 'node-event', t: 'node-treasure', b: 'node-boss' };
   var NODEHINT = { m: function () { return 'fight: card'; }, e: function () { return 'high risk: relic'; }, r: function () { return 'heal ' + (3 * (D.SCALE || 3) + (E.has('healing-moss') ? 10 : 0)); }, s: function () { return 'shop ● ' + G().gold; }, v: function () { return 'event'; }, t: function () { return 'free relic'; }, b: function () { return 'boss'; } };   // W420
   function mapScr() {
     var g = G(); hud();
@@ -458,7 +458,7 @@
       if (!e.dead) x.appendChild(intentBox(e));
       x.appendChild(A('enemy-' + (d.img || e.id), d.name, { ph: '#6a3a2a' })); if (e.spk) x.appendChild(h('div', 'spkchip', 'Spikes ' + e.spk));
       if (b.ph === 'e' && UI.actor === i) x.classList.add('acting');
-      if (e.blk) x.appendChild(h('div', 'blkchip', '🛡' + e.blk));
+      if (e.blk) x.appendChild(h('div', 'blkchip', '' + e.blk));
       x.appendChild(h('div', 'nm', d.name));
       x.appendChild(h('div', 'bar', null, [h('i'), h('b', '', e.hp + '/' + e.mhp)])); x.querySelector('.bar i').style.width = (100 * e.hp / e.mhp) + '%';
       if (SG && e.blk) x.querySelector('.bar').appendChild(h('span', 'w485shield', String(e.blk)));
@@ -475,7 +475,7 @@
       var H = D.H[hh.k], p = h('div', 'heropan' + (b.cur === i && b.ph === 'p' ? ' act' : '') + (hh.dead ? ' dead' : ''));
       p.setAttribute('data-w', 'h' + i);
       p.appendChild(A('hero-' + hh.k, H.name.split(' ')[0], { ph: TONE[hh.k] }));
-      var inf = h('div', 'inf'); var nmr = h('div', 'nm', H.name.split(' ')[0] + (hh.stance !== 'n' ? '  ' + (hh.stance === 'w' ? 'Wrath' : 'Calm') : '')); if (hh.blk) nmr.appendChild(h('span', 'w4blk', '🛡 ' + hh.blk + ' Block')); if (hh.stance !== 'n') nmr.appendChild(A('stance-' + hh.stance, '', { noph: 1, cls: 'stanceart' })); inf.appendChild(nmr);
+      var inf = h('div', 'inf'); var nmr = h('div', 'nm', H.name.split(' ')[0] + (hh.stance !== 'n' ? '  ' + (hh.stance === 'w' ? 'Wrath' : 'Calm') : '')); if (hh.blk) nmr.appendChild(h('span', 'w4blk', ' ' + hh.blk + ' Block')); if (hh.stance !== 'n') nmr.appendChild(A('stance-' + hh.stance, '', { noph: 1, cls: 'stanceart' })); inf.appendChild(nmr);
       inf.appendChild(h('div', 'bar', null, [h('i'), h('b', '', hh.hp + '/' + hh.mhp)])); inf.querySelector('.bar i').style.width = (100 * hh.hp / hh.mhp) + '%';
       inf.appendChild(stChips(hh));
       var inc = incoming(g, i); if (inc > 0 && !hh.dead) { var net = Math.max(0, inc - hh.blk); inf.appendChild(h('div', 'w4inc' + (net > 0 ? ' cut' : ''), net > 0 ? 'Incoming ' + net : 'Incoming ' + inc + ', blocked')); }

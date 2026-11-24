@@ -210,7 +210,7 @@ function bfPop(txt,at,cls,big){if(!at||!BF.fl)return;const d=document.createElem
   bfTrack(d.animate([{transform:'translate(-50%,-50%) scale(.4)',opacity:0},{transform:'translate(-50%,-80%) scale(1.25)',opacity:1,offset:.25},{transform:'translate(-50%,-160%) scale(1)',opacity:0}],{duration:bfD(big?1500:1150),easing:'ease-out',fill:'forwards'})).finished.then(()=>d.remove(),()=>d.remove())}
 function bfChipR(i){return bfR(bfQ(`[data-bfchip="${i}"]`))}
 function bfChipPop(i,txt,cls){const el=bfQ(`[data-bfchip="${i}"]`);if(!el)return;const r=bfR(el);if(r)r.top+=r.height*.9;bfPop(txt,r,(cls||'')+' chip');el.classList.remove('hit');void el.offsetWidth;el.classList.add('hit')}
-function bfScore(i,v){const el=bfQ(`[data-bfsc="${i}"]`);if(el)el.textContent='★'+v}
+function bfScore(i,v){const el=bfQ(`[data-bfsc="${i}"]`);if(el)el.textContent=''+v}
 // W466: a message stays until tapped or for 4 s + 1 s per 10 words; one at a time (a newer one waits its turn)
 function bfReadMs(t){const n=String(t||'').trim().split(/\s+/).filter(Boolean).length;return 4000+Math.ceil(n/10)*1000+400}
 function bfBanner(t,sub,ms){const tb=BF.tbl;if(!tb)return;if(!bfAnimOK())return;BF.banQ=BF.banQ||[];BF.banQ.push([t,sub,ms]);if(!BF.banOn)bfBanNext()}
@@ -249,7 +249,7 @@ async function bfStep(e){const S=BF.disp;
   if(e.t==='wall')return bfWall(e.x);
   if(e.t==='round'){if(S.phase==='wall'||S.pl.some(p=>p.floor.length)){if(UI.tut)await tutPause('floor');await bfFloors();}
     BF.tile=false;S.fac=e.fac;S.ctr=[];S.round=e.round;S.phase='offer';S.markerIn='ctr';S.first=e.first;BF.say='';const first=BF.deal&&e.round===1;BF.deal=false;
-    bfDraw({deal:true});bfBanner('Round '+e.round,first?'Most ★ wins':'');if(UI.cg)try{cgRound()}catch(er){}sfx('round');if(e.round===2){const fp=S.pl[bfFocus()];setTimeout(()=>bfTip(fp&&fp.lines.some(l=>l.length)?'keep':'bonus'),bfD(1600))}if(e.round===3)setTimeout(()=>bfTip('bonus'),bfD(1600));
+    bfDraw({deal:true});bfBanner('Round '+e.round,first?'Most stars wins':'');if(UI.cg)try{cgRound()}catch(er){}sfx('round');if(e.round===2){const fp=S.pl[bfFocus()];setTimeout(()=>bfTip(fp&&fp.lines.some(l=>l.length)?'keep':'bonus'),bfD(1600))}if(e.round===3)setTimeout(()=>bfTip('bonus'),bfD(1600));
     await bfWait(Math.min(800,300+S.fac.length*4*25));return}
   if(e.t==='win'){if(UI.tut)await tutPause('floor');await bfFloors();if(UI.tut)await tutPause('bonus');await bfBonus();if(UI.tut)await tutPause('final');sfx('win');return}}
 async function bfTake(x){let q=null;try{q=rvPre(x)}catch(e){}await bfTake0(x);try{if(q)rvPost(x,q)}catch(e){}}   // rival.js: the denial cheers
@@ -315,7 +315,7 @@ async function bfWall(x){const S=BF.disp,p=S.pl[x.p];const L=p.lines[x.r];if(!L|
   if(UI.tut)await tutPause('wall'+x.r,x);
   for(const [r,c] of run){const el=bfSlot(`w${x.p}_${r}_${c}`);if(el)el.classList.remove('lit')}}
 function bfRival(){const tb=BF.tbl;if(!tb||!BF.rv)return;let el=tb.querySelector('.bf-rvw');if(!el){el=document.createElement('div');el.className='bf-rvw';tb.appendChild(el)}const p=BF.disp.pl[BF.rv.p];
-  const sum=BF.rv.marks.reduce((a,m)=>a+m.pts,0);el.innerHTML=`<div class="bf-ph" style="--pc:${PCOL[p.i]}"><i></i><b>${esc(p.nm)}</b><span>★${p.score}</span><em class="bf-rvs">+${sum}</em></div>${phWallSVG(p,{marks:BF.rv.marks})}`}
+  const sum=BF.rv.marks.reduce((a,m)=>a+m.pts,0);el.innerHTML=`<div class="bf-ph" style="--pc:${PCOL[p.i]}"><i></i><b>${esc(p.nm)}</b><span>${p.score}</span><em class="bf-rvs">+${sum}</em></div>${phWallSVG(p,{marks:BF.rv.marks})}`}
 async function bfFloors(){BF.rv=null;const S=BF.disp;BF.say='Floor tiles cost points';
   const ls=S.pl.filter(p=>p.floor.length).map(p=>({p,l:Math.min(p.score,-floorPenalty(p.floor.length))})).filter(o=>o.l);
 
@@ -390,7 +390,7 @@ function bfBoardHTML(S,p,hp){const pi=p.i,live=!BF.busy;const sel=live&&hp&&hp.i
 function bfProj(S,p){let pts=0;if(!S.ex.gray){const w=p.wall.map(r=>r.slice());for(let r=0;r<5;r++){const L=p.lines[r];if(L.length!==cap(r))continue;const lc=lineColour(L);if(lc<0)continue;const c=WALLCOL(lc,r);if(w[r][c]>=0)continue;pts+=adjPts2(w,r,c);w[r][c]=lc}}
   return Math.max(0,p.score+pts+floorPenalty(Math.min(7,p.floor.length)))}
 function bfTopHTML(S){const s=BF.busy?BF.actor:sideToAct();
-  return `<button class="bf-ib" data-bf="menu" aria-label="Menu">${IC('menu')}</button><div class="bf-chips">${S.pl.map(p=>`<button class="bf-chip${p.i===s?' cur':''}" data-bfchip="${p.i}" style="--pc:${PCOL[p.i]}" aria-label="${esc(p.nm)}: ${p.score} points${S.markerIn===p.i?', has the Sun token: goes first next round':''}">${(()=>{const pc=!isYou(p.i)&&typeof sgPicOf==='function'&&sgPicOf(p.nm);return pc?`<i class="pic" style="background-image:url(media/${pc})"></i>`:'<i></i>'})()}<b>${isYou(p.i)?'You':S.pl.length>=4?'':esc(p.nm)}</b>${S.markerIn===p.i?`<em title="Sun token: goes first next round">${bfSun()}</em>`:''}<span class="bf-sc" data-bfsc="${p.i}">★${p.score}</span></button>`).join('')}</div><span class="bf-sack" title="Tiles left in the clay sack" aria-label="${G.bag.length} tiles left in the sack"><i class="sg-back" aria-hidden="true"></i><b>${G.bag.length}</b></span><button class="bf-ib" data-gx="rulesd" aria-label="How to play">${IC('rules')}</button>`}
+  return `<button class="bf-ib" data-bf="menu" aria-label="Menu">${IC('menu')}</button><div class="bf-chips">${S.pl.map(p=>`<button class="bf-chip${p.i===s?' cur':''}" data-bfchip="${p.i}" style="--pc:${PCOL[p.i]}" aria-label="${esc(p.nm)}: ${p.score} points${S.markerIn===p.i?', has the Sun token: goes first next round':''}">${(()=>{const pc=!isYou(p.i)&&typeof sgPicOf==='function'&&sgPicOf(p.nm);return pc?`<i class="pic" style="background-image:url(media/${pc})"></i>`:'<i></i>'})()}<b>${isYou(p.i)?'You':S.pl.length>=4?'':esc(p.nm)}</b>${S.markerIn===p.i?`<em title="Sun token: goes first next round">${bfSun()}</em>`:''}<span class="bf-sc" data-bfsc="${p.i}">${p.score}</span></button>`).join('')}</div><span class="bf-sack" title="Tiles left in the clay sack" aria-label="${G.bag.length} tiles left in the sack"><i class="sg-back" aria-hidden="true"></i><b>${G.bag.length}</b></span><button class="bf-ib" data-gx="rulesd" aria-label="How to play">${IC('rules')}</button>`}
 function bfWinLine(){if(!G.over)return '';const w=G.over.win.map(i=>P(i));const sc=G.over.scores.map(s=>s.s.total);const you=w.some(p=>isYou(p.i));
   return (you?(w.length>1?'You share the win':'You win'):w.map(p=>p.nm).join(' & ')+(w.length>1?' share it':' wins'))+' '+sc.slice(0,2).join(' to ')+'!'}
 function bfHintHTML(S,hp){let say='',chip='',tg='',thk='';const live=!BF.busy;
@@ -420,7 +420,7 @@ function bfResHTML(L,you){const w=bfWhy(L,you);const ord=L.slice().sort((x,y)=>(
   return `<div class="bf-card bf-res" role="dialog" aria-label="Result"><div class="bf-rt">${IC('trophy')}<b>${esc(you?(G.over.win.length>1?'You share the win!':'You win!'):G.winner+(G.over.win.length>1?' share the win':' wins'))}</b></div>
     <div class="bf-rs" style="--n:${n}"><div class="bf-rs-h"><span></span>${ord.map(r=>`<b style="--pc:${PCOL[r.p]}"><i></i>${name(r)}</b>`).join('')}</div>
     ${BF_CAT.map(([k,lab])=>`<div class="bf-rs-r"><span>${lab}</span>${ord.map(r=>cell(r,k)).join('')}</div>`).join('')}
-    <div class="bf-rs-r bf-rs-t"><span>Total</span>${ord.map(r=>`<b class="t">★${r.s.total}</b>`).join('')}</div></div>
+    <div class="bf-rs-r bf-rs-t"><span>Total</span>${ord.map(r=>`<b class="t">${r.s.total}</b>`).join('')}</div></div>
     ${(()=>{const up=bfLvUp();return up&&you?`<div class="bf-lvup">You beat ${esc(up.nm)} on ${up.from}. Ready for ${up.to}?</div>`:''})()}
     ${w.why?`<p class="bf-rs-why">${esc(w.why)}</p><p class="bf-rs-tip">${esc(w.tip)}</p>`:''}
     <div class="bf-btns">${(()=>{const up=bfLvUp();return up&&you?`<button class="bf-go" data-bf="lvup">Try ${up.to}</button>`:''})()}${isClient()?'':`<button class="bf-go${bfLvUp()&&you?' ghost':''}" data-a="new">Play again</button>`}<button class="bf-go ghost" data-bf="close">See boards</button></div></div>`}
@@ -429,7 +429,7 @@ function bfOvHTML(){if(!G)return '';
   if(BF.busy)return '';
   if(BF.menu){const nh=!human();const b=(ic,lab,attr)=>`<button class="bf-mi" ${attr}>${IC(ic)}<span>${lab}</span></button>`;
     return `<div class="bf-card bf-menu" role="dialog" aria-label="Menu">${b('rules','How to play','data-gx="rulesd"')}${typeof tutBtn==='function'?tutBtn('bf-mi',false):''}${b(SND.on?'snd':'mute','Sound: '+(SND.on?'on':'off'),'data-a="snd"')}${b(SND.music?'music':'nomusic','Music: '+(SND.music?'on':'off'),'data-a="mus"')}${b('music','Choose songs','data-a="musicpick"')}${b('speed','Speed: '+({0.5:'slow',1:'normal',3:'fast'}[UI.speed]||'normal'),'data-a="speed"')}${nh?b(UI.pause?'play':'pause',UI.pause?'Resume':'Pause','data-a="pause"'):''}${b('log','Every move','data-gx="logd"')}${b('tiles','Tile list','data-gx="refd"')}${b('new','New game','data-a="new"')}${typeof GXH!=='undefined'?GXH.settingsHTML({rowClass:'bf-set',btnClass:'bf-mi'}):''}</div>`}
-  if(BF.peek!=null&&P(BF.peek)){const p=P(BF.peek);return `<div class="bf-card bf-peek" role="dialog" aria-label="${esc(p.nm)}'s board"><div class="bf-ph" style="--pc:${PCOL[p.i]}">${(()=>{const pc=!isYou(p.i)&&typeof sgPicOf==='function'&&sgPicOf(p.nm);return pc?`<i class="pic" style="background-image:url(media/${pc})"></i>`:'<i></i>'})()}<b>${isYou(p.i)?'You':esc(p.nm)}</b><span>★${p.score}</span>${G.markerIn===p.i?`<em>${bfSun()}</em>`:''}<button class="bf-ib" data-bf="close" aria-label="Close">✕</button></div>${phBoardSVG(p)}${phBonus(p)?`<div class="bf-pn">End bonus so far +${phBonus(p)}</div>`:''}</div>`}
+  if(BF.peek!=null&&P(BF.peek)){const p=P(BF.peek);return `<div class="bf-card bf-peek" role="dialog" aria-label="${esc(p.nm)}'s board"><div class="bf-ph" style="--pc:${PCOL[p.i]}">${(()=>{const pc=!isYou(p.i)&&typeof sgPicOf==='function'&&sgPicOf(p.nm);return pc?`<i class="pic" style="background-image:url(media/${pc})"></i>`:'<i></i>'})()}<b>${isYou(p.i)?'You':esc(p.nm)}</b><span>${p.score}</span>${G.markerIn===p.i?`<em>${bfSun()}</em>`:''}<button class="bf-ib" data-bf="close" aria-label="Close">✕</button></div>${phBoardSVG(p)}${phBonus(p)?`<div class="bf-pn">End bonus so far +${phBonus(p)}</div>`:''}</div>`}
   if(G.over&&!BF.resHide&&!UI.tut){const L=G.over.scores;const you=G.over.win.some(i=>isYou(i));
     return bfResHTML(L,you)}
   return ''}
@@ -507,7 +507,7 @@ BF.on=bfWanted();document.documentElement.classList.toggle('bf',BF.on);
  const _pr=phRender;phRender=function(){if(BF.on)return bfRender();return _pr.apply(this,arguments)};
  const _pf=phFx;phFx=function(f){if(BF.on)return bfFx(f);return _pf.apply(this,arguments)};
  const _mp=renderMap2D;renderMap2D=function(){if(BF.on){const el=document.getElementById('map2d');if(el)el.hidden=true;return}return _mp.apply(this,arguments)};
- const _st=storyHtml;storyHtml=function(){if(!BF.on)return _st.apply(this,arguments);return `<div class="mbox story bf-story">${storyPic()}<p class="q"><b>Win with the most ★ when a wall row is full.</b></p><ul class="bf-aim"><li>Take every tile of one colour from a kiln.</li><li>Fill a rack: one tile moves to your wall and scores.</li><li>Touching tiles score more. Extra tiles cost points.</li></ul><div class="acts"><button class="btn go" data-ui="story-ok">Play ▶</button></div></div>`};
+ const _st=storyHtml;storyHtml=function(){if(!BF.on)return _st.apply(this,arguments);return `<div class="mbox story bf-story">${storyPic()}<p class="q"><b>Win with the most stars when a wall row is full.</b></p><ul class="bf-aim"><li>Take every tile of one colour from a kiln.</li><li>Fill a rack: one tile moves to your wall and scores.</li><li>Touching tiles score more. Extra tiles cost points.</li></ul><div class="acts"><button class="btn go" data-ui="story-ok">Play ▶</button></div></div>`};
  const _sh=startHtml;startHtml=function(){let h=_sh.apply(this,arguments);if(!BF.on)return h;const i=h.indexOf('<h3>Variants</h3>'),j=h.indexOf('</div>',h.indexOf('class="exs"'));if(i<0||j<0)return h;return h.slice(0,i)+'<details class="bf-more" ontoggle="var x=this.querySelector(\'.exs\');if(x)x.hidden=!this.open"><summary>Options</summary>'+h.slice(i+17,j+6).replace('class="exs"','class="exs" hidden')+'</details>'+h.slice(j+6)};
  const _to=toast;toast=function(t){if(!BF.on)return _to.apply(this,arguments)}}
 function bfRender(){if(!BF.on)return;bfEnsure();if(!G){BF.disp=null;bfDraw();return}const fresh=bfSync();

@@ -127,7 +127,7 @@ function aiPlan(forChars){if(!planOpen())return;forChars=forChars||G.chars.filte
 function aiPrePlan(forChars){const hum=forChars.some(i=>P(i)&&P(i).human);for(let i=G.own.length-1;i>=0&&!hum;i--){const k=G.own[i]&&G.own[i].k;if(!k||k==='leaves'||k==='veggies'&&!living().some(c=>c.w>=3))continue;if(!discWhy(i))discUse(i);if(!planOpen())return}
   for(const it of G.items.slice()){if(it.k==='biscuits'&&food()<eatersNeed())useItem('biscuits');if(it.k==='bottle')useItem('bottle');if(it.k==='pipe')useItem('pipe');if(it.k==='stormglass'&&!G.wxEarly&&(wxTab()[G.round]||[]).length)useItem('stormglass')}
   for(const c of living().filter(c=>forChars.includes(c.i)&&!c.npc)){const tr=[['peptalk',()=>G.morale<2&&c.det>=5],['broth',()=>c.det>=4&&food()<eatersNeed()],['remedy',()=>living().some(x=>x.w>=4)&&c.det>=3],['keeneye',()=>c.det>=6],['fortify',()=>c.det>=5],['drive',()=>c.det>=7&&G.weapon>=4],['idea',()=>c.det>=6&&G.inv.deck.length]];
-    // for a human castaway (💡 Suggest) only skills that need no answer: a question would stop the plan half-made
+    // for a human castaway ( Suggest) only skills that need no answer: a question would stop the plan half-made
     for(const [k,f] of tr)if(!skillWhy(c.i,k)&&f()&&!(c.human&&['idea','keeneye','recon','track','fortify','remedy'].includes(k))){useSkill(c.i,k);if(!planOpen())return}}
   if(G.scen==='marooned'){const room=SCEN.marooned.pileRoom();const spare=G.res.wood-(hasShelter()?0:2)-(G.round>=6?2:0);const stagesLeft=5-PILE_CUM.filter(c=>c<=G.sc.pile).length;const late=(10-G.round)<=stagesLeft;if(room&&spare>0&&(late||spare>=5))pileAdd(Math.min(room,spare))}}
 // ---------- driving the computer ----------

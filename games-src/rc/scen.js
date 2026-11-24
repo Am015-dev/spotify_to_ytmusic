@@ -46,7 +46,7 @@ const SCEN={
   specials:{ada:{n:'Row out and rescue Ada',dice:'explore',advWound:1,why(){if(G.sc.rescued)return 'Ada is already safe';if(!has('jraft'))return 'build the Rescue Raft first';return null},
     win(ctx){G.sc.rescued=true;const c={i:G.chars.length,k:'ada',nm:'Ada',w:G.sc.ada,det:0,dead:false,used:{},sp:{},cov:[],human:G.chars.some(hum),lv:'normal',pawnMinus:0,only:null,noSkills:true,out:null,rr:0,rrNext:0,pmNext:0,npc:1};if(G.net){c.hh=false;c.human=false}G.chars.push(c);lg('⛵ Ada is safe in camp! She can only rest, but she eats and feels the weather like everyone.','big');fx('build');SCEN.stranded.check()}}},
   afterWeather(){},
-  night(){if(!G.sc.rescued){G.sc.ada+=2;lg(`Out on the rock, Ada suffers through the night (${G.sc.ada}/${CHARS.ada.die}).`,'bad');if(G.sc.ada>=CHARS.ada.die){G.over={win:false,why:'Ada did not survive on the rock.'};lg('☠ Ada is gone. The castaways have lost.','bad');fx('lose')}}},
+  night(){if(!G.sc.rescued){G.sc.ada+=2;lg(`Out on the rock, Ada suffers through the night (${G.sc.ada}/${CHARS.ada.die}).`,'bad');if(G.sc.ada>=CHARS.ada.die){G.over={win:false,why:'Ada did not survive on the rock.'};lg(' Ada is gone. The castaways have lost.','bad');fx('lose')}}},
   built(){},
   check(){if(G.sc.rescued&&has('lifeboat'))win('With Ada aboard, the lifeboat pushes through the surf. You are going home!')},
   afterActions(){this.check()},endRound(){this.check()}},
@@ -55,12 +55,12 @@ const SCEN={
   goal(){const g=G.sc.goals.filter(has).length;return `Home: shelter ${hasShelter()?'✓':'✗'}, roof ${G.camp.roof}, palisade ${G.camp.pal}, weapon ${G.weapon} (each 1+) · inventions ${g}/${G.sc.goals.length} · children ${G.sc.kids}`},
   book(){G.prod.half=1;lg('Bad crops: production is halved this round.','bad')},
   totem(pos,ctx){const t=tileAt(pos);const other=G.map.some(m=>m.id!==pos&&tileAt(m.id)&&tileAt(m.id).terr===t.terr&&!m.waste);if(!other){G.map[pos].waste=1;lg(`Wasteland: this ${t.terr} is barren and counts as unexplored.`,'bad')}},
-  roundStart(){if([7,9,11].includes(G.round)){G.sc.kids++;lg(`👶 A child is born! (${G.sc.kids} now, each needs 1 food a night)`,'big')}},
+  roundStart(){if([7,9,11].includes(G.round)){G.sc.kids++;lg(` A child is born! (${G.sc.kids} now, each needs 1 food a night)`,'big')}},
   specials:{reclaim:{n:'Reclaim the land (remove a black marker)',dice:null,need:2,why(){return blackMarkers().length?null:'no black markers on the island'},win(ctx){push({f:'fn',k:'reclaimPick'})}}},
   nightKids(){if(!G.sc.kids)return;const have=G.res.food+G.res.pfood;if(have<G.sc.kids){G.over={win:false,why:'A child went hungry.'};lg('There is not enough food for the children. The settlement fails.','bad');fx('lose');return}pay('food',G.sc.kids,[],true);lg(`The children eat (${G.sc.kids} food).`)},
   check(){if(hasShelter()&&G.camp.roof>=1&&G.camp.pal>=1&&G.weapon>=1&&G.sc.goals.every(has))win('Snug house, strong walls, every tool you need: the settlers are home.')},
   afterActions(){this.check()},endRound(){this.check()}}};
-function win(why){if(G.over)return;G.over={win:true,why};lg('🏆 '+why,'big');fx('win')}
+function win(why){if(G.over)return;G.over={win:true,why};lg(' '+why,'big');fx('win')}
 function fogCandidates(){return G.map.filter(m=>!m.fog&&!m.down).map(m=>m.id)}
 FN.fogPick=fr=>{if(!fr.n)return;const o=fogCandidates().sort((a,b)=>fogHarm(a)-fogHarm(b)).map(p=>({l:`${tileAt(p)?'Tile '+tileAt(p).no+' ('+tileAt(p).terr+')':'Unexplored space '+p}${p===G.camp.pos?' — the camp!':''}`,frames:[{f:'fn',k:'fogPut',p,n:fr.n-1}],pos:p}));
   ask('team',`Mysterious fog: choose a space for fog (${fr.n} left)`,o,{kind:'fog'})};
@@ -93,6 +93,6 @@ function campMet(){const v=G.cmp.goal.value;const ok=[];
   return ok.length>0&&ok.every(Boolean)}
 // end of a day: a met checkpoint wins the chapter; a missed deadline loses it. true when the game is over.
 function campCheck(){const g=G.cmp.goal;if(!g||g.type!=='custom'||!g.value)return false;
-  if(campMet()){G.over={win:true,why:'Chapter goal reached: '+g.text.replace(/\.$/,'')+'.'};lg('🏆 '+G.over.why,'big');fx('win');return true}
+  if(campMet()){G.over={win:true,why:'Chapter goal reached: '+g.text.replace(/\.$/,'')+'.'};lg(' '+G.over.why,'big');fx('win');return true}
   const by=g.value.byDay||g.value.surviveDays;if(by&&G.round>=by){G.over={win:false,why:'Day '+by+' ended before the chapter goal: '+g.text.replace(/\.$/,'')+'.'};lg(G.over.why,'bad');fx('lose');return true}
   return false}

@@ -798,8 +798,16 @@ html body .gxc .gxc-path .gxc-node .gxc-lab,html body .gxc .gxc-path .gxc-act b,
 @media (min-width:1024px){html body .gxc .gxc-path .gxc-node .gxc-lab,html body .gxc .gxc-path .gxc-act b,html body .gxc .gxc-path .gxc-act small{font-size:16px}}
 @media (min-width:1024px){html.bf #phview #phlabel small.bfb{font-size:16px}}
 
-.hlp-rules-set .gxh-set>span,#rulesbody li,#tutset button>span{background:#fff6dc!important;color:#2a1a0a!important;text-shadow:none!important;border-radius:6px}
+.hlp-rules-set .gxh-set>span,#tutset button>span{background:#fff6dc!important;color:#2a1a0a!important;text-shadow:none!important;border-radius:6px}
 html body .gxc-head .gxc-ib{border-image:none!important;border:1px solid #6b4a1a!important;border-radius:8px;background:#2a1d0e!important;color:#fff4d8!important;filter:none!important;text-shadow:none!important}
+
+/* W641 contrast: solid plates behind campaign map text */
+html body .gxc-path .gxc-act{background:#1b1208!important;background-image:none!important;border:0!important;box-shadow:none!important}
+html body .gxc-path .gxc-act b,html body .gxc-path .gxc-act small{color:#fff4d8!important;opacity:1!important;text-shadow:none!important}
+html body .gxc-path .gxc-node .gxc-disc{background:#2b1b0e!important;background-image:none!important;border:3px solid #f2b93b!important;border-radius:50%!important;filter:none!important;opacity:1!important;color:#fff8ec!important;text-shadow:none!important}
+html body .gxc-path .gxc-node.locked .gxc-disc{background:#3b3b3b!important;border-color:#bbb!important;color:#fff!important}
+html body .gxc-path .gxc-node .gxc-pt-e,html body .gxc-path .gxc-node .gxc-lock{color:#fff!important;opacity:1!important}
+.hlp-rules-set .gxh-set button,#tutset .gx-ibtn span{background:#1b1208!important;color:#fff4d8!important;opacity:1!important;text-shadow:none!important;border-radius:4px;padding:0 4px}
 </style>
 <style>
 /* ===== GX skin: painted UI kit over the shared shell + campaign classes. Opt-in: nothing changes until gx-skin.js adds
@@ -1232,9 +1240,9 @@ html body :is(.gxh-ring,.gxt-ring){animation-duration:1.6s}
   <button class="gx-ibtn" data-gx="rulesd" aria-expanded="false" data-ico="book" aria-label="Rules"><span>Rules</span></button>
   <button class="gx-ibtn menub" data-a="menu" aria-expanded="false" aria-controls="moremenu" aria-label="More: sound, speed, graphics, new game" data-ico="menu"></button>
   <div class="more" id="moremenu">
-  <button class="gx-ibtn" data-a="snd" id="sndbtn" aria-label="Sound">🔊</button>
-  <button class="gx-ibtn" data-a="mus" id="musbtn" aria-label="Sea sounds">🌊 On</button>
-  <button class="gx-ibtn" data-a="musicopen" id="musicpick" aria-haspopup="dialog">♪ Pick songs</button>
+  <button class="gx-ibtn" data-a="snd" id="sndbtn" aria-label="Sound">Sound</button>
+  <button class="gx-ibtn" data-a="mus" id="musbtn" aria-label="Sea sounds"> On</button>
+  <button class="gx-ibtn" data-a="musicopen" id="musicpick" aria-haspopup="dialog">Pick songs</button>
   <button class="gx-ibtn" data-a="speed" id="speedbtn" title="How fast the computer plays">⏩ normal</button>
   <button class="gx-ibtn" data-a="gfx" id="gfxbtn" title="Graphics quality and speed" aria-haspopup="dialog" aria-controls="gfxpop" aria-expanded="false">Graphics</button>
   <button class="gx-ibtn" data-a="pause" id="pausebtn" hidden>⏸ Pause</button>
@@ -2748,7 +2756,7 @@ const GX={key:'gx',open:null,
   }
   function starRow(n, max, total) {
     var r = el('div', 'gxc-stars'); r.setAttribute('aria-label', n + ' of ' + (total || 3) + ' stars');
-    for (var i = 0; i < (total || 3); i++) r.appendChild(el('i', 'gxc-st' + (i < n ? ' on' : '') + (max != null && i >= max ? ' cap' : ''), '★'));
+    for (var i = 0; i < (total || 3); i++) r.appendChild(el('i', 'gxc-st' + (i < n ? ' on' : '') + (max != null && i >= max ? ' cap' : ''), '◆'));
     return r;
   }
   // twist text without its 'Boss rule:' prefix (the label shows it), first letter upper-case
@@ -2769,7 +2777,7 @@ const GX={key:'gx',open:null,
     head.appendChild(back);
     var tt = el('div', 'gxc-htitle'); tt.appendChild(el('b', null, D.title || 'Story')); head.appendChild(tt);
     var got = 0; list.forEach(function (c) { got += (P.ch[c.id] && P.ch[c.id].stars) || 0; });
-    var sc = btn('gxc-ib gxc-score', '★ ' + got + '/' + list.length * 3, function () { rewards(); });
+    var sc = btn('gxc-ib gxc-score', '◆ ' + got + '/' + list.length * 3, function () { rewards(); });
     sc.setAttribute('aria-label', got + ' stars of ' + list.length * 3 + '. Show rewards'); head.appendChild(sc);
     if (O.headButtons) { try { O.headButtons().forEach(function (b) { head.insertBefore(b, sc); }); } catch (e) {} }
     s.appendChild(head);
@@ -2850,7 +2858,7 @@ const GX={key:'gx',open:null,
     var g = el('div', 'gxc-goal'); g.appendChild(el('b', null, 'Goal')); g.appendChild(el('span', null, c.goal.text)); sh.appendChild(g);
     if (c.twist) { var tw = el('div', 'gxc-twist'); tw.appendChild(el('b', null, c.boss ? 'Boss rule' : 'Special rule')); tw.appendChild(el('span', null, ruleText(c.twist.text))); sh.appendChild(tw); }
     var sl = el('ul', 'gxc-slist');
-    c.stars.forEach(function (s, i) { var li = el('li', i < (st.stars || 0) ? 'on' : ''); li.appendChild(el('i', null, '★')); li.appendChild(el('span', null, s.text)); sl.appendChild(li); });
+    c.stars.forEach(function (s, i) { var li = el('li', i < (st.stars || 0) ? 'on' : ''); li.appendChild(el('i', null, '◆')); li.appendChild(el('span', null, s.text)); sl.appendChild(li); });
     sh.appendChild(sl);
     var row = el('div', 'gxc-row');
     var x = btn('gxc-btn ghost', 'Close', close); x.setAttribute('data-gxc-esc', ''); row.appendChild(x);
@@ -3005,7 +3013,7 @@ const GX={key:'gx',open:null,
       var sr = starRow(r.stars, def.maxStars, 3); sr.classList.add('big'); box.appendChild(sr);
       if (r.won && def.easy) box.appendChild(el('div', 'gxc-dim gxc-small', 'Easier mode: up to ' + def.maxStars + ' stars. Play it normally for 3.'));
       var sl = el('ul', 'gxc-slist');
-      def.stars.forEach(function (st, i) { var li = el('li', i < r.stars ? 'on' : ''); li.appendChild(el('i', null, '★')); li.appendChild(el('span', null, st.text)); sl.appendChild(li); });
+      def.stars.forEach(function (st, i) { var li = el('li', i < r.stars ? 'on' : ''); li.appendChild(el('i', null, '◆')); li.appendChild(el('span', null, st.text)); sl.appendChild(li); });
       box.appendChild(sl);
       var op = def.opponent, line = r.won ? op.praise : op.taunt;
       if (line) {
@@ -3068,23 +3076,23 @@ window.CAMPAIGN={
   "title": "The Log of the Gull's Wake",
   "version": 1,
   "cast": {
-    "log":       { "name": "The Ship's Log", "portrait": "camp-log.webp", "emoji": "📓", "color": "#7a5a34" },
-    "carpenter": { "name": "The Carpenter", "portrait": "camp-carpenter.webp", "emoji": "🪚", "color": "#8a5a2b" },
-    "cook":      { "name": "The Cook", "portrait": "camp-cook.webp", "emoji": "🍲", "color": "#b5462e" },
-    "explorer":  { "name": "The Explorer", "portrait": "camp-explorer.webp", "emoji": "🧭", "color": "#2f6f6a" },
-    "soldier":   { "name": "The Soldier", "portrait": "camp-soldier.webp", "emoji": "🛡️", "color": "#4b5563" },
-    "friday":    { "name": "Friday", "portrait": "camp-friday.webp", "emoji": "🧑🏾", "color": "#a0702a" },
-    "ada":       { "name": "Ada", "portrait": "camp-ada.webp", "emoji": "🧕", "color": "#3f6fa8" },
-    "hunger":    { "name": "Gnawing Hunger", "portrait": "camp-hunger.webp", "emoji": "🦴", "color": "#9c7a3c" },
-    "rain":      { "name": "The Long Rain", "portrait": "camp-rain.webp", "emoji": "🌧️", "color": "#4a6a8a" },
-    "prowlers":  { "name": "The Night Prowlers", "portrait": "camp-prowlers.webp", "emoji": "🐆", "color": "#5b4a2e" },
-    "horizon":   { "name": "The Empty Horizon", "portrait": "camp-horizon.webp", "emoji": "🌅", "color": "#c9853a" },
-    "whisper":   { "name": "The Whispering Fog", "portrait": "camp-whisper.webp", "emoji": "🌫️", "color": "#7d8a94" },
-    "altar":     { "name": "The Altar Shadows", "portrait": "camp-altar.webp", "emoji": "🕯️", "color": "#5a2d4a" },
-    "shroud":    { "name": "The Grey Shroud", "portrait": "camp-shroud.webp", "emoji": "👁️", "color": "#3b3f4a" },
-    "gale":      { "name": "The Autumn Gale", "portrait": "camp-gale.webp", "emoji": "🌪️", "color": "#36506b" },
-    "winter":    { "name": "The Lean Season", "portrait": "camp-winter.webp", "emoji": "❄️", "color": "#6f8fa8" },
-    "undertow":  { "name": "The Undertow", "portrait": "camp-undertow.webp", "emoji": "🌊", "color": "#1f4e6e" }
+    "log":       { "name": "The Ship's Log", "portrait": "camp-log.webp", "emoji": "", "color": "#7a5a34" },
+    "carpenter": { "name": "The Carpenter", "portrait": "camp-carpenter.webp", "emoji": "", "color": "#8a5a2b" },
+    "cook":      { "name": "The Cook", "portrait": "camp-cook.webp", "emoji": "", "color": "#b5462e" },
+    "explorer":  { "name": "The Explorer", "portrait": "camp-explorer.webp", "emoji": "", "color": "#2f6f6a" },
+    "soldier":   { "name": "The Soldier", "portrait": "camp-soldier.webp", "emoji": "", "color": "#4b5563" },
+    "friday":    { "name": "Friday", "portrait": "camp-friday.webp", "emoji": "", "color": "#a0702a" },
+    "ada":       { "name": "Ada", "portrait": "camp-ada.webp", "emoji": "", "color": "#3f6fa8" },
+    "hunger":    { "name": "Gnawing Hunger", "portrait": "camp-hunger.webp", "emoji": "", "color": "#9c7a3c" },
+    "rain":      { "name": "The Long Rain", "portrait": "camp-rain.webp", "emoji": "", "color": "#4a6a8a" },
+    "prowlers":  { "name": "The Night Prowlers", "portrait": "camp-prowlers.webp", "emoji": "", "color": "#5b4a2e" },
+    "horizon":   { "name": "The Empty Horizon", "portrait": "camp-horizon.webp", "emoji": "", "color": "#c9853a" },
+    "whisper":   { "name": "The Whispering Fog", "portrait": "camp-whisper.webp", "emoji": "", "color": "#7d8a94" },
+    "altar":     { "name": "The Altar Shadows", "portrait": "camp-altar.webp", "emoji": "", "color": "#5a2d4a" },
+    "shroud":    { "name": "The Grey Shroud", "portrait": "camp-shroud.webp", "emoji": "", "color": "#3b3f4a" },
+    "gale":      { "name": "The Autumn Gale", "portrait": "camp-gale.webp", "emoji": "", "color": "#36506b" },
+    "winter":    { "name": "The Lean Season", "portrait": "camp-winter.webp", "emoji": "", "color": "#6f8fa8" },
+    "undertow":  { "name": "The Undertow", "portrait": "camp-undertow.webp", "emoji": "", "color": "#1f4e6e" }
   },
   "acts": [
     { "act": 1, "title": "Washed Ashore", "blurb": "Eat, build a roof, look around, and light the signal fire." },
@@ -3107,7 +3115,7 @@ window.CAMPAIGN={
       "outro": [
         { "who": "log", "text": "Three nights, three meals, nobody lost. The beach almost feels like a camp." }
       ],
-      "opponent": { "name": "Gnawing Hunger", "portrait": "camp-hunger.webp", "emoji": "🦴", "cast": "hunger",
+      "opponent": { "name": "Gnawing Hunger", "portrait": "camp-hunger.webp", "emoji": "", "cast": "hunger",
         "personality": "Quiet and patient. It only bites at night, and only if the food pile is empty.",
         "aiLevel": "easy", "aiStyle": "starvation" },
       "setup": { "scen": "marooned", "chars": ["carpenter", "cook"], "friday": true, "dog": true, "items": 4, "diff": "easy" },
@@ -3132,7 +3140,7 @@ window.CAMPAIGN={
       "outro": [
         { "who": "carpenter", "text": "Walls and a floor. The rain can drum on it all it likes." }
       ],
-      "opponent": { "name": "The Long Rain", "portrait": "camp-rain.webp", "emoji": "🌧️", "cast": "rain",
+      "opponent": { "name": "The Long Rain", "portrait": "camp-rain.webp", "emoji": "", "cast": "rain",
         "personality": "Grey and steady. Ruins food and wood that sits above the roof.",
         "aiLevel": "easy", "aiStyle": "weather" },
       "setup": { "scen": "marooned", "chars": ["carpenter", "cook"], "friday": true, "dog": true, "items": 4, "diff": "easy" },
@@ -3157,7 +3165,7 @@ window.CAMPAIGN={
       "outro": [
         { "who": "log", "text": "A river, a ridge, a grove of good timber. And tracks we will not follow alone." }
       ],
-      "opponent": { "name": "The Night Prowlers", "portrait": "camp-prowlers.webp", "emoji": "🐆", "cast": "prowlers",
+      "opponent": { "name": "The Night Prowlers", "portrait": "camp-prowlers.webp", "emoji": "", "cast": "prowlers",
         "personality": "Curious and hungry. They wait at the edge of every new tile you uncover.",
         "aiLevel": "easy", "aiStyle": "beasts" },
       "setup": { "scen": "marooned", "chars": ["carpenter", "cook"], "friday": true, "dog": true, "items": 4, "diff": "easy" },
@@ -3183,7 +3191,7 @@ window.CAMPAIGN={
         { "who": "log", "text": "The ship turned. But her captain swore she'd seen grey fog wrap the island like a hand." },
         { "who": "log", "text": "She took our letters and promised to return. Then she sailed. The fog came in that night." }
       ],
-      "opponent": { "name": "The Empty Horizon", "portrait": "camp-horizon.webp", "emoji": "🌅", "cast": "horizon",
+      "opponent": { "name": "The Empty Horizon", "portrait": "camp-horizon.webp", "emoji": "", "cast": "horizon",
         "personality": "Calm and vast. It never attacks; it simply lets the days run out.",
         "aiLevel": "easy", "aiStyle": "time-pressure",
         "taunt": "Day twelve is over. Nothing on the water but me.",
@@ -3210,7 +3218,7 @@ window.CAMPAIGN={
       "outro": [
         { "who": "carpenter", "text": "Two crosses up, and the fog thinned a hand's width. It can be beaten." }
       ],
-      "opponent": { "name": "The Whispering Fog", "portrait": "camp-whisper.webp", "emoji": "🌫️", "cast": "whisper",
+      "opponent": { "name": "The Whispering Fog", "portrait": "camp-whisper.webp", "emoji": "", "cast": "whisper",
         "personality": "Sly. Book events bring fog onto tiles, and fog makes every action there cost one more pawn.",
         "aiLevel": "normal", "aiStyle": "fog" },
       "setup": { "scen": "hexed", "chars": ["carpenter", "cook"], "friday": true, "dog": false, "items": 2, "diff": "standard" },
@@ -3235,7 +3243,7 @@ window.CAMPAIGN={
       "outro": [
         { "who": "explorer", "text": "Old tools, a bell, a blade. The temple gave more than it took. This time." }
       ],
-      "opponent": { "name": "The Altar Shadows", "portrait": "camp-altar.webp", "emoji": "🕯️", "cast": "altar",
+      "opponent": { "name": "The Altar Shadows", "portrait": "camp-altar.webp", "emoji": "", "cast": "altar",
         "personality": "Greedy and theatrical. Totems reveal the temple, a wounding altar and hideouts full of fog.",
         "aiLevel": "normal", "aiStyle": "totems" },
       "setup": { "scen": "hexed", "chars": ["carpenter", "cook", "explorer"], "friday": false, "dog": false, "items": 2, "diff": "standard" },
@@ -3261,7 +3269,7 @@ window.CAMPAIGN={
         { "who": "log", "text": "The fifth cross went up at dusk. The fog lifted like a curtain, and out on the reef we saw her:" },
         { "who": "ada", "text": "Hello the shore! I've been on this rock for days. Please, a boat!" }
       ],
-      "opponent": { "name": "The Grey Shroud", "portrait": "camp-shroud.webp", "emoji": "👁️", "cast": "shroud",
+      "opponent": { "name": "The Grey Shroud", "portrait": "camp-shroud.webp", "emoji": "", "cast": "shroud",
         "personality": "Old, cold and certain. It spreads fog, wakes the altar, and lets the clock do the rest.",
         "aiLevel": "normal", "aiStyle": "curse",
         "taunt": "Ten days, and still the island is mine. Lie down in the fog.",
@@ -3288,7 +3296,7 @@ window.CAMPAIGN={
       "outro": [
         { "who": "log", "text": "The ship came, but the sea was too high to land. She dropped crates and a promise: spring." }
       ],
-      "opponent": { "name": "The Autumn Gale", "portrait": "camp-gale.webp", "emoji": "🌪️", "cast": "gale",
+      "opponent": { "name": "The Autumn Gale", "portrait": "camp-gale.webp", "emoji": "", "cast": "gale",
         "personality": "Loud and wasteful. More book events, more storms, and nothing kept dry for long.",
         "aiLevel": "hard", "aiStyle": "storms" },
       "setup": { "scen": "marooned", "chars": ["carpenter", "cook"], "friday": true, "dog": false, "items": 1, "diff": "hard" },
@@ -3314,7 +3322,7 @@ window.CAMPAIGN={
         { "who": "cook", "text": "A roof, a fence, a full larder, and three small voices arguing over the last fish." },
         { "who": "log", "text": "Spring is close. Ada is not. It's time to build a boat." }
       ],
-      "opponent": { "name": "The Lean Season", "portrait": "camp-winter.webp", "emoji": "❄️", "cast": "winter",
+      "opponent": { "name": "The Lean Season", "portrait": "camp-winter.webp", "emoji": "", "cast": "winter",
         "personality": "Thrifty and grim. Halves your harvest, turns land to waste and counts every mouth.",
         "aiLevel": "hard", "aiStyle": "scarcity" },
       "setup": { "scen": "settlers", "chars": ["carpenter", "cook", "soldier"], "friday": false, "dog": false, "items": 1, "diff": "hard" },
@@ -3340,7 +3348,7 @@ window.CAMPAIGN={
         { "who": "ada", "text": "I watched your smoke every day. I knew you would come." },
         { "who": "log", "text": "The Lifeboat cleared the reef at dawn. Last entry from the island. We are going home." }
       ],
-      "opponent": { "name": "The Undertow", "portrait": "camp-undertow.webp", "emoji": "🌊", "cast": "undertow",
+      "opponent": { "name": "The Undertow", "portrait": "camp-undertow.webp", "emoji": "", "cast": "undertow",
         "personality": "Cold, slow and relentless. Storms knock down your palisade while the clock runs on Ada.",
         "aiLevel": "hard", "aiStyle": "drowning",
         "taunt": "The rock is empty now. The sea keeps what it takes.",
@@ -3998,7 +4006,7 @@ function opText(op){const [k,a,b,c]=op;const pl=(n,s)=>`${n} ${s}${n===1?'':'s'}
   switch(k){
   case 'res':return `gain ${a==='pfood'?pl(b,'dry food').replace('dry foods','dry food'):b+' '+(RNAME[a]||a)}`;case 'resPer':return `gain 1 ${RNAME[a]} per castaway`;
   case 'lose':return `discard ${b} ${RNAME[a]}${c?' if you can':''}`;case 'loseAllRes':return 'discard all your resources';
-  case 'wound':return `${whoN(a)} ${a==='all'?'take':'takes'} ${pl(b,'wound')}`;case 'det':return `${whoN(a)} ${a==='all'?'gain':'gains'} ${b} ✊ determination`;
+  case 'wound':return `${whoN(a)} ${a==='all'?'take':'takes'} ${pl(b,'wound')}`;case 'det':return `${whoN(a)} ${a==='all'?'gain':'gains'} ${b}  determination`;
   case 'ldet':return `${whoN(a)} ${a==='all'?'lose':'loses'} ${b} determination`;case 'ldetAll':return `${whoN(a)} ${a==='all'?'lose':'loses'} all determination`;
   case 'heal':return `${whoN(a)} ${a==='all'?'heal':'heals'} ${pl(b,'wound')}`;case 'morale':return `morale ${a>0?'+':''}${a}`;
   case 'roof':return `roof ${a>0?'+':''}${a}${b==='shelter'?' (if you have a shelter)':''}`;case 'pal':return `palisade ${a>0?'+':''}${a}${b==='shelter'?' (if you have a shelter)':''}`;
@@ -4173,7 +4181,7 @@ const FN={};
 // ---------- wounds, determination, morale ----------
 function whoList(who,ctx){if(who==='all')return living();if(who==='first')return [firstC()];if(who==='actor')return ctx&&ctx.actor!=null&&ctx.actor>=0?[P(ctx.actor)]:(ctx&&ctx.actor===-1?[]:[firstC()]);if(who==='sp')return ctx.sp!=null?[P(ctx.sp)]:[];if(typeof who==='number')return [P(who)];return [firstC()]}
 function wound(c,n,why){if(!c||c.dead||n<=0)return;if(c==='fri'){return}
-  for(let k=0;k<n;k++){c.w++;G.lastWound={who:c.i,why:why||''};G.stats.wounds++;if(CHARS[c.k].arrows.includes(c.w)&&!c.cov.includes(c.w)){morale(-1,true)}if(c.w>=CHARS[c.k].die){c.dead=true;lg(`☠ ${c.nm} dies${why?' ('+why+')':''}. The castaways have lost.`,'bad');G.over={win:false,why:`${c.nm} died.`};fx('lose');return}}
+  for(let k=0;k<n;k++){c.w++;G.lastWound={who:c.i,why:why||''};G.stats.wounds++;if(CHARS[c.k].arrows.includes(c.w)&&!c.cov.includes(c.w)){morale(-1,true)}if(c.w>=CHARS[c.k].die){c.dead=true;lg(` ${c.nm} dies${why?' ('+why+')':''}. The castaways have lost.`,'bad');G.over={win:false,why:`${c.nm} died.`};fx('lose');return}}
   lg(`${c.nm} takes ${n} wound${n>1?'s':''}${why?' ('+why+')':''}.`,'bad');fx('wound',c.i)}
 function friWound(n){if(!G.fri||G.fri.dead)return;G.fri.w+=n;if(G.fri.w>=FRIDAY.die){G.fri.dead=true;lg('Friday is killed. The others carry on.','bad')}else lg(`Friday takes ${n} wound${n>1?'s':''}.`,'bad')}
 function heal(c,n){if(!c||c.dead)return 0;const h=Math.min(n,c.w);c.w-=h;if(h){lg(`${c.nm} heals ${h} wound${h>1?'s':''}.`,'good');fx('heal',c.i)}return h}
@@ -4353,7 +4361,7 @@ function invWhy(k,forC){const I=invReq(k);if(!I)return 'unknown';if(has(k)&&!I.m
 function invCost(k){const I=invReq(k);return I.alt?I.alt[0]:(I.r||{})}
 // defer: an item made during the Action phase goes to the future space; it works from the end of the phase (rulebook: Building)
 function completeInv(k,builder,free,defer){const I=invReq(k);if(I.multi){SC().built&&SC().built(k,builder);return}
-  G.stats.built++;lg(`🔨 ${I.n} is made${free?' (for free)':''}!`,'big');fx('build');if(defer){(G.inv.pending=G.inv.pending||[]).push({k})}else{G.inv.built[k]=1;doInv(k)}
+  G.stats.built++;lg(` ${I.n} is made${free?' (for free)':''}!`,'big');fx('build');if(defer){(G.inv.pending=G.inv.pending||[]).push({k})}else{G.inv.built[k]=1;doInv(k)}
   if(I.kind==='personal'&&builder!=null)gainDet(P(builder),2)}
 function doInv(k){switch(k){case 'bricks':case 'fire':roofPal('pal',1);break;case 'wall':case 'moat':roofPal('pal',2);break;case 'knife':weapon(1);break;case 'bow':case 'spear':weapon(3);break;case 'sling':weapon(2);break;
   case 'dam':gain('pfood',2,{});break;case 'snare':G.map[G.camp.pos].tok.c_food=1;break;case 'hatchet':G.map[G.camp.pos].tok.c_wood=1;break;
@@ -4392,7 +4400,7 @@ function boostOpts(c){const o=[];const it=G.items.find(i=>i.k==='pistol'&&i.uses
   if(c&&c.k==='soldier'&&!c.used.rage&&!c.noSkills&&c.det>=3)o.push({k:'rage',l:'Battle Rage (+3, 3 determination)'});
   if(G.kept.m_saber)o.push({k:'saber',l:'Cutlass (+3, you take 1 wound)'});if(G.kept.m_rifle)o.push({k:'m_rifle',l:'Old Musket (+3, one use)'});if(G.kept.e_surprise)o.push({k:'e_surprise',l:'Hidden Blade (+3, one use)'});if(G.kept.ritualknife)o.push({k:'ritualknife',l:'Ritual Knife (+3, you take 1 wound)'});if(G.kept.sc_pistol)o.push({k:'sc_pistol',l:'Old Pistol (+3, one use)'});return o}
 FN.fight2=f=>{const fr=f.fr;const b=fr.beast;const c=fr.who>=0?P(fr.who):null;const str=fr.str;const wpn=G.weapon+(fr.boost||0);let short=Math.max(0,str-wpn);
-  lg(`⚔ ${c?c.nm:'The castaways'} fight${c?'s':''} ${b.n}: strength ${str} vs weapon ${wpn}.`,'big');fx('fight',fr.who);
+  lg(` ${c?c.nm:'The castaways'} fight${c?'s':''} ${b.n}: strength ${str} vs weapon ${wpn}.`,'big');fx('fight',fr.who);
   if(short&&G.kept.m_helmet){short--;lg('The iron helmet takes a blow.','good')}
   if(short&&c)wound(c,short,b.n);else if(short&&!c)for(const x of living())wound(x,short,b.n);
   if(G.over)return;
@@ -4577,7 +4585,7 @@ FN.outcome=fr=>{const a=G.plan.acts.find(x=>x.id===fr.id);const d=fr.d;const c=f
 function advCtx(a){if(a.type==='gather'){const s=srcs(a.tgt.pos).find(x=>x.i===a.tgt.i);return {pos:a.tgt.pos,srcI:a.tgt.i,gres:s&&s.s==='wood'?'wood':'food'}}if(a.type==='explore')return {pos:a.tgt,explore:1};return {}}
 FN.success=fr=>{const a=G.plan.acts.find(x=>x.id===fr.id);const ctx=fr.ctx;const c=ctx.actor>=0?P(ctx.actor):null;
   if(a.type==='build'){const cost=actCost(a);for(const r in cost)if(cost[r])pay(r,cost[r],(ctx.pay||[]).map(P),false);if(G.tok.build.wood&&cost.wood)delete G.tok.build.wood;
-    const t=a.tgt.k;if(t==='shelter'){G.camp.shelter=true;lg('🏠 A shelter is built!','big');fx('build')}else if(t==='roof')roofPal('roof',1);else if(t==='pal')roofPal('pal',1);else if(t==='weapon')weapon(1);
+    const t=a.tgt.k;if(t==='shelter'){G.camp.shelter=true;lg(' A shelter is built!','big');fx('build')}else if(t==='roof')roofPal('roof',1);else if(t==='pal')roofPal('pal',1);else if(t==='weapon')weapon(1);
     else if(t==='cross')SC().built&&SC().built('cross',ctx.actor,a.tgt.cross);else completeInv(t,ctx.actor,false,true);return}
   if(a.type==='gather'){const s=srcs(a.tgt.pos).find(x=>x.i===a.tgt.i);if(!s)return;const r=s.s==='wood'?'wood':'food';let n=1;const m=G.map[a.tgt.pos];if(m.tok[r]&&s.s!=='parrot'||(r==='food'&&m.tok.food&&!s.tok))n++;
     for(const it of ['basket','sack'])if(has(it)&&!G.plan.used[it]){G.plan.used[it]=1;n++}
@@ -4586,7 +4594,7 @@ FN.success=fr=>{const a=G.plan.acts.find(x=>x.id===fr.id);const ctx=fr.ctx;const
   if(a.type==='special'){lg(`${actLabel(a)}: success!`,'good');SPEC(a.tgt).win(ctx)}};
 function exploreTile(pos,ctx){const no=G.tileDeck.shift();if(no==null)return;const m=G.map[pos];m.tile=no;const t=TILES.find(x=>x.no===no);G.stats.explored++;
   const before=new Set();for(const x of G.map)if(x.id!==pos){const tt=tileAt(x.id);if(tt&&!x.cov)before.add(tt.terr)}
-  lg(`🗺 New land at place ${pos+1}: ${t.terr}${t.src.length?' with '+t.src.join(' and '):''}${t.shelter?', a natural shelter':''}.`,'big');fx('explore',pos);
+  lg(` New land at place ${pos+1}: ${t.terr}${t.src.length?' with '+t.src.join(' and '):''}${t.shelter?', a natural shelter':''}.`,'big');fx('explore',pos);
   if(!before.has(t.terr))lg(`First ${t.terr} found: new inventions may now be possible.`,'good');
   if(m.tok.scorch){delete m.tok.scorch;if(t.src.length)m.exh[0]=1}
   if(t.beast&&G.beast.length){G.hunt.push(G.beast.shift());shuffle(G.hunt);lg('Animal tracks: a new beast joins the hunting grounds.')}
@@ -4615,7 +4623,7 @@ FN.weather=fr=>{G.phase='weather';beat('weather');const S=SCENARIOS[G.scen];cons
   if(!dice.includes('animals'))G.wxAnimal=null;
   G.wxNow={rain,snow,storm:G.wx.storm,animal:G.wxAnimal,out};G.lastWx=Object.assign({},G.wxNow,{round:G.round});
   if(!dice.length&&!rain&&!snow&&!G.wx.storm){lg('Weather: calm.');G.wx={rain:0,snow:0,storm:0,animals:0};return}
-  lg(`Weather: ${out.map(x=>x.replace(/^rain die: /,'🌧 rain die shows ').replace(/^winter die: /,'❄️ winter die shows ').replace(/^animals die: /,'🐾 animals die: ')).join(', ')||'no weather dice'}${G.wx.rain||G.wx.snow||G.wx.storm?', plus clouds from event cards':''} → ${rain} rain cloud${rain===1?'':'s'}, ${snow} snow cloud${snow===1?'':'s'}${G.wx.storm?', a storm':''}.`,'big');fx('weather');
+  lg(`Weather: ${out.map(x=>x.replace(/^rain die: /,' rain die shows ').replace(/^winter die: /,'❄️ winter die shows ').replace(/^animals die: /,' animals die: ')).join(', ')||'no weather dice'}${G.wx.rain||G.wx.snow||G.wx.storm?', plus clouds from event cards':''} → ${rain} rain cloud${rain===1?'':'s'}, ${snow} snow cloud${snow===1?'':'s'}${G.wx.storm?', a storm':''}.`,'big');fx('weather');
   push({f:'fn',k:'weather2'});
   // optional helps: the Cook's moonshine
   const cook=living().find(c=>c.k==='cook'&&!c.used.moonshine&&!c.noSkills&&c.det>=3);if(cook&&(rain+snow>G.camp.roof||snow)){ask(cook.i,'Use Moonshine in this weather?',[{l:'No',frames:[]},{l:'Ignore 1 rain cloud (3 determination)',frames:[{f:'fn',k:'moon',m:'rain',c:cook.i}]}].concat(snow?[{l:'Turn 1 snow cloud into rain (3 determination)',frames:[{f:'fn',k:'moon',m:'snow',c:cook.i}]}]:[]),{kind:'weather'})}};
@@ -4742,7 +4750,7 @@ const SCEN={
   specials:{ada:{n:'Row out and rescue Ada',dice:'explore',advWound:1,why(){if(G.sc.rescued)return 'Ada is already safe';if(!has('jraft'))return 'build the Rescue Raft first';return null},
     win(ctx){G.sc.rescued=true;const c={i:G.chars.length,k:'ada',nm:'Ada',w:G.sc.ada,det:0,dead:false,used:{},sp:{},cov:[],human:G.chars.some(hum),lv:'normal',pawnMinus:0,only:null,noSkills:true,out:null,rr:0,rrNext:0,pmNext:0,npc:1};if(G.net){c.hh=false;c.human=false}G.chars.push(c);lg('⛵ Ada is safe in camp! She can only rest, but she eats and feels the weather like everyone.','big');fx('build');SCEN.stranded.check()}}},
   afterWeather(){},
-  night(){if(!G.sc.rescued){G.sc.ada+=2;lg(`Out on the rock, Ada suffers through the night (${G.sc.ada}/${CHARS.ada.die}).`,'bad');if(G.sc.ada>=CHARS.ada.die){G.over={win:false,why:'Ada did not survive on the rock.'};lg('☠ Ada is gone. The castaways have lost.','bad');fx('lose')}}},
+  night(){if(!G.sc.rescued){G.sc.ada+=2;lg(`Out on the rock, Ada suffers through the night (${G.sc.ada}/${CHARS.ada.die}).`,'bad');if(G.sc.ada>=CHARS.ada.die){G.over={win:false,why:'Ada did not survive on the rock.'};lg(' Ada is gone. The castaways have lost.','bad');fx('lose')}}},
   built(){},
   check(){if(G.sc.rescued&&has('lifeboat'))win('With Ada aboard, the lifeboat pushes through the surf. You are going home!')},
   afterActions(){this.check()},endRound(){this.check()}},
@@ -4751,12 +4759,12 @@ const SCEN={
   goal(){const g=G.sc.goals.filter(has).length;return `Home: shelter ${hasShelter()?'✓':'✗'}, roof ${G.camp.roof}, palisade ${G.camp.pal}, weapon ${G.weapon} (each 1+) · inventions ${g}/${G.sc.goals.length} · children ${G.sc.kids}`},
   book(){G.prod.half=1;lg('Bad crops: production is halved this round.','bad')},
   totem(pos,ctx){const t=tileAt(pos);const other=G.map.some(m=>m.id!==pos&&tileAt(m.id)&&tileAt(m.id).terr===t.terr&&!m.waste);if(!other){G.map[pos].waste=1;lg(`Wasteland: this ${t.terr} is barren and counts as unexplored.`,'bad')}},
-  roundStart(){if([7,9,11].includes(G.round)){G.sc.kids++;lg(`👶 A child is born! (${G.sc.kids} now, each needs 1 food a night)`,'big')}},
+  roundStart(){if([7,9,11].includes(G.round)){G.sc.kids++;lg(` A child is born! (${G.sc.kids} now, each needs 1 food a night)`,'big')}},
   specials:{reclaim:{n:'Reclaim the land (remove a black marker)',dice:null,need:2,why(){return blackMarkers().length?null:'no black markers on the island'},win(ctx){push({f:'fn',k:'reclaimPick'})}}},
   nightKids(){if(!G.sc.kids)return;const have=G.res.food+G.res.pfood;if(have<G.sc.kids){G.over={win:false,why:'A child went hungry.'};lg('There is not enough food for the children. The settlement fails.','bad');fx('lose');return}pay('food',G.sc.kids,[],true);lg(`The children eat (${G.sc.kids} food).`)},
   check(){if(hasShelter()&&G.camp.roof>=1&&G.camp.pal>=1&&G.weapon>=1&&G.sc.goals.every(has))win('Snug house, strong walls, every tool you need: the settlers are home.')},
   afterActions(){this.check()},endRound(){this.check()}}};
-function win(why){if(G.over)return;G.over={win:true,why};lg('🏆 '+why,'big');fx('win')}
+function win(why){if(G.over)return;G.over={win:true,why};lg(' '+why,'big');fx('win')}
 function fogCandidates(){return G.map.filter(m=>!m.fog&&!m.down).map(m=>m.id)}
 FN.fogPick=fr=>{if(!fr.n)return;const o=fogCandidates().sort((a,b)=>fogHarm(a)-fogHarm(b)).map(p=>({l:`${tileAt(p)?'Tile '+tileAt(p).no+' ('+tileAt(p).terr+')':'Unexplored space '+p}${p===G.camp.pos?' — the camp!':''}`,frames:[{f:'fn',k:'fogPut',p,n:fr.n-1}],pos:p}));
   ask('team',`Mysterious fog: choose a space for fog (${fr.n} left)`,o,{kind:'fog'})};
@@ -4789,7 +4797,7 @@ function campMet(){const v=G.cmp.goal.value;const ok=[];
   return ok.length>0&&ok.every(Boolean)}
 // end of a day: a met checkpoint wins the chapter; a missed deadline loses it. true when the game is over.
 function campCheck(){const g=G.cmp.goal;if(!g||g.type!=='custom'||!g.value)return false;
-  if(campMet()){G.over={win:true,why:'Chapter goal reached: '+g.text.replace(/\.$/,'')+'.'};lg('🏆 '+G.over.why,'big');fx('win');return true}
+  if(campMet()){G.over={win:true,why:'Chapter goal reached: '+g.text.replace(/\.$/,'')+'.'};lg(' '+G.over.why,'big');fx('win');return true}
   const by=g.value.byDay||g.value.surviveDays;if(by&&G.round>=by){G.over={win:false,why:'Day '+by+' ended before the chapter goal: '+g.text.replace(/\.$/,'')+'.'};lg(G.over.why,'bad');fx('lose');return true}
   return false}
 
@@ -4997,7 +5005,7 @@ function aiPlan(forChars){if(!planOpen())return;forChars=forChars||G.chars.filte
 function aiPrePlan(forChars){const hum=forChars.some(i=>P(i)&&P(i).human);for(let i=G.own.length-1;i>=0&&!hum;i--){const k=G.own[i]&&G.own[i].k;if(!k||k==='leaves'||k==='veggies'&&!living().some(c=>c.w>=3))continue;if(!discWhy(i))discUse(i);if(!planOpen())return}
   for(const it of G.items.slice()){if(it.k==='biscuits'&&food()<eatersNeed())useItem('biscuits');if(it.k==='bottle')useItem('bottle');if(it.k==='pipe')useItem('pipe');if(it.k==='stormglass'&&!G.wxEarly&&(wxTab()[G.round]||[]).length)useItem('stormglass')}
   for(const c of living().filter(c=>forChars.includes(c.i)&&!c.npc)){const tr=[['peptalk',()=>G.morale<2&&c.det>=5],['broth',()=>c.det>=4&&food()<eatersNeed()],['remedy',()=>living().some(x=>x.w>=4)&&c.det>=3],['keeneye',()=>c.det>=6],['fortify',()=>c.det>=5],['drive',()=>c.det>=7&&G.weapon>=4],['idea',()=>c.det>=6&&G.inv.deck.length]];
-    // for a human castaway (💡 Suggest) only skills that need no answer: a question would stop the plan half-made
+    // for a human castaway ( Suggest) only skills that need no answer: a question would stop the plan half-made
     for(const [k,f] of tr)if(!skillWhy(c.i,k)&&f()&&!(c.human&&['idea','keeneye','recon','track','fortify','remedy'].includes(k))){useSkill(c.i,k);if(!planOpen())return}}
   if(G.scen==='marooned'){const room=SCEN.marooned.pileRoom();const spare=G.res.wood-(hasShelter()?0:2)-(G.round>=6?2:0);const stagesLeft=5-PILE_CUM.filter(c=>c<=G.sc.pile).length;const late=(10-G.round)<=stagesLeft;if(room&&spare>0&&(late||spare>=5))pileAdd(Math.min(room,spare))}}
 // ---------- driving the computer ----------
@@ -5353,14 +5361,14 @@ function storyNext(){const i=storyIdx();if(i<0)return;if(i===UI.beats.length-1&&
 function skipStop(i){for(let k=i+1;k<UI.beats.length;k++){if(skippable(k))continue;const b=UI.beats[k];if(b.kind==='daysum'||b.kind==='over'||beatLines(k).some(l=>l.c==='bad'))return k}return -1}
 function storySkip(){const i=storyIdx();const k=i<0?-1:skipStop(i);if(k>=0)UI.shown=k-1;else if(humanQ())UI.shown=UI.beats.length-2;else UI.shown=UI.beats.length-1;UI.seenBeat=null;refresh()}
 function charBark(ci,kind,seed){const c=ci!=null&&ci>=0?P(ci):null;if(!c)return '';const f=FL().chars&&FL().chars[c.k];const l=f&&pickL(f[kind],seed);return l?`<div class="bark" style="--pc:${PCOL[c.i%6]}"><b>${esc(c.nm)}:</b> “${esc(l)}”</div>`:''}
-const KIND_ICON={prod:'🧺',daysum:'📋',go:'🧭',finds:'🎒',intro:'🏝️',dawn:'🌅',event:'📜',threat:'⚠️',morning:'☀️',act:'🧭',adventure:'❓',mystery:'🗝️',fight:'⚔️',weather:'⛈️',night:'🌙',over:'🏁'};
-const ACT_ICON={threat:'⚠️',hunt:'🏹',build:'🔨',gather:'🧺',explore:'🧭',camp:'🏕️',rest:'😴',special:'⭐',tmap:'🗺️'};
+const KIND_ICON={prod:'',daysum:'',go:'',finds:'',intro:'',dawn:'',event:'',threat:'',morning:'☀️',act:'',adventure:'❓',mystery:'',fight:'',weather:'⛈️',night:'',over:''};
+const ACT_ICON={threat:'',hunt:'',build:'',gather:'',explore:'',camp:'',rest:'',special:'⭐',tmap:''};
 const AI=t=>`<i class="ai" data-a="${t}">${ACT_ICON[t]||'•'}</i>`;   // painted icon once html.sk-acts is set
 function beatHtml(i){const b=UI.beats[i];const d=b.data;const F=FL();const lines=beatLines(i).filter(MEANINGFUL);const S=SCENARIOS[G.scen];const fs=(F.scen||{})[G.scen]||{};
-  let kicker='',title='',story='',card='',extra='',icon=KIND_ICON[b.kind]||'📖';
+  let kicker='',title='',story='',card='',extra='',icon=KIND_ICON[b.kind]||'';
   switch(b.kind){
   case 'intro':kicker=`Chapter ${SCEN_ORDER.indexOf(G.scen)+1} · ${esc(S.n)}`;title=esc(fs.title||S.n);story=esc(fillCrew(d.text,d.page));if(d.page===d.of-1)extra=`<div class="goalbox"><b>Your goal</b> ${esc(S.x)}</div>`;break;
-  case 'dawn':kicker=`Day ${d.round} of ${G.rounds}`;title=esc((fs.days&&fs.days[d.round])||pickL((F.phase||{}).dawn,b.id)||'A new day');{const wx=wxTab()[d.round]||[];extra=`<div class="fore">Weather dice tonight: ${wx.length?wx.map(x=>({rain:'🌧 rain die',snow:'❄️ winter die',animals:'🐾 hungry-animals die'}[x])).join(' · '):'none, calm unless a card adds clouds'}</div>`+threadHtml(d.round)}break;
+  case 'dawn':kicker=`Day ${d.round} of ${G.rounds}`;title=esc((fs.days&&fs.days[d.round])||pickL((F.phase||{}).dawn,b.id)||'A new day');{const wx=wxTab()[d.round]||[];extra=`<div class="fore">Weather dice tonight: ${wx.length?wx.map(x=>({rain:' rain die',snow:'❄️ winter die',animals:' hungry-animals die'}[x])).join(' · '):'none, calm unless a card adds clouds'}</div>`+threadHtml(d.round)}break;
   case 'event':case 'threat':{const c=CARD[d.card];const fe=(F.ev||{})[d.card]||(F.adv||{})[d.card]||(F.mys||{})[d.card]||{};
     if(b.kind==='threat'){kicker='Too late';title=esc(c.th?c.th.n:c.n)+' — we never got to it';story=esc(fe.x||'')}
     else if(d.late){kicker='It comes back to haunt us';title=esc(c.ev.n);story=esc(fe.e||'')}
@@ -5390,7 +5398,7 @@ function beatHtml(i){const b=UI.beats[i];const d=b.data;const F=FL();const lines
   case 'over':{const w=G.over&&G.over.win;const ck=G.cmp&&G.cmp.goal&&G.cmp.goal.type==='custom';kicker=ck?'End of the chapter':'The end';title=ck?(w?'Chapter goal reached!':'Chapter lost'):w?'Rescued!':'Lost on the island';story=esc(ck?(w?'We did what we set out to do. The island still has more to teach us.':'Not this time. The island keeps its secrets a little longer.'):endLine());extra=`<p class="why">${esc(G.over?G.over.why:'')}</p>`;break}}
   const chips=lines.slice(0,14).map(l=>`<li class="${l.c}">${esc(l.t)}</li>`).join('');
   return {icon,kicker,title,story,card,extra,chips}}
-function diceHtml(d,seed){const f=[['wound',d.w,d.w?'🩸':'·','wound','no wound'],['success',d.s,d.s?'✔':'✖','success','failure'],['adventure',d.q,d.q?'❓':'·','adventure','no adventure']];
+function diceHtml(d,seed){const f=[['wound',d.w,d.w?'':'·','wound','no wound'],['success',d.s,d.s?'✔':'✖','success','failure'],['adventure',d.q,d.q?'❓':'·','adventure','no adventure']];
   return `<div class="dice3">${f.map(([k,v,g,a,n],j)=>`<div class="d3 ${k} ${k==='success'?(v?'good':'bad'):(v?'bad':'good')}" style="animation-delay:${j*.12}s"><span>${g}</span><small>${v?a:n}</small></div>`).join('')}</div>`}
 function renderStory(){const el=$('#story');if(!el)return;if(!G||UI.modal==='start'){el.hidden=true;document.body.classList.remove('storying');return}const i=storyIdx();document.body.classList.toggle('storying',i>=0);if(i<0){el.hidden=true;el.dataset.id='';if(V3.on)V3.focus=null;return}
   const b=UI.beats[i];const h=beatHtml(i);const q=i===UI.beats.length-1&&humanQ()?G.q:null;
@@ -5434,10 +5442,10 @@ function threadHtml(round){let t='';const pileW=p=>p>=15?'ready to light':p>=10?
   if(G.scen==='hexed')t=`Crosses raised: ${G.sc.crosses.length} of 5.`;
   if(G.scen==='stranded')t=G.sc.rescued?'Ada is safe in camp. Now the Lifeboat.':`Ada has ${CHARS.ada.die-G.sc.ada} life left on the rock.`;
   if(G.scen==='settlers')t=`Settlement goals made: ${G.sc.goals.filter(k=>has(k)).length} of ${G.sc.goals.length}.`;
-  return t?`<div class="fore thread">🧵 ${esc(t)}</div>`:''}
+  return t?`<div class="fore thread"> ${esc(t)}</div>`:''}
 const DEATH_LINE={hunger:'wasted away from hunger','sleeping in the open':'caught a deadly chill sleeping in the open','soaked and cold':'never got dry again','the cold':'froze in the night','low morale':'lost the will to go on','not enough determination':'lost the will to go on','a mishap':'was hurt once too often at work','no palisade left':'was crushed when the storm tore through the camp','hungry animals':'was mauled by hungry animals','fever':'burned up with fever'};
 function endLine(){const fs=(FL().scen||{})[G.scen]||{};if(!G.over)return '';if(G.over.win)return fs.win||'';const w=G.over.why;
-  if(/died\.$/.test(w)){const m=G.log.map(l=>/☠ (.+) dies(?: \(([^)]*)\))?/.exec(l.t)).find(Boolean);const who=m?m[1]:w.replace(/ died\.$/,'');const why=m&&m[2]||'';
+  if(/died\.$/.test(w)){const m=G.log.map(l=>/ (.+) dies(?: \(([^)]*)\))?/.exec(l.t)).find(Boolean);const who=m?m[1]:w.replace(/ died\.$/,'');const why=m&&m[2]||'';
     const how=DEATH_LINE[why]||(BEASTS.some(b=>b.n===why)?`was killed by the ${why}`:why?`died (${why})`:'died of their wounds');
     return `${who} ${how}. We bury our friend above the tide line. Without them the rest of us cannot hold out, and the journal ends here.`}
   if(/cut off/.test(w))return 'The ground gives way beneath the camp. Everything we built slides into the dark, and the journal ends here.';
@@ -5516,7 +5524,7 @@ function daySumHtml(i){const {r,A,B}=daySumData(i);const S=SCENARIOS[G.scen];con
 function dayWhy(r){const hurt={},food=[];const cnt={};
   for(const l of G.log.slice().reverse()){if(l.r!==r)continue;let m=/^(.+?) takes (\d+) wounds? \((.+)\)\./.exec(l.t);
     if(m){const k=m[1]+'|'+m[3];cnt[k]=(cnt[k]||0)+(+m[2]);continue}
-    m=/^☠ (.+?) dies \((.+)\)/.exec(l.t);if(m){const k=m[1]+'|'+m[2];cnt[k]=(cnt[k]||0)+1;continue}
+    m=/^ (.+?) dies \((.+)\)/.exec(l.t);if(m){const k=m[1]+'|'+m[2];cnt[k]=(cnt[k]||0)+1;continue}
     if((m=/^Everyone eats \((\d+) food\)/.exec(l.t)))food.push(`eaten ${m[1]}`);
     else if((m=/^(\d+) food spoils/.exec(l.t)))food.push(`${m[1]} spoiled overnight`);
     else if((m=/(\d+) food and \d+ wood are ruined/.exec(l.t)))food.push(`${m[1]} ruined by rain`);
@@ -5610,7 +5618,7 @@ function foodIn(list){let n=0;for(const op of list||[]){if(op[0]==='res'&&(op[1]
 function gatherYield(pos,i){const m=G.map[pos];const s=srcs(pos).find(x=>x.i===i);if(!s)return 0;let n=1;if(s.s!=='wood'&&m.tok.food)n++;return n}
 function foodOpts(){const o=[];
   for(const m of G.map){const t=tileAt(m.id);if(!t||m.id===G.camp.pos||dist(G.camp.pos,m.id)>2)continue;for(const s of srcs(m.id)){if(s.ex||s.s==='wood')continue;const tgt={pos:m.id,i:s.i};if(targetWhy('gather',tgt))continue;const n=actNeed({type:'gather',tgt});
-    o.push({type:'gather',tgt,food:gatherYield(m.id,s.i),pawns:n.max,title:`${s.s==='fish'?'🐟 Fish':'🦜 Birds'} at place ${m.id+1}`,sure:true,v:gatherYield(m.id,s.i)/n.max-(m.tok.beast&&G.weapon<1?.3:0)})}}
+    o.push({type:'gather',tgt,food:gatherYield(m.id,s.i),pawns:n.max,title:`${s.s==='fish'?' Fish':' Birds'} at place ${m.id+1}`,sure:true,v:gatherYield(m.id,s.i)/n.max-(m.tok.beast&&G.weapon<1?.3:0)})}}
   G.ev.threat.forEach((k,i)=>{if(!k)return;const th=CARD[k].th;const f=th.pw==='1-2'?foodIn(th.rw2):foodIn(th.rw);if(!f)return;const alt=threatAlt(i);if(alt<0)return;
     const pw=th.pw==='1-2'?2:th.pw;o.push({type:'threat',tgt:i,alt,food:f,pawns:pw,title:th.n,sure:true,v:f/pw+.2})});
   if(!targetWhy('hunt',null)&&G.weapon>=2)o.push({type:'hunt',tgt:null,food:2,pawns:2,title:'Hunt a beast',sure:true,v:.9-Math.max(0,3-G.weapon)*.3});
@@ -5628,45 +5636,45 @@ function allPriorities(){const o=[];if(!planOpen())return o;const S=SCENARIOS[G.
   const need=eatersNeed(),have=food(),planF=plannedFood();
   // near death: the hard rule
   for(const c of living()){if(c.npc||c.out)continue;const life=lifeLeft(c);if(!nearDeath(c))continue;
-    add({w:100,red:true,icon:'😴',title:`${c.nm} must rest: ${life} ${life>1?'wounds':'wound'} from death`,why:`${c.human?'Put one of '+c.nm+'’s pawns on Rest':hum(c)?c.nm+'’s player should put a pawn on Rest':c.nm+' (computer) rests by itself'}: rest heals 1. If anyone dies, you all lose.`,act:{type:'rest',tgt:null},lead:c.i,done:restPlanned(c.i),confirm:`⚠ ${c.nm} is ${life} ${life>1?'wounds':'wound'} from death and not resting.`})}
+    add({w:100,red:true,icon:'',title:`${c.nm} must rest: ${life} ${life>1?'wounds':'wound'} from death`,why:`${c.human?'Put one of '+c.nm+'’s pawns on Rest':hum(c)?c.nm+'’s player should put a pawn on Rest':c.nm+' (computer) rests by itself'}: rest heals 1. If anyone dies, you all lose.`,act:{type:'rest',tgt:null},lead:c.i,done:restPlanned(c.i),confirm:` ${c.nm} is ${life} ${life>1?'wounds':'wound'} from death and not resting.`})}
   // the story chapter's checkpoint (campaign only)
   if(G.cmp&&G.cmp.goal&&G.cmp.goal.type==='custom'){const v=G.cmp.goal.value;const late=v.byDay&&G.round>=v.byDay-1;
-    if(v.build==='shelter'&&!hasShelter())add({w:92,red:late,icon:'📖',title:'Chapter goal: build the Shelter',why:`Build ▸ Shelter by the end of day ${v.byDay}. It costs wood: gather some first if you are short. Two pawns make it certain.`,act:{type:'build',tgt:{k:'shelter'}},done:G.plan.acts.some(x=>x.type==='build'&&x.tgt&&x.tgt.k==='shelter')});
+    if(v.build==='shelter'&&!hasShelter())add({w:92,red:late,icon:'',title:'Chapter goal: build the Shelter',why:`Build ▸ Shelter by the end of day ${v.byDay}. It costs wood: gather some first if you are short. Two pawns make it certain.`,act:{type:'build',tgt:{k:'shelter'}},done:G.plan.acts.some(x=>x.type==='build'&&x.tgt&&x.tgt.k==='shelter')});
     if(v.explored&&G.stats.explored<v.explored){let t=null;try{const r=catRows('explore').find(x=>!x.why);if(r)t=r.tgt}catch(e){}
-      add({w:91,red:late,icon:'📖',title:`Chapter goal: explore (${G.stats.explored}/${v.explored} places)`,why:`Explore ${v.explored-G.stats.explored} more place${v.explored-G.stats.explored>1?'s':''} by the end of day ${v.byDay}. Each explored ❔ place turns over a new tile.`,act:t!=null?{type:'explore',tgt:t}:null,cant:t==null?'no unexplored place in reach':null,done:G.plan.acts.some(x=>x.type==='explore')})}}
+      add({w:91,red:late,icon:'',title:`Chapter goal: explore (${G.stats.explored}/${v.explored} places)`,why:`Explore ${v.explored-G.stats.explored} more place${v.explored-G.stats.explored>1?'s':''} by the end of day ${v.byDay}. Each explored ❔ place turns over a new tile.`,act:t!=null?{type:'explore',tgt:t}:null,cant:t==null?'no unexplored place in reach':null,done:G.plan.acts.some(x=>x.type==='explore')})}}
   // food for tonight
   // rain above the roof ruins food before supper: count the likely loss too
   const wxl=wxFoodLoss();const short=need+wxl-have-planF;
   if(short>0){const fo=foodOpts();const f=fo[0];const enough=f&&f.food>=short;
     const why=`${need} food needed tonight${wxl?` plus about ${wxl} the rain will likely ruin (clouds above your roof)`:''}, ${have} in store${planF?`, ${planF} planned`:''}. Anyone who goes hungry takes 2 wounds.`+(f?` Best source: ${f.title}, ${f.pawns} pawn${f.pawns>1?'s':''}${f.type==='gather'?'':' (a sure thing)'}, +${f.food} food${enough?' (enough for tonight)':''}.`:' No fish, birds or food reward in reach yet: explore to find some.');
-    add({w:95,red:true,key:'food',icon:'🍖',title:planF&&have+planF>=need?'More food: the rain will ruin some':'Find food for tonight',why,act:f?{type:f.type,tgt:f.tgt,alt:f.alt}:null,cant:f?null:planF?'every food source in reach is already in the plan':'no food source in reach',done:false,confirm:`⚠ Only ${have+planF} of ${need+wxl} food for tonight${wxl?' (with the rain)':''}: someone may go hungry (2 wounds).`})}
-  if(short<=0&&planF>0)add({w:95,info:true,done:true,icon:'🍖',title:`Food for tonight: covered (${have+planF} for ${need}${wxl?`, +${wxl} for rain`:''})`,why:''});
+    add({w:95,red:true,key:'food',icon:'',title:planF&&have+planF>=need?'More food: the rain will ruin some':'Find food for tonight',why,act:f?{type:f.type,tgt:f.tgt,alt:f.alt}:null,cant:f?null:planF?'every food source in reach is already in the plan':'no food source in reach',done:false,confirm:` Only ${have+planF} of ${need+wxl} food for tonight${wxl?' (with the rain)':''}: someone may go hungry (2 wounds).`})}
+  if(short<=0&&planF>0)add({w:95,info:true,done:true,icon:'',title:`Food for tonight: covered (${have+planF} for ${need}${wxl?`, +${wxl} for rain`:''})`,why:''});
   if(short<=0&&(have+planF>need||G.res.food>0)){const sp=Math.max(0,G.res.food+planF-need);if(sp>0&&!has('cellar')&&!G.kept.m_boxes){const ck=living().find(c=>c.k==='cook');const hurt=living().some(c=>c.w>0);const rem=ck&&hurt&&ck.det>=2;
-    add({w:34,info:true,icon:'🥫',title:`${sp} food will spoil tonight`,why:`Fresh food keeps only one night (dry food 🥫 keeps).${rem?` ${ck.nm}: Home Remedy heals 2 wounds for 1 food, and you are offered it at night.`:' Spend pawns on wood or exploring instead of more food.'}`,skill:rem&&ck.human&&!skillWhy(ck.i,'remedy')?`${ck.i}:remedy`:null})}}
+    add({w:34,info:true,icon:'',title:`${sp} food will spoil tonight`,why:`Fresh food keeps only one night (dry food  keeps).${rem?` ${ck.nm}: Home Remedy heals 2 wounds for 1 food, and you are offered it at night.`:' Spend pawns on wood or exploring instead of more food.'}`,skill:rem&&ck.human&&!skillWhy(ck.i,'remedy')?`${ck.i}:remedy`:null})}}
   // shelter
   if(!hasShelter()){const tb=SRP_COST[Math.min(4,Math.max(2,G.np))];const probe={id:-1,type:'build',tgt:{k:'shelter'},pw:[],pay:'wood'};const can=jobPlanned('build',{k:'shelter'})||afford(probe)||afford(Object.assign({},probe,{pay:'fur'}));
-    if(can)add({w:90,icon:'🏠',title:'Build a shelter',why:`${tb.wood} wood or ${tb.fur} fur. Without one, every castaway takes a wound each night.`,act:{type:'build',tgt:{k:'shelter'}},done:jobPlanned('build',{k:'shelter'})});
+    if(can)add({w:90,icon:'',title:'Build a shelter',why:`${tb.wood} wood or ${tb.fur} fur. Without one, every castaway takes a wound each night.`,act:{type:'build',tgt:{k:'shelter'}},done:jobPlanned('build',{k:'shelter'})});
     else{const wd=bestWood(),ex=bestExplore();const freeW=G.res.wood-committed().wood;const wg=G.plan.acts.filter(a=>a.type==='gather'&&(srcs(a.tgt.pos).find(s=>s.i===a.tgt.i)||{}).s==='wood').length;
-      add({w:88,icon:'🪵',title:'Collect wood for a shelter',why:`A shelter needs ${tb.wood} wood (you have ${freeW} free). Without one, everyone takes a wound each night.${wd?'':' No wood in reach yet: explore.'}`,act:wd?{type:'gather',tgt:wd}:ex!=null?{type:'explore',tgt:ex}:null,done:freeW+wg>=tb.wood})}}
+      add({w:88,icon:'',title:'Collect wood for a shelter',why:`A shelter needs ${tb.wood} wood (you have ${freeW} free). Without one, everyone takes a wound each night.${wd?'':' No wood in reach yet: explore.'}`,act:wd?{type:'gather',tgt:wd}:ex!=null?{type:'explore',tgt:ex}:null,done:freeW+wg>=tb.wood})}}
   // storm tonight
   if(G.wx.storm){const hurt=Math.max(0,G.wx.storm-G.camp.pal);const planned=G.plan.acts.filter(a=>a.type==='build'&&a.tgt.k==='pal').length;
     if(hurt>0)add({w:hurt>=Math.min(...living().map(lifeLeft))?99:78,red:hurt>=Math.min(...living().map(lifeLeft)),icon:'⛈️',title:'Storm tonight',why:`The storm knocks the palisade down by ${G.wx.storm}: palisade ${G.camp.pal} → everyone −${hurt} life. Each palisade level soaks up one storm hit.`,act:hasShelter()||jobPlanned('build',{k:'shelter'})?{type:'build',tgt:{k:'pal'}}:null,cant:hasShelter()||jobPlanned('build',{k:'shelter'})?null:'a palisade needs a shelter first',done:planned>=hurt})}
   // a beast waiting at dawn
   if(G.ev.wait){const B=BEAST[G.ev.wait];const who=nextFirst();const pw=G.plan.acts.filter(a=>a.type==='build'&&a.tgt.k==='weapon').length;const dmg=Math.max(0,B.str-G.weapon);
-    if(dmg>0){const lethal=dmg>=lifeLeft(who);add({w:lethal?99:74,red:lethal,icon:'🐾',title:`${B.n} attacks at dawn`,why:`Strength ${B.str} against weapon ${G.weapon}: ${who.nm} (first player tomorrow) takes ${dmg} wound${dmg>1?'s':''}. Weapon +1 costs ${1+G.cost.weapon} wood.`,act:{type:'build',tgt:{k:'weapon'}},done:pw>=dmg||pw>=2,confirm:lethal?`⚠ The ${B.n} at dawn would kill ${who.nm}.`:null})}}
+    if(dmg>0){const lethal=dmg>=lifeLeft(who);add({w:lethal?99:74,red:lethal,icon:'',title:`${B.n} attacks at dawn`,why:`Strength ${B.str} against weapon ${G.weapon}: ${who.nm} (first player tomorrow) takes ${dmg} wound${dmg>1?'s':''}. Weapon +1 costs ${1+G.cost.weapon} wood.`,act:{type:'build',tgt:{k:'weapon'}},done:pw>=dmg||pw>=2,confirm:lethal?` The ${B.n} at dawn would kill ${who.nm}.`:null})}}
   // weather against the roof
   const cl=clouds();
-  if(cl.est>G.camp.roof&&(hasShelter()||jobPlanned('build',{k:'shelter'}))){const names=cl.dice.map(x=>({rain:'🌧 rain die',snow:'❄️ winter die',animals:'🐾 animals die'}[x])).concat(G.wx.rain?[`+${G.wx.rain} rain`]:[],G.wx.snow?[`+${G.wx.snow} snow`]:[]);
+  if(cl.est>G.camp.roof&&(hasShelter()||jobPlanned('build',{k:'shelter'}))){const names=cl.dice.map(x=>({rain:' rain die',snow:'❄️ winter die',animals:' animals die'}[x])).concat(G.wx.rain?[`+${G.wx.rain} rain`]:[],G.wx.snow?[`+${G.wx.snow} snow`]:[]);
     const tb=SRP_COST[Math.min(4,Math.max(2,G.np))];const rp={id:-1,type:'build',tgt:{k:'roof'},pw:[],pay:'wood'};const canPay=jobPlanned('build',{k:'roof'})||afford(rp)||afford(Object.assign({},rp,{pay:'fur'}));
     add({w:80,icon:'☂️',title:'Raise the roof',why:`Weather tonight (${names.join(', ')}): each cloud above roof ${G.camp.roof} ruins 1 food and 1 wood, and what you can’t pay is a wound each. Roof +1 costs ${tb.wood+G.cost.roof} wood or ${tb.fur} fur.`,act:{type:'build',tgt:{k:'roof'}},cant:canPay?null:`needs ${tb.wood+G.cost.roof} wood or ${tb.fur} fur: you have ${G.res.wood-committed().wood} wood and ${G.res.fur-committed().fur} fur free`,done:jobPlanned('build',{k:'roof'})})}
   else if(!cl.dice.length&&(wxTab()[G.round+1]||[]).length&&G.camp.roof<2)add({w:40,icon:'☂️',title:'Get ready for the weather',why:`Weather dice start tomorrow. A roof keeps the clouds off your food and wood.`,act:hasShelter()||jobPlanned('build',{k:'shelter'})?{type:'build',tgt:{k:'roof'}}:null,cant:hasShelter()||jobPlanned('build',{k:'shelter'})?null:'needs a shelter first',done:jobPlanned('build',{k:'roof'})});
-  if((wxTab()[G.round]||[]).includes('snow')&&G.res.wood-committed().wood<2)add({w:60,icon:'🪵',title:'Wood for the fire',why:'Snow is coming: each snow cloud burns 1 wood for warmth, or everyone takes a wound.',act:bestWood()?{type:'gather',tgt:bestWood()}:null,cant:bestWood()?null:'no wood in reach',done:G.plan.acts.some(a=>a.type==='gather'&&(srcs(a.tgt.pos).find(s=>s.i===a.tgt.i)||{}).s==='wood')});
+  if((wxTab()[G.round]||[]).includes('snow')&&G.res.wood-committed().wood<2)add({w:60,icon:'',title:'Wood for the fire',why:'Snow is coming: each snow cloud burns 1 wood for warmth, or everyone takes a wound.',act:bestWood()?{type:'gather',tgt:bestWood()}:null,cant:bestWood()?null:'no wood in reach',done:G.plan.acts.some(a=>a.type==='gather'&&(srcs(a.tgt.pos).find(s=>s.i===a.tgt.i)||{}).s==='wood')});
   // the threat that strikes at the next dawn
   if(G.ev.threat[0]&&G.ev.threat[1]){const k=G.ev.threat[0],c=CARD[k];const harm=opsValue(c.te);if(harm<0){const r=c.th.req;const al=threatAlt(0);const rq=reqText(r);
-    add({w:70,icon:'⚠️',title:`Deal with “${c.th.n}”`,why:`It strikes at the next dawn if nobody deals with it: ${opsText(c.te)} ${c.th.pw==='1-2'?'1–2':c.th.pw} pawn${c.th.pw===1?'':'s'}${rq?`, needs ${rq}: ${haveText(r)}`:''}.`,act:al>=0?{type:'threat',tgt:0,alt:al}:null,cant:al>=0?null:`needs ${rq}`,done:jobPlanned('threat',0)})}}
+    add({w:70,icon:'',title:`Deal with “${c.th.n}”`,why:`It strikes at the next dawn if nobody deals with it: ${opsText(c.te)} ${c.th.pw==='1-2'?'1–2':c.th.pw} pawn${c.th.pw===1?'':'s'}${rq?`, needs ${rq}: ${haveText(r)}`:''}.`,act:al>=0?{type:'threat',tgt:0,alt:al}:null,cant:al>=0?null:`needs ${rq}`,done:jobPlanned('threat',0)})}}
   for(const g of goalSteps())add(g);
-  if(G.morale<0){const nf=nextFirst();add({w:G.morale<=-2?68:50,icon:'🎶',title:`Lift the mood (morale ${G.morale})`,why:`Tomorrow morning ${nf.nm} (first player) loses ${-G.morale} ✊ determination, and each one they can’t pay is a wound (they have ${nf.det}). Arranging the camp gives morale +1.`,act:{type:'camp',tgt:null},done:G.plan.acts.some(a=>a.type==='camp')})}
-  if(G.round<=3&&bestExplore()!=null)add({w:45,icon:'🧭',title:'Explore the island',why:'New land brings wood, food, discoveries and the terrain your inventions need.',act:{type:'explore',tgt:bestExplore()},done:G.plan.acts.some(a=>a.type==='explore')});
+  if(G.morale<0){const nf=nextFirst();add({w:G.morale<=-2?68:50,icon:'',title:`Lift the mood (morale ${G.morale})`,why:`Tomorrow morning ${nf.nm} (first player) loses ${-G.morale}  determination, and each one they can’t pay is a wound (they have ${nf.det}). Arranging the camp gives morale +1.`,act:{type:'camp',tgt:null},done:G.plan.acts.some(a=>a.type==='camp')})}
+  if(G.round<=3&&bestExplore()!=null)add({w:45,icon:'',title:'Explore the island',why:'New land brings wood, food, discoveries and the terrain your inventions need.',act:{type:'explore',tgt:bestExplore()},done:G.plan.acts.some(a=>a.type==='explore')});
   return o.filter(p=>p.act||p.cant||p.pile||p.info)}
 // the list shown in the panel: not-done first by weight, each checked against the plan and the free pawns
 // the same game state always gives the same list: keep it while nothing changes (the panel asks several times per render)
@@ -5679,26 +5687,26 @@ function bestWood(){let best=null,bv=-1;for(const m of G.map){const t=tileAt(m.i
 function bestExplore(){let best=null,bv=-99;for(const m of MAP){if(targetWhy('explore',m.id))continue;const v=-dist(G.camp.pos,m.id)*3+m.adj.filter(p=>G.map[p].tile==null).length;if(v>bv){bv=v;best=m.id}}return best}
 function missingTerrain(k){const I=invReq(k);return I&&I.t&&!explored().has(I.t)?I.t:null}
 // the next step toward the scenario goal
-function goalSteps(){const o=[];const inv=(k,w,why)=>{const m=missingTerrain(k);if(m){const e=bestExplore();o.push({w,icon:'🧭',title:`Find ${m} for ${invReq(k).n}`,why:`${invReq(k).n} ${why}, but it needs ${m} explored. Explore any ❔ place next to the land you know.`,act:e!=null?{type:'explore',tgt:e}:null,cant:e==null?'nothing within reach to explore':null,done:G.plan.acts.some(a=>a.type==='explore')});return}
+function goalSteps(){const o=[];const inv=(k,w,why)=>{const m=missingTerrain(k);if(m){const e=bestExplore();o.push({w,icon:'',title:`Find ${m} for ${invReq(k).n}`,why:`${invReq(k).n} ${why}, but it needs ${m} explored. Explore any ❔ place next to the land you know.`,act:e!=null?{type:'explore',tgt:e}:null,cant:e==null?'nothing within reach to explore':null,done:G.plan.acts.some(a=>a.type==='explore')});return}
   for(const it of invReq(k).it||[])if(!has(it)){inv(it,w-1,`is needed for ${invReq(k).n}`);return}
   const I=invReq(k);const probe={id:-1,type:'build',tgt:{k},pw:[],pay:'wood'};const tw=targetWhy('build',{k});
-  o.push({w,icon:'🔨',title:`Make ${I.n}`,why:`${I.n} ${why}. It needs ${invNeedPlain(I)}.`,act:{type:'build',tgt:{k}},cant:tw&&tw!=='already planned'?tw:(jobPlanned('build',{k})||afford(probe)?null:`needs ${invNeedPlain(I)}`),done:jobPlanned('build',{k})})};
+  o.push({w,icon:'',title:`Make ${I.n}`,why:`${I.n} ${why}. It needs ${invNeedPlain(I)}.`,act:{type:'build',tgt:{k}},cant:tw&&tw!=='already planned'?tw:(jobPlanned('build',{k})||afford(probe)?null:`needs ${invNeedPlain(I)}`),done:jobPlanned('build',{k})})};
   switch(G.scen){
   case 'marooned':{if(!has('fire'))inv('fire',G.round>=5?75:55,'is half of the rescue signal: sailors look for smoke');
     const s=PILE_CUM.findIndex(c=>c>G.sc.pile);const prev=s>0?PILE_CUM[s-1]:0;const room=SCEN.marooned.pileRoom();
     if(G.sc.pile<15&&G.round>=4){const stage=`Stage ${s+1} of 5: ${G.sc.pile-prev} of ${PILE_CUM[s]-prev} wood placed`;const daysLeft=Math.max(0,12-G.round+1);const woodLeft=15-G.sc.pile;
-      if(room&&G.res.wood-committed().wood>0&&G.round>=5)o.push({w:65,icon:'🔥',title:`Add wood to the signal pile (${G.sc.pile}/15)`,why:`${stage}. One stage per day: 1, then 2, 3, 4 and 5 wood. It must be full, with Fire, on day 10, 11 or 12.`,pile:1,done:false});
-      else if(G.sc.stageRound===G.round)o.push({w:30,icon:'🔥',title:`Signal pile: today’s stage is done (${G.sc.pile}/15)`,why:'Save wood for tomorrow’s stage.',done:true,pile:1,info:true});
-      else if(room&&G.round>=5)o.push({w:55,icon:'🔥',title:`Signal pile ${G.sc.pile}/15: no spare wood`,why:`${stage}. Gather wood today: you need ${woodLeft} more wood in all.`,act:bestWood()?{type:'gather',tgt:bestWood()}:null,cant:bestWood()?null:'no wood in reach',done:G.plan.acts.some(a=>a.type==='gather'&&(srcs(a.tgt.pos).find(q=>q.i===a.tgt.i)||{}).s==='wood')})}
+      if(room&&G.res.wood-committed().wood>0&&G.round>=5)o.push({w:65,icon:'',title:`Add wood to the signal pile (${G.sc.pile}/15)`,why:`${stage}. One stage per day: 1, then 2, 3, 4 and 5 wood. It must be full, with Fire, on day 10, 11 or 12.`,pile:1,done:false});
+      else if(G.sc.stageRound===G.round)o.push({w:30,icon:'',title:`Signal pile: today’s stage is done (${G.sc.pile}/15)`,why:'Save wood for tomorrow’s stage.',done:true,pile:1,info:true});
+      else if(room&&G.round>=5)o.push({w:55,icon:'',title:`Signal pile ${G.sc.pile}/15: no spare wood`,why:`${stage}. Gather wood today: you need ${woodLeft} more wood in all.`,act:bestWood()?{type:'gather',tgt:bestWood()}:null,cant:bestWood()?null:'no wood in reach',done:G.plan.acts.some(a=>a.type==='gather'&&(srcs(a.tgt.pos).find(q=>q.i===a.tgt.i)||{}).s==='wood')})}
     if(G.round>=8){const need=15-G.sc.pile;const stages=5-PILE_CUM.filter(c=>c<=G.sc.pile).length;o.push({w:66,info:true,icon:'⛵',title:G.round>=10?'The rescue window is open':'The rescue window opens on day 10',why:`Fire ${has('fire')?'✓':'✗'}, pile ${G.sc.pile}/15: you need ${need} more wood (${stages} stage${stages===1?'':'s'}, one a day)${has('fire')?'':', plus Fire'}. A ship can come on day 10, 11 or 12.`,done:false})}
     break}
-  case 'hexed':{const t=G.map.filter(m=>tileAt(m.id)&&!G.sc.crosses.includes(m.id)).sort((a,b)=>(a.fog?1:0)-(b.fog?1:0)||dist(G.camp.pos,a.id)-dist(G.camp.pos,b.id))[0];if(t){const tgt={k:'cross',cross:t.id};const tw=targetWhy('build',tgt);o.push({w:G.round>=5?78:58,icon:'✝️',title:`Raise a cross (${G.sc.crosses.length}/5)`,why:`Five crosses on five different places break the curse. Each costs 2 wood.`,act:{type:'build',tgt},cant:tw&&tw!=='already planned'?tw:(G.plan.acts.some(a=>a.type==='build'&&a.tgt.k==='cross')||G.res.wood-committed().wood>=2?null:'needs 2 wood: gather some'),done:G.plan.acts.some(a=>a.type==='build'&&a.tgt.k==='cross')})}if(G.sc.temple!=null&&!G.sc.templeDone)o.push({w:50,icon:'🛕',title:'Search the dark temple',why:'An explore action there draws mystery cards: up to 3 treasures.',act:{type:'special',tgt:'temple'},cant:targetWhy('special','temple')==='already planned'?null:targetWhy('special','temple'),done:jobPlanned('special','temple')})}break;
+  case 'hexed':{const t=G.map.filter(m=>tileAt(m.id)&&!G.sc.crosses.includes(m.id)).sort((a,b)=>(a.fog?1:0)-(b.fog?1:0)||dist(G.camp.pos,a.id)-dist(G.camp.pos,b.id))[0];if(t){const tgt={k:'cross',cross:t.id};const tw=targetWhy('build',tgt);o.push({w:G.round>=5?78:58,icon:'✝️',title:`Raise a cross (${G.sc.crosses.length}/5)`,why:`Five crosses on five different places break the curse. Each costs 2 wood.`,act:{type:'build',tgt},cant:tw&&tw!=='already planned'?tw:(G.plan.acts.some(a=>a.type==='build'&&a.tgt.k==='cross')||G.res.wood-committed().wood>=2?null:'needs 2 wood: gather some'),done:G.plan.acts.some(a=>a.type==='build'&&a.tgt.k==='cross')})}if(G.sc.temple!=null&&!G.sc.templeDone)o.push({w:50,icon:'',title:'Search the dark temple',why:'An explore action there draws mystery cards: up to 3 treasures.',act:{type:'special',tgt:'temple'},cant:targetWhy('special','temple')==='already planned'?null:targetWhy('special','temple'),done:jobPlanned('special','temple')})}break;
   case 'stranded':if(!has('jraft'))inv('jraft',88,'lets us row out to Ada');else if(!G.sc.rescued)o.push({w:98,icon:'⛵',title:'Row out and rescue Ada',why:`Ada loses 2 life every night on the rock (${CHARS.ada.die-G.sc.ada} left).`,act:{type:'special',tgt:'ada'},cant:targetWhy('special','ada')==='already planned'?null:targetWhy('special','ada'),done:jobPlanned('special','ada')});else inv('lifeboat',80,'takes everyone home');break;
-  case 'settlers':{const next=G.sc.goals.filter(k=>!has(k)).sort((a,b)=>(missingTerrain(a)?1:0)-(missingTerrain(b)?1:0))[0];if(next)inv(next,60,'is one of the nine things our settlement needs');if(G.camp.pal<1&&hasShelter())o.push({w:45,icon:'🧱',title:'Build a palisade',why:'The settlement needs a palisade of 1 or more.',act:{type:'build',tgt:{k:'pal'}},done:jobPlanned('build',{k:'pal'})});if(G.weapon<1)o.push({w:45,icon:'🗡️',title:'Make a weapon',why:'The settlement needs a weapon of 1 or more.',act:{type:'build',tgt:{k:'weapon'}},done:jobPlanned('build',{k:'weapon'})})}break}
+  case 'settlers':{const next=G.sc.goals.filter(k=>!has(k)).sort((a,b)=>(missingTerrain(a)?1:0)-(missingTerrain(b)?1:0))[0];if(next)inv(next,60,'is one of the nine things our settlement needs');if(G.camp.pal<1&&hasShelter())o.push({w:45,icon:'',title:'Build a palisade',why:'The settlement needs a palisade of 1 or more.',act:{type:'build',tgt:{k:'pal'}},done:jobPlanned('build',{k:'pal'})});if(G.weapon<1)o.push({w:45,icon:'',title:'Make a weapon',why:'The settlement needs a weapon of 1 or more.',act:{type:'build',tgt:{k:'weapon'}},done:jobPlanned('build',{k:'weapon'})})}break}
   return o}
 // the red priorities that are still open and could be fixed: Start the day asks first
 function uncoveredRed(){return priorities().filter(p=>p.red&&!p.done&&(p.can||p.move))}
-// ---------- ✨ Suggest: the priorities in order, then the computer's best plan for the pawns left ----------
+// ----------  Suggest: the priorities in order, then the computer's best plan for the pawns left ----------
 // keep: plan only the free pawns (the recommendation in plan step 2); otherwise start from an empty human plan
 function suggestCore(keep){const hs=G.chars.filter(c=>c.human&&!c.dead).map(c=>c.i);if(!keep)clearPlan(hs);const lines=[];const whyBy={};
   const who=id=>{const p=pawnInfo(id);return p?pawnLabel(p):'?'};
@@ -5717,7 +5725,7 @@ function suggestCore(keep){const hs=G.chars.filter(c=>c.human&&!c.dead).map(c=>c
   return {lines,why:whyBy}}
 function suggestPlan(){if(!planOpen())return '';const L=(typeof ADVLOOK!=='undefined'?ADVLOOK:G.learn)?lookSuggest():null;if(L){UI.sugWhy=L.why;refresh();return L.lines.join('\n')}
   const r=suggestCore(false);UI.sugWhy=r.why;refresh();return r.lines.join('\n')}
-// ---------- ✨ Suggest looks ahead: several whole plans (each priority first, the greedy plan, the computer's), each with or without wood on the
+// ----------  Suggest looks ahead: several whole plans (each priority first, the greedy plan, the computer's), each with or without wood on the
 // signal pile, are played out to the next morning a few times on reshuffled decks (the real engine, on a copy); the plan that keeps everyone
 // healthiest and the rescue on schedule wins. Only the plan comes back: nothing of the trial runs is kept.
 // On in the Learn to play game (G.learn): there it takes the coached player to the rescue (adv-test.js 30 learn: 29/30). In Play the faithful
@@ -5782,9 +5790,9 @@ function tutDone(){UI.tut=99;try{localStorage.setItem('swi_tut','done')}catch(e)
 <script>
 // ---------- the planning table: priorities, your plan, then jobs by category (one open at a time) ----------
 UI.cat=null;
-const CATS=[['build','🔨','Build'],['gather','🧺','Gather'],['explore','🧭','Explore'],['threat','⚠️','Threats'],['hunt','🏹','Hunt'],['camp','🏕️','Camp & rest'],['special','⭐','Scenario']];
+const CATS=[['build','','Build'],['gather','','Gather'],['explore','','Explore'],['threat','','Threats'],['hunt','','Hunt'],['camp','','Camp & rest'],['special','⭐','Scenario']];
 function planHtml(){
-  if(storyActive())return `<div class="waiting"><div class="big">📖</div><p>${typeof netOn==='function'&&netOn()?'The day is being told on the island, on everyone’s screen at once. The first player ★ steps through it with <b>Continue</b>.':'The day is being told on the island. Step through it with <b>Continue</b> (or Enter), or turn on <b>Play by itself</b>.'}</p></div>`+journalHtml();
+  if(storyActive())return `<div class="waiting"><div class="big"></div><p>${typeof netOn==='function'&&netOn()?'The day is being told on the island, on everyone’s screen at once. The first player ★ steps through it with <b>Continue</b>.':'The day is being told on the island. Step through it with <b>Continue</b> (or Enter), or turn on <b>Play by itself</b>.'}</p></div>`+journalHtml();
   if(!planOpen())return `${typeof netWaitHtml==='function'?netWaitHtml():''}<p class="muted">${G.over?'The game is over.':'The castaways are busy…'}</p>`+recentHtml();
   if(allAI())return `<p class="muted">The computer castaways are planning the day.</p>`+recentHtml();
   const st=pstep();const titles=['What today needs','Give each pawn a job','Check the risks','Start the day'];
@@ -5828,14 +5836,14 @@ function campCard(){const g=G.cmp.goal;const cp=campParts();const d=typeof campD
   const parts=cp.map(([l,h,n])=>`<li class="${(n===true?h:h>=n)?'ok':''}">${esc(l)} ${n===true?(h?'✓':'✗'):`${Math.min(h,n)}/${n}`}</li>`).join('');
   const how=Object.keys(CAMP_HOW).filter(k=>v[k]).map(k=>CAMP_HOW[k]).join(' ');
   const st=d&&d.stars?`<p class="cst">Stars: ${d.stars.slice(0,d.maxStars||3).map(s=>'☆ '+esc(s.text)).join(' · ')}</p>`:'';
-  return `<div class="daycard goal1"><div class="dk">📖 ${d?esc(d.title)+' · ':''}chapter goal · day ${G.round}${by?' of '+by:''}</div><b>${esc(g.text)}</b><ul class="cgp">${parts}</ul><p>${how}</p>${st}</div>`}
+  return `<div class="daycard goal1"><div class="dk"> ${d?esc(d.title)+' · ':''}chapter goal · day ${G.round}${by?' of '+by:''}</div><b>${esc(g.text)}</b><ul class="cgp">${parts}</ul><p>${how}</p>${st}</div>`}
 function goalCard(){if(G.cmp&&G.cmp.goal&&G.cmp.goal.type==='custom')return campCard();const S=SCENARIOS[G.scen];let how='',btn='';
   if(G.scen==='marooned'){const room=SCEN.marooned.pileRoom();const w=pileWhy(1);
     how=`<ul class="gl"><li>${has('fire')?'Fire: built ✓':'Build <b>Fire</b>. It is a Build job.'}</li><li>Add wood to the <b>signal pile</b> once a day: 1, then 2, 3, 4, 5.</li><li>The pile must be full (15) on day 10, 11 or 12.</li></ul>`;
     const fw=Math.max(0,G.res.wood-committed().wood);btn=room?`<button class="btn sm pileb" data-a="pilemax" ${w?'aria-disabled="true"':''}>Add ${Math.max(1,Math.min(room,fw))} wood to the pile${fw<room&&fw>0?` (${room} finish today’s stage)`:''}</button>${w?`<small>${esc(w==='no spare wood'?`needs ${room} spare wood`:w)}</small>`:''}`:G.sc.pile>=15?'':'<small>Today’s pile stage is done.</small>'}
   else how=esc(S.x);
   const win=G.scen==='marooned'?'You win if a ship sees your signal fire and everyone is alive.':'You win if you meet this goal and everyone is alive.';
-  return `<div class="daycard goal1"><div class="dk">🎯 Your goal · day ${G.round} of ${G.rounds}</div><b class="gw">${win}</b>${G.learn&&!G.tut?'<div class="gs">Easy island: milder events, no weather dice. Normal has the full rules.</div>':''}<div class="gs">${esc(SC().goal?SC().goal():S.x)}</div>${G.scen==='marooned'?how:`<p>${how}</p>`}${btn?`<div class="gb">${btn}</div>`:''}</div>`}
+  return `<div class="daycard goal1"><div class="dk"> Your goal · day ${G.round} of ${G.rounds}</div><b class="gw">${win}</b>${G.learn&&!G.tut?'<div class="gs">Easy island: milder events, no weather dice. Normal has the full rules.</div>':''}<div class="gs">${esc(SC().goal?SC().goal():S.x)}</div>${G.scen==='marooned'?how:`<p>${how}</p>`}${btn?`<div class="gb">${btn}</div>`:''}</div>`}
 // ---------- step 2: one pawn at a time ----------
 function wzAssign(){const list=wizPawns();const placed=placedIds();const cur=curPawn();
   const row=`<div class="pawnrow">${list.map((p,k)=>{const a=G.plan.acts.find(x=>x.pw.includes(p.id));const on=cur&&cur.id===p.id;const col=p.c!=null?PCOL[p.c%6]:p.f?'#f3f3f3':'#8d8d8d';
@@ -5860,7 +5868,7 @@ function wzAssign(){const list=wizPawns();const placed=placedIds();const cur=cur
 function planSoFar(){if(!G.plan.acts.length)return '';return `<details class="sofar" ${UI.ps.sofar?'open':''}><summary data-a="sofar">The plan so far (${G.plan.acts.length} job${G.plan.acts.length>1?'s':''})</summary><div class="plan">${G.plan.acts.map(a=>planLine(a)).join('')}</div></details>`}
 // ---------- step 3: every job with its risk ----------
 function wzReview(){let h=`<p class="wz-p">Each job shows its risk. <b>Certain</b> jobs always work. Jobs that <b>roll the dice</b> can fail or cost a wound. Tap a pawn’s name to take it off a job.</p>`;
-  if(!G.plan.acts.length)return h+`<p class="muted">Nothing planned yet. Go back to step 2, or press ✨ Plan it for me.</p>`;
+  if(!G.plan.acts.length)return h+`<p class="muted">Nothing planned yet. Go back to step 2, or press  Plan it for me.</p>`;
   const W=UI.sugWhy||{};
   h+=`<div class="review">${G.plan.acts.slice().sort((x,y)=>ORDER_T.indexOf(x.type)-ORDER_T.indexOf(y.type)).map((a,k)=>{const c=actCost(a);const cost=Object.entries(c).filter(([r,v])=>v).map(([r,v])=>`${v} ${RNAME[r]}`).join(' + ');const why=W[JSON.stringify([a.type,a.tgt])];
     const payT=a.type==='build'&&['shelter','roof','pal'].includes(a.tgt.k)&&(a.pay==='fur'||G.res.fur>=SRP_COST[Math.min(4,Math.max(2,G.np))].fur)?` <button class="btn xs" data-pay="${a.id}" title="Pay with wood or fur">pay with ${a.pay==='fur'?'fur':'wood'}</button>`:'';
@@ -5875,7 +5883,7 @@ function wzConfirm(){const acts=G.plan.acts;const roll=acts.filter(a=>{const n=a
   let h=`<p class="wz-p">${acts.length} job${acts.length===1?'':'s'}: ${acts.length-roll} certain, ${roll} roll${roll===1?'s':''} the dice.</p>`;
   h+=`<ul class="checks">${pr.map(p=>`<li class="${p.done?'ok':p.red?'bad':'meh'}">${p.done?'✓':p.red?'✗':'–'} ${esc(p.title)}</li>`).join('')}</ul>`;
   if(pb.length)h+=`<div class="probs">${pb.slice(0,3).map(x=>`<div>• ${esc(x)}</div>`).join('')}<div>Go back to step 2 to fix this.</div></div>`;
-  if(red.length)h+=`<div class="probs warn2">${red.map(p=>esc(p.confirm||('⚠ '+p.title+' is not covered.'))).join('<br>')}<div>You can still start, or press ✨ Plan it for me.</div></div>`;
+  if(red.length)h+=`<div class="probs warn2">${red.map(p=>esc(p.confirm||(' '+p.title+' is not covered.'))).join('<br>')}<div>You can still start, or press  Plan it for me.</div></div>`;
   h+=`<p class="wz-p">When you start, the day plays out one step at a time: <b>Actions</b> (job by job), then <b>Weather</b>, then <b>Night</b>. The plan can’t be changed after that.</p>`;
   return h}
 function posOf(act){if(!act)return null;if(act.type==='gather')return act.tgt.pos;if(act.type==='explore')return act.tgt;if(act.type==='build'&&act.tgt&&act.tgt.cross!=null)return act.tgt.cross;return null}
@@ -5884,31 +5892,31 @@ function prioHtml(p,i){const btn=p.pile?`<button class="btn sm" data-a="pilemax"
   const note=p.move?`<em class="mv">Every pawn has a job. This moves ${esc(p.move.nm)} off “${esc(p.move.label)}”.</em>`:p.cant?`<em class="no">Not possible now: ${esc(p.cant)}.</em>`:'';
   return `<div class="prio ${p.red?'red':''} ${p.cant?'cant':''} ${p.info?'info':''}" ${posAttr(p.act)}><div class="pi">${p.icon}</div><div class="pt"><b>${esc(p.title)}</b><span>${esc(p.why)}</span>${note}</div>${btn}</div>`}
 // what the computer teammates planned (and did) this morning
-function mateHtml(){const m=UI.mate;if(!m||m.round!==G.round||!m.lines.length)return '';return `<div class="mate"><b>🤖 Your computer teammates planned:</b>${m.lines.map(l=>`<span>${esc(l)}</span>`).join('')}</div>`}
+function mateHtml(){const m=UI.mate;if(!m||m.round!==G.round||!m.lines.length)return '';return `<div class="mate"><b> Your computer teammates planned:</b>${m.lines.map(l=>`<span>${esc(l)}</span>`).join('')}</div>`}
 function mateNews(before,mark,chars){if(typeof document==='undefined'||UI.sim)return;const lines=[];for(const a of G.plan.acts){const ids=a.pw.filter(id=>{const p=pawnInfo(id);return !before.has(id)&&p&&(p.c==null||chars.includes(p.c))});if(ids.length)lines.push(`${pawnGroup(ids)} → ${actLabel(a)}`)}
   const also=G.log.filter(l=>l.i>mark&&(l.c==='step'||/signal pile|Used:/.test(l.t))).reverse().map(l=>l.t.replace(/\.$/,''));for(const x of also)lines.push(x);
   UI.mate={round:G.round,lines}}
 function diceOdds(dt){const n=f=>DICE[dt+'-'+f].filter(x=>x===(f==='wound'?'wound':f==='success'?'success':'?')).length;return {s:Math.round(n('success')/6*100),w:n('wound'),q:n('adventure')}}
 function pawnsText(n,far){return n.roll?`${n.need} pawn${n.need>1?'s':''}: dice · ${n.max}: sure${far?' · far from camp (+1 pawn)':''}`:`${n.need} pawn${n.need>1?'s':''}, no dice`}
 function planLine(a){const n=actNeed(a);const k=a.pw.length;const dt=dtype(a);let chance;
-  if(k<n.need)chance=`<b class="warn">needs ${n.need-k} more</b>`;else if(n.roll&&k<n.max){const o=dt?diceOdds(dt):{s:80,w:1,q:3};chance=`<b class="roll" title="One pawn fewer than sure: the dice decide. Add 1 more pawn for a sure success. A failure gives the leader 2 determination.">🎲 ${o.s}% success · ${o.w}-in-6 wound risk</b>`}else chance='<b class="sure">✔ sure</b>';
+  if(k<n.need)chance=`<b class="warn">needs ${n.need-k} more</b>`;else if(n.roll&&k<n.max){const o=dt?diceOdds(dt):{s:80,w:1,q:3};chance=`<b class="roll" title="One pawn fewer than sure: the dice decide. Add 1 more pawn for a sure success. A failure gives the leader 2 determination."> ${o.s}% success · ${o.w}-in-6 wound risk</b>`}else chance='<b class="sure">✔ sure</b>';
   const c=actCost(a);const cost=Object.entries(c).filter(([r,v])=>v).map(([r,v])=>`${v}${RX(r)}`).join(' ');
-  const payT=a.type==='build'&&['shelter','roof','pal'].includes(a.tgt.k)&&(a.pay==='fur'||G.res.fur>=SRP_COST[Math.min(4,Math.max(2,G.np))].fur)?`<button class="btn xs" data-pay="${a.id}" title="Pay with wood or fur">${a.pay==='fur'?'🧶 fur':'🪵 wood'}</button>`:'';
+  const payT=a.type==='build'&&['shelter','roof','pal'].includes(a.tgt.k)&&(a.pay==='fur'||G.res.fur>=SRP_COST[Math.min(4,Math.max(2,G.np))].fur)?`<button class="btn xs" data-pay="${a.id}" title="Pay with wood or fur">${a.pay==='fur'?' fur':' wood'}</button>`:'';
   return `<div class="pl" ${posAttr(a)}><span class="pli">${AI(a.type)}</span><div class="plt"><b>${esc(actLabel(a))}</b><div class="plp">${a.pw.map(pid=>{const p=pawnInfo(pid);return p?chip(p,{rm:1,placed:1}):''}).join('')} ${chance} ${cost?`<span class="cost">${cost}</span>`:''} ${payT}</div></div></div>`}
 function catCount(k){try{return catRows(k).filter(r=>!r.why).length}catch(e){return 0}}
 // every job in a category: {type,tgt,alt,title,sub,why}
 function catRows(k){const o=[];const add=(type,tgt,title,sub,alt)=>{const why=targetWhy(type,tgt,alt||0,null);const pl=why==='already planned'&&findAct(type,tgt);o.push({type,tgt,alt:alt||0,title,sub,why:why==='already planned'&&(MULTI.includes(type)||pl&&pl.pw.length<actNeed(pl).max)?null:why})};
   if(k==='build'){const tb=SRP_COST[Math.min(4,Math.max(2,G.np))];
-    add('build',{k:'shelter'},'🏠 Shelter',`${tb.wood} wood or ${tb.fur} fur · no more wounds for sleeping outside`);add('build',{k:'roof'},'☂️ Roof +1',`${tb.wood+G.cost.roof} wood or ${tb.fur} fur · keeps 1 cloud off`);add('build',{k:'pal'},'🧱 Palisade +1',`${tb.wood+G.cost.pal} wood or ${tb.fur} fur · walls against beasts and storms`);add('build',{k:'weapon'},'🗡️ Weapon +1',`${1+G.cost.weapon} wood · for hunting and fights`);
+    add('build',{k:'shelter'},' Shelter',`${tb.wood} wood or ${tb.fur} fur · no more wounds for sleeping outside`);add('build',{k:'roof'},'☂️ Roof +1',`${tb.wood+G.cost.roof} wood or ${tb.fur} fur · keeps 1 cloud off`);add('build',{k:'pal'},' Palisade +1',`${tb.wood+G.cost.pal} wood or ${tb.fur} fur · walls against beasts and storms`);add('build',{k:'weapon'},' Weapon +1',`${1+G.cost.weapon} wood · for hunting and fights`);
     const invs=[...new Set(G.inv.board.concat(Object.keys(SCENARIOS[G.scen].invs||{})).concat(Object.keys(INVENTIONS).filter(x=>INVENTIONS[x].kind==='personal'&&G.chars.some(c=>c.k===INVENTIONS[x].owner&&!c.dead))))].filter(x=>x!=='cross'&&(!has(x)||invReq(x).multi));
-    for(const x of invs){const I=invReq(x);add('build',{k:x},`${I.kind==='scen'?'⭐ ':'💡 '}${I.n}`,`${invNeedPlain(I)} · ${I.x}`)}
+    for(const x of invs){const I=invReq(x);add('build',{k:x},`${I.kind==='scen'?'⭐ ':' '}${I.n}`,`${invNeedPlain(I)} · ${I.x}`)}
     if(G.scen==='hexed')for(const m of G.map)if(tileAt(m.id)&&!G.sc.crosses.includes(m.id))add('build',{k:'cross',cross:m.id},`✝️ Cross at place ${m.id+1}`,`2 wood · ${tileAt(m.id).terr}${m.fog?' · fog: +1 pawn':''}`)}
-  if(k==='gather')for(const m of G.map){const t=tileAt(m.id);if(!t||m.id===G.camp.pos||dist(G.camp.pos,m.id)>2)continue;for(const s of srcs(m.id)){if(s.ex)continue;const n=actNeed({type:'gather',tgt:{pos:m.id,i:s.i}});add('gather',{pos:m.id,i:s.i},`${s.s==='wood'?'🪵 Wood':s.s==='fish'?'🐟 Fish':'🦜 Birds'} · place ${m.id+1} (${t.terr})`,`+${gatherYield(m.id,s.i)} ${s.s==='wood'?'wood':'food'} · ${pawnsText(n,dist(G.camp.pos,m.id)>=2)}${m.tok.time?' · slow going (+1 pawn)':''}${m.tok.beast?' · danger: 1 wound without a weapon':''}`)}}
+  if(k==='gather')for(const m of G.map){const t=tileAt(m.id);if(!t||m.id===G.camp.pos||dist(G.camp.pos,m.id)>2)continue;for(const s of srcs(m.id)){if(s.ex)continue;const n=actNeed({type:'gather',tgt:{pos:m.id,i:s.i}});add('gather',{pos:m.id,i:s.i},`${s.s==='wood'?' Wood':s.s==='fish'?' Fish':' Birds'} · place ${m.id+1} (${t.terr})`,`+${gatherYield(m.id,s.i)} ${s.s==='wood'?'wood':'food'} · ${pawnsText(n,dist(G.camp.pos,m.id)>=2)}${m.tok.time?' · slow going (+1 pawn)':''}${m.tok.beast?' · danger: 1 wound without a weapon':''}`)}}
   if(k==='explore')for(const m of MAP){if(G.map[m.id].tile!=null||!m.adj.some(p=>tileAt(p))||dist(G.camp.pos,m.id)>2)continue;const n=actNeed({type:'explore',tgt:m.id});add('explore',m.id,`❔ Explore place ${m.id+1}`,`new land · ${pawnsText(n,dist(G.camp.pos,m.id)>=2)}${G.map[m.id].fog?' · fog (+1 pawn)':''}`)}
-  if(k==='threat')G.ev.threat.forEach((c0,i)=>{if(!c0)return;const c=CARD[c0];const r=c.th.req||{};const alts=r.alt?r.alt.length:1;for(let al=0;al<alts;al++)add('threat',i,`⚠️ ${c.th.n}`,`${i===0&&G.ev.threat[1]?'strikes at next dawn · ':''}${c.th.pw==='1-2'?'1–2':c.th.pw} pawn${c.th.pw===1?'':'s'}${reqText(alts>1?r.alt[al]:r)?' · needs '+reqText(alts>1?r.alt[al]:r)+' ('+haveText(alts>1?r.alt[al]:r)+')':''} · reward: ${opsText(c.th.rw||c.th.rw2||c.th.rw1)||'peace'} · if ignored: ${opsText(c.te)||'nothing'}`,al)});
-  if(k==='hunt')add('hunt',null,'🏹 Hunt a beast',`2 pawns, no dice · ${G.hunt.length} beast${G.hunt.length===1?'':'s'} in the hunting grounds · your weapon ${G.weapon} against its strength: each point short is a wound · gives food and fur`);
-  if(k==='camp'){add('camp',null,'🏕️ Arrange the camp',G.np===4?'+2 ✊ determination or morale +1':'+2 ✊ determination (spend ✊ on skills) and morale +1');add('rest',null,'😴 Rest',has('bed')?'heal 2 and +1 determination':'heal 1 wound')}
-  if(k==='special'){for(const s of Object.keys(SC().specials||{}))add('special',s,`⭐ ${SPEC(s).n}`,specialSub(s));if(G.kept.m_tmap)add('tmap',null,"🗺️ Follow the pirate's map",'2 pawns · 2 mystery cards')}
+  if(k==='threat')G.ev.threat.forEach((c0,i)=>{if(!c0)return;const c=CARD[c0];const r=c.th.req||{};const alts=r.alt?r.alt.length:1;for(let al=0;al<alts;al++)add('threat',i,` ${c.th.n}`,`${i===0&&G.ev.threat[1]?'strikes at next dawn · ':''}${c.th.pw==='1-2'?'1–2':c.th.pw} pawn${c.th.pw===1?'':'s'}${reqText(alts>1?r.alt[al]:r)?' · needs '+reqText(alts>1?r.alt[al]:r)+' ('+haveText(alts>1?r.alt[al]:r)+')':''} · reward: ${opsText(c.th.rw||c.th.rw2||c.th.rw1)||'peace'} · if ignored: ${opsText(c.te)||'nothing'}`,al)});
+  if(k==='hunt')add('hunt',null,' Hunt a beast',`2 pawns, no dice · ${G.hunt.length} beast${G.hunt.length===1?'':'s'} in the hunting grounds · your weapon ${G.weapon} against its strength: each point short is a wound · gives food and fur`);
+  if(k==='camp'){add('camp',null,' Arrange the camp',G.np===4?'+2  determination or morale +1':'+2  determination (spend  on skills) and morale +1');add('rest',null,' Rest',has('bed')?'heal 2 and +1 determination':'heal 1 wound')}
+  if(k==='special'){for(const s of Object.keys(SC().specials||{}))add('special',s,`⭐ ${SPEC(s).n}`,specialSub(s));if(G.kept.m_tmap)add('tmap',null," Follow the pirate's map",'2 pawns · 2 mystery cards')}
   return o}
 const CAT_TIP={gather:'1 pawn rolls the dice (it may fail or hurt); 1 more pawn makes it sure. Places 2 steps from camp need +1 pawn. Numbers are the places on the map.',explore:'Explore a ❔ place next to the land you know. 1 pawn rolls the dice, 1 more makes it sure; 2 steps from camp: +1 pawn.',build:'Building rolls the dice with 1 pawn (4-in-6 wound risk!); 2 pawns make it sure.',threat:'Threat cards strike at the next dawn if they are still in the left slot. Dealing with one needs no dice.'};
 function catHtml(k){const rows=catRows(k);const ok=rows.filter(r=>!r.why),no=rows.filter(r=>r.why);const tip=CAT_TIP[k]?`<p class="cattip">ℹ️ ${CAT_TIP[k]}</p>`:'';
@@ -6472,12 +6480,12 @@ function sync3D(){if(!V3.on||!G)return;hexArtLoad();if(HEXART.done<7&&performanc
 function fitIsland(){let m=0,cx=0,cz=0;const ts=MAP;for(const t of ts){const p=hexPos(t.q,t.r);cx+=p.x/ts.length;cz+=p.z/ts.length}for(const t of ts){const p=hexPos(t.q,t.r);m=Math.max(m,Math.hypot(p.x-cx,p.z-cz))}
   const rad=m+HEXR*1.6;buildIsland(cx,cz,rad);buildMist();V3.look.set(cx,0,cz+.6);V3.center=V3.look.clone();V3.rad=rad;V3.orbit.d=Math.max(20,rad*2.2);V3.d0=V3.orbit.d;fitDist();if(!V3.ph)V3.orbit.e=1.12;placeCam()}
 // ---------- floating labels over every tile you can read or act on ----------
-const TICON={beach:'🏖️',river:'🏞️',plains:'🌾',hills:'⛰️',mountains:'🏔️'};const SICON={wood:'🪵',fish:'🐟',parrot:'🦜'};
+const TICON={beach:'',river:'',plains:'',hills:'⛰️',mountains:''};const SICON={wood:'',fish:'',parrot:''};
 function syncLabels(){const box=document.getElementById('labels');if(!box)return;V3.lab=V3.lab||{};const PHN=!!V3.ph;
   for(const m of G.map){const t=tileAt(m.id);let h='';const reach=!t&&!m.down&&MAP[m.id].adj.some(p=>tileAt(p));
     if(PHN){h=(t||reach)?`<b><s class="pn">${m.id+1}</s><s class="pt ${t?'':'unk'}">${m.id===G.camp.pos?'Camp':t?String(TERRN(t.terr)).replace(/^./,c=>c.toUpperCase()):'Not explored\nyet'}</s></b>`:''}
-    else if(t){const cr=G.sc&&G.sc.crosses&&G.sc.crosses.includes(m.id);h=`<b><s class="pn">${m.id+1}</s>${TICON[t.terr]||''} ${t.terr}</b><i>${t.src.map((s,i)=>`<u class="${m.exh[i]?'gone':''}">${SICON[s]||s}</u>`).join('')}</i>${m.id===G.camp.pos?'<em class="camp">🏕️ camp</em>':''}${t.shelter?'<em>⛰ cave</em>':''}${m.fog?'<em>🌫 fog</em>':''}${cr?'<em>✝️</em>':''}${m.waste?'<em>barren</em>':''}`}
-    else if(reach)h=`<b class="unk">❔${m.id+1} explore</b>${m.fog?'<em>🌫</em>':''}`;
+    else if(t){const cr=G.sc&&G.sc.crosses&&G.sc.crosses.includes(m.id);h=`<b><s class="pn">${m.id+1}</s>${TICON[t.terr]||''} ${t.terr}</b><i>${t.src.map((s,i)=>`<u class="${m.exh[i]?'gone':''}">${SICON[s]||s}</u>`).join('')}</i>${m.id===G.camp.pos?'<em class="camp"> camp</em>':''}${t.shelter?'<em>⛰ cave</em>':''}${m.fog?'<em> fog</em>':''}${cr?'<em>✝️</em>':''}${m.waste?'<em>barren</em>':''}`}
+    else if(reach)h=`<b class="unk">❔${m.id+1} explore</b>${m.fog?'<em></em>':''}`;
     let el=V3.lab[m.id];if(!h){if(el)el.hidden=true;continue}
     if(!el){el=V3.lab[m.id]=document.createElement('button');el.className='tl';el.dataset.tile=m.id;box.appendChild(el)}
     el.hidden=false;if(el.dataset.h!==h){el.dataset.h=h;el.innerHTML=h}el.classList.toggle('sel',UI.tileSel===m.id);el.classList.toggle('pulse',UI.hoverPos===m.id);el.setAttribute('aria-label',`Place ${m.id+1}: ${t?t.terr:'unexplored'}`);el.classList.toggle('far',!t)}}
@@ -6961,7 +6969,7 @@ function musicTick(){const c=SND.ctx;if(!c||c.state!=='running')return;const bar
     SND.nextT+=bar;SND.beat++}}
 function toggleSound(){SND.on=!SND.on;try{localStorage.setItem('swi_snd',SND.on?'1':'0')}catch(e){}audioInit();if(window.GA){GA.setSfx(SND.on);GA.setMusic(SND.on&&SND.music);musicForget();musicSync();audioMood()}if(SND.master)SND.master.gain.value=SND.on?SND.vol:0;if(SND.on)sfx('click');soundBtns()}
 function toggleMusic(){SND.music=!SND.music;try{localStorage.setItem('swi_mus',SND.music?'1':'0')}catch(e){}if(window.GA)GA.setMusic(SND.on&&SND.music);if(SND.music){audioInit();musicStart()}else musicStop();soundBtns()}
-function soundBtns(){const a=document.getElementById('sndbtn'),b=document.getElementById('musbtn');if(typeof setBtn==='function'){setBtn(a,SND.on?'snd':'mute','');setBtn(b,'wave',SND.music?'On':'Off');return}if(a)a.textContent=SND.on?'🔊':'🔇';if(b)b.textContent=SND.music?'🌊 On':'🌊 Off'}
+function soundBtns(){const a=document.getElementById('sndbtn'),b=document.getElementById('musbtn');if(typeof setBtn==='function'){setBtn(a,SND.on?'snd':'mute','');setBtn(b,'wave',SND.music?'On':'Off');return}if(a)a.textContent=SND.on?'Sound':'Muted';if(b)b.textContent=SND.music?' On':' Off'}
 // ---------- recorded audio: init, and the weather / night / camp-fire mood ----------
 // GA shares the synth's AudioContext (created on the first gesture only), so nothing plays before the player touches the page.
 if(window.GA&&typeof GA_DATA!=='undefined'){GA.init({sfx:GA_DATA.sfx,music:GA_DATA.music,key:'swi',ctx:()=>{audioInit();return SND.ctx}});GA.setSfx(SND.on);GA.setMusic(SND.on&&SND.music)}
@@ -7056,7 +7064,7 @@ function lobbyHTML(){const host=isHost();const ps=NET.peers;const o=host?netOpts
   const seats=o&&Array.isArray(o.seats)?o.seats.slice(0,4).map((x,i)=>`<li><b>${esc(String(x&&x.c||'?'))}</b> · ${x&&x.p?esc(String(x.p)):'<span class="muted">computer</span>'}</li>`).join(''):'';
   const opt=o?`<p class="small">Scenario: <b>${esc(String(o.scen||''))}</b> · ${esc({easy:'Easier',standard:'Standard',hard:'Harder'}[o.diff]||'Standard')} · Friday ${o.fri?'helps':'stays away'} · the dog ${o.dog?'helps':'stays home'}</p><ol class="netseats">${seats}</ol>${o.extra?`<p class="small muted">${o.extra|0} more ${o.extra>1?'people watch':'person watches'}: a game has 4 castaways at most.</p>`:''}`:'<p class="small muted">Waiting for the host’s options…</p>';
   const link=NetRoom.inviteLink(NET.code);
-  return `<div class="mbox lobby" role="dialog" aria-modal="true" aria-labelledby="lobbyh"><button class="x" data-a="netclose" aria-label="Close">×</button><h2 id="lobbyh">🌐 Online game</h2>
+  return `<div class="mbox lobby" role="dialog" aria-modal="true" aria-labelledby="lobbyh"><button class="x" data-a="netclose" aria-label="Close">×</button><h2 id="lobbyh"> Online game</h2>
    <p class="netst2">${esc(netStatus())}</p>
    <p>Invite code: <b class="code">${esc(NET.code)}</b> <span class="small muted">Friends open this game, choose <b>Play online</b> and type the code, or open the link.</span></p>
    <div class="invrow"><input class="invlink" readonly value="${esc(link)}" aria-label="Invite link"><button class="btn" data-a="netcopy">Copy link</button>${NET.copied?'<span class="muted small">Copied.</span>':''}</div>
@@ -7067,14 +7075,14 @@ function lobbyHTML(){const host=isHost();const ps=NET.peers;const o=host?netOpts
    ${host?`<p class="small muted">To change the scenario or castaways, close this window, change them on the start screen, then open the lobby again.</p><div class="mb"><button class="btn go" data-a="netstart">Start with ${Math.min(4,ps.length)} player${Math.min(4,ps.length)===1?'':'s'}</button><button class="btn" data-a="netleave">Close the room</button></div>`
    :`<p class="tip">Waiting for the host to start the game…</p><div class="mb"><button class="btn" data-a="netleave">Leave</button></div>`}</div>`}
 function goneHTML(){return `<div class="mbox" role="dialog" aria-modal="true"><h2>The host left</h2><p>The host’s page ran the game, so the game is over.</p><div class="mb"><button class="btn go" data-a="netleave">Back to the start</button></div></div>`}
-function onlineBlock(){if(!NET.ready)return '';if(!NET.p2p)return '<p class="small muted netna">🌐 Online play needs a recent browser (Chrome, Edge, Firefox or Safari).</p>';
-  if(NET.on)return `<div class="online"><b>🌐 Online room <span class="code">${esc(NET.code)}</span></b> <span class="small muted">${esc(netStatus())}</span><div class="netrow"><button class="btn go" data-a="netlobby">Open the lobby</button><button class="btn" data-a="netleave">Leave the room</button></div>${NET.err?`<p class="warn">${esc(NET.err)}</p>`:''}</div>`;
-  return `<details class="online" id="netdet" ${UI.netOpen?'open':''}><summary>🌐 Play online with friends</summary><p class="small muted">Free and direct: your browsers connect to each other. Each friend plays their own castaway; empty seats go to the computer. Choose the scenario and castaways below, press Host, then send friends the code or link.</p>
+function onlineBlock(){if(!NET.ready)return '';if(!NET.p2p)return '<p class="small muted netna"> Online play needs a recent browser (Chrome, Edge, Firefox or Safari).</p>';
+  if(NET.on)return `<div class="online"><b> Online room <span class="code">${esc(NET.code)}</span></b> <span class="small muted">${esc(netStatus())}</span><div class="netrow"><button class="btn go" data-a="netlobby">Open the lobby</button><button class="btn" data-a="netleave">Leave the room</button></div>${NET.err?`<p class="warn">${esc(NET.err)}</p>`:''}</div>`;
+  return `<details class="online" id="netdet" ${UI.netOpen?'open':''}><summary> Play online with friends</summary><p class="small muted">Free and direct: your browsers connect to each other. Each friend plays their own castaway; empty seats go to the computer. Choose the scenario and castaways below, press Host, then send friends the code or link.</p>
    <div class="netrow"><input id="netname" placeholder="Your name" maxlength="24" autocomplete="off" value="${esc(NET.myName||'')}" aria-label="Your name"><button class="btn go" data-a="nethost">Host a game</button></div>
    <div class="netrow"><input id="joincode" placeholder="Invite code" maxlength="10" autocomplete="off" value="${esc(UI.joinCode||'')}" aria-label="Invite code"><button class="btn" data-a="netjoin">Join a game</button></div>${NET.err?`<p class="warn">${esc(NET.err)}</p>`:''}</details>`}
 function netCopy(){const t=NetRoom.inviteLink(NET.code);const sel=()=>{const i=document.querySelector('.invlink');if(i){i.focus();i.select()}};const done=()=>{NET.copied=true;render();setTimeout(()=>{NET.copied=false;render()},2500)};
   try{navigator.clipboard.writeText(t).then(done,sel)}catch(e){sel()}}
-function netPill(){if(NET.scrollJoin){const d=document.getElementById('netdet');if(d){NET.scrollJoin=false;setTimeout(()=>{try{d.scrollIntoView({block:'center'})}catch(e){}},50)}}const el=document.getElementById('netst');if(!el)return;const t=NET.on?`🌐 ${NET.code} · ${netStatus()}`:'';el.hidden=!t;if(el.textContent!==t)el.textContent=t;el.classList.toggle('bad',/Reconnecting|left/.test(t))}
+function netPill(){if(NET.scrollJoin){const d=document.getElementById('netdet');if(d){NET.scrollJoin=false;setTimeout(()=>{try{d.scrollIntoView({block:'center'})}catch(e){}},50)}}const el=document.getElementById('netst');if(!el)return;const t=NET.on?` ${NET.code} · ${netStatus()}`:'';el.hidden=!t;if(el.textContent!==t)el.textContent=t;el.classList.toggle('bad',/Reconnecting|left/.test(t))}
 setInterval(()=>{if(NET.on){netPill();if(isClient()&&NET.inLobby&&UI.modal!=='start'){const s=document.querySelector('.netst2');if(s&&s.textContent!==netStatus())render()}}},1000);
 // ---------- host: start ----------
 function netStart(){if(!isHost())return;const sp=netSeatPlan();if(!sp.hum.length)return;const s=UI.setup;const keep=JSON.stringify(s);
@@ -7170,7 +7178,7 @@ function netAct(m,seat){if(!G||!G.net||!m||typeof m.t!=='string')return null;con
 // ---------- the page's buttons in an online game ----------
 function netTryStart(force){if(!planOpen())return;const seat=NET.lens;if(!netStarter(seat)){netDo({t:'ready',v:1});return}
   const w=netNotReady(seat);if(w.length){toast(`Still planning: ${w.map(netWho).join(', ')}.`);return}
-  if(!force){const red=uncoveredRed();if(red.length){UI.confirm=red.map(p=>p.confirm||('⚠ '+p.title+' is not covered.')).join(' ');UI.confirmSig=planSig();renderStep();GX.showDock();return}}
+  if(!force){const red=uncoveredRed();if(red.length){UI.confirm=red.map(p=>p.confirm||(' '+p.title+' is not covered.')).join(' ');UI.confirmSig=planSig();renderStep();GX.showDock();return}}
   UI.confirm=null;sfx('click');netDo({t:'start'})}
 function netClick(b,d,e){
   switch(d.a){case 'nethost':NET.myName=NetRoom.setName((document.getElementById('netname')||{}).value||NET.myName);netJoin('host',NetRoom.newCode());return true;
@@ -7198,7 +7206,7 @@ function netClick(b,d,e){
   case 'skip':return act({t:'skip'});
   case 'auto':return isClient();
   case 'quick':if(isClient()){e.preventDefault();toast('The host chooses whether to skip the automatic steps.');return true}setQuick(b.checked);render();netPush(true);return true;
-  case 'suggest':act({t:'suggest'});setPStep(3);toast('✨ Your castaway’s pawns have jobs now. Check them below and change anything you like.',5000);render();return true;
+  case 'suggest':act({t:'suggest'});setPStep(3);toast(' Your castaway’s pawns have jobs now. Check them below and change anything you like.',5000);render();return true;
   case 'rec':{const c=curPawn();const r=c&&recPlan().map[c.id];if(!r){toast('No job to recommend: choose one below.');UI.ps.pick=true;render();return true}if(r.why)UI.sugWhy[JSON.stringify([r.type,r.tgt])]=r.why;UI.sel=null;sfx('place');return act({t:'place',pid:c.id,type:r.type,tgt:r.tgt,alt:r.alt||0})}
   case 'clear':return act({t:'clear'});
   case 'pile':return act({t:'pile',n:1});case 'pilemax':return act({t:'pile',n:SCEN.marooned.pileRoom()});
@@ -7229,8 +7237,8 @@ function netStoryCtl(i,nextL,jn){if(!netOn())return '';const last=i>=UI.beats.le
 // planning: every castaway's jobs, live, and who is still planning
 function netPlanBar(){if(!netOn())return '';const lead=netLead();const placed=placedIds();
   const rows=G.chars.filter(c=>!c.npc&&!c.dead).map(c=>{const left=allPawns().filter(p=>p.c===c.i&&!placed.has(p.id)).length;const rd=hum(c)&&G.net.ready[c.i]===G.round;
-    const jobs=G.plan.acts.filter(a=>a.pw.some(id=>{const q=pawnInfo(id);return q&&q.c===c.i})).map(a=>actLabel(a).replace(/^Threat: /,'⚠ '));
-    const st=!hum(c)?(left?'🤖 planning…':'🤖 done'):rd?'✓ ready':left?`planning · ${left} to place`:'planning';
+    const jobs=G.plan.acts.filter(a=>a.pw.some(id=>{const q=pawnInfo(id);return q&&q.c===c.i})).map(a=>actLabel(a).replace(/^Threat: /,' '));
+    const st=!hum(c)?(left?' planning…':' done'):rd?'✓ ready':left?`planning · ${left} to place`:'planning';
     return `<li class="${c.i===NET.lens?'me':''} ${rd||(!hum(c)&&!left)?'ok':''}" style="--pc:${PCOL[c.i%6]}"><b>${esc(c.nm.split(' ')[0])}${c.i===G.first?' ★':''}</b><span>${c.i===NET.lens?'you':hum(c)?esc((c.pn||'friend').split(' ')[0]):'computer'}</span><em>${st}</em>${jobs.length?`<small>${esc(jobs.join(' · '))}</small>`:''}</li>`}).join('');
   const help=[...new Set(allPawns().filter(p=>p.c==null).map(pawnLabel))];const hp=help.length?help.join(' and '):'';
   const who=lead===NET.lens?'★ You start the day once everyone is ready'+(hp?`, and you plan ${esc(hp)}`:'')+'.':`★ ${esc(netWho(lead))} starts the day once everyone is ready${hp?` and plans ${esc(hp)}`:''}.`;
@@ -7290,7 +7298,7 @@ function chipHtml(){let o={};withView(()=>{const need=eatersNeed(),have=food();o
 function goalShort(){const cp=typeof campParts==='function'&&G.cmp?campParts():null;if(cp){const by=G.cmp.goal.value.byDay;return cp.map(([l,h,n])=>n===true?`${l} ${h?'✓':'✗'}`:`${l} ${Math.min(h,n)}/${n}`).join(' · ')+(by?` · by day ${by}`:'')}
   const s=G.sc||{};switch(G.scen){case 'marooned':return `fire ${has('fire')?'✓':'✗'} · pile ${s.pile||0}/15`;case 'hexed':return `crosses ${(s.crosses||[]).length}/5`;
   case 'stranded':return `raft ${has('jraft')?'✓':'✗'} · Ada ${s.rescued?'safe':'waiting'} · boat ${has('lifeboat')?'✓':'✗'}`;case 'settlers':return `home ${[hasShelter(),G.camp.roof>=1,G.camp.pal>=1,G.weapon>=1].filter(Boolean).length}/4 · tools ${(s.goals||[]).filter(has).length}/${(s.goals||[]).length}`}return ''}
-function phaseLabel(){let t='';withView(()=>{const f=flowNow();const ph=f&&PHI(f.k)>=0?PH7[PHI(f.k)].n:'';t=`🎯 ${goalShort()}`});return t}
+function phaseLabel(){let t='';withView(()=>{const f=flowNow();const ph=f&&PHI(f.k)>=0?PH7[PHI(f.k)].n:'';t=` ${goalShort()}`});return t}
 PHO.sync=function(){if(!PHO.on){if(typeof BF!=='undefined')BF.pre();return}const dock=q('.gx-dock'),app=q('.gx-app');if(!dock)return;if(typeof BF!=='undefined')BF.pre();const st=state();PHO.st=st;dock.dataset.phs=st;if(app){app.dataset.phs=st;app.dataset.dec=(st==='plan'||st==='plan2'||PHO.pop&&PHO.pop.k!=='status'||st==='story'&&typeof humanQ==='function'&&humanQ()&&storyIdx()>=UI.beats.length-1)?'1':''}
   const pv=q('#phview'),chip=q('#phchip');const show=!!G&&st!=='none'&&st!=='start';if(pv)pv.hidden=!show;if(chip)chip.hidden=!show;
   if(show){try{const c=chipHtml();if(chip.dataset.h!==c.h){chip.dataset.h=c.h;chip.innerHTML=c.h}chip.setAttribute('aria-label',c.a);chip.classList.toggle('warn',c.warn);
@@ -7319,9 +7327,9 @@ function jobLine(r,rec){const key=encodeURIComponent(JSON.stringify({type:r.type
 function tileRows(id){const out=[];const cats=id===G.camp.pos?['build','camp','hunt','threat','special']:['gather','explore','build','special'];
   for(const k of cats){let rows=[];try{rows=catRows(k)}catch(e){}for(const r of rows){const onTile=(r.type==='gather'&&r.tgt&&r.tgt.pos===id)||(r.type==='explore'&&r.tgt===id)||(r.type==='build'&&r.tgt&&r.tgt.cross===id)||(r.type==='special'&&id===G.sc.temple&&r.tgt==='temple')||(id===G.camp.pos&&k!=='gather'&&k!=='explore'&&!(r.type==='build'&&r.tgt&&r.tgt.cross!=null));if(onTile)out.push(r)}}return out}
 function tileInfo(id){const t=tileAt(id),m=G.map[id];if(!t){if(m.down)return `<div class="ti"><b>A cut-off place</b><p>This place has broken away and can’t be used.</p></div>`;const reach=MAP[id].adj.some(p=>tileAt(p));
-    return `<div class="ti"><b>Unexplored place ${id+1}${m.fog?' · 🌫 fog':''}</b><p>${reach?'You can send a pawn to explore it. It turns over a new island tile.':'Too far to explore yet: explore the places next to the land you know first.'}</p></div>`}
+    return `<div class="ti"><b>Unexplored place ${id+1}${m.fog?' ·  fog':''}</b><p>${reach?'You can send a pawn to explore it. It turns over a new island tile.':'Too far to explore yet: explore the places next to the land you know first.'}</p></div>`}
   const toks=Object.keys(m.tok||{}).filter(k=>m.tok[k]).map(k=>({time:'slow going (+1 pawn)',beast:'animal tracks: danger without a weapon',food:'extra food (parrots)'}[k]||k));
-  return `<div class="ti"><b>Place ${id+1}: ${E(t.terr)}${id===G.camp.pos?' · 🏕 camp':''}</b><p>${t.src.length?'Sources: '+t.src.map((s,i)=>E(s)+(m.exh[i]?' (used up)':'')).join(', '):'No sources here.'}${t.shelter?' · natural shelter':''}${t.totem?' · 🗿 totem':''}${m.fog?' · 🌫 fog':''}${m.waste?' · barren':''}${toks.length?' · '+toks.join(' · '):''}</p></div>`}
+  return `<div class="ti"><b>Place ${id+1}: ${E(t.terr)}${id===G.camp.pos?' ·  camp':''}</b><p>${t.src.length?'Sources: '+t.src.map((s,i)=>E(s)+(m.exh[i]?' (used up)':'')).join(', '):'No sources here.'}${t.shelter?' · natural shelter':''}${t.totem?' ·  totem':''}${m.fog?' ·  fog':''}${m.waste?' · barren':''}${toks.length?' · '+toks.join(' · '):''}</p></div>`}
 function pawnPickRow(){const wz=q('#panel .wz');const row=wz&&wz.querySelector('.pawnrow');return row?row.outerHTML:''}
 function popContent(){const p=PHO.pop;if(!p||!G)return null;
   if(p.k==='status')return {title:'Camp status',cls:'st'};
@@ -7379,7 +7387,7 @@ function onClick(e){if(!PHO.on)return;const t=e.target;if(!t.closest)return;
 // ---------- UI: the island stage, the planning table, the camp, cards, questions and reports ----------
 const $=s=>document.querySelector(s);const esc=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const PCOL=['#e0625c','#4f8fe6','#57b36a','#e8ad45','#a57ce0','#9a9a9a'];
-const RICON={food:'🍖',pfood:'🥫',wood:'🪵',fur:'🧶',shelter:'🏠',roof:'☂',palisade:'🧱',weapon:'🗡'};
+const RICON={food:'',pfood:'',wood:'',fur:'',shelter:'',roof:'☂',palisade:'',weapon:''};
 const RX=k=>`<i class="rx" data-r="${k}">${RICON[k]}</i>`;   // painted icon once html.sk-res is set, the emoji until then
 const PHASES=[['event','Event'],['morale','Morale'],['prod','Production'],['plan','Plan'],['act','Actions'],['weather','Weather'],['night','Night']];
 UI.tab='plan';UI.sel=null;UI.tileSel=null;UI.report=null;UI.seenLog=0;UI.fxSeen=0;UI.lastRollId=0;UI.toasts=[];
@@ -7415,28 +7423,28 @@ function render(){if(typeof netPill==='function')netPill();if(!G){renderModal();
   const pb=$('#pausebtn');if(pb){pb.hidden=!allAI()||(typeof NET!=='undefined'&&NET.on);pb.textContent=UI.pause?'▶ Resume':'⏸ Pause'}setBtn($('#speedbtn'),'fast',({0.5:'slow',1:'normal',3:'fast'}[UI.speed]||'normal'));gfxBtn()}
 {const r0=render;render=function(){r0();if(typeof PHO!=='undefined')PHO.sync()}}
 const RLAB={food:'food',pfood:'dry food',wood:'wood',fur:'fur'};
-const RTIP={food:'🍖 Food: each castaway eats 1 at night; what is left spoils overnight',pfood:'🥫 Dry food: eaten like food, but it never spoils',wood:'🪵 Wood: pays for building, the roof and palisade, and warmth in snow',fur:'🧶 Fur: can pay for the shelter, roof or palisade instead of wood'};
+const RTIP={food:' Food: each castaway eats 1 at night; what is left spoils overnight',pfood:' Dry food: eaten like food, but it never spoils',wood:' Wood: pays for building, the roof and palisade, and warmth in snow',fur:' Fur: can pay for the shelter, roof or palisade instead of wood'};
 function renderHud(){const S=SCENARIOS[G.scen];const el=$('#hud');if(!el)return;const wx=wxTab()[G.round]||[];const ph=G.phase==='actdone'?'act':G.phase==='start'?'event':G.phase;
-  const dieI={rain:'🌧',snow:'❄️',animals:'🐾'};const dieN={rain:'rain die',snow:'winter die',animals:'hungry-animals die'};
-  const lives=G.chars.filter(c=>!c.npc||G.scen==='stranded').map(c=>{const C=CHARS[c.k];const left=c.dead?0:C.die-c.w;const warn=!c.dead&&left<=3;return `<span class="lf ${warn?'warn':''} ${c.dead?'dead':''}" style="--pc:${PCOL[c.i%6]}" title="${esc(c.nm)}: ${left} of ${C.die} life left (each wound costs 1; at 0 they die and everyone loses) · ✊ ${c.det} determination (spent on skills)${c.i===G.first?' · ★ first player: pays for low morale and faces the event cards first':''}"><b>${esc(c.nm.split(' ')[0])}${c.i===G.first?' ★':''}${typeof netTag==='function'?netTag(c):''}</b> ❤ ${left}/${C.die}${warn?' ⚠':''}<i class="lbar"><u style="width:${Math.round(left/C.die*100)}%"></u></i><small>✊${c.det}</small></span>`}).join('')+(G.fri?`<span class="lf fri ${G.fri.dead?'dead':''}" title="Friday: ${FRIDAY.die-G.fri.w} of ${FRIDAY.die} life. A helper: if he dies the game goes on."><b>Friday</b> ❤ ${G.fri.dead?0:FRIDAY.die-G.fri.w}/${FRIDAY.die}<i class="lbar"><u style="width:${Math.round((FRIDAY.die-G.fri.w)/FRIDAY.die*100)}%"></u></i></span>`:'');
+  const dieI={rain:'',snow:'❄️',animals:''};const dieN={rain:'rain die',snow:'winter die',animals:'hungry-animals die'};
+  const lives=G.chars.filter(c=>!c.npc||G.scen==='stranded').map(c=>{const C=CHARS[c.k];const left=c.dead?0:C.die-c.w;const warn=!c.dead&&left<=3;return `<span class="lf ${warn?'warn':''} ${c.dead?'dead':''}" style="--pc:${PCOL[c.i%6]}" title="${esc(c.nm)}: ${left} of ${C.die} life left (each wound costs 1; at 0 they die and everyone loses) ·  ${c.det} determination (spent on skills)${c.i===G.first?' · ★ first player: pays for low morale and faces the event cards first':''}"><b>${esc(c.nm.split(' ')[0])}${c.i===G.first?' ★':''}${typeof netTag==='function'?netTag(c):''}</b>  ${left}/${C.die}${warn?' ':''}<i class="lbar"><u style="width:${Math.round(left/C.die*100)}%"></u></i><small>${c.det}</small></span>`}).join('')+(G.fri?`<span class="lf fri ${G.fri.dead?'dead':''}" title="Friday: ${FRIDAY.die-G.fri.w} of ${FRIDAY.die} life. A helper: if he dies the game goes on."><b>Friday</b>  ${G.fri.dead?0:FRIDAY.die-G.fri.w}/${FRIDAY.die}<i class="lbar"><u style="width:${Math.round((FRIDAY.die-G.fri.w)/FRIDAY.die*100)}%"></u></i></span>`:'');
   el.innerHTML=`<div class="hud-l">
     <div class="rtrack" aria-label="Day ${G.round} of ${G.rounds}" title="Days. Dots under a day are its weather dice: orange = rain die, white = winter die, red = hungry-animals die">${Array.from({length:G.rounds},(_,i)=>`<span class="${i+1<G.round?'past':i+1===G.round?'now':''}" title="Day ${i+1}${(wxTab()[i+1]||[]).length?': '+wxTab()[i+1].map(d=>dieN[d]).join(', '):': no weather dice'}">${i+1}${(wxTab()[i+1]||[]).length?`<i>${wxTab()[i+1].map(d=>`<u class="wd ${d}"></u>`).join('')}</i>`:''}</span>`).join('')}</div>
     <div class="rleg"><b>Day ${G.round}/${G.rounds}</b> · dots = weather dice: <u class="wd rain"></u> rain <u class="wd snow"></u> winter <u class="wd animals"></u> animals</div>
     <div class="phases">${PHASES.map(([k,n])=>`<span class="${ph===k?'on':''}">${n}</span>`).join('')}</div></div>
    <div class="hud-r">
     <div class="res">${['food','pfood','wood','fur'].map(r=>`<span class="hk" title="${RTIP[r]}${G.fut[r]?' (+'+G.fut[r]+' arriving)':''}">${RX(r)} <b>${G.res[r]}</b>${G.fut[r]?`<small>+${G.fut[r]}</small>`:''}<em>${RLAB[r]}</em></span>`).join('')}</div>
-    <div class="trk"><span class="hk" title="Shelter: without one everyone takes a wound each night">${RX('shelter')}<b>${hasShelter()?'✓':'✗'}</b><em>shelter</em></span><span class="hk" title="Roof: each level keeps one weather cloud off your food and wood">${RX('roof')} <b>${G.camp.roof}</b><em>roof</em></span><span class="hk" title="Palisade: each level soaks up one storm or beast hit on the camp">${RX('palisade')} <b>${G.camp.pal}</b><em>palisade</em></span><span class="hk" title="Weapon: against beasts; every point a beast is stronger is a wound">${RX('weapon')} <b>${G.weapon}</b><em>weapon</em></span><span class="hk mor" title="Morale (−3 to +3): below 0 the first player loses that much ✊ determination each morning; above 0 they gain it"><span class="mt">${[-3,-2,-1,0,1,2,3].map(v=>`<i class="${v===G.morale?'on':''} ${v<0?'neg':v>0?'pos':''}">${v>0?'+'+v:v}</i>`).join('')}</span><em>morale</em></span></div>
-    <div class="lives" aria-label="Life of each castaway">${lives}</div><div class="rleg">❤ life left. ✊ determination pays for skills. ★ first player.</div>
-    <div class="fc" title="Weather dice rolled tonight, plus clouds added by event cards">${wx.length||G.wx.rain||G.wx.snow||G.wx.storm?`Weather tonight: ${wx.map(d=>dieI[d]+' '+dieN[d]).join(', ')}${G.wx.rain?' +🌧'.repeat(G.wx.rain):''}${G.wx.snow?' +❄️'.repeat(G.wx.snow):''}${G.wx.storm?' +⛈ storm':''}${G.wxEarly?` <b>(${Object.values(G.wxEarly).join(', ')})</b>`:''}`:'Weather tonight: calm'}</div></div>
+    <div class="trk"><span class="hk" title="Shelter: without one everyone takes a wound each night">${RX('shelter')}<b>${hasShelter()?'✓':'✗'}</b><em>shelter</em></span><span class="hk" title="Roof: each level keeps one weather cloud off your food and wood">${RX('roof')} <b>${G.camp.roof}</b><em>roof</em></span><span class="hk" title="Palisade: each level soaks up one storm or beast hit on the camp">${RX('palisade')} <b>${G.camp.pal}</b><em>palisade</em></span><span class="hk" title="Weapon: against beasts; every point a beast is stronger is a wound">${RX('weapon')} <b>${G.weapon}</b><em>weapon</em></span><span class="hk mor" title="Morale (−3 to +3): below 0 the first player loses that much  determination each morning; above 0 they gain it"><span class="mt">${[-3,-2,-1,0,1,2,3].map(v=>`<i class="${v===G.morale?'on':''} ${v<0?'neg':v>0?'pos':''}">${v>0?'+'+v:v}</i>`).join('')}</span><em>morale</em></span></div>
+    <div class="lives" aria-label="Life of each castaway">${lives}</div><div class="rleg"> life left.  determination pays for skills. ★ first player.</div>
+    <div class="fc" title="Weather dice rolled tonight, plus clouds added by event cards">${wx.length||G.wx.rain||G.wx.snow||G.wx.storm?`Weather tonight: ${wx.map(d=>dieI[d]+' '+dieN[d]).join(', ')}${G.wx.rain?' +'.repeat(G.wx.rain):''}${G.wx.snow?' +❄️'.repeat(G.wx.snow):''}${G.wx.storm?' +⛈ storm':''}${G.wxEarly?` <b>(${Object.values(G.wxEarly).join(', ')})</b>`:''}`:'Weather tonight: calm'}</div></div>
    <div class="goal">${esc(S.n)}: ${esc(SC().goal?SC().goal():'')}</div>`}
-function stepText(){if(G.over)return G.over.win?`🏆 ${G.over.why}`:`☠ ${G.over.why}`;
+function stepText(){if(G.over)return G.over.win?` ${G.over.why}`:` ${G.over.why}`;
   if(G.q){const c=P(G.q.who);if(typeof netWaitText==='function'&&netWaitText())return netWaitText();return c&&c.human?`${G.chars.filter(x=>x.human).length>1?c.nm+': ':''}${G.q.title}`:'The castaways are deciding…'}
   if(planOpen()){if(allAI())return UI.pause?'Paused.':'The computer castaways are planning…';const left=allPawns().filter(p=>p.c!=null&&!P(p.c).dead&&P(p.c).human&&!placedIds().has(p.id)).length;const pr=planProblems();
     return left?`Plan the day: ${left} pawn${left>1?'s':''} still to place. Pick a pawn, then an action${V3.on?' or a tile on the island':''}.`:pr.length?`Almost ready: ${pr[0]}`:'Everyone has a job. Start the day when you are happy with the plan.'}
   return 'The day unfolds…'}
 function wizSync(){if(planOpen()&&!allAI()){pstep();if(UI.ps.step!==2&&UI.sel&&!UI.tileSel)UI.sel=null}}
 function stepFoot(){const st=pstep();const cur=st===2?curPawn():null;const list=st===2?wizPawns():[];const red=st===4?uncoveredRed():[];const pb=planProblems();
-  const sug=`<button class="btn ghost" data-a="suggest" title="Give every pawn a job following today’s needs (H). You can change anything.">✨ Plan for me</button>`;
+  const sug=`<button class="btn ghost" data-a="suggest" title="Give every pawn a job following today’s needs (H). You can change anything."> Plan for me</button>`;
   const back=st>1?`<button class="btn ghost" data-a="pback">◀ Back</button>`:`<button class="btn ghost" data-a="clear" title="Take all your pawns off their jobs">Clear</button>`;
   const txt=st===1?'Planning 1 of 4: read what today needs, then give out jobs.':st===2?(cur?`Planning 2 of 4 · Pawn ${list.findIndex(p=>p.id===cur.id)+1} of ${list.length}: ${pawnNice(cur)}. Take the recommended job or choose another.`:'Planning 2 of 4: every pawn has a job.'):st===3?'Planning 3 of 4: check the risk of each job.':pb.length?`Planning 4 of 4: not ready yet. ${pb[0]}`:red.length?'Planning 4 of 4: something urgent is not covered.':'Planning 4 of 4: all set. Start the day!';
   const next=st===1?`<button class="btn go" data-a="pnext" title="Step 2: give each pawn a job">Next: jobs ▶</button>`:st===2?`<button class="btn go ${cur&&cur.c!=null?'dim':''}" data-a="pnext" title="Step 3: check the risk of each job">Next: check ▶</button>`:st===3?`<button class="btn go ${pb.length?'dim':''}" data-a="pnext" title="Step 4: start the day">Next: start ▶</button>`:
@@ -7444,7 +7452,7 @@ function stepFoot(){const st=pstep();const cur=st===2?curPawn():null;const list=
   return `<div class="st-t" id="steptext">${esc(typeof netOn==='function'&&netOn()&&st===4&&!pb.length?netStepText(red):txt)}</div><div class="st-b">${back}${sug}${next}</div>`}
 function renderStep(){const el=$('#step');if(!el)return;const st=storyActive();el.hidden=st;if(st)return;
   const cf=UI.confirm&&planOpen()&&!allAI();
-  el.innerHTML=cf?`<div class="st-t confirm" id="steptext" role="alert">${esc(UI.confirm)} Start anyway?</div><div class="st-b"><button class="btn ghost" data-a="suggest" title="Fill the priorities for me">✨ Plan it for me</button><button class="btn ghost" data-a="goback">Go back</button><button class="btn go" data-a="go" data-force="1">Start anyway ▶</button></div>`:
+  el.innerHTML=cf?`<div class="st-t confirm" id="steptext" role="alert">${esc(UI.confirm)} Start anyway?</div><div class="st-b"><button class="btn ghost" data-a="suggest" title="Fill the priorities for me"> Plan it for me</button><button class="btn ghost" data-a="goback">Go back</button><button class="btn go" data-a="go" data-force="1">Start anyway ▶</button></div>`:
   planOpen()&&!allAI()?stepFoot():`<div class="st-t" id="steptext">${esc(stepText())}</div>${G.over?`<div class="st-b"><button class="btn go" data-a="new">New game</button></div>`:''}`}
 // ---------- side panel ----------
 function renderPanel(){const el=$('#panel');if(!el)return;el.innerHTML=`<div class="pbody">${planHtml()}</div>`;if(UI.toTop&&!storyActive()){UI.toTop=0;const bd=document.querySelector('.gx-dock-body');if(bd)bd.scrollTop=0}
@@ -7474,26 +7482,26 @@ function invNeedText(k){const I=invReq(k);const ex=explored();const p=[];if(I.t)
   const r=I.alt?I.alt.map(o=>Object.entries(o).map(([k2,n])=>n+' '+RNAME[k2]).join('+')).join(' or '):Object.entries(I.r||{}).map(([k2,n])=>n+' '+RNAME[k2]).join(' + ');if(r)p.push(r);return p.join(' · ')||'free'}
 function crossRows(){return G.map.filter(m=>tileAt(m.id)).map(m=>row('build',{k:'cross',cross:m.id},`✝ Cross at place ${m.id+1} <small>(${tileAt(m.id).terr})</small>`,`2 wood${m.fog?' · fog: +1 pawn':''} · ${G.sc.crosses.includes(m.id)?'already has a cross':'counts toward the five'}`)).filter((r,i)=>!G.sc.crosses.includes(G.map.filter(m=>tileAt(m.id))[i].id)).join('')}
 function gatherRows(){let h='';for(const m of G.map){const t=tileAt(m.id);if(!t||m.id===G.camp.pos)continue;const d=dist(G.camp.pos,m.id);if(d>2)continue;for(const s of srcs(m.id)){if(s.ex)continue;const n=actNeed({type:'gather',tgt:{pos:m.id,i:s.i}});
-  h+=row('gather',{pos:m.id,i:s.i},`${s.s==='wood'?'🪵 Wood':s.s==='fish'?'🐟 Fish':'🦜 Birds'} at place ${m.id+1} <small>(${t.terr})</small>`,`${n.need} pawn${n.need>1?'s':''} rolls, ${n.max} sure${d>=2?' · far from camp':''}${m.tok.time?' · slow':''}${m.fog?' · fog':''}${m.tok.beast?' · danger':''}`)}}return h}
+  h+=row('gather',{pos:m.id,i:s.i},`${s.s==='wood'?' Wood':s.s==='fish'?' Fish':' Birds'} at place ${m.id+1} <small>(${t.terr})</small>`,`${n.need} pawn${n.need>1?'s':''} rolls, ${n.max} sure${d>=2?' · far from camp':''}${m.tok.time?' · slow':''}${m.fog?' · fog':''}${m.tok.beast?' · danger':''}`)}}return h}
 function exploreRows(){let h='';for(const m of MAP){if(G.map[m.id].tile!=null)continue;if(!m.adj.some(p=>tileAt(p)))continue;const d=dist(G.camp.pos,m.id);if(d>2)continue;const n=actNeed({type:'explore',tgt:m.id});h+=row('explore',m.id,`Explore place ${m.id+1}`,`${n.need} pawn${n.need>1?'s':''} rolls, ${n.max} sure${d>=2?' · far from camp':''}${G.map[m.id].fog?' · fog':''}`)}return h}
 function specialSub(k){const s=SPEC(k);if(!s.dice)return `${s.need||2} pawns, no dice`;const n=actNeed({type:'special',tgt:k});return `explore dice · ${n.need} pawn${n.need>1?'s':''} rolls, ${n.max} sure${s.advWound?' · a "?" means a wound':''}`}
 function tileFocusHtml(pos){const t=tileAt(pos);const m=G.map[pos];let body='';
-  if(t){body+=`<div class="tf-h">Place ${pos+1}: ${t.terr}${pos===G.camp.pos?' · 🏕 camp':''}${t.shelter?' · natural shelter':''}${t.totem?' · <span title="A totem: the scenario has a special effect when this place is found">🗿 totem (scenario effect)</span>':''}${m.fog?' · 🌫 fog':''}</div><div class="rs">${t.src.length?'Sources: '+t.src.map((s,i)=>s+(m.exh[i]?' (used up)':'')).join(', '):'No sources'}</div>`;
+  if(t){body+=`<div class="tf-h">Place ${pos+1}: ${t.terr}${pos===G.camp.pos?' ·  camp':''}${t.shelter?' · natural shelter':''}${t.totem?' · <span title="A totem: the scenario has a special effect when this place is found"> totem (scenario effect)</span>':''}${m.fog?' ·  fog':''}</div><div class="rs">${t.src.length?'Sources: '+t.src.map((s,i)=>s+(m.exh[i]?' (used up)':'')).join(', '):'No sources'}</div>`;
     if(pos!==G.camp.pos)for(const s of srcs(pos))if(!s.ex)body+=row('gather',{pos,i:s.i},`Gather ${s.s==='wood'?'wood':'food'} here`,'');
     if(G.scen==='hexed'&&!G.sc.crosses.includes(pos))body+=row('build',{k:'cross',cross:pos},'Raise a cross here','2 wood');
     if(G.scen==='hexed'&&G.sc.temple===pos&&!G.sc.templeDone)body+=row('special','temple','Search the dark temple','explore dice');}
-  else if(m.down)body=`<div class="tf-h">A cut-off tile</div>`;else{body=`<div class="tf-h">Unexplored place ${pos+1}${m.fog?' · 🌫 fog':''}</div>`;body+=row('explore',pos,'Explore this space','')}
+  else if(m.down)body=`<div class="tf-h">A cut-off tile</div>`;else{body=`<div class="tf-h">Unexplored place ${pos+1}${m.fog?' ·  fog':''}</div>`;body+=row('explore',pos,'Explore this space','')}
   return `<div class="tfocus">${body}<button class="btn xs" data-a="untile">close</button></div>`}
 // ---------- camp tab ----------
 function campHtml(){let h='';
-  for(const c of G.chars){const C=CHARS[c.k];const hearts=Array.from({length:C.die},(_,i)=>`<i class="${i<c.w?'hurt':''} ${C.arrows.includes(i+1)&&!c.cov.includes(i+1)?'arrow':''}" title="${i+1===C.die?'death':C.arrows.includes(i+1)?'morale drops when this fills':''}">${i+1===C.die?'☠':''}</i>`).join('');
+  for(const c of G.chars){const C=CHARS[c.k];const hearts=Array.from({length:C.die},(_,i)=>`<i class="${i<c.w?'hurt':''} ${C.arrows.includes(i+1)&&!c.cov.includes(i+1)?'arrow':''}" title="${i+1===C.die?'death':C.arrows.includes(i+1)?'morale drops when this fills':''}">${i+1===C.die?'':''}</i>`).join('');
     const sp=Object.entries(c.sp).filter(([k,v])=>v).map(([k,v])=>`${k}×${v}`).join(', ');
-    h+=`<div class="ch" style="--pc:${PCOL[c.i%6]}"><div class="ch-h"><img class="chp" src="media/camp-${esc(c.k)}.webp" alt="" onerror="this.remove()"><b>${esc(c.nm)}</b> ${c.dead?'☠':''}${c.i===G.first?' <span class="fp" title="First player: pays for low morale each morning and faces event cards first. The role passes on every day.">★ first player</span>':''} <span class="det" title="Determination: earned by arranging the camp and failed rolls, spent on skills">✊ ${c.det} determination</span>${typeof netOn==='function'&&netOn()?netTagLong(c):c.human?'':' <small>(computer)</small>'}${c.out?' <small>(out for the night)</small>':''}</div>
+    h+=`<div class="ch" style="--pc:${PCOL[c.i%6]}"><div class="ch-h"><img class="chp" src="media/camp-${esc(c.k)}.webp" alt="" onerror="this.remove()"><b>${esc(c.nm)}</b> ${c.dead?'':''}${c.i===G.first?' <span class="fp" title="First player: pays for low morale each morning and faces event cards first. The role passes on every day.">★ first player</span>':''} <span class="det" title="Determination: earned by arranging the camp and failed rolls, spent on skills"> ${c.det} determination</span>${typeof netOn==='function'&&netOn()?netTagLong(c):c.human?'':' <small>(computer)</small>'}${c.out?' <small>(out for the night)</small>':''}</div>
       <div class="life" aria-label="${c.w} of ${C.die} wounds">${hearts}</div>${sp?`<div class="rs">Injuries: ${sp}</div>`:''}
-      <div class="skills">${C.skills.map(s=>{const w=skillWhy(c.i,s.k)||(typeof netNotMine==='function'?netNotMine(c.i):null);return `<button class="btn sk" data-skill="${c.i}:${s.k}" ${w?'disabled':''} title="${esc(s.x)}${w?' — '+w:''}"><b>${esc(s.n)}</b> <small>${s.c}✊</small><span>${esc(s.x)}</span></button>`}).join('')}</div></div>`}
-  if(G.fri)h+=`<div class="ch" style="--pc:#f3f3f3"><div class="ch-h"><b>Friday</b> ${G.fri.dead?'☠':''} <span class="det">✊ ${G.fri.det}</span></div><div class="life">${Array.from({length:FRIDAY.die},(_,i)=>`<i class="${i<G.fri.w?'hurt':''}">${i+1===FRIDAY.die?'☠':''}</i>`).join('')}</div><div class="rs">Acts alone or helps. Spends 2 of his determination to reroll a die. Ignores weather, food and shelter.</div></div>`;
-  if(G.dog)h+=`<div class="rs">🐕 The dog helps with hunting and exploring every round.</div>`;
-  if(G.scen==='stranded')h+=`<div class="ch" style="--pc:#ff9fb2"><div class="ch-h"><b>Ada</b> ${G.sc.rescued?'(in camp)':'(on the rock)'}</div><div class="life">${Array.from({length:CHARS.ada.die},(_,i)=>`<i class="${i<(G.sc.rescued?(G.chars.find(c=>c.k==='ada')||{}).w:G.sc.ada)?'hurt':''}">${i+1===CHARS.ada.die?'☠':''}</i>`).join('')}</div><div class="rs">${G.sc.rescued?'She can only rest, and eats like everyone.':'She takes 2 wounds every night until rescued.'}</div></div>`;
+      <div class="skills">${C.skills.map(s=>{const w=skillWhy(c.i,s.k)||(typeof netNotMine==='function'?netNotMine(c.i):null);return `<button class="btn sk" data-skill="${c.i}:${s.k}" ${w?'disabled':''} title="${esc(s.x)}${w?' — '+w:''}"><b>${esc(s.n)}</b> <small>${s.c}</small><span>${esc(s.x)}</span></button>`}).join('')}</div></div>`}
+  if(G.fri)h+=`<div class="ch" style="--pc:#f3f3f3"><div class="ch-h"><b>Friday</b> ${G.fri.dead?'':''} <span class="det"> ${G.fri.det}</span></div><div class="life">${Array.from({length:FRIDAY.die},(_,i)=>`<i class="${i<G.fri.w?'hurt':''}">${i+1===FRIDAY.die?'':''}</i>`).join('')}</div><div class="rs">Acts alone or helps. Spends 2 of his determination to reroll a die. Ignores weather, food and shelter.</div></div>`;
+  if(G.dog)h+=`<div class="rs"> The dog helps with hunting and exploring every round.</div>`;
+  if(G.scen==='stranded')h+=`<div class="ch" style="--pc:#ff9fb2"><div class="ch-h"><b>Ada</b> ${G.sc.rescued?'(in camp)':'(on the rock)'}</div><div class="life">${Array.from({length:CHARS.ada.die},(_,i)=>`<i class="${i<(G.sc.rescued?(G.chars.find(c=>c.k==='ada')||{}).w:G.sc.ada)?'hurt':''}">${i+1===CHARS.ada.die?'':''}</i>`).join('')}</div><div class="rs">${G.sc.rescued?'She can only rest, and eats like everyone.':'She takes 2 wounds every night until rescued.'}</div></div>`;
   h+=section('Starting items',G.items.length?G.items.map(it=>{const w=itemWhy(it.k)||(typeof netShared==='function'?netShared():null);return `<div class="row">${artImg('item',it.k,'rowart')}<div class="rt"><div class="rn">${esc(ITEMS[it.k].n)} <small>${it.uses} use${it.uses>1?'s':''} left</small></div><div class="rs">${esc(ITEMS[it.k].x)}</div></div>${PLANITEMS.includes(it.k)?`<button class="btn sm" data-item="${it.k}" ${w?'disabled':''} title="${esc(w||'Use it')}">Use</button>`:`<small class="muted">${esc(w)}</small>`}</div>`}).join(''):'<div class="row empty">None left.</div>');
   h+=section('Discovery tokens',G.own.length?G.own.map((o,i)=>{const w=discWhy(i)||(typeof netShared==='function'?netShared():null);return `<div class="row"><div class="rt"><div class="rn">${esc(discName(o.k))}</div><div class="rs">${esc(discText(o.k))}</div></div><button class="btn sm" data-disc="${i}" ${w?'disabled':''} title="${esc(w||'Use it')}">Use</button></div>`}).join(''):'<div class="row empty">Explore to find some.</div>');
   const kept=Object.keys(G.kept);if(kept.length)h+=section('Kept cards',kept.map(k=>`<div class="row"><div class="rt"><div class="rn">${esc(cname(k))}</div><div class="rs">${CARD[k]?cardText(CARD[k]):''}</div></div></div>`).join(''));
@@ -7514,15 +7522,15 @@ function questionHtml(){const q=G.q;let ctx='';
   if(q.kind==='boost'||q.kind==='track'){const qa=q.art||(q.beast?'beast-'+q.beast:null);ctx=qa?`<div class="qart">${artImg(...qa.split('-'),'big')}</div>`:''}
   const recent=G.log.slice(0,4).reverse().map(l=>`<li class="${l.c}">${esc(l.t)}</li>`).join('');
   return `<div class="mbox"><h2>${esc(q.title)}</h2>${ctx}<ol class="rep small">${recent}</ol><div class="opts">${q.opts.map((o,i)=>`<button class="btn opt" data-ans="${i}">${o.art?artImg(...o.art.split('-'),'opt'):''}${esc(o.l)}</button>`).join('')}</div></div>`}
-function die(kind,v){const face={wound:v?'🩸 wound':'no wound',success:v?'✔ success':'✖ failure',adventure:v?'❓ adventure':'no adventure'}[kind];return `<div class="die ${v===(kind==='success')?'good':'bad'} ${kind}"><span>${face}</span></div>`}
+function die(kind,v){const face={wound:v?' wound':'no wound',success:v?'✔ success':'✖ failure',adventure:v?'❓ adventure':'no adventure'}[kind];return `<div class="die ${v===(kind==='success')?'good':'bad'} ${kind}"><span>${face}</span></div>`}
 // what went wrong: every wound of the game by cause, the cause of the end, and one tip per big cause
-function lossCauses(){const by={};let dies=null;for(const l of G.log){let m=/takes (\d+) wounds? \(([^)]*)\)/.exec(l.t);if(m){const k=m[2];by[k]=(by[k]||0)+(+m[1])}m=/☠ (.+) dies(?: \(([^)]*)\))?/.exec(l.t);if(m){dies={who:m[1],why:m[2]||''};by[m[2]||'?']=(by[m[2]||'?']||0)+1}}
+function lossCauses(){const by={};let dies=null;for(const l of G.log){let m=/takes (\d+) wounds? \(([^)]*)\)/.exec(l.t);if(m){const k=m[2];by[k]=(by[k]||0)+(+m[1])}m=/ (.+) dies(?: \(([^)]*)\))?/.exec(l.t);if(m){dies={who:m[1],why:m[2]||''};by[m[2]||'?']=(by[m[2]||'?']||0)+1}}
   return {by:Object.entries(by).sort((a,b)=>b[1]-a[1]),dies}}
-const LOSS_TIP={hunger:'Plan food every day: the 🍖 priority says how much you need. Threat rewards like the crates count too.','sleeping in the open':'Build a shelter on day 1 or 2 (2 wood).','soaked and cold':'Raise the roof before the rain dice start (look at the dots on the day track).','no palisade left':'Build a palisade before storms; each level soaks up one hit.','the cold':'Keep 1 wood per snow cloud for warmth.','low morale':'Arrange the camp to lift morale when it drops below 0.','not enough determination':'Arrange the camp for determination; low morale drains it every morning.','a mishap':'Add 1 more pawn to a job to make it sure: then no dice, no wounds.','hungry animals':'A weapon and dry food help against the hungry-animals die.'};
+const LOSS_TIP={hunger:'Plan food every day: the  priority says how much you need. Threat rewards like the crates count too.','sleeping in the open':'Build a shelter on day 1 or 2 (2 wood).','soaked and cold':'Raise the roof before the rain dice start (look at the dots on the day track).','no palisade left':'Build a palisade before storms; each level soaks up one hit.','the cold':'Keep 1 wood per snow cloud for warmth.','low morale':'Arrange the camp to lift morale when it drops below 0.','not enough determination':'Arrange the camp for determination; low morale drains it every morning.','a mishap':'Add 1 more pawn to a job to make it sure: then no dice, no wounds.','hungry animals':'A weapon and dry food help against the hungry-animals die.'};
 function overHtml(){const w=G.over.win;const st=G.stats;const lc=w?null:lossCauses();const top=lc?lc.by.filter(([k])=>k!=='?').slice(0,4):[];
   const tips=[...new Set(top.map(([k])=>LOSS_TIP[k]).filter(Boolean))].slice(0,2);
-  const why=lc?`<div class="over-why"><b>What went wrong</b><ul>${lc.dies?`<li>${esc(lc.dies.who)} died${lc.dies.why?' from '+esc(lc.dies.why):''} on day ${G.round}.</li>`:''}${top.length?`<li>Wounds this game: ${top.map(([k,n])=>`${esc(k)} ${n}`).join(' · ')}.</li>`:''}${tips.map(t=>`<li>💡 ${esc(t)}</li>`).join('')}${G.diff!=='easy'?'<li>💡 The Easier setting adds the dog and 4 starting items.</li>':''}</ul></div>`:'';
-  return `<div class="mbox"><h2>${w?'🏆 Rescued!':'☠ Lost on the island'}</h2><p class="big">${esc(G.over.why)}</p><p class="story">${esc(endLine())}</p>${why}<p class="small">Day ${G.round} of ${G.rounds} · places explored ${st.explored} · things made ${st.built} · fights ${st.fights} · wounds taken ${st.wounds}</p><div class="mb">${typeof netOn==='function'&&netOn()?netOverBtns():`${w?'':'<button class="btn go" data-a="retry">↻ Try again (same island)</button><button class="btn" data-a="retry" data-easy="1">Try it on Easier</button>'}<button class="btn ${w?'go':''}" data-a="new">New game</button><button class="btn" data-a="overok">Look at the island</button>`}</div></div>`}
+  const why=lc?`<div class="over-why"><b>What went wrong</b><ul>${lc.dies?`<li>${esc(lc.dies.who)} died${lc.dies.why?' from '+esc(lc.dies.why):''} on day ${G.round}.</li>`:''}${top.length?`<li>Wounds this game: ${top.map(([k,n])=>`${esc(k)} ${n}`).join(' · ')}.</li>`:''}${tips.map(t=>`<li> ${esc(t)}</li>`).join('')}${G.diff!=='easy'?'<li> The Easier setting adds the dog and 4 starting items.</li>':''}</ul></div>`:'';
+  return `<div class="mbox"><h2>${w?' Rescued!':' Lost on the island'}</h2><p class="big">${esc(G.over.why)}</p><p class="story">${esc(endLine())}</p>${why}<p class="small">Day ${G.round} of ${G.rounds} · places explored ${st.explored} · things made ${st.built} · fights ${st.fights} · wounds taken ${st.wounds}</p><div class="mb">${typeof netOn==='function'&&netOn()?netOverBtns():`${w?'':'<button class="btn go" data-a="retry">↻ Try again (same island)</button><button class="btn" data-a="retry" data-easy="1">Try it on Easier</button>'}<button class="btn ${w?'go':''}" data-a="new">New game</button><button class="btn" data-a="overok">Look at the island</button>`}</div></div>`}
 function retryGame(easy){const o=G;const s=UI.setup;s.scen=o.scen;s.chars=o.chars.filter(c=>!c.npc).map(c=>c.k);s.ai={};o.chars.forEach(c=>{if(!c.human)s.ai[c.k]=true});if(easy){s.diff='easy';s.items=4;s.dog=true;s.friday=true}
   const old=DEFSEED;DEFSEED=o.seed;try{beginGame()}finally{DEFSEED=old}}
 function toggleMenu(){const m=$('#moremenu'),b=$('.menub');if(!m)return;const on=!m.classList.contains('open');m.classList.toggle('open',on);if(b)b.setAttribute('aria-expanded',on)}
@@ -7537,7 +7545,7 @@ function startHtml(){const o=UI.setup;let saved=null;try{saved=localStorage.getI
    ${seg('Scenario',SCEN_ORDER.map(k=>['scen',k,SCENARIOS[k].n,o.scen===k]))}
    ${seg('Players',[1,2,3,4].map(n=>['np',n,String(n),o.chars.length===n]))}
    ${seg('Difficulty',[['easy','Easy island'],['standard','Normal'],['hard','Hard']].map(([k,n])=>['diff',k,n,o.diff===k]))}</div>
-   <details class="morep" open><summary>More ways to play</summary>${typeof tutBlock==='function'?tutBlock('top'):''}<div class="mb"><button class="btn" data-a="story">📖 Story chapters</button></div>${typeof tutBlock==='function'?tutBlock('after'):''}${typeof onlineBlock==='function'?onlineBlock():''}</details></div>`}
+   <details class="morep" open><summary>More ways to play</summary>${typeof tutBlock==='function'?tutBlock('top'):''}<div class="mb"><button class="btn" data-a="story"> Story chapters</button></div>${typeof tutBlock==='function'?tutBlock('after'):''}${typeof onlineBlock==='function'?onlineBlock():''}</details></div>`}
 function cardsHtml(){const t=UI.ctab||'events';const q=(UI.cq||'').toLowerCase();const tabs=[['events','Events'],['adv','Adventures'],['mys','Mysteries'],['beasts','Beasts'],['inv','Inventions'],['items','Items'],['tokens','Discovery tokens'],['tiles','Island tiles'],['scen','Scenarios']];
   let list=[];
   if(t==='events')list=EVENTS.concat(WRECKS).map(c=>({n:c.n,tag:c.k==='crates'||WRECKS.includes(c)?'wreckage':c.icon==='book'?'book event':c.icon+' event',cp:c.cp||1,x:cardText(c)}));
@@ -7559,7 +7567,7 @@ function renderMap2D(){const el=$('#map2d');if(!el||V3.on){if(el)el.hidden=true;
   const col={beach:'#e8d29a',river:'#6dbf7a',plains:'#9ccf62',hills:'#7fae55',mountains:'#9a9486'};
   el.innerHTML=`<svg viewBox="-10 -10 ${W*5+20} ${R*1.5*4+R+20}" role="img" aria-label="Island map">${MAP.map(m=>{const x=m.q*W+W/2,y=m.r*R*1.5+R;const t=tileAt(m.id);const g=G.map[m.id];
     const pts=Array.from({length:6},(_,i)=>{const a=Math.PI/3*i+Math.PI/6;return (x+Math.cos(a)*R*.98).toFixed(1)+','+(y+Math.sin(a)*R*.98).toFixed(1)}).join(' ');
-    return `<g data-tile="${m.id}" class="hx ${UI.tileSel===m.id?'sel':''} ${UI.hoverPos===m.id?'pulse':''} ${UI.pick&&UI.pick.includes(m.id)?'pick':''}"><polygon points="${pts}" fill="${t?col[t.terr]:g.down?'#333':'#24364a'}" stroke="#0b1520" stroke-width="2"/><text x="${x}" y="${y-6}" text-anchor="middle">${t?(m.id+1)+' '+t.terr.slice(0,5):'❔'+(m.id+1)}</text><text x="${x}" y="${y+12}" text-anchor="middle">${m.id===G.camp.pos?'🏕':''}${g.fog?'🌫':''}${G.sc.crosses&&G.sc.crosses.includes(m.id)?'✝':''}${t?t.src.map((s,i)=>g.exh[i]?'▪':s==='wood'?'🪵':'🐟').join(''):''}</text></g>`}).join('')}</svg>`}
+    return `<g data-tile="${m.id}" class="hx ${UI.tileSel===m.id?'sel':''} ${UI.hoverPos===m.id?'pulse':''} ${UI.pick&&UI.pick.includes(m.id)?'pick':''}"><polygon points="${pts}" fill="${t?col[t.terr]:g.down?'#333':'#24364a'}" stroke="#0b1520" stroke-width="2"/><text x="${x}" y="${y-6}" text-anchor="middle">${t?(m.id+1)+' '+t.terr.slice(0,5):'❔'+(m.id+1)}</text><text x="${x}" y="${y+12}" text-anchor="middle">${m.id===G.camp.pos?'':''}${g.fog?'':''}${G.sc.crosses&&G.sc.crosses.includes(m.id)?'✝':''}${t?t.src.map((s,i)=>g.exh[i]?'▪':s==='wood'?'':'').join(''):''}</text></g>`}).join('')}</svg>`}
 // ---------- input ----------
 function on3DTile(id){if(storyActive())return;if(planOpen()&&!allAI()&&pstep()!==2){setPStep(2);UI.ps.pick=true}UI.tileSel=id;UI.tab='plan';tutAdvance(3);const t=tileAt(id);if(!t&&G.map[id].tile==null)UI.cat=null;render();const f=document.querySelector('.tfocus');if(f&&f.scrollIntoView)f.scrollIntoView({block:'nearest',behavior:'smooth'})}
 {const t0=on3DTile;on3DTile=function(id){t0(id);if(typeof PHO!=='undefined'&&PHO.on)PHO.tile(id)}}
@@ -7574,7 +7582,7 @@ function toast(t,ms,keep){const el=$('#dockmsg');if(!el)return;el.textContent=t;
 function msgCheck(){const el=$('#dockmsg');if(!el||el.hidden||!G)return;if(UI.msgSig!==planSig()&&!UI.msgKeep)el.hidden=true;if(UI.confirmSig&&UI.confirmSig!==planSig())UI.confirm=null}
 // Start the day: first ask when a red priority is still open
 function wizPlaced(){if(planOpen()&&!allAI()&&pstep()===2&&!curPawn())setPStep(3)}
-function tryStart(force){if(!planOpen())return;if(typeof BF!=='undefined'&&BF.on){const pb=planProblems();if(pb.length){UI.confirm=null;toast(pb[0]);render();return}}if(!force){const red=uncoveredRed();if(red.length){UI.confirm=red.map(p=>p.confirm||('⚠ '+p.title+' is not covered.')).join(' ');UI.confirmSig=planSig();render();GX.showDock();return}}
+function tryStart(force){if(!planOpen())return;if(typeof BF!=='undefined'&&BF.on){const pb=planProblems();if(pb.length){UI.confirm=null;toast(pb[0]);render();return}}if(!force){const red=uncoveredRed();if(red.length){UI.confirm=red.map(p=>p.confirm||(' '+p.title+' is not covered.')).join(' ');UI.confirmSig=planSig();render();GX.showDock();return}}
   UI.confirm=null;const r=startActions();if(r){toast(r);render()}else{sfx('click');if(UI.tut<99)tutDone()}}
 function pulsePos(p){if(UI.hoverPos===p)return;UI.hoverPos=p;try{if(V3.lab)for(const id in V3.lab)V3.lab[id].classList.toggle('pulse',+id===p);if(!V3.on)withView(()=>renderMap2D())}catch(e){}}
 document.addEventListener('click',e=>{const pr=e.target.closest&&e.target.closest('.gx-dock [data-pos]');if(pr){pulsePos(+pr.dataset.pos);clearTimeout(UI.pt);UI.pt=setTimeout(()=>pulsePos(null),2500)}
@@ -7612,7 +7620,7 @@ document.addEventListener('click',e=>{const pr=e.target.closest&&e.target.closes
   case 'goback':UI.confirm=null;render();return;
   case 'next':storyNext();return;case 'skip':storySkip();return;
   case 'auto':UI.auto=!UI.auto;try{localStorage.setItem('swi_auto',UI.auto?'1':'0')}catch(e){}render();return;
-  case 'suggest':{const m=suggestPlan();setPStep(3);toast(m?'✨ Every pawn has a job now. Check the risk of each one below, and change anything you like.':'✨ Nothing to add.',6000);render();return}
+  case 'suggest':{const m=suggestPlan();setPStep(3);toast(m?' Every pawn has a job now. Check the risk of each one below, and change anything you like.':' Nothing to add.',6000);render();return}
   case 'pnext':setPStep(pstep()+1);render();return;case 'pback':setPStep(pstep()-1);render();return;
   case 'pick':UI.ps.pick=!UI.ps.pick;render();return;
   case 'pskip':{const c=curPawn();if(c&&c.c==null)UI.ps.skip.push(c.id);UI.sel=null;wizPlaced();render();return}
@@ -7644,7 +7652,7 @@ document.addEventListener('mouseover',e=>{const t=e.target.closest&&e.target.clo
 document.addEventListener('focusin',e=>{const t=e.target.closest&&e.target.closest('.gx-dock [data-pos]');if(t)pulsePos(+t.dataset.pos)});
 // ---------- game start ----------
 UI.setup={scen:'marooned',chars:['carpenter','cook'],ai:{},friday:true,dog:false,items:2,diff:'standard'};
-// the first real game is on the Easy island (owner 8 Nov: following ✨ lost on day 5-7 on the full deal); Normal afterwards
+// the first real game is on the Easy island (owner 8 Nov: following  lost on day 5-7 on the full deal); Normal afterwards
 try{if(!localStorage.getItem('swi_real1'))Object.assign(UI.setup,{diff:'easy',items:4,dog:true})}catch(e){}
 function openStart(){UI.modal='start';UI.overSeen=false;render();const m=$('#modal');m.hidden=false;m.innerHTML=startHtml();m.dataset.h=''}
 function beginGame(){const s=UI.setup;resetPlanSteps();UI.modal=null;UI.report=null;UI.overSeen=false;UI.sel=null;UI.tileSel=null;UI.fx.length=0;UI.fxSeen=0;
@@ -7771,7 +7779,7 @@ function optHtml(l){l=String(l==null?'':l).replace(/\s+/g,' ').trim();let main=l
   const c=/^([^:]{2,40}):\s+(.+)$/.exec(main);if(c&&!sub){main=c[1];sub=c[2]}else if(c&&sub){main=c[1];sub=c[2]+'. '+sub}
   sub=sub.split(/;\s*|,\s+(?=[a-z])|\.\s+/).map(x=>cap1(x.trim())).filter(Boolean).join('. ');if(sub&&!/[.!?]$/.test(sub))sub+='.';
   return `<b class="ol">${E(w12(main))}</b>${sub?`<small class="os">${E(w12(sub))}</small>`:''}`}
-const FINGER='<u class="rg"></u><span class="fg">👆</span>';
+const FINGER='<u class="rg"></u><span class="fg"></span>';
 // ---------- one-time DOM: tray, overlay, zoom buttons, ghost finger ----------
 function init(){if(BF.ready)return;BF.ready=true;const app=q('.gx-app'),board=q('.gx-board'),view=q('.gx-board .view');if(!app||!board)return;
   const tray=document.createElement('div');tray.id='bf';tray.setAttribute('role','region');tray.setAttribute('aria-label','Your move');app.appendChild(tray);
@@ -7785,7 +7793,7 @@ function init(){if(BF.ready)return;BF.ready=true;const app=q('.gx-app'),board=q(
   // the labels loop moves the chips and the finger with the camera
   if(typeof placeLabels==='function'){const pl0=placeLabels;placeLabels=function(){pl0.apply(this,arguments);if(BF.on)BF.place()}}
   // short messages go to the status line, never into the hidden dock
-  if(typeof toast==='function'){const t0=toast;toast=function(t,ms,keep){if(BF.on){const s=/^✨ Every pawn/.test(t||'')?'Plan ready. Check it, then start.':brief(t);BF.say(s,ms)}else t0.apply(this,arguments)}}}
+  if(typeof toast==='function'){const t0=toast;toast=function(t,ms,keep){if(BF.on){const s=/^ Every pawn/.test(t||'')?'Plan ready. Check it, then start.':brief(t);BF.say(s,ms)}else t0.apply(this,arguments)}}}
 // ---------- geometry ----------
 function tilePt(id){const ov=q('#bfov');if(!ov)return null;const r0=ov.getBoundingClientRect();
   if(typeof V3!=='undefined'&&V3.on&&V3.cam&&V3.r&&typeof MAP!=='undefined'&&MAP[id]){const p=hexPos(MAP[id].q,MAP[id].r);const v=new THREE.Vector3(p.x,HEXH,p.z);V3.cam.updateMatrixWorld();v.project(V3.cam);
@@ -7825,7 +7833,7 @@ function capFor(i){const b=UI.beats[i];if(!b)return '';const d=b.data||{};const 
   case 'over':{const w=G.over&&G.over.win;return w?'Rescued!':'Lost on the island'}
   default:return ''}}
 function planCap(st){const cur=curPawn();const pb=planProblems();
-  if(UI.confirm&&planOpen())return brief(String(UI.confirm).replace(/^⚠\s*/,''));
+  if(UI.confirm&&planOpen())return brief(String(UI.confirm).replace(/^\s*/,''));
   if(cur){const n=pawnLabel(cur).split(' ')[0];const lt=legalTiles(cur);if(!lt.length)return `No job for ${n} now`;return pb.length||cur.c!=null?`${n}: tap a glowing place`:`${n}: tap a place, or start`}
   if(pb.length)return badActs().size?'Tap a pulsing pawn to fix it':brief(pb[0]);return 'All set. Start the day!'}
 BF.status=function(){if(BF.msg&&Date.now()<BF.msg.until)return BF.msg.t;BF.msg=null;
@@ -7844,7 +7852,7 @@ function turnBanner(){const st=PHO.st;if(st==='plan'||st==='plan2')return ['you'
   return ['isl','The island’s turn']}
 function resStrip(){let o=null;try{withView(()=>{o={f:food(),need:eatersNeed(),w:G.res.wood,low:(()=>{let m=99;for(const c of G.chars){if(c.npc&&G.scen!=='stranded'||c.dead)continue;m=Math.min(m,CHARS[c.k].die-c.w)}return m===99?0:m})(),sh:hasShelter(),mo:G.morale,d:G.round,r:G.rounds}})}catch(e){}if(!o)return '';
   const c=(bad,t)=>`<span class="${bad?'bad':''}">${t}</span>`;
-  return c(false,`<b>Day ${o.d}</b><small> of ${o.r}</small>`)+c(o.f<o.need,`🍖 Food <b>${o.f}</b><small> (eat ${o.need})</small>`)+c(false,`🪵 Wood <b>${o.w}</b>`)+c(o.low<=3,`♥ Life <b>${o.low}</b>`)+(o.sh?c(false,'🏠 Shelter'):c(true,'No shelter'))}
+  return c(false,`<b>Day ${o.d}</b><small> of ${o.r}</small>`)+c(o.f<o.need,` Food <b>${o.f}</b><small> (eat ${o.need})</small>`)+c(false,` Wood <b>${o.w}</b>`)+c(o.low<=3,`♥ Life <b>${o.low}</b>`)+(o.sh?c(false,' Shelter'):c(true,'No shelter'))}
 BF.paint=function(){if(G&&R.dataset.scen!==G.scen)R.dataset.scen=G.scen;const rs=q('#bfres');if(rs&&G){const h=resStrip();if(rs.dataset.h!==h){rs.dataset.h=h;rs.innerHTML=h}}const lb=q('#phlabel');if(!lb||!BF.on)return;const s=BF.status();const bn=turnBanner();const key=bn[0]+'|'+bn[1]+'|'+s;if(lb.dataset.k===key)return;lb.dataset.k=key;
   lb.innerHTML=(bn[1]?`<small class="bfb ${bn[0]}">${E(bn[1])}</small>`:'')+`<span class="bft">${E(s)}</span>`};
 // ---------- the tray: your pawns and one big button ----------
@@ -7857,15 +7865,15 @@ function trayHtml(st){
     const nextL=b.kind==='daysum'&&!last?`Start day ${b.data.round+1} ▶`:last?(G.over?'See how it ended ▶':'Plan the day ▶'):'Continue ▶';
     return `<div class="bf-main"><button class="gx-ibtn bf-s ${UI.auto?'on':''}" data-a="auto" aria-pressed="${!!UI.auto}" aria-label="Play by itself">⏩</button><button class="btn go" data-a="next">${nextL}</button>${i<UI.beats.length-2?'<button class="gx-ibtn bf-s" data-a="skip" aria-label="Skip ahead">⏭</button>':''}</div>`}
   if(st==='plan'||st==='plan2'){const cur=curPawn();const pb=planProblems();
-    if(UI.confirm&&planOpen())return `<div class="bf-main"><button class="gx-ibtn bf-s" data-a="suggest" aria-label="Plan it for me" title="Plan it for me">✨</button><button class="btn ghost" data-a="goback">Go back</button><button class="btn go" data-a="go" data-force="1">Start anyway ▶</button></div>`;
-    return `<div class="pawnrow bf-pw" aria-label="Your pawns">${(()=>{const bd=badActs();return wizPawns().map(p=>tokHtml(p,cur,bd)).join('')})()}</div><div class="bf-main"><button class="gx-ibtn bf-s" data-a="suggest" aria-label="Plan it for me" title="Plan it for me">✨</button><button class="btn go ${pb.length?'dim':''}" data-a="go">Start day ▶</button></div>`}
+    if(UI.confirm&&planOpen())return `<div class="bf-main"><button class="gx-ibtn bf-s" data-a="suggest" aria-label="Plan it for me" title="Plan it for me"></button><button class="btn ghost" data-a="goback">Go back</button><button class="btn go" data-a="go" data-force="1">Start anyway ▶</button></div>`;
+    return `<div class="pawnrow bf-pw" aria-label="Your pawns">${(()=>{const bd=badActs();return wizPawns().map(p=>tokHtml(p,cur,bd)).join('')})()}</div><div class="bf-main"><button class="gx-ibtn bf-s" data-a="suggest" aria-label="Plan it for me" title="Plan it for me"></button><button class="btn go ${pb.length?'dim':''}" data-a="go">Start day ▶</button></div>`}
   if(allAI()&&!G.over)return `<div class="bf-main"><button class="gx-ibtn bf-s" data-a="pause" aria-label="Pause">${UI.pause?'▶':'⏸'}</button><button class="gx-ibtn bf-s" data-a="speed" aria-label="Speed">⏩</button></div>`;
   return ''}
 // ---------- chips on the island: the plan, then the day's jobs ----------
 function actPos(a){let p=null;try{p=pawnSpot(a)}catch(e){}return p!=null&&MAP[p]?p:G.camp.pos}
 function chipsFor(st){const out=[];
   if(st==='plan'||st==='plan2'){for(const a of G.plan.acts){if(!a.pw.length)continue;const n=actNeed(a);const k=a.pw.length;const risk=k<n.need?'warn':(n.roll&&k<n.max)?'dice':'sure';
-    out.push({pos:actPos(a),a,risk,badge:risk==='warn'?`needs +${n.need-k}`:risk==='dice'?'🎲 risky':'✔ sure',rm:a.pw[a.pw.length-1],cur:UI.lastAct===a.id,done:false})}return out}
+    out.push({pos:actPos(a),a,risk,badge:risk==='warn'?`needs +${n.need-k}`:risk==='dice'?' risky':'✔ sure',rm:a.pw[a.pw.length-1],cur:UI.lastAct===a.id,done:false})}return out}
   if(st==='story'){const i=storyIdx();if(i<0)return out;const b=UI.beats[i];if(!['go','act','finds'].includes(b.kind))return out;const s=beatState(i);if(!s||!s.plan)return out;
     for(const a of s.plan.acts){if(!a.pw.length)continue;const here=b.kind==='act'&&b.data.id===a.id;out.push({pos:(()=>{let p=null;try{p=pawnSpot(a)}catch(e){}return p!=null&&MAP[p]?p:s.camp.pos})(),a,risk:'sure',badge:a.done&&!here?'✓':'',rm:null,cur:here,done:!!a.done&&!here})}return out}
   return out}
@@ -7888,22 +7896,22 @@ function deltas(A,B){const o=[];if(!A||!B)return o;
   B.chars.forEach((c,j)=>{const x=A.chars[j];if(!x||(c.npc&&G.scen!=='stranded'))return;const d=lifeOf(B,c)-lifeOf(A,x);if(d)o.push({t:`<i style="background:${PCOL[c.i%6]}"></i>${d>0?'+':''}${d}♥`,c:d>0?'good':'bad'})});
   if(A.fri&&B.fri&&A.fri.w!==B.fri.w){const d=A.fri.w-B.fri.w;o.push({t:`${d>0?'+':''}${d}♥`,c:d>0?'good':'bad'})}
   if(A.morale!==B.morale)o.push({t:`${B.morale>A.morale?'☺ +':'☹ '}${B.morale-A.morale}`,c:B.morale>A.morale?'good':'bad'});
-  for(const [k,ic] of [['roof','☂'],['pal','🧱']])if(A.camp[k]!==B.camp[k])o.push({t:`${ic} ${B.camp[k]>A.camp[k]?'+':''}${B.camp[k]-A.camp[k]}`,c:B.camp[k]>A.camp[k]?'good':'bad'});
-  if(A.weapon!==B.weapon)o.push({t:`🗡 ${B.weapon>A.weapon?'+':''}${B.weapon-A.weapon}`,c:B.weapon>A.weapon?'good':'bad'});
-  const sa=withState(A,()=>hasShelter()),sz=withState(B,()=>hasShelter());if(sa!==sz)o.push({t:sz?'🏠 built':'🏠 lost',c:sz?'good':'bad'});
-  if(G.scen==='marooned'&&A.sc&&B.sc&&A.sc.pile!==B.sc.pile)o.push({t:`🔥 +${B.sc.pile-A.sc.pile}`,c:'good'});
+  for(const [k,ic] of [['roof','☂'],['pal','']])if(A.camp[k]!==B.camp[k])o.push({t:`${ic} ${B.camp[k]>A.camp[k]?'+':''}${B.camp[k]-A.camp[k]}`,c:B.camp[k]>A.camp[k]?'good':'bad'});
+  if(A.weapon!==B.weapon)o.push({t:` ${B.weapon>A.weapon?'+':''}${B.weapon-A.weapon}`,c:B.weapon>A.weapon?'good':'bad'});
+  const sa=withState(A,()=>hasShelter()),sz=withState(B,()=>hasShelter());if(sa!==sz)o.push({t:sz?' built':' lost',c:sz?'good':'bad'});
+  if(G.scen==='marooned'&&A.sc&&B.sc&&A.sc.pile!==B.sc.pile)o.push({t:` +${B.sc.pile-A.sc.pile}`,c:'good'});
   if(G.scen==='hexed'&&A.sc&&B.sc&&A.sc.crosses.length!==B.sc.crosses.length)o.push({t:'✝ raised',c:'good'});
-  const ea=A.map.filter(m=>m.tile!=null).length,ez=B.map.filter(m=>m.tile!=null).length;if(ez>ea)o.push({t:'🧭 new land',c:'good'});
+  const ea=A.map.filter(m=>m.tile!=null).length,ez=B.map.filter(m=>m.tile!=null).length;if(ez>ea)o.push({t:' new land',c:'good'});
   return o}
 BF.beatFx=function(i){const b=UI.beats[i];if(!b||!G)return;const d=b.data||{};let arr=[],pos=null;
   try{const B=beatState(i);pos=d.pos!=null?d.pos:(B&&B.camp?B.camp.pos:G.camp.pos);
     if(b.kind==='daysum'){const x=daySumData(i);arr=x.A&&x.B?deltas(x.A,x.B).slice(0,6):[]}
     else if(!['intro','plan','dawn','go'].includes(b.kind)&&i>0)arr=deltas(beatState(i-1),B);
     let k=0,t=0;
-    if(b.kind==='act'&&d.dice){const dd=d.dice;BF.pop(pos,'🎲','dice',0,k++);BF.pop(pos,dd.s?'✔':'✖',dd.s?'good big':'bad big',380,k++);if(dd.w)BF.pop(pos,'🩸','bad big',700,k++);if(dd.q)BF.pop(pos,'❓','big',1000,k++);t=1100}
+    if(b.kind==='act'&&d.dice){const dd=d.dice;BF.pop(pos,'','dice',0,k++);BF.pop(pos,dd.s?'✔':'✖',dd.s?'good big':'bad big',380,k++);if(dd.w)BF.pop(pos,'','bad big',700,k++);if(dd.q)BF.pop(pos,'❓','big',1000,k++);t=1100}
     arr.forEach((x,j)=>{BF.pop(pos,x.t,x.c,t+j*240,k+j);if(x.fly)BF.fly(pos,x.fly,x.up,t+j*240+350)})}catch(e){console.error(e)}}
 // a pending choice with dice shows the dice on the island too
-BF.qFx=function(){const qq=G.q;if(!qq||qq.kind!=='dice'||!qq.dice)return;const dd=qq.dice;const pos=G.camp.pos;BF.pop(pos,'🎲','dice',0,0);BF.pop(pos,dd.s?'✔':'✖',dd.s?'good big':'bad big',380,1);if(dd.w)BF.pop(pos,'🩸','bad big',700,2);if(dd.q)BF.pop(pos,'❓','big',1000,3)};
+BF.qFx=function(){const qq=G.q;if(!qq||qq.kind!=='dice'||!qq.dice)return;const dd=qq.dice;const pos=G.camp.pos;BF.pop(pos,'','dice',0,0);BF.pop(pos,dd.s?'✔':'✖',dd.s?'good big':'bad big',380,1);if(dd.w)BF.pop(pos,'','bad big',700,2);if(dd.q)BF.pop(pos,'❓','big',1000,3)};
 
 // ---------- gains fly to the resource row, losses fly away ----------
 BF.fly=function(id,icon,up,delay){if(!BF.on||!q('#bfov'))return;const p=tilePt(id),chip=q('#phchip');if(!p||!chip||!chip.getBoundingClientRect().width)return;const cr=chip.getBoundingClientRect();
@@ -7913,14 +7921,14 @@ BF.fly=function(id,icon,up,delay){if(!BF.on||!q('#bfov'))return;const p=tilePt(i
 // ---------- weather on the camp: rain drops, snow, a flash ----------
 BF.rain=function(pos,r,s,storm){const ov=q('#bfov');if(!ov||!BF.on)return;const p=tilePt(pos);if(!p)return;const n=Math.min(18,(r||0)*5+(s||0)*5+(storm?8:0));if(!n)return;
   const w=document.createElement('div');w.className='bfrain';w.style.left=Math.round(p.x-60)+'px';w.style.top=Math.round(p.y-120)+'px';
-  let h='';for(let i=0;i<n;i++)h+=`<i style="left:${(i*37)%120}px;animation-delay:${(i*83)%600}ms">${s&&!r?'❄':'💧'}</i>`;w.innerHTML=h+(storm?'<b>⚡</b>':'');ov.appendChild(w);setTimeout(()=>w.remove(),2400)};
+  let h='';for(let i=0;i<n;i++)h+=`<i style="left:${(i*37)%120}px;animation-delay:${(i*83)%600}ms">${s&&!r?'❄':''}</i>`;w.innerHTML=h+(storm?'<b>⚡</b>':'');ov.appendChild(w);setTimeout(()=>w.remove(),2400)};
 // ---------- the event / weather card flips onto the board ----------
-const CARDICON={event:'🎴',threat:'⏳',adventure:'🧭',mystery:'❓',fight:'⚔️'};const TYICON={book:'📖',build:'🔨',explore:'🧭',gather:'🌿',wreck:'⚓'};
+const CARDICON={event:'',threat:'⏳',adventure:'',mystery:'❓',fight:''};const TYICON={book:'',build:'',explore:'',gather:'',wreck:''};
 BF.cardClear=function(){const c=q('#bfcard');if(c)c.remove()};
 BF.card=function(i){BF.cardClear();const b=UI.beats[i];const ov=q('#bfov');if(!b||!ov||!BF.on)return;const k=b.kind;if(!['event','threat','adventure','mystery','fight','weather'].includes(k))return;const d=b.data||{};
-  let ic=CARDICON[k]||'🎴',cls=k,pos=G.camp.pos;
-  try{if(k==='weather'){const w=(viewState()||G).lastWx;const r=w&&w.rain||0,s=w&&w.snow||0;ic=w&&w.storm?'⛈️':r?'🌧️'.repeat(Math.min(3,r)):s?'❄️'.repeat(Math.min(3,s)):'☀️';BF.rain(pos,r,s,w&&w.storm);if(w&&w.storm)cls+=' storm'}
-    else if(d.card!=null&&CARD[d.card]){const c=CARD[d.card];const ti=c.icon&&TYICON[c.icon];ic=(CARDICON[k]||'🎴')+(ti?ti:'')}}catch(e){}
+  let ic=CARDICON[k]||'',cls=k,pos=G.camp.pos;
+  try{if(k==='weather'){const w=(viewState()||G).lastWx;const r=w&&w.rain||0,s=w&&w.snow||0;ic=w&&w.storm?'⛈️':r?''.repeat(Math.min(3,r)):s?'❄️'.repeat(Math.min(3,s)):'☀️';BF.rain(pos,r,s,w&&w.storm);if(w&&w.storm)cls+=' storm'}
+    else if(d.card!=null&&CARD[d.card]){const c=CARD[d.card];const ti=c.icon&&TYICON[c.icon];ic=(CARDICON[k]||'')+(ti?ti:'')}}catch(e){}
   const el=document.createElement('div');el.id='bfcard';el.className='bfcard '+cls;el.setAttribute('role','button');el.setAttribute('aria-label',w8(capFor(i))+' (hold for the full text)');
   let scene='';try{if(k==='weather'){const w=(viewState()||G).lastWx||{};scene=w.storm?'gale':w.snow?'winter':w.rain?'rain':'horizon'}
     else if(k==='threat'||k==='fight')scene='prowlers';else if(k==='mystery')scene='altar';
@@ -7951,10 +7959,10 @@ function fillInfo(){const d=document.getElementById('detd');if(!d)return;const b
   if(b.dataset.h!==h){b.dataset.h=h;b.innerHTML=h}}
 // ---------- the pop-up for a tapped place: only jobs this pawn can do ----------
 BF.tilePop=function(id){const cur=curPawn();if(!cur)return null;const rec=recPlan().map[cur.id];const rows=legalRows(id,cur);const camp=id===G.camp.pos;let h='';
-  if(camp&&G.scen==='marooned'){let room=0,why=null;try{room=SCEN.marooned.pileRoom();why=pileWhy(1)}catch(e){}if(room>0)h+=`<button class="bfr pile ${why?'no':''}" data-a="pilemax"><span class="t">🔥 Add wood to the signal pile</span><span class="b">+${Math.max(1,Math.min(room,Math.max(0,G.res.wood-committed().wood)))}</span></button>`}
+  if(camp&&G.scen==='marooned'){let room=0,why=null;try{room=SCEN.marooned.pileRoom();why=pileWhy(1)}catch(e){}if(room>0)h+=`<button class="bfr pile ${why?'no':''}" data-a="pilemax"><span class="t"> Add wood to the signal pile</span><span class="b">+${Math.max(1,Math.min(room,Math.max(0,G.res.wood-committed().wood)))}</span></button>`}
   const isRec=r=>rec&&rec.type===r.type&&JSON.stringify(rec.tgt)===JSON.stringify(r.tgt)&&(rec.alt||0)===(r.alt||0);
   h+=rows.map(r=>{const key=encodeURIComponent(JSON.stringify({type:r.type,tgt:r.tgt,alt:r.alt}));const a=findActAny(r.type,r.tgt,r.alt);const k=(a?a.pw.length:0)+1;const n=actNeed({type:r.type,tgt:r.tgt,alt:r.alt,pw:[]});
-      const badge=k<n.need?`needs ${n.need}`:(n.roll&&k<n.max)?'🎲':'✔';const cost=(()=>{try{const c=actCost({type:r.type,tgt:r.tgt,alt:r.alt,pw:[cur.id]});return Object.entries(c).filter(([x,v])=>v).map(([x,v])=>v+RICON[x]).join(' ')}catch(e){return ''}})();
+      const badge=k<n.need?`needs ${n.need}`:(n.roll&&k<n.max)?'':'✔';const cost=(()=>{try{const c=actCost({type:r.type,tgt:r.tgt,alt:r.alt,pw:[cur.id]});return Object.entries(c).filter(([x,v])=>v).map(([x,v])=>v+RICON[x]).join(' ')}catch(e){return ''}})();
       return `<button class="bfr ${isRec(r)?'rec':''} ${a?'has':''}" data-place="${key}" ${isRec(r)?'data-rec="1"':''}><span class="t">${isRec(r)?'⭐ ':''}${E(r.title)}</span><span class="b">${cost?E(cost)+' · ':''}${badge}</span></button>`}).join('');
   if(!h)return null;const t=tileAt(id);return {title:`${pawnLabel(cur).split(' ')[0]} → place ${id+1}${t?' · '+t.terr:''}`,html:`<div class="bfrows">${h}</div>`,cls:'tile bf'}};
 // a tap on a place while planning (the old tile handler has already selected it)
@@ -8190,7 +8198,7 @@ const TUT_KEEP={};
 const tutOn=()=>false;   // the spotlight tutorial is gone; the coached game (below) replaced it
 // the staged deal: called by newGame before the first scene. Day 1 has no event card; day 2 turns over Chill Rain (a rain cloud and a threat).
 // Learn to play is a gentler island (same rules, kinder deal): the mountains for Fire come second, the mildest event cards, weak beasts first,
-// a little more food and wood, and no weather dice (Chill Rain still brings a cloud on day 2 to teach the roof). A player who follows ✨ Suggest wins.
+// a little more food and wood, and no weather dice (Chill Rain still brings a cloud on day 2 to teach the roof). A player who follows  Suggest wins.
 // "Easy island" (the default first real game, and Easy afterwards): the same kind deal, without the coach. Normal keeps the full rules.
 function easyDeal(){if(G.scen!=='marooned'||G.cmp)return;const t=G.tut;tutDeal();if(!t)delete G.tut}
 function tutDeal(){G.tut=1;G.learn=1;G.res.food=Math.max(3,G.res.food);G.res.wood=Math.max(3,G.res.wood);if(G.scen==='marooned')G.tileDeck=[4,5,10,6,3,1,2,7,9,11];G.ev.threat=[null,null];G.wxT={};
@@ -8223,14 +8231,14 @@ const cwx=()=>{try{return (viewState()||G).lastWx||{}}catch(e){return {}}};
 // kind: 'rule' (first time it matters), 'move' (a good or poor choice, one line why), 'rival' (what the island just did to us)
 const COACH_RULES=[
  {id:'goal',when:()=>!!G&&G.round===1,say:"Our ship is gone. Build a fire and stack 15 wood by day 12. A ship will see it."},
- {id:'pick',when:()=>cplan()&&G.round===1&&!!COACH.done.goal,say:"Pick a pawn, then a glowing place. ✨ shows a good plan."},
+ {id:'pick',when:()=>cplan()&&G.round===1&&!!COACH.done.goal,say:"Pick a pawn, then a glowing place.  shows a good plan."},
  {id:'pawns',when:()=>cplan()&&G.round===1&&G.plan.acts.some(a=>a.pw.length),say:"Each pawn does one job. I cook and heal, the Carpenter builds, Friday helps."},
  {id:'dice',when:()=>cplan()&&!!G.plan.acts.find(a=>a.pw.length===1&&actNeed(a).roll),say:"One pawn alone rolls dice and can fail or get hurt. A second pawn makes it sure."},
  {id:'sure',kind:'move',when:()=>cplan()&&!!G.plan.acts.find(a=>a.pw.length>=2),say:"Good move: two pawns, no dice. A sure thing."},
  {id:'explore',when:()=>cplan()&&!!cact('explore'),say:"Exploring finds new land; we can gather there from tomorrow."},
  {id:'build',when:()=>cplan()&&!!cact('build'),say:"Building costs wood. A shelter costs 2 wood and ends night wounds."},
  {id:'gather',when:()=>cplan()&&!!cact('gather'),say:"Food and wood arrive after all the jobs are done, not before."},
- {id:'camp',when:()=>cplan()&&!!cact('camp'),say:"Tidying the camp earns determination ✊ for skills and lifts morale."},
+ {id:'camp',when:()=>cplan()&&!!cact('camp'),say:"Tidying the camp earns determination  for skills and lifts morale."},
  {id:'ready',kind:'move',when:()=>cplan()&&G.plan.acts.some(a=>a.pw.length)&&(()=>{try{return planProblems().length===0}catch(e){return false}})(),say:"Good plan: everyone has a job. Tap Start day when you are ready."},
  {id:'noshelter',kind:'move',when:()=>cplan()&&G.round>=2&&!hasShelter()&&!cact('build'),say:"Poor move: no shelter and no build planned. Tonight everyone takes a wound."},
  {id:'nofood',kind:'move',when:()=>cplan()&&G.round>=2&&food()<eatersNeed()&&!cact('gather')&&!cact('hunt'),say:"Poor move: food is short for tonight and nobody gathers. Hunger costs 2 wounds."},
@@ -8243,7 +8251,7 @@ const COACH_RULES=[
  {id:'weather',kind:'rival',when:()=>{const b=cbeat();return b&&b.kind==='weather'},say:()=>{const w=cwx(),n=(w.rain||0)+(w.snow||0);return (n?'The weather brings '+n+' cloud'+(n>1?'s':'')+'. ':'The sky is calm. ')+'Clouds above our roof (level '+G.camp.roof+') ruin 1 food and 1 wood each.'}},
  {id:'night',when:()=>{const b=cbeat();return b&&b.kind==='night'},say:"Night: everyone eats 1 food (or takes 2 wounds). No shelter means a wound each."},
  {id:'wounds',when:()=>{const b=cbeat();return b&&b.kind==='daysum'},say:"Each wound costs a life ♥. Resting heals one. Build a shelter soon."},
- {id:'skill',when:()=>cplan()&&G.round>=2&&G.chars.some(c=>!c.npc&&c.det>=2),say:"We have determination ✊. Open the Camp tab and use a skill: once per round, and it can turn a bad roll."},
+ {id:'skill',when:()=>cplan()&&G.round>=2&&G.chars.some(c=>!c.npc&&c.det>=2),say:"We have determination . Open the Camp tab and use a skill: once per round, and it can turn a bad roll."},
  {id:'fog',when:()=>cplan()&&G.map.some(m=>m.fog),say:"Fog hides a place: work there needs one more pawn, and a fogged camp makes nothing."}
 ];
 const COACH_LATER=[

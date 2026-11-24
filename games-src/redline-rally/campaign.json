@@ -5,37 +5,37 @@
  "cast": {
   "coach": {
    "name": "Coach Mara",
-   "emoji": "🧑‍🔧",
+   "emoji": "",
    "color": "#3b7a8c"
   },
   "kit": {
    "name": "Kit Marlow",
-   "emoji": "🏁",
+   "emoji": "",
    "color": "#d83a3a"
   },
   "juno": {
    "name": "Juno Vega",
-   "emoji": "🧢",
+   "emoji": "",
    "color": "#2f7be0"
   },
   "dax": {
    "name": "Dax Orrin",
-   "emoji": "🪖",
+   "emoji": "",
    "color": "#59626e"
   },
   "pia": {
    "name": "Pia Rask",
-   "emoji": "🌬️",
+   "emoji": "",
    "color": "#8a52d6"
   },
   "oto": {
    "name": "Oto Lind",
-   "emoji": "🧊",
+   "emoji": "",
    "color": "#2ea86b"
   },
   "bex": {
    "name": "Bex Hollis",
-   "emoji": "⚡",
+   "emoji": "",
    "color": "#e8a824"
   }
  },
@@ -97,7 +97,7 @@
    ],
    "opponent": {
     "name": "Kit Marlow",
-    "emoji": "🏁",
+    "emoji": "",
     "cast": "kit",
     "personality": "Smooth and patient.",
     "aiLevel": "easy",
@@ -175,7 +175,7 @@
    ],
    "opponent": {
     "name": "Juno Vega",
-    "emoji": "🧢",
+    "emoji": "",
     "cast": "juno",
     "personality": "Late on the brakes.",
     "aiLevel": "easy",
@@ -253,7 +253,7 @@
    ],
    "opponent": {
     "name": "Dax Orrin",
-    "emoji": "🪖",
+    "emoji": "",
     "cast": "dax",
     "personality": "Hates traffic, drives alone.",
     "aiLevel": "easy",
@@ -340,7 +340,7 @@
    ],
    "opponent": {
     "name": "Pia Rask",
-    "emoji": "🌬️",
+    "emoji": "",
     "cast": "pia",
     "personality": "Lives in the slipstream.",
     "aiLevel": "normal",
@@ -418,7 +418,7 @@
    ],
    "opponent": {
     "name": "Oto Lind",
-    "emoji": "🧊",
+    "emoji": "",
     "cast": "oto",
     "personality": "Cold engine, calm head.",
     "aiLevel": "normal",
@@ -502,7 +502,7 @@
    ],
    "opponent": {
     "name": "Pia Rask",
-    "emoji": "🌬️",
+    "emoji": "",
     "cast": "pia",
     "personality": "Lives in the slipstream.",
     "aiLevel": "normal",
@@ -593,7 +593,7 @@
    ],
    "opponent": {
     "name": "Juno Vega",
-    "emoji": "🧢",
+    "emoji": "",
     "cast": "juno",
     "personality": "Late on the brakes.",
     "aiLevel": "hard",
@@ -671,7 +671,7 @@
    ],
    "opponent": {
     "name": "Oto Lind",
-    "emoji": "🧊",
+    "emoji": "",
     "cast": "oto",
     "personality": "Cold engine, calm head.",
     "aiLevel": "hard",
@@ -755,7 +755,7 @@
    ],
    "opponent": {
     "name": "Bex Hollis",
-    "emoji": "⚡",
+    "emoji": "",
     "cast": "bex",
     "personality": "All gas, no fear.",
     "aiLevel": "hard",
