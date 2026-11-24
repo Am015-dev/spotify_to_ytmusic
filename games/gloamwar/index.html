@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en"><head><meta charset="utf-8">
+<html lang="en"><head><!-- Copyright (c) 2026 Am015-dev. All rights reserved. Not licensed for copying, modification or redistribution; see LICENSE in the source repository. --><meta name="copyright" content="&copy; 2026 Am015-dev. All rights reserved."><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Gloamwar</title>
 <meta name="description" content="Two-player epic war on an old woodcut map: march armies, sway nations, and hunt or guard the Company carrying the Hollow Crown to the Kiln.">
@@ -341,6 +341,49 @@ html.sk .gxc-act b,html.sk .gxc-act small{text-shadow:0 1px 3px rgba(0,0,0,.9)}
 }
 html body :is(.gxh-ring,.gxt-ring){animation-duration:1.6s}
 
+/* gx-scenario-tutor.css: scenario lesson card, picker, result card, hint ring (shell/gx-scenario-tutor.js, docs GXST.md).
+   Never dims, never blocks taps outside the card. Override with --gxst-* variables. */
+:root{--gxst-z:88;--gxst-bg:#fffaf0;--gxst-ink:#2e241c;--gxst-mute:#6b5a48;--gxst-head:#3b2f25;--gxst-on:#fffaf0;--gxst-acc:#e8907e;--gxst-ok:#5d9c58;--gxst-bad:#b5482f;--gxst-star:#e0a41c;--gxst-ring:#ffd36b}
+.gxst-card{position:fixed;left:8px;top:8px;z-index:var(--gxst-z);width:min(320px,calc(100vw - 16px));box-sizing:border-box;background:var(--gxst-bg);color:var(--gxst-ink);border:2px solid var(--gxst-head);border-radius:14px;box-shadow:0 8px 22px rgba(0,0,0,.3);font:15px/1.35 var(--gxh-font,system-ui,sans-serif);touch-action:none}
+.gxst-card.gxst-min{width:auto;background:none;border:0;box-shadow:none}
+.gxst-card.gxst-win{border-color:var(--gxst-ok)}.gxst-card.gxst-fail{border-color:var(--gxst-bad)}
+.gxst-hd{display:flex;align-items:center;padding:0 2px 0 12px;background:var(--gxst-head);color:var(--gxst-on);border-radius:11px 11px 0 0;cursor:move;user-select:none}
+.gxst-card.gxst-win .gxst-hd{background:var(--gxst-ok)}.gxst-card.gxst-fail .gxst-hd{background:var(--gxst-bad)}
+.gxst-hd b{font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.gxst-sp{flex:1}
+.gxst-ib{flex:none;width:44px;height:44px;border:0;background:none;color:var(--gxst-on);font-size:24px;line-height:1;border-radius:8px;cursor:pointer}
+.gxst-say,.gxst-goal{margin:10px 12px 4px;font-weight:700}
+.gxst-goal{font-size:16px}
+.gxst-hint{margin:4px 12px;padding:6px 8px;border-left:4px solid var(--gxst-star);background:rgba(224,164,28,.12);font-size:14px}
+.gxst-msg{margin:4px 12px 6px;font-size:14px}
+.gxst-rule{margin:2px 12px 6px;color:var(--gxst-mute);font-size:14px}
+.gxst-stars{margin:8px 12px 0;font-size:28px;line-height:1;color:var(--gxst-star);letter-spacing:4px}
+.gxst-ft{display:flex;gap:8px;padding:6px 10px 10px}
+.gxst-btn{min-height:44px;padding:0 14px;border-radius:10px;border:2px solid var(--gxst-head);background:transparent;color:var(--gxst-ink);font:700 15px/1 inherit;cursor:pointer}
+.gxst-btn.pri{background:var(--gxst-head);color:var(--gxst-on)}
+.gxst-btn:disabled{opacity:.5;cursor:default}
+.gxst-bulb::before{content:'';display:inline-block;width:10px;height:10px;margin-right:6px;border-radius:50%;background:var(--gxst-star);box-shadow:0 0 6px var(--gxst-star)}
+.gxst-list{margin:4px 8px 8px;padding:0;list-style:none;max-height:min(52vh,420px);overflow:auto}
+.gxst-pick{display:flex;align-items:center;gap:8px;width:100%;min-height:44px;margin:2px 0;padding:4px 8px;border:2px solid transparent;border-radius:10px;background:none;color:var(--gxst-ink);font:600 15px/1.2 inherit;text-align:left;cursor:pointer}
+.gxst-pick.rec{border-color:var(--gxst-acc)}
+.gxst-n{flex:none;width:26px;height:26px;border-radius:50%;background:var(--gxst-head);color:var(--gxst-on);display:grid;place-items:center;font-size:13px}
+.gxst-t{flex:1}.gxst-st{flex:none;color:var(--gxst-star);letter-spacing:1px}
+.gxst-chip{min-height:44px;max-width:calc(100vw - 16px);padding:4px 16px;border-radius:22px;background:var(--gxst-head);color:var(--gxst-on);border:2px solid var(--gxst-on);font:700 15px/1.2 var(--gxh-font,system-ui,sans-serif);box-shadow:0 4px 12px rgba(0,0,0,.3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:pointer}
+.gxst-ring{position:fixed;z-index:calc(var(--gxst-z) - 2);pointer-events:none;border-radius:14px;border:3px solid var(--gxst-ring);box-shadow:0 0 14px 3px var(--gxst-ring);animation:gxst-pulse 1.6s ease-in-out infinite}
+@keyframes gxst-pulse{0%,100%{opacity:.45;transform:scale(1)}50%{opacity:1;transform:scale(1.03)}}
+.gxst-q{min-height:44px;padding:0 12px;font-weight:700;cursor:pointer}
+.gxst-q.gxst-qfix{position:fixed;left:8px;bottom:8px;z-index:var(--gxst-z);border-radius:22px;background:var(--gxst-head);color:var(--gxst-on);border:2px solid var(--gxst-on)}
+@media (prefers-reduced-motion:reduce){.gxst-ring{animation:none;opacity:1}}
+
+/* phoneSlot (function/selector form): card inside a rect the game keeps free: compact, header/footer fixed, middle scrolls */
+.gxst-card.gxst-inslot{display:flex;flex-direction:column;overflow:hidden}
+.gxst-inslot .gxst-hd,.gxst-inslot .gxst-ft{flex:none}
+.gxst-inslot .gxst-ib{width:36px;height:34px;font-size:22px}
+.gxst-inslot .gxst-say,.gxst-inslot .gxst-goal{margin:6px 10px 2px;font-size:15px;overflow:auto;flex:0 1 auto;min-height:0}
+.gxst-inslot .gxst-hint,.gxst-inslot .gxst-msg,.gxst-inslot .gxst-rule{margin:2px 10px;font-size:13px;overflow:auto;flex:0 1 auto;min-height:0}
+.gxst-inslot .gxst-stars{margin:4px 10px 0;font-size:20px}
+.gxst-inslot .gxst-ft{padding:4px 8px 6px}
+.gxst-inslot .gxst-btn{min-height:38px;padding:0 12px}
+
 :root{--paper:#eadbb4;--paper2:#e0cc9d;--paper3:#d3bb85;--ink:#1f1812;--ink2:#4a3b2a;--ink3:#6b5840;--red:#9a2117;--red2:#6e130d;--sea:#cdbf98;--sea2:#b9a979;
  --dawn:#f3e7c6;--gloam:#7c1810;--gold:#a8842c;--gx-bg:var(--paper);--gx-panel:#efe2bf;--gx-ink:var(--ink);--gx-accent:var(--red);
  --fell:'IM Fell English',Georgia,'Times New Roman',serif;--fellsc:'IM Fell English SC','IM Fell English',Georgia,serif;--sans:'Alegreya Sans',Georgia,serif}
@@ -524,6 +567,29 @@ body.tut #bulbbtn{visibility:hidden}
 .seg button+button{border-left:1.5px solid var(--ink)}
 .seg button.on{background:var(--ink);color:var(--paper)}
 #res .big{font-family:var(--fellsc);font-size:2.2rem;margin:0}
+.gwart{position:absolute;inset:0;z-index:0;pointer-events:none}.gwart svg{width:100%;height:100%;display:block}
+#title>:not(.gwart),#res>:not(.gwart){position:relative;z-index:1}
+#title{background:#17132f;justify-content:flex-start;padding-top:max(28px,6vh);gap:14px}
+#title .logo{font-size:clamp(3.2rem,12vw,5.2rem);color:#f6e9c8;text-shadow:0 3px 0 #120d18,0 0 28px rgba(255,170,70,.55)}
+#title .logo i{color:#ff7a3a}
+#title .tag{color:#f6e9c8;font-size:1.2rem;max-width:32ch;text-shadow:0 1px 6px #120d18}
+#title #crest{width:96px;height:96px;filter:drop-shadow(0 4px 10px rgba(0,0,0,.6))}
+#title .btn{background:rgba(23,19,47,.88);color:#f6e9c8;border-color:#e8c36a;font-size:1.15rem}
+#title .btn.pri{background:#f6e9c8;color:#1f1812;border-color:#e8c36a}
+#title .btn.red{background:#b3161c;color:#fff;border-color:#f6e9c8}
+#title .seg{border-color:#e8c36a;background:rgba(23,19,47,.88)}#title .seg button{background:transparent;color:#f6e9c8;font-size:1.1rem}#title .seg button+button{border-color:#e8c36a}#title .seg button.on{background:#f6e9c8;color:#1f1812}
+#title .big{width:min(320px,86vw)}
+#res{background:#17132f;padding:16px}
+.rcard{box-sizing:border-box;width:min(440px,100%);padding:26px 20px 22px;background:linear-gradient(#f3e6c2,#e2cf9f);border:3px solid #1f1812;border-radius:10px;box-shadow:0 0 0 3px #e8c36a,0 18px 50px rgba(0,0,0,.6);display:flex;flex-direction:column;align-items:center;gap:10px}
+.rem{width:84px;height:84px;margin-top:-66px;border-radius:50%;border:4px solid #e8c36a;display:block;background:#1d4fae;box-shadow:0 6px 16px rgba(0,0,0,.5)}.rem.g{background:#b3161c}.rem svg{width:100%;height:100%;display:block}
+#res .big{font-weight:700;font-size:clamp(2.6rem,12vw,3.6rem);line-height:1;letter-spacing:.06em;color:var(--ink)}#res.lost .big{color:var(--red2)}
+.rwho{margin:0;font-family:var(--fellsc);font-size:1.35rem;color:var(--ink2)}
+.rwhy{margin:0;max-width:30ch;font-family:var(--fell);font-size:1.2rem;line-height:1.35}
+.rstats{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;width:100%;margin:6px 0}
+.rstats div{border:1.5px solid var(--ink);border-radius:6px;background:var(--paper);padding:8px 2px;display:flex;flex-direction:column;align-items:center}
+.rstats b{font-family:var(--fellsc);font-weight:400;font-size:2rem;line-height:1.05}.rstats span{font-family:var(--fell);font-size:.95rem;color:var(--ink2);line-height:1.1;text-align:center}
+#res .btn.big{font-family:var(--fell);font-size:1.3rem;letter-spacing:0;line-height:1.1;color:var(--ink);background:var(--paper2);min-height:52px}#res .btn.pri{background:var(--ink);color:var(--paper)}
+#res .row{display:flex;flex-direction:column;gap:8px;width:100%}#res .row .btn{width:100%}
 #toast{cursor:pointer;position:fixed;left:50%;top:128px;transform:translateX(-50%) translateY(-10px);background:var(--ink);color:var(--paper);font-family:var(--fell);font-size:1.05rem;padding:6px 14px;border-radius:4px;opacity:0;pointer-events:none;z-index:50;transition:opacity .25s,transform .25s;white-space:normal;text-align:center;max-width:92vw;min-height:44px;display:flex;align-items:center;border-radius:22px}
 #toast.on{pointer-events:auto}
 #toast.on{opacity:1;transform:translateX(-50%)}
@@ -570,6 +636,7 @@ body.tut #bulbbtn{visibility:hidden}
 .mlbl{font-family:Arial,sans-serif;font-weight:700;fill:#fff;stroke:#0d0a07;stroke-width:4px;paint-order:stroke;stroke-linejoin:round}
 .mlbl.minor{fill:#ece6d8;font-weight:400}
 .zoomed-out .mlbl.minor{display:none}
+.mlbl.hid{display:none}
 .rgglow{fill:rgba(255,230,140,.28);stroke:#ffe27a;stroke-width:7;animation:gwpulse 1.2s ease-in-out infinite}
 .rgsel{fill:rgba(255,255,255,.18);stroke:#fff;stroke-width:6}
 .rgnb{fill:none;stroke:#fff;stroke-width:3;stroke-dasharray:6 6;opacity:.8}
@@ -592,7 +659,7 @@ body.tut #bulbbtn{visibility:hidden}
 .act.red{background:var(--gloamc);color:#fff;border-color:#ff6b6b}.act.red small{color:#ffd9d9}
 .die{background:#f4f1ea;border-color:#0d0a07}
 .die.sel{box-shadow:0 6px 0 var(--gold2)}
-@media (min-width:900px){#msg{left:50%;right:auto;transform:translateX(-50%);top:calc(8px + env(safe-area-inset-top,0px));width:min(560px,calc(100% - 420px));text-align:center}#side{width:150px}.pc b{font-size:1.25rem}}
+@media (min-width:900px){#msg{left:50%;right:auto;transform:translateX(-50%);top:calc(8px + env(safe-area-inset-top,0px));width:min(560px,calc(100% - 420px));text-align:center}#side{width:180px}.pc b{font-size:1.25rem}.pc span,.pc small,#rival .rl{font-size:17px}#zoomb #keyB,.act small{font-size:17px}}
 @media (orientation:landscape) and (max-height:500px){#msg{right:170px;top:8px;left:180px}}
 /* ---------- tutorial windows: float, drag, minimise, close; never block the board */
 .tw{position:fixed;z-index:80;width:min(320px,calc(100vw - 24px));background:#fbf7ee;color:#1a1612;border-radius:14px;border:2px solid #14100c;box-shadow:0 8px 24px rgba(0,0,0,.45);font-family:Arial,sans-serif;font-size:.95rem;line-height:1.35}
@@ -657,7 +724,7 @@ body.tut #bulbbtn{visibility:hidden}
   <div class="trow"><span class="seg" id="segL"></span></div>
   <div class="trow"><span id="tutSlot"></span><button class="btn" id="howB" type="button">How to play</button><button class="btn" data-gx="setd" type="button" id="tMenuB">Settings</button></div>
 </div>
-<div class="scr" id="res"><p class="big" id="resH"></p><p id="resP" style="max-width:34ch;font-family:var(--fell);font-size:1.15rem"></p><div class="row" id="resRow" style="justify-content:center"></div></div>
+<div class="scr" id="res"><div class="rcard" id="rcard"><i class="rem" id="rEmb"></i><p class="big" id="resH"></p><p class="rwho" id="rWho"></p><p id="resP" class="rwhy"></p><div class="rstats" id="rStats"></div><div class="row" id="resRow"></div></div></div>
 <script>
 /* GX scenarios: "spawn the requirement only". Open any game with  ?scn=<id>  and it skips menus / tutorial offers, seeds the RNG,
    builds the exact engine state of ONE scenario directly (no playing through), shows a tiny "Test: <name>" tag and exposes
@@ -3955,6 +4022,39 @@ function aiMove(G, L) { return AI.move(G, L); }
 
 </script>
 <script>
+// Painted dusk scene for the title and result screens (own SVG art). GWART.paint(el) puts it behind the screen's content.
+var GWART = (function () {
+  var W = 1600, H = 900;
+  function pines(x0, x1, y, n, col, h) { var s = ''; for (var i = 0; i < n; i++) { var x = x0 + (x1 - x0) * (i + .5 * ((i * 7) % 3)) / n, k = h * (.7 + ((i * 37) % 10) / 20); s += '<path d="M' + x + ',' + y + ' l' + (-k * .22) + ',0 l' + (k * .22) + ',' + (-k) + ' l' + (k * .22) + ',' + k + ' z" fill="' + col + '"/>'; } return s; }
+  function flag(x, y, col, dark) { return '<rect x="' + (x - 3) + '" y="' + y + '" width="6" height="190" fill="#120d18"/><path d="M' + (x + 3) + ',' + (y + 6) + ' q40,-14 78,0 l-16,32 l16,32 q-38,-12 -78,0 z" fill="' + col + '" stroke="' + dark + '" stroke-width="3"/><circle cx="' + x + '" cy="' + y + '" r="7" fill="#e8c36a"/>'; }
+  function svg() {
+    var s = '<defs><linearGradient id="gwSky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#17132f"/><stop offset=".45" stop-color="#4b2750"/><stop offset=".72" stop-color="#b9573a"/><stop offset="1" stop-color="#f1a652"/></linearGradient>'
+      + '<radialGradient id="gwKiln" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#ffb347" stop-opacity=".95"/><stop offset="1" stop-color="#ff5a1f" stop-opacity="0"/></radialGradient>'
+      + '<radialGradient id="gwLamp" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#ffe9a8" stop-opacity=".95"/><stop offset="1" stop-color="#ffd25a" stop-opacity="0"/></radialGradient></defs>';
+    s += '<rect width="' + W + '" height="' + H + '" fill="url(#gwSky)"/>';
+    for (var i = 0; i < 46; i++) s += '<circle cx="' + ((i * 349) % W) + '" cy="' + (20 + (i * 131) % 330) + '" r="' + (1 + (i % 3) * .6) + '" fill="#f6e9c8" opacity="' + (.35 + (i % 4) * .15) + '"/>';
+    s += '<circle cx="1180" cy="200" r="46" fill="#f4e6c0" opacity=".9"/><circle cx="1196" cy="190" r="46" fill="#4b2750"/>';
+    s += '<path d="M0,640 L170,540 L300,610 L470,500 L640,620 L800,560 L960,640 L1180,520 L1380,610 L1600,540 L1600,900 L0,900Z" fill="#3b2a5a"/>';
+    s += '<ellipse cx="1000" cy="440" rx="190" ry="95" fill="url(#gwKiln)"/>';
+    s += '<path d="M770,700 L930,440 Q1000,418 1070,440 L1230,700Z" fill="#241a38"/><path d="M930,440 Q1000,462 1070,440 Q1000,424 930,440Z" fill="#ff8a2e"/>';
+    s += '<path d="M985,452 q-14,70 -34,130 M1008,454 q10,60 26,150" stroke="#ff9a3c" stroke-width="5" fill="none" stroke-linecap="round" opacity=".85"/>';
+    s += '<g fill="#cdbfd6" opacity=".22"><circle cx="1012" cy="392" r="32"/><circle cx="1040" cy="346" r="42"/><circle cx="1086" cy="300" r="52"/></g>';
+    s += '<path d="M0,730 L220,660 L420,720 L640,650 L880,730 L1120,670 L1340,730 L1600,660 L1600,900 L0,900Z" fill="#241a3a"/>' + pines(0, 1600, 735, 60, '#171126', 70);
+    s += '<path d="M0,800 Q300,740 560,790 T1100,780 T1600,770 L1600,900 L0,900Z" fill="#120d1c"/>' + pines(0, 1600, 805, 44, '#0c0814', 96);
+    s += '<path d="M560,900 Q640,830 800,800 Q930,780 1010,790" stroke="#3a2c52" stroke-width="18" fill="none" opacity=".7"/>';
+    s += '<ellipse cx="760" cy="796" rx="95" ry="62" fill="url(#gwLamp)"/>';
+    [[720, 0], [752, 4], [784, -2]].forEach(function (p) { s += '<g transform="translate(' + p[0] + ',' + (806 + p[1]) + ')"><path d="M0,-30 q-12,10 -14,34 h28 q-2,-24 -14,-34z" fill="#07050c"/><circle cx="0" cy="-36" r="8" fill="#07050c"/></g>'; });
+    s += '<rect x="805" y="778" width="4" height="30" fill="#07050c"/><rect x="800" y="768" width="14" height="16" rx="3" fill="#ffd25a"/>';
+    s += flag(560, 600, '#1d4fae', '#0e2b6b') + flag(1040, 600, '#b3161c', '#5a0a0e');
+    return s;
+  }
+  return { paint: function (el) {
+    if (!el || el.querySelector('.gwart')) return; var d = document.createElement('div'); d.className = 'gwart'; d.setAttribute('aria-hidden', 'true');
+    d.innerHTML = '<svg viewBox="0 0 ' + W + ' ' + H + '" preserveAspectRatio="xMidYMax slice" xmlns="http://www.w3.org/2000/svg">' + svg() + '</svg>'; el.insertBefore(d, el.firstChild); } };
+})();
+
+</script>
+<script>
 /* Gloamwar map view: a woodcut-and-ink map on aged parchment (SVG). Static layer drawn once; tokens and highlights redrawn on render.
    Pan with one finger, pinch or wheel to zoom, tap a region or a token. MV.render(G, hl) ; MV.focus(rid) ; MV.onTap = fn(kind, rid). */
 var MV = { k: 0.4, tx: 0, ty: 0, minK: 0.3, maxK: 2.6, onTap: null, hl: null };
@@ -4008,7 +4108,7 @@ function mapStatic() {
   REGIONS.forEach(function (r) {
     var major = !!r.set || ['whisperwood', 'cinderplain'].indexOf(r.id) >= 0, c = setPos(r), fs = r.set === 'strong' ? 26 : r.set === 'city' ? 24 : major ? 22 : 18;
     var y = r.set ? c[1] + (r.set === 'strong' ? 50 : 44) : r.y + 34;
-    h.push('<text class="mlbl' + (major ? '' : ' minor') + '" style="--b:' + fs + '" x="' + (r.set ? c[0] : r.x) + '" y="' + y + '" font-size="' + fs + '" text-anchor="middle">' + r.n + '</text>');
+    h.push('<text class="mlbl' + (major ? '' : ' minor') + '" style="--b:' + fs + '" data-x="' + (r.set ? c[0] : r.x) + '" x="' + (r.set ? c[0] : r.x) + '" y="' + y + '" font-size="' + fs + '" text-anchor="middle">' + r.n + '</text>');
   });
   h.push('<g pointer-events="none" font-family="Arial, sans-serif" fill="#9cc2dc" opacity=".8"><text x="60" y="1075" font-size="26" font-style="italic" transform="rotate(-80 60 1075)">The Pale Sea</text><text x="912" y="528" font-size="16" font-style="italic" text-anchor="middle">Bitter Mere</text></g>');
   return h.join('');
@@ -4079,6 +4179,7 @@ MV.render = function (G, hl, viewer) {
   Object.keys(byR).forEach(function (rid) { s.push(charBadges(G, rid, byR[rid])); });
   if (viewer === 'D' || !G.F.hid || G.F.road >= 0 || hl.showCompany) s.push(companySvg(G, viewer)); else s.push(companySvg(G, viewer));
   dyn.innerHTML = s.join('');
+  MV.labels();
   (hl.tokens || []).forEach(function (id) { var e = document.getElementById(id); if (e) { e.classList.add('legal'); var rg = e.querySelector('.tokring'); if (rg) rg.setAttribute('opacity', '1'); } });
   if (hl.selTok) { var e2 = document.getElementById(hl.selTok); if (e2) { e2.classList.add('sel'); var rg2 = e2.querySelector('.tokring'); if (rg2) rg2.setAttribute('opacity', '1'); } }
 };
@@ -4086,9 +4187,23 @@ MV.flash = function (rid) { var f = document.getElementById('flash'); if (!f || 
 // ---------------------------------------------------------------- camera
 MV.apply = function () { var m = document.getElementById('map'); if (!m) return; m.style.transform = 'translate(' + MV.tx.toFixed(1) + 'px,' + MV.ty.toFixed(1) + 'px) scale(' + MV.k.toFixed(4) + ')'; var b = document.getElementById('board'); if (b) b.classList.toggle('zoomed-out', MV.k < 0.62);
   var k = MV.k; m.style.setProperty('--ik', (1 / k).toFixed(3)); m.style.setProperty('--lf', (12.5 / k).toFixed(2)); m.style.setProperty('--ts', Math.min(2, Math.max(1, 15 / (31 * k))).toFixed(3)); m.style.setProperty('--tc', Math.min(2.4, Math.max(1, 14 / (17 * k))).toFixed(3));
+  if (MV._lk !== MV.k) { MV._lk = MV.k; MV.labels(); }
   if (window.closeRCard && !MV.keepCard) closeRCard(); };
-MV.clamp = function () { var b = document.getElementById('board'), W = b.clientWidth, H = b.clientHeight; var mw = MAPW * MV.k, mh = MAPH * MV.k; MV.tx = mw <= W ? (W - mw) / 2 : Math.min(0, Math.max(W - mw, MV.tx)); MV.ty = mh <= H ? (H - mh) / 2 : Math.min(0, Math.max(H - mh, MV.ty)); };
-MV.fit = function () { var b = document.getElementById('board'); if (!b || !b.clientWidth) return; var W = b.clientWidth, H = b.clientHeight; MV.minK = Math.min(W / MAPW, H / MAPH) * 0.98; MV.k0 = Math.max(MV.minK, Math.min(W / MAPW, 1.2)); if (W < 700) MV.k0 = Math.max(MV.k0, 0.82); if (!MV.k || MV.k < MV.minK || MV.k > MV.maxK) MV.k = MV.k0; MV.clamp(); MV.apply(); };
+// PC (board wider than 900px): top banner (#msg) and bottom pill (#phase) cover the board edges, so the map lives in an inset area
+MV.inset = function (W) { return W > 900 ? { t: 64, b: 56 } : { t: 0, b: 0 }; };
+MV.clamp = function () { var b = document.getElementById('board'), W = b.clientWidth, H = b.clientHeight, ins = MV.inset(W); var mw = MAPW * MV.k, mh = MAPH * MV.k, Hi = H - ins.t - ins.b; MV.tx = mw <= W ? (W - mw) / 2 : Math.min(0, Math.max(W - mw, MV.tx)); MV.ty = mh <= Hi ? ins.t + (Hi - mh) / 2 : Math.min(ins.t, Math.max(H - ins.b - mh, MV.ty)); };
+MV.fit = function () { var b = document.getElementById('board'); if (!b || !b.clientWidth) return; var W = b.clientWidth, H = b.clientHeight, ins = MV.inset(W), Hi = H - ins.t - ins.b; MV.minK = Math.min(W / MAPW, Hi / MAPH) * 0.98; MV.k0 = Math.max(MV.minK, Math.min(W / MAPW, 1.2)); if (W < 700) MV.k0 = Math.max(MV.k0, 0.82); if (!MV.k || MV.k < MV.minK || MV.k > MV.maxK) MV.k = MV.k0; MV.clamp(); MV.apply(); MV.labels(); };
+// region labels: clamp inside the map, and hide any label whose box lies within 64 map units of a token centre
+MV.labels = function () {
+  var svg = document.querySelector('#map svg'); if (!svg) return; var toks = [], dyn = document.getElementById('dyn');
+  if (dyn) dyn.querySelectorAll('.tok').forEach(function (g) { var m = /translate\(\s*([-\d.]+)[\s,]+([-\d.]+)\)/.exec(g.getAttribute('transform') || ''); if (m) toks.push([+m[1], +m[2]]); });
+  svg.querySelectorAll('text.mlbl').forEach(function (t) {
+    var ox = +t.getAttribute('data-x'), bb; t.classList.remove('hid'); t.setAttribute('x', ox); bb = t.getBBox();
+    var sh = bb.x < 2 ? 2 - bb.x : bb.x + bb.width > MAPW - 2 ? MAPW - 2 - (bb.x + bb.width) : 0;
+    if (sh) { t.setAttribute('x', ox + sh); bb = t.getBBox(); }
+    for (var i = 0; i < toks.length; i++) { var dx = Math.max(bb.x - toks[i][0], 0, toks[i][0] - (bb.x + bb.width)), dy = Math.max(bb.y - toks[i][1], 0, toks[i][1] - (bb.y + bb.height)); if (Math.hypot(dx, dy) < 64) { t.classList.add('hid'); break; } }
+  });
+};
 MV.setSel = function (rid) {
   var sp = document.getElementById('selp'), nb = document.getElementById('nbp'); if (!sp) return;
   if (!rid || !REG[rid]) { sp.setAttribute('d', ''); nb.innerHTML = ''; return; }
@@ -4512,8 +4627,12 @@ function showResult() {
   if (UI.ended) return; UI.ended = true; var w = G.win, me = UI.side, won = w.side === me;
   try { if (window.GXT && GXT.active()) { GXT.act({ type: 'event', what: 'done' }); return; } } catch (e) { }
   sfx(won ? 'win' : 'lose');
-  $('#resH').textContent = won ? 'Victory' : 'Defeat';
-  $('#resP').textContent = { taint: 'The Hollow Crown overcame the Bearers. The Gloam rules the dark.', kiln: 'The Hollow Crown was unmade in the Kiln of Kaldur. Dawn breaks.', vp: w.side === 'G' ? 'The Gloam took ten points of Dawn cities and strongholds.' : 'The Dawn League took four points of Gloam strongholds.' }[w.why] + ' Turn ' + G.turn + '.';
+  $('#resH').textContent = won ? 'Victory' : 'Defeat'; $('#res').className = 'scr' + (won ? ' won' : ' lost');
+  $('#rWho').textContent = (w.side === 'D' ? 'The Dawn League' : 'The Gloam') + (won ? ' prevails' : ' prevails over you');
+  $('#rEmb').className = 'rem ' + w.side.toLowerCase(); $('#rEmb').innerHTML = '<svg viewBox="0 0 64 64" aria-hidden="true"><path d="' + ICONS[w.side === 'D' ? 'lantern' : 'leader'] + '" transform="translate(8,8) scale(.109)" fill="#f6e9c8"/></svg>';
+  $('#resP').textContent = { taint: 'The Hollow Crown overcame the Bearers. The Gloam rules the dark.', kiln: 'The Hollow Crown was unmade in the Kiln of Kaldur. Dawn breaks.', vp: w.side === 'G' ? 'The Gloam took ten points of Dawn cities and strongholds.' : 'The Dawn League took four points of Gloam strongholds.' }[w.why];
+  var reg = { D: 0, G: 0 }; Object.keys(G.A).forEach(function (r) { var a = G.A[r], sd = armySide(a); if (sd && units(a)) reg[sd]++; });
+  $('#rStats').innerHTML = [[G.turn, G.turn === 1 ? 'turn' : 'turns'], [reg[me], 'your regions'], [reg[other(me)], 'rival regions'], [G.stats.battles, 'battles']].map(function (x) { return '<div><b>' + x[0] + '</b><span>' + x[1] + '</span></div>'; }).join('');
   var row = $('#resRow'); row.innerHTML = '';
   [['Play again', function () { startGame({ side: UI.side, level: UI.level }); }, 'pri'], ['Switch sides', function () { startGame({ side: other(UI.side), level: UI.level }); }, ''], ['Title', showTitle, '']].forEach(function (x) { var b = mk('button', 'btn big ' + x[2], x[0]); b.type = 'button'; b.onclick = x[1]; row.appendChild(b); });
   $('#res').classList.add('on'); document.body.classList.add('scr-on');
@@ -4530,7 +4649,7 @@ function crest() {
 }
 function boot() {
   UI.side = ls('gw-side') || 'D'; UI.level = ls('gw-lv') || 'normal';
-  crest(); if ($('#title').classList.contains('on')) document.body.classList.add('scr-on'); MV.init(); MV.onTap = onMapTap; menuInit(); helpInit();
+  GWART.paint($('#title')); GWART.paint($('#res')); crest(); if ($('#title').classList.contains('on')) document.body.classList.add('scr-on'); MV.init(); MV.onTap = onMapTap; menuInit(); helpInit();
   var seg = $('#segL'); [['easy', 'Easy'], ['normal', 'Normal'], ['hard', 'Hard']].forEach(function (x) { var b = mk('button', UI.level === x[0] ? 'on' : '', x[1]); b.type = 'button'; b.onclick = function () { UI.level = x[0]; ls('gw-lv', x[0]); seg.querySelectorAll('button').forEach(function (y) { y.classList.toggle('on', y === b); }); }; seg.appendChild(b); });
   $('#playD').onclick = function () { ls('gw-played', 1); startGame({ side: 'D', level: UI.level }); };
   $('#playG').onclick = function () { ls('gw-played', 1); startGame({ side: 'G', level: UI.level }); };
@@ -4860,6 +4979,313 @@ function startTutorial() {
   startGame({ side: 'D', level: 'easy', seed: 4242, mode: 'tut', dice: TUT_DICE });
   setTimeout(function () { TUT.guide(); }, 350);
 }
+
+</script>
+<script>
+// gx-scenario-tutor.js: scenario tutorials (owner verdict, Nov 2026: tutorials must be GAMES). Each scenario puts the real board in a
+// small, stacked position with ONE objective; the player makes real moves and learns the rule from the consequence. A floating
+// objective card never dims and never blocks taps. Needs gx-scenario-tutor.css. ES5, no dependencies. Docs: shell/GXST.md.
+// (Global is GXST because GXS is already the ?scn= test registry in gx-scenario.js.)
+//   GXST.init({game, scenarios:[...], storageKey?, settled?:()=>bool, keepClear?:[selectors], qParent?, phoneSlot?:{after,before,avoid:[selectors]}|fn()->rect|selector, keepPlace?:bool, goalAlways?:bool})   GXST.picker() GXST.start(id) GXST.retry()
+//   GXST.next() GXST.hint() GXST.close() GXST.state()      events: window 'gxst' CustomEvent, detail.type =
+//   picker | start | hint | win | fail | retry | close
+//   scenario: {id, title, rule, goal, setup(), success()->bool, fail()->false|'message', par?, moves?()->n, hints:[nudge, {say, target}],
+//              debrief, solve?(api) (tests only)}
+(function () {
+  'use strict';
+  var D = document, C = null, S = null, W = null, R = null, Q = null, tick = 0, drag = null;
+  function $(s) { try { return D.querySelector(s); } catch (e) { return null; } }
+  function mk(tag, cls, txt) { var e = D.createElement(tag); if (cls) e.className = cls; if (txt != null) e.textContent = txt; e.setAttribute('data-help', ''); return e; }
+  function btn(cls, txt, aria, f) { var b = mk('button', cls, txt); b.type = 'button'; if (aria) b.setAttribute('aria-label', aria); b.onclick = function (ev) { ev.stopPropagation(); f(); }; return b; }
+  function emit(type, x) { var d = { type: type, game: C && C.game }; for (var k in x) d[k] = x[k]; var e; try { e = new CustomEvent('gxst', { detail: d }); } catch (er) { e = D.createEvent('CustomEvent'); e.initCustomEvent('gxst', false, false, d); } window.dispatchEvent(e); }
+  function vis(e) { if (!e || !e.getBoundingClientRect) return null; var r = e.getBoundingClientRect(); if (r.width < 2 || r.height < 2) return null; return { left: r.left, top: r.top, right: r.right, bottom: r.bottom, width: r.width, height: r.height }; }
+  function find(t) { if (!t) return null; if (typeof t === 'function') { try { return t(); } catch (e) { return null; } } var a; try { a = D.querySelectorAll(t); } catch (e) { return null; } for (var i = 0; i < a.length; i++) if (vis(a[i])) return a[i]; return null; }
+  function hit(a, b) { return a.left < b.right && a.right > b.left && a.top < b.bottom && a.bottom > b.top; }
+  function call(f, d) { if (typeof f !== 'function') return d; try { return f(); } catch (e) { return d; } }
+  // ------------------------------------------------------------ progress: best stars per scenario, card position
+  function key() { return C.storageKey || 'gxst-' + C.game; }
+  function load() { var o = null; try { o = JSON.parse(localStorage.getItem(key()) || 'null'); } catch (e) { } return o && typeof o === 'object' ? o : {}; }
+  function save() { try { localStorage.setItem(key(), JSON.stringify({ best: S.best, pos: S.pos })); } catch (e) { } }
+  function sc(id) { for (var i = 0; i < C.scenarios.length; i++) if (C.scenarios[i].id === id) return i; return -1; }
+  function cur() { return S.i >= 0 ? C.scenarios[S.i] : null; }
+  function stars() { var s = cur(), n = 3 - S.hint; if (s && s.par && call(s.moves, 0) > s.par) n--; return Math.max(1, n); }
+  function firstOpen() { for (var i = 0; i < C.scenarios.length; i++) if (!S.best[C.scenarios[i].id]) return i; return 0; }
+  function txt(v) { return typeof v === 'function' ? call(v, '') : v; }
+  function starTxt(n) { var t = ''; for (var i = 0; i < 3; i++) t += i < n ? '★' : '☆'; return t; }
+  // ------------------------------------------------------------ Lessons button (reopens the picker)
+  function qBtn() {
+    if (Q && D.body.contains(Q)) return;
+    Q = btn('gxst-q', 'Lessons', 'Lessons: learn by playing', function () { GXST.picker(); });
+    var p = (C.qParent && $(C.qParent)) || $('.gx-bar');
+    if (p) { Q.className = 'gx-ibtn gxst-q'; p.appendChild(Q); } else { Q.className += ' gxst-qfix'; D.body.appendChild(Q); }
+    setTimeout(qCheck, 50);
+  }
+  // a Lessons button that renders smaller than a thumb, or off screen (hidden bar, 0x0 slot), moves to a fixed pill; the pill picks the screen corner
+  // that covers the fewest buttons, so it never hides the game's own controls
+  var QSEL = 'button,a,[role=button],[onclick],[tabindex],input,select,summary,.card,[data-c],[data-id],.chip,[class*=chip],#instr,#say,#status,.dock';
+  function qOver(r) {   // does the in-bar button sit on top of another control or chip?
+    var bs = D.querySelectorAll(QSEL), i, b; for (i = 0; i < bs.length; i++) { if (bs[i] === Q || bs[i].contains(Q) || Q.contains(bs[i])) continue; b = vis(bs[i]); if (b && hit(r, { left: b.left + 2, top: b.top + 2, right: b.right - 2, bottom: b.bottom - 2 })) return true; } return false;
+  }
+  function qCheck() {
+    if (!Q || !D.body.contains(Q)) return;
+    if (Q.className.indexOf('gxst-qfix') < 0) {
+      var r = Q.getBoundingClientRect(); if (r.width >= 44 && r.height >= 44 && r.left >= 0 && r.right <= innerWidth + 1 && r.top >= 0 && r.bottom <= innerHeight + 1 && !qOver(r)) return;
+      Q.className = 'gxst-q gxst-qfix'; D.body.appendChild(Q);
+    }
+    var vw = innerWidth, vh = innerHeight, w = Q.offsetWidth || 72, h = Q.offsetHeight || 44, bs = D.querySelectorAll(QSEL), rs = [], i;
+    for (i = 0; i < bs.length; i++) { if (bs[i] === Q || (W && W.contains(bs[i]))) continue; var q = vis(bs[i]); if (q) rs.push(q); }
+    var wr = W && vis(W); if (wr) rs.push(wr);
+    (C.keepClear || []).forEach(function (sel) { var a; try { a = D.querySelectorAll(sel); } catch (e) { a = []; } for (var j = 0; j < a.length; j++) { if (a[j] === Q || a[j].contains(Q)) continue; var kr = vis(a[j]); if (kr) rs.push(kr); } });
+    var cs = [[8, vh - h - 8], [vw - w - 8, vh - h - 8], [vw - w - 8, 8], [8, 8], [vw / 2 - w / 2, vh - h - 8], [vw / 2 - w / 2, 8], [vw - w - 8, 76], [8, 76], [vw / 2 - w / 2, 76]], best = null;
+    function cost(c) { var b = { left: c[0], top: c[1], right: c[0] + w, bottom: c[1] + h }, n = 0; for (var k = 0; k < rs.length; k++) if (hit(b, rs[k])) n++; return n; }
+    var cur = Q.getAttribute('data-pos'), cc = cur ? JSON.parse(cur) : null;
+    if (cc && cost(cc) === 0) return;
+    for (i = 0; i < cs.length; i++) { var v = cost(cs[i]) + i * 0.01; if (!best || v < best.v) best = { v: v, c: cs[i] }; }
+    Q.setAttribute('data-pos', JSON.stringify(best.c)); Q.style.left = Math.round(best.c[0]) + 'px'; Q.style.top = Math.round(best.c[1]) + 'px'; Q.style.bottom = 'auto';
+  }
+  // ------------------------------------------------------------ the card: picker | play | win | fail
+  function render() {
+    if (!S.open) { if (W) { W.remove(); W = null; } ring(); return; }
+    if (!W) { W = mk('div', 'gxst-card'); W.setAttribute('role', 'dialog'); W.setAttribute('aria-label', 'Lesson'); D.body.appendChild(W); wireDrag(); }
+    W.innerHTML = ''; W.className = 'gxst-card gxst-' + S.phase + (S.min ? ' gxst-min' : '');
+    var s = cur();
+    if (S.min) { W.appendChild(btn('gxst-chip', s && S.phase === 'play' ? s.title + ': ' + txt(s.goal) : 'Lessons', 'Open lesson card', function () { S.min = false; render(); })); place(); return; }
+    var hd = mk('div', 'gxst-hd');
+    hd.appendChild(mk('b', null, S.phase === 'picker' ? 'Learn by playing' : (S.i + 1) + '/' + C.scenarios.length + ' ' + s.title));
+    hd.appendChild(mk('span', 'gxst-sp'));
+    hd.appendChild(btn('gxst-ib', '–', 'Minimise', function () { S.min = true; render(); }));
+    hd.appendChild(btn('gxst-ib', '×', 'Close', function () { GXST.close(); }));
+    W.appendChild(hd);
+    var ft = mk('div', 'gxst-ft');
+    if (S.phase === 'picker') {
+      W.appendChild(mk('p', 'gxst-say', 'Short games on the real board. Each one teaches one rule.'));
+      var ol = mk('ol', 'gxst-list');
+      C.scenarios.forEach(function (x, i) {
+        var li = mk('li'), b = btn('gxst-pick' + (i === firstOpen() ? ' rec' : ''), null, 'Lesson ' + (i + 1) + ': ' + x.title, function () { GXST.start(x.id); });
+        b.setAttribute('data-id', x.id); b.appendChild(mk('span', 'gxst-n', String(i + 1))); b.appendChild(mk('span', 'gxst-t', x.title)); b.appendChild(mk('span', 'gxst-st', starTxt(S.best[x.id] || 0)));
+        li.appendChild(b); ol.appendChild(li);
+      });
+      W.appendChild(ol);
+    } else if (S.phase === 'play') {
+      W.appendChild(mk('p', 'gxst-goal', txt(s.goal)));
+      if (S.hint) { var h = s.hints[S.hint - 1]; W.appendChild(mk('p', 'gxst-hint', typeof h === 'string' ? h : h.say)); }
+      var hb = btn('gxst-btn gxst-bulb', S.hint ? (S.hint < s.hints.length ? 'Show me' : 'Hint shown') : 'Hint', 'Hint', function () { GXST.hint(); });
+      if (S.hint >= s.hints.length) hb.disabled = true;
+      ft.appendChild(hb); ft.appendChild(mk('span', 'gxst-sp'));
+      ft.appendChild(btn('gxst-btn', 'Restart', null, function () { GXST.retry(); }));
+    } else if (S.phase === 'win') {
+      if (C.goalAlways) W.appendChild(mk('p', 'gxst-goal', txt(s.goal)));
+      W.appendChild(mk('p', 'gxst-stars', starTxt(S.stars)));
+      W.appendChild(mk('p', 'gxst-say', s.debrief));
+      W.appendChild(mk('p', 'gxst-rule', 'Rule: ' + s.rule));
+      ft.appendChild(btn('gxst-btn', 'Retry', null, function () { GXST.retry(); })); ft.appendChild(mk('span', 'gxst-sp'));
+      ft.appendChild(btn('gxst-btn pri', S.i < C.scenarios.length - 1 ? 'Next lesson' : 'All lessons', null, function () { GXST.next(); }));
+    } else if (S.phase === 'fail') {
+      if (C.goalAlways) W.appendChild(mk('p', 'gxst-goal', txt(s.goal)));
+      W.appendChild(mk('p', 'gxst-say', 'Not quite.'));
+      W.appendChild(mk('p', 'gxst-msg', S.msg));
+      ft.appendChild(btn('gxst-btn', 'Lessons', null, function () { GXST.picker(); })); ft.appendChild(mk('span', 'gxst-sp'));
+      ft.appendChild(btn('gxst-btn pri', 'Retry', null, function () { GXST.retry(); }));
+    }
+    if (ft.children.length) W.appendChild(ft);
+    place();
+  }
+  function hintTarget() { var s = cur(); if (!s || S.phase !== 'play' || S.hint < 2) return null; var h = s.hints[S.hint - 1]; return h && typeof h === 'object' ? vis(find(h.target)) : null; }
+  // keep the card off the hinted target and the keepClear areas; a dragged position is kept unless it covers the hinted target
+  function place() {
+    if (!W) return;
+    // phoneSlot as a function (any width; return null to opt out) or selector string (narrow screens < 700px only): it gives the rect the game keeps free; the card lives inside it, compact, body scrolls; never over the game
+    var ps0 = C.phoneSlot, slot = typeof ps0 === 'function' ? call(ps0, null) : typeof ps0 === 'string' && innerWidth < 700 ? vis(find(ps0)) : null;
+    if (slot && slot.width == null) { slot.width = slot.right - slot.left; slot.height = slot.bottom - slot.top; }
+    if (slot && slot.width > 2 && slot.height > 2) { W.classList.add('gxst-inslot'); W.style.width = Math.round(slot.width) + 'px'; W.style.maxHeight = Math.round(slot.height) + 'px'; return put([slot.left, slot.top]); }
+    W.classList.remove('gxst-inslot'); W.style.maxHeight = ''; W.style.width = '';
+    var vw = innerWidth, vh = innerHeight, bw = W.offsetWidth, bh = W.offsetHeight, t = hintTarget(), av = [];
+    if (Q && Q.className.indexOf('gxst-qfix') >= 0) { var qr = vis(Q); if (qr) av.push(qr); }
+    (C.keepClear || []).forEach(function (sel) { var a; try { a = D.querySelectorAll(sel); } catch (e) { a = []; } for (var i = 0; i < a.length; i++) { var r = vis(a[i]); if (r) av.push(r); } });
+    function clamp(p) { return [Math.max(4, Math.min(vw - bw - 4, p[0])), Math.max(4, Math.min(vh - bh - 4, p[1]))]; }
+    function box(p) { return { left: p[0], top: p[1], right: p[0] + bw, bottom: p[1] + bh }; }
+    function cost(p) { var b = box(p), c = t && hit(b, t) ? 1e6 : 0; av.forEach(function (r) { var x = Math.min(b.right, r.right) - Math.max(b.left, r.left), y = Math.min(b.bottom, r.bottom) - Math.max(b.top, r.top); if (x > 0 && y > 0) c += x * y; }); return c; }
+    if (S.pos && !(S.min && C.phoneSlot && typeof C.phoneSlot === 'object' && vw < 600)) { var q = clamp(S.pos); if (!(t && hit(box(q), t))) return put(q); }
+    var top = 4, bar = $('.gx-bar'); if (bar) { var br = bar.getBoundingClientRect(); if (br.top < 4 && br.height < 90) top = br.bottom + 6; }
+    var sp = [[8, top], [vw - bw - 8, top], [vw - bw - 8, vh - bh - 8], [8, vh - bh - 8]];
+    av.concat(t ? [t] : []).forEach(function (r) { sp.push([8, r.bottom + 6], [vw - bw - 8, r.bottom + 6], [8, r.top - bh - 6], [r.right + 6, r.top]); });
+    var best = null; sp.forEach(function (p, i) { p = clamp(p); var c = cost(p) + i * 0.01; if (!best || c < best.c) best = { p: p, c: c }; });
+    if (S.min && C.phoneSlot && typeof C.phoneSlot === 'object' && vw < 600) {   // phone chip: keep the card's own spot when it is clear (no jump on open); else the chip gets a band just under phoneSlot.after or just above phoneSlot.before, never over phoneSlot.avoid items or the dock
+      var ps = C.phoneSlot, an = vis($(ps.after)), bf = vis($(ps.before)), ob = [], cs = [best.p];
+      (ps.avoid || []).forEach(function (sel) { var a; try { a = D.querySelectorAll(sel); } catch (e) { a = []; } for (var i = 0; i < a.length; i++) { var r = vis(a[i]); if (r) ob.push(r); } });
+      if (an) cs.push([8, an.bottom + 4]); if (bf) cs.push([8, bf.top - bh - 6]);
+      var pb = null; cs.forEach(function (c, k) { c = clamp(c); var b = box(c), v = t && hit(b, t) ? 1e6 : 0; ob.forEach(function (r) { if (hit(b, r)) v += 1; }); if (bf && b.bottom > bf.top) v += 1; if (!pb || v < pb.v) pb = { p: c, v: v }; });
+      if (pb && pb.v < 1e6) { W.style.left = '8px'; return put(pb.p); }
+    }
+    var cx = C.keepPlace && W.style.left ? clamp([parseFloat(W.style.left), parseFloat(W.style.top)]) : null;   // stay where you are unless somewhere is clearly better: a card that jumps while you reach for Retry is worse than a small overlap (opt-in: keepPlace)
+    if (cx && cost(cx) <= best.c + 0.5) best = { p: cx, c: 0 };
+    put(best.p);
+  }
+  function put(p) { W.style.left = Math.round(p[0]) + 'px'; W.style.top = Math.round(p[1]) + 'px'; }
+  function wireDrag() {
+    W.addEventListener('pointerdown', function (e) { if (!e.target.closest('.gxst-hd') || e.target.closest('button')) return; var r = W.getBoundingClientRect(); drag = [e.clientX - r.left, e.clientY - r.top, false]; try { W.setPointerCapture(e.pointerId); } catch (x) { } });
+    W.addEventListener('pointermove', function (e) { if (!drag) return; drag[2] = true; S.pos = [e.clientX - drag[0], e.clientY - drag[1]]; put(S.pos); });
+    W.addEventListener('pointerup', function () { if (drag && drag[2]) { save(); place(); } drag = null; });
+  }
+  // ------------------------------------------------------------ the "show me" ring: pointer-events none, never steals a tap
+  function ring() {
+    var t = S && S.open ? hintTarget() : null;
+    if (!t) { if (R) { R.remove(); R = null; } return; }
+    if (!R) { R = mk('div', 'gxst-ring'); D.body.appendChild(R); }
+    R.style.left = (t.left - 4) + 'px'; R.style.top = (t.top - 4) + 'px'; R.style.width = (t.width + 8) + 'px'; R.style.height = (t.height + 8) + 'px';
+  }
+  // ------------------------------------------------------------ judge: success / fail only when the game has settled (animations done)
+  function loop() {
+    if (!S || !S.open) return;
+    var s = cur();
+    if (S.phase === 'play' && S.live && call(C.settled, true)) {
+      if (call(s.success, false)) { S.stars = stars(); if ((S.best[s.id] || 0) < S.stars) S.best[s.id] = S.stars; S.phase = 'win'; S.min = false; save(); render(); emit('win', { id: s.id, stars: S.stars }); return; }
+      var f = call(s.fail, false); if (f) { S.phase = 'fail'; S.msg = String(f); S.min = false; render(); emit('fail', { id: s.id, msg: S.msg }); return; }
+    }
+    if (!drag) place(); ring();
+  }
+  function tickAll() { loop(); qCheck(); }
+  function begin(i, how) {
+    S.i = i; S.phase = 'play'; S.hint = 0; S.msg = ''; S.stars = 0; S.open = true; S.min = false; S.live = false;
+    var s = cur(), tok = ++S.tok; render();
+    var r = null; try { r = s.setup(); } catch (e) { console.error(e); }
+    var go = function () { if (tok === S.tok) { S.live = true; place(); emit(how, { id: s.id, i: i }); } };
+    if (r && typeof r.then === 'function') r.then(go, go); else go();
+  }
+  window.GXST = {
+    init: function (cfg) {
+      C = cfg; var o = load(); S = { open: false, phase: 'picker', i: -1, hint: 0, best: o.best || {}, pos: o.pos || null, min: false, live: false, tok: 0, msg: '', stars: 0 };
+      qBtn(); if (!tick) { tick = setInterval(tickAll, 250); addEventListener('resize', function () { if (S && S.open) render(); }); }
+      if (/[?&]lessons=1/.test(location.search)) setTimeout(function () { if (S && !S.open) GXST.picker(); }, 0);   // ?lessons=1 opens the picker in every game
+      return GXST;
+    },
+    picker: function () { if (!C) return; qBtn(); S.open = true; S.phase = 'picker'; S.min = false; S.tok++; S.live = false; render(); emit('picker', {}); },
+    start: function (id) { var i = typeof id === 'number' ? id : sc(id); if (i < 0) return; begin(i, 'start'); },
+    retry: function () { if (S.i < 0) return; begin(S.i, 'retry'); },
+    next: function () { if (S.i < C.scenarios.length - 1) begin(S.i + 1, 'start'); else GXST.picker(); },
+    hint: function () { var s = cur(); if (!s || S.phase !== 'play' || S.hint >= s.hints.length) return; S.hint++; render(); ring(); emit('hint', { id: s.id, level: S.hint }); },
+    close: function () { if (!S || !S.open) return; S.open = false; S.live = false; S.tok++; render(); emit('close', {}); },
+    place: function () { if (S && S.open && !drag) place(); },   // opt-in: a game calls this when its layout changes
+    active: function () { var s = S && S.open && S.phase !== 'picker' ? cur() : null; return s; },
+    state: function () {
+      if (!S) return null; var s = cur(), wr = W && vis(W), tr = hintTarget();
+      return { open: S.open, phase: S.phase, id: s && S.phase !== 'picker' ? s.id : null, i: S.i, live: S.live, hint: S.hint, stars: S.stars, msg: S.msg,
+        best: JSON.parse(JSON.stringify(S.best)), min: S.min, pos: S.pos, card: wr, target: tr, overlap: !!(wr && tr && hit(wr, tr)), count: C.scenarios.length };
+    }
+  };
+})();
+
+</script>
+<script>
+// Gloamwar scenario lessons (GXST, shell/gx-scenario-tutor.js, docs shell/GXST.md). They REPLACE the old floating checklist: Help > Lessons and
+// "Learn to play" open the lesson picker. Each lesson stages a tiny real position (a few dice, the rival has none) with ONE goal; the player
+// makes real moves on the real board and learns the rule from the consequence. Test: node gloamwar/tools/lessons-test.js (402x874 and 1366x768).
+//
+// RULE -> LESSON
+//   the hooded Character die walks the Company one step; each step may wake the hunt .......... walk
+//   a revealed Company must hide before it can walk again ...................................... hide
+//   a Muster die steps one nation toward war; only nations at war fight ........................ war
+//   an Army die moves up to two armies one region; armies can stand together .................. march
+//   an Army die attacks next door: dice hit on 5 or 6, a battle ends the fight ................. fight
+//   a Muster die raises troops in a town of a nation at war; an elite takes two hits ............ muster
+//   an Event die draws a card (hand limit 6) ..................................................... draw
+// NOT taught here (gaps): hunt tiles and taint damage, sieges, leaders and re-rolls, Gloam side dice, Will of the Dawn, minions, the Ashen Road, event card play, victory points.
+(function () {
+  if (!window.GXST) return;
+  var $ = function (s) { return document.querySelector(s); };
+  var L = { n: 0, base: 0, on: false };
+  var ready = function () { return typeof G !== 'undefined' && typeof startGame === 'function' && typeof UI !== 'undefined' && typeof render === 'function' && typeof MV !== 'undefined' && typeof newGame === 'function'; };
+  var usedN = function () { return G.used.D.filter(Boolean).length; };
+  var elites = function (rid) { var a = G.A[rid], t = 0; if (a) for (var n in a) t += a[n][1]; return t; };
+  var tokOf = function (rid, side) { return function () { return document.getElementById('tok-' + rid + '-' + side) || $('[data-tap="s:' + rid + '"]'); }; };
+  var dieOf = function (f) { return function () { return $('#mydice .die.can[data-f="' + f + '"]') || $('#mydice .die[data-f="' + f + '"]'); }; };
+  var actBtn = function (k) { return function () { return $('#acts .act[data-key="' + k + '"]'); }; };
+  // build the real game, then overwrite the table: Dawn dice (the Gloam has none, so the rival never acts), nations, armies, Company, hand
+  function stage(sp) {
+    try { GX.close(); } catch (e) { } try { GXH.setEnabled(false); GXH.hide(); } catch (e) { } try { if (window.TUT) TUT.stop(); } catch (e) { }
+    UI.fast = false; AIDELAY = 20; window.ANIM = false;
+    startGame({ side: 'D', level: 'easy', seed: sp.seed || 11, mode: 'lesson', noGoal: true }); clearTimeout(UI.timer);
+    L.on = true; L.n = 0;
+    G.phase = 'act'; G.act = 'D'; G.pend = null; G.dice = { D: sp.dice.slice(), G: [] }; G.used = { D: sp.dice.map(function () { return false; }), G: [] }; G.hb = { g: sp.hunt || 0, d: 0 };
+    G.hand.D = (sp.hand || []).slice(); G.hand.G = [];
+    G.F.hid = sp.hid !== false; G.F.tried = false; G.F.moved = 0; G.F.declared = true;
+    Object.keys(sp.pol || {}).forEach(function (k) { G.pol[k].s = sp.pol[k][0]; G.pol[k].a = sp.pol[k][1]; });
+    Object.keys(sp.A || {}).forEach(function (r) { if (sp.A[r]) G.A[r] = sp.A[r]; else delete G.A[r]; });
+    if (sp.focus) { try { MV.focus(sp.focus, MV.k0, false); } catch (e) { } }
+    UI.hold = false; UI.die = null; UI.src = null; UI.sub = null; UI.asFace = null;
+    render(); L.base = sp.base ? sp.base() : 0;
+  }
+  var lessons = [
+    { id: 'walk', title: 'Walk the Company', rule: 'The hooded Character die walks the Company one step toward the Kiln. A step can wake the Hunt.', par: 1,
+      goal: 'Move the Company one step.',
+      setup: function () { stage({ dice: ['C', 'X', 'E'], focus: 'lanternvale' }); },
+      success: function () { return G.F.tried; },
+      fail: function () { return usedN() > 0 && !G.F.tried ? 'That die cannot walk the Company. Only the hooded Character die does.' : false; },
+      hints: ['Which of your three dice shows a hooded figure?', { say: 'Tap the hooded die, then Move Company.', target: function () { return UI.die == null ? dieOf('C')() : actBtn('cmove')(); } }],
+      debrief: 'One Character die, one step. The Company has now moved, so it is easier to find.' },
+    { id: 'hide', title: 'Hide the Company', rule: 'A revealed Company cannot walk until it hides again. Hiding also costs a Character die.', par: 1,
+      goal: 'Hide the Company again.',
+      setup: function () { stage({ dice: ['C', 'M', 'E'], hid: false, focus: 'lanternvale' }); },
+      success: function () { return G.F.hid; },
+      fail: function () { return usedN() > 0 && !G.F.hid ? 'That die cannot hide the Company. Use the hooded Character die.' : false; },
+      hints: ['The lantern disc is red: the Company is seen. Which die hides it?', { say: 'Tap the hooded die, then Hide Company.', target: function () { return UI.die == null ? dieOf('C')() : actBtn('chide')(); } }],
+      debrief: 'Hidden again: next turn it can walk.' },
+    { id: 'war', title: 'Wake a nation', rule: 'A Muster die steps one nation closer to war. Only nations at war can fight or muster troops.', par: 1,
+      goal: 'Bring Aurelmont to war.',
+      setup: function () { stage({ dice: ['M', 'C', 'E'], pol: { au: [1, true], gr: [3, true], df: [3, false] }, focus: 'citadel' }); },
+      success: function () { return G.pol.au.s === 0; },
+      fail: function () { return usedN() > 0 && G.pol.au.s > 0 ? 'That was the wrong nation. Aurelmont is one step from war: stir it.' : false; },
+      hints: ['The nations tab shows how far each nation is from war. Which one is one step away?', { say: 'Tap the scroll die, Stir a nation, then Aurelmont.', target: function () { return UI.die == null ? dieOf('M')() : UI.sub === 'dip' ? actBtn('dip-au')() : actBtn('dip')(); } }],
+      debrief: 'Aurelmont is at war: its armies can fight and its towns muster.' },
+    { id: 'march', title: 'March an army', rule: 'An Army die moves up to two armies one region each. Tap an army, then a glowing region next to it.', par: 1,
+      goal: 'Move the Aurelmont army from the Citadel to the Crossing.',
+      setup: function () { stage({ dice: ['X', 'C', 'E'], pol: { au: [0, true] }, A: { citadel: { au: [3, 1, 1] }, crossing: null }, focus: 'citadel' }); },
+      success: function () { return !!G.A.crossing && units(G.A.crossing) >= 4; },
+      fail: function () { return usedN() > 0 && !(G.A.crossing && units(G.A.crossing) >= 4) && (!G.pend || G.pend.h !== 'amove') ? 'The army did not reach the Crossing. Tap the army, then the glowing Crossing next to it.' : false; },
+      hints: ['Which die moves armies? The helmet die does.', { say: 'Tap the helmet die, Move armies, the army, then the Crossing.', target: function () { return UI.die == null ? dieOf('X')() : !G.pend ? actBtn('amove')() : UI.src ? $('[data-tap="s:crossing"]') : tokOf('citadel', 'D')(); } }],
+      debrief: 'The whole army stepped to the Crossing: one die, one region.' },
+    { id: 'fight', title: 'Attack next door', rule: 'An Army die attacks an enemy army in the next region. Each troop rolls a die: 5 or 6 hits.', par: 1,
+      goal: 'Defeat the lone Gloam army next to Ferrystone.',
+      setup: function () { stage({ dice: ['X', 'C', 'E'], pol: { hl: [0, true] }, A: { ferrystone: { hl: [4, 1, 0] }, ottercrag: { pt: [1, 0, 0] } }, focus: 'ferrystone' }); },
+      success: function () { return !G.pend && !armyAt(G, 'ottercrag', 'G') && G.stats.battles > 0; },
+      fail: function () { return usedN() > 0 && !G.pend && G.stats.battles === 0 ? 'No fight happened. Use the helmet die to Attack, then tap the red army.' : (G.stats.battles > 0 && !G.pend && armyAt(G, 'ottercrag', 'G') ? 'The enemy held. Gather more troops before you strike.' : false); },
+      hints: ['Which die fights? The helmet die does, and so does crossed swords.', { say: 'Tap the helmet die, Attack, the red army, then fight on.', target: function () { return G.pend && G.pend.h === 'battle' ? $('#battle .btn.pri') || $('#battle .btn') : G.pend ? tokOf('ottercrag', 'G')() : UI.die == null ? dieOf('X')() : actBtn('attack')(); } }],
+      debrief: 'Five troops against one: the dice decide, and numbers win.' },
+    { id: 'muster', title: 'Raise an elite', rule: 'A Muster die raises troops in a town of a nation at war. An Elite takes two hits.', par: 1,
+      goal: 'Muster an Elite at the Citadel.',
+      setup: function () { stage({ dice: ['M', 'C', 'E'], pol: { au: [0, true] }, focus: 'citadel', base: function () { return elites('citadel'); } }); },
+      success: function () { return elites('citadel') > L.base; },
+      fail: function () { var g = G.pend && G.pend.h === 'recruit' ? G.pend.d.got : null; if (g && g.length && g[0].k !== 'e') return 'A Regular takes only one hit. An Elite takes two: pick Elite.'; return usedN() > 0 && !G.pend && elites('citadel') <= L.base ? 'No Elite was raised. Muster, tap the glowing Citadel, then pick Elite.' : false; },
+      hints: ['Which die raises troops, and where?', { say: 'Tap the scroll die, Muster, the Citadel, then Elite.', target: function () { return UI.die == null ? dieOf('M')() : !G.pend ? actBtn('recruit')() : UI.src ? actBtn('rec-e')() : $('[data-tap="s:citadel"]'); } }],
+      debrief: 'An Elite stands at the Citadel and takes two hits.' },
+    { id: 'draw', title: 'Draw a card', rule: 'The raven Event die draws a card. You may hold six.', par: 1,
+      goal: 'Draw one card.',
+      setup: function () { stage({ dice: ['E', 'C', 'M'], hand: [], focus: 'lanternvale', base: function () { return G.hand.D.length; } }); },
+      success: function () { return G.hand.D.length > L.base; },
+      fail: function () { return usedN() > 0 && G.hand.D.length <= L.base && !G.pend ? 'That die drew nothing. The raven Event die draws a card.' : false; },
+      hints: ['Which die has a raven?', { say: 'Tap the raven die, Draw a card, then pick a deck.', target: function () { return UI.die == null ? dieOf('E')() : UI.sub === 'draw' ? actBtn('draw-DC')() : actBtn('draw')(); } }],
+      debrief: 'A card in hand: play it later with an Event die.' }
+  ];
+  var go = function () {
+    if (!ready() || typeof GXST.init !== 'function') { setTimeout(go, 200); return; }
+    // lesson games never overwrite the player's saved game and show no result screen
+    if (typeof save === 'function') { var os = save; save = function () { if (!GXST.active()) return os.apply(this, arguments); }; }
+    var osr = showResult; showResult = function () { if (!GXST.active()) return osr.apply(this, arguments); };
+    var oa = apply; apply = function (m, byAI) { try { if (L.on && GXST.active() && !byAI && m && m.t === 'die') L.n++; } catch (e) { } return oa.apply(this, arguments); };
+    lessons.forEach(function (s) { s.moves = function () { return L.n; }; });
+    var phone = innerWidth < 600;
+    GXST.init({ game: 'gloamwar', scenarios: lessons, keepClear: ['#hudL', '#msg', '#phase', '#side', '#dock', '#mydice', '#acts'], settled: function () { return !!G && !UI.hold && !G.win && sideToAct(G) === 'D'; },
+      qParent: '#hudL', phoneSlot: { before: '#dock', after: '#phase' } });
+    window.GWLESSONS = { open: function () { try { TUT.stop(); } catch (e) { } $('#title').classList.remove('on'); document.body.classList.remove('scr-on'); GXST.picker(); } };
+    // every old entry point opens the lesson picker
+    TUT.lessons = function () { window.GWLESSONS.open(); }; startTutorial = function () { window.GWLESSONS.open(); };
+    /* phone portrait: the map and dock fill the screen, so a lesson starts as the one-line goal chip (tap it for Hint and Restart) */
+    addEventListener('gxst', function (e) { var t = e.detail && e.detail.type; if ((t === 'start' || t === 'retry') && innerWidth <= 600 && innerHeight > innerWidth) setTimeout(function () { var b = $('.gxst-card .gxst-ib[aria-label="Minimise"]'); if (b && GXST.state().phase === 'play') b.click(); }, 0); });
+    var lq = /[?&]lesson=(\w+)/.exec(location.search); if (lq) { try { $('#title').classList.remove('on'); document.body.classList.remove('scr-on'); } catch (e) { } GXST.start(lq[1]); }
+    else if (/[?&]lessons=1/.test(location.search)) window.GWLESSONS.open();
+  };
+  setTimeout(go, 300);
+})();
 
 </script>
 </body></html>
