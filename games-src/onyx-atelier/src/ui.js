@@ -65,6 +65,7 @@ var UI = (function () {
     var g = G(); if (!g) return; window.G = g;
     strip(1); strip(0); pyr(); board(); side(); status(); layout();
     if (U.tut && U.tut.onRender) U.tut.onRender();
+    if (window.OST) OST.render();
   }
   function strip(p) {
     var g = G(), P = g.pl[p], el = $(p ? '#rival' : '#me'), b = E.bonuses(P), bc = E.bestColour(P), q = g.pend, me = p === 0, h = '';
@@ -336,7 +337,7 @@ var UI = (function () {
     [].forEach.call(d.querySelectorAll('[data-pick]'), function (b) { b.onclick = function () { act({ t: 'royal', id: +b.dataset.pick }); }; });
   }
   function result() {
-    var g = G(); if (!g.over) return; var me = g.over.winner === 0, P = g.pl[g.over.winner];
+    var g = G(); if (!g.over) return; if (U.camp && window.OST) return OST.over(g); var me = g.over.winner === 0, P = g.pl[g.over.winner];
     var how = g.over.how === 'colour' ? '10 points in ' + NAME[E.bestColour(P).c] : HOW[g.over.how];
     if (me) SND.win();
     var d = sheet('<h2>' + (me ? 'You win!' : 'Rival wins') + '</h2><p style="text-align:center">' + (me ? 'You' : 'Rival') + ' reached ' + how + '.</p><p style="text-align:center">You ' + E.points(g.pl[0]) + ' pts · Rival ' + E.points(g.pl[1]) + ' pts</p><div class="acts"><button class="btn pri" data-again>Play again</button><button class="btn" data-menu>Menu</button></div>', true);
@@ -357,9 +358,9 @@ var UI = (function () {
     var d = sheet(h, true), mb = d.querySelector('[data-mapbtn]'); if (mb) mb.onclick = function () { closeSheet(); OTUT.mapOnly(); };
   }
   function menu() {
-    var d = sheet('<h2>Menu</h2><div style="display:flex;flex-direction:column;gap:8px"><button class="btn pri" data-a="resume">Resume</button><button class="btn" data-a="new">New game</button><button class="btn" data-a="learn">Learn to play</button><button class="btn" data-a="rules">How to play</button><button class="btn" data-a="snd">Sound: ' + (U.snd ? 'on' : 'off') + '</button><button class="btn" data-a="title">Title screen</button></div>', true);
+    var d = sheet('<h2>Menu</h2><div style="display:flex;flex-direction:column;gap:8px"><button class="btn pri" data-a="resume">Resume</button><button class="btn" data-a="new">New game</button>' + (window.OST ? '<button class="btn" data-a="story">Story map</button>' : '') + '<button class="btn" data-a="learn">Learn to play</button><button class="btn" data-a="rules">How to play</button><button class="btn" data-a="snd">Sound: ' + (U.snd ? 'on' : 'off') + '</button><button class="btn" data-a="title">Title screen</button></div>', true);
     [].forEach.call(d.querySelectorAll('[data-a]'), function (b) { b.onclick = function () { var a = b.dataset.a; closeSheet();
-      if (a === 'new') newGame(U.level); else if (a === 'learn') startTut(); else if (a === 'rules') rules(); else if (a === 'snd') { U.snd = !U.snd; LS('oa_snd', U.snd ? '1' : '0'); } else if (a === 'title') showTitle(); }; });
+      if (a === 'new') newGame(U.level); else if (a === 'learn') startTut(); else if (a === 'rules') rules(); else if (a === 'snd') { U.snd = !U.snd; LS('oa_snd', U.snd ? '1' : '0'); } else if (a === 'title') showTitle(); else if (a === 'story' && window.OST) OST.open(); }; });
   }
 
   // ---------- hint (same evaluation as the normal rival) ----------
@@ -423,9 +424,9 @@ var UI = (function () {
   }
 
   // ---------- game flow ----------
-  function save(clear) { if (U.tut || (window.GXS && GXS.on)) return; if (clear) LS('oa_save', null); else LS('oa_save', JSON.stringify({ G: U.G, level: U.level })); }
+  function save(clear) { if (U.tut || U.camp || (window.GXS && GXS.on)) return; if (clear) LS('oa_save', null); else LS('oa_save', JSON.stringify({ G: U.G, level: U.level })); }
   function newGame(level, seed, first) {
-    aiRun++; U.busy = false; U.tut = null; closeSheet(); var c = document.getElementById('coach'); if (c) c.remove();
+    aiRun++; U.busy = false; U.tut = null; U.camp = null; closeSheet(); var c = document.getElementById('coach'); if (c) c.remove();
     U.level = level || U.level; LS('oa_level', U.level);
     seed = seed || (Math.random() * 1e9) | 0;
     U.G = E.newGame(seed, first === undefined ? (Math.random() < .5 ? 0 : 1) : first);
@@ -437,16 +438,17 @@ var UI = (function () {
   function startTut() { if (window.OTUT) { $('#title').hidden = true; OTUT.start(); } else newGame('easy'); }
   function showTitle() {
     aiRun++; U.busy = false; closeSheet(); var c = document.getElementById('coach'); if (c) c.remove(); U.tut = null;
+    if (U.camp) { U.camp = null; U.level = LS('oa_level') || U.level; if (window.OST) OST.render(); }
     var t = $('#title'), sv = LS('oa_save'), seen = LS('oa_seen');
     t.innerHTML = '<svg class="sun" viewBox="0 0 100 100" aria-hidden="true"><use href="#fan"/></svg><h1>Onyx<br>Atelier</h1><div class="sub">A jeweller\'s duel</div><div class="gems">' + ['w', 'u', 'g', 'r', 'k', 'p', 'o'].map(function (k) { return OART.gm(k); }).join('') + '</div>' +
       (sv ? '<button class="btn pri" data-t="cont">Continue</button>' : '') +
       '<button class="btn' + (sv ? '' : ' pri') + '" data-t="play">' + (seen ? 'Play' : 'Play: first game teaches you') + '</button>' +
       '<div class="seg" role="group" aria-label="Rival strength">' + ['easy', 'normal', 'hard'].map(function (l) { return '<button class="btn" data-lv="' + l + '" aria-pressed="' + (U.level === l) + '">' + l[0].toUpperCase() + l.slice(1) + '</button>'; }).join('') + '</div>' +
-      '<button class="btn" data-t="learn">Learn to play</button><button class="btn" data-t="rules">How to play</button>';
+      (window.OST ? '<button class="btn" data-t="story">Story</button>' : '') + '<button class="btn" data-t="learn">Learn to play</button><button class="btn" data-t="rules">How to play</button>';
     t.hidden = false;
     t.onclick = function (e) { var b = e.target.closest('button'); if (!b) return;
       if (b.dataset.lv) { U.level = b.dataset.lv; LS('oa_level', U.level); [].forEach.call(t.querySelectorAll('[data-lv]'), function (x) { x.setAttribute('aria-pressed', x === b); }); return; }
-      var a = b.dataset.t; if (a === 'cont') resume(); else if (a === 'play') { if (!seen) startTut(); else newGame(U.level); } else if (a === 'learn') startTut(); else if (a === 'rules') rules(); };
+      var a = b.dataset.t; if (a === 'cont') resume(); else if (a === 'play') { if (!seen) startTut(); else newGame(U.level); } else if (a === 'learn') startTut(); else if (a === 'rules') rules(); else if (a === 'story' && window.OST) OST.open(); };
   }
   function boot() {
     OART.mount(); U.level = LS('oa_level') || 'easy'; U.snd = LS('oa_snd') !== '0';
