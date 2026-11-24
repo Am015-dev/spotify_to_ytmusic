@@ -436,7 +436,6 @@ html.ph .gx-bar h1,html.ph .gx-bar .gx-sp{display:none}
 html.ph .gx-bar .gx-ibtn{width:44px;min-width:44px;height:44px;min-height:44px;padding:0;flex:0 0 auto;border-radius:10px}
 html.ph .gx-bar .gx-ibtn span{display:none}
 html.ph .gx-bar .gx-ibtn svg.ic{width:24px;height:24px;stroke:currentColor;fill:none;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
-html.ph .gx-bar [data-gx="campd"]{display:none}
 html.ph.ph-p .gx-board{grid-row:2;grid-column:1}
 html.ph.ph-p #phview{grid-row:3;grid-column:1}
 html.ph.ph-p .gx-dock{grid-row:4;grid-column:1}
@@ -808,6 +807,18 @@ html body .gxc-path .gxc-node .gxc-disc{background:#2b1b0e!important;background-
 html body .gxc-path .gxc-node.locked .gxc-disc{background:#3b3b3b!important;border-color:#bbb!important;color:#fff!important}
 html body .gxc-path .gxc-node .gxc-pt-e,html body .gxc-path .gxc-node .gxc-lock{color:#fff!important;opacity:1!important}
 .hlp-rules-set .gxh-set button,#tutset .gx-ibtn span{background:#1b1208!important;color:#fff4d8!important;opacity:1!important;text-shadow:none!important;border-radius:4px;padding:0 4px}
+/* W674 HUD: status chips (icon + number), round bar buttons, readable pawn names */
+html.bf #bfres{gap:6px;padding:6px 8px;background:linear-gradient(rgba(11,22,32,.92),rgba(11,22,32,.55));border-bottom:0}
+html.bf #bfres>span{display:inline-flex;align-items:center;gap:5px;height:36px;padding:0 11px 0 8px;border-radius:18px;background:rgba(11,22,32,.88);border:2px solid #8a7348;color:#fff4d8;font:700 14px/1 var(--sans)}
+html.bf #bfres>span b{font-size:18px;color:#ffd98a}html.bf #bfres>span small{font:600 13px var(--sans);color:#cdd8e2}
+html.bf #bfres>span .rci{width:20px;height:20px;flex:0 0 20px;color:#ffd98a}
+html.bf #bfres>span.bad{border-color:#ff9a88;background:#4a1d17}html.bf #bfres>span.bad b,html.bf #bfres>span.bad small,html.bf #bfres>span.bad .rci{color:#ffc2b6}
+.gx-bar .gx-ibtn{border-radius:50%}
+html.bf .bfpc{max-width:none;min-width:0}html.ph.bf .bfpc .bfpn{max-width:100%;font-size:13px!important;letter-spacing:-.2px;overflow-wrap:break-word;word-break:normal;white-space:normal;overflow:visible;text-overflow:clip}
+.card .tag{font-size:13px}
+html.ph .gx-bar>[data-gx="cardsd"]{display:none}#moremenu .mcards{display:none}html.ph #moremenu .mcards{display:flex}
+@media (min-width:1024px){html.bf #bfres>span{height:42px;padding:0 14px 0 10px;gap:7px;font-size:16px}html.bf #bfres>span b{font-size:21px}html.bf #bfres>span small{font-size:16px}html.bf #bfres>span .rci{width:24px;height:24px;flex-basis:24px}}
+@media (min-width:1024px){html.bf #phview #phlabel .bfb,.mb>button.btn>span,.gxc-path .gxc-act small,.gxh-bd .gxh-tt,.gxh-bd .gxh-tx{font-size:16px!important}}
 </style>
 </head>
 
