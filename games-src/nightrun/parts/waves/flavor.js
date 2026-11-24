@@ -234,7 +234,7 @@ HOOK['PW.draw'](pd=>function(t){pd.call(this,t);try{FL.front(t);}catch(e){}});
 {const rr=RET.resultRow;RET.resultRow=function(){let h=rr.apply(this,arguments);try{if(RET.flavor&&ST.on)h+=FL.rowHTML();}catch(e){}return h;};}
 /* ---- the Stats sheet (parts/stats.js) gets a SHOOTER FLAVOUR block when it exists; read defensively ---- */
 {const put=sh=>{try{if(!RET.flavor||!RET.stats||!sh||sh.querySelector('#flStats'))return;const S=FL.S,n=Object.values(S.med).reduce((a,b)=>a+(b|0),0),cell=(l,v)=>'<div class="sc"><small>'+l+'</small><b>'+v+'</b></div>';
-    const h=[...sh.querySelectorAll('h3')].find(x=>/^CREDITS/.test(x.textContent));if(!h)return;
+    const h=[...sh.querySelectorAll('h3')].find(x=>/^PRIVACY/.test(x.textContent));if(!h)return;
     const d=document.createElement('div');d.id='flStats';d.innerHTML='<h3>SHOOTER FLAVOUR</h3><div class="stGrid">'+cell('Sprites rescued',S.resc)+cell('Secrets found',S.sec)+cell('Medals earned',n)+cell('Signs and crates',S.brk)+'</div>'
       +(S.found.length?'<div class="stCred"><p><b>Secrets</b> stages '+S.found.slice().sort((a,b)=>a-b).join(', ')+'</p></div>':'');
     h.parentNode.insertBefore(d,h);}catch(e){}};
