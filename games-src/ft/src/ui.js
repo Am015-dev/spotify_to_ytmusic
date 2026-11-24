@@ -52,11 +52,10 @@ function lineText(){if(!G)return '';if(G.over){const hs=G.pl.filter(x=>x.human);
 // ---------- seats (the score race) ----------
 function E2(e,k){return `<i class="e2" data-i="${k}">${e}</i>`}
 function pip(c,n){return n?`<span class="pp" title="${esc(MPLUR[c])}"><i class="mp sm" data-c="${c}"></i>${n}</span>`:''}
-function seatHtml(p){const a=sideToAct()===p.i&&!G.over;const kill=UI.pickSeat.includes(p.i);const nm=seatName(p);
-  return `<div class="sch ${a?'actnow':''} ${kill?'glow':''}" data-seat="${p.i}" style="--pc:${PCOL[p.i]}" aria-label="${esc(nm)}, score ${shownTotal(p)}">
-   <b class="sn">${esc(nm)}${!p.human?'<small>cpu</small>':''}</b><b class="ss"><i class="sti">★</i>${shownTotal(p)}</b>
-   <span class="s2"><span class="st">${E2('<img class="pic" src="media/icon-coin.webp" alt="">','coin')}${p.coins}<em class="w"> coins</em></span><span class="st">${E2('<img class="pic" src="media/icon-camel.webp" alt="">','camel')}${p.camels}<em class="w"> camel${p.camels===1?'':'s'} left</em></span>${p.tent?'<span class="st"><img class="pic" src="media/token-tent-0.webp" alt=""></span>':''}${(()=>{const dj=scoreOf(p).djinns;return dj?`<span class="st dje" title="Djinn points, counted at the end">${'<img class="pic" src="media/icon-djinn.webp" alt="">'}+${dj}<em class="w"> at end</em></span>`:''})()}</span>
-   <span class="s3">${pip('vizier',p.vz)}${pip('elder',p.el)}${G.ex.artisans?pip('artisan',p.art):''}${p.fk?`<span class="pp">${p.fk}</span>`:''}${p.res.length?`<span class="pp">${E2('<img class="pic" src="media/icon-basket.webp" alt="">','basket')}${p.res.length}</span>`:''}${p.dj.length?`<span class="pp">${E2('<img class="pic" src="media/icon-djinn.webp" alt="">','djinn')}${p.dj.length}</span>`:''}</span></div>`}
+function seatHtml(p){const a=sideToAct()===p.i&&!G.over;const kill=UI.pickSeat.includes(p.i);const nm=seatName(p);const vp=viewP();
+  return `<div class="sch ${a?'actnow':''} ${kill?'glow':''} ${vp&&vp.i===p.i?'me':''}" data-seat="${p.i}" role="button" style="--pc:${PCOL[p.i]}" aria-label="${esc(nm)}, score ${shownTotal(p)}, ${p.coins} coins, ${p.camels} camels">
+   <b class="sn">${esc(nm)}</b><b class="ss"><i class="sti"></i>${shownTotal(p)}</b>
+   <span class="s2"><span class="st">${E2('<img class="pic" src="media/icon-coin.webp" alt="">','coin')}${p.coins}</span><span class="st">${E2('<img class="pic" src="media/icon-camel.webp" alt="">','camel')}${p.camels}</span></span></div>`}
 function renderSeats(){const el=$('#seats');if(!el)return;const h=G.pl.map(seatHtml).join('');el.dataset.n=G.pl.length;el.innerHTML=h}
 // ---------- the bazaar ----------
 function mgHtml(m){const n={};for(const c of m)n[c]=(n[c]||0)+1;return Object.keys(n).map(c=>`<span class="mg" title="${n[c]} ${esc(n[c]>1?MPLUR[c]:MNAME[c])}"><i class="mp" data-c="${c}"></i><b>${n[c]}</b></span>`).join('')}
@@ -76,9 +75,11 @@ function renderGrid(){const g=$('#grid');if(!g)return;renderLegend();g.style.set
 function renderMarket(){const el=$('#mkt');if(!el)return;const tk=G.step==='tribe'&&G.act&&G.act.color==='merchant'&&G.phase==='turn'?G.act.n:0;
   let h='<div class="mrow" aria-label="Goods market">';for(let j=0;j<9;j++){const r=G.market[j];
     h+=r?`<button class="mcard ${UI.pickMk.includes(j)?'glow':''} ${UI.mkSel.includes(j)?'sel':''} ${j<tk?'mtake':''}" data-mk="${j}" data-r="${r}" style="--gi:url(media/good-${r}.webp)" aria-label="${esc(RNAME[r])}"><span class="mi">${RICON[r]}</span><span class="mn">${esc(RNAME[r])}</span></button>`:'<span class="mcard empty"></span>'}
-  h+='</div><div class="drow" aria-label="Djinns">'+G.djRow.map(k=>`<button class="dcard ${UI.pickDj.includes(k)?'glow':''}" data-dj="${k}" style="--dj:url(media/djinn-${k}.webp)" aria-label="${esc(DJ[k].n)}"><span class="dinfo" data-info="${k}" aria-label="About ${esc(DJ[k].n)}">i</span><b>${esc(DJ[k].n)}</b><span class="dv">${DJ[k].vp}</span></button>`).join('')
-   +(G.ex.thieves?G.thRow.map(k=>`<button class="dcard th ${UI.pickDj.includes('t:'+k)?'glow':''}" data-th="${k}" aria-label="${esc(THIEVES[k].n)}"><i class="thi" style="--ti:url(media/thief-${k}.webp)"></i><b>${esc(THIEVES[k].n.replace(' Cutpurse',''))}</b></button>`).join(''):'')+'</div>'+(typeof ownedDjHtml==='function'?ownedDjHtml():'');
-  if(el.dataset.h!==h){el.innerHTML=h;el.dataset.h=h}}
+  const hp=viewP();h+='</div>'+goodsInfo(hp);const dh='<div class="drow" aria-label="Djinns">'+G.djRow.map(k=>`<button class="dcard ${UI.pickDj.includes(k)?'glow':''}" data-dj="${k}" style="--dj:url(media/djinn-${k}.webp)" aria-label="${esc(DJ[k].n)}"><span class="dinfo" data-info="${k}" aria-label="About ${esc(DJ[k].n)}">i</span><b>${esc(DJ[k].n)}</b><span class="dv">${DJ[k].vp}</span></button>`).join('')
+   +(G.ex.thieves?G.thRow.map(k=>`<button class="dcard th ${UI.pickDj.includes('t:'+k)?'glow':''}" data-th="${k}" aria-label="${esc(THIEVES[k].n)}"><i class="thi" style="--ti:url(media/thief-${k}.webp)"></i><b>${esc(THIEVES[k].n.replace(' Cutpurse',''))}</b></button>`).join(''):'')+'</div>';
+  if(el.dataset.h!==h){el.innerHTML=h;el.dataset.h=h}const dr=$('#djrow');if(dr&&dr.dataset.h!==dh){dr.innerHTML=dh;dr.dataset.h=dh}}
+function goodsInfo(hp){const sv=[1,2,3,4,5,6,7,8,9].map(n=>`<span class="sv"><b>${n}</b><small>kind${n>1?'s':''}</small><i>${sellValue(n)}</i></span>`).join('');const mine=hp?hp.res.slice().sort():[];
+  return `<h3>Your goods</h3><div class="mygoods">${mine.length?mine.map(r=>`<span class="mcard mini" style="--gi:url(media/good-${r}.webp)" title="${esc(RNAME[r])}"><span class="mn">${esc(RNAME[r])}</span></span>`).join(''):'<p class="muted">None yet. Take goods at a Bazaar.</p>'}</div><h3>Selling sets (coins)</h3><div class="svt" aria-label="Different kinds sold together, and the coins they pay">${sv}</div>`}
 // ---------- buttons under the table ----------
 const mvAttr=m=>esc(JSON.stringify(m));
 function abtn(m,label,cls){return `<button class="ab ${cls||''}" data-mv='${mvAttr(m)}'>${label}</button>`}
@@ -105,7 +106,7 @@ const gdOn=()=>typeof gdStep==='function'&&!!gdStep();   // the guided game show
 function buildActs(){UI.autoMove=null;const hp=me();if(!G||G.over||!hp||UI.modal)return '';const vm=validMoves(hp.i);const by=a=>vm.filter(m=>m.act===a);let h='',main='';
   if(G.q){const q=G.q;main=q.opts.map((o,i)=>qBoardTile(o)!=null?(o.h==='noop'?'':''):abtn({act:'q',i},esc(shortOpt(o.l)),'')).join('');
     const done=q.opts.findIndex(o=>o.h==='noop');if(done>=0)main+=abtn({act:'q',i:done},'Done','go');return `<div class="arow">${main}</div>`}
-  if(G.phase==='bid')return trackHtml(hp,vm);
+  if(G.phase==='bid')return `<div class="arow"><button class="ab go" data-gx="bidd">Choose your turn order</button></div>`;
   const pw=powerChips(hp,vm);
   switch(G.step){
   case 'move':if(G.move){const u=by('undo')[0];main=u?abtn(u,'↶ Put them back','ghost'):(UI.moveSnap&&G.move.drops.length?'<button class="ab ghost" data-ui="undodrop">↶ Undo last drop</button>':'')}break;
@@ -128,7 +129,9 @@ function buildActs(){UI.autoMove=null;const hp=me();if(!G||G.over||!hp||UI.modal
     else if(kinds.length>1)main+=abtn({act:'sell',kinds:kinds.slice().sort()},`Sell all ${kinds.length} kinds +${sellValue(kinds.length)}`,'');   // F3: one button sells one of each kind
     main+=abtn(end,'End turn ▶','go');break}}
   if(main)h+=`<div class="arow${main.indexOf('ab ern')>=0?' earn':''}">${main}</div>`;if(G.step==='move'&&typeof f3Mine==='function')h=f3ActsHtml()+h;return h+pw}
-function renderActs(){const el=$('#acts');if(!el)return;const h=buildActs();if(el.dataset.h!==h){el.innerHTML=h;el.dataset.h=h}el.classList.toggle('empty',!h)}
+function renderActs(){const el=$('#acts');if(!el)return;const h=buildActs()+pickBtns();const bt=$('#bidt');if(bt&&G&&!G.over){const hp=me();const th=G.phase==='bid'?trackHtml(hp||viewP(),hp?validMoves(hp.i):[]):'';if(bt.dataset.h!==th){bt.innerHTML=th;bt.dataset.h=th}}if(el.dataset.h!==h){el.innerHTML=h;el.dataset.h=h}el.classList.toggle('empty',!h)}
+function pickBtns(){if(!G||G.over||!me()||UI.modal||G.q)return '';let h='';const vm=validMoves(me().i);UI.djPay=(UI.djPay||[]).filter(m=>vm.some(v=>same(v,m)));
+  if(UI.djPay.length)h+=`<div class="arow djpay">${UI.djPay.map(m=>abtn(m,`${esc((m.thief?THIEVES[m.thief]:DJ[m.dj]).n)}${m.pay?`: pay ${m.pay.el} Sage${m.pay.el>1?'s':''}${m.pay.fk?' + 1 Mystic':''}`:''}`,'go')).join('')}</div>`;if(UI.pickMk.length)h+=`<button class="ab go" data-gx="mktd"><img class="pic" src="media/icon-basket.webp" alt=""> Choose goods</button>`;if(UI.pickDj.length)h+=`<button class="ab go" data-gx="djd"><img class="pic" src="media/icon-djinn.webp" alt=""> Choose a djinn</button>`;return h?`<div class="arow pick">${h}</div>`:''}
 function renderMine(){const el=$('#mine');if(!el)return;const hp=me();let h='';
   if(G&&!G.over&&hp&&!UI.modal&&!G.q&&G.phase==='turn'&&G.step==='sell'){const kinds=[...new Set(hp.res)];UI.sellSel=UI.sellSel.filter(k=>kinds.includes(k));
     h=kinds.map(k=>`<button class="gchip ${UI.sellSel.includes(k)?'on':''}" data-sell="${k}" aria-label="${esc(RNAME[k])}">${RICON[k]}${hp.res.filter(x=>x===k).length>1?'<small>×'+hp.res.filter(x=>x===k).length+'</small>':''}</button>`).join('')}
@@ -178,7 +181,7 @@ function onMarket(j){const p=me();const el=document.querySelector(`[data-mk="${j
   if(!UI.mkSel.length){if(tm.some(m=>m.take.includes(j))){UI.mkSel=[j];return render()}return}
   const a=UI.mkSel[0];const m=tm.find(m=>m.take.length===2&&m.take.includes(a)&&m.take.includes(j));UI.mkSel=[];if(m)return go(m);render()}
 function onDjinn(k,th){const p=me();const ak=th?'t:'+k:k;if(UI.chz&&UI.chz.anchor.dj===ak){UI.chz=null;return render()}if(p&&G.step==='tile'&&!G.q){const tm=validMoves(p.i).filter(m=>m.act==='tile'&&(th?m.thief===k:m.dj===k));
-    if(tm.length===1)return go(tm[0]);if(tm.length>1){UI.chz={anchor:{dj:ak},opts:tm.map(m=>({html:`<span class="paychip">Pay ${m.pay.el} Sage${m.pay.el>1?'s':''}${m.pay.fk?' + 1 Mystic':''}</span>`,m}))};return render()}}
+    if(tm.length===1)return go(tm[0]);if(tm.length>1){UI.djPay=tm;if(GX.open)GX.close();return render()}/* W662: the pay choice goes to the dock */}
   const d=DJ[k];showTip(document.querySelector(th?`[data-th="${k}"]`:`[data-dj="${k}"]`),th?`<img class="tipart" src="media/thief-${k}.webp" alt=""><b>${esc(THIEVES[k].n)}</b><br>${esc(THIEVES[k].x)}`:`<img class="tipart" src="media/djinn-${k}.webp" alt=""><b>${esc(d.n)}</b> · ${d.vp} points<br>${esc(d.x)}`)}
 function go(m){if(m&&m.act==='f3plan'){UI.chz=null;return f3Plan(m.o)}UI.chz=null;UI.mkSel=[];UI.pendDj=null;UI.pendItem=null;clearTimeout(UI.autoT);if(online()&&isClient()){netSend(m);return}const s=sideToAct();const hu=s>=0&&P(s).human;const mine=!online()||s===NET.mySeat;
   if(hu&&m.act==='start'){UI.moveSnap=JSON.stringify(G);UI.moveSteps=[m]}else if(hu&&m.act==='step'&&UI.moveSteps)UI.moveSteps.push(m);else if(m.act!=='djinn'&&m.act!=='item')UI.moveSnap=null;

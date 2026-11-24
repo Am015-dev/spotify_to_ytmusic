@@ -87,3 +87,29 @@ function boot(){GX.init({key:'soq'});paintIcons();GX.onShow=id=>{if(id==='setd')
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot);else boot();
 
 function goalHtml(){return `<div class="mbox goal"><h2>Goal</h2><p class="lede">Finish with the most points. The game ends at the end of the round in which someone places their last camel.</p><ul class="goal-l"><li>Tap a spot to bid for turn order.</li><li>Walk your tribes over tiles.</li><li>Then sell goods for coins.</li></ul><div class="acts big"><button class="btn go big" data-ui="goalgo">Start playing</button></div></div>`}
+// ---------- W662 HUD: the board is the screen; everything else lives in windows the player opens ----------
+// Turn order opens by itself only when it is your bid, and closes once you have bid. A window opened from the dock to pick
+// goods or a djinn closes when the pick is made. On a PC a window can be pinned: it docks on the right and comes back next time.
+document.documentElement.classList.add('hud2');
+const HUD={pin:null,pick:null,restored:false};try{HUD.pin=localStorage.getItem('soq_pin')||null}catch(e){}
+const hudWide=()=>innerWidth>=1024;
+function hudPin(id){HUD.pin=id;try{id?localStorage.setItem('soq_pin',id):localStorage.removeItem('soq_pin')}catch(e){}hudPinCls()}
+function hudPinCls(){const on=!!HUD.pin&&hudWide()&&GX.open===HUD.pin;document.documentElement.classList.toggle('pinned',on);
+  for(const d of document.querySelectorAll('.gx-drawer'))d.classList.toggle('pin',on&&d.id===HUD.pin);
+  for(const b of document.querySelectorAll('.gx-pin'))b.setAttribute('aria-pressed',String(b.closest('.gx-drawer').id===HUD.pin));
+  if(on){GX.bg(false);GX.scrim&&GX.scrim.classList.remove('on')}if(G&&typeof fit==='function')setTimeout(fit,0)}
+function hudInit(){for(const d of document.querySelectorAll('.gx-drawer')){const h=d.querySelector('.gx-drawer-head');if(!h||h.querySelector('.gx-pin')||d.id==='menud'||d.id==='bidd')continue;
+    const b=document.createElement('button');b.className='gx-pin';b.type='button';b.setAttribute('aria-label','Pin to the side');b.title='Keep open beside the board';b.innerHTML='<img class="pic" src="media/icon-star.webp" alt="">';h.insertBefore(b,h.querySelector('.gx-x'))}
+  const os=GX.onShow,oc=GX.onClose;
+  GX.onShow=function(id){if(os)os.apply(this,arguments);hudPinCls()};
+  GX.onClose=function(id){if(oc)oc.apply(this,arguments);if(id===HUD.pin)hudPin(null);else if(HUD.pin&&hudWide()&&!GX.open&&G&&!UI.modal)GX.show(HUD.pin);hudPinCls()};
+  document.addEventListener('click',e=>{const p=e.target.closest&&e.target.closest('.gx-pin');if(p){const id=p.closest('.gx-drawer').id;hudPin(HUD.pin===id?null:id);if(!HUD.pin)GX.close();return}
+    const k=e.target.closest&&e.target.closest('.arow.pick [data-gx]');if(k)HUD.pick=k.dataset.gx},true)}
+function hudAfter(){if(!G||!GX.app)return;const live=!G.over&&!UI.modal;const myBid=live&&G.phase==='bid'&&!!me();
+  const key=G.round+':'+G.bids.length;
+  if(GX.open==='bidd'&&HUD.bidKey&&(G.phase!=='bid'||G.over||key!==HUD.bidKey))GX.close();   // you bid (or the bidding ended): the window closes itself
+  if(myBid&&HUD.bidKey!==key){HUD.bidKey=key;if(!GX.open||GX.open===HUD.pin)GX.show('bidd')}
+  if(HUD.pick&&GX.open===HUD.pick&&!(HUD.pick==='mktd'?UI.pickMk.length:UI.pickDj.length)){HUD.pick=null;GX.close()}
+  if(!HUD.restored&&live&&HUD.pin&&hudWide()){HUD.restored=true;if(!GX.open)GX.show(HUD.pin)}}
+(function(){const o=render;render=function(){o.apply(this,arguments);try{hudAfter()}catch(e){console.error(e)}}})();
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',hudInit);else hudInit();

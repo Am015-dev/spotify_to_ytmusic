@@ -23,7 +23,7 @@ const hq=s=>()=>document.querySelector(s);
 const hfirst=(...sels)=>()=>{for(const s of sels){const e=document.querySelector(s);if(e&&e.getBoundingClientRect().width)return e}return null};
 const hadv=(...sels)=>()=>{try{const e=hlpEl(hlpAdvice());if(e&&e.getBoundingClientRect().width)return e}catch(x){}return hfirst(...sels)()};   // the advised tile when there is one
 const HLP_STEPS={
- bid:{target:hfirst('#acts .sp-b.glow'),title:'Buy turn order',text:'Tap a glowing spot. Pricier spots play earlier.',pic:()=>HP.spot('3')},
+ bid:{target:hfirst('#bidt .sp-b.glow'),title:'Buy turn order',text:'Tap a glowing spot. Pricier spots play earlier.',pic:()=>HP.spot('3')},
  lift:{target:hadv('#grid .tile.glow'),title:'Lift a group',text:'Tap a glowing tile to pick up everyone standing on it.',pic:()=>HP.meeple('merchant')},
  drop:{target:hadv('#grid .tile.glow'),title:'Drop one by one',text:'Tap a glowing neighbour to drop one person there.',pic:()=>HP.meeple('builder')},
  collect:{target:hfirst('#acts .ab.go','#acts .ab'),title:'Use your tribe',text:'Tap Collect. Power chips below are optional.',pic:()=>HP.meeple('vizier')},
@@ -31,8 +31,8 @@ const HLP_STEPS={
  shadow:{target:hfirst('#grid .tile.glow','#seats .sch.glow','#acts .ab.go'),title:'Remove a person',text:'Tap a glowing tile or rival to remove someone there.',pic:()=>HP.meeple('assassin')},
  hamlet:{target:hfirst('#grid .tile.glow','#acts .ab.go'),title:'Build a palace',text:'Tap the glowing spot to build. A palace scores 5 points for the tile’s holder.',pic:()=>HP.icon('')},
  oasis:{target:hfirst('#grid .tile.glow','#acts .ab.go'),title:'Plant a palm',text:'Tap the glowing spot to plant. A palm scores 3 points for the tile’s holder.',pic:()=>HP.icon('')},
- shrine:{target:hfirst('#mkt .dcard.glow'),title:'Summon a djinn',text:'Tap a glowing djinn. It costs 2 Sages, or 1 Sage and 1 Mystic.',pic:()=>HP.djinn()},
- goods:{target:hfirst('#mkt .mcard.glow'),title:'Buy goods',text:'Tap a glowing goods card to buy it. The Grand Bazaar lets you tap two.',pic:()=>HP.goods('gold')},
+ shrine:{target:hfirst('#djd.on #djrow .dcard.glow','#acts .arow.pick .ab'),title:'Summon a djinn',text:'Tap a glowing djinn. It costs 2 Sages, or 1 Sage and 1 Mystic.',pic:()=>HP.djinn()},
+ goods:{target:hfirst('#mktd.on #mkt .mcard.glow','#acts .arow.pick .ab'),title:'Buy goods',text:'Tap a glowing goods card to buy it. The Grand Bazaar lets you tap two.',pic:()=>HP.goods('gold')},
  workshop:{target:hfirst('#acts .ab.go','#acts .ab'),title:'Commission an item',text:'Tap a pay button to take the top item, or tap Skip.',pic:()=>HP.icon('')},
  sell:{target:hfirst('#mine .gchip','#acts .ab.go','#acts .ab'),title:'Sell or finish',text:'Tap goods of different kinds, then Sell for coins. Or tap End turn.',pic:()=>HP.coin('+')},
  power:{target:hfirst('#grid .tile.glow'),title:'Aim your power',text:'Tap a glowing tile to use the power there. Tap the chip again to cancel.',pic:()=>HP.djinn()},
@@ -168,7 +168,7 @@ function hlpWalk(){try{if(typeof f3Mine!=='function'||!f3Mine())return null;let 
 // ---------------------------------------------------------------- wiring
 let _hlpInit=false;
 function hlpInit(){if(_hlpInit||typeof GXH==='undefined')return;_hlpInit=true;
-  GXH.init({game:'sands-of-qamar',defaultOn:false,steps:HLP_STEPS,rules:HLP_RULES,avoid:'.glow,#acts .ab,#acts .sp-b,#mine .gchip,#finger'});
+  GXH.init({game:'sands-of-qamar',defaultOn:false,steps:HLP_STEPS,rules:HLP_RULES,avoid:'.glow,#acts .ab,#bidt .sp-b,#mine .gchip,#finger'});
   GXH.bulb({el:'#whatbtn',suggest:hlpSuggest,rulesFor:hlpPhase});try{GXH.setEnabled(false)}catch(e){}   // bubbles live only in Learn to play; the bulb is the Hints button "What should I do?"
   const hm=document.getElementById('gxhmenu');if(hm)hm.innerHTML=GXH.settingsHTML({rowClass:'',btnClass:'btn sm'});
   // a tap that lands on a bubble only dismisses it (the board under it must not act)
