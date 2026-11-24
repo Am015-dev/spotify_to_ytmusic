@@ -47,6 +47,10 @@
       if (r && r.success && L.on && mv && (side == null || side === 0) && (mv.act === 'dial' || (mv.act === 'action' && mv.a !== 'skip') || (mv.act === 'fire' && mv.w !== 'skip'))) L.n++;
       return r; }; }
 
+  // a lesson that ends the game (the range lesson destroys the Slate) must show the lesson card's debrief, not the game's victory screen
+  var wrapOver = function () { if (typeof overUI !== 'function') return setTimeout(wrapOver, 200); var oU = overUI; overUI = function () { if (live()) { try { setHint(''); setBtns(''); } catch (e) { } return; } return oU.apply(this, arguments); }; };
+  wrapOver();
+
   // ---- build a two-ship position. sp: me, foe (pilot ids), mp {x,y,h}, fp {x,y,h}, foeMove {s,t}, a0/d0/a1/d1 dice faces, stress
   function stage(sp) {
     try { var sk = $('[data-gxt-skip]'); if (sk) sk.click(); } catch (e) { }

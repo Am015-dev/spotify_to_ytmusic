@@ -30,10 +30,10 @@ async function run(size, base) {
   const ctx = await browser.newContext({ viewport: { width: W, height: H }, hasTouch: W < 800, isMobile: W < 800 });
   await turbo(ctx);
   // the 3D board repaints on every (1 ms) turbo frame and saturates the page: ~80 frames a second are plenty for the logic
-  await ctx.addInitScript(() => { window.requestAnimationFrame = f => setTimeout(() => f(performance.now()), 1200); });
+  await ctx.addInitScript(() => { window.requestAnimationFrame = f => setTimeout(() => f(performance.now()), W < 800 ? 2500 : 7000); });
   const p = await ctx.newPage(); const errs = [];
   p.on('pageerror', e => errs.push(e.message));
-  await p.goto(base); await tick(p, 3000);
+  await p.goto(base, { waitUntil: 'domcontentloaded' }); await p.waitForFunction(() => window.GXST && typeof G !== 'undefined' && window.GXH, null, { timeout: 30000 }); await tick(p, 3000);
   const st = () => p.evaluate(() => GXST.state());
   const rectOf = sel => p.evaluate(sel => { for (const e of document.querySelectorAll(sel)) { const r = e.getBoundingClientRect(); if (r.width > 3 && r.height > 3 && getComputedStyle(e).visibility !== 'hidden' && r.bottom > 0 && r.top < innerHeight) return [r.left + r.width / 2, r.top + r.height / 2]; } return null; }, sel);
   // a tap on a real element: the point must hit the element (or a child) in elementFromPoint
@@ -88,13 +88,17 @@ async function run(size, base) {
       if (same > 40) { ok(false, 'stuck at ' + sig + ' buttons ' + await p.evaluate(() => JSON.stringify({ rings: [...document.querySelectorAll('.bfring')].map(e => e.className), sel: BF.sel, info: UI.info, g: GXST.state().phase, draft: UI.draft, dial: !!document.querySelector('#bfdial:not([hidden])'), fly: (document.querySelector('[data-bf=fly]') || {}).disabled, top: [...document.querySelectorAll('[data-bf]')].map(e => e.dataset.bf).join() }))); return s; }
       if (q.ph === 'plan' && q.r >= 2) return await st();
       if (q.cur && q.cur !== 's1' && q.ph !== 'amod' && q.ph !== 'dmod') continue;
-      if (q.ph === 'action') { const a = sp.act; if (a && await tap('.bfact[data-bfa="' + a + '"]', 'action ' + a)) { } else if (a && (did.aw = (did.aw || 0) + 1) < 8) { } else await tap('.bfact[data-bfa="skip"]', 'skip action'); continue; }
-      if (q.ph === 'target') { if (sp.fire === false) await tap('[data-act="fire"][data-w="skip"]', 'hold fire', 4); else if (!(await tap('.bftgt', 'target', 6))) await tap('[data-act="fire"][data-w="skip"]', 'hold fire'); continue; }
+      if (q.ph === 'action') { const a = sp.act; if (a && await tap('.bfact[data-bfa="' + a + '"]', 'action ' + a, 6)) { } else if (a && (did.aw = (did.aw || 0) + 1) < 8) { } else await tap('.bfact[data-bfa="skip"]', 'skip action'); continue; }
+      if (q.ph === 'target') { if (sp.fire === false) await tap('[data-act="fire"][data-w="skip"]', 'hold fire', 4); else if (!(await tap('.bftgt', 'target', 14))) await tap('[data-act="fire"][data-w="skip"]', 'hold fire'); continue; }
       if (q.ph === 'amod' && q.cur === 's1') {
         if (sp.spend === 'focus' && !did.spend && await tap('[data-act="amod"][data-k="focus"]', 'use focus', 4)) { did.spend = 1; continue; }
         if (sp.reroll && !did.re) { const b = await p.evaluate(() => [...document.querySelectorAll('[data-act="amod"]')].map(e => e.dataset.k + ':' + e.textContent.trim().slice(0, 20)).join(',')); if (process.env.DEBUG) console.log('amod buttons', b);
-          if (await tap('[data-act="amod"][data-k="tl"]', 'use lock', 4)) { did.re = 1;
-            await tap('[data-bfq="t0"]', 'pick die 1', 6); await tap('[data-bfq="t1"]', 'pick die 2', 6); await tap('[data-bfq="ok"]', 'confirm reroll', 6); continue; } }
+          if (await tap('[data-act="amod"][data-k="tl"]', 'use lock', 4)) {
+            // wait on game state, not time: the dice picker is open, tick dice until two are ticked (a tap on a ticked die would un-tick it), then confirm
+            const ticked = () => p.evaluate(() => (G.phase === 'ask' && G.q && G.q.key === 'dice') ? G.q.opts.filter(o => /^t\d+$/.test(o.k) && /^\u2611/.test(o.l)).length : -1);
+            for (let k = 0, n = await ticked(); n >= 0 && n < 2 && k < 8; k++, n = await ticked()) await tap('[data-bfq="t' + n + '"]', 'pick die ' + (n + 1), 6);
+            if (await ticked() === 2) { await tap('[data-bfq="ok"]', 'confirm reroll', 6); did.re = 1; }
+            continue; } }
         if ((sp.spend === 'focus' && !did.spend) || (sp.reroll && !did.re)) { did.w = (did.w || 0) + 1; if (did.w < 6) continue; }   // the token button may need a moment to appear
         if (await tap('[data-act="amod"][data-k="done"]', 'Roll')) continue;
         continue;
@@ -119,6 +123,7 @@ async function run(size, base) {
   const ids = await p.evaluate(() => [...document.querySelectorAll('.gxst-pick [data-i], .gxst-row, [data-gxst-i]')].length);
   const lessonIds = Object.keys(SOLVE).filter(k => !process.env.ONLY || process.env.ONLY.split(',').includes(k));
   for (const id of lessonIds) {
+    if (process.env.T) console.log('  t', id, ((Date.now() - t0) / 1000).toFixed(1));
     const sv = SOLVE[id];
     // 1) the right move wins with 3 stars
     badTaps = [];
@@ -127,11 +132,14 @@ async function run(size, base) {
     s = await st(); ok(s.phase === 'play' && s.id === id, size + ' ' + id + ': lesson starts');
     if (SHOTS) await p.screenshot({ path: path.join(SHOTS, size + '-' + id + '-start.png') });
     // the card must not cover the player's ship ring or the board buttons
-    const cov = await p.evaluate(() => { const c = GXST.state().card; const out = []; for (const sel of ['.bfring.need', '#bfbtns .btn', '.bfring']) for (const e of document.querySelectorAll(sel)) { const r = e.getBoundingClientRect(); if (r.width > 3 && !(r.right < c.left || r.left > c.right || r.bottom < c.top || r.top > c.bottom)) out.push(sel); } return out; });
+    const covOf = () => p.evaluate(() => { const c = GXST.state().card; const out = []; for (const sel of ['.bfring.need', '#bfbtns .btn', '.bfring']) for (const e of document.querySelectorAll(sel)) { const r = e.getBoundingClientRect(); if (r.width > 3 && !(r.right < c.left || r.left > c.right || r.bottom < c.top || r.top > c.bottom)) out.push(sel); } return out; });
+    let cov = await covOf();
+    for (let i = 0; i < 8 && cov.length; i++) { await tick(p, 300); cov = await covOf(); }   // the card re-places itself after the board settles: wait on the layout, not a fixed time
     ok(!cov.length, size + ' ' + id + ': card keeps off the ship ring and buttons' + (cov.length ? ' (covers ' + cov[0] + ')' : ''));
     // hint 1 = nudge, hint 2 = ring on a visible target
     await p.evaluate(() => GXST.hint()); await p.evaluate(() => GXST.hint()); await tick(p, 1000);
     s = await st(); ok(s.hint >= 2 && !!s.target, size + ' ' + id + ': Show-me hint draws a ring on a target' + (s.target ? '' : ' (no target)'));
+    for (let i = 0; i < 8 && s.overlap; i++) { await tick(p, 300); s = await st(); }   // the card moves off the target once the board settles: wait on the state
     ok(!s.overlap, size + ' ' + id + ': card does not cover the hinted target');
     await p.evaluate(() => { GXST.retry && GXST.retry(); }); await tick(p, 1500);
     const res = await fly(sv);

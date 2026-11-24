@@ -23,25 +23,7 @@
   var inView = function (e) { var r = e.getBoundingClientRect(); return r.left >= -2 && r.right <= innerWidth + 2 && r.top >= -2 && r.bottom <= innerHeight + 2; };
   var fonts = function (root, min) { var bad = []; [].forEach.call(document.querySelectorAll(root + ' *'), function (e) { if (e.children.length || !(e.textContent || '').trim() || !GXS.vis(e)) return; var px = parseFloat(getComputedStyle(e).fontSize); if (px < min) bad.push(e.textContent.trim().slice(0, 16) + ' ' + px + 'px'); }); return bad; };
 
-  GXS.add({
-    id: 'nb-tutorial-play', name: 'Tutorial: tap your ship', ask: 'Tap the glowing ship', seed: 6, when: function () { return booted() && !window.GXST; },   // the staged duel is retired (scenario lessons, lessons.js)
-    setup: function () {
-      try { GX.close(); } catch (e) { }
-      tutStart();   // the same lesson the menu opens, fixed squads and dice
-      return GXS.wait(function () { return GXT.active() && G && G.tut && G.phase === 'plan' && BF.on; }, 20000).then(function () {
-        GXT.goto('ship');   // the step that asks you to tap your ship
-        return GXS.wait(function () { var s = GXT.state(); return s.id === 'ship' && s.shown && document.querySelector('.bfring.need'); }, 15000);
-      }).then(function () { return idle(700); });
-    },
-    checks: [
-      { kind: 'fn', name: 'tutorial is on the "tap your ship" step', fn: function () { return GXT.state().id === 'ship' || 'step is ' + GXT.state().id; } },
-      { kind: 'visible', sel: '.bfring.need', name: 'glowing ship ring' },
-      { kind: 'fn', name: 'nothing but the ring is asked for (no Skip over it)', fn: function () { var r = document.querySelector('.bfring.need').getBoundingClientRect(), s = document.querySelector('[data-gxt-skip]'); if (!s) return true; var k = s.getBoundingClientRect(); return !(k.left < r.right && k.right > r.left && k.top < r.bottom && k.bottom > r.top) || 'Skip button over the ring'; } },
-      { kind: 'tap', sel: '.bfring.need', name: 'tap the glowing ship', state: function () { return { sel: BF.sel, step: GXT.state().id }; },
-        expect: function (a, b) { return (b.sel === 's1' && b.step !== 'ship') || (b.sel !== 's1' ? 'the ship was not picked (sel ' + b.sel + ')' : 'tutorial stayed on the step'); } },
-      { kind: 'fn', name: 'its moves are on screen and the tutorial moved on', fn: function () { return (!!document.querySelector('.bfm') || GXT.state().id !== 'ship') || 'no maneuver cards after the tap'; } }
-    ]
-  });
+  // nb-tutorial-play retired: it tested the staged duel, which the scenario lessons (lessons.js, lessons-test.js) replaced
 
   // phone layer: board-first buttons; desktop: the dock's own buttons (the board itself is the same 3D mat)
   var seeAny = function (name, sels) { return { kind: 'fn', name: name, fn: function () { for (var i = 0; i < sels.length; i++) { var e = document.querySelector(sels[i]); if (e && GXS.vis(e)) { var r = e.getBoundingClientRect(), t = document.elementFromPoint(Math.min(innerWidth - 1, Math.max(1, r.left + r.width / 2)), Math.min(innerHeight - 1, Math.max(1, r.top + r.height / 2))); if (r.left < -2 || r.right > innerWidth + 2 || r.bottom > innerHeight + 2) return sels[i] + ' partly off screen'; if (t && t !== e && !e.contains(t) && !t.contains(e) && t.id !== 'gxscn-tag') return sels[i] + ' covered by ' + (t.id || t.className); return true; } } return 'none visible: ' + sels.join(' / '); } }; };
