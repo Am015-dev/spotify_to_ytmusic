@@ -1,5 +1,1 @@
-start:  small 12px "7 short lessons on the r"
-menu:  small 12px "7 short lessons on the r"
 sq-art:  offscreen "Djinn" | offscreen "Ann"
-story-scene:  small 12px "7 short lessons on the r"
-x32:  small 12px "pay 1 Mystic"

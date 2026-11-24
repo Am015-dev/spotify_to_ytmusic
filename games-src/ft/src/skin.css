@@ -320,3 +320,27 @@ html body #acts .ab.f3x{flex:0 0 48px;min-width:48px;min-height:44px}
 .ls-target{outline:4px solid #f2b632;outline-offset:2px;border-radius:8px;animation:lspulse 1.4s ease-in-out infinite}
 @keyframes lspulse{0%,100%{outline-color:#f2b632}50%{outline-color:#fff3c4}}
 @media (prefers-reduced-motion:reduce){.ls-target{animation:none}}
+/* W759 (R15 critic): no spreadsheet under the board. The owner chips row goes (owners are the camels on the tiles);
+   the turn-order track is a row of coin tokens; the grid gets the space; bigger tile names; pc grid never touches the edge. */
+html body #cleg{display:none!important}
+html body #bd .bidt{grid-auto-flow:row!important;grid-template-columns:repeat(9,minmax(0,1fr))!important;gap:3px!important}
+html body #bd .bidt:has(> .spot:nth-child(10)){grid-template-columns:repeat(6,minmax(0,1fr))!important}
+html body #bd .bidt .spot{min-width:0!important;min-height:52px!important;border-radius:50%/42%!important;border:2px solid #8a5a1e!important;background:radial-gradient(circle at 35% 30%,#fff7d6,#f0cf7a 55%,#c9932f)!important;box-shadow:inset 0 -3px 0 rgba(90,50,10,.35),0 2px 3px rgba(0,0,0,.35)!important;overflow:hidden}
+html body #bd .bidt .spot.taken{background:radial-gradient(circle at 35% 30%,color-mix(in srgb,var(--pc) 55%,#fff),var(--pc) 70%)!important;border-color:#fff6dc!important}
+html body #bd .bidt .sp-b{min-width:0!important;min-height:52px!important;border:0!important;border-radius:inherit!important;background:transparent!important;box-shadow:none!important}
+html body #bd .bidt .sp-b.glow{box-shadow:inset 0 0 0 3px #1f6a2a!important}
+html body #bd .bidt .sp-b .spc,html body #bd .bidt .spot .sp-c{font:900 17px/1 var(--ff-b,system-ui)!important;color:#3b1c0e}
+html body #bd .bidt .spot .ord{font:800 13px/1 var(--ff-b,system-ui)!important;color:#5a3414!important}
+html body #bd .bidt .spot.taken .ord,html body #bd .bidt .spot.taken .sp-c{color:#fff!important}
+html body #grid .tile .tn{font-size:15px!important;line-height:17px!important}
+html body #bd .bidt .spot.shut{opacity:1!important;filter:grayscale(.85) brightness(.82)}   /* not yours to take now: grey coin, still readable */
+@media (min-width:1024px){
+ html body #bd .bidt,html body #bd .bidt:has(> .spot:nth-child(10)){grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:6px!important}
+ html body #bd .bidt .spot,html body #bd .bidt .sp-b{min-width:0!important;min-height:64px!important}
+ html body #bd .bidt .sp-b .spc,html body #bd .bidt .spot .sp-c{font-size:22px!important}
+ html body #bd .bidt .spot .ord{font-size:16px!important}
+ html body #grid .tile .tn{font-size:17px!important;line-height:20px!important}
+ html body #gw{padding-bottom:10px!important;box-sizing:border-box}
+ html.land body:not(.lesson) #bd #acts{grid-row:6/8!important;align-self:start!important;margin-top:8px}   /* the coins sit right under 'Pick 2 turns', not at the bottom of an empty column (lessons keep that space for their card) */
+ html body .gx-bar .gxst-q,html body .gxh-card button,html body .gxh-pics .gxh-ar,html body .gxh-pics figcaption,html body .gxc-scene .gxc-sc-title,html body .gxc-row .gxc-btn{font-size:16px!important}
+}
