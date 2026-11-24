@@ -38,7 +38,7 @@ function newGame(mode, o) {
   const seed = UI.seed != null ? UI.seed : (Date.now() ^ (Math.random() * 1e9)) | 0;
   let tries = 0;
   // the staged tutorial is a fixed, stacked deal (data.js tutorial); the computer divers are scripted (ui12.js tutMove)
-  const gs = mode === 'tutorial' ? tutorialStack() : null;
+  const gs = mode === 'tutorial' ? tutorialStack() : (o.stack || null);
   G = LD.newGame({ players: np, seed, names, ai, mission, timer: !!opt.timer, stack: gs, boss: mode === 'descent' ? opt.boss || null : null });
   G.noProg = mode === 'tutorial' || (mission.kind !== 'log' && mission.kind !== 'deep');
   resetUI(mode, { np, level: opt.level, lv: (opt.lv || DEF.lv).slice(), seats: chefs ? chefs.slice(1) : null, kind: opt.kind, mission: opt.mission, d: opt.d, cmt: opt.cmt, deep: opt.deep, job: opt.job, timer: !!opt.timer });

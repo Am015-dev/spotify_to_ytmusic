@@ -86,16 +86,9 @@ setInterval(()=>{try{const s=TUTG.on&&TUTG.cur;if(!s||typeof GXT==='undefined')r
   if(TUTG.freeze&&UI.qKey)UI.qT0=Date.now()
   if(sh&&!s.tap&&s.until&&s.until())GXT.act({type:'event',k:'poll'})}catch(e){}},150);
 // ---------------------------------------------------------------- start / leave
-function tutStart(o){if(NET.on||typeof GXT==='undefined')return;const pro=!!(o&&o.prologue);TUTG.prologue=pro;TUTG.seen=[];
-  try{GX.close()}catch(e){}try{localStorage.setItem('tw_offered','1')}catch(e){}
-  tutBegin();
-  const first=window.CAMPAIGN&&window.CAMPAIGN.chapters&&window.CAMPAIGN.chapters[0];
-  GXT.start({game:TUT_GAME,story:false,steps:tutSteps(),live:tutLive,
-    endTitle:'You know the rules',endText:'Now a real game against a computer. Add-ons are off; tick one in Setup to see how it works.',
-    endButtons:pro&&first?[{id:'chapter',label:'Start chapter 1'},{id:'menu',label:'Menu'}]:[{id:'play',label:'Play a real game'},{id:'menu',label:'Menu'}],
-    onDone:r=>{const c=r&&r.choice;tutLeave();try{GXT.markDone(TUT_GAME)}catch(e){}
-      if(c==='chapter'&&first){showStart();GXC.play(first.id)}else if(c==='play'){const s=defaultSetup();s.mode='me';s.np=2;s.variant=null;s.noMon=false;s.exp={rift:0,wave:0,maelstrom:0,cannon:0};s.seats[0].h=true;s.seats[1].h=false;startGame(s)}else showStart()},
-    onExit:()=>{tutLeave();showStart()}})}
+function tutStart(o){if(NET.on||typeof GXST==='undefined')return;   // the old dimming guided game is retired: the tutorial is the scenario lessons (lessons.js)
+  try{GX.close()}catch(e){}try{localStorage.setItem('tw_offered','1')}catch(e){}try{GXT.markDone(TUT_GAME)}catch(e){}
+  GXST.picker()}
 function tutBegin(){const s=defaultSetup();s.mode='me';s.np=2;s.variant=null;s.noMon=false;s.exp={rift:0,wave:0,maelstrom:0,cannon:0};
   s.seats[0]={h:true,lv:'normal',col:0};s.seats[1]={h:false,lv:'easy',col:3};
   TUTG.base=UI.speed||1;TS.on=true;TUT=tutDice;UI.tut=1;TUTG.on=true;TUTG.starting=1;try{setSeed(TS.seed);setAiSeed(3)}catch(e){}
@@ -104,12 +97,12 @@ function tutBegin(){const s=defaultSetup();s.mode='me';s.np=2;s.variant=null;s.n
 function tutLeave(){try{TSW.on=false;swRender()}catch(e){}if(TUTG.base){UI.speed=TUTG.base;try{TWKit.setSpeed(UI.speed)}catch(x){}TUTG.base=0}TUTG.on=false;TUTG.cur=null;TUTG.hold=false;TS.on=false;TUT=null;UI.tut=0;TUTG.freeze=false;clearTimeout(UI.tm);UI.gen++;UI.started=false;UI.busy=false;UI.sel=null;UI.sunk=[];UI.mph=null;
   try{GXH.hide()}catch(e){}try{kitReset()}catch(e){}try{PH.pop=null;PH.pd=null;PH.cur=null;phAfter()}catch(e){}}
 // Story is preceded by the guided game (the prologue) until it has been finished once
-function storyOpen(){if(typeof GXC==='undefined')return;if(typeof GXT!=='undefined'&&!NET.on&&!GXT.isDone(TUT_GAME))tutStart({prologue:true});else campOpen()}
+function storyOpen(){if(typeof GXC==='undefined')return;campOpen()}
 // a first-time player tapping Play is offered the guided game once
 function tutOffer(go){if(typeof GXT==='undefined'||NET.on||!firstTime()||GXT.status(TUT_GAME).seen)return false;
   try{localStorage.setItem('tw_offered','1')}catch(e){}
   const d=document.createElement('div');d.className='gxt-end';d.setAttribute('data-help','');d.setAttribute('role','dialog');d.setAttribute('aria-modal','true');d.setAttribute('aria-label','New here?');
-  d.innerHTML='<div class="gxt-endc"><div class="gxt-et">New here?</div><div class="gxt-ex">Learn by playing one short game, one tap at a time.</div><div class="gxt-eb"><button type="button" class="gxt-b pri" data-tutoffer="learn">Learn to play</button><button type="button" class="gxt-b" data-tutoffer="play">Just play</button></div></div>';
+  d.innerHTML='<div class="gxt-endc"><div class="gxt-et">New here?</div><div class="gxt-ex">Learn with short lesson games on the real board.</div><div class="gxt-eb"><button type="button" class="gxt-b pri" data-tutoffer="learn">Learn to play</button><button type="button" class="gxt-b" data-tutoffer="play">Just play</button></div></div>';
   document.body.appendChild(d);
   d.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest('[data-tutoffer]');if(!b)return;e.stopPropagation();d.remove();if(b.dataset.tutoffer==='learn')tutStart();else go()});
   return true}

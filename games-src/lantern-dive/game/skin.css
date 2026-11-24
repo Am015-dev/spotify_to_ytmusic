@@ -4,6 +4,8 @@ html.sk .btn{display:inline-flex;flex-direction:column;align-items:center;border
 html.sk .btn.pri,html.sk .btn.go,html.sk .btn.on{border-image-source:url(media/ui-button-go-c.webp);color:#2b1d0c}
 html.sk .btn:disabled{opacity:.5}
 html.sk .gx-bar .gx-ibtn{color:#1f1408}
+html .gx-bar .gxst-q{padding:0 3px;min-width:46px;min-height:44px;font-size:14px;font-weight:800;line-height:1}
+html.sk .gx-bar .gxst-q{border-image-width:4px;color:#1f1408}
 html.sk .gx-bar h1,html.sk .gx-bar #barstat{text-shadow:0 1px 3px rgba(0,0,0,.9)}
 /* oxygen tanks, boss hearts, air label */
 html.sk-tank .tank{width:24px;height:40px;border:0;border-radius:0;background:url(media/icon-tank-empty.webp) center/contain no-repeat}
