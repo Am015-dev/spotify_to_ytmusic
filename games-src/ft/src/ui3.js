@@ -97,17 +97,21 @@ function hudPin(id){HUD.pin=id;try{id?localStorage.setItem('soq_pin',id):localSt
 function hudPinCls(){const on=!!HUD.pin&&hudWide()&&GX.open===HUD.pin;document.documentElement.classList.toggle('pinned',on);
   for(const d of document.querySelectorAll('.gx-drawer'))d.classList.toggle('pin',on&&d.id===HUD.pin);
   for(const b of document.querySelectorAll('.gx-pin'))b.setAttribute('aria-pressed',String(b.closest('.gx-drawer').id===HUD.pin));
-  if(on){GX.bg(false);GX.scrim&&GX.scrim.classList.remove('on')}if(G&&typeof fit==='function')setTimeout(fit,0)}
+  const bo=GX.open==='bidd';document.documentElement.classList.toggle('bidopen',bo);   // the turn-order window docks: the board makes room, nothing is covered
+  if(bo){const d=document.getElementById('bidd');document.documentElement.style.setProperty('--bidh',(d?d.offsetHeight:0)+'px')}
+  if(on||bo){GX.bg(false);GX.scrim&&GX.scrim.classList.remove("on")}if(G&&typeof fit==="function"){setTimeout(fit,0);setTimeout(fit,40);const b=document.getElementById("bd");if(b)b.scrollTop=0}}
 function hudInit(){for(const d of document.querySelectorAll('.gx-drawer')){const h=d.querySelector('.gx-drawer-head');if(!h||h.querySelector('.gx-pin')||d.id==='menud'||d.id==='bidd')continue;
     const b=document.createElement('button');b.className='gx-pin';b.type='button';b.setAttribute('aria-label','Pin to the side');b.title='Keep open beside the board';b.innerHTML='<img class="pic" src="media/icon-star.webp" alt="">';h.insertBefore(b,h.querySelector('.gx-x'))}
+  const gw=document.getElementById('gw');if(gw&&window.ResizeObserver)new ResizeObserver(()=>{if(G&&typeof fit==='function')fit()}).observe(gw);   // the board refits when a docked window takes room
   const os=GX.onShow,oc=GX.onClose;
-  GX.onShow=function(id){if(os)os.apply(this,arguments);hudPinCls()};
+  GX.onShow=function(id){if(id==='bidd'&&G)HUD.bidAt=G.round+':'+G.bids.length;if(os)os.apply(this,arguments);hudPinCls()};
   GX.onClose=function(id){if(oc)oc.apply(this,arguments);if(id===HUD.pin)hudPin(null);else if(HUD.pin&&hudWide()&&!GX.open&&G&&!UI.modal)GX.show(HUD.pin);hudPinCls()};
+  document.addEventListener('pointerdown',e=>{if(GX.open==='bidd'&&e.target.closest&&!e.target.closest('#bidd,[data-gx]'))GX.close()},true);   // no scrim on turn order: a tap outside still closes it
   document.addEventListener('click',e=>{const p=e.target.closest&&e.target.closest('.gx-pin');if(p){const id=p.closest('.gx-drawer').id;hudPin(HUD.pin===id?null:id);if(!HUD.pin)GX.close();return}
     const k=e.target.closest&&e.target.closest('.arow.pick [data-gx]');if(k)HUD.pick=k.dataset.gx},true)}
 function hudAfter(){if(!G||!GX.app)return;const live=!G.over&&!UI.modal;const myBid=live&&G.phase==='bid'&&!!me();
   const key=G.round+':'+G.bids.length;
-  if(GX.open==='bidd'&&HUD.bidKey&&(G.phase!=='bid'||G.over||key!==HUD.bidKey))GX.close();   // you bid (or the bidding ended): the window closes itself
+  if(GX.open==='bidd'&&HUD.bidAt&&(G.phase!=='bid'||G.over||key!==HUD.bidAt))GX.close();   // you bid (or the bidding ended): the window closes itself
   if(myBid&&HUD.bidKey!==key){HUD.bidKey=key;if(!GX.open||GX.open===HUD.pin)GX.show('bidd')}
   if(HUD.pick&&GX.open===HUD.pick&&!(HUD.pick==='mktd'?UI.pickMk.length:UI.pickDj.length)){HUD.pick=null;GX.close()}
   if(!HUD.restored&&live&&HUD.pin&&hudWide()){HUD.restored=true;if(!GX.open)GX.show(HUD.pin)}}

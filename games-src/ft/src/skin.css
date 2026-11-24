@@ -350,7 +350,7 @@ html.hud2 body #bd #trk .trk-p{display:flex;gap:3px;width:100%}
 html.hud2 body #bd #trk .trk-p i{flex:1 1 0;height:6px;border-radius:3px;background:rgba(255,243,214,.25);font-size:0!important;color:transparent;overflow:hidden;padding:0;min-width:18px}
 html.hud2 body #bd #trk .trk-p i.done{background:#c98a2c}html.hud2 body #bd #trk .trk-p i.on{background:#ffd36b;box-shadow:0 0 6px #ffd36b}
 html.hud2 body #bd #trk .trk-w{font-size:13px!important;font-weight:700;opacity:.9;white-space:nowrap}html.hud2 body #bd #trk .trk-w.me{color:#ffd36b;opacity:1}
-html.hud2 body #bd #trk .trk-r{display:none}
+html.hud2 body #bd #trk .trk-r{font-size:13px!important;font-weight:700;opacity:.8;white-space:nowrap}
 html.hud2 body #bd #line{font-size:16px!important;line-height:1.25;min-height:24px;padding:4px 10px;text-align:center;white-space:normal;border-radius:12px;background:rgba(255,249,234,.94);color:#3b1c0e;font-weight:800}
 html.hud2:not(.m-hints) body #bd>#trk2{display:none!important}
 /* the board takes all the room left */
@@ -361,7 +361,7 @@ html.hud2 body #bd .tile.owned{box-shadow:0 0 0 4px var(--oc),0 2px 6px rgba(0,0
 /* the dock: only the actions valid now, big */
 html.hud2 body #bd #acts{min-height:0;gap:6px}html.hud2 body #bd #acts.empty{display:none}
 html.hud2 body #bd #acts .arow{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
-html.hud2 body #bd #acts .ab{min-height:48px!important;font-size:16px!important;padding:0 18px}
+html.hud2 body #bd #acts .ab{min-height:48px!important;font-size:16px!important}
 html.hud2 body #bd #acts .ab .pic{width:24px;height:24px;vertical-align:middle}
 /* windows: X >= 44 px, the turn-order window is a short sheet, the goods window holds the market and the sale table */
 html.hud2 .gx-x{min-width:48px!important;min-height:48px!important;font-size:30px}
@@ -371,7 +371,7 @@ html.hud2 #bidd{height:auto!important;max-height:62dvh}
 html.hud2 #bidd .bidt{display:grid;grid-template-columns:repeat(auto-fill,minmax(68px,1fr));gap:8px}
 html.hud2 #bidd .spot{min-height:60px}html.hud2 #bidd .spot .sp-b{min-height:56px;width:100%;font-size:17px!important}
 html.hud2 #bidd .spot .ord,html.hud2 #bidd .spot .sp-c{font-size:14px!important}
-html.hud2 #mktd{height:auto!important;max-height:88dvh}html.hud2 body #mktd #mkt .mrow{display:grid!important;grid-template-columns:repeat(auto-fill,minmax(80px,1fr));gap:8px;height:auto;overflow:visible}
+html.hud2 body #mktd #mkt .mrow{display:grid!important;grid-template-columns:repeat(auto-fill,minmax(80px,1fr));gap:8px;height:auto;overflow:visible}
 html.hud2 body #mktd #mkt .mcard{min-height:100px;width:auto;height:auto;max-width:none}html.hud2 #mktd .mcard .mn{font-size:14px!important}
 html.hud2 #mktd h3{margin:14px 0 6px;font-size:17px}
 html.hud2 #mktd .mygoods{display:flex;flex-wrap:wrap;gap:6px}html.hud2 #mktd .mcard.mini{min-height:64px;width:72px;display:inline-flex;align-items:flex-end;justify-content:center;background:var(--gi) center/cover,#fff6dc;border-radius:8px;border:2px solid #c98a2c}
@@ -394,4 +394,42 @@ html.hud2 #plrd #cleg{pointer-events:auto;margin-bottom:8px}
  html.hud2.pinned .gx-main{margin-right:400px}
  html.hud2 .gx-drawer.pin{width:388px!important;right:6px;box-shadow:none}
 }
-@media (max-width:1023px){html.hud2 body .gx-drawer{top:auto!important;bottom:0!important;left:0!important;right:0!important;width:auto!important;height:auto!important;max-height:80dvh!important}html.hud2 body .gx-drawer .gx-drawer-body{overflow:auto}}
+@media (max-width:1023px){html.hud2 body .gx-drawer{top:auto!important;bottom:0!important;left:0!important;right:0!important;width:auto!important;height:78dvh!important;max-height:80dvh!important}html.hud2 body :is(#bidd,#logd,#plrd,#setd,#musicd,#menud){height:auto!important}html.hud2 body .gx-drawer .gx-drawer-body{overflow:auto}}
+/* ---------- the floating tour (tour.js, W655): never dims, never blocks; only the window, chip and labels take taps ---------- */
+.tourw{position:fixed;z-index:70;left:12px;top:60px;max-height:min(60vh,460px);display:flex;flex-direction:column;background:#fff8ec;color:#2a1a0c;border:2px solid #b07a2a;border-radius:14px;box-shadow:0 8px 24px rgba(0,0,0,.35);font-size:14px;line-height:1.35}
+.tourw[hidden],.tourchip[hidden],.tourring[hidden],.tourmap[hidden]{display:none}
+.tw-h{display:flex;align-items:center;gap:4px;padding:6px 8px 6px 12px;background:#f1dfbd;border-radius:12px 12px 0 0;cursor:grab;touch-action:none;user-select:none}
+.tw-ti{font-size:14px}.tw-sp{flex:1}
+.tw-b{min-width:36px;min-height:32px;padding:0 8px;border:1px solid #b07a2a;border-radius:8px;background:#fff8ec;color:#2a1a0c;font:inherit;font-weight:700;cursor:pointer}
+.tw-b[aria-pressed=true]{background:#b07a2a;color:#fff8ec}
+.tw-body{padding:8px 12px 12px;overflow:auto}
+.tw-t{margin:6px 0 4px;font-size:16px;color:#7a3d10}.tw-s{margin:0 0 6px}.tw-w,.tw-d{margin:0 0 6px;font-size:13px}.tw-d{color:#5a3a12}
+.tw-acts{display:flex;gap:8px;justify-content:flex-end;margin-top:4px}
+.tw-b2{min-height:40px;padding:0 14px;border:1px solid #b07a2a;border-radius:10px;background:#fff8ec;color:#2a1a0c;font:inherit;font-weight:700;cursor:pointer}
+.tw-b2.go{background:#b4501c;border-color:#7a3010;color:#fff}
+.tw-prog{display:flex;align-items:center;gap:6px;width:100%;min-height:32px;padding:0;border:0;background:none;color:#5a3a12;font:inherit;font-size:12px;font-weight:700;cursor:pointer;text-align:left}
+.tw-prog s{width:0;height:0;border:5px solid transparent;border-top-color:currentColor;margin-top:4px}
+.tw-list{display:none;margin:0 0 6px;padding:0;list-style:none;max-height:180px;overflow:auto;border:1px solid #e4cfa6;border-radius:8px}
+.tw-open .tw-list{display:block}
+.tw-list button{display:flex;align-items:center;gap:8px;width:100%;min-height:32px;padding:2px 8px;border:0;background:none;color:#2a1a0c;font:inherit;font-size:13px;text-align:left;cursor:pointer}
+.tw-list .cur button{background:#f6e6c6;font-weight:700}
+.tw-tick{flex:none;width:14px;height:14px;border:2px solid #b07a2a;border-radius:4px}
+.tw-list .ok .tw-tick{background:#3c8a3c;border-color:#2a6a2a;box-shadow:inset 0 0 0 2px #fff8ec}
+.tw-comm{display:flex;flex-direction:column;gap:6px}.tw-comm .tw-b2{text-align:left;min-height:36px}
+.tourchip{position:fixed;z-index:70;left:12px;bottom:12px;display:flex;align-items:center;gap:6px;min-height:40px;padding:4px 12px;border:2px solid #b07a2a;border-radius:20px;background:#fff8ec;color:#2a1a0c;font:inherit;font-weight:700;box-shadow:0 4px 12px rgba(0,0,0,.3);cursor:pointer}
+.tourchip .pic{width:22px;height:22px}
+.tourring{position:fixed;z-index:65;pointer-events:none;border:4px solid #ffc83a;border-radius:12px;box-shadow:0 0 0 2px rgba(122,48,16,.6);animation:tourpulse 1.6s ease-in-out infinite}
+@keyframes tourpulse{0%,100%{box-shadow:0 0 0 2px rgba(122,48,16,.6),0 0 0 0 rgba(255,211,106,.7)}50%{box-shadow:0 0 0 2px rgba(122,48,16,.6),0 0 0 12px rgba(255,200,58,0)}}
+@media (prefers-reduced-motion:reduce){.tourring{animation:none}}
+.tourmap{position:fixed;inset:0;z-index:66;pointer-events:none}
+.tm-svg{position:absolute;left:0;top:0;pointer-events:none}
+.tm-svg line{stroke:#2a1a0c;stroke-width:1.6}.tm-svg circle{fill:#ffd36a;stroke:#2a1a0c;stroke-width:1.4}
+.tm-l{position:absolute;z-index:1;pointer-events:auto;min-height:24px;padding:2px 7px;border:1.5px solid #2a1a0c;border-radius:7px;background:#fff8ec;color:#2a1a0c;font:700 11px/1.2 inherit;white-space:nowrap;cursor:pointer;box-shadow:0 2px 6px rgba(0,0,0,.3)}
+.tm-l.on{background:#ffd36a}
+#tourbtn .tq{display:inline-grid;place-items:center;width:24px;height:24px;border-radius:50%;background:#b4501c;color:#fff;font-size:16px;line-height:1}
+#tourbtn.tq-fl{position:fixed;left:6px;top:2px;z-index:40}
+#tourbtn[hidden]{display:none}
+html.hud2 body #bidd{z-index:72}
+
+@media (min-width:1024px){html.hud2.bidopen .gx-main{margin-right:400px}html.hud2 body #bidd{top:calc(var(--gx-bar-h) + 8px)!important;bottom:auto!important;right:6px!important;transform:none!important;width:388px!important;max-height:calc(100dvh - var(--gx-bar-h) - 16px)}html.hud2 body #bidd:not(.on){transform:translateX(120%)!important}}
+@media (max-width:1023px){html.hud2 #bidd .bidt{grid-template-columns:repeat(5,minmax(0,1fr));gap:6px}html.hud2 #bidd .spot{min-height:52px}html.hud2 #bidd .spot .sp-b{min-height:50px}}

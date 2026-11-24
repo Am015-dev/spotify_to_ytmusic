@@ -16,7 +16,7 @@
     return GXS.wait(function () { return G && G.phase === 'bid' && $('#bidt .sp-b.glow') && !UI.modal; }, 12000).then(function () { return idle(1200); });
   }
 
-  GXS.boardOpen = function () { if (!booted()) return; return table(5).then(function () { try { GXH.reset(); GXH.setEnabled(true); GXH.phase(hlpPhase()); } catch (e) { } render(); }); };
+  GXS.boardOpen = function () { if (!booted()) return; return table(5).then(function () { try { GXH.reset(); GXH.setEnabled(true); GXH.phase(hlpPhase()); } catch (e) { } render(); try { if (GX.open === 'bidd') GX.close(); } catch (e) { } return idle(300); }); };   // the board surface is checked with the turn-order window put away (W662)
 
   GXS.add({
     id: 'sq-board', name: 'Start of game board', ask: 'Is the bazaar clear and filled?', seed: 5, when: booted,
@@ -79,7 +79,7 @@ GXS.add({
       { kind: 'visible', sel: '#trk', name: 'turn tracker' },
       { kind: 'text', sel: '#trk', re: /Round \d/, name: 'tracker shows the round' },
       { kind: 'fn', name: 'tile cost badges are at least 14 px with a plate', fn: function () { var bad = ''; [].forEach.call(document.querySelectorAll('#grid .tile .tv'), function (e) { if (bad) return; var cs = getComputedStyle(e), r = e.getBoundingClientRect(); if (parseFloat(cs.fontSize) < 14) bad = 'badge font ' + cs.fontSize; else if (r.height < 20) bad = 'badge only ' + Math.round(r.height) + ' px high'; else if (cs.backgroundColor === 'rgba(0, 0, 0, 0)') bad = 'badge has no plate'; }); return !bad || bad; } },
-      { kind: 'fn', name: 'seat counters say coins and camels', fn: function () { var t = $('.sch[data-seat="0"]').innerText; return (/coins/.test(t) && /camels/.test(t)) || 'seat chip: ' + t.replace(/\n/g, ' '); } },
+      { kind: 'fn', name: 'seat chip names coins and camels (icons on screen, words for readers; W662)', fn: function () { var e = $('.sch[data-seat="0"]'), t = e.getAttribute('aria-label') || ''; return !!(/coins/.test(t) && /camels/.test(t) && e.querySelector('[data-i="coin"],img[src*="icon-coin"]') && e.querySelector('[data-i="camel"],img[src*="icon-camel"]')) || 'seat chip: ' + t; } },
       { kind: 'fn', name: 'seat counters name the people', fn: function () { var e = $('.sch[data-seat="0"] .s4'); return (e && /People/.test(e.textContent)) || 'no People count in the seat chip'; } },
       { kind: 'fn', name: 'the title is not cut off', fn: function () { var h = $('.gx-bar h1'); return h.scrollWidth <= h.clientWidth + 1 || 'title cut: ' + h.scrollWidth + ' > ' + h.clientWidth; } },
       { kind: 'fn', name: 'a score toast never covers the instruction line', fn: function () { var l = $('#line').getBoundingClientRect(), bad = ''; [].forEach.call(document.querySelectorAll('.plpop'), function (p) { var r = p.getBoundingClientRect(); if (r.top < l.bottom && r.bottom > l.top && r.left < l.right && r.right > l.left) bad = 'toast over the line'; }); return !bad || bad; } },
