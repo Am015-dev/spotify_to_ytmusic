@@ -159,7 +159,7 @@
       rule: 'A shield soaks that much damage from every hit before the monster loses hit points.',
       goal: 'Defeat the crab this turn.',
       setup: function () {
-        return stack({ hand: ['ww01', 'ww09', 'ww06', 'ww03'], mons: [{ id: 'cr', type: 'crab', idx: 0, hp: 2, dist: 1, shield: 2 }] });
+        return stack({ hand: ['ww01', 'ww09', 'ww06', 'ww03'], mons: [{ id: 'cr', type: 'crab', idx: 2, hp: 2, dist: 1 }] });
       },
       success: function () { return !alive('cr'); },
       fail: function () {
@@ -273,7 +273,7 @@
     keepClear: ['.gx-bar', '#tray', '#promptrow', '#hot > *', '#zoombox', '#order'],
     qParent: document.querySelector('.gx-bar header') || document.querySelector('.gx-bar')
   });
-  window.WDL = { lessons: lessons };
+  window.WDL = { lessons: lessons, ctx: ctx };
 
   // ?lesson=<id> starts that lesson once the game has booted
   var m = /[?&]lesson=([^&#]+)/.exec(window.location.search);

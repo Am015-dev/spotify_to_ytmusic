@@ -57,7 +57,7 @@ async function run(b, W, H) {
       const re = a.re || null;
       let cands = [...document.querySelectorAll(a.sel)].filter(x => vis(x) && (!a.name || (x.closest('.cd') || x).textContent.includes(a.name)) && (!re || re.test(x.textContent)));
       if (a.near && cands.length) {   // the lit hex closest to the lesson's target: a monster, the closed door, or the coin
-        const goal = Object.keys(G.hex).filter(k => a.near === 'mon' ? G.figs.some(f => f.team === 'm' && f.hp > 0 && f.pos === k) : a.near === 'door' ? G.hex[k].t === 'door' && !G.hex[k].open : !!G.hex[k].coin);
+        const goal = Object.keys(G.hex).filter(k => a.near === 'mon' ? G.figs.some(f => f.team === 'm' && f.hp > 0 && f.pos === k) : a.near === 'door' ? G.hex[k].t === 'door' && !G.hex[k].open : k === WDL.ctx.coin);
         const d = x => Math.min(...goal.map(k => WD.dist(x.dataset.k, k)));
         cands.sort((u, v) => d(u) - d(v));
       }
@@ -83,12 +83,13 @@ async function run(b, W, H) {
     for (const s of steps) {
       if (s.engine) { await engineFinish(); continue; }
       if (!(await tapStep(s))) return;
+      dbg(await p.evaluate(() => JSON.stringify({ ask: G.ask && G.ask.h, act: G.act && G.act.used, figs: G.figs.map(f => [f.id, f.hp, f.pos]), sel: UI.sel })));
       if ((await st()).phase !== 'play') return;
     }
   };
 
   const res = {};
-  for (const lesson of ['pick', 'halves', 'shield', 'retal', 'door', 'coin', 'finish']) {
+  for (const lesson of (process.env.WD_ONLY || 'pick,halves,shield,retal,door,coin,finish').split(',')) {
     const t0 = Date.now(), before = probs.length;
     dbg('lesson ' + lesson); await p.evaluate(id => GXST.start(id), lesson);
     await live(lesson);

@@ -333,3 +333,7 @@ body.tutor-on #promptrow{justify-content:flex-start}
 #tray .cd .in{width:24px;height:24px;line-height:22px;font-size:11px}
 @media (min-width:701px){#tray,#tray.hand2{grid-template-columns:repeat(auto-fill,minmax(116px,1fr))}#tray .cd .half{font-size:13px}#tray .cd .nm{font-size:12px}}
 body.tutor-on #coach,body:has(.gxst-card) #coach{display:none!important}
+/* W734 HUD: only what matters now stays on screen; an element shows only while it is charged (tap it for its rule) */
+#els .el.s0{display:none}
+@media (pointer:coarse){#zoombox{display:none}}
+body:has(#rulesd.on,#logd.on,#setd.on,#insp:not([hidden])) #coach{display:none!important}
