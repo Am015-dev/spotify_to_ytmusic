@@ -2,7 +2,7 @@
 
 One line per rule or count; each is an `ok(...)` check in `rules-test.js` (run `node rules-test.js`). Source of truth: rules-notes.md.
 
-- [x] 7 starting cards
+- [x] 8 starting cards, one is a Settler (fixed 24 Nov from the published rules)
 - [x] decks I (8) and II (7) for 2 players
 - [x] 2 market Builders, cost 1 tool
 - [x] 2 market Governors, cost 1 wine
@@ -67,7 +67,7 @@ One line per rule or count; each is an `ok(...)` check in `rules-test.js` (run `
 - [x] Eagle: 1 per non-brick house x 2 cards
 - [x] Sickle: 1 per region x 2 cards
 - [x] Wing: 2 per kind of good (3 kinds) x 1 card
-- [x] Shield: 2 per colonist on the map (2) x 1 card
+- [x] Shield: 2 per colonist on the map (2) x 2 cards (Herald + Settler)
 - [x] buying the last card takes the Laurel; the game goes on
 - [x] the other player gets exactly one more turn
 - [x] Laurel is worth 7
