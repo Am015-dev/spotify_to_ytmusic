@@ -2,7 +2,7 @@
 // small, stacked position with ONE objective; the player makes real moves and learns the rule from the consequence. A floating
 // objective card never dims and never blocks taps. Needs gx-scenario-tutor.css. ES5, no dependencies. Docs: shell/GXST.md.
 // (Global is GXST because GXS is already the ?scn= test registry in gx-scenario.js.)
-//   GXST.init({game, scenarios:[...], storageKey?, settled?:()=>bool, keepClear?:[selectors], qParent?, phoneSlot?:{after,before,avoid:[selectors]}})   GXST.picker() GXST.start(id) GXST.retry()
+//   GXST.init({game, scenarios:[...], storageKey?, settled?:()=>bool, keepClear?:[selectors], qParent?, phoneSlot?:{after,before,avoid:[selectors]}, keepPlace?:bool})   GXST.picker() GXST.start(id) GXST.retry()
 //   GXST.next() GXST.hint() GXST.close() GXST.state()      events: window 'gxst' CustomEvent, detail.type =
 //   picker | start | hint | win | fail | retry | close
 //   scenario: {id, title, rule, goal, setup(), success()->bool, fail()->false|'message', par?, moves?()->n, hints:[nudge, {say, target}],
@@ -120,7 +120,7 @@
       var pb = null; cs.forEach(function (c, k) { c = clamp(c); var b = box(c), v = t && hit(b, t) ? 1e6 : 0; ob.forEach(function (r) { if (hit(b, r)) v += 1; }); if (bf && b.bottom > bf.top) v += 1; if (!pb || v < pb.v) pb = { p: c, v: v }; });
       if (pb && pb.v < 1e6) { W.style.left = '8px'; return put(pb.p); }
     }
-    var cx = W.style.left ? clamp([parseFloat(W.style.left), parseFloat(W.style.top)]) : null;   // stay where you are unless somewhere is clearly better: a card that jumps while you reach for Retry is worse than a small overlap
+    var cx = C.keepPlace && W.style.left ? clamp([parseFloat(W.style.left), parseFloat(W.style.top)]) : null;   // stay where you are unless somewhere is clearly better: a card that jumps while you reach for Retry is worse than a small overlap (opt-in: keepPlace)
     if (cx && cost(cx) <= best.c + 0.5) best = { p: cx, c: 0 };
     put(best.p);
   }
