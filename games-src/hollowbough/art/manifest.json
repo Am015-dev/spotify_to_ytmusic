@@ -1,55 +1,55 @@
 {
  "note": "id (the card key k in cards.js) -> base file name in this folder. Painted with Google Flow (Nano Banana), prompts in game-assets/cards/doorkick/prompts.json; made by prep_doorkick_art.py.",
  "items": {
-  "architect": "architect",
-  "bard": "bard",
-  "barge_toad": "barge_toad",
-  "castle": "castle",
-  "cemetery": "cemetery",
-  "chapel": "chapel",
-  "chip_sweep": "chip_sweep",
-  "clock_tower": "clock_tower",
-  "courthouse": "courthouse",
-  "crane": "crane",
-  "doctor": "doctor",
-  "dungeon": "dungeon",
-  "ever_tree": "ever_tree",
-  "fair_grounds": "fair_grounds",
-  "farm": "farm",
-  "fool": "fool",
-  "general_store": "general_store",
+  "master_lathwright": "architect",
+  "ballad_finch": "bard",
+  "reedpunt_toad": "barge_toad",
+  "stonecrown_keep": "castle",
+  "mossgrave_glade": "cemetery",
+  "candlewick_shrine": "chapel",
+  "tinder_chipmunk": "chip_sweep",
+  "dewdrop_belfry": "clock_tower",
+  "mosswood_assize": "courthouse",
+  "pulley_lift": "crane",
+  "poultice_badger": "doctor",
+  "thornhold_cells": "dungeon",
+  "elderheart_oak": "ever_tree",
+  "midsummer_green": "fair_grounds",
+  "bramble_allotment": "farm",
+  "mudpie_jester": "fool",
+  "cranny_market": "general_store",
   "haven": "haven",
-  "historian": "historian",
-  "husband": "husband",
-  "inn": "inn",
-  "innkeeper": "innkeeper",
-  "judge": "judge",
-  "king": "king",
-  "lookout": "lookout",
-  "mine": "mine",
-  "miner_mole": "miner_mole",
-  "monastery": "monastery",
-  "monk": "monk",
-  "palace": "palace",
-  "peddler": "peddler",
-  "post_office": "post_office",
-  "postal_pigeon": "postal_pigeon",
-  "queen": "queen",
-  "ranger": "ranger",
-  "resin_refinery": "resin_refinery",
-  "ruins": "ruins",
-  "school": "school",
-  "shepherd": "shepherd",
-  "shopkeeper": "shopkeeper",
-  "storehouse": "storehouse",
-  "teacher": "teacher",
-  "theater": "theater",
-  "twig_barge": "twig_barge",
-  "undertaker": "undertaker",
-  "university": "university",
-  "wanderer": "wanderer",
-  "wife": "wife",
-  "woodcarver": "woodcarver",
+  "chronicle_owl": "historian",
+  "goodman_vole": "husband",
+  "lantern_rest": "inn",
+  "hostler_hedgehog": "innkeeper",
+  "gavel_marten": "judge",
+  "bramble_sovereign": "king",
+  "spyglass_perch": "lookout",
+  "flintpit": "mine",
+  "echo_mole": "miner_mole",
+  "quietstone_cloister": "monastery",
+  "brother_moss": "monk",
+  "gildenfern_court": "palace",
+  "haggle_magpie": "peddler",
+  "dovecote_depot": "post_office",
+  "parcel_dove": "postal_pigeon",
+  "thistle_regent": "queen",
+  "trailwarden_fox": "ranger",
+  "amber_still": "resin_refinery",
+  "toppled_hall": "ruins",
+  "acorn_academy": "school",
+  "crook_shrew": "shepherd",
+  "tallyshop_mouse": "shopkeeper",
+  "hoard_cellar": "storehouse",
+  "slate_schoolmarm": "teacher",
+  "glowworm_playhouse": "theater",
+  "kindling_raft": "twig_barge",
+  "hollow_sexton": "undertaker",
+  "lorewood_college": "university",
+  "footsore_drifter": "wanderer",
+  "goodwife_vole": "wife",
+  "whittle_beaver": "woodcarver",
   "basic_amber_weep": "basic_amber_weep",
   "basic_berry_patch": "basic_berry_patch",
   "basic_dewberry_nook": "basic_dewberry_nook",
@@ -91,195 +91,195 @@
   "sev_wingborne_healers": "sev_wingborne_healers"
  },
  "size": {
-  "architect": [
+  "master_lathwright": [
    256,
    256
   ],
-  "bard": [
+  "ballad_finch": [
    256,
    256
   ],
-  "barge_toad": [
+  "reedpunt_toad": [
    256,
    256
   ],
-  "castle": [
+  "stonecrown_keep": [
    256,
    256
   ],
-  "cemetery": [
+  "mossgrave_glade": [
    256,
    256
   ],
-  "chapel": [
+  "candlewick_shrine": [
    256,
    256
   ],
-  "chip_sweep": [
+  "tinder_chipmunk": [
    256,
    256
   ],
-  "clock_tower": [
+  "dewdrop_belfry": [
    256,
    256
   ],
-  "courthouse": [
+  "mosswood_assize": [
    256,
    256
   ],
-  "crane": [
+  "pulley_lift": [
    256,
    256
   ],
-  "doctor": [
+  "poultice_badger": [
    256,
    256
   ],
-  "dungeon": [
+  "thornhold_cells": [
    256,
    256
   ],
-  "ever_tree": [
+  "elderheart_oak": [
    256,
    256
   ],
-  "fair_grounds": [
+  "midsummer_green": [
    256,
    256
   ],
-  "farm": [
+  "bramble_allotment": [
    256,
    256
   ],
-  "fool": [
+  "mudpie_jester": [
    256,
    256
   ],
-  "general_store": [
+  "cranny_market": [
    256,
    256
   ],
-  "historian": [
+  "chronicle_owl": [
    256,
    256
   ],
-  "husband": [
+  "goodman_vole": [
    256,
    256
   ],
-  "inn": [
+  "lantern_rest": [
    256,
    256
   ],
-  "innkeeper": [
+  "hostler_hedgehog": [
    256,
    256
   ],
-  "judge": [
+  "gavel_marten": [
    256,
    256
   ],
-  "king": [
+  "bramble_sovereign": [
    256,
    256
   ],
-  "lookout": [
+  "spyglass_perch": [
    256,
    256
   ],
-  "mine": [
+  "flintpit": [
    256,
    256
   ],
-  "miner_mole": [
+  "echo_mole": [
    256,
    256
   ],
-  "monastery": [
+  "quietstone_cloister": [
    256,
    256
   ],
-  "monk": [
+  "brother_moss": [
    256,
    256
   ],
-  "palace": [
+  "gildenfern_court": [
    256,
    256
   ],
-  "peddler": [
+  "haggle_magpie": [
    256,
    256
   ],
-  "post_office": [
+  "dovecote_depot": [
    256,
    256
   ],
-  "postal_pigeon": [
+  "parcel_dove": [
    256,
    256
   ],
-  "queen": [
+  "thistle_regent": [
    256,
    256
   ],
-  "ranger": [
+  "trailwarden_fox": [
    256,
    256
   ],
-  "resin_refinery": [
+  "amber_still": [
    256,
    256
   ],
-  "ruins": [
+  "toppled_hall": [
    256,
    256
   ],
-  "school": [
+  "acorn_academy": [
    256,
    256
   ],
-  "shepherd": [
+  "crook_shrew": [
    256,
    256
   ],
-  "shopkeeper": [
+  "tallyshop_mouse": [
    256,
    256
   ],
-  "storehouse": [
+  "hoard_cellar": [
    256,
    256
   ],
-  "teacher": [
+  "slate_schoolmarm": [
    256,
    256
   ],
-  "theater": [
+  "glowworm_playhouse": [
    256,
    256
   ],
-  "twig_barge": [
+  "kindling_raft": [
    256,
    256
   ],
-  "undertaker": [
+  "hollow_sexton": [
    256,
    256
   ],
-  "university": [
+  "lorewood_college": [
    256,
    256
   ],
-  "wanderer": [
+  "footsore_drifter": [
    256,
    256
   ],
-  "wife": [
+  "goodwife_vole": [
    256,
    256
   ],
-  "woodcarver": [
+  "whittle_beaver": [
    256,
    256
   ]
