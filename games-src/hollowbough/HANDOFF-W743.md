@@ -11,6 +11,7 @@ Done
 
 Still weak / not done
 - pc: the card sits bottom-left over the "Hand 3/8" label (empty part of the hand row).
+- phone build/meadow: the 3-line top-bar prompt grows after the card is placed and touches the card top by a few px.
 - pc: the WIN card (261 px tall) can jump once ~1-2 s after minimise/restore (cost of its spot changes as panels settle); lessons-test.js
   pc failed "close left the card" in about 1 of 3 runs during work, last runs PASS. Fix idea: put the result card in a fixed spot.
 - Task (b) not done: old GXT tour in ui12.js, tutor-test.js, learn-touch.js still there (out of time). TUTORIAL-COVERAGE.md still
