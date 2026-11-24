@@ -39,8 +39,8 @@ function animate(prev){const cur=snapState();if(!ANIM||!prev||document.hidden)re
   const mk=take(prev.market,cur.market);const rows=$('#mkt');
   if(mk.left.length&&rows){const slots=rows.querySelectorAll('.mrow .mcard');for(const i of mk.left){const s=slots[i];if(!s)continue;flyEl(`<span class="mi">${RICON[prev.market[i]]}</span>`,'card',ctr(s.getBoundingClientRect()),seatPoint(actor),{delay:n*70,fade:true,end2:.4});n++}}
   if(mk.added&&rows){const slots=rows.querySelectorAll('.mrow .mcard:not(.empty)');for(let k=Math.max(0,slots.length-mk.added);k<slots.length;k++){slots[k].classList.add('newc')}}
-  const dj=take(prev.djRow,cur.djRow);const drs=$('#djrow');if(dj.left.length&&drs&&drs.querySelector('.drow')){const dr=drs.querySelector('.drow');const r=dr.getBoundingClientRect();for(const i of dj.left){flyEl(`<span class="mi">🧞</span>`,'card',{x:r.left+r.width*(i+.5)/Math.max(3,prev.djRow.length),y:r.top+r.height/2},seatPoint(actor),{delay:n*70,fade:true,end2:.4});n++}}
-  if(dj.added&&drs){const cs=drs.querySelectorAll('.drow .dcard:not(.th)');for(let k=Math.max(0,cs.length-dj.added);k<cs.length;k++)cs[k].classList.add('newc')}
+  const dj=take(prev.djRow,cur.djRow);if(dj.left.length&&rows){const dr=rows.querySelector('.drow');const r=dr.getBoundingClientRect();for(const i of dj.left){flyEl(`<span class="mi">🧞</span>`,'card',{x:r.left+r.width*(i+.5)/Math.max(3,prev.djRow.length),y:r.top+r.height/2},seatPoint(actor),{delay:n*70,fade:true,end2:.4});n++}}
+  if(dj.added&&rows){const cs=rows.querySelectorAll('.drow .dcard:not(.th)');for(let k=Math.max(0,cs.length-dj.added);k<cs.length;k++)cs[k].classList.add('newc')}
   // tokens that appeared: camels, tents, palms, palaces
   for(let i=0;i<cur.tiles.length;i++){const a=prev.tiles[i],b=cur.tiles[i];if(!a)continue;const te=tileEl(i);if(!te)continue;
     if((b.camel!=null&&a.camel!==b.camel)||(b.tent!=null&&a.tent!==b.tent)){const o=te.querySelector('.ob .bm');if(o)o.classList.add('popin')}

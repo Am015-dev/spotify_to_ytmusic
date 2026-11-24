@@ -14,7 +14,7 @@ const sleep=ms=>new Promise(r=>setTimeout(r,ms));
  const p=await ctx.newPage();p.on('pageerror',e=>bad('PAGE ERROR '+e.message));p.on('console',m=>{if(m.type()==='error'&&!/net::|Failed to load|favicon|404|GLTFLoader/.test(m.text()))bad('console '+m.text().slice(0,140))});
  const tap=async(x,y)=>touch?p.touchscreen.tap(x,y):p.mouse.click(x,y);
  // tap the centre of an element, only if that element (or its child) is what a finger would hit there
- const tapEl=async(sel,i=0)=>{await p.evaluate(s=>{const e=document.querySelector(s);if(GX.open&&e&&!e.closest('.gx-drawer'))GX.close()},sel);const c=await p.evaluate(([s,i])=>{const L=[...document.querySelectorAll(s)].filter(e=>e.getBoundingClientRect().width>2);const free=e=>{const r=e.getBoundingClientRect();const h=document.elementFromPoint(r.left+r.width/2,r.top+r.height/2);return !!h&&(e===h||e.contains(h))};const e=i<0?(L.find(free)||L[0]):L[i];if(!e)return null;e.scrollIntoView({block:'nearest'});const r=e.getBoundingClientRect();const x=r.left+r.width/2,y=r.top+r.height/2;const h=document.elementFromPoint(x,y);return {x,y,ok:!!h&&(e===h||e.contains(h)),by:h?(h.id||h.className.toString()||h.tagName+'<'+(h.parentElement.id||h.parentElement.className)).slice(0,40):''}},[sel,i]);
+ const tapEl=async(sel,i=0)=>{const c=await p.evaluate(([s,i])=>{const L=[...document.querySelectorAll(s)].filter(e=>e.getBoundingClientRect().width>2);const free=e=>{const r=e.getBoundingClientRect();const h=document.elementFromPoint(r.left+r.width/2,r.top+r.height/2);return !!h&&(e===h||e.contains(h))};const e=i<0?(L.find(free)||L[0]):L[i];if(!e)return null;e.scrollIntoView({block:'nearest'});const r=e.getBoundingClientRect();const x=r.left+r.width/2,y=r.top+r.height/2;const h=document.elementFromPoint(x,y);return {x,y,ok:!!h&&(e===h||e.contains(h)),by:h?(h.id||h.className.toString()).slice(0,40):''}},[sel,i]);
    if(!c){bad('no element '+sel+' at lesson '+(await p.evaluate(()=>TOUR.i+1)));return false}if(!c.ok){bad('covered '+sel+' by '+c.by);return false}await tap(c.x,c.y);await sleep(60);return true};
  const shot=async n=>{if(!SH)return;fs.mkdirSync(SH,{recursive:true});await sleep(80);await p.screenshot({path:`${SH}/tour-${n}-${W}x${H}.jpg`,type:'jpeg',quality:62})};
  const ov=(a,b)=>Math.max(0,Math.min(a.right,b.right)-Math.max(a.left,b.left))*Math.max(0,Math.min(a.bottom,b.bottom)-Math.max(a.top,b.top));
@@ -53,10 +53,10 @@ const sleep=ms=>new Promise(r=>setTimeout(r,ms));
    else if(g.l.ev){ // a real move by tapping the ringed control, while the game lets you
      for(let t=0;t<80;t++){const s=await p.evaluate(()=>({i:TOUR.i,mine:!!(G&&!G.over&&me()&&sideToAct()===me().i),ph:G.phase,step:G.step,mv:!!G.move,chz:!!document.querySelector('#chz:not([hidden]) button')}));
        if(s.i!==before)break;
-       if(g.l.ev==='phase:play'||g.l.ev==='round2'){if(s.mine&&s.ph==='bid'&&g.l.ev==='round2'){await p.evaluate(()=>{if(GX.open!=='bidd')GX.show('bidd')});await sleep(60);await tapEl('#bidt .bidt button:not([disabled])',-1)}else if(s.mine&&g.l.ev==='round2'){await p.evaluate(()=>{const m=aiMove(me().i);if(m)go(m)})}await sleep(150);continue}
+       if(g.l.ev==='phase:play'||g.l.ev==='round2'){if(s.mine&&s.ph==='bid'&&g.l.ev==='round2')await tapEl('#acts .bidt button:not([disabled])',-1);else if(s.mine&&g.l.ev==='round2'){await p.evaluate(()=>{const m=aiMove(me().i);if(m)go(m)})}await sleep(150);continue}
        if(!s.mine){await sleep(100);continue}
        if(s.chz){await tapEl('#chz:not([hidden]) button');continue}
-       if(g.l.ev==='bid'&&s.ph==='bid'){await p.evaluate(()=>{if(GX.open!=='bidd')GX.show('bidd')});await sleep(60);await tapEl('#bidt .bidt button:not([disabled])',-1);continue}
+       if(g.l.ev==='bid'&&s.ph==='bid'){await tapEl('#acts .bidt button:not([disabled])',-1);continue}
        if(['start','step','take'].includes(g.l.ev)&&s.step==='move'){
          if(g.l.ev==='start'&&!s.mv){const two=await p.evaluate(()=>document.querySelectorAll('#grid .tile.glow').length);
            await tapEl('#grid .tile.glow',two>1?1:0);if(!await p.evaluate(()=>!!G.move))bad('tap on a non-highlighted glowing tile did not lift');continue}

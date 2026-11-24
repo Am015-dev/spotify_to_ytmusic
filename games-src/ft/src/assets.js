@@ -11,7 +11,7 @@ const TABLE_SET=['default','court','night','palace','workshop'];
 // deck piles: goods deck at the end of the market row, djinn deck at the end of the djinn row, items deck when the Crafters play
 function asDecks(){if(!G||G.over)return;const back=(f,n,lbl)=>`<div class="deckback" data-help aria-label="${lbl}: ${n} left"><i style="background-image:url(media/${f}.webp)"></i><b>${n}</b></div>`;
   const mr=document.querySelector('#mkt .mrow');if(mr&&!mr.querySelector('.deckback'))mr.insertAdjacentHTML('beforeend',back('back-default',G.rdeck.length,'Goods deck'));
-  const dr=document.querySelector('#djrow .drow');if(dr&&!dr.querySelector('.deckback')){dr.insertAdjacentHTML('beforeend',back('back-lamp',G.djDeck.length,'Djinn deck')+(G.ex&&G.ex.artisans?back('back-copper',(G.items||[]).length,'Item deck'):''))}}
+  const dr=document.querySelector('#mkt .drow');if(dr&&!dr.querySelector('.deckback')){dr.insertAdjacentHTML('beforeend',back('back-lamp',G.djDeck.length,'Djinn deck')+(G.ex&&G.ex.artisans?back('back-copper',(G.items||[]).length,'Item deck'):''))}}
 // the Card list drawer gets a gallery: card backs, thieves, items, pieces
 function asGallery(){const b=document.getElementById('refbody');if(!b||b.querySelector('.asgal'))return;
   const th=typeof THIEVES!=='undefined'?Object.keys(THIEVES).map(k=>`<figure><img src="media/thief-${k}.webp" alt=""><figcaption>${esc(THIEVES[k].n.replace(/^The /,''))}</figcaption></figure>`).join(''):'';

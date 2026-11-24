@@ -31,8 +31,7 @@ function scTracker(){const ln=document.getElementById('line');if(!ln)return;cons
   if(!G||G.over||online()){t.hidden=true;return}t.hidden=false;
   const s=sideToAct();const who=s<0?'':P(s);const mine=who&&who.human&&G.pl.filter(x=>x.human).length===1;const ph=scPhase();
   const nm=mine?'Your turn':who?plName(who.nm)+"'s turn":'';
-  const big=['Bid for turn order','Move','Take','Sell'][ph];   // W662: one clear phase banner with a progress strip
-  t.innerHTML='<b class="trk-h">'+big+'</b><span class="trk-p" aria-label="Phase '+(ph+1)+' of 4">'+SC_PH.map((l,i)=>'<i class="'+(i===ph?'on':i<ph?'done':'')+'" title="'+l+'"></i>').join('')+'</span><b class="trk-w '+(mine?'me':'')+'">'+esc(nm)+'</b><b class="trk-r">Round '+G.round+'</b>'}
+  t.innerHTML='<span class="trk-p">'+SC_PH.map((l,i)=>'<i class="'+(i===ph?'on':i<ph?'done':'')+'">'+l+'</i>').join('')+'</span><b class="trk-w '+(mine?'me':'')+'">'+esc(nm)+'</b><b class="trk-r">Round '+G.round+'</b>'}
 function scPreview(){const ln=document.getElementById('line');if(!ln)return;const e=scEl('trk2','trk2',(document.getElementById('trk')||ln).nextSibling);if(!G||G.over||online()||G.coach||!G.pl[0].human){e.hidden=true;return}
   let txt='';const p=G.pl[0];
   if(scMine()&&G.step==='move'){scCompute();
