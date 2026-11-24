@@ -11,7 +11,7 @@ function cardHtml(cid, extra, cls) {
     '<div class="cb">In battle: <b>' + c.cb.t + '</b> ' + c.cb.text + ' Goes ' + ordinal(c.cb.i) + '.</div>' + (extra || '') + '</div>';
 }
 function ordinal(n) { return n + (n === 1 ? 'st' : n === 2 ? 'nd' : n === 3 ? 'rd' : 'th'); }
-function openCards(discard) {
+function openCards(discard) { try { if (window.TUT && TUT.on) TUT.act({ what: 'cards' }); } catch (e) { }
   UI.discardMode = !!discard; var me = UI.side, ms = human(sideToAct(G)) && !UI.hold ? validMoves(G) : [], body = '';
   if (discard) body += '<p>Your hand holds more than 6 cards. Tap one to discard it.</p>';
   else body += '<p>' + (UI.die != null ? 'Cards your ' + FACE_NAME[G.dice[me][UI.die]] + ' die can play glow red.' : 'Pick a die first to play a card. An Event die plays any card; Character, Army and Muster dice play their own type.') + '</p>';
@@ -39,7 +39,7 @@ function openNations() {
   openSheet('nations', { title: 'Nations', body: body });
 }
 function tileHtml(t) { var cls = 'tile' + (t.r ? ' r' : '') + (t.sp ? (HUNT_SPECIAL[t.sp].side === 'D' ? ' d' : ' sp') : ''); var face = t.v === 'eye' ? ico('eye', '#9a2117', 20) : t.v === 'die' ? 'd6' : t.v; return '<span class="' + cls + '" title="' + tileName(t) + '">' + face + '</span>'; }
-function openCompany() {
+function openCompany() { try { if (window.TUT && TUT.on) TUT.act({ what: 'taint' }); } catch (e) { }
   var F = G.F, me = UI.side, g = guideOf(G), body = '';
   body += '<p>The Company carries the Hollow Crown. Walk it to the Kiln of Kaldur: reach a gate (Blackgate or Wraithpass), then take 5 steps on the Ashen Road. <b>12 taint</b> and the Gloam wins.</p>';
   body += '<div class="ctype" style="font-size:.9rem;text-transform:uppercase;letter-spacing:.06em">Taint</div><div class="track">'; for (var i = 0; i <= 12; i++) body += '<span class="' + (i === F.taint ? 'on' : i === 12 ? 'end' : '') + '">' + i + '</span>'; body += '</div>';
@@ -53,22 +53,29 @@ function openCompany() {
   openSheet('company', { title: 'The Company', body: body });
 }
 function openLog() { var body = '<div style="font-size:.95rem;line-height:1.4">' + G.log.slice(-60).reverse().map(function (l) { return '<div>' + (l.k === 'turn' ? '<b>' + l.x + '</b>' : '<span style="color:' + (l.s === 'G' ? 'var(--red)' : 'var(--ink)') + '">' + l.x + '</span>') + '</div>'; }).join('') + '</div>'; openSheet('log', { title: 'Chronicle', body: body }); }
-function openVP(side) {
+function openVP(side) { try { if (window.TUT && TUT.on) TUT.act({ what: 'vp' }); } catch (e) { }
   var lst = REGIONS.filter(function (r) { return VP[r.set] && r.nat && natSide(r.nat) !== side; });
   var body = '<p>' + (side === 'D' ? 'The Dawn League wins at <b>4 points</b> of Gloam cities and strongholds.' : 'The Gloam wins at <b>10 points</b> of Dawn cities and strongholds.') + ' Strongholds are 2, cities 1. Checked at the end of each turn.</p>';
   body += '<p>' + lst.map(function (r) { return (G.ctl[r.id] === side ? '<b style="color:var(--red)">✓ ' : '') + r.n + ' (' + VP[r.set] + ')' + (G.ctl[r.id] === side ? '</b>' : ''); }).join(' · ') + '</p>';
   openSheet('vp', { title: (side === 'D' ? 'Dawn' : 'Gloam') + ' victory points', body: body });
 }
 function armyText(a) { if (!a) return ''; return natsIn(a).map(function (n) { var x = a[n]; return NATIONS[n].short + ': ' + [x[0] ? x[0] + ' regular' : '', x[1] ? x[1] + ' elite' : '', x[2] ? x[2] + (n === 'pt' ? ' Gloamrider' : ' leader') : ''].filter(Boolean).join(', '); }).join('<br>'); }
-function regionInfo(rid) {
-  var r = REG[rid]; if (!r) return; var body = '<p>' + (r.nat ? NATIONS[r.nat].n : 'No nation') + (r.set ? ' · ' + { strong: 'stronghold (2 VP)', city: 'city (1 VP)', town: 'town', fort: 'fortification' }[r.set] : '') + (r.set && controller(G, rid) !== ownerSide(rid) ? ' · held by the ' + (controller(G, rid) === 'G' ? 'Gloam' : 'Dawn League') : '') + '</p>';
+var WHAT = {
+  t: ['Army', 'A round token: the number is its troops. It moves and attacks with an Army die.'],
+  'in': ['Besieged garrison', 'Troops shut inside their stronghold walls. Attackers need a siege to get in.'],
+  co: ['The Company', 'Carries the Hollow Crown. Walk it to the Kiln to win; the Hunt adds taint.'],
+  s: ['Settlement', 'Its plate colour shows who holds it. Strongholds give 2 points, cities 1.'],
+  r: ['Region', 'One space of the map. Armies move one region per step.'] };
+function regionInfo(rid, kind, extra, hint) {
+  var r = REG[rid]; if (!r) return; kind = kind === 't' && extra === 'in' ? 'in' : kind || 'r'; if (kind === 's') WHAT.s[0] = { strong: 'Stronghold', city: 'City', town: 'Town', fort: 'Fortification' }[r.set] || 'Settlement';
+  var w = WHAT[kind] || WHAT.r, body = '<p class="what">' + w[0] + ': ' + w[1] + '</p>' + (hint ? '<p><b>' + hint + '</b></p>' : '') + '<p>' + (r.nat ? NATIONS[r.nat].n : 'No nation') + (r.set ? ' · ' + { strong: 'stronghold (2 VP)', city: 'city (1 VP)', town: 'town', fort: 'fortification' }[r.set] : '') + (r.set && controller(G, rid) !== ownerSide(rid) ? ' · held by the ' + (controller(G, rid) === 'G' ? 'Gloam' : 'Dawn League') : '') + '</p>';
   if (G.A[rid]) body += '<p>' + armyText(G.A[rid]) + '</p>'; if (G.IN[rid]) body += '<p><b>Behind the walls:</b><br>' + armyText(G.IN[rid]) + '</p>';
   var cs = Object.keys(G.C).filter(function (c) { return G.C[c] === rid; }); if (cs.length) body += '<p>' + cs.map(function (c) { return '<b>' + CHARS[c].n + '</b>: ' + CHARS[c].out; }).join('<br>') + '</p>';
   if (G.F.loc === rid && G.F.road < 0) body += '<p>The Company was last seen here.</p>';
   if (!G.A[rid] && !G.IN[rid] && !cs.length) body += '<p>Empty land. Dotted outlines are its neighbours.</p>';
   regionCard(rid, r.n, body);
 }
-function charInfo(c) { var d = CHARS[c]; openSheet('char', { title: d.n, body: '<p>Level ' + (d.lv > 50 ? 'flies' : d.lv) + ' · leadership ' + d.ld + '</p>' + (d.guide ? '<p><b>As guide:</b> ' + d.guide + '</p>' : '') + (d.out ? '<p><b>On the map:</b> ' + d.out + '</p>' : '') }); }
+function charInfo(c) { var d = CHARS[c]; openSheet('char', { title: d.n, body: '<p class="what">' + (d.side === 'G' ? 'Minion (dark shield): a Gloam champion. Each one gives the Gloam +1 action die.' : 'Hero (light shield): a Dawn champion. Leads armies and protects the Company.') + '</p><p>Level ' + (d.lv > 50 ? 'flies' : d.lv) + ' · leadership ' + d.ld + '</p>' + (d.guide ? '<p><b>As guide:</b> ' + d.guide + '</p>' : '') + (d.out ? '<p><b>On the map:</b> ' + d.out + '</p>' : '') }); }
 // ---------------------------------------------------------------- menu + rules
 function menuInit() {
   try {
