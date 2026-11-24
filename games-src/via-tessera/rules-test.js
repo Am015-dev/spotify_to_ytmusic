@@ -8,10 +8,10 @@ const count = (arr, f) => arr.filter(f).length;
 const fresh = (o) => VT.newGame(Object.assign({ seed: 11, first: 0 }, o || {}));
 
 // ---------- components ----------
-ok(D.START_HAND.length === 8, '8 starting cards');
+ok(D.START_HAND.length === 7, '7 starting cards (published setup: 7 per player)');
 ok(D.START_HAND.map(i => D.CARDS[i]).filter(c => c.act === 'colo' && c.god === 'shield' && !Object.keys(c.cost).length).length === 1, 'FIX: the starting hand has a Settler (Shield)');
 const sh = D.START_HAND.map(i => D.CARDS[i]);
-ok(count(sh, c => c.act === 'trib' && c.god === 'shield') === 1 && count(sh, c => c.act === 'arch' && c.god === 'eagle') === 1 && count(sh, c => c.act === 'pref' && c.god === 'sickle') === 2 &&
+ok(count(sh, c => c.act === 'trib' && c.god === 'shield') === 1 && count(sh, c => c.act === 'arch' && c.god === 'eagle') === 1 && count(sh, c => c.act === 'pref' && c.god === 'sickle') === 1 &&
    count(sh, c => c.act === 'merc' && c.god === 'wing' && c.coins === 3) === 1 && count(sh, c => c.act === 'dipl' && c.god === 'eagle') === 1 && count(sh, c => c.act === 'sen' && c.god === 'hearth') === 1, 'starting hand cards and patrons');
 const [I, II] = D.DECK_STACKS(2);
 ok(I.length === 8 && II.length === 7, 'decks I (8) and II (7) for 2 players');
@@ -50,7 +50,8 @@ ok(G.pm === 1, 'Grand Governor starts with the second player');
 ok(D.PROVS.every(p => { const best = Math.max(...D.CITIES.filter(c => c.p === p.id).map(c => D.PRICE[G.city[c.id].g])); return G.prov[p.id].up && D.PRICE[G.prov[p.id].g] === best; }), 'region marker = its most valuable good, good side up');
 
 // ---------- rules ----------
-const playAct = (G, act) => { const i = G.pl[G.cur].hand.findIndex(id => D.CARDS[id].act === act); VT.performMove(G, { t: 'play', i }); };
+const playAct = (G, act) => { const P = G.pl[G.cur]; if (!P.hand.some(id => D.CARDS[id].act === act)) { const d = P.disc.findIndex(id => D.CARDS[id].act === act); if (d >= 0) P.hand.push(P.disc.splice(d, 1)[0]); }   // one of each role: a card already played is taken back (as after a Herald)
+  const i = P.hand.findIndex(id => D.CARDS[id].act === act); VT.performMove(G, { t: 'play', i }); };
 // Builder: steps = colonists on the map, one per line, may pass, land/sea split
 G = fresh(); playAct(G, 'arch');
 ok(G.pend.h === 'arch-move' && G.pend.steps === 2, 'Builder steps = colonists on the map (2)');
@@ -92,7 +93,7 @@ let c6 = VT.cardCost(G, 6, false); ok(c6.goods.cloth >= 2, 'slot 7 costs two ext
 let c2 = VT.cardCost(G, 1, false); ok(c2.any === 1, 'slot 2 costs one extra good of your choice');
 let c6c = VT.cardCost(G, 6, true); ok(c6c.any === 0 && JSON.stringify(c6c.goods) === JSON.stringify(Object.assign({ brick: 0, food: 0, tool: 0, wine: 0, cloth: 0 }, D.CARDS[G.disp[6]].cost)), 'Censor pays only the printed cost');
 playAct(G, 'sen'); VT.performMove(G, { t: 'buy', s: 0 }); VT.performMove(G, { t: 'buy', s: 1 });
-ok(G.pl[0].hand.length === 9 && G.disp.length === 7 && G.deck.length === 6, 'Patron buys 2; the display refills to 7');
+ok(G.pl[0].hand.length === 8 && G.disp.length === 7 && G.deck.length === 6, 'Patron buys 2; the display refills to 7');
 // Settler (bought cards: take one out of the market into the hand)
 const give = (G, act) => { const id = I.concat(II).filter(i => D.CARDS[i].act === act)[0]; G.disp = G.disp.filter(x => x !== id); G.deck = G.deck.filter(x => x !== id); while (G.disp.length < 7 && G.deck.length) G.disp.push(G.deck.shift()); G.pl[G.cur].hand.push(id); return id; };
 G = fresh(); give(G, 'colo'); playAct(G, 'colo'); ok(VT.validMoves(G).some(m => m.t === 'ccoins'), 'Settler: coins option');
@@ -102,9 +103,9 @@ const spots = new Set(VT.validMoves(G).filter(m => m.t === 'place').map(m => m.c
 VT.performMove(G, { t: 'place', c: 'alpina', k: 'L' }); VT.performMove(G, { t: 'place', c: 'caput', k: 'S' });
 ok(G.pl[0].goods.food === 0 && G.pl[0].goods.tool === 0 && VT.onBoard(G.pl[0]) === 4, 'each new colonist costs 1 grain + 1 tool');
 // Herald: cards back + coins over 3, colonist only in the capital
-G = fresh(); ['arch', 'pref', 'pref', 'merc'].forEach((a, k) => { G.cur = 0; G.pend = null; const i = G.pl[0].hand.findIndex(id => D.CARDS[id].act === a); G.pl[0].disc.push(G.pl[0].hand.splice(i, 1)[0]); });
+G = fresh(); ['arch', 'pref', 'merc', 'sen'].forEach((a, k) => { G.cur = 0; G.pend = null; const i = G.pl[0].hand.findIndex(id => D.CARDS[id].act === a); G.pl[0].disc.push(G.pl[0].hand.splice(i, 1)[0]); });
 const cb = G.pl[0].coins; playAct(G, 'trib');
-ok(G.pl[0].hand.length === 8 && G.pl[0].disc.length === 0 && G.pl[0].coins === cb + 2, 'Herald: 5 cards back = 2 coins');
+ok(G.pl[0].hand.length === 7 && G.pl[0].disc.length === 0 && G.pl[0].coins === cb + 2, 'Herald: 5 cards back = 2 coins');
 ok(VT.validMoves(G).filter(m => m.t === 'place').every(m => m.c === 'caput'), 'Herald colonist goes to the capital');
 // Envoy
 G = fresh(); playAct(G, 'merc'); VT.performMove(G, { t: 'trade', ops: [] }); playAct(G, 'dipl');
@@ -131,7 +132,7 @@ let sc = VT.score(G, 0); ok(sc.by.hearth.pts === 3, 'Hearth: 1 per 10 wealth');
 const cs = D.CITIES.filter(c => c.L).slice(0, 4); cs.forEach((c, k) => { G.city[c.id].g = ['brick', 'food', 'cloth', 'cloth'][k]; G.city[c.id].h.push(0); p0.houses.push(c.id); });
 sc = VT.score(G, 0); const regions = new Set(cs.map(c => c.p)).size;
 ok(sc.by.eagle.pts === 2 * 3, 'Eagle: 1 per non-brick house x 2 cards');
-ok(sc.by.sickle.pts === 2 * regions, 'Sickle: 1 per region x 2 cards');
+ok(sc.by.sickle.pts === 1 * regions, 'Sickle: 1 per region x 1 card');
 ok(sc.by.wing.pts === 1 * 6, 'Wing: 2 per kind of good (3 kinds) x 1 card');
 ok(sc.by.shield.pts === 2 * 4, 'Shield: 2 per colonist on the map (2) x 2 cards (Herald + Settler)');
 // game end
