@@ -157,7 +157,7 @@ function tutSteps(){
   return S}
 // ---------------------------------------------------------------- start, leave, hooks
 function tutRelease(){TUT.hold=false;try{schedule()}catch(e){}}
-function tutStart(o){tutStartScripted(o)}   // the guided first game: one sentence and one highlighted tap per step, then a real game
+function tutStart(o){if(window.GXST){try{GXH.hide()}catch(e){}try{GXT.markDone(TUT_GAME)}catch(e){}GXST.picker();return}tutStartScripted(o)}   // the dimming guided game is retired: the tutorial is the scenario lessons (lessons.js)   // the guided first game: one sentence and one highlighted tap per step, then a real game
 function tutStartScripted(o){if(typeof GXT==='undefined')return;const pro=!!(o&&o.prologue),first=window.CAMPAIGN&&window.CAMPAIGN.chapters&&window.CAMPAIGN.chapters[0];
   GXT.start({game:TUT_GAME,steps:tutSteps(),story:!!(window.CAMPAIGN&&typeof GXC!=='undefined'),
     endTitle:'You know the rules',endText:pro?'Now the Story begins.':'Now a real game.',
@@ -184,7 +184,7 @@ function tutMenus(){const s=document.getElementById('gxtset');if(s)s.innerHTML=t
   document.querySelectorAll('[data-gxt-slot]').forEach(e=>{e.innerHTML=tutBtn(e.dataset.gxtSlot||'btn')})}
 // Story starts with the tutorial (Chapter 0) the first time; afterwards it opens the chapter map
 function storyOpen(){if(typeof GXC==='undefined')return;
-  if(typeof GXT!=='undefined'&&!GXT.status(TUT_GAME).seen)tutStart({prologue:true});else GXC.open()}
+  GXC.open()}
 // the game tells the kit what the player does, before it is applied
 (function(){const _ga=gameAct;gameAct=function(ds,seat){
   if(tutOn()&&!UI._tutIn){let a=null;
