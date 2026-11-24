@@ -2,11 +2,6 @@
 "phone": {
 "look": [],
 "axe": [],
-"axe_pages": [
-"menu-phone.json",
-"tt-board-phone.json",
-"tt-result-phone.json",
-"tt-select-phone.json"
-]
+"axe_pages": []
 }
 }

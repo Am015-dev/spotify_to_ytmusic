@@ -845,6 +845,33 @@ html.desk:has(#main .opts) #road>*{visibility:hidden}
 #sidelog{display:none!important}
 @media (min-width:1024px){.st-t{display:none!important}}
 .gx-ibtn.gxst-q{display:none!important}
+/*W753 popups: children never shrink into each other, so a tall popup scrolls inside its own box and stays in the viewport*/
+.ppop:not([hidden]){max-height:min(86dvh,100dvh - 24px);overflow-y:auto;-webkit-overflow-scrolling:touch}
+.ppop:not([hidden])>*{flex-shrink:0}
+.ppop[data-kind=kc]:not([hidden]) .pp-row,.ppop[data-kind=card]:not([hidden]) .pp-row{flex-shrink:0}
+/* W754 readability pass (owner 24 Nov: "unreadable"): phone text >= 14px where the player decides, >= 12px elsewhere; pc >= 16px.
+   Solid plates behind text on the painting; hand cards show cost + name only (role is on the zoom). */
+.tb-map:not(.tb-compact) .tb-name{display:none}
+.tb-m-heralds text{display:none}
+.hcb i{display:none!important}
+.hcb b{font-size:14px!important;letter-spacing:-.3px!important}
+html.desk .hcb b{font-size:17px!important}
+@media (min-width:1024px){.gx-bar h1{font-size:18px}}
+html:not(.desk) #rivals .rv-t b{font-size:14px!important;letter-spacing:-.2px}
+html:not(.desk) .rv-n,html.ph .race-c.many .rv-n{font-size:20px!important;padding-right:2px}
+html:not(.desk) #cstrip .cs-c,html:not(.desk) #cstrip .cs-c b,html:not(.desk) #cstrip .cs-c span,html:not(.desk) #cstrip .cs-c em,html:not(.desk) #cstrip .cs-c i{font-size:15px!important}
+#cstrip .cs-c em{opacity:1!important;color:#f6e6b4}
+#cstrip .cs-c{background:rgba(20,10,8,.92)}
+html:not(.bf-w) body #tbturn .tbt-chip{font-size:15px!important}
+html.desk body #tbturn .tbt-chip,html.desk #rivals .rv-t b,html.desk #cstrip .cs-c,html.desk #cstrip .cs-c *{font-size:17px!important}
+html.desk .gxc-lab,html.desk .gxc-node small,html.desk .gxc-node b{font-size:17px!important}
+.gxc-lab{background:rgba(20,10,8,.9);color:#f6e6b4;padding:3px 8px;border-radius:8px}
+html.desk .ppop small,html.desk .ppop .hint,html.desk .ppop p,html.desk .ppop li,html.desk .ppop span{font-size:17px!important;line-height:1.4}
+html:not(.desk) .ppop small,html:not(.desk) .ppop .hint,html:not(.desk) .ppop p,html:not(.desk) .ppop li{font-size:15px!important;line-height:1.4}
+html.desk .gxc-act b,html.desk .gxc-act small,html.desk .gxc-sc-title,html.desk .ovwhy li,html.desk .ovwhy li span{font-size:17px!important}
+.gxc-act small{opacity:1!important}
+#rivals .rv-t b{line-height:1.3!important;padding-block:1px}
+html.desk .ppop:not([hidden]){padding-left:64px!important;padding-right:64px!important}
 /* ===== GX campaign styles: chapter map, story scenes, boss card, result. Theme with the --gxc-* variables. ===== */
 :root{--gxc-bg:#1b1410;--gxc-paper:#efe0bd;--gxc-paper2:#e2cc9b;--gxc-ink:#2a1d10;--gxc-dim:rgba(42,29,16,.68);--gxc-line:rgba(60,38,14,.28);
   --gxc-go:#c9662a;--gxc-go-ink:#fff8ec;--gxc-gold:#f2b93b;--gxc-a1:#4f8a4b;--gxc-a2:#c07a2c;--gxc-a3:#8e3b46;--gxc-road:#b98a52;--gxc-radius:16px;
@@ -1781,7 +1808,7 @@ html body :is(.gxh-ring,.gxt-ring){animation-duration:1.6s}
   });
   GXS.add({
     id: 'tb-over', name: 'End card with the 3D crown', ask: 'Is the crown on the end card?', seed: 8, when: booted, group: 'Art',
-    setup: function () { return table(8).then(function () { G.over = { winner: 0, ranking: G.pl.map(function (q) { return q.seat; }), scores: G.pl.map(function (q) { return q.inf; }), bonus: {}, tieBreak: null }; showOver(); renderAll(); return new Promise(function (r) { setTimeout(r, 1200); }); }); },
+    setup: function () { return table(8).then(function () { G.pl.forEach(function (q, i) { q.inf = [31, 26, 22, 18][i]; }); /* W754: a real final score, not a row of zeros */ G.over = { winner: 0, ranking: G.pl.map(function (q) { return q.seat; }), scores: G.pl.map(function (q) { return q.inf; }), bonus: {}, tieBreak: null }; showOver(); renderAll(); return new Promise(function (r) { setTimeout(r, 1200); }); }); },
     checks: [{ kind: 'fn', name: 'the crown is on the end card (3D canvas or the @512 picture)', fn: function () { return !!document.querySelector('.crown3') || 'no crown on the end card'; } }]
   });
 })();
@@ -2578,6 +2605,30 @@ const GX={key:'gx',open:null,
     Q = btn('gxst-q', 'Lessons', 'Lessons: learn by playing', function () { GXST.picker(); });
     var p = (C.qParent && $(C.qParent)) || $('.gx-bar');
     if (p) { Q.className = 'gx-ibtn gxst-q'; p.appendChild(Q); } else { Q.className += ' gxst-qfix'; D.body.appendChild(Q); }
+    setTimeout(qCheck, 50);
+  }
+  // a Lessons button that renders smaller than a thumb, or off screen (hidden bar, 0x0 slot), moves to a fixed pill; the pill picks the screen corner
+  // that covers the fewest buttons, so it never hides the game's own controls
+  var QSEL = 'button,a,[role=button],[onclick],[tabindex],input,select,summary,.card,[data-c],[data-id],.chip,[class*=chip],#instr,#say,#status,.dock';
+  function qOver(r) {   // does the in-bar button sit on top of another control or chip?
+    var bs = D.querySelectorAll(QSEL), i, b; for (i = 0; i < bs.length; i++) { if (bs[i] === Q || bs[i].contains(Q) || Q.contains(bs[i])) continue; b = vis(bs[i]); if (b && hit(r, { left: b.left + 2, top: b.top + 2, right: b.right - 2, bottom: b.bottom - 2 })) return true; } return false;
+  }
+  function qCheck() {
+    if (!Q || !D.body.contains(Q)) return;
+    if (Q.className.indexOf('gxst-qfix') < 0) {
+      var r = Q.getBoundingClientRect(); if (r.width >= 44 && r.height >= 44 && r.left >= 0 && r.right <= innerWidth + 1 && r.top >= 0 && r.bottom <= innerHeight + 1 && !qOver(r)) return;
+      Q.className = 'gxst-q gxst-qfix'; D.body.appendChild(Q);
+    }
+    var vw = innerWidth, vh = innerHeight, w = Q.offsetWidth || 72, h = Q.offsetHeight || 44, bs = D.querySelectorAll(QSEL), rs = [], i;
+    for (i = 0; i < bs.length; i++) { if (bs[i] === Q || (W && W.contains(bs[i]))) continue; var q = vis(bs[i]); if (q) rs.push(q); }
+    var wr = W && vis(W); if (wr) rs.push(wr);
+    (C.keepClear || []).forEach(function (sel) { var a; try { a = D.querySelectorAll(sel); } catch (e) { a = []; } for (var j = 0; j < a.length; j++) { if (a[j] === Q || a[j].contains(Q)) continue; var kr = vis(a[j]); if (kr) rs.push(kr); } });
+    var cs = [[8, vh - h - 8], [vw - w - 8, vh - h - 8], [vw - w - 8, 8], [8, 8], [vw / 2 - w / 2, vh - h - 8], [vw / 2 - w / 2, 8], [vw - w - 8, 76], [8, 76], [vw / 2 - w / 2, 76]], best = null;
+    function cost(c) { var b = { left: c[0], top: c[1], right: c[0] + w, bottom: c[1] + h }, n = 0; for (var k = 0; k < rs.length; k++) if (hit(b, rs[k])) n++; return n; }
+    var cur = Q.getAttribute('data-pos'), cc = cur ? JSON.parse(cur) : null;
+    if (cc && cost(cc) === 0) return;
+    for (i = 0; i < cs.length; i++) { var v = cost(cs[i]) + i * 0.01; if (!best || v < best.v) best = { v: v, c: cs[i] }; }
+    Q.setAttribute('data-pos', JSON.stringify(best.c)); Q.style.left = Math.round(best.c[0]) + 'px'; Q.style.top = Math.round(best.c[1]) + 'px'; Q.style.bottom = 'auto';
   }
   // ------------------------------------------------------------ the card: picker | play | win | fail
   function render() {
@@ -2628,6 +2679,7 @@ const GX={key:'gx',open:null,
   // keep the card off the hinted target and the keepClear areas; a dragged position is kept unless it covers the hinted target
   function place() {
     if (!W) return; var vw = innerWidth, vh = innerHeight, bw = W.offsetWidth, bh = W.offsetHeight, t = hintTarget(), av = [];
+    if (Q && Q.className.indexOf('gxst-qfix') >= 0) { var qr = vis(Q); if (qr) av.push(qr); }
     (C.keepClear || []).forEach(function (sel) { var a; try { a = D.querySelectorAll(sel); } catch (e) { a = []; } for (var i = 0; i < a.length; i++) { var r = vis(a[i]); if (r) av.push(r); } });
     function clamp(p) { return [Math.max(4, Math.min(vw - bw - 4, p[0])), Math.max(4, Math.min(vh - bh - 4, p[1]))]; }
     function box(p) { return { left: p[0], top: p[1], right: p[0] + bw, bottom: p[1] + bh }; }
@@ -2671,6 +2723,7 @@ const GX={key:'gx',open:null,
     }
     if (!drag) place(); ring();
   }
+  function tickAll() { loop(); qCheck(); }
   function begin(i, how) {
     S.i = i; S.phase = 'play'; S.hint = 0; S.msg = ''; S.stars = 0; S.open = true; S.min = false; S.live = false;
     var s = cur(), tok = ++S.tok; render();
@@ -2681,7 +2734,8 @@ const GX={key:'gx',open:null,
   window.GXST = {
     init: function (cfg) {
       C = cfg; var o = load(); S = { open: false, phase: 'picker', i: -1, hint: 0, best: o.best || {}, pos: o.pos || null, min: false, live: false, tok: 0, msg: '', stars: 0 };
-      qBtn(); if (!tick) { tick = setInterval(loop, 250); addEventListener('resize', function () { if (S && S.open) render(); }); }
+      qBtn(); if (!tick) { tick = setInterval(tickAll, 250); addEventListener('resize', function () { if (S && S.open) render(); }); }
+      if (/[?&]lessons=1/.test(location.search)) setTimeout(function () { if (S && !S.open) GXST.picker(); }, 0);   // ?lessons=1 opens the picker in every game
       return GXST;
     },
     picker: function () { if (!C) return; qBtn(); S.open = true; S.phase = 'picker'; S.min = false; S.tok++; S.live = false; render(); emit('picker', {}); },
@@ -6725,7 +6779,8 @@ function sealOf(seat){const c=fcol(seat)||'';const m=/^#([0-9a-f]{6})$/i.exec(c)
 function drawOverlay(){const ov=MAP.ov,m=MAP.m;if(!ov||!m)return;const V=UI.V,f=[];
   // location reward coins (+1 / +2) and a favour disc marker
   for(let l=0;l<6;l++){const p=m.locPos(LOCID[l]),inf=DD.LOCS[l][2],k=UI.phone?1.2:1;
-    f.push('<g transform="translate('+(p.x+40*k)+' '+(p.y-40*k)+')"><circle r="'+(UI.phone?19:17)+'" fill="#1b0b10" stroke="#e8c867" stroke-width="2.6"/><text y="8" text-anchor="middle" font-family="'+TBKit.fonts.display+'" font-weight="700" font-size="'+(UI.phone?24:22)+'" fill="#fff0b8">+'+inf+'</text></g>');
+    const bf=Math.max(UI.phone?24:22,Math.ceil((UI.phone?14.5:16.5)*1000/(UI.bs||600))); // W754: influence badge reads >= 14px phone / 16px pc
+    f.push('<g transform="translate('+(p.x+(30+bf*.45)*k)+' '+(p.y-(30+bf*.45)*k)+')"><circle r="'+Math.round(bf*.82)+'" fill="#1b0b10" stroke="#e8c867" stroke-width="3"/><text y="'+Math.round(bf*.35)+'" text-anchor="middle" font-family="'+TBKit.fonts.display+'" font-weight="700" font-size="'+bf+'" fill="#fff0b8">+'+inf+'</text></g>');
     // council marker / favour
     if(l===2){const h=V.fav.h;const col=h>=0?fcol(h):'#e8c867';f.push('<g transform="translate('+(p.x-40*k)+' '+(p.y-40*k)+')"><circle r="'+(UI.phone?18:16)+'" fill="'+col+'" stroke="#fff3c4" stroke-width="2.6"/><path d="M0 -9 L2.6 -2.6 9 -2.6 3.8 1.6 5.8 8 0 4 -5.8 8 -3.8 1.6 -9 -2.6 -2.6 -2.6Z" fill="#fff6d0" stroke="#4a3208" stroke-width="1"/></g>')}
     // Kingdom Cards that sit on a Location
@@ -6739,10 +6794,10 @@ function drawOverlay(){const ov=MAP.ov,m=MAP.m;if(!ov||!m)return;const V=UI.V,f=
     for(let s=0;s<n;s++){const sp=V.pl[s].supp,cnt=sp.r[r]+sp.x[r];if(!cnt)continue;const c=s%cols,rw=Math.floor(s/cols);const x=S.cx-tw/2+c*(sw+gap)+sw/2,y=S.cy-th/2+rw*(sh+gap)+sh+(UI.phone?10:9);
       f.push('<g transform="translate('+x+' '+y+')"><circle r="'+(UI.phone?11:10)+'" fill="'+fcol(s)+'" stroke="#fff3c4" stroke-width="2"/><text y="5" text-anchor="middle" font-size="14" font-weight="700" fill="#fff" font-family="'+TBKit.fonts.display+'">'+cnt+'</text></g>')}}
   regionChips(f);
-  if(UI.phone&&(UI.bs||0)>=250){ // phones: the kit's banners are hidden, so every location gets a short name tag of its own
-    for(let l=0;l<6;l++){const P=LOCPOS[l],name=LOCN[l],fs=Math.max(36,Math.ceil(14.2*1000/(UI.bs||360))),words=name.split(' ');const lines=name.length*fs*.6+18>330&&words.length>1?[words[0],words.slice(1).join(' ')]:[name];
-      const wd=Math.max(...lines.map(t=>t.length))*fs*.6+18,ht=lines.length*fs+8;const cx=Math.max(wd/2+4,Math.min(996-wd/2,P[0])),top=P[1]+52;
-      f.push('<g class="locname"><rect x="'+Math.round(cx-wd/2)+'" y="'+top+'" width="'+Math.round(wd)+'" height="'+ht+'" rx="10" fill="#1d120b" fill-opacity=".82"/>'+lines.map((t,i)=>'<text x="'+Math.round(cx)+'" y="'+Math.round(top+(i+1)*fs-4)+'" text-anchor="middle" font-family="'+TBKit.fonts.display+'" font-weight="700" font-size="'+fs+'" fill="#f6e6b4">'+esc(t)+'</text>').join('')+'</g>')}}
+  if((UI.bs||0)>=250){ // the kit's banners are hidden (W754: on pc too, they were 13px), so every location gets a solid name tag of its own
+    for(let l=0;l<6;l++){const P=LOCPOS[l],name=LOCN[l],fs=Math.max(UI.phone?36:30,Math.ceil((UI.phone?14.5:16.5)*1000/(UI.bs||360))),words=name.split(' ');const lines=name.length*fs*.6+18>330&&words.length>1?[words[0],words.slice(1).join(' ')]:[name];
+      const wd=Math.max(...lines.map(t=>t.length))*fs*.6+18,ht=lines.length*fs+8;const cx=Math.max(wd/2+56,Math.min(944-wd/2,P[0])),top=P[1]+52; // W754: clear of the score track
+      f.push('<g class="locname"><rect x="'+Math.round(cx-wd/2)+'" y="'+top+'" width="'+Math.round(wd)+'" height="'+ht+'" rx="10" fill="#1d120b" fill-opacity=".9" stroke="#e8c867" stroke-opacity=".55" stroke-width="2"/>'+lines.map((t,i)=>'<text x="'+Math.round(cx)+'" y="'+Math.round(top+(i+1)*fs-4)+'" text-anchor="middle" font-family="'+TBKit.fonts.display+'" font-weight="700" font-size="'+fs+'" fill="#f6e6b4">'+esc(t)+'</text>').join('')+'</g>')}}
   ov.innerHTML=f.join('')}
 function setHl(ids,regs,rec){MAP.hl=ids||[];MAP.hlR=regs||[];MAP.rec=rec||{};applyHl()}
 function applyHl(){const m=MAP.m;if(!m)return;const sel=null;m.highlight(MAP.hl.map(l=>LOCID[l]));m.select(sel);
@@ -6750,7 +6805,9 @@ function applyHl(){const m=MAP.m;if(!m)return;const sel=null;m.highlight(MAP.hl.
   if(MAP.pan)MAP.pan.querySelectorAll('[data-reg]').forEach(g=>{const r=+g.getAttribute('data-reg');const on=(MAP.hlR||[]).includes(r);g.classList.toggle('rglow',on);g.classList.toggle('rrec',on&&MAP.rec.reg===r)});
   drawSelName()}
 // Phones: the kit's name banners are hidden (they were clipped and overlapped the region labels and reward coins). A tapped location shows its name here instead, in a spot with nothing else: below the circle in the top row and the upper half of the side columns, above it in the lower half.
-function drawSelName(){const g=MAP.sg;if(!g)return;if(UI.phone){g.innerHTML='';return}if(!UI.phone||UI.pop!=='loc'||!UI.popArg||UI.popArg.l==null){g.innerHTML='';return}
+function drawSelName(){const g=MAP.sg;if(!g)return;if(UI.phone||(UI.bs||0)>=250){g.innerHTML='';return}
+// W754: every location already carries its own name tag
+if(!UI.phone||UI.pop!=='loc'||!UI.popArg||UI.popArg.l==null){g.innerHTML='';return}
   const l=UI.popArg.l,P=LOCPOS[l],name=LOCN[l],fs=34,words=name.split(' ');let lines=[name];if(name.length>9&&words.length>1){const h=Math.ceil(words.length/2);lines=[words.slice(0,h).join(' '),words.slice(h).join(' ')]}
   const wd=Math.max(...lines.map(t=>t.length))*fs*.66+30,ht=lines.length*(fs+8)+14,below=l<2||l===2||l===4;let cx=P[0];cx=Math.max(wd/2+8,Math.min(1000-wd/2-8,cx));const top=below?P[1]+60:P[1]-60-ht;
   g.innerHTML='<g><rect x="'+Math.round(cx-wd/2)+'" y="'+Math.round(top)+'" width="'+Math.round(wd)+'" height="'+ht+'" rx="14" fill="#1d120b" fill-opacity=".92" stroke="#e8c867" stroke-width="3"/>'+lines.map((t,i)=>'<text x="'+Math.round(cx)+'" y="'+Math.round(top+7+(i+1)*(fs+8)-6)+'" text-anchor="middle" font-family="'+TBKit.fonts.display+'" font-weight="700" font-size="'+fs+'" fill="#f6e6b4">'+esc(t)+'</text>').join('')+'</g>'}
@@ -7098,7 +7155,7 @@ function renderPop(){const el=$('#ppop');if(!el)return;
   el.dataset.kind=UI.pop;el.dataset.read=a.read?'1':'';
   sizePopCard()}
 function sizePopCard(){const el=$('#ppop');const c=el&&el.querySelector('.pp-card');if(!c)return;const W=el.clientWidth,H=el.clientHeight;
-  const big=c.dataset.kc!=null||el.dataset.kind==='card';const w=big?Math.max(120,Math.min(c.dataset.kc!=null?300:270,W*.74,(innerHeight*.86-(c.dataset.kc!=null?130:190))/1.4308)):Math.max(96,Math.min(260,W*.42,(H-150)/1.4308));c.innerHTML='';c.appendChild(c.dataset.kc!=null?kcEl(+c.dataset.kc,w):cardEl(+c.dataset.cid,w))}
+  const big=c.dataset.kc!=null||el.dataset.kind==='card';const w=big?Math.max(120,Math.min(c.dataset.kc!=null?300:(innerWidth>=1024?340:270),W*.74,(innerHeight*.86-(c.dataset.kc!=null?130:190))/1.4308)):Math.max(96,Math.min(260,W*.42,(H-150)/1.4308));c.innerHTML='';c.appendChild(c.dataset.kc!=null?kcEl(+c.dataset.kc,w):cardEl(+c.dataset.cid,w))}
 function popCard(id,read){const s=vs();const i=cinfo(id);const mine=!read&&ownerOf(id)===s;const acts=mine?optsFor(s,id):[];const rec=mine&&UI._rec&&G.q?UI._rec:null;let h='';
   if(acts.length){h+='<div class="pp-act">';for(const m of acts.slice(0,10)){const isRec=UI._recShown&&rec&&rec.k===m.k;h+='<button class="btn'+(isRec?' pri':'')+'" data-a="mv" data-k="'+esc(m.k)+'">'+esc(actLabel(m))+(isRec?' (suggested)':'')+'</button>'}
     h+='</div>'}
@@ -9146,7 +9203,7 @@ window.tbLineOver=function(ln){try{const L=ln.getBoundingClientRect(),w=document
     var os = saveGame; saveGame = function () { if (!GXST.active()) return os.apply(this, arguments); };
     var oh = humanMove; humanMove = function (k) { var r = oh.apply(this, arguments); if (r && GXST.active() && !/^(done|seldone)$/.test(k)) L.n++; return r; };
     window.TBL = { L: L, stack: stack, lessons: lessons, until: until };
-    if (lessons.length) GXST.init({ game: 'thornbound', scenarios: lessons, keepClear: ['#handw', '#rivals', '#tbturn', '#act', '#cstrip'], settled: function () { return !!(G && G.over) || (!UI.busy && !UI.card && !UI.pumping); } });
+    if (lessons.length) GXST.init({ game: 'thornbound', scenarios: lessons, keepClear: ['#handw', '#rivals', '#tbturn', '#act', '#cstrip', '.gx-bar h1', 'h1.logo'], settled: function () { return !!(G && G.over) || (!UI.busy && !UI.card && !UI.pumping); } });
   };
   setTimeout(go, 300);
 })();

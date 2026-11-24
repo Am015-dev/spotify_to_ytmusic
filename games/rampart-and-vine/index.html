@@ -676,6 +676,14 @@ body:has(#modal .scrim) .gedges{display:none}
 .card[data-win] .winx{position:absolute;top:6px;right:6px;width:44px;height:44px;border-radius:10px;border:0;background:#281b12;color:#fff3dc;font:700 26px/1 var(--ff);cursor:pointer}
 .card[data-win] h2{padding-right:48px}
 .dlog{margin:0;padding-left:20px;text-align:left;line-height:1.4;font-size:16px}.dlog li{margin:5px 0}
+/*W753 opts: unpressed tiles sit on the cream button art, so their label must be dark (was cream on cream = blank)*/
+html.sk body .card .opts .opt:not([aria-pressed=true]){color:#3a2410!important;background:#f3e3c3!important}
+/*W753 status: never clip the turn line; let it wrap*/
+html.sk #status,html.sk #status .ins{overflow:visible}
+html.sk #status .ins{display:block;-webkit-line-clamp:unset}
+/*W753 story map title: wrap on word boundaries, two clean lines*/
+html.sk .gxc-htitle{overflow-wrap:normal;word-break:normal;font-size:16px}
+html.sk .gxc-htitle b{display:inline;padding:2px 8px;-webkit-box-decoration-break:clone;box-decoration-break:clone;line-height:1.5}
 
 :root{--gxh-btn:#b5532f;--gxh-accent:#e0a83a;--gxh-bg:#f6ead2;--gxh-font:var(--ff)}</style>
 <style>
@@ -1437,7 +1445,7 @@ html body :is(.gxh-ring,.gxt-ring){animation-duration:1.6s}
   var ART = ['piece-meeple', 'piece-champ', 'piece-mason', 'piece-hog'].reduce(function (a, n) { return a.concat(['red', 'blue', 'yellow', 'green'].map(function (c) { return n + '-' + c; })); }, ['ui-row', 'ui-bubble-tail']);
   GXS.add({
     id: 'rv-art', name: 'Painted pieces, rows and bubble tail', ask: 'Are the pieces painted and coloured?', seed: 11, when: booted, group: 'UI',
-    setup: function () { return table(11).then(function () { var d = document.createElement('div'); d.id = 'rvprobe'; d.style.cssText = 'position:fixed;left:-300px;top:0'; d.innerHTML = '<div class="gxh-bub gxh-a-bottom"><i class="gxh-arr"></i></div><div class="menu"><button>x</button></div>'; document.body.appendChild(d); return Promise.all(ART.map(function (n) { return new Promise(function (r) { var i = new Image(); i.onload = function () { r(i.naturalWidth > 0 ? '' : n); }; i.onerror = function () { r(n); }; i.src = 'media/' + n + '.webp'; }); })); }).then(function (a) { window.__artBad = a.filter(Boolean); }); },
+    setup: function () { return table(11).then(function () { var d = document.createElement('div'); d.id = 'rvprobe'; d.style.cssText = 'position:fixed;left:-300px;top:0;visibility:hidden;pointer-events:none;opacity:0;z-index:-1'; d.innerHTML = '<div class="gxh-bub gxh-a-bottom"><i class="gxh-arr"></i></div><div class="menu"><button>x</button></div>'; document.body.appendChild(d); return Promise.all(ART.map(function (n) { return new Promise(function (r) { var i = new Image(); i.onload = function () { r(i.naturalWidth > 0 ? '' : n); }; i.onerror = function () { r(n); }; i.src = 'media/' + n + '.webp'; }); })); }).then(function (a) { window.__artBad = a.filter(Boolean); }); },
     checks: [
       { kind: 'fn', name: 'all 18 painted files load', fn: function () { return !window.__artBad.length || 'did not load: ' + window.__artBad.join(', '); } },
       { kind: 'fn', name: 'menu rows are painted', fn: function () { return /ui-row/.test(getComputedStyle(document.querySelector('#rvprobe .menu button')).backgroundImage) || 'menu row not painted'; } },
@@ -2281,6 +2289,30 @@ html body :is(.gxh-ring,.gxt-ring){animation-duration:1.6s}
     Q = btn('gxst-q', 'Lessons', 'Lessons: learn by playing', function () { GXST.picker(); });
     var p = (C.qParent && $(C.qParent)) || $('.gx-bar');
     if (p) { Q.className = 'gx-ibtn gxst-q'; p.appendChild(Q); } else { Q.className += ' gxst-qfix'; D.body.appendChild(Q); }
+    setTimeout(qCheck, 50);
+  }
+  // a Lessons button that renders smaller than a thumb, or off screen (hidden bar, 0x0 slot), moves to a fixed pill; the pill picks the screen corner
+  // that covers the fewest buttons, so it never hides the game's own controls
+  var QSEL = 'button,a,[role=button],[onclick],[tabindex],input,select,summary,.card,[data-c],[data-id],.chip,[class*=chip],#instr,#say,#status,.dock';
+  function qOver(r) {   // does the in-bar button sit on top of another control or chip?
+    var bs = D.querySelectorAll(QSEL), i, b; for (i = 0; i < bs.length; i++) { if (bs[i] === Q || bs[i].contains(Q) || Q.contains(bs[i])) continue; b = vis(bs[i]); if (b && hit(r, { left: b.left + 2, top: b.top + 2, right: b.right - 2, bottom: b.bottom - 2 })) return true; } return false;
+  }
+  function qCheck() {
+    if (!Q || !D.body.contains(Q)) return;
+    if (Q.className.indexOf('gxst-qfix') < 0) {
+      var r = Q.getBoundingClientRect(); if (r.width >= 44 && r.height >= 44 && r.left >= 0 && r.right <= innerWidth + 1 && r.top >= 0 && r.bottom <= innerHeight + 1 && !qOver(r)) return;
+      Q.className = 'gxst-q gxst-qfix'; D.body.appendChild(Q);
+    }
+    var vw = innerWidth, vh = innerHeight, w = Q.offsetWidth || 72, h = Q.offsetHeight || 44, bs = D.querySelectorAll(QSEL), rs = [], i;
+    for (i = 0; i < bs.length; i++) { if (bs[i] === Q || (W && W.contains(bs[i]))) continue; var q = vis(bs[i]); if (q) rs.push(q); }
+    var wr = W && vis(W); if (wr) rs.push(wr);
+    (C.keepClear || []).forEach(function (sel) { var a; try { a = D.querySelectorAll(sel); } catch (e) { a = []; } for (var j = 0; j < a.length; j++) { if (a[j] === Q || a[j].contains(Q)) continue; var kr = vis(a[j]); if (kr) rs.push(kr); } });
+    var cs = [[8, vh - h - 8], [vw - w - 8, vh - h - 8], [vw - w - 8, 8], [8, 8], [vw / 2 - w / 2, vh - h - 8], [vw / 2 - w / 2, 8], [vw - w - 8, 76], [8, 76], [vw / 2 - w / 2, 76]], best = null;
+    function cost(c) { var b = { left: c[0], top: c[1], right: c[0] + w, bottom: c[1] + h }, n = 0; for (var k = 0; k < rs.length; k++) if (hit(b, rs[k])) n++; return n; }
+    var cur = Q.getAttribute('data-pos'), cc = cur ? JSON.parse(cur) : null;
+    if (cc && cost(cc) === 0) return;
+    for (i = 0; i < cs.length; i++) { var v = cost(cs[i]) + i * 0.01; if (!best || v < best.v) best = { v: v, c: cs[i] }; }
+    Q.setAttribute('data-pos', JSON.stringify(best.c)); Q.style.left = Math.round(best.c[0]) + 'px'; Q.style.top = Math.round(best.c[1]) + 'px'; Q.style.bottom = 'auto';
   }
   // ------------------------------------------------------------ the card: picker | play | win | fail
   function render() {
@@ -2331,6 +2363,7 @@ html body :is(.gxh-ring,.gxt-ring){animation-duration:1.6s}
   // keep the card off the hinted target and the keepClear areas; a dragged position is kept unless it covers the hinted target
   function place() {
     if (!W) return; var vw = innerWidth, vh = innerHeight, bw = W.offsetWidth, bh = W.offsetHeight, t = hintTarget(), av = [];
+    if (Q && Q.className.indexOf('gxst-qfix') >= 0) { var qr = vis(Q); if (qr) av.push(qr); }
     (C.keepClear || []).forEach(function (sel) { var a; try { a = D.querySelectorAll(sel); } catch (e) { a = []; } for (var i = 0; i < a.length; i++) { var r = vis(a[i]); if (r) av.push(r); } });
     function clamp(p) { return [Math.max(4, Math.min(vw - bw - 4, p[0])), Math.max(4, Math.min(vh - bh - 4, p[1]))]; }
     function box(p) { return { left: p[0], top: p[1], right: p[0] + bw, bottom: p[1] + bh }; }
@@ -2374,6 +2407,7 @@ html body :is(.gxh-ring,.gxt-ring){animation-duration:1.6s}
     }
     if (!drag) place(); ring();
   }
+  function tickAll() { loop(); qCheck(); }
   function begin(i, how) {
     S.i = i; S.phase = 'play'; S.hint = 0; S.msg = ''; S.stars = 0; S.open = true; S.min = false; S.live = false;
     var s = cur(), tok = ++S.tok; render();
@@ -2384,7 +2418,8 @@ html body :is(.gxh-ring,.gxt-ring){animation-duration:1.6s}
   window.GXST = {
     init: function (cfg) {
       C = cfg; var o = load(); S = { open: false, phase: 'picker', i: -1, hint: 0, best: o.best || {}, pos: o.pos || null, min: false, live: false, tok: 0, msg: '', stars: 0 };
-      qBtn(); if (!tick) { tick = setInterval(loop, 250); addEventListener('resize', function () { if (S && S.open) render(); }); }
+      qBtn(); if (!tick) { tick = setInterval(tickAll, 250); addEventListener('resize', function () { if (S && S.open) render(); }); }
+      if (/[?&]lessons=1/.test(location.search)) setTimeout(function () { if (S && !S.open) GXST.picker(); }, 0);   // ?lessons=1 opens the picker in every game
       return GXST;
     },
     picker: function () { if (!C) return; qBtn(); S.open = true; S.phase = 'picker'; S.min = false; S.tok++; S.live = false; render(); emit('picker', {}); },
@@ -4479,7 +4514,7 @@ function focusView(cx,cy,cell){const m=measure(),s=cell/100,top=topSafe(),bot=bo
 function fitCells(cells,m){let x0=1e9,y0=1e9,x1=-1e9,y1=-1e9;for(const [x,y] of cells){x0=Math.min(x0,x);x1=Math.max(x1,x);y0=Math.min(y0,y);y1=Math.max(y1,y)}
   const w=x1-x0+1,h=y1-y0+1,aw=m.W-14,ah=m.H-52,c0=Math.min(aw/w,ah/h);return {c:Math.max(MINC,Math.min(innerWidth>=1024?190:MAXC,c0)),fits:c0>=MINC,cx:(x0+x1+1)/2,cy:(y0+y1+1)/2,w,h}}
 function viewFor(f,m){const s=f.c/100;return {s,x:m.W/2-f.cx*100*s,y:m.H/2+16-f.cy*100*s}}
-function fitTarget(){const m=measure();if(!G.order.length)return {s:.4,x:0,y:0};const last=unkey(G.cur&&G.cur.k||G.order[G.order.length-1]);
+function fitTarget(){const m=measure();if(!G.order.length)return {s:.4,x:0,y:0};{const pv=pcView();if(pv)return pv}const last=unkey(G.cur&&G.cur.k||G.order[G.order.length-1]);
   const gl=UI.legal.map(g=>[g.x,g.y]);let f=fitCells(G.order.map(unkey).concat(gl),m);if(f.fits)return viewFor(f,m);
   f=fitCells(gl.concat([last]),m);return viewFor(f,m)}
 function ensureGlowVisible(){if(!myTurn('place')||UI.tw||UI.user)return;if([...document.querySelectorAll('#world .glow')].some(g=>g.style.visibility!=='hidden'))return;
@@ -4503,8 +4538,12 @@ const CAMMIN=()=>PHONE()?54:64,CAMMAX=()=>PHONE()?104:(innerWidth>=1024?200:MAXC
 function valleyCells(extra,around){const all=G.order.map(unkey).concat(extra||[]);const cmin=CAMMIN();if(fitsAt(all,cmin))return all;
   const c=around||unkey(G.order[G.order.length-1]);const by=all.slice().sort((a,b)=>Math.hypot(a[0]-c[0],a[1]-c[1])-Math.hypot(b[0]-c[0],b[1]-c[1]));const out=[];
   for(const q of by){out.push(q);if(!fitsAt(out,cmin)){out.pop();if(out.length>=4)break}}return out.length?out:[c]}
-function camValley(extra,around,ms){if(!G||!G.order.length)return;tweenView(frameCells(valleyCells(extra,around),CAMMIN(),CAMMAX()),ms==null?600:ms)}
-function camAim(ms){if(!G||!myTurn('place')||UI.user||!G.order.length)return;const gl=UI.legal.filter(q=>q.r===UI.rot).map(q=>[q.x,q.y]);
+// PC (>=1024px): frame every placed tile plus a one-tile margin so the valley fills the play area; null when that would make cells too small (then the patch logic below takes over)
+const PCMAX=240;
+function pcView(){if(innerWidth<1024||!G||!G.order.length)return null;let x0=1e9,y0=1e9,x1=-1e9,y1=-1e9;for(const k of G.order){const [x,y]=unkey(k);x0=Math.min(x0,x);x1=Math.max(x1,x);y0=Math.min(y0,y);y1=Math.max(y1,y)}
+  const box=[[x0-1,y0-1],[x1+1,y1+1]];if(!fitsAt(box,GLOWMIN()))return null;return frameCells(box,GLOWMIN(),PCMAX)}
+function camValley(extra,around,ms){if(!G||!G.order.length)return;{const pv=pcView();if(pv){tweenView(pv,ms==null?600:ms);return}}tweenView(frameCells(valleyCells(extra,around),CAMMIN(),CAMMAX()),ms==null?600:ms)}
+function camAim(ms){if(!G||!myTurn('place')||UI.user||!G.order.length)return;{const pv=pcView();if(pv){tweenView(pv,ms==null?600:ms);return}}const gl=UI.legal.filter(q=>q.r===UI.rot).map(q=>[q.x,q.y]);
   {const all=G.order.map(unkey).concat(gl),gm=GLOWMIN();if(!fitsAt(all,CAMMIN())&&fitsAt(all,gm)){tweenView(frameCells(all,gm,CAMMAX()),ms==null?600:ms);return}if(!fitsAt(all,gm)&&gl.length&&fitsAt(gl.concat([unkey(G.order[G.order.length-1])]),gm)){tweenView(frameCells(gl.concat([unkey(G.order[G.order.length-1])]),gm,CAMMAX()),ms==null?600:ms);return}}
   const near=aimCells();const cells=valleyCells(gl);if(!near.slice(0,-1).some(q=>cells.some(c=>c[0]===q[0]&&c[1]===q[1]))){camValley(near,near[0],ms==null?600:ms);return}tweenView(frameCells(cells,CAMMIN(),CAMMAX()),ms==null?600:ms)}
 function camSpot(x,y,ms){const m=measure(),c=UI.view.s*100,sx=(x+.5)*c+UI.view.x,sy=(y+.5)*c+UI.view.y,top=topSafe(),bot=botSafe();if(sx>c&&sx<m.W-c&&sy>top+c*.8&&sy<m.H-bot-c*.8)return;tweenView(focusView(x+.5,y+.5,Math.max(c,CAMMIN())),ms==null?420:ms)}
@@ -5190,6 +5229,8 @@ if(document.readyState==='complete')setTimeout(assetsWarm,1200);else addEventLis
   }
   window.__RVL = { SPECS: SPECS, build: build, tiles: tiles, figL: figL, tid: tid, lessons: lessons,
     open: function () { var go = function () { if (!ready()) { setTimeout(go, 200); return; } boot(); GXST.picker(); }; go(); } };
+  // boot at load so the Lessons button is always there (and ?lessons=1 opens the picker, via GXST.init)
+  (function early() { if (!ready() || !window.GXST) { setTimeout(early, 300); return; } boot(); })();
 })();
 
 </script>
