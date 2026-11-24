@@ -539,3 +539,25 @@ html body :is(.gxh-tt,.gxh-tx,.gxh-bd button,.gxt-say,.gxt-tt){font-size:16px!im
 /* W601: the placed-token backing ring + terrain bands are drawn in the tile SVG (ui.js tileSvg, art.js tokenSvg) */
 #map .tband{pointer-events:none}
 #map .tdiv{pointer-events:none}
+/* floating tutorial (tutor.js): never dims, never blocks taps */
+#twin{position:fixed;z-index:70;width:min(340px,calc(100vw - 16px));box-sizing:border-box;background:#f6efdc;color:#1d2420;border:2px solid #2c3a2f;border-radius:14px;box-shadow:0 8px 22px rgba(0,0,0,.45);font-size:15px;line-height:1.35;touch-action:none}
+#twin.min{width:auto;background:none;border:0;box-shadow:none}
+#twin .tchip{min-height:44px;padding:4px 16px;border-radius:22px;background:#2c3a2f;color:#f6efdc;border:2px solid #f6efdc;font-weight:700;font-size:15px;box-shadow:0 4px 12px rgba(0,0,0,.35)}
+#twin .twh{display:flex;align-items:center;gap:4px;padding:2px 2px 2px 12px;background:#2c3a2f;color:#f6efdc;border-radius:11px 11px 0 0;cursor:move}
+#twin .twh b{font-size:15px}#twin .sp{flex:1}
+#twin .twb{width:44px;height:44px;border:0;background:none;color:#f6efdc;font-size:26px;line-height:1;border-radius:8px;cursor:pointer}
+#twin .tws{margin:8px 12px 2px;font-weight:700;font-size:16px}#twin .twy{margin:2px 12px 6px;color:#45524a;font-size:14px}
+#twin .twc{display:flex;flex-wrap:wrap;gap:4px;margin:0 10px 4px;padding:0;list-style:none}
+#twin .twc li{width:13px;height:13px;border-radius:50%;background:#d9cfb6;font-size:0;overflow:hidden}#twin .twc li.ok{background:#3f7a4a}#twin .twc li.cur{outline:2px solid #e3a33b;outline-offset:1px}
+#twin .twf{display:flex;gap:8px;padding:4px 10px 10px}#twin .ab{min-height:44px;min-width:64px}
+#tmap{position:fixed;inset:0;z-index:65;pointer-events:none}
+#tmap .tml{position:absolute;inset:0}#tmap line{stroke:#f6efdc;stroke-width:2;stroke-dasharray:4 3}#tmap circle{fill:#e3a33b;stroke:#1d2420;stroke-width:1.5}
+#tmap .tlab{position:absolute;pointer-events:auto;min-height:32px;padding:3px 10px;border-radius:16px;background:#2c3a2f;color:#f6efdc;border:2px solid #e3a33b;font-weight:700;font-size:14px;white-space:nowrap;box-shadow:0 2px 8px rgba(0,0,0,.4);cursor:pointer}
+#tmap .tlab:before{content:'';position:absolute;inset:-6px -2px}
+#tmap .tlab.on{background:#e3a33b;color:#1d2420}
+.tsug{animation:tsug 1.6s ease-in-out infinite}
+#map .tsug{animation:tsugs 1.6s ease-in-out infinite}
+@keyframes tsug{0%,100%{box-shadow:0 0 0 0 rgba(227,163,59,0)}50%{box-shadow:0 0 0 6px rgba(227,163,59,.8)}}
+@keyframes tsugs{0%,100%{filter:none}50%{filter:drop-shadow(0 0 6px #e3a33b) drop-shadow(0 0 3px #e3a33b)}}
+@media (prefers-reduced-motion:reduce){.tsug,#map .tsug{animation:none;box-shadow:0 0 0 4px rgba(227,163,59,.8)}}
+#tutQ{font-weight:800;font-size:20px;min-width:44px;justify-content:center}
