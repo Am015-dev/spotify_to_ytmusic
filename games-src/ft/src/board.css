@@ -553,6 +553,7 @@ html.land .tile.hasmk .tn{display:block}
 
 /* W749 lessons on phone: a smaller board leaves a strip between board and your goods for the lesson card (lessons.js lsSlot) */
 html:not(.land) body.lesson #gw{margin-bottom:214px}
+body.lesson .gxst-card,body.lesson #gw,body.lesson #grid,body.lesson #table>*{transition-property:none!important}   /* the board row never animates its size in a lesson: the card follows it in the same frame */
 html:not(.land) body.lesson .gxst-inslot.gxst-win .gxst-rule{display:none}
 body.lesson .gxst-inslot .gxst-goal,body.lesson .gxst-inslot .gxst-stars{flex:none}
 html.land body.lesson #feed{display:none!important}

@@ -17,7 +17,9 @@ const t0 = Date.now(), stop = budget(60000, 'sands lessons layout');
       const hit = (a, b) => a.left < b.right - 1 && a.right > b.left + 1 && a.top < b.bottom - 1 && a.bottom > b.top + 1;
       const HUD = ['.gx-bar', '#seats', '#line', '#cleg', '#mkt', '#mine', '#acts', '#feed'];
       const BUB = '.gxh-bub,.commb,.tourw,.coachb,.gd-bub,.coach-b,#tip';
-      function check(id, step) {
+      const frame = () => new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));   // what the player sees = after one painted frame (observers have run)
+      async function check(id, step) {
+        await frame();
         const cards = [...document.querySelectorAll('.gxst-card')].filter(R), bad = [];
         if (cards.length !== 1) bad.push('cards=' + cards.length);
         const card = cards[0], cr = card && R(card);
@@ -33,12 +35,12 @@ const t0 = Date.now(), stop = budget(60000, 'sands lessons layout');
       }
       lsOpen();
       for (let i = 0; i < LESSONS.length; i++) {
-        const L = LESSONS[i]; GXST.start(L.id); await wait(3000); check(L.id, 0);
+        const L = LESSONS[i]; GXST.start(L.id); await wait(3000); await check(L.id, 0);
         for (let k = 0; k < L.solve.length; k++) {
           const m = L.solve[k] === 'dj' ? validMoves(0).find(x => x.act === 'tile' && x.dj) : L.solve[k]; go(m); await wait(300);
           let s = GXST.state(); for (let n = 0; n < 20 && k === L.solve.length - 1 && s.phase !== 'win'; n++) { await wait(150); s = GXST.state(); }
           if (k === L.solve.length - 1 && s.phase !== 'win') out.push({ id: L.id, step: 'win', bad: ['no win: ' + s.phase] });
-          await wait(3000); check(L.id, k === L.solve.length - 1 ? 'win' : k + 1);
+          await wait(3000); await check(L.id, k === L.solve.length - 1 ? 'win' : k + 1);
         }
       }
       return out;

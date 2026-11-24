@@ -154,6 +154,7 @@
     next: function () { if (S.i < C.scenarios.length - 1) begin(S.i + 1, 'start'); else GXST.picker(); },
     hint: function () { var s = cur(); if (!s || S.phase !== 'play' || S.hint >= s.hints.length) return; S.hint++; render(); ring(); emit('hint', { id: s.id, level: S.hint }); },
     close: function () { if (!S || !S.open) return; S.open = false; S.live = false; S.tok++; render(); emit('close', {}); },
+    place: function () { if (S && S.open && !drag) place(); },   // opt-in: a game calls this when its layout changes
     active: function () { var s = S && S.open && S.phase !== 'picker' ? cur() : null; return s; },
     state: function () {
       if (!S) return null; var s = cur(), wr = W && vis(W), tr = hintTarget();

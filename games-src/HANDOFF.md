@@ -319,3 +319,8 @@ Live fix: original-name phrase removed from shelf blurb + sands page (15:2x).
 ## W740 onyx-atelier visual fix (24 Nov)
 Done: tutorial part names now a tidy list inside the guide window, ONE callout on the board for the picked part (no chip cloud); PC (>=1000px) grid layout: board left (cell up to 112px), rival/jewels/you stacked right; guide never sits on the PC board.
 Weak: PC guide window still covers the rival jewel rows on lesson 1; HUD pips and phone start menu not changed. Sheets: onyx-atelier/proof/w740-*-sheet.jpg. Integrator: build.py then copy onyx-atelier.html to games/onyx-atelier/index.html (not in build-all).
+## W752 (sands lessons: card lag fixed)
+- Result: ft/lessons-layout-test.js 66/66 (6.6 s), ft/lessons-test.js pass (17.7 s). Root cause of the "one-tick lag": turbo forces transition-duration .001s on everything, so margin/left/top of #gw, #grid and the card took a frame to land. Fix: board.css `body.lesson .gxst-card,#gw,#grid,#table>*{transition-property:none}` (lesson mode only).
+- Also: shell GXST.place() (opt-in, no change for other games); sands wraps fit() to re-seat the card in the same task, and a ResizeObserver on the board rows re-fits. Test now awaits a painted frame before each check.
+- Phone sheet: no card over board/HUD; the card sits right under the board. Proof: sands-of-qamar/proof/ (phone/pc sheets).
+- Still weak: some phone cells keep a wooden band below the card (strip 214 px reserve vs shorter card); not tightened further.

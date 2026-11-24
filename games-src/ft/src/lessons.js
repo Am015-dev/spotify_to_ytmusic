@@ -103,6 +103,7 @@ function lsInit(){if(!window.GXST||LS.init)return;LS.init=1;
   GXST.init({game:'sands',scenarios:LESSONS,storageKey:'soq_lessons',keepClear:['.ls-target','.ls-target','.ls-target','.ls-target','#acts','.gx-bar','#seats','#line','#mkt','#mine','#grid'],   // the target is listed 4 times: covering it costs 4x any other area
     settled:()=>!aiTimer,goalAlways:true,phoneSlot:lsSlot});
   const q=document.querySelector('.gxst-q');if(q)q.classList.add('nar-hide');   // phone bar holds at most 5 buttons; Learn to play (menu) and the card reopen the lessons
+  const f0=fit;fit=function(){const r=f0.apply(this,arguments);if(document.body.classList.contains('lesson'))GXST.place();return r};if(window.ResizeObserver){const ro=new ResizeObserver(()=>{if(document.body.classList.contains('lesson'))fit()});['#gw','#mkt','#mine','#cleg','#acts'].forEach(q=>{const e=document.querySelector(q);if(e)ro.observe(e)})}   // board re-fitted (a move changed the rows): re-seat the card in the same task, before paint
   setInterval(lsMark,250)}
 // the card lives in a free rect, never over board, HUD or bubbles. Phone: the board shrinks (board.css body.lesson) and the card takes the strip
 // between the board and the next row under it. PC (land): right of the board, under the market and the claims legend, above your goods / actions.
