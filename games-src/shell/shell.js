@@ -9,6 +9,7 @@ const GX={key:'gx',open:null,
     // keyboard basics: Enter/Space presses the focused control, or the main action when nothing is focused. Runs last (window, bubble)
     // and only if the game did not handle the key itself (preventDefault); games can opt out with GX.noKeys=true.
     window.addEventListener('keydown',e=>this.key1(e));
+    this.tidyWatch();
     // resize hook for boards
     const b=document.querySelector('.gx-board');if(b&&window.ResizeObserver)new ResizeObserver(()=>{for(const f of this._rs)try{f(b.clientWidth,b.clientHeight)}catch(e){}}).observe(b)},
   // a drawer is modal: the page behind it is inert and hidden from assistive tech, so nothing under the sheet is a live tap target
@@ -24,6 +25,20 @@ const GX={key:'gx',open:null,
     for(const b of root.querySelectorAll(this.PRIMARY)){if(b.disabled||b.getAttribute('aria-disabled')==='true'||b.closest('[inert],[aria-hidden="true"],[hidden]'))continue;
       const r=b.getBoundingClientRect();if(r.width<4||r.height<4||r.bottom<0||r.right<0||r.top>innerHeight||r.left>innerWidth)continue;
       const s=getComputedStyle(b);if(s.visibility==='hidden'||s.pointerEvents==='none'||+s.opacity<.1)continue;return b}return null},
+  // text floor + empty popups. At >= 1024 px wide, HUD and popup text under the floor (16 px body, 14 px labels; UI-BAR 1) is raised
+  // in place, so nothing already big is touched; on the board only running text (p/li) is raised, card art keeps its sizing. An open popup whose body has no text gets
+  // .gx-is-empty (CSS prints "No events yet", or the body's data-empty). Runs on open and, throttled, when the HUD or popup changes.
+  FLOOR:'.gx-bar,.gx-dock,.gx-drawer.on',BODY:'p,li,td,dd,blockquote',
+  tidy(){if(this.open){const bd=document.querySelector('#'+CSS.escape(this.open)+' .gx-drawer-body');if(bd)bd.classList.toggle('gx-is-empty',!bd.textContent.trim()&&!bd.querySelector('img,svg,canvas,input,button,select'))}
+    if(innerWidth<1024)return;for(const r of document.querySelectorAll(this.FLOOR))for(const e of r.querySelectorAll('*')){
+      if(e.closest('svg')||!e.firstChild||![...e.childNodes].some(n=>n.nodeType===3&&n.textContent.trim()))continue;
+      const f=e.matches(this.BODY)||e.parentElement&&e.parentElement.matches('.gx-drawer-body,.gx-dock-body')?16:14,c=parseFloat(getComputedStyle(e).fontSize);
+      if(c&&c<f)e.style.setProperty('font-size',f+'px','important')}
+    // on the board only running text (logs, notes) is raised: card faces and tokens keep their art-fitted sizes
+    for(const e of document.querySelectorAll('.gx-main :is('+this.BODY+')')){if(e.closest('button,svg,.gx-dock,[class*=card],[class*=tile]'))continue;
+      const c=parseFloat(getComputedStyle(e).fontSize);if(c&&c<16&&e.textContent.trim())e.style.setProperty('font-size','16px','important')}},
+  tidyWatch(){if(!window.MutationObserver)return;let t=0;const run=()=>{t=0;try{this.tidy()}catch(e){}};const later=()=>{if(!t)t=setTimeout(run,200)};
+    new MutationObserver(later).observe(document.body,{childList:true,subtree:true,characterData:true});addEventListener('resize',later);later()},
   _rs:[],onResize(f){this._rs.push(f)},
   boardSize(){const b=document.querySelector('.gx-board');return b?{w:b.clientWidth,h:b.clientHeight}:{w:innerWidth,h:innerHeight}},
   toggleDock(force){const min=force!=null?!force:!this.app.classList.contains('gx-dock-min');this.app.classList.toggle('gx-dock-min',min);this.app.classList.remove('gx-sheet-full');try{localStorage.setItem(this.key+'_dockmin',min?'1':'0')}catch(e){}},
@@ -34,7 +49,7 @@ const GX={key:'gx',open:null,
   show(id){const d=document.getElementById(id);if(!d)return;if(this.open&&this.open!==id){const o=document.getElementById(this.open);if(o)o.classList.remove('on')}
     this.open=id;d.classList.add('on');this.scrim&&this.scrim.classList.add('on');this.bg(true);this._back=document.activeElement;
     for(const b of document.querySelectorAll('[data-gx="'+id+'"]'))b.setAttribute('aria-expanded','true');
-    const f=d.querySelector('.gx-x');if(f)f.focus({preventScroll:true});if(this.onShow)this.onShow(id)},
+    const f=d.querySelector('.gx-x');if(f)f.focus({preventScroll:true});if(this.onShow)this.onShow(id);try{this.tidy()}catch(e){}},
   close(){if(!this.open)return;const id=this.open;const d=document.getElementById(this.open);if(d)d.classList.remove('on');for(const b of document.querySelectorAll('[data-gx="'+this.open+'"]'))b.setAttribute('aria-expanded','false');this.open=null;this.bg(false);this.scrim&&this.scrim.classList.remove('on');if(this._back&&this._back.focus)this._back.focus({preventScroll:true});if(this.onClose)this.onClose(id)},
   // build a drawer shell around a body element: <div class=gx-drawer id><head><h2>title</h2><button.gx-x></head><body/></div>
   drawer(id,title,bodyEl,wide){let d=document.getElementById(id);if(!d){d=document.createElement('section');d.id=id;d.className='gx-drawer'+(wide?' wide':'');d.setAttribute('role','dialog');d.setAttribute('aria-label',title);

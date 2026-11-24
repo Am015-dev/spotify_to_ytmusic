@@ -24,13 +24,16 @@ html.gx,html.gx body{height:100%;margin:0;overflow:hidden;overscroll-behavior:no
 /* popups */
 .gx-scrim{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:40;opacity:0;pointer-events:none;transition:opacity .18s}
 .gx-scrim.on{opacity:1;pointer-events:auto}
-.gx-drawer{position:fixed;z-index:41;top:calc(var(--gx-bar-h) + 8px + env(safe-area-inset-top,0px));right:8px;bottom:8px;width:min(520px,calc(100vw - 16px));display:flex;flex-direction:column;background:var(--gx-panel);color:var(--gx-ink);border-radius:var(--gx-radius);box-shadow:var(--gx-shadow);padding:31px;transform:translateX(calc(100% + 16px));transition:transform .22s ease;visibility:hidden}
+.gx-drawer{position:fixed;z-index:41;top:calc(var(--gx-bar-h) + 8px + env(safe-area-inset-top,0px));right:8px;max-height:calc(100dvh - var(--gx-bar-h) - 16px - env(safe-area-inset-top,0px));width:min(520px,calc(100vw - 16px));display:flex;flex-direction:column;background:var(--gx-panel);color:var(--gx-ink);border-radius:var(--gx-radius);box-shadow:var(--gx-shadow);padding:31px;transform:translateX(calc(100% + 16px));transition:transform .22s ease;visibility:hidden}
 .gx-drawer.on{transform:none;visibility:visible}
 .gx-drawer.wide{width:min(980px,calc(100vw - 16px))}
 .gx-drawer-head{display:flex;align-items:center;gap:8px;padding:10px 12px;border-bottom:1px solid var(--gx-line);flex:0 0 auto}
 .gx-drawer-head h2{margin:0;font-size:1.15rem;flex:1;min-width:0}
 .gx-x{appearance:none;border:0;background:transparent;font-size:1.6rem;line-height:1;cursor:pointer;color:inherit;min-width:44px;min-height:44px;border-radius:10px}
-.gx-drawer-body{flex:1;min-height:0;overflow:auto;padding:10px 12px 16px;overscroll-behavior:contain}
+.gx-drawer-body{flex:0 1 auto;min-height:0;overflow:auto;padding:10px 12px 16px;overscroll-behavior:contain}
+/* a popup with nothing in it says so in one line instead of showing a blank sheet (GX.tidy sets the class) */
+.gx-drawer-body.gx-is-empty::before{content:"No events yet";display:block;padding:12px 0;font-size:max(16px,1em);opacity:.75}
+.gx-drawer-body.gx-is-empty[data-empty]::before{content:attr(data-empty)}
 /* phones (portrait, or anything under 720 px wide): the dock becomes a sheet under the board (still in flow), the drawers slide up
    from the bottom. Any landscape window >= 720 px wide (a 1366 laptop at 150 % = 910x512) keeps the side dock: board left at full height. */
 @media (max-width:719px),(max-width:999px) and (orientation:portrait){
@@ -42,7 +45,7 @@ html.gx,html.gx body{height:100%;margin:0;overflow:hidden;overscroll-behavior:no
   .gx-app.gx-dock-min .gx-dock-body{display:none}
   .gx-reopen{display:none!important}
   .gx-grab{display:block;width:44px;height:5px;border-radius:3px;background:currentColor;opacity:.35;margin:0 auto}
-  .gx-drawer{top:auto;left:0;right:0;bottom:0;width:auto;max-height:88dvh;height:88dvh;border-radius:var(--gx-radius) var(--gx-radius) 0 0;transform:translateY(100%);padding-bottom:calc(31px + env(safe-area-inset-bottom,0px))}
+  .gx-drawer{top:auto;left:0;right:0;bottom:0;width:auto;max-height:88dvh;border-radius:var(--gx-radius) var(--gx-radius) 0 0;transform:translateY(100%);padding-bottom:calc(31px + env(safe-area-inset-bottom,0px))}
   .gx-drawer.wide{width:auto}
   .gx-hide-narrow{display:none!important}
 }

@@ -2,6 +2,17 @@
 
 Older notes (everything from "Nightrun TIMING" down, and all shelf-wide history) moved to games-src/HANDOFF-ARCHIVE.md on 21 Oct 2026. Nothing was deleted.
 
+## W745 (24 Nov 2026): shell panels size to content, empty state, text floor (branch shelf/W745-shell-panels, not deployed)
+- shell.css: .gx-drawer no longer stretches to the screen bottom (max-height instead of bottom:8px / phone height:88dvh); body flex 0 1 auto.
+- shell.js GX.tidy: empty open drawer body gets .gx-is-empty ("No events yet", or the body's data-empty); at >= 1024 px raises bar/dock/drawer text
+  under 14 px (16 px for p/li and direct body text) and board p/li logs to 16 px. Card faces/tokens are untouched on purpose.
+- Still weak: card-face text on boards stays 6-8 px (doorkick hand card names) and thornbound hand chips 13 px: needs per-game card art work.
+  The "blank diary" in R14 is a timing race (content lands after the 450 ms shot), not missing content. Zoom popups in thornbound (ppop) and
+  tidewake are per-game code, not the shell drawer. turbo.js freezes CSS transitions, so getComputedStyle under turbo can report pre-transition sizes.
+- Integrator: ONE build-all --deploy of every game that loads the shell: cauldron-fair crown-city-smash doorkick-dungeon emberclimb final-approach
+  hollowbough kaiten-kitchen lantern-dive nebula-aces perch-and-plume redline-rally rampart-and-vine sands-of-qamar shipwreck-isle short-fuse
+  stitchwise sunglaze thornbound tidewake twin-thrones vale-of-banners wildmark vinegrave (+ deep-signal also loads it; its owner decides).
+
 ## New games: pick only from the top ranked board games (owner, 7 Nov 2026: "I want top board games from now on")
 
 - Suggest and build new shelf games only from the current top of the overall board game rankings, not niche picks. Owner chooses from the list.
