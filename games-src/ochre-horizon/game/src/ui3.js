@@ -18,6 +18,7 @@ function vib(ms) { try { if (navigator.vibrate) navigator.vibrate(ms); } catch (
 var HQ = [], HCUR = null;
 function toast(html, me, ms, o) {
   o = o || {};
+  if (document.body.classList.contains('charter')) return;   // the tutorial panel already says it in plain words; a toast on top overlaps it
   if (typeof GD !== 'undefined' && GD.on) { guideResult(html, me); return; }
   var it = { html: html, me: me, ms: ms || 2400, key: o.key || '' };
   if (it.key) HQ = HQ.filter(function (x) { return x.key !== it.key; });

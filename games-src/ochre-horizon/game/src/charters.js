@@ -54,11 +54,10 @@
     {
       id: 'seed', n: 1, title: 'Four Seasons', gens: 4, plan: 'income',
       story: [
-        'The Assembly has signed your charter. ' + YOU + ' gets four seasons on Ochre and one rule: finish ahead of ' + RIV + '.',
-        RIV + ' starts level with you. They are buying income cards: they plan to be rich in season 10.',
-        'Your rating is your points, and every season it pays you its number in credits.'
+        'You have 4 seasons to beat ' + RIV + '. Whoever has more points at the end wins.',
+        'Each season you earn credits equal to your points. Points are worth more early.'
       ],
-      goal: 'Have more points than ' + RIV + ' when season 4 ends.',
+      goal: 'Beat ' + RIV + ' on points in 4 seasons.',
       lesson: 'Count the seasons left. An income card pays back after about 4-5 seasons; with only 4 left, raising the planet (rating) wins.',
       hint: 'In a full game (12+ rounds) it flips: buy income in the first 3 rounds, terraform from the middle on.',
       setup: function () { return base(7101, { pl: [{ mc: 31, tr: 20, hand: ['p009', 'p004'] }, { mc: 31, tr: 20, hand: ['p001', 'p181', 'p185'] }], temp: -30 }); },
@@ -78,11 +77,10 @@
     {
       id: 'garden', n: 2, title: 'The Garden Ring', gens: 3, plan: 'rating',
       story: [
-        'Your settlers want a home, not a number. The Assembly will name the first garden city by season 3.',
-        RIV + ' is building one too. A city scores 1 point for every greenery that touches it, yours or anyone’s.',
-        'Where you put a tile matters as much as when.'
+        'Build a garden city. Every green tile next to a city scores 1 point.',
+        'Where you place a tile matters. ' + RIV + ' is racing you for it.'
       ],
-      goal: 'Score more points than ' + RIV + ' by the end of season 3.',
+      goal: 'Beat ' + RIV + ' on points in 3 seasons.',
       lesson: 'Cities and greenery feed each other: a city in open ground with room for greenery around it scores every leaf.',
       hint: 'In a full game, plan your city where 3-4 greenery can follow, and plant next to it.',
       setup: function () { return base(7202, { pl: [{ mc: 26, tr: 20, hand: ['p042'], plant: 24, prod: { plant: 8 } }, { mc: 26, tr: 27, plant: 24, prod: { plant: 8 } }], temp: -20, oxy: 2 }); },
@@ -104,11 +102,10 @@
     {
       id: 'thaw', n: 3, title: 'The Thaw', gens: 3, plan: 'race',
       story: [
-        'Season 3 of the new world. The ice line is close: at 0°C the first sea breaks through, a free ocean for whoever gets there.',
-        RIV + ' raises the temperature every chance it gets. Every step is +1 rating for whoever raises it.',
-        'The white mark at 0°C pays its ocean to the player who lands on it, not to the one who did the work before.'
+        'At 0°C a free sea appears. The player who lifts the heat onto 0°C gets it.',
+        RIV + ' lifts the heat too. Time your step to be the one that lands on 0°C.'
       ],
-      goal: 'Finish season 3 with more rating than ' + RIV + '.',
+      goal: 'Finish 3 seasons ahead of ' + RIV + '.',
       lesson: 'Don’t set up your rival. One step short of a white mark is a gift to whoever moves next. Count the steps.',
       hint: 'In a full game, before you raise a gauge, check the next white mark: land on it yourself or stop two steps short.',
       setup: function () { return base(7303, { pl: [{ mc: 18, tr: 26, heat: 8, prod: { mc: 2, heat: 4 } }, { mc: 18, tr: 26, heat: 8, prod: { mc: 2, heat: 4 } }], temp: -4, oxy: 4, oceans: 3 }); },
