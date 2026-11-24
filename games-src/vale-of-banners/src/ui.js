@@ -202,7 +202,7 @@ function trackerEl() {
   var a = VB.actor(G), p = G.P[a] || me(), hu = G.seats.filter(function (x) { return x.human; }).length;
   var who = G.over ? 'Game over' : isHuman(a) ? (hu > 1 ? G.seats[a].name + '\'s turn' : 'Your turn') : G.seats[a].name + '\'s turn';
   var left = G.over ? 0 : p.used.filter(function (x) { return !x; }).length;
-  var kids = [h('span.ttr', { text: 'Round ' + Math.min(G.round + 1, nRounds()) + ' of ' + nRounds() }), h('span.ttw', { text: who, style: G.over ? null : '--sc:' + (VB.SEATCOL[a] || '#c9a24a') })];
+  var kids = [h('span.ttr', { text: VB.PHASES[Math.min(G.phase, 4)] + ' \u00b7 Round ' + Math.min(G.round + 1, nRounds()) + ' of ' + nRounds() }), h('span.ttw', { text: who, style: G.over ? null : '--sc:' + (VB.SEATCOL[a] || '#c9a24a') })];
   if (!G.over) {
     kids.push(h('span.ttd', { text: left ? left + (left > 1 ? ' dice left' : ' die left') : 'no dice left' }));
     p.dice.forEach(function (v, i) { kids.push(h('span.tok' + (p.used[i] ? '.spent' : '') + (isHuman(a) && UI.die === i ? '.sel' : ''), { text: v, 'aria-label': 'Die ' + v + (p.used[i] ? ' spent' : ' left') })); });
@@ -309,7 +309,7 @@ function layout() {
   var b = $('#bd'), W = b.clientWidth, H = b.clientHeight; if (!W || !H) return;
   var cmp = portraitPhone() && innerHeight <= 700; $('#opp').classList.toggle('cmp', cmp);   /* short portrait phones: score chips only (the dock title and dice row say whose turn and which dice) */
   var tiny = cmp && innerHeight <= 600; L.tiny = tiny;   /* very short phones (375x553): no score strip; the view tabs carry the points */
-  var oppH = tiny ? 6 : cmp ? 50 : (H < 420 ? 84 : innerWidth >= 1024 ? 102 : 92) - (hints() ? 0 : innerWidth >= 1024 ? 18 : 14), pad = 6, n = G ? VB.depotSize(G) : 2;
+  var oppH = tiny ? 6 : cmp ? 6 : 46, pad = 6, n = G ? VB.depotSize(G) : 2;
   var wide = W > H * 1.15 && !portraitPhone();   /* a tall dock must not flip a portrait phone into the landscape layout */
   var mk = $('#mk'), es = $('#es'), opp = $('#opp'); mk.classList.toggle('ph', !wide); if (!UI.tab) UI.tab = 'estate'; if (wide || !phoneTabs()) { L.tabs = false; mk.style.display = ''; es.style.display = ''; var t1 = $('#tabs'); if (t1) t1.remove(); var r1 = $('#rv'); if (r1) r1.style.display = 'none'; mk.classList.remove('big'); } var two = !wide && n > 2; mk.classList.toggle('two', two);
   opp.style.cssText = (tiny ? 'display:none;' : '') + 'left:' + pad + 'px;top:' + pad + 'px;right:' + pad + 'px;height:' + (oppH - 6) + 'px';
@@ -410,20 +410,20 @@ function markBest() {
 function renderBar() {
   $('#barstat').textContent = G.over ? 'Game over' : (innerWidth <= 640 ? VB.PHASES[Math.min(G.phase, 4)] + ' ' + (G.phase + 1) + '/' + G.nPhases : VB.PHASES[Math.min(G.phase, 4)] + ' · season ' + (G.phase + 1) + ' of ' + G.nPhases);   /* phones: the short form fits the bar, no clipped text */
 }
-function renderOpp() {   /* turn tracker (round, whose turn, dice left as tokens) + score chips with points by source */
+function renderOpp() {   /* phase banner (round, whose turn, dice left) in #opp; score chips (banner colour + points) live in the top bar */
   var o = $('#opp'); o.innerHTML = ''; o.classList.toggle('clean', !hints()); if (!o.classList.contains('cmp')) o.appendChild(trackerEl());
+  var bc = $('#barchips'); if (!bc) return; bc.innerHTML = '';
   var seats = G.n <= 2 ? [UI.view].concat(G.order.filter(function (s) { return s !== UI.view; })) : [UI.view, rivalSeat()];
   var top = Math.max.apply(null, G.P.map(function (p) { return p.vp; })), tie = G.P.filter(function (p) { return p.vp === top; }).length > 1;
-  var row = h('div.scl');
+  var lab = [];
   seats.forEach(function (s) {
     var p = G.P[s], now = !G.over && VB.actor(G) === s, lead = p.vp === top && !tie && top > 0, src = srcOf(s);
+    lab.push(G.seats[s].name + ' ' + p.vp + (lead ? ' leading' : ''));
     var parts = Object.keys(src).filter(function (k) { return src[k] > 0; }).sort(function (a, b) { return src[b] - src[a]; }).map(function (k) { return (SRC_LBL[k] || k) + ' ' + src[k]; });
-    row.appendChild(h('button.och' + (now ? '.now' : '') + (lead ? '.lead' : ''), { type: 'button', 'data-seat': s, 'aria-label': G.seats[s].name + ' ' + p.vp + ' points' + (lead ? ', leading' : '') + (parts.length ? ': ' + parts.join(', ') : ''), onclick: function () { showSeat(s); } },
-      [h('span.oh', {}, [h('span.ban', { style: 'background:' + VB.SEATCOL[s] }), h('b', { text: G.seats[s].name }), h('span.pts', { text: p.vp + ' pts' }), lead ? h('span.lead', { text: '★ leads' }) : null]),
-       hints() ? h('span.why', { text: parts.length ? parts.slice(0, 2).join(', ') + (parts.length > 2 ? ' …' : '') : 'no points yet' }) : null]));
-    row.lastChild.title = scoreWhy(s);
+    bc.appendChild(h('span.och' + (now ? '.now' : '') + (lead ? '.lead' : ''), { 'data-seat': s, title: scoreWhy(s) },
+      [h('span.oh', {}, [h('span.ban', { style: 'background:' + VB.SEATCOL[s] }), h('b', { text: G.seats[s].name }), h('span.pts', { text: String(p.vp) }), lead ? h('span.lead', { text: '\u2605' }) : null])]));
   });
-  o.appendChild(row);
+  bc.setAttribute('aria-label', 'Scores: ' + lab.join(', ') + '. Tap for details');
 }
 function legalTakeFor(d, slot) {
   var top = pend();
@@ -597,7 +597,8 @@ function renderScores() {
   G.order.forEach(function (s) { var p = G.P[s]; tb.appendChild(h('tr', {}, [G.seats[s].name, p.vp, p.silver, p.workers, VB.estateFilled(p) + '/37', p.pos].map(function (x) { return h('td', { text: String(x) }); }))); });
   b.appendChild(tb);
   b.appendChild(h('p.tip', { text: 'Turn order follows the banner track. Barges move you up. Goods still to come this season: ' + (G.rg.filter(Boolean).map(function (g) { return VB.GOODS[g]; }).join(', ') || 'none') + '.' }));
-  b.appendChild(h('p.tip', { text: 'Tap a name at the top to see that estate.' }));
+  G.order.forEach(function (s) { b.appendChild(h('p.tip', { text: scoreWhy(s) })); });
+  G.order.forEach(function (s) { b.appendChild(h('button.btn.alt', { type: 'button', 'data-seat': s, text: 'See ' + (s === UI.view ? 'your' : G.seats[s].name + '\'s') + ' estate', style: 'margin:4px 6px 0 0', onclick: function () { showSeat(s); } })); });
 }
 
 /* ---------------- big tile view (every tile can be read large) ---------------- */
@@ -1030,7 +1031,7 @@ function tutSteps() {
     { id: 'kinds', rule: 'kinds', tab: 'estate', say: 'You can keep at most three kinds of goods.', target: id('goods'), wait: null, ai: rivalThen(3) },
     { id: 'rvscore', rule: 'order', tab: 'estate', say: function () { var r = UI.rvTut || { pts: 0, region: 0, colour: 0 }, nm = String(G.seats[1].name).split(' ')[0], pr = [];
         if (r.region) pr.push(r.region + (r.region > 1 ? ' regions' : ' region')); if (r.colour) pr.push(r.colour + ' colour bonus');
-        return r.pts ? nm + ' scored ' + r.pts + (pr.length ? ': ' + pr.join(', ') : '') + '.' : nm + ' has not scored yet.'; }, target: id('opp'), wait: null },
+        return r.pts ? nm + ' scored ' + r.pts + (pr.length ? ': ' + pr.join(', ') : '') + '.' : nm + ' has not scored yet.'; }, target: id('barchips'), wait: null },
     { id: 'bend', rule: 'bend', tab: 'market', say: 'A worker moves a die one step. Tap the keep.', target: id('mt-2-0'), wait: tapW('market', function (a) { return a.d === 2; }) },
     { id: 'bend2', rule: 'bend', tab: 'market', say: 'Pay one worker: your 1 becomes a 2.', target: btn('die 1'), wait: ev('take') },
     { id: 'wrap', rule: 'wrap', tab: 'estate', say: 'Six and one are neighbours too: a worker turns 6 into 1.', target: id('r-workers'), wait: null },
