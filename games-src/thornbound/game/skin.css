@@ -136,6 +136,7 @@ html.desk:has(#main .opts) #road>*{visibility:hidden}
 .hcb i{display:none!important}
 .hcb b{font-size:14px!important;letter-spacing:-.3px!important}
 html.desk .hcb b{font-size:17px!important}
+@media (min-width:1024px){.gx-bar h1{font-size:18px}}
 html:not(.desk) #rivals .rv-t b{font-size:14px!important;letter-spacing:-.2px}
 html:not(.desk) .rv-n,html.ph .race-c.many .rv-n{font-size:20px!important;padding-right:2px}
 html:not(.desk) #cstrip .cs-c,html:not(.desk) #cstrip .cs-c b,html:not(.desk) #cstrip .cs-c span,html:not(.desk) #cstrip .cs-c em,html:not(.desk) #cstrip .cs-c i{font-size:15px!important}
