@@ -2,6 +2,7 @@
 Rules for every brief: games-src/BRIEF-TEMPLATE.md (karpathy line, floating non-blocking tutorial with HUD map, no emoji, machine-speed tests).
 Models: Haiku mechanical, Sonnet specified, Opus design.
 ## Next (top = first)
+0. [Sonnet] QA SHEETS: contact-sheet.js for every game (phone+pc), READ each sheet, write games-src/orch/QA-SHEETS.md = bug list per game (cell id, what is wrong), then fix the top 15 in the games no other worker owns.
 1. [Opus] SHARED floating-tutorial kit (games-src/shell): draggable/minimisable/closable window, pulse ring (never dims/blocks), HUD-map callout generator (labelled leader lines, no overlaps), checklist, ? reopen. Then roll out per game.
 2. [Haiku] Integrator pass 2: merge W647 tessera, W648 wickdeep, W649 perch, W651 contrast, W652 meadowfold-hud, W653 wildmark, W654 tessera-rules, W655 sands-tour; build; check; one push; verify live; update panel worker list + costs.
 3. [Sonnet] Thornbound: make engine match the 5 card-text mismatches (Reed Ambush vs Ward Towers, Pan Bulwark, Hot Iron, Pardon Scroll, Glow Caves) + 44px region taps.

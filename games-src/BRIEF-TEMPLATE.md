@@ -66,3 +66,4 @@ Orchestrator notes
 - First line after Goal: `Load Skill karpathy-guidelines (.claude/skills/karpathy-guidelines/SKILL.md) and follow it.`
 - Work as a numbered plan, each step with a verify check; smallest change; every changed line traces to the task.
 - The final report MUST end with one line: `Karpathy: plan=<n steps>, verified=<n>/<n>, untraced changes=<none|list>`. A report without it is rejected by the coordinator.
+- VERIFY BY CONTACT SHEET, never by one screenshot (owner, 24 Nov): run `NODE_PATH=$(npm root -g) node games-src/scripts/contact-sheet.js <slug> phone` and `... pc` (games served on :8779), open the *-sheet.jpg with the Read tool, and list every clipped/overlapping/unreadable/empty cell plus the *-flags.txt lines; include tutorial steps via `--urls`. Fix, re-run, commit the final sheets under games-src/<game>/proof/. The report must say how many cells were bad before and after.
