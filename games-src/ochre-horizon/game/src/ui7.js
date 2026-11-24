@@ -30,7 +30,7 @@ function chTick() {
 function chGoalLine() { var R = CHUI.R, G = OH.G; return 'Season ' + Math.min(G.gen, R.ch.gens) + ' of ' + R.ch.gens + ' · You ' + OH.score(0).total + ' · Greyline ' + OH.score(1).total; }
 function chPanel(d) {
   var R = CHUI.R, h = '<div class="cht">Charter ' + R.ch.n + ' · ' + esc(R.ch.title) + '<span>' + esc(chGoalLine()) + '</span></div>';
-  if (CHUI.beat < R.ch.story.length && d) h += '<div class="chs">' + R.ch.story.map(esc).join(' ') + '</div><div class="chg">Goal: ' + esc(R.ch.goal) + '</div>';
+  if (CHUI.beat < R.ch.story.length && d) h += '<div class="chs">' + R.ch.story.map(esc).join('<br>') + '</div><div class="chg">Goal: ' + esc(R.ch.goal) + '</div>';
   var lines = CHUI.last.slice(-4);
   if (lines.length) h += '<div class="chf">' + lines.map(function (l) { return l.who === -1 ? '<div class="chl sys">' + esc(l.t) + '</div>' : chLine(l); }).join('') + '</div>';
   if (d) {
