@@ -117,4 +117,37 @@
     ]
   });
 
+  // Story mode, Act 4 "The Late Menu" (W758): ?scn=kk-story-map shows the road at Act 4; ?scn=kk-story-c11..c15 opens that stage's intro
+  function storyUnlock(upTo) {
+    var ch = (window.CAMPAIGN && CAMPAIGN.chapters) || [], p = { v: 1, ch: {}, unlocked: [], last: null };
+    for (var i = 0; i < ch.length && ch[i].id !== upTo; i++) p.ch[ch[i].id] = { beaten: true, stars: 3, best: 50, tries: 1, losses: 0, easy: false };
+    try { localStorage.setItem('gns-campaign-kaiten', JSON.stringify(p)); } catch (e) { }
+  }
+  function storyReady() { return booted() && typeof GXC !== 'undefined' && !!window.CAMPAIGN; }
+  GXS.add({
+    id: 'kk-story-map', name: 'Story map at Act 4', ask: 'Is the Late Menu act readable on the road?', seed: 1, when: storyReady,
+    setup: function () {
+      try { GXH.setEnabled(false); GX.close(); } catch (e) { }
+      storyUnlock('c11'); GXC.open();
+      return idle(400).then(function () { var b = [].filter.call(document.querySelectorAll('.gxc-act'), function (e) { return /Act 4/.test(e.textContent); })[0]; if (b) b.scrollIntoView({ block: 'start' }); return idle(400); });
+    },
+    checks: [
+      { kind: 'fn', name: 'Act 4 banner on the road', fn: function () { return [].some.call(document.querySelectorAll('.gxc-act'), function (e) { return /Act 4/.test(e.textContent); }) || 'no Act 4 banner'; } },
+      { kind: 'fn', name: 'campaign data validates', fn: function () { var b = GXC.validate(window.CAMPAIGN); return !b.length || b[0]; } }
+    ]
+  });
+  ['c11', 'c12', 'c13', 'c14', 'c15'].forEach(function (id) {
+    GXS.add({
+      id: 'kk-story-' + id, name: 'Story stage ' + id, ask: 'Are the intro line and the goal clear?', seed: 1, when: storyReady,
+      setup: function () {
+        try { GXH.setEnabled(false); GX.close(); } catch (e) { }
+        storyUnlock(id); GXC.open(); GXC.play(id);
+        return idle(900);
+      },
+      checks: [
+        { kind: 'fn', name: 'stage intro is showing', fn: function () { var t = document.body.innerText, c = CAMPAIGN.chapters.filter(function (x) { return x.id === id; })[0]; return t.indexOf(c.title) >= 0 || 'title ' + c.title + ' not on screen'; } }
+      ]
+    });
+  });
+
 })();

@@ -314,3 +314,15 @@ Live fix: original-name phrase removed from shelf blurb + sands page (15:2x).
 ## W740 onyx-atelier visual fix (24 Nov)
 Done: tutorial part names now a tidy list inside the guide window, ONE callout on the board for the picked part (no chip cloud); PC (>=1000px) grid layout: board left (cell up to 112px), rival/jewels/you stacked right; guide never sits on the PC board.
 Weak: PC guide window still covers the rival jewel rows on lesson 1; HUD pips and phone start menu not changed. Sheets: onyx-atelier/proof/w740-*-sheet.jpg. Integrator: build.py then copy onyx-atelier.html to games/onyx-atelier/index.html (not in build-all).
+
+## W758 kaiten story Act 4 (shelf/W758-kaiten-story, 24 Nov)
+- No kaiten expansion exists anywhere (src, built site, kaiten branches): nothing to switch on. If the owner meant a
+  specific add-on, it has to be built first (new dish types touch data.js deck size, AI value(), art, rules help).
+- Story: Act 4 "The Late Menu", 5 stages c11-c15 (Kofi's Banner roll-banner 1, Custard Debt custard-head-start 2 at 3p,
+  Four at the Counter sweet-tooth 1.6 at 4p goal 35+, Head Start boss-head-start 6, boss Taro's Rematch long-think 400).
+  Sim, normal player, 40-60 games: 50 / 45 / 43 / 23 / 0 % (c15 easier = normal Taro, as c10).
+- Shell gx-campaign.js validator now allows 3-4 acts and up to 16 chapters with a 4th act (other games unchanged).
+- Scenarios: ?scn=kk-story-map, kk-story-c11..c15 (not yet in games/scenarios.json: add at integration).
+- Proof: game/story-act4-test.js wins all 5 (9-17 s each); sheets in kaiten-kitchen/proof/W758 (phone 0 flags; pc flags
+  are the pre-existing hidden-help "offscreen" flag, also 9/9 on the live build).
+- Left: pc hidden-help offscreen flag (all cells, pre-existing); kaiten skin.css bumps campaign pc text to 16 px locally.

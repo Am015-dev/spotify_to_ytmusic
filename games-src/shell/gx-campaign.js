@@ -30,13 +30,13 @@
     ['game', 'title'].forEach(function (k) { if (!data[k]) add('missing ' + k); });
     var cast = data.cast || {}, twists = {}, ids = {};
     (data.twists || []).forEach(function (t) { if (!t.id || !t.how) add('twist without id/how'); twists[t.id] = t; });
-    if (!data.acts || data.acts.length !== 3) add('needs 3 acts');
+    if (!data.acts || data.acts.length < 3 || data.acts.length > 4) add('needs 3 or 4 acts');
     var ch = data.chapters || [];
-    if (ch.length < 9 || ch.length > 10) add('needs 9 or 10 chapters (has ' + ch.length + ')');
+    if (ch.length < 9 || ch.length > (data.acts && data.acts.length === 4 ? 16 : 10)) add('needs 9-10 chapters (9-16 with a 4th act; has ' + ch.length + ')');
     ch.forEach(function (c, i) {
       var at = 'chapter ' + (c.id || i) + ': ';
       if (!c.id) add(at + 'no id'); else if (ids[c.id]) add(at + 'duplicate id'); ids[c.id] = 1;
-      if ([1, 2, 3].indexOf(c.act) < 0) add(at + 'act must be 1-3');
+      if ([1, 2, 3, 4].indexOf(c.act) < 0 || c.act > (data.acts || []).length) add(at + 'act must be 1-' + (data.acts || []).length);
       if (i && c.act < ch[i - 1].act) add(at + 'acts out of order');
       if (!c.title) add(at + 'no title');
       var intro = c.intro || [], outro = c.outro || [];
@@ -53,13 +53,13 @@
       if (!c.stars || c.stars.length !== 3) add(at + 'needs exactly 3 stars');
       else c.stars.forEach(function (s) { if (!s.text || !s.test) add(at + 'star needs text and test'); });
       if (c.twist) { if (!twists[c.twist.id]) add(at + 'twist ' + c.twist.id + ' not in the twists menu'); if (!c.twist.text) add(at + 'twist needs text'); }
-      if (c.act === 3 && c.boss && !c.twist) add(at + 'act 3 boss needs a twist');
+      if (c.act >= 3 && c.boss && !c.twist) add(at + 'act 3 boss needs a twist');
       if (c.act === 1 && c.hints !== true) add(at + 'act 1 needs hints:true');
       if (!c.easier) add(at + 'no easier block');
       (c.unlock || []).forEach(function (u) { if (UNLOCKS.indexOf(u.type) < 0) add(at + 'unknown unlock type ' + u.type); if (!u.text) add(at + 'unlock needs text'); });
       if (!c.setup || typeof c.setup !== 'object') add(at + 'setup must be an object');
     });
-    [1, 2, 3].forEach(function (a) {
+    (data.acts || []).map(function (x, i) { return i + 1; }).forEach(function (a) {
       var inAct = ch.filter(function (c) { return c.act === a; });
       if (!inAct.length) return add('act ' + a + ' has no chapters');
       if (!inAct[inAct.length - 1].boss) add('act ' + a + ' must end with a boss');
