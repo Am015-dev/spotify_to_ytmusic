@@ -1,0 +1,32 @@
+/* gx-scenario-tutor.css: scenario lesson card, picker, result card, hint ring (shell/gx-scenario-tutor.js, docs GXST.md).
+   Never dims, never blocks taps outside the card. Override with --gxst-* variables. */
+:root{--gxst-z:88;--gxst-bg:#fffaf0;--gxst-ink:#2e241c;--gxst-mute:#6b5a48;--gxst-head:#3b2f25;--gxst-on:#fffaf0;--gxst-acc:#e8907e;--gxst-ok:#5d9c58;--gxst-bad:#b5482f;--gxst-star:#e0a41c;--gxst-ring:#ffd36b}
+.gxst-card{position:fixed;left:8px;top:8px;z-index:var(--gxst-z);width:min(320px,calc(100vw - 16px));box-sizing:border-box;background:var(--gxst-bg);color:var(--gxst-ink);border:2px solid var(--gxst-head);border-radius:14px;box-shadow:0 8px 22px rgba(0,0,0,.3);font:15px/1.35 var(--gxh-font,system-ui,sans-serif);touch-action:none}
+.gxst-card.gxst-min{width:auto;background:none;border:0;box-shadow:none}
+.gxst-card.gxst-win{border-color:var(--gxst-ok)}.gxst-card.gxst-fail{border-color:var(--gxst-bad)}
+.gxst-hd{display:flex;align-items:center;padding:0 2px 0 12px;background:var(--gxst-head);color:var(--gxst-on);border-radius:11px 11px 0 0;cursor:move;user-select:none}
+.gxst-card.gxst-win .gxst-hd{background:var(--gxst-ok)}.gxst-card.gxst-fail .gxst-hd{background:var(--gxst-bad)}
+.gxst-hd b{font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.gxst-sp{flex:1}
+.gxst-ib{flex:none;width:44px;height:44px;border:0;background:none;color:var(--gxst-on);font-size:24px;line-height:1;border-radius:8px;cursor:pointer}
+.gxst-say,.gxst-goal{margin:10px 12px 4px;font-weight:700}
+.gxst-goal{font-size:16px}
+.gxst-hint{margin:4px 12px;padding:6px 8px;border-left:4px solid var(--gxst-star);background:rgba(224,164,28,.12);font-size:14px}
+.gxst-msg{margin:4px 12px 6px;font-size:14px}
+.gxst-rule{margin:2px 12px 6px;color:var(--gxst-mute);font-size:14px}
+.gxst-stars{margin:8px 12px 0;font-size:28px;line-height:1;color:var(--gxst-star);letter-spacing:4px}
+.gxst-ft{display:flex;gap:8px;padding:6px 10px 10px}
+.gxst-btn{min-height:44px;padding:0 14px;border-radius:10px;border:2px solid var(--gxst-head);background:transparent;color:var(--gxst-ink);font:700 15px/1 inherit;cursor:pointer}
+.gxst-btn.pri{background:var(--gxst-head);color:var(--gxst-on)}
+.gxst-btn:disabled{opacity:.5;cursor:default}
+.gxst-bulb::before{content:'';display:inline-block;width:10px;height:10px;margin-right:6px;border-radius:50%;background:var(--gxst-star);box-shadow:0 0 6px var(--gxst-star)}
+.gxst-list{margin:4px 8px 8px;padding:0;list-style:none;max-height:min(52vh,420px);overflow:auto}
+.gxst-pick{display:flex;align-items:center;gap:8px;width:100%;min-height:44px;margin:2px 0;padding:4px 8px;border:2px solid transparent;border-radius:10px;background:none;color:var(--gxst-ink);font:600 15px/1.2 inherit;text-align:left;cursor:pointer}
+.gxst-pick.rec{border-color:var(--gxst-acc)}
+.gxst-n{flex:none;width:26px;height:26px;border-radius:50%;background:var(--gxst-head);color:var(--gxst-on);display:grid;place-items:center;font-size:13px}
+.gxst-t{flex:1}.gxst-st{flex:none;color:var(--gxst-star);letter-spacing:1px}
+.gxst-chip{min-height:44px;max-width:calc(100vw - 16px);padding:4px 16px;border-radius:22px;background:var(--gxst-head);color:var(--gxst-on);border:2px solid var(--gxst-on);font:700 15px/1.2 var(--gxh-font,system-ui,sans-serif);box-shadow:0 4px 12px rgba(0,0,0,.3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:pointer}
+.gxst-ring{position:fixed;z-index:calc(var(--gxst-z) - 2);pointer-events:none;border-radius:14px;border:3px solid var(--gxst-ring);box-shadow:0 0 14px 3px var(--gxst-ring);animation:gxst-pulse 1.6s ease-in-out infinite}
+@keyframes gxst-pulse{0%,100%{opacity:.45;transform:scale(1)}50%{opacity:1;transform:scale(1.03)}}
+.gxst-q{min-height:44px;padding:0 12px;font-weight:700;cursor:pointer}
+.gxst-q.gxst-qfix{position:fixed;left:8px;bottom:8px;z-index:var(--gxst-z);border-radius:22px;background:var(--gxst-head);color:var(--gxst-on);border:2px solid var(--gxst-on)}
+@media (prefers-reduced-motion:reduce){.gxst-ring{animation:none;opacity:1}}
