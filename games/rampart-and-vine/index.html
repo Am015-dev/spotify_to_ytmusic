@@ -221,6 +221,38 @@ button{font:inherit;color:inherit;cursor:pointer}
 .gxt-pill.gxt-wait i:nth-child(2){animation-delay:.15s}.gxt-pill.gxt-wait i:nth-child(3){animation-delay:.3s}
 @keyframes gxtDot{0%,100%{opacity:.6;transform:scale(.8)}50%{opacity:1;transform:scale(1.1)}}
 @media (prefers-reduced-motion:reduce){.gxt-pill.gxt-wait i{animation:none;opacity:.8}}
+/* gx-scenario-tutor.css: scenario lesson card, picker, result card, hint ring (shell/gx-scenario-tutor.js, docs GXST.md).
+   Never dims, never blocks taps outside the card. Override with --gxst-* variables. */
+:root{--gxst-z:88;--gxst-bg:#fffaf0;--gxst-ink:#2e241c;--gxst-mute:#6b5a48;--gxst-head:#3b2f25;--gxst-on:#fffaf0;--gxst-acc:#e8907e;--gxst-ok:#5d9c58;--gxst-bad:#b5482f;--gxst-star:#e0a41c;--gxst-ring:#ffd36b}
+.gxst-card{position:fixed;left:8px;top:8px;z-index:var(--gxst-z);width:min(320px,calc(100vw - 16px));box-sizing:border-box;background:var(--gxst-bg);color:var(--gxst-ink);border:2px solid var(--gxst-head);border-radius:14px;box-shadow:0 8px 22px rgba(0,0,0,.3);font:15px/1.35 var(--gxh-font,system-ui,sans-serif);touch-action:none}
+.gxst-card.gxst-min{width:auto;background:none;border:0;box-shadow:none}
+.gxst-card.gxst-win{border-color:var(--gxst-ok)}.gxst-card.gxst-fail{border-color:var(--gxst-bad)}
+.gxst-hd{display:flex;align-items:center;padding:0 2px 0 12px;background:var(--gxst-head);color:var(--gxst-on);border-radius:11px 11px 0 0;cursor:move;user-select:none}
+.gxst-card.gxst-win .gxst-hd{background:var(--gxst-ok)}.gxst-card.gxst-fail .gxst-hd{background:var(--gxst-bad)}
+.gxst-hd b{font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.gxst-sp{flex:1}
+.gxst-ib{flex:none;width:44px;height:44px;border:0;background:none;color:var(--gxst-on);font-size:24px;line-height:1;border-radius:8px;cursor:pointer}
+.gxst-say,.gxst-goal{margin:10px 12px 4px;font-weight:700}
+.gxst-goal{font-size:16px}
+.gxst-hint{margin:4px 12px;padding:6px 8px;border-left:4px solid var(--gxst-star);background:rgba(224,164,28,.12);font-size:14px}
+.gxst-msg{margin:4px 12px 6px;font-size:14px}
+.gxst-rule{margin:2px 12px 6px;color:var(--gxst-mute);font-size:14px}
+.gxst-stars{margin:8px 12px 0;font-size:28px;line-height:1;color:var(--gxst-star);letter-spacing:4px}
+.gxst-ft{display:flex;gap:8px;padding:6px 10px 10px}
+.gxst-btn{min-height:44px;padding:0 14px;border-radius:10px;border:2px solid var(--gxst-head);background:transparent;color:var(--gxst-ink);font:700 15px/1 inherit;cursor:pointer}
+.gxst-btn.pri{background:var(--gxst-head);color:var(--gxst-on)}
+.gxst-btn:disabled{opacity:.5;cursor:default}
+.gxst-bulb::before{content:'';display:inline-block;width:10px;height:10px;margin-right:6px;border-radius:50%;background:var(--gxst-star);box-shadow:0 0 6px var(--gxst-star)}
+.gxst-list{margin:4px 8px 8px;padding:0;list-style:none;max-height:min(52vh,420px);overflow:auto}
+.gxst-pick{display:flex;align-items:center;gap:8px;width:100%;min-height:44px;margin:2px 0;padding:4px 8px;border:2px solid transparent;border-radius:10px;background:none;color:var(--gxst-ink);font:600 15px/1.2 inherit;text-align:left;cursor:pointer}
+.gxst-pick.rec{border-color:var(--gxst-acc)}
+.gxst-n{flex:none;width:26px;height:26px;border-radius:50%;background:var(--gxst-head);color:var(--gxst-on);display:grid;place-items:center;font-size:13px}
+.gxst-t{flex:1}.gxst-st{flex:none;color:var(--gxst-star);letter-spacing:1px}
+.gxst-chip{min-height:44px;max-width:calc(100vw - 16px);padding:4px 16px;border-radius:22px;background:var(--gxst-head);color:var(--gxst-on);border:2px solid var(--gxst-on);font:700 15px/1.2 var(--gxh-font,system-ui,sans-serif);box-shadow:0 4px 12px rgba(0,0,0,.3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:pointer}
+.gxst-ring{position:fixed;z-index:calc(var(--gxst-z) - 2);pointer-events:none;border-radius:14px;border:3px solid var(--gxst-ring);box-shadow:0 0 14px 3px var(--gxst-ring);animation:gxst-pulse 1.6s ease-in-out infinite}
+@keyframes gxst-pulse{0%,100%{opacity:.45;transform:scale(1)}50%{opacity:1;transform:scale(1.03)}}
+.gxst-q{min-height:44px;padding:0 12px;font-weight:700;cursor:pointer}
+.gxst-q.gxst-qfix{position:fixed;left:8px;bottom:8px;z-index:var(--gxst-z);border-radius:22px;background:var(--gxst-head);color:var(--gxst-on);border:2px solid var(--gxst-on)}
+@media (prefers-reduced-motion:reduce){.gxst-ring{animation:none;opacity:1}}
 /* ===== GX skin: painted UI kit over the shared shell + campaign classes. Opt-in: nothing changes until gx-skin.js adds
    html.sk (after the kit files loaded). Kit files live in the game's media/ (ui-topbar, ui-iconbtn, ui-panel, ui-drawer-head,
    ui-button-cream/go/power, ui-row, ui-bubble, ui-node-*). Extra switches: html.sk-icons (icon-*.webp set), html.sk-map (story-map.webp),
@@ -634,6 +666,9 @@ body:has(#endplate) #hand #hinfo{visibility:hidden}
 .gedge b{color:#ffd24a;font-size:14px}
 .gedge[hidden]{display:none}
 body:has(#modal .scrim) .gedges{display:none}
+
+/* scenario lessons: the card has its own Lessons entry in the menu, so the floating Lessons button stays hidden */
+.gxst-q{display:none!important}
 
 :root{--gxh-btn:#b5532f;--gxh-accent:#e0a83a;--gxh-bg:#f6ead2;--gxh-font:var(--ff)}</style>
 <style>
@@ -2198,6 +2233,156 @@ html body :is(.gxh-ring,.gxt-ring){animation-duration:1.6s}
     index: function () { return S ? S.i : -1; }, goto: function (id) { if (!S) return false; for (var i = 0; i < cfg.steps.length; i++) if (cfg.steps[i].id === id) { clearVisuals(); enter(i); return true; } return false; },   /* test scenarios jump straight to a step (gx-scenario.js) */ state: state, skip: skip, stop: stop, next: next, relayout: relayout, lint: lint,
     status: status, isDone: function (g) { var s = status(g); return s.done || s.skipped; }, markDone: function (g) { mark(g, { done: 1, open: 0, step: 0 }); }, reset: function (g) { save(g, {}); try { localStorage.removeItem(key(g)); } catch (e) {} delete mem[g]; },
     menuHTML: menuHTML, label: label
+  };
+})();
+
+</script>
+<script>
+// gx-scenario-tutor.js: scenario tutorials (owner verdict, Nov 2026: tutorials must be GAMES). Each scenario puts the real board in a
+// small, stacked position with ONE objective; the player makes real moves and learns the rule from the consequence. A floating
+// objective card never dims and never blocks taps. Needs gx-scenario-tutor.css. ES5, no dependencies. Docs: shell/GXST.md.
+// (Global is GXST because GXS is already the ?scn= test registry in gx-scenario.js.)
+//   GXST.init({game, scenarios:[...], storageKey?, settled?:()=>bool, keepClear?:[selectors], qParent?})   GXST.picker() GXST.start(id) GXST.retry()
+//   GXST.next() GXST.hint() GXST.close() GXST.state()      events: window 'gxst' CustomEvent, detail.type =
+//   picker | start | hint | win | fail | retry | close
+//   scenario: {id, title, rule, goal, setup(), success()->bool, fail()->false|'message', par?, moves?()->n, hints:[nudge, {say, target}],
+//              debrief, solve?(api) (tests only)}
+(function () {
+  'use strict';
+  var D = document, C = null, S = null, W = null, R = null, Q = null, tick = 0, drag = null;
+  function $(s) { try { return D.querySelector(s); } catch (e) { return null; } }
+  function mk(tag, cls, txt) { var e = D.createElement(tag); if (cls) e.className = cls; if (txt != null) e.textContent = txt; e.setAttribute('data-help', ''); return e; }
+  function btn(cls, txt, aria, f) { var b = mk('button', cls, txt); b.type = 'button'; if (aria) b.setAttribute('aria-label', aria); b.onclick = function (ev) { ev.stopPropagation(); f(); }; return b; }
+  function emit(type, x) { var d = { type: type, game: C && C.game }; for (var k in x) d[k] = x[k]; var e; try { e = new CustomEvent('gxst', { detail: d }); } catch (er) { e = D.createEvent('CustomEvent'); e.initCustomEvent('gxst', false, false, d); } window.dispatchEvent(e); }
+  function vis(e) { if (!e || !e.getBoundingClientRect) return null; var r = e.getBoundingClientRect(); if (r.width < 2 || r.height < 2) return null; return { left: r.left, top: r.top, right: r.right, bottom: r.bottom, width: r.width, height: r.height }; }
+  function find(t) { if (!t) return null; if (typeof t === 'function') { try { return t(); } catch (e) { return null; } } var a; try { a = D.querySelectorAll(t); } catch (e) { return null; } for (var i = 0; i < a.length; i++) if (vis(a[i])) return a[i]; return null; }
+  function hit(a, b) { return a.left < b.right && a.right > b.left && a.top < b.bottom && a.bottom > b.top; }
+  function call(f, d) { if (typeof f !== 'function') return d; try { return f(); } catch (e) { return d; } }
+  // ------------------------------------------------------------ progress: best stars per scenario, card position
+  function key() { return C.storageKey || 'gxst-' + C.game; }
+  function load() { var o = null; try { o = JSON.parse(localStorage.getItem(key()) || 'null'); } catch (e) { } return o && typeof o === 'object' ? o : {}; }
+  function save() { try { localStorage.setItem(key(), JSON.stringify({ best: S.best, pos: S.pos })); } catch (e) { } }
+  function sc(id) { for (var i = 0; i < C.scenarios.length; i++) if (C.scenarios[i].id === id) return i; return -1; }
+  function cur() { return S.i >= 0 ? C.scenarios[S.i] : null; }
+  function stars() { var s = cur(), n = 3 - S.hint; if (s && s.par && call(s.moves, 0) > s.par) n--; return Math.max(1, n); }
+  function firstOpen() { for (var i = 0; i < C.scenarios.length; i++) if (!S.best[C.scenarios[i].id]) return i; return 0; }
+  function txt(v) { return typeof v === 'function' ? call(v, '') : v; }
+  function starTxt(n) { var t = ''; for (var i = 0; i < 3; i++) t += i < n ? '★' : '☆'; return t; }
+  // ------------------------------------------------------------ Lessons button (reopens the picker)
+  function qBtn() {
+    if (Q && D.body.contains(Q)) return;
+    Q = btn('gxst-q', 'Lessons', 'Lessons: learn by playing', function () { GXST.picker(); });
+    var p = (C.qParent && $(C.qParent)) || $('.gx-bar');
+    if (p) { Q.className = 'gx-ibtn gxst-q'; p.appendChild(Q); } else { Q.className += ' gxst-qfix'; D.body.appendChild(Q); }
+  }
+  // ------------------------------------------------------------ the card: picker | play | win | fail
+  function render() {
+    if (!S.open) { if (W) { W.remove(); W = null; } ring(); return; }
+    if (!W) { W = mk('div', 'gxst-card'); W.setAttribute('role', 'dialog'); W.setAttribute('aria-label', 'Lesson'); D.body.appendChild(W); wireDrag(); }
+    W.innerHTML = ''; W.className = 'gxst-card gxst-' + S.phase + (S.min ? ' gxst-min' : '');
+    var s = cur();
+    if (S.min) { W.appendChild(btn('gxst-chip', s && S.phase === 'play' ? s.title + ': ' + txt(s.goal) : 'Lessons', 'Open lesson card', function () { S.min = false; render(); })); place(); return; }
+    var hd = mk('div', 'gxst-hd');
+    hd.appendChild(mk('b', null, S.phase === 'picker' ? 'Learn by playing' : (S.i + 1) + '/' + C.scenarios.length + ' ' + s.title));
+    hd.appendChild(mk('span', 'gxst-sp'));
+    hd.appendChild(btn('gxst-ib', '–', 'Minimise', function () { S.min = true; render(); }));
+    hd.appendChild(btn('gxst-ib', '×', 'Close', function () { GXST.close(); }));
+    W.appendChild(hd);
+    var ft = mk('div', 'gxst-ft');
+    if (S.phase === 'picker') {
+      W.appendChild(mk('p', 'gxst-say', 'Short games on the real board. Each one teaches one rule.'));
+      var ol = mk('ol', 'gxst-list');
+      C.scenarios.forEach(function (x, i) {
+        var li = mk('li'), b = btn('gxst-pick' + (i === firstOpen() ? ' rec' : ''), null, 'Lesson ' + (i + 1) + ': ' + x.title, function () { GXST.start(x.id); });
+        b.setAttribute('data-id', x.id); b.appendChild(mk('span', 'gxst-n', String(i + 1))); b.appendChild(mk('span', 'gxst-t', x.title)); b.appendChild(mk('span', 'gxst-st', starTxt(S.best[x.id] || 0)));
+        li.appendChild(b); ol.appendChild(li);
+      });
+      W.appendChild(ol);
+    } else if (S.phase === 'play') {
+      W.appendChild(mk('p', 'gxst-goal', txt(s.goal)));
+      if (S.hint) { var h = s.hints[S.hint - 1]; W.appendChild(mk('p', 'gxst-hint', typeof h === 'string' ? h : h.say)); }
+      var hb = btn('gxst-btn gxst-bulb', S.hint ? (S.hint < s.hints.length ? 'Show me' : 'Hint shown') : 'Hint', 'Hint', function () { GXST.hint(); });
+      if (S.hint >= s.hints.length) hb.disabled = true;
+      ft.appendChild(hb); ft.appendChild(mk('span', 'gxst-sp'));
+      ft.appendChild(btn('gxst-btn', 'Restart', null, function () { GXST.retry(); }));
+    } else if (S.phase === 'win') {
+      W.appendChild(mk('p', 'gxst-stars', starTxt(S.stars)));
+      W.appendChild(mk('p', 'gxst-say', s.debrief));
+      W.appendChild(mk('p', 'gxst-rule', 'Rule: ' + s.rule));
+      ft.appendChild(btn('gxst-btn', 'Retry', null, function () { GXST.retry(); })); ft.appendChild(mk('span', 'gxst-sp'));
+      ft.appendChild(btn('gxst-btn pri', S.i < C.scenarios.length - 1 ? 'Next lesson' : 'All lessons', null, function () { GXST.next(); }));
+    } else if (S.phase === 'fail') {
+      W.appendChild(mk('p', 'gxst-say', 'Not quite.'));
+      W.appendChild(mk('p', 'gxst-msg', S.msg));
+      ft.appendChild(btn('gxst-btn', 'Lessons', null, function () { GXST.picker(); })); ft.appendChild(mk('span', 'gxst-sp'));
+      ft.appendChild(btn('gxst-btn pri', 'Retry', null, function () { GXST.retry(); }));
+    }
+    if (ft.children.length) W.appendChild(ft);
+    place();
+  }
+  function hintTarget() { var s = cur(); if (!s || S.phase !== 'play' || S.hint < 2) return null; var h = s.hints[S.hint - 1]; return h && typeof h === 'object' ? vis(find(h.target)) : null; }
+  // keep the card off the hinted target and the keepClear areas; a dragged position is kept unless it covers the hinted target
+  function place() {
+    if (!W) return; var vw = innerWidth, vh = innerHeight, bw = W.offsetWidth, bh = W.offsetHeight, t = hintTarget(), av = [];
+    (C.keepClear || []).forEach(function (sel) { var a; try { a = D.querySelectorAll(sel); } catch (e) { a = []; } for (var i = 0; i < a.length; i++) { var r = vis(a[i]); if (r) av.push(r); } });
+    function clamp(p) { return [Math.max(4, Math.min(vw - bw - 4, p[0])), Math.max(4, Math.min(vh - bh - 4, p[1]))]; }
+    function box(p) { return { left: p[0], top: p[1], right: p[0] + bw, bottom: p[1] + bh }; }
+    function cost(p) { var b = box(p), c = t && hit(b, t) ? 1e6 : 0; av.forEach(function (r) { var x = Math.min(b.right, r.right) - Math.max(b.left, r.left), y = Math.min(b.bottom, r.bottom) - Math.max(b.top, r.top); if (x > 0 && y > 0) c += x * y; }); return c; }
+    if (S.pos) { var q = clamp(S.pos); if (!(t && hit(box(q), t))) return put(q); }
+    var top = 4, bar = $('.gx-bar'); if (bar) { var br = bar.getBoundingClientRect(); if (br.top < 4 && br.height < 90) top = br.bottom + 6; }
+    var sp = [[8, top], [vw - bw - 8, top], [vw - bw - 8, vh - bh - 8], [8, vh - bh - 8]];
+    av.concat(t ? [t] : []).forEach(function (r) { sp.push([8, r.bottom + 6], [vw - bw - 8, r.bottom + 6], [8, r.top - bh - 6], [r.right + 6, r.top]); });
+    var best = null; sp.forEach(function (p, i) { p = clamp(p); var c = cost(p) + i * 0.01; if (!best || c < best.c) best = { p: p, c: c }; });
+    put(best.p);
+  }
+  function put(p) { W.style.left = Math.round(p[0]) + 'px'; W.style.top = Math.round(p[1]) + 'px'; }
+  function wireDrag() {
+    W.addEventListener('pointerdown', function (e) { if (!e.target.closest('.gxst-hd') || e.target.closest('button')) return; var r = W.getBoundingClientRect(); drag = [e.clientX - r.left, e.clientY - r.top, false]; try { W.setPointerCapture(e.pointerId); } catch (x) { } });
+    W.addEventListener('pointermove', function (e) { if (!drag) return; drag[2] = true; S.pos = [e.clientX - drag[0], e.clientY - drag[1]]; put(S.pos); });
+    W.addEventListener('pointerup', function () { if (drag && drag[2]) { save(); place(); } drag = null; });
+  }
+  // ------------------------------------------------------------ the "show me" ring: pointer-events none, never steals a tap
+  function ring() {
+    var t = S && S.open ? hintTarget() : null;
+    if (!t) { if (R) { R.remove(); R = null; } return; }
+    if (!R) { R = mk('div', 'gxst-ring'); D.body.appendChild(R); }
+    R.style.left = (t.left - 4) + 'px'; R.style.top = (t.top - 4) + 'px'; R.style.width = (t.width + 8) + 'px'; R.style.height = (t.height + 8) + 'px';
+  }
+  // ------------------------------------------------------------ judge: success / fail only when the game has settled (animations done)
+  function loop() {
+    if (!S || !S.open) return;
+    var s = cur();
+    if (S.phase === 'play' && S.live && call(C.settled, true)) {
+      if (call(s.success, false)) { S.stars = stars(); if ((S.best[s.id] || 0) < S.stars) S.best[s.id] = S.stars; S.phase = 'win'; S.min = false; save(); render(); emit('win', { id: s.id, stars: S.stars }); return; }
+      var f = call(s.fail, false); if (f) { S.phase = 'fail'; S.msg = String(f); S.min = false; render(); emit('fail', { id: s.id, msg: S.msg }); return; }
+    }
+    if (!drag) place(); ring();
+  }
+  function begin(i, how) {
+    S.i = i; S.phase = 'play'; S.hint = 0; S.msg = ''; S.stars = 0; S.open = true; S.min = false; S.live = false;
+    var s = cur(), tok = ++S.tok; render();
+    var r = null; try { r = s.setup(); } catch (e) { console.error(e); }
+    var go = function () { if (tok === S.tok) { S.live = true; place(); emit(how, { id: s.id, i: i }); } };
+    if (r && typeof r.then === 'function') r.then(go, go); else go();
+  }
+  window.GXST = {
+    init: function (cfg) {
+      C = cfg; var o = load(); S = { open: false, phase: 'picker', i: -1, hint: 0, best: o.best || {}, pos: o.pos || null, min: false, live: false, tok: 0, msg: '', stars: 0 };
+      qBtn(); if (!tick) { tick = setInterval(loop, 250); addEventListener('resize', function () { if (S && S.open) render(); }); }
+      return GXST;
+    },
+    picker: function () { if (!C) return; qBtn(); S.open = true; S.phase = 'picker'; S.min = false; S.tok++; S.live = false; render(); emit('picker', {}); },
+    start: function (id) { var i = typeof id === 'number' ? id : sc(id); if (i < 0) return; begin(i, 'start'); },
+    retry: function () { if (S.i < 0) return; begin(S.i, 'retry'); },
+    next: function () { if (S.i < C.scenarios.length - 1) begin(S.i + 1, 'start'); else GXST.picker(); },
+    hint: function () { var s = cur(); if (!s || S.phase !== 'play' || S.hint >= s.hints.length) return; S.hint++; render(); ring(); emit('hint', { id: s.id, level: S.hint }); },
+    close: function () { if (!S || !S.open) return; S.open = false; S.live = false; S.tok++; render(); emit('close', {}); },
+    active: function () { var s = S && S.open && S.phase !== 'picker' ? cur() : null; return s; },
+    state: function () {
+      if (!S) return null; var s = cur(), wr = W && vis(W), tr = hintTarget();
+      return { open: S.open, phase: S.phase, id: s && S.phase !== 'picker' ? s.id : null, i: S.i, live: S.live, hint: S.hint, stars: S.stars, msg: S.msg,
+        best: JSON.parse(JSON.stringify(S.best)), min: S.min, pos: S.pos, card: wr, target: tr, overlap: !!(wr && tr && hit(wr, tr)), count: C.scenarios.length };
+    }
   };
 })();
 
@@ -4014,7 +4199,8 @@ function tutLeave(){UI.tut=false;UI.tutHold=false;UI.tutAuto=0;UI.aiT&&clearTime
 // Learn to play (owner, 8 Nov: gameplay first): a guided first game that teaches every core rule in order, one sentence + one highlighted tap
 // per step (shell/gx-tutor.js), then a real game. The coached free game (coach.js) is no longer launched from here.
 const TUT_RULES=['goal','turn','place1','fig_road','computer','claimed','place2','fig_priory','road_done','place3','fig_town','town_done','pennant','place4','fig_farmer','majority','tie','place5','discard','place6','skip','priory_done','final','winner'];
-function tutStart(o){const pro=!!(o&&o.prologue);if(typeof GXT==='undefined'){coachStart(o);return}
+function tutStart(o){if(window.__RVL&&window.__RVL.open){try{GXC.close()}catch(e){}closeMenu();$('#modal').innerHTML='';window.__RVL.open();return}   // scenario lessons (lessons.js) replace the old forced-tap tutorial; the code below is retired
+  const pro=!!(o&&o.prologue);if(typeof GXT==='undefined'){coachStart(o);return}
   try{GXC.close()}catch(e){}closeMenu();$('#modal').innerHTML='';
   GXT.start({game:TUT_GAME,story:true,setup:tutSetup,steps:tutSteps(),endTitle:STORY.tutEndTitle,endText:pro?STORY.tutEndStory:STORY.tutEndText,
     endButtons:pro?[{id:'chapter',label:'Start chapter 1'}]:[{id:'play',label:'Play a real game'}],
@@ -4458,7 +4644,7 @@ function syncTurn(){if(!G||G.over||!G.cur)return;const key=G.turn+':'+G.step;if(
   else{UI.legal=[];UI.hint=null;UI.hintFig=null;UI.sel=null}}
 // ---------- the main render ----------
 function render(){if(!G)return;syncTurn();renderTop();renderTiles();renderGlows();renderMeeples();renderFigSpots();renderHand();renderStatus();renderSheet();updateGhost();placeOverlay();ensureGlowVisible();setTimeout(ensureGlowVisible,500);hlpAfter()}
-function save(){if(UI.tut||UI.coach)return;try{if(G&&!G.over&&G.pl.some(p=>p.human)&&!UI.camp)localStorage.setItem(SAVE,JSON.stringify(G));else localStorage.removeItem(SAVE)}catch(e){}}
+function save(){if(UI.tut||UI.coach||UI.lesson)return;try{if(G&&!G.over&&G.pl.some(p=>p.human)&&!UI.camp)localStorage.setItem(SAVE,JSON.stringify(G));else localStorage.removeItem(SAVE)}catch(e){}}
 function refresh(){if(UI.sim||!G)return;render();save();playFx();if(UI.coach)try{coachTick()}catch(e){console.error(e)}if(G.over)finishUp();else schedAI()}
 // ---------- actions ----------
 function rotate(){if(!myTurn('place')||UI.rots.length<2){return}if(!tutGate({what:'rotate'}))return;const i=UI.rots.indexOf(UI.rot),n=UI.rots[(i+1)%UI.rots.length];UI.deg+=((n-UI.rot+4)%4||4)*90;UI.rot=n;sfx('click');if(UI.sel){if(UI.legal.some(g=>g.r===n&&g.x===UI.sel.x&&g.y===UI.sel.y))UI.sel.r=n;else UI.sel=null}renderGlows();renderHand();renderStatus();if(UI.sel){try{pvHighlight(prevCalc(UI.sel.x,UI.sel.y,n).hl)}catch(e){}}else{pvHighlight(null);camAim(350)}updateGhost();placeOverlay();ensureGlowVisible();const b=$('#htile');if(b)b.querySelector('.spin').style.transform=`rotate(${UI.deg}deg)`}
@@ -4521,7 +4707,7 @@ function finalPops(){const fs=finalScores();let n=0;const dets=fs.det.filter(d=>
   for(const d of dets){const pts=d.ty==='F'?d.n*(G.figs.some(f=>f.k==='pig'&&find(f.s)===d.r&&d.win.includes(f.p))?4:3):d.pts;if(!pts)continue;setTimeout(()=>scorePop({r:d.r,pts,win:d.win},true),FINAL0+n*FINALSTEP);n++}
   return n}
 function tutFinalPops(){if(UI.tut)finalPops()}
-function finishUp(){if(UI.endShown)return;UI.endShown=true;UI.aiT&&clearTimeout(UI.aiT);UI.aiT=0;if(UI.coach){const n=finalPops();setTimeout(()=>{try{coachEnd()}catch(e){console.error(e)}},Math.min(8000,1400+n*700));return}if(UI.tut)return;sfx('win');
+function finishUp(){if(UI.endShown)return;UI.endShown=true;UI.aiT&&clearTimeout(UI.aiT);UI.aiT=0;if(UI.coach){const n=finalPops();setTimeout(()=>{try{coachEnd()}catch(e){console.error(e)}},Math.min(8000,1400+n*700));return}if(UI.tut)return;if(UI.lesson){try{endView()}catch(e){}finalPops();return}sfx('win');
   try{endView()}catch(e){}const n=finalPops();
   const wait=Math.min(3400,FINAL0+n*FINALSTEP+1300);let gone=false;
   const plate=document.createElement('div');plate.id='endplate';plate.setAttribute('role','status');plate.innerHTML='<b>Final count</b><small>Tap to skip</small>';$('#app').appendChild(plate);
@@ -4559,7 +4745,7 @@ function menuAway(e){if(!e.target.closest('#menu,#menubtn'))closeMenu()}
 function closeMenu(){const d=$('#menu');if(d)d.remove();document.removeEventListener('pointerdown',menuAway,true);if(d)hlpAfter()}
 function showRules(){$('#modal').innerHTML=`<div class="scrim"><div class="card drawer" role="dialog" aria-label="How to play"><h2>How to play</h2><p class="raim">Score the most points by finishing roads and towns.</p><ul><li>Draw a tile. Turn it and lay it so edges match.</li><li>Then put a follower on a road, town, priory or field.</li><li>Or skip and keep your follower.</li><li>Finish a road or town. Its owner scores and the follower goes home.</li><li>A priory with eight tiles around it scores 9.</li><li>At the end, a farmer scores 3 per finished town.</li><li>Most followers on a road, town or field takes its points.</li><li>Equal followers: each scores in full.</li><li>A tile that fits nowhere is swapped for a new one.</li><li>Most points wins.</li></ul><button class="btn" data-a="x">Got it</button></div></div>`;$('#modal [data-a=x]').onclick=()=>{$('#modal').innerHTML=''}}
 // ---------- new game / continue ----------
-function beginGame(o){UI.camp=o&&o.camp?o.camp:null;if(o&&!o.camp||!o)o=o||setupOpts();UI.lastOpts=o;resetUI();DEFSEED=o.seed!=null?o.seed:null;newGame(o);$('#modal').innerHTML='';UI.humanTurns=0;refit(false);showGoal();}
+function beginGame(o){UI.lesson=!!(o&&o.lesson);UI.camp=o&&o.camp?o.camp:null;if(o&&!o.camp||!o)o=o||setupOpts();UI.lastOpts=UI.lesson?setupOpts():o;resetUI();DEFSEED=o.seed!=null?o.seed:null;newGame(o);$('#modal').innerHTML='';UI.humanTurns=0;refit(false);showGoal();}
 function showGoal(){const o=$('#goal');if(o)o.remove();if(UI.coach||UI.tut||UI.sim||!G||!human()||/[?&]scn=/.test(location.search))return;const d=document.createElement('section');d.id='goal';d.setAttribute('aria-label','Goal');
   d.innerHTML='<h2>How you win</h2><p class="gwin">Have the most points when the last tile is laid.</p><ul><li>Put a follower on a road, town or priory.</li><li>Finish it, and you score. Towns pay double.</li><li>Farmers in fields score at the very end.</li></ul><button type="button" id="goalok">Got it, start</button>';
   $('#app').appendChild(d);$('#goalok').addEventListener('click',()=>d.remove())}
@@ -4834,6 +5020,158 @@ function assetsWarm(){const L=MEDIA_FILES.filter(f=>/\.webp$/.test(f)).map(f=>ME
 function musicWarm(){let save=false;try{save=!!(navigator.connection&&navigator.connection.saveData)}catch(e){}if(save||typeof fetch!=='function'||typeof GA_DATA==='undefined')return;
   const M=[].concat(...Object.values(GA_DATA).map(o=>o&&typeof o==='object'?Object.values(o):[])).filter(v=>typeof v==='string'&&/^url:music\//.test(v)).map(v=>v.slice(4));let i=0;const one=()=>{if(i>=M.length)return;fetch(M[i++]).then(r=>r.blob()).catch(()=>{}).finally(()=>setTimeout(one,1500))};one()}
 if(document.readyState==='complete')setTimeout(assetsWarm,1200);else addEventListener('load',()=>setTimeout(assetsWarm,1200));
+
+</script>
+<script>
+// Rampart & Vine: scenario tutorials on the shared engine (shell/gx-scenario-tutor.js, docs shell/GXST.md, spec orch/TUTORIAL-SPEC.md).
+// Each lesson builds a small real position (pre-placed tiles and followers), gives the player one tile, one goal, and judges the real game.
+// The old forced-tap tutorial (tutor.js) is retired: tutStart() now opens this picker. Nothing here is ever saved over a real game.
+// Rules and the lesson that teaches each (the rest of the rules sit in the Help cards, see hlp.js HLP_RULES):
+//   match edges, turn the tile ........ fit        one follower per turn, claim before you finish ... claim
+//   finished town 2 a tile, banner +2 .. town       priory 9 when eight tiles ring it ................ priory
+//   most followers take all ............ crowd      farmer: 3 per finished town, stays to the end .... farmer
+//   unfinished features 1 a tile at end  open       a whole short game ............................... game
+//   one owner per feature (crowd: the rival's follower blocks a claim), finished road 1 a tile (fit)
+//   NOT yet a lesson: River, Taverns, Merchants (expansions, off in a normal game), the set-aside tile.
+(function () {
+  var tid = function (n) { for (var i = 0; i < TT.length; i++) if (TT[i].id === n) return i; throw new Error('no tile ' + n); };
+  var seg = function (t, ty, n) { var c = 0; for (var i = 0; i < TSEG[t].length; i++) if (TSEG[t][i].ty === ty) { if (c === n) return i; c++; } return -1; };
+  var T = { start: 'BA_RCr_start', J: 'BA_RRR', line: 'BA_RFr', bend: 'BA_Rr', edge: 'BA_C', bridge: 'BA_CFcp', pri: 'BA_L', corner: 'BA_Cc_1', wall: 'BA_Ccc', cr: 'BA_CRr', bridge2: 'BA_CFc_1', lane: 'BA_LR' };
+  // ---- the positions. pre: [tile, x, y, rot] laid before the player's turn; figs: [seat, 'f', x, y, 'R'|'C'|'F'|'M', nth segment of that kind on the tile]
+  //      hand: tiles the stack deals in order (the player's first); score: [you, rival]; opp: scripted rival turns [{x,y,r,fig:null|{ty,w|h}}]
+  //      sol: the scripted solution (tests, hints): the tile spot and the follower (a {ty,w} / {ty,h} spot on the new tile, or 'skip')
+  var SPECS = {
+    fit: { pre: [[T.J, -1, 0, 0]], figs: [[0, 'f', 0, 0, 'R', 0]], hand: [T.J], sol: { x: 1, y: 0, r: 0, fig: 'skip' } },
+    claim: { pre: [[T.line, 1, 0, 0], [T.J, 2, 0, 0]], figs: [], hand: [T.J], sol: { x: -1, y: 0, r: 0, fig: { ty: 'R', w: 1 } } },
+    town: { pre: [[T.bridge, 0, -1, 1]], figs: [[0, 'f', 0, 0, 'C', 0]], hand: [T.edge], sol: { x: 0, y: -2, r: 2, fig: 'skip' } },
+    priory: { pre: [['BA_RRR', -1, 0, 0], ['BA_RRR', 1, 0, 1], [T.pri, 0, 1, 0], ['BA_CRr', -1, 1, 2], ['BA_RFr', 1, 1, 3], ['BA_CRr', -1, 2, 0], ['BA_RFr', 0, 2, 2]], figs: [[0, 'f', 0, 1, 'M', 0]], hand: [T.bend], sol: { x: 1, y: 2, r: 1, fig: 'skip' } },
+    crowd: { pre: [[T.bridge2, 0, -1, 1], [T.bridge2, 0, -2, 1]], figs: [[0, 'f', 0, 0, 'C', 0], [1, 'f', 0, -1, 'C', 0], [0, 'f', 0, -2, 'C', 0]], hand: [T.edge], sol: { x: 0, y: -3, r: 2, fig: 'skip' } },
+    farmer: { last: 1, pre: [[T.edge, 0, -1, 2]], figs: [], hand: [T.line], sol: { x: 1, y: -1, r: 1, fig: { ty: 'F', h: 6 } }, bad: { x: 1, y: -1, r: 1, fig: { ty: 'F', h: 2 } } },
+    open: { pre: [[T.bridge, 0, -1, 1]], figs: [[0, 'f', 0, 0, 'C', 0]], hand: [T.corner], last: 1, score: [0, 3], sol: { x: 0, y: -2, r: 2, fig: 'skip' } },
+    game: { last: 1, pre: [], figs: [], hand: ['BA_Rr', 'BA_C', 'BA_RFr', 'BA_CRr', 'BA_Cc_1', 'BA_RFr', 'BA_C', 'BA_Rr', 'BA_RrC', 'BA_CRr', 'BA_C'], sol: null }
+  };
+  // ---- build: turn the freshly started game into the position (the engine's own place/figs, so every invariant still holds)
+  function build(sp, ids) {
+    G.stack.unshift(G.cur.t); G.turn = 0; G.log = []; G.logN = 0; G.cur = { p: G.np - 1 }; G.step = null;
+    (sp.pre || []).forEach(function (a) { var t = tid(a[0]); if (!canPlace(t, a[3], a[1], a[2])) throw new Error('pre tile does not fit ' + a); place(t, a[3], a[1], a[2]); });
+    for (var r in G.fd) { var F = G.fd[r]; if ((F.ty === 'C' || F.ty === 'R') && !F.oe.length) F.done = 1; }
+    (sp.figs || []).forEach(function (a) { var Tl = G.tiles[key(a[2], a[3])], l = seg(Tl.t, a[4], a[5]); G.figs.push({ p: a[0], k: a[1], s: Tl.s0 + l }); G.pl[a[0]].sup[a[1]]--; });
+    if (sp.score) sp.score.forEach(function (v, i) { G.pl[i].score = v; G.pl[i].sc.road = v; });
+    if (!sp.last) for (var i = 0; i < 4; i++) G.stack.push(tid(T.bend));   // the valley goes on after your turn
+    G.halfway = true; G.total = G.stack.length + G.order.length; nextPlayer(true); G.log = []; G.logN = 0;
+  }
+  var tiles = function (a) { return a.map(tid); };
+  // the player's follower spot on the tile just placed: {ty,w} (a side of a road/town) or {ty,h} (a half-edge of a field), 'M' priory
+  function figL(f) {
+    var Tl = G.tiles[G.cur.k], i, s;
+    for (i = 0; i < TSEG[Tl.t].length; i++) { s = TSEG[Tl.t][i]; if (s.ty !== f.ty) continue;
+      if (f.ty === 'M') return i;
+      if (f.ty === 'F') { if (s.h.some(function (h) { return (h + 2 * Tl.r) % 8 === f.h; })) return i; }
+      else if (segWorld(Tl.t, Tl.r, i).indexOf(f.w) >= 0) return i; }
+    return -1;
+  }
+
+  // ---------------------------------------------------------------- the lessons
+  var $q = function (q) { return document.querySelector(q); };
+  var me = function () { return G.pl[0]; }, rival = function () { return G.pl[1]; };
+  var done1 = function () { return !!G && (G.over || G.turn >= 2); };   // your first turn is over
+  var ready = function () { return typeof G !== 'undefined' && typeof beginGame === 'function' && typeof UI !== 'undefined' && typeof render === 'function' && typeof myTurn === 'function' && typeof onGlow === 'function'; };
+  var until = function (f, ms) { var t0 = Date.now(); return new Promise(function (r) { (function w() { var ok = false; try { ok = f(); } catch (e) { } if (ok || Date.now() - t0 > ms) r(ok); else setTimeout(w, 60); })(); }); };
+  var wasScored = function (ty) { for (var k in G.stats.scored) if (k.indexOf(ty) === 0) return true; return false; };
+  // hint target: the tile to turn, the square, then the follower spot or Skip
+  function spot(s) {
+    return function () {
+      if (!G || !G.cur) return null;
+      if (G.step === 'fig') { if (s.fig === 'skip') return $q('#hskip'); var l = figL(s.fig), b = null; (UI.figs || []).forEach(function (e) { if (e._m.l === l && e._m.k === 'f') b = e; }); return b || $q('#hskip'); }
+      if (UI.rot !== s.r) return $q('#htile');
+      return $q('#world .glow[data-x="' + s.x + '"][data-y="' + s.y + '"]');
+    };
+  }
+  function stage(id) {
+    var sp = SPECS[id];
+    try { GXH.setEnabled(false); GXH.hide(); } catch (e) { } try { GXC.close(); } catch (e) { }
+    var m = $q('#modal'); if (m) m.innerHTML = ''; try { closeMenu(); } catch (e) { }
+    UI.camp = null; UI.coach = null; UI.tut = false; AIDELAY = window.__rvlFast ? 60 : 320; 
+    beginGame({ np: 2, seats: ['human', 'ai'], lv: ['normal', 'easy'], ex: {}, seed: 7, stack: tiles(sp.hand), lesson: true });
+    var g = $q('#goal'); if (g) g.remove();
+    if (UI.aiT) clearTimeout(UI.aiT); UI.aiT = 0;
+    build(sp); G.pl[1].nm = (typeof STORY !== 'undefined' && STORY.rival && STORY.rival.name) || G.pl[1].nm;
+    resetUI(); UI.humanTurns = 0; refresh(); refit(false);
+    return until(function () { return myTurn('place') && document.querySelectorAll('#world .glow').length && !UI.tw; }, 12000).then(function () { return new Promise(function (r) { setTimeout(r, 700); }); });
+  }
+  var S = SPECS;
+  var lessons = [
+    { id: 'fit', title: 'Close a road', rule: 'A road scores 1 point per tile once both ends are closed. Turn your tile to make it fit.',
+      goal: 'Finish the road. Your follower is on it.',
+      setup: function () { return stage('fit'); },
+      success: function () { return done1() && me().score >= 3; },
+      fail: function () { return done1() ? 'The road is still open. A road scores only when both ends are closed.' : false; },
+      hints: ['Tap your tile to turn it. Which square closes the road?', { say: 'Close the open end here.', target: spot(S.fit.sol) }],
+      debrief: 'Three tiles, three points. Your follower walks home.' },
+    { id: 'claim', title: 'Claim first', rule: 'Only a follower on a road scores it. Claim as you close it, before the points are counted.',
+      goal: 'Finish the road and score it. Nobody holds it yet.',
+      setup: function () { return stage('claim'); },
+      success: function () { return done1() && me().score >= 4; },
+      fail: function () { return !done1() ? false : wasScored('road') ? 'You closed the road with no follower on it, so nobody scored.' : 'The road is still open. Close it, then claim it.'; },
+      hints: ['Close the road, then look for a circle on your new tile.', { say: 'Close it here, then tap the road circle.', target: spot(S.claim.sol) }],
+      debrief: 'Claimed as it closed: 4 tiles, 4 points. The follower comes home.' },
+    { id: 'town', title: 'Banner town', rule: 'A finished town scores 2 per tile. Each banner adds 2 more.',
+      goal: 'Close the town to score 8 points.',
+      setup: function () { return stage('town'); },
+      success: function () { return done1() && me().score >= 8; },
+      fail: function () { return done1() ? 'The town is still open. It scores only when its last gap is closed.' : false; },
+      hints: ['The town opens to the north. Turn your tile to cap it.', { say: 'Cap the town here.', target: spot(S.town.sol) }],
+      debrief: 'Three tiles and one banner: 2 x 4 = 8.' },
+    { id: 'priory', title: 'Priory ring', rule: 'A priory scores 9 once eight tiles surround it.',
+      goal: 'Complete the ring round your priory.',
+      setup: function () { return stage('priory'); },
+      success: function () { return done1() && me().score >= 9; },
+      fail: function () { return done1() ? 'A gap is left round the priory. It scores 9 only when all eight sides are filled.' : false; },
+      hints: ['Count the tiles round the priory. Which side is empty?', { say: 'Fill the last gap here.', target: spot(S.priory.sol) }],
+      debrief: 'Eight neighbours: 9 points, and the follower comes home.' },
+    { id: 'crowd', title: 'Most followers', rule: 'The player with most followers in a town or road scores all of it. A tie scores for both.',
+      goal: 'Close the town. Your two followers outnumber the rival.',
+      setup: function () { return stage('crowd'); },
+      success: function () { return done1() && me().score >= 8 && rival().score === 0; },
+      fail: function () { return done1() ? 'The town is still open, so nobody scored yet.' : false; },
+      hints: ['One end of the town is still open. Cap it.', { say: 'Cap the town here.', target: spot(S.crowd.sol) }],
+      debrief: 'Two followers beat one: you scored all 8, the rival nothing.' },
+    { id: 'farmer', title: 'Farmer', rule: 'A farmer stays until the end and scores 3 for each finished town beside his field.',
+      goal: 'Place a farmer who scores 3 when the game ends.',
+      setup: function () { return stage('farmer'); },
+      success: function () { return !!G.over && me().end.field >= 3; },
+      fail: function () { return G.over ? 'That farmer touches no finished town, so he scored nothing.' : false; },
+      hints: ['The finished town is up north. Which field touches it?', { say: 'Lay it here, then tap the field next to the town.', target: spot(S.farmer.sol) }],
+      debrief: 'One finished town beside the field: 3 points for the farmer.' },
+    { id: 'open', title: 'Last tile', rule: 'At the end, unfinished roads and towns score 1 per tile. Banners count 1.',
+      goal: 'Last tile: you trail 0 to 3. Finish ahead.',
+      setup: function () { return stage('open'); },
+      success: function () { return !!G.over && me().score > rival().score; },
+      fail: function () { return G.over ? 'Not enough. Unfinished towns score 1 per tile, so make yours longer.' : false; },
+      hints: ['Your open town scores 1 per tile. Make it longer.', { say: 'Extend your town here.', target: spot(S.open.sol) }],
+      debrief: 'Four open tiles (with the banner) score 4 and beat 3.' },
+    { id: 'game', title: 'A short game', rule: 'Lay tiles, claim roads and towns, close them for points. Most points wins.',
+      goal: 'Win a short game: ten tiles, one rival.',
+      setup: function () { return stage('game'); },
+      success: function () { return !!G.over && me().score > rival().score; },
+      fail: function () { return G.over ? 'The rival scored more. Put followers on what you close.' : false; },
+      hints: ['Claim a road or town, then close it before the rival does.', { say: 'Tap the lightbulb in the menu for a suggested move.', target: '#htile' }],
+      debrief: 'Claim, close, score. That is the whole game.' }
+  ];
+  // ---------------------------------------------------------------- wiring
+  var booted = false, capT = 0;
+  function boot() {
+    if (booted) return window.__RVL; booted = true;
+    GXST.init({ game: 'rampart-and-vine', scenarios: lessons, keepClear: ['#hand', '#seats', '#top', '#status'],
+      settled: function () {
+        if (!UI.cap) capT = 0; else if (!capT) capT = Date.now();
+        return !!G && !UI.aiFly && !UI.tw && (!UI.cap || Date.now() - capT > 2200) && (!!G.over || myTurn() || done1());   // the score caption shows for 2 s, then the card judges
+      } });   // judged when the score caption is gone, not after the rival's reply
+    return window.__RVL;
+  }
+  window.__RVL = { SPECS: SPECS, build: build, tiles: tiles, figL: figL, tid: tid, lessons: lessons,
+    open: function () { var go = function () { if (!ready()) { setTimeout(go, 200); return; } boot(); GXST.picker(); }; go(); } };
+})();
 
 </script>
 <script>window.GXLAB_CSS="/* GX LAB (test mode only; every rule is under #gxlab-* / .gxl-*, so the page is untouched when test mode is off) */\n#gxlab-bar{position:fixed;z-index:2147483640;top:max(2px,env(safe-area-inset-top));left:2px;display:flex;gap:3px;align-items:center;max-width:calc(100vw - 4px);font:700 12px/1 system-ui,-apple-system,sans-serif}\n#gxlab-bar.r{left:auto;right:2px;flex-direction:row-reverse}\n#gxlab-bar button,.gxl-panel button{font:700 12px/1 system-ui,-apple-system,sans-serif;color:#f4ead8;background:rgba(36,24,16,.86);border:1px solid #f0c05a;border-radius:9px;padding:0 8px;min-height:28px;cursor:pointer;touch-action:manipulation;white-space:nowrap}\n#gxlab-bar button.on{background:#f0c05a;color:#2a1b10}\n#gxlab-bar .gxl-r button{min-width:30px;padding:0 4px}\n#gxlab-bar .gxl-r button[aria-pressed=true]{background:#2f7d4f;border-color:#2f7d4f}\n#gxlab-bar .gxl-r button[data-s=bad][aria-pressed=true]{background:#b3382c;border-color:#b3382c}\n#gxlab-bar .gxl-r{display:flex;gap:3px}\n.gxl-panel{position:fixed;z-index:2147483600;left:0;right:0;bottom:0;height:min(78vh,640px);display:flex;flex-direction:column;box-sizing:border-box;background:#241810;color:#f4ead8;border:1.5px solid #f0c05a;border-radius:14px 14px 0 0;box-shadow:0 -8px 30px rgba(0,0,0,.55);font:500 14px/1.35 system-ui,-apple-system,sans-serif;padding-bottom:env(safe-area-inset-bottom,0)}\n.gxl-panel[hidden]{display:none}\n@media (min-width:700px){.gxl-panel{left:auto;top:0;width:380px;height:auto;border-radius:0;border-width:0 0 0 1.5px}}\n.gxl-h{display:flex;gap:6px;align-items:center;padding:8px 8px 6px 12px;border-bottom:1px solid #4a3326;flex:none}\n.gxl-h h2{margin:0;flex:1;min-width:0;font:800 15px/1.2 system-ui,sans-serif;color:#f0c05a;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}\n.gxl-panel button{min-height:40px}\n.gxl-tools{display:flex;gap:6px;flex-wrap:wrap;padding:6px 10px 0;flex:none}\n.gxl-tools button{flex:1 1 auto}\n.gxl-body{overflow:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;padding:6px 10px 14px;flex:1;min-height:0}\n.gxl-g{font:800 11px/1 system-ui,sans-serif;letter-spacing:.08em;text-transform:uppercase;color:#bca78c;margin:12px 0 4px}\n.gxl-row,.gxl-item{border:1px solid #4a3326;border-radius:11px;padding:8px 10px;margin:5px 0;background:rgba(255,255,255,.03)}\n.gxl-row{display:flex;gap:8px;align-items:center}\n.gxl-row .gxl-t{flex:1;min-width:0}\n.gxl-row b,.gxl-item .gxl-p{display:block;font:700 14px/1.25 system-ui,sans-serif;overflow-wrap:anywhere}\n.gxl-row small,.gxl-ask{display:block;color:#9fd6ff;font:600 12px/1.3 system-ui,sans-serif;overflow-wrap:anywhere}\n.gxl-go{border-color:#f0c05a!important;background:rgba(240,192,90,.14)!important;color:#f0c05a!important;font-weight:800!important;min-width:58px}\n.gxl-go.here{background:#f0c05a!important;color:#2a1b10!important}\n.gxl-chip{min-width:44px;font-size:18px!important;padding:0!important;border-color:#4a3326!important;background:transparent!important}\n.gxl-rate{display:flex;gap:6px;margin-top:6px}\n.gxl-rate button{flex:1;padding:0 4px}\n.gxl-rate button[aria-pressed=true][data-s=ok]{background:#2f7d4f;border-color:#2f7d4f}\n.gxl-rate button[aria-pressed=true][data-s=bad]{background:#b3382c;border-color:#b3382c}\n.gxl-rate button[aria-pressed=true][data-s=skip]{background:#6b5a48;border-color:#6b5a48}\n.gxl-item .gxl-top{display:flex;gap:8px;align-items:center;margin-top:5px}\n.gxl-item .gxl-top .gxl-ask{flex:1}\n.gxl-note{display:block;width:100%;box-sizing:border-box;margin-top:6px;min-height:40px;padding:0 10px;border-radius:10px;border:1.5px solid #b3382c;background:#150d08;color:#f4ead8;font:500 16px system-ui,sans-serif}\n.gxl-ed{font:800 12px/1.2 system-ui,sans-serif;color:#bca78c;margin:10px 0 2px}\n.gxl-ed b{color:#f4ead8}\n.gxl-toast{position:fixed;z-index:2147483100;left:50%;bottom:90px;transform:translateX(-50%);background:#2f7d4f;color:#fff;font:700 13px system-ui,sans-serif;padding:8px 14px;border-radius:10px;pointer-events:none}\n.gxl-fb{position:fixed;z-index:2147483200;left:12px;right:12px;bottom:12px;max-width:520px;margin:auto;background:#241810;color:#f4ead8;border:1.5px solid #f0c05a;border-radius:12px;padding:10px;display:grid;gap:8px}\n.gxl-fb textarea{width:100%;min-height:110px;box-sizing:border-box;background:#150d08;color:#f4ead8;border:1px solid #4a3326;border-radius:8px;font:12px system-ui}\n.gxl-fb button{min-height:40px;border-radius:10px;border:1.5px solid #f0c05a;background:transparent;color:#f4ead8;font:700 13px system-ui}\n";</script>
