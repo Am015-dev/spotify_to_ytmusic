@@ -96,7 +96,9 @@ async function run(b, W, H) {
   s = await st(); if (Object.keys(s.best).length !== ids.length) note('progress saved for ' + Object.keys(s.best).length + '/' + ids.length);
   // 7) close, Lessons reopens the picker
   await tap('.gxst-hd .gxst-ib[aria-label="Close"]'); if ((await st()).open || await p.$('.gxst-card')) note('close left the card');
-  await tap('.gxt-menu'); s = await st(); if (!s.open || s.phase !== 'picker') note('Learn to play (title) did not open the lesson picker');
+  s = await st(); if (await p.evaluate(() => UI.mode) !== 'game') note('closing the last lesson did not start a real game');   // R13: Close from the last lesson goes on into a real climb
+  await p.evaluate(() => { var g = document.querySelector('.ec-goal'); if (g) g.remove(); });   // the new game's goal card sits where the pill is until dismissed
+  await tap('.gxst-q'); s = await st(); if (!s.open || s.phase !== 'picker') note('the Lessons button did not open the lesson picker');
   const ev = await p.evaluate(() => __ev.join(',')); ['start', 'fail', 'retry', 'hint', 'win', 'close', 'picker'].forEach(t => { if (ev.indexOf(t + ':') < 0) note('no ' + t + ' event'); });
   // contact sheet of lesson starts
   const cols = phone ? 5 : 3, cw = phone ? 240 : 455, ch = Math.round(cw * H / W);

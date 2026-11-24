@@ -261,4 +261,3 @@ html:not(.bf-wide) #bf .bf-riv:not(.open) .rv-hd{padding-right:56px}
 .gxst-card.gxst-play .gxst-hd{grid-area:hd}.gxst-card.gxst-play .gxst-goal{grid-area:goal;margin:2px 4px 2px 12px;font-size:14px;line-height:1.25}
 .gxst-card.gxst-play .gxst-ft{grid-area:ft;padding:2px 6px 2px 0;gap:4px}.gxst-card.gxst-play .gxst-ft .gxst-sp{display:none}
 .gxst-card.gxst-play .gxst-btn{padding:0 9px;font-size:14px}.gxst-card.gxst-play .gxst-hint{grid-area:hint;margin:2px 8px 6px}
-.gxst-q.gxst-qfix{display:none}

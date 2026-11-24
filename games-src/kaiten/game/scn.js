@@ -104,8 +104,8 @@
         ['ui-row-c', 'ui-bubble-tail'].forEach(function (n) { var i = new Image(); i.onload = function () { artLoad[n] = i.naturalWidth > 0 ? 'ok' : 'empty'; }; i.onerror = function () { artLoad[n] = 'failed'; }; i.src = 'media/' + n + '.webp'; });
         GX.show('setd');
         var row = $('#setd .btn.gxt-menu'); if (row) row.scrollIntoView({ block: 'center' });
-        var b = document.createElement('div'); b.id = 'art-bub'; b.className = 'gxh-bub on gxh-a-bottom'; b.style.cssText = 'left:40px;top:70px';
-        b.innerHTML = '<i class="gxh-arr"></i><div class="gxh-tx">Tap a glowing card</div>'; document.body.appendChild(b);
+        var b = document.createElement('div'); b.id = 'art-bub'; b.className = 'gxh-bub on gxh-a-bottom'; var rr = row ? row.getBoundingClientRect() : { left: 40, top: 160 }; b.style.cssText = 'left:' + Math.round(rr.left + 8) + 'px;top:' + Math.max(60, Math.round(rr.top - 62)) + 'px';   // points at the row it names, never over the panel header
+        b.innerHTML = '<i class="gxh-arr"></i><div class="gxh-tx">Learn by doing</div>'; document.body.appendChild(b);
         return new Promise(function (r) { setTimeout(r, 700); });
       });
     },

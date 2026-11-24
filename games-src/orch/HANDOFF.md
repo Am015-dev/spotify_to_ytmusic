@@ -116,3 +116,11 @@ Live check URL form: https://am015-dev.github.io/spotify_to_ytmusic/<slug>/ (gam
 - Gate: lessons tests PASS (redline, ochre, wildmark, vinegrave, meadowfold; via-tessera has none), phone+pc contact sheets opened, 0 bad cells. wildmark fixes: Esc closes the lesson picker; acorn counter moved below the Animal points button (phone).
 - build-all --quick fails only on missing visual baselines (ui-baselines branch absent), so wildmark/vinegrave/redline-rally were deployed with --no-check after the manual gates; meadowfold/via-tessera/ochre-horizon copied from their own builds and stamped.
 - Dropped: none. What's new added for the six plus vale-of-banners and doorkick-dungeon.
+
+## INT20r (24 Nov 2026, 18:00 UTC)
+- Deployed: NONE. R15 (CRITIC-R15.md) fails all 29 games (min row 3-5); no merged branch lifts a game to >= 7 on all 5 rows.
+- Merged on alex (source only, not deployed): W726 shared tutor (+ pill avoids keepClear areas, fixes gloamwar "draw" lesson on phone), W727, W741r, W730r gloamwar, W742, W743 hollowbough, W744 wickdeep, W739r kaiten.
+- Tests: wickdeep lessons PASS phone+pc; gloamwar lessons PASS (phone "minimise chip" check flaky under load).
+- build-all --quick on 17 tutor games: 1/17 PASS (rampart-and-vine). Others FAIL on: missing ui-baselines snapshots (cauldron-fair, kaiten, redline, tidewake, vale, wildmark: baseline-only) and look-check findings (text under/overlapping other text; thornbound reports the "Lessons" pill overlapping text: W726 pill regression to fix before any deploy) in crown, doorkick, emberclimb, hollowbough, lantern-dive, short-fuse, sunglaze, thornbound, twin-thrones, vinegrave.
+- Held by critic: all 29. Defects: see games-src/orch/CRITIC-R15.md (empty panels, 7-9px text, label-value strips, pc dead space).
+- Not done: contact sheets per game (no deploy, so skipped); hollowbough art untouched.

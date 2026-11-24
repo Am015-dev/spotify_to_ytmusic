@@ -21,8 +21,6 @@
   function mon(id) { return WD.fig(G, id); }
   function alive(id) { var m = mon(id); return !!(m && m.hp > 0); }
   function turnOver() { return G.phase === 'select' && G.round > 1; }
-  // the hero has played the first half of its turn and now holds the second: the attack was made
-  function actedOnce() { var h = hero(); return !!(G.act && G.act.id === h.id && G.act.used && G.act.used.length >= 1 && G.ask && G.ask.h === 'second' && (!G.act.q || G.act.i >= G.act.q.length)); }
   function cardInit(c) { return D.CARD[c].i; }
 
   // hexes reachable from `from` over floor, by distance (BFS, at most 8 steps)
@@ -55,7 +53,7 @@
   // sp = { hand: [card ids], hp: hero hp or null, mons: [{ id, type, idx, hp, dist, shield, elite }],
   //        doorAt: n (hero n steps from a door, same room), coin: n (coin n steps from hero), realDeck: keep modifier deck }
   function stack(sp) {
-    UI.fast = true; UI.sel = {}; UI.pick = null; UI.det = null;
+    UI.fast = true;
     localStorage.removeItem('wickdeep-game-v1');
     if (!window.__wdlSaveWrapped) {
       window.__wdlSaveWrapped = true;
@@ -95,7 +93,10 @@
     G.figs = G.figs.filter(function (f) { return f.kind !== 'mon' && f.kind !== 'boss'; });
 
     if (sp.coin) {
-      ctx.coin = hexAt(h.pos, sp.coin, inRoom);
+      // the lowest such hex on screen: the lesson card sits at the top on phones, so the coin stays in view
+      var dc = dists(h.pos), low = Object.keys(dc).filter(function (k) { return dc[k] === sp.coin && inRoom(k) && !WD.figAt(G, k); })
+        .sort(function (a, b) { return WD.P(b)[1] - WD.P(a)[1]; });
+      ctx.coin = low[0] || hexAt(h.pos, sp.coin, inRoom);
       if (ctx.coin) G.hex[ctx.coin].coin = 1;
     }
 
@@ -159,11 +160,11 @@
       rule: 'A shield soaks that much damage from every hit before the monster loses hit points.',
       goal: 'Defeat the crab this turn.',
       setup: function () {
-        return stack({ hand: ['ww01', 'ww09', 'ww06', 'ww03'], mons: [{ id: 'cr', type: 'crab', idx: 2, hp: 2, dist: 1 }] });
+        return stack({ hand: ['ww01', 'ww09', 'ww06', 'ww03'], mons: [{ id: 'cr', type: 'crab', idx: 7, hp: 2, dist: 1, shield: 2 }] });
       },
       success: function () { return !alive('cr'); },
       fail: function () {
-        if (!(turnOver() || actedOnce()) || !alive('cr')) return false;
+        if (!turnOver() || !alive('cr')) return false;
         return why('The crab\'s shield soaked 2 of the damage: Attack 4 kills it, but Attack 3 leaves it at 1 hp.');
       },
       par: 1,
@@ -178,11 +179,11 @@
       rule: 'Some monsters retaliate: when you hit them in melee, they strike back. A ranged attack gets no retaliation.',
       goal: 'Hurt the ghoul and stay alive.',
       setup: function () {
-        return stack({ hp: 1, hand: ['ww07', 'ww01', 'ww04', 'ww03'], mons: [{ id: 'gh', type: 'ghoul', idx: 0, hp: 4, dist: 2 }] });
+        return stack({ hp: 1, hand: ['ww07', 'ww01', 'ww04', 'ww03'], mons: [{ id: 'gh', type: 'ghoul', idx: 7, hp: 4, dist: 2 }] });
       },
       success: function () {
         var g = mon('gh');
-        return (turnOver() || actedOnce()) && !!g && g.hp < 4 && hero().hp > 0;
+        return !!g && g.hp < 4 && hero().hp > 0;
       },
       fail: function () {
         if (hero().hp <= 0) return why('The ghoul\'s retaliate 1 killed you at 1 hp: a melee hit draws it back, so use Hot Wax Hurl at range 3.');
@@ -222,7 +223,7 @@
       setup: function () {
         return stack({ hand: ['ww01', 'ww03', 'ww05', 'ww06'], coin: 3 });
       },
-      success: function () { return hero().coins > 0 || (!!ctx.coin && hero().pos === ctx.coin && (turnOver() || actedOnce())); },
+      success: function () { return hero().coins > 0; },
       fail: function () {
         if (!turnOver() || hero().coins > 0) return false;
         return why('Your turn ended off the coin, so no coin was picked up: Move 3 from the bottom of Tallow Bash lands you on it.');
@@ -262,25 +263,44 @@
   // Open the lessons from the title menu, and never show the old dock lesson panel.
   startTutorial = function () { GXST.start(0); };
   nextLesson = function () { return null; };
+  // a lesson's win or loss is shown by the lesson card, not the game's results screen (which would also pay out rewards)
+  var realResult = showResult;
+  showResult = function () { if (GXST.active()) return; return realResult.apply(this, arguments); };
   window.addEventListener('gxst', function (e) {
-    if (e && e.detail && e.detail.type === 'close') UI.tut = false;
-    // the last lesson flows straight into a real game
-    if (e && e.detail && e.detail.type === 'win' && e.detail.id === 'finish') setTimeout(function () {
-      var ft = document.querySelector('.gxst-card .gxst-ft'); if (!ft || document.getElementById('wdl-real')) return;
-      var b = document.createElement('button'); b.type = 'button'; b.id = 'wdl-real'; b.className = 'gxst-btn pri'; b.textContent = 'Play a real game';
-      b.addEventListener('click', function () { GXST.close(); UI.tut = false; UI.fast = false; G = null; quickPlay(); });
-      ft.innerHTML = ''; ft.appendChild(b);
-    }, 0);
+    if (e && e.detail && e.detail.type === 'close') { UI.tut = false; document.body.classList.remove('wdl-on'); }
   });
+
+  // An invisible box over the lesson's pieces (figures, door, coin): the card keeps off it, so it never hides the action.
+  // The main game's coach bubble and goal chip speak about scenario 1: hidden while a lesson runs (the card gives the goal).
+  var css = document.createElement('style');
+  css.textContent = 'body.wdl-on #coach, body.wdl-on #goalchip { display: none !important; }';
+  document.head.appendChild(css);
+  var zone = null;
+  function markZone() {
+    if (!zone) { zone = document.createElement('div'); zone.id = 'wdl-zone'; zone.style.cssText = 'position:fixed;pointer-events:none;opacity:0;z-index:-1'; document.body.appendChild(zone); }
+    var cv = document.getElementById('cv'), keys = [];
+    document.body.classList.toggle('wdl-on', !!GXST.active());
+    if (!GXST.active() || !cv || !window.G || !G.figs || typeof toScreen !== 'function') { zone.style.width = '0'; return; }
+    G.figs.forEach(function (f) { if (f.pos) keys.push(f.pos); });
+    if (ctx.door) keys.push(ctx.door);
+    if (ctx.coin) keys.push(ctx.coin);
+    var o = cv.getBoundingClientRect(), z = CAM.z * 1.3, b = null;
+    keys.forEach(function (k) {
+      var q = toScreen(k), x = o.left + q.x, y = o.top + q.y;
+      b = b ? [Math.min(b[0], x - z), Math.min(b[1], y - z), Math.max(b[2], x + z), Math.max(b[3], y + z)] : [x - z, y - z, x + z, y + z];
+    });
+    if (!b) { zone.style.width = '0'; return; }
+    zone.style.left = b[0] + 'px'; zone.style.top = b[1] + 'px'; zone.style.width = (b[2] - b[0]) + 'px'; zone.style.height = (b[3] - b[1]) + 'px';
+  }
 
   GXST.init({
     game: 'wickdeep',
     scenarios: lessons,
-    settled: function () { return !UI.busy && (!G.ask || G.ask.h !== 'anim'); },
-    keepClear: ['.gx-bar', '#tray', '#promptrow', '#hot > *', '#zoombox', '#order'],
+    settled: function () { markZone(); return !UI.busy && (!G.ask || G.ask.h !== 'anim'); },
+    keepClear: ['.gx-bar', '#tray .cd', '#pbtns', '#wdl-zone'],
     qParent: document.querySelector('.gx-bar header') || document.querySelector('.gx-bar')
   });
-  window.WDL = { lessons: lessons, ctx: ctx };
+  window.WDL = { lessons: lessons };
 
   // ?lesson=<id> starts that lesson once the game has booted
   var m = /[?&]lesson=([^&#]+)/.exec(window.location.search);
