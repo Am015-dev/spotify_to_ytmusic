@@ -620,4 +620,25 @@ html,body{background:#3a1f0e}
 #rulesbox .qr{margin:0 0 10px;padding:0 0 0 22px;font-size:16px;line-height:1.4}#rulesbox .qr li{margin:3px 0}
 #rulesbox .rsec{border-top:1px solid rgba(255,255,255,.15);padding-top:6px;margin-top:8px}#rulesbox .rsec h4{margin:0 0 4px;font-weight:800;font-size:17px;color:#f2c230}
 #rulesbox .rsec ul{list-style:disc;margin:2px 0 8px;padding-left:20px}#rulesbox .rsec li{display:list-item;position:static;font-size:15px;line-height:1.4;margin:4px 0;height:auto}
+/* W664 HUD: slim icon bar + score chips; the rival city and the goal live in windows, so the pyramid gets the space */
+.gx-bar{gap:4px;padding-left:8px;padding-right:8px}
+.gx-bar .ttic,#hintbtn.ttic{width:44px;height:44px;min-width:44px;padding:0;border-radius:50%;flex:0 0 44px}
+.gx-bar .ttic svg,#hintbtn svg{display:block;width:24px;height:24px}
+.ttchip{flex:0 0 auto;display:inline-flex;align-items:center;gap:5px;height:36px;padding:0 10px 0 9px;border-radius:18px;background:#2a1a0c;border:2px solid #8a6a3a;color:#fff;cursor:pointer;line-height:1}
+.ttchip .cd{font-style:normal;font-size:13px;font-weight:700;color:#e8d6ae}
+.ttchip b{font-size:19px;font-weight:900;min-width:1ch;text-align:center}
+.ttchip.riv{border-color:#b0574a}.ttchip.lead{background:#4a3d10;border-color:#f2c230}.ttchip.act{box-shadow:0 0 0 2px #f2c230}
+body>#hintbtn{display:none}
+#instr #hintbtn{flex:0 0 44px;background:#3b2414;color:#f6e3b8;border:1px solid #7a5428}
+#instr #hintbtn.on{background:#f2c230;color:#231a05;border-color:#f2c230}
+#instr{height:auto;min-height:48px}
+#s1 .tab{display:none}
+#s1 .plate .who{text-decoration:underline dotted rgba(255,255,255,.5);text-underline-offset:3px}
+.strip .tab{min-height:44px}
+@media (max-width:999px){.gx-bar h1{display:none}}
+@media (min-width:1000px){.strip .tab{min-height:62px}}
+.strip .plate .who{flex:none;max-width:none;overflow:visible;text-overflow:clip}
+@media (min-width:1000px){#s1{min-height:0}#s1 .plate{min-height:44px}#s1 .wt{height:40px;flex-basis:56px;width:56px}.strip .tab{min-height:52px}}
+.milrow{display:contents}
+@media (min-width:1000px){.milrow{display:flex;align-items:center;gap:12px;flex:0 0 auto}.milrow #mil{flex:1 1 60%;min-width:0}.milrow .tokrow{flex:0 1 auto;margin:0}}
 </style></head>
