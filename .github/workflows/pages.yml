@@ -28,9 +28,14 @@ jobs:
           sparse-checkout: games
         timeout-minutes: 15
       - uses: actions/configure-pages@v5
+      - name: Stage the site without dev-only folders (smaller upload, faster publish)
+        run: |
+          mkdir _site
+          tar -C games --exclude=./asset-viewer --exclude=./shots -cf - . | tar -C _site -xf -
+          du -sh _site
       - uses: actions/upload-pages-artifact@v3
         with:
-          path: games
+          path: _site
       - id: deployment
         uses: actions/deploy-pages@v4
         continue-on-error: true
