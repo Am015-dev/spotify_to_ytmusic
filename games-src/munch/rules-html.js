@@ -38,11 +38,4 @@ const RULES_HTML=`
 <li><b>Cleric:</b> discard up to 3 cards for +3 each against undead.</li>
 </ul>
 <p class="small muted">A half-blood card lets you have two races, and a double-class card two classes. Curses can be played on anyone: here that's on your turn, during fights, or when someone else's turn starts. Names, card texts and art in this game are original. The rules follow the real card game.</p>
-<section class="credits-audio">
-<h3>Credits</h3>
-<p>Names, card text and art are original. All card paintings and the six boss reveal clips were painted by Am015-dev.</p>
-<h4>Audio</h4>
-<ul>
-<li>Art and music by Am015-dev</li></ul>
-<p><small>All sounds were trimmed, loudness-normalised and converted to MP3 for this game.</small></p>
-</section>`;
+`;

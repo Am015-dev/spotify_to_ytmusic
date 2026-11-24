@@ -71,7 +71,6 @@ function buildRules() {
   sec('Modules', h('div', ...Object.keys(D.mods).map(k => h('div.rcard', h('div.rt', h('b', D.mods[k].name), ...split(D.mods[k].text).map(t => h('div', t)))))));
   sec('Ability cards', h('div', ...Object.keys(D.abilities).map(k => h('div.rcard', h('div.rt', h('b', D.abilities[k].name), ...split(D.abilities[k].text).map(t => h('div', t)))))));
   sec('Playing on a phone', L('ul', ['Tap a die, then a glowing space.', 'Tap the die again to put it back.', 'Coffee buttons show when you hold tokens.', 'Hot-seat hides everything between turns.', 'Online, you only see your own dice.', 'The bulb turns hints on and off.']));
-  root.appendChild(h('div', { html: '<section class="credits-audio"><h3>Credits</h3><p>Sounds by Kenney (kenney.nl, CC0).</p><p>Ambience and music: OpenGameArt contributors, CC0.</p><p>Painted art is original, made in this repository.</p><p>Names, text and art are original.</p></section>' }));
   return root;
 }
 function buildRef() {

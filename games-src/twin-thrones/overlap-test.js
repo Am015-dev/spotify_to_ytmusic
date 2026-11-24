@@ -34,7 +34,7 @@ const { chromium } = require('playwright');
     if (ov(dk, s0)) bad.push('dock over your city'); if (ov(dk, s1)) bad.push('dock over the rival city');
     // the lift (tapped card + Build/Sell/Wonder) stays off both cities and the dock
     const lift = document.querySelector('#zoom:not([hidden]) .lift');
-    if (lift) { const l = R(lift); if (ov(l, s0)) bad.push('lift over your city'); if (ov(l, s1)) bad.push('lift over the rival city'); if (ov(l, dk)) bad.push('lift over the dock'); if (l.b > H || l.t < 0) bad.push('lift off screen'); }
+    if (lift) { const l = R(lift); /* W597: the Build/Sell/Wonder bar sits on your city row on purpose, so it never covers a pyramid card */ if (cards.some(c => ov(l, c))) bad.push('lift over a pyramid card'); if (ov(l, s1)) bad.push('lift over the rival city'); if (ov(l, dk)) bad.push('lift over the dock'); if (l.b > H || l.t < 0) bad.push('lift off screen'); }
     // every button: on screen, 44px+ tall, not covered by a floater or tooltip
     const btns = [...document.querySelectorAll('#acts button, #zoom .zb, #dock .gx-ibtn')].filter(vis);
     btns.forEach(e => { const r = R(e), t = (e.textContent || '').trim().slice(0, 14);

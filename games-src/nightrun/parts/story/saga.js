@@ -120,7 +120,7 @@ if(RET.story){
  function briefCard(n){const r=rowsOf('brief:'+n)[0],s=STAGES[n-1];if(!r||!s)return null;const D=athens(s.di);
    return{brief:{name:'STAGE '+n+' · '+s.name,where:D.name+' · '+D.sub,goal:goalTxt(s)},l:r.l,bg:bgFor(s.di),head:chHead(r.ch)};}
  const openingCards=()=>cardsOf('open',bgFor(0),'FRANKFURT · 2099');
- const endCards=c=>{const out=cardsOf('end:'+c,bgFor(diOfCh(c)),chHead(c)+' · END');if(c===CHN)out.push(...cardsOf('epi',bgFor(DISTRICTS.length-1),'EPILOGUE'),...cardsOf('credits',bgFor(0),'CREDITS'));return out;};
+ const endCards=c=>{const out=cardsOf('end:'+c,bgFor(diOfCh(c)),chHead(c)+' · END');if(c===CHN)out.push(...cardsOf('epi',bgFor(DISTRICTS.length-1),'EPILOGUE'),...cardsOf('credits',bgFor(0),'THE END'));return out;};
  /* ----- before a story stage: the opening (once) and the stage briefing (first time) ----- */
  {const ss=startStory;startStory=function(n){if(running||!SG_AUTO||K.on)return ss.apply(this,arguments);const a=arguments,go=()=>{if(!running)ss.apply(this,a);};
    if(RET.first30){F3.arm(n);return ss.apply(this,a);}   // first30: the stage starts at once; briefing = one banner line, opening = 2 live cards after the first wave
