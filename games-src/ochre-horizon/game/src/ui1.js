@@ -68,6 +68,16 @@ function whyNot(p, id) {
   return '';
 }
 
+// short reason on a card you cannot play yet (shown on the card itself, 5 words or so)
+function whyShort(p, id) {
+  var c = OH.CARDS[id];
+  if (G.phase !== 'action') return '';
+  if (!OH.reqOk(p, c.req)) return 'Needs ' + reqWords(c.req);
+  if (!OH.opsPossible(p, c.play, id)) return 'Needs production you lack';
+  var cost = OH.cardCost(p, id), pay = OH.maxPay(p, c, cost);
+  if (pay.mc > G.pl[p].mc) return 'Short ' + (pay.mc - G.pl[p].mc) + ' credits';
+  return '';
+}
 // ---------- card html ----------
 function cardHTML(id, opt) {
   opt = opt || {};
@@ -83,6 +93,7 @@ function cardHTML(id, opt) {
   if (opt.flavor && c.flavor) h += '<div class="fl">' + esc(c.flavor) + '</div>';
   h += '</div>';
   if (c.vp) h += '<span class="vp">' + esc(vpWords(c.vp)) + '</span>';
+  if (opt.no && G && G.pl && OH.CARDS[id]) { var wn = whyShort(0, id); if (wn) h += '<span class="why">' + esc(wn) + '</span>'; }
   h += '<span class="chk">' + (opt.chk || 'Keep') + '</span></div>';
   return h;
 }
@@ -131,7 +142,7 @@ function renderBar() {
   $('bActS').textContent = ready ? ready + ' ready' : (P.played.some(function (id) { return OH.CARDS[id] && OH.CARDS[id].action && OH.CARDS[id].action.length; }) || P.corp && OH.card(P.corp).action ? 'used or none' : 'none yet');
   $('bPassT').textContent = G.acts === 1 ? 'Done' : 'Pass';
   $('bPassS').textContent = G.acts === 1 ? (G.pl[1].passed ? 'you go again' : 'end turn, play again') : 'out till next round';
-  $('bPass').setAttribute('aria-label', G.acts === 1 ? 'Done: end this turn, you play again next round' : 'Pass: you are out until the next generation. Income next round: ' + (P.prod.mc + P.tr) + ' credits');
+  $('bPass').setAttribute('aria-label', G.acts === 1 ? 'Done: end this turn after one action; you play again after the rival' : 'Pass: you are out until the next generation. Income next round: ' + (P.prod.mc + P.tr) + ' credits');
   ['bProj', 'bAct', 'bPass'].forEach(function (b) { $(b).disabled = !my; });
   $('bCards').disabled = false;
 }

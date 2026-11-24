@@ -17,15 +17,15 @@ $('zin').innerHTML = A.icon('plus', 20); $('zout').innerHTML = A.icon('minus', 2
 $('hintbtn').innerHTML = A.icon('bulb', 22);
 function rulesHTML() {
   return '<div class="rules">' +
-    '<h4>Goal</h4><p>Make Ochre livable with your rival. Temperature to 8°C, oxygen to 14%, all 9 oceans. When all three are done, the round ends the game. Most points wins.</p>' +
+    '<h4>Goal</h4><p>Make Ochre livable with your rival. Temperature to 8°C, oxygen to 14%, all 9 oceans. When all three are done, that round is the last: income is paid, both may turn plants into greenery once more, then points are counted. Most points wins; a tie goes to the most credits.</p>' +
     '<h4>Points</h4><p>Your rating (starts at 20, +1 for every step you raise), milestones and awards, 1 per greenery, 1 per greenery next to your cities, and points on cards.</p>' +
-    '<h4>A round (generation)</h4><p>1. New cards: see 4, buy any for 3 credits each (round 1: pick a company and keep from 10).</p><p>2. Actions: take turns doing 1 or 2 actions, until both pass.</p><p>3. Income: energy turns into heat. Gain credits = credit production + rating, and every other production.</p>' +
+    '<h4>A round (generation)</h4><p>1. New cards: see 4, buy any for 3 credits each (round 1: pick a company and keep from 10).</p><p>2. Actions: take turns doing 1 or 2 actions, until both pass. Who goes first swaps every round.</p><p>3. Income: energy turns into heat. Gain credits = credit production + rating, and every other production.</p>' +
     '<h4>Actions</h4><p>Play a card (pay its cost; steel pays 2 for building cards, titanium 3 for space cards; meet its needs). Use a standard project. Plant greenery for 8 plants. Warm the air for 8 heat. Claim a milestone. Fund an award. Use a card action once per round. Pass.</p>' +
     '<h4>Standard projects</h4><p>Sell cards 1 each · Power plant 11 · Comet strike 14 · Aquifer 18 · Greenery 23 · City 25.</p>' +
-    '<h4>Bonus steps</h4><p>Temperature −24°C and −20°C: +1 heat production. 0°C: place an ocean. Oxygen 8%: +1 temperature.</p>' +
+    '<h4>Bonus steps</h4><p>Temperature −24°C and −20°C: +1 heat production. 0°C: place an ocean. Oxygen 8%: +1 temperature. A full gauge cannot go higher and pays no rating, but cards that would raise it can still be played.</p>' +
     '<h4>Tiles</h4><p>Oceans only on ocean spaces. Greenery next to your own tile if you can; it raises oxygen. Cities never next to another city. Spaces pay their bonus icons, and each ocean next to the new tile pays 2 credits.</p>' +
     '<h4>Milestones and awards</h4><p>Milestones: 8 credits, 5 points, only 3 claimed in a game. Awards: fund for 8, 14, then 20; only 3. At the end the leader gets 5 points (2 players: no second place; a tie pays both).</p>' +
-    '<h4>Card kinds</h4><p>Orange Projects act once. Teal Lasting cards stay with an effect or an action. Pink Events act once and their tags only count when played.</p></div>';
+    '<h4>Card kinds</h4><p>Orange Projects act once. Teal Lasting cards stay with an effect or an action. Pink Events act once and their tags only count when played. A card that cuts production takes it from the rival; if the rival has too little, it takes yours, and if neither has enough it cannot be played.</p></div>';
 }
 // ---------- start screen ----------
 function showStart() {
@@ -69,12 +69,12 @@ var COACH = {
   pass: 'Out of money? Pass. Income comes when both pass.',
   research: 'Marked cards are our pick. Tap to change. 3 credits each.',
   research2: 'Income = credit production + your rating. Grow both.',
-  bonus: 'White marks on gauges give a bonus: heat production, an ocean.',
+  bonus: 'White marks on gauges pay a bonus: heat production, an ocean, warmth.',
   vp: 'VP on a card means points at the end. Not rating.',
   plants: 'Glowing plants? Tap them: 8 plants make a greenery.',
   goals: 'Projects tab holds milestones and awards: 5 points each.',
   out: 'Rival is out. Keep taking turns until you pass too.',
-  end: 'Game ends when all three gauges hit their goals.'
+  end: 'When all three gauges are full, that round is the last.'
 };
 function coachShow(k) {
   if (!UI.tut || UI.coachDone[k] || UI.scn || (window.guideEnabled && guideEnabled())) return;
