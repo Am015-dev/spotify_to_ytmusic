@@ -319,6 +319,24 @@ Live fix: original-name phrase removed from shelf blurb + sands page (15:2x).
 - nb-art "empty stat chips": chips do carry text (Skill/Attack/Agility/Hull/Shields). The empty look was the contact sheet capturing at 450 ms before the scenario built the cards; added `--wait <ms>` to scripts/contact-sheet.js. Ship art is still one grey/orange silhouette per side, not per-hull paintings (weak, not fixed).
 - Weak: title screen cells (start, nb-tutorial-play) show dark empty-looking buttons in the sheets; not touched.
 - Proof: xw/proof/w751-phone-sheet.jpg, w751-pc-sheet.jpg (16 cells each, --wait 3000, takes ~2 min real).
+## W748 pc layout
+- emberclimb: empty potion circles hidden at >= 1024 px (css in src/head.html). Fight stage stays phone-sized in the middle: scaling enemy art overlapped the hero panel, so it was reverted; needs a stage re-layout.
+- lantern-dive: pool job cards and Pass button larger, seat chips 16 px at >= 1024 px (game/skin.css). Trick/felt geometry (tableGeo in src/ui2.js) still leaves the felt mostly empty.
+- meadowfold: start card scaled up at >= 1024 px (src/skin.css). In-game PC board already has strip/map/rail columns; not changed.
+- Phone sheets: flags identical before/after; pixel diffs only on animated water (also differ between two unchanged runs).
+
+## W748r pc layout (real desktop layouts, >= 1024/1100 px only; phone sheets identical apart from image-load timing)
+- emberclimb (src/head.html, end): fights at >= 1024x680 are a grid: hero panel (240 px portrait) left vs enemies right (230 px portraits), hand cards 176 px. Bad pc cells 6 -> 2.
+- lantern-dive (skin.css end, ui2.js tableGeo): table no longer capped at 1180 px (black side bars gone); job card 420x150 / 30 px; seats 240x132 at >= 1300 px. Bad 6 -> 4.
+- meadowfold (src/skin.css end): >= 1100 px puts scores, cards and pockets in a left column; the valley gets the full height (hex board ~490x500 -> ~680x730). Bad 6 -> 1.
+- Dead space (flat backdrop blocks, 1366x768 mean): emberclimb 27 -> 26, lantern-dive 40 -> 35, meadowfold 34 -> 33. The pixel metric counts the side column and
+  painted background as dead, so it barely moves although the boards grew; the 15% target is NOT met by that metric.
+- Still weak: lantern-dive job phase is one card on an empty felt (needs a real design: job row across the felt); emberclimb dock below the deck is empty
+  black, 6+ card hand overlaps at pc although it would fit (dense --cw uses the full viewport width, ui.js:505) and dense cards hide their text;
+  ec-result and story scenes are a small box on dark. meadowfold left column has ~110 px of empty green above the pockets.
+- Tests: build-all --quick scenarios pass for emberclimb (14/17) and lantern-dive (7/10); the 6 failures are only missing visual baselines. meadowfold
+  lessons-test PASS at 402x874 and 1366x768; rules-test.js did not finish within 60 s (untouched engine, not investigated).
+- contact-sheet.js waits 450 ms: lantern-dive's hand is often not painted yet in its cells (timing, not layout).
 ## W735 thornbound HUD diet (shelf/W735-hud-thornbound)
 - tb-story-start failure was NOT the HUD diet: parent commit fails the same. Story now opens the chapter map directly (tutorial = lesson row, scenario lessons); the scenario still waited for the old Skip-tutorial spotlight. Scenario rewritten (scn.js), HUD cuts untouched.
 - Test against a build-all staged build (python3 scripts/build-all.py thornbound --no-check), not games/thornbound (deployed copy).

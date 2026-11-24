@@ -672,5 +672,25 @@ html body.ec-stage #stage .hand.fan.w770two .card{margin:0!important}
   html body .w485leg{gap:10px 18px}html body .w485lgi{font-size:16px;gap:8px}html body .w485lgi .w485ni{width:32px;height:32px;padding:4px}html body .w485lgi .art{width:52px;height:52px;flex:none;border-radius:50%;border:3px solid #6b4a2e}html body .w485leg{display:grid;grid-template-columns:1fr 1fr;margin-top:6px}
   html body .hand.w770fit{gap:6px}html body .hand.w770fit .card{margin:0}
   .pcplan .rl{align-items:flex-start}.pcplan .rl .art{width:36px;height:36px}
+/* W748 pc layout (>= 1024 px only): no empty potion circles; phone untouched */
+@media (min-width:1024px){
+  html body .pots .pot:not(:has(.art)){display:none}
+  html body .pots:not(:has(.art)){display:none}
+}
+/* W748r pc fight layout (>= 1024 px wide, not short): hero left vs enemies right, bigger hand; phone untouched */
+@media (min-width:1024px) and (min-height:680px){
+  html body #stage:has(> .mid){display:grid;grid-template-columns:minmax(0,.85fr) minmax(0,1.25fr);grid-template-rows:minmax(0,1fr) auto auto;grid-template-areas:"hero en" "ctl ctl" "hand hand"}
+  html body #stage:has(> .mid)>.enemies{grid-area:en;padding:12px 16px 0 0}
+  html body #stage:has(> .mid)>.mid{grid-area:hero;max-width:none;margin:0;padding:12px 0 0 24px;align-items:center;justify-content:center;gap:14px}
+  html body #stage:has(> .mid) .heropan{flex:0 1 240px;width:240px;max-width:240px;flex-direction:column;align-items:stretch;padding:10px;gap:8px}
+  html body #stage:has(> .mid) .heropan>.art.k-portrait{width:100%!important;height:auto!important;aspect-ratio:3/4;max-height:250px}
+  html body #stage:has(> .mid) .heropan .inf{width:100%}
+  html body #stage:has(> .mid) .heropan .nm{font-size:20px}
+  html body #stage:has(> .mid) .heropan .bar{width:100%!important}
+  html body #stage:has(> .mid) .en{max-width:300px}
+  html body #stage:has(> .mid) .en>.art.k-portrait{width:min(230px,26vh)!important;height:min(230px,26vh)!important}
+  html body #stage:has(> .mid) .en .nm{font-size:20px}
+  html body #stage:has(> .mid)>.ctl{grid-area:ctl;max-width:none;width:100%;justify-content:center;gap:40px}
+  html body #stage:has(> .mid)>.hand{grid-area:hand;--cw:min(176px,15vw,24vh)}
 }
 </style></head>
