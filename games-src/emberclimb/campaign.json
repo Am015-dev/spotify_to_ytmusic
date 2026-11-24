@@ -5,13 +5,13 @@
  "cast": {
   "guide": {
    "name": "Warden Ashgrove",
-   "emoji": "🔥",
+   "emoji": "",
    "color": "#c8472b",
    "portrait": "cast-guide.webp"
   },
   "rival": {
    "name": "The Gatekeeper",
-   "emoji": "🚪",
+   "emoji": "",
    "color": "#7a6a5a",
    "portrait": "cast-rival.webp"
   }
@@ -79,7 +79,7 @@
    "hints": true,
    "opponent": {
     "name": "Gnawer",
-    "emoji": "🐀",
+    "emoji": "",
     "cast": "guide",
     "personality": "A small rat. It only bites.",
     "aiLevel": "easy",
@@ -151,7 +151,7 @@
    "hints": true,
    "opponent": {
     "name": "Iron Warden",
-    "emoji": "👹",
+    "emoji": "",
     "cast": "guide",
     "personality": "A guardian of the tower.",
     "aiLevel": "easy",
@@ -242,7 +242,7 @@
    "hints": true,
    "opponent": {
     "name": "Mire Behemoth",
-    "emoji": "💀",
+    "emoji": "",
     "cast": "rival",
     "personality": "A guardian of the tower.",
     "aiLevel": "easy",
@@ -335,7 +335,7 @@
    "hints": false,
    "opponent": {
     "name": "Skyclaw",
-    "emoji": "👹",
+    "emoji": "",
     "cast": "guide",
     "personality": "A guardian of the tower.",
     "aiLevel": "normal",
@@ -427,7 +427,7 @@
    "hints": false,
    "opponent": {
     "name": "Sleeper Statue",
-    "emoji": "👹",
+    "emoji": "",
     "cast": "guide",
     "personality": "A guardian of the tower.",
     "aiLevel": "normal",
@@ -514,7 +514,7 @@
    "hints": false,
    "opponent": {
     "name": "Ashen Wraith",
-    "emoji": "💀",
+    "emoji": "",
     "cast": "rival",
     "personality": "A guardian of the tower.",
     "aiLevel": "normal",
@@ -603,7 +603,7 @@
    "hints": false,
    "opponent": {
     "name": "Tomb King",
-    "emoji": "👹",
+    "emoji": "",
     "cast": "guide",
     "personality": "A guardian of the tower.",
     "aiLevel": "hard",
@@ -690,7 +690,7 @@
    "hints": false,
    "opponent": {
     "name": "Thorn Brute",
-    "emoji": "👹",
+    "emoji": "",
     "cast": "guide",
     "personality": "A guardian of the tower.",
     "aiLevel": "hard",
@@ -777,7 +777,7 @@
    "hints": false,
    "opponent": {
     "name": "Gate Wyrm",
-    "emoji": "💀",
+    "emoji": "",
     "cast": "rival",
     "personality": "A guardian of the tower.",
     "aiLevel": "hard",
@@ -870,7 +870,7 @@
    "hints": false,
    "opponent": {
     "name": "Ember Tyrant",
-    "emoji": "💀",
+    "emoji": "",
     "cast": "rival",
     "personality": "A guardian of the tower.",
     "aiLevel": "hard",

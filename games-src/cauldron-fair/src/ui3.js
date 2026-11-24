@@ -67,7 +67,7 @@ function newsLines(first) {
   if (!out.length) return;
   if (!UI.newsToast) return;   // W471: one line of text at a time. The news is on the board, the fortune chip and in the Log.
   if (isPh()) {   // phones: a short headline, the full lines stay in the log
-    const sh = out.map(t => { let m = /fortune card "([^"]+)"/.exec(t); if (m) return '\u2728 ' + m[1]; m = /head start of (\d+) space/.exec(t); if (m) return '\ud83d\udc00 Head start +' + m[1]; if (/^Day \d/.test(t)) return ''; return t.length <= 48 ? t : ''; }).filter(Boolean);
+    const sh = out.map(t => { let m = /fortune card "([^"]+)"/.exec(t); if (m) return '' + m[1]; m = /head start of (\d+) space/.exec(t); if (m) return '\ud83d\udc00 Head start +' + m[1]; if (/^Day \d/.test(t)) return ''; return t.length <= 48 ? t : ''; }).filter(Boolean);
     if (sh.length) toast(sh.slice(-3).join('  \u00b7  ')); return;
   }
   toast(out.slice(-3).join(' '));

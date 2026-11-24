@@ -8,7 +8,7 @@ const TUT_KEEP={};
 const tutOn=()=>false;   // the spotlight tutorial is gone; the coached game (below) replaced it
 // the staged deal: called by newGame before the first scene. Day 1 has no event card; day 2 turns over Chill Rain (a rain cloud and a threat).
 // Learn to play is a gentler island (same rules, kinder deal): the mountains for Fire come second, the mildest event cards, weak beasts first,
-// a little more food and wood, and no weather dice (Chill Rain still brings a cloud on day 2 to teach the roof). A player who follows ✨ Suggest wins.
+// a little more food and wood, and no weather dice (Chill Rain still brings a cloud on day 2 to teach the roof). A player who follows  Suggest wins.
 // "Easy island" (the default first real game, and Easy afterwards): the same kind deal, without the coach. Normal keeps the full rules.
 function easyDeal(){if(G.scen!=='marooned'||G.cmp)return;const t=G.tut;tutDeal();if(!t)delete G.tut}
 function tutDeal(){G.tut=1;G.learn=1;G.res.food=Math.max(3,G.res.food);G.res.wood=Math.max(3,G.res.wood);if(G.scen==='marooned')G.tileDeck=[4,5,10,6,3,1,2,7,9,11];G.ev.threat=[null,null];G.wxT={};
@@ -41,14 +41,14 @@ const cwx=()=>{try{return (viewState()||G).lastWx||{}}catch(e){return {}}};
 // kind: 'rule' (first time it matters), 'move' (a good or poor choice, one line why), 'rival' (what the island just did to us)
 const COACH_RULES=[
  {id:'goal',when:()=>!!G&&G.round===1,say:"Our ship is gone. Build a fire and stack 15 wood by day 12. A ship will see it."},
- {id:'pick',when:()=>cplan()&&G.round===1&&!!COACH.done.goal,say:"Pick a pawn, then a glowing place. ✨ shows a good plan."},
+ {id:'pick',when:()=>cplan()&&G.round===1&&!!COACH.done.goal,say:"Pick a pawn, then a glowing place.  shows a good plan."},
  {id:'pawns',when:()=>cplan()&&G.round===1&&G.plan.acts.some(a=>a.pw.length),say:"Each pawn does one job. I cook and heal, the Carpenter builds, Friday helps."},
  {id:'dice',when:()=>cplan()&&!!G.plan.acts.find(a=>a.pw.length===1&&actNeed(a).roll),say:"One pawn alone rolls dice and can fail or get hurt. A second pawn makes it sure."},
  {id:'sure',kind:'move',when:()=>cplan()&&!!G.plan.acts.find(a=>a.pw.length>=2),say:"Good move: two pawns, no dice. A sure thing."},
  {id:'explore',when:()=>cplan()&&!!cact('explore'),say:"Exploring finds new land; we can gather there from tomorrow."},
  {id:'build',when:()=>cplan()&&!!cact('build'),say:"Building costs wood. A shelter costs 2 wood and ends night wounds."},
  {id:'gather',when:()=>cplan()&&!!cact('gather'),say:"Food and wood arrive after all the jobs are done, not before."},
- {id:'camp',when:()=>cplan()&&!!cact('camp'),say:"Tidying the camp earns determination ✊ for skills and lifts morale."},
+ {id:'camp',when:()=>cplan()&&!!cact('camp'),say:"Tidying the camp earns determination  for skills and lifts morale."},
  {id:'ready',kind:'move',when:()=>cplan()&&G.plan.acts.some(a=>a.pw.length)&&(()=>{try{return planProblems().length===0}catch(e){return false}})(),say:"Good plan: everyone has a job. Tap Start day when you are ready."},
  {id:'noshelter',kind:'move',when:()=>cplan()&&G.round>=2&&!hasShelter()&&!cact('build'),say:"Poor move: no shelter and no build planned. Tonight everyone takes a wound."},
  {id:'nofood',kind:'move',when:()=>cplan()&&G.round>=2&&food()<eatersNeed()&&!cact('gather')&&!cact('hunt'),say:"Poor move: food is short for tonight and nobody gathers. Hunger costs 2 wounds."},
@@ -61,7 +61,7 @@ const COACH_RULES=[
  {id:'weather',kind:'rival',when:()=>{const b=cbeat();return b&&b.kind==='weather'},say:()=>{const w=cwx(),n=(w.rain||0)+(w.snow||0);return (n?'The weather brings '+n+' cloud'+(n>1?'s':'')+'. ':'The sky is calm. ')+'Clouds above our roof (level '+G.camp.roof+') ruin 1 food and 1 wood each.'}},
  {id:'night',when:()=>{const b=cbeat();return b&&b.kind==='night'},say:"Night: everyone eats 1 food (or takes 2 wounds). No shelter means a wound each."},
  {id:'wounds',when:()=>{const b=cbeat();return b&&b.kind==='daysum'},say:"Each wound costs a life ♥. Resting heals one. Build a shelter soon."},
- {id:'skill',when:()=>cplan()&&G.round>=2&&G.chars.some(c=>!c.npc&&c.det>=2),say:"We have determination ✊. Open the Camp tab and use a skill: once per round, and it can turn a bad roll."},
+ {id:'skill',when:()=>cplan()&&G.round>=2&&G.chars.some(c=>!c.npc&&c.det>=2),say:"We have determination . Open the Camp tab and use a skill: once per round, and it can turn a bad roll."},
  {id:'fog',when:()=>cplan()&&G.map.some(m=>m.fog),say:"Fog hides a place: work there needs one more pawn, and a fogged camp makes nothing."}
 ];
 const COACH_LATER=[

@@ -82,7 +82,7 @@ for(const [W,H] of L.SIZES){if(process.env.ONLY&&!process.env.ONLY.split(',').in
           await tap('#pacts [data-act="hint"]','hint');await shot('5-kept');
           const r0=await pg.evaluate(()=>G.rolls);const rb=await pg.evaluate(()=>{const b=document.querySelector('#pacts [data-act="reroll"]');return b&&!b.disabled});if(rb){await tap('#pacts [data-act="reroll"]','roll button');await sleep(700);chk((await pg.evaluate(()=>G.rolls))===r0-1,'Roll did not use a reroll')}
           // the advice card and the tips button
-          // portrait is board-first: no 🧭 panel button (the finger and the line teach); landscape keeps it
+          // portrait is board-first: no  panel button (the finger and the line teach); landscape keeps it
           if(W>H){await tap('#pacts [data-a="advise"]','advice');await sleep(200);await card('advice');await tap('#advice [data-a="advise"]','advice close');chk((await st()).card==='','advice did not close');}
           // chip -> monster info pop-up, closed with the x
           await tap('.pchip:nth-child(2)','chip');await sleep(200);c=await card('monster pop-up (chip)');chk(/\bYOU\b|Boltbox|Squidrik|Magmaw|Shroomhulk|Glacyx|Voltusk/.test(c.text||''),'monster pop-up has no name');await shot('6-monpop');await tap('#pcx [data-ph="close"]','pop-up x');chk((await st()).card==='','x did not close the monster pop-up');

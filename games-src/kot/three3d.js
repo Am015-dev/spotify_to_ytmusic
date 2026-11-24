@@ -594,14 +594,14 @@ function sync3D(){if(!V3.on)return;if(PH)PH.wake();
   // tags
   [...tags.children].forEach((el,k)=>{const p=G.pl[k];el.className=`tag ${k===G.active&&!G.winner?'on':''} ${p.alive?'':'ko'} ${inCity(p.i)?'city':''}`;
     el.style.setProperty('--mc',MONS[p.m].c);
-    el.innerHTML=`<b>${inCity(p.i)?'<i class="crn">👑</i> ':''}${esc(mname(p))}${(G.mode==='solo'&&p.human)||(NET.on&&k===NET.mySeat)?' <i>you</i>':''}${NET.on&&pname(p)?' <i>'+esc(pname(p))+'</i>':''}</b>${p.alive?`<span><em class="h">♥${p.hp}</em><em class="v">★${p.vp}</em><em class="e">⚡${p.en}</em>${mbOn()?`<em class="m">🧠${p.mb}</em>`:''}${exIcons(p)?`<em>${exIcons(p)}</em>`:''}</span>`:'<span>K.O.</span>'}`});
+    el.innerHTML=`<b>${inCity(p.i)?'<i class="crn"></i> ':''}${esc(mname(p))}${(G.mode==='solo'&&p.human)||(NET.on&&k===NET.mySeat)?' <i>you</i>':''}${NET.on&&pname(p)?' <i>'+esc(pname(p))+'</i>':''}</b>${p.alive?`<span><em class="h">♥${p.hp}</em><em class="v">★${p.vp}</em><em class="e">⚡${p.en}</em>${mbOn()?`<em class="m">${p.mb}</em>`:''}${exIcons(p)?`<em>${exIcons(p)}</em>`:''}</span>`:'<span>K.O.</span>'}`});
   V3.tower.visible=exOn('tower');if(exOn('tower'))G.tower.forEach((o,l)=>{const m=V3.tsegs[l].material;m.color.set(o>=0?MONS[P(o).m].c:'#d8442e');m.emissive.set(o>=0?0x331100:0x000000)});
   V3.csign.visible=exOn('curse');if(exOn('curse')&&V3.curseShown!==G.curse){V3.curseShown=G.curse;V3.csign.material.map=signTex(CURSES[G.curse].n.toUpperCase(),'#b57bff','#ffffff');V3.csign.material.needsUpdate=true}
   G.pl.forEach((p,k)=>{const o=V3.mons[k];o.berserk=!!(p.tok&&p.tok.berserk&&p.alive);const n=p.alive?(p.cult||0):0;o.cults=o.cults||[];
     while(o.cults.length<n){const c=mesh(new THREE.IcosahedronGeometry(.26,2),glowMat(0xc08bff,2.6),0,0,0,V3.scene,true);o.cults.push(c)}
     while(o.cults.length>n)V3.scene.remove(o.cults.pop())});
   const hud=document.getElementById('hud');const a=cur();
-  hud.innerHTML=G.winner?`<b>👑 ${esc((()=>{const q=G.winner==='draw'?null:G.pl[+String(G.winner).slice(1)-1];return q?mname(q)+' wins!':'Nobody wins'})())}</b>`:`<b>ROUND ${G.turn}</b> · ${esc(mname(a))} ${['','is rolling','resolves','enters the city','is shopping','ends its turn'][G.step]||''}${G.phase==='roll'?` · ${G.rolls} reroll${G.rolls===1?'':'s'} left`:''}`;
+  hud.innerHTML=G.winner?`<b> ${esc((()=>{const q=G.winner==='draw'?null:G.pl[+String(G.winner).slice(1)-1];return q?mname(q)+' wins!':'Nobody wins'})())}</b>`:`<b>ROUND ${G.turn}</b> · ${esc(mname(a))} ${['','is rolling','resolves','enters the city','is shopping','ends its turn'][G.step]||''}${G.phase==='roll'?` · ${G.rolls} reroll${G.rolls===1?'':'s'} left`:''}`;
   V3.hsign.visible=G.bayOn;if(V3.harbor.userData.open!==G.bayOn){V3.harbor.userData.open=G.bayOn;V3.hsign.material.map=G.bayOn?signTex('HARBOR','#43c8ff','#e9fbff'):signTex('CLOSED','#8aa6b5','#ffffff')}
   V3.water.material.color.set(G.bayOn?0x1d6f8a:0x4a5a66);
   if(G.winner&&!V3.won){V3.won=true;const w=G.winner==='draw'?null:+G.winner.slice(1)-1;if(w!==null){for(let i=0;i<40;i++)spawn(i%3?'star':'spark',V3.mons[w].g.position.clone().add(new THREE.Vector3(0,3,0)),1,1.8)}}

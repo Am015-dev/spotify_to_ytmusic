@@ -15,30 +15,30 @@ function meSeat(){if(!G)return -1;if(NET.on)return NET.mySeat;if(G.mode==='solo'
 // a newspaper headline for one chronicle line (null when the line is not news)
 function headline(l){if(!l||l.s===undefined||l.s<0||!G||!G.pl[l.s])return null;const t=l.t,p=G.pl[l.s],N=UP(mname(p)),V=MVERB[p.m]||MVERB[0];let m;
   if(m=t.match(/ resolves(?: the stolen dice)?: (.+)\.$/)){const x=m[1];const st=[...x.matchAll(/(\d+)★ from/g)].reduce((a,y)=>a+ +y[1],0);const en=(x.match(/(?:^|, )(\d+)⚡/)||[])[1];const hl=(x.match(/healed (\d+)♥/)||[])[1];
-    if(st)return `★ ${N} SCORES ${st} STAR${st===1?'':'S'}${en?` AND ${V.e} (+${en}⚡)`:''}`;if(en)return `⚡ ${N} ${V.e} (+${en}⚡)`;if(hl)return `💚 ${N} ${V.h} (+${hl}♥)`;return null}
-  if(m=t.match(/ smashes (.+)\.$/))return `💥 ${N} ${V.s} ${UP(m[1])}`;
-  if(/ is knocked out!$/.test(t))return `☠ ${N} ${V.ko}: K.O.!`;
-  if(m=t.match(/ (?:storms|dashes|wades|marches|drops from the sky|is dragged) into (Downtown|the Harbor) \(\+(\d+) stars?\)/))return m[1]==='Downtown'?`🏙 ${N} STORMS DOWNTOWN! (+${m[2]}★)`:`⚓ ${N} WADES INTO THE HARBOR (+${m[2]}★)`;
-  if(/ yields and flees the city/.test(t))return `🏃 ${N} FLEES THE CITY!`;
-  if(m=t.match(/ buys “(.+?)”/))return `🛒 ${N} SNAPS UP “${UP(m[1])}”`;
-  if(m=t.match(/ starts in (Downtown|the Harbor) and gains (\d+) stars?/))return `👑 ${N} HOLDS ${UP(m[1])} ANOTHER DAY (+${m[2]}★)`;
-  if(m=t.match(/ BRAINJACKS (.+) and resolves/))return `🧠 ${N} HIJACKS ${UP(m[1])}’S ROLL!`;
-  if(m=t.match(/ plays its evolution “(.+)”/))return `🧬 ${N} EVOLVES: ${UP(m[1])}!`;
-  if(/is crowned|takes the crown|wins anyway|rules the city/.test(t))return `🏆 ${N} IS THE NEW KING OF CROWN CITY!`;
+    if(st)return `★ ${N} SCORES ${st} STAR${st===1?'':'S'}${en?` AND ${V.e} (+${en}⚡)`:''}`;if(en)return `⚡ ${N} ${V.e} (+${en}⚡)`;if(hl)return ` ${N} ${V.h} (+${hl}♥)`;return null}
+  if(m=t.match(/ smashes (.+)\.$/))return ` ${N} ${V.s} ${UP(m[1])}`;
+  if(/ is knocked out!$/.test(t))return ` ${N} ${V.ko}: K.O.!`;
+  if(m=t.match(/ (?:storms|dashes|wades|marches|drops from the sky|is dragged) into (Downtown|the Harbor) \(\+(\d+) stars?\)/))return m[1]==='Downtown'?` ${N} STORMS DOWNTOWN! (+${m[2]}★)`:` ${N} WADES INTO THE HARBOR (+${m[2]}★)`;
+  if(/ yields and flees the city/.test(t))return ` ${N} FLEES THE CITY!`;
+  if(m=t.match(/ buys “(.+?)”/))return ` ${N} SNAPS UP “${UP(m[1])}”`;
+  if(m=t.match(/ starts in (Downtown|the Harbor) and gains (\d+) stars?/))return ` ${N} HOLDS ${UP(m[1])} ANOTHER DAY (+${m[2]}★)`;
+  if(m=t.match(/ BRAINJACKS (.+) and resolves/))return ` ${N} HIJACKS ${UP(m[1])}’S ROLL!`;
+  if(m=t.match(/ plays its evolution “(.+)”/))return ` ${N} EVOLVES: ${UP(m[1])}!`;
+  if(/is crowned|takes the crown|wins anyway|rules the city/.test(t))return ` ${N} IS THE NEW KING OF CROWN CITY!`;
   return null}
 // read new chronicle lines: rivalries, near-wins, knock-out moments, your best moment
 function storyScan(){if(!G)return;if(UI.sgid!==G.gid){UI.sgid=G.gid;UI.lseen=0;UI.news=[];UI.riv={};UI.rivSaid={};UI.near={};UI.best=null;UI.moment=null;UI.hadTurn=false;UI.myTurns=0;UI.myTid=null;
-    const mine=meSeat();const q=mine>=0?G.pl[mine]:null;UI.news.push(q?`📰 ${UP(mname(q))} RISES FROM THE PORTAL. THE CITY TREMBLES.`:`📰 ${G.pl.length} MONSTERS RISE FROM THE PORTAL OVER CROWN CITY`)}
+    const mine=meSeat();const q=mine>=0?G.pl[mine]:null;UI.news.push(q?` ${UP(mname(q))} RISES FROM THE PORTAL. THE CITY TREMBLES.`:` ${G.pl.length} MONSTERS RISE FROM THE PORTAL OVER CROWN CITY`)}
   const fresh=G.log.filter(l=>l.n&&l.n>UI.lseen).reverse();if(fresh.length)UI.lseen=Math.max(...fresh.map(l=>l.n));
   const me=meSeat(),myName=me>=0?mname(G.pl[me]):null;
   for(const l of fresh){const h=headline(l);if(h)UI.news.push(h);
     if(me>=0&&l.s!==me&&l.s>=0){const m=l.t.match(/ smashes (.+)\.$/);if(m){const r=new RegExp(myName+' \\(−(\\d+)');const d=m[1].match(r);if(d){UI.riv[l.s]=(UI.riv[l.s]||0)+ +d[1];
-      if(UI.riv[l.s]>=4&&!UI.rivSaid[l.s]){UI.rivSaid[l.s]=1;UI.news.push(`😠 RIVALRY: ${UP(mname(G.pl[l.s]))} HAS SMASHED YOU FOR ${UI.riv[l.s]} ♥. PAYBACK TIME?`)}}}}
+      if(UI.riv[l.s]>=4&&!UI.rivSaid[l.s]){UI.rivSaid[l.s]=1;UI.news.push(` RIVALRY: ${UP(mname(G.pl[l.s]))} HAS SMASHED YOU FOR ${UI.riv[l.s]} ♥. PAYBACK TIME?`)}}}}
     if(me>=0&&l.s===me&&h){const x=l.t;let sc=0;const st=[...x.matchAll(/(\d+)★ from/g)].reduce((a,y)=>a+ +y[1],0);sc+=st*2;const dm=[...x.matchAll(/\(−(\d+)/g)].reduce((a,y)=>a+ +y[1],0);if(/ smashes /.test(x))sc+=dm*1.3;if(/BRAINJACKS/.test(x))sc+=4;if(/STORMS DOWNTOWN/.test(h))sc+=2;
       if(sc>0&&(!UI.best||sc>UI.best.sc))UI.best={sc,h,r:G.turn}}
-    if(/ is knocked out!$/.test(l.t)&&G.pl[l.s]){const left=G.pl.filter(q=>q.alive).length;UI.moment={h:`💥 ${UP(mname(G.pl[l.s]))} IS DOWN!`,s:left>1?`${left} monsters left in Crown City.`:'The dust settles…',c:MONS[G.pl[l.s].m].c};clearTimeout(UI.momT);UI.momT=setTimeout(()=>{UI.moment=null;if(G)renderPanel()},ANIM?4200:1)}}
+    if(/ is knocked out!$/.test(l.t)&&G.pl[l.s]){const left=G.pl.filter(q=>q.alive).length;UI.moment={h:` ${UP(mname(G.pl[l.s]))} IS DOWN!`,s:left>1?`${left} monsters left in Crown City.`:'The dust settles…',c:MONS[G.pl[l.s].m].c};clearTimeout(UI.momT);UI.momT=setTimeout(()=>{UI.moment=null;if(G)renderPanel()},ANIM?4200:1)}}
   if(!G.winner)G.pl.forEach(q=>{if(!q.alive)return;for(const th of [15,18]){const k=q.i+':'+th;if(q.vp>=th&&!UI.near[k]){UI.near[k]=1;UI.near[q.i+':15']=1;
-      UI.news.push(q.i===me?`⭐ YOU HAVE ${q.vp} ★: ${Math.max(1,20-q.vp)} MORE AND THE CROWN IS YOURS`:`⚠ ${UP(mname(q))} HAS ${q.vp} ★. ONE MORE GOOD TURN AND CROWN CITY BOWS TO IT`);break}}});
+      UI.news.push(q.i===me?`⭐ YOU HAVE ${q.vp} ★: ${Math.max(1,20-q.vp)} MORE AND THE CROWN IS YOURS`:` ${UP(mname(q))} HAS ${q.vp} ★. ONE MORE GOOD TURN AND CROWN CITY BOWS TO IT`);break}}});
   if(UI.news.length>60)UI.news.splice(0,UI.news.length-60);
   if(me>=0&&humanTurn()&&G.tid!==UI.myTid&&!G.bug){UI.myTid=G.tid;UI.myTurns++}
   if(me>=0&&humanTurn()&&G.phase==='buy'&&!G.bug)UI.hadTurn=true}
@@ -48,9 +48,9 @@ function renderNews(){const n=document.getElementById('news'),m=document.getElem
   if(UI.moment){m.classList.remove('hidden');m.style.setProperty('--mc',UI.moment.c||'#e63946');m.innerHTML=`<b>${esc(UI.moment.h)}</b><span>${esc(UI.moment.s)}</span>`}else{m.classList.add('hidden');m.innerHTML=''}}
 // the resolve banner, with the reason things happened
 function storyBanner(R){const p=R.p;const out=[...R.out];
-  if(R.forced==='city'||(R.yielders.length&&R.forced))out.push(`moves into Downtown 👑 +1★`);else if(R.forced==='bay')out.push('moves into the Harbor ⚓ +1★');
-  let h=`${R.bug?'🧠 ':''}<b>${esc(mname(p))}</b>${R.bug?' (borrowed roll)':''}${out.length?out.map(o=>`<div class="bo">${esc(o)}</div>`).join(''):'<div class="bo">nothing useful</div>'}`;const why=[];
-  if(R.out.some(o=>/^smashes /.test(o)))why.push(R.inT?'from the city, claws hit every monster outside':`claws from outside hit whoever holds the city${G.city>=0&&G.city!==p.i&&!R.yielders.length?` (${mname(P(G.city))} 👑)`:''}`);
+  if(R.forced==='city'||(R.yielders.length&&R.forced))out.push(`moves into Downtown  +1★`);else if(R.forced==='bay')out.push('moves into the Harbor  +1★');
+  let h=`${R.bug?' ':''}<b>${esc(mname(p))}</b>${R.bug?' (borrowed roll)':''}${out.length?out.map(o=>`<div class="bo">${esc(o)}</div>`).join(''):'<div class="bo">nothing useful</div>'}`;const why=[];
+  if(R.out.some(o=>/^smashes /.test(o)))why.push(R.inT?'from the city, claws hit every monster outside':`claws from outside hit whoever holds the city${G.city>=0&&G.city!==p.i&&!R.yielders.length?` (${mname(P(G.city))} )`:''}`);
   if(R.out.includes('claws hit nobody'))why.push('nobody was in the city to hit');
   if(R.out.some(o=>/hearts wasted/.test(o)))why.push('hearts cannot heal you inside the city');
   if(R.yielders.length)why.push(`${R.yielders.map(mname).join(' and ')} yielded, so ${mname(p)} ${R.forced?'moved in: +1 ★':'got to stay out'}`);
@@ -63,7 +63,7 @@ function mbHold(q){if(!(UI.firstGame&&G.mode==='solo'&&!UI.hadTurn))return false
 // ---------- the opening story card ----------
 function introHTML(){const me=meSeat(),q=me>=0?G.pl[me]:null;const names=G.pl.map(x=>mname(x));
   const cast=names.slice(0,-1).join(', ')+' and '+names[names.length-1];
-  return `<div class="intro"><h2>📰 Dawn over Crown City</h2>
+  return `<div class="intro"><h2> Dawn over Crown City</h2>
    ${q?`<p class="you" style="--mc:${MONS[q.m].c}">${monFace(q.m)}<span>You are <b>${esc(UP(mname(q)))}</b></span></p>`:G.mode==='hot'?'<p>Pass the screen to whoever’s turn it is.</p>':'<p>Sit back and watch the computer play.</p>'}
    <div class="goal nocut"><p class="aim">Be first to <b>${GOAL()} ★</b>, or the last monster standing.</p>
    <ul class="how"><li>Three of a kind scores stars: three 3s = 3 ★.</li><li>Downtown pays: +1 ★ going in, +2 ★ each turn.</li><li>Claws knock hearts off rivals. 0 ♥ is out.</li></ul></div>
@@ -89,7 +89,7 @@ function advise(){if(!G)return {a:'Press ▶ Play now.',w:'The recommended setup
     const r=c.options.find(o=>o.rec||/Recommended\./.test(o.d||''));if(r)return {k:r.k,a:`Choose “${r.l}”.`,w:(r.d||'').replace(/ ?Recommended\.?/,'')||'It is the safer option here.'};
     if(typeof c.ai==='function'&&!c.net){if(c._aiK===undefined){try{c._aiK=String(c.ai())}catch(e){c._aiK=null}}const o=c.options.find(x=>String(x.k)===c._aiK);if(o)return {k:o.k,a:`Choose “${o.l}”.`,w:(o.d?o.d+' ':'')+'That is what an experienced monster would pick right now.'}}
     return {a:'Pick one of the options.',w:'The small text under each option says what it does. The computer waits for you.'}}
-  if(!humanTurn()){const w=me>=0?`You are ${mname(G.pl[me])}. You will get a pop-up if you can yield the city${mbOn()&&G.pl[me].mb?' or steal this roll with your 🧠':''}.`:'';return {a:`Watch: ${mname(p)} is playing.`,w:(riv?riv+' ':'')+w}}
+  if(!humanTurn()){const w=me>=0?`You are ${mname(G.pl[me])}. You will get a pop-up if you can yield the city${mbOn()&&G.pl[me].mb?' or steal this roll with your ':''}.`:'';return {a:`Watch: ${mname(p)} is playing.`,w:(riv?riv+' ':'')+w}}
   if(G.phase==='roll'){const inT=inCity(p.i);const occ=G.city>=0?P(G.city):null;
     if(G.rolls<=0)return {a:'Press Resolve dice.',w:`No rerolls left. You will get: ${scoreDice(p,G.dice).text}.`};
     const m=suggestMask(p);const keep=G.dice.filter((d,k)=>m[k]).map(d=>d.f);const cnt=countsOf(G.dice);
@@ -106,7 +106,7 @@ function advise(){if(!G)return {a:'Press ▶ Play now.',w:'The recommended setup
   return {a:'Wait a moment.',w:'The game is resolving.'}}
 function renderAdvice(){const el=document.getElementById('advice');if(!el)return;const b=document.getElementById('advbtn');if(b)b.setAttribute('aria-expanded',UI.adv?'true':'false');
   if(!UI.adv||!G||UI.info){el.classList.add('hidden');el.innerHTML='';return}const a=advise();el.classList.remove('hidden');
-  el.innerHTML=`<button class="gx-x" data-a="advise" aria-label="Close advice">×</button><p><b>🧭 Do:</b> ${esc(a.a)}</p><p class="small"><b>Why:</b> ${esc(a.w)}</p>`}
+  el.innerHTML=`<button class="gx-x" data-a="advise" aria-label="Close advice">×</button><p><b> Do:</b> ${esc(a.a)}</p><p class="small"><b>Why:</b> ${esc(a.w)}</p>`}
 
 // ---------- the newspaper front page at the end ----------
 function placeOf(){const me=meSeat();const w=G.winner&&G.winner!=='draw'?+G.winner.slice(1)-1:-1;
@@ -118,12 +118,12 @@ function statsHTML(){const {order,me,w}=placeOf();const W=w>=0?G.pl[w]:null;cons
   return `<div class="dlg paper" role="dialog" aria-modal="true"><div class="mast"><span>Round ${G.turn}</span><b>THE CROWN CITY CLARION</b><span>Late edition</span></div>
   <h2 class="hl1">${esc(head)}</h2><p class="deck">${esc(G.winText)}</p>
   <div class="cols">${me>=0?`<div><h4>Your result</h4><p><b>${myPlace?ord(myPlace):''} of ${G.pl.length}</b> as ${esc(mname(G.pl[me]))}.${myPlace===1?' The city is yours!':G.pl[me].alive?' You survived the rampage.':' You went down fighting.'}</p></div>`:''}
-   <div><h4>${me>=0?'Your best moment'+(UI.best?' · round '+UI.best.r:''):'Headline of the day'}</h4><p>${esc(me>=0?(UI.best?UI.best.h:'You kept your head down this time.'):((UI.news||[]).filter(x=>/💥|☠/.test(x)).pop()||'A quiet day, by monster standards.'))}</p></div>
+   <div><h4>${me>=0?'Your best moment'+(UI.best?' · round '+UI.best.r:''):'Headline of the day'}</h4><p>${esc(me>=0?(UI.best?UI.best.h:'You kept your head down this time.'):((UI.news||[]).filter(x=>/|/.test(x)).pop()||'A quiet day, by monster standards.'))}</p></div>
    ${nem&&nem[1]>0?`<div><h4>Your nemesis</h4><p>${esc(mname(G.pl[nem[0]]))} smashed you for ${plu(nem[1],'heart')}.</p></div>`:''}</div>
   <table class="stats"><tr><th></th><th>Monster</th><th>Hearts</th><th>Stars</th><th>Claw damage</th><th>K.O.s</th><th>Cards</th><th>Turns in city</th></tr>${rows}</table>
   <div class="acts"><button class="btn primary" data-a="new">Play again</button><button class="btn" data-a="closestats">Look at the city</button></div></div>`}
 // sound buttons in the ⚙ menu keep their explanation
-function soundBtns(){const a=document.getElementById('sndbtn'),b=document.getElementById('musbtn');if(a)a.innerHTML=(SND.on?'🔊 Sound on':'🔇 Sound off')+'<small>Dice, smashes and cheers</small>';if(b)b.innerHTML=(SND.music?'🎵 Music on':'🎵 Music off')+'<small>Background music</small>'}
+function soundBtns(){const a=document.getElementById('sndbtn'),b=document.getElementById('musbtn');if(a)a.innerHTML=(SND.on?' Sound on':' Sound off')+'<small>Dice, smashes and cheers</small>';if(b)b.innerHTML=(SND.music?' Music on':' Music off')+'<small>Background music</small>'}
 
 // ---------- "While you waited": what the computer turns did, shown when your turn starts ----------
 // Snapshot ♥ ★ ⚡ and the log position when the first computer turn after yours begins; at your next turn the result
@@ -133,7 +133,7 @@ function recapMe(){if(!G||G.mode!=='solo')return -1;return G.pl.findIndex(q=>q.h
 function recapHTML(){const me=recapMe();if(me<0||!RECAP.snap)return '';
   const parts=[];G.pl.forEach((q,k)=>{const s=RECAP.snap[k];if(!s)return;const d=[];
     if(s.alive&&!q.alive){d.push('knocked out')}else{if(q.vp!==s.vp)d.push(`${q.vp>s.vp?'+':'−'}${Math.abs(q.vp-s.vp)}★`);if(q.hp!==s.hp)d.push(`${q.hp>s.hp?'+':'−'}${Math.abs(q.hp-s.hp)}♥`);if(k===me&&s.en!==undefined&&q.en!==s.en)d.push(`${q.en>s.en?'+':'−'}${Math.abs(q.en-s.en)}⚡`)}
-    if(s.city!==(G.city===k)&&q.alive)d.push(G.city===k?'👑in':'👑out');
+    if(s.city!==(G.city===k)&&q.alive)d.push(G.city===k?'in':'out');
     if(d.length)parts[k===me?'unshift':'push'](`<b>${k===me?'You':esc(mname(q))}</b> ${d.join(' ')}`)});
   const ev=G.log.filter(l=>l.n>RECAP.n).reverse().map(l=>`<li>${esc(l.t)}</li>`);
   if(!parts.length&&!ev.length)return '';

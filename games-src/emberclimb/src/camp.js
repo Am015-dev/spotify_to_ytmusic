@@ -32,7 +32,7 @@
     isWon: function (G) { return !!G.won; },
     metrics: function (G) { return { won: !!G.won, hpPct: pct(G), gold: G.gold }; },
     headButtons: function () { var b = document.createElement('button'); b.type = 'button'; b.className = 'gxc-ib'; b.textContent = 'Guide'; b.setAttribute('aria-label', 'Replay the guide'); b.addEventListener('click', function () { UI.camp = { setup: { tutorial: 1 }, id: 'guide' }; UI.tutStart(); }); return [b]; },
-    portrait: function (who, size) { if (!window.EC_A) return null; var e = EC_A('cast-' + who, who === 'rival' ? '🚪' : '🔥', { kind: 'portrait', ph: who === 'rival' ? '#5a4a3a' : '#a8431f' }); e.style.width = e.style.height = (size || 64) + 'px'; e.style.borderRadius = '50%'; e.style.backgroundSize = 'cover'; return e; },
+    portrait: function (who, size) { if (!window.EC_A) return null; var e = EC_A('cast-' + who, who === 'rival' ? '' : '', { kind: 'portrait', ph: who === 'rival' ? '#5a4a3a' : '#a8431f' }); e.style.width = e.style.height = (size || 64) + 'px'; e.style.borderRadius = '50%'; e.style.backgroundSize = 'cover'; return e; },
     onExit: exitCamp,
     scores: function (G) { return [G.floor || 0]; },
     seats: function () { return [{ name: 'You', me: true }]; }

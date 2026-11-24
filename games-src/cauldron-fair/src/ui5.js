@@ -148,7 +148,7 @@ function titleEl() {
       (() => { const o = optObj(), cur = o.seats.every(c => (o.lvBy[c] || TEMPER[c]) === o.lvBy[o.seats[0]]) ? o.lvBy[o.seats[0]] : ''; return h('div.tseg', h('span.lbl', 'Rivals'), ['easy', 'normal', 'hard'].map(v => h('button.chipb' + (cur === v ? '.on' : ''), { 'data-a': 'lvall', 'data-v': v, type: 'button', 'aria-pressed': cur === v ? 'true' : 'false', 'aria-label': 'Computer makers play ' + v }, v))); })()),
       h('div.tsec',
         h('button.tsb', { 'data-a': 'play', type: 'button' }, 'More options'),
-        h('button.tsb', { 'data-a': 'story', type: 'button' }, '\u2728 Story'),
+        h('button.tsb', { 'data-a': 'story', type: 'button' }, 'Story'),
         h('button.tsb', { 'data-a': 'online', type: 'button' }, 'Online'),
         sv ? h('button.tsb', { 'data-a': 'loadsave', type: 'button' }, 'Continue') : null))));
 }

@@ -55,7 +55,7 @@
   GX.buzz = function (pat) { try { if (P.haptics && root.navigator && typeof root.navigator.vibrate === 'function') return root.navigator.vibrate(pat == null ? 12 : pat); } catch (e) { } return false; };
   GX.canBuzz = function () { try { return !!(root.navigator && typeof root.navigator.vibrate === 'function'); } catch (e) { return false; } };
   // colour-blind hook: one symbol per seat / colour index, shown next to colour-coded pieces when html.cb is on
-  GX.SYMBOLS = ['●', '▲', '■', '◆', '★', '✚', '⬟', '✱'];
+  GX.SYMBOLS = ['●', '▲', '■', '◆', '◆', '✚', '⬟', '✱'];
   GX.mark = function (i) { return GX.SYMBOLS[((i | 0) % GX.SYMBOLS.length + GX.SYMBOLS.length) % GX.SYMBOLS.length]; };
   GX.applyPrefs = function () {
     try {

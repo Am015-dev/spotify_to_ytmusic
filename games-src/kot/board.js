@@ -30,7 +30,7 @@ function bfBuild(){if($bf('bfx'))return;const fx=document.createElement('div');f
   const f=document.createElement('div');f.id='bfinger';f.setAttribute('aria-hidden','true');f.innerHTML='<i></i>';document.body.appendChild(f);
   // the score strip lives in the top bar; the menu gets the rows the hidden bar buttons used to open
 
-  const menu=document.querySelector('#menuwrap .menu');if(menu&&!menu.querySelector('[data-bfm]')){const rows=[['dr-market','🃏 Cards for sale','Every card in the shop, with its full text'],['dr-mine','🎴 Your cards','What you own and what it does'],['dr-mons','👾 Monsters','Every monster’s cards and stats'],['dr-log','📰 What happened','Every event, newest first']];
+  const menu=document.querySelector('#menuwrap .menu');if(menu&&!menu.querySelector('[data-bfm]')){const rows=[['dr-market','🃏 Cards for sale','Every card in the shop, with its full text'],['dr-mine',' Your cards','What you own and what it does'],['dr-mons',' Monsters','Every monster’s cards and stats'],['dr-log',' What happened','Every event, newest first']];
     menu.insertAdjacentHTML('afterbegin',rows.map(([g,t,s])=>`<button class="btn mrow" data-gx="${g}" data-bfm="1">${t}<small>${s}</small></button>`).join(''))}}
 // ---- the one line on the board ----
 function bfOut(){if(!G||G.winner||G.mode!=='solo')return false;const me=meSeat();return me>=0&&!G.pl[me].alive}
@@ -60,10 +60,10 @@ function bfMarks(){const el=$bf('bmarks');if(!el)return;
   if(s.dmg&&s.targets.length)s.targets.forEach(q=>at(bfMonXY(q.i,3.6),'hit',`${faceSVG('C')}<span>−${s.dmg}</span>`));
   const gain=[];if(s.hl)gain.push(`<span class="h">+${s.hl}♥</span>`);if(s.en)gain.push(`<span class="e">+${s.en}⚡</span>`);if(s.vp)gain.push(`<span class="v">+${s.vp}★</span>`);
   // hearts that cannot heal (in Downtown) and pairs that score nothing yet, shown where they would have counted
-  if(s.c&&s.c.H&&!s.hl)gain.push(`<span class="no">${canHealDice(p)?'♥ full':'♥ ✕ 👑'}</span>`);
+  if(s.c&&s.c.H&&!s.hl)gain.push(`<span class="no">${canHealDice(p)?'♥ full':'♥ ✕ '}</span>`);
   if(!s.vp&&G.rolls>0)['1','2','3'].forEach(f=>{if((s.c&&s.c[f])===2)gain.push(`<span class="pair">one more ${f} → ★</span>`)});
   if(gain.length)at(bfMonXY(p.i,3.6),'gain',gain.join(''));
-  if(G.city<0&&!inCity(p.i)&&(!G.bayOn||G.bay<0))at(bfCityXY(),'city','<i class="crn">👑</i> <span>+1★</span>');
+  if(G.city<0&&!inCity(p.i)&&(!G.bayOn||G.bay<0))at(bfCityXY(),'city','<i class="crn"></i> <span>+1★</span>');
   const h=items.join('');if(h!==BF.marks){el.innerHTML=h;BF.marks=h}}
 // ---- the reroll: dice tumble and land one by one ----
 function bfRollWatch(){if(!G||G.rollId===BF.rid)return;const first=BF.rid<0;BF.rid=G.rollId;if(first||!bfAnim()||G.phase!=='roll')return;
@@ -121,7 +121,7 @@ function bfRecapWatch(){if(!G||G.winner||G.tut||NET.on){BF.rsA=-1;BF.recap='';re
   const o=BF.rs;if(o&&G.pl[o.a]&&!G.pl[o.a].human){const q=G.pl[o.a],me=meSeat();
     const dv=q.vp-o.vp,de=q.en-o.en,dh=q.hp-o.hp[q.i];const g=[];if(dv>0)g.push(`+${dv}★`);if(de>0)g.push(`+${de}⚡`);if(dh>0)g.push(`+${dh}♥`);
     const hit=G.pl.filter(r=>r.i!==q.i&&o.hp[r.i]>r.hp).map(r=>[r.i===me?'you':mname(r),o.hp[r.i]-Math.max(0,r.hp)]);
-    BF.recap=bfShort(mname(q),[g.join(' '),G.city===q.i&&o.city!==q.i?'took 👑':''].filter(Boolean).join(' · '),hit,BF.bought||[])}
+    BF.recap=bfShort(mname(q),[g.join(' '),G.city===q.i&&o.city!==q.i?'took ':''].filter(Boolean).join(' · '),hit,BF.bought||[])}
   BF.bought=[];BF.rsA=a;const q=G.pl[a];BF.rs=q?{a,vp:q.vp,en:q.en,hp:G.pl.map(r=>r.hp),city:G.city}:null}
 // the recap and the skip hint sit in their own small lines just under the board line (each one short)
 function bfSub(rc,sk,ln){let w=document.getElementById('bsub');if(!w){w=document.createElement('div');w.id='bsub';w.setAttribute('aria-live','polite');w.innerHTML='<div id="brecap"></div><div id="bskip">⏩ Tap to skip</div>';document.body.appendChild(w)}
@@ -175,7 +175,7 @@ function bfCityTag(){const bd=document.querySelector('.gx-board');if(!bd)return;
   if(G&&!G.winner&&tr&&tr.offsetParent){const r=tr.getBoundingClientRect(),c=bfCityXY();if(c&&r.width&&c.x>r.left-20&&c.x<r.right+20&&c.y>r.top-30&&c.y<r.bottom+20){show=true;const br=bd.getBoundingClientRect();el.style.top=Math.max(4,r.top-br.top-34)+'px'}}
   if(!show){el.classList.remove('on');return}
   const nm=i=>{const q=G.pl[i];return q?(q.i===meSeat()?'You':mname(q)):''};
-  const t=G.city>=0?`👑 Downtown: ${nm(G.city)}${G.bayOn&&G.bay>=0?' + '+nm(G.bay):''}`:'👑 Downtown is empty';
+  const t=G.city>=0?` Downtown: ${nm(G.city)}${G.bayOn&&G.bay>=0?' + '+nm(G.bay):''}`:' Downtown is empty';
   if(el.textContent!==t)el.textContent=t;el.classList.add('on')}
 function bfRender(){if(!phOn())return;bfBuild();bfPlaceChips();try{bfCityTag()}catch(e){}
   // G7: the chip tap is taught once, on the first rival turn of a game
@@ -193,7 +193,7 @@ function bfRace(){const dk=document.querySelector('.gx-dock');if(!dk)return;let 
   if(!el){el=document.createElement('div');el.id='bfrace';el.className='nocut';el.setAttribute('aria-live','off');dk.appendChild(el)}
   if(!G||PHONE.land){el.hidden=true;return}el.hidden=false;
   const me=meSeat(),live=G.pl.filter(q=>q.alive),top=live.slice().sort((a,b)=>b.vp-a.vp)[0],mine=me>=0?G.pl[me]:null;
-  let who='';const wq=typeof G.winner==='string'&&/^P\d+$/.test(G.winner)?G.pl[+G.winner.slice(1)-1]:null;if(G.winner)who=wq?(wq===mine?'You win!':`${esc(mname(wq))} wins`):'Nobody wins';else if(top&&top.vp>0){const tie=live.filter(q=>q.vp===top.vp).length>1;who=tie?`Tied at ${top.vp} ★`:top===mine?`👑 You lead`:`👑 ${esc(mname(top))} <b>${top.vp} ★</b>`}
+  let who='';const wq=typeof G.winner==='string'&&/^P\d+$/.test(G.winner)?G.pl[+G.winner.slice(1)-1]:null;if(G.winner)who=wq?(wq===mine?'You win!':`${esc(mname(wq))} wins`):'Nobody wins';else if(top&&top.vp>0){const tie=live.filter(q=>q.vp===top.vp).length>1;who=tie?`Tied at ${top.vp} ★`:top===mine?` You lead`:` ${esc(mname(top))} <b>${top.vp} ★</b>`}
   const html=`<span class="g">Goal <b>${GOAL()} ★</b></span>${mine?`<span class="y">You <b>${mine.vp} ★</b></span>`:''}${who?`<span class="l">${who}</span>`:''}`;
   if(el.innerHTML!==html)el.innerHTML=html}
 // ---- wiring ----
@@ -212,7 +212,7 @@ function bfRace(){const dk=document.querySelector('.gx-dock');if(!dk)return;let 
    document.querySelectorAll('#pchips .pchip').forEach(c=>{const k=+c.dataset.pm,s=BF.snap[k];if(!s)return;[['h','♥'],['v','★'],['e','⚡']].forEach(([f,sym])=>{if(BF.rel[k+f])return;const em=c.querySelector('em.'+f);if(em)em.textContent=sym+s[f]})})};
  // the tray labels: big words, pips for the rolls left
  const _pa=phActs;phActs=function(){_pa.apply(this,arguments);const pa=$bf('pacts');if(!pa||!G||!humanTurn())return;
-   const r=pa.querySelector('[data-act="reroll"]');if(r&&G.phase==='roll'){const nk=G.dice.filter(d=>!d.k).length;r.innerHTML=`<span class="bl">🎲 Roll</span><small class="pips">${Array.from({length:Math.max(G.rolls,rerollsOf(cur()))},(_,k)=>`<i class="${k<G.rolls?'':'used'}"></i>`).join('')}</small>`;r.setAttribute('aria-label',`Roll the ${nk} unkept dice, ${G.rolls} rolls left`)}
+   const r=pa.querySelector('[data-act="reroll"]');if(r&&G.phase==='roll'){const nk=G.dice.filter(d=>!d.k).length;r.innerHTML=`<span class="bl"> Roll</span><small class="pips">${Array.from({length:Math.max(G.rolls,rerollsOf(cur()))},(_,k)=>`<i class="${k<G.rolls?'':'used'}"></i>`).join('')}</small>`;r.setAttribute('aria-label',`Roll the ${nk} unkept dice, ${G.rolls} rolls left`)}
    const d=pa.querySelector('[data-act="resolve"]');if(d)d.innerHTML='<span class="bl">✔ Done</span><small>use these dice</small>';
    const e=pa.querySelector('[data-act="end"]');if(e&&G.phase==='buy'){const win=!G.bug&&cur().vp>=GOAL();e.innerHTML=`<span class="bl">✔ ${G.bug?'Finish turn':'Done'}</span><small>${win?'end your turn to win':'end your turn'}</small>`}
    const s=pa.querySelector('[data-act="sweep"]');if(s&&G.phase==='buy'){s.innerHTML='<span class="bl">♻</span><small>new · 2⚡</small>';s.setAttribute('aria-label','Throw these 3 cards away and deal 3 new ones, 2 energy')}};

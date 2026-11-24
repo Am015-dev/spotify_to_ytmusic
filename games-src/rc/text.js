@@ -7,7 +7,7 @@ function opText(op){const [k,a,b,c]=op;const pl=(n,s)=>`${n} ${s}${n===1?'':'s'}
   switch(k){
   case 'res':return `gain ${a==='pfood'?pl(b,'dry food').replace('dry foods','dry food'):b+' '+(RNAME[a]||a)}`;case 'resPer':return `gain 1 ${RNAME[a]} per castaway`;
   case 'lose':return `discard ${b} ${RNAME[a]}${c?' if you can':''}`;case 'loseAllRes':return 'discard all your resources';
-  case 'wound':return `${whoN(a)} ${a==='all'?'take':'takes'} ${pl(b,'wound')}`;case 'det':return `${whoN(a)} ${a==='all'?'gain':'gains'} ${b} ✊ determination`;
+  case 'wound':return `${whoN(a)} ${a==='all'?'take':'takes'} ${pl(b,'wound')}`;case 'det':return `${whoN(a)} ${a==='all'?'gain':'gains'} ${b}  determination`;
   case 'ldet':return `${whoN(a)} ${a==='all'?'lose':'loses'} ${b} determination`;case 'ldetAll':return `${whoN(a)} ${a==='all'?'lose':'loses'} all determination`;
   case 'heal':return `${whoN(a)} ${a==='all'?'heal':'heals'} ${pl(b,'wound')}`;case 'morale':return `morale ${a>0?'+':''}${a}`;
   case 'roof':return `roof ${a>0?'+':''}${a}${b==='shelter'?' (if you have a shelter)':''}`;case 'pal':return `palisade ${a>0?'+':''}${a}${b==='shelter'?' (if you have a shelter)':''}`;

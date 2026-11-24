@@ -6,55 +6,55 @@
     "osk": {
       "name": "Grandmother Osk",
       "portrait": "camp-osk.webp",
-      "emoji": "🏮",
+      "emoji": "",
       "color": "#d9a21b"
     },
     "wick": {
       "name": "Wick",
       "portrait": "camp-wick.webp",
-      "emoji": "🕯️",
+      "emoji": "",
       "color": "#2f6fb5"
     },
     "harrow": {
       "name": "Gull Harrow",
       "portrait": "camp-harrow.webp",
-      "emoji": "🦅",
+      "emoji": "",
       "color": "#7b4fb5"
     },
     "brann": {
       "name": "Brann Ashkeel",
       "portrait": "camp-brann.webp",
-      "emoji": "💥",
+      "emoji": "",
       "color": "#c0392b"
     },
     "saltshade": {
       "name": "Saltshade",
       "portrait": "camp-saltshade.webp",
-      "emoji": "🐙",
+      "emoji": "",
       "color": "#1fa3a3"
     },
     "sabel": {
       "name": "Sabel Riftwright",
       "portrait": "camp-sabel.webp",
-      "emoji": "🌀",
+      "emoji": "",
       "color": "#2e9c6a"
     },
     "vey": {
       "name": "Corsair Vey",
       "portrait": "camp-vey.webp",
-      "emoji": "🏴‍☠️",
+      "emoji": "",
       "color": "#2a2f3a"
     },
     "crown": {
       "name": "The Abyssal Crown",
       "portrait": "camp-crown.webp",
-      "emoji": "🐉",
+      "emoji": "",
       "color": "#1b3a5c"
     },
     "ysolde": {
       "name": "Admiral Ysolde",
       "portrait": "camp-ysolde.webp",
-      "emoji": "⚓",
+      "emoji": "",
       "color": "#e8e1cf"
     }
   },
@@ -135,7 +135,7 @@
       "opponent": {
         "name": "Wick",
         "portrait": "camp-wick.webp",
-        "emoji": "🕯️",
+        "emoji": "",
         "cast": "wick",
         "personality": "Cheerful cabin hand who lays whatever tile is on top of the hand.",
         "aiLevel": "easy",
@@ -243,7 +243,7 @@
       "opponent": {
         "name": "Wick",
         "portrait": "camp-wick.webp",
-        "emoji": "🕯️",
+        "emoji": "",
         "cast": "wick",
         "personality": "Cheerful cabin hand who forgets the leviathans exist.",
         "aiLevel": "easy",
@@ -346,7 +346,7 @@
       "opponent": {
         "name": "Gull Harrow",
         "portrait": "camp-harrow.webp",
-        "emoji": "🦅",
+        "emoji": "",
         "cast": "harrow",
         "personality": "Swaggering toll-taker who loves crowding rivals toward the corners.",
         "aiLevel": "easy",
@@ -475,7 +475,7 @@
       "opponent": {
         "name": "Brann Ashkeel",
         "portrait": "camp-brann.webp",
-        "emoji": "💥",
+        "emoji": "",
         "cast": "brann",
         "personality": "Loud cannoneer who keeps every Deck Cannon and fires at the first leviathan in reach.",
         "aiLevel": "normal",
@@ -578,7 +578,7 @@
       "opponent": {
         "name": "Saltshade",
         "portrait": "camp-saltshade.webp",
-        "emoji": "🐙",
+        "emoji": "",
         "cast": "saltshade",
         "personality": "A patient leviathan that drifts close and waits for you to run out of room.",
         "aiLevel": "normal",
@@ -687,7 +687,7 @@
       "opponent": {
         "name": "Sabel Riftwright",
         "portrait": "camp-sabel.webp",
-        "emoji": "🌀",
+        "emoji": "",
         "cast": "sabel",
         "personality": "Calm navigator who saves the Rift Gate for her own escape and fires cannons late.",
         "aiLevel": "normal",
@@ -808,7 +808,7 @@
       "opponent": {
         "name": "Corsair Vey",
         "portrait": "camp-vey.webp",
-        "emoji": "🏴‍☠️",
+        "emoji": "",
         "cast": "vey",
         "personality": "Cold corsair who plans a turn ahead and steers rivals toward the wave.",
         "aiLevel": "hard",
@@ -911,7 +911,7 @@
       "opponent": {
         "name": "Corsair Vey",
         "portrait": "camp-vey.webp",
-        "emoji": "🏴‍☠️",
+        "emoji": "",
         "cast": "vey",
         "personality": "Cold corsair who plans a turn ahead; Brann sails beside him.",
         "aiLevel": "hard",
@@ -1020,7 +1020,7 @@
       "opponent": {
         "name": "The Abyssal Crown",
         "portrait": "camp-crown.webp",
-        "emoji": "🐉",
+        "emoji": "",
         "cast": "crown",
         "personality": "The eldest leviathan: slow, relentless, never alone.",
         "aiLevel": "hard",
@@ -1124,7 +1124,7 @@
       "opponent": {
         "name": "Admiral Ysolde",
         "portrait": "camp-ysolde.webp",
-        "emoji": "⚓",
+        "emoji": "",
         "cast": "ysolde",
         "personality": "Ruthless admiral who looks ahead and pins rival junks against the board edge.",
         "aiLevel": "hard",
