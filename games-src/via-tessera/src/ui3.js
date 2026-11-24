@@ -10,14 +10,14 @@ function startGame(mode, o) {
   UI.sel = null; UI.selCol = null; UI.selProv = null; UI.busy = false; UI.tipsSeen = {};
   $('#start').hidden = true; $('#result').hidden = true; $('#drawer').hidden = true; closeSheet();
   buildMap(); setView({ x: 0, y: 0, w: VTART.W }); homeView(); render(); save();
-  if (UI.learn) { tip('Goal: most points at the end'); setTimeout(function () { if (G && G.turn < 3) banner('Tap a score to see the points'); }, 5200); }
+  if (UI.learn) { tip('Goal: most points at the end', '#race'); setTimeout(function () { if (G && G.turn < 3) banner('Tap a score to see the points', '#race'); }, 5200); }
   if (!isHuman(VT.sideToAct(G))) setTimeout(runAI, UI.fast ? 30 : 900);
 }
 // learn mode: one short line the first time each action comes up (8 words max)
 var TIPS = { 'arch-move': 'Steps = your carts and ships on the map', 'arch-build': 'Build next to your carts and ships', pref: 'Every house in the region makes one good', merc: 'Sell spare goods, buy what you need', buy: 'Each card adds points at the end', colo: 'More carts and ships, more steps', trib: 'Your played cards come back to hand', dipl: 'Use the rival’s last card as yours' };
-function tip(t) { if (!UI.learn) return; banner(t); }
+function tip(t, a) { if (!UI.learn) return; banner(t, a || '#acts .btn'); }
 var _rp = renderPrompt;
-renderPrompt = function () { _rp(); if (UI.learn && G && G.pend && isHuman(VT.sideToAct(G)) && !UI.busy && TIPS[G.pend.h] && !UI.tipsSeen[G.pend.h]) { UI.tipsSeen[G.pend.h] = 1; tip(TIPS[G.pend.h]); } };
+renderPrompt = function () { _rp(); if (UI.learn && G && G.pend && isHuman(VT.sideToAct(G)) && !UI.busy && TIPS[G.pend.h] && !UI.tipsSeen[G.pend.h]) { UI.tipsSeen[G.pend.h] = 1; UI.tipFor = { h: G.pend.h, t: TIPS[G.pend.h] }; setTimeout(function () { if (typeof placeFinger === 'function') placeFinger(); }, 40); } };
 
 // ---------- title ----------
 function showTitle() {

@@ -114,7 +114,7 @@ function renderMap() {
       var x, y;
       if (col.at.r != null) { x = GEO[col.at.r].mx; y = GEO[col.at.r].my; }
       else { var cc = VT.CITY[col.at.c], n = inCity[col.at.c] = (inCity[col.at.c] || 0) + 1, a = -Math.PI / 2 + n * 1.25; x = cc.x + Math.cos(a) * 30; y = cc.y + Math.sin(a) * 30; }
-      var isT = tg.col[pi + ':' + k], g = el('g', { 'class': 'col' + (isT ? ' glow' : '') + (UI.selCol === k && pi === VT.sideToAct(G) ? ' sel' : ''), transform: 'translate(' + x + ' ' + y + ')' }, L.cols);
+      var isT = tg.col[pi + ':' + k], g = el('g', { 'data-pk': pi + ':' + k, 'class': 'col' + (isT ? ' glow' : '') + (UI.selCol === k && pi === VT.sideToAct(G) ? ' sel' : ''), transform: 'translate(' + x + ' ' + y + ')' }, L.cols);
       el('circle', { 'class': 'halo', r: 15, fill: 'rgba(0,0,0,0)' }, g);
       el('circle', { r: 11.5, fill: PCOL[pi], stroke: '#f1e9da', 'stroke-width': 2.5 }, g);
       el('use', { href: '#i-' + (col.t === 'L' ? 'meeple' : 'ship'), x: -8, y: -8, width: 16, height: 16, fill: '#fff' }, g);
@@ -163,13 +163,28 @@ function growHits(k) {
     else { var w = Math.max(96, 62 * k), h = Math.max(64, 50 * k); e.setAttribute('x', (-w / 2).toFixed(1)); e.setAttribute('y', (-38 - (h - 64) / 2).toFixed(1)); e.setAttribute('width', w.toFixed(1)); e.setAttribute('height', h.toFixed(1)); }
   });
 }
+// labels keep a constant size on screen (>= 12px) at every zoom; one that would sit on another label is hidden until you zoom in
+function labelScale(k) {
+  $('#map').style.setProperty('--k', k.toFixed(3));
+  var labs = Array.prototype.slice.call(document.querySelectorAll('#map .city .lab')), box = [];
+  var ms = Math.max(1, Math.min(2.2, k * 0.75)); $('#map').style.setProperty('--ms', ms.toFixed(2));   // city markers grow when the whole map is in view
+  labs.forEach(function (t) { var cap = t.classList.contains('cap'); t.setAttribute('y', ((cap ? 24 : 20) * ms + 3 + (cap ? 15 : 12) * k * 0.85).toFixed(1)); t.style.visibility = ''; });
+  labs.sort(function (a, b) { var ga = a.parentNode.classList.contains('glow') ? 0 : a.classList.contains('cap') ? 1 : 2, gb = b.parentNode.classList.contains('glow') ? 0 : b.classList.contains('cap') ? 1 : 2; return ga - gb; });
+  var discs = Array.prototype.slice.call(document.querySelectorAll('#map .city .ring')).map(function (d) { return { g: d.parentNode, r: d.getBoundingClientRect() }; });
+  $('#map').classList.toggle('far', k > 1.7);   // region names only once zoomed in
+  labs.forEach(function (t) {
+    var r = t.getBoundingClientRect(), hit = box.some(function (q) { return r.left < q.right + 2 && r.right > q.left - 2 && r.top < q.bottom && r.bottom > q.top; }) ||
+      discs.some(function (d) { return d.g !== t.parentNode && r.left < d.r.right && r.right > d.r.left && r.top < d.r.bottom && r.bottom > d.r.top; });
+    if (hit) t.style.visibility = 'hidden'; else box.push(r);
+  });
+}
 function setView(v, anim) {
   var bb = boardBox(), asp = bb.h / bb.w;
-  v.w = Math.max(260, Math.min(1100, v.w)); v.h = v.w * asp;
+  v.w = Math.max(260, Math.min(1200, v.w)); v.h = v.w * asp;
   // keep some of the map in view
   v.x = v.w >= VTART.W ? (VTART.W - v.w) / 2 : Math.max(0, Math.min(VTART.W - v.w, v.x)); v.y = v.h >= VTART.H ? (VTART.H - v.h) / 2 : Math.max(0, Math.min(VTART.H - v.h, v.y));   // the mosaic always fills the board
   UI.view = v;
-  growHits(v.w / bb.w);
+  growHits(v.w / bb.w); labelScale(v.w / bb.w);
   $('#map').setAttribute('viewBox', v.x.toFixed(1) + ' ' + v.y.toFixed(1) + ' ' + v.w.toFixed(1) + ' ' + v.h.toFixed(1));
 }
 function fitPoints(pts, pad, minW) {
@@ -191,10 +206,13 @@ function animView(to) {
 }
 function zoomBy(f, cx, cy) {
   var v = UI.view; if (!v) return; cx = cx == null ? v.x + v.w / 2 : cx; cy = cy == null ? v.y + v.h / 2 : cy;
-  var w = Math.max(260, Math.min(1100, v.w * f)), k = w / v.w;
+  var w = Math.max(260, Math.min(1200, v.w * f)), k = w / v.w;
   setView({ x: cx - (cx - v.x) * k, y: cy - (cy - v.y) * k, w: w });
 }
+// first view: the whole map, with a margin so the outer labels stay inside
+function fitMap() { animView({ x: -59, y: 0, w: 1100 }); }
 function homeView() {
+  fitMap(); return;
   var pts = [], p = G.pl[0];
   p.cols.forEach(function (c) { if (c.at) pts.push(c.at.r != null ? { x: GEO[c.at.r].mx, y: GEO[c.at.r].my } : VT.CITY[c.at.c]); });
   p.houses.forEach(function (cid) { pts.push(VT.CITY[cid]); });
