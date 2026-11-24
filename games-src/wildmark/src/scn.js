@@ -68,7 +68,7 @@
   GXS.add({
     id: 'wm-result', name: 'Season end: results', ask: 'Can you read the score table?', seed: 3, when: booted,
     setup: function () { begin({ np: 3, humans: 1, ai: 'normal', seed: 3 }); WM.forceEnd(G); step(); return wait(600); },
-    checks: [{ kind: 'visible', sel: '#againB', name: 'Play again' }, { kind: 'visible', sel: '#rs .st', name: 'score table' },
+    checks: [{ kind: 'visible', sel: '#againB', name: 'Play again' }, { kind: 'fn', name: 'score table sits behind Details (closed)', fn: function () { var d = document.querySelector('#rs .rdet'); return !!(d && !d.open && d.querySelector('.st')) || 'details missing or open'; } },
       { kind: 'eq', name: 'your total', a: function () { var r = document.querySelectorAll('#rs .st .tot td b'); return +r[0].textContent; }, b: function () { return G.res[0].total; } }]
   });
 })();
