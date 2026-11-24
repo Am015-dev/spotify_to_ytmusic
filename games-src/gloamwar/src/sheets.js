@@ -42,7 +42,7 @@ function tileHtml(t) { var cls = 'tile' + (t.r ? ' r' : '') + (t.sp ? (HUNT_SPEC
 function openCompany() {
   var F = G.F, me = UI.side, g = guideOf(G), body = '';
   body += '<p>The Company carries the Hollow Crown. Walk it to the Kiln of Kaldur: reach a gate (Blackgate or Wraithpass), then take 5 steps on the Ashen Road. <b>12 taint</b> and the Gloam wins.</p>';
-  body += '<div class="ctype" style="font-size:.85rem;text-transform:uppercase;letter-spacing:.06em">Taint</div><div class="track">'; for (var i = 0; i <= 12; i++) body += '<span class="' + (i === F.taint ? 'on' : i === 12 ? 'end' : '') + '">' + i + '</span>'; body += '</div>';
+  body += '<div class="ctype" style="font-size:.9rem;text-transform:uppercase;letter-spacing:.06em">Taint</div><div class="track">'; for (var i = 0; i <= 12; i++) body += '<span class="' + (i === F.taint ? 'on' : i === 12 ? 'end' : '') + '">' + i + '</span>'; body += '</div>';
   body += '<p>' + (F.road >= 0 ? 'On the Ashen Road: step <b>' + F.road + ' of 5</b>.' : 'Last seen at <b>' + rn(F.loc) + '</b>, ' + gateDist(F.loc) + ' regions from a gate. Moved <b>' + F.prog + '</b> unseen.') + ' The Company is <b>' + (F.hid ? 'hidden' : 'revealed: hide it before it moves') + '</b>.</p>';
   body += '<div class="comp">'; COMPANIONS.concat(['wretch']).forEach(function (c) { var l = G.C[c]; if (c === 'wretch' && l !== 'F') return; body += '<div class="cmp' + (c === g ? ' guide' : '') + (l === 'dead' ? ' dead' : '') + '">' + ico(CHARS[c].icon, '#1f1812', 22) + '<div><b style="font-family:var(--fell);font-weight:400">' + CHARS[c].short + '</b><br><small>' + (l === 'F' ? (c === g ? 'guide · ' : '') + 'level ' + CHARS[c].lv : l === 'dead' ? 'fallen' : rn(l)) + '</small></div></div>'; }); body += '</div>';
   if (g && CHARS[g].guide) body += '<p><b>Guide ' + CHARS[g].short + ':</b> ' + CHARS[g].guide + '</p>';
@@ -132,7 +132,7 @@ function bubble(html, tr, o) {
   el.dataset.side = pick.side; el._tr = tr; return el;
 }
 function closeBubble(b) { if (b && b.parentNode) b.parentNode.removeChild(b); }
-function tip(text, tr) { closeBubble(UI.tipEl); UI.tipEl = bubble('<span>' + text + '</span>', tr, { cls: 'tip' }); var e = UI.tipEl; clearTimeout(UI.tipT); UI.tipT = setTimeout(function () { closeBubble(e); }, 2200); }
+function tip(text, tr) { closeBubble(UI.tipEl); UI.tipEl = bubble('<span>' + text + '</span>', tr, { cls: 'tip' }); var e = UI.tipEl; clearTimeout(UI.tipT); UI.tipT = setTimeout(function () { closeBubble(e); }, 7000); if (e) e.onclick = function () { closeBubble(e); }; }
 function closeRCard() { if (UI.rcard) { closeBubble(UI.rcard); UI.rcard = null; try { MV.setSel(null); } catch (e) { } document.removeEventListener('pointerdown', UI.rcardOff, true); } }
 function regionCard(rid, title, body) {
   closeRCard(); MV.setSel(rid);
