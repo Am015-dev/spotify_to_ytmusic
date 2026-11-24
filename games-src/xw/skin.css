@@ -35,3 +35,7 @@ html.sk-tail .gxh-a-right .gxh-arr{transform:rotate(-90deg)}
 
 /* QA W659: disabled "Plan your ships first" label was dark red on dark red (about 1.5:1) */
 html.sk .btn.primary:disabled{color:#f3e6d4;text-shadow:0 1px 2px rgba(0,0,0,.8)}
+
+/* the Lessons button keeps one size before and after the painted skin loads (scenario gate: painted skin moves no box) */
+/* html:root body ... outranks the shelf's injected html:root body :is(.gx-ibtn){min-width:44px}; fixed 60 px (flex 0 0) so a crowded bar cannot squeeze it and the round chip keeps its room */
+html:root body .gx-ibtn.gxst-q{flex:0 0 60px;width:60px;min-width:60px;padding:0 4px;font-size:14px;text-shadow:0 1px 2px rgba(0,0,0,.75)}
