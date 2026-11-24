@@ -38,16 +38,20 @@
   }
   // a Lessons button that renders smaller than a thumb, or off screen (hidden bar, 0x0 slot), moves to a fixed pill; the pill picks the screen corner
   // that covers the fewest buttons, so it never hides the game's own controls
+  var QSEL = 'button,a,[role=button],[onclick],[tabindex],input,select,summary,.card,[data-c],[data-id],.chip,[class*=chip],#instr,#say,#status,.dock';
+  function qOver(r) {   // does the in-bar button sit on top of another control or chip?
+    var bs = D.querySelectorAll(QSEL), i, b; for (i = 0; i < bs.length; i++) { if (bs[i] === Q || bs[i].contains(Q) || Q.contains(bs[i])) continue; b = vis(bs[i]); if (b && hit(r, { left: b.left + 2, top: b.top + 2, right: b.right - 2, bottom: b.bottom - 2 })) return true; } return false;
+  }
   function qCheck() {
     if (!Q || !D.body.contains(Q)) return;
     if (Q.className.indexOf('gxst-qfix') < 0) {
-      var r = Q.getBoundingClientRect(); if (r.width >= 44 && r.height >= 44 && r.left >= 0 && r.right <= innerWidth + 1 && r.top >= 0 && r.bottom <= innerHeight + 1) return;
+      var r = Q.getBoundingClientRect(); if (r.width >= 44 && r.height >= 44 && r.left >= 0 && r.right <= innerWidth + 1 && r.top >= 0 && r.bottom <= innerHeight + 1 && !qOver(r)) return;
       Q.className = 'gxst-q gxst-qfix'; D.body.appendChild(Q);
     }
-    var vw = innerWidth, vh = innerHeight, w = Q.offsetWidth || 72, h = Q.offsetHeight || 44, bs = D.querySelectorAll('button,a,[role=button],[onclick],[tabindex],input,select,summary'), rs = [], i;
+    var vw = innerWidth, vh = innerHeight, w = Q.offsetWidth || 72, h = Q.offsetHeight || 44, bs = D.querySelectorAll(QSEL), rs = [], i;
     for (i = 0; i < bs.length; i++) { if (bs[i] === Q || (W && W.contains(bs[i]))) continue; var q = vis(bs[i]); if (q) rs.push(q); }
     var wr = W && vis(W); if (wr) rs.push(wr);
-    var cs = [[8, vh - h - 8], [vw - w - 8, vh - h - 8], [vw - w - 8, 8], [8, 8], [vw / 2 - w / 2, vh - h - 8], [vw / 2 - w / 2, 8], [8, vh / 2], [vw - w - 8, vh / 2]], best = null;
+    var cs = [[8, vh - h - 8], [vw - w - 8, vh - h - 8], [vw - w - 8, 8], [8, 8], [vw / 2 - w / 2, vh - h - 8], [vw / 2 - w / 2, 8], [vw - w - 8, 76], [8, 76], [vw / 2 - w / 2, 76]], best = null;
     function cost(c) { var b = { left: c[0], top: c[1], right: c[0] + w, bottom: c[1] + h }, n = 0; for (var k = 0; k < rs.length; k++) if (hit(b, rs[k])) n++; return n; }
     var cur = Q.getAttribute('data-pos'), cc = cur ? JSON.parse(cur) : null;
     if (cc && cost(cc) === 0) return;
