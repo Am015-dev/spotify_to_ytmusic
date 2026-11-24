@@ -273,3 +273,12 @@ html.sk-stall .stalls.tight .stall{border-width:22px 7px 6px;border-image-width:
 @media (orientation:portrait){.mkt .sinfo{max-height:none!important;overflow:visible!important;flex:0 0 auto}}
 @media (max-height:640px){html.sk-awn .awn{height:40px}}
 .stall .sdo .ss{display:none}.stalls.c3 .sdo .sl{display:none}.stalls.c3 .sdo .ss{display:inline}.stalls.tight .stall .sdo{display:none}
+
+/* W760: the story scene sits on the fairground art, never on a blank dark page */
+.gxc.gxc-scene-on{background:linear-gradient(rgba(24,14,10,.42),rgba(24,14,10,.62)),var(--tbl-img,url(media/table-phone.webp)) center/cover no-repeat,#2a1c14}
+/* W760: pc text floor 16px on the rules cards and the story scene */
+@media (min-width:1024px){html body .gxh-card .gxh-x,html body .gxh-card .gxh-ar,html body .gxh-card figcaption,html body .gxh-card .gxh-nav button,html body .gxc-scene .gxc-sc-title,html body .gxc-scene .gxc-btn{font-size:16px}}
+/* W760: pc market text floor 16px (stall names were 12px on a 1366 screen) */
+@media (min-width:1024px){html body .stall .sth b{font-size:19px}html body .stall .sdo .sl{font-size:16px}html body .stall .tok .pc{font-size:16px}html body .sthead .dsc b{font-size:16px}html body .gxh-card figcaption{font-size:16px!important}}
+/* W760: "Back to your cauldron" had a cream-on-cream solid fill under its skin (1.1:1); give it a dark base */
+html body .btn.go.backb{background-color:#2f6b3c;color:#fff6df}

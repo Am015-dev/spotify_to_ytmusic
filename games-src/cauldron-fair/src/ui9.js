@@ -141,7 +141,7 @@ function stgRace(ds, v, play, R) {
   box.appendChild(h('div.drhero', por, h('div.drhl', h('b', 'Points after day ' + R.round), hl)));
   if (fresh) setTimeout(() => show(lead('after')), 800);
   ds.forEach(d => {
-    const me = d.p.seat === v, w0 = Math.round(100 * d.start / top), w1 = Math.round(100 * d.after / top);
+    const me = d.p.seat === v, w0 = Math.max(8, Math.round(100 * d.start / top)), w1 = Math.max(8, Math.round(100 * d.after / top));   // W760: a 0 total still shows a stub, never an empty bar
     const bar = h('span.drbar', h('i.drold', { style: 'width:' + w0 + '%' }), h('i.drnew', { style: '--w0:' + w0 + '%;--w1:' + (play ? w0 : w1) + '%' }));
     const num = h('b.drn', play ? d.start : d.after);
     box.appendChild(h('div.drrow' + (me ? '.me' : ''), h('span.drav', { html: avHTML(d.p.seat, 32) }), h('span.drnm', me ? 'You' : d.p.name), bar, num, h('span.drg' + (d.gain > 0 ? '.up' : ''), d.gain > 0 ? '+' + d.gain : '')));
