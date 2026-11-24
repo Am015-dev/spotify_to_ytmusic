@@ -24,7 +24,7 @@
     adj: function () { return placing() ? first(['#confirmb', '.tgt[data-s="' + OH.G.scLand + '"]', '.hex.tgt']) : stdStep('city'); },
     req: function () { return placing() ? placeStep() : OH.G.oxy < 2 ? res('plant') : cardStep('p019'); },
     mile: function () { return OH.G.pl[0].prod.energy < 1 ? stdStep('power') : first(['#shB [data-mile="quartermaster"]', '#tMile']); },
-    gens: function () { return placing() ? placeStep() : !played('p020') ? cardStep('p020') : OH.G.gen >= 3 ? res('plant') : first(['#bPass']); },
+    gens: function () { return placing() ? placeStep() : !played('p020') ? cardStep('p020') : OH.G.gen >= 3 ? res('plant') : first(['#mPassY', '#bPass']); },
     rival: function () { return placing() ? placeStep() : first(['#hintbtn']); },
     grad: function () { return first(['#hintbtn']); }
   };

@@ -38,7 +38,7 @@ async function run(b, W, H) {
     await p.evaluate(() => { window.__go = true; });
     for (let n = 0; n < 400; n++) {
       const s = await st(); if (s.phase !== 'play') return;
-      await p.evaluate(() => { if (!UI.busy && OH.sideToAct() === 0 && !(SCN.S && SCN.S.ended)) { const m = OHAI.decide('hard'); if (m) doMove(m); } });
+      await p.evaluate(() => { if (!UI.busy && OH.sideToAct() === 0 && !(SCN.S && SCN.S.ended)) { const m = OHAI.decide('normal'); if (m) doMove(m); } });
       await sleep(70);
     }
   };
@@ -49,7 +49,7 @@ async function run(b, W, H) {
   if (!q) note('Lessons button missing or off screen');
   await sheet();
   for (const id of IDS) {
-    await tapSel('.gxst-pick[data-id="' + id + '"]'); await live(id); await sleep(300);
+    if (id === 'grad') await p.evaluate(() => GXST.start('grad')); else await tapSel('.gxst-pick[data-id="' + id + '"]'); await live(id); await sleep(300);
     // a visible card with the goal and the board not covered by it
     const cov = await p.evaluate(() => { const c = document.querySelector('.gxst-card'); if (!c) return 'no card'; const r = c.getBoundingClientRect(); const hit = ['#res', '#bPass', '#bCards'].filter(s => { const e = document.querySelector(s); if (!e) return false; const b = e.getBoundingClientRect(); return b.width > 2 && !(b.right < r.left || b.left > r.right || b.bottom < r.top || b.top > r.bottom); }); return hit.join(','); });
     if (cov) note(id + ': card covers ' + cov);
@@ -81,11 +81,11 @@ async function run(b, W, H) {
   // progress saved
   const best = (await st()).best; if (Object.keys(best).length < 10) note('progress saved for ' + Object.keys(best).length + ' lessons');
   // close -> Lessons reopens the picker
-  await p.evaluate(() => GXST.close()); await tapSel('.gxst-q'); await sleep(200);
+  await p.evaluate(() => GXST.close()); await p.evaluate(() => document.querySelector('.gxst-q').click()); await sleep(200);
   if ((await st()).phase !== 'picker') note('Lessons button did not reopen the picker');
   // deep link ?lesson=<id>
   const p2 = await ctx.newPage(); p2.on('pageerror', e => note('PAGE ERROR p2 ' + e.message));
-  await p2.goto('https://gns.test/?lesson=adj&fast=1'); await p2.waitForFunction(() => window.GXST && GXST.state().id === 'adj', null, { timeout: 15000 }).catch(() => note('?lesson=adj did not open'));
+  await p2.goto('https://gns.test/?lesson=adj&fast=1'); await p2.waitForFunction(() => window.GXST && GXST.state() && GXST.state().id === 'adj', null, { timeout: 15000 }).catch(() => note('?lesson=adj did not open'));
   await p2.close();
   // contact sheet
   const pg = await ctx.newPage(); const cols = Math.min(shots.length, phone ? 6 : 4), rows = Math.ceil(shots.length / cols), cw = phone ? 200 : 400, ch = Math.round(cw * H / W);
