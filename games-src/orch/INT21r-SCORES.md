@@ -1,4 +1,4 @@
-# INT21r critic scores (24 Nov 2026, ~18:10 UTC)
+# INT21r critic scores (24 Nov 2026, 17:57 UTC)
 Order: Readability / Game-not-spreadsheet / Layout / Finish / First-minute. Gate: every row >= 7 on phone AND pc. Strict; unsure = 6.
 Sheets: games-src/<game dir>/proof/int21r-{phone,pc}-sheet.jpg. Baselines missing for these games (snapshot title/menu/board only failures in build-all --quick).
 No CRITIC-R15.md rubric exists on shelf/R15-critic (sheets only), so the task rubric was used. Live comparison not run: no game passes, so "not worse than live" is moot.
