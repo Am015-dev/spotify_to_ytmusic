@@ -125,7 +125,7 @@ function showCredits() {
 // ---------- boot ----------
 function boot() {
   installIcons();
-  UI.hints = LS.get('hints') !== '0'; UI.mute = LS.get('mute') === '1'; UI.lvl = LS.get('lvl') || 'easy';
+  UI.hints = LS.get('hints') !== '0'; UI.mute = LS.get('mute') === '1'; UI.lvl = LS.get('lvl') || 'normal';
   wireCamera();
   $('#hand').addEventListener('click', onHandTap);
   $('#menub').onclick = showMenu; $('#homeb').onclick = showMenu;

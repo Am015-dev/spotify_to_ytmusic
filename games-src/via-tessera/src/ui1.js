@@ -1,7 +1,7 @@
 // ui1: page state, icons, the map (SVG over the mosaic), the camera (pan, pinch, wheel, follow) and the dock (prompt, storehouse, hand).
 var G = null;
 var D = VTD;
-var UI = { mode: 'vs', lvl: 'easy', hints: true, busy: false, fast: false, sel: null, selCol: null, selProv: null, view: null, mosaic: null, learn: false, AIDELAY: 650, trade: null };
+var UI = { mode: 'vs', lvl: 'normal', hints: true, busy: false, fast: false, sel: null, selCol: null, selProv: null, view: null, mosaic: null, learn: false, AIDELAY: 650, trade: null };
 var $ = function (s) { return document.querySelector(s); };
 var SVGNS = 'http://www.w3.org/2000/svg';
 function el(tag, attrs, parent) { var e = document.createElementNS(SVGNS, tag); for (var k in attrs) e.setAttribute(k, attrs[k]); if (parent) parent.appendChild(e); return e; }
@@ -278,6 +278,21 @@ function renderRace() {
   var mleft = G.deck.length + G.disp.filter(function (x) { return x != null; }).length;
   $('#mktn').textContent = mleft; $('#mktb').setAttribute('aria-label', 'Market: ' + mleft + ' cards left, the game ends at 0'); $('#mktb').classList.toggle('low', mleft <= 3);
 }
+function renderHud() {
+  var h = '', mleft = G.deck.length + G.disp.filter(function (x) { return x != null; }).length;
+  var sc = G.pl.map(function (p, i) { return VT.score(G, i); });
+  G.pl.forEach(function (p, i) {
+    var turn = G.phase === 'play' && VT.sideToAct(G) === i, wealth = p.coins; D.GOODS.forEach(function (g) { wealth += p.goods[g] * D.PRICE[g]; });
+    var goods = 0; D.GOODS.forEach(function (g) { goods += p.goods[g]; });
+    h += '<span class="hc' + (turn ? ' turn' : '') + '"><span class="h1"><span class="dot" style="background:' + PCOL[i] + '"></span><span class="hn">' + esc(p.name) + '</span><b>' + sc[i].total + '</b><span class="hs">' +
+      icon('coins') + p.coins + ' ' + icon('amphora') + goods + ' &#8962;' + p.houses.length + '/15</span></span><span class="h2">';
+    D.GODS.forEach(function (gd) { var b = sc[i].by[gd.id]; h += '<span class="pg' + (b.n ? ' on' : '') + '" title="' + gd.n + '">' + icon(gd.icon) + b.pts + '</span>'; });
+    h += '</span></span>';
+  });
+  var d = sc[0].total - sc[1].total;
+  h += '<span class="hg">' + (G.ender >= 0 ? '<b>Last turn!</b> ' + esc(G.pl[G.ender].name) + ' took the Laurel. ' : 'Ends: market 0 (' + mleft + ' left) or 15th house. ') + (d === 0 ? 'Tied' : (d > 0 ? 'You lead by ' + d : 'Rival leads by ' + (-d))) + '</span>';
+  $('#hud').innerHTML = h;
+}
 function renderStore() {
   var pi = UI.mode === 'hot' ? Math.max(0, VT.sideToAct(G)) : 0, p = G.pl[pi], h = '<button type="button" class="storebtn" id="storeb" aria-label="Your storehouse"><span class="slots">';
   var n = 0;
@@ -301,5 +316,5 @@ function renderRival() {
 function render() {
   setTimeout(function () { if (UI.view) growHits(UI.view.w / boardBox().w); }, 0);
   if (!G) return;
-  renderRace(); renderStore(); renderHand(); renderRival(); renderMap(); renderPrompt();
+  renderRace(); renderHud(); renderStore(); renderHand(); renderRival(); renderMap(); renderPrompt();
 }

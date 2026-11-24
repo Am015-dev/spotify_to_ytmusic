@@ -16,7 +16,7 @@ function renderPrompt() {
   if (G.drop && G.drop.length) { say(me + 'Storehouse full: pick goods'); acts([]); openTake(); return; }
   if (!pd) {
     if (UI.sel == null) { say(me + 'Pick a card to play'); acts([{ t: 'Points', alt: true, f: function () { showScoreNow(); } }, { t: 'Market', alt: true, f: function () { openMarket(false); } }]); }
-    else { var c = D.CARDS[p.hand[UI.sel]]; say(cardWhat(c)); acts([{ t: 'Play ' + c.n, glow: true, f: function () { playSel(); } }]); }
+    else { var c = D.CARDS[p.hand[UI.sel]]; say(cardWhat(c) + patronTag(c, pi)); acts([{ t: 'Play ' + c.n, glow: true, f: function () { playSel(); } }]); }
     return;
   }
   var h = pd.h;
@@ -425,4 +425,9 @@ function sfx(k) {
   o.type = f[2]; o.frequency.setValueAtTime(f[0], t); if (k === 'coin' || k === 'win') o.frequency.exponentialRampToValueAtTime(f[0] * 1.5, t + f[1]);
   g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(k === 'build' ? 0.06 : 0.1, t + 0.01); g.gain.exponentialRampToValueAtTime(0.0001, t + f[1]);
   o.start(t); o.stop(t + f[1] + 0.02);
+}
+
+function patronTag(c, pi) {
+  var v = VT.patronValues(G, pi), g = D.GODS.filter(function (x) { return x.id === c.god; })[0], n = c.god === 'owl' ? (v.owl[c.spec] || 0) : v[c.god];
+  return ' \u2022 Its ' + g.n + ' is worth +' + n + ' to you now.';
 }
