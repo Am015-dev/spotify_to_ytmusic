@@ -43,22 +43,22 @@ for (let g = 0; g < MIXED; g++) {
 
 // ---------- phase 2: forced scenarios ----------
 const PRE = {
-  chip_sweep: { city: ['farm', 'mine'] }, miner_mole: { opp: ['farm', 'barge_toad', 'mine'] }, ruins: { city: ['farm'] },
-  wife: { city: ['husband'] }, husband: { city: ['farm', 'wife'] }, barge_toad: { city: ['farm'] }, general_store: { city: ['farm'] },
-  chapel: {}, shepherd: { city: ['chapel'] }, ranger: { dep: true }, teacher: {}, university: { city: ['farm', 'mine'] },
-  castle: { city: ['farm', 'mine'] }, palace: { city: ['castle'] }, school: { city: ['husband', 'wanderer'] }, theater: { city: ['bard', 'king'] },
-  king: {}, architect: {}, ever_tree: { city: ['castle'] }, queen: { hand: ['farm'] }, inn: { meadow: ['farm'] }, post_office: { hand: ['farm', 'mine', 'castle', 'palace'] },
-  cemetery: {}, monastery: {}, lookout: {}, storehouse: {}, clock_tower: {}, dungeon: { city: ['husband'] }, courthouse: {}, historian: {},
-  doctor: {}, woodcarver: {}, monk: {}, peddler: {}, postal_pigeon: { top: ['mine', 'farm'] }, undertaker: {}, bard: { hand: ['farm', 'mine'] },
+  tinder_chipmunk: { city: ['bramble_allotment', 'flintpit'] }, echo_mole: { opp: ['bramble_allotment', 'reedpunt_toad', 'flintpit'] }, toppled_hall: { city: ['bramble_allotment'] },
+  goodwife_vole: { city: ['goodman_vole'] }, goodman_vole: { city: ['bramble_allotment', 'goodwife_vole'] }, reedpunt_toad: { city: ['bramble_allotment'] }, cranny_market: { city: ['bramble_allotment'] },
+  candlewick_shrine: {}, crook_shrew: { city: ['candlewick_shrine'] }, trailwarden_fox: { dep: true }, slate_schoolmarm: {}, lorewood_college: { city: ['bramble_allotment', 'flintpit'] },
+  stonecrown_keep: { city: ['bramble_allotment', 'flintpit'] }, gildenfern_court: { city: ['stonecrown_keep'] }, acorn_academy: { city: ['goodman_vole', 'footsore_drifter'] }, glowworm_playhouse: { city: ['ballad_finch', 'bramble_sovereign'] },
+  bramble_sovereign: {}, master_lathwright: {}, elderheart_oak: { city: ['stonecrown_keep'] }, thistle_regent: { hand: ['bramble_allotment'] }, lantern_rest: { meadow: ['bramble_allotment'] }, dovecote_depot: { hand: ['bramble_allotment', 'flintpit', 'stonecrown_keep', 'gildenfern_court'] },
+  mossgrave_glade: {}, quietstone_cloister: {}, spyglass_perch: {}, hoard_cellar: {}, dewdrop_belfry: {}, thornhold_cells: { city: ['goodman_vole'] }, mosswood_assize: {}, chronicle_owl: {},
+  poultice_badger: {}, whittle_beaver: {}, brother_moss: {}, haggle_magpie: {}, parcel_dove: { top: ['flintpit', 'bramble_allotment'] }, hollow_sexton: {}, ballad_finch: { hand: ['bramble_allotment', 'flintpit'] },
 };
-const DESTS = new Set(['inn', 'post_office', 'queen', 'cemetery', 'chapel', 'lookout', 'monastery', 'university', 'storehouse']);
+const DESTS = new Set(['lantern_rest', 'dovecote_depot', 'thistle_regent', 'mossgrave_glade', 'candlewick_shrine', 'spyglass_perch', 'quietstone_cloister', 'lorewood_college', 'hoard_cellar']);
 for (const c of D.cards) {
   const ctx = 'card ' + c.key, pre = PRE[c.key] || {};
   try {
     const G = mk(3, ctx);
     if (pre.city) T.city(G, 0, pre.city);
     if (pre.opp) T.city(G, 1, pre.opp);
-    const hand = pre.hand ? [c.key].concat(pre.hand) : [c.key, 'farm', 'mine'];
+    const hand = pre.hand ? [c.key].concat(pre.hand) : [c.key, 'bramble_allotment', 'flintpit'];
     const ids = T.hand(G, 0, hand);
     if (pre.meadow) T.meadow(G, 0, pre.meadow[0]);
     if (pre.top) T.topDeck(G, pre.top);
@@ -71,28 +71,28 @@ for (const c of D.cards) {
     // destinations and the storehouse: also visit
     if (DESTS.has(c.key)) {
       G.cur = 0; const e = G.players[0].city.find(x => x.id === ids[0]);
-      if (e && c.key === 'storehouse') e.stock.twig = 3;
-      if (c.key === 'inn') { T.meadow(G, 1, 'mine'); }
-      if (c.key === 'queen') T.meadow(G, 1, 'mine');
-      if (c.key === 'post_office') T.hand(G, 0, ['farm', 'mine', 'castle']);
-      if (c.key === 'cemetery') T.topDeck(G, ['farm', 'mine', 'castle', 'palace']);
+      if (e && c.key === 'hoard_cellar') e.stock.twig = 3;
+      if (c.key === 'lantern_rest') { T.meadow(G, 1, 'flintpit'); }
+      if (c.key === 'thistle_regent') T.meadow(G, 1, 'flintpit');
+      if (c.key === 'dovecote_depot') T.hand(G, 0, ['bramble_allotment', 'flintpit', 'stonecrown_keep']);
+      if (c.key === 'mossgrave_glade') T.topDeck(G, ['bramble_allotment', 'flintpit', 'stonecrown_keep', 'gildenfern_court']);
       G.players[0].dep = [];
       A(G, 0, m => m.type === 'worker' && m.k === 'dest' && m.c === ids[0], ctx + ' visit');
     }
     // production in spring (every green card), clock tower use, ranger etc.
-    if (c.color === 'green' || c.key === 'clock_tower') {
+    if (c.color === 'green' || c.key === 'dewdrop_belfry') {
       G.cur = 0; G.players[0].dep = []; G.players[0].season = 0; G.players[0].workers = 2;
       A(G, 0, m => m.type === 'worker' && m.k === 'basic' && D.basic[m.i].key === 'basic_berry_patch', ctx);
       G.cur = 0; A(G, 0, m => m.type === 'worker' && m.k === 'basic' && D.basic[m.i].key === 'basic_berry_patch', ctx);
       G.cur = 0; A(G, 0, m => m.type === 'prepare', ctx + ' spring');
     }
-    if (c.color === 'purple') { const s = HB.score(G, 0); if (s.detail.some(d => HB.cardKey(d.card) === c.key) || c.key === 'wife' || c.key === 'architect') tally['score:' + c.key] = (tally['score:' + c.key] || 0) + 1; }
+    if (c.color === 'purple') { const s = HB.score(G, 0); if (s.detail.some(d => HB.cardKey(d.card) === c.key) || c.key === 'goodwife_vole' || c.key === 'master_lathwright') tally['score:' + c.key] = (tally['score:' + c.key] || 0) + 1; }
     addUsed(G);
   } catch (e) { problems.push(ctx + ': EXCEPTION ' + (e.stack || e.message).split('\n').slice(0, 3).join(' | ')); }
 }
 // purple end-game scoring with everything on the table
 {
-  const G = mk(2, 'purple'); T.city(G, 0, ['castle', 'palace', 'school', 'theater', 'ever_tree', 'king', 'architect', 'wife', 'husband', 'farm', 'mine']); G.bev[0].o = 0; G.sev[0].o = 0; T.res(G, 0, { resin: 3, pebble: 4 });
+  const G = mk(2, 'purple'); T.city(G, 0, ['stonecrown_keep', 'gildenfern_court', 'acorn_academy', 'glowworm_playhouse', 'elderheart_oak', 'bramble_sovereign', 'master_lathwright', 'goodwife_vole', 'goodman_vole', 'bramble_allotment', 'flintpit']); G.bev[0].o = 0; G.sev[0].o = 0; T.res(G, 0, { resin: 3, pebble: 4 });
   const s = HB.score(G, 0); for (const d of s.detail) tally['score:' + HB.cardKey(d.card)] = (tally['score:' + HB.cardKey(d.card)] || 0) + 1;
   if (s.detail.length < 8) problems.push('purple scoring detail incomplete: ' + s.detail.length);
 }
@@ -100,51 +100,51 @@ for (const c of D.cards) {
 // governance triggers and abilities
 function scen(name, fn) { try { const G = mk(3, name); fn(G, name); addUsed(G); check(G, name); } catch (e) { problems.push(name + ': EXCEPTION ' + (e.stack || e.message).split('\n').slice(0, 3).join(' | ')); } }
 scen('triggers', (G, ctx) => {
-  T.city(G, 0, ['historian', 'shopkeeper', 'courthouse']); const [w, m] = T.hand(G, 0, ['wanderer', 'mine']);
+  T.city(G, 0, ['chronicle_owl', 'tallyshop_mouse', 'mosswood_assize']); const [w, m] = T.hand(G, 0, ['footsore_drifter', 'flintpit']);
   A(G, 0, x => x.type === 'play' && x.card === w && x.how === 'pay', ctx); A(G, 0, x => x.type === 'play' && x.card === m && x.how === 'pay', ctx);
 });
-scen('judge', (G, ctx) => { T.city(G, 0, ['judge']); T.res(G, 0, { twig: 1, resin: 1, berry: 1 }); const [m] = T.hand(G, 0, ['mine']); A(G, 0, x => x.type === 'play' && x.card === m && x.how === 'judge', ctx); });
-scen('innkeeper', (G, ctx) => { T.city(G, 0, ['innkeeper']); T.res(G, 0, {}); const [m] = T.hand(G, 0, ['husband']); A(G, 0, x => x.type === 'play' && x.card === m && x.how === 'innkeeper', ctx); });
-scen('crane', (G, ctx) => { T.city(G, 0, ['crane']); T.res(G, 0, { twig: 2, resin: 3 }); const [m] = T.hand(G, 0, ['castle']); A(G, 0, x => x.type === 'play' && x.card === m && x.how === 'crane', ctx); });
+scen('gavel_marten', (G, ctx) => { T.city(G, 0, ['gavel_marten']); T.res(G, 0, { twig: 1, resin: 1, berry: 1 }); const [m] = T.hand(G, 0, ['flintpit']); A(G, 0, x => x.type === 'play' && x.card === m && x.how === 'gavel_marten', ctx); });
+scen('hostler_hedgehog', (G, ctx) => { T.city(G, 0, ['hostler_hedgehog']); T.res(G, 0, {}); const [m] = T.hand(G, 0, ['goodman_vole']); A(G, 0, x => x.type === 'play' && x.card === m && x.how === 'hostler_hedgehog', ctx); });
+scen('pulley_lift', (G, ctx) => { T.city(G, 0, ['pulley_lift']); T.res(G, 0, { twig: 2, resin: 3 }); const [m] = T.hand(G, 0, ['stonecrown_keep']); A(G, 0, x => x.type === 'play' && x.card === m && x.how === 'pulley_lift', ctx); });
 scen('dungeon x2', (G, ctx) => {
-  T.city(G, 0, ['dungeon', 'ranger', 'husband', 'bard']); T.res(G, 0, { twig: 2, resin: 3 }); const [a] = T.hand(G, 0, ['castle']);
-  A(G, 0, x => x.type === 'play' && x.card === a && x.how === 'dungeon', ctx);
-  T.res(G, 0, { twig: 2, resin: 3 }); const [b] = T.hand(G, 0, ['palace']); T.res(G, 0, { twig: 4, resin: 6, pebble: 3 }); G.cur = 0;
-  const m = T.find(G, 0, x => x.type === 'play' && x.card === b && x.how === 'dungeon'); if (m) { step(G, m, ctx); resolve(G, ctx); } else problems.push(ctx + ': second cell not usable');
-  tally['dungeon:2cells'] = G.players[0].city.find(e => HB.cardKey(e.id) === 'dungeon').pris.length >= 2 ? 1 : 0;
+  T.city(G, 0, ['thornhold_cells', 'trailwarden_fox', 'goodman_vole', 'ballad_finch']); T.res(G, 0, { twig: 2, resin: 3 }); const [a] = T.hand(G, 0, ['stonecrown_keep']);
+  A(G, 0, x => x.type === 'play' && x.card === a && x.how === 'thornhold_cells', ctx);
+  T.res(G, 0, { twig: 2, resin: 3 }); const [b] = T.hand(G, 0, ['gildenfern_court']); T.res(G, 0, { twig: 4, resin: 6, pebble: 3 }); G.cur = 0;
+  const m = T.find(G, 0, x => x.type === 'play' && x.card === b && x.how === 'thornhold_cells'); if (m) { step(G, m, ctx); resolve(G, ctx); } else problems.push(ctx + ': second cell not usable');
+  tally['dungeon:2cells'] = G.players[0].city.find(e => HB.cardKey(e.id) === 'thornhold_cells').pris.length >= 2 ? 1 : 0;
 });
-scen('occupy + elderheart', (G, ctx) => { T.city(G, 0, ['farm', 'ever_tree']); const [h, b] = T.hand(G, 0, ['husband', 'bard']); A(G, 0, x => x.card === h && x.how === 'occupy', ctx); A(G, 0, x => x.card === b && x.how === 'occupy', ctx); });
+scen('occupy + elderheart', (G, ctx) => { T.city(G, 0, ['bramble_allotment', 'elderheart_oak']); const [h, b] = T.hand(G, 0, ['goodman_vole', 'ballad_finch']); A(G, 0, x => x.card === h && x.how === 'occupy', ctx); A(G, 0, x => x.card === b && x.how === 'occupy', ctx); });
 scen('bazaar + undertaker + queen + inn on rival', (G, ctx) => {
-  G.forest = [D.forest.findIndex(f => f.key === 'forest_meadow_bazaar'), 0, 1]; T.meadow(G, 0, 'mine'); T.meadow(G, 1, 'farm');
+  G.forest = [D.forest.findIndex(f => f.key === 'forest_meadow_bazaar'), 0, 1]; T.meadow(G, 0, 'flintpit'); T.meadow(G, 1, 'bramble_allotment');
   A(G, 0, x => x.type === 'worker' && x.k === 'forest' && x.i === 0, ctx);
-  T.city(G, 1, ['inn', 'post_office']); G.cur = 0; T.hand(G, 0, ['farm', 'mine']); T.meadow(G, 2, 'mine'); A(G, 0, x => x.type === 'worker' && x.k === 'dest' && x.o === 1 && HB.cardKey(x.c) === 'inn', ctx);
+  T.city(G, 1, ['lantern_rest', 'dovecote_depot']); G.cur = 0; T.hand(G, 0, ['bramble_allotment', 'flintpit']); T.meadow(G, 2, 'flintpit'); A(G, 0, x => x.type === 'worker' && x.k === 'dest' && x.o === 1 && HB.cardKey(x.c) === 'lantern_rest', ctx);
 });
 scen('monastery + cemetery with second slot', (G, ctx) => {
-  T.city(G, 0, ['monastery', 'monk', 'cemetery', 'undertaker']); G.players[0].workers = 4; G.players[0].season = 2;
-  A(G, 0, x => x.type === 'worker' && x.k === 'dest' && HB.cardKey(x.c) === 'monastery', ctx); T.res(G, 0, { twig: 3, berry: 3 }); T.topDeck(G, ['farm', 'mine', 'castle', 'palace']);
-  G.cur = 0; A(G, 0, x => x.type === 'worker' && x.k === 'dest' && HB.cardKey(x.c) === 'cemetery', ctx);
+  T.city(G, 0, ['quietstone_cloister', 'brother_moss', 'mossgrave_glade', 'hollow_sexton']); G.players[0].workers = 4; G.players[0].season = 2;
+  A(G, 0, x => x.type === 'worker' && x.k === 'dest' && HB.cardKey(x.c) === 'quietstone_cloister', ctx); T.res(G, 0, { twig: 3, berry: 3 }); T.topDeck(G, ['bramble_allotment', 'flintpit', 'stonecrown_keep', 'gildenfern_court']);
+  G.cur = 0; A(G, 0, x => x.type === 'worker' && x.k === 'dest' && HB.cardKey(x.c) === 'mossgrave_glade', ctx);
 });
 
 // forest, basic, haven, journey
 D.forest.forEach((f, i) => scen('forest ' + f.key, (G, ctx) => {
-  G.forest = [i, (i + 1) % 11, (i + 2) % 11]; T.hand(G, 0, ['farm', 'mine', 'castle', 'bard', 'wanderer']); T.meadow(G, 0, 'mine'); T.meadow(G, 1, 'farm');
+  G.forest = [i, (i + 1) % 11, (i + 2) % 11]; T.hand(G, 0, ['bramble_allotment', 'flintpit', 'stonecrown_keep', 'ballad_finch', 'footsore_drifter']); T.meadow(G, 0, 'flintpit'); T.meadow(G, 1, 'bramble_allotment');
   A(G, 0, x => x.type === 'worker' && x.k === 'forest' && x.i === 0, ctx);
 }));
 D.basic.forEach((b, i) => scen('basic ' + b.key, (G, ctx) => A(G, 0, x => x.type === 'worker' && x.k === 'basic' && x.i === i, ctx)));
-scen('haven', (G, ctx) => { T.hand(G, 0, ['farm', 'mine', 'castle', 'bard', 'wanderer']); A(G, 0, x => x.type === 'worker' && x.k === 'haven', ctx); });
-D.journey.forEach((j, i) => scen('journey ' + j.points, (G, ctx) => { G.players[0].season = 3; G.players[0].workers = 6; T.hand(G, 0, ['farm', 'mine', 'castle', 'bard', 'wanderer', 'monk']); A(G, 0, x => x.type === 'worker' && x.k === 'journey' && x.i === i, ctx); }));
+scen('haven', (G, ctx) => { T.hand(G, 0, ['bramble_allotment', 'flintpit', 'stonecrown_keep', 'ballad_finch', 'footsore_drifter']); A(G, 0, x => x.type === 'worker' && x.k === 'haven', ctx); });
+D.journey.forEach((j, i) => scen('journey ' + j.points, (G, ctx) => { G.players[0].season = 3; G.players[0].workers = 6; T.hand(G, 0, ['bramble_allotment', 'flintpit', 'stonecrown_keep', 'ballad_finch', 'footsore_drifter', 'brother_moss']); A(G, 0, x => x.type === 'worker' && x.k === 'journey' && x.i === i, ctx); }));
 // basic events
-const BASICSET = { bev_harvest_gathering: ['farm', 'mine', 'resin_refinery', 'twig_barge'], bev_wayfarers_fair: ['inn', 'chapel', 'lookout'], bev_elders_council: ['historian', 'crane', 'courthouse'], bev_wanderers_moot: ['bard', 'wanderer', 'ranger'] };
+const BASICSET = { bev_harvest_gathering: ['bramble_allotment', 'flintpit', 'amber_still', 'kindling_raft'], bev_wayfarers_fair: ['lantern_rest', 'candlewick_shrine', 'spyglass_perch'], bev_elders_council: ['chronicle_owl', 'pulley_lift', 'mosswood_assize'], bev_wanderers_moot: ['ballad_finch', 'footsore_drifter', 'trailwarden_fox'] };
 D.basicEvents.forEach((e, i) => scen('basic event ' + e.key, (G, ctx) => { T.city(G, 0, BASICSET[e.key]); A(G, 0, x => x.type === 'worker' && x.k === 'event' && x.e === 'b' && x.i === i, ctx); }));
 // special events
 D.specialEvents.forEach((e, i) => scen('special event ' + e.key, (G, ctx) => {
   G.sev = [{ k: i, o: -1, tuck: [], hid: false, stock: { twig: 0, resin: 0, pebble: 0, berry: 0 } }];
-  const need = e.req.slice(); if (e.colors) need.push('farm', 'mine', 'bard', 'wanderer', 'historian', 'crane', 'castle', 'palace', 'inn', 'chapel');
+  const need = e.req.slice(); if (e.colors) need.push('bramble_allotment', 'flintpit', 'ballad_finch', 'footsore_drifter', 'chronicle_owl', 'pulley_lift', 'stonecrown_keep', 'gildenfern_court', 'lantern_rest', 'candlewick_shrine');
   T.city(G, 0, need);
-  if (e.key === 'sev_gilded_shrine_vault') T.entry(G, 0, 'chapel').tok = 2;
+  if (e.key === 'sev_gilded_shrine_vault') T.entry(G, 0, 'candlewick_shrine').tok = 2;
   if (e.key === 'sev_hurry_scurry_dash') { G.players[0].workers = 3; G.players[0].season = 1; A(G, 0, x => x.type === 'worker' && x.k === 'basic' && D.basic[x.i].key === 'basic_berry_patch', ctx); }
-  if (e.key === 'sev_commencement_of_pupils') T.hand(G, 0, ['bard', 'wanderer', 'ranger', 'farm']);
-  if (e.key === 'sev_marsh_fever_remedy') T.city(G, 0, ['farm']);
+  if (e.key === 'sev_commencement_of_pupils') T.hand(G, 0, ['ballad_finch', 'footsore_drifter', 'trailwarden_fox', 'bramble_allotment']);
+  if (e.key === 'sev_marsh_fever_remedy') T.city(G, 0, ['bramble_allotment']);
   A(G, 0, x => x.type === 'worker' && x.k === 'event' && x.e === 's' && x.i === 0, ctx);
   if (G.sev[0].o !== 0) problems.push(ctx + ': not claimed');
   HB.score(G, 0);
@@ -154,11 +154,11 @@ D.specialEvents.forEach((e, i) => scen('special event ' + e.key, (G, ctx) => {
 const need = [];
 const req = (tag, why) => need.push([tag, why]);
 for (const c of D.cards) req('play:' + c.key, 'card ' + c.name);
-const FX = ['barge_toad', 'chip_sweep', 'doctor', 'fair_grounds', 'farm', 'general_store', 'husband', 'miner_mole', 'mine', 'monk', 'peddler', 'resin_refinery', 'storehouse', 'teacher', 'twig_barge', 'woodcarver', 'bard', 'postal_pigeon', 'ranger', 'shepherd', 'undertaker', 'wanderer', 'fool', 'ruins', 'historian', 'shopkeeper', 'courthouse', 'clock_tower'];
+const FX = ['reedpunt_toad', 'tinder_chipmunk', 'poultice_badger', 'midsummer_green', 'bramble_allotment', 'cranny_market', 'goodman_vole', 'echo_mole', 'flintpit', 'brother_moss', 'haggle_magpie', 'amber_still', 'hoard_cellar', 'slate_schoolmarm', 'kindling_raft', 'whittle_beaver', 'ballad_finch', 'parcel_dove', 'trailwarden_fox', 'crook_shrew', 'hollow_sexton', 'footsore_drifter', 'mudpie_jester', 'toppled_hall', 'chronicle_owl', 'tallyshop_mouse', 'mosswood_assize', 'dewdrop_belfry'];
 for (const k of FX) req('fx:' + k, 'effect of ' + k);
-for (const k of ['inn', 'post_office', 'queen', 'cemetery', 'chapel', 'lookout', 'monastery', 'university', 'storehouse']) req('visit:' + k, 'visit ' + k);
-for (const k of ['architect', 'castle', 'ever_tree', 'king', 'palace', 'school', 'theater', 'wife']) req('score:' + k, 'end-game bonus of ' + k);
-for (const h of ['pay', 'occupy', 'innkeeper', 'crane', 'dungeon', 'judge', 'inn', 'bazaar', 'free']) req('how:' + h, 'ability/way: ' + h);
+for (const k of ['lantern_rest', 'dovecote_depot', 'thistle_regent', 'mossgrave_glade', 'candlewick_shrine', 'spyglass_perch', 'quietstone_cloister', 'lorewood_college', 'hoard_cellar']) req('visit:' + k, 'visit ' + k);
+for (const k of ['master_lathwright', 'stonecrown_keep', 'elderheart_oak', 'bramble_sovereign', 'gildenfern_court', 'acorn_academy', 'glowworm_playhouse', 'goodwife_vole']) req('score:' + k, 'end-game bonus of ' + k);
+for (const h of ['pay', 'occupy', 'hostler_hedgehog', 'pulley_lift', 'thornhold_cells', 'gavel_marten', 'lantern_rest', 'bazaar', 'free']) req('how:' + h, 'ability/way: ' + h);
 for (const f of D.forest) req('forest:' + f.key, 'forest ' + f.name);
 D.basic.forEach((b, i) => req('basic:' + i, 'basic ' + b.name));
 req('haven', 'haven'); D.journey.forEach((j, i) => req('journey:' + i, 'journey ' + j.points));

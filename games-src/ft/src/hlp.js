@@ -59,7 +59,7 @@ const HLP_RULES=[
  {phase:'collect',title:'Each colour acts',text:'Advisors and Sages are kept. Traders fetch goods. Masons earn coins. Shadows remove people. Crafters make items.',pic:()=>hpics([['meeple','vizier'],['meeple','merchant'],['meeple','builder'],['meeple','assassin']])},
  {phase:'collect',title:'Then the tile',text:'After the tribe, the tile you ended on has its own action: build, plant, summon or buy.',pic:()=>hpics([['meeple','merchant'],'>',['tile','small']])},
  {phase:'collect',title:'Optional powers',text:'Djinn and item chips are optional. Tap one, then a glowing target.',pic:()=>hpics([['chip','✨ Power'],'>',['tap']])},
- {phase:'mason',title:'Blue tiles pay',text:'Each Mason earns 1 coin per blue tile within one step.',pic:()=>hpics([['meeple','builder','×'],['tile','sacred','blue'],'>',['coin','+']])},
+ {phase:'mason',title:'Blue tiles pay',text:'Each Mason earns 1 coin per blue tile in the 3x3 around the landing tile: diagonals and the landing tile count.',pic:()=>hpics([['meeple','builder','×'],['tile','sacred','blue'],'>',['coin','+']])},
  {phase:'mason',title:'Mystic Mason',text:'Spending a Mystic card adds one Mason to the count, but the card is gone.',pic:()=>hpics([['goods','fakir'],'>',['meeple','builder','+1']])},
  {phase:'shadow',title:'Reach',text:'Shadows remove a nearby person, or a rival’s Advisor or Sage.',pic:()=>hpics([['meeple','assassin'],'>',['meeple','vizier','Rival']])},
  {phase:'shadow',title:'Empty tiles',text:'Empty a tile and your camel claims it.',pic:()=>hpics([['tile','small','Empty'],'>',['camel']])},
@@ -73,8 +73,8 @@ const HLP_RULES=[
  {phase:'shrine',title:'Summon a djinn',text:'Pay 2 Sages, or a Sage and a Mystic. Paid Sages stop scoring.',pic:()=>hpics([['meeple','elder','×2'],'>',['djinn']])},
  {phase:'shrine',title:'What a djinn gives',text:'Each djinn scores points and has a power.',pic:()=>hpics([['djinn'],'>',['pts','+'],['chip','Power']])},
  {phase:'shrine',title:'Not worth it?',text:'You may skip. Tap Skip if no djinn is worth the Sages you would spend.',pic:()=>hpics([['pass',null,'Skip']])},
- {phase:'goods',title:'Goods make sets',text:'Sets of different goods score 1, 3, 7, 13, 21 points.',pic:()=>hpics([['goods','gold'],['goods','silk'],['goods','spice'],'>',['pts',7]])},
- {phase:'goods',title:'What it costs',text:'Stall: 3 coins for one of the first 3. Bazaar: 6 coins for two. Exchange: 4 coins for any.',pic:()=>hpics([['tile','small','3'],['tile','large','6'],['tile','exchange','4']])},
+ {phase:'goods',title:'Goods make sets',text:'Sets of different goods score 1, 3, 6, 12, 20 points.',pic:()=>hpics([['goods','gold'],['goods','silk'],['goods','spice'],'>',['pts',7]])},
+ {phase:'goods',title:'What it costs',text:'Stall: 3 coins for one of the first 3. Grand Bazaar: 6 coins for 2 of the first 6. Exchange: 4 coins for any.',pic:()=>hpics([['tile','small','3'],['tile','large','6'],['tile','exchange','4']])},
  {phase:'goods',title:'Mystic cards',text:'Mystic cards boost Masons and Shadows and pay for djinns. They never join a set.',pic:()=>hpics([['goods','fakir']])},
  {phase:'workshop',title:'Items',text:'Pay 1 Crafter or 2 Mystics to take the top item. Items give points or one-off powers.',pic:()=>hpics([['meeple','artisan','×1'],'>',['icon','🪄',null,'#9a5bd0']])},
  {phase:'workshop',title:'Using items',text:'Tap an item chip to use it. You may use one item each turn.',pic:()=>hpics([['chip','🪄 Item'],'>',['tap']])},
@@ -158,9 +158,13 @@ function hlpWhy(m,hp){let t='';
      else if(q.kind==='item')t='Keep the item worth most to you.';
      else if(q.kind==='djinn'&&q.cards&&DJ[q.cards[m.i]])t='Keep '+DJ[q.cards[m.i]].n+': worth '+DJ[q.cards[m.i]].vp+' points.';break}}
   return capW(t,15)}
-function hlpSuggest(){if(hlpBusy())return null;const hp=me();const m=hlpAdvice();if(!m)return null;
+function hlpSuggest(){if(hlpBusy())return null;const hp=me();const m=hlpAdvice();if(!m)return null;if(m.act==='step'&&!(typeof gdStep==='function'&&gdStep()))return hlpWalk();   // F3: during a walk the button names a good place to end; the player plans the drops
+  
   const why=hlpWhy(m,hp);if(!why||!hlpEl(m))return null;
   return {why,key:JSON.stringify(m),target:()=>hlpEl(m),from:null}}
+// asked for during a walk: the ending that takes the most people (ties: the most valuable tile)
+function hlpWalk(){try{if(typeof f3Mine!=='function'||!f3Mine())return null;let b=null;for(const o of f3Outs()){const v=o.n*10+(G.board[o.e].v||0);if(!b||v>b.v)b={o,v}}if(!b)return null;const o=b.o;const nm=o.n>1?MPLUR[o.c]:MNAME[o.c];
+  return {why:'Try ending here: take '+o.n+' '+nm+'. Tap this tile, then ✓.',key:'walk'+o.e+o.c,target:()=>tileEl(o.e),from:null}}catch(e){return null}}
 // ---------------------------------------------------------------- wiring
 let _hlpInit=false;
 function hlpInit(){if(_hlpInit||typeof GXH==='undefined')return;_hlpInit=true;

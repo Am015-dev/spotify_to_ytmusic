@@ -37,7 +37,7 @@
  },
  "cards": [
   {
-   "role": "architect",
+   "role": "master_lathwright",
    "new_name": "Master Lathwright",
    "copies": 2,
    "type": "prosperity",
@@ -48,7 +48,7 @@
     "berry": 4
    },
    "base_points": 2,
-   "linked": "crane",
+   "linked": "pulley_lift",
    "spec": {
     "timing": "end_game",
     "ops": [
@@ -64,7 +64,7 @@
    "new_text": "At the end of the game, score 1 point per resin and per pebble you still hold, to a maximum of 6."
   },
   {
-   "role": "bard",
+   "role": "ballad_finch",
    "new_name": "Ballad Finch",
    "copies": 2,
    "type": "traveler",
@@ -75,7 +75,7 @@
     "berry": 3
    },
    "base_points": 0,
-   "linked": "theatre",
+   "linked": "ballad_finch_pair",
    "spec": {
     "timing": [
      "on_play"
@@ -91,7 +91,7 @@
    "new_text": "Sing away up to 5 cards from your hand and take a point token for each."
   },
   {
-   "role": "barge_toad",
+   "role": "reedpunt_toad",
    "new_name": "Reedpunt Toad",
    "copies": 3,
    "type": "production",
@@ -102,7 +102,7 @@
     "berry": 2
    },
    "base_points": 1,
-   "linked": "twig_barge",
+   "linked": "kindling_raft",
    "spec": {
     "timing": [
      "on_play",
@@ -121,7 +121,7 @@
    "new_text": "Gain 2 twigs for every Allotment (Farm-role card) in your city."
   },
   {
-   "role": "chip_sweep",
+   "role": "tinder_chipmunk",
    "new_name": "Tinder Chipmunk",
    "copies": 3,
    "type": "production",
@@ -132,7 +132,7 @@
     "berry": 3
    },
    "base_points": 2,
-   "linked": "resin_refinery",
+   "linked": "amber_still",
    "spec": {
     "timing": [
      "on_play",
@@ -149,7 +149,7 @@
    "new_text": "Re-run one other production card in your own city."
   },
   {
-   "role": "doctor",
+   "role": "poultice_badger",
    "new_name": "Poultice Badger",
    "copies": 2,
    "type": "production",
@@ -160,7 +160,7 @@
     "berry": 4
    },
    "base_points": 4,
-   "linked": "university",
+   "linked": "lorewood_college",
    "spec": {
     "timing": [
      "on_play",
@@ -178,7 +178,7 @@
    "new_text": "Spend up to 3 berries and take a point token for each one spent."
   },
   {
-   "role": "fool",
+   "role": "mudpie_jester",
    "new_name": "Mudpie Jester",
    "copies": 2,
    "type": "traveler",
@@ -189,7 +189,7 @@
     "berry": 3
    },
    "base_points": -2,
-   "linked": "fair_grounds",
+   "linked": "midsummer_green",
    "spec": {
     "timing": [
      "on_play"
@@ -206,7 +206,7 @@
    "new_text": "Plant this prankster in a rival village; it takes one of their spaces and costs them 2 points."
   },
   {
-   "role": "historian",
+   "role": "chronicle_owl",
    "new_name": "Chronicle Owl",
    "copies": 3,
    "type": "governance",
@@ -217,7 +217,7 @@
     "berry": 2
    },
    "base_points": 1,
-   "linked": "clock_tower",
+   "linked": "dewdrop_belfry",
    "spec": {
     "timing": "ongoing",
     "ops": [
@@ -231,7 +231,7 @@
    "new_text": "Whenever you play another card, draw 1 card afterwards."
   },
   {
-   "role": "husband",
+   "role": "goodman_vole",
    "new_name": "Goodman Vole",
    "copies": 4,
    "type": "production",
@@ -242,7 +242,7 @@
     "berry": 3
    },
    "base_points": 2,
-   "linked": "farm",
+   "linked": "bramble_allotment",
    "spec": {
     "timing": [
      "on_play",
@@ -256,7 +256,7 @@
      }
     ],
     "pairing": {
-     "partner": "wife",
+     "partner": "goodwife_vole",
      "shares_space": true,
      "decided_when_second_card_played": true,
      "cannot_pair_later": true,
@@ -266,7 +266,7 @@
    "new_text": "Shares a space with one Goodwife. If paired and you own an Allotment, gain any 1 resource on play and every production."
   },
   {
-   "role": "innkeeper",
+   "role": "hostler_hedgehog",
    "new_name": "Hostler Hedgehog",
    "copies": 3,
    "type": "governance",
@@ -277,7 +277,7 @@
     "berry": 1
    },
    "base_points": 1,
-   "linked": "inn",
+   "linked": "lantern_rest",
    "spec": {
     "timing": "ongoing_discount",
     "ops": [
@@ -295,7 +295,7 @@
    "new_text": "When you play a Critter you may send this hedgehog away to cut 3 berries off its price."
   },
   {
-   "role": "judge",
+   "role": "gavel_marten",
    "new_name": "Gavel Marten",
    "copies": 2,
    "type": "governance",
@@ -306,7 +306,7 @@
     "berry": 3
    },
    "base_points": 2,
-   "linked": "courthouse",
+   "linked": "mosswood_assize",
    "spec": {
     "timing": "ongoing_discount",
     "ops": [
@@ -321,7 +321,7 @@
    "new_text": "When playing any card, pay one required resource with a different resource of your choice."
   },
   {
-   "role": "king",
+   "role": "bramble_sovereign",
    "new_name": "Bramble Sovereign",
    "copies": 2,
    "type": "prosperity",
@@ -332,7 +332,7 @@
     "berry": 6
    },
    "base_points": 4,
-   "linked": "castle",
+   "linked": "stonecrown_keep",
    "spec": {
     "timing": "end_game",
     "ops": [
@@ -351,7 +351,7 @@
    "new_text": "End of game: 1 point per basic event and 2 points per special event you achieved."
   },
   {
-   "role": "miner_mole",
+   "role": "echo_mole",
    "new_name": "Echo Mole",
    "copies": 3,
    "type": "production",
@@ -362,7 +362,7 @@
     "berry": 3
    },
    "base_points": 1,
-   "linked": "mine",
+   "linked": "flintpit",
    "spec": {
     "timing": [
      "on_play",
@@ -381,7 +381,7 @@
    "new_text": "Mimic any one production card in a rival village, as though it were theirs."
   },
   {
-   "role": "monk",
+   "role": "brother_moss",
    "new_name": "Brother Moss",
    "copies": 2,
    "type": "production",
@@ -392,7 +392,7 @@
     "berry": 1
    },
    "base_points": 0,
-   "linked": "monastery",
+   "linked": "quietstone_cloister",
    "spec": {
     "timing": [
      "on_play",
@@ -411,7 +411,7 @@
    "new_text": "Give up to 2 berries to a rival and take 2 point tokens for each. Opens the second Cloister slot."
   },
   {
-   "role": "peddler",
+   "role": "haggle_magpie",
    "new_name": "Haggle Magpie",
    "copies": 3,
    "type": "production",
@@ -422,7 +422,7 @@
     "berry": 2
    },
    "base_points": 1,
-   "linked": "ruins",
+   "linked": "toppled_hall",
    "spec": {
     "timing": [
      "on_play",
@@ -440,7 +440,7 @@
    "new_text": "Swap up to 2 of your resources for any 2 resources from the supply."
   },
   {
-   "role": "postal_pigeon",
+   "role": "parcel_dove",
    "new_name": "Parcel Dove",
    "copies": 3,
    "type": "traveler",
@@ -451,7 +451,7 @@
     "berry": 2
    },
    "base_points": 0,
-   "linked": "post_office",
+   "linked": "dovecote_depot",
    "spec": {
     "timing": [
      "on_play"
@@ -474,7 +474,7 @@
    "new_text": "Reveal 2 cards; you may play one worth up to 3 base points free; discard the other."
   },
   {
-   "role": "queen",
+   "role": "thistle_regent",
    "new_name": "Thistle Regent",
    "copies": 2,
    "type": "destination",
@@ -485,7 +485,7 @@
     "berry": 5
    },
    "base_points": 4,
-   "linked": "palace",
+   "linked": "gildenfern_court",
    "spec": {
     "timing": "visit",
     "visitable_by": "owner only",
@@ -500,7 +500,7 @@
    "new_text": "Send a worker here to play any card worth up to 3 base points from hand or meadow without paying."
   },
   {
-   "role": "ranger",
+   "role": "trailwarden_fox",
    "new_name": "Trailwarden Fox",
    "copies": 2,
    "type": "traveler",
@@ -511,7 +511,7 @@
     "berry": 2
    },
    "base_points": 1,
-   "linked": "dungeon",
+   "linked": "thornhold_cells",
    "spec": {
     "timing": [
      "on_play"
@@ -528,7 +528,7 @@
    "new_text": "Relocate one of your deployed workers to another legal spot. Opens the second Thornhold cell."
   },
   {
-   "role": "shepherd",
+   "role": "crook_shrew",
    "new_name": "Crook Shrew",
    "copies": 2,
    "type": "traveler",
@@ -539,7 +539,7 @@
     "berry": 3
    },
    "base_points": 1,
-   "linked": "chapel",
+   "linked": "candlewick_shrine",
    "spec": {
     "timing": [
      "on_play"
@@ -562,7 +562,7 @@
    "new_text": "Gain 3 berries plus 1 point token per token on your Shrine. If bought with berries, they go to a rival."
   },
   {
-   "role": "shopkeeper",
+   "role": "tallyshop_mouse",
    "new_name": "Tallyshop Mouse",
    "copies": 3,
    "type": "governance",
@@ -573,7 +573,7 @@
     "berry": 2
    },
    "base_points": 1,
-   "linked": "general_store",
+   "linked": "cranny_market",
    "spec": {
     "timing": "ongoing",
     "ops": [
@@ -589,7 +589,7 @@
    "new_text": "Gain 1 berry whenever you play another Critter."
   },
   {
-   "role": "teacher",
+   "role": "slate_schoolmarm",
    "new_name": "Slate Schoolmarm",
    "copies": 3,
    "type": "production",
@@ -600,7 +600,7 @@
     "berry": 2
    },
    "base_points": 2,
-   "linked": "school",
+   "linked": "acorn_academy",
    "spec": {
     "timing": [
      "on_play",
@@ -620,7 +620,7 @@
    "new_text": "Draw 2 cards, keep one, and hand the other to a rival."
   },
   {
-   "role": "undertaker",
+   "role": "hollow_sexton",
    "new_name": "Hollow Sexton",
    "copies": 2,
    "type": "traveler",
@@ -631,7 +631,7 @@
     "berry": 2
    },
    "base_points": 1,
-   "linked": "cemetary",
+   "linked": "hollow_sexton_pair",
    "spec": {
     "timing": [
      "on_play"
@@ -654,7 +654,7 @@
    "new_text": "Clear 3 meadow cards, refill, then take 1 meadow card. Opens the second Mossgrave Glade plot."
   },
   {
-   "role": "wanderer",
+   "role": "footsore_drifter",
    "new_name": "Footsore Drifter",
    "copies": 3,
    "type": "traveler",
@@ -665,7 +665,7 @@
     "berry": 2
    },
    "base_points": 1,
-   "linked": "lookout",
+   "linked": "spyglass_perch",
    "spec": {
     "timing": [
      "on_play"
@@ -681,7 +681,7 @@
    "new_text": "Draw 3 cards. Does not use up a city space."
   },
   {
-   "role": "wife",
+   "role": "goodwife_vole",
    "new_name": "Goodwife Vole",
    "copies": 4,
    "type": "prosperity",
@@ -692,7 +692,7 @@
     "berry": 2
    },
    "base_points": 2,
-   "linked": "farm",
+   "linked": "bramble_allotment",
    "spec": {
     "timing": "end_game",
     "ops": [
@@ -703,7 +703,7 @@
      }
     ],
     "pairing": {
-     "partner": "husband",
+     "partner": "goodman_vole",
      "shares_space": true
     },
     "note": "Purple: base 2 plus the bonus 3."
@@ -711,7 +711,7 @@
    "new_text": "Shares a space with a Goodman; if paired, worth 3 extra points at the end."
   },
   {
-   "role": "woodcarver",
+   "role": "whittle_beaver",
    "new_name": "Whittle Beaver",
    "copies": 3,
    "type": "production",
@@ -722,7 +722,7 @@
     "berry": 2
    },
    "base_points": 2,
-   "linked": "storehouse",
+   "linked": "hoard_cellar",
    "spec": {
     "timing": [
      "on_play",
@@ -740,7 +740,7 @@
    "new_text": "Spend up to 3 twigs and take a point token for each."
   },
   {
-   "role": "castle",
+   "role": "stonecrown_keep",
    "new_name": "Stonecrown Keep",
    "copies": 2,
    "type": "prosperity",
@@ -753,7 +753,7 @@
     "pebble": 3
    },
    "base_points": 4,
-   "linked": "king",
+   "linked": "bramble_sovereign",
    "spec": {
     "timing": "end_game",
     "ops": [
@@ -767,7 +767,7 @@
    "new_text": "End of game: 1 point per common construction in your city."
   },
   {
-   "role": "cemetery",
+   "role": "mossgrave_glade",
    "new_name": "Mossgrave Glade",
    "copies": 2,
    "type": "destination",
@@ -778,13 +778,13 @@
     "pebble": 2
    },
    "base_points": 0,
-   "linked": "undertaker",
+   "linked": "hollow_sexton",
    "spec": {
     "timing": "visit",
     "visitable_by": "owner only",
     "slots": {
      "base": 1,
-     "second_unlocked_by": "undertaker"
+     "second_unlocked_by": "hollow_sexton"
     },
     "ops": [
      {
@@ -807,7 +807,7 @@
    "new_text": "A worker settles here forever; reveal 4 cards from deck or discard pile and play one free, discarding the rest."
   },
   {
-   "role": "chapel",
+   "role": "candlewick_shrine",
    "new_name": "Candlewick Shrine",
    "copies": 2,
    "type": "destination",
@@ -820,7 +820,7 @@
     "pebble": 1
    },
    "base_points": 2,
-   "linked": "shepherd",
+   "linked": "crook_shrew",
    "spec": {
     "timing": "visit",
     "visitable_by": "owner only",
@@ -841,7 +841,7 @@
    "new_text": "Add a point token here, then draw 2 cards for every token now on the Shrine."
   },
   {
-   "role": "clock_tower",
+   "role": "dewdrop_belfry",
    "new_name": "Dewdrop Belfry",
    "copies": 3,
    "type": "governance",
@@ -853,7 +853,7 @@
     "pebble": 1
    },
    "base_points": 0,
-   "linked": "historian",
+   "linked": "chronicle_owl",
    "spec": {
     "timing": "on_prepare_for_season",
     "ops": [
@@ -872,7 +872,7 @@
    "new_text": "Place 3 tokens here when built. Before recalling workers each season, spend one to repeat a basic or forest spot you occupy. Leftover tokens score."
   },
   {
-   "role": "courthouse",
+   "role": "mosswood_assize",
    "new_name": "Mosswood Assize",
    "copies": 2,
    "type": "governance",
@@ -885,7 +885,7 @@
     "pebble": 2
    },
    "base_points": 2,
-   "linked": "judge",
+   "linked": "gavel_marten",
    "spec": {
     "timing": "ongoing",
     "ops": [
@@ -904,7 +904,7 @@
    "new_text": "Gain 1 twig, resin or pebble each time you build another construction."
   },
   {
-   "role": "crane",
+   "role": "pulley_lift",
    "new_name": "Pulley Lift",
    "copies": 3,
    "type": "governance",
@@ -915,7 +915,7 @@
     "pebble": 1
    },
    "base_points": 1,
-   "linked": "architect",
+   "linked": "master_lathwright",
    "spec": {
     "timing": "ongoing_discount",
     "ops": [
@@ -931,7 +931,7 @@
    "new_text": "When building a Construction, dismantle this lift to cut 3 resources of your choice off the price."
   },
   {
-   "role": "dungeon",
+   "role": "thornhold_cells",
    "new_name": "Thornhold Cells",
    "copies": 2,
    "type": "governance",
@@ -943,7 +943,7 @@
     "pebble": 2
    },
    "base_points": 0,
-   "linked": "ranger",
+   "linked": "trailwarden_fox",
    "spec": {
     "timing": "ongoing_discount",
     "ops": [
@@ -958,7 +958,7 @@
     ],
     "slots": {
      "base": 1,
-     "second_unlocked_by": "ranger"
+     "second_unlocked_by": "trailwarden_fox"
     },
     "exclusive_with_other_card_playing_abilities": true,
     "note": "Only one cell per played card even with both open."
@@ -966,7 +966,7 @@
    "new_text": "Lock one of your Critters beneath this card to cut 3 resources off the price of a card. Opens a second cell with a Trailwarden."
   },
   {
-   "role": "ever_tree",
+   "role": "elderheart_oak",
    "new_name": "Elderheart Oak",
    "copies": 2,
    "type": "prosperity",
@@ -979,7 +979,7 @@
     "pebble": 3
    },
    "base_points": 5,
-   "linked": "any critter",
+   "linked": "elderheart_oak_pair",
    "spec": {
     "timing": "end_game",
     "ops": [
@@ -994,7 +994,7 @@
    "new_text": "End of game: 1 point per purple card in your city (itself included). Can house any one Critter for free."
   },
   {
-   "role": "fair_grounds",
+   "role": "midsummer_green",
    "new_name": "Midsummer Green",
    "copies": 3,
    "type": "production",
@@ -1007,7 +1007,7 @@
     "pebble": 1
    },
    "base_points": 3,
-   "linked": "fool",
+   "linked": "mudpie_jester",
    "spec": {
     "timing": [
      "on_play",
@@ -1023,7 +1023,7 @@
    "new_text": "Draw 2 cards."
   },
   {
-   "role": "farm",
+   "role": "bramble_allotment",
    "new_name": "Bramble Allotment",
    "copies": 8,
    "type": "production",
@@ -1053,7 +1053,7 @@
    "new_text": "Gain 1 berry."
   },
   {
-   "role": "general_store",
+   "role": "cranny_market",
    "new_name": "Cranny Market",
    "copies": 3,
    "type": "production",
@@ -1065,7 +1065,7 @@
     "pebble": 1
    },
    "base_points": 1,
-   "linked": "shopkeeper",
+   "linked": "tallyshop_mouse",
    "spec": {
     "timing": [
      "on_play",
@@ -1090,7 +1090,7 @@
    "new_text": "Gain 1 berry, or 2 berries if you own any Allotment."
   },
   {
-   "role": "inn",
+   "role": "lantern_rest",
    "new_name": "Lantern Rest",
    "copies": 3,
    "type": "destination",
@@ -1102,7 +1102,7 @@
     "resin": 1
    },
    "base_points": 2,
-   "linked": "innkeeper",
+   "linked": "hostler_hedgehog",
    "spec": {
     "timing": "visit",
     "visitable_by": "owner and opponents",
@@ -1121,7 +1121,7 @@
    "new_text": "Send a worker to play a meadow card for 3 fewer resources. Rivals may visit too and pay you 1 point."
   },
   {
-   "role": "lookout",
+   "role": "spyglass_perch",
    "new_name": "Spyglass Perch",
    "copies": 2,
    "type": "destination",
@@ -1134,7 +1134,7 @@
     "pebble": 1
    },
    "base_points": 2,
-   "linked": "wanderer",
+   "linked": "footsore_drifter",
    "spec": {
     "timing": "visit",
     "visitable_by": "owner only",
@@ -1150,7 +1150,7 @@
    "new_text": "Copy any one basic or forest spot, even if it is occupied."
   },
   {
-   "role": "mine",
+   "role": "flintpit",
    "new_name": "Flintpit",
    "copies": 3,
    "type": "production",
@@ -1163,7 +1163,7 @@
     "pebble": 1
    },
    "base_points": 2,
-   "linked": "miner_mole",
+   "linked": "echo_mole",
    "spec": {
     "timing": [
      "on_play",
@@ -1181,7 +1181,7 @@
    "new_text": "Gain 1 pebble."
   },
   {
-   "role": "monastery",
+   "role": "quietstone_cloister",
    "new_name": "Quietstone Cloister",
    "copies": 2,
    "type": "destination",
@@ -1194,13 +1194,13 @@
     "pebble": 1
    },
    "base_points": 1,
-   "linked": "monk",
+   "linked": "brother_moss",
    "spec": {
     "timing": "visit",
     "visitable_by": "owner only",
     "slots": {
      "base": 1,
-     "second_unlocked_by": "monk"
+     "second_unlocked_by": "brother_moss"
     },
     "ops": [
      {
@@ -1219,7 +1219,7 @@
    "new_text": "A worker settles here forever: give 2 resources to a rival and take 4 point tokens."
   },
   {
-   "role": "palace",
+   "role": "gildenfern_court",
    "new_name": "Gildenfern Court",
    "copies": 2,
    "type": "prosperity",
@@ -1232,7 +1232,7 @@
     "pebble": 3
    },
    "base_points": 4,
-   "linked": "queen",
+   "linked": "thistle_regent",
    "spec": {
     "timing": "end_game",
     "ops": [
@@ -1246,7 +1246,7 @@
    "new_text": "End of game: 1 point per unique construction, itself included."
   },
   {
-   "role": "post_office",
+   "role": "dovecote_depot",
    "new_name": "Dovecote Depot",
    "copies": 3,
    "type": "destination",
@@ -1258,7 +1258,7 @@
     "resin": 2
    },
    "base_points": 2,
-   "linked": "postal_pigeon",
+   "linked": "parcel_dove",
    "spec": {
     "timing": "visit",
     "visitable_by": "owner and opponents",
@@ -1283,7 +1283,7 @@
    "new_text": "Give a rival 2 cards, discard any others you like, then refill your hand from the deck. Visitors pay you 1 point."
   },
   {
-   "role": "resin_refinery",
+   "role": "amber_still",
    "new_name": "Amber Still",
    "copies": 3,
    "type": "production",
@@ -1295,7 +1295,7 @@
     "pebble": 1
    },
    "base_points": 1,
-   "linked": "chip_sweep",
+   "linked": "tinder_chipmunk",
    "spec": {
     "timing": [
      "on_play",
@@ -1313,7 +1313,7 @@
    "new_text": "Gain 1 resin."
   },
   {
-   "role": "ruins",
+   "role": "toppled_hall",
    "new_name": "Toppled Hall",
    "copies": 3,
    "type": "traveler",
@@ -1322,7 +1322,7 @@
    "unique": false,
    "cost": {},
    "base_points": 0,
-   "linked": "peddler",
+   "linked": "haggle_magpie",
    "spec": {
     "timing": [
      "on_play"
@@ -1346,7 +1346,7 @@
    "new_text": "Raze one of your constructions, build here in its place, regain its exact cost, and draw 2 cards."
   },
   {
-   "role": "school",
+   "role": "acorn_academy",
    "new_name": "Acorn Academy",
    "copies": 2,
    "type": "prosperity",
@@ -1358,7 +1358,7 @@
     "resin": 2
    },
    "base_points": 2,
-   "linked": "teacher",
+   "linked": "slate_schoolmarm",
    "spec": {
     "timing": "end_game",
     "ops": [
@@ -1372,7 +1372,7 @@
    "new_text": "End of game: 1 point per common critter."
   },
   {
-   "role": "storehouse",
+   "role": "hoard_cellar",
    "new_name": "Hoard Cellar",
    "copies": 3,
    "type": "production",
@@ -1385,7 +1385,7 @@
     "pebble": 1
    },
    "base_points": 2,
-   "linked": "woodcarver",
+   "linked": "whittle_beaver",
    "spec": {
     "timing": [
      "on_play",
@@ -1419,7 +1419,7 @@
    "new_text": "Each production adds a stack (3 twigs, 2 resin, 1 pebble or 2 berries) to this card; send a worker to haul it all away."
   },
   {
-   "role": "theater",
+   "role": "glowworm_playhouse",
    "new_name": "Glowworm Playhouse",
    "copies": 2,
    "type": "prosperity",
@@ -1432,7 +1432,7 @@
     "pebble": 1
    },
    "base_points": 3,
-   "linked": "bard",
+   "linked": "ballad_finch",
    "spec": {
     "timing": "end_game",
     "ops": [
@@ -1446,7 +1446,7 @@
    "new_text": "End of game: 1 point per unique critter."
   },
   {
-   "role": "twig_barge",
+   "role": "kindling_raft",
    "new_name": "Kindling Raft",
    "copies": 3,
    "type": "production",
@@ -1458,7 +1458,7 @@
     "pebble": 1
    },
    "base_points": 1,
-   "linked": "barge_toad",
+   "linked": "reedpunt_toad",
    "spec": {
     "timing": [
      "on_play",
@@ -1476,7 +1476,7 @@
    "new_text": "Gain 2 twigs."
   },
   {
-   "role": "university",
+   "role": "lorewood_college",
    "new_name": "Lorewood College",
    "copies": 2,
    "type": "destination",
@@ -1488,7 +1488,7 @@
     "pebble": 2
    },
    "base_points": 3,
-   "linked": "doctor",
+   "linked": "poultice_badger",
    "spec": {
     "timing": "visit",
     "visitable_by": "owner only",
@@ -1516,7 +1516,7 @@
  ],
  "forest_locations": [
   {
-   "role": "forest_two_berry_one_card",
+   "role": "berry_thicket",
    "new_name": "Berry Thicket",
    "effect": {
     "gain": {
@@ -1533,7 +1533,7 @@
    "note": "ASSUMPTION (2 sources agree): all 11 are exclusive, any can be drawn at any player count; 2p/3p use only first slot, 4p opens a second slot (two different players, never twice the same player)."
   },
   {
-   "role": "forest_two_any",
+   "role": "foragers_crossing",
    "new_name": "Foragers Crossing",
    "effect": {
     "gain_any": 2
@@ -1547,7 +1547,7 @@
    "note": "ASSUMPTION (2 sources agree): all 11 are exclusive, any can be drawn at any player count; 2p/3p use only first slot, 4p opens a second slot (two different players, never twice the same player)."
   },
   {
-   "role": "forest_discard_any_draw_two_each",
+   "role": "rummage_hollow",
    "new_name": "Rummage Hollow",
    "effect": {
     "discard_any_from_hand": true,
@@ -1563,7 +1563,7 @@
    "note": "ASSUMPTION (2 sources agree): all 11 are exclusive, any can be drawn at any player count; 2p/3p use only first slot, 4p opens a second slot (two different players, never twice the same player)."
   },
   {
-   "role": "forest_copy_basic_plus_card",
+   "role": "echoing_meadow",
    "new_name": "Echoing Meadow",
    "effect": {
     "copy_basic_location": true,
@@ -1579,7 +1579,7 @@
    "note": "ASSUMPTION (2 sources agree): all 11 are exclusive, any can be drawn at any player count; 2p/3p use only first slot, 4p opens a second slot (two different players, never twice the same player)."
   },
   {
-   "role": "forest_pebble_three_cards",
+   "role": "quarry_burrow",
    "new_name": "Quarry Burrow",
    "effect": {
     "gain": {
@@ -1596,7 +1596,7 @@
    "note": "ASSUMPTION (2 sources agree): all 11 are exclusive, any can be drawn at any player count; 2p/3p use only first slot, 4p opens a second slot (two different players, never twice the same player)."
   },
   {
-   "role": "forest_twig_resin_berry",
+   "role": "mixed_glade",
    "new_name": "Mixed Glade",
    "effect": {
     "gain": {
@@ -1614,7 +1614,7 @@
    "note": "ASSUMPTION (2 sources agree): all 11 are exclusive, any can be drawn at any player count; 2p/3p use only first slot, 4p opens a second slot (two different players, never twice the same player)."
   },
   {
-   "role": "forest_three_berries",
+   "role": "bumper_bramble",
    "new_name": "Bumper Bramble",
    "effect": {
     "gain": {
@@ -1630,7 +1630,7 @@
    "note": "ASSUMPTION (2 sources agree): all 11 are exclusive, any can be drawn at any player count; 2p/3p use only first slot, 4p opens a second slot (two different players, never twice the same player)."
   },
   {
-   "role": "forest_two_resin_one_twig",
+   "role": "sapwell_copse",
    "new_name": "Sapwell Copse",
    "effect": {
     "gain": {
@@ -1647,7 +1647,7 @@
    "note": "ASSUMPTION (2 sources agree): all 11 are exclusive, any can be drawn at any player count; 2p/3p use only first slot, 4p opens a second slot (two different players, never twice the same player)."
   },
   {
-   "role": "forest_two_cards_one_any",
+   "role": "postbag_clearing",
    "new_name": "Postbag Clearing",
    "effect": {
     "draw": 2,
@@ -1662,7 +1662,7 @@
    "note": "ASSUMPTION (2 sources agree): all 11 are exclusive, any can be drawn at any player count; 2p/3p use only first slot, 4p opens a second slot (two different players, never twice the same player)."
   },
   {
-   "role": "forest_discard_up_to_three_gain_any_each",
+   "role": "barter_stump",
    "new_name": "Barter Stump",
    "effect": {
     "discard_from_hand_max": 3,
@@ -1677,7 +1677,7 @@
    "note": "ASSUMPTION (2 sources agree): all 11 are exclusive, any can be drawn at any player count; 2p/3p use only first slot, 4p opens a second slot (two different players, never twice the same player)."
   },
   {
-   "role": "forest_meadow_two_play_one_discounted",
+   "role": "meadow_bazaar",
    "new_name": "Meadow Bazaar",
    "effect": {
     "draw_from_meadow": 2,
@@ -1698,7 +1698,7 @@
  ],
  "basic_events": [
   {
-   "role": "basic_event_four_production",
+   "role": "harvest_gathering",
    "new_name": "Harvest Gathering",
    "requires": {
     "production": 4
@@ -1706,7 +1706,7 @@
    "points": 3
   },
   {
-   "role": "basic_event_three_destination",
+   "role": "wayfarers_fair",
    "new_name": "Wayfarers' Fair",
    "requires": {
     "destination": 3
@@ -1714,7 +1714,7 @@
    "points": 3
   },
   {
-   "role": "basic_event_three_governance",
+   "role": "elders_council",
    "new_name": "Elders Council",
    "requires": {
     "governance": 3
@@ -1722,7 +1722,7 @@
    "points": 3
   },
   {
-   "role": "basic_event_three_traveler",
+   "role": "wanderers_moot",
    "new_name": "Wanderers' Moot",
    "requires": {
     "traveler": 3
@@ -1735,8 +1735,8 @@
    "role": "special_grand_market_scheme",
    "new_name": "Grand Market Scheme",
    "requires_cards": [
-    "shopkeeper",
-    "post_office"
+    "tallyshop_mouse",
+    "dovecote_depot"
    ],
    "base_points": 0,
    "on_achieve": {
@@ -1752,8 +1752,8 @@
    "role": "special_hurry_scurry_dash",
    "new_name": "Hurry-Scurry Dash",
    "requires_cards": [
-    "chip_sweep",
-    "clock_tower"
+    "tinder_chipmunk",
+    "dewdrop_belfry"
    ],
    "base_points": 4,
    "on_achieve": {
@@ -1769,8 +1769,8 @@
    "role": "special_night_of_sparklers",
    "new_name": "Night of Sparklers",
    "requires_cards": [
-    "lookout",
-    "miner_mole"
+    "spyglass_perch",
+    "echo_mole"
    ],
    "base_points": 0,
    "on_achieve": {
@@ -1790,8 +1790,8 @@
    "role": "special_lost_parchments_unearthed",
    "new_name": "Lost Parchments Unearthed",
    "requires_cards": [
-    "historian",
-    "ruins"
+    "chronicle_owl",
+    "toppled_hall"
    ],
    "base_points": 0,
    "on_achieve": {
@@ -1809,8 +1809,8 @@
    "role": "special_acorn_bandits_seized",
    "new_name": "Acorn Bandits Seized",
    "requires_cards": [
-    "courthouse",
-    "ranger"
+    "mosswood_assize",
+    "trailwarden_fox"
    ],
    "base_points": 0,
    "on_achieve": {
@@ -1826,8 +1826,8 @@
    "role": "special_marsh_fever_remedy",
    "new_name": "Marsh Fever Remedy",
    "requires_cards": [
-    "undertaker",
-    "barge_toad"
+    "hollow_sexton",
+    "reedpunt_toad"
    ],
    "base_points": 6,
    "on_achieve": {
@@ -1846,8 +1846,8 @@
    "role": "special_wingborne_healers",
    "new_name": "Wingborne Healers",
    "requires_cards": [
-    "doctor",
-    "postal_pigeon"
+    "poultice_badger",
+    "parcel_dove"
    ],
    "base_points": 0,
    "on_achieve": {},
@@ -1861,8 +1861,8 @@
    "role": "special_commencement_of_pupils",
    "new_name": "Commencement of Pupils",
    "requires_cards": [
-    "teacher",
-    "university"
+    "slate_schoolmarm",
+    "lorewood_college"
    ],
    "base_points": 0,
    "on_achieve": {
@@ -1878,8 +1878,8 @@
    "role": "special_counsel_for_scoundrels",
    "new_name": "Counsel for Scoundrels",
    "requires_cards": [
-    "monk",
-    "dungeon"
+    "brother_moss",
+    "thornhold_cells"
    ],
    "base_points": 0,
    "on_achieve": {},
@@ -1893,8 +1893,8 @@
    "role": "special_pilgrims_trail",
    "new_name": "Pilgrims Trail",
    "requires_cards": [
-    "monastery",
-    "wanderer"
+    "quietstone_cloister",
+    "footsore_drifter"
    ],
    "base_points": 0,
    "on_achieve": {},
@@ -1908,8 +1908,8 @@
    "role": "special_resident_minstrel",
    "new_name": "Resident Minstrel",
    "requires_cards": [
-    "inn",
-    "bard"
+    "lantern_rest",
+    "ballad_finch"
    ],
    "base_points": 0,
    "on_achieve": {
@@ -1928,8 +1928,8 @@
    "role": "special_gilded_shrine_vault",
    "new_name": "Gilded Shrine Vault",
    "requires_cards": [
-    "woodcarver",
-    "chapel"
+    "whittle_beaver",
+    "candlewick_shrine"
    ],
    "base_points": 0,
    "on_achieve": {
@@ -1946,8 +1946,8 @@
    "role": "special_vigil_of_remembrance",
    "new_name": "Vigil of Remembrance",
    "requires_cards": [
-    "cemetery",
-    "shepherd"
+    "mossgrave_glade",
+    "crook_shrew"
    ],
    "base_points": 0,
    "on_achieve": {},
@@ -1961,8 +1961,8 @@
    "role": "special_toll_holiday",
    "new_name": "Toll Holiday",
    "requires_cards": [
-    "judge",
-    "queen"
+    "gavel_marten",
+    "thistle_regent"
    ],
    "base_points": 3,
    "on_achieve": {
@@ -1997,8 +1997,8 @@
    "role": "special_change_of_proprietors",
    "new_name": "Change of Proprietors",
    "requires_cards": [
-    "peddler",
-    "general_store"
+    "haggle_magpie",
+    "cranny_market"
    ],
    "base_points": 0,
    "on_achieve": {

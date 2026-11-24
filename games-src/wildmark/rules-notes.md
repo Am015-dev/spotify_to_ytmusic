@@ -21,17 +21,16 @@ D sight pairs by kinds between = 4,7,9 (3+). Fox B kinds of animal pairs next to
 kinds of animal pairs around = 5,7,9,11.
 
 ## Cross-check against the rulebook online (7 Nov)
-Checked against an online rules reference (rulespal.com/cascadia/rulebook) and the official rules PDF listing: tile supply 43/63/83 and
+Checked against an online rules reference (URL left out on purpose) and the official rules PDF listing: tile supply 43/63/83 and
 solo 43 = match; four-of-a-kind sweep (repeat) and optional three-of-a-kind once per turn = match; acorn powers = match; majority bonuses
 (2p 2 / tie 1; 3-4p 3+1, two-way tie 2 each, 3-4-way tie 1 each, no second place after a tie, tie for second 0) = match; solo +2 for 7+ =
-match; solo removal (tile and token furthest from the stacks) = match (we return that token to the bag); tie-break most acorns then shared
+match; solo removal (tile and token furthest from the stacks) = match (the token leaves the game too); tie-break most acorns then shared
 = match. Card patterns B-D match the reference descriptions; their POINT TABLES were not on the pages found, so the B-D numbers above are
-from memory (guessed). The reference names the original game: kept as a URL only.
+from memory; all later checked, see W507 below. The reference is not named here.
 
 ## Confirmed vs guessed
 - Confirmed (well known): counts, turn order, sweeps, acorn powers, A-card point tables, habitat and majority rules.
-- Guessed / simplified: exact tile terrain/animal distribution and starter triads are our own balanced set; elk lines
-  are split greedily longest-first; the solo removal returns the token to the bag; B-D cards not yet implemented.
+- Guessed / simplified: exact tile terrain/animal distribution and starter triads are our own balanced set; the elk split is exact and B-D cards are implemented.
 
 ## B-D tables checked (W507, 8 Nov)
 Checked against an online rules guide listing every card: all B-D numbers match except Salmon D (needs runs of 3+) and Hawk D (4/7/9,

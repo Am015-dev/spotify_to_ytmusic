@@ -23,7 +23,7 @@ const sum=a=>a.reduce((x,y)=>x+y,0);
 const LOCV=[1.5,1.5,1.7,2.2,1.2,1.3];            // rough worth of claiming each Location (influence + its text)
 const LOCINF=[1,1,1,2,1,1];
 // Kingdom Card values (0-8) as a computer sees them
-const KCV=[0,4,4,3,5,7,3,4,3,4,3,4,5,5,4,3,3,6,3,2,3,2,2,4,3,3,4,3,3,3,3,3,4,3,3,5,4,3,4,3,3,3,3,5,3,3,4,3,4,3,3,4,3];
+const KCV=[0,4,4,3,5,5,3,4,3,4,3,4,5,5,4,3,3,6,3,2,3,2,2,4,3,3,4,3,3,3,3,3,4,3,3,5,4,3,4,3,3,3,3,5,3,3,4,3,4,3,3,4,3];
 const kcv=n=>KCV[n]||3;
 function heirOf(S,seat){return seat*100+13}
 // ---------------------------------------------------------------- state readers (own + public information only)
@@ -52,7 +52,7 @@ function keepValue(S,seat,id){const d=cd(S,id);let v=d.s*0.6;if(d.kind==='heir')
 function journeyValue(d){return d.l}
 // ---------------------------------------------------------------- the clash picture (public after reveal; own down cards known)
 function clashPic(S,seat){const c=S.clash;if(!c)return null;const out={tot:{},me:0,best:0,bestSeat:-1};
-  for(const s of c.parts){let t=0;for(const id of (c.cards[s]||[]))t+=TB.cardInfo(S,id).strength;t+=S.pl[s].supp.r[c.r]*(S.rm.masonry.includes(s)?2:1)+(c.bonus[s]||0);out.tot[s]=t}
+  for(const s of c.parts){let t=0;for(const id of (c.cards[s]||[]))t+=TB.cardInfo(S,id).strength;t+=S.pl[s].supp.r[c.r]+(S.rm.masonry.includes(s)?Math.min(3,S.pl[s].supp.r[c.r]):0)+(c.bonus[s]||0);out.tot[s]=t}
   out.me=out.tot[seat]||0;for(const s of c.parts)if(s!==seat&&out.tot[s]>=out.best){out.best=out.tot[s];out.bestSeat=s}return out}
 // ---------------------------------------------------------------- bid
 function pickBidCard(S,seat,mv,lv,rng){const P=S.pl[seat];const best=Math.max(0,...S.road.filter(Boolean).map(kcv));
@@ -109,13 +109,13 @@ function scoreAct(S,seat,m,lv){const a=m.a,p=m.p||{},P=S.pl[seat],step=S.q.ctx.s
   case 't:nob_t2':return 0.8;
   case 't:cln_t1':return 2+(P.supp.r.some(x=>x>=2)?1:0);
   case 't:upr_t1':return P.hand.some(id=>cd(S,id).kind==='heir')||S.reg.some(R=>R.down.some(id=>id===heirOf(S,seat)))?1.8:0.4;
-  case 't:upr_t3':return occCountP(P)*0.9*(S.np-1)*0.7;
+  case 't:upr_t3':return (occCountP(P)>=2?2:occCountP(P))*0.9*(S.np-1)*0.7;
   case 't:upr_t4':return 0.2;
   case 't:gth_t2':return S.kdisc.length>=5&&P.hand.length>=4?1.3:0.2;
   case 'hq:cln_hq2':return 1.4;
-  case 'kc2':return 3;case 'kc13':return 2.6;case 'kc14':return P.hand.length<P.hs?1.6:-1;case 'kc23':return 1.1;case 'kc26':return Math.max(0,...S.road.map(kcv))>=5?1.8:0.2;
-  case 'kc6':return P.tac.some(t=>t.ex&&!t.burn)?1.2:0.1;case 'kc19':return P.hand.length<=3?0.6:0.1;case 'kc25':return G_lostStrong(S,seat)?1.5:-1;case 'kc38':return myStrongHand>=8?1.2:0.2;case 'kc30':return 0.6;case 'kc47':return 0.2;
-  case 'kc20':case 'kc20a':return 0.1;
+  case 'kc2':return 3;case 'kc13':return 2.6;case 'kc14':return P.hand.length<P.hs?1.6:-1;case 'kc23':return 1.4;case 'kc26':return Math.max(0,...S.road.map(kcv))>=5?1.8:0.2;
+  case 'kc6':return P.tac.some(t=>t.ex&&!t.burn)?1.2:0.1;case 'kc19':return P.hand.length<P.hs?1.0:0.1;case 'kc25':return G_lostStrong(S,seat)?1.5:-1;case 'kc38':return myStrongHand>=8?1.2:0.2;case 'kc30':return 0.6;case 'kc47':return 0.2;
+  case 'kc20':return 0.8;
   case 'cmd:deploySpring':return 2.3;
   case 'cmd:ambush':{if(!pic)return 0;const need=pic.best-pic.me+1;const bestHand=P.hand.reduce((b,id)=>Math.max(b,cd(S,id).s),0);const gate=m.p.mode==='ar'&&false;
       if(pic.me>pic.best+bestHand*0.5)return -1;if(bestHand>=need)return 3+(bestHand-need)*0.1;return bestHand>=need-2?0.9:0.2}
@@ -128,7 +128,7 @@ function scoreAct(S,seat,m,lv){const a=m.a,p=m.p||{},P=S.pl[seat],step=S.q.ctx.s
   case 'hq:cln_hq1':return 0.2;case 'hq:gth_hq':return 1.0;case 'card:fang':return 2.2;
   case 'kc21':return 0.2;case 'kc22':return 0.3;case 'kc29':return 0.2;case 'kc40':return 0.2;case 'kc44':return 0.4;
   case 'kc45':return pic&&P.hand.length&&myStrongHand>=pic.best-pic.me?1.6:0.3;
-  case 'kc46':return pic&&pic.me<=pic.best&&pic.me+5>pic.best?3.2:-1;
+  case 'kc46':return pic&&pic.me<=pic.best&&pic.me+4>pic.best?3.2:-1;
   case 'kc50':return pic&&(S.clash.cards[seat]||[]).length&&opponentsHave(S,seat)>=2?2.4:0.5;
   case 'kc51':return oppDeadly(S,seat)?3.5:-1;
   case 'fav:spring':case 'fav:day':case 'fav:autumn':return favScore(S,seat,p);
@@ -144,7 +144,7 @@ function scoreAct(S,seat,m,lv){const a=m.a,p=m.p||{},P=S.pl[seat],step=S.q.ctx.s
   case 'hq:nob_hq':return p.cap>=0&&p.inf?3:p.cap>=0?1.8:1.5;
   case 'hq:upr_hq1':return kcv(p.kc)-2.2;
   case 'card:hallseats':return 0.2;case 'card:rampart':return 1.6;case 'card:whisperer':return 2.2;
-  case 'kc10':return 1.0;case 'kc16':return P.hs<8?1.8:-1;case 'kc24':return 0.2;case 'kc31':return G_ownLost(S,seat).length>=3?1.8:0.3;
+  case 'kc10':return 1.0;case 'kc16':return P.hs<7?1.0:-1;case 'kc24':return 0.2;case 'kc31':return G_ownLost(S,seat).length>=3?1.8:0.3;
   case 'kc32':return TB.cardInfo(S,p.id).strength>=7||cd(S,p.id).kind==='heir'?2.3:0.3;
   case 'kc36':return P.hand.length<P.hs?1.2:-1;case 'kc37':return 1.5;case 'kc42':return 2.0;case 'kc48':return 1.0;
   }
@@ -198,7 +198,7 @@ PICK.gate2=(S,seat,q,mv)=>mv.find(m=>!!m.yes);
 PICK.mirror=(S,seat,q,mv)=>mv.slice().sort((a,b)=>cd(S,b.id).s-cd(S,a.id).s)[0];
 PICK.favNob=(S,seat,q,mv)=>mv.find(m=>m.inf);
 PICK.favClan=(S,seat,q,mv)=>{const c=S.clash;const rv=[2*c.r,2*c.r+1];return mv.filter(m=>!m.skip).sort((a,b)=>locValue(S,seat,b.loc)-locValue(S,seat,a.loc))[0]||mv[0]};
-PICK.favClanSup=(S,seat,q,mv)=>mv.filter(m=>!m.skip).sort((a,b)=>S.pl[seat].supp.r[b.r]-S.pl[seat].supp.r[a.r])[0]||mv.find(m=>m.skip);
+PICK.favClanSup=(S,seat,q,mv)=>mv.filter(m=>!m.skip).sort((a,b)=>(b.r<0?9:S.pl[seat].supp.r[b.r])-(a.r<0?9:S.pl[seat].supp.r[a.r]))[0]||mv.find(m=>m.skip);
 PICK.favUpr=(S,seat,q,mv)=>mv.slice().sort((a,b)=>regionValue(S,seat,b.r)-regionValue(S,seat,a.r))[0];
 PICK.favUpr2=(S,seat,q,mv)=>mv.find(m=>m.skip);
 PICK.favGath=(S,seat,q,mv)=>mv.filter(m=>!m.skip).sort((a,b)=>cd(S,b.id).s-cd(S,a.id).s)[0];
@@ -234,6 +234,11 @@ SEL.offering=(S,seat,q)=>q.items.map(it=>it.v).filter(id=>keepValue(S,seat,id)<1
 // ---------------------------------------------------------------- the policy (one decision)
 const LV={easy:{noise:3,cunning:0.2,rnd:0.5},normal:{noise:0.6,cunning:1,rnd:0,sup:1.5,jb:0,gb:0,bidT:0,hb:1,kcw:1,oaths:1},hard:{noise:0.3,cunning:1,rnd:0,sup:1.5,jb:0,gb:0,bidT:0,hb:1,kcw:1,oaths:1}};
 for(const k of ['easy']){LV[k].sup=1.5;LV[k].jb=0;LV[k].gb=0;LV[k].bidT=0;LV[k].hb=1;LV[k].kcw=1}
+// Easy (owner, Nov 2026): sensible play, weaker judgement; 'newcomer' models a careful first-time player for the balance test (never offered in the menu)
+Object.assign(LV.easy,{noise:5,cunning:0,rnd:0,lead:1,ease:3});   // F14: gentler default rival (a newcomer who follows the suggestions wins most games; Normal and Hard unchanged)
+Object.assign(LV.easy,{earlyR:2,earlyNoise:3,earlyRnd:0.45});   // F15: easier learning rounds (half-advice newcomer 45% instead of 18% in sugsim FOLLOW=0.5)
+LV.newcomer=Object.assign({},LV.normal,{noise:1.6,cunning:0.6});
+if(typeof globalThis!=='undefined'&&globalThis.TB_LV)for(const k in globalThis.TB_LV)Object.assign(LV[k]||(LV[k]={}),globalThis.TB_LV[k]);
 function policy(S,seat,lv,rng){const q=S.q;const mv=TB.moves(S,seat);if(mv.length<=1)return mv[0];
   lv=lv||LV.normal;rng=rng||Math.random;const k=q.kind;let m=null;
   if(q.t==='sel'){const want=(SEL[k]||(()=>[]))(S,seat,q);const next=want.find(v=>!q.chosen.includes(v)&&mv.some(x=>x.t==='sel'&&x.v===v));
@@ -293,6 +298,14 @@ function bidCandidates(S,seat,mv,rng){const hand=mv.slice().sort((a,b)=>cd(S,a.i
 // ---------------------------------------------------------------- public API
 AI.choose=function(G,seat,level,opts){opts=opts||{};level=level||(G.pl[seat].ai)||'normal';const rng=mkRng(viewSeed(G,seat,1));
   const lv=LV[level]||LV.normal;
+  if(level==='easy'&&!LV.easy.rnd){   // Easy plays by the rules and sensibly (no random moves): looser judgement, and a rival far ahead of every human eases off
+    const mv=TB.moves(G,seat);if(mv.length<=1)return mv[0];const hum=G.pl.map((p,i)=>i).filter(i=>!G.pl[i].ai||G.pl[i].asHuman);
+    const lead=hum.length?G.pl[seat].inf-Math.max.apply(null,hum.map(i=>G.pl[i].inf)):0;const e=LV.easy;
+    let lv2=lead>=e.lead?Object.assign({},e,{noise:e.noise*e.ease,cunning:0}):e;
+    // F15: rounds 1-2 are the newcomer's learning rounds: the rival's judgement is looser still and some of its moves are plain legal picks
+    if(G.round<=e.earlyR){lv2=Object.assign({},lv2,{noise:lv2.noise*e.earlyNoise,cunning:0});
+      if(rng()<e.earlyRnd){if(G.q.t==='menu'||G.q.kind==='menu'){const nm=mv.filter(m=>m.t==='done');if(nm.length&&rng()<0.5)return nm[0]}return mv[Math.floor(rng()*mv.length)]}}
+    const S=TB.poison(G,seat,mkRng(viewSeed(G,seat,5)));return policy(S,seat,lv2,rng)}
   if(level==='easy'){const mv=TB.moves(G,seat);if(mv.length<=1)return mv[0];
     const S=TB.poison(G,seat,mkRng(viewSeed(G,seat,5)));
     if(rng()<lv.rnd){const k=G.q.kind;if(k==='menu'){const nm=mv.filter(m=>m.t==='done');if(rng()<0.6&&nm.length)return nm[0]}

@@ -24,13 +24,13 @@ test('clash order reason: "least Influence" is not claimed when a Tactic gave th
   w.eval(`newGame('me',{np:2,faction:'clans',seed:5})`);w.eval(`T_drive(()=>G.q&&G.q.kind==='clashOrder',4000)`);
   w.eval(`G.rm.tempests=0;G.pl[0].inf=8;G.pl[1].inf=3;G.q.seats=[0];G.q.o[0]=G.q.o[G.q.seats[0]]||G.q.o[1]`);
   const t=w.eval('T_view()');if(/least Influence/.test(t))throw new Error('screen says: '+t.match(/[^.]*least Influence[^.]*/)[0])});
-test('a Tactic with markers is not called "once-only" (Open Waterways can be used once a round, 3 times)',async w=>{
-  w.eval(`newGame('me',{np:2,faction:'clans',seed:11})`);const ok=w.eval(`T_drive(()=>G.q&&G.q.t==='menu'&&G.q.seats[0]===0&&TB.moves(G,0).some(m=>m.a==='t:cln_t2'),20000)`);if(!ok)throw new Error('no Open Waterways menu reached');
+test('a Tactic with markers is not called "once-only" (Hidden Fords can be used once a round, 3 times)',async w=>{
+  w.eval(`newGame('me',{np:2,faction:'clans',seed:11})`);const ok=w.eval(`T_drive(()=>G.q&&G.q.t==='menu'&&G.q.seats[0]===0&&TB.moves(G,0).some(m=>m.a==='t:cln_t2'),20000)`);if(!ok)throw new Error('no Hidden Fords menu reached');
   w.eval(`UI.moreOpen=true`);const t=w.eval('T_view()')+w.eval(`(typeof GL!=='undefined'&&GL.tactic?GL.tactic[3]:'')`);
   if(/once-only|Each can be used once/i.test(t))throw new Error('text calls Tactics once-only: '+(t.match(/[^.]*(once-only|can be used once)[^.]*/i)||[''])[0])});
 test('buying an HQ card: the option says HQ and the card sheet explains it does not go to the hand',async w=>{
   w.eval(`newGame('me',{np:2,faction:'clans',seed:3});G.pl[0].lore=4;TB.test.run(G,[['siteBuy',{seat:0}]])`);
-  const t=w.eval('T_view()');if(!/Roving Mission/.test(t)||!/HQ/.test(t))throw new Error('siteBuy screen does not show the HQ option: '+t.slice(0,160));
+  const t=w.eval('T_view()');if(!/Ferry Network/.test(t)||!/HQ/.test(t))throw new Error('siteBuy screen does not show the HQ option: '+t.slice(0,160));
   const id=w.eval(`G.pl[0].site.find(id=>TB.cardInfo(G,id).kind==='hq')`);const h=w.eval(`popCard(${id})`);
   if(!/(not|never) (a card for|go|goes|come|comes) (in)?(to )?your hand|stays in front of you|permanent/i.test(h))throw new Error('HQ card sheet does not explain it: '+h.replace(/<[^>]*>/g,' ').slice(0,200))});
 test('the end-of-round card is not drawn over the next decision (no decision buttons under it)',async w=>{
@@ -52,7 +52,7 @@ test('guided game: the first suggested bid is not cancelled by the Court',async 
   w.eval(`newGame('guided')`);w.eval(`UI.coachDone={goal:1,map:1,round:1}`);const k=w.eval(`(getRec(0,TB.moves(G,0))||{}).k`);if(!k)throw new Error('no suggested bid');
   w.eval(`humanMove(${JSON.stringify(k)})`);w.eval(`T_drive(()=>G.bidRev&&G.step==='bidres'||G.q&&G.q.kind==='bidRes',200)`);const b=w.eval(`G.bstr[0]`),p=w.eval(`TB.cardInfo(G,G.pl[0].bid).strength`);if(b!==p)throw new Error('your bid counts '+b+' instead of '+p)});
 test('the occupier suggestion and its sentence agree (the "weakest card" is the pick)',async w=>{
-  w.eval(`newGame('me',{np:2,faction:'clans',seed:44});const P=G.pl[0];for(const id of P.hand.slice())TB.test.put(G,id,'deck');TB.test.put(G,13,'hand');TB.test.put(G,14,'hand');TB.internal.askPick(0,'occupier','Riverbank Raiders: choose the card from your hand that will occupy it.',P.hand.map(id=>({k:'c'+id,id,label:TB.cardName(G,id)+' ('+TB.cardInfo(G,id).strength+')'})),'raiders',{s2:1,j:0})`);
+  w.eval(`newGame('me',{np:2,faction:'clans',seed:44});const P=G.pl[0];for(const id of P.hand.slice())TB.test.put(G,id,'deck');TB.test.put(G,13,'hand');TB.test.put(G,14,'hand');TB.internal.askPick(0,'occupier','Reed Ambush: choose the card from your hand that will occupy it.',P.hand.map(id=>({k:'c'+id,id,label:TB.cardName(G,id)+' ('+TB.cardInfo(G,id).strength+')'})),'raiders',{s2:1,j:0})`);
   w.eval('ANIM=1');const t=w.eval('T_view()');w.eval('ANIM=0');const rec=w.eval(`(UI._rec||{}).id`);if(rec==null)return; // no suggestion is fine
   const weakest=w.eval(`G.pl[0].hand.slice().sort((a,b)=>TB.cardInfo(G,a).strength-TB.cardInfo(G,b).strength)[0]`);
   if(/weakest/i.test(t)&&w.eval(`TB.cardInfo(G,${rec}).strength`)!==w.eval(`TB.cardInfo(G,${weakest}).strength`))throw new Error('sentence says weakest but the pick is '+w.eval(`TB.cardInfo(G,${rec}).name+' ('+TB.cardInfo(G,${rec}).strength+')'`))});
@@ -62,7 +62,7 @@ test('Day step warns before a Deadly card eliminates yours (no "nothing else hel
     T.put(G,12,'down',0);T.put(G,106,'down',0);T.put(G,4,'down',1);T.put(G,103,'down',1);T.put(G,5,'down',2);T.put(G,104,'down',2);
     T.giveKC(G,0,46,G.pl[0].hand[0],0);G.cord=[0,1,2];T.run(G,[['startRegion',{i:0}]])`);w.eval(`T_drive(()=>G.q&&G.q.t==='menu'&&G.q.seats[0]===0,40)`);
   if(!w.eval(`G.q&&G.q.t==='menu'&&G.q.seats[0]===0`))throw new Error('no Day menu for you: '+w.eval('G.q&&G.q.kind'));
-  const t=w.eval('T_view()');if(/Nothing else here helps/.test(t))throw new Error('says nothing else helps while Poison Physician will eliminate your card');
+  const t=w.eval('T_view()');if(/Nothing else here helps/.test(t))throw new Error('says nothing else helps while Bitter Taster will eliminate your card');
   if(!/Deadly/.test(t)||!/eliminat/i.test(t))throw new Error('no warning about the Deadly card: '+t.slice(0,240))});
 (async()=>{let pass=0,fail=0;for(const [n,f] of tests){const w=await page(false);w.eval(HELP);try{await f(w);pass++;console.log('PASS '+n)}catch(e){fail++;console.log('FAIL '+n+'\n     '+String(e.message).slice(0,400))}
   if(w.__errs.length)console.log('     page errors: '+w.__errs.slice(0,2).join(' | '));w.close()}

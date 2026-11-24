@@ -1,0 +1,19 @@
+# Onyx Atelier rules checklist (each line is asserted in rules-test.js)
+- [x] 67 jewels 30/24/13; 11 per colour, 9 matching, 3 colourless, 5 double; 92 points, 28 crowns; powers 6/5/5/5
+- [x] 4 patrons: 3 pts; 2 pts + Encore / Favour / Pinch
+- [x] 25 tokens: 4 per gem, 2 pearls, 3 gold; all on the board at setup via the spiral from the centre
+- [x] pyramid 5/4/3; the rest in decks
+- [x] second player starts with 1 Favour; 3 Favours total
+- [x] take 1-3 in a straight line incl. diagonals, no gaps, no gold
+- [x] 3 of one colour or 2 pearls: rival gains a Favour; supply empty: from the other player; all 3 held: nothing
+- [x] Favour: any one gem or pearl, never gold; returns to the supply; before refilling only
+- [x] refill only with a non-empty bag; rival gains a Favour
+- [x] keep: any pyramid jewel or a deck top, plus 1 gold; at most 3 kept
+- [x] buy: bonuses lower cost per colour; gold is wild; paid tokens to the bag; slot refills
+- [x] matching jewel needs a coloured jewel; joins a colour for bonus and colour points
+- [x] Pinch takes a gem/pearl, not gold; Encore = same player again
+- [x] 3 crowns: patron choice; patron points count
+- [x] more than 10 tokens: return down to 10 before the turn ends
+- [x] no action possible: refill is the only move
+- [x] wins: 20 points, 10 crowns, 10 points in one colour
+- [x] full games end; invariants (token, card, Favour, patron counts) after every move

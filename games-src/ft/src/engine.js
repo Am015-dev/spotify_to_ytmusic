@@ -7,7 +7,7 @@ function rnd(n){let t=(G.rng+=0x6D2B79F5);t=Math.imul(t^t>>>15,t|1);t^=t+Math.im
 function setSeed(s){DEFSEED=s>>>0;if(G)G.rng=s>>>0}
 function shuffle(a){for(let i=a.length-1;i>0;i--){const j=rnd(i+1);[a[i],a[j]]=[a[j],a[i]]}return a}
 function lg(t,c){G.logN=(G.logN||0)+1;G.log.unshift({t,r:G.round,c:c||'',i:G.logN});if(G.log.length>500)G.log.length=500}
-function fx(t,x){if(UI.sim)return;UI.fxN=(UI.fxN||0)+1;UI.fx.push({t,x,n:UI.fxN});if(UI.fx.length>40)UI.fx.shift()}
+function fx(t,x,p,w){if(UI.sim)return;UI.fxN=(UI.fxN||0)+1;UI.fx.push({t,x,n:UI.fxN,p,w});if(UI.fx.length>40)UI.fx.shift()}
 const P=i=>G.pl[i];
 // ---------- geometry (W×H grid, impassable tiles, mountains between tiles) ----------
 const wkey=(a,b)=>a<b?a+'_'+b:b+'_'+a;
@@ -106,8 +106,8 @@ function finishMove(e,c){const t=G.board[e];const p=P(G.cur);const n=t.m.filter(
 function claimTile(p,e,how){const t=G.board[e];if(t.camel!=null||t.tent!=null)return;
   if(how==='auto'&&p.tent&&p.human&&!UI.sim){ask(p.i,`Claim ${tileName(t)} with a camel or your tent?`,[{l:'🐪 A camel',h:'claim',d:{p:p.i,e,how:'camel'}},{l:'⛺ The tent (its tile plus 1 per nearby red tile)',h:'claim',d:{p:p.i,e,how:'tent'}}],{kind:'claim'});return}
   if(how==='auto'&&p.tent&&(!p.human||UI.sim)&&aiWantsTent(p,e))how='tent';
-  if(how==='tent'&&p.tent){p.tent=0;t.tent=p.i;lg(`⛺ ${p.nm} pitches the tent on ${tileName(t)}.`,'good');fx('camel',e);return}
-  if(p.camels<=0){lg(`${p.nm} has no camels left to claim ${tileName(t)}.`);return}t.camel=p.i;p.camels--;lg(`🐪 ${p.nm} claims ${tileName(t)}.`,'good');fx('camel',e);
+  if(how==='tent'&&p.tent){p.tent=0;t.tent=p.i;lg(`⛺ ${p.nm} pitches the tent on ${tileName(t)}.`,'good');fx('camel',e,p.i,'tent');return}
+  if(p.camels<=0){lg(`${p.nm} has no camels left to claim ${tileName(t)}.`);return}t.camel=p.i;p.camels--;lg(`🐪 ${p.nm} claims ${tileName(t)}.`,'good');fx('camel',e,p.i,'camel');
   if(p.camels===0&&!G.endTrig){G.endTrig=true;lg(`${p.nm} placed the last camel. The round finishes, then the game ends.`,'big')}}
 QH.claim=d=>claimTile(P(d.p),d.e,d.how);
 function owner(t){return t.camel!=null?t.camel:t.tent!=null?t.tent:null}
@@ -156,8 +156,8 @@ function doTile(m){const a=G.act;const p=P(G.cur);const t=G.board[a.tile];a.tile
   if(m.thief){payCost(p,m.pay);G.thRow.splice(G.thRow.indexOf(m.thief),1);p.thieves.push({k:m.thief,turn:G.turn});lg(`🦹 ${p.nm} hires the ${THIEVES[m.thief].n}.`,'big');return}
   if(m.take){const cost=t.k==='small'?3:t.k==='large'?6:4;p.coins-=cost;const got=m.take.slice().sort((x,y)=>y-x).map(j=>G.market.splice(j,1)[0]);for(const r of got)gainCard(p,r,1);lg(`${p.nm} buys ${got.map(r=>RNAME[r]).join(' and ')} for ${cost} coins.`,'good');fx('res');return}
   if(m.work){if(m.work==='art'){p.art--;G.bag.push('artisan')}else{p.fk-=2;G.rdisc.push('fakir','fakir')}p.items.push(G.items.shift());lg(`${p.nm} commissions an item at the Workshop.`,'good');return}}
-function placePalace(p,i,viaDj){if(SUP().pal<1){lg('The palace pieces have run out.');return}SUP().pal--;const t=G.board[i];t.pal++;lg(`🏰 ${p.nm} raises a palace on ${tileName(t)}.`,'good');fx('build',i);trig('palace',p.i)}
-function placePalm(p,i){if(SUP().palm<1){lg('The palm trees have run out.');return}SUP().palm--;const t=G.board[i];t.palm++;lg(`🌴 ${p.nm} plants a palm on ${tileName(t)}.`,'good');fx('build',i)}
+function placePalace(p,i,viaDj){if(SUP().pal<1){lg('The palace pieces have run out.');return}SUP().pal--;const t=G.board[i];t.pal++;lg(`🏰 ${p.nm} raises a palace on ${tileName(t)}.`,'good');fx('build',i,p.i,'pal');trig('palace',p.i)}
+function placePalm(p,i){if(SUP().palm<1){lg('The palm trees have run out.');return}SUP().palm--;const t=G.board[i];t.palm++;lg(`🌴 ${p.nm} plants a palm on ${tileName(t)}.`,'good');fx('build',i,p.i,'palm')}
 function gainDjinn(p,k){p.dj.push(k);G.stats.djinns++;lg(`✨ ${p.nm} summons ${DJ[k].n}.`,'big');fx('djinn',k);fx('summon',k);if(!UI.sim&&UI.fx.length)UI.fx[UI.fx.length-1].h=p.human?1:0;trig('djinn',p.i,{k})}
 // ---------- goods sale (end of turn, optional) ----------
 function sellValue(n){return SETVP[Math.min(n,9)]}
@@ -240,14 +240,14 @@ function performMove(m,s){if(s===undefined)s=sideToAct();let ok=validMoves(s).so
 // ---------- scoring ----------
 function lakeNear(i){return AROUND(i).some(j=>G.board[j].k==='lake')}
 function scoreOf(p){const s={coins:p.coins,advisors:0,sages:0,crafters:0,djinns:0,tiles:0,palms:0,palaces:0,goods:0,items:0,cities:0};
-  s.advisors=p.vz*(hasDj(p,'wazira')?3:1);for(const q of G.pl)if(q.i!==p.i&&q.vz<p.vz)s.advisors+=10;
-  s.sages=p.el*(hasDj(p,'hikma')?4:2);
-  if(G.ex.artisans){const most=G.pl.every(q=>q.art<=p.art);s.crafters=p.art*(most?3:2)+(hasDj(p,'sana')?2*p.art:0);
-    for(const k of p.items)if(ITEMS[k].kind==='precious')s.items+=ITEMS[k].vp+(hasDj(p,'jawhar')?3:0)}
-  for(const k of p.dj)s.djinns+=DJ[k].vp;if(hasDj(p,'majlis'))s.djinns+=5*p.dj.length;
-  let cities=0;for(const t of G.board){const own=owner(t);if(own!==p.i)continue;s.tiles+=t.v;const dbl=G.ex.sultan&&lakeNear(t.i)?2:1;s.palms+=t.palm*(hasDj(p,'nakhla')?5:3)*dbl;s.palaces+=t.pal*5*dbl;
+  s.advisors=p.vz*(hasDj(p,'wazira')?DJN.wazira:1);for(const q of G.pl)if(q.i!==p.i&&q.vz<p.vz)s.advisors+=10;
+  s.sages=p.el*(hasDj(p,'hikma')?DJN.hikma:2);
+  if(G.ex.artisans){const most=G.pl.every(q=>q.art<=p.art);s.crafters=p.art*(most?3:2)+(hasDj(p,'sana')?DJN.sana*p.art:0);
+    for(const k of p.items)if(ITEMS[k].kind==='precious')s.items+=ITEMS[k].vp+(hasDj(p,'jawhar')?DJN.jawhar:0)}
+  for(const k of p.dj)s.djinns+=DJ[k].vp;if(hasDj(p,'majlis'))s.djinns+=DJN.majlis*p.dj.length;
+  let cities=0;for(const t of G.board){const own=owner(t);if(own!==p.i)continue;s.tiles+=t.v;const dbl=G.ex.sultan&&lakeNear(t.i)?2:1;s.palms+=t.palm*(hasDj(p,'nakhla')?DJN.nakhla:3)*dbl;s.palaces+=t.pal*5*dbl;
     if(t.tent===p.i)s.tiles+=AROUND(t.i).filter(j=>!G.board[j].blue&&!G.board[j].block).length;if(t.k==='city')cities++}
-  if(cities)s.cities=5*cities*cities;
+  if(cities)s.cities=CITYVP(cities);
   s.goods=goodsBest(p);s.total=Object.values(s).reduce((a,b)=>a+b,0);return s}
 function goodsScore(res){const c={};for(const r of res)c[r]=(c[r]||0)+1;let tot=0;while(true){const kinds=Object.keys(c).filter(k=>c[k]>0);if(!kinds.length)break;tot+=SETVP[Math.min(kinds.length,9)];for(const k of kinds)c[k]--}return tot}
 // Zarifa: every 2 Mystics = 1 wild goods card; pick the kinds that score best

@@ -5,10 +5,10 @@ CSS = '.tb-card{display:block;filter:drop-shadow(0 3px 5px rgba(0,0,0,.55));font
   '.tb-map{display:block;width:100%;height:auto;-webkit-tap-highlight-color:transparent;user-select:none;-webkit-user-select:none}' +
   '.tb-map .tb-loc{cursor:pointer;outline:none}.tb-map .tb-ring{transform-box:fill-box;transform-origin:center}' +
   '.tb-map .tb-loc:hover .tb-ring,.tb-map .tb-loc:focus-visible .tb-ring{opacity:.85!important}' +
-  '.tb-map .tb-loc.tb-hl .tb-ring{opacity:1!important;animation:tb-dash 7s linear infinite,tb-breathe 1.6s ease-in-out infinite}' +
+  '.tb-map .tb-loc.tb-hl .tb-ring{opacity:1!important;animation:tb-dash 4s linear 1,tb-breathe 1.6s ease-in-out 3}' +
   '.tb-map .tb-loc.tb-sel .tb-ring{opacity:1!important;stroke:#fff;stroke-dasharray:none}' +
   '.tb-map.tb-compact .tb-name{display:none}.tb-map.tb-compact .tb-loc.tb-sel .tb-name,.tb-map.tb-compact .tb-loc.tb-hl .tb-name{display:inline}.tb-map .tb-herald,.tb-map .tb-infl{pointer-events:none}.tb-map .tb-herald,.tb-map .tb-infl{will-change:transform}' +
-  '.tb-map .tb-win{animation:tb-breathe 1.2s ease-in-out infinite;transform-box:fill-box;transform-origin:center}' +
+  '.tb-map .tb-win{animation:tb-breathe 1.2s ease-in-out 3;transform-box:fill-box;transform-origin:center}' +
   '@keyframes tb-dash{to{stroke-dashoffset:-160}}@keyframes tb-breathe{0%,100%{transform:scale(1)}50%{transform:scale(1.045)}}' +
   '.tb-flipcard{position:relative;display:inline-block;perspective:900px;transition:transform .5s cubic-bezier(.2,.8,.2,1),filter .5s,opacity .5s}' +
   '.tb-flip-inner{position:relative;width:100%;height:100%;transform-style:preserve-3d;transition:transform .62s cubic-bezier(.3,.7,.2,1)}' +

@@ -41,3 +41,4 @@ MODULES.md
 .look-live-cache/
 .baselines/
 gloamwar/gloamwar.html
+orch/raw-sessions.jsonl

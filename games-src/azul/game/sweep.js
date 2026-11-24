@@ -2,7 +2,7 @@
 // Run: (cd games-src/azul/game && python3 -m http.server 8095 &) ; NODE_PATH=/opt/node-tools/node_modules node sweep.js
 // Help kit (gx-help): tips ON in 3 of 4 games (every first-time bubble must appear once, point at its target, never cover the target or a glowing thing, be short,
 // dismiss on a tap, and the game is still completed); the 4th game has tips OFF (no bubble may appear). The lightbulb is tapped on every other turn: the ghost
-// finger must sit on the tile/row/space the advice function names, the why is <= 15 words, the rules cards are 2-4, <= 20 words, with a picture; no advice -> rules only.
+// finger must sit on the tile/row/space the advice function names, the why is <= 15 words, the rules cards are 2-4, <= 20 words, with a picture; a close call -> a fallback move (never the rules card).
 // Env: GAMES=40 ROT=5 CONC=4 URL=... QUICK=1 (4 games, 1 rotation, chapter 3 only)
 const {chromium}=require('playwright');const fs=require('fs');const path=require('path');
 const gx = require('../../scripts/gx-serve.js');   // one shared http server (build-all passes GX_URL); never file://
@@ -82,7 +82,7 @@ async function coachBubble(p,ctx,ph){
   // dismiss on a tap on the bubble's own button, then on a tap elsewhere for the next phase
   await tapEl(p,'.gxh-bub .gxh-ok');await sleep(150);
   await chk(!(await p.evaluate(()=>!!document.querySelector('.gxh-bub'))),'bubble dismisses on a tap',ctx,ph,p)}
-// the lightbulb: the finger sits on what the advice function names; no advice -> rules cards only
+// the lightbulb: the finger sits on what the advice function names; a close call -> the fallback move, still never the rules card
 async function hintCheck(p,ctx){
   const info=await p.evaluate(()=>{const hp=me();const ms=legalTakes(G,hp.i);const R=ms.map(m=>({m,net:phNow(m,hp.i).net})).sort((a,b)=>b.net-a.net);const max=R[0].net;
     const teach=!BF.seen.took;const a=adviceFor(hp.i);let an=null;if(a)an=(R.find(x=>JSON.stringify(x.m)===JSON.stringify(a.m))||{}).net;
@@ -102,8 +102,9 @@ async function hintCheck(p,ctx){
     if(f.vis){await chk(f.why&&wc(f.why)<=15,'bulb why <= 15 words',ctx,f.why,p);await chk(f.link,'bulb bubble has "How does this work?"',ctx,'no link',p)}
     if(f.vis&&Math.random()<.5&&f.link){await tapEl(p,'.gxh-bub .gxh-link');await sleep(250);await rulesCheck(p,ctx,'bulb link')}}
   else{HT.bulbNull++;await tapEl(p,'#bulbbtn');await sleep(350);
-    const f=await p.evaluate(()=>({finger:!!document.querySelector('.gxh-finger'),rules:!!document.querySelector('.gxh-rules')}));
-    await chk(!f.finger,'no finger when no hint',ctx,'finger shown without a hint',p);await chk(f.rules,'no hint: rules cards open',ctx,'no rules overlay',p);if(f.rules)await rulesCheck(p,ctx,'no-advice bulb')}
+    const f=await p.evaluate(()=>{const b=document.querySelector('.gxh-bub.gxh-bulbb');return {finger:!!document.querySelector('.gxh-finger'),rules:!!document.querySelector('.gxh-rules'),why:b&&b.querySelector('.gxh-tx').textContent}});
+    // F4 (owner): a close call still gets a suggested move with a reason (hlpFallback), never the rules card
+    await chk(f.finger&&!f.rules,'close call: bulb still suggests a move, no rules card',ctx,JSON.stringify(f),p);if(f.why!=null)await chk(wc(f.why)>=3&&wc(f.why)<=15,'close-call why 3-15 words',ctx,f.why,p)}
   await p.evaluate(()=>{GXH.hide();const r=document.querySelector('.gxh-rules');if(r)r.remove()});await sleep(100)}
 // one human move by touch
 async function humanMove(p,ctx){
@@ -116,6 +117,7 @@ async function humanMove(p,ctx){
   else{const key=await p.evaluate(m=>{const a=m.src<0?G.ctr:G.fac[m.src];const k=a.findIndex(t=>m.c===PRISM?t===PRISM:t===m.c);return k<0?null:(m.src<0?'c_':'f'+m.src+'_')+k},m);
     if(!key){await fail('legal move exists',ctx,'source tile missing '+JSON.stringify(m),p);return false}
     await tapEl(p,`[data-k="${key}"]`);await sleep(250);
+    if(await p.evaluate(n=>G.logN!==n,before.logN)){await chk(m.line===5,'nothing fits: one tap sent it to the floor',ctx,JSON.stringify(m),p);return true}   // no rack can take it
     const sel=await p.evaluate(()=>UI.sel&&{src:UI.sel.src,c:UI.sel.c,j:UI.sel.j?1:0});
     await chk(sel&&sel.src===m.src&&sel.c===m.c,'tile tap selects it',ctx,JSON.stringify(sel)+' for '+JSON.stringify(m),p);
     if(sel&&m.c<5&&(sel.j?1:0)!==(m.j?1:0)){await tapEl(p,'[data-bf=prism]');await sleep(200)}

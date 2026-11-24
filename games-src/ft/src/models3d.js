@@ -17,5 +17,5 @@ function m3Gallery(el){if(!el)return;['meeple','palm','palace','camel','lamp'].f
 // title and result card
 (function(){const o=renderModal;renderModal=function(){o.apply(this,arguments);try{const m=document.getElementById('modal');if(!m||m.hidden)return;
   if(UI.modal==='start'){const b=m.querySelector('.mbox.start');if(b&&!b.querySelector('.hero3d')){const h=document.createElement('div');h.className='hero3d';h.setAttribute('data-help','');b.insertBefore(h,b.firstChild);m3Show(h,'lamp',160)}}
-  if(UI.modal==='over'&&G&&G.over){const b=m.querySelector('.mbox.over');if(b&&!b.querySelector('.hero3d')){const won=viewP()&&G.over.win.includes(viewP().i);const h=document.createElement('div');h.className='hero3d';h.setAttribute('data-help','');b.insertBefore(h,b.firstChild);m3Show(h,won?'palace':'camel',160)}}}catch(e){console.error(e)}}})();
+  if(UI.modal==='over'&&G&&G.over){const b=m.querySelector('.mbox.over');if(b&&!b.querySelector('.hero3d')){const won=viewP()&&G.over.win.includes(viewP().i);const h=document.createElement('div');h.className='hero3d';h.setAttribute('data-help','');const t2=b.querySelector('h2');b.insertBefore(h,t2||b.firstChild);m3Show(h,won?'palace':'camel',160)}}}catch(e){console.error(e)}}})();
 if(document.readyState==='complete')setTimeout(m3Load,600);else addEventListener('load',()=>setTimeout(m3Load,600));

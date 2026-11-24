@@ -18,19 +18,25 @@ const url = process.argv[2] || 'file://' + path.join(__dirname, 'perch-and-plume
       if (!s.mine) { await page.waitForTimeout(150); continue; }
       if (s.gs) await tap('#acts [data-a="mv"]');
       else if (!s.q) { await tap(['.ract[data-h="0"]', '.ract[data-h="1"]', '.ract[data-h="2"]'][turns % 3]); turns++; }
-      else if (s.q === 'die') await tap('.die.glow');
-      else if (s.q === 'egg') await tap('.bc[data-a="bird"].glow');
+      else if (s.q === 'die') await tap('.die[data-legal]');
+      else if (s.q === 'egg') await tap('.bc[data-a="bird"][data-legal]');
       else if (s.q === 'draw') await tap('#deckb');
       else await tap('#acts .btn');
       await page.waitForTimeout(120);
     }
-    for (let k = 0; k < 100; k++) { if (await page.evaluate(() => myTurn() && !G.q)) break; const q = await page.evaluate(() => myTurn() && G.q && G.q.h); if (q === 'die') await tap('.die.glow'); else if (q === 'draw') await tap('#deckb'); else if (q === 'egg') await tap('.bc[data-a="bird"].glow'); else if (q) await tap('#acts .btn'); await page.waitForTimeout(150); }
+    for (let k = 0; k < 100; k++) { if (await page.evaluate(() => myTurn() && !G.q)) break; const q = await page.evaluate(() => myTurn() && G.q && G.q.h); if (q === 'die') await tap('.die[data-legal]'); else if (q === 'draw') await tap('#deckb'); else if (q === 'egg') await tap('.bc[data-a="bird"][data-legal]'); else if (q) await tap('#acts .btn'); await page.waitForTimeout(150); }
     const t3 = await page.evaluate(() => G.pl[0].cubes);
     console.log((t3 === 5 ? 'PASS ' : 'FAIL ') + name + ' three turns played by tapping (cubes left ' + t3 + ')'); if (t3 !== 5) fails++;
     // force the end of the year: every player out of cubes, last round
     await page.evaluate(() => { G.round = G.rounds - 1; G.pl.forEach(p => { p.cubes = 1; }); render(); });
-    await tap('.ract[data-h="2"]');
-    for (let k = 0; k < 40; k++) { const q = await page.evaluate(() => myTurn() && G.q && G.q.h); if (q === 'draw') await tap('#deckb'); else if (q) await tap('#acts .btn'); if (await page.locator('#again').isVisible().catch(() => false)) break; await page.waitForTimeout(250); }
+    // cause of the old flake: the forced state was tapped once, at once, even while a rival step or a banner was still playing (not your turn yet), so the tap was lost and the year never ended.
+    // Now every pass asks the game what it wants (your turn, nothing animating) and taps only then.
+    for (let k = 0; k < 160; k++) {
+      if (await page.locator('#again').isVisible().catch(() => false)) break;
+      const s = await page.evaluate(() => ({ ok: myTurn() && !UI.busy && !document.querySelector('.turnban,.reveal'), q: G.q && G.q.h, over: G.phase === 'over' }));
+      if (s.ok && !s.over) { if (s.q === 'draw') await tap('#deckb'); else if (s.q === 'die') await tap('.die[data-legal]'); else if (s.q === 'egg') await tap('.bc[data-a="bird"][data-legal]'); else if (s.q) await tap('#acts .btn'); else await tap('.ract[data-h="2"]'); await page.waitForTimeout(400); }
+      else await page.waitForTimeout(150);
+    }
     await page.waitForSelector('#again', { state: 'visible', timeout: 30000 }).catch(() => { });
     const done = await page.locator('#again').isVisible().catch(() => false);
     console.log((done && !errs.length ? 'PASS ' : 'FAIL ') + name + ' reached the result screen; errors: ' + errs.length + ' ' + errs.slice(0, 2).join(' | ')); if (!done || errs.length) fails++;
