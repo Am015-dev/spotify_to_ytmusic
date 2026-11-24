@@ -48,7 +48,7 @@ async function run(b, W, H) {
       continue;
     }
     // 1) tap anything: no hand card sits under the lesson card, Rules opens mid-lesson
-    const cov = await p.evaluate(() => [...document.querySelectorAll('#handw .hc')].filter(e => { const r = e.getBoundingClientRect(); if (r.width < 4) return false; const u = document.elementFromPoint(r.left + r.width / 2, r.top + r.height / 2); return u && u.closest('.gxst-card'); }).length);
+    const cov = await p.evaluate(() => [...document.querySelectorAll('#handw .hc, #act button, #cstrip')].filter(e => { const r = e.getBoundingClientRect(); if (r.width < 4) return false; const u = document.elementFromPoint(r.left + r.width / 2, r.top + r.height / 2); return u && u.closest('.gxst-card'); }).length);
     if (cov) note(id + ': ' + cov + ' hand cards under the lesson card');
     if (id === 'bid') {
       const open = await p.evaluate(() => { const b = document.querySelector('[data-gx="rulesd"]'); if (!b) return -1; b.click(); return document.querySelector('.gx-drawer') ? 1 : 0; }); if (open !== 1) note('Rules did not open mid-lesson (' + open + ')');
@@ -65,10 +65,18 @@ async function run(b, W, H) {
   // progress + events
   s = await st(); if (Object.keys(s.best).length < ids.length) note('progress saved for ' + Object.keys(s.best).length + '/' + ids.length);
   const ev = await p.evaluate(() => __ev.join(',')); ['start', 'fail', 'retry', 'hint', 'win'].forEach(t => { if (ev.indexOf(t) < 0) note('no ' + t + ' event'); });
-  await ctx.close(); stop(); return shots;
+  await ctx.close(); stop(); return { shots, ids };
+}
+// contact sheet of every lesson start (phone and pc): proof/thornbound-lessons-<size>-sheet.jpg
+async function sheet(b, W, H, { shots, ids }) {
+  const phone = W < 600, cols = phone ? 5 : 3, cw = phone ? 260 : 455, ch = Math.round(cw * H / W);
+  const cells = shots.map((x, i) => '<figure><img src="data:image/jpeg;base64,' + x.toString('base64') + '"><figcaption>' + (i + 1) + ' ' + ids[i] + '</figcaption></figure>').join('');
+  const pg = await b.newPage({ viewport: { width: cols * (cw + 8) + 8, height: Math.ceil(shots.length / cols) * (ch + 30) + 8 } });
+  await pg.setContent('<style>body{margin:4px;background:#222;display:flex;flex-wrap:wrap;font:14px sans-serif;color:#fff}figure{margin:4px;width:' + cw + 'px}img{width:100%;display:block}figcaption{padding:2px}</style>' + cells);
+  await pg.screenshot({ path: path.join(PROOF, 'thornbound-lessons-' + W + 'x' + H + '-sheet.jpg'), type: 'jpeg', quality: 75, fullPage: true }); await pg.close();
 }
 (async () => {
   const b = await PW.chromium.launch(fs.existsSync('/opt/pw-browsers/chromium') ? { executablePath: '/opt/pw-browsers/chromium' } : {});
-  for (const [W, H] of SIZES) { const n = probs.length, t0 = Date.now(); await run(b, W, H).catch(e => probs.push(W + 'x' + H + ': CRASH ' + e.message.split('\n')[0])); console.log((probs.length === n ? 'PASS ' : 'FAIL ') + W + 'x' + H + ' ' + ((Date.now() - t0) / 1000).toFixed(1) + 's'); }
+  for (const [W, H] of SIZES) { const n = probs.length, t0 = Date.now(); const out = await run(b, W, H).catch(e => { probs.push(W + 'x' + H + ': CRASH ' + e.message.split('\n')[0]); return null; }); if (out) await sheet(b, W, H, out); console.log((probs.length === n ? 'PASS ' : 'FAIL ') + W + 'x' + H + ' ' + ((Date.now() - t0) / 1000).toFixed(1) + 's'); }
   await b.close(); probs.forEach(x => console.log('  ' + x)); process.exit(probs.length ? 1 : 0);
 })();

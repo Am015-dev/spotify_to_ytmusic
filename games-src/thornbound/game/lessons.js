@@ -1,4 +1,12 @@
 // Thornbound lessons: short scenario games on the shared engine (shell/gx-scenario-tutor.js, docs shell/GXST.md).
+// RULE -> LESSON TABLE (rules-notes.md, rules drawer, engine.js):
+//   secret bid, highest bid chooses first, take from the Great Road ... bid       | steal an occupied Kingdom Card, bid must beat occupier ... steal
+//   one face-down card per Region, higher Strength wins the Region ..... place     | Supporters add +1 Strength each in Spring ............... supporters
+//   tied Clash: add a card or pass, new Clash of the new cards ......... tie       | Herald Reward on the claimed Location, steal from rivals . herald
+//   Journey for Lore, buy from the Site of Power ....................... journey   | Kingdom's Favour disc at Market Cross ................... favour
+//   Govern a card with Votes into a Council ............................ govern    | the whole round, two rounds, most Influence wins ........ game
+//   Rules without a lesson of their own (rules drawer + hint bulb): Attrition and Hand Size, Order Track ties, Commands (Ambush, Retreat, Flank, Rally,
+//   Deploy), Deadly, Tactics, Secrets and Bond Councils, Kingdom Card powers, advanced setup. The short game lets any of them come up.
 (function () {
   if (!window.GXST) return;
   var L = { ai: null, n: 0, pre: 0 };
@@ -36,7 +44,7 @@
     if (sp.prep) sp.prep(G);
     var from = START[sp.at || 'bid']; SKEL.slice(from).forEach(function (a) { G.ag.push({ h: a[0], d: a[1] ? JSON.parse(JSON.stringify(a[1])) : {} }); });
     I.flow(); UI.evq = []; UI.card = null; UI.pop = null; UI.busy = false; UI.rs0 = snapInf(); UI.rsLog = G.logN; UI.rsInfl = JSON.parse(JSON.stringify(G.infl || [])); UI.mapReset = true;
-    renderAll(); pump();
+    renderAll(); pump(); try { GXH.setEnabled(false); GXH.hide(); } catch (e) { }
     return until(function () { return !UI.busy && !UI.card && G.q && whoActs().hum.length; }, 8000).then(function () { return new Promise(function (r) { setTimeout(r, 500); }); });
   }
 
@@ -142,7 +150,7 @@
     var os = saveGame; saveGame = function () { if (!GXST.active()) return os.apply(this, arguments); };
     var oh = humanMove; humanMove = function (k) { var r = oh.apply(this, arguments); if (r && GXST.active() && !/^(done|seldone)$/.test(k)) L.n++; return r; };
     window.TBL = { L: L, stack: stack, lessons: lessons, until: until };
-    if (lessons.length) GXST.init({ game: 'thornbound', scenarios: lessons, keepClear: ['#handw', '#road'], settled: function () { return !!(G && G.over) || (!UI.busy && !UI.card && !UI.pumping); } });
+    if (lessons.length) GXST.init({ game: 'thornbound', scenarios: lessons, keepClear: ['#handw', '#rivals', '#tbturn', '#act', '#cstrip'], settled: function () { return !!(G && G.over) || (!UI.busy && !UI.card && !UI.pumping); } });
   };
   setTimeout(go, 300);
 })();
