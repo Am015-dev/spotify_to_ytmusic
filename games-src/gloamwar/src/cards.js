@@ -1,0 +1,106 @@
+/* Gloamwar event cards: 4 decks x 24 = 96. Every title, effect and combat half is our own design.
+   Deck structure follows the original: character decks are character-type cards; strategy decks are 12 muster + 12 army cards; each card has a combat half with an initiative number.
+   K(id, deck, type, title, pre, effects, text, combat:[title, initiative, op, n, need, text], table key)
+   pre: precondition key (effects.js cardPre); effects: ops run by effects.js; table: the card stays in play until its discard condition. */
+var CARDS = [], CARD = {};
+function K(id, deck, type, n, pre, eff, text, cb, tab) { var c = { id: id, deck: deck, type: type, n: n, pre: pre || '', eff: eff, text: text, cb: { t: cb[0], i: cb[1], op: cb[2], a: cb[3] || 1, need: cb[4] || '', text: cb[5] }, tab: tab || null }; CARDS.push(c); CARD[id] = c; }
+// ------------------------------------------------ Dawn League: character deck (24 character cards)
+K('dc01', 'DC', 'C', 'Fog on the Fens', 'hidden', [{ o: 'cmove', card: 1 }], 'The Company slips 1 step on. No die goes to the hunt box.', ['Blinding Fog', 3, 'minus', 1, 'def', 'Defending: Gloam rolls -1 this round.']);
+K('dc02', 'DC', 'C', 'The Hooded Lantern', '', [{ o: 'tile', k: 'dlantern' }], 'Add the Hooded lantern tile (-2 taint) for the Ashen Road.', ['Lantern Signal', 6, 'lead', 1, '', '+1 leader re-roll.']);
+K('dc03', 'DC', 'C', 'Ashcloth Cloaks', '', [{ o: 'tile', k: 'dcloak' }], 'Add the Ashcloth cloaks tile (-1 taint) for the Ashen Road.', ['Grey Mantles', 2, 'shield', 1, 'def', 'Defending: ignore 1 hit.']);
+K('dc04', 'DC', 'C', 'The Knotted Rope', '', [{ o: 'tile', k: 'drope' }], 'Add the Knotted rope tile (0 taint) for the Ashen Road.', ['Tied Ranks', 5, 'shield', 1, '', 'Ignore 1 hit.']);
+K('dc05', 'DC', 'C', 'Bitter Moss', '', [{ o: 'tile', k: 'dmoss' }], 'Add the Bitter moss tile (-1 taint) for the Ashen Road.', ['Field Dressing', 7, 'shield', 1, '', 'Ignore 1 hit.']);
+K('dc06', 'DC', 'C', 'Healing Spring', 'offroad', [{ o: 'heal', n: 2 }], 'Remove 2 taint. Not on the Ashen Road.', ['Fresh Water', 8, 'lead', 1, '', '+1 leader re-roll.']);
+K('dc07', 'DC', 'C', 'A Quiet Night', '', [{ o: 'heal', n: 1 }, { o: 'draw', d: 'DC' }], 'Remove 1 taint and draw a character card.', ['Rested Troops', 9, 'plus', 1, 'def', 'Defending: +1 to your rolls.']);
+K('dc08', 'DC', 'C', 'Hidden Trail', '', [], 'Stays in play. The next hunt tile deals 1 less taint.', ['Unseen Path', 4, 'stop', 1, 'def', 'Defending: the battle ends after this round.'], 'trail');
+K('dc09', 'DC', 'C', 'Lamplight Vigil', 'orrinF', [], 'Stays in play while Orrin guides. Cancels the next hunt tile.', ['Staff of Light', 1, 'cancel', 1, '', 'Cancel the enemy combat card.'], 'vigil');
+K('dc10', 'DC', 'C', 'The Ranger\'s Path', 'kestrelF', [{ o: 'hide' }, { o: 'cmove', card: 1 }], 'Hide the Company, then it moves 1 step. No die to the hunt box.', ['Ranger\'s Eye', 4, 'reroll', 1, '', 'Re-roll your misses once more.']);
+K('dc11', 'DC', 'C', 'An Old Hearth Song', 'smallF', [{ o: 'heal', n: 1 }, { o: 'hide' }], 'Remove 1 taint and hide the Company.', ['Brave Hearts', 6, 'plus', 1, 'def', 'Defending: +1 to your rolls.']);
+K('dc12', 'DC', 'C', 'Back Roads', '', [], 'Stays in play. The next reveal is ignored.', ['Feint', 3, 'minus', 1, '', 'Enemy rolls -1 this round.'], 'backroads');
+K('dc13', 'DC', 'C', 'Kestrel\'s Call', 'kestrelMap', [{ o: 'recHere', c: 'kestrel', u: 'e' }], 'Kestrel raises 1 elite of the nation where she stands.', ['Rally to Me', 5, 'lead', 2, 'char', 'With a companion: +2 leader re-rolls.']);
+K('dc14', 'DC', 'C', 'Darian\'s Horn', 'darianMap', [{ o: 'pol', nat: 'au', n: 1, wake: 1 }, { o: 'pol', nat: 'va', n: 0, wake: 1 }], 'Aurelmont wakes and steps toward war. Varrn wakes.', ['Horn Blast', 2, 'charge', 1, 'att', 'Attacking: +1 to rolls in round 1.']);
+K('dc15', 'DC', 'C', 'Sylwen\'s Arrows', 'sylwenNear', [{ o: 'hitsNear', c: 'sylwen', n: 1 }], 'A Gloam army next to Sylwen takes 1 hit.', ['Arrow Storm', 3, 'hit', 1, 'nat:gr', 'Greenhold army: score 1 extra hit.']);
+K('dc16', 'DC', 'C', 'Brokk\'s Vow', 'brokkOut', [{ o: 'pol', nat: 'df', n: 1, wake: 1 }], 'The Deepforge Clans wake and step toward war.', ['Stone Shields', 5, 'shield', 1, 'nat:df', 'Deepforge army: ignore 1 hit.']);
+K('dc17', 'DC', 'C', 'The Wanderer Returns', 'orrinMap', [{ o: 'draw', d: 'DC' }, { o: 'draw', d: 'DS' }], 'Draw a character card and a strategy card.', ['Wizard Fire', 1, 'hit', 1, 'char', 'With a companion: score 1 extra hit.']);
+K('dc18', 'DC', 'C', 'Forced March', 'compMap', [{ o: 'charmove' }], 'Move your companions on the map.', ['Quick Step', 8, 'charge', 1, 'att', 'Attacking: +1 to rolls in round 1.']);
+K('dc19', 'DC', 'C', 'Shieldwall', 'compArmy', [{ o: 'recComp', u: 'e' }], 'An army with a companion gains 1 elite of its nation.', ['Locked Shields', 2, 'shield', 2, 'def', 'Defending: ignore 2 hits.']);
+K('dc20', 'DC', 'C', 'Courage of Small Folk', 'small', [{ o: 'wakeAny' }], 'Wake one sleeping Dawn nation.', ['Unlooked-for Help', 7, 'dice', 1, '', '+1 combat die (max 5).']);
+K('dc21', 'DC', 'C', 'Messenger Birds', '', [{ o: 'draw', d: 'DC' }, { o: 'draw', d: 'DS' }], 'Draw a character card and a strategy card.', ['Warning Cry', 9, 'lead', 1, '', '+1 leader re-roll.']);
+K('dc22', 'DC', 'C', 'Sudden Ambush', 'leadAdj', [{ o: 'attack', lead: 1 }], 'An army with a leader attacks now.', ['Ambush', 2, 'hit', 1, 'att', 'Attacking: score 1 extra hit.']);
+K('dc23', 'DC', 'C', 'The Wardens Watch', '', [], 'Stays in play until the Ashen Road. Gloamriders give the Hunt no re-roll.', ['Watchful', 6, 'nolead', 1, 'def', 'Defending: the enemy gets no re-rolls.'], 'watch');
+K('dc24', 'DC', 'C', 'Last Light', 'onroad', [{ o: 'heal', n: 1 }, { o: 'hide' }], 'On the Ashen Road: remove 1 taint and hide the Company.', ['Final Stand', 1, 'plus', 1, '', '+1 to your rolls.']);
+// ------------------------------------------------ Dawn League: strategy deck (12 muster + 12 army)
+K('ds01', 'DS', 'M', 'Call of the Greenhold', 'own:lanternvale', [{ o: 'rec', at: ['lanternvale'], nat: 'gr', u: ['e'] }], 'Lanternvale raises 1 Greenhold elite.', ['Forest Bows', 4, 'hit', 1, 'nat:gr', 'Greenhold army: score 1 extra hit.']);
+K('ds02', 'DS', 'M', 'Ironmonger Levy', 'own:hammerdeep', [{ o: 'rec', at: ['hammerdeep'], nat: 'df', u: ['r', 'r'] }], 'Hammerdeep raises 2 Deepforge regulars.', ['Hammer and Anvil', 5, 'dice', 1, 'nat:df', 'Deepforge army: +1 die.']);
+K('ds03', 'DS', 'M', 'Citadel Muster', 'own:citadel', [{ o: 'rec', at: ['citadel'], nat: 'au', u: ['e', 'l'] }], 'Aurel Citadel raises 1 elite and 1 leader.', ['White Walls', 3, 'shield', 1, 'siege', 'In a siege: ignore 1 hit.']);
+K('ds04', 'DS', 'M', 'The Seawatch Fleet', 'own:seawatch', [{ o: 'rec', at: ['seawatch'], nat: 'au', u: ['r', 'r'] }], 'Seawatch raises 2 Aurelmont regulars.', ['Sea Wind', 7, 'plus', 1, '', '+1 to your rolls.']);
+K('ds05', 'DS', 'M', 'Riders of Varrn', 'war:va', [{ o: 'rec', at: ['hallowmead'], nat: 'va', u: ['e', 'e'] }], 'Varrn at war: Hallowmead raises 2 elites.', ['Thunder of Hooves', 2, 'charge', 1, 'att', 'Attacking: +1 to rolls in round 1.']);
+K('ds06', 'DS', 'M', 'Hearth Militia', '', [{ o: 'rec', at: ['thistledown', 'kettlecross'], nat: 'hl', u: ['r', 'r'] }], 'Thistledown and Kettlecross raise 1 regular each.', ['Pitchforks', 9, 'dice', 1, 'def', 'Defending: +1 die.']);
+K('ds07', 'DS', 'M', 'Brightwater Bowmen', 'own:brightwater', [{ o: 'rec', at: ['brightwater'], nat: 'hl', u: ['e', 'r'] }], 'Brightwater raises 1 elite and 1 regular.', ['Volley', 4, 'hit', 1, 'def', 'Defending: score 1 extra hit.']);
+K('ds08', 'DS', 'M', 'Envoy to Aurelmont', '', [{ o: 'pol', nat: 'au', n: 1, wake: 1 }], 'Aurelmont wakes and steps toward war.', ['Banners Raised', 6, 'lead', 1, '', '+1 leader re-roll.']);
+K('ds09', 'DS', 'M', 'Envoy to Varrn', '', [{ o: 'pol', nat: 'va', n: 1, wake: 1 }], 'Varrn wakes and steps toward war.', ['Steppe Riders', 5, 'charge', 1, 'att', 'Attacking: +1 to rolls in round 1.']);
+K('ds10', 'DS', 'M', 'Envoy to the Clans', '', [{ o: 'pol', nat: 'df', n: 1, wake: 1 }], 'The Deepforge Clans wake and step toward war.', ['Deep Delvings', 8, 'shield', 1, 'def', 'Defending: ignore 1 hit.']);
+K('ds11', 'DS', 'M', 'Council of Lanterns', '', [{ o: 'polAny', n: 2 }], 'Two different awake Dawn nations each step toward war.', ['Council\'s Word', 1, 'cancel', 1, '', 'Cancel the enemy combat card.']);
+K('ds12', 'DS', 'M', 'The Beacons Burn', '', [{ o: 'pol', nat: 'au', n: 0, wake: 1 }, { o: 'pol', nat: 'va', n: 0, wake: 1 }, { o: 'pol', nat: 'hl', n: 0, wake: 1 }], 'Aurelmont, Varrn and the Hearthlands wake.', ['Beacon Fire', 7, 'lead', 1, '', '+1 leader re-roll.']);
+K('ds13', 'DS', 'A', 'Sally at Dawn', 'besiegedD', [{ o: 'sortie' }], 'A besieged Dawn army sallies out now.', ['Dawn Sally', 3, 'plus', 1, 'att', 'Attacking: +1 to your rolls.']);
+K('ds14', 'DS', 'A', 'Swift Riders', 'army:va', [{ o: 'move', n: 2, nat: 'va' }], 'Move up to 2 armies with Varrn units.', ['Flank Ride', 4, 'charge', 1, 'att', 'Attacking: +1 to rolls in round 1.']);
+K('ds15', 'DS', 'A', 'River Barges', 'armyD', [{ o: 'move', n: 1 }, { o: 'move', n: 1 }], 'Move one army, then move one army again.', ['Fresh Reserves', 8, 'dice', 1, '', '+1 combat die (max 5).']);
+K('ds16', 'DS', 'A', 'Counterstroke', 'adjD', [{ o: 'attack' }], 'A Dawn army attacks now.', ['Counterstroke', 2, 'hit', 1, '', 'Score 1 extra hit.']);
+K('ds17', 'DS', 'A', 'Hold the Walls', '', [], 'Stays in play. Dawn defenders in the next siege get +1 die.', ['Hot Pitch', 1, 'hit', 1, 'siege', 'In a siege: score 1 extra hit.'], 'walls');
+K('ds18', 'DS', 'A', 'Scorched Fields', 'gloamInDawn', [{ o: 'hitsIn', n: 1 }], 'A Gloam army inside a Dawn nation takes 1 hit.', ['Burnt Ground', 6, 'minus', 1, 'def', 'Defending: Gloam rolls -1 this round.']);
+K('ds19', 'DS', 'A', 'Archers on the Ridge', 'nearNat:gr', [{ o: 'hitsNear', nat: 'gr', n: 1 }], 'A Gloam army next to Greenhold troops takes 1 hit.', ['High Ground', 5, 'plus', 1, 'def', 'Defending: +1 to your rolls.']);
+K('ds20', 'DS', 'A', 'Relief Column', 'armyD', [{ o: 'move', n: 2 }], 'Move up to 2 armies.', ['Relief', 7, 'shield', 1, '', 'Ignore 1 hit.']);
+K('ds21', 'DS', 'A', 'Rally the Fallen', '', [{ o: 'recWar', n: 2 }], 'Raise 1 regular in each of 2 settlements of nations at war.', ['Second Wind', 9, 'reroll', 1, '', 'Re-roll your misses once more.']);
+K('ds22', 'DS', 'A', 'War Council', '', [{ o: 'draw', d: 'DS' }, { o: 'draw', d: 'DS' }], 'Draw 2 strategy cards.', ['Battle Plan', 4, 'lead', 2, 'lead', 'With a leader: +2 leader re-rolls.']);
+K('ds23', 'DS', 'A', 'Ambush at the Ford', 'adjD', [{ o: 'attack' }], 'A Dawn army attacks now.', ['Ford Ambush', 3, 'charge', 1, 'att', 'Attacking: +1 to rolls in round 1.']);
+K('ds24', 'DS', 'A', 'Spies in the Tower', '', [{ o: 'discardOpp', n: 1 }, { o: 'draw', d: 'DS' }], 'The Gloam discards a random card. Draw a strategy card.', ['Turncoat', 1, 'cancel', 1, '', 'Cancel the enemy combat card.']);
+// ------------------------------------------------ the Gloam: character deck (24 character cards)
+K('gc01', 'GC', 'C', 'The Coil', '', [{ o: 'tile', k: 'gcoil' }], 'Add the Coil tile (a die of taint, stops a step) for the Ashen Road.', ['Strangling Coil', 4, 'minus', 1, '', 'Enemy rolls -1 this round.']);
+K('gc02', 'GC', 'C', 'The Crown Calls', '', [{ o: 'tile', k: 'gcrown' }], 'Add the Crown calls tile (a die, reveals, stops) for the Ashen Road.', ['Dread Call', 2, 'nolead', 1, '', 'The enemy gets no re-rolls.']);
+K('gc03', 'GC', 'C', 'The Cave Maw', '', [{ o: 'tile', k: 'gmaw' }], 'Add the Cave maw tile (3 taint, stops) for the Ashen Road.', ['From the Deep', 5, 'hit', 1, 'att', 'Attacking: score 1 extra hit.']);
+K('gc04', 'GC', 'C', 'The Watchers', '', [{ o: 'tile', k: 'gwatch' }], 'Add the Watchers tile (1 taint, reveals, stops) for the Ashen Road.', ['Silent Sentries', 7, 'shield', 1, 'def', 'Defending: ignore 1 hit.']);
+K('gc05', 'GC', 'C', 'Sniffing Hounds', 'huntbox', [{ o: 'hunttile' }], 'Draw a hunt tile against the Company now (the Gaze counts 0).', ['Hounds', 6, 'charge', 1, 'att', 'Attacking: +1 to rolls in round 1.']);
+K('gc06', 'GC', 'C', 'Whispers of the Crown', 'revealed', [{ o: 'taint', n: 1 }], 'The Company is revealed: +1 taint.', ['Whispers', 8, 'minus', 1, 'def', 'Defending: enemy rolls -1.']);
+K('gc07', 'GC', 'C', 'Eyes in the Dark', 'riderNear', [{ o: 'reveal' }], 'A Gloamrider is in or next to the Company\'s region: reveal it.', ['Eyes Everywhere', 3, 'cancel', 1, '', 'Cancel the enemy combat card.']);
+K('gc08', 'GC', 'C', 'Black Tidings', 'revealed', [{ o: 'hunttile' }], 'The Company is revealed: draw a hunt tile (the Gaze counts 0).', ['Despair', 4, 'nolead', 1, 'att', 'Attacking: the enemy gets no re-rolls.']);
+K('gc09', 'GC', 'C', 'The Hunters\' Net', '', [], 'Stays in play until the Ashen Road. Each hunt roll gets 1 more re-roll.', ['Net', 9, 'lead', 1, '', '+1 leader re-roll.'], 'net');
+K('gc10', 'GC', 'C', 'Bitter Cold', 'prog2', [{ o: 'taint', n: 1 }], 'The Company has moved 2+ steps unseen: +1 taint.', ['Frostbite', 7, 'minus', 1, '', 'Enemy rolls -1 this round.']);
+K('gc11', 'GC', 'C', 'Betrayal in the Camp', 'betray', [{ o: 'kill', who: 'random' }], 'Revealed next to a Gloam army: a random companion falls.', ['Knife in the Dark', 1, 'hit', 1, '', 'Score 1 extra hit.']);
+K('gc12', 'GC', 'C', 'The Crown\'s Weight', 'onroad', [{ o: 'taint', n: 1 }], 'The Company is on the Ashen Road: +1 taint.', ['Heavy Burden', 5, 'stop', 1, 'def', 'Defending: the battle ends after this round.']);
+K('gc13', 'GC', 'C', 'Riders Abroad', 'riders', [{ o: 'nzmove' }], 'Move your Gloamriders and minions.', ['Wings of Dread', 3, 'nolead', 1, '', 'The enemy gets no re-rolls.']);
+K('gc14', 'GC', 'C', 'Summon the Riders', 'ridersPool', [{ o: 'recRiders', n: 2 }], 'Place 2 Gloamriders from reserve in Throne strongholds.', ['Shrieks', 6, 'minus', 1, '', 'Enemy rolls -1 this round.']);
+K('gc15', 'GC', 'C', 'The Marshal\'s Terror', 'marshalArmy', [{ o: 'attack', c: 'marshal' }], 'The Wraith-Marshal\'s army attacks now.', ['Black Captain', 2, 'lead', 2, 'lead', 'With a leader: +2 leader re-rolls.']);
+K('gc16', 'GC', 'C', 'Vael\'s Sermon', 'vael', [], 'Stays in play while Vael lives. Varrn cannot be stirred by dice.', ['Silver Tongue', 1, 'cancel', 1, '', 'Cancel the enemy combat card.'], 'sermon');
+K('gc17', 'GC', 'C', 'Brass Engines', 'vael', [{ o: 'rec', at: ['corvel'], nat: 'cv', u: ['r', 'r'] }], 'Vael in play: Corvel Tower raises 2 regulars.', ['Brass Engines', 4, 'dice', 1, 'nat:cv', 'Corvel army: +1 die.']);
+K('gc18', 'GC', 'C', 'The Voice Speaks', 'voice', [{ o: 'discardOpp', n: 2 }], 'The Voice in play: the Dawn League discards 2 random cards.', ['Parley', 5, 'stop', 1, '', 'The battle ends after this round.']);
+K('gc19', 'GC', 'C', 'Terror on the Wind', 'riderOnDawn', [{ o: 'hitsRider', n: 1 }], 'A Dawn army sharing a region with a Gloamrider takes 1 hit.', ['Terror', 3, 'hit', 1, 'lead', 'With a leader: score 1 extra hit.']);
+K('gc20', 'GC', 'C', 'Dark Wings', 'riders', [{ o: 'nzmove' }, { o: 'draw', d: 'GC' }], 'Move your Gloamriders, then draw a character card.', ['Swoop', 8, 'charge', 1, 'att', 'Attacking: +1 to rolls in round 1.']);
+K('gc21', 'GC', 'C', 'Treachery', '', [{ o: 'discardOpp', n: 1 }, { o: 'draw', d: 'GC' }], 'The Dawn League discards a random card. Draw a character card.', ['Traitor Gate', 2, 'minus', 1, 'att', 'Attacking: enemy rolls -1.']);
+K('gc22', 'GC', 'C', 'Spite of the Throne', 'loneComp', [{ o: 'killLone' }], 'A companion standing without a Dawn army falls.', ['Spite', 6, 'hit', 1, 'att', 'Attacking: score 1 extra hit.']);
+K('gc23', 'GC', 'C', 'Cruel Muster', '', [{ o: 'rec', at: ['spire', 'gallowmere', 'wraithpass', 'blackgate', 'hollowdeep', 'cragmaw'], nat: 'pt', u: ['e'] }], 'A Throne stronghold raises 1 elite.', ['Cruelty', 7, 'plus', 1, 'att', 'Attacking: +1 to your rolls.']);
+K('gc24', 'GC', 'C', 'Ill Omens', '', [{ o: 'draw', d: 'GC' }, { o: 'draw', d: 'GS' }], 'Draw a character card and a strategy card.', ['Omen', 9, 'lead', 1, '', '+1 leader re-roll.']);
+// ------------------------------------------------ the Gloam: strategy deck (12 muster + 12 army)
+K('gs01', 'GS', 'M', 'Brassmoor Levies', '', [{ o: 'rec', at: ['nbrass', 'sbrass'], nat: 'cv', u: ['r', 'r'] }], 'North and South Brassmoor raise 1 regular each.', ['Brass Pikes', 6, 'dice', 1, 'nat:cv', 'Corvel army: +1 die.']);
+K('gs02', 'GS', 'M', 'The Corsair Fleet', 'own:saltfang', [{ o: 'rec', at: ['saltfang'], nat: 'sh', u: ['r', 'r', 'r'], same: 1 }], 'Saltfang raises 3 Host regulars.', ['Corsair Raid', 4, 'charge', 1, 'att', 'Attacking: +1 to rolls in round 1.']);
+K('gs03', 'GS', 'M', 'The Steppe Horde', '', [{ o: 'rec', at: ['khazmar', 'steppegate'], nat: 'sh', u: ['r', 'r', 'e'] }], 'Khazmar and Steppegate raise 2 regulars and 1 elite.', ['Horse Archers', 3, 'hit', 1, 'nat:sh', 'Host army: score 1 extra hit.']);
+K('gs04', 'GS', 'M', 'The Desert Kings', '', [{ o: 'pol', nat: 'sh', n: 1 }, { o: 'rec', at: ['dunesreach'], nat: 'sh', u: ['e'] }], 'The Hosts step toward war. Dunesreach raises 1 elite.', ['Dune Riders', 7, 'plus', 1, '', '+1 to your rolls.']);
+K('gs05', 'GS', 'M', 'Pits of Cragmaw', 'own:cragmaw', [{ o: 'rec', at: ['cragmaw'], nat: 'pt', u: ['r', 'r'], same: 1 }], 'Cragmaw raises 2 Throne regulars.', ['Swarm', 8, 'dice', 1, '', '+1 combat die (max 5).']);
+K('gs06', 'GS', 'M', 'Hollowdeep Stirs', 'own:hollowdeep', [{ o: 'rec', at: ['hollowdeep'], nat: 'pt', u: ['r', 'r'], same: 1 }], 'Hollowdeep raises 2 Throne regulars.', ['Tunnels', 5, 'shield', 1, 'def', 'Defending: ignore 1 hit.']);
+K('gs07', 'GS', 'M', 'The Throne Commands', '', [{ o: 'pol', nat: 'pt', n: 1 }, { o: 'draw', d: 'GS' }], 'The Pale Throne steps toward war. Draw a strategy card.', ['Iron Will', 6, 'lead', 1, '', '+1 leader re-roll.']);
+K('gs08', 'GS', 'M', 'Corvel Mobilises', '', [{ o: 'pol', nat: 'cv', n: 1 }, { o: 'rec', at: ['corvel'], nat: 'cv', u: ['e'] }], 'Corvel steps toward war. Corvel Tower raises 1 elite.', ['Brass Shields', 4, 'shield', 1, '', 'Ignore 1 hit.']);
+K('gs09', 'GS', 'M', 'Threats and Bribes', '', [], 'Stays in play until a Dawn nation goes to war. The Dawn League cannot stir nations with dice.', ['Bribed Captain', 2, 'cancel', 1, '', 'Cancel the enemy combat card.'], 'bribes');
+K('gs10', 'GS', 'M', 'Gold for Swords', '', [{ o: 'recWar', n: 2 }], 'Raise 1 regular in each of 2 settlements of nations at war.', ['Mercenaries', 9, 'dice', 1, 'att', 'Attacking: +1 die.']);
+K('gs11', 'GS', 'M', 'Endless Columns', 'own:blackgate', [{ o: 'rec', at: ['blackgate'], nat: 'pt', u: ['r', 'r', 'r'], same: 1 }], 'Blackgate raises 3 Throne regulars.', ['Endless Ranks', 7, 'dice', 1, '', '+1 combat die (max 5).']);
+K('gs12', 'GS', 'M', 'The Fell Smiths', 'own:spire', [{ o: 'rec', at: ['spire'], nat: 'pt', u: ['e', 'e'], same: 1 }], 'Morvast Spire raises 2 Throne elites.', ['Black Steel', 3, 'plus', 1, '', '+1 to your rolls.']);
+K('gs13', 'GS', 'A', 'March of the Hosts', 'armyG', [{ o: 'move', n: 2 }], 'Move up to 2 armies.', ['Drums', 8, 'charge', 1, 'att', 'Attacking: +1 to rolls in round 1.']);
+K('gs14', 'GS', 'A', 'Siege Ladders', '', [], 'Stays in play. In your next siege battle you hit on 5+.', ['Ladders', 2, 'siege', 1, 'siege', 'In a siege: hit on 5+ this round.'], 'ladders');
+K('gs15', 'GS', 'A', 'Night Assault', 'big5', [{ o: 'attack', min: 5 }], 'An army of 5 or more units attacks now.', ['Under Darkness', 3, 'plus', 1, 'att', 'Attacking: +1 to your rolls.']);
+K('gs16', 'GS', 'A', 'Raiders', 'army:sh', [{ o: 'move', n: 1, nat: 'sh' }, { o: 'move', n: 1, nat: 'sh' }], 'Move one Host army, then move one Host army again.', ['Raid', 5, 'hit', 1, 'att', 'Attacking: score 1 extra hit.']);
+K('gs17', 'GS', 'A', 'Burning Villages', 'dawnNearG', [{ o: 'hitsDawnNear', n: 1 }], 'A Dawn army next to a Gloam army takes 1 hit.', ['Smoke', 6, 'minus', 1, '', 'Enemy rolls -1 this round.']);
+K('gs18', 'GS', 'A', 'Wolves at the Gate', 'adjG', [{ o: 'attack', nat: 'pt' }], 'An army with Throne units attacks now.', ['Wolf Pack', 4, 'charge', 1, 'att', 'Attacking: +1 to rolls in round 1.']);
+K('gs19', 'GS', 'A', 'Whipped Onward', 'armyG', [{ o: 'move', n: 2 }], 'Move up to 2 armies.', ['Lash', 9, 'reroll', 1, '', 'Re-roll your misses once more.']);
+K('gs20', 'GS', 'A', 'Undermine the Walls', 'siegingG', [{ o: 'hitsIn', garrison: 1, n: 1 }], 'A Dawn garrison you besiege takes 1 hit.', ['Sappers', 1, 'siege', 1, 'siege', 'In a siege: hit on 5+ this round.']);
+K('gs21', 'GS', 'A', 'Encircle', 'adjG', [{ o: 'attack' }], 'A Gloam army attacks now.', ['Pincer', 2, 'hit', 1, 'att', 'Attacking: score 1 extra hit.']);
+K('gs22', 'GS', 'A', 'Brass Fire', 'nearNat:cv', [{ o: 'hitsNearG', nat: 'cv', n: 1 }], 'A Dawn army next to Corvel troops takes 1 hit.', ['Fire Pots', 5, 'hit', 1, 'nat:cv', 'Corvel army: score 1 extra hit.']);
+K('gs23', 'GS', 'A', 'Plunder', '', [{ o: 'draw', d: 'GS' }, { o: 'draw', d: 'GS' }], 'Draw 2 strategy cards.', ['Loot', 8, 'lead', 1, '', '+1 leader re-roll.']);
+K('gs24', 'GS', 'A', 'Overrun', 'adjG', [{ o: 'attack' }], 'A Gloam army attacks now.', ['Trample', 3, 'dice', 1, 'att', 'Attacking: +1 die.']);

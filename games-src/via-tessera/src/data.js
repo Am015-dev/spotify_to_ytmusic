@@ -1,0 +1,60 @@
+// Via Tessera data: goods, every card (7 starting + 15 market cards for 2 players, decks I and II), city tokens, bonus markers and the
+// map (12 regions, 30 cities + the capital, 44 roads, 35 sea lanes). Original names; counts and numbers follow rules-notes.md / COMPONENTS.md.
+(function (root) {
+var VTD = {};
+VTD.GOODS = ['brick', 'food', 'tool', 'wine', 'cloth'];
+VTD.GOOD_NAME = { brick: 'brick', food: 'grain', tool: 'tools', wine: 'wine', cloth: 'cloth' };
+VTD.PRICE = { brick: 3, food: 4, tool: 5, wine: 6, cloth: 7 };      // storehouse roof prices: buy and sell
+VTD.CITY_COIN = { brick: 1, food: 2, tool: 3, wine: 4, cloth: 5 };  // building coins per house already there + this one
+VTD.BONUS_COIN = { brick: 1, food: 1, tool: 2, wine: 2, cloth: 1 }; // coin side of the region markers [unverified: see rules-notes]
+VTD.SLOTS = 12; VTD.HOUSES = 15; VTD.DISPLAY = 7; VTD.TRADE_KINDS = 2; VTD.TRIBUNE_FREE = 3; VTD.COLONIST_COINS = 5; VTD.MERCATOR_COINS = 3;
+VTD.LAUREL_VP = 7; VTD.EAGLE_MAX = 15;
+VTD.START_COINS = [5, 6];
+VTD.START_GOODS = { food: 2, brick: 1, tool: 1, wine: 1, cloth: 1 };
+VTD.START_COLS = [{ t: 'L', board: 1 }, { t: 'S', board: 1 }, { t: 'L' }, { t: 'L' }, { t: 'S' }, { t: 'S' }];
+// market slot surcharge: slot 1 free, 2-3 one good of your choice, 4-5 one cloth, 6 any + cloth, 7 two cloth
+VTD.SURCHARGE = [{}, { any: 1 }, { any: 1 }, { cloth: 1 }, { cloth: 1 }, { any: 1, cloth: 1 }, { cloth: 2 }];
+// patrons (scoring symbols on the cards)
+VTD.GODS = [
+  { id: 'hearth', n: 'Hearth', icon: 'hearth', rule: '1 point per 10 coins of wealth (goods count at price)' },
+  { id: 'eagle', n: 'Eagle', icon: 'eagle', rule: '1 point per house outside brick cities' },
+  { id: 'sickle', n: 'Sickle', icon: 'sickle', rule: '1 point per region with your house' },
+  { id: 'wing', n: 'Wing', icon: 'wing', rule: '2 points per kind of good your cities make' },
+  { id: 'shield', n: 'Shield', icon: 'shield', rule: '2 points per cart or ship on the map' },
+  { id: 'owl', n: 'Owl', icon: 'owl', rule: 'Points per house in cities of the card’s good' }];
+VTD.OWL = { brick: 3, food: 3, tool: 3, wine: 4, cloth: 5 };
+// actions: arch (move + build), pref (rule a region / collect taxes), merc (coins + trade), sen (buy 2), cons (buy 1, no surcharge),
+// dipl (copy rival's top card), colo (new carts/ships or coins), trib (take cards back), spec (your cities of one good produce)
+VTD.ACTS = {
+  arch: { n: 'Builder', icon: 'temple', what: 'Move carts and ships, then build houses' },
+  pref: { n: 'Governor', icon: 'scroll', what: 'A region produces, or collect taxes' },
+  merc: { n: 'Trader', icon: 'coins2', what: 'Take coins, then trade 2 kinds of goods' },
+  sen: { n: 'Patron', icon: 'laurel', what: 'Buy up to 2 cards from the market' },
+  cons: { n: 'Censor', icon: 'toga', what: 'Buy 1 card at its printed price' },
+  dipl: { n: 'Envoy', icon: 'masks', what: 'Copy the rival’s last card' },
+  colo: { n: 'Settler', icon: 'meeple', what: 'New carts or ships, or take coins' },
+  trib: { n: 'Herald', icon: 'bugle', what: 'Take your played cards back' },
+  spec: { n: 'Maker', icon: 'trowel', what: 'Your cities of one good produce' } };
+VTD.SPEC_NAME = { brick: 'Potter', food: 'Reaper', tool: 'Tinker', wine: 'Presser', cloth: 'Dyer' };
+var C = [], mk = function (act, god, cost, deck, extra) { var c = { id: C.length, act: act, god: god, cost: cost || {}, deck: deck }; for (var k in extra || {}) c[k] = extra[k]; c.n = act === 'spec' ? VTD.SPEC_NAME[c.spec] : VTD.ACTS[act].n; C.push(c); return c.id; };
+// starting hand (each player has these 7)
+VTD.START_HAND = [mk('trib', 'shield', {}, 0), mk('arch', 'eagle', {}, 0), mk('pref', 'sickle', {}, 0), mk('pref', 'sickle', {}, 0), mk('merc', 'wing', {}, 0, { coins: 3 }), mk('dipl', 'eagle', {}, 0), mk('sen', 'hearth', {}, 0)];
+// market deck I (8) and II (7); decks III-V are only for 3+ players and are not part of this 2-player game
+var I = [mk('arch', 'eagle', { tool: 1 }, 1), mk('pref', 'sickle', { wine: 1 }, 1), mk('merc', 'wing', { wine: 1 }, 1, { coins: 5 }), mk('colo', 'shield', { food: 1 }, 1), mk('dipl', 'sickle', { tool: 1 }, 1),
+  mk('spec', 'owl', { food: 1 }, 1, { spec: 'brick' }), mk('spec', 'owl', { food: 1, brick: 1 }, 1, { spec: 'food' }), mk('spec', 'owl', { tool: 1, brick: 1 }, 1, { spec: 'tool' })];
+var II = [mk('arch', 'eagle', { tool: 1 }, 2), mk('pref', 'sickle', { wine: 1 }, 2), mk('merc', 'wing', { wine: 1 }, 2, { coins: 5 }), mk('colo', 'shield', { food: 1 }, 2), mk('cons', 'eagle', { cloth: 1 }, 2),
+  mk('spec', 'owl', { wine: 1, brick: 1 }, 2, { spec: 'wine' }), mk('spec', 'owl', { cloth: 1, brick: 1 }, 2, { spec: 'cloth' })];
+VTD.CARDS = C;
+VTD.DECK_STACKS = function (np) { return [I, II]; };
+// city tokens by letter (A 7, B 8, C 10, D 5 cities) [per-letter mix unverified: see rules-notes]
+VTD.TOKENS = { A: ['brick', 'brick', 'food', 'food', 'tool', 'wine', 'cloth'], B: ['brick', 'brick', 'food', 'food', 'tool', 'tool', 'wine', 'cloth'],
+  C: ['brick', 'brick', 'brick', 'food', 'food', 'tool', 'tool', 'wine', 'wine', 'cloth'], D: ['brick', 'food', 'tool', 'wine', 'cloth'] };
+VTD.CAPITAL = 'caput';
+// tie: the holder of the Grand Governor tile wins, else the player who would get it next (2 players: the other one)
+VTD.TIEBREAK = function (G, pi) { return G.pm === pi ? 1 : 0; };
+VTD.PROVS=[{"id":"caledra","n":"Caledra","num":"I"},{"id":"aurenia","n":"Aurenia","num":"II"},{"id":"iberra","n":"Iberra","num":"III"},{"id":"silvana","n":"Silvana","num":"IV"},{"id":"latria","n":"Latria","num":"V"},{"id":"numara","n":"Numara","num":"VI"},{"id":"carpia","n":"Carpia","num":"VII"},{"id":"thessia","n":"Thessia","num":"VIII"},{"id":"syrtica","n":"Syrtica","num":"IX"},{"id":"anatra","n":"Anatra","num":"X"},{"id":"levantia","n":"Levantia","num":"XI"},{"id":"nilora","n":"Nilora","num":"XII"}];
+VTD.CITIES=[{"id":"caput","n":"Caput","x":470,"y":290},{"id":"iscadun","n":"Iscadun","x":150,"y":79,"L":"A","p":"caledra"},{"id":"thamesa","n":"Thamesa","x":218,"y":60,"L":"A","p":"caledra"},{"id":"sequana","n":"Sequana","x":267,"y":124,"L":"B","p":"aurenia"},{"id":"garumna","n":"Garumna","x":208,"y":221,"L":"B","p":"aurenia"},{"id":"saltara","n":"Saltara","x":328,"y":257,"L":"B","p":"aurenia"},{"id":"brigo","n":"Brigo","x":52,"y":254,"L":"B","p":"iberra"},{"id":"tagora","n":"Tagora","x":38,"y":367,"L":"B","p":"iberra"},{"id":"turia","n":"Turia","x":212,"y":348,"L":"B","p":"iberra"},{"id":"rhenum","n":"Rhenum","x":359,"y":74,"L":"A","p":"silvana"},{"id":"danuvia","n":"Danuvia","x":548,"y":139,"L":"A","p":"silvana"},{"id":"alpina","n":"Alpina","x":392,"y":206,"L":"D","p":"latria"},{"id":"aquila","n":"Aquila","x":488,"y":197,"L":"D","p":"latria"},{"id":"trinacra","n":"Trinacra","x":526,"y":406,"L":"D","p":"latria"},{"id":"byrsa","n":"Byrsa","x":426,"y":410,"L":"B","p":"numara"},{"id":"rusica","n":"Rusica","x":162,"y":449,"L":"B","p":"numara"},{"id":"somesa","n":"Somesa","x":692,"y":173,"L":"A","p":"carpia"},{"id":"savana","n":"Savana","x":612,"y":216,"L":"A","p":"carpia"},{"id":"pontica","n":"Pontica","x":792,"y":235,"L":"A","p":"carpia"},{"id":"illyra","n":"Illyra","x":610,"y":305,"L":"D","p":"thessia"},{"id":"glaucis","n":"Glaucis","x":694,"y":384,"L":"D","p":"thessia"},{"id":"leptara","n":"Leptara","x":506,"y":514,"L":"C","p":"syrtica"},{"id":"silphia","n":"Silphia","x":658,"y":509,"L":"C","p":"syrtica"},{"id":"halysa","n":"Halysa","x":922,"y":288,"L":"C","p":"anatra"},{"id":"pamphyla","n":"Pamphyla","x":834,"y":410,"L":"C","p":"anatra"},{"id":"bosphora","n":"Bosphora","x":800,"y":312,"L":"C","p":"anatra"},{"id":"orontes","n":"Orontes","x":944,"y":427,"L":"C","p":"levantia"},{"id":"murex","n":"Murex","x":924,"y":497,"L":"C","p":"levantia"},{"id":"pharia","n":"Pharia","x":818,"y":547,"L":"C","p":"nilora"},{"id":"nilopolis","n":"Nilopolis","x":846,"y":572,"L":"C","p":"nilora"},{"id":"rosaria","n":"Rosaria","x":928,"y":566,"L":"C","p":"nilora"}];
+VTD.ROUTES=[{"id":"l0","t":"land","a":"pharia","b":"silphia"},{"id":"l1","t":"land","a":"pharia","b":"nilopolis"},{"id":"l2","t":"land","a":"pharia","b":"murex"},{"id":"l3","t":"land","a":"orontes","b":"pamphyla"},{"id":"l4","t":"land","a":"orontes","b":"halysa"},{"id":"l5","t":"land","a":"orontes","b":"murex"},{"id":"l6","t":"land","a":"aquila","b":"alpina"},{"id":"l7","t":"land","a":"aquila","b":"caput"},{"id":"l8","t":"land","a":"aquila","b":"savana"},{"id":"l9","t":"land","a":"aquila","b":"danuvia"},{"id":"l10","t":"land","a":"glaucis","b":"illyra"},{"id":"l11","t":"land","a":"pamphyla","b":"bosphora"},{"id":"l12","t":"land","a":"brigo","b":"garumna"},{"id":"l13","t":"land","a":"brigo","b":"tagora"},{"id":"l14","t":"land","a":"brigo","b":"turia"},{"id":"l15","t":"land","a":"garumna","b":"sequana"},{"id":"l16","t":"land","a":"garumna","b":"saltara"},{"id":"l17","t":"land","a":"bosphora","b":"illyra"},{"id":"l18","t":"land","a":"bosphora","b":"halysa"},{"id":"l19","t":"land","a":"bosphora","b":"pontica"},{"id":"l20","t":"land","a":"byrsa","b":"leptara"},{"id":"l21","t":"land","a":"byrsa","b":"rusica"},{"id":"l22","t":"land","a":"rhenum","b":"sequana"},{"id":"l23","t":"land","a":"rhenum","b":"alpina"},{"id":"l24","t":"land","a":"rhenum","b":"danuvia"},{"id":"l25","t":"land","a":"silphia","b":"leptara"},{"id":"l26","t":"land","a":"silphia","b":"nilopolis"},{"id":"l27","t":"land","a":"illyra","b":"savana"},{"id":"l28","t":"land","a":"iscadun","b":"thamesa"},{"id":"l29","t":"land","a":"thamesa","b":"sequana"},{"id":"l30","t":"land","a":"sequana","b":"saltara"},{"id":"l31","t":"land","a":"saltara","b":"alpina"},{"id":"l32","t":"land","a":"saltara","b":"turia"},{"id":"l33","t":"land","a":"nilopolis","b":"rosaria"},{"id":"l34","t":"land","a":"somesa","b":"savana"},{"id":"l35","t":"land","a":"somesa","b":"pontica"},{"id":"l36","t":"land","a":"alpina","b":"caput"},{"id":"l37","t":"land","a":"tagora","b":"rusica"},{"id":"l38","t":"land","a":"tagora","b":"turia"},{"id":"l39","t":"land","a":"rosaria","b":"murex"},{"id":"l40","t":"land","a":"caput","b":"trinacra"},{"id":"l41","t":"land","a":"rusica","b":"turia"},{"id":"l42","t":"land","a":"savana","b":"pontica"},{"id":"l43","t":"land","a":"savana","b":"danuvia"},{"id":"s44","t":"sea","a":"pharia","b":"glaucis"},{"id":"s45","t":"sea","a":"pharia","b":"pamphyla"},{"id":"s46","t":"sea","a":"pharia","b":"silphia"},{"id":"s47","t":"sea","a":"pharia","b":"murex"},{"id":"s48","t":"sea","a":"orontes","b":"pamphyla"},{"id":"s49","t":"sea","a":"orontes","b":"murex"},{"id":"s50","t":"sea","a":"aquila","b":"illyra"},{"id":"s51","t":"sea","a":"glaucis","b":"pamphyla"},{"id":"s52","t":"sea","a":"glaucis","b":"bosphora"},{"id":"s53","t":"sea","a":"glaucis","b":"silphia"},{"id":"s54","t":"sea","a":"glaucis","b":"trinacra"},{"id":"s55","t":"sea","a":"brigo","b":"garumna"},{"id":"s56","t":"sea","a":"brigo","b":"iscadun"},{"id":"s57","t":"sea","a":"brigo","b":"tagora"},{"id":"s58","t":"sea","a":"garumna","b":"iscadun"},{"id":"s59","t":"sea","a":"bosphora","b":"halysa"},{"id":"s60","t":"sea","a":"bosphora","b":"pontica"},{"id":"s61","t":"sea","a":"byrsa","b":"leptara"},{"id":"s62","t":"sea","a":"byrsa","b":"saltara"},{"id":"s63","t":"sea","a":"byrsa","b":"caput"},{"id":"s64","t":"sea","a":"byrsa","b":"rusica"},{"id":"s65","t":"sea","a":"byrsa","b":"trinacra"},{"id":"s66","t":"sea","a":"byrsa","b":"turia"},{"id":"s67","t":"sea","a":"rhenum","b":"thamesa"},{"id":"s68","t":"sea","a":"silphia","b":"leptara"},{"id":"s69","t":"sea","a":"silphia","b":"trinacra"},{"id":"s70","t":"sea","a":"illyra","b":"trinacra"},{"id":"s71","t":"sea","a":"iscadun","b":"thamesa"},{"id":"s72","t":"sea","a":"leptara","b":"trinacra"},{"id":"s73","t":"sea","a":"saltara","b":"caput"},{"id":"s74","t":"sea","a":"saltara","b":"turia"},{"id":"s75","t":"sea","a":"tagora","b":"rusica"},{"id":"s76","t":"sea","a":"caput","b":"trinacra"},{"id":"s77","t":"sea","a":"rusica","b":"turia"},{"id":"s78","t":"sea","a":"halysa","b":"pontica"}];
+root.VTD = VTD;
+if (typeof module !== 'undefined') module.exports = VTD;
+})(typeof window !== 'undefined' ? window : global);

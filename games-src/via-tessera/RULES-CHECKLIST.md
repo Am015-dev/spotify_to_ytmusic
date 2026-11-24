@@ -1,0 +1,76 @@
+# Via Tessera: rules checklist
+
+One line per rule or count; each is an `ok(...)` check in `rules-test.js` (run `node rules-test.js`). Source of truth: rules-notes.md.
+
+- [x] 7 starting cards
+- [x] decks I (8) and II (7) for 2 players
+- [x] 2 market Builders, cost 1 tool
+- [x] 2 market Governors, cost 1 wine
+- [x] 2 market Traders (5 coins), cost 1 wine
+- [x] 2 Settlers, cost 1 grain
+- [x] 1 market Envoy (deck I), cost 1 tool
+- [x] 1 Censor (deck II), cost 1 cloth
+- [x] Potter costs 1 grain
+- [x] Reaper costs grain + brick
+- [x] Tinker costs tool + brick
+- [x] Presser costs wine + brick (deck II)
+- [x] Dyer costs cloth + brick (deck II)
+- [x] makers carry the Owl
+- [x] Owl values 3/3/3/4/5
+- [x] 30 cities + capital
+- [x] letters A7 B8 C10 D5
+- [x] one token per lettered city (30)
+- [x] 44 roads, 35 sea lanes
+- [x] capital has 3 roads + 3 lanes
+- [x] 12 storehouse spaces, 15 houses, 7 display slots
+- [x] roof prices 3/4/5/6/7
+- [x] start coins 5 and 6
+- [x] start goods 2 grain + 1 of each other
+- [x] 6 colonists: 1 cart + 1 ship in the capital
+- [x] storehouse starts with 10 of 12 used
+- [x] display of 7 from deck I; deck II under deck I
+- [x] Grand Governor starts with the second player
+- [x] Builder steps = colonists on the map (2)
+- [x] carts move on roads only
+- [x] ships move on sea lanes only
+- [x] cannot stop on an occupied line
+- [x] can pass through an occupied line (it still costs a step)
+- [x] wine city with 1 house: 8 coins + brick + wine
+- [x] brick city: 1 coin + 1 grain
+- [x] never build in the capital
+- [x] one house per player per city
+- [x] Governor: each house makes 1, the player also takes the bonus
+- [x] marker flips to coins
+- [x] Grand Governor doubles the bonus good and passes on
+- [x] taxes: coins from flipped markers, all flip back
+- [x] Trader gives 3 coins
+- [x] trade at most 2 kinds
+- [x] trade limited by storehouse room
+- [x] same price to buy and sell
+- [x] slot 7 costs two extra cloth
+- [x] slot 2 costs one extra good of your choice
+- [x] Censor pays only the printed cost
+- [x] Patron buys 2; the display refills to 7
+- [x] Settler: coins option
+- [x] Settler coins = 5 + 1 per colonist on the map
+- [x] Settler places in the capital or own-house cities
+- [x] each new colonist costs 1 grain + 1 tool
+- [x] Herald: 5 cards back = 2 coins
+- [x] Herald colonist goes to the capital
+- [x] Envoy can copy the rival top card
+- [x] Envoy acts as the copied card
+- [x] nothing to copy when the rival pile is empty
+- [x] Potter: only your brick houses produce
+- [x] too many goods: the owner picks what to keep
+- [x] storehouse fills to 12, stored goods kept
+- [x] Hearth: 1 per 10 wealth
+- [x] Eagle: 1 per non-brick house x 2 cards
+- [x] Sickle: 1 per region x 2 cards
+- [x] Wing: 2 per kind of good (3 kinds) x 1 card
+- [x] Shield: 2 per colonist on the map (2) x 1 card
+- [x] buying the last card takes the Laurel; the game goes on
+- [x] the other player gets exactly one more turn
+- [x] Laurel is worth 7
+- [x] tie goes to the Grand Governor holder
+- [x] the 15th house ends the game
+- [x] gauntlet: computer-vs-computer games end with no broken invariant (storehouse <= 12, one colonist per line, right line type, card count, houses match)

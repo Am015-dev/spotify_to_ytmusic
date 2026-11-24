@@ -1,0 +1,37 @@
+<body>
+<div class="gx-app" id="app">
+<header class="bar">
+  <button class="brand" id="homeb" type="button" aria-label="Menu"><svg viewBox="0 0 512 512" class="ic"><use href="#i-laurel"/></svg><span>Via Tessera</span></button>
+  <div class="race" id="race" aria-live="polite"></div>
+  <button class="tb" id="mktb" type="button" aria-label="Market"><svg viewBox="0 0 512 512" class="ic"><use href="#i-amphora"/></svg><span>Market</span><b id="mktn"></b></button>
+  <button class="tb sq" id="menub" type="button" aria-label="Menu"><svg viewBox="0 0 24 24" class="ic ln"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
+</header>
+<main class="board gx-board" id="board" data-board aria-label="The map">
+  <svg id="map" viewBox="0 0 980 600" preserveAspectRatio="xMidYMid meet" role="group" aria-label="Map"></svg>
+  <div class="zoom"><button type="button" id="zin" aria-label="Zoom in">+</button><button type="button" id="zout" aria-label="Zoom out">&minus;</button></div>
+  <div id="rivalcard" aria-live="polite"></div>
+  <div id="banner" aria-live="polite"></div>
+</main>
+<section class="dock" id="dock" aria-label="Your turn">
+  <div class="prow"><p id="prompt" aria-live="polite"></p><div id="acts"></div></div>
+  <div id="store" aria-label="Your storehouse"></div>
+  <div id="hand" role="group" aria-label="Your cards"></div>
+</section>
+</div>
+<div id="sheet" class="sheet" role="dialog" aria-label="Choice" hidden></div>
+<div id="start" class="ov" hidden></div>
+<div id="result" class="ov" hidden></div>
+<div id="drawer" class="ov dr" role="dialog" aria-label="Info" hidden></div>
+<div id="fx" aria-hidden="true"></div>
+<div id="finger" aria-hidden="true"></div>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs id="icondefs"></defs></svg>
+<script src="gx-scenario.js"></script>
+<script src="scn.js"></script>
+<script src="icons.js"></script>
+<script src="data.js"></script>
+<script src="engine.js"></script>
+<script src="ai.js"></script>
+<script src="art.js"></script>
+<script src="ui.js"></script>
+</body>
+</html>
