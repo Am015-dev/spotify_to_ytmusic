@@ -32,7 +32,7 @@ function boardWH(r) { var cols = MF.BOARDS[G.side]; var maxH = 0; cols.forEach(f
 function newGame(o) {
   clearTimeout(UI.aiT); o = Object.assign({ np: 2, humans: 1, ai: 'normal', side: 'A', spirits: false }, o || {});
   if (o.seed != null && window.GXS && GXS.seed) GXS.seed(o.seed);
-  UI.cfg = o; UI.sel = null; UI.undo = []; UI.busy = false; UI.tab = 'row'; UI.hintMove = null;
+  UI.cfg = o; UI.sel = null; UI.undo = []; UI.busy = false; UI.tab = 'row'; UI.hintMove = null; UI.log = [];
   E.newGame(o); UI.view = firstHuman(); hideOverlays(); document.documentElement.classList.add('mf-play');
   render(); save(); nextActor();
   return G;
@@ -67,7 +67,7 @@ function act(m, how) {   // a human move
   if (m.k && !G.over) flyGains(me, mi, m.k, explain(me, b0, E.score(me), m.k, fx ? { name: E.card(fx.id).name.split(' ').pop() } : null), '#map');
   if (fx) settleFx(m.k, fx, me, '#map');
   if (window.tutAfter) tutAfter(m);
-  if (m.t === 'end') { UI.sel = null; save(); nextActor(); }
+  if (m.t === 'end') { (UI.log = UI.log || []).push('Round ' + G.round + ' · ' + me.name + ' finish their turn: ' + E.score(me).total + ' points'); UI.sel = null; save(); nextActor(); }
   return true;
 }
 function undo() { if (!UI.undo.length || UI.busy) return; G = JSON.parse(UI.undo.pop()); UI.sel = G.turn.hand.length ? { kind: 'tok', h: 0 } : null; render(); }
@@ -85,7 +85,7 @@ function runAI() {
     if (m.t === 'end') {
       var d = E.score(s).total - start, sc1 = E.score(s), why = [['animals', 'animals'], ['trees', 'trees'], ['mounts', 'peaks'], ['fields', 'fields'], ['builds', 'buildings'], ['water', G.side === 'A' ? 'river' : 'islands']].map(function (q) { return [q[1], (sc1[q[0]] || 0) - (sc0all[q[0]] || 0)]; }).filter(function (q) { return q[1] > 0; }).sort(function (a, b) { return b[1] - a[1]; }).slice(0, 2);
       UI.recap = s.name + ' +' + d + (why.length ? ': ' + why.map(function (q) { return q[0] + ' +' + q[1]; }).join(', ') : '') + (got.length ? ' (' + got.slice(0, 2).join(', ') + ')' : '') + '.';
-      save(); if (!UI.fast) SND.card();
+      (UI.log = UI.log || []).push('Round ' + G.round + ' · ' + UI.recap); save(); if (!UI.fast) SND.card();
       if (UI.fast || G.over) { UI.busy = false; UI.view = G.over ? UI.view : G.cur; return nextActor(); }
       render(); UI.aiT = setTimeout(function () { UI.busy = false; UI.rivalMark = null; UI.view = G.cur; nextActor(); }, UI.skip ? 1200 : Math.max(2000, AIDELAY * 3.4)); return;
     }
@@ -374,6 +374,8 @@ function onTap(e) {
   if (UI.dragged && Date.now() - UI.dragged < 400) return;
   if (UI.busy && G && !G.over && E.seat().ai && !UI.skip && !t.closest('.gx-drawer,.gx-bar')) { UI.skip = true; toast('Speeding up the rival.'); return; }
   if (t.closest('#backB')) { UI.view = firstHuman(); UI.sel = null; render(); return; }
+  var it = t.closest('[data-itab]'); if (it) { infoTab(it.dataset.itab); return; }
+  var ch = t.closest('#chips'); if (ch && G && !t.closest('[data-gx]')) { UI.infoTab = 'sc'; GX.show('scored'); return; }
   var rc = t.closest('[data-rc]'); if (rc) { var pr = rc.dataset.rc.split(':'), so = G.seats[+pr[0]], rid = pr[1] === 'S' ? so.spirit.id : (so.cards[+pr[1]] || {}).id; if (rid) bigCard(null, rid, +pr[0]); return; }
   var seatB = t.closest('[data-seat]'); if (seatB) { if (UI.mode === 'tut' && TUT) { toast('Finish the lesson first.'); return; } var v = +seatB.dataset.seat; if (v === UI.view) { toast(v === firstHuman() ? 'This is your valley.' : 'Showing ' + G.seats[v].name + '.'); return; } UI.view = v; UI.sel = null; render(); toast(v === G.cur || v === firstHuman() ? 'Back to your valley.' : 'Showing ' + G.seats[v].name + '. Tap your name to return.'); return; }
   if (!G) return;
@@ -487,6 +489,19 @@ function hint() {
 
 // ---------- results, scores, rules ----------
 function scoreRows(s) { var sc = E.score(s); return [['Trees', sc.trees], ['Mountains', sc.mounts], ['Fields', sc.fields], ['Buildings', sc.builds], [G.side === 'A' ? 'River (' + sc.river + ')' : 'Islands (' + sc.islands + ')', sc.water], ['Animals', sc.animals], ['Spirit', sc.spirit], ['Total', sc.total]]; }
+function infoTab(t) { UI.infoTab = t; var b = $('#scoresb'); if (b) b.innerHTML = infoHTML(); }
+function infoHTML() {
+  var t = UI.infoTab || 'sc', h = '<div class="itabs">' + [['sc', 'Scores'], ['rv', 'Rivals'], ['lg', 'Log']].map(function (x) { return '<button type="button" class="itab' + (t === x[0] ? ' on' : '') + '" data-itab="' + x[0] + '">' + x[1] + '</button>'; }).join('') + '</div>';
+  if (t === 'sc') return h + scoresHTML();
+  if (t === 'lg') return h + '<ol class="logl">' + ((UI.log || []).slice(-30).reverse().map(function (x) { return '<li>' + esc(x) + '</li>'; }).join('') || '<li>No turns finished yet.</li>') + '</ol>';
+  var r = '';
+  G.seats.forEach(function (s, i) {
+    if (i === firstHuman()) return;
+    var v = valleySVG(s, { f: 'ip' + i, still: true });
+    r += '<section class="rv1" data-rv="' + i + '"><div class="rvh"><b>' + esc(s.name) + '</b><span class="rvs">' + E.score(s).total + ' pts</span></div><svg class="mini" viewBox="' + v.vb + '" role="img" aria-label="' + esc(s.name) + ' valley">' + v.html + '</svg>' + chipRow(s, i, 'rvc') + '<div class="rvcards">' + (s.spirit && !s.spirit.placed ? cardHTML(s.spirit.id, {}) : '') + s.cards.map(function (c) { return cardHTML(c.id, { left: c.left }); }).join('') + '</div></section>';
+  });
+  return h + (r || '<p class="small">No rivals in this game.</p>');
+}
 function scoresHTML() {
   var rows = scoreRows(G.seats[0]).map(function (r, j) { return '<tr' + (j === 7 ? ' class="tot"' : '') + '><th>' + r[0].replace(/ \(.*/, '') + '</th>' + G.seats.map(function (s) { return '<td>' + scoreRows(s)[j][1] + '</td>'; }).join('') + '</tr>'; }).join('');
   return '<table class="sct"><tr><th></th>' + G.seats.map(function (s) { return '<th>' + esc(s.name) + '</th>'; }).join('') + '</tr>' + rows + '</table><p class="small">' + (G.side === 'A' ? 'River: longest line of water.' : 'Islands: land split by water.') + '</p>';
@@ -562,10 +577,10 @@ function load() { try { var d = JSON.parse(localStorage.getItem('mf_save')); if 
 // ---------- boot ----------
 function boot() {
   GX.init({ key: 'mf' });
-  var sb = document.createElement('div'); sb.id = 'scoresb'; GX.drawer('scored', 'Scores', sb, true);
+  var sb = document.createElement('div'); sb.id = 'scoresb'; GX.drawer('scored', 'Scores, rivals, log', sb, true);
   var rb = document.createElement('div'); rb.id = 'rulesb'; GX.drawer('rulesd', 'How to play', rb, false);
   var oc = GX.onClose; GX.onClose = function (id) { if (oc) oc(id); if (id === 'bigd' && G) render(); };
-  GX.onShow = function (id) { if (id === 'scored') $('#scoresb').innerHTML = G ? scoresHTML() : '<p>No game yet.</p>'; if (id === 'rulesd') fillRules(); };
+  GX.onShow = function (id) { if (id === 'scored') $('#scoresb').innerHTML = G ? infoHTML() : '<p>No game yet.</p>'; if (id === 'rulesd') fillRules(); };
   try {
     GX.settings({ id: 'setd', title: 'Menu',
       game: function (S) { var a = document.createElement('button'); a.type = 'button'; a.className = 'gx-sb'; a.textContent = 'Title screen'; a.onclick = function () { GX.close(); showTitle(); };

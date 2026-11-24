@@ -325,3 +325,24 @@ button{font:inherit;color:inherit}
 #tbub.arr-down::after{left:var(--ax);margin-left:-10px;bottom:-20px;border-top-color:#4a3b2e}#tbub.res.arr-down::after{border-top-color:#2f5f3c}
 #tbub.arr-l::after{left:-20px;top:var(--ay);margin-top:-10px;border-right-color:#4a3b2e}#tbub.res.arr-l::after{border-right-color:#2f5f3c}
 #tbub.arr-r::after{right:-20px;top:var(--ay);margin-top:-10px;border-left-color:#4a3b2e}#tbub.res.arr-r::after{border-left-color:#2f5f3c}
+
+/* popups hold the detail; the main screen stays clean */
+.itabs{display:flex;gap:6px;margin-bottom:10px}
+.itab{flex:1;min-height:44px;border-radius:12px;border:2px solid #fff;background:#efe3cf;font:700 15px inherit;font-family:inherit;color:var(--ink)}
+.itab.on{background:#fffaf0;box-shadow:var(--sh);color:#2f5f86}
+.logl{margin:0;padding-left:22px;font-size:15px;line-height:1.5}
+#chips{cursor:pointer}
+@media (max-width:700px){
+  #chips .clg,.chip i{display:none}
+  .chip{min-height:44px}
+  #chips::after{content:'';}
+}
+.rv1{border-radius:16px;padding:8px;margin-bottom:10px;background:#f6efe2;border:2px solid #fff;box-shadow:var(--sh)}
+.rvh{display:flex;align-items:center;gap:8px;font-size:17px}
+.rvh .rvs{margin-left:auto;font-size:20px;font-weight:800;color:#2f5f86}
+.gx-drawer .mini{width:100%;height:auto;max-height:34vh;display:block;margin:4px 0}
+.rvc{display:flex;gap:4px;flex-wrap:wrap}
+.chip1{display:flex;align-items:center;gap:3px;background:#fffaf0;border:2px solid #fff;border-radius:10px;padding:2px 8px;font-size:14px;min-height:36px}
+.chip1 svg{width:18px;height:18px}
+.rvcards{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
+.rvcards .acard{width:96px;min-height:120px}
