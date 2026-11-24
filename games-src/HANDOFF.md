@@ -306,3 +306,9 @@ Live fix: original-name phrase removed from shelf blurb + sands page (15:2x).
 - Content rule finding: doorkick-dungeon (live) copied the original card pool 1:1 (R98). F18 (Opus) redesigning our own 168 cards; then UI fixes; redeploy needs owner yes. COPYAUDIT running over all games.
 - Closest to done: short-fuse (4/5, F3 polish+PC then review), kaiten-kitchen (4/5-ish, F3 polish+PC then review), crown-city-smash (R97 7.4, F2), perch-and-plume (F3), lantern-dive (F2).
 - Pending: approve baselines (sunglaze, rampart: proof/baselines-new) before deploy; hollowbough R96 list after PLAY2; calm-audit doesn't count #coach/#toast.
+
+## W748 pc layout
+- emberclimb: empty potion circles hidden at >= 1024 px (css in src/head.html). Fight stage stays phone-sized in the middle: scaling enemy art overlapped the hero panel, so it was reverted; needs a stage re-layout.
+- lantern-dive: pool job cards and Pass button larger, seat chips 16 px at >= 1024 px (game/skin.css). Trick/felt geometry (tableGeo in src/ui2.js) still leaves the felt mostly empty.
+- meadowfold: start card scaled up at >= 1024 px (src/skin.css). In-game PC board already has strip/map/rail columns; not changed.
+- Phone sheets: flags identical before/after; pixel diffs only on animated water (also differ between two unchanged runs).

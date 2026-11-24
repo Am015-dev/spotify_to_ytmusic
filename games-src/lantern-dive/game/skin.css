@@ -206,3 +206,17 @@ html.sk .gx-drawer-head button.gx-x{background:#0b1f3a!important;border-image:no
 
 /* QA W659: story Next button label was white on pale art */
 html.sk .gxc-btn.go{color:#3a1604;text-shadow:0 1px 0 rgba(255,255,255,.6);font-weight:800}
+
+/* W748 pc layout (>= 1024 px only): job cards and Pass fill the felt, seat chips 16 px; phone untouched */
+@media (min-width:1024px){
+  html body #pool .jcard{min-width:280px;min-height:112px;padding:10px 12px 10px 20px;gap:10px}
+  html body #pool .jcard b{font-size:24px;line-height:1.15}
+  html body #pool .jcard .dd i{width:14px;height:14px}
+  html body #pool .jcard .nocap{width:28px;height:28px}
+  html body #pool{align-content:center;justify-content:center}
+  html body #felt .btn,html body #bd .btn.alt{min-height:60px;min-width:150px;font-size:22px;padding:10px 28px}
+  html body .seat .bdg,html body .me .bdg,html body #mine .bdg{font-size:16px;height:26px;line-height:26px;padding:0 8px 0 6px}
+  html body .seat .bdg b,html body .me .bdg b,html body #mine .bdg b,html body .bdg span{font-size:16px}
+  html body .seat .jc,html body #mine .mjobs .jc{font-size:16px}
+  html body #felttxt,html body #lead,html body #lead span{font-size:18px}
+}

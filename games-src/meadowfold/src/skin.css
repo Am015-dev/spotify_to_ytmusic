@@ -552,3 +552,11 @@ body,.gx-app{background:#9cc7a4 radial-gradient(ellipse 70% 55% at 50% 48%,#cfe8
 #strip .spg svg{width:24px;height:24px;fill:none;stroke:#3d3026;stroke-width:2.6;stroke-linecap:round;stroke-linejoin:round}
 @media (max-width:759px){#strip{justify-content:center}#strip .acard{width:150px}#strip .acard .pat{width:136px;height:60px}#strip .srow{min-height:150px}}
 @media (min-width:760px){.pp:not(.on),.gx-drawer:not(.on){display:none}}   /* closed side panels leave the layout (were parked off-canvas) */
+
+/* W748 pc layout (>= 1024 px only): bigger start card; phone untouched */
+@media (min-width:1024px){
+  .tcard{width:min(640px,100%);padding:22px 28px 24px}
+  .tcard h1{font-size:52px}.sub{font-size:20px;margin-bottom:16px}
+  .tbtns{gap:12px}.tbtns .btn,.btn.big{min-height:64px;font-size:21px}
+  .opts summary{font-size:17px}
+}
