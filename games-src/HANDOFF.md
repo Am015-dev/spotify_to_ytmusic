@@ -2,6 +2,10 @@
 
 Older notes (everything from "Nightrun TIMING" down, and all shelf-wide history) moved to games-src/HANDOFF-ARCHIVE.md on 21 Oct 2026. Nothing was deleted.
 
+## W754 thornbound readability (24 Nov 2026, branch shelf/W754-thornbound-read, merged W753)
+Done: board influence badges and location tags sized from board scale (>= 14px phone, >= 16px pc, solid plates, kit banners off on pc too), herald 5px digits hidden, hand cards show cost + name only (14px phone / 17px pc), rival bar, Favour/Tactics, turn chip, story map, end list and windows raised; pc windows padded clear of the painted frame; tb-over fixture shows real scores. Small-text cells phone 9 -> 0 (12px) and 8 -> 1 (14px); pc 11 -> 1. Proof: thornbound/proof/w754-*.
+Still weak: card zoom keeps the kit card's own 13.5px "2 votes" ribbon (kit is read-only; the rule text below the card is large). ?scn= phone+pc: 4-5 fails, all also on a clean source build or live: shelf-face fonts + campaign gxc-ib frame (menu), tb-art Close under the Menu drawer, flaky "hc glow pl did not respond to a tap".
+
 ## New games: pick only from the top ranked board games (owner, 7 Nov 2026: "I want top board games from now on")
 
 - Suggest and build new shelf games only from the current top of the overall board game rankings, not niche picks. Owner chooses from the list.
