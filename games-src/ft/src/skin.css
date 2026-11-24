@@ -315,37 +315,8 @@ html body #acts .ab.f3x{flex:0 0 48px;min-width:48px;min-height:44px}
 #grid .tile .f3num.f3alt{background:#fff7e4;color:#b8532b;box-shadow:0 0 0 2px #b8532b;left:auto;right:3px;top:auto;bottom:24px;min-width:24px;height:24px;line-height:24px;font-size:14px;opacity:.95}
 #grid .tile.f3end{box-shadow:inset 0 0 0 4px rgba(255,214,90,.98),0 0 0 2px rgba(80,40,0,.7)!important;animation:f3ring 1.2s ease-in-out infinite alternate}
 @keyframes f3ring{to{filter:brightness(1.12)}}
-/* ---------- the floating tour (tour.js, W655): never dims, never blocks; only the window, chip and labels take taps ---------- */
-.tourw{position:fixed;z-index:70;left:12px;top:60px;max-height:min(60vh,460px);display:flex;flex-direction:column;background:#fff8ec;color:#2a1a0c;border:2px solid #b07a2a;border-radius:14px;box-shadow:0 8px 24px rgba(0,0,0,.35);font-size:14px;line-height:1.35}
-.tourw[hidden],.tourchip[hidden],.tourring[hidden],.tourmap[hidden]{display:none}
-.tw-h{display:flex;align-items:center;gap:4px;padding:6px 8px 6px 12px;background:#f1dfbd;border-radius:12px 12px 0 0;cursor:grab;touch-action:none;user-select:none}
-.tw-ti{font-size:14px}.tw-sp{flex:1}
-.tw-b{min-width:36px;min-height:32px;padding:0 8px;border:1px solid #b07a2a;border-radius:8px;background:#fff8ec;color:#2a1a0c;font:inherit;font-weight:700;cursor:pointer}
-.tw-b[aria-pressed=true]{background:#b07a2a;color:#fff8ec}
-.tw-body{padding:8px 12px 12px;overflow:auto}
-.tw-t{margin:6px 0 4px;font-size:16px;color:#7a3d10}.tw-s{margin:0 0 6px}.tw-w,.tw-d{margin:0 0 6px;font-size:13px}.tw-d{color:#5a3a12}
-.tw-acts{display:flex;gap:8px;justify-content:flex-end;margin-top:4px}
-.tw-b2{min-height:40px;padding:0 14px;border:1px solid #b07a2a;border-radius:10px;background:#fff8ec;color:#2a1a0c;font:inherit;font-weight:700;cursor:pointer}
-.tw-b2.go{background:#b4501c;border-color:#7a3010;color:#fff}
-.tw-prog{display:flex;align-items:center;gap:6px;width:100%;min-height:32px;padding:0;border:0;background:none;color:#5a3a12;font:inherit;font-size:12px;font-weight:700;cursor:pointer;text-align:left}
-.tw-prog s{width:0;height:0;border:5px solid transparent;border-top-color:currentColor;margin-top:4px}
-.tw-list{display:none;margin:0 0 6px;padding:0;list-style:none;max-height:180px;overflow:auto;border:1px solid #e4cfa6;border-radius:8px}
-.tw-open .tw-list{display:block}
-.tw-list button{display:flex;align-items:center;gap:8px;width:100%;min-height:32px;padding:2px 8px;border:0;background:none;color:#2a1a0c;font:inherit;font-size:13px;text-align:left;cursor:pointer}
-.tw-list .cur button{background:#f6e6c6;font-weight:700}
-.tw-tick{flex:none;width:14px;height:14px;border:2px solid #b07a2a;border-radius:4px}
-.tw-list .ok .tw-tick{background:#3c8a3c;border-color:#2a6a2a;box-shadow:inset 0 0 0 2px #fff8ec}
-.tw-comm{display:flex;flex-direction:column;gap:6px}.tw-comm .tw-b2{text-align:left;min-height:36px}
-.tourchip{position:fixed;z-index:70;left:12px;bottom:12px;display:flex;align-items:center;gap:6px;min-height:40px;padding:4px 12px;border:2px solid #b07a2a;border-radius:20px;background:#fff8ec;color:#2a1a0c;font:inherit;font-weight:700;box-shadow:0 4px 12px rgba(0,0,0,.3);cursor:pointer}
-.tourchip .pic{width:22px;height:22px}
-.tourring{position:fixed;z-index:65;pointer-events:none;border:4px solid #ffc83a;border-radius:12px;box-shadow:0 0 0 2px rgba(122,48,16,.6);animation:tourpulse 1.6s ease-in-out infinite}
-@keyframes tourpulse{0%,100%{box-shadow:0 0 0 2px rgba(122,48,16,.6),0 0 0 0 rgba(255,211,106,.7)}50%{box-shadow:0 0 0 2px rgba(122,48,16,.6),0 0 0 12px rgba(255,200,58,0)}}
-@media (prefers-reduced-motion:reduce){.tourring{animation:none}}
-.tourmap{position:fixed;inset:0;z-index:66;pointer-events:none}
-.tm-svg{position:absolute;left:0;top:0;pointer-events:none}
-.tm-svg line{stroke:#2a1a0c;stroke-width:1.6}.tm-svg circle{fill:#ffd36a;stroke:#2a1a0c;stroke-width:1.4}
-.tm-l{position:absolute;z-index:1;pointer-events:auto;min-height:24px;padding:2px 7px;border:1.5px solid #2a1a0c;border-radius:7px;background:#fff8ec;color:#2a1a0c;font:700 11px/1.2 inherit;white-space:nowrap;cursor:pointer;box-shadow:0 2px 6px rgba(0,0,0,.3)}
-.tm-l.on{background:#ffd36a}
-#tourbtn .tq{display:inline-grid;place-items:center;width:24px;height:24px;border-radius:50%;background:#b4501c;color:#fff;font-size:16px;line-height:1}
-#tourbtn.tq-fl{position:fixed;left:6px;top:2px;z-index:40}
-#tourbtn[hidden]{display:none}
+
+/* scenario lessons (lessons.js): the one highlighted target is a class on the real tile/button, never an overlay */
+.ls-target{outline:4px solid #f2b632;outline-offset:2px;border-radius:8px;animation:lspulse 1.4s ease-in-out infinite}
+@keyframes lspulse{0%,100%{outline-color:#f2b632}50%{outline-color:#fff3c4}}
+@media (prefers-reduced-motion:reduce){.ls-target{animation:none}}

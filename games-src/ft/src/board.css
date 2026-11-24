@@ -541,21 +541,6 @@ html.land .tile.hasmk .tn{display:block}
 .dcard:not(.th):not(.omy):not(.odj){padding-right:40px}
 .orow .odj{padding-right:34px}
 /* W624 commissions: one bubble beside its target (UI-BAR 10), the debrief card */
-.commb{position:fixed;z-index:60;display:flex;gap:10px;align-items:flex-start;padding:14px 16px;background:#fff8ec;color:#2a1a0c;border:2px solid #b07a2a;border-radius:14px;box-shadow:0 8px 24px rgba(0,0,0,.35);font-size:15px;line-height:1.35;pointer-events:none}
-.commb[hidden]{display:none}
-.commb>i{font-style:normal;font-size:24px;line-height:1}
-.commb div{display:flex;flex-direction:column;gap:4px}
-.commb b{font-size:16px}.commb em{font-style:normal;font-weight:700;color:#7a3d00}.commb .cu-did{color:#1d5a2a;font-weight:700}
-.commb .cu-arrow{position:absolute;width:14px;height:14px;background:#fff8ec;border:2px solid #b07a2a;transform:rotate(45deg)}
-.commb[data-side="above"] .cu-arrow{bottom:-9px;border-top:0;border-left:0}
-.commb[data-side="below"] .cu-arrow{top:-9px;border-bottom:0;border-right:0}
-.commb[data-side="none"] .cu-arrow{display:none}
-.commd{position:fixed;inset:0;z-index:80;display:flex;align-items:center;justify-content:center;background:rgba(20,10,0,.55);padding:16px}
-.commd-box{max-width:420px;width:100%;background:#fff8ec;color:#2a1a0c;border-radius:16px;padding:20px;border:3px solid #b07a2a;font-size:16px}
-.commd-box.won{border-color:#2e7d32}.commd-box h2{margin:4px 0 10px;font-size:22px}
-.commd-box .cu-k{margin:0;font-size:14px;color:#6b4a1a}.commd-box .cu-why{font-weight:700}
-.commd-box .cu-les b{display:block;font-size:14px;color:#7a3d00}
-.commd-box .cu-acts{display:flex;flex-direction:column;gap:8px;margin-top:14px}
 /* game art instead of emoji inside marks and stats */
 .bm .pic{width:100%;height:100%;margin:0;vertical-align:0;object-fit:contain;filter:drop-shadow(0 1px 1px rgba(0,0,0,.5))}
 .bm .pic{width:88%;height:88%}
@@ -565,3 +550,10 @@ html.land .tile.hasmk .tn{display:block}
 /* readable bid spots that are shut/free (audit B: contrast) */
 .spot.shut small.ord,.spot.shut .sp-c,.spot .sp-c{color:#4a2a14}
 .spot.shut{opacity:1}
+
+/* W749 lessons on phone: a smaller board leaves a strip between board and your goods for the lesson card (lessons.js lsSlot) */
+html:not(.land) body.lesson #gw{margin-bottom:214px}
+body.lesson .gxst-card,body.lesson #gw,body.lesson #grid,body.lesson #table>*{transition-property:none!important}   /* the board row never animates its size in a lesson: the card follows it in the same frame */
+html:not(.land) body.lesson .gxst-inslot.gxst-win .gxst-rule{display:none}
+body.lesson .gxst-inslot .gxst-goal,body.lesson .gxst-inslot .gxst-stars{flex:none}
+html.land body.lesson #feed{display:none!important}

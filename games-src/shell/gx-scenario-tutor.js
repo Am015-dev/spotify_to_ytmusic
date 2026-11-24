@@ -2,7 +2,7 @@
 // small, stacked position with ONE objective; the player makes real moves and learns the rule from the consequence. A floating
 // objective card never dims and never blocks taps. Needs gx-scenario-tutor.css. ES5, no dependencies. Docs: shell/GXST.md.
 // (Global is GXST because GXS is already the ?scn= test registry in gx-scenario.js.)
-//   GXST.init({game, scenarios:[...], storageKey?, settled?:()=>bool, keepClear?:[selectors], qParent?, phoneSlot?:{after,before,avoid:[selectors]}, keepPlace?:bool})   GXST.picker() GXST.start(id) GXST.retry()
+//   GXST.init({game, scenarios:[...], storageKey?, settled?:()=>bool, keepClear?:[selectors], qParent?, phoneSlot?:{after,before,avoid:[selectors]}|fn()->rect|selector, keepPlace?:bool, goalAlways?:bool})   GXST.picker() GXST.start(id) GXST.retry()
 //   GXST.next() GXST.hint() GXST.close() GXST.state()      events: window 'gxst' CustomEvent, detail.type =
 //   picker | start | hint | win | fail | retry | close
 //   scenario: {id, title, rule, goal, setup(), success()->bool, fail()->false|'message', par?, moves?()->n, hints:[nudge, {say, target}],
@@ -66,12 +66,14 @@
       ft.appendChild(hb); ft.appendChild(mk('span', 'gxst-sp'));
       ft.appendChild(btn('gxst-btn', 'Restart', null, function () { GXST.retry(); }));
     } else if (S.phase === 'win') {
+      if (C.goalAlways) W.appendChild(mk('p', 'gxst-goal', txt(s.goal)));
       W.appendChild(mk('p', 'gxst-stars', starTxt(S.stars)));
       W.appendChild(mk('p', 'gxst-say', s.debrief));
       W.appendChild(mk('p', 'gxst-rule', 'Rule: ' + s.rule));
       ft.appendChild(btn('gxst-btn', 'Retry', null, function () { GXST.retry(); })); ft.appendChild(mk('span', 'gxst-sp'));
       ft.appendChild(btn('gxst-btn pri', S.i < C.scenarios.length - 1 ? 'Next lesson' : 'All lessons', null, function () { GXST.next(); }));
     } else if (S.phase === 'fail') {
+      if (C.goalAlways) W.appendChild(mk('p', 'gxst-goal', txt(s.goal)));
       W.appendChild(mk('p', 'gxst-say', 'Not quite.'));
       W.appendChild(mk('p', 'gxst-msg', S.msg));
       ft.appendChild(btn('gxst-btn', 'Lessons', null, function () { GXST.picker(); })); ft.appendChild(mk('span', 'gxst-sp'));
@@ -83,17 +85,23 @@
   function hintTarget() { var s = cur(); if (!s || S.phase !== 'play' || S.hint < 2) return null; var h = s.hints[S.hint - 1]; return h && typeof h === 'object' ? vis(find(h.target)) : null; }
   // keep the card off the hinted target and the keepClear areas; a dragged position is kept unless it covers the hinted target
   function place() {
-    if (!W) return; var vw = innerWidth, vh = innerHeight, bw = W.offsetWidth, bh = W.offsetHeight, t = hintTarget(), av = [];
+    if (!W) return;
+    // phoneSlot as a function (any width; return null to opt out) or selector string (narrow screens < 700px only): it gives the rect the game keeps free; the card lives inside it, compact, body scrolls; never over the game
+    var ps0 = C.phoneSlot, slot = typeof ps0 === 'function' ? call(ps0, null) : typeof ps0 === 'string' && innerWidth < 700 ? vis(find(ps0)) : null;
+    if (slot && slot.width == null) { slot.width = slot.right - slot.left; slot.height = slot.bottom - slot.top; }
+    if (slot && slot.width > 2 && slot.height > 2) { W.classList.add('gxst-inslot'); W.style.width = Math.round(slot.width) + 'px'; W.style.maxHeight = Math.round(slot.height) + 'px'; return put([slot.left, slot.top]); }
+    W.classList.remove('gxst-inslot'); W.style.maxHeight = ''; W.style.width = '';
+    var vw = innerWidth, vh = innerHeight, bw = W.offsetWidth, bh = W.offsetHeight, t = hintTarget(), av = [];
     (C.keepClear || []).forEach(function (sel) { var a; try { a = D.querySelectorAll(sel); } catch (e) { a = []; } for (var i = 0; i < a.length; i++) { var r = vis(a[i]); if (r) av.push(r); } });
     function clamp(p) { return [Math.max(4, Math.min(vw - bw - 4, p[0])), Math.max(4, Math.min(vh - bh - 4, p[1]))]; }
     function box(p) { return { left: p[0], top: p[1], right: p[0] + bw, bottom: p[1] + bh }; }
     function cost(p) { var b = box(p), c = t && hit(b, t) ? 1e6 : 0; av.forEach(function (r) { var x = Math.min(b.right, r.right) - Math.max(b.left, r.left), y = Math.min(b.bottom, r.bottom) - Math.max(b.top, r.top); if (x > 0 && y > 0) c += x * y; }); return c; }
-    if (S.pos && !(S.min && C.phoneSlot && vw < 600)) { var q = clamp(S.pos); if (!(t && hit(box(q), t))) return put(q); }
+    if (S.pos && !(S.min && C.phoneSlot && typeof C.phoneSlot === 'object' && vw < 600)) { var q = clamp(S.pos); if (!(t && hit(box(q), t))) return put(q); }
     var top = 4, bar = $('.gx-bar'); if (bar) { var br = bar.getBoundingClientRect(); if (br.top < 4 && br.height < 90) top = br.bottom + 6; }
     var sp = [[8, top], [vw - bw - 8, top], [vw - bw - 8, vh - bh - 8], [8, vh - bh - 8]];
     av.concat(t ? [t] : []).forEach(function (r) { sp.push([8, r.bottom + 6], [vw - bw - 8, r.bottom + 6], [8, r.top - bh - 6], [r.right + 6, r.top]); });
     var best = null; sp.forEach(function (p, i) { p = clamp(p); var c = cost(p) + i * 0.01; if (!best || c < best.c) best = { p: p, c: c }; });
-    if (S.min && C.phoneSlot && vw < 600) {   // phone chip: keep the card's own spot when it is clear (no jump on open); else the chip gets a band just under phoneSlot.after or just above phoneSlot.before, never over phoneSlot.avoid items or the dock
+    if (S.min && C.phoneSlot && typeof C.phoneSlot === 'object' && vw < 600) {   // phone chip: keep the card's own spot when it is clear (no jump on open); else the chip gets a band just under phoneSlot.after or just above phoneSlot.before, never over phoneSlot.avoid items or the dock
       var ps = C.phoneSlot, an = vis($(ps.after)), bf = vis($(ps.before)), ob = [], cs = [best.p];
       (ps.avoid || []).forEach(function (sel) { var a; try { a = D.querySelectorAll(sel); } catch (e) { a = []; } for (var i = 0; i < a.length; i++) { var r = vis(a[i]); if (r) ob.push(r); } });
       if (an) cs.push([8, an.bottom + 4]); if (bf) cs.push([8, bf.top - bh - 6]);
@@ -146,6 +154,7 @@
     next: function () { if (S.i < C.scenarios.length - 1) begin(S.i + 1, 'start'); else GXST.picker(); },
     hint: function () { var s = cur(); if (!s || S.phase !== 'play' || S.hint >= s.hints.length) return; S.hint++; render(); ring(); emit('hint', { id: s.id, level: S.hint }); },
     close: function () { if (!S || !S.open) return; S.open = false; S.live = false; S.tok++; render(); emit('close', {}); },
+    place: function () { if (S && S.open && !drag) place(); },   // opt-in: a game calls this when its layout changes
     active: function () { var s = S && S.open && S.phase !== 'picker' ? cur() : null; return s; },
     state: function () {
       if (!S) return null; var s = cur(), wr = W && vis(W), tr = hintTarget();
