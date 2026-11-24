@@ -6,11 +6,11 @@
 var TUT = { on: false, i: 0, done: {}, min: false, pos: null, open: false, note: null, t: 0 };
 var LESSONS = [
   { id: 'hud', t: 'Your table', s: 'This is the whole game screen; tap any label to hear what it does.', why: 'Knowing where things are makes every turn quick.' },
-  { id: 'goal', t: 'The goal', s: 'Most points at the end wins, and points come from the patron on every card you own.', why: 'Each card you buy adds to one patron score.', tg: '#plb', ev: 'points' },
+  { id: 'goal', t: 'The goal', s: 'Most points at the end wins, and every card you own scores for the symbol printed on it.', why: 'Each card you buy adds to one symbol’s score.', tg: '#plb', ev: 'points' },
   { id: 'turn', t: 'Your turn', s: 'Pick one card from your hand, then tap the big check to play it.', why: 'Played cards stay out until a Herald brings them back.', tg: '#hand', ev: 'play' },
   { id: 'arch', t: 'Builder: move', s: 'The Builder gives one step per cart and ship on the map; carts use roads, ships use sea lanes.', why: 'Only one piece may stop on a line, but you may pass others.', card: 'arch', ev: 'play:arch' },
   { id: 'build', t: 'Builder: build', s: 'Then build in cities next to your pieces for 1 brick, 1 of the city’s good and coins.', why: 'Coins rise with every house already there; a brick city costs 1 grain.', tg: '#map .city.glow, #map .col', ev: 'build' },
-  { id: 'store', t: 'Storehouse', s: 'Your 12 spaces hold goods and the carts and ships still waiting.', why: 'When it is full, extra goods stay in the bank.', tg: '#store' },
+  { id: 'store', t: 'Storehouse', s: 'Your 12 spaces hold goods and the carts and ships still waiting.', why: 'If more goods arrive than fit, you choose which to keep.', tg: '#store' },
   { id: 'pref', t: 'Governor: produce', s: 'Pick a region showing its good: every house there makes 1, and you take its bonus good.', why: 'Rival houses there produce too, so pick regions where you have more.', card: 'pref', ev: 'prov' },
   { id: 'tax', t: 'Governor: taxes', s: 'Or collect the coins on every flipped marker and flip them all back.', why: 'Taxes grow while regions wait.', card: 'pref', ev: 'pcoins' },
   { id: 'gg', t: 'Grand Governor', s: 'Its holder gets 2 bonus goods when making a region produce, then passes it on.', why: 'It starts with the second player and also wins ties.', tg: '#race' },
@@ -33,7 +33,7 @@ var HUDLAB = [
   ['#race .strip:first-child', 'Rival', 'The rival’s score, houses, carts, ships and coins; tap it for more.'],
   ['#race .strip:last-child', 'You', 'Your score, houses, carts, ships and coins; tap it for more.'],
   ['#mktb', 'Market', 'Cards for sale; the number is how many are left before the end.'],
-  ['#plb', 'Points', 'Live patron points for both players.'],
+  ['#plb', 'Points', 'Live points for both players.'],
   ['#helpb', 'Help', 'Reopens this lesson window and this labelled map.'],
   ['#menub', 'Menu', 'Sound, hints, all rules, every card and a new game.'],
   ['.zoom', 'Zoom', 'Zoom the map; you can also pinch and drag it.'],
