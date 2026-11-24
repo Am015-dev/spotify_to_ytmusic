@@ -4,7 +4,7 @@ UI.sel=null;UI.tgt=null;UI.adv=null;UI.recap=[];UI.fxSeen=0;UI.hover=null;UI.las
 try{UI.coach=localStorage.getItem('sgz_coach')==='1'}catch(e){UI.coach=false}  // W466: play mode is clean; hints only when turned on
 const CHAPTERS=['The king’s first commission: the north wall','Morning light on the fountain court','The king inspects the east wall','Dust and colour in the south arcade','The west wall catches the sunset','The whole court gathers to watch','Lanterns over the throne-room gallery','One last wall before the feast'];
 const chapter=r=>`Round ${r}: ${CHAPTERS[Math.min(r,CHAPTERS.length)-1]}`;
-function refresh(){if(G&&!NET.on&&!UI.tut){try{if(!G.over&&G.pl.some(p=>p.human)&&G.turn>0)localStorage.setItem(SAVE,JSON.stringify(G));else if(G.over)localStorage.removeItem(SAVE)}catch(e){}}
+function refresh(){if(G&&!NET.on&&!UI.tut&&!window.__lessons){try{if(!G.over&&G.pl.some(p=>p.human)&&G.turn>0)localStorage.setItem(SAVE,JSON.stringify(G));else if(G.over)localStorage.removeItem(SAVE)}catch(e){}}
   if(!G){render();return}const h=me();if(h&&UI.lastHuman!==h.i){UI.lastHuman=h.i;if(V3.on)relayout()}
   playFx();computeHL();render();try{sync3D();camFocus()}catch(e){console.error(e)}schedule();netAfter()}
 const me=()=>{if(!G||G.over)return null;const s=sideToAct();if(NET.on&&s!==NET.mySeat)return null;return s>=0&&P(s).human?P(s):null};
@@ -121,7 +121,7 @@ function renderModal(){const m=$('#modal');if(!m)return;const h=UI.modal==='star
 function startHtml(){const o=UI.setup;let saved=null;try{saved=localStorage.getItem(SAVE)}catch(e){}
   const lvAll=o.lv[1]||'easy';
   const seats=Array.from({length:o.np},(_,i)=>`<div class="seat" style="--pc:${PCOL[i]}"><i></i><b>${PNAMES[i]}</b>${NET.on?'':`<button class="btn sm" data-seat="${i}">${o.seats[i]==='human'?IC('person')+' you / a friend':IC('cpu')+' computer'}</button>`}${o.seats[i]==='ai'||NET.on?`<button class="btn sm ghost" data-lv="${i}" title="easy · normal · hard">${o.lv[i]}</button>`:''}</div>`).join('');
-  return `<div class="mbox start"><h2>Sunglaze</h2><p class="lede">Take tiles, fill rows, score the most stars.</p>${NET.on?'':'<div class="acts"><button class="btn" style="min-height:48px" data-a="tutorial">New here? Learn to play</button></div>'}
+  return `<div class="mbox start"><h2>Sunglaze</h2><p class="lede">Take tiles, fill rows, score the most stars.</p>${NET.on?'':'<div class="acts"><button class="btn" style="min-height:48px" data-a="tutorial">New here? Learn by playing</button></div>'}
    <div class="acts">${NET.on?'<button class="btn go bigb" data-a="netopen">Back to the online lobby</button>':'<button class="btn go bigb" data-ui="start">Begin ▶</button>'}</div>
    ${saved&&!NET.on?`<div class="acts"><button class="btn" data-ui="continue">Continue saved game</button></div>`:''}
    <div class="qrow"><span>Glaziers</span><div class="seg">${[2,3,4].map(n=>`<button class="${o.np===n?'on':''}" data-np="${n}">${n}</button>`).join('')}</div></div>

@@ -56,7 +56,7 @@ function tileSvg(tile, x, y, s, rot, opt) {
   else if (!opt.noSlots) {   // the animals this tile accepts: small discs
     var n = tile.a.length, rr = s * (n === 1 ? 0.3 : 0.22), off = n === 1 ? [[0, 0]] : n === 2 ? [[-0.27, 0], [0.27, 0]] : [[-0.27, 0.16], [0.27, 0.16], [0, -0.3]];
     if (opt.big) { rr = s * (n === 1 ? 0.44 : n === 2 ? 0.33 : 0.29); off = n === 1 ? [[0, 0]] : n === 2 ? [[-0.37, 0], [0.37, 0]] : [[-0.34, 0.22], [0.34, 0.22], [0, -0.38]]; }   // market/preview: readable animal icons
-    if (zr && !opt.big) rr = Math.min(s * (n === 1 ? 0.42 : 0.27), Math.max(rr, 14.5 / zr));
+    if (zr && !opt.big) { rr = Math.min(s * (n === 1 ? 0.42 : n === 2 ? 0.38 : 0.35), Math.max(rr, 14.5 / zr)); if (n > 1 && rr > s * 0.24) off = n === 2 ? [[-0.4, 0], [0.4, 0]] : [[-0.36, 0.22], [0.36, 0.22], [0, -0.4]]; }   // W684: slots >= 28 px on the map, spread so they do not overlap
     tile.a.forEach(function (a, i) { out += tokenSvg(a, x + off[i][0] * s, y + off[i][1] * s, rr, ' sm' + (zr && !opt.big ? ' slot' : '')); });
   }
   return out;
@@ -268,18 +268,18 @@ function safeRect() {
   if (r.b - r.t < 120) r.b = Math.min(wh[1] - 6, r.t + 120);
   return r;
 }
-var HEX_MIN = 44, HEX_FIT = 30;   // F3: auto-fit may go down to a 30 px hex so a late valley fits without panning; taps snap to the nearest spot
+var HEX_MIN = 44, HEX_FIT = 72;   // W684: auto-fit never goes below a 72 px hex (readable tiles, 28 px animal slots); past that, pan/pinch + edge arrows; taps snap to the nearest spot
 function fitView(now, force) {   // F2: your own valley gets one frame per turn (set when your turn starts, kept while you choose); now/force = refit anyway
   if (!G) return; var env = G.seats[UI.view].env, cells = Object.keys(env), tut = typeof tutOn === 'function' && tutOn(), hum = !G.seats[UI.view].ai;
-  var key = UI.view + ':' + G.seats[UI.view].done;
+  var key = UI.view + ':' + G.seats[UI.view].done + ':' + (G.stage === 'tile' ? 't' : '');   // W684: refit when the tile step starts/ends (spots only frame the tile step)
   if (!now && !force && !tut && hum && UI.turnFit === key && !G.over) { edgeArrows(); return; }
   UI.turnFit = key;
-  var spots = tut ? ((G.stage === 'tile' && UI.view === G.cur && !G.seats[G.cur].ai) ? WM.spots(env) : []) : hum && !G.over ? WM.spots(env) : [];
+  var spots = tut ? ((G.stage === 'tile' && UI.view === G.cur && !G.seats[G.cur].ai) ? WM.spots(env) : []) : hum && !G.over && G.stage === 'tile' && UI.view === G.cur ? WM.spots(env) : [];
   function box(list) { var b = { x0: 1e9, y0: 1e9, x1: -1e9, y1: -1e9 }; list.forEach(function (c) { var p = pix(c); b.x0 = Math.min(b.x0, p[0]); b.x1 = Math.max(b.x1, p[0]); b.y0 = Math.min(b.y0, p[1]); b.y1 = Math.max(b.y1, p[1]); }); return b; }
   var sr = safeRect(), aw = sr.r - sr.l, ah = sr.b - sr.t, zMin = Math.max(ZMIN, HEX_MIN / (SZ * SQ3));
   function zFor(b) { return Math.min(aw / (b.x1 - b.x0 + SZ * SQ3 + 4), ah / (b.y1 - b.y0 + SZ * 2 + 4)); }
-  var b = box(cells.concat(spots)), z = Math.min(wideUI() ? 1.6 : 2.5, zFor(b));   // F3: the whole valley AND every open spot fit the safe area, zooming out as the valley grows (no panning late)
-  zMin = HEX_FIT / (SZ * SQ3); if (z < zMin) { var bc = box(cells), zc = zFor(bc); z = Math.max(zMin, zc < z ? z : Math.min(zc, z)); }   // never below a 30 px hex: past that, spots outside get edge arrows
+  var b = box(cells.concat(spots)), z = Math.min(wideUI() ? 2.2 : 2.5, zFor(b));   // F3: the whole valley AND every open spot fit the safe area, zooming out as the valley grows (no panning late)
+  zMin = HEX_FIT / (SZ * SQ3); if (z < zMin) { var bc = box(cells), zc = zFor(bc); z = Math.max(zMin, zc < z ? z : Math.min(zc, z)); if (z <= zMin) b = bc; }   // W684: clamped: centre on the valley itself   // never below a 30 px hex: past that, spots outside get edge arrows
   if (!isFinite(z) || b.x0 > b.x1) z = 1;
   var t = { z: z, tx: sr.l + aw / 2 - (b.x0 + b.x1) / 2 * z, ty: sr.t + ah / 2 - (b.y0 + b.y1) / 2 * z };
   var fc = typeof tutOn === 'function' && tutOn() && spots.length && UI.tut.spot && spots.indexOf(UI.tut.spot) >= 0 ? UI.tut.spot : null;   // tutorial: its one glowing spot is always fully in view
@@ -486,6 +486,8 @@ function renderTop() {
   scoreWhy(fin);
   var tr = $('#terr'); if (!tr) { tr = document.createElement('button'); tr.type = 'button'; tr.id = 'terr'; tr.className = 'terr'; tr.setAttribute('data-gx', 'scored'); $('#board').appendChild(tr); }
   tr.classList.toggle('solo', G.np < 2);
+  var ab = $('#anib'); if (!ab) { ab = document.createElement('button'); ab.type = 'button'; ab.id = 'anib'; ab.className = 'anib'; ab.setAttribute('aria-expanded', 'false'); ab.onclick = function () { var o = document.documentElement.classList.toggle('wm-anio'); ab.setAttribute('aria-expanded', o ? 'true' : 'false'); }; $('#board').appendChild(ab); }   // W684: phone: animal + area counters fold into a tap-to-open panel
+  ab.textContent = document.documentElement.classList.contains('wm-anio') ? 'Hide points' : 'Animal points';
   tr.setAttribute('aria-label', 'Largest area of each terrain' + (rv ? ', you vs ' + G.seats[ri].name : '') + ': open the score sheet');
   tr.innerHTML = '<span class="tl">Largest area' + (rv ? '<small><b class="me">' + (UI.view === meSeat() ? 'you' : esc(G.seats[UI.view].name)) + '</b> &middot; <b class="riv">' + (ri === meSeat() ? 'you' : esc(G.seats[ri].name)) + '</b></small>' : '') + '</span>' + th;
   var turn = Math.min(G.turns, G.seats[G.cur].done + 1);

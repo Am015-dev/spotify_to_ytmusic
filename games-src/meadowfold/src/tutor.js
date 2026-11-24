@@ -17,13 +17,13 @@ var TUT_STEPS = [
   { id: 'pick', title: 'Take a pocket', say: 'Tap any pocket in the tray to take its 3 tokens.', why: 'Every turn starts this way; the pocket refills afterwards.', on: 'take', sug: '.pocket.glow' },
   { id: 'place', title: 'Place all 3 tokens', say: 'Tap a token in your hand, then a glowing hex. Place all three.', why: 'You must place every token you took, in any order.', on: 'place3', sug: '#map .hx.glow' },
   { id: 'stack', title: 'Stacking', say: 'Grey stacks up to 3. Leaves go on 0-2 trunks. Red goes on one grey, trunk or red. Blue and yellow stay flat.', why: 'Taller trees and peaks score more; flat tiles shape rivers and fields.', sug: '#map' },
-  { id: 'card', title: 'Take an animal card', say: 'Open Animals and take one card (once per turn, at most 4 unfinished).', why: 'Cards are your animals; each shows the habitat it wants.', on: 'card', sug: '#railRow' },
-  { id: 'cube', title: 'Settle an animal', say: 'When a card says Home ready, tap it in My cards, then the glowing hex.', why: 'Its habitat matches (any rotation): the animal moves onto its home hex.', on: 'cube', sug: '#railMine' },
-  { id: 'animal', title: 'How an animal scores', say: 'Each settled animal uncovers a number; the card scores the highest one showing.', why: 'Settle the same card again for a bigger number. One animal per hex; nothing stacks on it.', sug: '#railMine' },
+  { id: 'card', title: 'Take an animal card', say: 'Tap an animal card in the row and take it (once per turn, at most 4 unfinished).', why: 'Cards are your animals; each shows the habitat it wants.', on: 'card', sug: '#strip .acard.playable' },
+  { id: 'cube', title: 'Settle an animal', say: 'When one of your cards says Home ready, tap it, then the glowing hex.', why: 'Its habitat matches (any rotation): the animal moves onto its home hex.', on: 'cube', sug: '#strip .sg-mine' },
+  { id: 'animal', title: 'How an animal scores', say: 'Each settled animal uncovers a number; the card scores the highest one showing.', why: 'Settle the same card again for a bigger number. One animal per hex; nothing stacks on it.', sug: '#strip .sg-mine' },
   { id: 'end', title: 'End your turn', say: 'Tap End turn when your hand is empty.', why: 'The pocket refills, the animal row refills to 5 and the rival plays.', on: 'end', sug: '#endB' },
   { id: 'land', title: 'Landscape points', say: 'Trees 1/3/7, peaks 1/3/7 if touching a peak, 5 per field group of 2+, 5 per building with 3 colours around.', why: 'Every hex can earn points, so plan shapes, not single tiles.', sug: '#railScore' },
   { id: 'water', title: 'River (side A) or islands (side B)', say: 'Side A: the longest river path scores 2, 5, 8, 11, 15, then +4 per hex. Side B: 5 per island.', why: 'Water links your valley; see Scoring for the full table.', sug: '#railScore' },
-  { id: 'spirit', title: 'Spirits (variant)', say: 'With spirits on, keep 1 of 2 on turn one; settle it for its bonus.', why: 'A spirit is a big end-game goal; its cube is not an animal cube.', sug: '#railMine' },
+  { id: 'spirit', title: 'Spirits (variant)', say: 'With spirits on, keep 1 of 2 on turn one; settle it for its bonus.', why: 'A spirit is a big end-game goal; its cube is not an animal cube.', sug: '#strip .sg-mine' },
   { id: 'over', title: 'End of game', say: 'When the pouch runs dry or a player has 2 or fewer empty hexes, the round finishes.', why: 'Everyone gets equal turns. Most points wins; a tie goes to most animals on the board.', sug: '#barstat' },
   { id: 'practice', title: 'Practice game', say: '', why: 'Finish this game. The line below always says what to do now.', practice: true, sug: null }
 ];
@@ -34,7 +34,8 @@ var TUT_MAP = [
   ['[data-gx="rulesd"]', 'Rules', 'The full rules, any time.'],
   ['[data-gx="setd"]', 'Menu', 'New game, sound, restart.'],
   ['#tutQ', 'Help ?', 'Reopens this map and the lesson window.'],
-  ['#railRow', 'Animals', 'The 5 animal cards you can take this turn.'],
+  ['#strip .sg-row', 'Animals', 'The face-up animal cards: take 1 per turn. Tap one for its details.'],
+  ['#strip .sg-mine', 'Your cards', 'Your cards and their score tracks; Home ready = tap it, then the glowing hex.'],
   ['#railMine', 'My cards', 'Your cards: which homes are ready and what they score.'],
   ['#railScore', 'Scoring', 'How every landscape and animal scores, with your points.'],
   ['#railTot', 'Totals', 'Full score table for every player.'],
@@ -126,7 +127,7 @@ function tutPlace(w) {   // keep clear of what the lesson explains (and of the m
   var st = tutCur(), avoid = [];
   if (TUT.map) { if (TUT.info) { var ri = tVis(tq(TUT.info[0])); if (ri) avoid.push([ri, 40]); } $$('#tmap .tlab').forEach(function (b) { avoid.push([b.getBoundingClientRect(), 200]); }); var rc = tVis(tq('#central')); if (rc) avoid.push([rc, 200]); }
   else if (st && st.sug) { var e = tq('.tsug') || tq(st.sug), r = tVis(e); if (r && r.width < innerWidth * .6) avoid.push([r, 400]); ['.pocket.glow', '#endB', '#tray', '#central'].forEach(function (s) { var r2 = tVis(tq(s)); if (r2) avoid.push([r2, 200]); }); }
-  [['#dock.on', 300], ['#scorep.on', 300], ['.gx-drawer[open]', 300], ['#rail', 40], ['#topbar', 40], ['#map', 2]].forEach(function (a) { var r3 = tVis(tq(a[0])); if (r3) avoid.push([r3, a[1]]); });
+  [['#dock.on', 300], ['#scorep.on', 300], ['.gx-drawer.on', 300], ['#rail', 40], ['#topbar', 40], ['#map', 2]].forEach(function (a) { var r3 = tVis(tq(a[0])); if (r3) avoid.push([r3, a[1]]); });
   var spots = [[8, H - bh - 8], [W - bw - 8, H - bh - 8], [8, 64], [W - bw - 8, 64], [(W - bw) / 2, H - bh - 8], [(W - bw) / 2, 64], [8, (H - bh) / 2], [W - bw - 8, (H - bh) / 2], [(W - bw) / 2, (H - bh) / 2], [(W - bw) / 2, H * .3]], best = null;
   spots.forEach(function (p, i) {
     var box = { left: p[0], top: p[1], right: p[0] + bw, bottom: p[1] + bh }, sc = i * .1;
@@ -150,7 +151,8 @@ function tutRing() {   // a soft pulse ring on the suggestion; never the only ta
   var st = tutCur(); if (!TUT || TUT.map || !st || !st.sug || st.practice || !G || G.cur !== 0 || UI.busy) return;
   var sel = st.sug;
   if (st.id === 'card' && UI.pp === 'dock' && UI.tab === 'row') sel = '.acard.playable';
-  if (st.id === 'cube') sel = UI.sel && UI.sel.kind === 'card' ? '#map .hx.glow' : UI.pp === 'dock' && UI.tab === 'mine' ? '.acard.ready' : '#railMine';
+  if (st.id === 'card' && tVis(tq('#takeB'))) sel = '#takeB';   // the card sheet is open: point at Take, keep the window off it
+  if (st.id === 'cube') sel = UI.sel && UI.sel.kind === 'card' ? '#map .hx.glow' : tq('.acard.ready') ? '.acard.ready' : '#strip .sg-mine';
   if (st.id === 'place' && !(UI.sel && UI.sel.kind === 'tok')) sel = '.htok';
   var e = tq(sel), w = tq('#twin');
   if (sel === '#map .hx.glow' && w) {   // suggest a glowing hex the window does not cover

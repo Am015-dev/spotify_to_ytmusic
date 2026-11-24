@@ -4,7 +4,7 @@
 const TUT_GAME = 'lantern-dive';
 const tutOn = () => typeof GXT !== 'undefined' && GXT.active() && UI.mode === 'tutorial';
 const tutCoach = () => false;
-const tutBtn = cls => typeof GXT === 'undefined' ? '' : GXT.menuHTML({ game: TUT_GAME, first: firstTime(), cls: cls, launch: tutStart, sub: false });
+const tutBtn = cls => '<button type="button" class="' + cls + ' gxt-menu" data-lessons-open="1" data-help><b>Lessons</b></button>';   // the old dimming guided dive is retired: this opens the scenario lessons (lessons.js)
 const tcard = t => { const L = { C: 0, T: 1, K: 2, S: 3, L: 4 }; return D.card(L[t[0]], +t.slice(1)); };
 const tutAuto = () => false;
 function tutPaused() { try { const s = GXT.state(); return !!(s.active && s.shown && !s.wait); } catch (e) { return false; } }
