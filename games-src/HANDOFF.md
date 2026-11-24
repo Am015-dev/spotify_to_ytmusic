@@ -306,3 +306,8 @@ Live fix: original-name phrase removed from shelf blurb + sands page (15:2x).
 - Content rule finding: doorkick-dungeon (live) copied the original card pool 1:1 (R98). F18 (Opus) redesigning our own 168 cards; then UI fixes; redeploy needs owner yes. COPYAUDIT running over all games.
 - Closest to done: short-fuse (4/5, F3 polish+PC then review), kaiten-kitchen (4/5-ish, F3 polish+PC then review), crown-city-smash (R97 7.4, F2), perch-and-plume (F3), lantern-dive (F2).
 - Pending: approve baselines (sunglaze, rampart: proof/baselines-new) before deploy; hollowbough R96 list after PLAY2; calm-audit doesn't count #coach/#toast.
+
+## W742 crown-city-smash visual (24 Nov 2026) - branch shelf/W742-vis-crown
+Done: dice faces never blank (tumble keeps the face visible; star faces now show a star behind the digit, so no bare white tiles); phone board repacked so the city, round panel, harbor and seats fill the top (about 1.7x larger) instead of an empty sunburst (art.js, phone only).
+NOT done (pc, R14 item 3): dice tray still a full-width green bar with dice at its left, 5 "0 cards" empty slots still shown, left player list still 8-9px. Next worker: board.css/onboard.css at >=1024px, centre dice at 56px+, hide empty card slots, 16px list.
+Gate not met: pc sheet still has dead-space/small-text cells; baselines pull failed (no origin/ui-baselines in the shallow clone), so build-all showed 12/15 on missing snapshots only. lessons-test PASS phone 26s, pc 16s.
