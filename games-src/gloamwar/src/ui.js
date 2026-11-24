@@ -36,7 +36,10 @@ function startGame(o) {
 function goalCard(done) {
   var d = UI.side === 'D', el = $('#battle');
   el.innerHTML = '<h3>' + (d ? 'You lead the Dawn League' : 'You command the Gloam') + '</h3><p class="bnote">' + (d ? 'Walk the lantern to the Kiln, the red mountain.' : 'Hunt the lantern until its taint reaches 12.') + '</p><p class="bnote">' + (d ? 'Or take 4 points of Gloam strongholds.' : 'Or take 10 points of Dawn cities and strongholds.') + '</p><p class="bnote">Each turn: tap a die, then pick an action.</p><div class="row" style="justify-content:center"><button class="btn pri big" type="button" id="goalGo">Start</button></div>';
-  el.classList.add('on'); $('#goalGo').onclick = function () { el.classList.remove('on'); done(); };
+  el.classList.remove('on'); el.innerHTML = '';
+  var c = document.getElementById('company'), cr = c ? c.getBoundingClientRect() : null;
+  var b = bubble('<b>' + (d ? 'You lead the Dawn League' : 'You command the Gloam') + '</b><br>' + (d ? 'This lantern is your Company. Walk it to the Kiln (red mountain), or take 4 points of Gloam strongholds.' : 'Hunt this lantern until its taint reaches 12, or take 10 points of Dawn cities.') + '<br>Each turn: tap a die, then pick an action.<br><button class="btn pri" type="button" id="goalGo">Start</button>', cr || { left: 180, right: 220, top: 200, bottom: 240 }, { cls: 'goal' });
+  $('#goalGo').onclick = function () { closeBubble(b); done(); };
 }
 function later(f, ms) { clearTimeout(UI.timer); UI.timer = setTimeout(f, ms); }
 function human(s) { return s === UI.side; }
@@ -118,6 +121,7 @@ $('#vD').textContent = vpOf(G, 'D') + '/' + VPWIN.D; $('#vG').textContent = vpOf
   MV.render(G, hl, me);
   if (G.pend && G.pend.h === 'battle') battleRender(ms); else if (!UI.roundShow) battleClose();
   if (UI.sheet) refreshSheet();
+  if (window.closeRCard && !UI.keepCard) closeRCard();
 }
 function renderDice(ms) {
   var me = UI.side, them = other(me), d = $('#mydice'); d.innerHTML = '';
@@ -151,7 +155,7 @@ function companyUI(ms, hl, acts) {
   acts.push({ t: 'Stay hidden', s: 'move it later with dice', cls: 'pri', key: 'cdone', f: function () { apply({ t: 'cdone' }); } });
   ms.filter(function (m) { return m.t === 'road'; }).forEach(function () { acts.push({ t: 'Ashen Road', s: 'start the last 5 steps', cls: 'red', key: 'road', f: function () { apply({ t: 'road' }); } }); });
   ms.filter(function (m) { return m.t === 'guide'; }).forEach(function (m) { acts.push({ t: CHARS[m.c].short + ' guides', s: 'change the guide', key: 'guide', f: function () { apply(m); } }); });
-  return decl.length ? 'Declare: tap a glow, or stay hidden' : 'Company phase';
+  return decl.length ? 'Place the Company: tap a glowing region, or Stay hidden' : 'Company phase: tap Stay hidden to start your turn';
 }
 function huntUI(ms, acts) {
   ms.forEach(function (m) { acts.push({ t: m.n + (m.n === 1 ? ' die' : ' dice'), s: m.n ? 'to the Hunt' : 'no hunt', cls: m.n === 2 ? 'pri' : '', key: 'hunt' + m.n, f: function () { apply(m); } }); });
@@ -167,7 +171,7 @@ function actUI(ms, hl, acts) {
     ms.filter(function (m) { return m.t === 'pass'; }).forEach(function (m) { acts.push({ t: 'Pass', s: 'rival acts first', key: 'pass', f: function () { apply(m); } }); });
     if (ms.some(function (m) { return m.t === 'lamp'; })) acts.push({ t: me === 'D' ? 'Lamp of Dawn' : 'Shuttered Lamp', s: 'change one die', key: 'lamp', f: function () { lampPick(ms); } });
     UI.tap = function (kind, rid) { return false; };
-    return 'Your turn: tap a die';
+    return 'Your move: tap one of your dice';
   }
   var dms = ms.filter(function (m) { return m.t === 'die' && m.i === UI.die; }), f = G.dice[me][UI.die];
   // group by action
@@ -177,7 +181,7 @@ function actUI(ms, hl, acts) {
     am.forEach(function (m) { hl.tokens.push(tokId(m.from)); hl.regions.push(m.from); });
     UI.tap = function (kind, rid) { var m = am.filter(function (x) { return x.from === rid; })[0]; if (m) { apply(m); return true; } };
     acts.push({ t: 'Back', key: 'back', f: function () { UI.src = null; render(); } });
-    return 'Tap the ringed army';
+    return 'Tap an army with a dashed ring';
   }
   // the Will of the Dawn: first pick which face it becomes (or a hero)
   if (f === 'W' && !UI.asFace) {
@@ -314,7 +318,7 @@ function effectUI(ms, hl, acts) {
     else if (m.t === 'ekill') acts.push({ t: CHARS[m.c].short, s: 'falls', cls: 'red', key: 'ekill', f: function () { apply(m); } });
     else if (m.t === 'esortie') acts.push({ t: 'Sally at ' + rn(m.r), key: 'esortie', f: function () { apply(m); } });
   });
-  return reg.length ? 'Tap a glowing place' : c.n + ': choose';
+  return reg.length ? 'Tap a glowing region on the map' : c.n + ': choose';
 }
 // ---------------------------------------------------------------- map taps
 function onMapTap(kind, rid, extra, ev, under) {
@@ -322,7 +326,7 @@ function onMapTap(kind, rid, extra, ev, under) {
   if (kind === 't') kind = 'r';
   if (kind === 'co') kind = 'r';
   if (human(sideToAct(G)) && !UI.hold && UI.tap) { if (UI.tap(kind, rid, extra)) return; if (under && under !== rid && UI.tap('r', under)) return; }
-  if (human(sideToAct(G)) && !UI.hold && MV.hl && (MV.hl.regions || []).length) { toast('Not there: tap a red glowing place'); return; }
+  if (human(sideToAct(G)) && !UI.hold && MV.hl && (MV.hl.regions || []).length) { tip('Not here: tap a glowing red region', ev && ev.clientX != null ? { left: ev.clientX - 14, right: ev.clientX + 14, top: ev.clientY - 14, bottom: ev.clientY + 14 } : MV.rectOf(rid)); return; }
   if (kind === 'c') { charInfo(rid); return; }
   regionInfo(rid);
 }

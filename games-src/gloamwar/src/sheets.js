@@ -65,8 +65,8 @@ function regionInfo(rid) {
   if (G.A[rid]) body += '<p>' + armyText(G.A[rid]) + '</p>'; if (G.IN[rid]) body += '<p><b>Behind the walls:</b><br>' + armyText(G.IN[rid]) + '</p>';
   var cs = Object.keys(G.C).filter(function (c) { return G.C[c] === rid; }); if (cs.length) body += '<p>' + cs.map(function (c) { return '<b>' + CHARS[c].n + '</b>: ' + CHARS[c].out; }).join('<br>') + '</p>';
   if (G.F.loc === rid && G.F.road < 0) body += '<p>The Company was last seen here.</p>';
-  if (!G.A[rid] && !G.IN[rid] && !cs.length) body += '<p>Empty land. Next to: ' + r.adj.map(rn).join(', ') + '.</p>';
-  openSheet('region', { title: r.n, body: body });
+  if (!G.A[rid] && !G.IN[rid] && !cs.length) body += '<p>Empty land. Dotted outlines are its neighbours.</p>';
+  regionCard(rid, r.n, body);
 }
 function charInfo(c) { var d = CHARS[c]; openSheet('char', { title: d.n, body: '<p>Level ' + (d.lv > 50 ? 'flies' : d.lv) + ' · leadership ' + d.ld + '</p>' + (d.guide ? '<p><b>As guide:</b> ' + d.guide + '</p>' : '') + (d.out ? '<p><b>On the map:</b> ' + d.out + '</p>' : '') }); }
 // ---------------------------------------------------------------- menu + rules
@@ -114,4 +114,30 @@ function helpInit() {
       rules: RULES });
     GXH.bulb({ el: '#bulbbtn', suggest: suggest, rulesFor: function () { return phaseId() || 'act'; } });
   } catch (e) { console.warn(e); }
+}
+
+// ---------------------------------------------------------------- bubbles: a card with an arrow touching its target (UI-BAR rule 10)
+function bubble(html, tr, o) {
+  o = o || {}; var el = document.createElement('div'); el.className = 'gwb' + (o.cls ? ' ' + o.cls : ''); el.innerHTML = html + '<i class="gwa"></i>'; el.style.visibility = 'hidden'; document.body.appendChild(el);
+  var br = document.getElementById('board').getBoundingClientRect(), V = { l: 6, t: Math.max(6, br.top + 4), r: innerWidth - 6, b: Math.min(innerHeight - 6, br.bottom - 4) };
+  var w = el.offsetWidth, h = el.offsetHeight, A = 12, G2 = 6, cx = (tr.left + tr.right) / 2, cy = (tr.top + tr.bottom) / 2, clampX = function (x) { return Math.max(V.l, Math.min(V.r - w, x)); }, clampY = function (y) { return Math.max(V.t, Math.min(V.b - h, y)); };
+  var cand = [
+    { side: 'below', room: V.b - tr.bottom, x: clampX(cx - w / 2), y: tr.bottom + A + G2 }, { side: 'above', room: tr.top - V.t, x: clampX(cx - w / 2), y: tr.top - A - G2 - h },
+    { side: 'right', room: V.r - tr.right, x: tr.right + A + G2, y: clampY(cy - h / 2) }, { side: 'left', room: tr.left - V.l, x: tr.left - A - G2 - w, y: clampY(cy - h / 2) }];
+  var fits = function (c) { return c.x >= V.l - 0.5 && c.y >= V.t - 0.5 && c.x + w <= V.r + 0.5 && c.y + h <= V.b + 0.5; };
+  var pick = cand.filter(fits).sort(function (a, b) { return b.room - a.room; })[0] || cand.slice().sort(function (a, b) { return b.room - a.room; })[0];
+  var x = Math.max(V.l, Math.min(V.r - w, pick.x)), y = Math.max(V.t, Math.min(V.b - h, pick.y)), ar = el.querySelector('.gwa');
+  el.className += ' s-' + pick.side; el.style.left = x + 'px'; el.style.top = y + 'px'; el.style.visibility = '';
+  if (pick.side === 'below' || pick.side === 'above') { ar.style.left = Math.max(14, Math.min(w - 14, cx - x)) - 8 + 'px'; } else { ar.style.top = Math.max(14, Math.min(h - 14, cy - y)) - 8 + 'px'; }
+  el.dataset.side = pick.side; el._tr = tr; return el;
+}
+function closeBubble(b) { if (b && b.parentNode) b.parentNode.removeChild(b); }
+function tip(text, tr) { closeBubble(UI.tipEl); UI.tipEl = bubble('<span>' + text + '</span>', tr, { cls: 'tip' }); var e = UI.tipEl; clearTimeout(UI.tipT); UI.tipT = setTimeout(function () { closeBubble(e); }, 2200); }
+function closeRCard() { if (UI.rcard) { closeBubble(UI.rcard); UI.rcard = null; try { MV.setSel(null); } catch (e) { } document.removeEventListener('pointerdown', UI.rcardOff, true); } }
+function regionCard(rid, title, body) {
+  closeRCard(); MV.setSel(rid);
+  var el = bubble('<h3>' + title + '<button class="x" type="button" aria-label="Close">✕</button></h3>' + body, MV.rectOf(rid), { cls: 'rcard' });
+  el.querySelector('.x').onclick = closeRCard; UI.rcard = el;
+  UI.rcardOff = function (e) { if (!el.contains(e.target)) closeRCard(); };
+  setTimeout(function () { document.addEventListener('pointerdown', UI.rcardOff, true); }, 0);
 }
