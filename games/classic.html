@@ -105,11 +105,6 @@ html.ph #fab.dim{opacity:.4}
 #loader .lk{font:600 .85rem "Chivo",system-ui,sans-serif;color:#bca78c}
 #loader .lk a{color:#f2c05a}
 @media (prefers-reduced-motion:reduce){#loader,#loader .lb i{transition:none}}
-/* support the shelf */
-.kofi{display:inline-flex;align-items:center;gap:8px;min-height:44px;padding:0 16px;border-radius:99px;background:#29abe0;color:#fff!important;font:800 .95rem "Chivo",system-ui,sans-serif;text-decoration:none;box-shadow:0 4px 12px rgba(0,0,0,.25)}
-.kofi:hover{filter:brightness(1.08)}
-.support{margin-top:14px;display:flex;flex-wrap:wrap;gap:10px 14px;align-items:center}
-.support p{margin:0;max-width:52ch}
 </style>
 
 </head>
@@ -125,7 +120,7 @@ html.ph #fab.dim{opacity:.4}
 
   <section class="shelf" id="shelf" aria-label="Games"></section>
 
-  <footer>Each game keeps its own save, sound and difficulty settings. Every board game can be played online with friends for free: open it, press Host, and send them the invite code or link. Your browsers connect directly, with no account or server. Missing a game, or something bugs you? <a href="suggest.html" style="color:var(--brass)">Drop a card in the suggestion box</a>.<br><a href="credits.html" style="color:var(--brass)">Credits &amp; licences</a> · <a href="privacy.html" style="color:var(--brass)">Privacy</a> · <a href="terms.html" style="color:var(--brass)">Terms</a><br><small>&copy; 2026 Am015-dev. All rights reserved. Original games inspired by published board games; not affiliated with their designers or publishers.</small><div class="support" id="support" hidden><p>These games are free and ad-free. If they made your game night, you can help cover the hosting and development costs.</p><a class="kofi kofi-link" target="_blank" rel="noopener" href="#">☕ Support on Ko-fi</a></div></footer>
+  <footer>Each game keeps its own save, sound and difficulty settings. Every board game can be played online with friends for free: open it, press Host, and send them the invite code or link. Your browsers connect directly, with no account or server. Missing a game, or something bugs you? <a href="suggest.html" style="color:var(--brass)">Drop a card in the suggestion box</a>.<br><a href="privacy.html" style="color:var(--brass)">Privacy</a> · <a href="terms.html" style="color:var(--brass)">Terms</a><br><small>&copy; 2026 Am015-dev. All rights reserved.</small></footer>
 </div>
 
 <div id="table" hidden>
@@ -135,7 +130,7 @@ html.ph #fab.dim{opacity:.4}
     <a id="solo" href="#" target="_blank" rel="noopener">Open on its own</a>
   </div>
   <iframe id="frame" title="Game" allow="fullscreen; autoplay"></iframe>
-  <div id="loader" class="done" aria-live="polite"><div class="lc"><div class="lt" id="lname">Game</div><div class="lb" role="progressbar" aria-label="Loading"><i id="lbar"></i></div><div class="lm">Made with <b aria-label="love">♥</b> by Alex</div><div class="lk" id="lkofi" hidden>Enjoying the shelf? <a class="kofi-link" target="_blank" rel="noopener" href="#">Buy Alex a coffee ☕</a></div></div></div>
+  <div id="loader" class="done" aria-live="polite"><div class="lc"><div class="lt" id="lname">Game</div><div class="lb" role="progressbar" aria-label="Loading"><i id="lbar"></i></div><div class="lm">Made with <b aria-label="love">♥</b> by Alex</div></div></div>
 </div>
 <button type="button" id="fab" aria-label="Game menu: back to the shelf" hidden>←</button>
 <div id="fabmenu" role="menu" hidden><div class="t" id="fabname"></div><button type="button" id="fabback" role="menuitem">← Back to the shelf</button><button type="button" id="fabfull" role="menuitem">⛶ Full screen</button><a id="fabsolo" role="menuitem" href="#" target="_blank" rel="noopener">Open on its own</a></div>
@@ -389,9 +384,6 @@ document.addEventListener('click',e=>{const b=e.target.closest('[data-ref]');if(
 addEventListener('keydown',e=>{if(e.key==='Escape'&&!table.hidden)closeGame()});
 const start=GAMES.find(g=>'#'+g.id===location.hash);if(start)openGame(start);
 
-/* Ko-fi support: set the page name to switch the support links on */
-const KOFI='am015dev';
-if(KOFI){for(const a of document.querySelectorAll('.kofi-link'))a.href='https://ko-fi.com/'+KOFI;const s=document.getElementById('support');if(s)s.hidden=false;const k=document.getElementById('lkofi');if(k)k.hidden=false}
 /* loading card while a game starts: "Made with love by Alex" */
 var lt0=0,ltick=0;
 function showLoader(name){const loader=document.getElementById('loader'),lbar=document.getElementById('lbar');if(!loader)return;document.getElementById('lname').textContent=name;loader.classList.remove('done');lt0=performance.now();let p=8;lbar.style.width=p+'%';clearInterval(ltick);
