@@ -1,3 +1,12 @@
+# Orchestrator handoff (24 Nov 2026, 09:40 UTC) - READ THIS FIRST
+ROLE: coordinator only. Brief workers (cloud sessions via create_session, branch from alex/brave-carson-rbpmlk, outcome_branch shelf/W###-name, model by task: Haiku mechanical, Sonnet specified, Opus design). Do NOT build or edit games yourself; delegate merge/build/check/push to a Haiku 'integrator' worker. Never ask the owner for approval. One short report per round.
+OWNER RULES (24 Nov): tutorials = FLOATING windows (drag/minimise/close), never dim or block taps, always start with a labelled HUD map; screens look like a game, info in closable panels; no emoji (use game images); use open-source/PC-game references first (Ochre has an open-source oracle, read-only, GPL: never copy, never name); deploys must be fast.
+IN FLIGHT (cloud, started 09:17-09:35): W640 emoji-out (Haiku, branch shelf/W640-emoji-out); W641 text-fix twin 12px + contrast (Sonnet, shelf/W641-text-fix); W643 Ochre floating tutorial + HUD guide + fun (Opus, shelf/W643-ochre-guide); W644 Gloamwar v3 map/icons/HUD/tutorial (Opus, shelf/W644-gloamwar-v3); W645 Onyx v3 rules diff + ordered tutorial (Opus, shelf/W645-onyx-v3).
+WHEN A WORKER FINISHES: integrator merges (check authors are am015-dev), builds (ochre: python3 build.py in games-src/ochre-horizon/game then copy to games/ochre-horizon/index.html; gloamwar/meadowfold/via-tessera/onyx-atelier: build.py in dir then copy <slug>.html to games/<slug>/index.html; others: build-all.py --deploy <slug>, then git checkout -- games/deep-signal games/mainhattan-overdrive), loads phone 402x874 + PC 1366x768 with 0 errors, screenshots, ONE push, verifies live md5.
+LIVE (09:12 UTC): all 5 new games with game-like screens. Pages publish ~100 s (workflow trimmed; asset-viewer and shots folders no longer published).
+Local aids (may be gone): /tmp/claude-0/{sheet.js,mk.py,emo.js,five.js}; panel app: games-src/orch/panel.py port 8765 (report_preview_port).
+OPEN: Via Tessera and Meadowfold not re-reviewed by owner; Onyx guide bubble covers gems; Gloamwar pill over Log; Twin Thrones 12px (W641); audit leftovers in games-src/orch/AUDIT-24NOV.md; 14 games lack assets-inbox folders.
+
 # Orchestrator handoff (24 Nov 2026, 00:45 UTC)
 
 ## PROTOCOL (owner is exhausted; follow exactly)
