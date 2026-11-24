@@ -49,7 +49,7 @@ async function run(b, W, H) {
   const markTap = async (x, y, e) => {
     await myTurn();
     if (phone) { const pt = await p.evaluate(([x, y]) => { const q = hproj(x - BC, y - BC + .5); return q ? { x: q.x, y: q.y } : null; }, [x, y]); if (pt) { await p.touchscreen.tap(pt.x, pt.y); await sleep(300); } }
-    await tap('[data-a=startmark]:not(.pri)[data-x="' + x + '"][data-y="' + y + '"][data-e="' + e + '"]'); await sleep(250);
+    await tap('[data-a=startmark][data-x="' + x + '"][data-y="' + y + '"][data-e="' + e + '"]'); await sleep(250);
   };
   const answer = async re => { await myTurn(); const i = await p.evaluate(re => { const o = G.q && G.q.opts; if (!o) return -1; return o.findIndex(x => new RegExp(re).test(x.l)); }, re.source); if (i < 0) return false; return tap('[data-a=q][data-i="' + i + '"]'); };
   // a question that needs a sensible answer (gate flow): take the first option that rides to an open end / places a tile, never "Accept"
@@ -85,7 +85,7 @@ async function run(b, W, H) {
   // 2) every lesson: start shot, wrong move fails with a message, Retry restarts, scripted solution wins with 3 stars; a non-lesson tap works
   let covered = 0, retried = 0;
   for (const id of ids) {
-    await p.evaluate(i => GXST.start(i), id); await live(id).catch(() => note(id + ' did not start')); await sleep(700);
+    console.log('lesson', id, Date.now() % 1e6); await p.evaluate(i => GXST.start(i), id); await live(id).catch(() => note(id + ' did not start')); await sleep(700);
     shots.push(await p.screenshot({ type: 'jpeg', quality: 72 }));
     covered += await p.evaluate(() => [...document.querySelectorAll('#board, [data-a=card], [data-ph=pcard], [data-a=place]')].filter(e => { const r = e.getBoundingClientRect(); if (r.width < 4 || r.bottom <= 0 || r.top >= innerHeight) return false; const u = document.elementFromPoint(r.left + r.width / 2, r.top + r.height / 2); return u && u.closest('.gxst-card'); }).length);
     if (id === 'lay') {   // hint: nudge then show draws a ring that is not under the card; a Rules tap works mid-lesson; minimise and back

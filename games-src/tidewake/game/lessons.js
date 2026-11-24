@@ -142,7 +142,7 @@
   var go = function () {
     if (!ready()) { setTimeout(go, 200); return; }
     hook();
-    GXST.init({ game: 'tidewake', scenarios: lessons, keepClear: ['#board'], settled: function () { return !!G && UI.started && !UI.busy && !G.ag.length && (G.over || sideToAct() === 0); } });
+    GXST.init({ game: 'tidewake', scenarios: lessons, keepClear: ['#board', '[data-a=card]', '[data-ph=pcard]', '[data-a=rot]', '[data-a=place]', '[data-a=q]', '[data-a=startmark]'], settled: function () { return !!G && UI.started && !UI.busy && !G.ag.length && (G.over || sideToAct() === 0); } });
   };
   setTimeout(go, 300);
 })();
