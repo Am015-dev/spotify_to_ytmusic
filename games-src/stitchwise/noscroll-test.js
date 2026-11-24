@@ -12,6 +12,7 @@ const PROBE = () => {
   (modal || document).querySelectorAll(sel).forEach(b => {
     const cs = getComputedStyle(b); if (b.disabled || !b.offsetParent || cs.visibility === 'hidden' || +cs.opacity < .1) return;
     const r = b.getBoundingClientRect(); if (r.width < 2 || r.height < 2) return;
+    const rd = b.closest('.gx-drawer-body'); if (rd && rd.scrollHeight > rd.clientHeight + 2) return; // a reading window (rules text) may scroll inside itself; the game screen may not
     const name = (b.dataset.a || b.getAttribute('aria-label') || b.textContent).trim().slice(0, 20);
     out.btns.push(name + '@' + Math.round(r.top) + '-' + Math.round(r.bottom));
     if (r.bottom > innerHeight + 1 || r.top < -1 || r.right > innerWidth + 1 || r.left < -1) { out.bad.push('off-viewport ' + name + ' y=' + Math.round(r.top) + '..' + Math.round(r.bottom)); return; }
