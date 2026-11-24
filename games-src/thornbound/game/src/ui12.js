@@ -43,6 +43,7 @@ function tutAI(seat){if(!(UI.cfg&&UI.cfg.tutorial)||!G||!G.q||seat!==1||G.round>
 (function(){const o=aiChoose;aiChoose=function(seat,level){const m=tutAI(seat);return m||o(seat,level)}})();
 // ---------------------------------------------------------------- where each step points
 const tq=sel=>()=>{const e=document.querySelector(sel);return e&&e.getBoundingClientRect().width?e:null};
+const tutMarket=()=>{const e=[...document.querySelectorAll('.tb-loc')].find(x=>/Market Cross/.test(x.textContent));const r=e&&e.querySelector('.tb-ring');return r&&r.getBoundingClientRect().width?r:null};   // wide layout hides #cstrip: point at the map instead
 const tkind=k=>!!(UI.bf&&UI.bf.kind===k&&!UI.card&&!UI.pop);
 const tfirst=(...sels)=>()=>{for(const s of sels){const e=document.querySelector(s);if(e&&e.getBoundingClientRect().width)return e}return null};
 // a hand card's visible strip (the next card overlaps its right side), so the tap lands on that card
@@ -71,7 +72,7 @@ function tutSteps(){
   return [
  {id:'goal',title:'Your goal',say:'Most Influence after the last round wins. This is your score.',target:tq('#rivals'),wait:null,ready:()=>tkind('bid')},
  {id:'map',title:'The kingdom',say:'Win a region’s fight to claim one of its two locations.',target:tq('#mapbox svg'),wait:null,ready:()=>tkind('bid')},
- {id:'tactic',title:'Tactics',say:'Your four Tactics: special powers, most work once per game.',target:tq('#cstrip .cs-t'),wait:null,ready:()=>tkind('bid')},
+ {id:'tactic',title:'Tactics',say:()=>document.documentElement.classList.contains('bf-w')?'Your four Tactics live under your name. Most work once per game.':'Your four Tactics: special powers, most work once per game.',target:tfirst('#cstrip .cs-t','#rivals .rv.me'),wait:null,ready:()=>tkind('bid')},
  {id:'attrition',title:'Hand size',say:'Deck empty? Reshuffle your discards, but your hand size drops by one.',target:tq('#rivals .rv.me'),wait:null,ready:()=>tkind('bid')},
  {id:'bid1',title:'Spring: bid',say:()=>'Each round starts with a secret bid. Tap your '+cinfo(tutBidId()).strength+'.',target:()=>tutHandRect(tutBidId()),
    wait:{type:'tap',match:a=>a.what==='select'&&a.id===tutBidId()},ready:()=>tkind('bid')&&UI.hand==null},
@@ -82,7 +83,7 @@ function tutSteps(){
    ready:()=>!!(UI.card&&UI.card.kind==='event'&&UI.card.ev.t==='bids'&&UI.card.rank&&UI.card.revN>=UI.card.rank.length)},
  {id:'takeback',title:'Keep your card',say:'Bids win Kingdom Cards, or you take your card back. Tap it.',target:tq('#bidspot.glow'),
    wait:{type:'tap',match:a=>isMove(a,'bidRes')&&a.mv&&a.mv.t==='return'},ready:()=>tkind('bidRes')&&!!document.querySelector('#bidspot.glow')},
- {id:'favour',title:'The Favour',say:'Win the Market Cross to hold the Favour: a power and tiebreaker.',target:tq('#cstrip .cs-f'),wait:null,ready:()=>tkind('herald')},
+ {id:'favour',title:'The Favour',say:'Win the Market Cross to hold the Favour: a power and tiebreaker.',target:()=>tq('#cstrip .cs-f')()||tutMarket(),wait:null,ready:()=>tkind('herald')},
  {id:'herald',title:'Your Herald',say:()=>'Put your Herald on '+(UI.bf&&UI.bf.rec?locOf(UI.bf.rec):'the glowing location')+'. Win there for a bonus.',target:tutLoc,
    wait:{type:'tap',match:a=>isMove(a,'herald')},ready:()=>tkind('herald')&&!!tutLoc()},
  {id:'cmds',title:'Card powers',say:'Day powers act first, then Night effects (like Deadly), and only then is Strength counted.',target:()=>{const id=tutPlace()&&tutPlace()[0];return id!=null?tutHandRect(id):null},wait:null,ready:()=>tkind('place')&&tutPlaced()===0&&UI.hand==null},
@@ -123,7 +124,7 @@ function tutSteps(){
    wait:{type:'tap',match:a=>a.what==='select'&&a.id===tutAutCard('govern')},ready:()=>tkind('menu')&&/Autumn/.test(G.q.title||'')&&UI.autCard==null&&tutAutCard('govern')!=null},
  {id:'govern',title:'Govern',say:'Govern: put it in a Council. Its votes earn Council powers.',target:tfirst('#act .autc [data-aut=govern]'),
    wait:{type:'tap',match:a=>isMove(a,'menu')&&a.mv&&a.mv.a==='govern'},ready:()=>tkind('menu')&&/Autumn/.test(G.q.title||'')&&UI.autCard!=null&&!!document.querySelector('#act .autc [data-aut=govern]')},
- {id:'council',title:'Councils',say:'Your card now sits in that Council, shown on the board here.',target:()=>{const c=myCouncil();return c?document.querySelector('#cstrip [data-c='+c+']'):null},wait:null,
+ {id:'council',title:'Councils',say:'Your card now sits in that Council, shown on the board here.',target:()=>{const c=myCouncil();return c?tq('#cstrip [data-c='+c+']')()||tq('#mapbox svg')():null},wait:null,
    ready:()=>!!myCouncil()&&!UI.card},
  {id:'autumn3',title:'Journey',say:'Now tap your other glowing card.',target:()=>{const id=tutAutCard('journey');return id!=null?tutHandRect(id):null},
    wait:{type:'tap',match:a=>a.what==='select'&&a.id===tutAutCard('journey')},ready:()=>tkind('menu')&&/Autumn/.test(G.q.title||'')&&UI.autCard==null&&tutAutCard('journey')!=null},
@@ -140,8 +141,8 @@ function tutSteps(){
    wait:{type:'tap',match:a=>a.what==='select'&&a.id===tutVK()},ready:()=>G.round===2&&tkind('bid')&&UI.hand==null&&tutVK()!=null},
  {id:'bid4',title:'Face down',say:'Tap the crown spot.',target:tq('#bidspot'),from:()=>tutHandRect(tutVK()),
    wait:{type:'tap',match:a=>isMove(a,'bid')},ready:()=>G.round===2&&tkind('bid')&&UI.hand===tutVK()&&!!document.querySelector('#bidspot.glow')},
- {id:'kc',title:'Steal it',say:'Your bid beats the card on their Kingdom Card. Steal it!',target:tq('#handw .kcb.steal'),
-   wait:{type:'tap',match:a=>isMove(a,'bidRes')&&a.mv&&a.mv.t==='steal'},ready:()=>G.round===2&&tkind('bidRes')&&!!document.querySelector('#handw .kcb.steal')},
+ {id:'kc',title:'Steal it',say:'Your bid beats the card on their Kingdom Card. Steal it!',target:tfirst('#handw .kcb.steal','#road .kcb.steal'),
+   wait:{type:'tap',match:a=>isMove(a,'bidRes')&&a.mv&&a.mv.t==='steal'},ready:()=>G.round===2&&tkind('bidRes')&&!!document.querySelector('#handw .kcb.steal,#road .kcb.steal')},
  {id:'end',title:'Your game',say:'Its power is yours now. After the last round, most Influence wins.',
    target:tq('#rivals'),wait:null,ready:()=>!!(G&&G.round===2&&G.pl[0].ks.some(x=>x))}
   ]}
