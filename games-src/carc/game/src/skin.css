@@ -356,5 +356,3 @@ body:has(#endplate) #hand #hinfo{visibility:hidden}
 .gedge[hidden]{display:none}
 body:has(#modal .scrim) .gedges{display:none}
 
-/* scenario lessons: the card has its own Lessons entry in the menu, so the floating Lessons button stays hidden */
-.gxst-q{display:none!important}

@@ -53,6 +53,10 @@
   // the first uncut wire of stand si worth v (a crew wire to point at)
   var tile = function (si, v) { return function () { if (!G) return null; var sl = G.st[si].w.find(function (x) { return !x.cut && cv(x.id) === v; }); var e = sl && tileEl(sl.u); return e && e.getBoundingClientRect().width ? e : null; }; };
   var my = function (v) { return function () { if (!G) return null; var sl = G.st[0].w.find(function (x) { return !x.cut && cv(x.id) === v; }); var e = sl && tileEl(sl.u); return e && e.getBoundingClientRect().width ? e : null; }; };
+  // multi-step: ring the wire to point at first, then the number to name (UI.sel holds the pointed wire); a rack tool is chosen first
+  var probeT = function () { var q = UI.sel; if (!q || !q.tool) return $('#tb .chip'); var n = q.tg ? q.tg.length : 0; return n === 0 ? tile(1, 4)() : n === 1 ? tile(1, 9)() : my(4)(); };
+  var two = function (tf, v) { return function () { var m = my(v)(); return UI.sel && UI.sel.mode === 'dual' && UI.sel.tg && UI.sel.tg.length && m ? m : tf(); }; };
+  var afterCut = function (v, f, then) { return function () { var e = then(); return cutOf(v) >= 2 && e ? e : f(); }; };
   // the tempting wrong guess: one message for any miss
   var missMsg = function (why) { return function () { return missed() ? why : (boom() ? 'BOOM. ' + (G.over.why || 'The fuse ran out.') : false); }; };
 
@@ -62,21 +66,21 @@
       setup: function () { return stack({ me: ['5', '9', '12'], s1: ['5t', '7', '11'], s2: ['7t', '11t'] }); },
       success: function () { return cutOf(5) >= 2; },
       fail: missMsg('That wire was not a 5: the fuse burns a step. A token shows a wire\'s true number.'),
-      hints: ['One crew wire carries a token. What does it say?', { say: 'Point at the wire with the 5 token, then tap your 5.', target: tile(1, 5) }],
+      hints: ['One crew wire carries a token. What does it say?', { say: 'Point at the wire with the 5 token, then tap your 5.', target: two(tile(1, 5), 5) }],
       debrief: 'Token said 5, you hold a 5: both cut.' },
     { id: 'order', title: 'Read the rack', rule: 'Each rack runs low to high, left to right. A wire left of a 3 is never a 9.', par: 1,
       goal: 'Cut a pair of 1s with the leftmost wire.',
       setup: function () { return stack({ me: ['1', '9', '12'], s1: ['1', '3t', '10'], s2: ['7', '11t'] }); },
       success: function () { return cutOf(1) >= 2; },
       fail: missMsg('Racks run low to high: the wire left of the 3 is the small one, so the 1.'),
-      hints: ['Look at the 3 token. Which side holds the smaller numbers?', { say: 'The leftmost wire is the 1. Point at it and tap your 1.', target: tile(1, 1) }],
+      hints: ['Look at the 3 token. Which side holds the smaller numbers?', { say: 'The leftmost wire is the 1. Point at it and tap your 1.', target: two(tile(1, 1), 1) }],
       debrief: 'Left of a 3 means small: it had to be the 1.' },
     { id: 'miss', title: 'A miss burns fuse', rule: 'A wrong guess burns one fuse step and the wire gets a token with its true number. No steps left: boom.', par: 2,
       goal: 'Cut a pair of 8s. The fuse can take one miss.',
       setup: function () { return stack({ me: ['6', '8', '12'], s1: ['2t', '8', '12t'], s2: ['3t', '10t'], dial: 2 }); },
       success: function () { return cutOf(8) >= 2; },
       fail: function () { return boom() ? 'The fuse was spent: a second miss is boom. Use the token a miss leaves.' : false; },
-      hints: ['If you miss once, the wire shows you its number.', { say: 'Say 8 on the middle wire. If it was not 8, the token tells you.', target: tile(1, 8) }],
+      hints: ['If you miss once, the wire shows you its number.', { say: 'Say 8 on the middle wire. If it was not 8, the token tells you.', target: two(tile(1, 8), 8) }],
       debrief: 'A miss costs a step, but the token turns it into a sure cut.' },
     { id: 'solo', title: 'Solo cut', rule: 'Hold every wire left of a number (all four, or the last two) and cut them alone. It cannot miss.', par: 1,
       goal: 'Cut all four 7s without burning the fuse.',
@@ -90,35 +94,35 @@
       setup: function () { return stack({ me: ['6', '9', '12'], s1: ['6t', '7', '11'], s2: ['7t', '11t'], eq: ['eq6'], dial: 2 }); },
       success: function () { return G.dial >= 3; },
       fail: missMsg('That wire was not a 6. Two cut 6s are what unlock the Rewind card.'),
-      hints: ['The Rewind card is locked. Its number is on it.', { say: 'Cut the pair of 6s, then tap Rewind.', target: tile(1, 6) }],
+      hints: ['The Rewind card is locked. Its number is on it.', { say: 'Cut the pair of 6s, then tap Rewind.', target: afterCut(6, two(tile(1, 6), 6), function () { return $('#tb .eqk'); }) }],
       debrief: 'Two 6s cut unlocked Rewind: one step back.' },
     { id: 'probe', title: 'Twin Probe', rule: 'Once per job, test two wires at once: it hits if either matches. Great when one miss would end the job.', par: 1,
       goal: 'Cut a pair of 4s. One miss ends the job.',
       setup: function () { return stack({ me: ['4', '9', '12'], s1: ['4', '9', '12t'], s2: ['7t', '11t'], dial: 1 }); },
       success: function () { return cutOf(4) >= 2; },
       fail: missMsg('One miss was the end of the fuse. The Twin Probe tests two wires at once.'),
-      hints: ['You have a personal tool. Look for it by your stand.', { say: 'Tap the Twin Probe, tap both blank wires, then your 4.', target: '#tb .chip' }],
+      hints: ['You have a personal tool. Look for it by your stand.', { say: 'Tap the Twin Probe, tap both blank wires, then your 4.', target: probeT }],
       debrief: 'Two wires, one test: either could be the 4.' },
     { id: 'yellow', title: 'Yellow wires', rule: 'Yellow matches only yellow. Name yellow by tapping your yellow wire.', par: 1,
       goal: 'Cut the pair of yellow wires.',
       setup: function () { return stack({ me: ['y1', '5', '8'], s1: ['y2t', '5t', '11'], s2: ['7t', '11t'] }); },
       success: function () { return G.st.reduce(function (a, s) { return a + s.w.filter(function (x) { return x.cut && cv(x.id) === 'Y'; }).length; }, 0) >= 2; },
       fail: missMsg('Yellow only matches yellow. Tap your yellow wire to name it.'),
-      hints: ['Which crew wire has the yellow token?', { say: 'Point at the yellow-token wire, then tap your yellow.', target: tile(1, 'Y') }],
+      hints: ['Which crew wire has the yellow token?', { say: 'Point at the yellow-token wire, then tap your yellow.', target: two(tile(1, 'Y'), 'Y') }],
       debrief: 'Yellow met yellow: a pair.' },
     { id: 'red', title: 'Never point at red', rule: 'Red wires are never named. Pointing at one blows the bomb.', par: 1,
       goal: 'Cut a pair of 4s. A red wire is in play on their rack.',
       setup: function () { return stack({ me: ['4', '9'], s1: ['r2', '4t', '12'], s2: ['7t', '11t'] }); },
       success: function () { return cutOf(4) >= 2; },
       fail: function () { return boom() ? 'You pointed at a red wire: boom. The red marker said one was in play.' : (missed() ? 'That was not a 4. Only the token is certain.' : false); },
-      hints: ['The board shows a red wire in play. Which wire is not certain?', { say: 'Skip the blank wire. Use the 4 token.', target: tile(1, 4) }],
+      hints: ['The board shows a red wire in play. Which wire is not certain?', { say: 'Skip the blank wire. Use the 4 token.', target: two(tile(1, 4), 4) }],
       debrief: 'Only tokened wires were safe: the blank one was red.' },
     { id: 'reveal', title: 'Last red reveals', rule: 'If your last wires are all red, they reveal themselves at your turn.', par: 2,
       goal: 'Defuse the bomb. Cut your last blue wire.',
       setup: function () { return stack({ me: ['5', 'r2'], s1: ['5t'], s2: [] }); },
       success: function () { return G.over && G.over.win; },
       fail: function () { return missed() ? 'That was not a 5. Cut the token wire, then your red reveals itself.' : (boom() ? 'BOOM. ' + (G.over.why || '') : false); },
-      hints: ['After your blue wire is gone, what is left in your hand?', { say: 'Cut the 5 pair. Your red reveals next turn.', target: tile(1, 5) }],
+      hints: ['After your blue wire is gone, what is left in your hand?', { say: 'Cut the 5 pair. Your red reveals next turn.', target: two(tile(1, 5), 5) }],
       debrief: 'Only reds left: they revealed themselves and the bomb is defused.' },
     { id: 'game', title: 'A short job', rule: 'Everything together: show a wire, take turns, cut all wires before the fuse runs out.', par: 99,
       goal: 'Defuse the whole bomb with your crew.',
@@ -153,7 +157,6 @@
     var sn = saveNow; saveNow = function () { if (!(window.GXST && GXST.active() && L.on)) return sn.apply(this, arguments); };
     var settle = function () { if (!G) return false; if (G.logN !== L.ln) { L.ln = G.logN; L.t = Date.now(); } return Date.now() - L.t > 900 && !UI.aiT && (G.over || decider() === 0 || (G.q && G.q.who === 0)); };
     window.addEventListener('gxst', function (e) { var t = e.detail && e.detail.type; if (t === 'start' || t === 'retry') L.on = 1; if (t === 'close' && L.on) leave(); });
-    var cs = document.createElement('style'); cs.textContent = '.gxst-q{display:none!important}'; document.head.appendChild(cs);   // the Tutorial button is the way in; a sixth top-bar button breaks the bar rule
     GXST.init({ game: 'short-fuse', scenarios: lessons, keepClear: ['.gx-bar', '#strip', '#say', '#tb .eqk', '#tb .tile', '#tb .plate', '#tray'], settled: settle });
   };
   setTimeout(go, 300);
