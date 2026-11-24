@@ -156,9 +156,15 @@ body{background-color:var(--lac);background-image:
 #toast{position:fixed;left:50%;top:40%;transform:translate(-50%,-50%);z-index:62;pointer-events:none;font-family:var(--deco);font-size:26px;color:var(--gold2);text-shadow:0 2px 6px #000,0 0 18px rgba(216,180,90,.6);opacity:0;white-space:nowrap}
 #toast.on{animation:toast 1.3s ease-out}
 @keyframes toast{0%{opacity:0;transform:translate(-50%,-30%) scale(.8)}15%{opacity:1;transform:translate(-50%,-50%) scale(1.05)}75%{opacity:1}100%{opacity:0;transform:translate(-50%,-60%)}}
-#coach{position:fixed;left:8px;right:8px;z-index:35;max-width:520px;margin:0 auto;background:#f1e3bf;color:#1d160a;border-radius:10px;padding:8px 10px;font-size:15px;line-height:1.3;font-weight:600;box-shadow:0 6px 18px rgba(0,0,0,.6);display:flex;gap:8px;align-items:center}
+#coach{position:fixed;left:8px;z-index:35;width:300px;box-sizing:border-box;background:#f1e3bf;color:#1d160a;border-radius:10px;padding:8px 12px;font-size:16px;line-height:1.3;font-weight:600;box-shadow:0 6px 18px rgba(0,0,0,.6);display:flex;gap:8px;align-items:center;pointer-events:none}
+#coach.res{background:#e3efd0}
+#coach::after{content:"";position:absolute;left:var(--ax,50%);margin-left:-10px;width:0;height:0;border:10px solid transparent}
+#coach.arr-up::after{top:-20px;border-bottom-color:#f1e3bf}#coach.arr-up.res::after{border-bottom-color:#e3efd0}
+#coach.arr-down::after{bottom:-20px;border-top-color:#f1e3bf}#coach.arr-down.res::after{border-top-color:#e3efd0}
+#coach.arr-l::after{left:-20px;top:var(--ay,50%);margin:-10px 0 0;border-right-color:#f1e3bf}#coach.arr-r::after{left:auto;right:-20px;top:var(--ay,50%);margin:-10px 0 0;border-left-color:#f1e3bf}
+#coachskip{position:fixed;right:8px;top:48px;z-index:36;min-height:44px;min-width:44px;font-size:13px;padding:2px 12px;background:#1d160a;color:var(--gold2)}
 #coach .t{flex:1 1 auto}
-#coach .btn{min-height:44px;font-size:13px;padding:2px 10px;background:#1d160a;color:var(--gold2)}
+#coach .btn{min-height:44px;min-width:44px;font-size:13px;padding:2px 10px;background:#1d160a;color:var(--gold2);pointer-events:auto}
 .finger{position:fixed;z-index:36;width:34px;height:34px;pointer-events:none;border-radius:50%;border:3px solid #fff;box-shadow:0 0 12px var(--gold2);animation:fing 1.2s ease-in-out 3}
 @keyframes fing{50%{transform:scale(.7)}}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
