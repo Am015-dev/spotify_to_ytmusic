@@ -541,7 +541,7 @@ var TT_TEST = {};
   }
   function sndLabel() { return 'Sound: ' + (SND.isOn() ? 'on' : 'off'); }
   function firstTime() { try { return !localStorage.getItem('tt_seen') && !GXT.isDone('twin-thrones'); } catch (e) { return false; } }
-  function tutBtn() { return window.GXT ? GXT.menuHTML({ game: 'twin-thrones', first: firstTime(), cls: 'btn alt sm', launch: function () { GX.close && GX.close(); if (window.TT_TUTOR) TT_TUTOR.start(); } }) : ''; }
+  function tutBtn() { return window.GXT ? GXT.menuHTML({ game: 'twin-thrones', first: firstTime(), cls: 'btn alt sm', launch: function () { GX.close && GX.close(); if (window.GXST) GXST.picker(); } }) : ''; }
   var FLAVOUR = (window.CAMPAIGN && CAMPAIGN.quick && CAMPAIGN.quick.intro) || ['Two thrones stand empty. Draft your wonders, then out-build the rival.'];
   function newGame(mode, seed, camp) {
     try { localStorage.setItem('tt_seen', '1'); } catch (e) { } U.mode = mode; U.ai = [mode === 'watch', mode !== 'two']; U.G = E.newGame({ seed: seed, first: U.tut ? 0 : undefined }); U.camp = camp || null; U.finished = false; U.logs = []; var tw = camp && camp.twist; if (tw) { if (tw.id === 'extra-coins') U.G.players[1].coins += tw.param; if (tw.id === 'head-start') U.G.mil = -tw.param; } U.sel = null; U.fingerDone = false; U.busy = false; U.seq++; U.narr = false; U.lastSide = null; clearTimeout(U.nt); if (!U.tut) U.rivalName = null;
