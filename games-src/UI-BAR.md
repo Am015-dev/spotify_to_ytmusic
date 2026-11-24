@@ -20,6 +20,7 @@ campaign map, chapter/boss intros, board, hand, end/win/lose screen. At 5 sizes:
 9. Nothing cut by the screen edge or an overflow:hidden parent; no text spilling out of its chip.
 10. Tutorial and guide text sits NEXT TO the thing it points at (owner, 24 Nov 2026): a bubble with an arrow touching the glowing target, on the side with room, never covering the target or the choices. Never a banner at the screen top or a panel at the bottom that the player must connect to a target far away. Applies to every tap-here, explain-this, result-of-your-tap message. Check at 402x874 and 1366x768.
 
+11. NO POINTLESS TAPS in a tutorial or guide (owner, 24 Nov 2026): every tap the player is asked to make must teach something: a rule, the reason behind it, or a strategic idea, and the screen says what was learned right after. No 'tap Next / Got it / OK' just to advance, no 'tap the glowing thing' whose only purpose is to move on, no step that repeats a lesson already taught. A step that teaches nothing is deleted or merged into the one that does. A tap that is a real decision (choose between moves with different consequences) is the best kind.
 Proof: `?scn=menu` passes at all 5 projects (`SCN_SLUGS=<slug> node_modules/.bin/playwright test --project=phone-s --project=phone
 --project=tablet --project=pc --project=wide -g menu`). Where the test cannot see a rule (5, 6, 7), check it in the DOM with a small
 ?scn= check of your own. No screenshots.
