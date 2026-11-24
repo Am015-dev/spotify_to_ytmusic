@@ -189,6 +189,7 @@ function suggest() {
   UI.gear = p.gear; UI.sel = p.idx.slice(); UI.boost = false; drawPlan();   /* boost is offered after the reveal; Suggest marks its advice there */
 }
 function commit() {
+  if (window.RRL && window.GXST && GXST.active()) RRL.n++;
   if (tutOn() && !GXT.act({ type: 'tap', what: 'go' })) return; sfx('go');
   var c = you(); if (!G.hot) rateStart(c); var plan = { gear: UI.gear, idx: UI.sel.slice(), boost: UI.boost }, e = submitPlan(G, c.i, plan);
   if (e) { setMsg('Not allowed: ' + e, 'warn'); return; } RACE.prev = null; RACE.rateKeep = 0;
