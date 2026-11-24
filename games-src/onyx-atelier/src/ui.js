@@ -154,7 +154,14 @@ var UI = (function () {
     el.textContent = s;
   }
   function layout() {
-    var app = $('#app'), W = Math.min(app.clientWidth - 12, 548), H = app.clientHeight - parseFloat(getComputedStyle(app).paddingTop) - parseFloat(getComputedStyle(app).paddingBottom), rs = document.documentElement.style;
+    var app = $('#app'), wide = innerWidth >= 1000 && innerHeight >= 560; app.classList.toggle('wide', wide);
+    if (wide) { // PC: board big on the left, rival / jewels / you stacked on the right
+      var HH = app.clientHeight, cl = Math.max(52, Math.min(112, Math.floor((HH - 44 - 40) / 5))), st = document.documentElement.style; st.setProperty('--cell', cl + 'px');
+      var RW = app.clientWidth - (5 * cl + 10 + 14 + 190) - 64, usedR = $('#rival').offsetHeight + $('#me').offsetHeight + 24, phh = HH - 44 - usedR, rh = Math.floor((phh - 12) / 3);
+      var chh = Math.max(60, Math.min(rh, 150)), cww = Math.floor(Math.min((RW - 6 * 8) / 6, chh * 0.8));
+      st.setProperty('--ch', chh + 'px'); st.setProperty('--cw', cww + 'px'); st.setProperty('--rg', '8px'); var b0 = $('#bar'), o0 = $('#obj'); if (b0 && o0) { o0.style.top = Math.round(b0.getBoundingClientRect().top + 3) + 'px'; o0.style.left = '64px'; o0.style.transform = 'none'; } return;
+    }
+    var W = Math.min(app.clientWidth - 12, 548), H = app.clientHeight - parseFloat(getComputedStyle(app).paddingTop) - parseFloat(getComputedStyle(app).paddingBottom), rs = document.documentElement.style;
     var used = $('#bar').offsetHeight + $('#rival').offsetHeight + $('#me').offsetHeight + 12;
     var cellMax = Math.floor(Math.min((W - 100 - 16) / 5, 58)), cell = Math.max(30, cellMax), ch, cw, rg, tries = 0;
     // fit the whole stack (market 3 rows, then board + side, inside the viewport): shrink the board until the measured middle row and the market both fit
@@ -167,7 +174,7 @@ var UI = (function () {
       cell = Math.max(30, cell - Math.max(2, Math.ceil((48 - rowH) * 3 / 5)));
     } while (++tries < 12);
     rs.setProperty('--ch', ch + 'px'); rs.setProperty('--cw', cw + 'px'); rs.setProperty('--rg', rg + 'px');
-    var bar = $('#bar'), ob = $('#obj'); if (bar && ob) ob.style.top = Math.round(bar.getBoundingClientRect().top + 46) + 'px';   // the goal card sits in the bar's lower strip, below the title and the safe area
+    var bar = $('#bar'), ob = $('#obj'); if (bar && ob) { ob.style.top = Math.round(bar.getBoundingClientRect().top + 46) + 'px'; ob.style.left = ''; ob.style.transform = ''; }   // the goal card sits in the bar's lower strip, below the title and the safe area
   }
 
   // ---------- fx ----------

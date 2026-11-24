@@ -36,20 +36,15 @@
 
   GXS.add({
     // the tutorial is the spotlight walk (GXT) since W489; the old coached game (GXCOACH) still counts
-    id: 'tb-story-start', name: 'Story after Skip tutorial', ask: 'Skip tutorial: is the chapter map next?', seed: 6, when: function () { return booted() && typeof storyOpen === 'function' && typeof GXC !== 'undefined' && !!window.CAMPAIGN; },
+    id: 'tb-story-start', name: 'Story opens the chapter map', ask: 'Story button: is the chapter map next, with Tutorial and chapter 1 to play?', seed: 6, when: function () { return booted() && typeof storyOpen === 'function' && typeof GXC !== 'undefined' && !!window.CAMPAIGN; },
     setup: function () {
       try { GXH.setEnabled(false); } catch (e) { }
-      showStart(); storyOpen();   // what the Story button does: first time, the tutorial comes first
-      return GXS.wait(function () { return tutRunning() && document.querySelector('[data-gxt-skip]'); }, 10000).then(function () { return new Promise(function (r) { setTimeout(r, 500); }); });
+      showStart(); storyOpen();   // what the Story button does: the tutorial is now a scenario lesson row on the chapter map, no spotlight walk
+      return GXS.wait(function () { return document.querySelector('.gxc-map-on .gxc-map'); }, 10000).then(function () { return new Promise(function (r) { setTimeout(r, 500); }); });
     },
     checks: [
-      { kind: 'fn', name: 'the tutorial opened first (not seen yet)', fn: function () { return tutRunning() || 'no tutorial'; } },
-      { kind: 'text', sel: '[data-gxt-skip]', re: /skip tutorial/i, name: 'Skip tutorial label' },
-      { kind: 'tap', sel: '[data-gxt-skip]', name: 'tap Skip tutorial', state: function () { return { tut: tutRunning(), map: !!document.querySelector('.gxc-map-on .gxc-map'), start: !document.getElementById('start').hidden && !document.querySelector('.gxc-map-on') }; },
-        expect: function (a, b) { return (!b.tut && b.map) || (b.tut ? 'tutorial still running' : b.start ? 'went back to the title screen, not the chapter map' : 'blank: no chapter map'); } },
       { kind: 'visible', sel: '.gxc-map-on .gxc-map', name: 'chapter map' },
-      { kind: 'fn', name: 'map has chapter 1 to play, and no tutorial strip is left', fn: function () { var n = document.querySelectorAll('.gxc-map-on button, .gxc-map-on [data-ch]').length; return (n >= 2 && !document.querySelector('.gxt-top')) || (n < 2 ? 'chapter map is empty' : 'tutorial strip left over'); } },
-      { kind: 'fn', name: 'Story does not force the tutorial again', fn: function () { return GXT.isDone('thornbound') || GXT.isDone(TUT_GAME) || 'tutorial not counted as seen'; } }
+      { kind: 'fn', name: 'map has the Tutorial row and chapter 1 to play, and no spotlight strip', fn: function () { var m = document.querySelector('.gxc-map-on'), n = document.querySelectorAll('.gxc-map-on button, .gxc-map-on [data-ch]').length; return (m && /tutorial/i.test(m.textContent) && n >= 2 && !document.querySelector('.gxt-top')) || (n < 2 ? 'chapter map is empty' : 'no Tutorial row or a spotlight strip is left'); } }
     ]
   });
 
@@ -142,7 +137,7 @@
   });
   GXS.add({
     id: 'tb-over', name: 'End card with the 3D crown', ask: 'Is the crown on the end card?', seed: 8, when: booted, group: 'Art',
-    setup: function () { return table(8).then(function () { G.over = { winner: 0, ranking: G.pl.map(function (q) { return q.seat; }), scores: G.pl.map(function (q) { return q.inf; }), bonus: {}, tieBreak: null }; showOver(); renderAll(); return new Promise(function (r) { setTimeout(r, 1200); }); }); },
+    setup: function () { return table(8).then(function () { G.pl.forEach(function (q, i) { q.inf = [31, 26, 22, 18][i]; }); /* W754: a real final score, not a row of zeros */ G.over = { winner: 0, ranking: G.pl.map(function (q) { return q.seat; }), scores: G.pl.map(function (q) { return q.inf; }), bonus: {}, tieBreak: null }; showOver(); renderAll(); return new Promise(function (r) { setTimeout(r, 1200); }); }); },
     checks: [{ kind: 'fn', name: 'the crown is on the end card (3D canvas or the @512 picture)', fn: function () { return !!document.querySelector('.crown3') || 'no crown on the end card'; } }]
   });
 })();

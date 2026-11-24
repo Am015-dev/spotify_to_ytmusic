@@ -642,4 +642,22 @@ body>#hintbtn{display:none}
 .milrow{display:contents}
 @media (min-width:1000px){.milrow{display:flex;align-items:center;gap:12px;flex:0 0 auto}.milrow #mil{flex:1 1 60%;min-width:0}.milrow .tokrow{flex:0 1 auto;margin:0}}
 @media (min-width:1000px){#pyr .card .nm,#pyr .card .nm.t1,#pyr .card .nm.t2,#pyr .card .nm.t3,.strip .wt .wc,.strip .tab .emp,#mil .mend,#bank em,#lvls .btn,.rsec li{font-size:16px!important}}
+/* W771 HUD diet (owner 24 Nov: "lot of detail around"). Always on screen: 2 score chips, How to play, Menu, Lessons, the one
+   instruction line, the rival throne, your throne (plus the board: pyramid and war track). Log, All cards and the rival city move
+   into the Menu / a tap on the rival plate; the age counter shows only as a danger warning; the token row only while you pick one. */
+.gx-bar [data-city],.gx-bar [data-gx=cardsd],.gx-bar [data-gx=logd]{display:none!important}
+#instr:not([data-d]) .trk,#instr[data-d=""] .trk{display:none!important}
+#bd:not(.tokpick):not(.tour) #tokrow{display:none!important}
+@media (min-width:1000px){#bd:not(.tokpick):not(.tour) .milrow #mil{flex:1 1 100%}}
+/* W771 board tour: lesson 1 names each board region; the bubble sits next to the region, its arrow touching it */
+#tt-tour{position:fixed;inset:0;z-index:2147483000;cursor:pointer}
+#tt-tour .bub{transition:none!important;animation:none!important;position:fixed;box-sizing:border-box;padding:14px 16px 12px;border-radius:14px;background:#fff8e6;color:#2a1a0c;border:2px solid #f2c230;box-shadow:0 8px 28px rgba(0,0,0,.55);font:600 17px/1.35 system-ui,sans-serif}
+#tt-tour .bub .n{display:block;margin-top:6px;font:500 13px/1.2 system-ui,sans-serif;color:#6b4a1f}
+#tt-tour .bub i{position:absolute;width:16px;height:16px;background:#fff8e6;border:2px solid #f2c230;transform:rotate(45deg)}
+#tt-tour .bub[data-up="1"] i{top:-10px;border-right:0;border-bottom:0}
+#tt-tour .bub[data-up="0"] i{bottom:-10px;border-left:0;border-top:0}
+#tt-tour .bub[data-up="in"] i{display:none}
+.tt-hl{outline:4px solid #f2c230!important;outline-offset:2px;box-shadow:0 0 22px 6px rgba(242,194,48,.75)!important}
+html.tt-touring .gxst-card,html.tt-touring .gxst-chip{visibility:hidden!important}
+@media (min-width:1000px){#tt-tour .bub{font-size:18px}#tt-tour .bub .n{font-size:16px}}
 </style></head>

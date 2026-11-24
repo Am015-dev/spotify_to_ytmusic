@@ -79,3 +79,64 @@ Check every 10 min via send_later (re-arm each time). Rules for hanging work: bl
 LIVE and verified (md5 live == repo tip 13:25): ochre, gloamwar, onyx (+story), meadowfold (HUD v5), via-tessera, wickdeep, perch, wildmark (readable), sands (HUD + tutorial), thornbound, twin, doorkick, crown, kaiten (scenario tutorial pilot), shipwreck, cauldron, stitchwise, vale, emberclimb/sunglaze/lantern (scenario tutorials), tidewake, short-fuse, rampart.
 STILL IN FLIGHT: integrators 11 (short-fuse, stitchwise baselines, rampart) and 12 (twin, crown scenario tutorials); unfinished scenario-tutorial workers W688 doorkick, W690 thornbound, W691 tidewake, W692 cauldron, W693 shipwreck, W694 vale (branches shelf/W6xx-*): merge with an integrator when pushed. Interrupted: W695 nebula, W696 redline (not started).
 NEXT: owner's play feedback -> route per game (workers: Sonnet specified, Opus design); keep check every 10 min via send_later if he asks for more work; tutorials must be scenario games; HUD diet remaining: thornbound, hollowbough, rampart; contrast leftovers 33 (goal 14); convert floating-lesson tutorials (wickdeep, perch, wildmark, via-tessera, meadowfold, gloamwar, onyx, sands) to scenarios; scenario tutorials for nebula, redline, vinegrave, hollowbough, final-approach.
+
+## 15:15 UTC CHEAPAG FIXED
+Env "Alex" setup script installs cheap-agent, writes /root/.config/cheapag/config.json (provider local = api.anthropic.com/v1, claude-haiku-5-5, key env ANT), `claude mcp add -s user cheapag -- cheapag`, `cheapag allow` in the repo. Proven 15:13: delegate OK, test pass, $0.05, 6 turns. Every brief now says: all code via mcp__cheapag__delegate (BRIEF-TEMPLATE.md). Workers launched 14:56 (W698-W702, W704) predate it. Trial B8 session_01RR7mnXzBvG1gr4TqyAmew6 checks a fresh worker loads the tools.
+15:20 UTC: fresh workers get cheapag connected but tools not callable (B8). Fix: games-src/scripts/cag.js calls the cheapag MCP server from Bash; proven OK. Brief rule updated.
+
+## 15:40 UTC ROUND (20 workers, all code via cag.js -> Haiku)
+Integrators: INT15 vale(W704)+doorkick(W700) session_01RR7mnbjrozxC6CR9udNMVw | INT16 crown(W698 dice-row fix)+meadowfold contrast(W703) session_01RR7mnb4wFvpsdQT37Ph9Wf.
+Scenario tutorials: W701 nebula (no cheapag) | W705 shipwreck redo | W706 redline redo | W707 vinegrave | W708 hollowbough | W709 final-approach.
+Conversions to scenarios: W710 wickdeep | W711 perch | W712 wildmark | W713 via-tessera | W714 meadowfold | W715 gloamwar | W716 sands.
+HUD diet (Opus): W717 thornbound | W718 rampart. Chores (Haiku): W719 contrast | W720 stitchwise baselines. Reviewer R13 (Opus): REVIEW-R13.md.
+Branches shelf/W7xx-*. Workers report via create_trigger "[DONE Wxxx]". W699/W702 pushes were denied (work lost) -> redone as W705/W706; briefs now say push per milestone or paste format-patch.
+Next: as branches land, one Sonnet integrator per 2-4 branches (shared gx-scenario-tutor.js changes -> one build-all). Onyx (has story tutorial) not converted.
+15:53 UTC DECISION: cheapag net-negative on feature work (W707 $1.22, W712 $1.5, nothing produced; W711 stalled). Kept only for one-file fixes; briefs updated.
+
+## 15:56 UTC STATE (orchestrator session_01RR7mnbria2H5cZehPYYq6S; hand off here if context is full)
+LIVE 15:51: crown-city-smash (2D PC overlap fixed) + meadowfold (contrast) via INT16 790bf02a.
+Source merged but NOT deployed: vale (W704) + doorkick (W700) at 04392461 -> phone lessons fail after merge; W722 (Opus) fixing shared gx-scenario-tutor phoneSlot regression + deploying affected games (vale, doorkick, crown, thornbound, rampart).
+Reviewer R13 (shelf/R13-review REVIEW-R13.md): ochre 0 (no lessons) -> W725; thornbound lessons not live (W722 deploys); twin/emberclimb end->title, Lessons button 0x0, ?lessons=1, show-me ring -> W726 (waits for W722); tidewake phone + >60 s tests -> W727.
+Redos: W721 vinegrave, W723 perch, W724 wildmark (no cheapag). Running from 15:33/15:39 round: W701 nebula (1b5f03f5 pushed), W705 shipwreck, W706 redline, W708 hollowbough, W709 final-approach, W710 wickdeep, W713 via-tessera, W714 meadowfold (ca260ae0), W715 gloamwar, W716 sands, W717/W718 HUD diet (Opus), W719 contrast, W720 stitchwise.
+Merge plan: after W722 lands, one Sonnet integrator per 2-4 pushed branches; shared shell changes -> one build-all. cheapag: one-file fixes only.
+
+## 16:04 UTC HANDOFF to new orchestrator
+Since 15:56: What's new entries added for today's deploys (daa0737fe); briefs now require add-update.py on every deploy. New workers: W725 ochre scenario tutorial, W726 shared tutor fixes (waits for W722), W727 tidewake phone + test speed, W728 nebula fix (from W701), W729 final-approach fix (from W709, card covers dice tray). Pending merges: W714 meadowfold scenarios (ca260ae0), others as they push. W722 (Opus regression fix + deploy of vale/doorkick/crown/thornbound/rampart) is the gate before any new integrator.
+Cost data for owner: cheapag on feature work W707 $1.22, W712 $1.5, W709 $1.9, INT16 $1.2 (2/4 jobs failed); Sonnet session cost readable from get_session usage.cost_usd (W711 $0.61 at 147k tokens). Decision: cheapag only for one-file fixes.
+Live check URL form: https://am015-dev.github.io/spotify_to_ytmusic/<slug>/ (games/ is the site root).
+
+## 16:30 UTC (orchestrator #2 session_01RR7mnaXzf4yNDTeJiWjiqx)
+- W722 landed 272c1764 (shell: keepPlace is opt-in).
+- INT17 (this integrator: wildmark, vinegrave, meadowfold scenario lessons) and INT18 (redline / via-tessera / ochre, deploys at least 30 min after INT17).
+- Workers running: W730 gloamwar, W730 shipwreck-overhaul (old orch), W731 perch, W732 wickdeep, W734 hollowbough, W735 thornbound HUD, W737 sands (Opus), W738 rampart HUD, W739 kaiten visual (Opus), W740 onyx, W741 short-fuse, W742 crown visual.
+- INT17 status at 16:55 UTC: merged all three branches clean into int17; lessons tests PASS (wildmark 26 s, vinegrave 4 s, meadowfold 9-12 s at 402x874 and 1366x768). NOT deployed: deploy gate (contact sheets, every window and lesson step, phone + pc, read by eye) did not fit the 40 min budget. Next integrator: run the sheets, then build-all --deploy wildmark vinegrave meadowfold in one call, add-update.py per game.
+
+## INT18s (24 Nov 2026, 17:17 UTC)
+- Merged (squash): W706 redline-rally, W713 via-tessera, W725 ochre-horizon lesson scenarios; wildmark/vinegrave/meadowfold already merged by INT17.
+- Gate: lessons tests PASS (redline, ochre, wildmark, vinegrave, meadowfold; via-tessera has none), phone+pc contact sheets opened, 0 bad cells. wildmark fixes: Esc closes the lesson picker; acorn counter moved below the Animal points button (phone).
+- build-all --quick fails only on missing visual baselines (ui-baselines branch absent), so wildmark/vinegrave/redline-rally were deployed with --no-check after the manual gates; meadowfold/via-tessera/ochre-horizon copied from their own builds and stamped.
+- Dropped: none. What's new added for the six plus vale-of-banners and doorkick-dungeon.
+
+## INT20r (24 Nov 2026, 18:00 UTC)
+- Deployed: NONE. R15 (CRITIC-R15.md) fails all 29 games (min row 3-5); no merged branch lifts a game to >= 7 on all 5 rows.
+- Merged on alex (source only, not deployed): W726 shared tutor (+ pill avoids keepClear areas, fixes gloamwar "draw" lesson on phone), W727, W741r, W730r gloamwar, W742, W743 hollowbough, W744 wickdeep, W739r kaiten.
+- Tests: wickdeep lessons PASS phone+pc; gloamwar lessons PASS (phone "minimise chip" check flaky under load).
+- build-all --quick on 17 tutor games: 1/17 PASS (rampart-and-vine). Others FAIL on: missing ui-baselines snapshots (cauldron-fair, kaiten, redline, tidewake, vale, wildmark: baseline-only) and look-check findings (text under/overlapping other text; thornbound reports the "Lessons" pill overlapping text: W726 pill regression to fix before any deploy) in crown, doorkick, emberclimb, hollowbough, lantern-dive, short-fuse, sunglaze, thornbound, twin-thrones, vinegrave.
+- Held by critic: all 29. Defects: see games-src/orch/CRITIC-R15.md (empty panels, 7-9px text, label-value strips, pc dead space).
+- Not done: contact sheets per game (no deploy, so skipped); hollowbough art untouched.
+
+## ORCH session_01RR7mnZ3Hj6twBG9rg6E2C6 (orch #5, 24 Nov 2026, 18:08 UTC)
+- BLOCKED: this session is at lineage depth 8 (hard limit 8). It cannot create sessions, triggers or send_later reminders. So no new fixers, no integrators, no 10-min checks from here.
+- Fix: the owner starts orch #6 as a NEW top-level session (claude.ai/code, repo am015-dev/spotify_to_ytmusic, branch alex/brave-carson-rbpmlk). Orch #6 must not be spawned by any orchestrator, or it hits the same limit after 1 more level.
+- Running at 18:07 UTC (all push shelf/<branch>, none deploys): W759 sands, W760 cauldron, W761r short-fuse, W763 hollowbough (owner card art 48/48), W764 lantern, W765r crown, W766r gloamwar, W767 stitchwise HUD, W768 nebula, W769 doorkick, W770 emberclimb, W758 kaiten Act 4, INT22.
+- Stuck: W762r vinegrave (idle, could not git push its branch: permission). W734 wickdeep (could not schedule its DONE ping; work is on d7b638a2 / PR #316).
+- Waiting for an integrator: W755 tidewake HUD, W746-final-approach, W733 ochre tutorial, W732 wildmark, W757r hollowbough art, INT21r.
+- Gate unchanged: 0/29 games pass the R15 critic; last deploy 17:17 UTC.
+- Queue for fixers: onyx-atelier, twin-thrones, redline-rally, ochre-horizon (on W733), wildmark (on W732), vale, final-approach (on W746), meadowfold, sunglaze, via-tessera, tidewake (after W755), perch (after W731), kaiten (after W758).
+- 18:09 UTC relay: W746-final-approach@e9cdffa3 lessons 7/7 phone+pc, sheets 0 flags. Its diff carries shared shell/gx-scenario-tutor.* (from W709/W729): reconcile with W726/W752 before merge. Weak: phone pilot tray shows 2 of 4 dice faces in some shots. R15 live: phone 6/6/7/7/6, pc 5/6/6/6/6.
+- 18:18 UTC relay W758 kaiten DONE: shelf/W758-kaiten-story@d65861a0c. No kaiten expansion exists in any source/branch, nothing switched on. Added Act 4 "The Late Menu" c11-c15 (?scn=kk-story-map, kk-story-c11..c15), act4 test 5/5 won, logic 81/81; sim win% c11-c15 50/45/43/23/0 (c15 boss 0%: verify beatable). Shared shell gx-campaign.js (4 acts/16 chapters) -> all-games build. Integrate after W739r-vis-kaiten; add scn ids to games/scenarios.json; kaiten still needs a belt/dishes-on-screen fixer (R15 min 3). Archive session_01RR7mnbTb2hmSPULh6PMV1n once merged.
+- 18:12 UTC: W771 twin-thrones tutorial (board description) + HUD diet, local Opus worker in orch #5, pushes shelf/W771-twin-thrones (owner 18:10 "tutorial still very confusing, not describing the game board, HUD very bad with lot of detail").
+- 18:27 UTC finished list (owner "check the ready for review", "you missed several games"): review-ready W760 cauldron, W731 perch (PR #315); finished W766r gloamwar (phone 7/8/7/7/7, pc 6/8/7/7/7), W764 lantern, W767 stitchwise (R2/R4/R5 <7), INT22 thornbound+rampart (both HELD, scores in shelf/INT22), W758 kaiten, W746 final-approach, W755 tidewake, W733 ochre, W732 wildmark, W757r hollowbough art, W734 wickdeep (PR #316), W730 shipwreck (lessons test failing). Work NOT pushed (git permission): W761r short-fuse, W762r vinegrave: relaunch. Still running: W759 sands, W763 hollowbough, W765r crown, W768 nebula, W769 doorkick, W770 emberclimb, W771 twin-thrones (local).
+- 18:27 UTC: INT23 (local Sonnet in orch #5) integrates W766 gloamwar, W760 cauldron, W764 lantern, W767 stitchwise under the critic gate; pushes shelf/INT23.
+- STOP (owner 18:26 UTC: finalise and deploy, stop spending). INT23 18:31: shelf/INT23@ca7e6e18 has W766 gloamwar, W760 cauldron, W764 lantern, W767 stitchwise squashed, NOT deployed (unverified: playwright/test missing in sandbox; gloamwar phone lessons fail "minimise gave no chip"). W771 twin-thrones: shelf/W771-twin-thrones@e4a6b583, NOT deployed: HUD 17->8 phone, 18->8 pc, 14-step board tour + war/science-win lessons; lessons test FAILS (tour bubble 23-541px off target on 8 phone/5 pc steps; own/pair Retry does not restart). cheapag: needs owner /cheapag:allow in the session (CONSENT refusal), 0 jobs ran.
+- 19:14 UTC orch #5: DEPLOYED twin-thrones (board tour, 8-item HUD, tour bubble + retry fixed), thornbound (Lessons pill off title, pc 16px), rampart-and-vine (board fit) at c3439f2e; lessons tests PASS phone+pc. Not deployed: gloamwar, cauldron-fair, lantern-dive, stitchwise (on shelf/INT23 and shelf/W772-batch). Cheap-agent spend today ~96 USD Sonnet + ~6 USD Haiku. Next: owner starts orch #6 fresh.

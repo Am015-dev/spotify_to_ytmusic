@@ -8,7 +8,7 @@ function faceSVG(f){const s=`stroke="${INK}" stroke-width="5" stroke-linejoin="r
   if(f==='FW')return `<svg viewBox="0 0 60 60"><path d="M6 24 Q16 14 26 24 T46 24 T56 24 M6 38 Q16 28 26 38 T46 38 T56 38" fill="none" stroke="#3a86ff" stroke-width="6" stroke-linecap="round"/></svg>`;
   if(f==='FS')return `<svg viewBox="0 0 60 60"><path d="M12 48 C4 38 22 34 30 38 C40 42 54 36 46 26 C40 18 24 26 22 16 C20 8 34 6 40 10" fill="none" stroke="#1a1320" stroke-width="9" stroke-linecap="round"/><path d="M12 48 C4 38 22 34 30 38 C40 42 54 36 46 26 C40 18 24 26 22 16 C20 8 34 6 40 10" fill="none" stroke="#7ee04c" stroke-width="5" stroke-linecap="round"/><circle cx="40" cy="10" r="3" fill="#e63946"/></svg>`;
   if(f==='FA')return `<svg viewBox="0 0 60 60"><ellipse cx="30" cy="16" rx="9" ry="11" fill="none" stroke="#f4a300" stroke-width="7"/><path d="M30 26 V56 M14 30 H46" stroke="#f4a300" stroke-width="8" stroke-linecap="round"/><ellipse cx="30" cy="16" rx="9" ry="11" fill="none" stroke="${INK}" stroke-width="2"/></svg>`;
-  if('123'.includes(f))return `<svg viewBox="0 0 60 60"><text x="30" y="47" text-anchor="middle" font-family="Bangers,Impact,sans-serif" font-size="46" fill="#2a1650" stroke="#ffd23f" stroke-width="3" paint-order="stroke" stroke-linejoin="round" transform="translate(-2,-2)">${f}</text></svg>`;
+  if('123'.includes(f))return `<svg viewBox="0 0 60 60"><path d="M30 3 L37 20 L56 21 L42 33 L47 52 L30 42 L13 52 L18 33 L4 21 L23 20 Z" fill="#ffd23f" stroke="#1a1320" stroke-width="3" stroke-linejoin="round"/><text x="30" y="40" text-anchor="middle" font-family="Bangers,Impact,sans-serif" font-size="30" fill="#2a1650" stroke="#fff3cf" stroke-width="2.5" paint-order="stroke" stroke-linejoin="round">${f}</text></svg>`;
   if(f==='E')return `<svg viewBox="0 0 60 60"><path d="M36 4 L14 34 H28 L22 56 L48 22 H33 Z" fill="${INK}" transform="translate(2,2)"/><path d="M34 4 L12 34 H27 L22 56 L48 22 H32 Z" fill="#2ec27e" ${s}/><path d="M30 10 L20 26" stroke="#b9ffd8" stroke-width="3" stroke-linecap="round"/></svg>`;
   if(f==='H')return `<svg viewBox="0 0 60 60"><path d="M30 52 C8 36 4 24 10 15 C16 6 27 8 30 17 C33 8 44 6 50 15 C56 24 52 36 30 52 Z" fill="#e63946" ${s}/><path d="M15 18 C17 13 22 12 25 15" fill="none" stroke="#ffc2c7" stroke-width="3.5" stroke-linecap="round"/></svg>`;
   return `<svg viewBox="0 0 60 60"><g fill="none" ${s} stroke-width="7"><path d="M14 10 C22 22 22 38 12 52"/><path d="M29 6 C37 20 37 38 28 54"/><path d="M44 10 C52 22 52 38 42 52"/></g><g fill="none" stroke="#e63946" stroke-width="2.5" stroke-linecap="round"><path d="M14 10 C22 22 22 38 12 52"/><path d="M29 6 C37 20 37 38 28 54"/><path d="M44 10 C52 22 52 38 42 52"/></g></svg>`}
@@ -112,7 +112,7 @@ function renderMap(){const svg=document.getElementById('map');if(!G){svg.innerHT
   for(let k=0;k<16;k++){const a=k*Math.PI/8;s+=`<path d="M465 230 L${465+Math.cos(a)*900} ${230+Math.sin(a)*900} L${465+Math.cos(a+.12)*900} ${230+Math.sin(a+.12)*900} Z" fill="#fff" opacity=".13"/>`}
   s+=`<rect width="1000" height="640" fill="url(#ht)"/>${clouds()}${skyline()}<rect x="0" y="380" width="1000" height="260" fill="#3b2447"/><rect x="0" y="380" width="1000" height="260" fill="url(#ht)"/><path d="M0 384 H1000" stroke="#ffd23f" stroke-width="3" stroke-dasharray="18 14" opacity=".6"/>`;
   const act=cur();
-  s+=`<g><rect x="306" y="102" width="330" height="270" rx="16" fill="${INK}"/><rect x="300" y="96" width="330" height="270" rx="16" fill="#fff3cf" stroke="${INK}" stroke-width="5"/><rect x="300" y="96" width="330" height="270" rx="16" fill="url(#ht)"/>
+  s+=`<g class="ph-dn"><rect x="306" y="102" width="330" height="270" rx="16" fill="${INK}"/><rect x="300" y="96" width="330" height="270" rx="16" fill="#fff3cf" stroke="${INK}" stroke-width="5"/><rect x="300" y="96" width="330" height="270" rx="16" fill="url(#ht)"/>
    <path d="M318 350 L318 318 L612 318 L612 350" fill="none" stroke="${INK}" stroke-width="3" stroke-dasharray="8 6"/>
    <g transform="translate(465,96) rotate(-2)"><rect x="-96" y="-22" width="192" height="40" rx="8" fill="#e63946" stroke="${INK}" stroke-width="4"/><text x="0" y="10" text-anchor="middle" font-family="Bangers,Impact,sans-serif" font-size="30" fill="#ffd23f" stroke="${INK}" stroke-width="3" paint-order="stroke" letter-spacing="2">DOWNTOWN</text></g>`;
   if(G.city>=0){const o=P(G.city);s+=`${burst(465,240,96,'url(#glow)')}<g transform="translate(465,240) scale(1.25)">${monArt(o.m)}</g>
@@ -120,13 +120,13 @@ function renderMap(){const svg=document.getElementById('map');if(!G){svg.innerHT
      <text x="465" y="352" text-anchor="middle" font-family="Bangers,Impact,sans-serif" font-size="26" fill="${INK}">${esc(mname(o))} rules the city</text>`}
   else s+=`<text x="465" y="225" text-anchor="middle" font-family="Bangers,Impact,sans-serif" font-size="34" fill="${INK}" opacity=".55">EMPTY!</text><text x="465" y="258" text-anchor="middle" font-family="Nunito,sans-serif" font-weight="800" font-size="16" fill="${INK}" opacity=".6">The next monster to finish rolling must move in</text>`;
   s+=`<text x="465" y="134" text-anchor="middle" font-family="Nunito,sans-serif" font-weight="900" font-size="14" fill="${INK}" opacity=".85">+1★ going in · +2★ each turn · no healing</text></g>`;
-  s+=`<g><rect x="666" y="156" width="310" height="216" rx="16" fill="${INK}"/><rect x="660" y="150" width="310" height="216" rx="16" fill="${G.bayOn?'#3aa6d9':'#8aa6b5'}" stroke="${INK}" stroke-width="5"/><rect x="660" y="150" width="310" height="216" rx="16" fill="url(#waves)"/>
+  s+=`<g class="ph-bay"><rect x="666" y="156" width="310" height="216" rx="16" fill="${INK}"/><rect x="660" y="150" width="310" height="216" rx="16" fill="${G.bayOn?'#3aa6d9':'#8aa6b5'}" stroke="${INK}" stroke-width="5"/><rect x="660" y="150" width="310" height="216" rx="16" fill="url(#waves)"/>
    <g transform="translate(815,150) rotate(2)"><rect x="-70" y="-20" width="140" height="36" rx="8" fill="#3a86ff" stroke="${INK}" stroke-width="4"/><text x="0" y="9" text-anchor="middle" font-family="Bangers,Impact,sans-serif" font-size="26" fill="#fff" stroke="${INK}" stroke-width="3" paint-order="stroke" letter-spacing="2">HARBOR</text></g>`;
   if(G.bayOn&&G.bay>=0){const o=P(G.bay);s+=`<g transform="translate(815,258)">${monArt(o.m)}</g><text x="815" y="354" text-anchor="middle" font-family="Bangers,Impact,sans-serif" font-size="22" fill="#fff" stroke="${INK}" stroke-width="3" paint-order="stroke">${esc(mname(o))} holds the harbor</text>`}
   else s+=`<text x="815" y="258" text-anchor="middle" font-family="Bangers,Impact,sans-serif" font-size="24" fill="#fff" stroke="${INK}" stroke-width="3" paint-order="stroke">${G.bayOn?'EMPTY':'CLOSED'}</text><text x="815" y="284" text-anchor="middle" font-family="Nunito,sans-serif" font-weight="800" font-size="14" fill="#fff">${G.bayOn?'Counts as the city too':'Opens with 5–6 monsters'}</text>`;
   s+=`</g>`;
   // round + dice panel
-  s+=`<g><rect x="36" y="102" width="245" height="270" rx="16" fill="${INK}"/><rect x="30" y="96" width="245" height="270" rx="16" fill="#fff3cf" stroke="${INK}" stroke-width="5"/>
+  s+=`<g class="ph-rnd"><rect x="36" y="102" width="245" height="270" rx="16" fill="${INK}"/><rect x="30" y="96" width="245" height="270" rx="16" fill="#fff3cf" stroke="${INK}" stroke-width="5"/>
    <text x="152" y="132" text-anchor="middle" font-family="Bangers,Impact,sans-serif" font-size="28" fill="#e63946" stroke="${INK}" stroke-width="1.2" letter-spacing="1">ROUND ${G.turn}</text>
    <g transform="translate(78,190) scale(.62)">${monArt(act.m)}</g>
    <text x="118" y="176" font-family="Bangers,Impact,sans-serif" font-size="22" fill="${INK}">${esc(mname(act))}</text>
@@ -169,3 +169,15 @@ function mapPlates(svg){if(!svg||!svg.getBBox)return;const lum=c=>{const m=Strin
     r.setAttribute('class','wplate');r.setAttribute('x',b.x-4);r.setAttribute('y',b.y-2);r.setAttribute('width',b.width+8);r.setAttribute('height',b.height+4);r.setAttribute('rx',4);
     r.setAttribute('fill',light?'#000':'#fff');const tr=t.getAttribute('transform');if(tr)r.setAttribute('transform',tr);t.parentNode.insertBefore(r,t)}}
 {const _rm=renderMap;renderMap=function(){_rm.apply(this,arguments);try{const svg=document.getElementById('map');if(svg&&getComputedStyle(svg).display!=='none')mapPlates(svg)}catch(e){}}}
+
+/* W742: on a phone the city is the board. The cards are packed into a 600x600 box (about 1.7x the old size) instead of floating in the middle of a 1000-wide sky. */
+{const _rp=renderMap;renderMap=function(){_rp.apply(this,arguments);try{const svg=document.getElementById('map');if(!svg||!G)return;
+  const ph=typeof phOn==='function'&&phOn();svg.setAttribute('viewBox',ph?'0 -58 600 650':'0 0 1000 640');svg.setAttribute('preserveAspectRatio',ph?'xMidYMin meet':'xMidYMid meet');
+  if(!ph||G.winner)return;const bb=g=>g.getBBox();const rnd=svg.querySelector('.ph-rnd'),down=svg.querySelector('.ph-dn'),bay=svg.querySelector('.ph-bay');if(!rnd||!down||!bay)return;
+  down.setAttribute('transform','translate(-170 -74) scale(1.15)');
+  const rw=document.createElementNS('http://www.w3.org/2000/svg','g');rw.setAttribute('transform','translate(-2 20) scale(.62)');rnd.parentNode.insertBefore(rw,rnd);rw.appendChild(rnd);
+  if(G.bayOn)bay.setAttribute('transform','translate(-300 -35) scale(.5)');else bay.style.display='none';
+  const seats=[...svg.querySelectorAll('g.seat')];if(!seats.length)return;let x0=1e9,x1=-1e9;seats.forEach(g=>{const b=bb(g);x0=Math.min(x0,b.x);x1=Math.max(x1,b.x+b.width)});
+  const sc=Math.min(.9,584/(x1-x0));const w=document.createElementNS('http://www.w3.org/2000/svg','g');w.setAttribute('transform',`translate(${300-sc*(x0+x1)/2} ${362-sc*392}) scale(${sc})`);
+  seats[0].parentNode.insertBefore(w,seats[0]);seats.forEach(g=>w.appendChild(g));
+ }catch(e){}}}

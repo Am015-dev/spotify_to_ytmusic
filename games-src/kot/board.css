@@ -40,7 +40,7 @@ html.ph .pchip em{display:inline-block}
 html.ph .die.bfroll{animation:bfTumble var(--land,.6s) cubic-bezier(.3,.6,.4,1.15) both}
 html.ph .die.bfroll svg{animation:bfFace var(--land,.6s) steps(1,end) both;animation-delay:inherit}
 @keyframes bfTumble{0%{transform:translateY(-28px) rotate(-560deg) scale(.55)}55%{transform:translateY(-8px) rotate(-120deg) scale(.96)}82%{transform:translateY(2px) rotate(8deg) scale(1)}100%{transform:none}}   /* W467: the tumble stays inside its own cell, so a rolling die never covers its neighbour */
-@keyframes bfFace{0%{opacity:.15}80%{opacity:.15}81%{opacity:1}100%{opacity:1}}
+@keyframes bfFace{0%{opacity:1}100%{opacity:1}}   /* W742: a rolling die always shows its face symbol */
 @media (prefers-reduced-motion:reduce){html.ph .die.bfroll,html.ph .die.bfroll svg,html.ph .bm,html.ph .bm.hit{animation:none}}
 /* the ghost finger */
 #bfinger{position:fixed;left:-100px;top:-100px;z-index:59;pointer-events:none;width:0;height:0;opacity:0;transition:opacity .25s,left .35s,top .35s}
@@ -122,6 +122,7 @@ html.ph #choice .bfintro .goal .how li{position:relative;padding-left:20px;font-
 html.ph #choice .bfintro .goal .how li::before{content:'';position:absolute;left:4px;top:.45em;width:9px;height:9px;border-radius:50%;background:var(--mc,#ffd23f);box-shadow:0 0 0 2px #1a1320}
 html.ph .bfintro .you span{font-size:16px}
 html.ph-p header.gx-bar .pchip.me b{padding-right:24px}
+html.ph-p header.gx-bar .gxst-q{display:none}   /* phone header has no room: Lessons opens from the menu (tutStart -> picker) */
 html.ph #choice.bfpoke{animation:bfPoke .5s}
 @keyframes bfPoke{0%,100%{transform:none}30%{transform:translateY(-8px)}60%{transform:translateY(2px)}}
 html.ph-p .gx-dock[data-card="choice"] #choice h2{font-size:1.6rem}

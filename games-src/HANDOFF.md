@@ -306,3 +306,32 @@ Live fix: original-name phrase removed from shelf blurb + sands page (15:2x).
 - Content rule finding: doorkick-dungeon (live) copied the original card pool 1:1 (R98). F18 (Opus) redesigning our own 168 cards; then UI fixes; redeploy needs owner yes. COPYAUDIT running over all games.
 - Closest to done: short-fuse (4/5, F3 polish+PC then review), kaiten-kitchen (4/5-ish, F3 polish+PC then review), crown-city-smash (R97 7.4, F2), perch-and-plume (F3), lantern-dive (F2).
 - Pending: approve baselines (sunglaze, rampart: proof/baselines-new) before deploy; hollowbough R96 list after PLAY2; calm-audit doesn't count #coach/#toast.
+
+## W735 thornbound HUD diet (shelf/W735-hud-thornbound)
+- tb-story-start failure was NOT the HUD diet: parent commit fails the same. Story now opens the chapter map directly (tutorial = lesson row, scenario lessons); the scenario still waited for the old Skip-tutorial spotlight. Scenario rewritten (scn.js), HUD cuts untouched.
+- Test against a build-all staged build (python3 scripts/build-all.py thornbound --no-check), not games/thornbound (deployed copy).
+- Still failing, same before and after W717: phone-s tb-board/help/rivals/buttons ("hc glow pl" tap not responding, hint bubble over Purse), pc tb-zoom/tb-art (pp-x Close under drawer), menu (axe contrast on hint bubble). Contact sheets phone+pc NOT run (time).
+## W740 onyx-atelier visual fix (24 Nov)
+Done: tutorial part names now a tidy list inside the guide window, ONE callout on the board for the picked part (no chip cloud); PC (>=1000px) grid layout: board left (cell up to 112px), rival/jewels/you stacked right; guide never sits on the PC board.
+Weak: PC guide window still covers the rival jewel rows on lesson 1; HUD pips and phone start menu not changed. Sheets: onyx-atelier/proof/w740-*-sheet.jpg. Integrator: build.py then copy onyx-atelier.html to games/onyx-atelier/index.html (not in build-all).
+## W742 crown-city-smash visual (24 Nov 2026) - branch shelf/W742-vis-crown
+Done: dice faces never blank (tumble keeps the face visible; star faces now show a star behind the digit, so no bare white tiles); phone board repacked so the city, round panel, harbor and seats fill the top (about 1.7x larger) instead of an empty sunburst (art.js, phone only).
+NOT done (pc, R14 item 3): dice tray still a full-width green bar with dice at its left, 5 "0 cards" empty slots still shown, left player list still 8-9px. Next worker: board.css/onboard.css at >=1024px, centre dice at 56px+, hide empty card slots, 16px list.
+Gate not met: pc sheet still has dead-space/small-text cells; baselines pull failed (no origin/ui-baselines in the shallow clone), so build-all showed 12/15 on missing snapshots only. lessons-test PASS phone 26s, pc 16s.
+## W734 hollowbough scenario lessons (branch shelf/W734-scn-hollowbough)
+Done: 8 GXST lessons (game/src/lessons.js), build.py/body.html wiring, game/lessons-test.js (PASS both sizes, ~9 s each).
+Next: lesson card covers the top HUD on phone and some meadow/places on desktop (tune keepClear, one attempt made and reverted); add Haven/event/Autumn lessons;
+retire the unreachable GXT tour in ui12.js and its tests (tutor-test.js, learn-touch.js).
+## W744 wickdeep scenario lessons (all 7 pass)
+- All 7 lessons pass (scripted win + wrong-move fail for pick/shield/retal) at 402x874 and 1366x768, ~9 s total, stable 4/4 runs. Hint twice draws the ring.
+- Fixes: crab/ghoul used monster card 0 (init 9/11, shield +1) so they acted first; now card 7 (late). Retal judged at the ranged hit (no new round). Test: door/coin pick the door/coin glow, coin plays the second half (Holdfast top) so the turn ends; retal wrong = move in + melee.
+- Lessons hide the game's coach bubble, goal chip and results screen (showResult) while active; an invisible #wdl-zone over figures/door/coin is in keepClear, so the card stays off the pieces.
+- Shots: SHOTS=<dir> on lessons-test.js writes one PNG per step (play, hint, fail, win) plus picker and rules.
+- Still weak: phone win/fail cards can overlap the (inactive) tray; Rules dialog body looks empty in shots (pre-existing, not lessons); card text and cards under 13 px (game-wide).
+
+## W732 wickdeep scenario lessons (partial)
+- Hang cause (found, fixed): test-side. 4th hand card sits off-screen in the horizontal tray (needs scrollIntoView before tap); step regexes used "Attack N" but halves read "Hit N"; `#playbtn` only exists on a pick (optional); real-time waits (15-20 s each) replaced by turbo + 3 s caps.
+- Real game bug fixed (ui2.js doMove): tapping the two cards in non-hand order was refused ("Not now"). The first-tapped card leads, so both orders are now legal.
+- Test now runs in ~30 s for both sizes (was hanging past 60 s). pick, halves, finish PASS. Still failing in lessons-test.js (script-side, not game): shield solve (crab ends hp 1: check which half is tapped), retal wrong/solve, door, coin (turn stays in 'second' ask: play the second half or ENGINE step), hint-twice ring not found, atk glow missing in retal. Only 7 lessons exist, not 10.
+- Run: cd games-src && python3 wickdeep/build.py && DBG=1 PW_DIR=$(npm root -g)/playwright node wickdeep/lessons-test.js
+- Start screenshots removed from the branch; test writes none.

@@ -150,7 +150,7 @@
     var os = saveGame; saveGame = function () { if (!GXST.active()) return os.apply(this, arguments); };
     var oh = humanMove; humanMove = function (k) { var r = oh.apply(this, arguments); if (r && GXST.active() && !/^(done|seldone)$/.test(k)) L.n++; return r; };
     window.TBL = { L: L, stack: stack, lessons: lessons, until: until };
-    if (lessons.length) GXST.init({ game: 'thornbound', scenarios: lessons, keepClear: ['#handw', '#rivals', '#tbturn', '#act', '#cstrip'], settled: function () { return !!(G && G.over) || (!UI.busy && !UI.card && !UI.pumping); } });
+    if (lessons.length) GXST.init({ game: 'thornbound', scenarios: lessons, keepClear: ['#handw', '#rivals', '#tbturn', '#act', '#cstrip', '.gx-bar h1', 'h1.logo'], settled: function () { return !!(G && G.over) || (!UI.busy && !UI.card && !UI.pumping); } });
   };
   setTimeout(go, 300);
 })();

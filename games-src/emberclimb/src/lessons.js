@@ -25,6 +25,9 @@
   var turn = function () { return inFight() ? G().b.turn : 99; };
   var cardIdx = function (id) { var h = hero().hand; for (var i = 0; i < h.length; i++) if (h[i].id === id) return i; return -1; };
   var cardEl = function (id) { return function () { var i = cardIdx(id); return i < 0 ? null : $('.hand .card[data-c="' + i + '"]'); }; };
+  // multi-step moves: the ring follows the move, card by card (L.n = plays so far), then End turn
+  var seq = function (ids) { return function () { return cardEl(ids[Math.min(L.n, ids.length - 1)])(); }; };
+  var thenEnd = function (n, f) { return function () { var e = $('#end'); return L.n >= n && e && e.getBoundingClientRect().width > 1 ? e : f(); }; };
   var lost = function () { return hero().mhp - hero().hp; };
   // count real card plays / potions (par)
   var op = E.performMove; E.performMove = function (m) { var r = op.apply(this, arguments); if (r && L.on && m && (m.t === 'play' || m.t === 'pot')) L.n++; return r; };
@@ -59,42 +62,42 @@
       setup: function () { stage({ foes: one(80, 8), hand: ['w-strike', 'w-defend', 'w-strike', 'w-strike', 'w-defend'] }); },
       success: function () { return round2() && lost() === 0; },
       fail: function () { return round2() && lost() > 0 ? 'It hit you for ' + lost() + '. Block must be on you before the turn ends: Plate Guard gives 8.' : false; },
-      hints: ['The foe is about to bite. Look at the sword number over it.', { say: 'Play Plate Guard, then End turn.', target: cardEl('w-defend') }],
+      hints: ['The foe is about to bite. Look at the sword number over it.', { say: 'Play Plate Guard, then End turn.', target: thenEnd(1, cardEl('w-defend')) }],
       debrief: 'Plate Guard took the whole bite: 8 Block against 8 damage.' },
     { id: 'intent', title: 'Read the intent', rule: 'The sign over a foe shows its next move and how big it is.', par: 3,
       goal: 'The foe plans a huge hit. Take none of it.',
       setup: function () { stage({ foes: one(80, 24), hand: ['w-defend', 'w-strike', 'w-defend', 'w-strike', 'w-defend'] }); },
       success: function () { return round2() && lost() === 0; },
       fail: function () { return round2() && lost() > 0 ? 'It hit for ' + lost() + '. The sign said 24; each Plate Guard blocks 8, so you needed three.' : false; },
-      hints: ['Read the number over the foe, then count your Block.', { say: '24 damage needs three Plate Guards (3 x 8).', target: cardEl('w-defend') }],
+      hints: ['Read the number over the foe, then count your Block.', { say: '24 damage needs three Plate Guards (3 x 8).', target: thenEnd(3, cardEl('w-defend')) }],
       debrief: 'Read the sign first: 24 incoming, 3 x 8 Block.' },
     { id: 'vuln', title: 'Vulnerable', rule: 'A Vulnerable foe takes double damage from hits. Apply it first.', par: 2,
       goal: 'Defeat the Ooze Drop (32 HP) this turn.',
       setup: function () { stage({ foes: one(32, 8), hand: ['w-strike', 'w-strike', 'w-hammer', 'w-strike', 'w-defend'] }); },
       success: function () { return !alive().length; },
       fail: function () { return alive().length && (hero().en === 0 || ended()) ? 'Not enough damage. Vulnerable doubles later hits, so Anvil Blow has to land BEFORE the Strike.' : false; },
-      hints: ['Three Strikes only make 24. What card makes hits count double?', { say: 'Anvil Blow (16) first, then Strike hits for 16.', target: cardEl('w-hammer') }],
+      hints: ['Three Strikes only make 24. What card makes hits count double?', { say: 'Anvil Blow (16) first, then Strike hits for 16.', target: seq(['w-hammer', 'w-strike']) }],
       debrief: 'Anvil Blow 16, then a doubled Strike 16: 32.' },
     { id: 'weak', title: 'Weak', rule: 'A Weak foe hits 8 less per hit. Exhaust cards leave the fight once played.', par: 1,
       goal: 'End your turn without losing HP. You have no Block card.',
       setup: function () { stage({ foes: one(80, 8), hand: ['w-strike', 'w-roar', 'w-strike', 'w-strike', 'w-strike'] }); },
       success: function () { return round2() && lost() === 0; },
       fail: function () { return round2() && lost() > 0 ? 'It hit for ' + lost() + '. Weak makes a foe hit 8 less: Intimidating Roar costs 0 and weakens it.' : false; },
-      hints: ['Nothing here blocks. What else can blunt an attack?', { say: 'Play Intimidating Roar (cost 0), then End turn.', target: cardEl('w-roar') }],
+      hints: ['Nothing here blocks. What else can blunt an attack?', { say: 'Play Intimidating Roar (cost 0), then End turn.', target: thenEnd(1, cardEl('w-roar')) }],
       debrief: 'Weak took 8 off an 8 bite. Roar is exhausted: gone for this fight.' },
     { id: 'poison', title: 'Poison', rule: 'Poison hurts at the end of your turn, ignores Block and never wears off.', par: 1,
       goal: 'Defeat the shielded foe by the end of your turn.',
       setup: function () { stage({ foes: one(16, 8, 80), hand: ['w-strike', 'w-strike', 'w-defend', 'w-strike', 'w-defend'], pots: ['venom-vial'] }); },
       success: function () { return !alive().length; },
       fail: function () { return alive().length && ended() ? 'It lives: 80 Block shrugs off Strikes. Poison ignores Block: drink the Venom Vial, then End turn.' : false; },
-      hints: ['Its Block is huge. Is there something Block cannot stop?', { say: 'Drink the Venom Vial (potion bar), then End turn.', target: '.pots .pot.full' }],
+      hints: ['Its Block is huge. Is there something Block cannot stop?', { say: 'Drink the Venom Vial (potion bar), then End turn.', target: thenEnd(1, function () { return $('.pots .pot.full'); }) }],
       debrief: 'Poison ignores Block: 2 tokens x 8 = 16 at turn end.' },
     { id: 'strength', title: 'Strength', rule: 'Strength adds damage to every hit, and a Power card lasts the whole fight.', par: 3,
       goal: 'Defeat the Ooze Drop (32 HP) this turn.',
       setup: function () { stage({ foes: one(32, 8), hand: ['w-strike', 'w-kindle', 'w-strike', 'w-strike', 'w-defend'] }); },
       success: function () { return !alive().length; },
       fail: function () { return alive().length && (hero().en === 0 || ended()) ? 'Three plain Strikes make only 24. Kindle gives +8 to every hit, so play it first.' : false; },
-      hints: ['Three Strikes make 24. What makes each one bigger?', { say: 'Kindle (cost 1), then two Strikes of 16.', target: cardEl('w-kindle') }],
+      hints: ['Three Strikes make 24. What makes each one bigger?', { say: 'Kindle (cost 1), then two Strikes of 16.', target: seq(['w-kindle', 'w-strike', 'w-strike']) }],
       debrief: 'Kindle: +8 on each hit. Two Strikes of 16 = 32.' },
     { id: 'sweep', title: 'Hit them all', rule: 'Most cards hit one foe you tap. A hit-all card strikes every foe.', par: 1,
       goal: 'Defeat all three foes this turn.',
@@ -131,7 +134,11 @@
     GXST.init({ game: 'emberclimb', scenarios: lessons, keepClear: ['.hand', '.en', '#end', '.pots', '.ec-potpop', '.reward'], settled: function () { var g = G(); return !UI.busy && (g.scr !== 'battle' || (g.b && g.b.ph === 'p')); } });
     window.addEventListener('gxst', function (ev) {
       var t = ev.detail && ev.detail.type;
-      if (t === 'close' && L.on && UI.mode === 'game') { L.on = false; window.EC_NOSAVE = 0; UI.mode = 'title'; UI.sub = ''; UI.ov = null; try { UI.render(); } catch (e) { } }
+      if (t === 'close' && L.on && UI.mode === 'game') {
+        var fin = GXST.state() && GXST.state().i === lessons.length - 1;   // closed from the last lesson: go on into a real climb, not back to the title
+        L.on = false; window.EC_NOSAVE = 0; UI.sub = ''; UI.ov = null;
+        if (fin) { try { UI.pick = ['w']; UI.acts = 1; UI.start(); return; } catch (e) { } }
+        UI.mode = 'title'; try { UI.render(); } catch (e) { } }
     });
     if (/[?&]lessons=1/.test(location.search)) GXST.picker();
   };

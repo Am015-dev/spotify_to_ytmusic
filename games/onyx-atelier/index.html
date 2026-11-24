@@ -314,11 +314,13 @@ body{background-color:var(--lac);background-image:
 #coach{position:fixed;left:0;top:0;width:0;height:0;z-index:45}
 #coach .tmap{position:fixed;left:0;top:0;width:100vw;height:100vh;pointer-events:none;overflow:visible}
 #coach .tmap line{stroke:#f1d68c;stroke-width:1.5;stroke-dasharray:3 2}#coach .tmap circle{fill:#f1d68c}
-#coach .tlab{position:fixed;min-height:30px;padding:3px 9px;border-radius:15px;border:1px solid #1d160a;background:#f1e3bf;color:#1d160a;font:700 12px/1.1 inherit;font-family:inherit;white-space:nowrap;box-shadow:0 2px 6px rgba(0,0,0,.6);cursor:pointer}
-#coach .tlab.on{background:#f1d68c;outline:2px solid #fff}
+#coach .tleg{display:flex;flex-wrap:wrap;gap:4px;margin:4px 0}#coach .tleg:empty{display:none}
+#coach .tlab{min-height:36px;padding:2px 10px;border-radius:18px;border:1px solid #1d160a;background:#e6d4a6;color:#1d160a;font:700 13px/1.1 inherit;font-family:inherit;white-space:nowrap;cursor:pointer}
+#coach .tcall{position:fixed;padding:6px 12px;border-radius:14px;background:#f1d68c;color:#1d160a;font:700 15px/1.1 inherit;font-family:inherit;white-space:nowrap;box-shadow:0 3px 10px rgba(0,0,0,.7);outline:2px solid #fff;pointer-events:none}
+#coach .tlab.on{background:#f1d68c;outline:2px solid #1d160a}
 #coach .tring{position:fixed;display:none;pointer-events:none;border-radius:12px;border:3px solid #f1d68c;box-shadow:0 0 12px rgba(241,214,140,.8);animation:tpulse 1.4s ease-in-out infinite}
 @keyframes tpulse{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(1.06);opacity:.55}}
-#coach .twin{position:fixed;left:8px;top:60px;width:min(320px,calc(100vw - 16px));box-sizing:border-box;background:#f1e3bf;color:#1d160a;border-radius:12px;padding:6px 12px 10px;font-size:15px;line-height:1.3;box-shadow:0 6px 18px rgba(0,0,0,.6)}
+#coach .twin{position:fixed;left:8px;top:60px;width:min(360px,calc(100vw - 16px));box-sizing:border-box;background:#f1e3bf;color:#1d160a;border-radius:12px;padding:6px 12px 10px;font-size:15px;line-height:1.3;box-shadow:0 6px 18px rgba(0,0,0,.6)}
 #coach .thead{display:flex;align-items:center;gap:4px;margin:0 -6px 2px 0;cursor:move;touch-action:none;user-select:none}
 #coach .tno{flex:1 1 auto;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:#6b5420}
 #coach .tb{min-width:36px;min-height:36px;border:0;border-radius:8px;background:#1d160a;color:#f1d68c;font:700 17px/1 inherit;font-family:inherit;padding:0}
@@ -345,6 +347,20 @@ button.sbox{font-family:inherit;cursor:pointer;min-height:44px}
 .pcols{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}.pc{border:1px solid rgba(216,180,90,.28);border-radius:8px;padding:4px 2px;text-align:center;background:var(--lac2)}
 .pc .gm{width:26px;height:26px}.pc b{display:block;font-size:16px}.pc span{font-size:13px;color:var(--gold2)}
 .log{margin:0;padding-left:22px;font-size:14px;line-height:1.5}.log li{margin:0 0 3px}
+/* PC (>= 1000px): board left and large, rival / jewels / you on the right; no dead black */
+@media (min-width:1000px) and (min-height:560px){
+#app.wide{max-width:none;display:grid;grid-template-columns:auto minmax(0,1fr);grid-template-rows:44px auto minmax(0,1fr) auto;column-gap:24px;padding:8px 20px;
+ grid-template-areas:"bar bar" "mid rival" "mid pyr" "mid me"}
+#app.wide #bar{grid-area:bar;padding-bottom:0!important;flex-basis:auto!important}#app.wide #rival{grid-area:rival}#app.wide #pyr{grid-area:pyr;justify-content:space-evenly;align-items:center}
+#app.wide #mid{grid-area:mid;align-self:center;gap:14px}#app.wide #me{grid-area:me}
+#app.wide #pyr>*{justify-content:center}
+#app.wide #side{max-width:190px;min-width:150px;gap:10px}#app.wide .sbox{font-size:16px;padding:6px}
+#app.wide .ps .top{font-size:17px;min-height:34px}#app.wide .ps .nm{font-size:19px}#app.wide .race span,#app.wide .resb{font-size:16px}
+#app.wide .race b{font-size:18px}#app.wide .race svg{width:20px;height:20px}
+#app.wide .col{min-height:64px}#app.wide .col .gm{width:32px;height:32px}#app.wide .col .tn{font-size:18px}#app.wide .col .bn{font-size:15px}
+#app.wide #rival .col{min-height:34px}#app.wide #rival .col .gm{width:22px;height:22px}#app.wide #rival .col .tn{font-size:16px}
+#app.wide #status{font-size:20px}#app.wide .av{width:84px}
+#app.wide #me{border-radius:14px}}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 @media (min-height:760px){.ps .top{font-size:14px}.col{min-height:50px}.col .gm{width:26px;height:26px}}
 </style>
@@ -1462,7 +1478,14 @@ var UI = (function () {
     el.textContent = s;
   }
   function layout() {
-    var app = $('#app'), W = Math.min(app.clientWidth - 12, 548), H = app.clientHeight - parseFloat(getComputedStyle(app).paddingTop) - parseFloat(getComputedStyle(app).paddingBottom), rs = document.documentElement.style;
+    var app = $('#app'), wide = innerWidth >= 1000 && innerHeight >= 560; app.classList.toggle('wide', wide);
+    if (wide) { // PC: board big on the left, rival / jewels / you stacked on the right
+      var HH = app.clientHeight, cl = Math.max(52, Math.min(112, Math.floor((HH - 44 - 40) / 5))), st = document.documentElement.style; st.setProperty('--cell', cl + 'px');
+      var RW = app.clientWidth - (5 * cl + 10 + 14 + 190) - 64, usedR = $('#rival').offsetHeight + $('#me').offsetHeight + 24, phh = HH - 44 - usedR, rh = Math.floor((phh - 12) / 3);
+      var chh = Math.max(60, Math.min(rh, 150)), cww = Math.floor(Math.min((RW - 6 * 8) / 6, chh * 0.8));
+      st.setProperty('--ch', chh + 'px'); st.setProperty('--cw', cww + 'px'); st.setProperty('--rg', '8px'); var b0 = $('#bar'), o0 = $('#obj'); if (b0 && o0) { o0.style.top = Math.round(b0.getBoundingClientRect().top + 3) + 'px'; o0.style.left = '64px'; o0.style.transform = 'none'; } return;
+    }
+    var W = Math.min(app.clientWidth - 12, 548), H = app.clientHeight - parseFloat(getComputedStyle(app).paddingTop) - parseFloat(getComputedStyle(app).paddingBottom), rs = document.documentElement.style;
     var used = $('#bar').offsetHeight + $('#rival').offsetHeight + $('#me').offsetHeight + 12;
     var cellMax = Math.floor(Math.min((W - 100 - 16) / 5, 58)), cell = Math.max(30, cellMax), ch, cw, rg, tries = 0;
     // fit the whole stack (market 3 rows, then board + side, inside the viewport): shrink the board until the measured middle row and the market both fit
@@ -1475,7 +1498,7 @@ var UI = (function () {
       cell = Math.max(30, cell - Math.max(2, Math.ceil((48 - rowH) * 3 / 5)));
     } while (++tries < 12);
     rs.setProperty('--ch', ch + 'px'); rs.setProperty('--cw', cw + 'px'); rs.setProperty('--rg', rg + 'px');
-    var bar = $('#bar'), ob = $('#obj'); if (bar && ob) ob.style.top = Math.round(bar.getBoundingClientRect().top + 46) + 'px';   // the goal card sits in the bar's lower strip, below the title and the safe area
+    var bar = $('#bar'), ob = $('#obj'); if (bar && ob) { ob.style.top = Math.round(bar.getBoundingClientRect().top + 46) + 'px'; ob.style.left = ''; ob.style.transform = ''; }   // the goal card sits in the bar's lower strip, below the title and the safe area
   }
 
   // ---------- fx ----------
@@ -1936,7 +1959,7 @@ var OTUT = (function () {
     c.innerHTML = '<svg class="tmap" aria-hidden="true"></svg><div class="tlabels"></div><div class="tring" aria-hidden="true"></div>' +
       '<div class="twin" role="dialog" aria-label="Guide"><div class="thead"><span class="tno"></span><button class="tb" data-tq aria-label="Show the screen map">?</button>' +
       '<button class="tb" data-tmin aria-label="Minimise the guide">&#8211;</button><button class="tb" data-tx aria-label="Close the guide">&#215;</button></div>' +
-      '<b class="ttl"></b><p class="tsay"></p><p class="twhy"></p><ul class="tchk"></ul><div class="tfoot"><button class="btn" data-tnext></button></div></div>' +
+      '<b class="ttl"></b><p class="tsay"></p><p class="twhy"></p><div class="tleg"></div><ul class="tchk"></ul><div class="tfoot"><button class="btn" data-tnext></button></div></div>' +
       '<button class="tchip" data-tchip aria-label="Open the guide"></button>';
     document.body.appendChild(c);
     c.addEventListener('click', function (e) {
@@ -1981,39 +2004,28 @@ var OTUT = (function () {
   }
   // ---- map labels: each label sits near its part, clear of every other label and the window, with a leader line
   function layoutMap() {
-    var c = root(), lab = c.querySelector('.tlabels'), svg = c.querySelector('.tmap'), w = c.querySelector('.twin');
-    if (!T.mapOn) { lab.innerHTML = ''; svg.innerHTML = ''; return; }
+    var c = root(), lab = c.querySelector('.tlabels'), svg = c.querySelector('.tmap'), w = c.querySelector('.twin'), leg = c.querySelector('.tleg');
+    if (!T.mapOn) { lab.innerHTML = ''; svg.innerHTML = ''; leg.innerHTML = ''; return; }
     var W = innerWidth, H = innerHeight, items = MAP.map(function (m, i) { return { m: m, i: i, r: R(m.sel) }; }).filter(function (x) { return x.r; });
-    if (!lab.children.length) lab.innerHTML = items.map(function (x) { return '<button class="tlab" data-map="' + x.i + '">' + x.m.name + '</button>'; }).join('');
-    var placed = [], wr = w.style.display === 'none' ? null : R(w), small = items.filter(function (x) { return x.r.width * x.r.height < 9000; }).map(function (x) { return x.r; }), lines = '';
-    items.forEach(function (x) {
-      var el = lab.querySelector('[data-map="' + x.i + '"]'); if (!el) return;
-      el.classList.toggle('on', mapPick === x.i);
-      var bw = el.offsetWidth, bh = el.offsetHeight, r = x.r, cx = (r.left + r.right) / 2, cy = (r.top + r.bottom) / 2, best = null;
-      var big = r.width * r.height > 20000, cands = [];
-      [0, 14, 30, 48, 70, 96].forEach(function (d) {
-        cands.push([cx - bw / 2, r.bottom + d], [cx - bw / 2, r.top - d - bh], [r.right + d, cy - bh / 2], [r.left - d - bw, cy - bh / 2],
-          [r.right + d - bw, r.bottom + d], [r.left - d, r.bottom + d], [r.right + d - bw, r.top - d - bh], [r.left - d, r.top - d - bh]);
-      });
-      if (big) for (var fx = 0.15; fx < 0.9; fx += 0.175) for (var fy = 0.1; fy < 0.95; fy += 0.2) cands.push([r.left + r.width * fx - bw / 2, r.top + r.height * fy - bh / 2]);
-      cands.forEach(function (p, k) {
-        var b = { left: p[0], top: p[1], right: p[0] + bw, bottom: p[1] + bh };
-        if (b.left < 4 || b.right > W - 4 || b.top < 4 || b.bottom > H - 4) return;
-        if (placed.some(function (o) { return hit(b, o, 3); })) return;
-        if (wr && hit(b, wr, 4)) return;
-        var sc = Math.hypot((b.left + b.right) / 2 - cx, (b.top + b.bottom) / 2 - cy) * (big ? 0.2 : 1);
-        small.forEach(function (s) { if (s !== r && hit(b, s)) sc += 400; });
-        if (!best || sc < best.sc) best = { sc: sc, b: b };
-      });
-      if (!best) { el.style.display = 'none'; return; }
-      el.style.display = ''; el.style.left = Math.round(best.b.left) + 'px'; el.style.top = Math.round(best.b.top) + 'px'; placed.push(best.b);
-      var lx = (best.b.left + best.b.right) / 2, ly = (best.b.top + best.b.bottom) / 2;
-      var tx = Math.max(r.left + 3, Math.min(r.right - 3, lx)), ty = Math.max(r.top + 3, Math.min(r.bottom - 3, ly));
-      if (big && lx > r.left && lx < r.right && ly > r.top && ly < r.bottom) { tx = lx; ty = best.b.top - 6 < r.top ? ly : best.b.top - 6; }
-      var sx = Math.max(best.b.left, Math.min(best.b.right, tx)), sy = Math.max(best.b.top, Math.min(best.b.bottom, ty));
-      lines += '<line x1="' + sx + '" y1="' + sy + '" x2="' + tx + '" y2="' + ty + '"/><circle cx="' + tx + '" cy="' + ty + '" r="3"/>';
+    // the part names are a tidy list inside the window; only the part you pick gets ONE callout on the board
+    var lg = items.map(function (x) { return '<button class="tlab' + (mapPick === x.i ? ' on' : '') + '" data-map="' + x.i + '">' + x.m.name + '</button>'; }).join('');
+    if (leg.innerHTML !== lg) leg.innerHTML = lg;
+    lab.innerHTML = ''; svg.innerHTML = ''; svg.setAttribute('viewBox', '0 0 ' + W + ' ' + H);
+    var pk = items.filter(function (x) { return x.i === mapPick; })[0]; if (!pk) return;
+    var r = pk.r; lab.innerHTML = '<span class="tcall">' + pk.m.name + '</span>'; var el = lab.firstChild, bw = el.offsetWidth, bh = el.offsetHeight, wr = w.style.display === 'none' ? null : R(w), best = null;
+    var cx = (r.left + r.right) / 2, cy = (r.top + r.bottom) / 2, cands = [];
+    [8, 24, 48, 80].forEach(function (d) { cands.push([cx - bw / 2, r.bottom + d], [cx - bw / 2, r.top - d - bh], [r.right + d, cy - bh / 2], [r.left - d - bw, cy - bh / 2]); });
+    cands.push([cx - bw / 2, r.top + 6]);
+    cands.forEach(function (p) {
+      var b = { left: p[0], top: p[1], right: p[0] + bw, bottom: p[1] + bh };
+      if (b.left < 4 || b.right > W - 4 || b.top < 4 || b.bottom > H - 4) return;
+      if (wr && hit(b, wr, 4)) return;
+      var sc = Math.hypot((b.left + b.right) / 2 - cx, (b.top + b.bottom) / 2 - cy); if (!best || sc < best.sc) best = { sc: sc, b: b };
     });
-    svg.setAttribute('viewBox', '0 0 ' + W + ' ' + H); svg.innerHTML = lines;
+    if (!best) { el.style.display = 'none'; return; }
+    el.style.left = Math.round(best.b.left) + 'px'; el.style.top = Math.round(best.b.top) + 'px';
+    var lx = (best.b.left + best.b.right) / 2, ly = (best.b.top + best.b.bottom) / 2, tx = Math.max(r.left + 3, Math.min(r.right - 3, lx)), ty = Math.max(r.top + 3, Math.min(r.bottom - 3, ly));
+    svg.innerHTML = '<line x1="' + Math.max(best.b.left, Math.min(best.b.right, tx)) + '" y1="' + Math.max(best.b.top, Math.min(best.b.bottom, ty)) + '" x2="' + tx + '" y2="' + ty + '"/><circle cx="' + tx + '" cy="' + ty + '" r="4"/>';
   }
   function showMap(on) { T.mapOn = on; if (!on) mapPick = null; var lab = $('#coach .tlabels'); if (lab) lab.innerHTML = ''; paint(); }
 
@@ -2040,7 +2052,8 @@ var OTUT = (function () {
     var sh = R('#sheet') || R('.modal'); if (sh) avoid.push(sh);
     if (s.cells) s.cells.forEach(function (k) { var r = R('.cell[data-cell="' + k + '"]'); if (r) avoid.push(r); });
     var tb = R('#takebtn'); if (tb) avoid.push(tb);
-    if (T.mapOn) MAP.forEach(function (m) { var r = R(m.sel); if (r) soft.push(r); });
+    if (innerWidth >= 1000) { var bd = R('#board'); if (bd && !T.mapOn) avoid.push(bd); ['#rival', '#pyr'].forEach(function (q) { var rv = R(q); if (rv && T.mapOn) avoid.push(rv); }); }   // PC: the guide never sits on the gem board
+    if (T.mapOn) { if (mapPick !== null) { var pr = R(MAP[mapPick].sel); if (pr) avoid.push(pr); } ['#board', '#pyr', '#me', '#side'].forEach(function (q) { var r = R(q); if (r) soft.push(r); }); }
     else ['#board', '#pyr', '#me', '#side'].forEach(function (q) { var r = R(q); if (r) soft.push(r); });
     if (!mini) placeWin(w, avoid, soft);
     layoutMap();
@@ -2093,7 +2106,7 @@ var OTUT = (function () {
     if (U.tut) { showMap(true); return; }
     var old = $('#coach'); if (old) old.remove();
     var c = document.createElement('div'); c.id = 'coach'; c.innerHTML = '<svg class="tmap" aria-hidden="true"></svg><div class="tlabels"></div>' +
-      '<div class="twin" role="dialog" aria-label="Screen map"><div class="thead"><span class="tno">Screen map</span><button class="tb" data-tx aria-label="Close the map">&#215;</button></div><p class="tsay">Tap any label to learn that part of the screen.</p></div>';
+      '<div class="twin" role="dialog" aria-label="Screen map"><div class="thead"><span class="tno">Screen map</span><button class="tb" data-tx aria-label="Close the map">&#215;</button></div><p class="tsay">Tap a part to see it on the board.</p><div class="tleg"></div></div>';
     document.body.appendChild(c);
     var saveT = T, pick = null; T = { mapOn: true };
     function draw() { var w = c.querySelector('.twin'); if (pick !== null) c.querySelector('.tsay').textContent = MAP[pick].name + ': ' + MAP[pick].say; mapPick = pick;

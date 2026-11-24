@@ -1,6 +1,215 @@
 [
  {
   "date": "2026-11-24",
+  "game": "rampart-and-vine",
+  "title": "Board fits the screen",
+  "items": [
+   "Top bar cut to 7 items; Rules and Diary open as closable windows",
+   "On desktop the board zooms to your tiles"
+  ],
+  "check": "Tap the top bar buttons, then close the Rules window"
+ },
+ {
+  "date": "2026-11-24",
+  "game": "thornbound",
+  "title": "Easier to read",
+  "items": [
+   "Top bar down to 5 buttons; Lessons now sit in the Menu",
+   "Goal, rival sub-stats, empty council boxes and the PC side log are hidden",
+   "Ten scenario lessons: learn bidding, stealing, placing, supporters, ties, herald, journey, favour, governing and a short game",
+   "Lessons button no longer covers the title; bigger text on desktop"
+  ],
+  "check": "Menu > Lessons: learn by playing"
+ },
+ {
+  "date": "2026-11-24",
+  "game": "twin-thrones",
+  "title": "Clearer tutorial and calmer screen",
+  "items": [
+   "A board tour names every area before your first move; the screen shows only the essentials, the rest opens from the menu"
+  ],
+  "check": ""
+ },
+ {
+  "date": "2026-11-24",
+  "game": "wildmark",
+  "title": "Wildmark: learn by playing",
+  "items": [
+   "Eight short lessons on the real board replace the floating tutorial: take and settle, keystone, acorns, sweep, land, bears, hawks, fox",
+   "Acorn counter no longer hides behind the Animal points button on phones"
+  ],
+  "check": "Tap ? and play the first lesson"
+ },
+ {
+  "date": "2026-11-24",
+  "game": "vinegrave",
+  "title": "Vinegrave: learn by playing",
+  "items": [
+   "New lessons: small scenarios, one rule each, with a retry and a short debrief"
+  ],
+  "check": "Open Lessons and play the first scenario"
+ },
+ {
+  "date": "2026-11-24",
+  "game": "redline-rally",
+  "title": "Redline Rally: learn by playing",
+  "items": [
+   "New lessons: corner, slipstream and more, one rule each, with a retry and a short debrief"
+  ],
+  "check": "Open Lessons and play the first scenario"
+ },
+ {
+  "date": "2026-11-24",
+  "game": "meadowfold",
+  "title": "Meadowfold: learn by playing",
+  "items": [
+   "Each guide instruction is attached to its glowing target",
+   "Main button text is easier to read",
+   "New lessons: pocket, stack, tree, fields, river, animal - one rule each, with a retry and a short debrief"
+  ],
+  "check": "Tap Learn to play and finish lesson 1"
+ },
+ {
+  "date": "2026-11-24",
+  "game": "tessera",
+  "title": "Via Tessera: learn by playing",
+  "items": [
+   "Guide bubbles sit next to their targets",
+   "Map fits the screen and labels are no longer cut off",
+   "New lessons: play a card, builder and more, one rule each, with a retry and a short debrief"
+  ],
+  "check": "Open Lessons and play the first scenario"
+ },
+ {
+  "date": "2026-11-24",
+  "game": "ochre",
+  "title": "Ochre Horizon: learn by playing",
+  "items": [
+   "New lessons: first greenery, stock and production, the rival and more, one rule each"
+  ],
+  "check": "Open Lessons and play the first scenario"
+ },
+ {
+  "date": "2026-11-24",
+  "game": "doorkick",
+  "title": "Doorkick Dungeon: lesson fixes",
+  "items": [
+   "Lessons read cleanly and no longer cover the board"
+  ],
+  "check": "Open Lessons and play the first scenario"
+ },
+ {
+  "date": "2026-11-24",
+  "game": "vale-of-banners",
+  "title": "Vale of Banners: lesson fixes",
+  "items": [
+   "Lessons read cleanly and no longer cover the board"
+  ],
+  "check": "Open Lessons and play the first scenario"
+ },
+ {
+  "date": "2026-11-24",
+  "game": "onyx-atelier",
+  "title": "Tidier guide, wide PC layout",
+  "items": [
+   "The guide shows one callout at a time instead of a cloud of chips",
+   "On PC the board sits left with rival, jewels and you stacked right"
+  ],
+  "check": "Play: first game teaches you, on a wide screen"
+ },
+ {
+  "date": "2026-11-24",
+  "game": "twinthrones",
+  "title": "Twin Thrones: learn by playing",
+  "items": [
+   "New lessons: small scenarios, one rule each, with a retry and a short debrief"
+  ],
+  "check": "Open Lessons and play the first scenario"
+ },
+ {
+  "date": "2026-11-24",
+  "game": "tidewake",
+  "title": "Tidewake: learn by playing",
+  "items": [
+   "New lessons: small scenarios, one rule each, with a retry and a short debrief"
+  ],
+  "check": "Open Lessons and play the first scenario"
+ },
+ {
+  "date": "2026-11-24",
+  "game": "cauldron",
+  "title": "Cauldron Fair: learn by playing",
+  "items": [
+   "New lessons: small scenarios, one rule each, with a retry and a short debrief"
+  ],
+  "check": "Open Lessons and play the first scenario"
+ },
+ {
+  "date": "2026-11-24",
+  "game": "rampart",
+  "title": "Rampart: learn by playing",
+  "items": [
+   "New lessons: small scenarios, one rule each, with a retry and a short debrief"
+  ],
+  "check": "Open Lessons and play the first scenario"
+ },
+ {
+  "date": "2026-11-24",
+  "game": "short-fuse",
+  "title": "Short Fuse: learn by playing",
+  "items": [
+   "New lessons: small scenarios, one rule each, with a retry and a short debrief"
+  ],
+  "check": "Open Lessons and play the first scenario"
+ },
+ {
+  "date": "2026-11-24",
+  "game": "lantern",
+  "title": "Lantern Dive: learn by playing",
+  "items": [
+   "New lessons: small scenarios, one rule each, with a retry and a short debrief"
+  ],
+  "check": "Open Lessons and play the first scenario"
+ },
+ {
+  "date": "2026-11-24",
+  "game": "sunglaze",
+  "title": "Sunglaze: learn by playing",
+  "items": [
+   "New lessons: small scenarios, one rule each, with a retry and a short debrief"
+  ],
+  "check": "Open Lessons and play the first scenario"
+ },
+ {
+  "date": "2026-11-24",
+  "game": "emberclimb",
+  "title": "Emberclimb: learn by playing",
+  "items": [
+   "New lessons: small scenarios, one rule each, with a retry and a short debrief"
+  ],
+  "check": "Open Lessons and play the first scenario"
+ },
+ {
+  "date": "2026-11-24",
+  "game": "kaiten",
+  "title": "Kaiten Kitchen: learn by playing",
+  "items": [
+   "New lessons: small scenarios, one rule each, with a retry and a short debrief"
+  ],
+  "check": "Open Lessons and play the first scenario"
+ },
+ {
+  "date": "2026-11-24",
+  "game": "crown",
+  "title": "Crown City Smash: playable lessons",
+  "items": [
+   "10 short lessons, each a real move with feedback",
+   "PC without 3D: dice and hints no longer cover the board"
+  ],
+  "check": "Menu > Lessons, play lesson 1"
+ },
+ {
+  "date": "2026-11-24",
   "game": "gloamwar",
   "title": "More readable map and guide",
   "items": [
@@ -9,25 +218,6 @@
    "Each phase says what to tap"
   ],
   "check": "Start the first scenario and tell me what you cannot read or understand"
- },
- {
-  "date": "2026-11-24",
-  "game": "tessera",
-  "title": "Clearer guide and map",
-  "items": [
-   "Guide bubbles sit next to their targets",
-   "Map fits the screen and labels are no longer cut off"
-  ],
-  "check": "Play the guided game on your phone and tell me what is still unclear"
- },
- {
-  "date": "2026-11-24",
-  "game": "meadowfold",
-  "title": "Guide next to what it points at",
-  "items": [
-   "Each guide instruction is attached to its glowing target"
-  ],
-  "check": "Start the guided game and tap only what is glowing"
  },
  {
   "date": "2026-11-24",

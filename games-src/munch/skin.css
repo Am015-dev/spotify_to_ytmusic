@@ -186,3 +186,6 @@ html:not(.ph) #prompt .tip{font-size:16px}
   html:not(.ph) .pile .card.xs{--w:clamp(84px,7vw,120px)}
   html:not(.ph) .bfcap,html:not(.ph) .bfcap.sm{font-size:20px}
 }
+html.sk .gx-ibtn.gxst-q{padding:0 14px}
+html.ph .gx-bar .gx-ibtn.gxst-q{font-size:0;padding:0;width:44px}
+html.ph .gx-bar .gx-ibtn.gxst-q::before{content:"?";font-size:22px;font-weight:700;line-height:1;color:var(--sk-cream)}

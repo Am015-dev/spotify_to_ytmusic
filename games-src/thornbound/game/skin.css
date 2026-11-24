@@ -118,3 +118,37 @@ html.desk:has(#main .opts) #road>*{visibility:hidden}
 .cd-sum .regs .rg-n{font-weight:700;color:#e8c867;margin-right:4px}
 /* F16b: phone portrait (taller than 620px): a slimmer turn strip gives the map ~10px more (two 16px lines still fit) */
 @media (min-height:621px) and (max-width:700px){html:not(.bf-w) #tbturn{height:62px;padding:3px 10px}html:not(.bf-w) #tbturn .tbt-line{max-height:54px}}
+/* W717 HUD diet: game screen shows only board, hand, whose turn, key resources */
+.tbt-goal{display:none!important}
+.rv .rv-t small{display:none!important}
+.cs-c:not(.cs-f):has(> span > em){display:none!important}
+#sidelog{display:none!important}
+@media (min-width:1024px){.st-t{display:none!important}}
+.gx-ibtn.gxst-q{display:none!important}
+/*W753 popups: children never shrink into each other, so a tall popup scrolls inside its own box and stays in the viewport*/
+.ppop:not([hidden]){max-height:min(86dvh,100dvh - 24px);overflow-y:auto;-webkit-overflow-scrolling:touch}
+.ppop:not([hidden])>*{flex-shrink:0}
+.ppop[data-kind=kc]:not([hidden]) .pp-row,.ppop[data-kind=card]:not([hidden]) .pp-row{flex-shrink:0}
+/* W754 readability pass (owner 24 Nov: "unreadable"): phone text >= 14px where the player decides, >= 12px elsewhere; pc >= 16px.
+   Solid plates behind text on the painting; hand cards show cost + name only (role is on the zoom). */
+.tb-map:not(.tb-compact) .tb-name{display:none}
+.tb-m-heralds text{display:none}
+.hcb i{display:none!important}
+.hcb b{font-size:14px!important;letter-spacing:-.3px!important}
+html.desk .hcb b{font-size:17px!important}
+@media (min-width:1024px){.gx-bar h1{font-size:18px}}
+html:not(.desk) #rivals .rv-t b{font-size:14px!important;letter-spacing:-.2px}
+html:not(.desk) .rv-n,html.ph .race-c.many .rv-n{font-size:20px!important;padding-right:2px}
+html:not(.desk) #cstrip .cs-c,html:not(.desk) #cstrip .cs-c b,html:not(.desk) #cstrip .cs-c span,html:not(.desk) #cstrip .cs-c em,html:not(.desk) #cstrip .cs-c i{font-size:15px!important}
+#cstrip .cs-c em{opacity:1!important;color:#f6e6b4}
+#cstrip .cs-c{background:rgba(20,10,8,.92)}
+html:not(.bf-w) body #tbturn .tbt-chip{font-size:15px!important}
+html.desk body #tbturn .tbt-chip,html.desk #rivals .rv-t b,html.desk #cstrip .cs-c,html.desk #cstrip .cs-c *{font-size:17px!important}
+html.desk .gxc-lab,html.desk .gxc-node small,html.desk .gxc-node b{font-size:17px!important}
+.gxc-lab{background:rgba(20,10,8,.9);color:#f6e6b4;padding:3px 8px;border-radius:8px}
+html.desk .ppop small,html.desk .ppop .hint,html.desk .ppop p,html.desk .ppop li,html.desk .ppop span{font-size:17px!important;line-height:1.4}
+html:not(.desk) .ppop small,html:not(.desk) .ppop .hint,html:not(.desk) .ppop p,html:not(.desk) .ppop li{font-size:15px!important;line-height:1.4}
+html.desk .gxc-act b,html.desk .gxc-act small,html.desk .gxc-sc-title,html.desk .ovwhy li,html.desk .ovwhy li span{font-size:17px!important}
+.gxc-act small{opacity:1!important}
+#rivals .rv-t b{line-height:1.3!important;padding-block:1px}
+html.desk .ppop:not([hidden]){padding-left:64px!important;padding-right:64px!important}

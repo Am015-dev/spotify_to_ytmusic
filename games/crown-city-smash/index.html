@@ -898,6 +898,7 @@ html.ph #choice .bfintro .goal .how li{position:relative;padding-left:20px;font-
 html.ph #choice .bfintro .goal .how li::before{content:'';position:absolute;left:4px;top:.45em;width:9px;height:9px;border-radius:50%;background:var(--mc,#ffd23f);box-shadow:0 0 0 2px #1a1320}
 html.ph .bfintro .you span{font-size:16px}
 html.ph-p header.gx-bar .pchip.me b{padding-right:24px}
+html.ph-p header.gx-bar .gxst-q{display:none}   /* phone header has no room: Lessons opens from the menu (tutStart -> picker) */
 html.ph #choice.bfpoke{animation:bfPoke .5s}
 @keyframes bfPoke{0%,100%{transform:none}30%{transform:translateY(-8px)}60%{transform:translateY(2px)}}
 html.ph-p .gx-dock[data-card="choice"] #choice h2{font-size:1.6rem}
@@ -1164,6 +1165,13 @@ html.ph-l #ob #pacts [data-act="end"]{min-height:60px}
 #ob .obbig .obbtns .btn{min-height:46px;min-width:110px;font-size:17px;font-weight:800;border-radius:12px;border:3px solid #1a1320;cursor:pointer}
 #ob .obbig .obbuy{background:#1f9d5c;color:#fff}
 #ob .obbig .obx{background:#fff;color:#1a1320}
+/* 2D board on desktop (body without .three): dice left of the monster cards, hint + SMASH right of them; the cards span x 418-948 at 1366 */
+@media (min-width:900px){
+html:not(.ph) body:not(.three) #ob #dicewrap{position:absolute;left:14px;right:14px;bottom:calc(10px + 90px);margin:0;pointer-events:none;z-index:4}
+html:not(.ph) body:not(.three) #ob #dice{display:grid;grid-template-columns:repeat(3,var(--dw));justify-content:center;gap:10px 8px;padding:0;width:calc(50% - 280px);pointer-events:auto}
+html:not(.ph) body:not(.three) #ob #preview{position:absolute;right:0;bottom:0;width:calc(50% - 290px);max-width:none;margin:0;font-size:15px}
+html:not(.ph) body:not(.three) #ob #pacts [data-act="resolve"]{justify-self:end}
+}
 
 /* W500: with a pinned card the big card lives in the space above the shop row; its art gives way when the screen is short */
 #ob #obcard.on{align-items:center;grid-template-rows:minmax(0,1fr);grid-template-columns:minmax(0,1fr)}
@@ -1655,6 +1663,39 @@ html.ph .bfintro .you img.mface{width:64px;height:64px;flex:none;object-fit:cont
 .gxt-pill.gxt-wait i:nth-child(2){animation-delay:.15s}.gxt-pill.gxt-wait i:nth-child(3){animation-delay:.3s}
 @keyframes gxtDot{0%,100%{opacity:.6;transform:scale(.8)}50%{opacity:1;transform:scale(1.1)}}
 @media (prefers-reduced-motion:reduce){.gxt-pill.gxt-wait i{animation:none;opacity:.8}}
+
+/* gx-scenario-tutor.css: scenario lesson card, picker, result card, hint ring (shell/gx-scenario-tutor.js, docs GXST.md).
+   Never dims, never blocks taps outside the card. Override with --gxst-* variables. */
+:root{--gxst-z:88;--gxst-bg:#fffaf0;--gxst-ink:#2e241c;--gxst-mute:#6b5a48;--gxst-head:#3b2f25;--gxst-on:#fffaf0;--gxst-acc:#e8907e;--gxst-ok:#5d9c58;--gxst-bad:#b5482f;--gxst-star:#e0a41c;--gxst-ring:#ffd36b}
+.gxst-card{position:fixed;left:8px;top:8px;z-index:var(--gxst-z);width:min(320px,calc(100vw - 16px));box-sizing:border-box;background:var(--gxst-bg);color:var(--gxst-ink);border:2px solid var(--gxst-head);border-radius:14px;box-shadow:0 8px 22px rgba(0,0,0,.3);font:15px/1.35 var(--gxh-font,system-ui,sans-serif);touch-action:none}
+.gxst-card.gxst-min{width:auto;background:none;border:0;box-shadow:none}
+.gxst-card.gxst-win{border-color:var(--gxst-ok)}.gxst-card.gxst-fail{border-color:var(--gxst-bad)}
+.gxst-hd{display:flex;align-items:center;padding:0 2px 0 12px;background:var(--gxst-head);color:var(--gxst-on);border-radius:11px 11px 0 0;cursor:move;user-select:none}
+.gxst-card.gxst-win .gxst-hd{background:var(--gxst-ok)}.gxst-card.gxst-fail .gxst-hd{background:var(--gxst-bad)}
+.gxst-hd b{font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.gxst-sp{flex:1}
+.gxst-ib{flex:none;width:44px;height:44px;border:0;background:none;color:var(--gxst-on);font-size:24px;line-height:1;border-radius:8px;cursor:pointer}
+.gxst-say,.gxst-goal{margin:10px 12px 4px;font-weight:700}
+.gxst-goal{font-size:16px}
+.gxst-hint{margin:4px 12px;padding:6px 8px;border-left:4px solid var(--gxst-star);background:rgba(224,164,28,.12);font-size:14px}
+.gxst-msg{margin:4px 12px 6px;font-size:14px}
+.gxst-rule{margin:2px 12px 6px;color:var(--gxst-mute);font-size:14px}
+.gxst-stars{margin:8px 12px 0;font-size:28px;line-height:1;color:var(--gxst-star);letter-spacing:4px}
+.gxst-ft{display:flex;gap:8px;padding:6px 10px 10px}
+.gxst-btn{min-height:44px;padding:0 14px;border-radius:10px;border:2px solid var(--gxst-head);background:transparent;color:var(--gxst-ink);font:700 15px/1 inherit;cursor:pointer}
+.gxst-btn.pri{background:var(--gxst-head);color:var(--gxst-on)}
+.gxst-btn:disabled{opacity:.5;cursor:default}
+.gxst-bulb::before{content:'';display:inline-block;width:10px;height:10px;margin-right:6px;border-radius:50%;background:var(--gxst-star);box-shadow:0 0 6px var(--gxst-star)}
+.gxst-list{margin:4px 8px 8px;padding:0;list-style:none;max-height:min(52vh,420px);overflow:auto}
+.gxst-pick{display:flex;align-items:center;gap:8px;width:100%;min-height:44px;margin:2px 0;padding:4px 8px;border:2px solid transparent;border-radius:10px;background:none;color:var(--gxst-ink);font:600 15px/1.2 inherit;text-align:left;cursor:pointer}
+.gxst-pick.rec{border-color:var(--gxst-acc)}
+.gxst-n{flex:none;width:26px;height:26px;border-radius:50%;background:var(--gxst-head);color:var(--gxst-on);display:grid;place-items:center;font-size:13px}
+.gxst-t{flex:1}.gxst-st{flex:none;color:var(--gxst-star);letter-spacing:1px}
+.gxst-chip{min-height:44px;max-width:calc(100vw - 16px);padding:4px 16px;border-radius:22px;background:var(--gxst-head);color:var(--gxst-on);border:2px solid var(--gxst-on);font:700 15px/1.2 var(--gxh-font,system-ui,sans-serif);box-shadow:0 4px 12px rgba(0,0,0,.3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:pointer}
+.gxst-ring{position:fixed;z-index:calc(var(--gxst-z) - 2);pointer-events:none;border-radius:14px;border:3px solid var(--gxst-ring);box-shadow:0 0 14px 3px var(--gxst-ring);animation:gxst-pulse 1.6s ease-in-out infinite}
+@keyframes gxst-pulse{0%,100%{opacity:.45;transform:scale(1)}50%{opacity:1;transform:scale(1.03)}}
+.gxst-q{min-height:44px;padding:0 12px;font-weight:700;cursor:pointer}
+.gxst-q.gxst-qfix{position:fixed;left:8px;bottom:8px;z-index:var(--gxst-z);border-radius:22px;background:var(--gxst-head);color:var(--gxst-on);border:2px solid var(--gxst-on)}
+@media (prefers-reduced-motion:reduce){.gxst-ring{animation:none;opacity:1}}
 
 /* Playable pass (W386): dice words, turn banner, steadier chips, readable lines. Every rule is additive. */
 .die[data-lab]::after{content:attr(data-lab);position:absolute;left:50%;bottom:-9px;transform:translateX(-50%);padding:1px 6px 2px;border-radius:7px;background:#1a1320;color:#fff;font:900 13px/14px Nunito,sans-serif;letter-spacing:.04em;white-space:nowrap;pointer-events:none;z-index:2}
@@ -3348,6 +3389,165 @@ const GX={key:'gx',open:null,
     index: function () { return S ? S.i : -1; }, goto: function (id) { if (!S) return false; for (var i = 0; i < cfg.steps.length; i++) if (cfg.steps[i].id === id) { clearVisuals(); enter(i); return true; } return false; },   /* test scenarios jump straight to a step (gx-scenario.js) */ state: state, skip: skip, stop: stop, next: next, relayout: relayout, lint: lint,
     status: status, isDone: function (g) { var s = status(g); return s.done || s.skipped; }, markDone: function (g) { mark(g, { done: 1, open: 0, step: 0 }); }, reset: function (g) { save(g, {}); try { localStorage.removeItem(key(g)); } catch (e) {} delete mem[g]; },
     menuHTML: menuHTML, label: label
+  };
+})();
+
+</script>
+<script>
+// gx-scenario-tutor.js: scenario tutorials (owner verdict, Nov 2026: tutorials must be GAMES). Each scenario puts the real board in a
+// small, stacked position with ONE objective; the player makes real moves and learns the rule from the consequence. A floating
+// objective card never dims and never blocks taps. Needs gx-scenario-tutor.css. ES5, no dependencies. Docs: shell/GXST.md.
+// (Global is GXST because GXS is already the ?scn= test registry in gx-scenario.js.)
+//   GXST.init({game, scenarios:[...], storageKey?, settled?:()=>bool, keepClear?:[selectors], qParent?, phoneSlot?:{after,before,avoid:[selectors]}, keepPlace?:bool})   GXST.picker() GXST.start(id) GXST.retry()
+//   GXST.next() GXST.hint() GXST.close() GXST.state()      events: window 'gxst' CustomEvent, detail.type =
+//   picker | start | hint | win | fail | retry | close
+//   scenario: {id, title, rule, goal, setup(), success()->bool, fail()->false|'message', par?, moves?()->n, hints:[nudge, {say, target}],
+//              debrief, solve?(api) (tests only)}
+(function () {
+  'use strict';
+  var D = document, C = null, S = null, W = null, R = null, Q = null, tick = 0, drag = null;
+  function $(s) { try { return D.querySelector(s); } catch (e) { return null; } }
+  function mk(tag, cls, txt) { var e = D.createElement(tag); if (cls) e.className = cls; if (txt != null) e.textContent = txt; e.setAttribute('data-help', ''); return e; }
+  function btn(cls, txt, aria, f) { var b = mk('button', cls, txt); b.type = 'button'; if (aria) b.setAttribute('aria-label', aria); b.onclick = function (ev) { ev.stopPropagation(); f(); }; return b; }
+  function emit(type, x) { var d = { type: type, game: C && C.game }; for (var k in x) d[k] = x[k]; var e; try { e = new CustomEvent('gxst', { detail: d }); } catch (er) { e = D.createEvent('CustomEvent'); e.initCustomEvent('gxst', false, false, d); } window.dispatchEvent(e); }
+  function vis(e) { if (!e || !e.getBoundingClientRect) return null; var r = e.getBoundingClientRect(); if (r.width < 2 || r.height < 2) return null; return { left: r.left, top: r.top, right: r.right, bottom: r.bottom, width: r.width, height: r.height }; }
+  function find(t) { if (!t) return null; if (typeof t === 'function') { try { return t(); } catch (e) { return null; } } var a; try { a = D.querySelectorAll(t); } catch (e) { return null; } for (var i = 0; i < a.length; i++) if (vis(a[i])) return a[i]; return null; }
+  function hit(a, b) { return a.left < b.right && a.right > b.left && a.top < b.bottom && a.bottom > b.top; }
+  function call(f, d) { if (typeof f !== 'function') return d; try { return f(); } catch (e) { return d; } }
+  // ------------------------------------------------------------ progress: best stars per scenario, card position
+  function key() { return C.storageKey || 'gxst-' + C.game; }
+  function load() { var o = null; try { o = JSON.parse(localStorage.getItem(key()) || 'null'); } catch (e) { } return o && typeof o === 'object' ? o : {}; }
+  function save() { try { localStorage.setItem(key(), JSON.stringify({ best: S.best, pos: S.pos })); } catch (e) { } }
+  function sc(id) { for (var i = 0; i < C.scenarios.length; i++) if (C.scenarios[i].id === id) return i; return -1; }
+  function cur() { return S.i >= 0 ? C.scenarios[S.i] : null; }
+  function stars() { var s = cur(), n = 3 - S.hint; if (s && s.par && call(s.moves, 0) > s.par) n--; return Math.max(1, n); }
+  function firstOpen() { for (var i = 0; i < C.scenarios.length; i++) if (!S.best[C.scenarios[i].id]) return i; return 0; }
+  function txt(v) { return typeof v === 'function' ? call(v, '') : v; }
+  function starTxt(n) { var t = ''; for (var i = 0; i < 3; i++) t += i < n ? '★' : '☆'; return t; }
+  // ------------------------------------------------------------ Lessons button (reopens the picker)
+  function qBtn() {
+    if (Q && D.body.contains(Q)) return;
+    Q = btn('gxst-q', 'Lessons', 'Lessons: learn by playing', function () { GXST.picker(); });
+    var p = (C.qParent && $(C.qParent)) || $('.gx-bar');
+    if (p) { Q.className = 'gx-ibtn gxst-q'; p.appendChild(Q); } else { Q.className += ' gxst-qfix'; D.body.appendChild(Q); }
+  }
+  // ------------------------------------------------------------ the card: picker | play | win | fail
+  function render() {
+    if (!S.open) { if (W) { W.remove(); W = null; } ring(); return; }
+    if (!W) { W = mk('div', 'gxst-card'); W.setAttribute('role', 'dialog'); W.setAttribute('aria-label', 'Lesson'); D.body.appendChild(W); wireDrag(); }
+    W.innerHTML = ''; W.className = 'gxst-card gxst-' + S.phase + (S.min ? ' gxst-min' : '');
+    var s = cur();
+    if (S.min) { W.appendChild(btn('gxst-chip', s && S.phase === 'play' ? s.title + ': ' + txt(s.goal) : 'Lessons', 'Open lesson card', function () { S.min = false; render(); })); place(); return; }
+    var hd = mk('div', 'gxst-hd');
+    hd.appendChild(mk('b', null, S.phase === 'picker' ? 'Learn by playing' : (S.i + 1) + '/' + C.scenarios.length + ' ' + s.title));
+    hd.appendChild(mk('span', 'gxst-sp'));
+    hd.appendChild(btn('gxst-ib', '–', 'Minimise', function () { S.min = true; render(); }));
+    hd.appendChild(btn('gxst-ib', '×', 'Close', function () { GXST.close(); }));
+    W.appendChild(hd);
+    var ft = mk('div', 'gxst-ft');
+    if (S.phase === 'picker') {
+      W.appendChild(mk('p', 'gxst-say', 'Short games on the real board. Each one teaches one rule.'));
+      var ol = mk('ol', 'gxst-list');
+      C.scenarios.forEach(function (x, i) {
+        var li = mk('li'), b = btn('gxst-pick' + (i === firstOpen() ? ' rec' : ''), null, 'Lesson ' + (i + 1) + ': ' + x.title, function () { GXST.start(x.id); });
+        b.setAttribute('data-id', x.id); b.appendChild(mk('span', 'gxst-n', String(i + 1))); b.appendChild(mk('span', 'gxst-t', x.title)); b.appendChild(mk('span', 'gxst-st', starTxt(S.best[x.id] || 0)));
+        li.appendChild(b); ol.appendChild(li);
+      });
+      W.appendChild(ol);
+    } else if (S.phase === 'play') {
+      W.appendChild(mk('p', 'gxst-goal', txt(s.goal)));
+      if (S.hint) { var h = s.hints[S.hint - 1]; W.appendChild(mk('p', 'gxst-hint', typeof h === 'string' ? h : h.say)); }
+      var hb = btn('gxst-btn gxst-bulb', S.hint ? (S.hint < s.hints.length ? 'Show me' : 'Hint shown') : 'Hint', 'Hint', function () { GXST.hint(); });
+      if (S.hint >= s.hints.length) hb.disabled = true;
+      ft.appendChild(hb); ft.appendChild(mk('span', 'gxst-sp'));
+      ft.appendChild(btn('gxst-btn', 'Restart', null, function () { GXST.retry(); }));
+    } else if (S.phase === 'win') {
+      W.appendChild(mk('p', 'gxst-stars', starTxt(S.stars)));
+      W.appendChild(mk('p', 'gxst-say', s.debrief));
+      W.appendChild(mk('p', 'gxst-rule', 'Rule: ' + s.rule));
+      ft.appendChild(btn('gxst-btn', 'Retry', null, function () { GXST.retry(); })); ft.appendChild(mk('span', 'gxst-sp'));
+      ft.appendChild(btn('gxst-btn pri', S.i < C.scenarios.length - 1 ? 'Next lesson' : 'All lessons', null, function () { GXST.next(); }));
+    } else if (S.phase === 'fail') {
+      W.appendChild(mk('p', 'gxst-say', 'Not quite.'));
+      W.appendChild(mk('p', 'gxst-msg', S.msg));
+      ft.appendChild(btn('gxst-btn', 'Lessons', null, function () { GXST.picker(); })); ft.appendChild(mk('span', 'gxst-sp'));
+      ft.appendChild(btn('gxst-btn pri', 'Retry', null, function () { GXST.retry(); }));
+    }
+    if (ft.children.length) W.appendChild(ft);
+    place();
+  }
+  function hintTarget() { var s = cur(); if (!s || S.phase !== 'play' || S.hint < 2) return null; var h = s.hints[S.hint - 1]; return h && typeof h === 'object' ? vis(find(h.target)) : null; }
+  // keep the card off the hinted target and the keepClear areas; a dragged position is kept unless it covers the hinted target
+  function place() {
+    if (!W) return; var vw = innerWidth, vh = innerHeight, bw = W.offsetWidth, bh = W.offsetHeight, t = hintTarget(), av = [];
+    (C.keepClear || []).forEach(function (sel) { var a; try { a = D.querySelectorAll(sel); } catch (e) { a = []; } for (var i = 0; i < a.length; i++) { var r = vis(a[i]); if (r) av.push(r); } });
+    function clamp(p) { return [Math.max(4, Math.min(vw - bw - 4, p[0])), Math.max(4, Math.min(vh - bh - 4, p[1]))]; }
+    function box(p) { return { left: p[0], top: p[1], right: p[0] + bw, bottom: p[1] + bh }; }
+    function cost(p) { var b = box(p), c = t && hit(b, t) ? 1e6 : 0; av.forEach(function (r) { var x = Math.min(b.right, r.right) - Math.max(b.left, r.left), y = Math.min(b.bottom, r.bottom) - Math.max(b.top, r.top); if (x > 0 && y > 0) c += x * y; }); return c; }
+    if (S.pos && !(S.min && C.phoneSlot && vw < 600)) { var q = clamp(S.pos); if (!(t && hit(box(q), t))) return put(q); }
+    var top = 4, bar = $('.gx-bar'); if (bar) { var br = bar.getBoundingClientRect(); if (br.top < 4 && br.height < 90) top = br.bottom + 6; }
+    var sp = [[8, top], [vw - bw - 8, top], [vw - bw - 8, vh - bh - 8], [8, vh - bh - 8]];
+    av.concat(t ? [t] : []).forEach(function (r) { sp.push([8, r.bottom + 6], [vw - bw - 8, r.bottom + 6], [8, r.top - bh - 6], [r.right + 6, r.top]); });
+    var best = null; sp.forEach(function (p, i) { p = clamp(p); var c = cost(p) + i * 0.01; if (!best || c < best.c) best = { p: p, c: c }; });
+    if (S.min && C.phoneSlot && vw < 600) {   // phone chip: keep the card's own spot when it is clear (no jump on open); else the chip gets a band just under phoneSlot.after or just above phoneSlot.before, never over phoneSlot.avoid items or the dock
+      var ps = C.phoneSlot, an = vis($(ps.after)), bf = vis($(ps.before)), ob = [], cs = [best.p];
+      (ps.avoid || []).forEach(function (sel) { var a; try { a = D.querySelectorAll(sel); } catch (e) { a = []; } for (var i = 0; i < a.length; i++) { var r = vis(a[i]); if (r) ob.push(r); } });
+      if (an) cs.push([8, an.bottom + 4]); if (bf) cs.push([8, bf.top - bh - 6]);
+      var pb = null; cs.forEach(function (c, k) { c = clamp(c); var b = box(c), v = t && hit(b, t) ? 1e6 : 0; ob.forEach(function (r) { if (hit(b, r)) v += 1; }); if (bf && b.bottom > bf.top) v += 1; if (!pb || v < pb.v) pb = { p: c, v: v }; });
+      if (pb && pb.v < 1e6) { W.style.left = '8px'; return put(pb.p); }
+    }
+    var cx = C.keepPlace && W.style.left ? clamp([parseFloat(W.style.left), parseFloat(W.style.top)]) : null;   // stay where you are unless somewhere is clearly better: a card that jumps while you reach for Retry is worse than a small overlap (opt-in: keepPlace)
+    if (cx && cost(cx) <= best.c + 0.5) best = { p: cx, c: 0 };
+    put(best.p);
+  }
+  function put(p) { W.style.left = Math.round(p[0]) + 'px'; W.style.top = Math.round(p[1]) + 'px'; }
+  function wireDrag() {
+    W.addEventListener('pointerdown', function (e) { if (!e.target.closest('.gxst-hd') || e.target.closest('button')) return; var r = W.getBoundingClientRect(); drag = [e.clientX - r.left, e.clientY - r.top, false]; try { W.setPointerCapture(e.pointerId); } catch (x) { } });
+    W.addEventListener('pointermove', function (e) { if (!drag) return; drag[2] = true; S.pos = [e.clientX - drag[0], e.clientY - drag[1]]; put(S.pos); });
+    W.addEventListener('pointerup', function () { if (drag && drag[2]) { save(); place(); } drag = null; });
+  }
+  // ------------------------------------------------------------ the "show me" ring: pointer-events none, never steals a tap
+  function ring() {
+    var t = S && S.open ? hintTarget() : null;
+    if (!t) { if (R) { R.remove(); R = null; } return; }
+    if (!R) { R = mk('div', 'gxst-ring'); D.body.appendChild(R); }
+    R.style.left = (t.left - 4) + 'px'; R.style.top = (t.top - 4) + 'px'; R.style.width = (t.width + 8) + 'px'; R.style.height = (t.height + 8) + 'px';
+  }
+  // ------------------------------------------------------------ judge: success / fail only when the game has settled (animations done)
+  function loop() {
+    if (!S || !S.open) return;
+    var s = cur();
+    if (S.phase === 'play' && S.live && call(C.settled, true)) {
+      if (call(s.success, false)) { S.stars = stars(); if ((S.best[s.id] || 0) < S.stars) S.best[s.id] = S.stars; S.phase = 'win'; S.min = false; save(); render(); emit('win', { id: s.id, stars: S.stars }); return; }
+      var f = call(s.fail, false); if (f) { S.phase = 'fail'; S.msg = String(f); S.min = false; render(); emit('fail', { id: s.id, msg: S.msg }); return; }
+    }
+    if (!drag) place(); ring();
+  }
+  function begin(i, how) {
+    S.i = i; S.phase = 'play'; S.hint = 0; S.msg = ''; S.stars = 0; S.open = true; S.min = false; S.live = false;
+    var s = cur(), tok = ++S.tok; render();
+    var r = null; try { r = s.setup(); } catch (e) { console.error(e); }
+    var go = function () { if (tok === S.tok) { S.live = true; place(); emit(how, { id: s.id, i: i }); } };
+    if (r && typeof r.then === 'function') r.then(go, go); else go();
+  }
+  window.GXST = {
+    init: function (cfg) {
+      C = cfg; var o = load(); S = { open: false, phase: 'picker', i: -1, hint: 0, best: o.best || {}, pos: o.pos || null, min: false, live: false, tok: 0, msg: '', stars: 0 };
+      qBtn(); if (!tick) { tick = setInterval(loop, 250); addEventListener('resize', function () { if (S && S.open) render(); }); }
+      return GXST;
+    },
+    picker: function () { if (!C) return; qBtn(); S.open = true; S.phase = 'picker'; S.min = false; S.tok++; S.live = false; render(); emit('picker', {}); },
+    start: function (id) { var i = typeof id === 'number' ? id : sc(id); if (i < 0) return; begin(i, 'start'); },
+    retry: function () { if (S.i < 0) return; begin(S.i, 'retry'); },
+    next: function () { if (S.i < C.scenarios.length - 1) begin(S.i + 1, 'start'); else GXST.picker(); },
+    hint: function () { var s = cur(); if (!s || S.phase !== 'play' || S.hint >= s.hints.length) return; S.hint++; render(); ring(); emit('hint', { id: s.id, level: S.hint }); },
+    close: function () { if (!S || !S.open) return; S.open = false; S.live = false; S.tok++; render(); emit('close', {}); },
+    active: function () { var s = S && S.open && S.phase !== 'picker' ? cur() : null; return s; },
+    state: function () {
+      if (!S) return null; var s = cur(), wr = W && vis(W), tr = hintTarget();
+      return { open: S.open, phase: S.phase, id: s && S.phase !== 'picker' ? s.id : null, i: S.i, live: S.live, hint: S.hint, stars: S.stars, msg: S.msg,
+        best: JSON.parse(JSON.stringify(S.best)), min: S.min, pos: S.pos, card: wr, target: tr, overlap: !!(wr && tr && hit(wr, tr)), count: C.scenarios.length };
+    }
   };
 })();
 
@@ -8642,7 +8842,7 @@ function tutSteps(){
   return S}
 // ---------------------------------------------------------------- start, leave, hooks
 function tutRelease(){TUT.hold=false;try{schedule()}catch(e){}}
-function tutStart(o){tutStartScripted(o)}   // the guided first game: one sentence and one highlighted tap per step, then a real game
+function tutStart(o){if(window.GXST){try{GXH.hide()}catch(e){}try{GXT.markDone(TUT_GAME)}catch(e){}GXST.picker();return}tutStartScripted(o)}   // the dimming guided game is retired: the tutorial is the scenario lessons (lessons.js)   // the guided first game: one sentence and one highlighted tap per step, then a real game
 function tutStartScripted(o){if(typeof GXT==='undefined')return;const pro=!!(o&&o.prologue),first=window.CAMPAIGN&&window.CAMPAIGN.chapters&&window.CAMPAIGN.chapters[0];
   GXT.start({game:TUT_GAME,steps:tutSteps(),story:!!(window.CAMPAIGN&&typeof GXC!=='undefined'),
     endTitle:'You know the rules',endText:pro?'Now the Story begins.':'Now a real game.',
@@ -8669,7 +8869,7 @@ function tutMenus(){const s=document.getElementById('gxtset');if(s)s.innerHTML=t
   document.querySelectorAll('[data-gxt-slot]').forEach(e=>{e.innerHTML=tutBtn(e.dataset.gxtSlot||'btn')})}
 // Story starts with the tutorial (Chapter 0) the first time; afterwards it opens the chapter map
 function storyOpen(){if(typeof GXC==='undefined')return;
-  if(typeof GXT!=='undefined'&&!GXT.status(TUT_GAME).seen)tutStart({prologue:true});else GXC.open()}
+  GXC.open()}
 // the game tells the kit what the player does, before it is applied
 (function(){const _ga=gameAct;gameAct=function(ds,seat){
   if(tutOn()&&!UI._tutIn){let a=null;
@@ -8968,6 +9168,172 @@ tutMenus();
     setTimeout(() => { for (let k = 0; k < 3; k++) idle(next) }, 4000);
   }
   if (typeof render === 'function') { const _r = render; render = function () { _r.apply(this, arguments); try { go() } catch (e) { } } }
+})();
+
+</script>
+<script>
+// Crown City Smash lessons: ten short scenario games on the shared engine (shell/gx-scenario-tutor.js, docs shell/GXST.md).
+// Each lesson sets a tiny real position on the real board (the game's own engine), gives ONE goal, scripts the dice and the rivals, judges the real state.
+// RULE -> LESSON TABLE (rules-notes.md, tutor.js TUT_RULES, the rules drawer):
+//   keep dice, three throws, three of a kind, a pair scores nothing ........ keep
+//   extra matching die +1, energy dice, empty Downtown: move in +1 ......... enter
+//   outside: claws hit the monster in Downtown ............................. claws
+//   in Downtown: claws hit every rival ..................................... city
+//   hearts heal outside Downtown ........................................... heal
+//   spend energy on power cards: permanent vs one-shot ..................... buy
+//   sweep the cards for 2 energy ........................................... sweep
+//   stay or yield after a hit; Downtown pays +2 stars at turn start ........ yield
+//   20 stars win at the END of your turn ................................... win20
+//   a short real game: first to 8 stars, last standing ..................... game
+//   NOT a lesson (rules drawer only): Harbor (5-6 monsters), evolutions, Brainjack, curses, expansions, each card's own text.
+(function () {
+  if (!window.GXST) return;
+  var L = { on: 0, n: 0, res: 0, t0: 0, mine: [], riv: [], re: [], feed: 0, frame: null };
+  var ready = function () { return typeof G !== 'undefined' && typeof newGame === 'function' && typeof render === 'function' && typeof UI !== 'undefined' && typeof resolve === 'function' && typeof nextTurn === 'function' && typeof startRoll === 'function'; };
+  var M = function () { return G.pl.filter(function (p) { return p.human; })[0]; };
+  var R = function () { return G.pl.filter(function (p) { return !p.human; }); };
+  var nm = function (p) { return mname(p); };
+  var until = function (f, ms) { var t0 = Date.now(); return new Promise(function (r) { (function w() { var ok = false; try { ok = f(); } catch (e) { } if (ok || Date.now() - t0 > ms) r(ok); else setTimeout(w, 50); })(); }); };
+  var q = function (s) { return function () { var e = document.querySelector(s); if (!e) return null; var r = e.getBoundingClientRect(); return r.width ? e : null; }; };
+  var die = function (k) { return q('#dice .die[data-die="' + k + '"]'); };
+  var SMASH = q('#pacts [data-act="resolve"]'), ROLL = q('#pacts [data-act="reroll"]'), END = q('#pacts [data-act="end"]'), SWEEP = q('#pacts [data-act="sweep"]');
+  var opt = function (o) { return q('#choice [data-opt="' + o + '"]'); };
+  var shop = function (k) { return function () { return q('#pshop [data-shop="' + k + '"]')() || q('#buymini [data-card="' + k + '"]')(); }; };
+  var keepers = function (p) { return p.cards.filter(function (c) { return CARDS[base(c)].t === 'K'; }).length; };
+
+  // ---- the position: a fresh solo table (fixed seed), then every number set by hand
+  function stack(sp) {
+    try { GX.close(); } catch (e) { } try { GXH.setEnabled(false); GXH.hide(); } catch (e) { }
+    L.on = 1; L.n = 0; L.res = 0;
+    L.mine = (sp.mine || []).map(function (f) { return f.slice(); }); L.riv = (sp.riv || []).map(function (f) { return f.slice(); }); L.re = (sp.re || []).map(function (f) { return f.slice(); });
+    var sv = { lvl: UI.lvl, xp: UI.xp, evo: UI.evo, ex: UI.ex, mon: UI.mon, n: UI.n };
+    UI.lvl = 'easy'; UI.xp = 'base'; UI.evo = false; UI.ex = {}; UI.mon = 0;
+    // a solo game (you vs computer monsters), no menus or story card, waiting at YOUR roll
+    var m = document.getElementById('modal'); if (m) { m.hidden = true; m.innerHTML = ''; }
+    try { AIDELAY = 60; UI.n = sp.n || 3; UI.firstGame = false; UI.intro = false; UI.adv = false; UI.coach = -1; UI.freeze = false; UI.tour = false; UI.tipSeen = {}; UI.info = false; UI.stats = false; setSeed(7); newGame('solo'); render(); } finally { Object.assign(UI, sv); }
+    return until(function () { return humanTurn() && G.phase === 'roll' && !UI.busy && !UI.choice && G.dice.length === 6; }, 15000).then(function () {
+      var me = M(), rv = R(), i;
+      G.pl.forEach(function (p) { G.disc.push.apply(G.disc, p.cards); p.cards = []; p.hp = 10; p.vp = 0; p.en = 0; p.tok = {}; p.alive = true; p.dmod = 0; p.evo = []; });
+      Object.assign(me, sp.me || {});
+      (sp.rv || []).forEach(function (d, k) { Object.assign(rv[k], d); });
+      G.city = sp.city === 'me' ? me.i : sp.city == null ? -1 : rv[sp.city].i; G.bay = -1; G.goal = sp.goal || 20; G.xq = []; G.winner = null;
+      if (sp.market) {
+        var all = sp.market.concat(sp.next || []);
+        G.deck = G.deck.concat(G.market, G.disc).filter(function (c) { return all.indexOf(c) < 0; }); G.market = sp.market.slice(); G.disc = [];
+        (sp.next || []).slice().reverse().forEach(function (c) { G.deck.push(c); }); G.ncards = cardTotal();
+      }
+      G.phase = 'roll'; G.step = 1; G.active = me.i; G.home = me.i; G.tf.startIn = [G.city, G.bay];
+      if (sp.dice === null) { setSeed(null); startRoll(me); }   // a real game: real random dice
+      else { G.dice = (sp.dice || ['1', '2', '3', 'E', 'H', 'C']).map(function (f) { return { f: f, k: false, x: false }; }); G.rolls = sp.rolls == null ? 2 : sp.rolls; }
+      UI.choice = null; UI.pick = null; UI.banner = ''; UI.busy = false; UI.info = false; G.log = []; try { BF.recap = ''; BF.rsA = G.active; } catch (e) { }
+      render();
+      L.t0 = G.tid;
+      if (sp.rivalsFirst) { G.dice = []; nextTurn(me); return until(function () { return UI.choice || (humanTurn() && G.phase === 'roll' && G.dice.length); }, 15000).then(function () { return new Promise(function (r) { setTimeout(r, 800); }); }); }
+      return new Promise(function (r) { setTimeout(r, 700); });
+    });
+  }
+  var settled = function () { if (!G || UI.busy || UI.choice) return false; var me = M(); if (!me) return false; return !!G.winner || !me.alive || (humanTurn() && (G.phase === 'roll' || G.phase === 'buy')); };
+  var res = function () { return L.res > 0; };
+
+  var lessons = [
+    { id: 'keep', title: 'Keep and reroll', rule: 'You throw 6 dice up to 3 times. Tap dice to keep them; the rest are rerolled. Three matching numbers score, a pair scores nothing.', par: 2,
+      goal: 'Score 3 stars from the dice.',
+      setup: function () { return stack({ city: 0, dice: ['3', '3', 'E', 'H', 'C', '1'], re: [['3', 'E', 'E', '2'], ['2', '1', 'E', 'E']] }); },
+      success: function () { return res() && M().vp >= 3; },
+      fail: function () { return res() && M().vp < 3 ? 'Only three matching numbers score. You kept a pair, and a pair scores nothing.' : false; },
+      hints: ['Two dice already match. Keep them and reroll the rest.', { say: 'Tap both 3s to keep them, tap Roll, then SMASH!', target: die(0) }],
+      debrief: 'Keep the pair, reroll the rest: three 3s score 3 stars.' },
+    { id: 'enter', title: 'Take Downtown', rule: 'A fourth matching die adds 1. When Downtown is empty you must move in: +1 star. Each energy die gives 1 energy.', par: 1,
+      goal: 'Reach 5 stars this turn.',
+      setup: function () { return stack({ dice: ['3', '3', '3', '3', 'E', 'H'], re: [['3', '1']] }); },
+      success: function () { return res() && M().vp >= 5 && G.city === M().i; },
+      fail: function () { return res() && M().vp < 5 ? 'You made ' + M().vp + ' stars. Four 3s score 4, and moving into the empty Downtown gives 1 more.' : false; },
+      hints: ['Count the 3s. Downtown is empty, so you will move in.', { say: 'Keep all four 3s and tap SMASH!', target: SMASH }],
+      debrief: 'Four 3s are 3 + 1 stars, and moving into Downtown is +1.' },
+    { id: 'claws', title: 'Claws outside', rule: 'Rolled from outside the city, claws hit only the monster in Downtown. One claw takes one heart.', par: 1,
+      goal: function () { var d = R()[0]; return 'Knock out ' + (d ? nm(d) : 'the monster in Downtown') + '.'; },
+      setup: function () { return stack({ city: 0, dice: ['C', 'C', 'C', '1', '2', 'E'], rv: [{ hp: 3 }, { hp: 5 }], re: [['1', '2', 'E']] }); },
+      success: function () { var d = R()[0]; return res() && (!d.alive || d.hp <= 0); },
+      fail: function () { var d = R()[0]; return res() && d.alive && d.hp > 0 ? nm(d) + ' has ' + d.hp + ' hearts left. One claw takes one heart: three claws knock out three hearts.' : false; },
+      hints: ['The monster in Downtown has 3 hearts. How many claws do you hold?', { say: 'Keep the three claws and tap SMASH!', target: SMASH }],
+      debrief: 'Three claws, three hearts: the Downtown monster is out.' },
+    { id: 'city', title: 'Claws from Downtown', rule: 'Rolled from Downtown, claws hit EVERY rival at once, wherever they stand.', par: 2,
+      goal: 'Knock out both rivals this turn.',
+      setup: function () { return stack({ city: 'me', dice: ['C', 'C', '3', '3', 'E', 'H'], rv: [{ hp: 3 }, { hp: 3 }], re: [['C', '2', 'E', '1']] }); },
+      success: function () { return res() && R().every(function (p) { return !p.alive || p.hp <= 0; }); },
+      fail: function () { var a = R().filter(function (p) { return p.alive && p.hp > 0; }); return res() && a.length ? 'Each claw hits every rival from Downtown, but you rolled too few: ' + nm(a[0]) + ' kept ' + a[0].hp + ' heart.' : false; },
+      hints: ['Both rivals have 3 hearts, and claws hit them both. You need three claws.', { say: 'Keep the two claws, reroll the rest, then SMASH!', target: die(0) }],
+      debrief: 'In Downtown every claw hits every rival: three claws, two knockouts.' },
+    { id: 'heal', title: 'Hearts heal', rule: 'Heart dice heal 1 each, but only outside Downtown. In Downtown they do nothing.', par: 2,
+      goal: 'Heal back up to 8 hearts.',
+      setup: function () { return stack({ city: 0, me: { hp: 4 }, dice: ['H', 'H', '3', '2', '1', 'E'], re: [['H', 'H', 'C', '2']] }); },
+      success: function () { return res() && M().hp >= 8; },
+      fail: function () { return res() && M().hp < 8 ? 'You healed to ' + M().hp + ' hearts. Each heart die heals 1, so you needed four hearts.' : false; },
+      hints: ['You start with 4 hearts and two heart dice. Four hearts heal 4.', { say: 'Keep both hearts, reroll the rest, then SMASH!', target: die(0) }],
+      debrief: 'Four heart dice, four hearts back: healing works outside Downtown only.' },
+    { id: 'buy', title: 'Buy a power card', rule: 'Spend energy on a face-up card. A Keep card (PERMANENT) works all game; a one-shot card works once and is gone.', par: 2,
+      goal: 'Buy a card that works all game.',
+      setup: function () { return stack({ city: 0, dice: ['E', 'E', 'E', 'E', '1', '2'], rolls: 0, market: ['cosmic', 'kiosk', 'plated'] }); },
+      success: function () { return keepers(M()) > 0; },
+      fail: function () {
+        if (G.tf.bought && !keepers(M()) && res()) return 'Corner Kiosk is one-shot: it gave 1 star and is gone. Pick a PERMANENT card.';
+        return G.tid > L.t0 && !keepers(M()) ? 'You ended the turn with energy unspent. Energy only buys cards.' : false; },
+      hints: ['SMASH! turns energy dice into energy, then cards you can afford light up.', { say: 'Tap SMASH!, then buy a card marked PERMANENT.', target: SMASH }],
+      debrief: 'A permanent card keeps working every turn.' },
+    { id: 'sweep', title: 'Sweep the cards', rule: 'Pay 2 energy to throw away all three face-up cards and deal three new ones.', par: 3,
+      goal: 'Buy a card, though none for sale is affordable now.',
+      setup: function () { return stack({ city: 0, me: { en: 5 }, dice: ['1', '2', '3', '1', '2', '3'], rolls: 0, market: ['acid', 'skull', 'egg'], next: ['cosmic', 'kiosk', 'plated'] }); },
+      success: function () { return M().cards.length > 0 && res(); },
+      fail: function () { return G.tid > L.t0 && !M().cards.length ? 'You ended the turn with 5 energy. The cards cost 6 or more: sweep for 2 to deal new ones.' : false; },
+      hints: ['The cards for sale all cost more than your 5 energy.', { say: 'Tap SMASH!, then Sweep, then buy a cheaper card.', target: SMASH }],
+      debrief: 'Sweep costs 2: you dealt cards you could afford.' },
+    { id: 'yield', title: 'Stay or yield', rule: 'Hit in Downtown, you choose: stay for +2 stars next turn but keep getting hit, or yield and run. A yielded Downtown goes to the attacker.', par: 1,
+      goal: 'Survive the round with your monster alive.',
+      setup: function () { return stack({ city: 'me', me: { hp: 3 }, dice: ['1', '2', '3', 'E', 'H', 'E'], riv: [['C', 'C', '1', '2', 'E', 'E'], ['C', 'C', '1', '2', 'E', 'E']], rivalsFirst: 1 }); },
+      success: function () { return M().alive && G.city !== M().i && humanTurn(); },
+      fail: function () { return !M().alive ? 'You stayed with 1 heart in Downtown. The next claws knocked you out.' : false; },
+      hints: ['You have 1 heart left and another rival rolls after this one.', { say: 'Tap Yield and run.', target: opt('yield') }],
+      debrief: 'Yielding saved you. Stay only when one more hit will not knock you out.' },
+    { id: 'win20', title: 'Win at 20', rule: 'Reach 20 stars and survive to the end of your own turn: you win. Last monster standing also wins.', par: 2,
+      goal: 'Win the game.',
+      setup: function () { return stack({ city: 0, me: { vp: 17 }, dice: ['3', '3', '3', 'H', 'E', 'C'], rolls: 1, re: [['1', '2', 'E']] }); },
+      success: function () { return G.winner === 'P' + (M().i + 1); },
+      fail: function () { return res() && !G.winner && M().vp < 20 ? 'You have ' + M().vp + ' stars. You need 20: keep the three 3s.' : (G.winner && G.winner !== 'P' + (M().i + 1) ? 'A rival won.' : false); },
+      hints: ['You have 17 stars. Three 3s are worth 3.', { say: 'Keep the 3s and SMASH!, then End turn to win.', target: SMASH }],
+      debrief: 'Win is checked when your turn ends: 17 + 3 = 20.' },
+    { id: 'game', title: 'Short game', rule: 'First to 8 stars, or last monster standing, wins. Use everything you learned.',
+      goal: 'Win a short game: first to 8 stars.',
+      setup: function () { return stack({ goal: 8, dice: null }); },
+      success: function () { return G.winner === 'P' + (M().i + 1); },
+      fail: function () { return G.winner && G.winner !== 'P' + (M().i + 1) ? (G.winText || 'A rival won.') : false; },
+      hints: ['Keep matching numbers. Move into Downtown when it is empty.', 'Heal when you are low, and yield rather than be knocked out.'],
+      debrief: 'You reached 8 stars and finished your turn: the city is yours.' }
+  ];
+  lessons.forEach(function (s) { s.moves = function () { return L.n; }; });
+
+  // ---- hooks while a lesson runs: scripted throws, nothing saved over the player's real game
+  function hook() {
+    var fo = faceOf; faceOf = function (d) { if (L.feed && L.frame && L.frame.length) return L.frame.shift(); return fo(d); };
+    var feed = function (f, frame) { return function () { if (!(L.on && GXST.active())) return f.apply(this, arguments); L.frame = frame(); L.feed = 1; try { return f.apply(this, arguments); } finally { L.feed = 0; L.frame = null; } }; };
+    var sr = startRoll; startRoll = function (p) {
+      if (!(L.on && GXST.active())) return sr.apply(this, arguments);
+      L.frame = (p.human ? L.mine : L.riv).shift() || null; L.feed = 1;
+      try { return sr.apply(this, arguments); } finally { L.feed = 0; L.frame = null; if (!p.human && G.dice.length && (L.riv.length || true)) G.rolls = 0; }
+    };
+    var rr = reroll; reroll = feed(function () { if (G.pl[G.active].human) L.n++; return rr.apply(this, arguments); }, function () { return G.pl[G.active].human ? (L.re.shift() || null) : null; });
+    var rs = resolve; resolve = function () { if (L.on && GXST.active() && G.pl[G.active].human && G.phase === 'roll') { L.n++; L.res++; } return rs.apply(this, arguments); };
+    var sw = sweep; sweep = function () { if (L.on && GXST.active() && G.pl[G.active].human) L.n++; return sw.apply(this, arguments); };
+    var by = buy; buy = function () { if (L.on && GXST.active() && G.pl[G.active].human) L.n++; return by.apply(this, arguments); };
+    var sv = save; save = function () { if (!(L.on && GXST.active())) return sv.apply(this, arguments); };
+    window.CCL = { L: L, stack: stack };
+  }
+  var go = function () {
+    if (!ready()) { setTimeout(go, 200); return; }
+    hook();
+    GXST.init({ game: 'crown-city-smash', scenarios: lessons, keepClear: ['#dice', '#pacts', '#pshop', '#buymini', '#choice'], settled: settled });
+    window.addEventListener('gxst', function (e) { if (e.detail.type === 'close') { L.on = 0; try { setSeed(null); } catch (x) { } } });
+  };
+  setTimeout(go, 300);
 })();
 
 </script>
