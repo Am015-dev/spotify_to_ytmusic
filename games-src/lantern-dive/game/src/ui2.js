@@ -16,7 +16,7 @@ function actorSeat() {
 // ---- sizes: hand card width (CSS variable); the table's own geometry comes from tableGeo() once the hand has its height ----
 function layoutVars() {
   const bd = $('#bd'); if (!bd) return; const W = bd.clientWidth || 360, H = bd.clientHeight || 600, ph = isPh(), vw = GXV.now(), land = ph && vw.w > vw.h;
-  let hw = ph ? (land ? Math.max(44, Math.min(48, Math.round(H * .13))) : Math.max(48, Math.min(64, Math.round(H * .1)))) : Math.max(60, Math.min(150, Math.round(H * (W >= 1000 ? .15 : .125))));
+  let hw = ph ? (land ? Math.max(44, Math.min(48, Math.round(H * .13))) : Math.max(48, Math.min(64, Math.round(H * .1)))) : Math.max(60, Math.min(150, Math.round(H * (W >= 1000 ? .19 : .125))));
   const short = ph && !land && vw.h < 640; document.documentElement.classList.toggle('ph-short', short); if (short) hw = 44;
   bd.classList.toggle('side', W > H * 1.45);
   document.documentElement.style.setProperty('--hw', hw + 'px');
@@ -211,7 +211,8 @@ function renderFelt(v) {
     const mv = myMoves(), mineTurn = iMustAct() && assign && !UI.busy, free = G.tasks.filter(t => t.owner < 0).length;
     const pw = Math.max(120, geo.pr - geo.pl);
     pool.style.left = geo.pl + 'px'; pool.style.right = 'auto'; pool.style.width = pw + 'px'; pool.style.top = geo.top + 'px'; pool.style.height = geo.zoneH + 'px';
-    const cols = free <= 1 ? 1 : (pw < 260 ? 2 : (free <= 4 ? 2 : 3)), tw = Math.max(86, Math.min(pw >= 700 ? 230 : 150, Math.floor((pw - 4 - 8 * (cols - 1)) / cols)));
+    const cols = free <= 1 ? 1 : (pw < 260 ? 2 : (free <= 4 ? 2 : 3)), tw = Math.max(86, Math.min(pw >= 700 ? 230 : (free <= 2 ? 300 : 150), Math.floor((pw - 4 - 8 * (cols - 1)) / cols)));
+    pool.classList.toggle('few', free <= 2);   // W764: one or two jobs left: big cards fill the centre instead of one chip on empty water
     G.tasks.forEach((t, i) => {
       if (t.owner >= 0) return; const d = TASKS[t.id], can = mineTurn && mv.some(m => m.t === 'take' && m.i === i);
       const c = h('button.jcard' + (can ? '.glow' : (mineTurn && mv.some(m => m.t === 'take') ? '.no' : '.off')), { type: 'button', 'data-a': 'pool', 'data-i': i, 'data-key': 'job' + i, style: 'width:' + tw + 'px', 'aria-label': d.s + ', difficulty ' + jobDiff(i) + (can ? '' : ', not available') });
@@ -220,6 +221,9 @@ function renderFelt(v) {
       if (!d.cap) c.append(h('span.nocap', { title: 'Not for the Captain', html: '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5" fill="none" stroke-width="2.4"/><path d="M6 6L18 18" stroke-width="2.4"/></svg>' }));
       pool.append(c);
     });
+    // W764: jobs already taken this dive stay in the centre, dimmed, with who took them, so the whole job set is visible at a glance
+    const tk = G.tasks.map((t, i) => [t, i]).filter(x => x[0].owner >= 0);
+    if (tk.length) { const row = h('div.tjobs'); tk.forEach(([t]) => row.append(h('div.tjob', h('span.tav', { html: avatarS(t.owner, 40) }), h('b', TASKS[t.id].s), h('span.who', pname(t.owner))))); pool.append(row); }
     return renderLead(lead, pile, v);
   }
   { let tp = $('#tpad'); if (!tp) { tp = h('div#tpad', { 'aria-hidden': 'true' }); felt.insertBefore(tp, felt.firstChild); }

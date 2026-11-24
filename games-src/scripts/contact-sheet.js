@@ -47,7 +47,7 @@ const AUDIT = function (MINPX) {
   for (const [id, q] of shots) {
     const c = await b.newContext({ viewport: mob ? { width: 402, height: 874 } : { width: 1366, height: 768 }, hasTouch: mob, isMobile: mob, serviceWorkers: 'block' }); await turbo(c);
     const p = await c.newPage(); const errs = []; p.on('pageerror', e => errs.push(String(e).slice(0, 80)));
-    await p.goto(`${BASE}/${slug}/${q}`); await p.waitForTimeout(450);
+    await p.goto(`${BASE}/${slug}/${q}`); await p.waitForFunction(() => !/[?&]scn=/.test(location.search) || (window.GXSCN && window.GXSCN.ready), null, { timeout: 20000 }).catch(() => { }); await p.waitForTimeout(450);   // W764: shoot the scenario once its setup finished (was mid-setup: hand not yet dealt, empty tip bubble)
     const au = await p.evaluate(`(${AUDIT})(${MINPX})`), f = au.lines; T += au.tiny; L += au.low; H += au.hard;
     await p.screenshot({ path: path.join(dir, `${id}.png`) });
     if (f.length || errs.length) flags.push(`${id}: ${errs.join(' | ')} ${f.join(' | ')}`);

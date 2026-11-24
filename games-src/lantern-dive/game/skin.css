@@ -229,3 +229,21 @@ html.sk .gxc-btn.go{color:#3a1604;text-shadow:0 1px 0 rgba(255,255,255,.6);font-
   html body #pool .jcard .dd i{width:18px;height:18px}
   html body .seat .nm,html body .me .nm{font-size:18px}
 }
+
+/* W764 job phase fills the centre: big cards when 1-2 jobs are left, taken jobs shown dimmed with their diver; pc seats bigger */
+html body #pool .tjobs{flex:0 0 100%;display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
+html body #pool .tjob{display:flex;align-items:center;gap:8px;min-height:48px;padding:6px 12px 6px 6px;border-radius:12px;background:rgba(251,243,221,.82);color:#27261f;border:2px solid #0b1f3a;opacity:.85}
+html body #pool .tjob b{font-size:15px;font-weight:900}
+html body #pool .tjob .who{font-size:14px;font-weight:800;color:#2b5b3a}
+html body #pool .tjob .tav{width:36px;height:36px;border-radius:50%;overflow:hidden;flex:0 0 auto}html body #pool .tjob .tav svg{width:100%;height:100%}
+@media (max-width:1023px){html body #pool.few .jcard{min-height:112px;padding:12px 14px 12px 22px;gap:10px}html body #pool.few .jcard b{font-size:24px}html body #pool.few .jcard .dd i{width:14px;height:14px}}
+@media (min-width:1024px){
+  html body #pool .tjob{min-height:64px;padding:8px 18px 8px 8px}html body #pool .tjob b{font-size:20px}html body #pool .tjob .who{font-size:18px}
+  html body #pool .tjob .tav{width:48px;height:48px}
+  html body #pool.few .jcard{min-width:min(560px,44%);min-height:200px;padding:20px 22px 20px 30px;gap:14px}html body #pool.few .jcard b{font-size:40px}html body #pool.few .jcard .dd i{width:24px;height:24px}
+  html body .seat .av{width:52px;height:52px}
+  html body #mine .sigst,html body #mine .pbtn,html body #mine .pbtn b{font-size:16px}
+  html body #bd.side #mine{bottom:24px;width:220px}html body #mine .me .av{width:48px;height:48px}
+  html body .gxt-menu b,html body .gx-bar .gxst-q{font-size:16px!important}
+  html body .gxh-card *{font-size:max(16px,1em)!important}
+}
