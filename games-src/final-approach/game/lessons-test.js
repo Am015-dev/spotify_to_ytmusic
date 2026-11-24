@@ -13,8 +13,8 @@ const PROOF = path.join(__dirname, '..', 'proof'); fs.mkdirSync(PROOF, { recursi
 const sleep = ms => new Promise(r => setTimeout(r, ms)); const probs = [];
 // scripted solutions: [die index, slot key]; 'plus' = tap the coffee "+" chip first
 const SOLVE = {
-  axis: [[0, 'ax0']], speed: [[0, 'en0']], radio: [[0, 'ra0'], [1, 'en0']], gear: [[1, 'lg0'], [2, 'lg1'], [0, 'lg2']],
-  brakes: [[1, 'br0'], [0, 'br1']], coffee: [[1, 'co0'], [0, 'br0', 'plus']], touchdown: [[0, 'ax0'], [1, 'en0']]
+  axis: [[0, 'ax0']], speed: [[0, 'en0']], radio: [[0, 'ra0'], [1, 'en0']], gear: [[1, 'lg0'], [2, 'lg1']],
+  brakes: [[1, 'br0'], [0, 'br1']], coffee: [[1, 'co0'], [0, 'br0', 'plus']], touchdown: [[0, 'ax0'], [1, 'en0'], [2, 'br2'], [3, 'co1']]
 };
 const WRONG = { axis: [1, 'ax0'], speed: [1, 'en0'] };
 async function run(b, W, H) {

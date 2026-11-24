@@ -306,3 +306,13 @@ Live fix: original-name phrase removed from shelf blurb + sands page (15:2x).
 - Content rule finding: doorkick-dungeon (live) copied the original card pool 1:1 (R98). F18 (Opus) redesigning our own 168 cards; then UI fixes; redeploy needs owner yes. COPYAUDIT running over all games.
 - Closest to done: short-fuse (4/5, F3 polish+PC then review), kaiten-kitchen (4/5-ish, F3 polish+PC then review), crown-city-smash (R97 7.4, F2), perch-and-plume (F3), lantern-dive (F2).
 - Pending: approve baselines (sunglaze, rampart: proof/baselines-new) before deploy; hollowbough R96 list after PLAY2; calm-audit doesn't count #coach/#toast.
+
+## W750 (final-approach lessons)
+Done: all 7 lessons solve by real taps at 402x874 and 1366x768 (lessons-test.js PASS, about 11 s and 14 s). Fixes in final-approach/game/lessons.js:
+gear had 3 free placements but 4 dice minus the mandatory axis and engine dice leave 2, so the third gear starts down (par 2); touchdown co-pilot dice
+made the axis tilt 2 and speed 5, now 3 and 2 (speed 4 = brakes) and the landing is judged at round end, so all 4 pilot dice go down (par 4);
+setup waits were 8 s of game time, so under turbo the scripted dice were set before the real roll overwrote them (now 60 s limits that end on the phase);
+newGame opened the flight story card over the board on pc (closed in setup); the roll's fly-in tween was replaced by the value-change tween, so lesson
+dice were invisible in the tray (sprites dropped before the re-render). Proof: final-approach/proof/lessons-{phone,pc}-sheet.jpg (picker + 7 lessons) and full sheets, 0 flags.
+Open: on pc the GXST card (top right) covers the first line of the Cockpit side panel (round and co-pilot chips), 7 cells; fix with a keepClear or
+pcSlot for that panel. Test only checks start, one wrong move (axis, speed) and the win per lesson, not a shot after every single move.

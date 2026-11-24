@@ -36,6 +36,7 @@
     UI.seed = sp.seed || 7;
     newGame('vs', { scenario: 'tt', role: 0, level: 'normal', tipsOff: true });
     UI.coach.level = 'off';
+    try { closeRS(true); } catch (e) { }   // newGame opens the flight story card on a wide screen; it would sit over the lesson
     if (sp.pos != null) G.pl.pos = sp.pos;
     if (sp.planes) G.planes = sp.planes.slice();
     if (sp.axis != null) G.pl.axis = sp.axis;
@@ -48,11 +49,19 @@
     }
     if (sp.final) G.round = DD().rounds - 1 - G.row0;
     render();
-    return until(function () { return G.phase === 'brief'; }, 8000).then(function () { commit(0, { t: 'ready' }); return until(function () { return G.phase === 'place'; }, 10000); }).then(function () {
+    // generous limits: they end the moment the phase arrives, and under a sped-up clock (tests) 8 s of game time passed before the roll,
+    // so the scripted dice were set and then overwritten by the real roll
+    return until(function () { return G.phase === 'brief' || G.phase === 'place'; }, 60000).then(function () {
+      if (G.phase === 'brief') commit(0, { t: 'ready' });
+      return until(function () { return G.phase === 'place'; }, 60000);
+    }).then(function () {
       if (sp.dice) sp.dice.forEach(function (row, s) {
         row.forEach(function (v, i) { var d = G.dice[s][i]; d.v = v; d.u = false; });
       });
       G.turn = 0; G.first = 0; G.events = []; UI.evN = G.evN;
+      // the real roll's fly-in tween may still run; a value change would replace it and leave the die invisible above the board,
+      // so drop the tray dice sprites and let render() place them fresh at their tray spots
+      try { if (typeof PX !== 'undefined' && PX.objs) [...PX.objs.keys()].filter(function (k) { return /^die:/.test(k); }).forEach(function (k) { pxKill(k, PX.objs.get(k)); }); } catch (e) { }
       render();
       return new Promise(function (r) { setTimeout(r, 400); });
     });
@@ -92,10 +101,11 @@
       hints: ['A plane sits on your space. Which die can clear it?', { say: 'Put the 1 on the first radio slot.', target: die(0, 0) }],
       debrief: 'Clear the plane first, then move. Moving away first causes a collision.' },
 
-    { id: 'gear', title: 'Landing gear', par: 3, moves: function () { return L.n; },
+    { id: 'gear', title: 'Landing gear', par: 2, moves: function () { return L.n; },
       rule: 'Each gear space takes a pair of values (1-2, 3-4, 5-6). A green gear raises the blue speed marker.',
-      goal: 'Turn all three gear lights green.',
-      setup: function () { return stack({ dice: [[5, 2, 4, 6], [3, 3, 3, 3]], cop: [[0, 'co0']] }); },
+      goal: 'Turn the last two gear lights green.',
+      // the third gear is already down: 4 dice minus the mandatory axis and engine dice leave 2 free placements
+      setup: function () { return stack({ sw: { lg: [0, 0, 1], fl: [0, 0, 0, 0], br: [0, 0, 0] }, dice: [[5, 2, 4, 6], [3, 3, 3, 3]], cop: [[0, 'co0']] }); },
       success: function () { return G.pl.sw.lg.every(function (v) { return !!v; }); },
       fail: function () {
         var open = openIdx(G.pl.sw.lg);
@@ -140,17 +150,17 @@
       hints: ['No die is a 2. How do you change one?', { say: 'Put the 6 on a Concentration space.', target: die(0, 1) }],
       debrief: 'Coffee changes a die by 1. Earn it on a Concentration space, then spend it.' },
 
-    { id: 'touchdown', title: 'Touchdown', par: 3, moves: function () { return L.n; },
+    { id: 'touchdown', title: 'Touchdown', par: 4, moves: function () { return L.n; },
       rule: 'Landing needs gear, flaps, a level axis, a clear strip, and speed no higher than the brakes.',
       goal: 'Land the plane.',
       setup: function () {
         return stack({ final: true, pos: 4, planes: [0, 0, 0, 0], axis: 0,
           sw: { lg: [1, 1, 1], fl: [1, 1, 1, 1], br: [1, 1, 0] },
-          dice: [[3, 2, 6, 5], [1, 3, 3, 3]], cop: [[0, 'ax1'], [1, 'en1']] });
+          dice: [[3, 2, 6, 5], [3, 2, 3, 3]], cop: [[0, 'ax1'], [1, 'en1'], [2, 'co0'], [3, 'co2']] });   // co-pilot: 3 levels the axis, 2 + 2 = speed 4 = brakes
       },
       success: function () { return !!(G.result && G.result.win); },
       fail: generic,
-      hints: ['Match the axis dice. Keep speed at or under the brakes.', { say: 'Put the 3 on the first axis slot.', target: die(0, 0) }],
+      hints: ['Match the axis dice. Keep speed at or under the brakes. The plane lands once every die is placed.', { say: 'Put the 3 on the first axis slot.', target: die(0, 0) }],
       debrief: 'Gear, flaps, level axis, clear strip and safe speed: the plane lands.' }
   ];
 
