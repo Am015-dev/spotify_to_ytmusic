@@ -447,6 +447,19 @@ html body .gx-drawer{height:auto;bottom:auto;max-height:calc(100dvh - var(--gx-b
 html body :is(#log li,#log small,.gx-dock .btn,.gx-dock .banner,#banner,#banner *,#youbox,.gx-drawer i,.gx-drawer em){font-size:max(var(--minfs),1em)!important}
 html body .gx-drawer-head{height:56px;box-sizing:border-box}html body .gx-drawer-head .gx-x{font-size:1.5rem;line-height:1}
 .die{min-width:44px;min-height:44px}
+/* W666 HUD (PC): a slim bar of round icon buttons, the board fills the screen, the side panel opens only when pinned */
+html:not(.ph) header.gx-bar .gx-ibtn{width:44px;height:44px;min-width:44px;min-height:44px;padding:0;border-radius:50%;justify-content:center;flex:0 0 auto}
+html:not(.ph) header.gx-bar .gx-ibtn .ico{width:22px;height:22px;margin:0}
+html:not(.ph) .gx-reopen{display:none!important}
+html:not(.ph) .gx-drawer-head .gx-x{min-width:44px;min-height:44px}
+#bpc{display:none}
+html:not(.ph) #bpc{position:absolute;top:10px;left:50%;transform:translateX(-50%);z-index:4;display:flex;flex-direction:column;align-items:center;gap:4px;pointer-events:none;max-width:calc(100% - 24px)}
+html:not(.ph) #bpc[hidden],#bpcln[hidden]{display:none}
+#bpcph{padding:4px 18px;border-radius:999px;background:#1a1320;color:#ffd23f;border:2.5px solid #ffd23f;box-shadow:3px 3px 0 #1a1320;font:400 22px/1.15 Bangers,Impact,sans-serif;letter-spacing:.05em;white-space:nowrap}
+#bpcln{padding:4px 14px;border-radius:999px;background:rgba(26,19,32,.88);color:#fff;font:800 16px/1.2 Nunito,sans-serif;white-space:nowrap}
+/* a question for the player floats over the board as the action card while the panel is closed */
+html:not(.ph) .gx-app.gx-dock-min .gx-dock.choosing{visibility:visible;position:fixed;left:50%;bottom:92px;transform:translateX(-50%);width:min(560px,calc(100vw - 32px));max-height:62vh;z-index:30;border:4px solid #1a1320;border-radius:16px;box-shadow:8px 8px 0 #1a1320;overflow:auto}
+html:not(.ph) .gx-app.gx-dock-min .gx-dock.choosing .gx-dock-head,html:not(.ph) .gx-app.gx-dock-min .gx-dock.choosing #dockbody>:not(#choice){display:none}
 
 /* ===== v10 polish: dusk neon chrome, printed card frames, enamel buttons, resin dice (visual only) ===== */
 :root{--hl:rgba(255,255,255,.55);--hl0:rgba(255,255,255,0);--lo:rgba(26,19,32,.07);--drop:0 10px 24px rgba(26,19,32,.18);
@@ -1846,9 +1859,12 @@ html body :is(.gxh-ring,.gxt-ring){animation-duration:1.6s}
 <header class="gx-bar">
   <h1>Crown City Smash</h1>
   <span class="gx-sp"></span>
-  <button class="gx-ibtn btn" data-gx="dr-market" title="Power cards for sale"><svg class="ico" viewBox="0 0 20 20" aria-hidden="true"><rect x="3" y="4" width="9" height="13" rx="1.6" transform="rotate(-12 7.5 10.5)" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round" stroke-linecap="round"/><rect x="8" y="3" width="9" height="13" rx="1.6" fill="currentColor" opacity=".25"/><rect x="8" y="3" width="9" height="13" rx="1.6" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round" stroke-linecap="round"/><path d="M12.5 6.5l-1.6 2.9h2.2l-1.3 2.8" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round" stroke-linecap="round"/></svg>Cards</button>
-  <button class="gx-ibtn btn" data-gx="dr-log" title="The Crown City chronicle (what happened)"><svg class="ico" viewBox="0 0 20 20" aria-hidden="true"><rect x="3" y="3.5" width="12" height="13" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round" stroke-linecap="round"/><path d="M15 7h2v8a1.5 1.5 0 0 1-3 0" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round" stroke-linecap="round"/><path d="M6 7h6M6 10h6M6 13h4" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round" stroke-linecap="round"/></svg>Log</button>
+  <button class="gx-ibtn btn" data-gx="dr-mons" title="Monsters: every rival's cards and stats" aria-label="Players"><svg class="ico" viewBox="0 0 20 20" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round" stroke-linecap="round"><circle cx="7" cy="7.5" r="2.6"/><path d="M2.8 16c.4-2.6 2.1-4 4.2-4s3.8 1.4 4.2 4"/><circle cx="13.6" cy="6.6" r="2.2"/><path d="M12.6 11.3c2.3-.3 4.2 1 4.7 3.8"/></g></svg></button>
+  <button class="gx-ibtn btn" data-gx="dr-market" title="Power cards for sale" aria-label="Cards for sale"><svg class="ico" viewBox="0 0 20 20" aria-hidden="true"><rect x="3" y="4" width="9" height="13" rx="1.6" transform="rotate(-12 7.5 10.5)" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round" stroke-linecap="round"/><rect x="8" y="3" width="9" height="13" rx="1.6" fill="currentColor" opacity=".25"/><rect x="8" y="3" width="9" height="13" rx="1.6" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round" stroke-linecap="round"/><path d="M12.5 6.5l-1.6 2.9h2.2l-1.3 2.8" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round" stroke-linecap="round"/></svg></button>
+  <button class="gx-ibtn btn" data-gx="dr-log" title="The Crown City chronicle (what happened)" aria-label="Log"><svg class="ico" viewBox="0 0 20 20" aria-hidden="true"><rect x="3" y="3.5" width="12" height="13" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round" stroke-linecap="round"/><path d="M15 7h2v8a1.5 1.5 0 0 1-3 0" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round" stroke-linecap="round"/><path d="M6 7h6M6 10h6M6 13h4" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round" stroke-linecap="round"/></svg></button>
+  <button class="gx-ibtn btn" data-gx="dr-rules" title="Rules and dice faces" aria-label="Rules"><svg class="ico" viewBox="0 0 20 20" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round" stroke-linecap="round"><circle cx="10" cy="10" r="7.2"/><path d="M7.8 8a2.3 2.3 0 1 1 3.2 2.1c-.7.3-1 .8-1 1.5v.3M10 14.4v.1"/></g></svg></button>
   <button class="gx-ibtn gxh-bulb" id="bulbbtn" data-help type="button" aria-label="Hint"></button>
+  <button class="gx-ibtn btn gx-pin" data-gx="dock" title="Pin the turn panel to the side" aria-label="Turn panel"><svg class="ico" viewBox="0 0 20 20" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round" stroke-linecap="round"><rect x="3" y="4" width="14" height="12" rx="1.6"/><path d="M12.2 4v12"/></g></svg></button>
   <button class="gx-ibtn btn" data-gx="dr-menu" title="Rules, tips, sound, speed, new game" aria-label="Menu"><svg class="ico" viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="2.6" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round" stroke-linecap="round"/><path d="M10 2.5v2.2M10 15.3v2.2M2.5 10h2.2M15.3 10h2.2M4.7 4.7l1.6 1.6M13.7 13.7l1.6 1.6M4.7 15.3l1.6-1.6M13.7 6.3l1.6-1.6" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round" stroke-linecap="round"/></svg></button>
 </header>
 <div class="gx-main">
@@ -7901,7 +7917,14 @@ window.addEventListener('click',e=>{if(!bfOn())return;const t=e.target;
 try{if(phOn()&&localStorage.getItem('ccs_speed')===null&&ANIM)AIDELAY=230}catch(e){}
 // the recap names what each computer monster bought
 if(typeof buy==='function'){const _b=buy;buy=function(k){try{if(G&&!humanTurn()&&G.market[k]!==undefined)(BF.bought=BF.bought||[]).push(CARDS[base(G.market[k])].n)}catch(e){}return _b.apply(this,arguments)}}
-setInterval(()=>{if(!bfOn())return;bfMarks();bfFinger();bfLine()},400);
+// ---- PC (W666): the side panel is closed until the player pins it (remembered); the game never opens it by itself ----
+if(typeof GX!=='undefined'&&GX.app){const _sd=GX.showDock,_td=GX.toggleDock;GX.showDock=function(){if(phOn())return _sd.apply(this,arguments)};
+  GX.toggleDock=function(f){const r=_td.apply(this,arguments);if(!phOn())try{localStorage.setItem('ccs_pin',this.app.classList.contains('gx-dock-min')?'0':'1')}catch(e){}return r};
+  let pin=false;try{pin=localStorage.getItem('ccs_pin')==='1'}catch(e){}if(!phOn())GX.app.classList.toggle('gx-dock-min',!pin)}
+// ---- PC (W666): the phase banner and the one prompt line on the board; the side panel stays closed unless pinned ----
+function bfPc(){if(phOn()||!G)return;let w=$bf('bpc');if(!w){const b=document.querySelector('.gx-board');if(!b)return;w=document.createElement('div');w.id='bpc';w.setAttribute('aria-live','polite');w.innerHTML='<b id="bpcph"></b><span id="bpcln"></span>';b.appendChild(w)}
+  const dt=$bf('docktitle'),ph=dt?dt.textContent:'',ln=G.winner?'':bfLineText(),a=w.firstChild,l=w.lastChild;if(a.textContent!==ph)a.textContent=ph;if(l.textContent!==ln)l.textContent=ln;l.hidden=!ln;w.hidden=!ph}
+setInterval(()=>{bfPc();if(!bfOn())return;bfMarks();bfFinger();bfLine()},400);
 phLayout();
 
 </script>
