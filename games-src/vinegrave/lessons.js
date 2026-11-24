@@ -184,9 +184,13 @@
       var b = e.target.closest && e.target.closest('[data-lessons-open]');
       if (b) { try { GX.close(); } catch (x) { } GXST.picker(); }
     });
+    var KEEP = { play: [], dig: ['#map .site.l0'], travel: ['#map .site.l0'], plane: ['#map .site.l0'], discover: ['#map .site.l1'], overcome: ['#map .site.l1'], market: ['#row'], research: ['#track'] };
+    var KC = ['.gx-bar', '#dock'];   // live list: the card keeps off the dock and only the board area the current lesson uses
+    var setKC = function () { var id = (GXST.state() || {}).id, k = ['.gx-bar', '#dock'].concat(KEEP[id] || []); KC.length = 0; k.forEach(function (x) { KC.push(x); }); };
+    window.addEventListener('gxst', function (e) { if (e.detail.type === 'start' || e.detail.type === 'retry') setKC(); });
     GXST.init({
-      game: 'vinegrave', scenarios: lessons, qParent: '#gxst-slot',
-      keepClear: ['#dock', '#row', '#map', '.gx-bar'],
+      game: 'vinegrave', scenarios: lessons, qParent: '.gx-bar',
+      keepClear: KC,
       phoneSlot: { after: '.gx-bar', before: '#dock', avoid: ['#dock', '#row', '#map'] },
       settled: settled
     });
