@@ -86,7 +86,7 @@ async function run(b, W, H) {
   await tap('.gxst-bulb', 'bulb'); await tap('.gxst-bulb', 'bulb'); s = await st();
   if (s.hint !== 2 || !s.target) note('show-me hint has no target'); if (s.overlap) note('card covers the hinted target'); if (!(await p.$('.gxst-ring'))) note('no hint ring');
   await tap('.gxst-hd .gxst-ib[aria-label="Minimise"]', 'minimise'); if (!(await st()).min || !(await p.$('.gxst-chip'))) note('minimise gave no chip');
-  await tap('.gxst-chip', 'chip'); if ((await st()).min) note('chip did not restore');
+  await sleep(300); await tap('.gxst-chip', 'chip'); if ((await st()).min) note('chip did not restore');
   await solve('jobs'); s = await st(); if (s.stars !== 1) note('two hints should give 1 star, got ' + s.stars);
   // 2) every lesson: start picture for the sheet, a wrong move fails (not the game), the scripted solution wins with 3 stars
   for (let i = 0; i < ids.length; i++) {
