@@ -88,7 +88,7 @@ document.addEventListener('click',e=>{
    case 'cback':try{localStorage.setItem('tb_back',t.dataset.v==='court'?'court':'default')}catch(x){}renderMenu();break;
    case 'mus':UI.music=!UI.music;try{localStorage.setItem('tb_mus',UI.music?'1':'0')}catch(x){}if(window.GA)GA.setMusic(UI.music);musicSync();renderMenu();break;
    case 'gfx':UI.lowGfx=!UI.lowGfx;try{localStorage.setItem('tb_gfx',UI.lowGfx?'low':'high')}catch(x){}UI.mapReset=true;renderAll();renderMenu();break;
-   case 'savenow':saveGame();toast('Saved. You can continue from the start screen.');break;
+   case 'savenow':saveGame();toast('Saved. You can continue from the start screen.');try{t.textContent='Saved ✓';t.setAttribute('aria-live','polite');clearTimeout(t._sv);t._sv=setTimeout(()=>{t.textContent='Save now'},2200)}catch(e){}break;
    case 'newgame':GX.close();showStart();break;
    case 'spd':UI.speed=+t.dataset.v;renderMenu();break;
    case 'logall':UI.logAll=!UI.logAll;renderLog();break;
