@@ -238,5 +238,12 @@ window.addEventListener('click',e=>{if(!bfOn())return;const t=e.target;
 try{if(phOn()&&localStorage.getItem('ccs_speed')===null&&ANIM)AIDELAY=230}catch(e){}
 // the recap names what each computer monster bought
 if(typeof buy==='function'){const _b=buy;buy=function(k){try{if(G&&!humanTurn()&&G.market[k]!==undefined)(BF.bought=BF.bought||[]).push(CARDS[base(G.market[k])].n)}catch(e){}return _b.apply(this,arguments)}}
-setInterval(()=>{if(!bfOn())return;bfMarks();bfFinger();bfLine()},400);
+// ---- PC (W666): the side panel is closed until the player pins it (remembered); the game never opens it by itself ----
+if(typeof GX!=='undefined'&&GX.app){const _sd=GX.showDock,_td=GX.toggleDock;GX.showDock=function(){if(phOn())return _sd.apply(this,arguments)};
+  GX.toggleDock=function(f){const r=_td.apply(this,arguments);if(!phOn())try{localStorage.setItem('ccs_pin',this.app.classList.contains('gx-dock-min')?'0':'1')}catch(e){}return r};
+  let pin=false;try{pin=localStorage.getItem('ccs_pin')==='1'}catch(e){}if(!phOn())GX.app.classList.toggle('gx-dock-min',!pin)}
+// ---- PC (W666): the phase banner and the one prompt line on the board; the side panel stays closed unless pinned ----
+function bfPc(){if(phOn()||!G)return;let w=$bf('bpc');if(!w){const b=document.querySelector('.gx-board');if(!b)return;w=document.createElement('div');w.id='bpc';w.setAttribute('aria-live','polite');w.innerHTML='<b id="bpcph"></b><span id="bpcln"></span>';b.appendChild(w)}
+  const dt=$bf('docktitle'),ph=dt?dt.textContent:'',ln=G.winner?'':bfLineText(),a=w.firstChild,l=w.lastChild;if(a.textContent!==ph)a.textContent=ph;if(l.textContent!==ln)l.textContent=ln;l.hidden=!ln;w.hidden=!ph}
+setInterval(()=>{bfPc();if(!bfOn())return;bfMarks();bfFinger();bfLine()},400);
 phLayout();

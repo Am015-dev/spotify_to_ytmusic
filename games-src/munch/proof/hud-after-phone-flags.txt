@@ -1,0 +1,5 @@
+dk-art:  offscreen "Lv 1" | offscreen "Lv"
+dk-win-pip:  small 12.8px "Hero" | small 12.8px "Level" | small 12.8px "Kills" | small 12.8px "Helps" | small 12.8px "Deaths" | small 12.8px "Cursed"
+dk-win-morwen:  small 12.8px "Hero" | small 12.8px "Level" | small 12.8px "Kills" | small 12.8px "Helps" | small 12.8px "Deaths" | small 12.8px "Cursed"
+dk-win-grub:  small 12.8px "Hero" | small 12.8px "Level" | small 12.8px "Kills" | small 12.8px "Helps" | small 12.8px "Deaths" | small 12.8px "Cursed"
+dk-win-tansy:  small 12.8px "Hero" | small 12.8px "Level" | small 12.8px "Kills" | small 12.8px "Helps" | small 12.8px "Deaths" | small 12.8px "Cursed"
