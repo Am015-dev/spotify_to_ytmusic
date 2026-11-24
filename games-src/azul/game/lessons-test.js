@@ -8,14 +8,15 @@ const fs = require('fs'), path = require('path');
 const html = fs.readFileSync(path.join(__dirname, 'sunglaze.html'));
 const SIZES = (process.argv[2] || '402x874,1366x768').split(',').map(s => s.split('x').map(Number));
 const PROOF = path.join(__dirname, '..', 'proof', 'lessons'); fs.mkdirSync(PROOF, { recursive: true });
-const sleep = ms => new Promise(r => setTimeout(r, ms)); const probs = [];
+const { turbo } = require('../../scripts/turbo'); const SLEEPDIV = +(process.env.SLEEPDIV || 3);   // game time runs TURBO x faster, so test waits shrink too
+const sleep = ms => new Promise(r => setTimeout(r, Math.max(1, ms / SLEEPDIV))); const probs = [];
 // one move = [source, colour, rack]: source -1 the middle, 0..4 a kiln; rack 0..4 (5 = floor)
 const SOLVE = { take: [[0, 2, 2]], racks: [[0, 0, 3]], blocked: [[0, 1, 3]], sun: [[-1, 2, 1]], tiling: [[0, 2, 2]], chain: [[0, 0, 2]], floor: [[0, 0, 3]], end: [[0, 4, 0]], game: [[4, 4, 0]] };
 const WRONG = { take: [1, 2, 0], racks: [0, 0, 0], blocked: [0, 1, 1], sun: [1, 3, 0], tiling: [1, 3, 3], chain: [1, 4, 4], floor: [0, 0, 0], end: [1, 0, 2] };
 const words = t => t.trim().split(/\s+/).filter(Boolean).length;
 async function run(b, W, H) {
   const tag = W + 'x' + H, phone = W < 600, note = m => probs.push(tag + ': ' + m), shots = [];
-  const ctx = await b.newContext({ viewport: { width: W, height: H }, deviceScaleFactor: 1, isMobile: phone, hasTouch: true });
+  const ctx = await b.newContext({ viewport: { width: W, height: H }, deviceScaleFactor: 1, isMobile: phone, hasTouch: true }); await turbo(ctx, +(process.env.TURBO || 20));
   await ctx.route('**/*', r => { const u = new URL(r.request().url()); if (u.host !== 'gns.test') return r.abort(); if (u.pathname === '/') return r.fulfill({ status: 200, contentType: 'text/html', body: html }); return r.fulfill({ status: 404, body: '' }); });
   const p = await ctx.newPage(); p.setDefaultTimeout(15000);
   p.on('pageerror', e => note('PAGE ERROR ' + e.message));
