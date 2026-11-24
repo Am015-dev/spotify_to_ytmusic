@@ -58,11 +58,8 @@ function tutQBtn() {
   if (tq('#tutQ')) return; var bar = tq('.gx-bar'), h = tq('#bulbbtn'); if (!bar) return;
   var b = document.createElement('button'); b.type = 'button'; b.id = 'tutQ'; b.className = 'gx-ibtn'; b.setAttribute('aria-label', 'Help: screen map'); b.textContent = '?';
   if (h) bar.insertBefore(b, h); else bar.appendChild(b);
-  b.onclick = function () {
-    if (!G || G.over) { tutStart(); return; }
-    if (!UI.tut || !UI.tut.steps) UI.tut = tutNew(true);
-    UI.tut.min = false; tutMapOpen();
-  };
+  b.onclick = function () { tutStart(); };   // the ? button opens the lesson picker (lessons.js replaces tutStart); the old floating window is no longer on the default path
+
 }
 function tutNew(free) { return { steps: TUT_STEPS, i: free ? TUT_STEPS.length - 1 : 0, done: {}, did: {}, map: true, min: false, pos: null, info: null, free: !!free, t0: 0, r0: 0, spot: null, fixed: {}, shown: [], seen: {} }; }
 function tutMapOpen() { var T = UI.tut; if (!T) return; T.map = true; T.info = null; tutQBtn(); tutMapDraw(); tutWin(); }
@@ -223,6 +220,7 @@ document.addEventListener('click', function (e) {
 function storyOpen() { if (!window.GXC) return; $('#start').hidden = true; GXC.open(); }   // the title steps aside so its buttons never sit under the map
 function tutLeave() { UI.mode = 'quick'; UI.tutor = false; UI.tut = null; coachHide(); }
 function tutStart(o) {
+  if (window.GXST && window.__wmLessons) { try { GX.close(); } catch (e) { } if (window.GXC && GXC.close) try { GXC.close(); } catch (e) { } try { GXT.markDone('wildmark'); } catch (e) { } UI.prefs.played = 1; savePrefs(); GXST.picker(); return; }   // default path: the scenario lessons (lessons.js); the floating window below is the fallback
   try { GX.close(); } catch (e) { } if (window.GXC && GXC.close) try { GXC.close(); } catch (e) { }
   try { if (window.GXT && GXT.running()) GXT.stop(); } catch (e) { }
   UI.coachPrologue = !!(o && o.prologue); UI.prefs.played = 1; savePrefs();
