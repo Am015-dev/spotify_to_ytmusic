@@ -518,5 +518,30 @@ html body .gx-sec .gx-row-l,html body .gx-sec .gx-row-l small{background:#f4ecd8
 @media (min-width:1024px){.gx-dock{display:flex;flex-direction:column;min-height:0}.gx-dock .gx-dock-body{display:flex;flex-direction:column;min-height:0;flex:1 1 auto;overflow:hidden}
 #offers{flex:1 1 auto!important;min-height:0;overflow-y:auto}#offers .offer{min-height:0}#acts{flex:0 0 auto;padding-top:8px;background:#fbf4e4;border-top:2px solid #e0cfa6}
 #offers .offer .shape{transform-origin:center;zoom:.8}#offers .offer{padding:6px 10px!important;gap:4px!important}#detail:empty{display:none!important}}
+
+/* W767 no-scroll HUD: 3 offers + one 'Up next' chip, never a scrolling strip; PC cards are compact rows so the dock never scrolls */
+#offers.ring{overflow:visible!important;scroll-snap-type:none!important}
+.gx-drawer:not(.on){display:none!important}/* closed windows park off-screen: never readable, never tabbable */
+#offers.ring>.offer:not(.up){flex:1 1 0!important;min-width:0!important;transform:none!important}
+#offers .upchip{flex:0 0 46px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;padding:6px 2px;border:2px dashed #b89c66;border-radius:12px;background:#fbf2dc;color:#3a2a1a;cursor:pointer;font:inherit;min-height:44px}
+#offers .upchip .upl{font-size:13px;font-weight:800;text-transform:uppercase;letter-spacing:.3px}
+#offers .upchip .upn{font-size:14px;font-weight:800;color:#6b4300}
+#offers .upchip .shape{display:none!important}
+.refgrid.live button:nth-child(-n+3){border-color:#e0a82e;box-shadow:0 0 0 2px #e0a82e66}
+@media (min-width:1024px){
+#offers{overflow:visible!important;gap:8px!important}
+#offers .ntok{display:none}
+#offers.ring>.offer:not(.up){flex:0 0 auto!important;min-height:0!important;display:grid!important;grid-template-columns:104px 1fr!important;grid-template-rows:auto auto auto!important;grid-template-areas:"shape name" "shape facts" "shape why";column-gap:12px!important;row-gap:4px!important;padding:8px 12px!important;align-items:center;max-height:none}
+#offers.ring>.offer:not(.up) .onm{grid-area:name;font-size:18px!important;justify-self:start}
+#offers.ring>.offer:not(.up) .shape{grid-area:shape;justify-self:center;align-self:center;zoom:.72}
+#offers.ring>.offer:not(.up) .ofx{grid-area:facts;flex-direction:row!important;gap:6px!important;justify-content:flex-start}
+#offers.ring>.offer:not(.up) .of{min-width:0!important;padding:3px 8px!important}#offers.ring>.offer:not(.up) .of b{font-size:20px!important}
+#offers.ring>.offer.cant::after{grid-area:why;grid-column:auto!important;font-size:16px!important}
+#offers.ring>.offer .hand{top:4px!important;right:4px!important}
+#offers .upchip{flex:0 0 auto;flex-direction:row;justify-content:flex-start;gap:12px;padding:8px 14px;min-height:52px}
+#offers .upchip .upl{font-size:16px}#offers .upchip .upn{font-size:16px;margin-left:auto}
+#offers .upchip .shape{display:grid!important;opacity:.9}
+#trhead,#trhead *,#track .tkn,#barchips .pstrip b,#barchips .pstrip span,.offer .hand b,.menu .btn small,.big p.sub,.gxc-sc-title,.rvtally,.rvtally *,.rvname{font-size:16px!important}.rvt3{font-size:18px!important}
+}
 </style>
 </head>

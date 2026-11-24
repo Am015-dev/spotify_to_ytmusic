@@ -137,20 +137,15 @@ function ringStrip() {
   var box = $('#offers'); if (!box || !G || G.over || G.pend || box.style.display === 'none' || box.classList.contains('placing')) return;
   var L = G.ring.length; box.classList.add('ring');
   box.insertBefore(h('span.ntok', { title: 'The spool: only the 3 patches after it are for sale', 'aria-label': 'Spool. The 3 patches after it are for sale' }, h('i')), box.firstChild);
-  var cs = document.documentElement.classList.contains('sm') ? 8 : 10;
-  for (var k = 3; k < L; k++) {
-    var pid = G.ring[(G.start + k) % L], p = PATCHES[pid], bb = bbox(p.cells);
-    var c = h('div.offer.up', { 'data-a': 'upnext', 'data-pid': pid, role: 'button', 'aria-disabled': 'true', tabindex: '-1', 'aria-label': p.name + ', not for sale yet: ' + p.cost + ' buttons, ' + p.time + ' time, ' + p.inc + ' income' });
-    c.appendChild(patchShape(pid, '', Math.max(6, Math.min(cs, Math.floor(56 / bb[0]), Math.floor(40 / bb[1])))));
-    c.appendChild(h('div.upf', { html: '<span class="uc">' + p.cost + '</span><span class="ut">' + p.time + '</span><span class="ui">+' + p.inc + '</span>' }));
-    box.appendChild(c);
-  }
-  if (L > 3) box.appendChild(h('span.ringend', { 'aria-hidden': 'true' }, '↻'));
-  if (UI.ringSeen !== G.start + ':' + L) { UI.ringSeen = G.start + ':' + L; box.scrollLeft = 0; }
+  if (L <= 3) return; /* W767: one 'Up next' chip instead of a scrolling strip of every patch; the full ring lives in the All patches window */
+  var nx = h('button.upchip', { type: 'button', 'data-a': 'upnext', 'aria-label': 'Up next: ' + (L - 3) + ' more patches. Open all patches' }, h('span.upl', 'Next'));
+  for (var k = 3; k < Math.min(L, 5); k++) { var pid = G.ring[(G.start + k) % L], bb = bbox(PATCHES[pid].cells); nx.appendChild(patchShape(pid, '', Math.max(5, Math.min(9, Math.floor(40 / bb[0]), Math.floor(30 / bb[1]))))); }
+  nx.appendChild(h('span.upn', '+' + (L - 3))); box.appendChild(nx);
 }
 document.addEventListener('click', function (e) {
+  if (e.target.closest && e.target.closest('header [data-gx="patchd"]')) buildPatchList();   // W767: the window shows the current sale order
   var t = e.target.closest && e.target.closest('[data-a]'); if (!t || !G) return; var a = t.dataset.a;
-  if (a === 'upnext') { e.stopImmediatePropagation(); t.classList.remove('nope'); void t.offsetWidth; t.classList.add('nope'); toast('Not for sale yet. Only the 3 after the spool.', 2200); return; }
+  if (a === 'upnext') { e.stopImmediatePropagation(); var pb = document.querySelector('header [data-gx="patchd"]'); if (pb) pb.click(); return; }   // W767: the chip opens the All patches window
   if (a === 'strip' && +t.dataset.seat !== viewSeat() && !T2) { e.stopImmediatePropagation(); showOppQuilt(+t.dataset.seat); return; }   // the rival's quilt, one tap away
   if (a === 't2next') { e.stopImmediatePropagation(); t2Next(); return; }
   if (a === 't2real') { e.stopImmediatePropagation(); t2Real(); return; }

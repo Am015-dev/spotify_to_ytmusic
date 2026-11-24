@@ -7,7 +7,7 @@ const SH = A.includes('--shots') ? A[A.indexOf('--shots') + 1] : null; if (SH) f
 const WANT = ['buy', 'rotate', 'place', 'pay', 'time', 'advance', 'income', 'leather', 'bonus', 'flip', 'bonus', 'end'];
 let fails = 0; const ok = (c, m) => { if (!c) { fails++; console.log('FAIL', m); } };
 (async () => {
-  const b = await chromium.launch(); const ctx = await b.newContext({ viewport: { width: sz[0], height: sz[1] }, hasTouch: true, isMobile: true, deviceScaleFactor: SH ? 2 : 1 });
+  const b = await chromium.launch({ executablePath: fs.existsSync('/opt/pw-browsers/chromium') ? '/opt/pw-browsers/chromium' : undefined }); const ctx = await b.newContext({ viewport: { width: sz[0], height: sz[1] }, hasTouch: true, isMobile: true, deviceScaleFactor: SH ? 2 : 1 }); if (!SH) await require('../scripts/turbo').turbo(ctx); /* W767: machine speed */
   const pg = await ctx.newPage(); const errs = []; pg.on('pageerror', e => errs.push(e.message));
   await pg.addInitScript(() => { try { localStorage.clear(); localStorage.setItem('gns-prefs', JSON.stringify({ anim: 'off', ai: 'fast' })); } catch (e) { } });
   await pg.goto(process.env.URL || 'file://' + path.join(__dirname, 'stitchwise.html')); await pg.waitForTimeout(900);
