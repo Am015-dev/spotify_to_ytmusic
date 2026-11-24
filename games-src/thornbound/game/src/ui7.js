@@ -1,5 +1,5 @@
 // ===================== part 7: plain words (log lines, glossary), the guided first game, title + setup screens =====================
-// ---------------------------------------------------------------- plain log lines: "Heathbound Clans gains 2" -> "You gain 2" for the local player
+// ---------------------------------------------------------------- plain log lines: "Reedfolk gains 2" -> "You gain 2" for the local player
 function myName(){if(!G)return null;if(NET.on){const m=NET.mySeat;return m>=0?G.pl[m].name:null}if(hotSeat()||UI.mode==='watch')return null;const h=humans();return h.length===1?G.pl[h[0]].name:null}
 const escRe=s=>s.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
 function verbYou(w){const l=w.toLowerCase();if(l==='has')return 'have';if(l==='is')return 'are';if(l==='was')return 'were';if(l==='does')return 'do';
@@ -32,31 +32,33 @@ function renderNow(){const el=$('#now');if(!el||!G)return;
 const GLOSS=[
  ['influence',/\bInfluence\b/,'Influence','The score. Most Influence when the last round ends wins the throne. You gain it by winning Clashes and claiming locations.'],
  ['kingdom card',/\bKingdom Cards?\b/,'Kingdom Card','A shared power card. Win one with your bid. It sits on your board, with your bid card tucked under it. Its power works while you keep it (at most two).'],
- ['great road',/\bGreat Road\b/,'Great Road','The row of four face-up Kingdom Cards you can bid for. Cards nobody takes slide along. The oldest is thrown away each round.'],
+ ['great road',/\bGreat Road\b/,'Great Road','The row of four face-up Kingdom Cards you can bid for. Cards nobody takes slide along. The oldest is thrown away each round (two if nobody took one).'],
  ['herald',/\bHeralds?\b/,'Herald','Your one public envoy. Put it on a location in Spring. Then win that region and claim that location. You gain +1 Influence and take 1 from every rival Herald there.'],
- ['supporter',/\bSupporters?\b/,'Supporter','Five small helpers on your board. Each one you send adds +1 Strength in that region\'s first Clash. In Winter, Supporters on the map go to the Lost Pile. They are gone unless a Council of Pledges brings them back. Other powers can too.'],
+ ['supporter',/\bSupporters?\b/,'Supporter','Five small helpers on your board. Each one you send adds +1 Strength in that region\'s first Clash. In Winter, Supporters on the map go to the Lost Pile. They are gone unless a Bond Council brings them back. Other powers can too.'],
  ['clash',/\bClash(es)?\b/,'Clash','The fight in one region. Everyone\'s hidden cards there are flipped and abilities are used. The highest total Strength (cards + Supporters) wins the region.'],
  ['strength',/\bStrength\b/,'Strength','The big number at the top left of a card. In a Clash, add up your cards\' Strength there, +1 per Supporter.'],
- ['region',/\bregions?\b/i,'Region','The three map areas: Uplands, Tablelands and Sinks. Each has two locations and one Clash per round.'],
+ ['region',/\bregions?\b/i,'Region','The three map areas: North Reach, Crossroads and South Weald. Each has two locations and one Clash per round.'],
  ['location',/\blocations?\b/i,'Location','One of the six places on the map. The winner of a region\'s Clash claims one of its two locations. That gives Influence plus its bonus.'],
  ['bid',/\bbids?\b/i,'Bid','A card you choose secretly at the start of a round. Its Strength is the bid. The highest bid picks a Kingdom Card first.'],
- ['tactic',/\bTactics?\b/,'Tactic','Four special powers of your faction. Most work once per game, then they are Exhausted. A Tactic with markers (like Open Waterways) works once a round. It stops when its markers run out.'],
+ ['tactic',/\bTactics?\b/,'Tactic','Four special powers of your faction. Most work once per game, then they are Exhausted. A Tactic with markers (like Hidden Fords) works once a round. It stops when its markers run out.'],
  ['lore',/\bLore\b/,'Lore','A second currency. You gain it with a Journey. Spend it on your faction\'s Site of Power cards. They give stronger cards and permanent powers.'],
  ['site of power',/\bSite of Power\b/,'Site of Power','Your faction\'s five extra cards, bought with Lore. Buy them all and leftover Lore becomes Influence at the end.'],
  ['govern',/\bGovern\b/,'Govern','An Autumn action, once a round. Move a hand card with votes into one of three Councils.'],
+ ['active',/\bActive\b/,'Active','A card of yours that is face up on the map this round and not Eliminated. Active cards fight in the Clash and can use Autumn powers. In Winter they go to your discard pile.'],
+ ['pledges',/\bBond\b/,'Bond Council','One of the three Councils. Cards Governed here bring your spent Supporters back to you.'],
  ['journey',/\bJourney\b/,'Journey','An Autumn action, once a round. Send away a hand card that shows Lore. Gain that much Lore.'],
- ['council',/\bCouncils?\b/,'Council','Three Councils (Coin, Whispers, Pledges). Cards with votes placed there give you a lasting benefit every round.'],
+ ['council',/\bCouncils?\b/,'Council','Three Councils (Purse, Veil, Bond). Cards with votes placed there give you a lasting benefit every round.'],
  ['attrition',/\bAttrition\b/,'Attrition','Empty deck on a draw? Your discard pile becomes the new deck. Your hand size drops by one (never below 3).'],
- ['favour',/\b(Kingdom's )?Favour\b/,'Kingdom\'s Favour','A disc you claim at the Gleaning Meadow. While you hold it, use your faction\'s Favour power (three uses). If Influence is tied when the game ends, the holder wins. It does not decide Clash ties.'],
- ['order track',/\bOrder Track\b/,'Order Track','The turn order. Each round, the player with the most Influence goes first. The last player chooses the Clash order. Ties go to the player higher on it.'],
+ ['favour',/\b(Kingdom's )?Favour\b/,'Kingdom\'s Favour','A disc you claim at the Market Cross. While you hold it, use your faction\'s Favour power (three uses). If Influence is tied when the game ends, the holder wins. It does not decide Clash ties.'],
+ ['order track',/\bOrder Track\b/,'Order Track','The turn order. Each round, the player with the most Influence goes first. The last player chooses the Clash order. Players tied on Influence swap places: whoever was lower goes first.'],
  ['winter',/\bWinter\b/,'Winter','The end of a round. Heralds go home. Supporters on the map go to the Lost Pile. Played cards go to the discard pile.'],
  ['autumn',/\bAutumn\b/,'Autumn','After the Clashes, you may Govern and Journey once each. You may also use Autumn abilities such as Rally.'],
  ['ambush',/\bAmbush\b/,'Ambush','A Day ability. Add a hidden card from your hand to this Clash.'],
  ['retreat',/\bRetreat\b/,'Retreat','A Day ability. Pull your cards, Herald or Supporters out of this region.'],
  ['flank',/\bFlank\b/,'Flank','A Day ability. Move this card to a region that has not fought yet.'],
- ['deadly',/\bDeadly\b/,'Deadly','A Night effect. Every opposing card in the Clash is Eliminated unless Invulnerable. It goes to the Lost Pile. Two Deadly cards eliminate each other.'],
- ['rally',/\bRally\b/,'Rally','An Autumn ability. Take your cards on the map back to hand before Winter.'],
- ['deploy',/\bDeploy\b/,'Deploy','An Autumn ability. Put a card face up next to a region. It stays through the next Winter(s).'],
+ ['deadly',/\bDeadly\b/,'Deadly','A Night effect. Every opposing Active card in the Clash is Eliminated unless Invulnerable. It goes to the Lost Pile (Resilient: the Discard Pile). Two Deadly cards eliminate each other.'],
+ ['rally',/\bRally\b/,'Rally','An Autumn ability. Return some of your Active cards to your hand, before Winter.'],
+ ['deploy',/\bDeploy\b/,'Deploy','An Autumn ability. Put a card from your hand face up next to a region, where it stays Active.'],
  ['lost pile',/\bLost Pile\b/,'Lost Pile','Where Eliminated cards and spent Supporters go. They do not come back when your deck is reshuffled.'],
  ['hand size',/\bhand size\b/i,'Hand size','Draw up to this many cards each round. You start at 6. Attrition lowers it.'],
  ['occupier',/\boccup(ier|ying|ies|y)\b/i,'Occupier','The card tucked under a Kingdom Card (your bid card). It cannot fight. A rival can steal the Kingdom Card with a stronger bid. Then your bid card comes back to your hand.'],
@@ -83,14 +85,17 @@ const GLOSS=[
  ['spring',/\bSpring\b/,'Spring','The first part of a round. Bids, Heralds, hidden cards, then optional Spring powers such as sending Supporters.'],
  ['day',/\bDay\b/,'Day','Before each Clash, cards are face up. Players may use Day powers. These are Ambush, Retreat, Flank and some Tactics.'],
  ['night',/\bNight\b/,'Night','Right after Day, before the count: Night effects happen by themselves. Deadly cards eliminate opposing cards.'],
- ['council of coin',/\bCouncil of Coin\b/,'Council of Coin','Claim a Herald Reward to take your cards out of this Council. Gain Influence equal to their votes.'],
- ['council of whispers',/\bCouncil of Whispers\b/,'Council of Whispers','In Autumn, place markers on locations. Four on one location claim its bonus.'],
- ['council of pledges',/\bCouncil of Pledges\b/,'Council of Pledges','In Autumn, bring Supporters back to your board. Get one per vote, and one more for the biggest voter.'],
+ ['council of coin',/\bPurse Council\b/,'Purse Council','Claim a Herald Reward to take your cards out of this Council. Gain Influence equal to their votes.'],
+ ['council of whispers',/\bVeil Council\b/,'Veil Council','In Autumn, place markers on locations. Four on one location claim its bonus.'],
+ ['council of pledges',/\bBond Council\b/,'Bond Council','In Autumn, bring Supporters back to your board. Get one per vote, and one more for the biggest voter.'],
  ['kingdom deck',/\bKingdom Deck\b/,'Kingdom Deck','The face-down pile that refills the Great Road.'],
+ ['tie',/\b(tied|ties|a tie|Tie)\b/,'Tie','Equal Strength in a Clash. Each side may add one more hidden card, or pass. If nobody adds one, nobody wins there.'],
+ ['deck bottom',/\b[Dd]eck bottom\b/,'Deck bottom','Cards put here are drawn last, after everything else in your deck.'],
+ ['face-down',/\bface-down\b/,'Face-down','A card placed hidden. Nobody sees it until the Clash flips it.'],
 ];
 const GL={};GLOSS.forEach(g=>GL[g[0]]=g);
 // escape + wrap the first appearance of each term in this text with a tappable chip
-// card and Kingdom Card names are never split into glossary words ("Night Ferry Captain" stays a name)
+// card and Kingdom Card names are never split into glossary words ("Furnace Boss" stays a name)
 let _nameRe=null;function nameRe(){if(_nameRe)return _nameRe;const D=TB.DATA,n=[];for(const f in D.BASICNAMES)n.push(...D.BASICNAMES[f]);for(const f in D.SITE)for(const c of D.SITE[f])n.push(c.nm);for(const k of D.KC)n.push(k.nm);for(const t in D.TACTICS)for(const x of D.TACTICS[t])n.push(x.nm);for(const f in D.FAVOUR)n.push(D.FAVOUR[f].nm);
   const u=[...new Set(n)].filter(Boolean).sort((a,b)=>b.length-a.length).map(x=>x.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'));_nameRe=new RegExp('('+u.join('|')+')','g');return _nameRe}
 function gloss(text){if(text==null)return '';text=String(text);const hits=[];const masked=[];{const re=nameRe();re.lastIndex=0;let m;while((m=re.exec(text)))masked.push([m.index,m.index+m[0].length])}
@@ -100,12 +105,13 @@ function gloss(text){if(text==null)return '';text=String(text);const hits=[];con
   for(const h of hits){if(h.i<p)continue;out+=esc(text.slice(p,h.i));const nw=!(UI.glSeen&&UI.glSeen[h.k]);out+='<button type="button" class="gl'+(nw?' new':'')+'" data-a="gloss" data-t="'+esc(h.k)+'" aria-label="'+esc(text.substr(h.i,h.n))+': what does it mean?">'+esc(text.substr(h.i,h.n))+'</button>';p=h.i+h.n}
   return out+esc(text.slice(p))}
 function showGloss(k){const g=GL[k];const el=$('#gdef');if(!g||!el)return;UI.glSeen=UI.glSeen||{};UI.glSeen[k]=1;
-  el.innerHTML='<p><b>'+esc(g[2])+'</b>: '+esc(g[3])+'</p><button class="pp-x" data-a="gclose" aria-label="Close">'+ico('x')+'</button>';el.hidden=false;el.setAttribute('role','dialog');el.setAttribute('aria-modal','true');if(typeof sfx==='function')sfx('tap')}
+  el.innerHTML='<p><b>'+esc(g[2])+'</b>: '+esc(g[3])+'</p><button class="pp-x" data-a="gclose" aria-label="Close">'+ico('x')+'</button>';el.hidden=false;el.style.top='';try{const rv=$('#rivals'),q=rv&&rv.getBoundingClientRect();if(q&&q.width>innerWidth*.6&&q.bottom>0&&q.bottom<innerHeight*.4)el.style.top=Math.round(q.bottom+6)+'px'}catch(x){}   /* the word card opens under the rival chips, never over them */
+  el.setAttribute('role','dialog');el.setAttribute('aria-modal','true');if(typeof sfx==='function')sfx('tap')}
 function hideGloss(){const el=$('#gdef');if(el){el.hidden=true;el.innerHTML=''}}
 document.addEventListener('toggle',e=>{const d=e.target;if(d&&d.dataset&&d.dataset.more)UI.moreOpen=d.open},true);
 // ---------------------------------------------------------------- the guided first game: fixed deal, one thing per step
-// Deal: you lead the Heathbound Clans against the Gilded Court (Easy), 4 rounds, seed 23 (picked with the seed search in the clarity pass: round 1 has no elimination, one Clash lost, one won with Supporters on the contested Herald location, so the +1 and the steal happen).
-// Cairn Field and win there with your Heir and two Supporters: the +2, the Herald's +1 and the steal all happen in round 1.
+// Deal: you lead the Reedfolk against the Salt Crown (Easy), 4 rounds, seed 23 (picked with the seed search in the clarity pass: round 1 has no elimination, one Clash lost, one won with Supporters on the contested Herald location, so the +1 and the steal happen).
+// Broken Shield and win there with your Heir and two Supporters: the +2, the Herald's +1 and the steal all happen in round 1.
 const GUIDED={seed:23,lastNormal:0,ai:9,faction:'clans',rival:'nobility'};
 const isGuided=()=>!!(UI.cfg&&UI.cfg.guided&&!NET.on);
 // the old coach pop-ups (goal / map / round) are replaced by the staged tutorial (part 12, shell/gx-tutor.js)
@@ -119,10 +125,10 @@ const BONUSK=['castle','wilderness','harvest','shrine','ossuary'];
 // teaching moves for round 1 (falls back to the normal suggestion when the scripted card is not there)
 function coachRec(s,mv){if(!isGuided()||!G.q)return null;if(UI.cfg.tutorial){const tr=tutRec(s,mv);if(tr!==undefined)return tr}const q=G.q,k=q.kind;
   if(G.round===1){
-    if(k==='bid')return byLabel(mv,'Sailing Hall');
+    if(k==='bid')return byLabel(mv,'Punt Catapult');
     if(k==='bidRes'){const takes=mv.filter(m=>m.t==='take');const pref=[11,13,17,5,46,51,14,39];for(const n of pref){const m=takes.find(x=>x.kc===n);if(m)return m}
       return takes.find(m=>!/Tactic|Favour|Council|Lore|Govern|Journey|SETUP/.test(TB.kingdomInfo(m.kc).text))||null}
-    if(k==='herald'){const riv=G.pl.find(p=>p.seat!==s&&p.herald>=0);return riv?mv.find(m=>m.loc===riv.herald):byLabel(mv,'Cairn Field')}
+    if(k==='herald'){const riv=G.pl.find(p=>p.seat!==s&&p.herald>=0);return riv?mv.find(m=>m.loc===riv.herald):byLabel(mv,'Broken Shield')}
     if(k==='place'){const P=G.pl[s];const heir=P.hand.find(id=>cinfo(id).archetype==='heir');if(heir!=null)return mv.find(m=>m.id===heir&&m.r===1);const big=P.hand.slice().sort((a,b)=>cinfo(b).strength-cinfo(a).strength);
       if(big.length)return mv.find(m=>m.id===big[0]&&m.r===0)||mv.find(m=>m.id===big[0]);return null}
     if(q.t==='menu'){const ph=menuPhase(q);if(ph==='Spring'&&G.pl[s].supp.r[1]===0){const m=mv.find(x=>x.a==='supp'&&x.p.r===1&&x.p.n===2);if(m)return m}return mv.find(m=>m.t==='done')}
@@ -133,7 +139,7 @@ const STEPN=(n,t)=>'Step '+n+' of 6 · '+t;
 const NEWK={cmd:['Card abilities','Some of your cards have a power printed on them. Examples are Flank, Ambush, Retreat, Rally and Deploy. The card says when it works. Why you\'d want it: move a card to where it wins.'],
   lore:['Journey','Send a hand card away to gain its Lore. Why you\'d want it: Lore buys Site of Power cards. They are stronger than your basic cards.'],
   tactic:['Tactics','Four special powers of your faction. Most work once per game, some once a round. Why you\'d want them: one well-timed Tactic can turn a Clash.'],
-  favour:['The Kingdom\'s Favour','A faction power with three uses, from the Gleaning Meadow. Why you\'d want it: an extra push when you need it. If Influence is tied when the game ends, the holder wins. It does not decide Clash ties.'],
+  favour:['The Kingdom\'s Favour','A faction power with three uses, from the Market Cross. Why you\'d want it: an extra push when you need it. If Influence is tied when the game ends, the holder wins. It does not decide Clash ties.'],
   govern:['Govern and Councils','Put a hand card with votes into a Council. Why you\'d want it: each Council gives a lasting power. That is Influence, Supporters back, or location bonuses.'],
   council:['Councils','Your cards in a Council give you a power. Why you\'d want it: it works every round while cards stay.'],
   kc:['Kingdom Card powers','Some Kingdom and HQ cards have a power you time yourself. Why you\'d want it: each row says what it costs and gives.']};
@@ -146,12 +152,12 @@ function coachFor(s,mv,rm){UI._coachShown=null;if(!isGuided()||!G.q||UI.cfg.tuto
     if(k==='herald'){const riv=G.pl.find(p=>p.seat!==s&&p.herald>=0);return {title:STEPN(3,'Place your Herald'),pulse:1,noRec:1,text:'Win the region where your Herald stands and claim its location. Gain +1 Influence, and take 1 from each rival Herald there.'+(riv&&rm?' The Court is on '+LOCN[riv.herald]+': join it.':'')}}
     if(k==='place'){const n=UI.V.reg.reduce((a,R2)=>a+R2.down.filter(id=>id>=0&&ownerOf(id)===s).length,0);
       return {title:STEPN(4,'Hide a card at each region'),pulse:1,noRec:1,text:'Card '+Math.min(3,n+1)+' of 3, hidden until the Clash. '+(rm?nm(rm.id)+' to '+REG[rm.r]+(cinfo(rm.id).archetype==='heir'?': your strongest card where both Heralds wait.':'.'):'Choose a card for each region.')}}
-    if(q.t==='menu'&&menuPhase(q)==='Spring'){const sent=G.pl[s].supp.r[1]>0;return {title:STEPN(5,'Send Supporters'),pulse:1,noRec:1,text:sent?'Two Supporters stand with your Heir. Now tap Done with Spring.':'Each Supporter you send adds +1 Strength in a region\'s first Clash. It is gone after this round. Send 2 to the Tablelands to back your Heir.'}}
+    if(q.t==='menu'&&menuPhase(q)==='Spring'){const sent=G.pl[s].supp.r[1]>0;return {title:STEPN(5,'Send Supporters'),pulse:1,noRec:1,text:sent?'Two Supporters stand with your Heir. Now tap Done with Spring.':'Each Supporter you send adds +1 Strength in a region\'s first Clash. It is gone after this round. Send 2 to the Crossroads to back your Heir.'}}
     if(k==='clashOrder')return {title:STEPN(6,'The Clashes'),pulse:1,noRec:1,text:'You are last in turn order. You choose the first region to fight. Any order works: take the suggested one.'};
     if(q.t==='menu'&&menuPhase(q)==='Day')return {title:STEPN(6,'The Clash in '+(G.clash?REG[G.clash.r]:'a region')),pulse:1,noRec:1,text:'The cards are face up: the box shows each side\'s Strength. Later you can use Day powers here. For now, tap Done and the Clash is fought.'};
     if(k==='location')return {title:'You won: claim a location',pulse:1,noRec:1,text:'Pick one of the region\'s two locations.'+(rm?' '+whyFor(s,rm):'')};
     if(k==='tie')return {title:'A tie!',pulse:1,text:'Both sides have the same total. Each of you may add one more hidden card, or pass. If nobody adds one, nobody wins here.'};
-    if(BONUSK.includes(k))return {title:'Location bonus: '+(QNAME[k]||'a bonus'),pulse:1,noRec:1,text:({castle:'The Spire Court lets you put a card into a Council. Councils come in round 3: skip it for now.',wilderness:'Thornwild lets you send a card on a Journey for Lore. Lore comes in round 2: skip it for now.',harvest:'The Gleaning Meadow gives you the Kingdom\'s Favour. It is a power for later, and it wins ties. Claim it.',shrine:'Moss Altar lets you put cards at the bottom of your deck. Choose none for now.',ossuary:'You drew cards back from your Discard Pile. You may also discard some: choose none for now.'})[k]}}
+    if(BONUSK.includes(k))return {title:'Location bonus: '+(QNAME[k]||'a bonus'),pulse:1,noRec:1,text:({castle:'The Bell Tower lets you put a card into a Council. Councils come in round 3: skip it for now.',wilderness:'Standing Stones lets you send a card on a Journey for Lore. Lore comes in round 2: skip it for now.',harvest:'The Market Cross gives you the Kingdom\'s Favour. It is a power for later, and it wins ties. Claim it.',shrine:'Wishing Well lets you put cards at the bottom of your deck. Choose none for now.',ossuary:'You drew cards back from your Discard Pile. You may also discard some: choose none for now.'})[k]}}
   if(q.t==='menu'){const L=visibleActs(mv).filter(m=>m.t==='act');for(const K of ['cmd','lore','tactic','favour','govern','council','kc']){if(UI.coachDone['new_'+K])continue;if(L.some(m=>actKind(m.a)===K)){UI._coachShown='new_'+K;return {title:'New: '+NEWK[K][0],text:NEWK[K][1]}}}}
   if(k==='siteBuy'&&!UI.coachDone.new_site){UI._coachShown='new_site';return {title:'New: spend Lore',text:'Lore buys your Site of Power cards. A card with a Strength goes to your hand. An HQ card is a permanent power in front of you. Keep the Lore if nothing fits yet.'}}
   return null}
@@ -168,11 +174,14 @@ function overBreakdown(){if(!G.infl)return '';const rows=youFirst(G.pl.map(p=>p.
   return '<h4 class="bdh">Where the Influence came from</h4><ul class="rank bd2">'+rows+'</ul>'}
 // ---------------------------------------------------------------- title + setup
 const STORY={
- nobility:{story:'The old court dresses for dinner in a palace with no king. Its stewards count every coin and every vote. They mean to crown one of their own before the frost.',enjoy:'Choose the Gilded Court for steady income, sturdy cards and Councils.',tag:'Defence and votes · easy to learn'},
- clans:{story:'From the cold coasts the clans ride in with the tide. They move fast and bring many hands. They strike where the valley folk least expect.',enjoy:'Choose the Heathbound Clans for big swings, region-switching riders and Supporters.',tag:'Speed and numbers · easy to learn'},
- uprising:{story:'In the dockside alleys, printers and ferrymen pass notes by lantern-light. They cannot win a fair fight, so they never fight fair.',enjoy:'Choose the Lantern Rising for bluffs, ambushes and knocking out rival cards.',tag:'Tricks and ambushes · medium'},
- gathering:{story:'Under the moon the Choir sings to what others threw away. Lost cards return to them. Small cards win their fights. Patience is their weapon.',enjoy:'Choose the Pale Choir for clever combinations and playing the long game.',tag:'Combos and patience · harder'}};
-const sv={mode:'me',np:3,faction:'clans',length:'standard',guide:'off',levels:['normal','normal','normal','normal']};
+ nobility:{story:'The old court dresses for dinner in a palace with no king. Its stewards count every coin and every vote. They mean to crown one of their own before the frost.',enjoy:'Choose the Salt Crown for steady income, sturdy cards and Councils.',tag:'Defence and votes · easy to learn'},
+ clans:{story:'From the cold coasts the clans ride in with the tide. They move fast and bring many hands. They strike where the valley folk least expect.',enjoy:'Choose the Reedfolk for big swings, region-switching riders and Supporters.',tag:'Speed and numbers · easy to learn'},
+ uprising:{story:'In the dockside alleys, printers and ferrymen pass notes by lantern-light. They cannot win a fair fight, so they never fight fair.',enjoy:'Choose the Ember Guild for bluffs, ambushes and knocking out rival cards.',tag:'Tricks and ambushes · medium'},
+ gathering:{story:'Under the moon the Choir sings to what others threw away. Lost cards return to them. Small cards win their fights. Patience is their weapon.',enjoy:'Choose the Hollow Synod for clever combinations and playing the long game.',tag:'Combos and patience · harder'}};
+const sv={mode:'me',np:3,faction:'clans',length:'standard',guide:'off',levels:['easy','easy','easy','easy']};
+// a newcomer's first game (until one real game is finished): hints on, one Easy rival, 4 rounds
+function newcomer(){try{return !localStorage.getItem('tb_fin')}catch(e){return true}}
+if(newcomer())Object.assign(sv,{np:2,length:'short',guide:'full',levels:['easy','easy','easy','easy']});
 function titleArtSvg(){return '<svg viewBox="0 0 1200 800" preserveAspectRatio="xMidYMid slice" aria-hidden="true"><defs>'+
  '<linearGradient id="tsky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#140a1c"/><stop offset=".45" stop-color="#3a1a30"/><stop offset=".72" stop-color="#8a3c3a"/><stop offset=".86" stop-color="#d98a52"/><stop offset="1" stop-color="#f2c27a"/></linearGradient>'+
  '<radialGradient id="tmoon" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#fff6d6"/><stop offset=".55" stop-color="#f6e2a8" stop-opacity=".9"/><stop offset="1" stop-color="#f6e2a8" stop-opacity="0"/></radialGradient>'+

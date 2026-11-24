@@ -4,7 +4,7 @@
    Steps: TUT_STEPS below (rule ids in COACH_RULES). Proof: tutorial-end.js (walks it by touch, checks every rule step appears). */
 var TUT_GAME = 'wildmark', TUT_SEED = 11, TUT_TURNS = 7;
 window.GXCOACH = { running: false, explained: [], done: false };   // read by the QA bot's coached mode
-var COACH_RULES = ['goal', 'pick', 'place', 'settle', 'keystone', 'rival', 'bear', 'rotate', 'habitat', 'sweep3', 'elk', 'acornSpend', 'salmon', 'wipe4', 'hawk', 'acornReplace', 'fox', 'majority', 'return', 'end20', 'acornsEnd', 'tiebreak'];
+var COACH_RULES = ['goal', 'pick', 'place', 'settle', 'keystone', 'rival', 'bear', 'rotate', 'habitat', 'sweep3', 'elk', 'acornSpend', 'salmon', 'wipe4', 'hawk', 'acornReplace', 'fox', 'majority', 'end20', 'acornsEnd', 'tiebreak', 'return'];
 // one step = { r: rule id taught (first step of a rule), say: <=12 words, hl: what glows, ok: allowed action, done: finished?, go: on enter }
 // hl kinds: 'next' (the bubble's Next button), 'col:i' (market tile i), 'tok:i' (market animal i), 'spot' (chosen map spot), 'cell' (tile just placed), '#id'
 function tutSteps() {
@@ -13,8 +13,7 @@ function tutSteps() {
     { r: 'goal', say: 'Beat Bram: score more points in your valley than he does.', hl: 'next' },
     { r: 'pick', say: 'Each turn take a tile and the animal below it.', hl: 'col:0', ok: 'take:0', done: function () { return G.stage === 'tile'; } },
     { r: 'place', say: 'Your tile must touch your valley. Tap the glowing spot.', hl: 'spot', pick: 'best', ok: 'spot', done: function () { return !!UI.ghost; } },
-    { say: 'Tap Place to put the tile down.', hl: '#okB', ok: 'ok', done: function () { return G.stage === 'tok'; } },
-    { r: 'settle', say: 'Animals live only on tiles that show them. Tap your bear tile.', hl: 'cell', ok: 'tok', done: turnDone },
+    { r: 'settle', say: 'Bears live on tiles that show them. Tap your new ringed tile.', hl: 'cell', ok: 'tok', done: turnDone },
     { r: 'keystone', say: 'Gold keystone tile: an animal on it earns you an acorn.', hl: 'next' },
     { r: 'rival', say: 'Now Bram plays: he takes, places and settles like you.', hl: 'next' },
     { wait: 1 },
@@ -22,52 +21,48 @@ function tutSteps() {
     { r: 'bear', say: 'Bears score in pairs of two. Take the second bear.', hl: 'col:1', ok: 'take:1', done: function () { return G.stage === 'tile'; } },
     { say: 'Tap the spot beside your first bear.', hl: 'spot', pick: 'nearBear', ok: 'spot', done: function () { return !!UI.ghost; } },
     { r: 'rotate', say: 'Two-land tiles turn. Tap Turn so forest meets forest.', hl: '#rotB', ok: 'rot', go: rotPrep, done: function () { return UI.ghost && UI.ghost.rot === UI.tut.best; } },
-    { say: 'Good fit. Tap Place.', hl: '#okB', ok: 'ok', done: function () { return G.stage === 'tok'; } },
-    { say: 'Put the bear next to your first bear: a pair!', hl: 'cell', ok: 'tok', done: turnDone },
-    { r: 'habitat', say: 'Touching same land joins up: 1 point per joined tile.', hl: 'next' },
+    { say: 'Good fit. Tap the tile: it goes down, the bear moves in.', hl: 'cell', ok: 'tok', done: turnDone },
+    { r: 'habitat', say: 'Same land joins up: your largest group scores 1 per tile.', hl: 'next' },
     { wait: 1 },
     // turn 3: three alike, elk lines
     { r: 'sweep3', say: 'Three alike? Once per turn you may sweep them, free.', hl: '#w3B', ok: 'w3', done: function () { return !!G.used3; }, after: fixSweep },
     { r: 'elk', say: 'Elk score in straight lines. Take the elk.', hl: 'col:3', ok: 'take:3', done: function () { return G.stage === 'tile'; } },
     { say: 'Tap the glowing spot.', hl: 'spot', pick: 'best', ok: 'spot', done: function () { return !!UI.ghost; } },
-    { say: 'Tap Place.', hl: '#okB', ok: 'ok', done: function () { return G.stage === 'tok'; } },
-    { say: 'Settle the elk on its new tile.', hl: 'cell', ok: 'tok', done: turnDone },
+    { say: 'Tap the ringed tile: tile down, elk in. One tap.', hl: 'cell', ok: 'tok', done: turnDone },
     { wait: 1 },
     // turn 4: spend an acorn on a free pick, salmon runs (turn 6 uses the other power, Replace animals)
-    { r: 'acornSpend', say: 'You have an acorn. Tap Use acorn.', hl: '#acornB', ok: 'acorn', done: function () { return !!UI.acornMenu; } },
+    { r: 'acornSpend', say: 'You have an acorn. Tap the Acorn button.', hl: '#acornB', ok: 'acorn', done: function () { return !!UI.acornMenu; } },
     { say: 'Free pick takes any tile and any animal. Tap it.', hl: '#freeB', ok: 'freeB', done: function () { return !!UI.free; } },
     { r: 'salmon', say: 'Salmon score in runs. Tap the river tile.', hl: 'col:0', ok: 'freet:0', done: function () { return UI.free && UI.free.ti === 0 || G.stage === 'tile'; } },
     { say: 'Now tap the salmon from another column.', hl: 'tok:2', ok: 'freek:2', done: function () { return G.stage === 'tile'; } },
     { say: 'Tap the spot next to your river.', hl: 'spot', pick: 'nearRiver', ok: 'spot', done: function () { return !!UI.ghost; } },
-    { say: 'Tap Place.', hl: '#okB', ok: 'ok', done: function () { return G.stage === 'tok'; } },
-    { say: 'Settle the salmon: another keystone, another acorn.', hl: 'cell', ok: 'tok', done: turnDone },
+    { say: 'Tap the ringed river tile: another keystone, another acorn.', hl: 'cell', ok: 'tok', done: turnDone },
     { wait: 1 },
     // turn 5: four alike wipe themselves, lone hawks
     { r: 'wipe4', say: 'Four alike! The market swaps them by itself.', hl: 'next', after: fixWipe4 },
     { r: 'hawk', say: 'Hawks score alone, touching no other hawk. Take the hawk.', hl: 'col:2', ok: 'take:2', done: function () { return G.stage === 'tile'; } },
     { say: 'Tap the spot away from other hawks.', hl: 'spot', pick: 'noHawk', ok: 'spot', done: function () { return !!UI.ghost; } },
-    { say: 'Tap Place.', hl: '#okB', ok: 'ok', done: function () { return G.stage === 'tok'; } },
-    { say: 'Settle the hawk.', hl: 'cell', ok: 'tok', done: turnDone },
+    { say: 'Tap the ringed tile to settle the hawk.', hl: 'cell', ok: 'tok', done: turnDone },
     { wait: 1 },
     // turn 6: fox neighbours
-    { say: 'Acorns can also swap market animals. Tap Use acorn.', hl: '#acornB', ok: 'acorn', done: function () { return !!UI.acornMenu; } },
+    { say: 'Acorns can also swap market animals. Tap the Acorn button.', hl: '#acornB', ok: 'acorn', done: function () { return !!UI.acornMenu; } },
     { r: 'acornReplace', say: 'Tap Replace animals.', hl: '#wipeB', ok: 'wipeB', done: function () { return !!UI.wipe; } },
     { say: 'Tap the salmon you do not need.', hl: 'tok:3', ok: 'wsel:3', done: function () { return !!UI.wipe && UI.wipe.indexOf(3) >= 0; } },
     { say: 'Tap Replace: a new animal comes from the bag.', hl: '#wokB', ok: 'wok', done: function () { return !UI.wipe; }, after: fixReplace },
     { r: 'fox', say: 'A fox scores 1 per different animal beside it.', hl: 'col:1', ok: 'take:1', done: function () { return G.stage === 'tile'; } },
     { say: 'Tap the spot with the most animals around it.', hl: 'spot', pick: 'nearTok', ok: 'spot', done: function () { return !!UI.ghost; } },
-    { say: 'Tap Place.', hl: '#okB', ok: 'ok', done: function () { return G.stage === 'tok'; } },
-    { say: 'Settle the fox among its neighbours.', hl: 'cell', ok: 'tok', done: turnDone },
+    { say: 'Tap the ringed tile: the fox moves in among neighbours.', hl: 'cell', ok: 'tok', done: turnDone },
     { wait: 1 },
     // turn 7: majority bonus, returning an animal, the end of a real game
-    { r: 'majority', say: 'Biggest land of a kind beats Bram: plus 2 points.', hl: 'next' },
-    { say: 'Last turn. Take this pair.', hl: 'col:0', ok: 'take:0', done: function () { return G.stage === 'tile'; } },
-    { say: 'Tap the glowing spot.', hl: 'spot', pick: 'best', ok: 'spot', done: function () { return !!UI.ghost; } },
-    { say: 'Tap Place.', hl: '#okB', ok: 'ok', done: function () { return G.stage === 'tok'; } },
-    { r: 'return', say: 'No good spot? Return the animal to the bag.', hl: '#backB', ok: 'back', done: turnDone },
+    { r: 'majority', say: 'Biggest land of a kind: plus 2. Tied with Bram: 1 each.', hl: 'next' },
+    { say: 'With 3-4 players: biggest plus 3, second plus 1, ties earn less.', hl: 'next' },
     { r: 'end20', say: 'Real games last 20 turns each, then everything scores.', hl: 'next' },
     { r: 'acornsEnd', say: 'Every acorn you still hold is worth 1 point.', hl: 'next' },
     { r: 'tiebreak', say: 'Tied on points? More acorns wins.', hl: 'next' },
+    { say: 'Last turn. Take this pair.', hl: 'col:0', ok: 'take:0', done: function () { return G.stage === 'tile'; } },
+    { say: 'Tap the glowing spot.', hl: 'spot', pick: 'best', ok: 'spot', done: function () { return !!UI.ghost; } },
+    { say: 'Keeping the animal is optional. Tap Place tile instead.', hl: '#okB', ok: 'ok', done: function () { return G.stage === 'tok'; } },
+    { r: 'return', say: 'No good spot? Tap Skip animal: it goes back to the bag.', hl: '#backB', ok: 'back', done: turnDone },
     { wait: 2 }
   ];
 }
@@ -154,7 +149,7 @@ function tutDraw() {
   else if (h.indexOf('col:') === 0) el = $('#mk .mt[data-i="' + h.slice(4) + '"]');
   else if (h.indexOf('tok:') === 0) el = $('#mk .mk[data-i="' + h.slice(4) + '"]');
   else if (h === 'spot') el = UI.ghost ? null : $('#map .spot[data-c="' + T.spot + '"]');
-  else if (h === 'cell') el = $('#map .hx[data-c="' + T.spot + '"]');
+  else if (h === 'cell') el = UI.ghost && UI.ghost.c === T.spot ? $('#map .ghost') : $('#map .hx[data-c="' + T.spot + '"]');
   else el = $(h);
   if (el) el.classList.add('tuthl');
 }
@@ -169,7 +164,7 @@ function coachFinalHTML() {
   var r = G.res[0], b = G.res[1], tb = 0, hb = 0; WM.TER.forEach(function (t) { hb += r.hab[t]; tb += r.bonus[t] || 0; });
   window.WM_COACH = { explained: Object.keys(UI.tut.seen), shown: UI.tut.shown.slice(), later: [], step: UI.tut.i, steps: UI.tut.steps.length };
   window.GXCOACH = { running: false, explained: Object.keys(UI.tut.seen), later: [], done: true };
-  var h = '<div class="cfinal"><p class="ch"><i class="cface" aria-hidden="true"></i><b>Rowan</b> Here is how your score adds up.</p><ol>';
+  var h = '<div class="cfinal"><p class="ch"><i class="cface" aria-hidden="true"></i><span><b>Rowan</b> Here is how your score adds up.</span></p><ol>';
   h += '<li>Animals: <b>' + r.aniT + '</b></li>';
   h += '<li>Biggest land of each kind: <b>' + hb + '</b>, bonus <b>' + tb + '</b></li>';
   h += '<li>Acorns kept: <b>' + r.acorns + '</b></li>';
@@ -190,6 +185,6 @@ function tutStart(o) {
   UI.coachPrologue = !!(o && o.prologue); UI.prefs.played = 1; savePrefs();
   UI.tut = { steps: tutSteps(), i: 0, entered: false, seen: {}, shown: [], fixed: {}, t0: 0, spot: null, best: 0, busy: false };
   window.GXCOACH = { running: true, explained: [], done: false };
-  UI.mode = 'coach'; newGame({ np: 2, humans: 1, ai: 'novice', seed: TUT_SEED, turns: TUT_TURNS, names: [null, 'Bram'] }); UI.mode = 'coach';
+  UI.mode = 'coach'; newGame({ np: 2, humans: 1, ai: 'novice', seed: TUT_SEED, turns: TUT_TURNS, names: [null, 'Bram'] }); UI.mode = 'coach'; G.tutRival = true;
   tutFix(); render();
 }

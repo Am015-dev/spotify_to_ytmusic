@@ -1,7 +1,7 @@
 // ---------- Sunglaze: constants. Numbers follow the published game; names and art are original. ----------
 // tile codes: 0..4 the five glazes, 5 = prism tile (joker promo), 6 = the Sun token on a breakage line
 const NC=5,PRISM=5,SUN=6;
-const TNAME=['Cobalt','Saffron','Garnet','Obsidian','Frost','Prism'];
+const TNAME=['Blue','Yellow','Red','Black','Snowflake','Prism'];
 const TCSS=['#1f4fa8','#f0b429','#c2362f','#23252b','#bfe6ea','#f4f0ff'];
 const TINK=['#fff5d8','#b5451b','#ffe3b0','#e2b24a','#1d6f84','#7b5bc4'];
 const TICON=['◆','✹','✤','☾','❄','✧'];

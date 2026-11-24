@@ -24,8 +24,13 @@ A bird-collecting engine-building card game for 1-5 players (solo against an aut
   nests (bowl, cavity, ground, platform, star = any). Powers are from a set of 26 types true to the design's colours, not copies of real cards.
 - Goals: 12 original goal tiles, green-side (competitive) scoring only; solo with no rival uses 1 point per item up to 5.
 - Bonus cards: 18 original ones with tiered or per-bird scoring.
-- Rival Flock (solo): a shuffled deck of 8 action cards per round (add the top deck bird to its flock, take a die, lay eggs,
-  take the first tray bird); goal count = marks from its cards. A simplification of an automa, not a copy.
+- Rival Flock (solo), the original solo structure (F1, 20 Nov 2026): 10 action cards (+1 expert card on hard), 4 round sections each,
+  one card per turn, only the current round's section counts; one card leaves after each of rounds 1-3; you always go first. Play = the
+  highest tray bird that fits its bonus card (face up) or a hidden deck bird; draw = discard the whole tray, keep a hidden bird; food =
+  first face of the card's key found in the feeder, remove every die of it; eggs = 1 point each; goal count = base value + cubes
+  (birds-in-a-row goal capped at 5); a pink icon fires all your pink powers; hidden birds 3/4/5 points (easy/normal/hard); its bonus card
+  scores nothing; tie = it has 2 leftover food. Card faces and base values are this game's own (tuned so a mixed newcomer wins ~half on Easy).
+- Brown powers are optional: the game asks when a power also helps others (everyone gains/draws); others fire by themselves.
 - Payment and egg sources are chosen automatically (cheapest food first; eggs from the fullest nests); "Other food" cycles the payment.
 
 ## Cross-check against the online rulebook (7 Nov 2026)

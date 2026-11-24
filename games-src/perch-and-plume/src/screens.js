@@ -55,7 +55,7 @@ function quickStart() {
   if (CFG.n === 1) seats.push({ name: 'Rival Flock', kind: 'automa', lvl: CFG.lvl, face: 'corvin' });
   for (var i = 1; i < CFG.n; i++) seats.push({ name: NAMES[i - 1], kind: CFG.kinds[i] === 'human' ? 'human' : 'ai', lvl: CFG.lvl, face: FACES[i - 1] });
   if (seats.filter(function (s) { return s.kind === 'human'; }).length > 1) seats[0].name = 'Player 1';
-  setTimeout(function () { var L = STORY.quickIntro; toast(L[Math.floor(Math.random() * L.length)], 2600); }, 300);
+  if (window.innerHeight > 640) setTimeout(function () { var L = STORY.quickIntro; toast(L[Math.floor(Math.random() * L.length)], 2600); }, 300);
   startGame({ seats: seats, mode: seats.some(function (s, k) { return k && s.kind === 'human'; }) ? 'hot' : CFG.n === 1 ? 'solo' : 'vs', goalSide: CFG.side === 'blue' ? 'blue' : 'green', first: CFG.first === 'random' ? 'random' : 0 });
 }
 // ---------------- the starting hand: keep 5 in total (birds + food), pick 1 of 2 bonus cards
@@ -80,7 +80,7 @@ function showKeep(s) { hideHelp();
   draw();
 }
 // ---------------- game over
-function gameOver() { hideHelp();
+function gameOver() { hideHelp(); UI.cap = null; try { var pr = $('#prompt'); if (pr) pr.textContent = 'The year is over.'; $('#toast').innerHTML = ''; } catch (e) { }   // no stale line under the result
   if (UI.overShown === G) return; UI.overShown = G;
   clearSave(); musicSync(); sfx('end');
   try { localStorage.setItem('pp-played', '1'); } catch (e) { }
@@ -102,9 +102,10 @@ function gameOver() { hideHelp();
       '<ul class="goalstars">' + sl + '</ul>' + (gwin ? '' : '<small>Stars are earned once the goal is met.</small>') + '</div>';
     var cid = UI.camp.id; if (!gwin && STORY.lose[cid]) voice = sayB(STORY.lose[cid]); else if (gwin && STORY.bossWin[cid]) voice = sayB(STORY.bossWin[cid]);
   }
-  var h = artHTML('bg-result', 'bgart', '') + (UI.camp && UI.camp.goal ? '<h2>' + esc(gwin ? 'Goal met!' : 'Goal missed') + '</h2><p class="yr">' + esc(line) + '</p>' + goalHTML : '<h2>' + esc(line) + '</h2>') + voice + '<table class="stand"><tr><th>Player</th><th>Birds</th><th>Bonus</th><th>Goals</th><th>Eggs</th><th>Food</th><th>Tucked</th><th>Total</th></tr>' +
+  var h = artHTML('bg-result', 'bgart', '') + (UI.camp && UI.camp.goal ? '<h2>' + esc(gwin ? 'Goal met!' : 'Goal missed') + '</h2><p class="yr">' + esc(line) + '</p>' + goalHTML : '<h2>' + esc(line) + '</h2>') + voice + '<table class="stand"><tr><th>Player</th><th>Birds</th><th>Bonus</th><th>Goals</th><th>Eggs</th><th>Stored food</th><th>Tucked</th><th>Total</th></tr>' +
     order.map(function (i) { var s = sc[i]; return '<tr class="' + (winners.indexOf(i) >= 0 ? 'win' : '') + '"><td>' + esc(G.pl[i].name) + '</td><td>' + s.birds + '</td><td>' + s.bonus + '</td><td>' + s.goals + '</td><td>' + s.eggs + '</td><td>' + s.cache + '</td><td>' + s.tuck + (s.lead ? '+' + s.lead : '') + '</td><td><b data-engine="G.final[' + i + '].total">' + s.total + '</b></td></tr>'; }).join('') + '</table>';
-  h += '<p class="rnote">Birds = card points. Food = food cached on birds. Ties go to the most food left over.</p><div class="tmenu">' +
+  if (G.gres && G.gres.length) h += '<div class="gbreak"><b>Round goals</b>' + G.gres.map(function (r, k) { return '<p><span>Round ' + (k + 1) + ': ' + esc(PP.GOL[r.gid || G.goals[k]].n) + '</span> ' + r.pts.map(function (v, i) { return esc(isHuman(i) && humans().length <= 1 ? 'You' : G.pl[i].name) + ' ' + v; }).join(', ') + '</p>'; }).join('') + '</div>';
+  h += '<p class="rnote">Birds = card points. Stored food = food cached on birds. Ties go to the most food left over in your supply (the solo rival too).</p><div class="tmenu">' +
     (UI.camp ? '<button type="button" class="btn big primary" id="again">Continue the story</button>' : '<button type="button" class="btn big primary" id="again">Play again</button><button type="button" class="btn" id="totitle">Title screen</button>') + '</div>';
   el.innerHTML = h;
   setTimeout(function () {
@@ -125,12 +126,13 @@ var RULES = [
   ['Playing a bird', 'Pay its food (any 2 food can stand in for 1) and put it in the leftmost empty space of a habitat it lives in. Spaces 2 and 3 cost 1 egg, spaces 4 and 5 cost 2 eggs.'],
   ['Powers', 'Brown powers fire every time you use that row, one by one from right to left. White powers fire once when the bird is played. Pink powers react to other players between your turns.'],
   ['End of round', 'The round goal is scored: most items gets the most points (4/1/0 in round 1 up to 7/4/3 in round 4); ties share. The tray is refreshed and the first player passes on.'],
+  ['Solo: the Rival Flock', 'You always go first. Each Flock turn turns one card; only this round\'s part counts. Play: it keeps the best tray bird that fits its bonus card, or a hidden bird. Draw: it clears the tray and keeps a hidden bird. Food: it removes every die of one food. Eggs: 1 point each. Goal cubes add to its base count. Its pink icon fires all your pink powers. Hidden birds score 3, 4 or 5 (easy, normal, hard); its bonus card scores nothing.'],
   ['End of the year', 'After round 4, add up card points, bonus cards, goals, eggs, cached food and tucked cards. Ties go to the most leftover food.']
 ];
 function rulesBody() {
   var d = document.createElement('div'); d.className = 'dr';
-  d.innerHTML = '<h3>How a turn works</h3><ol class="howturn"><li>On your turn you do ONE thing.</li><li>Play a bird from your hand into a row (pay the food on the card).</li><li>Or tap a row button: forest = food, grassland = eggs, wetland = cards.</li><li>Every bird in that row then uses its power, right to left.</li><li>After 4 rounds, most points wins: birds, eggs, goals, bonus cards.</li></ol>' + RULES.map(function (r) { return '<h3>' + r[0] + '</h3><p>' + r[1] + '</p>'; }).join('') +
-    '<h3>Simplified on purpose</h3><ul><li>Food and eggs you pay for a bird are picked for you (cheapest first).</li><li>The solo Rival Flock is this game\'s own simple deck.</li><li>120 birds, 18 bonus cards and 12 goals, all original.</li><li>A row\'s trade (card for food, food for egg, egg for card) is offered before the row\'s gain, not after.</li><li>Row yields: forest and wetland 1,1,2,2,3,3; grassland 2,2,3,3,4,4; a trade on every second space.</li><li>The 4 round goals never repeat a family.</li><li>When the feeder dice all match and a power wants a food that is not there, the dice are rerolled for you.</li></ul>' +
+  d.innerHTML = '<h3>How a turn works</h3><ol class="howturn"><li>On your turn you do ONE thing.</li><li>Play a bird from your hand into a row (pay the food on the card).</li><li>Or tap a row button: forest = food, grassland = eggs, wetland = cards.</li><li>Every bird in that row then uses its power, right to left.</li><li>After 4 rounds, most points wins: birds, bonus cards, goals, eggs, cached food, tucked cards.</li></ol>' + RULES.map(function (r) { return '<h3>' + r[0] + '</h3><p>' + r[1] + '</p>'; }).join('') +
+    '<h3>Simplified on purpose</h3><ul><li>Food and eggs you pay for a bird are picked for you (cheapest first).</li><li>Brown powers are optional: you are asked when one also helps others; one that only helps you fires by itself.</li><li>120 birds, 18 bonus cards and 12 goals, all original.</li><li>A row\'s trade (card for food, food for egg, egg for card) is offered before the row\'s gain, not after.</li><li>Row yields: forest and wetland 1,1,2,2,3,3; grassland 2,2,3,3,4,4; a trade on every second space.</li><li>The round goals all differ, except that two may be about nests.</li><li>When the feeder dice all match and a power wants a food that is not there, the dice are rerolled for you.</li></ul>' +
     '<h3>Row actions by birds in the row</h3><p>Forest food: 1, 1+trade, 2, 2+trade, 3, 3+trade. Grassland eggs: 2, 2+trade, 3, 3+trade, 4, 4+trade. Wetland cards: 1, 1+trade, 2, 2+trade, 3, 3+trade.</p>' +
     '<div class="tmenu" style="margin:10px 0"><button type="button" class="btn" id="rtut">Play the tutorial</button><button type="button" class="btn" id="rref">All cards</button></div>';
   setTimeout(function () { var t = $('#rtut', d); if (t) t.onclick = function () { GX.close(); tutStart(); }; var r = $('#rref', d); if (r) r.onclick = function () { GX.close(); try { GX.refOpen(); } catch (e) { } }; }, 0);
@@ -140,7 +142,7 @@ function goalsBody() {
   var d = document.createElement('div'); d.className = 'dr';
   if (!G) { d.innerHTML = '<p>Start a game to see its round goals.</p>'; return d; }
   var me = UI.view, p = G.pl[me];
-  d.innerHTML = '<h3>Round goals</h3>' + G.goals.map(function (gid, r) {
+  d.innerHTML = '<h3>Round goals</h3><p class="gnote">Each goal counts only what its name says (a nest goal: eggs on that nest type only). Most gets the most points.</p>' + G.goals.map(function (gid, r) {
     var res = G.gres[r], cur = r === G.round && G.phase !== 'over';
     var detail = res ? res.pts.map(function (v, i) { return G.pl[i].name + ' ' + v; }).join(', ') : 'Now: ' + G.pl.map(function (q, i) { return q.name + ' ' + PP.goalCount(G, i, gid); }).join(', ');
     return '<div class="gl' + (cur ? ' now' : '') + '"><span>Round ' + (r + 1) + ': ' + esc(PP.GOL[gid].n) + '<br><small>' + PP.GOALPTS[Math.min(r, 3)].join('/') + ' pts · ' + esc(detail) + '</small></span></div>';
@@ -151,7 +153,7 @@ function goalsBody() {
 function logBody() { var d = document.createElement('div'); d.className = 'dr'; d.innerHTML = G ? G.log.slice(-60).reverse().map(function (l) { return '<div class="logl">' + esc(l) + '</div>'; }).join('') : '<p>No game yet.</p>'; return d; }
 function oppBody(s) {
   var d = document.createElement('div'), p = G.pl[s], sc = PP.scoreOf(G, s); d.className = 'dr';
-  if (p.auto) { d.innerHTML = '<p>The Rival Flock has ' + p.auto.birds.length + ' birds, ' + p.auto.eggs + ' eggs and ' + p.auto.tuck + ' tucked cards. Goal marks this round: ' + p.auto.marks + '.</p><p>Score so far: <b>' + sc.total + '</b></p>'; return d; }
+  if (p.auto) { d.innerHTML = '<p>The Rival Flock has ' + p.auto.birds.length + ' face-up birds, ' + p.auto.down.length + ' hidden birds and ' + p.auto.eggs + ' eggs. Goal cubes this round: ' + p.auto.marks + '.' + (p.auto.bonus ? ' Its bonus card: ' + esc(PP.BON[p.auto.bonus].n) + ' (it picks tray birds by it).' : '') + '</p><p>Score so far: <b>' + sc.total + '</b></p>'; return d; }
   d.innerHTML = '<p><b>' + sc.total + ' points</b> so far · ' + p.hand.length + ' cards in hand · ' + p.cubes + ' actions left · food ' + PP.FOODS.map(function (f) { return foodIcon(f) + p.food[f]; }).join(' ') + '</p>' +
     [0, 1, 2].map(function (h) { return '<div class="minirow"><span class="rl h' + HABC[h] + '">' + HABN[h] + '</span>' + [0, 1, 2, 3, 4].map(function (c) { var st = p.board[h][c]; return '<div class="slot">' + (st ? cardHTML(st.id, 'slot', st, 'data-oz="' + st.id + '" role="button" tabindex="0"') : '') + '</div>'; }).join('') + '</div>'; }).join('');
   setTimeout(function () { $$('[data-oz]', d).forEach(function (b) { b.onclick = function () { showCard(b.dataset.oz); }; }); }, 0);
@@ -170,7 +172,9 @@ function bootDrawers() {
         var b2 = document.createElement('button'); b2.className = 'btn'; b2.type = 'button'; b2.textContent = 'New quick game'; b2.onclick = function () { GX.close(); showConfig(); };
         var b3 = document.createElement('button'); b3.className = 'btn'; b3.type = 'button'; b3.textContent = 'Story map'; b3.onclick = function () { GX.close(); openStory(); };
         var b4 = document.createElement('button'); b4.className = 'btn'; b4.type = 'button'; b4.textContent = 'Restart'; b4.onclick = function () { GX.close(); restartGame(); };
-        S.appendChild(GX.row('This game', [b4, b1, b2, b3])); },
+        S.appendChild(GX.row('This game', [b4, b1, b2, b3]));
+        if (UI.skipKinds == null) loadAsk();
+        S.appendChild(GX.row('Ask me about optional powers', GX.onoff(UI.askOpt, function (v) { setAsk(v); if (v) { UI.skipKinds = {}; try { localStorage.removeItem('pp-skipk'); } catch (e) { } } }), 'Off: tuck, spend-an-egg and pay-for-extra steps are skipped for you. On also clears every "Always skip".')); },
       sound: function (S) { S.appendChild(GX.row('Sound effects', GX.onoff(SND.on, function (v) { SND.on = v; try { localStorage.setItem('pp-snd', v ? '1' : '0'); } catch (e) { } }))); var mb = document.createElement('button'); mb.className = 'btn'; mb.type = 'button'; mb.textContent = (window.PP_MUSIC || []).length ? 'Pick songs' : 'No songs yet'; mb.disabled = !(window.PP_MUSIC || []).length; mb.onclick = function () { try { GXMUS.open(); } catch (e) { } }; S.appendChild(GX.row('Music', [mb], 'Songs play here once the music files are added.')); },
       help: function (S) { var r = document.createElement('button'); r.className = 'btn'; r.type = 'button'; r.textContent = 'Rules'; r.onclick = function () { GX.show('rulesd'); };
         var c = document.createElement('button'); c.className = 'btn'; c.type = 'button'; c.textContent = 'All cards'; c.onclick = function () { GX.close(); try { GX.refOpen(); } catch (e) { } };

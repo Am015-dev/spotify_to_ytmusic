@@ -1,0 +1,32 @@
+GAUNTLET  games 300  levels normal  counts 2/3/4  time 25.7s
+errors 0   stalls 0   invariant violations 0
+
+== 2 players: 100 games ==
+avg rounds 5.00  avg decisions 229  avg winner score 20.1  avg score 15.4  avg margin 9.5  ties broken 2.0% (favour 0, order 2)
+fair share 50.0%
+  Gilded Court      win  80.4%   avg score 20.3   (51 seats)
+  Heathbound Clans  win  36.0%   avg score 13.0   (50 seats)
+  Lantern Rising    win  42.0%   avg score 15.0   (50 seats)
+  Pale Choir        win  40.8%   avg score 13.2   (49 seats)
+  seat index wins: 0:60.0%  1:40.0%
+  start-order position wins (1 = first on the track): 1:59.0%  2:41.0%
+
+== 3 players: 100 games ==
+avg rounds 5.00  avg decisions 331  avg winner score 16.6  avg score 10.8  avg margin 6.7  ties broken 3.0% (favour 0, order 3)
+fair share 33.3%
+  Gilded Court      win  46.7%   avg score 12.4   (75 seats)
+  Heathbound Clans  win  30.7%   avg score 10.6   (75 seats)
+  Lantern Rising    win  29.3%   avg score 10.5   (75 seats)
+  Pale Choir        win  26.7%   avg score 9.5   (75 seats)
+  seat index wins: 0:34.0%  1:36.0%  2:30.0%
+  start-order position wins (1 = first on the track): 1:39.0%  2:27.0%  3:34.0%
+
+== 4 players: 100 games ==
+avg rounds 5.00  avg decisions 425  avg winner score 14.5  avg score 8.3  avg margin 5.2  ties broken 5.0% (favour 2, order 3)
+fair share 25.0%
+  Gilded Court      win  27.0%   avg score 8.6   (100 seats)
+  Heathbound Clans  win  22.0%   avg score 7.9   (100 seats)
+  Lantern Rising    win  32.0%   avg score 9.6   (100 seats)
+  Pale Choir        win  19.0%   avg score 7.2   (100 seats)
+  seat index wins: 0:26.0%  1:18.0%  2:29.0%  3:27.0%
+  start-order position wins (1 = first on the track): 1:19.0%  2:30.0%  3:35.0%  4:16.0%

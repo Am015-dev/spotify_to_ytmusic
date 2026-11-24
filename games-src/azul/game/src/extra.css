@@ -166,7 +166,7 @@ html.bf-land #bf .bf-line .bf-say{background:rgba(10,20,50,.72);padding:4px 14px
 #bf .bf-c .pr{inset:5%;opacity:.3;filter:saturate(.45)}
 #bf .bf-wall .bf-c>.bf-t{box-shadow:0 2px 4px rgba(0,0,0,.45)}
 /* rival turn: the kiln it takes from glows; its chip pulses as the tiles arrive */
-#bf .rv-src{animation:rvSrc .9s ease-in-out infinite;border-radius:50%}
+#bf .rv-src{animation:rvSrc .9s ease-in-out 3;border-radius:50%}
 @keyframes rvSrc{0%,100%{box-shadow:0 0 0 0 rgba(255,214,90,0)}50%{box-shadow:0 0 0 6px rgba(255,214,90,.9),0 0 28px 8px rgba(255,190,60,.7)}}
 #bf .bf-chip.hit{animation:chipHit .45s ease-out}
 @keyframes chipHit{40%{transform:scale(1.12)}100%{transform:none}}
@@ -180,3 +180,79 @@ html.bf-land #bf .bf-line .bf-say{background:rgba(10,20,50,.72);padding:4px 14px
 #bf .bf-chip:has(.bf-pj)>i{display:none}
 #bf .bf-chip:has(.bf-pj){gap:2px;padding:0 6px}
 #bf .bf-chip .bf-pj{padding:1px 3px;margin-left:2px}
+/* F1 (R79): 44px hit boxes everywhere at 375x553; the drawn tile keeps its size (--v) inside the box */
+#bf .bf-table>.bf-t svg{position:absolute;left:50%;top:50%;width:var(--v);height:var(--v);margin:calc(var(--v)/-2) 0 0 calc(var(--v)/-2)}
+#bf .bf-table>.bf-t.sun{box-shadow:none;border-radius:0}
+#bf .bf-table>.bf-t.sun svg{border-radius:50%;box-shadow:0 0 0 2px #fff6c0,0 0 10px #ffd24a}
+#bf .bf-table .bf-t.nofit::after{right:calc(50% - var(--v)*.56);top:calc(50% - var(--v)*.56);width:max(12px,calc(var(--v)*.4));height:max(12px,calc(var(--v)*.4))}
+#bf .bf-table .bf-t.adv{outline:none;animation:none}
+#bf .bf-table .bf-t.adv svg{outline:3px solid #ffd24a;outline-offset:1px;border-radius:4px;animation:bfReady 1.2s ease-in-out 3}
+#bf .bf-me .bf-rack{min-height:44px;box-sizing:border-box;align-items:center}
+#bf .bf-me .bf-fl{min-height:44px;box-sizing:border-box;align-items:center}
+#bf .bf-c.pick{z-index:2}
+#bf .bf-c.pick>.bf-hit{position:absolute;left:50%;top:50%;width:44px;height:44px;margin:-22px 0 0 -22px;border-radius:8px}
+/* F1 (R79 P3): the bulb bubble keeps a readable width and stays on screen (the shell's short-phone padding was for a corner OK button it doesn't have) */
+html body .gxh-bub.gxh-bulbb{min-width:min(236px,calc(100vw - 12px));box-sizing:border-box}
+html body .gxh-bub.gxh-bulbb .gxh-tx{padding-right:0}
+/* the drawn tile takes the pointer, so a neighbour's 44px box never covers a tile's centre; a tap in the box margin reaches the kiln/middle/table and bfClick takes the nearest tile */
+#bf .bf-table .bf-t{pointer-events:none}
+#bf .bf-table .bf-t>svg{pointer-events:auto}
+/* the rival's board, always in view: a strip above the kilns on phones, a column left of the kilns on wide screens */
+#bf .bf-riv{flex:none;display:grid;grid-template-columns:auto 1fr;grid-template-rows:auto 1fr;column-gap:10px;align-items:center;margin:4px 6px 0;padding:4px 8px;border-radius:12px;background:rgba(10,20,50,.74);box-shadow:inset 0 0 0 1.5px rgba(255,214,107,.35);color:#fff1c8;position:relative;z-index:2;min-width:0}
+#bf .bf-riv[hidden]{display:none}
+#bf .rv-hd{grid-column:2;grid-row:1;display:flex;align-items:center;gap:5px;font:800 13px var(--ff);min-width:0;white-space:nowrap}
+#bf .rv-hd i{width:18px;height:18px;border-radius:50%;background:var(--pc) center/cover;flex:none;box-shadow:0 0 0 1.5px var(--pc)}
+#bf .rv-hd span{color:#ffd66b}#bf .rv-hd em{font-style:normal;display:inline-grid;width:18px;height:18px}#bf .rv-hd em img{width:18px;height:18px}
+#bf .rv-bd{grid-column:1;grid-row:1/3;display:flex;flex-direction:column;gap:1px;background:linear-gradient(#f6ead0,#ead9b4);border-radius:6px;padding:3px;box-shadow:inset 0 0 0 1.5px #b88a4c}
+#bf .rv-row{display:flex;gap:3px;border-radius:3px;transition:box-shadow .2s,background .2s}
+#bf .rv-rk,#bf .rv-wl,#bf .rv-fl{display:flex;gap:1px;position:relative}
+#bf .rv-c{width:var(--rc);height:var(--rc);border-radius:2px;position:relative;display:block;flex:none;background:#d6c29a;box-shadow:inset 0 0 0 1px #9a7a4e}
+#bf .rv-c.no{background:none}
+#bf .rv-c.w{background:#fffaf0;box-shadow:inset 0 0 0 1px #cdb995}#bf .rv-c.w[style]{background:color-mix(in srgb,var(--wc) 32%,#fffaf0)}#bf .rv-c.f{background:#f3dcd6;box-shadow:inset 0 0 0 1px #c9a29a}
+#bf .rv-c>.bf-t{inset:0}#bf .rv-c .bf-t svg{filter:none}
+#bf .rv-row.need{box-shadow:0 0 0 2px #e8a200,0 0 10px #ffd24a;background:rgba(255,210,74,.55)}
+#bf .rv-row.could{box-shadow:0 0 0 1.5px rgba(255,210,74,.55)}
+#bf .rv-fl{margin-top:2px;align-items:center}
+#bf .rv-pen{font:900 12px var(--ff);color:#ff9a8a;margin-left:4px}
+#bf .rv-say{grid-column:2;grid-row:2;display:flex;flex-direction:column;gap:1px;font:700 13px/1.2 var(--ff);min-width:0;align-self:start}
+#bf .rv-say b{font-weight:800;color:#ffe08a;font-size:13px}#bf .rv-say span{color:#e9dcc0}
+html.bf-wide #bf .bf-riv{grid-template-columns:1fr;grid-template-rows:auto auto auto;align-self:center;margin:4px 0 4px 10px;padding:12px 14px;row-gap:10px;width:calc(var(--rc)*10 + 34px);box-sizing:content-box}
+html.bf-wide #bf .rv-hd{grid-column:1;grid-row:1;font-size:18px}html.bf-wide #bf .rv-hd i{width:26px;height:26px}
+html.bf-wide #bf .rv-bd{grid-column:1;grid-row:2;gap:2px}html.bf-wide #bf .rv-row{gap:6px}html.bf-wide #bf .rv-rk,html.bf-wide #bf .rv-wl,html.bf-wide #bf .rv-fl{gap:2px}
+html.bf-wide #bf .rv-say{grid-column:1;grid-row:3;font-size:14px;min-height:56px}html.bf-wide #bf .rv-say b{font-size:16px}
+html.bf-wide #bf .rv-pen{font-size:15px}
+/* wall planning: what a tile will score at round end */
+#bf .bf-c.tgt2{box-shadow:inset 0 0 0 2px rgba(47,138,74,.7)}
+#bf .bf-c em.soon{opacity:.8;font-size:max(12px,calc(var(--cs)*.36))!important}
+#bf .bf-c em.soon.on{opacity:1;color:#145c28}
+#bf .bf-lvup{text-align:center;font:800 15px var(--ff);color:#7a4a10;margin:6px 0 2px}
+html:not(.bf-land) #bf.hasrv .bf-sack{top:calc(var(--sat,0px) + 50px);right:12px;padding:1px 6px 1px 3px;font-size:13px}html:not(.bf-land) #bf.hasrv .bf-sack .sg-back{width:18px;height:18px}
+#bf .bf-chip .rv-bd.rv-mini{padding:1px;gap:1px;border-radius:3px;margin:0 2px;flex:none;box-shadow:none}#bf .bf-chip .rv-mini .rv-row{gap:2px}
+#bf .rv-rk .rv-c{background:#c9ad7c}#bf .rv-rk .rv-c.no{background:none;box-shadow:none}
+#bf .rv-row.could{box-shadow:0 0 0 2px rgba(232,162,0,.85)}
+#bf .bf-chip:has(.rv-mini){padding:0 5px;gap:3px}#bf .bf-chip .rv-mini .rv-row{gap:1px}#bf .bf-chip:has(.rv-mini) .bf-sc{font-size:14px}
+#bf .bf-chip:has(.rv-mini) i.pic{width:20px;height:20px;min-width:20px}#bf .bf-chip .rv-bd.rv-mini{margin:0}#bf .bf-chip:has(.rv-mini) .bf-sc{margin-left:auto}
+/* guided game: a compact bubble (two lines of 13px) so it fits the strip between the kilns and the racks on a phone */
+html body .gxt-bub{max-width:min(352px,calc(100vw - 12px));padding:2px 9px}
+html body .gxt-bub .gxh-tx{font-size:13px;line-height:1.15}
+
+/* tutorial: look-only steps say how to go on (not part of the step's one sentence); a wrong tap swaps the whole line for a step-specific hint */
+html body .gxt-bub:is([data-step=goal],[data-step=slide],[data-step=keep],[data-step=floor],[data-step=tiling],[data-step=chain],[data-step=alone],[data-step=floorpen],[data-step=gameend],[data-step=bonus],[data-step=win]) .gxh-tx::after{content:' Tap the glow to go on.';font-weight:700;color:#8a4b00}
+html body .gxt-bub.gxt-shake .gxh-tx::after{content:none}
+/* the bubble has its own band between the kilns and the racks on phones, so it never sits on a tile */
+html.sg-tut.bf:not(.bf-land) #bf .bf-line{height:58px}
+html body .gxt-bub.gxt-nobtn .gxh-tx{padding-right:0}
+
+/* F5: phones keep the rival as one compact row (name, stars, start token); tap it to open the mini board */
+html:not(.bf-wide) #bf .bf-riv:not(.open){padding:2px 10px;margin-top:2px;grid-template-columns:1fr;grid-template-rows:auto;min-height:30px}
+html:not(.bf-wide) #bf .bf-riv:not(.open) .rv-bd,html:not(.bf-wide) #bf .bf-riv:not(.open) .rv-say{display:none}
+html:not(.bf-wide) #bf .bf-riv:not(.open) .rv-hd{grid-column:1;grid-row:1}
+html:not(.bf-wide) #bf .bf-riv:not(.open) .rv-hd::after{content:'▾ board';margin-left:auto;font-size:13px;color:#e9dcc0}
+
+/* IPH: phone playability. Bigger invisible hit areas on table tiles, no overlap between hint, sun label and sack counter, 44px rival row */
+html:not(.bf-wide) #bf .bf-table>.bf-t[data-k]::before{content:'';position:absolute;inset:-4px;border-radius:8px}
+html:not(.bf-wide) #bf .bf-table>.bf-t[data-k^="c_"]::before{inset:-9px}
+html:not(.bf-land) .bf-sunlbl{display:none}
+html:not(.bf-wide) #bf .bf-riv:not(.open){min-height:44px;cursor:pointer}
+html:not(.bf-wide) #bf .bf-riv:not(.open) .rv-hd{padding-right:56px}
+#bf .bf-top{z-index:3}

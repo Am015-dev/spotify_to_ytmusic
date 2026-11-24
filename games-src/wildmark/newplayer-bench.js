@@ -43,20 +43,26 @@ function randomPlan(G) {
   return { i, c, r: ro, tc: ts.length ? ts[Math.floor(r() * ts.length)] : null };
 }
 const BOT = process.env.BOT || 'greedy';
+// first: always the first market column, the first legal spot, no turning, the animal on the first legal tile (the review's "always the first option" player)
+function firstPlan(G) {
+  const env = G.seats[G.cur].env, i = [0, 1, 2, 3].find(k => G.market.tiles[k] && G.market.toks[k]), tile = G.market.tiles[i], c = W.spots(env)[0];
+  env[c] = { id: tile.id, t: tile.t, a: tile.a, key: tile.key, rot: 0, tok: null }; const ts = W.tokSpots(env, G.market.toks[i]); delete env[c];
+  return { i, c, r: 0, tc: ts.length ? ts[0] : null };
+}
 function greedy(G) {
-  if (G.stage === 'pick') { G._g = BOT === 'random' ? randomPlan(G) : BOT !== 'greedy' ? newcomerPlan(G) : greedyPlan(G); return { t: 'take', i: G._g.i }; }
+  if (G.stage === 'pick') { G._g = BOT === 'first' ? firstPlan(G) : BOT === 'random' ? randomPlan(G) : BOT !== 'greedy' ? newcomerPlan(G) : greedyPlan(G); return { t: 'take', i: G._g.i }; }
   if (G.stage === 'tile') return { t: 'place', c: G._g.c, rot: G._g.r };
   const tc = G._g.tc; return tc && W.tokSpots(G.seats[G.cur].env, G.hold.tok).includes(tc) ? { t: 'tok', c: tc } : { t: 'back' };
 }
 const levels = (process.argv[3] || 'novice,easy,normal').split(','), out = {};
 for (const lv of levels) {
-  let pts = 0, sh = 0, sa = 0;
+  let pts = 0, sh = 0, sa = 0; const mg = [];
   for (let g = 0; g < N; g++) {
     const me = g % 2, ai = me ? [lv, 'first'] : ['first', lv], G = W.newGame({ np: 2, seed: 9100 + g, ai });
     while (!G.over) W.apply(G, G.cur === me ? greedy(G) : W.AI.choose(G, lv));
-    pts += G.winner === me ? 1 : G.winner === -2 ? 0.5 : 0; sh += G.res[me].total; sa += G.res[1 - me].total;
+    pts += G.winner === me ? 1 : G.winner === -2 ? 0.5 : 0; sh += G.res[me].total; sa += G.res[1 - me].total; mg.push(G.res[me].total - G.res[1 - me].total);
   }
   out[lv] = Math.round(100 * pts / N);
-  console.log(lv + ': ' + BOT + ' bot wins ' + out[lv] + '%, avg ' + (sh / N).toFixed(1) + ' vs rival ' + (sa / N).toFixed(1) + ' over ' + N);
+  console.log(lv + ': ' + BOT + ' bot wins ' + out[lv] + '%, avg ' + (sh / N).toFixed(1) + ' vs rival ' + (sa / N).toFixed(1) + ' over ' + N + '; margin median ' + mg.slice().sort((a, b) => a - b)[N >> 1] + ', mean |margin| ' + (mg.reduce((a, b) => a + Math.abs(b), 0) / N).toFixed(1) + ', within 10: ' + Math.round(100 * mg.filter(x => Math.abs(x) <= 10).length / N) + '%');
 }
 module.exports = out;

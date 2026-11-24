@@ -12,10 +12,10 @@ function hex2(h) { h = h.replace('#', ''); if (h.length === 3) h = h[0] + h[0] +
 function mix(a, b, t) { var A = hex2(a), B = hex2(b); return '#' + [0, 1, 2].map(function (i) { var v = Math.round(A[i] + (B[i] - A[i]) * t); return (v < 16 ? '0' : '') + v.toString(16); }).join(''); }
 
 var FAC = {
-  gilded: { id: 'gilded', name: 'The Gilded Court', short: 'Gilded Court', blurb: 'Fading nobility', main: '#7c1b2c', dark: '#3a0912', light: '#b8404f', accent: '#d4ad55', accent2: '#8f7330', paper: '#f1e3c3', ink: '#2b1511', glyph: '#f1d98a' },
-  heath: { id: 'heath', name: 'The Heathbound Clans', short: 'Heathbound Clans', blurb: 'Old clans of the land', main: '#4e6c33', dark: '#1d2c15', light: '#88a85a', accent: '#e8dfc4', accent2: '#a9a083', paper: '#eee5c9', ink: '#1f2a15', glyph: '#efe6c9' },
-  lantern: { id: 'lantern', name: 'The Lantern Rising', short: 'Lantern Rising', blurb: "The people's uprising", main: '#d9622a', dark: '#2b2422', light: '#f49a52', accent: '#ffd079', accent2: '#8d8178', paper: '#f2e3c2', ink: '#2a1b12', glyph: '#fff0c0' },
-  choir: { id: 'choir', name: 'The Pale Choir', short: 'Pale Choir', blurb: 'Moon cult', main: '#7f72b4', dark: '#171230', light: '#c5bde8', accent: '#d9dcea', accent2: '#8c90ad', paper: '#ece6dc', ink: '#1a1530', glyph: '#e9e8f6' },
+  gilded: { id: 'gilded', name: 'The Salt Crown', short: 'Salt Crown', blurb: 'Salt-pan lords', main: '#7c1b2c', dark: '#3a0912', light: '#b8404f', accent: '#d4ad55', accent2: '#8f7330', paper: '#f1e3c3', ink: '#2b1511', glyph: '#f1d98a' },
+  heath: { id: 'heath', name: 'The Reedfolk', short: 'Reedfolk', blurb: 'Marsh riders', main: '#4e6c33', dark: '#1d2c15', light: '#88a85a', accent: '#e8dfc4', accent2: '#a9a083', paper: '#eee5c9', ink: '#1f2a15', glyph: '#efe6c9' },
+  lantern: { id: 'lantern', name: 'The Ember Guild', short: 'Ember Guild', blurb: 'Forge conspirators', main: '#d9622a', dark: '#2b2422', light: '#f49a52', accent: '#ffd079', accent2: '#8d8178', paper: '#f2e3c2', ink: '#2a1b12', glyph: '#fff0c0' },
+  choir: { id: 'choir', name: 'The Hollow Synod', short: 'Hollow Synod', blurb: 'A silent order', main: '#7f72b4', dark: '#171230', light: '#c5bde8', accent: '#d9dcea', accent2: '#8c90ad', paper: '#ece6dc', ink: '#1a1530', glyph: '#e9e8f6' },
   neutral: { id: 'neutral', name: 'The Market', short: 'Market', blurb: 'Neutral wares', main: '#7b5b37', dark: '#33220f', light: '#b48c57', accent: '#cfa84e', accent2: '#8a6f3a', paper: '#efe0bd', ink: '#2a1c0e', glyph: '#f0dba0' }
 };
 var FIDS = ['gilded', 'heath', 'lantern', 'choir', 'neutral'];
@@ -307,7 +307,7 @@ var ART = {}, ART_KEYS = [];
 function def(key, f, sc, opt, fn) { ART[key] = { f: f, sc: sc, opt: opt, fn: fn }; ART_KEYS.push(key); }
 var MIST = function (y, op) { return '<rect x="0" y="' + y + '" width="220" height="26" fill="url(#tb-mist)" opacity="' + (op || .5) + '" filter="url(#tb-fog)"/>'; };
 
-/* --- Gilded Court --- */
+/* --- Salt Crown --- */
 def('knight', 'gilded', 'dusk', { ruins: 1 }, function (R, f) { return bannerShape(40, 112, .9, f, R, 1, 62) + person(112, 134, 1.5, { f: f, short: 1, armor: 1, head: 'helm', plume: 1, held: 'sword', hand: [18, -40], shield: 1, tabard: 1, cape: '#4a0f1a', glow: 'warm' }) + ivy(176, 126, 40, -100, R); });
 def('herald', 'gilded', 'dusk', { ruins: 1 }, function (R, f) { return person(104, 134, 1.5, { f: f, head: 'cap', tabard: 1, held: 'trumpet', hand: [14, -50], cape: '#3a0912' }) + bannerShape(176, 126, .8, f, R, 0, 70); });
 def('guard', 'gilded', 'hall', {}, function (R, f) { return person(66, 140, 1.38, { f: f, short: 1, armor: 1, head: 'helm', held: 'halberd', tabard: 1, hand: [16, -34] }) + person(156, 140, 1.38, { f: f, short: 1, armor: 1, head: 'helm', plume: 1, held: 'halberd', tabard: 1, hand: [16, -34] }) + glowAt(110, 70, 36, 'warm'); });
@@ -323,7 +323,7 @@ def('hound', 'gilded', 'dusk', { ruins: 1 }, function (R) { return beast('hound'
 def('duelist', 'gilded', 'stone', { ruins: 1 }, function (R, f) { return person(70, 136, 1.4, { f: f, short: 1, head: 'bareheaded', held: 'sword', hand: [18, -36], cape: '#3a0912' }) + flip(person(-150, 136, 1.4, { f: 'heath', short: 1, head: 'bareheaded', held: 'sword', hand: [18, -36], cape: '#1d2c15' })) + '<path d="M96 78 L124 70" stroke="#fff" stroke-opacity=".5"/>' + glowAt(110, 74, 16, 'white'); });
 def('throne', 'gilded', 'sanct', {}, function (R) { return glowAt(110, 80, 70, 'gold') + '<path d="M70 126 V40 Q70 24 86 24 Q96 40 110 28 Q124 40 134 24 Q150 24 150 40 V126Z" fill="#241014"/><path d="M70 40 Q70 24 86 24 Q96 40 110 28 Q124 40 134 24 Q150 24 150 40" fill="none" stroke="url(#tb-gold)" stroke-width="3"/><rect x="80" y="78" width="60" height="30" rx="4" fill="#5b1424"/><rect x="74" y="106" width="72" height="16" fill="#2c1a10"/>' + ivy(70, 120, 80, -90, R, 3.6) + ivy(150, 120, 64, -92, R, 3.6) + thorn(40, 140, 50, -20, R) + thorn(180, 140, 50, -160, R) + crownShape(110, 76, .8); });
 
-/* --- Heathbound Clans --- */
+/* --- Reedfolk --- */
 def('clan_warrior', 'heath', 'moor', {}, function (R, f) { return person(110, 136, 1.5, { f: f, short: 1, head: 'bareheaded', hair: '#8a4a22', held: 'axe', hand: [17, -34], shield: 1, cape: '#2a3a1c', glow: 'warm' }) + stoneAt(36, 122, 22, 44, -4) + ivy(36, 120, 30, -90, R); });
 def('clan_chief', 'heath', 'moor', { }, function (R, f) { return stoneAt(40, 120, 24, 52, 5) + stoneAt(182, 122, 22, 40, -6) + person(110, 138, 1.58, { f: f, head: 'antlers', held: 'spear', hand: [18, -34], cape: '#e8dfc4', skin: '#d4a77f', glow: 'warm' }); });
 def('hunter', 'heath', 'forest', {}, function (R, f) { return beast('stag', 160, 128, .7, { col: '#6a5440' }) + person(72, 138, 1.45, { f: f, head: 'hood', held: 'bow', hand: [14, -38], cape: '#243b2a' }) + broadTree(20, 128, .9, R, 1); });
@@ -334,7 +334,7 @@ def('boar', 'heath', 'moor', {}, function (R) { return beast('boar', 108, 134, 1
 def('bear', 'heath', 'forest', {}, function (R) { return beast('bear', 104, 136, 1.55, { col: '#4a3a2c' }) + ivy(24, 140, 50, -80, R); });
 def('ravens', 'heath', 'dusk', { ruins: 1 }, function (R) { var s = tower(150, 128, 1.1, '#2a342e', R); for (var i = 0; i < 9; i++) s += beast('raven', 20 + R() * 180, 20 + R() * 70, .7 + R() * .4, { flip: R() > .5 }); return s; });
 
-/* --- Lantern Rising --- */
+/* --- Ember Guild --- */
 def('rioter', 'lantern', 'ember', {}, function (R, f) { var s = ''; [28, 188].forEach(function (x, i) { s += person(x, 130, .95, { f: f, short: 1, head: 'cap', held: i ? 'pitchfork' : 'torch', hand: [16, -34], alpha: .85 }); }); return s + person(108, 140, 1.55, { f: f, short: 1, head: 'cap', held: 'torch', hand: [17, -40], skin: '#c89870', glow: 'warm' }); });
 def('lantern_bearer', 'lantern', 'street', {}, function (R, f) { return person(100, 140, 1.55, { f: f, head: 'cap', held: 'lantern', hand: [16, -34], cape: '#2b2422' }) + glowAt(120, 60, 50, 'warm'); });
 def('barricade', 'lantern', 'ember', {}, function (R, f) { var s = ''; for (var i = 0; i < 7; i++) s += '<rect x="' + (28 + i * 24) + '" y="' + (88 + (i % 2) * 6) + '" width="10" height="48" fill="#4a2c14" transform="rotate(' + (i % 2 ? 8 : -9) + ' ' + (33 + i * 24) + ' 112)"/>'; s += '<path d="M24 118 H196 M30 104 H190" stroke="#3a2210" stroke-width="7"/><circle cx="70" cy="124" r="14" fill="#3a2210"/><circle cx="70" cy="124" r="14" fill="none" stroke="#6a4a2a" stroke-width="3"/><circle cx="160" cy="126" r="12" fill="#3a2210"/>'; return s + bannerShape(112, 92, .9, f, R, 1, 60) + flame(30, 92, 1.6) + flame(194, 94, 1.5); });
@@ -342,7 +342,7 @@ def('bellringer', 'lantern', 'ember', {}, function (R, f) { return '<path d="M60
 def('mob', 'lantern', 'ember', {}, function (R, f) { var s = ''; for (var i = 0; i < 9; i++) { var x = 14 + i * 24 + (R() - .5) * 8, y = 126 + (i % 3) * 5; s += person(x, y, .8 + (i % 3) * .08, { f: f, short: i % 2, head: i % 2 ? 'cap' : 'hood', held: i % 3 === 0 ? 'torch' : i % 3 === 1 ? 'pitchfork' : 'none', hand: [14, -42], alpha: .95 }); } return s; });
 def('beacon', 'lantern', 'night', {}, function (R) { return '<path d="M50 140 L90 80 L120 100 L160 70 L210 140Z" fill="#14172b"/><path d="M96 84 L106 72 L112 84Z" fill="#2a1a12"/>' + glowAt(108, 74, 66, 'warm') + flame(108, 82, 3.2) + '<path d="M80 100 L140 100" stroke="#3a2614" stroke-width="3"/>' + thorn(10, 146, 60, -10, R); });
 
-/* --- Pale Choir --- */
+/* --- Hollow Synod --- */
 def('moon_priest', 'choir', 'night', {}, function (R, f) { return person(110, 140, 1.55, { f: f, head: 'mitre', held: 'staff', orb: 'cool', hand: [17, -34], cape: '#e0def2', skin: '#e6dcd0', glow: 'cool' }) + stoneAt(36, 128, 20, 44, 3) + stoneAt(186, 128, 22, 52, -3); });
 def('choir', 'choir', 'hall', {}, function (R, f) { var s = ''; [48, 90, 132, 174].forEach(function (x, i) { s += person(x, 138 - (i % 2) * 6, 1.1, { f: f, head: 'hood', held: 'candle', hand: [4, -38], lhand: [-4, -38], skin: '#e0d6c8' }); }); return s; });
 def('spirit', 'choir', 'night', { ruins: 1 }, function (R) { return glowAt(110, 70, 64, 'cool') + '<path d="M110 20 Q80 24 80 64 Q80 100 70 130 Q86 120 94 132 Q104 118 110 134 Q116 118 126 132 Q134 120 150 130 Q140 100 140 64 Q140 24 110 20Z" fill="#e6e4fb" opacity=".55" filter="url(#tb-rough)"/><ellipse cx="100" cy="58" rx="6" ry="9" fill="#171230"/><ellipse cx="120" cy="58" rx="6" ry="9" fill="#171230"/><ellipse cx="110" cy="78" rx="4" ry="6" fill="#171230" opacity=".8"/>'; });
@@ -438,7 +438,7 @@ function backPattern(f, P) {
   for (i = 0; i < 6; i++) for (j = 0; j < 8; j++) s += '<circle cx="' + (22 + i * 43.2) + '" cy="' + (22 + j * 47) + '" r="1.5" fill="' + P.accent + '" opacity=".28"/>';
   return s;
 }
-/* painted art (optional): TB.setArt({id: url}) for sp.img, TB.setBack(url) for the face-down back. Without them the procedural SVG art is used. */
+/* painted art (optional): TB.setArt({id: url}) for sp.img, */
 var IMG = {}, BACK = '';
 TB.setArt = function (m) { IMG = m || {}; TB.clearCache(); };
 TB.setBack = function (u) { if (u === BACK) return; BACK = u || ''; TB.clearCache(); };
@@ -468,7 +468,7 @@ function cardBackInner(f, lite) {
   return s;
 }
 function fitTitle(t, maxW, start, min) { var px = start; while (px > min && measure(t, 'bold ' + px + 'px ' + DISPLAY) > maxW) px -= .5; return px; }
-function cardFaceInner(sp, lite) {
+function cardFaceInner(sp, lite, noNum) {
   var f = FAC[sp.faction] ? sp.faction : 'neutral', P = FAC[f], s = '';
   var type = TYPES[sp.type] ? sp.type : 'unit', tl = sp.typeLabel || TYPES[type];
   s += '<g clip-path="url(#tb-clip-card)"><rect width="260" height="372" fill="url(#tb-f-' + f + ')"/>';
@@ -479,10 +479,10 @@ function cardFaceInner(sp, lite) {
   s += '<rect x="14" y="14" width="232" height="336" rx="5" fill="' + P.paper + '"/>' + (lite ? '' : '<rect x="15" y="15" width="230" height="334" rx="5" filter="url(#tb-stain)" opacity=".5"/>');
   if (lite) {
     /* compact layout for thumbnails: huge number, art, icon + cost */
-    s += '<text x="130" y="84" text-anchor="middle" font-family="' + DISPLAY + '" font-weight="700" font-size="92" fill="' + mix(P.main, '#1a0a0c', .55) + '" stroke="' + P.dark + '" stroke-width="2.5" paint-order="stroke">' + (sp.value == null ? '' : esc(sp.value)) + '</text>';
+    if (!noNum) s += '<text x="130" y="84" text-anchor="middle" font-family="' + DISPLAY + '" font-weight="700" font-size="92" fill="' + mix(P.main, '#1a0a0c', .55) + '" stroke="' + P.dark + '" stroke-width="2.5" paint-order="stroke">' + (sp.value == null ? '' : esc(sp.value)) + '</text>';
     s += '<g transform="translate(20 96)"><rect x="-2" y="-2" width="224" height="156" rx="7" fill="url(#tb-gold)"/>' + (paintedArt(sp) || artSVG(sp.art, f, true)) + '</g>';
     s += '<rect x="20" y="258" width="220" height="90" rx="6" fill="' + P.dark + '"/><g transform="translate(70 303) scale(3.6)">' + typeIcon(type, '#f1e3c3') + '</g>';
-    if (sp.cost != null) s += '<g transform="translate(190 303)"><circle r="31" fill="url(#tb-gold)" stroke="#4a3208" stroke-width="2"/><text y="14" text-anchor="middle" font-family="' + DISPLAY + '" font-weight="700" font-size="40" fill="#2b1808">' + esc(sp.cost) + '</text></g>';
+    if (sp.cost != null && !noNum) s += '<g transform="translate(190 303)"><circle r="31" fill="url(#tb-gold)" stroke="#4a3208" stroke-width="2"/><text y="14" text-anchor="middle" font-family="' + DISPLAY + '" font-weight="700" font-size="40" fill="#2b1808">' + esc(sp.cost) + '</text></g>';
     return s;
   }
   /* title banner */
@@ -511,7 +511,7 @@ function cardFaceInner(sp, lite) {
   s += '</g>';
   /* footer */
   s += '<g transform="translate(130 362) scale(.4)" opacity=".95">' + emblem(f) + '</g>';
-  s += '<text x="20" y="364" font-family="' + DISPLAY + '" font-weight="700" font-size="10" letter-spacing="1.2" fill="' + P.glyph + '" opacity="1">' + esc(P.short.toUpperCase()) + '</text>';
+  s += '<text x="20" y="362" font-family="' + DISPLAY + '" font-weight="700" font-size="14" letter-spacing="1.2" fill="' + P.glyph + '" opacity="1">' + esc(P.short.toUpperCase()) + '</text>';
   if (sp.num != null) s += '<text x="240" y="364" text-anchor="end" font-family="' + DISPLAY + '" font-weight="700" font-size="10" letter-spacing="1" fill="' + P.glyph + '" opacity="1">' + esc(sp.num) + '</text>';
   return s;
 }
@@ -674,7 +674,7 @@ function mapDefs() {
     lg('tbm-ribbon', [[0, '#e8d9b0'], [1, '#c1ab78']], 0, 0, 0, 1) + lg('tbm-lane', [[0, '#120b07'], [1, '#2a1a10']], 0, 0, 0, 1);
 }
 
-/* painted map (optional): TB.setMapImg(url) puts a painting under the roads, locations and track; CSS html[data-mapimg] then lets it show through. */
+/* painted map (optional): TB.setMapImg(url) puts a painting */
 var MAPIMG = '';
 function mapImgEl(W, H) { return '<image class="tb-bg-img" href="' + MAPIMG + '" x="0" y="0" width="' + W + '" height="' + H + '" preserveAspectRatio="xMidYMid slice"/>'; }
 TB.setMapImg = function (u) {
@@ -685,7 +685,7 @@ TB.setMapImg = function (u) {
     if (MAPIMG && v && vb) v.insertAdjacentHTML('afterend', mapImgEl(vb.width, vb.height));
   });
 };
-/* painted track lane (tile) and throne (transparent centrepiece): optional, applied to every mounted map and to maps built later */
+/* painted track lane (tile) and throne (transparent */
 var TRACKIMG = '', THRONEIMG = '';
 function surfApply(root) {
   Array.prototype.forEach.call((root || document).querySelectorAll('.tb-m-static'), function (g) {
@@ -827,9 +827,10 @@ TB.map = function (opts) {
     s += '<rect x="2" y="3" width="' + sw + '" height="' + sh + '" rx="5" fill="#000" opacity=".5"/>';
     s += '<g class="tb-slotcard">';
     if (st.faceDown !== false && !st.card && st.value == null) s += '<use href="#tb-back-' + f + '" width="' + sw + '" height="' + sh + '"/>';
-    else if (st.card) s += '<svg x="0" y="0" width="' + sw + '" height="' + sh + '" viewBox="0 0 260 372">' + cardFaceInner(st.card, true) + '</svg>';
+    else if (st.card) s += '<svg x="0" y="0" width="' + sw + '" height="' + sh + '" viewBox="0 0 260 372">' + cardFaceInner(st.card, true, true) + '</svg>';
     else s += '<rect width="' + sw + '" height="' + sh + '" rx="5" fill="' + P.paper + '" stroke="url(#tb-gold)" stroke-width="2.4"/><text x="' + sw / 2 + '" y="' + (sh / 2 + 11) + '" text-anchor="middle" font-family="' + DISPLAY + '" font-weight="700" font-size="32" fill="' + P.main + '" stroke="' + P.dark + '" stroke-width="1" paint-order="stroke">' + esc(st.value) + '</text>';
     s += '</g>';
+    if (st.card && st.card.value != null) s += '<g class="tb-sbadge" transform="translate(10 11)"><circle r="10" fill="#1b0b10" stroke="url(#tb-gold)" stroke-width="1.8"/><text y="5.4" text-anchor="middle" font-family="' + DISPLAY + '" font-weight="700" font-size="14" fill="#f6e6b4">' + st.card.value + '</text></g>';
     if (st.winner) s += '<rect x="-3" y="-3" width="' + (sw + 6) + '" height="' + (sh + 6) + '" rx="7" fill="none" stroke="#ffe9a0" stroke-width="3.4" class="tb-win"/>';
     if (st.count > 1) s += '<g transform="translate(' + (sw - 3) + ' 4)"><circle r="9.5" fill="#1b0b10" stroke="url(#tb-gold)" stroke-width="1.8"/><text y="5.4" text-anchor="middle" font-family="' + DISPLAY + '" font-weight="700" font-size="14" fill="#f6e6b4">' + st.count + '</text></g>';
     if (st.loser) s += '<rect width="' + sw + '" height="' + sh + '" rx="5" fill="#000" opacity=".5"/>';
@@ -906,14 +907,14 @@ TB.map = function (opts) {
       for (i = 0; i <= Math.min(steps, 60); i++) { var q = inflXY(seat, from + dir * i); fr.push({ transform: 'translate(' + q.x + 'px,' + q.y + 'px)' }); }
       var e = inflXY(seat, v); el.style.transform = 'translate(' + e.x + 'px,' + e.y + 'px)';
       if (fr.length < 2 || (o && o.immediate)) return Promise.resolve();
-      return anim(el, fr, Math.min(1600, 120 * steps + 250), 'linear');
+      return anim(el, fr, Math.min(600, 70 * steps + 250), 'linear');
     },
     influence: function (seat) { return S.infl[seat] || 0; },
     setRound: function (n, total) { S.round = { n: n, total: total || S.round.total }; buildRound(); return api; },
     highlight: function (ids) { S.hl = ids ? [].concat(ids) : []; applyHl(); return api; },
     select: function (id) { S.sel = id || null; applyHl(); return api; },
     pulse: function (id) { var g = locEls[id]; if (!g) return Promise.resolve(); var ring = g.querySelector('.tb-ring'); return anim(ring, [{ opacity: 0, transform: 'scale(.8)' }, { opacity: 1, transform: 'scale(1.15)' }, { opacity: 0, transform: 'scale(1.4)' }], 900, 'ease-out'); },
-    /* revealSlots(loc, [{seat, card:spec, value, winner}], {stagger}) -> Promise: flips the face-down slot cards one by one then marks the winner(s). */
+    /* revealSlots(loc, [{seat, card:spec, value, winner}], */
     revealSlots: function (loc, entries, o) {
       o = o || {}; var g = locEls[loc], p = S.pos[loc], p0 = Promise.resolve(), fx = g.querySelector('.tb-lfx');
       fx.innerHTML = '<g transform="translate(0 -4)" opacity="0">' + tokenInner('clash') + '</g>'; var mk = fx.firstChild;
@@ -951,10 +952,10 @@ CSS = '.tb-card{display:block;filter:drop-shadow(0 3px 5px rgba(0,0,0,.55));font
   '.tb-map{display:block;width:100%;height:auto;-webkit-tap-highlight-color:transparent;user-select:none;-webkit-user-select:none}' +
   '.tb-map .tb-loc{cursor:pointer;outline:none}.tb-map .tb-ring{transform-box:fill-box;transform-origin:center}' +
   '.tb-map .tb-loc:hover .tb-ring,.tb-map .tb-loc:focus-visible .tb-ring{opacity:.85!important}' +
-  '.tb-map .tb-loc.tb-hl .tb-ring{opacity:1!important;animation:tb-dash 7s linear infinite,tb-breathe 1.6s ease-in-out infinite}' +
+  '.tb-map .tb-loc.tb-hl .tb-ring{opacity:1!important;animation:tb-dash 4s linear 1,tb-breathe 1.6s ease-in-out 3}' +
   '.tb-map .tb-loc.tb-sel .tb-ring{opacity:1!important;stroke:#fff;stroke-dasharray:none}' +
   '.tb-map.tb-compact .tb-name{display:none}.tb-map.tb-compact .tb-loc.tb-sel .tb-name,.tb-map.tb-compact .tb-loc.tb-hl .tb-name{display:inline}.tb-map .tb-herald,.tb-map .tb-infl{pointer-events:none}.tb-map .tb-herald,.tb-map .tb-infl{will-change:transform}' +
-  '.tb-map .tb-win{animation:tb-breathe 1.2s ease-in-out infinite;transform-box:fill-box;transform-origin:center}' +
+  '.tb-map .tb-win{animation:tb-breathe 1.2s ease-in-out 3;transform-box:fill-box;transform-origin:center}' +
   '@keyframes tb-dash{to{stroke-dashoffset:-160}}@keyframes tb-breathe{0%,100%{transform:scale(1)}50%{transform:scale(1.045)}}' +
   '.tb-flipcard{position:relative;display:inline-block;perspective:900px;transition:transform .5s cubic-bezier(.2,.8,.2,1),filter .5s,opacity .5s}' +
   '.tb-flip-inner{position:relative;width:100%;height:100%;transform-style:preserve-3d;transition:transform .62s cubic-bezier(.3,.7,.2,1)}' +
@@ -987,8 +988,7 @@ TB.flipCard = function (spec, size) {
   d.setResult = function (r) { d.classList.remove('tb-winner', 'tb-loser', 'tb-tied'); if (r) d.classList.add('tb-' + r); };
   return d;
 };
-/* clash(entries,{stagger,sparkParent,tie}) entries: [{el: flipCard element, winner:bool, col?: wrapper to mark}] -> Promise.
-   Flips every card in turn, plays a spark, then lifts + glows the winner(s) and dims the rest. */
+/* clash(entries,{stagger,sparkParent,tie}) entries: [{el: */
 TB.clash = function (entries, o) {
   o = o || {}; var st = o.stagger != null ? o.stagger : 420, p = Promise.resolve(), parent = o.sparkParent;
   entries.forEach(function (en) { p = p.then(function () { return en.el.flip(); }).then(function () { if (en.col) en.col.classList.add('tb-shown'); return sleep(st); }); });
