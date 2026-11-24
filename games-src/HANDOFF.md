@@ -314,3 +314,7 @@ Live fix: original-name phrase removed from shelf blurb + sands page (15:2x).
 ## W740 onyx-atelier visual fix (24 Nov)
 Done: tutorial part names now a tidy list inside the guide window, ONE callout on the board for the picked part (no chip cloud); PC (>=1000px) grid layout: board left (cell up to 112px), rival/jewels/you stacked right; guide never sits on the PC board.
 Weak: PC guide window still covers the rival jewel rows on lesson 1; HUD pips and phone start menu not changed. Sheets: onyx-atelier/proof/w740-*-sheet.jpg. Integrator: build.py then copy onyx-atelier.html to games/onyx-atelier/index.html (not in build-all).
+
+## W753 (rampart-and-vine, thornbound)
+Done: start option tiles dark labels; story-map title wraps; rv-art probe hidden; status wrap; thornbound popups scroll inside viewport; sheet tool waits for scenario ready and ignores sr-only/closed drawers.
+Still: thornbound lessons-test passes at 402x874 (39 s) but 1366x768 exceeded the 60 s budget in this container; carc lessons-test could not launch chromium here. build-all --quick fails only on missing ui-baselines.

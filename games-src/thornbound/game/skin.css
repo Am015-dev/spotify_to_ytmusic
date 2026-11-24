@@ -125,3 +125,7 @@ html.desk:has(#main .opts) #road>*{visibility:hidden}
 #sidelog{display:none!important}
 @media (min-width:1024px){.st-t{display:none!important}}
 .gx-ibtn.gxst-q{display:none!important}
+/*W753 popups: children never shrink into each other, so a tall popup scrolls inside its own box and stays in the viewport*/
+.ppop:not([hidden]){max-height:min(86dvh,100dvh - 24px);overflow-y:auto;-webkit-overflow-scrolling:touch}
+.ppop:not([hidden])>*{flex-shrink:0}
+.ppop[data-kind=kc]:not([hidden]) .pp-row,.ppop[data-kind=card]:not([hidden]) .pp-row{flex-shrink:0}
