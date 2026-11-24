@@ -74,6 +74,21 @@ var OD = {
     {"id":66,"lvl":3,"b":"x","n":1,"c":{"r":8},"pts":3,"cr":0,"ab":"again"}
   ],
   // patrons (royal cards): taken at 3 and 6 crowns
-  ROYALS: [{"id":0,"pts":2,"ab":"again"},{"id":1,"pts":3,"ab":""},{"id":2,"pts":2,"ab":"priv"},{"id":3,"pts":2,"ab":"steal"}]
+  ROYALS: [{"id":0,"pts":2,"ab":"again"},{"id":1,"pts":3,"ab":""},{"id":2,"pts":2,"ab":"priv"},{"id":3,"pts":2,"ab":"steal"}],
+  // one wording for the Rules panel and the guided first game (the tutorial says these sentences word for word)
+  TXT: {
+    win: 'You win at the end of your turn with 20 points, or 10 crowns, or 10 points on jewels of one colour.',
+    take: 'Take 1 to 3 gems or pearls in one straight line: touching, no gaps, never gold.',
+    takeFav: 'Taking 3 gems of one colour, or 2 pearls, gives your rival a Favour.',
+    buy: 'Buy a jewel by paying its gems. Gold pays for any one gem or pearl you are missing.',
+    bonus: 'Each jewel you own makes its colour cheaper for the rest of the game.',
+    keep: 'Keep a jewel: take 1 gold and hold any jewel for later. You can keep 3 at most.',
+    fav: 'Before your move, spend a Favour to take any one gem or pearl from the board, never gold.',
+    refill: 'Before your move, you may refill the board from the bag. Your rival gets a Favour. No Favours after a refill.',
+    limit: 'End your turn with at most 10 tokens (gems, pearls and gold together). Return the extra.',
+    power: 'A jewel can have a power. Polish: take one more gem of its colour from the board.',
+    crowns: 'Jewels carry crowns. At 3 crowns choose a patron, at 6 a second one. A patron adds points.',
+    order: 'Each turn: Favours and a refill if you like, then exactly one of: take gems, keep a jewel, buy a jewel.'
+  }
 };
 if (typeof module !== 'undefined') module.exports = OD;

@@ -1,4 +1,4 @@
-// Onyx Atelier guided first game: a scripted opening that teaches taking gems, buying, keeping with gold, Favours, then the race. Then the real game goes on. (FLAG: none)
+// Onyx Atelier guided first game: one rule at a time (take, buy, keep, Favour, refill, power, patron, 10-gem limit, how you win); each lesson says the rule (OD.TXT, same words as the Rules panel), makes you do it, then confirms. (FLAG: none)
 var OTUT = (function () {
   var E = OE, U = UI.U, step = 0, T = null, fingerFor = null;
   var TARGET = 1;   // a Ring: 1 Diamond, 1 Sapphire, 1 Emerald, 1 Onyx
@@ -21,16 +21,77 @@ var OTUT = (function () {
     E.checkInvariants(G);
     return G;
   }
-  var STEPS = [
-    { say: 'Tap 3 gems in a straight line.', cells: [0, 1, 2], noFav: true, at: '.cell[data-cell="0"]', allow: function (m) { return m.t === 'take' && m.cells.slice().sort().join() === '0,1,2'; } },
-    { say: 'You can afford the glowing jewel. Tap it.', card: TARGET, noFav: true, cells: [], at: '.card[data-id="' + TARGET + '"]', allow: function (m) { return m.t === 'buy' && m.l === 0 && U.G.pyr[0][m.i] === TARGET; } },
-    { say: 'Your jewel makes Ruby 1 cheaper, forever.', info: 'Next' },
-    { say: 'Tap a gold coin. Gold keeps a jewel.', noFav: true, gold: true, allow: function (m) { return m.t === 'reserve'; } },
-    { say: 'A Favour scroll takes any one gem. Tap yours.', at: '#me .favb', cells: null, allow: function (m) { return m.t === 'fav'; } },
-    { say: 'Now take gems or buy. Your move!', cells: null, allow: function () { return true; } },
-    { say: 'Win: 20 points, 10 crowns, or 10 in one colour.', info: 'Got it' },
-    { say: 'Crowns win patrons. Stuck? The bulb shows a good move.', info: 'Play on' }
+  var X = OD.TXT;
+  // ---- staging: before a lesson, put the board in the teaching position (every token and card stays accounted for)
+  function pull(G, c, keep) {   // one token of colour c from the bag, the board (not a kept cell), or a player
+    var i = G.bag.indexOf(c); if (i >= 0) { G.bag.splice(i, 1); return c; }
+    for (i = 0; i < 25; i++) if (G.board[i] === c && !(keep && keep.indexOf(i) >= 0)) { G.board[i] = null; return c; }
+    for (var p = 1; p >= 0; p--) if (G.pl[p].t[c] > 0) { G.pl[p].t[c]--; return c; }
+    throw new Error('no ' + c);
+  }
+  function putCell(G, cell, c) { if (G.board[cell] === c) return; if (G.board[cell]) G.bag.push(G.board[cell]); G.board[cell] = null; G.board[cell] = pull(G, c, [cell]); }
+  function hand(G, p, spec) {   // set the player's gems exactly
+    var P = G.pl[p]; E.TOK.forEach(function (c) { for (var n = 0; n < P.t[c]; n++) G.bag.push(c); P.t[c] = 0; });
+    Object.keys(spec).forEach(function (c) { for (var n = 0; n < spec[c]; n++) { pull(G, c); P.t[c]++; } });
+  }
+  function scrolls(G, mine) { G.pl[0].fav = mine; G.pl[1].fav = 0; G.fav = 3 - mine; }
+  function place(G, id) {   // put jewel id in the middle slot of its row (swap with whatever is there)
+    var l = E.card(id).lvl - 1, at = G.decks[l].indexOf(id);
+    if (at >= 0) { G.decks[l][at] = G.pyr[l][2]; G.pyr[l][2] = id; return; }
+    var k = G.pyr[l].indexOf(id); if (k >= 0) { var t = G.pyr[l][2]; G.pyr[l][2] = id; G.pyr[l][k] = t; }
+  }
+  function own(G, ids) {    // give the player jewels straight from the decks/pyramid
+    ids.forEach(function (id) {
+      var P = G.pl[0]; if (P.cards.indexOf(id) >= 0) return;
+      var l = E.card(id).lvl - 1, at = G.decks[l].indexOf(id);
+      if (at >= 0) G.decks[l].splice(at, 1); else { var k = G.pyr[l].indexOf(id); if (k >= 0) G.pyr[l][k] = G.decks[l].pop(); }
+      P.cards.push(id);
+    });
+  }
+  function isMain(m) { return /^(take|buy|reserve)$/.test(m.t); }
+  function boughtId(m) { return m.t === 'buy' && m.l !== undefined && U.G.pyr[m.l][m.i]; }
+  var NM = { w: 'Diamond', u: 'Sapphire', g: 'Emerald', r: 'Ruby', k: 'Onyx' };
+  // one lesson = a "do" step (the rule in one sentence, the player acts) + a "confirm" step (what just happened)
+  var LESSONS = [
+    { key: 'take', say: X.take, at: '.cell[data-cell="0"]', cells: [0, 1, 2], noFav: true,
+      allow: function (m) { return m.t === 'take' && m.cells.slice().sort().join() === '0,1,2'; },
+      done: 'You took 3 gems in a line. ' + X.takeFav },
+    { key: 'buy', say: X.buy, card: TARGET, at: '.card[data-id="' + TARGET + '"]', cells: [], noFav: true,
+      stage: function (G) { place(G, TARGET); },
+      allow: function (m) { return m.t === 'buy' && m.l === 0 && U.G.pyr[0][m.i] === TARGET; },
+      done: 'Bought. ' + X.bonus },
+    { key: 'keep', say: X.keep, gold: true, noFav: true,
+      stage: function (G) { putCell(G, 12, 'o'); },
+      allow: function (m) { return m.t === 'reserve'; },
+      done: 'Kept, and you took 1 gold. Gold pays for any one gem or pearl. Buy it later from the Kept button.' },
+    { key: 'fav', say: X.fav, at: '#me .favb', cells: null, free: true,
+      stage: function (G) { scrolls(G, 1); G.refilled = false; },
+      allow: function (m) { return m.t === 'fav'; },
+      done: 'You took a gem and the scroll went back to the supply. You still have your move to make.' },
+    { key: 'refill', say: X.refill, at: '#refillbtn', cells: null, free: true,
+      stage: function (G) { [20, 21, 22].forEach(function (c) { if (G.board[c]) { G.bag.push(G.board[c]); G.board[c] = null; } }); },
+      allow: function (m) { return m.t === 'refill'; },
+      done: 'The board is full again and your rival got a Favour. Now no more Favours this turn.' },
+    { key: 'power', say: 'Buy the glowing jewel. ' + X.power, card: 13, at: '.card[data-id="13"]', cells: [],
+      stage: function (G) { place(G, 13); hand(G, 0, { r: 2, k: 2 }); putCell(G, 7, 'w'); },
+      allow: function (m) { return m.t === 'buy' && boughtId(m) === 13; },
+      done: 'Polish: you took one more Diamond from the board. Powers happen when you buy the jewel.' },
+    { key: 'patron', say: 'Buy the glowing jewel: it has a crown. ' + X.crowns, card: 11, at: '.card[data-id="11"]', cells: [],
+      stage: function (G) { own(G, [3, 9]); place(G, 11); hand(G, 0, { u: 3 }); G.pl[0].rq1 = 0; },
+      allow: function (m) { return m.t === 'buy' && boughtId(m) === 11; },
+      done: 'Your patron joined you and its points count towards 20. A second patron comes at 6 crowns.' },
+    { key: 'limit', say: 'Take the 3 glowing gems. ' + X.limit, at: '.cell[data-cell="0"]', cells: [0, 1, 2],
+      stage: function (G) { hand(G, 0, { w: 3, u: 2, g: 2, r: 1, k: 2 }); putCell(G, 0, 'w'); putCell(G, 1, 'u'); putCell(G, 2, 'g'); },
+      allow: function (m) { return m.t === 'take' && m.cells.slice().sort().join() === '0,1,2'; },
+      done: 'Back to 10. If you ever cannot do anything else, you must refill.' }
   ];
+  var STEPS = [];
+  LESSONS.forEach(function (L, i) {
+    L.i = STEPS.length; STEPS.push(L);
+    STEPS.push({ key: L.key + '-done', info: 'Next', lesson: L, say: L.done });
+  });
+  STEPS.push({ key: 'win', info: 'Play on', at: '#me .race', say: function () { var P = U.G.pl[0], bc = E.bestColour(P);
+    return X.win + ' You have ' + E.points(P) + ' of 20 points, ' + E.crowns(P) + ' of 10 crowns, ' + bc.v + ' of 10 in ' + NM[bc.c] + '.'; } });
   function coach(text, btn) {
     var c = $('#coach'); if (!c) { c = document.createElement('div'); c.id = 'coach'; document.body.appendChild(c); }
     var r = $('#rival').getBoundingClientRect(); c.style.top = Math.max(46, r.top) + 'px';
@@ -45,9 +106,10 @@ var OTUT = (function () {
   }
   function go(i) {
     step = i; var s = STEPS[i]; if (!s) return end();
-    T.cells = s.cells || null; T.card = s.card; T.noFav = !!s.noFav; T.allowStep = s.allow; fingerFor = s.at || null;
+    if (s.stage) { s.stage(U.G); E.checkInvariants(U.G); U.sel = []; U.mode = null; }
+    T.cells = s.cells || null; T.card = s.card; T.noFav = !!s.noFav; T.allowStep = s.allow || (s.info ? function () { return false; } : null); fingerFor = s.at || null;
     if (s.gold) { T.cells = []; U.G.board.forEach(function (t, k) { if (t === 'o') T.cells.push(k); }); fingerFor = '.cell[data-cell="' + T.cells[0] + '"]'; }
-    coach(s.say, s.info);
+    coach(typeof s.say === 'function' ? s.say() : s.say, s.info);
     UI.render();
   }
   function end() {
@@ -55,21 +117,30 @@ var OTUT = (function () {
     if (U.G && U.G.turn === 1 && !U.G.over) UI.aiTurn();
   }
   function start() {
-    T = { allow: function (m) { if (/^(wild|tok|steal|royal|disc)$/.test(m.t)) return true; var ok = !T.allowStep || T.allowStep(m); if (ok && /^(take|buy|reserve)$/.test(m.t)) T.lastOk = step; return ok; },
+    T = { allow: function (m) { if (/^(wild|tok|steal|royal|disc)$/.test(m.t)) return true; var ok = !T.allowStep || T.allowStep(m); if (ok && isMain(m)) T.lastOk = step; return ok; },
       onMove: function (m, ev) {
         if (ev && ev.p === 1) return;   // the rival's moves never advance the lesson
         var s = STEPS[step]; if (!s || s.info) return;
-        if (m.t === 'fav' && step === 4) { go(5); return; }
-        if (T.lastOk === step && /^(take|buy|reserve)$/.test(m.t)) { T.lastOk = -1; T.waitRival = step + 1; }
+        if (s.free && s.allow(m)) { go(step + 1); return; }   // Favour and refill: your move is still to come
+        if (T.lastOk === step && isMain(m)) { T.lastOk = -1; T.waitRival = step + 1; }
       },
       onRender: function () {
-        if (T.waitRival !== undefined && U.G.turn === 0 && !U.busy && !U.G.pend) { var n = T.waitRival; T.waitRival = undefined; go(n); return; }
-        if (U.G.turn === 0 && !U.busy) finger(U.mode === 'res' && step === 3 ? '.card.glow' : U.sel.length === 3 && step === 0 ? '#takebtn' : document.querySelector('#sheet [data-buy]:not([disabled])') ? '#sheet [data-buy]' : fingerFor);
-        else finger(null);
-        var co = $('#coach'); if (co) co.style.visibility = (U.G.turn === 1 || U.busy) && !STEPS[step].info ? 'hidden' : 'visible';
-        var c = $('#coach .t');
-        if (c && step === 3 && U.mode === 'res') c.textContent = 'Now tap any jewel to keep it.';
-        if (c && step === 0 && U.sel.length === 3) c.textContent = 'Tap Take.';
+        var s = STEPS[step], g = U.G, q = g.pend;
+        if (T.waitRival !== undefined && g.turn === 0 && !U.busy && !q) { var n = T.waitRival; T.waitRival = undefined; go(n); return; }
+        var f = fingerFor, say = null;
+        if (s.cells && s.cells.length === 3 && s.take !== false) {
+          var nx = s.cells.filter(function (x) { return U.sel.indexOf(x) < 0; });
+          if (nx.length) { if (U.sel.length) say = 'Tap the next glowing gem in the line.'; f = '.cell[data-cell="' + nx[0] + '"]'; } else { f = '#takebtn'; say = 'Tap Take.'; }
+        }
+        if (s.key === 'keep' && U.mode === 'res') { f = '.card.glow'; say = 'Now tap any jewel to keep it.'; }
+        if (s.key === 'fav' && U.mode === 'fav') { f = '#board .cell.glow'; say = 'Now tap any gem on the board.'; }
+        if (document.querySelector('#sheet [data-buy]:not([disabled])')) f = '#sheet [data-buy]';
+        if (q && q.h === 'tok') { f = '#board .cell.glow'; say = 'Polish: tap the glowing ' + NM[q.c] + '.'; }
+        if (q && q.h === 'royal') { f = '.patc'; say = 'Choose a patron. Any of them is fine.'; }
+        if (q && q.h === 'disc') { f = '#me .col.glow'; say = 'Tap your gems to return ' + q.n + '.'; }
+        if (g.turn === 0 && !U.busy) finger(f); else finger(null);
+        var co = $('#coach'); if (co) co.style.visibility = (g.turn === 1 || U.busy) && !s.info ? 'hidden' : 'visible';
+        var c = $('#coach .t'); if (c && say) c.textContent = say;
       } };
     UI.newGame('easy', 1, 0); U.tut = T; U.G = setup(); U.sel = []; U.mode = null;
     var t0 = document.getElementById('toast'); if (t0) t0.classList.remove('on');

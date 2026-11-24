@@ -87,6 +87,23 @@ function put(G, cells) { Object.keys(cells).forEach(s => { const i = G.bag.index
   P.cards = C.filter(c => c.b === 'r' && c.pts).sort((a, b) => b.pts - a.pts).map(c => c.id); ok(E.colourPts(P, 'r') >= 10 && E.winOf(P) === 'colour', '10 points in one colour wins');
   P.cards = C.filter(c => c.cr).map(c => c.id).slice(0, 10); ok(E.crowns(P) >= 10 && E.winOf(P), '10 crowns win');
   P.cards = C.filter(c => c.pts >= 3).map(c => c.id); P.att = {}; ok(E.points(P) >= 20 && E.winOf(P), '20 points win'); }
+// ---- added by the rules audit (proof/RULES-AUDIT.md)
+{ const G = blank(); put(G, { 0: 'r', 5: 'u' }); G.pl[0].fav = 1; G.fav = 2; G.bag.push('w');
+  E.performMove(G, { t: 'refill' }); ok(G.refilled && !E.validMoves(G).some(m => m.t === 'fav'), 'no Favour after a refill'); }
+{ const G = blank(); const P = G.pl[0]; put(G, { 0: 'u' }); P.cards.push(4); G.decks[0] = G.decks[0].filter(x => x !== 4); G.pyr[0] = G.pyr[0].map(x => x === 4 ? G.decks[0].pop() : x);
+  G.q.push({ h: 'token', id: 4 }); E.performMove(G, { t: 'take', cells: [0] }); ok(!G.pend && G.turn === 1, 'Polish with no gem of its colour on the board: nothing happens'); }
+{ const G = E.newGame(10, 0), P = G.pl[0]; P.cards = C.filter(c => c.cr >= 1).slice(0, 6).map(c => c.id); P.roy = [1]; P.rq1 = 1; G.royals = G.royals.filter(x => x !== 1);
+  G.decks.forEach((d, i) => G.decks[i] = d.filter(x => !P.cards.includes(x))); G.pyr.forEach((r, l) => r.forEach((x, i) => { if (P.cards.includes(x)) r[i] = G.decks[l].pop(); }));
+  E.performMove(G, E.validMoves(G).find(m => m.t === 'take')); ok(E.crowns(P) >= 6 && G.pend && G.pend.h === 'royal', '6 crowns: a second patron'); }
+{ const P = { cards: [29, 30, 54], roy: [], att: {}, t: {} }; ok(E.points(P) === 14 && !E.winOf(P) && E.bestColour(P).v === 0, 'jewels with no colour count for points but for no colour'); }
+{ const P = { cards: [], roy: [], att: {}, t: {} }; P.cards = [2, 12, 17, 23, 7]; const pts = P.cards.reduce((a, i) => a + C[i].pts, 0); ok(pts === 5 && !E.winOf(P), '5 points: no win'); }
+{ const G = blank(); const P = G.pl[0]; P.cards = C.filter(c => c.pts >= 3 && !c.cr).map(c => c.id); put(G, { 0: 'r' }); E.performMove(G, { t: 'take', cells: [0] }); ok(G.over && G.over.winner === 0 && G.over.how === 'points', 'the win is checked at the end of your own turn'); }
+// the Rules panel and the guided first game say the rules in the same words (src/data.js TXT)
+{ const T = D.TXT; ok(/20 points/.test(T.win) && /10 crowns/.test(T.win) && /10 points on jewels of one colour/.test(T.win), 'win text: 20 points, 10 crowns, 10 points in one colour');
+  ok(/1 to 3/.test(T.take) && /never gold/.test(T.take) && /3 at most/.test(T.keep) && /3 crowns/.test(T.crowns) && /6/.test(T.crowns) && /10 tokens/.test(T.limit), 'rule text matches the engine numbers');
+  const ui = require('fs').readFileSync(__dirname + '/src/ui.js', 'utf8'), tu = require('fs').readFileSync(__dirname + '/src/tutor.js', 'utf8');
+  ok(['win', 'take', 'takeFav', 'keep', 'buy', 'bonus', 'fav', 'refill', 'limit', 'power', 'crowns'].every(k => ui.includes('X.' + k) || ui.includes('TXT.' + k)), 'Rules panel uses every shared rule sentence');
+  ok(['take', 'buy', 'keep', 'fav', 'refill', 'limit', 'power', 'crowns', 'win', 'takeFav', 'bonus'].every(k => tu.includes('X.' + k)), 'the guided game says the same sentences'); }
 // ---- full games, invariants after every move
 const N = +process.argv[2] || (process.env.QUICK ? 4 : 30), LV = ['easy', 'normal', 'hard'];
 let done = 0, how = {}, maxTurns = 0;

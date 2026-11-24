@@ -70,9 +70,9 @@ var UI = (function () {
     var g = G(), P = g.pl[p], el = $(p ? '#rival' : '#me'), b = E.bonuses(P), bc = E.bestColour(P), q = g.pend, me = p === 0, h = '';
     el.classList.toggle('turn', g.turn === p && !g.over);
     h += '<div class="top"><span class="nm">' + (me ? 'You' : 'Rival') + '</span><span class="race">' +
-      '<span><b data-engine="OA_TEST.pts.' + p + '">' + E.points(P) + '</b>/20 pts</span>' +
-      '<span>' + OART.icon('crown') + '<b>' + E.crowns(P) + '</b>/10</span>' +
-      '<span>' + OART.gm(bc.c) + '<b>' + bc.v + '</b>/10</span></span><span class="favs">';
+      '<span title="Points: 20 wins" aria-label="' + E.points(P) + ' of 20 points"><b data-engine="OA_TEST.pts.' + p + '">' + E.points(P) + '</b>/20 pts</span>' +
+      '<span title="Crowns: 10 wins" aria-label="' + E.crowns(P) + ' of 10 crowns">' + OART.icon('crown') + '<b>' + E.crowns(P) + '</b>/10</span>' +
+      '<span title="Points on jewels of one colour: 10 wins" aria-label="' + bc.v + ' of 10 points on one colour">' + OART.gm(bc.c) + '<b>' + bc.v + '</b>/10</span></span><span class="favs">';
     if (P.fav) { var fl = P.fav > 1 ? '<b class="fx">' + P.fav + '</b>' : ''; h += me ? '<button class="favb' + (human() && !g.pend && !g.refilled && !(U.tut && U.tut.noFav) ? ' glow' : '') + '" data-fav="1" aria-label="Use a Favour (' + P.fav + ')">' + OART.icon('scroll') + fl + '</button>' : '<span class="favb">' + OART.icon('scroll') + fl + '</span>'; }
     h += '</span>';
     if (me) h += '<span class="resb" aria-label="Gems held, max 10">' + E.tokens(P) + '/10</span>';
@@ -301,7 +301,7 @@ var UI = (function () {
     [].forEach.call(d.querySelectorAll('[data-r]'), function (b) { b.onclick = function () { zoom({ res: +b.dataset.r }); }; });
   }
   function patHtml(i, btn) { var R = OD.ROYALS[i]; return '<' + (btn ? 'button' : 'div') + ' class="patc' + (btn ? ' glow' : '') + '" data-pick="' + i + '"><svg viewBox="0 0 48 48"><use href="#patron"/></svg><b>' + PAT[i].n + '</b>' + R.pts + ' points' + (R.ab ? '<br>' + ABN[R.ab] + ': ' + ABT[R.ab].replace('.', '') : '') + '</' + (btn ? 'button' : 'div') + '>'; }
-  function patronInfo() { var g = G(), h = '<h2>Patrons</h2><p>At 3 crowns, choose a patron. At 6 crowns, a second.</p><div class="pats">'; g.royals.forEach(function (i) { h += patHtml(i); }); sheet(h + '</div>', true); }
+  function patronInfo() { var g = G(), h = '<h2>Patrons</h2><p>' + OD.TXT.crowns + '</p><div class="pats">'; g.royals.forEach(function (i) { h += patHtml(i); }); sheet(h + '</div>', true); }
   function patronPick() {
     var g = G(), h = '<h2>Choose a patron</h2><div class="pats">'; g.royals.forEach(function (i) { h += patHtml(i, true); });
     var d = sheet(h + '</div>', true); d.setAttribute('data-lock', '1'); var x = d.querySelector('[data-close]'); if (x) x.remove();
@@ -316,13 +316,13 @@ var UI = (function () {
     d.querySelector('[data-menu]').onclick = function () { closeSheet(); showTitle(); };
   }
   function rules() {
-    var h = '<h2>How to play</h2><p><b>Win</b> at the end of your turn with <b>20 points</b>, <b>10 crowns</b>, or <b>10 points in one colour</b>.</p>' +
-      '<h3>Your turn</h3><ul><li>First, if you like: spend Favour scrolls (one gem each), then refill the board. Refilling gives your rival a Favour.</li>' +
-      '<li>Then do one: <b>take up to 3 gems</b> in a straight line (no gaps, no gold), <b>keep a jewel</b> and take one gold, or <b>buy a jewel</b>.</li>' +
-      '<li>Taking 3 of one colour, or 2 pearls, gives your rival a Favour.</li><li>Gold pays for any colour. You may keep up to 3 jewels.</li>' +
-      '<li>Each jewel you own makes its colour cheaper forever.</li><li>End your turn with at most 10 gems.</li><li>If you can do nothing else, you must refill.</li></ul>' +
-      '<h3>Jewel powers</h3><ul><li><b>Encore:</b> take another turn.</li><li><b>Polish:</b> take a gem of that colour from the board.</li><li><b>Favour:</b> gain a Favour scroll.</li><li><b>Pinch:</b> take a gem or pearl from your rival.</li><li><b>Matching jewel</b> (rainbow gem): joins one colour you own.</li></ul>' +
-      '<h3>Crowns</h3><p>At 3 crowns choose a patron, at 6 a second one.</p>' +
+    var X = OD.TXT;
+    var h = '<h2>How to play</h2><h3>How you win</h3><p>' + X.win + '</p>' +
+      '<h3>Your turn</h3><p>' + X.order + '</p><ul><li>' + X.fav + '</li><li>' + X.refill + '</li>' +
+      '<li>' + X.take + '</li><li>' + X.takeFav + '</li><li>' + X.keep + '</li><li>' + X.buy + '</li><li>' + X.bonus + '</li><li>' + X.limit + '</li>' +
+      '<li>If you can do nothing else, you must refill. Gold only comes from keeping a jewel. A Favour you spend goes back to the supply.</li></ul>' +
+      '<h3>Jewel powers</h3><p>' + X.power + '</p><ul><li><b>Encore:</b> take another turn.</li><li><b>Polish:</b> take a gem of that colour from the board.</li><li><b>Favour:</b> gain a Favour.</li><li><b>Pinch:</b> take a gem or pearl from your rival.</li><li><b>Matching jewel</b> (rainbow gem): you need a coloured jewel to buy it; it joins one colour you own.</li></ul>' +
+      '<h3>Crowns and patrons</h3><p>' + X.crowns + '</p>' +
       '<h3>Everything in the box</h3><p>25 board spaces. 4 each of Diamond, Sapphire, Emerald, Ruby, Onyx. 2 Pearls, 3 Gold. 3 Favours. 4 Patrons. 67 jewels: 30 Rings, 24 Brooches, 13 Tiaras.</p><div class="pats">' + [0, 1, 2, 3].map(function (i) { return patHtml(i); }).join('') + '</div>';
     [1, 2, 3].forEach(function (l) { h += '<h3>' + TIER[l - 1] + 's (' + OD.CARDS.filter(function (c) { return c.lvl === l; }).length + ')</h3><div class="ref">'; OD.CARDS.forEach(function (c) { if (c.lvl === l) h += '<div class="card t' + l + '" role="img" aria-label="' + esc(cardLabel(c.id)) + '">' + cardHtml(c.id) + '</div>'; }); h += '</div>'; });
     h += '<h3>Credits</h3><p>Game design adapted; names, art and code original. Fonts: Limelight and Josefin Sans (SIL Open Font License). All art drawn in code.</p>';
