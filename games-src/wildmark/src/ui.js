@@ -11,13 +11,13 @@ document.addEventListener('pointerdown', function (e) { if (UI.aiHold && !(e.tar
 document.addEventListener('click', function (e) { if (UI.eatClick && Date.now() < UI.eatClick) { UI.eatClick = 0; e.stopImmediatePropagation(); e.preventDefault(); } }, true);   // the tap that skips the rival summary does nothing else   // tap during a rival turn: play it faster; tap on its summary: go on   // tap during a rival turn: play it faster
 function savePrefs() { try { localStorage.setItem('wm-prefs', JSON.stringify(UI.prefs)); } catch (e) { } }
 function an(a) { return (/^[AEIOU]/.test(WM.ANI_NAME[a]) ? 'an ' : 'a ') + WM.ANI_NAME[a]; }
-function toastPlace(e) {   // in play, toasts sit at the bottom of the valley, just above the instruction line (never over the score chips)
+function toastPlace(e, over) {   // in play, toasts sit at the bottom of the valley, just above the instruction line (never over the score chips)
   var ln = $('#line'), st = $('#start'); e.style.top = ''; e.style.bottom = ''; if (!ln || !st || !st.hidden || !G) return;
   var pv = $('#pv'); if (pv && !pv.hidden && pv.offsetHeight) ln = pv;   // above the points strip when it shows
-  var r = ln.getBoundingClientRect(); if (r.height && r.top > 200) { e.style.top = 'auto'; e.style.bottom = Math.round(innerHeight - r.top + 8) + 'px'; }
+  var r = ln.getBoundingClientRect(); if (r.height && r.top > 200) { e.style.top = 'auto'; e.style.bottom = Math.round(over ? innerHeight - r.bottom : innerHeight - r.top + 8) + 'px'; }
 }
 document.addEventListener('pointerdown', function (e) { var b = e.target.closest && e.target.closest('#okB, #backB, #rotB, #mk .pair, #acts .ab'); if (b) { b.classList.add('tapped'); setTimeout(function () { b.classList.remove('tapped'); }, 260); } }, true);   // R107: instant feedback
-function toast(t, ms) { if (G && !G.over && !hintsOn() && $('#start').hidden) return; if (G && !G.over && $('#start').hidden && !toast.now) { helper('toast', function () { toast.now = 1; toast(t, ms); toast.now = 0; }, ms || 2200, function () { $('#toast').classList.remove('on'); }, 2500); return; } var e = $('#toast'); if (document.querySelector('.gx-drawer.on, .gx-drawer[aria-hidden="false"]')) return; e.textContent = t; toastPlace(e); e.classList.add('on'); clearTimeout(toast.t); toast.t = setTimeout(function () { e.classList.remove('on'); }, ms || 2200); }
+function toast(t, ms, over) { if (G && !G.over && !hintsOn() && $('#start').hidden) return; if (G && !G.over && $('#start').hidden && !toast.now) { helper('toast', function () { toast.now = 1; toast(t, ms, over); toast.now = 0; }, ms || 2200, function () { $('#toast').classList.remove('on'); }, 2500); return; } var e = $('#toast'); if (document.querySelector('.gx-drawer.on, .gx-drawer[aria-hidden="false"]')) return; e.textContent = t; toastPlace(e, over); e.classList.add('on'); clearTimeout(toast.t); toast.t = setTimeout(function () { e.classList.remove('on'); }, ms || 2200); }
 // ---------------------------------------------------------------- sound (synth; music slots via gx-music when files exist)
 var SND = { ctx: null };
 function hintsOn() { return UI.mode === 'coach' || UI.prefs.hints !== 0; }   // G5: hints (goal chips + point previews) are on until the player switches them off
@@ -43,14 +43,21 @@ function tileSvg(tile, x, y, s, rot, opt) {
     out += '<polygon points="' + poly(x, y, s, [r, r + 1, r + 2, r + 3]) + '" fill="url(#pt-' + tile.t[0] + ')"/>';
     out += '<polygon points="' + poly(x, y, s, [r + 3, r + 4, r + 5, r + 6]) + '" fill="url(#pt-' + tile.t[1] + ')"/>';
   }
-  out += '<polygon points="' + poly(x, y, s, [0, 1, 2, 3, 4, 5]) + '" fill="none" stroke="' + (tile.key ? '#f2d27a' : 'rgba(20,30,20,.55)') + '" stroke-width="' + (tile.key ? s * 0.09 : s * 0.04) + '"/>';
+  // READ pass (W601): every terrain gets a flat edge band in its legend colour, so where one habitat ends and the next starts is clear at a glance
+  (function () {
+    var bw = s * 0.17, ap = s * 0.866, rc = (ap - bw / 2) / 0.866, halves = tile.t.length === 1 ? [[0, 6, tile.t[0]]] : [[r, r + 3, tile.t[0]], [r + 3, r + 6, tile.t[1]]];
+    halves.forEach(function (hv) { var js = [], j; for (j = hv[0]; j <= hv[1]; j++) js.push(j); if (hv[1] - hv[0] === 6) js.push(hv[0]);
+      out += '<polyline class="tband" points="' + poly(x, y, rc, js) + '" fill="none" stroke="' + WM.TER_COL[hv[2]] + '" stroke-width="' + bw.toFixed(1) + '" stroke-linejoin="miter" stroke-linecap="butt"/>'; });
+    if (tile.t.length > 1) { var a0 = corner(x, y, s, ((r % 6) + 6) % 6), a1 = corner(x, y, s, (((r + 3) % 6) + 6) % 6); out += '<line class="tdiv" x1="' + a0[0].toFixed(1) + '" y1="' + a0[1].toFixed(1) + '" x2="' + a1[0].toFixed(1) + '" y2="' + a1[1].toFixed(1) + '" stroke="#1b231e" stroke-width="' + Math.max(2, s * 0.07).toFixed(1) + '" stroke-linecap="butt"/>'; }
+  })();
+  out += '<polygon points="' + poly(x, y, s, [0, 1, 2, 3, 4, 5]) + '" fill="none" stroke="' + (tile.key ? '#f2d27a' : 'rgba(20,30,20,.7)') + '" stroke-width="' + (tile.key ? s * 0.09 : s * 0.05) + '"/>';
   var zr = opt.map && UI.pan && UI.pan.z || 0;   // map only: keep portraits readable at phone zoom (36 px placed, 24 px slots), inside the hex
-  if (opt.tok) out += (opt.hop ? '<g class="hop">' : '') + tokenSvg(opt.tok, x, y, zr ? Math.min(s * 0.66, Math.max(s * 0.46, 19 / zr)) : s * 0.46) + (opt.hop ? '</g>' : '');
+  if (opt.tok) out += (opt.hop ? '<g class="hop">' : '') + tokenSvg(opt.tok, x, y, zr ? Math.min(s * 0.7, Math.max(s * 0.46, 22 / zr)) : s * 0.46, zr ? ' lbl' : '') + (opt.hop ? '</g>' : '');
   else if (!opt.noSlots) {   // the animals this tile accepts: small discs
     var n = tile.a.length, rr = s * (n === 1 ? 0.3 : 0.22), off = n === 1 ? [[0, 0]] : n === 2 ? [[-0.27, 0], [0.27, 0]] : [[-0.27, 0.16], [0.27, 0.16], [0, -0.3]];
     if (opt.big) { rr = s * (n === 1 ? 0.44 : n === 2 ? 0.33 : 0.29); off = n === 1 ? [[0, 0]] : n === 2 ? [[-0.37, 0], [0.37, 0]] : [[-0.34, 0.22], [0.34, 0.22], [0, -0.38]]; }   // market/preview: readable animal icons
-    if (zr && !opt.big) rr = Math.min(s * (n === 1 ? 0.42 : 0.27), Math.max(rr, 12.5 / zr));
-    tile.a.forEach(function (a, i) { out += tokenSvg(a, x + off[i][0] * s, y + off[i][1] * s, rr, ' sm'); });
+    if (zr && !opt.big) rr = Math.min(s * (n === 1 ? 0.42 : 0.27), Math.max(rr, 14.5 / zr));
+    tile.a.forEach(function (a, i) { out += tokenSvg(a, x + off[i][0] * s, y + off[i][1] * s, rr, ' sm' + (zr && !opt.big ? ' slot' : '')); });
   }
   return out;
 }
@@ -299,7 +306,7 @@ function edgeArrows() {
       if (!ok) return; placed.push([x, y]);
       h += '<button type="button" class="ea ea-' + k + '" data-c="' + a[2] + '" style="left:' + x.toFixed(0) + 'px;top:' + y.toFixed(0) + 'px" aria-label="' + L.length + ' more spot' + (L.length > 1 ? 's' : '') + ' this way">' + ({ l: '&#9664;', r: '&#9654;', t: '&#9650;', b: '&#9660;' })[k] + '<small>' + L.length + '</small></button>'; });
   }
-  host.innerHTML = h; if (h && !UI.fast && hintsOn() && !UI.prefs.seenEdge && UI.mode !== 'coach' && UI.mode !== 'tutorial') { UI.prefs.seenEdge = 1; savePrefs(); toast('An arrow with a number: that many more places to build lie that way. Tap it to look.', 3200); }
+  host.innerHTML = h; if (h && !UI.fast && hintsOn() && !UI.prefs.seenEdge && UI.mode !== 'coach' && UI.mode !== 'tutorial') { UI.prefs.seenEdge = 1; savePrefs(); toast('Arrow + number: more places to build that way.', 3000, 1); }
 }
 // F3: a tap that just misses a small hex (late game, zoomed out) goes to the nearest glowing spot / ringed tile within a finger's reach
 function nearTarget(x, y) {
