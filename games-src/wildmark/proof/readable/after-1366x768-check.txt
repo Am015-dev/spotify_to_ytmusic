@@ -1,0 +1,14 @@
+01-title: ok
+02-board-mid: ok
+03-hand-market: ok
+04-tile-held: ok
+05-card-inspect: ok
+06-cards-window: ok
+07-rules-window: ok
+08-rules-cards: ok
+08b-card-zoom: ok
+09-scores-window: ok
+10-menu-window: ok
+11-result: ok
+12-lesson-a: ok
+13-lesson-b: ok

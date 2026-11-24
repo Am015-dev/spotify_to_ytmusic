@@ -1,0 +1,13 @@
+01-title: 8 -> text on art "Solo" | text on art "3" | text on art "4" | text on art "More options" | text on art "StoryTen chapters" | font 13.0px "Ten chapters" | text on art "Ten chapters" | text on art "How to play"
+02-board-mid: 3 -> font 10.0px "Test: Your turn: the m" | icon 23px tk sm | icon 26px tk sm
+03-hand-market: 4 -> font 10.0px "Test: Place a tile" | icon 23px tk sm | icon 26px tk sm | icon 11px tk sm
+04-tile-held: 3 -> font 10.0px "Test: Your turn: the m" | icon 23px tk sm | icon 26px tk sm
+05-card-inspect: 4 -> font 10.0px "Test: Your turn: the m" | icon 16px tk | icon 23px tk sm | icon 26px tk sm
+06-cards-window: 5 -> font 10.0px "Test: Mixed animal car" | icon 24px [object SVGAnimatedString] | icon 22px tk | icon 24px ti hasart | icon 26px tk sm
+07-rules-window: 3 -> font 10.0px "Test: Your turn: the m" | icon 23px tk sm | icon 26px tk sm
+08-rules-cards: 4 -> font 10.0px "Test: Your turn: the m" | icon 23px tk sm | icon 26px tk sm | icon 24px tk
+09-scores-window: 4 -> font 10.0px "Test: Your turn: the m" | icon 23px tk sm | icon 26px tk sm | icon 22px tk
+10-menu-window: 3 -> font 10.0px "Test: Your turn: the m" | icon 23px tk sm | icon 26px tk sm
+11-result: 3 -> font 10.0px "Test: Season end: resu" | icon 26px tk sm | icon 23px tk sm
+12-lesson-a: 1 -> icon 26px tk sm
+13-lesson-b: 1 -> icon 26px tk sm

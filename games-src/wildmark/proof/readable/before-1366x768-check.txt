@@ -1,0 +1,13 @@
+01-title: 7 -> text on art "Solo" | text on art "3" | text on art "4" | text on art "More options" | text on art "StoryTen chapters" | text on art "Ten chapters" | text on art "How to play"
+02-board-mid: 4 -> font 10.0px "Test: Your turn: the m" | icon 26px ic hasart | icon 22px ti hasart | icon 26px tk sm
+03-hand-market: 5 -> font 10.0px "Test: Place a tile" | icon 26px ic hasart | icon 22px ti hasart | icon 26px tk sm | icon 12px tk sm
+04-tile-held: 4 -> font 10.0px "Test: Your turn: the m" | icon 26px ic hasart | icon 22px ti hasart | icon 26px tk sm
+05-card-inspect: 5 -> font 10.0px "Test: Your turn: the m" | icon 26px ic hasart | icon 22px ti hasart | icon 16px tk | icon 26px tk sm
+06-cards-window: 3 -> font 10.0px "Test: Mixed animal car" | icon 26px ic hasart | icon 22px ti hasart
+07-rules-window: 4 -> font 10.0px "Test: Your turn: the m" | icon 26px ic hasart | icon 22px ti hasart | icon 26px tk sm
+08-rules-cards: 5 -> font 10.0px "Test: Your turn: the m" | icon 26px ic hasart | icon 22px ti hasart | icon 26px tk sm | icon 24px tk
+09-scores-window: 5 -> font 10.0px "Test: Your turn: the m" | icon 26px ic hasart | icon 22px ti hasart | icon 26px tk sm | icon 22px tk
+10-menu-window: 4 -> font 10.0px "Test: Your turn: the m" | icon 26px ic hasart | icon 22px ti hasart | icon 26px tk sm
+11-result: 4 -> font 10.0px "Test: Season end: resu" | icon 26px ic hasart | icon 22px ti hasart | icon 26px tk sm
+12-lesson-a: 1 -> icon 22px ti hasart
+13-lesson-b: 2 -> icon 26px ic hasart | icon 22px ti hasart

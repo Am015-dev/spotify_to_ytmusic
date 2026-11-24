@@ -599,3 +599,46 @@ html body .gx-set-nav{flex-wrap:wrap;overflow-x:visible}
   #rs .rbox{max-width:760px}
 }
 html body .gxc-lock{font-size:13px!important;text-indent:-99px;overflow:visible;clip-path:circle(50%);white-space:nowrap;line-height:18px}   /* W684: lock glyph hidden by indent, not a 0 px font */
+/* W732 readable: card pictures big enough to read and tappable to a large pop-up, a picture legend, every icon >= 28 px, phone labels >= 14 px */
+html body .cart{width:92px;height:129px;border:0;padding:0;position:relative;cursor:pointer;box-shadow:0 2px 6px rgba(0,0,0,.25)}
+html body .cart.hasart{background-size:contain!important;background-color:#2a2620}
+.cart .zm{position:absolute;right:-6px;bottom:-6px;width:30px;height:30px;border-radius:50%;background:#1d2420;border:2px solid #f6efdc;display:flex;align-items:center;justify-content:center}
+html body .cart .zm svg{display:block!important;width:18px;height:18px;fill:none;stroke:#f6efdc;stroke-width:2.4;stroke-linecap:round}
+@media (min-width:1000px){html body .cart{width:110px;height:154px}}
+html body .pat{width:150px;max-height:124px}
+#whyp .wpat{flex:0 0 120px}#whyp .wpat svg{width:120px}
+#cardz{position:fixed;inset:0;z-index:200;background:rgba(8,10,9,.82);display:flex;align-items:center;justify-content:center;padding:12px}
+#cardz[hidden]{display:none}
+#cardz .czp{position:relative;background:#f6efdc;color:#1d2420;border-radius:16px;overflow:hidden;width:min(400px,100%);max-height:100%;overflow-y:auto;display:flex;flex-direction:column;box-shadow:0 10px 40px rgba(0,0,0,.6)}
+#cardz .czart{background:#2a2620;display:flex;justify-content:center;padding:10px}
+#cardz .czart img{display:block;height:min(52vh,460px);width:auto;max-width:100%;aspect-ratio:5/7;object-fit:contain;border-radius:10px}
+#cardz .czph svg{width:160px;height:160px}
+#cardz .czcap{padding:10px 16px 14px;background:#f6efdc}
+#cardz .czh{display:flex;align-items:center;gap:8px}#cardz .czh svg{width:36px;height:36px;flex:0 0 auto}
+#cardz h3{margin:0;font-size:19px}#cardz p{margin:6px 0;font-size:16px;line-height:1.35}#cardz .pts{font-size:16px}
+#cardz .cx{position:absolute;top:8px;right:8px;width:44px;height:44px;border-radius:50%;border:2px solid #f6efdc;background:#1d2420;color:#f6efdc;font-size:26px;line-height:1;cursor:pointer;z-index:2}
+.legend{display:grid;grid-template-columns:1fr 1fr;gap:6px 10px;margin:6px 0 4px}
+.legend .lg{display:flex;align-items:center;gap:8px;font-size:15px;line-height:1.25}
+.legend .lg svg{width:40px;height:40px;flex:0 0 auto}
+html body .legend .lg span,html body .lgn{font-size:15px}
+@media (max-width:420px){.legend{grid-template-columns:1fr}}
+@media (max-width:999px){html body .cc svg{width:28px!important;height:28px!important}html body .cc i{font-size:14px}}
+html body #terr{flex-wrap:wrap;row-gap:2px}
+html body #terr .tl{flex-direction:row;gap:4px;flex-basis:100%;font-size:14px}html body #terr .tl small{font-size:14px}html body #terr .sep{font-size:14px}
+html body #terr .ti{width:26px;height:29px}
+@media (min-width:1000px){html body #terr .ti{width:28px;height:31px}html body #terr .tl{flex-basis:auto}}
+html body .trow .ab small{font-size:14px}
+html body .gx-bar h1 .ic{width:30px;height:30px}
+@media (max-width:999px){html body .mt{height:86px}html body .mt svg{height:82px}}
+@media (max-width:999px) and (min-height:760px){html body #mk .mt{height:86px}html body #mk .mt svg{height:82px}}
+html body .st td svg{width:28px;height:28px}
+#whyp .wpat{flex:0 0 100px}#whyp .wpat svg{width:100px}
+#whyp{max-height:calc(100% - 170px);overflow-y:auto}
+@media (max-width:999px){html body .cc svg{width:31px!important;height:31px!important}}
+html body #terr .ti{width:29px;height:32px}
+html body .st td svg{width:31px;height:31px}
+#whyp .wpat{flex:0 0 124px}#whyp .wpat svg{width:124px}
+/* W732: title buttons sit on a solid plate, never see-through over the painting */
+html body #start .trow .ab,html body #start .tsz:not(.on){background-color:#17211c;background-image:none}
+html body #start .tsize > span:first-child{background:#17211c;border-radius:8px;padding:4px 8px;text-shadow:none}
+@media (min-width:1000px){html body #terr{flex-wrap:nowrap}}

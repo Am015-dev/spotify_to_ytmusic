@@ -55,7 +55,7 @@ function tileSvg(tile, x, y, s, rot, opt) {
   if (opt.tok) out += (opt.hop ? '<g class="hop">' : '') + tokenSvg(opt.tok, x, y, zr ? Math.min(s * 0.7, Math.max(s * 0.46, 22 / zr)) : s * 0.46, zr ? ' lbl' : '') + (opt.hop ? '</g>' : '');
   else if (!opt.noSlots) {   // the animals this tile accepts: small discs
     var n = tile.a.length, rr = s * (n === 1 ? 0.3 : 0.22), off = n === 1 ? [[0, 0]] : n === 2 ? [[-0.27, 0], [0.27, 0]] : [[-0.27, 0.16], [0.27, 0.16], [0, -0.3]];
-    if (opt.big) { rr = s * (n === 1 ? 0.44 : n === 2 ? 0.33 : 0.29); off = n === 1 ? [[0, 0]] : n === 2 ? [[-0.37, 0], [0.37, 0]] : [[-0.34, 0.22], [0.34, 0.22], [0, -0.38]]; }   // market/preview: readable animal icons
+    if (opt.big) { rr = s * (n === 1 ? 0.48 : n === 2 ? 0.38 : 0.37); off = n === 1 ? [[0, 0]] : n === 2 ? [[-0.41, 0], [0.41, 0]] : [[-0.38, 0.27], [0.38, 0.27], [0, -0.38]]; }   // W732: market discs >= 28 px on a phone   // market/preview: readable animal icons
     if (zr && !opt.big) { rr = Math.min(s * (n === 1 ? 0.42 : n === 2 ? 0.38 : 0.35), Math.max(rr, 14.5 / zr)); if (n > 1 && rr > s * 0.24) off = n === 2 ? [[-0.4, 0], [0.4, 0]] : [[-0.36, 0.22], [0.36, 0.22], [0, -0.4]]; }   // W684: slots >= 28 px on the map, spread so they do not overlap
     tile.a.forEach(function (a, i) { out += tokenSvg(a, x + off[i][0] * s, y + off[i][1] * s, rr, ' sm' + (zr && !opt.big ? ' slot' : '')); });
   }
@@ -369,7 +369,7 @@ function drawMap() {
   $('#map').classList.toggle('dimtok', mine && G.stage === 'tok' && WM.tokSpots(env, G.hold.tok).length > 0);
   if (UI.tut && typeof tutDraw === 'function') tutDraw();   // the guided tutorial's glow survives map-only redraws
 }
-function mkTile(t, s) { var w = s * SQ3, h = s * 2; return '<svg viewBox="' + (-w / 2 - 2) + ' ' + (-h / 2 - 2) + ' ' + (w + 4) + ' ' + (h + 4) + '" aria-hidden="true">' + terrainDefs() + tileSvg(t, 0, 0, s, t.t.length > 1 ? 1 : 0, { big: 1 }) + '</svg>'; }
+function mkTile(t, s, bare) { var w = s * SQ3, h = s * 2; return '<svg viewBox="' + (-w / 2 - 2) + ' ' + (-h / 2 - 2) + ' ' + (w + 4) + ' ' + (h + 4) + '" aria-hidden="true">' + terrainDefs() + tileSvg(t, 0, 0, s, t.t.length > 1 ? 1 : 0, { big: 1, noSlots: !!bare }) + '</svg>'; }
 // pattern picture for an animal card (first set only): a small hex cluster showing a scoring shape, tokens drawn as on the map
 var PAT = {
   bear: [[0, 0, 'bear'], [1, 0, 'bear'], [-1, 1, 0], [0, 1, 0], [2, -1, 0], [1, -1, 0]],
@@ -414,7 +414,7 @@ function renderDock() {
         if (me.acorns > 0) a += UI.acornMenu ? '<button type="button" class="ab" id="freeB">Free pick</button><button type="button" class="ab" id="wipeB">Replace animals</button><button type="button" class="ab" id="acornX">Cancel</button>' : '<button type="button" class="ab" id="acornB" aria-label="Use an acorn (' + me.acorns + ' left)">Acorn (' + me.acorns + ')</button>';
       }
     } else if (G.stage === 'tile') {
-      a += '<span class="held">' + mkTile(G.hold.tile, 24) + mkTok(G.hold.tok) + '</span>';
+      a += '<span class="held">' + mkTile(G.hold.tile, 24, 1) + mkTok(G.hold.tok) + '</span>';   // W732: the held tile without its 12 px slot discs (the board ghost shows them large)
       if (UI.ghost) { if (G.hold.tile.t.length > 1) a += (quickTok() ? '<button type="button" class="ab rb" id="rotL" aria-label="Turn the tile left">&#8634;</button>' : '') + '<button type="button" class="ab' + (quickTok() ? ' rb' : '') + '" id="rotB" aria-label="Turn the tile right">&#8635;' + (quickTok() ? '' : ' Turn') + '</button>'; a += '<button type="button" class="ab pri" id="okB">' + (quickTok() && WM.tokSpots(G.seats[G.cur].env, G.hold.tok).length + (ghostTakes() ? 1 : 0) ? 'Place tile' : 'Place') + '</button>'; }
       if (UI.undo) a += '<button type="button" class="ab" id="undoB">Back</button>';
     } else if (G.stage === 'tok') {
@@ -556,7 +556,7 @@ function scoresHTML() {   // every source with its why, you vs the rivals (also 
 }
 function cardsHTML() {
   var h = '<div class="cards">';
-  WM.ANI.forEach(function (a) { var C = cinfo(a), st = cset(a); var mine = G ? (G.over ? G.res : WM.final(G))[meSeat()].ani[a] : null; h += '<div class="card"><div class="cart" data-art="card-' + a + '-' + st + '">' + mkTok(a) + '</div><div><h3>' + esc(WM.ANI_NAME[a]) + ': ' + esc(C.title) + (mine != null ? ' <span class="minep">you: ' + mine + '</span>' : '') + '</h3><p>' + esc(C.rule) + '</p>' + patSvg(a) + '<p class="pts">' + (C.pts ? C.pts.slice(1).map(function (p, i) { return (i + 1) + (i + 2 === C.pts.length && C.pts[C.pts.length - 1] !== 13 ? '+' : '') + ': ' + p; }).join(' &middot; ') : a === 'fox' && st === 'a' ? '0 to 5 per fox' : 'Card ' + st.toUpperCase()) + '</p></div></div>'; });
+  WM.ANI.forEach(function (a) { var C = cinfo(a), st = cset(a); var mine = G ? (G.over ? G.res : WM.final(G))[meSeat()].ani[a] : null; h += '<div class="card"><button type="button" class="cart" data-zoom="' + a + '" aria-label="See the ' + esc(WM.ANI_NAME[a]) + ' card large" data-art="card-' + a + '-' + st + '">' + mkTok(a) + '<span class="zm" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="10" cy="10" r="6"/><path d="M15 15l5 5M10 7v6M7 10h6"/></svg></span></button><div><h3>' + esc(WM.ANI_NAME[a]) + ': ' + esc(C.title) + (mine != null ? ' <span class="minep">you: ' + mine + '</span>' : '') + '</h3><p>' + esc(C.rule) + '</p>' + patSvg(a) + '<p class="pts">' + (C.pts ? C.pts.slice(1).map(function (p, i) { return (i + 1) + (i + 2 === C.pts.length && C.pts[C.pts.length - 1] !== 13 ? '+' : '') + ': ' + p; }).join(' &middot; ') : a === 'fox' && st === 'a' ? '0 to 5 per fox' : 'Card ' + st.toUpperCase()) + '</p></div></div>'; });
   return h + '</div>';
 }
 var RULES_HTML = '<div class="howturn"><h3>How a turn works</h3><ol><li>Pick one tile and the animal under it.</li><li>Tap a glowing spot to add the tile to your valley.</li><li>Put the animal on a tile that shows it, or skip it (it goes back to the bag, no penalty).</li><li>Animals score by their card; joined terrain scores too.</li><li>After 20 turns the most points wins.</li></ol></div>' +
@@ -743,12 +743,38 @@ function cardWhyRender() {
   var ri = rivalOf(UI.view), C = cinfo(a), rl = ri >= 0 ? pvCardLine(a, ri) : '';
   if (rl.indexOf(' (') > 0) rl = rl.slice(0, rl.indexOf(' ('));
   var ml = pvCardLine(a, UI.view); if (ml.indexOf(' (') > 0) ml = ml.slice(0, ml.indexOf(' ('));   // rule and table sit just above: one short line each
-  e.innerHTML = '<div class="wpat">' + (patSvg(a) || mkTok(a)) + '</div><div class="wtx"><h3>' + esc(WM.ANI_NAME[a] + ': ' + C.title) + '</h3><p>' + esc(C.rule) + '</p>' + (pvSetA(a) ? '<p class="wt">' + esc(PV_TABLE[a]) + '</p>' : '') + '<p class="wl me">' + esc(ml) + '</p>' + (rl ? '<p class="wl riv">' + esc(rl) + '</p>' : '') + '<p class="wh">Lit on the board: the ' + ({ bear: 'bears', elk: 'elk', salmon: 'salmon', hawk: 'hawks', fox: 'foxes' })[a] + ' that score.</p><button type="button" class="ab" id="whyAll">All cards</button></div><button type="button" class="cx" id="whyX" aria-label="Close">&times;</button>';
+  e.innerHTML = '<div class="wpat">' + (patSvg(a) || mkTok(a)) + '</div><div class="wtx"><h3>' + esc(WM.ANI_NAME[a] + ': ' + C.title) + '</h3><p>' + esc(C.rule) + '</p>' + (pvSetA(a) ? '<p class="wt">' + esc(PV_TABLE[a]) + '</p>' : '') + '<p class="wl me">' + esc(ml) + '</p>' + (rl ? '<p class="wl riv">' + esc(rl) + '</p>' : '') + '<p class="wh">Lit on the board: the ' + ({ bear: 'bears', elk: 'elk', salmon: 'salmon', hawk: 'hawks', fox: 'foxes' })[a] + ' that score.</p><button type="button" class="ab" data-zoom="' + a + '">See card</button> <button type="button" class="ab" id="whyAll">All cards</button></div><button type="button" class="cx" id="whyX" aria-label="Close">&times;</button>';
   e.hidden = false; $$('.cc').forEach(function (c) { c.classList.toggle('on', c.getAttribute('data-card') === a); });
 }
 document.addEventListener('click', function (ev) { var t = ev.target.closest && ev.target.closest('#whyX, #whyAll'); if (!t) return; UI.whyA = null; render(); if (t.id === 'whyAll') openCards(); });
+// W732 readable: what every picture means (rules window) and a big card pop-up (tap any card picture)
+function terrIcon(t, key) { return '<svg viewBox="-62 -62 124 124" aria-hidden="true"><polygon points="' + poly(0, 0, 58, [0, 1, 2, 3, 4, 5]) + '" fill="url(#pt-' + t + ')" stroke="' + (key ? '#f2d27a' : WM.TER_COL[t]) + '" stroke-width="' + (key ? 9 : 7) + '"/></svg>'; }
+function legendHTML() {
+  var h = '<h3>What the pictures mean</h3><div class="legend">';
+  WM.TER.forEach(function (t) { h += '<div class="lg">' + terrIcon(t) + '<span><b>' + esc(WM.TER_NAME[t]) + '</b> terrain</span></div>'; });
+  WM.ANI.forEach(function (a) { h += '<div class="lg">' + mkTok(a) + '<span><b>' + esc(WM.ANI_NAME[a]) + '</b> (' + WM.ANI_NAME[a].charAt(0) + ' on small discs): ' + esc(cinfo(a).title) + '</span></div>'; });
+  h += '<div class="lg">' + terrIcon('forest', 1) + '<span><b>Gold rim</b> = keystone: an animal here earns an acorn</span></div>';
+  h += '<div class="lg">' + mkTok('acorn') + '<span><b>Acorn</b>: spend for a free choice, 1 point each at the end</span></div>';
+  return h + '</div><p class="lgn">Small discs on a tile = the animals it accepts. Tap any card picture to see it large.</p>';
+}
+function cardBig(a) {
+  var C = cinfo(a), st = cset(a), stem = 'card-' + a + '-' + st, z = $('#cardz');
+  if (!z) { z = document.createElement('div'); z.id = 'cardz'; z.setAttribute('role', 'dialog'); z.setAttribute('aria-modal', 'true'); document.body.appendChild(z); }
+  var pts = C.pts ? C.pts.slice(1).map(function (p, i) { return (i + 1) + (i + 2 === C.pts.length && C.pts[C.pts.length - 1] !== 13 ? '+' : '') + ': ' + p; }).join(' &middot; ') : a === 'fox' && st === 'a' ? '0 to 5 points per fox' : 'Card ' + st.toUpperCase();
+  z.setAttribute('aria-label', WM.ANI_NAME[a] + ' card');
+  z.innerHTML = '<div class="czp"><button type="button" class="cx" id="cardzX" aria-label="Close">&times;</button>' +
+    '<div class="czart">' + (artHas(stem) ? '<img src="' + artUrl(stem) + '" alt="' + esc(WM.ANI_NAME[a] + ' card: ' + C.title) + '">' : '<div class="czph">' + mkTok(a) + '</div>') + '</div>' +
+    '<div class="czcap"><div class="czh">' + mkTok(a) + '<h3>' + esc(WM.ANI_NAME[a]) + ': ' + esc(C.title) + '</h3></div><p>' + esc(C.rule) + '</p>' + patSvg(a) + '<p class="pts"><b>Points:</b> ' + pts + '</p></div></div>';
+  z.hidden = false; sfx('tap'); var x = $('#cardzX'); if (x) x.focus();
+}
+function cardBigClose() { var z = $('#cardz'); if (z) z.hidden = true; }
+document.addEventListener('click', function (ev) {
+  var t = ev.target.closest && ev.target.closest('[data-zoom]'); if (t) { ev.preventDefault(); cardBig(t.getAttribute('data-zoom')); return; }
+  var z = $('#cardz'); if (z && !z.hidden && (ev.target === z || (ev.target.closest && ev.target.closest('#cardzX')))) cardBigClose();
+});
+document.addEventListener('keydown', function (e) { if (e.key === 'Escape') cardBigClose(); });
 function openCards() { GX.drawer('cardsd', 'Scoring cards', null, false); $('#cardsd .gx-drawer-body').innerHTML = cardsHTML(); artApply($('#cardsd')); GX.show('cardsd'); }
-function fillRules() { var b = $('#rulesd .gx-drawer-body'); if (!b) return; b.innerHTML = RULES_HTML + '<h3>The animal cards</h3>' + cardsHTML(); artApply(b); b.scrollTop = 0; setTimeout(function () { b.scrollTop = 0; }, 0); }   // filled on every open (the drawer body is never empty, so an emptiness test left it blank)
+function fillRules() { var b = $('#rulesd .gx-drawer-body'); if (!b) return; b.innerHTML = RULES_HTML.replace('<h3>Keystones', legendHTML() + '<h3>Keystones') + '<h3>The animal cards</h3>' + cardsHTML(); artApply(b); b.scrollTop = 0; setTimeout(function () { b.scrollTop = 0; }, 0); }   // filled on every open (the drawer body is never empty, so an emptiness test left it blank)
 function openRules() { fillRules(); GX.show('rulesd'); }
 // ---------------------------------------------------------------- music (silent until files exist)
 function musicSync() { try { if (window.GXMUS) GXMUS.sync(); } catch (e) { } }
