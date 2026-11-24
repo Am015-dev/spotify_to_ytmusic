@@ -367,7 +367,7 @@ function shipMesh(s){const g=new THREE.Group();const b=S3(B(s));const fc=FACCOL[
   const acr=new THREE.MeshPhysicalMaterial({color:0xcfe6ff,roughness:.05,metalness:0,transparent:true,opacity:.28,clearcoat:1,envMapIntensity:2,depthWrite:false});
   const sock=new THREE.Mesh(new THREE.CylinderGeometry(.34,.42,.3,16),plastic);sock.position.y=.66;g.add(sock);
   const peg=new THREE.Mesh(new THREE.CylinderGeometry(.13,.16,3.2,12),acr);peg.position.y=2.2;g.add(peg);
-  const T=SHIPS[s.type];const gk=glbOn()&&GLBS[T.model]&&V3.glbR[T.model];const mdl=gk?gk.clone(true):(MODELS[T.model]||MODELS.lance)(fc);mdl.position.y=3.6;const k=(s.base==='L'?2.1:2.3)*(T.scale||1);/* big, readable miniatures that overhang their bases, like the real ones */mdl.scale.multiplyScalar(k);g.add(mdl);
+  const T=SHIPS[s.type];const gk=glbOn()&&GLBS[T.model]&&V3.glbR[T.model];const mdl=gk?gk.clone(true):(MODELS[T.model]||MODELS.lance)(fc);mdl.position.y=3.6;const k=(s.base==='L'?2.1:2.3)*2*(T.scale||1);/* twice real size so ships read on a phone; miniatures overhang their bases, like the real ones */mdl.scale.multiplyScalar(k);g.add(mdl);
   const pick=new THREE.Mesh(new THREE.BoxGeometry(Math.max(b,5),5,Math.max(b,5)),new THREE.MeshBasicMaterial({visible:false}));pick.position.y=2;pick.userData.ship=s.id;g.add(pick);
   const bs=new THREE.Box3().setFromObject(mdl);const sz=bs.getSize(new THREE.Vector3());
   const shield=new THREE.Mesh(new THREE.SphereGeometry(1,40,24),shieldMat());shield.scale.set(sz.x*.62+.6,Math.max(1.6,sz.y*.9+.8),sz.z*.62+.6);shield.position.y=3.6;shield.renderOrder=5;g.add(shield);
