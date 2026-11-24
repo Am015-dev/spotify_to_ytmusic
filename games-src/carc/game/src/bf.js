@@ -41,7 +41,7 @@ function focusView(cx,cy,cell){const m=measure(),s=cell/100,top=topSafe(),bot=bo
 function fitCells(cells,m){let x0=1e9,y0=1e9,x1=-1e9,y1=-1e9;for(const [x,y] of cells){x0=Math.min(x0,x);x1=Math.max(x1,x);y0=Math.min(y0,y);y1=Math.max(y1,y)}
   const w=x1-x0+1,h=y1-y0+1,aw=m.W-14,ah=m.H-52,c0=Math.min(aw/w,ah/h);return {c:Math.max(MINC,Math.min(innerWidth>=1024?190:MAXC,c0)),fits:c0>=MINC,cx:(x0+x1+1)/2,cy:(y0+y1+1)/2,w,h}}
 function viewFor(f,m){const s=f.c/100;return {s,x:m.W/2-f.cx*100*s,y:m.H/2+16-f.cy*100*s}}
-function fitTarget(){const m=measure();if(!G.order.length)return {s:.4,x:0,y:0};const last=unkey(G.cur&&G.cur.k||G.order[G.order.length-1]);
+function fitTarget(){const m=measure();if(!G.order.length)return {s:.4,x:0,y:0};{const pv=pcView();if(pv)return pv}const last=unkey(G.cur&&G.cur.k||G.order[G.order.length-1]);
   const gl=UI.legal.map(g=>[g.x,g.y]);let f=fitCells(G.order.map(unkey).concat(gl),m);if(f.fits)return viewFor(f,m);
   f=fitCells(gl.concat([last]),m);return viewFor(f,m)}
 function ensureGlowVisible(){if(!myTurn('place')||UI.tw||UI.user)return;if([...document.querySelectorAll('#world .glow')].some(g=>g.style.visibility!=='hidden'))return;
@@ -65,8 +65,12 @@ const CAMMIN=()=>PHONE()?54:64,CAMMAX=()=>PHONE()?104:(innerWidth>=1024?200:MAXC
 function valleyCells(extra,around){const all=G.order.map(unkey).concat(extra||[]);const cmin=CAMMIN();if(fitsAt(all,cmin))return all;
   const c=around||unkey(G.order[G.order.length-1]);const by=all.slice().sort((a,b)=>Math.hypot(a[0]-c[0],a[1]-c[1])-Math.hypot(b[0]-c[0],b[1]-c[1]));const out=[];
   for(const q of by){out.push(q);if(!fitsAt(out,cmin)){out.pop();if(out.length>=4)break}}return out.length?out:[c]}
-function camValley(extra,around,ms){if(!G||!G.order.length)return;tweenView(frameCells(valleyCells(extra,around),CAMMIN(),CAMMAX()),ms==null?600:ms)}
-function camAim(ms){if(!G||!myTurn('place')||UI.user||!G.order.length)return;const gl=UI.legal.filter(q=>q.r===UI.rot).map(q=>[q.x,q.y]);
+// PC (>=1024px): frame every placed tile plus a one-tile margin so the valley fills the play area; null when that would make cells too small (then the patch logic below takes over)
+const PCMAX=240;
+function pcView(){if(innerWidth<1024||!G||!G.order.length)return null;let x0=1e9,y0=1e9,x1=-1e9,y1=-1e9;for(const k of G.order){const [x,y]=unkey(k);x0=Math.min(x0,x);x1=Math.max(x1,x);y0=Math.min(y0,y);y1=Math.max(y1,y)}
+  const box=[[x0-1,y0-1],[x1+1,y1+1]];if(!fitsAt(box,GLOWMIN()))return null;return frameCells(box,GLOWMIN(),PCMAX)}
+function camValley(extra,around,ms){if(!G||!G.order.length)return;{const pv=pcView();if(pv){tweenView(pv,ms==null?600:ms);return}}tweenView(frameCells(valleyCells(extra,around),CAMMIN(),CAMMAX()),ms==null?600:ms)}
+function camAim(ms){if(!G||!myTurn('place')||UI.user||!G.order.length)return;{const pv=pcView();if(pv){tweenView(pv,ms==null?600:ms);return}}const gl=UI.legal.filter(q=>q.r===UI.rot).map(q=>[q.x,q.y]);
   {const all=G.order.map(unkey).concat(gl),gm=GLOWMIN();if(!fitsAt(all,CAMMIN())&&fitsAt(all,gm)){tweenView(frameCells(all,gm,CAMMAX()),ms==null?600:ms);return}if(!fitsAt(all,gm)&&gl.length&&fitsAt(gl.concat([unkey(G.order[G.order.length-1])]),gm)){tweenView(frameCells(gl.concat([unkey(G.order[G.order.length-1])]),gm,CAMMAX()),ms==null?600:ms);return}}
   const near=aimCells();const cells=valleyCells(gl);if(!near.slice(0,-1).some(q=>cells.some(c=>c[0]===q[0]&&c[1]===q[1]))){camValley(near,near[0],ms==null?600:ms);return}tweenView(frameCells(cells,CAMMIN(),CAMMAX()),ms==null?600:ms)}
 function camSpot(x,y,ms){const m=measure(),c=UI.view.s*100,sx=(x+.5)*c+UI.view.x,sy=(y+.5)*c+UI.view.y,top=topSafe(),bot=botSafe();if(sx>c&&sx<m.W-c&&sy>top+c*.8&&sy<m.H-bot-c*.8)return;tweenView(focusView(x+.5,y+.5,Math.max(c,CAMMIN())),ms==null?420:ms)}

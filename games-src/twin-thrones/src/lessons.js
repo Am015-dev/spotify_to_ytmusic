@@ -76,7 +76,7 @@
   var T = { i: -1, el: null, hl: null, done: false };
   function tourEnd(quiet) {
     if (T.hl) T.hl.classList.remove('tt-hl'); T.hl = null;
-    if (T.el) T.el.remove(); T.el = null; T.i = -1;
+    if (T.el) T.el.remove(); T.el = null; T.i = -1; removeEventListener('resize', tourPlace); T.raf = 0; if (T.ro) { try { T.ro.disconnect(); } catch (e) { } T.ro = null; }
     document.documentElement.classList.remove('tt-touring'); var bd = $('bd'); if (bd) bd.classList.remove('tour');
     if (!quiet) T.done = true;
   }
@@ -86,8 +86,17 @@
     var tg = document.querySelector(st[0]), r = tg && tg.getBoundingClientRect();
     if (!r || r.width < 4 || r.height < 4) { T.i++; tourShow(); return; }
     tg.classList.add('tt-hl'); T.hl = tg;
-    var b = T.el.firstChild, vw = innerWidth, vh = innerHeight, bw = Math.min(340, vw - 24);
-    b.style.width = bw + 'px'; b.querySelector('.tx').textContent = st[1]; b.querySelector('.n').textContent = (T.i + 1) + ' of ' + TOUR.length + ' · tap to go on';
+    var b = T.el.firstChild;
+    b.querySelector('.tx').textContent = st[1]; b.querySelector('.n').textContent = (T.i + 1) + ' of ' + TOUR.length + ' · tap to go on';
+    tourPlace();
+  }
+  // place the bubble next to the target's CURRENT rect
+  function tourPlace() {
+    var b = T.el && T.el.firstChild, st = TOUR[T.i]; if (!b || !st) return;
+    var tg = T.hl; if (!tg || !tg.isConnected) { tg = document.querySelector(st[0]); if (!tg) return; tg.classList.add('tt-hl'); T.hl = tg; }   // the region may have been re-rendered
+    var r = tg.getBoundingClientRect(); if (r.width < 4 || r.height < 4) return;
+    var vw = innerWidth, vh = innerHeight, bw = Math.min(340, vw - 24);
+    b.style.width = bw + 'px';
     var bh = b.offsetHeight, x = Math.max(12, Math.min(vw - bw - 12, r.left + r.width / 2 - bw / 2)), y, up;
     if (r.bottom + 16 + bh <= vh - 8) { y = r.bottom + 14; up = '1'; }          // below, arrow up
     else if (r.top - 16 - bh >= 8) { y = r.top - bh - 14; up = '0'; }           // above, arrow down
@@ -101,7 +110,8 @@
     var o = document.createElement('div'); o.id = 'tt-tour'; o.setAttribute('role', 'dialog'); o.setAttribute('aria-label', 'Board tour');
     o.innerHTML = '<div class="bub" aria-live="polite"><i></i><span class="tx"></span><span class="n"></span></div>';
     o.addEventListener('click', function (e) { e.stopPropagation(); T.i++; tourShow(); });
-    document.body.appendChild(o); T.el = o; setTimeout(tourShow, 60);
+    document.body.appendChild(o); T.el = o; addEventListener('resize', tourPlace); try { T.ro = new ResizeObserver(function () { tourPlace(); }); ['bd', 'pyr', 's0', 's1', 'mil', 'instr', 'tokrow'].forEach(function (id) { var e = $(id); if (e) T.ro.observe(e); }); if (document.body) T.ro.observe(document.body); } catch (e) { }
+    T.raf = 1; (function loop() { if (!T.raf) return; tourPlace(); requestAnimationFrame(loop); })(); setTimeout(tourShow, 60);   // the HUD diet moves the layout after a step starts: keep the bubble on the target's current rect
   }
   var lessons = [
     { id: 'board', title: 'The board', rule: 'Meet the board first: the card pyramid, both thrones, the war track, science and points.',

@@ -16,9 +16,9 @@
     "jq"
   ],
   "limits": {
-    "max_cost_usd": 20,
-    "max_turns": 200,
-    "max_minutes": 60,
-    "max_parallel": 5
+    "max_cost_usd": 3,
+    "max_turns": 60,
+    "max_minutes": 20,
+    "max_parallel": 3
   }
 }
