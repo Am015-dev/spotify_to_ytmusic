@@ -2,12 +2,11 @@
 
 Browser board games, live from `games/` at https://am015-dev.github.io/spotify_to_ytmusic/. Branch `alex/brave-carson-rbpmlk`,
 never main. Next steps: `games-src/HANDOFF.md`. How-to: `games-src/PLAYBOOK.md`. UI standard: `games-src/UI-BAR.md`.
-Old rules: `games-src/RULES-ARCHIVE.md`.
 
 ## Hard rules
 - Never write an original game's, publisher's or designer's name in the repo or on the site. No model names, no Co-Authored-By,
   Claude-Session or other AI attribution in files, commits or PRs.
-- Don't edit Mainhattan Overdrive. Nightrun belongs to this orchestrator. Ticket to Ride is on hold.
+- Don't edit Mainhattan Overdrive. Nightrun belongs to this orchestrator.
 - Game workers: first load Skills boardgame-builder, fun-game-design, impeccable; read board-first-play.md.
 - Never unwire owner art (assets-inbox/<game>); free art fills empty slots only.
 - Before pushing: `git fetch origin alex/brave-carson-rbpmlk && git merge`; never force-push; `git add` explicit paths only.
