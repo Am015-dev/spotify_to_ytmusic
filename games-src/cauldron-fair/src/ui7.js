@@ -101,16 +101,34 @@ function pxBuildBoard(S) {
   { const P0 = KIT.GEO.pts; x.fillStyle = 'rgba(255,246,220,.85)'; for (let i = 1; i < P0.length - 1; i += 2) { const a = P0[i], b = P0[i + 1], mx = W / 2 + (a.x + b.x) / 2 * u, my = W / 2 + (a.y + b.y) / 2 * u, ang = Math.atan2(b.y - a.y, b.x - a.x); x.save(); x.translate(mx, my); x.rotate(ang); x.beginPath(); x.moveTo(-.1 * u, -.1 * u); x.lineTo(.12 * u, 0); x.lineTo(-.1 * u, .1 * u); x.closePath(); x.fill(); x.restore(); } }
   return PIXI.Texture.from(cv);
 }
+// W760: the next 8 spaces ahead of the scoring space are drawn big (coin number >= 15 px); every other space is dimmed, so the eye finds "where can my next chip land"
+function pxAhead(cur) {
+  if (!PX.dimG) { PX.dimG = new PIXI.Graphics(); PX.aheadC = new PIXI.Container(); PX.L.board.addChild(PX.dimG); PX.L.board.addChild(PX.aheadC); }
+  const key = cur + '|' + PX.S + '|' + Math.round(PX.cx) + '|' + Math.round(PX.cy); if (PX.aheadKey === key) return; PX.aheadKey = key;
+  const g = PX.dimG, k = PX.k, N = KIT.GEO.pts.length, end = Math.min(N - 1, cur + 8), ff = 'Nunito,Trebuchet MS,Segoe UI,sans-serif'; g.clear();
+  for (let i = 1; i < N; i++) { if (i >= cur && i <= end) continue; const q = pxPos(i); g.circle(q.x, q.y, k * .5).fill({ color: 0x1c1020, alpha: .5 }); }
+  PX.aheadC.removeChildren().forEach(c => c.destroy());
+  for (let i = Math.max(1, cur + 1); i <= end; i++) {
+    const q = pxPos(i), vp = D.VP[i] > 0, b = new PIXI.Graphics();
+    b.circle(q.x, q.y, k * .6).fill(0xfff4d6).stroke({ width: Math.max(2, k * .07), color: 0x7a4a1a }); PX.aheadC.addChild(b);
+    const t = new PIXI.Text({ text: String(D.COINS[i]), style: { fontFamily: ff, fontWeight: '900', fontSize: Math.max(15, Math.round(k * (vp ? .5 : .62))), fill: 0x3a2014 } });
+    t.resolution = Math.max(1, PX.res * 1.5); t.anchor.set(.5); t.x = q.x; t.y = q.y + (vp ? k * .2 : 0); PX.aheadC.addChild(t);
+    if (vp) { const v = new PIXI.Text({ text: '\u2605' + D.VP[i], style: { fontFamily: ff, fontWeight: '900', fontSize: Math.max(13, Math.round(k * .34)), fill: 0x7a4a1a } }); v.resolution = t.resolution; v.anchor.set(.5); v.x = q.x; v.y = q.y - k * .26; PX.aheadC.addChild(v); }
+    if (D.RUBY[i] && PX.tex.ruby) { const r = new PIXI.Sprite(PX.tex.ruby); r.anchor.set(.5); r.width = r.height = k * .36; r.x = q.x + k * .48; r.y = q.y - k * .42; PX.aheadC.addChild(r); }
+  }
+}
 // ---- layout read ----
 let pxQueued = false;
-function pxDirty() { if (!PX.on || pxQueued) return; pxQueued = true; requestAnimationFrame(() => { pxQueued = false; try { pxSync(); } catch (e) { console.error(e); } }); }
+// first paint: draw the pot synchronously once (a busy or software-rendered pc can starve rAF for seconds, leaving an empty fairground)
+function pxDirty() { if (PX.on && !PX.painted) { try { pxSync(); if (PX.boardSp && PX.boardSp.visible) { PX.app.renderer.render(PX.app.stage); PX.painted = true; PX.dirty = false; } } catch (e) { } }
+  if (!PX.on || pxQueued) return; pxQueued = true; requestAnimationFrame(() => { pxQueued = false; try { pxSync(); } catch (e) { console.error(e); } }); }
 function pxResize(force) {
   if (!PX.app) return; const bd = $('#bd'); const w = Math.max(16, bd.clientWidth), h = Math.max(16, bd.clientHeight);
   if (force || w !== PX.w || h !== PX.h) { PX.w = w; PX.h = h; try { PX.app.renderer.resize(w, h, PX.res); } catch (e) { } PX.dirty = true; }
   pxDirty();
 }
 const pxPos = i => { const p = KIT.GEO.pts[Math.max(0, Math.min(D.TRACK_LEN - 1, i))]; return { x: PX.cx + p.x * PX.k, y: PX.cy + p.y * PX.k }; };
-function pxClear() { for (const [, o] of PX.chips) { try { o.sp.destroy(); o.sh.destroy(); } catch (e) { } } PX.chips.clear(); PX.L.chips && PX.L.chips.removeChildren(); if (PX.boardSp) PX.boardSp.visible = false; if (PX.ring) PX.ring.visible = false; if (PX.drop) PX.drop.visible = false; if (PX.rat) PX.rat.visible = false; PX.seat = -1; }
+function pxClear() { for (const [, o] of PX.chips) { try { o.sp.destroy(); o.sh.destroy(); } catch (e) { } } PX.chips.clear(); PX.L.chips && PX.L.chips.removeChildren(); if (PX.boardSp) PX.boardSp.visible = false; if (PX.dimG) { PX.dimG.clear(); PX.aheadC.removeChildren().forEach(c => c.destroy()); PX.aheadKey = ''; } if (PX.ring) PX.ring.visible = false; if (PX.drop) PX.drop.visible = false; if (PX.rat) PX.rat.visible = false; PX.seat = -1; }
 function pxSync() {
   if (!PX.on) return;
   if (!G || !UI.started) { pxClear(); PX.dirty = true; return; }
@@ -155,7 +173,7 @@ function pxSync() {
   // droplet, rat stone, the ring on the scoring space
   PX.drop.visible = true; const dp = pxPos(p.droplet); pxMoveMark(PX.drop, dp.x, dp.y, csz * .86, snapAll);
   const hasRat = p.rat > 0 && p.rat > p.droplet; PX.rat.visible = hasRat; if (hasRat) { const rp = pxPos(p.rat); pxMoveMark(PX.rat, rp.x, rp.y - csz * .08, csz * 1.0, snapAll); }
-  PX.ringAt = pxPos(CF.spaceOf(p)); PX.ring.visible = !!PX.ringAt;
+  PX.ringAt = pxPos(CF.spaceOf(p)); PX.ring.visible = !!PX.ringAt; pxAhead(CF.spaceOf(p));
   PX.boomNow = !!p.boom; PX.boardSp.tint = p.boom ? 0xffb090 : 0xffffff;
   PX.snap = false; PX.dirty = true; PX.chipsN = p.pot.length;
 }
