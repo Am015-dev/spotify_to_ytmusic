@@ -604,6 +604,98 @@ html[data-pp] #pscrim{opacity:1;pointer-events:auto}
 @media (prefers-reduced-motion:reduce){.tsug{animation:none;box-shadow:0 0 0 4px rgba(232,144,126,.75)}}
 #tutQ{font-weight:800;font-size:20px;min-width:44px;justify-content:center}
 
+/* ===== HUD v3: a landscape table, not a page. Board floats on the meadow; strips top-left, round rail, paper tray. ===== */
+body,.gx-app{background:#9cc7a4 radial-gradient(ellipse 70% 55% at 50% 48%,#cfe8c4 0%,#b4d8b0 45%,#8fbf9c 100%)}
+.gx-app::before{content:'';position:absolute;inset:0;pointer-events:none;opacity:.35;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240' viewBox='0 0 240 240'%3E%3Cg fill='none' stroke='%23ffffff' stroke-width='1.2'%3E%3Cpath d='M-20 60c40-30 80 10 120-10s70-40 160-5'/%3E%3Cpath d='M-20 100c50-25 90 15 130-5s60-35 150 0'/%3E%3Cpath d='M-20 150c45-20 85 20 135 0s65-30 145 5'/%3E%3Cpath d='M-20 200c40-25 95 15 140-5s60-30 140 0'/%3E%3Cellipse cx='175' cy='40' rx='26' ry='14'/%3E%3Cellipse cx='175' cy='40' rx='12' ry='6'/%3E%3Cellipse cx='50' cy='178' rx='22' ry='11'/%3E%3C/g%3E%3C/svg%3E")}
+.gx-bar{background:transparent;box-shadow:none;border:0}
+.gx-app{grid-template-rows:minmax(0,1fr)}.gx-bar{position:absolute;top:0;left:0;right:0;z-index:32;pointer-events:none}.gx-bar>*{pointer-events:auto}.gx-bar h1{display:none}
+.gx-bar .gx-ibtn{width:46px;height:46px;min-width:46px;padding:0;border-radius:50%;background:#fffaf0;border:2px solid #fff;box-shadow:0 3px 8px rgba(40,70,40,.25);justify-content:center}
+.gx-bar .gx-ibtn span{display:none}
+.gx-board.rivalv{background:radial-gradient(ellipse at 50% 45%,rgba(205,228,240,.55),rgba(205,228,240,0) 70%)}
+/* the valley: a raised island with depth */
+#map{filter:drop-shadow(0 10px 14px rgba(30,60,35,.35))}
+#map .hx.glow .cell{fill:#fff7dc;animation:mfslotg 1.1s ease-in-out infinite alternate}
+@keyframes mfslotg{to{fill:#ffe9a8}}
+#map .ghost.pv{opacity:.5}
+#map .hx.glow:not(.home) .ring{stroke:#f0b54a;stroke-dasharray:none;stroke-width:2.5;animation:none}
+#map .pop{animation:mfpop2 .5s cubic-bezier(.3,1.6,.5,1) 1}
+@keyframes mfpop2{0%{transform-box:fill-box;transform-origin:center;transform:translateY(-18px) scale(1.25)}60%{transform-box:fill-box;transform-origin:center;transform:translateY(2px) scale(.96)}100%{transform-box:fill-box;transform-origin:center;transform:none}}
+/* player strips: colour tab, name, leaf badge */
+#topbar{align-items:flex-start}
+#barstat{flex-direction:column;gap:5px}
+.pill{position:relative;overflow:hidden;gap:8px;min-height:44px;padding:0 4px 0 18px;border-radius:0 22px 22px 0;background:rgba(60,82,70,.82);color:#fffaf0;border:0;box-shadow:0 3px 8px rgba(30,50,30,.28);font-size:15px;min-width:132px;justify-content:space-between}
+.pill .stab{position:absolute;left:0;top:0;bottom:0;width:10px;background:var(--sc);transform:skewX(-12deg);transform-origin:bottom left}
+.pill span{max-width:none;font-weight:700;letter-spacing:.3px}
+.pill .badge{display:flex;align-items:center;justify-content:center;min-width:44px;height:36px;padding:0 8px;border-radius:18px;background:#fffaf0;color:var(--ink);font-size:18px;font-weight:800;box-shadow:inset 0 0 0 2px var(--sc)}
+.pill.cur{background:rgba(48,70,58,.95);box-shadow:0 0 0 3px var(--sc),0 3px 8px rgba(30,50,30,.3)}
+.pill.view{outline:0}
+.pill.view span{text-decoration:underline;text-decoration-color:var(--sc);text-decoration-thickness:3px;text-underline-offset:3px}
+.badge.tick{animation:mftick .7s cubic-bezier(.3,1.6,.5,1) 1}
+@keyframes mftick{0%{transform:scale(1)}30%{transform:scale(1.35);background:#f2d675}100%{transform:scale(1)}}
+#endw{flex:0 1 auto;align-self:center;background:rgba(255,250,240,.92);border-radius:999px;box-shadow:0 3px 8px rgba(30,50,30,.2);color:#6b4a12;font-size:13px}
+/* round rail */
+.rb{background:#fffaf0;border:3px solid #fff;box-shadow:0 4px 10px rgba(30,60,35,.3)}
+.rb svg.an{stroke:none;width:40px;height:40px}
+.rb.on{background:#fde9c8;box-shadow:0 0 0 3px #e8907e,0 4px 10px rgba(30,60,35,.3)}
+/* tray: a paper board along the bottom */
+#tray{background:#fbf3e3;border-radius:22px 22px 0 0;box-shadow:0 -6px 18px rgba(30,60,35,.28);border-top:3px solid #fff;padding-top:4px}
+#tray #line{font-size:15px;color:#4a3b2e}
+#central{gap:8px;padding-top:8px}
+#tray #line{margin-bottom:2px}
+.pocket{border-radius:50%;aspect-ratio:1;max-width:72px;background:radial-gradient(circle at 50% 40%,#fffaf0,#efe2c8);border:3px solid #fff;transition:transform .15s}
+.pocket.glow{box-shadow:0 0 0 3px #f2d675,0 4px 8px rgba(90,70,50,.25)}
+.pocket.glow:hover,.pocket.glow:focus-visible,.pocket.hint{transform:translateY(-5px)}
+.pocket.taken{transform:translateY(-5px);opacity:.4}
+.pouch{display:flex;flex-direction:column;align-items:center}
+.pouch svg{width:26px;height:26px;fill:#c9a777;stroke:#7d6a58;stroke-width:1.4}
+.htok{border-radius:50%;width:58px!important;height:58px;min-height:58px;padding:0;background:radial-gradient(circle at 50% 40%,#fffaf0,#efe2c8);transition:transform .15s}
+.htok span{display:none}
+.htok svg{width:44px;height:44px}
+.htok.sel{transform:translateY(-5px) scale(1.06)}
+.htok.fresh{animation:mfin .45s cubic-bezier(.3,1.6,.5,1) both}
+.htok.fresh:nth-of-type(2){animation-delay:.08s}.htok.fresh:nth-of-type(3){animation-delay:.16s}
+@keyframes mfin{0%{transform:translateY(-40px) scale(.3);opacity:0}100%{opacity:1}}
+#endB{min-height:56px;padding:8px 22px;font-size:18px;border-radius:28px}
+#undoB{flex:0 0 auto;width:56px;height:56px;padding:0;border-radius:50%;background:#fffaf0;border:2px solid #e6d6bd;display:flex;align-items:center;justify-content:center}
+#undoB svg{width:26px;height:26px;fill:none;stroke:var(--ink);stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round;pointer-events:none}
+@media (max-width:759px){
+  #topbar{padding-right:4px}
+  #barstat{flex-direction:row;flex-wrap:wrap}
+  .pill{min-width:0;padding-left:16px}
+  .pill span{max-width:64px;overflow:hidden;text-overflow:ellipsis}
+  #rail{position:absolute;top:58px;left:6px;padding:0;gap:5px;z-index:31}
+  .gx-bar{top:54px;min-height:0;padding:4px 6px 0 0;gap:5px;overflow:visible}
+  .gx-bar .gx-ibtn{width:44px;height:44px;min-width:44px;min-height:44px}
+  .rb{flex:0 0 auto;width:44px;min-height:44px;height:44px;border-radius:50%;padding:0;border-width:2px}
+  .rb span{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+  .rb svg{width:24px;height:24px}.rb svg.an{width:36px;height:36px}
+  #topbar{min-height:108px;padding:6px 6px 0 0;align-content:flex-start;flex-wrap:nowrap}
+  #barstat{flex:0 0 auto;gap:6px}
+  .pill{gap:6px;padding:0 3px 0 14px;font-size:15px}.pill span{max-width:46px}.pill .badge{min-width:42px;height:34px;font-size:17px}
+  #endw{flex:0 1 auto;min-width:0;align-self:flex-start;margin-top:4px;line-height:1.2;padding:6px 10px;max-width:none}
+  #endw .ed{display:none}
+  .handrow .anyo{display:none}
+  #endB{padding:8px 16px}
+  .htok{width:56px!important;height:56px;min-height:56px}
+}
+@media (min-width:760px){
+  #topbar{padding:10px 220px 0 10px;min-height:56px}
+  .pocket{max-width:84px}.htok{width:70px!important;height:70px;min-height:70px}.htok svg{width:52px;height:52px}
+  #endw{max-width:380px}
+  .rb span{font-size:13px}
+}
+@media (prefers-reduced-motion:reduce){#map .hx.glow .cell,.htok.fresh,.badge.tick{animation:none}}
+/* text floor: 13px on phones (title art numbers), 16px from 1024 wide (audit rule A) */
+.tdeco text{font-size:13px!important}
+@media (min-width:1024px){
+  .tdeco text{font-size:16px!important}
+  .pill span,#tray #line,.pouch,.pouch b,.rb span,.rb .bd,#twin .tchip,#tmap .tlab,#twin,#twin .twh b,#twin .btn,#endw{font-size:16px!important}
+  .rb{width:84px!important;min-height:84px!important}
+  .setup label,.seg button,.opts summary{font-size:16px}
+  .gx-drawer :is(p,li,small,span,div,button,output,label,summary,td,th,a){font-size:max(16px,1em)}
+  .gx-set :is(button,span,div,small,output,label){font-size:max(16px,1em)}
+}
+
 </style>
 </head>
 <body>
@@ -2603,7 +2695,7 @@ function act(m, how) {   // a human move
   UI.recap = null;
   UI.hintMove = null;
   var s = G.seats[UI.view], gain = G.over ? 0 : E.score(s).total - sc0;
-  if (m.t === 'take') { SND.take(); UI.sel = { kind: 'tok', h: 0 }; }
+  if (m.t === 'take') { SND.take(); UI.fresh = true; UI.sel = { kind: 'tok', h: 0 }; }
   if (m.t === 'place') { SND.place(); UI.flash = m.k; buzz(8); var T = G.turn; UI.sel = T.hand.length ? { kind: 'tok', h: Math.min(m.h, T.hand.length - 1) } : null; }
   if (m.t === 'card') { SND.card(); UI.tab = 'mine'; if (UI.pp) { UI.pp = null; document.documentElement.removeAttribute('data-pp'); } }
   if (m.t === 'cube') { SND.animal(); UI.flash = m.k; buzz([10, 40, 10]); UI.sel = null; }
@@ -2651,12 +2743,15 @@ function render() {
   if (window.tutRender) tutRender();
 }
 function myTurn() { return G && !G.over && !E.seat().ai && UI.view === G.cur && !UI.busy; }
+var SEATC = ['#e8907e', '#3f7fb0', '#5d9c58', '#e3b23c'];
 function renderBar() {
   var h = '';
   G.seats.forEach(function (s, i) {
     var sc = E.score(s).total;
-    h += '<button type="button" class="pill' + (i === G.cur && !G.over ? ' cur' : '') + (i === UI.view ? ' view' : '') + '" data-seat="' + i + '" aria-label="' + esc(s.name) + ' ' + sc + ' points"><span>' + esc(s.name) + '</span><b data-engine="E.score(G.seats[' + i + ']).total">' + sc + '</b></button>';
+    var up = UI.lastSc && UI.lastSc[i] != null && sc > UI.lastSc[i];
+    h += '<button type="button" class="pill' + (i === G.cur && !G.over ? ' cur' : '') + (i === UI.view ? ' view' : '') + '" data-seat="' + i + '" style="--sc:' + SEATC[i % 4] + '" aria-label="' + esc(s.name) + ' ' + sc + ' points"><i class="stab" aria-hidden="true"></i><span>' + esc(s.name) + '</span><b class="badge' + (up ? ' tick' : '') + '" data-engine="E.score(G.seats[' + i + ']).total">' + sc + '</b></button>';
   });
+  UI.lastSc = G.seats.map(function (s) { return E.score(s).total; });
   $('#barstat').innerHTML = h;
 }
 
@@ -2677,6 +2772,7 @@ function renderRail() {
   if (!G) return; var s = G.seats[firstHuman()], act = s.cards.length + (s.spirit && !s.spirit.placed ? 1 : 0), cs = E.seat();
   var ready = !s.ai && (s.cards.some(function (c) { return Object.keys(E.cubeSpots(s, c.id)).length; }) || (s.spirit && !s.spirit.placed && Object.keys(E.cubeSpots(s, s.spirit.id)).length > 0));
   var canTake = myTurn() && !G.turn.tookCard && !G.turn.swapped && E.active(cs) < 4;
+  var rr = $('#railRow svg'); if (rr && G.row.length) { var an = E.card(G.row[0]).an; if (rr.dataset.an !== an) { rr.dataset.an = an; rr.setAttribute('viewBox', '0 0 30 30'); rr.setAttribute('class', 'an'); rr.innerHTML = ART.defs('rr') + ART.animal(an, 15, 15, 27, '#7a5a44', 'rr'); } }
   var a = $('#bdRow'), b = $('#bdMine');
   if (a) { a.textContent = canTake ? '1' : ''; a.hidden = !canTake; }
   if (b) { var go = ready && myTurn(); b.textContent = go ? '!' : act + '/4'; b.className = 'bd' + (go ? ' go' : ''); b.hidden = !act && !go; }
@@ -2710,7 +2806,7 @@ function renderCentral() {
     h += '<button type="button" class="pocket' + (can1 && sp.length ? ' glow' : '') + (taken ? ' taken' : '') + (hint ? ' hint' : '') + '" data-pocket="' + i + '"' + (can1 && sp.length ? '' : ' disabled') + ' aria-label="Pocket ' + (i + 1) + ': ' + sp.map(function (c) { return ART.NAME[c]; }).join(', ') + '">' +
       '<svg viewBox="0 0 46 42" aria-hidden="true">' + ART.defs('c' + i) + sp.map(function (c, j) { var xy = [[12, 29], [34, 29], [23, 12]][j]; return ART.token(c, xy[0], xy[1], 10.5, 'c' + i); }).join('') + '</svg></button>';
   });
-  h += '<span class="pouch" title="Tokens left in the pouch"><b>' + E.bagCount() + '</b> left</span>';
+  h += '<span class="pouch" title="Tokens left in the pouch"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 4h6l-1.5 3h-3zM7.5 8.5C4 11 3.5 20 12 20s8-9 4.5-11.5z"/></svg><b>' + E.bagCount() + '</b> left</span>';
   $('#central').innerHTML = h;
 }
 function wide() { return false; }   // one layout everywhere: the board is the screen, info lives in panels
@@ -2731,6 +2827,7 @@ function valleySVG(s, o) {
     if (g) h += '<polygon points="' + ART.hexPts(xy[0], xy[1], r - 4) + '" class="ring"/>';
     if (plan[k]) h += '<polygon points="' + ART.hexPts(xy[0], xy[1], r - 4) + '" class="pring"/><g class="plab"><rect x="' + (xy[0] - Math.max(25, plan[k].length * 3.6)) + '" y="' + (xy[1] + r * .3) + '" width="' + Math.max(50, plan[k].length * 7.2) + '" height="19" rx="9.5"/><text x="' + xy[0] + '" y="' + (xy[1] + r * .3 + 14) + '">' + esc(plan[k]) + '</text></g>';
     if (g && gain[k]) h += '<g class="gain"><rect x="' + (xy[0] - 15) + '" y="' + (xy[1] + r * .38) + '" width="30" height="18" rx="9"/><text x="' + xy[0] + '" y="' + (xy[1] + r * .38 + 13.5) + '">' + (gain[k] > 0 ? '+' : '') + gain[k] + '</text></g>';
+    if (g === 1 && o.tok) h += '<g class="ghost pv">' + ART.token(o.tok, xy[0], ART.topY(st, xy[1], r) - r * .1, r * .42, f) + '</g>';
     if (g === 2 && o.ghost) h += '<g class="ghost">' + ART.animal(o.ghost, xy[0], ART.topY(st, xy[1], r) - r * .05, r * .62, '#6b4e3a', f) + '</g>';
     h += '</g>';
   });
@@ -2748,7 +2845,7 @@ function renderMap() {
     else if (sel.ci === 'S') { c.cubes[k] = 'S'; c.spirit.placed = true; } else { c.cubes[k] = 1; c.cards[sel.ci].left--; }
     gain[k] = E.score(c).total - base;
   });
-  var v = valleySVG(s, { glow: glow, gain: gain, ghost: ghost, hint: UI.hintMove, plan: plan, marks: G.seats[UI.view].ai || UI.view !== firstHuman() ? UI.rivalMark : null, flash: UI.flash, f: 'm' });
+  var v = valleySVG(s, { glow: glow, gain: gain, ghost: ghost, tok: mine && sel && sel.kind === 'tok' ? G.turn.hand[sel.h] : null, hint: UI.hintMove, plan: plan, marks: G.seats[UI.view].ai || UI.view !== firstHuman() ? UI.rivalMark : null, flash: UI.flash, f: 'm' });
   svg.setAttribute('viewBox', v.vb); svg.innerHTML = v.html; UI.flash = null;
   svg.setAttribute('aria-label', (UI.view === firstHuman() && !s.ai ? 'Your' : s.name + '\'s') + ' valley');
   var vb = $('#vbanner'), other = UI.view !== firstHuman() && humans() === 1;
@@ -2866,7 +2963,7 @@ function endInfo() {   // the countdown line, or null while the end is far
   var who = G.seats[bi], nm = who.ai || humans() > 1 ? who.name + ' has' : 'you have';
   return { t: (bt <= 1 ? 'Could end next turn' : '~' + bt + ' turns left') + ': ' + nm + ' ' + be + ' empty hexes. End at 2.' };
 }
-function renderEnd() { var e = $('#endw'), i = endInfo(); e.hidden = !i; if (i) { e.textContent = i.t; e.classList.toggle('last', !!i.last); } }
+function renderEnd() { var e = $('#endw'), i = endInfo(); e.hidden = !i; if (i) { var c = i.t.indexOf(':'); e.innerHTML = c < 0 ? esc(i.t) : '<b>' + esc(i.t.slice(0, c)) + '</b><span class="ed">' + esc(i.t.slice(c)) + '</span>'; e.title = i.t; e.classList.toggle('last', !!i.last); } }
 function cardSVG(id, left, big) {
   var c = E.card(id), pat = c.pat, rr = big ? 15 : 9.5, pts = [], q = 0, ar = 0;
   pat.forEach(function (p, i) { if (i) { var d = E.DIRS[p.d]; q += d[0]; ar += d[1]; } pts.push([1.5 * q * rr, R3 * (ar + q / 2) * rr, p]); });
@@ -2893,10 +2990,11 @@ function cardHTML(id, o) {
 }
 function renderHand() {
   var T = G.turn, h = '<div class="handrow">' + (T.hand.length > 1 ? '<span class="anyo">Any<br>order</span>' : '');
-  T.hand.forEach(function (c, i) { var hint = UI.hintMove && UI.hintMove.t === 'place' && UI.hintMove.h === i; h += '<button type="button" class="htok' + (UI.sel && UI.sel.kind === 'tok' && UI.sel.h === i ? ' sel' : '') + (hint ? ' hint' : '') + '" data-h="' + i + '" aria-label="Place ' + ART.NAME[c] + '"><svg viewBox="0 0 40 40" aria-hidden="true">' + ART.defs('h' + i) + ART.token(c, 20, 20, 15, 'h' + i) + '</svg><span>' + ART.NAME[c] + '</span></button>'; });
+  T.hand.forEach(function (c, i) { var hint = UI.hintMove && UI.hintMove.t === 'place' && UI.hintMove.h === i; h += '<button type="button" class="htok' + (UI.fresh ? ' fresh' : '') + (UI.sel && UI.sel.kind === 'tok' && UI.sel.h === i ? ' sel' : '') + (hint ? ' hint' : '') + '" data-h="' + i + '" aria-label="Place ' + ART.NAME[c] + '"><svg viewBox="0 0 40 40" aria-hidden="true">' + ART.defs('h' + i) + ART.token(c, 20, 20, 15, 'h' + i) + '</svg><span>' + ART.NAME[c] + '</span></button>'; });
   if (!T.hand.length) h += '<span class="hn">' + (E.moves().some(function (m) { return m.t === 'cube'; }) ? 'All placed. An animal can move in!' : 'All placed.') + '</span>';
   h += '<span class="sp"></span>';
-  if (UI.undo.length) h += '<button type="button" class="btn ghostb" id="undoB">Undo</button>';
+  UI.fresh = false;
+  if (UI.undo.length) h += '<button type="button" class="btn ghostb" id="undoB" aria-label="Undo" title="Undo"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 7 4 12l5 5M4 12h10a5 5 0 0 1 0 10h-3"/></svg></button>';
   var canEnd = E.legal({ t: 'end' }); h += '<button type="button" class="btn primary' + (canEnd ? ' go' : '') + '" id="endB"' + (canEnd ? '' : ' aria-disabled="true"') + '>End turn</button>';
   $('#central').innerHTML = h + '</div>';
 }
@@ -3242,7 +3340,7 @@ function tutMapDraw() {
     var b = document.createElement('button'); b.type = 'button'; b.className = 'tlab'; b.textContent = t.m[1]; b.dataset.k = t.m[0]; o.appendChild(b);
     var bw = b.offsetWidth, bh = b.offsetHeight, r = t.r, cx = (r.left + r.right) / 2, cy = (r.top + r.bottom) / 2, best = null;
     var big = r.width > W * .45 || r.height > H * .35;
-    var pts = big ? [[cx - bw / 2, cy - bh / 2], [cx - bw / 2, r.top + 8], [r.left + 8, cy - bh / 2], [cx - bw / 2, r.bottom - bh - 8]] : [];
+    var pts = big ? [[cx - bw / 2, r.bottom - bh - 8], [cx - bw / 2, cy - bh / 2], [cx - bw / 2, r.top + 8], [r.left + 8, cy - bh / 2]] : [];   // big targets: label at their bottom edge, leaving the middle free for the lesson window
     for (var d = 10; d <= 150; d += 14) pts.push([cx - bw / 2, r.bottom + d], [cx - bw / 2, r.top - d - bh], [r.left - d - bw, cy - bh / 2], [r.right + d, cy - bh / 2], [r.left - d - bw, r.bottom + d], [r.right + d, r.bottom + d], [r.left - bw, r.top - d - bh], [r.right, r.top - d - bh]);
     pts.forEach(function (p, i) {
       var x = Math.max(4, Math.min(W - bw - 4, p[0])), y = Math.max(4, Math.min(H - bh - 4, p[1])), box = { left: x, top: y, right: x + bw, bottom: y + bh }, sc = i * .01;
