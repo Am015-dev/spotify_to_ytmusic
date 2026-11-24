@@ -314,3 +314,9 @@ Live fix: original-name phrase removed from shelf blurb + sands page (15:2x).
 ## W740 onyx-atelier visual fix (24 Nov)
 Done: tutorial part names now a tidy list inside the guide window, ONE callout on the board for the picked part (no chip cloud); PC (>=1000px) grid layout: board left (cell up to 112px), rival/jewels/you stacked right; guide never sits on the PC board.
 Weak: PC guide window still covers the rival jewel rows on lesson 1; HUD pips and phone start menu not changed. Sheets: onyx-atelier/proof/w740-*-sheet.jpg. Integrator: build.py then copy onyx-atelier.html to games/onyx-atelier/index.html (not in build-all).
+
+## W755 tidewake HUD diet (shelf/W755-hud-tidewake)
+- skin.css only (no engine/rules/lesson changes): dock no longer shows rival log list, "Since your last move" feed or crew cards; Crews + Log are now top-bar icons (were Menu-only); Crews window table was hidden on phone (head.html .lg2 rule) and now shows; pc drawers start under the bar and scroll (Menu used to run 139 px off the top); pc Crews/Log text 16 px.
+- Leaf items on main screen, start of board: 17 -> 10 (phone and pc); own turn: ~20 -> 16 (3 hand tiles + Turn/Turn/Place count). Proof: games-src/tidewake/proof/w755-hud-{before,after}-{phone,pc}-sheet.jpg, w755-hud-windows-sheet.jpg.
+- Lessons: lessons-test.js PASS 402x874 and 1366x768 (~23 s each). Scenarios (phone, phone-s, pc): 19 pass, 2 fail, both same on the parent commit: phone-s menu (opip pickable marks over column numbers) and pc menu (menuAuditAll: "Lessons" under #setd while panels scroll). Visual baselines missing (expected).
+- Still weak: phone has empty space under the dock (board is width-bound); contact-sheet pc "menu" cell is captured while the bar is still visibility:hidden (loads at ~3 s; fine at 6 s).
