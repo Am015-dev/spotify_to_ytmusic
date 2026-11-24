@@ -79,3 +79,28 @@ Check every 10 min via send_later (re-arm each time). Rules for hanging work: bl
 LIVE and verified (md5 live == repo tip 13:25): ochre, gloamwar, onyx (+story), meadowfold (HUD v5), via-tessera, wickdeep, perch, wildmark (readable), sands (HUD + tutorial), thornbound, twin, doorkick, crown, kaiten (scenario tutorial pilot), shipwreck, cauldron, stitchwise, vale, emberclimb/sunglaze/lantern (scenario tutorials), tidewake, short-fuse, rampart.
 STILL IN FLIGHT: integrators 11 (short-fuse, stitchwise baselines, rampart) and 12 (twin, crown scenario tutorials); unfinished scenario-tutorial workers W688 doorkick, W690 thornbound, W691 tidewake, W692 cauldron, W693 shipwreck, W694 vale (branches shelf/W6xx-*): merge with an integrator when pushed. Interrupted: W695 nebula, W696 redline (not started).
 NEXT: owner's play feedback -> route per game (workers: Sonnet specified, Opus design); keep check every 10 min via send_later if he asks for more work; tutorials must be scenario games; HUD diet remaining: thornbound, hollowbough, rampart; contrast leftovers 33 (goal 14); convert floating-lesson tutorials (wickdeep, perch, wildmark, via-tessera, meadowfold, gloamwar, onyx, sands) to scenarios; scenario tutorials for nebula, redline, vinegrave, hollowbough, final-approach.
+
+## 15:15 UTC CHEAPAG FIXED
+Env "Alex" setup script installs cheap-agent, writes /root/.config/cheapag/config.json (provider local = api.anthropic.com/v1, claude-haiku-5-5, key env ANT), `claude mcp add -s user cheapag -- cheapag`, `cheapag allow` in the repo. Proven 15:13: delegate OK, test pass, $0.05, 6 turns. Every brief now says: all code via mcp__cheapag__delegate (BRIEF-TEMPLATE.md). Workers launched 14:56 (W698-W702, W704) predate it. Trial B8 session_01RR7mnXzBvG1gr4TqyAmew6 checks a fresh worker loads the tools.
+15:20 UTC: fresh workers get cheapag connected but tools not callable (B8). Fix: games-src/scripts/cag.js calls the cheapag MCP server from Bash; proven OK. Brief rule updated.
+
+## 15:40 UTC ROUND (20 workers, all code via cag.js -> Haiku)
+Integrators: INT15 vale(W704)+doorkick(W700) session_01RR7mnbjrozxC6CR9udNMVw | INT16 crown(W698 dice-row fix)+meadowfold contrast(W703) session_01RR7mnb4wFvpsdQT37Ph9Wf.
+Scenario tutorials: W701 nebula (no cheapag) | W705 shipwreck redo | W706 redline redo | W707 vinegrave | W708 hollowbough | W709 final-approach.
+Conversions to scenarios: W710 wickdeep | W711 perch | W712 wildmark | W713 via-tessera | W714 meadowfold | W715 gloamwar | W716 sands.
+HUD diet (Opus): W717 thornbound | W718 rampart. Chores (Haiku): W719 contrast | W720 stitchwise baselines. Reviewer R13 (Opus): REVIEW-R13.md.
+Branches shelf/W7xx-*. Workers report via create_trigger "[DONE Wxxx]". W699/W702 pushes were denied (work lost) -> redone as W705/W706; briefs now say push per milestone or paste format-patch.
+Next: as branches land, one Sonnet integrator per 2-4 branches (shared gx-scenario-tutor.js changes -> one build-all). Onyx (has story tutorial) not converted.
+15:53 UTC DECISION: cheapag net-negative on feature work (W707 $1.22, W712 $1.5, nothing produced; W711 stalled). Kept only for one-file fixes; briefs updated.
+
+## 15:56 UTC STATE (orchestrator session_01RR7mnbria2H5cZehPYYq6S; hand off here if context is full)
+LIVE 15:51: crown-city-smash (2D PC overlap fixed) + meadowfold (contrast) via INT16 790bf02a.
+Source merged but NOT deployed: vale (W704) + doorkick (W700) at 04392461 -> phone lessons fail after merge; W722 (Opus) fixing shared gx-scenario-tutor phoneSlot regression + deploying affected games (vale, doorkick, crown, thornbound, rampart).
+Reviewer R13 (shelf/R13-review REVIEW-R13.md): ochre 0 (no lessons) -> W725; thornbound lessons not live (W722 deploys); twin/emberclimb end->title, Lessons button 0x0, ?lessons=1, show-me ring -> W726 (waits for W722); tidewake phone + >60 s tests -> W727.
+Redos: W721 vinegrave, W723 perch, W724 wildmark (no cheapag). Running from 15:33/15:39 round: W701 nebula (1b5f03f5 pushed), W705 shipwreck, W706 redline, W708 hollowbough, W709 final-approach, W710 wickdeep, W713 via-tessera, W714 meadowfold (ca260ae0), W715 gloamwar, W716 sands, W717/W718 HUD diet (Opus), W719 contrast, W720 stitchwise.
+Merge plan: after W722 lands, one Sonnet integrator per 2-4 pushed branches; shared shell changes -> one build-all. cheapag: one-file fixes only.
+
+## 16:04 UTC HANDOFF to new orchestrator
+Since 15:56: What's new entries added for today's deploys (daa0737fe); briefs now require add-update.py on every deploy. New workers: W725 ochre scenario tutorial, W726 shared tutor fixes (waits for W722), W727 tidewake phone + test speed, W728 nebula fix (from W701), W729 final-approach fix (from W709, card covers dice tray). Pending merges: W714 meadowfold scenarios (ca260ae0), others as they push. W722 (Opus regression fix + deploy of vale/doorkick/crown/thornbound/rampart) is the gate before any new integrator.
+Cost data for owner: cheapag on feature work W707 $1.22, W712 $1.5, W709 $1.9, INT16 $1.2 (2/4 jobs failed); Sonnet session cost readable from get_session usage.cost_usd (W711 $0.61 at 147k tokens). Decision: cheapag only for one-file fixes.
+Live check URL form: https://am015-dev.github.io/spotify_to_ytmusic/<slug>/ (games/ is the site root).

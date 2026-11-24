@@ -249,6 +249,7 @@ html.ph .sline .sl1{gap:5px;padding:1px 10px 2px}html.ph .sline .sy,html.ph .sli
 html.ph .sline .n{min-width:.9em}
 /* PC: after a bonus card the fight rows outgrow the arena; Fight!/Run/Help stay pinned inside it instead of being cut off and unclickable (scenario dk-fight-bonus @1366x768) */
 html:not(.ph) .arena .fbtns{position:sticky;bottom:0;z-index:3}
+html:not(.ph) .arena{border-radius:18px}
 
 /* 9+ cards: slices under 44px, so a card's price tag hides and its name ends in an ellipsis instead of running under the next card */
 html.ph .mine .hand.tight .card:not(:last-child) :is(.gold,.aw){display:none}
@@ -333,7 +334,10 @@ html.gx:not(.ph) .gx-dock .gx-dock-body{display:block!important;padding:8px 18px
 html.gx:not(.ph) .gx-dock .gx-dock-body::before{display:none}
 html:not(.ph) #prompt{display:flex;flex-wrap:wrap;align-items:center;gap:8px 16px;max-width:1100px;margin:0 auto}
 html:not(.ph) #prompt .order,html:not(.ph) #prompt .steps,html:not(.ph) #prompt>.who,html:not(.ph) #prompt ol,html:not(.ph) #prompt>.fightnote,html:not(.ph) .gx-dock .recent,html:not(.ph) #prompt .hint .hx{display:none!important}
-html:not(.ph) #prompt:not(.bfq) p.say,html:not(.ph) #prompt>p:not(.bfline):not(.say),html:not(.ph) #prompt .hint,html:not(.ph) #prompt .lesson,html:not(.ph) #prompt>.tip,html:not(.ph) #prompt .since{display:none!important}
+html:not(.ph) #prompt:not(.bfq) p.say,html:not(.ph) #prompt>p:not(.bfline):not(.say),html:not(.ph) #prompt .hint,html:not(.ph) #prompt .lesson,html:not(.ph) #prompt>.tip:not(.sellbar),html:not(.ph) #prompt .since{display:none!important}
+html:not(.ph) #prompt>.tip.sellbar{display:block;flex:1 1 280px;margin:0;font-size:16px}
+html:not(.ph) #prompt>.sellbar .acts{display:flex;gap:8px;margin-top:6px}
+html:not(.ph) #prompt:has(>.sellbar)>:is(.acts.main,.bfline){display:none!important}
 html:not(.ph) #prompt:not(.bfq) .bfline{display:block;flex:1 1 280px;margin:0!important;font:700 19px/1.25 var(--title)!important;color:var(--cream)!important;text-shadow:0 1px 0 #000!important;min-height:22px}
 html:not(.ph) #prompt.bfq{display:block;color:var(--cream)}
 html:not(.ph) #prompt.bfq p.say{color:var(--cream);font-size:17px}
