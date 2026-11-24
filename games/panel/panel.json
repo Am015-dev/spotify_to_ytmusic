@@ -1,5 +1,5 @@
 {
- "updated": "2026-11-24T03:09:50Z",
+ "updated": "2026-11-24T06:15:53Z",
  "live_base": "https://am015-dev.github.io/spotify_to_ytmusic/",
  "decisions": [
   {
@@ -13,6 +13,10 @@
   }
  ],
  "notes": [
+  {
+   "at": "06:15",
+   "text": "Owner decision: new games stay visible on the shelf as Preview so he can test and track progress. Each has a What's new note listing what changed and what to test. Next for them: rules audits for Via Tessera, Meadowfold and Gloamwar (done for Onyx), a feel pass (animations, sound, theme) and the owner's art."
+  },
   {
    "at": "03:09",
    "text": "LIVE and verified (site files match the build): 22 games with credits removed + fixes (Wildmark readability, Perch clarity, Sands claims/paths, Thornbound tutorial); previews: Wickdeep redesign, Ochre guide, Via Tessera, Onyx Atelier, Meadowfold, Gloamwar (still Preview, not called finished). NOT live: Twin Thrones (old version stays; a fix worker for its board layout check is running)."
@@ -63,8 +67,8 @@
    "slug": "meadowfold",
    "name": "Meadowfold",
    "live": true,
-   "stage": "live",
-   "step": "live (not changed today)"
+   "stage": "preview",
+   "step": "guide beside targets; needs feel pass + your art"
   },
   {
    "slug": "hollowbough",
@@ -242,8 +246,8 @@
    "slug": "onyx-atelier",
    "name": "Onyx Atelier (new)",
    "live": true,
-   "stage": "live",
-   "step": "live (not changed today)"
+   "stage": "preview",
+   "step": "rules audited, 28-step rules tutorial with bubbles; needs feel pass + your art"
   },
   {
    "slug": "dungeon-crawler",
@@ -265,6 +269,20 @@
    "live": true,
    "stage": "live",
    "step": "door guidance live (test.html)"
+  },
+  {
+   "slug": "via-tessera",
+   "name": "Via Tessera (new)",
+   "live": true,
+   "stage": "preview",
+   "step": "clarity pass done; dense map; needs feel pass + your art"
+  },
+  {
+   "slug": "gloamwar",
+   "name": "Gloamwar (new)",
+   "live": true,
+   "stage": "preview",
+   "step": "clarity pass done; dense map; needs feel pass + your art"
   }
  ]
 }

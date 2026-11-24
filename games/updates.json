@@ -1,5 +1,46 @@
 [
  {
+  "date": "2026-11-24",
+  "game": "gloamwar",
+  "title": "More readable map and guide",
+  "items": [
+   "Guide bubbles sit next to their targets",
+   "Region info no longer covers the map",
+   "Each phase says what to tap"
+  ],
+  "check": "Start the first scenario and tell me what you cannot read or understand"
+ },
+ {
+  "date": "2026-11-24",
+  "game": "tessera",
+  "title": "Clearer guide and map",
+  "items": [
+   "Guide bubbles sit next to their targets",
+   "Map fits the screen and labels are no longer cut off"
+  ],
+  "check": "Play the guided game on your phone and tell me what is still unclear"
+ },
+ {
+  "date": "2026-11-24",
+  "game": "meadowfold",
+  "title": "Guide next to what it points at",
+  "items": [
+   "Each guide instruction is attached to its glowing target"
+  ],
+  "check": "Start the guided game and tap only what is glowing"
+ },
+ {
+  "date": "2026-11-24",
+  "game": "onyx",
+  "title": "Rules tutorial that teaches every rule",
+  "items": [
+   "The tutorial now teaches the rules one step at a time and makes you do each one",
+   "Rules panel and tutorial use the same wording, checked against the rules notes",
+   "Instruction bubbles are attached to what they point at"
+  ],
+  "check": "Open Onyx Atelier on your phone, start the guided first game and tell me any rule that is wrong or any step you cannot follow"
+ },
+ {
   "date": "2026-11-23",
   "game": "thornbound",
   "title": "Clearer steps and rules",
