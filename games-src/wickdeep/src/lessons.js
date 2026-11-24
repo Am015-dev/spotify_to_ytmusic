@@ -264,6 +264,13 @@
   nextLesson = function () { return null; };
   window.addEventListener('gxst', function (e) {
     if (e && e.detail && e.detail.type === 'close') UI.tut = false;
+    // the last lesson flows straight into a real game
+    if (e && e.detail && e.detail.type === 'win' && e.detail.id === 'finish') setTimeout(function () {
+      var ft = document.querySelector('.gxst-card .gxst-ft'); if (!ft || document.getElementById('wdl-real')) return;
+      var b = document.createElement('button'); b.type = 'button'; b.id = 'wdl-real'; b.className = 'gxst-btn pri'; b.textContent = 'Play a real game';
+      b.addEventListener('click', function () { GXST.close(); UI.tut = false; UI.fast = false; G = null; quickPlay(); });
+      ft.innerHTML = ''; ft.appendChild(b);
+    }, 0);
   });
 
   GXST.init({

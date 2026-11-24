@@ -125,6 +125,11 @@ async function run(b, W, H) {
     const won = await phaseIs('win', 15000);
     const s = await st();
     if (!won) note(lesson + ': not solved (phase ' + s.phase + ') ' + (s.msg || '') + ' ' + (await p.evaluate(() => JSON.stringify(G.figs.map(f => [f.id, f.hp, f.shield, f.pos])))));
+    if (lesson === 'finish' && won) {   // the last lesson's card offers a real game, and it starts
+      await tapStep({ sel: '#wdl-real' });
+      if (!(await p.waitForFunction(() => !GXST.state().open && !!document.querySelector('#start:not([hidden]),#camp:not([hidden]),#rs:not([hidden])') || (!GXST.state().open && window.G && G.ask), null, { timeout: 8000 }).then(() => true, () => false))) note('finish: Play a real game did not start a game');
+      res[lesson] = { ok: probs.length === before, sec: ((Date.now() - t0) / 1000).toFixed(1) }; continue;
+    }
     await p.evaluate(() => GXST.picker && GXST.picker());
     await p.evaluate(() => GXST.close && GXST.close());
     res[lesson] = { ok: won && probs.length === before, sec: ((Date.now() - t0) / 1000).toFixed(1) };
