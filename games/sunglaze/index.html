@@ -2707,7 +2707,7 @@ const GX={key:'gx',open:null,
   }
   function starRow(n, max, total) {
     var r = el('div', 'gxc-stars'); r.setAttribute('aria-label', n + ' of ' + (total || 3) + ' stars');
-    for (var i = 0; i < (total || 3); i++) r.appendChild(el('i', 'gxc-st' + (i < n ? ' on' : '') + (max != null && i >= max ? ' cap' : ''), '★'));
+    for (var i = 0; i < (total || 3); i++) r.appendChild(el('i', 'gxc-st' + (i < n ? ' on' : '') + (max != null && i >= max ? ' cap' : ''), '◆'));
     return r;
   }
   // twist text without its 'Boss rule:' prefix (the label shows it), first letter upper-case
@@ -2728,7 +2728,7 @@ const GX={key:'gx',open:null,
     head.appendChild(back);
     var tt = el('div', 'gxc-htitle'); tt.appendChild(el('b', null, D.title || 'Story')); head.appendChild(tt);
     var got = 0; list.forEach(function (c) { got += (P.ch[c.id] && P.ch[c.id].stars) || 0; });
-    var sc = btn('gxc-ib gxc-score', '★ ' + got + '/' + list.length * 3, function () { rewards(); });
+    var sc = btn('gxc-ib gxc-score', '◆ ' + got + '/' + list.length * 3, function () { rewards(); });
     sc.setAttribute('aria-label', got + ' stars of ' + list.length * 3 + '. Show rewards'); head.appendChild(sc);
     if (O.headButtons) { try { O.headButtons().forEach(function (b) { head.insertBefore(b, sc); }); } catch (e) {} }
     s.appendChild(head);
@@ -2809,7 +2809,7 @@ const GX={key:'gx',open:null,
     var g = el('div', 'gxc-goal'); g.appendChild(el('b', null, 'Goal')); g.appendChild(el('span', null, c.goal.text)); sh.appendChild(g);
     if (c.twist) { var tw = el('div', 'gxc-twist'); tw.appendChild(el('b', null, c.boss ? 'Boss rule' : 'Special rule')); tw.appendChild(el('span', null, ruleText(c.twist.text))); sh.appendChild(tw); }
     var sl = el('ul', 'gxc-slist');
-    c.stars.forEach(function (s, i) { var li = el('li', i < (st.stars || 0) ? 'on' : ''); li.appendChild(el('i', null, '★')); li.appendChild(el('span', null, s.text)); sl.appendChild(li); });
+    c.stars.forEach(function (s, i) { var li = el('li', i < (st.stars || 0) ? 'on' : ''); li.appendChild(el('i', null, '◆')); li.appendChild(el('span', null, s.text)); sl.appendChild(li); });
     sh.appendChild(sl);
     var row = el('div', 'gxc-row');
     var x = btn('gxc-btn ghost', 'Close', close); x.setAttribute('data-gxc-esc', ''); row.appendChild(x);
@@ -2964,7 +2964,7 @@ const GX={key:'gx',open:null,
       var sr = starRow(r.stars, def.maxStars, 3); sr.classList.add('big'); box.appendChild(sr);
       if (r.won && def.easy) box.appendChild(el('div', 'gxc-dim gxc-small', 'Easier mode: up to ' + def.maxStars + ' stars. Play it normally for 3.'));
       var sl = el('ul', 'gxc-slist');
-      def.stars.forEach(function (st, i) { var li = el('li', i < r.stars ? 'on' : ''); li.appendChild(el('i', null, '★')); li.appendChild(el('span', null, st.text)); sl.appendChild(li); });
+      def.stars.forEach(function (st, i) { var li = el('li', i < r.stars ? 'on' : ''); li.appendChild(el('i', null, '◆')); li.appendChild(el('span', null, st.text)); sl.appendChild(li); });
       box.appendChild(sl);
       var op = def.opponent, line = r.won ? op.praise : op.taunt;
       if (line) {
@@ -4176,7 +4176,7 @@ function finish(){if(G.over)return;for(const p of G.pl){const b=endBonus(p);p.st
     if(b.rows+b.cols+b.colours)lg(`${p.nm} earns end bonuses: ${b.rows} row${b.rows===1?'':'s'} (+${p.st.rows}), ${b.cols} column${b.cols===1?'':'s'} (+${p.st.cols}), ${b.colours} full colour${b.colours===1?'':'s'} (+${p.st.colours}).`,'good')}
   const sc=G.pl.slice().sort((a,b)=>b.score-a.score||b.fr-a.fr);const top=sc[0];const winners=sc.filter(p=>p.score===top.score&&p.fr===top.fr);
   G.over={scores:sc.map(p=>({p:p.i,s:Object.assign({total:p.score,fr:p.fr},p.st)})),win:winners.map(w=>w.i),tie:sc.filter(p=>p.score===top.score).length>1};G.winner=winners.map(w=>w.nm).join(' & ');
-  G.winText=`${G.winner} ${winners.length>1?'share the win':'wins'} with ${top.score} points${G.over.tie&&winners.length===1?' (more finished rows breaks the tie)':''}.`;G.phase='over';G.wt=null;lg('🏆 '+G.winText,'big');fx('win')}
+  G.winText=`${G.winner} ${winners.length>1?'share the win':'wins'} with ${top.score} points${G.over.tie&&winners.length===1?' (more finished rows breaks the tie)':''}.`;G.phase='over';G.wt=null;lg(' '+G.winText,'big');fx('win')}
 // ---------- the API ----------
 function sideToAct(){if(!G||G.over)return -1;if(G.phase==='offer')return G.cur;if(G.phase==='wall'&&G.wt&&G.wt.q)return G.wt.q.p;return -1}
 function validMoves(s){if(!G||G.over)return[];if(s===undefined)s=sideToAct();if(s<0||s!==sideToAct())return[];
@@ -5032,17 +5032,17 @@ function netStatus(){const n=NET.peers.length;
   if(isClient()&&!NET.lastRx)return 'Looking for the host…';
   if(n<=1)return 'Looking for players…';return `${n} players connected`}
 function netDockHtml(){if(!NET.on)return '';const s=NET.mySeat>=0&&G?G.pl[NET.mySeat]:null;
-  return `<div class="netst small"><span>🌐 Room <b>${esc(NET.code)}</b>${s?` · you are <b style="color:${PCOL[s.i]}">${esc(s.nm)}</b>`:G?' · watching':''}${isHost()?' · you host':''} · <span class="nst">${netStatus()}</span></span><button class="btn sm ghost" data-a="netopen">Lobby</button><button class="btn sm ghost" data-a="netleave">Leave</button></div>`}
+  return `<div class="netst small"><span> Room <b>${esc(NET.code)}</b>${s?` · you are <b style="color:${PCOL[s.i]}">${esc(s.nm)}</b>`:G?' · watching':''}${isHost()?' · you host':''} · <span class="nst">${netStatus()}</span></span><button class="btn sm ghost" data-a="netopen">Lobby</button><button class="btn sm ghost" data-a="netleave">Leave</button></div>`}
 function lobbyHTML(){const host=isHost();const ps=lobbyPlayers();const o=host?lobbyOpt():(NET.opt||null);
   const rows=ps.map((p,i)=>`<li>${i<4?`<i style="background:${PCOL[i]}"></i>`:'<i class="w"></i>'}<b>${esc(p.nm||'Player')}</b>${p.me?' (you)':''}${p.host?' · host':''}${i>=4?' · watching':''}</li>`).join('')||'<li class="muted">Connecting…</li>';
   let opts='';if(o){const np=Math.min(4,Math.max(o.np|0,ps.length));const vs=[o.ex&&o.ex.gray?'unmarked mosaic':'',o.ex&&o.ex.prism?'prism tiles':''].filter(Boolean).join(', ')||'none';
     const ai=np-Math.min(4,ps.length);const lvs=(o.lv||[]).slice(Math.min(4,ps.length),np).map(x=>esc(String(x))).join(', ');
     opts=`<p class="small">Game: <b>${np} glaziers</b> · variants: <b>${vs}</b>${ai>0?` · ${ai} computer seat${ai>1?'s':''} (<b>${lvs}</b>)`:''}.${host?' To change this, close this panel and use the start screen.':''}</p>`}
   const inGame=!!G;
-  return `<div class="mbox lobby" role="dialog" aria-modal="true" aria-label="Online game"><button class="gx-x lbx" data-a="netclose" aria-label="Close">×</button><h2>🌐 Online game</h2>
+  return `<div class="mbox lobby" role="dialog" aria-modal="true" aria-label="Online game"><button class="gx-x lbx" data-a="netclose" aria-label="Close">×</button><h2> Online game</h2>
    <p>Invite code: <b class="code">${esc(NET.code)}</b></p>
    <div class="invrow"><input class="invlink" readonly value="${esc(NetRoom.inviteLink(NET.code))}" aria-label="Invite link"><button class="btn sm" data-a="netcopy">${NET.copied?'Copied ✓':'Copy link'}</button></div>
-   <p class="small muted">Send friends the link, or they open Sunglaze, choose 🌐 Play online and type the code.</p>
+   <p class="small muted">Send friends the link, or they open Sunglaze, choose  Play online and type the code.</p>
    <p class="small nst">${netStatus()}</p>
    <h3>Players (${ps.length})</h3><ul class="plist">${rows}</ul>${opts}
    ${host?`<div class="acts"><button class="btn go" data-a="netstart">${inGame?'Start a new game':'Start the game'} with ${Math.min(4,ps.length)} player${ps.length===1?'':'s'}</button><button class="btn" data-a="netleave">Close the room</button></div>`
@@ -5054,7 +5054,7 @@ function onlineBlock(){let h='';
   else h=`<p class="small muted">Free and direct: your browsers connect to each other. Host a game, then send friends the code or the link.</p>
     <div class="nrow"><input id="netname" placeholder="Your name" maxlength="24" autocomplete="off" value="${esc(NET.myName||'')}"><button class="btn sm go" data-a="nethost">Host a game</button></div>
     <div class="nrow"><input id="joincode" placeholder="Invite code" maxlength="10" autocomplete="off" autocapitalize="off" value="${esc(UI.joinCode||'')}"><button class="btn sm" data-a="netjoin">Join</button></div>${NET.busy?'<p class="small muted">Opening the room…</p>':''}${NET.err?`<p class="small warn">${esc(NET.err)}</p>`:''}`;
-  return `<details class="online" id="onl"${UI.onl||NET.on?' open':''}><summary>🌐 Play online</summary>${h}</details>`}
+  return `<details class="online" id="onl"${UI.onl||NET.on?' open':''}><summary> Play online</summary>${h}</details>`}
 function netCopy(){const t=NetRoom.inviteLink(NET.code);const sel=()=>{const i=document.querySelector('.invlink');if(i){i.focus();i.select()}};
   const done=()=>{NET.copied=true;render();setTimeout(()=>{NET.copied=false;render()},2500)};
   try{navigator.clipboard.writeText(t).then(done,sel)}catch(e){sel()}}
@@ -5116,9 +5116,9 @@ function render(){renderModal();if(!G){try{phRender()}catch(e){console.error(e)}
   const pb=$('#pausebtn');if(pb){pb.hidden=human();const h=IC(UI.pause?'play':'pause')+'<span>'+(UI.pause?'Resume':'Pause')+'</span>';if(pb.dataset.h!==h){pb.innerHTML=h;pb.dataset.h=h}}const sb=$('#speedbtn');if(sb){const h=IC('speed')+'<span>Speed: '+({0.5:'slow',1:'normal',3:'fast'}[UI.speed]||'normal')+'</span>';if(sb.dataset.h!==h){sb.innerHTML=h;sb.dataset.h=h}}
   const cb=$('#coachbtn');if(cb){cb.classList.toggle('on',!!UI.coach);const h=IC('guide')+'<span>Guide: '+(UI.coach?'on':'off')+'</span>';if(cb.dataset.h!==h){cb.innerHTML=h;cb.dataset.h=h}}
   const ch=$('#chip');if(ch){const s=sideToAct();ch.textContent=G.over?'The king’s judgement':`${innerWidth<700?'Round '+G.round:chapter(G.round)} · ${G.phase==='wall'?'setting the walls':s>=0?P(s).nm+' to play':''}`}}
-function scoresHtml(){const s=sideToAct();return `<div class="scores">${G.pl.map(p=>`<span class="sc ${p.i===s?'cur':''}" style="--pc:${PCOL[p.i]}"><i></i>${esc(p.nm)}${NET.on&&p.i===NET.mySeat?' (you)':''} ★${p.score}${phBonus(p)?` <small title="End bonus earned so far">+${phBonus(p)} bonus</small>`:''}${G.markerIn===p.i?' ☀':''}</span>`).join('')}</div>`}
+function scoresHtml(){const s=sideToAct();return `<div class="scores">${G.pl.map(p=>`<span class="sc ${p.i===s?'cur':''}" style="--pc:${PCOL[p.i]}"><i></i>${esc(p.nm)}${NET.on&&p.i===NET.mySeat?' (you)':''} ${p.score}${phBonus(p)?` <small title="End bonus earned so far">+${phBonus(p)} bonus</small>`:''}${G.markerIn===p.i?' ☀':''}</span>`).join('')}</div>`}
 function thumbsHtml(){const f=focusSeat();const narrow=V3.on?(V3.L&&V3.L.name==='focus'):innerWidth<700;if(!narrow)return '';
-  return `<div class="thumbs">${G.pl.filter(p=>p.i!==f).map(p=>`<button class="thumb" data-gx="plrd" style="--pc:${PCOL[p.i]}" aria-label="Open ${esc(p.nm)}'s board">${esc(p.nm)} ★${p.score}<svg viewBox="0 0 1240 940">${boardG(p,{})}</svg></button>`).join('')}</div>`}
+  return `<div class="thumbs">${G.pl.filter(p=>p.i!==f).map(p=>`<button class="thumb" data-gx="plrd" style="--pc:${PCOL[p.i]}" aria-label="Open ${esc(p.nm)}'s board">${esc(p.nm)} ${p.score}<svg viewBox="0 0 1240 940">${boardG(p,{})}</svg></button>`).join('')}</div>`}
 function btn(m,label,cls,extra){return `<button class="btn ${cls||''}" data-mv='${esc(JSON.stringify(m))}'${extra||''}>${label}</button>`}
 function renderDock(){const el=$('#dockbody');if(!el)return;const s=sideToAct();const p=s>=0?P(s):null;const hp=me();let h='';
   const dt=$('#dockt');if(dt)dt.textContent=G.over?'The king’s judgement':hp?(G.pl.filter(q=>q.human).length>1&&!NET.on?`${hp.nm}, your turn`:'Your turn'):p?(NET.on&&p.human?`Waiting for ${p.nm}…`:`${p.nm} is choosing…`):G.phase==='wall'?'Setting the walls':'';
@@ -5155,12 +5155,12 @@ function sourcesHtml(){const one=(src,a)=>{const cnt={};for(const t of a)cnt[t]=
 function infoHtml(){return `<div class="info"><i class="sg-back" aria-hidden="true"></i>Clay sack ${G.bag.length} · shard box ${G.lid.length}${G.ex.gray?' · unmarked walls':''}${G.ex.prism?' · prism tiles':''}</div>`}
 function advHtml(){const hp=me();if(!hp)return '';if(!UI.adv)return `<div class="acts"><button class="btn sm cob" data-ui="advise">${IC('bulb')} Suggest a move</button></div>`;
   return `<div class="adv"><b>${IC('bulb')} Advice</b><p>${UI.adv.why}</p><div class="acts">${btn(UI.adv.m,'Do it','go')}<button class="btn ghost sm" data-ui="noadv">Dismiss</button></div></div>`}
-function endHtml(){const rows=G.over.scores;const L=[['place','Tiles set'],['floor','Floor'],['rows','Rows +2'],['cols','Columns +7'],['colours','Full colours +10'],['total','★ Total'],['fr','Complete rows (tie-break)']];
+function endHtml(){const rows=G.over.scores;const L=[['place','Tiles set'],['floor','Floor'],['rows','Rows +2'],['cols','Columns +7'],['colours','Full colours +10'],['total',' Total'],['fr','Complete rows (tie-break)']];
   if(UI.guideNote==null){let note='';if(UI.coach&&human()){let seen=null;try{seen=localStorage.getItem('sgz_guided')}catch(e){}if(!seen){try{localStorage.setItem('sgz_guided','1');localStorage.setItem('sgz_coach','0')}catch(e){}note='<p class="small muted">That was your guided first game. Next time the guide starts off. The Guide button brings it back at any time.</p>'}}UI.guideNote=note}const note=UI.guideNote;
   return `<div class="prompt"><h3>${IC('trophy')} ${esc(G.winText)}</h3><p class="muted">The king walks the middle in the evening light and names ${esc(G.winner)}’s wall the finest in the palace.</p><div class="tw"><table><tr><th></th>${rows.map(r=>`<th style="color:${PCOL[r.p]}">${esc(P(r.p).nm)}</th>`).join('')}</tr>${L.map(([k,n])=>`<tr class="${k==='total'?'tot':''}"><td>${n}</td>${rows.map(r=>`<td>${r.s[k]}</td>`).join('')}</tr>`).join('')}</table></div>${note}</div><div class="acts">${isClient()?'<span class="small muted">The host can start another game.</span>':'<button class="btn go" data-ui="new">New game</button>'}<button class="btn" data-gx="plrd">See the walls</button></div>`}
 // ---------- the board as SVG (2D view, drawers, thumbnails); units: 100 = one tile pitch ----------
 function boardG(p,o){o=o||{};const X=v=>(v+6.2)*100,Z=v=>(v+4.7)*100;const pi=p.i;let s=`<rect x="4" y="4" width="1232" height="932" rx="18" fill="#efe3c8" stroke="#8a5a2b" stroke-width="8"/><rect x="24" y="24" width="1192" height="92" rx="8" fill="${PCOL[pi]}"/>
-  <text x="50" y="86" font-size="56" font-weight="700" fill="#fff8ea" font-family="Georgia,serif">${esc(p.nm)}${p.human?(NET.on&&G&&isYou(pi)?' (you)':''):' · '+p.lv}</text><text x="1190" y="88" text-anchor="end" font-size="62" font-weight="700" fill="#fff8ea" font-family="Georgia,serif">★ ${p.score}</text>`;
+  <text x="50" y="86" font-size="56" font-weight="700" fill="#fff8ea" font-family="Georgia,serif">${esc(p.nm)}${p.human?(NET.on&&G&&isYou(pi)?' (you)':''):' · '+p.lv}</text><text x="1190" y="88" text-anchor="end" font-size="62" font-weight="700" fill="#fff8ea" font-family="Georgia,serif"> ${p.score}</text>`;
   const hl=o.hl||{};const ghost={};for(const g of hl.ghost||[])ghost[g.sl]=g;
   for(let r=0;r<5;r++){const zc=Z(-3.2+.54+r*CP);const lineHl=(hl.lines||[]).find(l=>l.r===r);
     s+=`<g ${o.act?`data-line="${r}" class="hit"`:''}>`;for(let k=0;k<cap(r);k++){const xc=X(-.45-.54-k*CP);const t=p.lines[r][k];const sl=`l${pi}_${r}_${k}`;s+=`<rect x="${xc-46}" y="${zc-46}" width="92" height="92" rx="10" fill="#d8c6a2" stroke="#9a7a4e" stroke-width="4"/>`;
@@ -5191,7 +5191,7 @@ function renderMap2D(){const el=$('#map2d');if(!el)return;if(V3.on){el.hidden=tr
   others.forEach((p,k)=>{s+=`<g transform="translate(${(k%2)*(W/2)+20},${top+960+Math.floor(k/2)*600}) scale(.6)">${boardG(p,{})}</g>`});el.innerHTML=s+'</svg>'}
 // ---------- popups ----------
 function renderPopups(){if(GX.open==='logd')$('#logbody').innerHTML=`<ol class="log">${G.log.slice(0,400).map(l=>`<li class="${l.c}"><small>R${l.r}</small> ${esc(l.t)}</li>`).join('')}</ol>`;
-  if(GX.open==='plrd')$('#plrbody').innerHTML=G.pl.map(p=>`<section class="sheet" style="--pc:${PCOL[p.i]}"><h3><span style="color:${PCOL[p.i]}">${esc(p.nm)}</span> <small class="muted">${p.human?(NET.on?(p.i===NET.mySeat?'you':'online player'):'player'):p.lv+' computer'+(p.away?' (player away)':'')}</small>${G.markerIn===p.i?' ☀':''}<span class="tot">★ ${p.score}</span></h3>${boardSVG(p,{})}
+  if(GX.open==='plrd')$('#plrbody').innerHTML=G.pl.map(p=>`<section class="sheet" style="--pc:${PCOL[p.i]}"><h3><span style="color:${PCOL[p.i]}">${esc(p.nm)}</span> <small class="muted">${p.human?(NET.on?(p.i===NET.mySeat?'you':'online player'):'player'):p.lv+' computer'+(p.away?' (player away)':'')}</small>${G.markerIn===p.i?' ☀':''}<span class="tot"> ${p.score}</span></h3>${boardSVG(p,{})}
     <div class="small muted">Tiles set ${p.st.place} · floor ${p.st.floor}${G.over?` · rows +${p.st.rows} · columns +${p.st.cols} · colours +${p.st.colours}`:''} · complete rows ${fullRows(p)}</div></section>`).join('')}
 // ---------- modal: start screen and the opening story ----------
 UI.setup={np:2,seats:['human','ai','ai','ai'],lv:['easy','easy','easy','easy'],ex:{gray:false,prism:false}};
@@ -5205,7 +5205,7 @@ function startHtml(){const o=UI.setup;let saved=null;try{saved=localStorage.getI
    <div class="qrow"><span>Glaziers</span><div class="seg">${[2,3,4].map(n=>`<button class="${o.np===n?'on':''}" data-np="${n}">${n}</button>`).join('')}</div></div>
    ${(()=>{const RO=sgRoster();if(!RO.length||NET.on)return '';const cur=o.rival||'tamsin';return `<div class="qrow sg-rvrow"><span>Rival</span><div class="sg-rivals" role="radiogroup" aria-label="Rival">${RO.map(r=>`<button class="sg-rv${r.id===cur?' on':''}" data-rival="${r.id}" role="radio" aria-checked="${r.id===cur}" aria-label="${esc(r.nm)}" title="${esc(r.nm)}"><img src="media/${r.pic}" alt="" loading="eager"></button>`).join('')}</div></div><div class="sg-rvname">${esc((RO.find(r=>r.id===cur)||RO[0]).nm)}</div>`})()}
    <div class="qrow"><span>Computer</span><div class="seg">${['easy','normal','hard'].map(l=>`<button class="${lvAll===l?'on':''}" data-alv="${l}">${l}</button>`).join('')}</div></div>
-   ${NET.on||typeof campOpen!=='function'||!window.CAMPAIGN?'':'<div class="acts"><button class="btn" data-ui="story-map">★ Story</button></div>'}
+   ${NET.on||typeof campOpen!=='function'||!window.CAMPAIGN?'':'<div class="acts"><button class="btn" data-ui="story-map">Story</button></div>'}
    <details class="more"><summary>More options</summary>
    ${(()=>{const T=[['default','Middle'],['prism-light','Prism light'],['unmarked-slate','Slate'],['sun-palace','Sun palace']],B=[['default','Clay'],['guild-seal','Guild seal'],['lamplight','Lamplight']];const ct=o.table||'default',cb=o.back||'default';
      return `<div class="qrow sg-look"><span>Table</span><div class="sg-thumbs">${T.map(([k,n])=>`<button class="sg-th${k===ct?' on':''}" data-tbl="${k}" aria-pressed="${k===ct}" aria-label="${n} table" title="${n}"><img src="media/table-${k}.webp" alt=""></button>`).join('')}</div></div>
@@ -5220,7 +5220,7 @@ function storyPic(){const tiles=[];for(let i=0;i<14;i++)tiles.push(tileSVG(i%5,4
   <rect width="600" height="330" fill="url(#sky)"/><circle cx="470" cy="70" r="40" fill="#fff1b8"/><circle cx="470" cy="70" r="28" fill="#ffd66b"/><rect x="0" y="120" width="600" height="190" fill="#e9c99a"/><rect x="0" y="120" width="600" height="14" fill="#c98e5a"/>
   ${tiles.join('')}${arch(40)}${arch(245)}${arch(450)}<rect x="0" y="300" width="600" height="30" fill="#c9794a"/><ellipse cx="300" cy="306" rx="80" ry="12" fill="#2f6f8a"/><path d="M300 300q-8-40 0-60q8 20 0 60" fill="#9fd3e6" opacity=".8"/>
   <rect x="190" y="248" width="16" height="52" fill="#7a4a2a"/><circle cx="198" cy="238" r="12" fill="#e0674a"/><rect x="204" y="262" width="30" height="8" rx="2" fill="#1d4aa3"/></svg>`}
-function storyHtml(){return `<div class="mbox story">${storyPic()}<p class="q"><b>Win with the most ★ when a wall row is full.</b></p>
+function storyHtml(){return `<div class="mbox story">${storyPic()}<p class="q"><b>Win with the most stars when a wall row is full.</b></p>
   <ul class="win"><li>Take every tile of one colour from a kiln.</li><li>Fill a rack: one tile moves to your wall and scores.</li><li>Touching tiles score more. Extra tiles cost points.</li></ul>
   <div class="acts"><button class="btn go" data-ui="story-ok">Enter the middle ▶</button></div></div>`}
 // ---------- input ----------
@@ -5408,7 +5408,7 @@ function phGoalHTML(){let best=null;for(const p of G.pl)for(let r=0;r<5;r++){con
     if(!best||n+ready>best.n+best.ready||(n+ready===best.n+best.ready&&ready>best.ready))best={p,r,n,ready}}
   const warn=best&&best.n+best.ready>=5?`<b class="bad">Last round: ${esc(best.p.nm)}${isYou(best.p.i)?' (you)':''} will complete wall row ${best.r+1}.</b>`:best&&best.n>=4?`<b>${esc(best.p.nm)}${isYou(best.p.i)?' (you)':''} has 4 of 5 in wall row ${best.r+1}.</b>`:'';
   const left=G.ctr.filter(t=>t!==SUN).length+G.fac.reduce((a,f)=>a+f.length,0);const late=G.phase==='offer'&&left>0&&left<=8?`<b>Only ${left} tile${left===1?'':'s'} left this round: every tile must be taken, and what fits no rack breaks.</b>`:'';
-  return `<div class="ph-goal">${IC('trophy')}<span${warn||late?' class="wq"':''}><span class="gl">Most ★ wins. The game ends after a round in which someone completes a wall row. Then: full row +2, full column +7, all 5 of a colour +10.</span><span class="gs">Most ★ wins · ends after a wall row is full · end bonus: row +2, column +7, colour +10</span> ${warn||late}${(()=>{const o=G.pl.filter(q=>q.i!==focusSeat()&&phBonus(q));return o.length?` <b class="ph-bn">End bonus so far: ${o.map(q=>esc(q.nm)+' +'+phBonus(q)+' ('+phBonusWhy(q)+')').join(', ')}.</b>`:''})()}</span></div>`}
+  return `<div class="ph-goal">${IC('trophy')}<span${warn||late?' class="wq"':''}><span class="gl">Most stars wins. The game ends after a round in which someone completes a wall row. Then: full row +2, full column +7, all 5 of a colour +10.</span><span class="gs">Most stars wins · ends after a wall row is full · end bonus: row +2, column +7, colour +10</span> ${warn||late}${(()=>{const o=G.pl.filter(q=>q.i!==focusSeat()&&phBonus(q));return o.length?` <b class="ph-bn">End bonus so far: ${o.map(q=>esc(q.nm)+' +'+phBonus(q)+' ('+phBonusWhy(q)+')').join(', ')}.</b>`:''})()}</span></div>`}
 function phTakeHTML(hp){const sel=UI.sel,src=sel?sel.src:PHN.src;const a=src<0?G.ctr:G.fac[src];if(!a||!a.length)return '';
   const cnt={};for(const t of a)cnt[t]=(cnt[t]||0)+1;const keys=Object.keys(cnt).map(Number).sort((x,y)=>x-y);const nj=cnt[PRISM]||0;
   const chips=keys.map(c=>{const on=sel&&sel.c===c;return `<button class="ph-g${on?' on':''}" data-ph="pick" data-pick='${JSON.stringify({src,c,j:c===PRISM?1:0})}' aria-pressed="${!!on}" aria-label="${cnt[c]} ${TNAME[c]}">${tileChip(c,cnt[c])}<span>${TNAME[c]}</span></button>`}).join('');
@@ -5424,16 +5424,16 @@ function phTakeHTML(hp){const sel=UI.sel,src=sel?sel.src:PHN.src;const a=src<0?G
       if(r===5)v=`<span class="ph-v bad">${pv.info.n} tile${pv.info.n>1?'s':''} ${X.tp||''}</span>`;
       else{const good=pv.full?`<span class="good">fills${pv.pts!=null?' +'+pv.pts:''}</span>`:`<span>${pv.cnt}/${cap(r)}</span>`;v=`<span class="ph-v">${good}${over>0?` <span class="bad">· ${over}✗ ${X.tp}</span>`:''}</span>`}
       const aria=`${lab}: ${r<5?(pv.full?'fills it':pv.cnt+' of '+cap(r)):'all to floor'}${over>0&&r<5?', '+over+' break':''}${X.tp?', '+X.tp+' points':''}`;
-      grid+=`<button class="ph-o${rec===r?' rec':''}${over||r===5?' ov':''}" data-mv='${esc(JSON.stringify(m))}' aria-label="${esc(aria)}"><span class="ph-r">${lab}${rec===r?' <i>★ best</i>':''}</span>${phRackMini(hp,m,pv)}${v}</button>`}
+      grid+=`<button class="ph-o${rec===r?' rec':''}${over||r===5?' ov':''}" data-mv='${esc(JSON.stringify(m))}' aria-label="${esc(aria)}"><span class="ph-r">${lab}${rec===r?' <i> best</i>':''}</span>${phRackMini(hp,m,pv)}${v}</button>`}
     const sun=sel.src<0&&G.markerIn==='ctr';const f0=hp.floor.length;const sp=floorPenalty(f0+1)-floorPenalty(f0);
     body=`<div class="ph-grid">${grid}</div>`+(sun?`<div class="ph-sun">☀ First middle take: you also get the Sun token: it takes your next floor space (${String(sp||0).replace('-','−')}) whichever rack you choose, and you start next round.</div>`:'')
-      +(RX?`<div class="ph-why">${UI.adv&&UI.adv.m.act==='take'?IC('bulb')+' Suggested colour. ':''}${rec>=0?'<b>★</b> ':''}${esc(phWhy(RX))}</div>`:'')
+      +(RX?`<div class="ph-why">${UI.adv&&UI.adv.m.act==='take'?IC('bulb')+' Suggested colour. ':''}${rec>=0?'<b></b> ':''}${esc(phWhy(RX))}</div>`:'')
       +(UI.coach?`<div class="ph-teach">Rack N holds N tiles of one colour. Full racks score at round end; extra tiles break.</div>`:'')}
   if(!sel)body+=`<div class="ph-teach">Tap a colour: you take <b>every</b> tile of it here. The rest of a kiln slides to the middle.</div>`;
   return `<div class="ph-head"><span class="ph-t">${title}</span><button class="ph-ib" data-ph="boards" aria-label="See the boards">${IC('players')}</button><button class="ph-ib" data-ph="close" aria-label="Close">${PH_X}</button></div>${keys.length>1||!sel||tgS?`<div class="ph-chips${keys.length>4?' many':''}">${keys.length>1||!sel?chips:''}${tgS}</div>`:''}${body}`}
 // ---------- the board pop-up (yours or a rival's, bigger) ----------
 function phBoardHTML(){const i=PHN.board;const p=P(i);if(!p)return '';const fr=fullRows(p);
-  const tabs=G.pl.map(q=>`<button class="ph-tab${q.i===i?' on':''}" style="--pc:${PCOL[q.i]}" data-ph="board" data-i="${q.i}" aria-pressed="${q.i===i}"><span class="tn">${esc(q.nm)}</span> ★${q.score}</button>`).join('');
+  const tabs=G.pl.map(q=>`<button class="ph-tab${q.i===i?' on':''}" style="--pc:${PCOL[q.i]}" data-ph="board" data-i="${q.i}" aria-pressed="${q.i===i}"><span class="tn">${esc(q.nm)}</span> ${q.score}</button>`).join('');
   return `<div class="ph-head"><div class="ph-tabs">${tabs}</div><button class="ph-ib" data-ph="close" aria-label="Close">${PH_X}</button></div>
    <div class="ph-bsvg">${phBoardSVG(p)}</div>
    <div class="ph-note">${G.markerIn===i?'☀ holds the Sun token · ':''}${p.human?(isYou(i)||!NET.on?'player':'online player'):p.lv+' computer'} · tiles set ${p.st.place} · floor ${p.st.floor} · complete rows ${fr}<br>End of game: row +${BONUS.row} · column +${BONUS.col} · full colour +${BONUS.colour}</div>`}
@@ -5446,13 +5446,13 @@ function phStripHTML(){const f=focusSeat(),fp=P(f),hp=me(),s=sideToAct();const p
   a=`<div class="ph-a"><span class="ph-msg">${left}</span>${right}</div>`;
   const net=NET.on?netDockHtml():'';
   const sack='';
-  const mine=`<button class="ph-mine" data-ph="board" data-i="${f}" style="--pc:${PCOL[f]}" aria-label="Open ${esc(fp.nm)}'s board"><span class="ph-mh"><i></i><b>${esc(fp.nm)}${isYou(f)?' (you)':''}</b><b class="ph-sc">★${fp.score}</b>${phBonus(fp)?`<small class="ph-bn" title="End bonus earned so far">+${phBonus(fp)} end bonus</small>`:''}${G.markerIn===f?'<span title="Sun token">☀</span>':''}${sack}</span><span class="ph-ms">${phBoardSVG(fp)}</span></button>`;
-  const rivals=G.pl.filter(q=>q.i!==f).map(q=>`<button class="ph-rv${q.i===s?' cur':''}" data-ph="board" data-i="${q.i}" style="--pc:${PCOL[q.i]}" aria-label="Open ${esc(q.nm)}'s board, ${q.score} points"><i></i><b>${esc(q.nm)}</b><span>★${q.score}</span>${G.markerIn===q.i?'<span>☀</span>':''}${q.floor.length?`<small>✗${q.floor.filter(t=>t!==SUN).length}</small>`:''}</button>`).join('');
+  const mine=`<button class="ph-mine" data-ph="board" data-i="${f}" style="--pc:${PCOL[f]}" aria-label="Open ${esc(fp.nm)}'s board"><span class="ph-mh"><i></i><b>${esc(fp.nm)}${isYou(f)?' (you)':''}</b><b class="ph-sc">${fp.score}</b>${phBonus(fp)?`<small class="ph-bn" title="End bonus earned so far">+${phBonus(fp)} end bonus</small>`:''}${G.markerIn===f?'<span title="Sun token">☀</span>':''}${sack}</span><span class="ph-ms">${phBoardSVG(fp)}</span></button>`;
+  const rivals=G.pl.filter(q=>q.i!==f).map(q=>`<button class="ph-rv${q.i===s?' cur':''}" data-ph="board" data-i="${q.i}" style="--pc:${PCOL[q.i]}" aria-label="Open ${esc(q.nm)}'s board, ${q.score} points"><i></i><b>${esc(q.nm)}</b><span>${q.score}</span>${G.markerIn===q.i?'<span>☀</span>':''}${q.floor.length?`<small>✗${q.floor.filter(t=>t!==SUN).length}</small>`:''}</button>`).join('');
   const rc=UI.recap.length&&!G.over?`<div class="ph-recap" aria-label="Recent moves">${UI.recap.slice(0,hp?Math.max(1,G.np-1):3).map(t=>`<div>${t}</div>`).join('')}</div>`:'';
   return net+a+(G.over?'':phGoalHTML())+mine+rc+`<div class="ph-rvs">${rivals}</div>`}
 // ---------- cards: one at a time, always with Continue ----------
 function phSumHTML(S){const f=focusSeat();const mine=S.walls.filter(w=>w.p===f);
-  const rows=G.pl.map(p=>{const r=S.rs[p.i]||{place:0,floor:0};return `<div class="ph-sr" style="--pc:${PCOL[p.i]}"><i></i><b>${esc(p.nm)}</b><span class="good">+${r.place}</span><span class="${r.floor?'bad':'muted'}">${r.floor?r.floor:'0'}</span><b>★${S.sc[p.i]}</b></div>`}).join('');
+  const rows=G.pl.map(p=>{const r=S.rs[p.i]||{place:0,floor:0};return `<div class="ph-sr" style="--pc:${PCOL[p.i]}"><i></i><b>${esc(p.nm)}</b><span class="good">+${r.place}</span><span class="${r.floor?'bad':'muted'}">${r.floor?r.floor:'0'}</span><b>${S.sc[p.i]}</b></div>`}).join('');
   const nxt=!S.final&&S.first>=0?`<div class="ph-note">☀ ${esc(P(S.first).nm)} starts round ${S.round+1}.</div>`:'';
   return `<div class="ph-head"><span class="ph-t"><b>${S.final?'The last walls are set':'Round '+S.round+': walls set'}</b></span></div>
    <div class="ph-sum"><div class="ph-wall">${phWallSVG(P(f),{marks:mine})}</div><div class="ph-sl"><div class="ph-sh"><span></span><span>tiles</span><span>floor</span><span>score</span></div>${rows}${nxt}
@@ -5469,7 +5469,7 @@ function phMoreHTML(){const nh=!human();
    ${b(IC(SND.music?'music':'nomusic'),'Music: '+(SND.music?'on':'off'),'data-a="mus"')}${b(IC('gfx'),typeof gfxLabel==='function'?gfxLabel():'Graphics','data-a="gfx"')}
    ${nh?b(IC('speed'),'Speed: '+({0.5:'slow',1:'normal',3:'fast'}[UI.speed]||'normal'),'data-a="speed"'):''}${nh?b(IC(UI.pause?'play':'pause'),UI.pause?'Resume':'Pause','data-a="pause"'):''}
    ${b(IC('new'),'New game','data-a="new"')}</div>`}
-function phCoachHTML(){return `<div class="ph-head"><span class="ph-t"><b>${IC('guide')} Your first game</b></span></div><div class="ph-coach"><p><b>Win:</b> have the most ★. The game ends after a round in which someone completes a row of their wall.</p><p><b>Your turn:</b> tap a kiln, take <b>every</b> tile of one colour, put them on one rack. The rest slides to the middle.</p><p><b>Round end:</b> each full rack sets one tile in your wall and scores; racks not yet full wait for the next round. A wall row never holds a colour twice. Tiles that don’t fit break and cost points.</p><p><b>Sun token:</b> the first to take from the middle gets it: it takes a floor space, but they start next round.</p><p><b>Tip:</b> full columns pay +7 each at the end, full rows only +2.</p></div><div class="ph-cont"><button class="ph-go" data-ph="continue">Got it</button></div>`}
+function phCoachHTML(){return `<div class="ph-head"><span class="ph-t"><b>${IC('guide')} Your first game</b></span></div><div class="ph-coach"><p><b>Win:</b> have the most . The game ends after a round in which someone completes a row of their wall.</p><p><b>Your turn:</b> tap a kiln, take <b>every</b> tile of one colour, put them on one rack. The rest slides to the middle.</p><p><b>Round end:</b> each full rack sets one tile in your wall and scores; racks not yet full wait for the next round. A wall row never holds a colour twice. Tiles that don’t fit break and cost points.</p><p><b>Sun token:</b> the first to take from the middle gets it: it takes a floor space, but they start next round.</p><p><b>Tip:</b> full columns pay +7 each at the end, full rows only +2.</p></div><div class="ph-cont"><button class="ph-go" data-ph="continue">Got it</button></div>`}
 function phEndHTML(){const pr=$('#dockbody .prompt');if(!pr)return '';
   return `<div class="ph-end">${pr.outerHTML}</div><div class="ph-cont three"><button class="ph-go" data-a="new">New game</button><button class="ph-go ghost" data-ph="endboards">Walls</button><button class="ph-go ghost" data-ph="continue">Close</button></div>`}
 // ---------- which view is up (one at a time) ----------
@@ -5743,7 +5743,7 @@ function bfPop(txt,at,cls,big){if(!at||!BF.fl)return;const d=document.createElem
   bfTrack(d.animate([{transform:'translate(-50%,-50%) scale(.4)',opacity:0},{transform:'translate(-50%,-80%) scale(1.25)',opacity:1,offset:.25},{transform:'translate(-50%,-160%) scale(1)',opacity:0}],{duration:bfD(big?1500:1150),easing:'ease-out',fill:'forwards'})).finished.then(()=>d.remove(),()=>d.remove())}
 function bfChipR(i){return bfR(bfQ(`[data-bfchip="${i}"]`))}
 function bfChipPop(i,txt,cls){const el=bfQ(`[data-bfchip="${i}"]`);if(!el)return;const r=bfR(el);if(r)r.top+=r.height*.9;bfPop(txt,r,(cls||'')+' chip');el.classList.remove('hit');void el.offsetWidth;el.classList.add('hit')}
-function bfScore(i,v){const el=bfQ(`[data-bfsc="${i}"]`);if(el)el.textContent='★'+v}
+function bfScore(i,v){const el=bfQ(`[data-bfsc="${i}"]`);if(el)el.textContent=''+v}
 // W466: a message stays until tapped or for 4 s + 1 s per 10 words; one at a time (a newer one waits its turn)
 function bfReadMs(t){const n=String(t||'').trim().split(/\s+/).filter(Boolean).length;return 4000+Math.ceil(n/10)*1000+400}
 function bfBanner(t,sub,ms){const tb=BF.tbl;if(!tb)return;if(!bfAnimOK())return;BF.banQ=BF.banQ||[];BF.banQ.push([t,sub,ms]);if(!BF.banOn)bfBanNext()}
@@ -5782,7 +5782,7 @@ async function bfStep(e){const S=BF.disp;
   if(e.t==='wall')return bfWall(e.x);
   if(e.t==='round'){if(S.phase==='wall'||S.pl.some(p=>p.floor.length)){if(UI.tut)await tutPause('floor');await bfFloors();}
     BF.tile=false;S.fac=e.fac;S.ctr=[];S.round=e.round;S.phase='offer';S.markerIn='ctr';S.first=e.first;BF.say='';const first=BF.deal&&e.round===1;BF.deal=false;
-    bfDraw({deal:true});bfBanner('Round '+e.round,first?'Most ★ wins':'');if(UI.cg)try{cgRound()}catch(er){}sfx('round');if(e.round===2){const fp=S.pl[bfFocus()];setTimeout(()=>bfTip(fp&&fp.lines.some(l=>l.length)?'keep':'bonus'),bfD(1600))}if(e.round===3)setTimeout(()=>bfTip('bonus'),bfD(1600));
+    bfDraw({deal:true});bfBanner('Round '+e.round,first?'Most stars wins':'');if(UI.cg)try{cgRound()}catch(er){}sfx('round');if(e.round===2){const fp=S.pl[bfFocus()];setTimeout(()=>bfTip(fp&&fp.lines.some(l=>l.length)?'keep':'bonus'),bfD(1600))}if(e.round===3)setTimeout(()=>bfTip('bonus'),bfD(1600));
     await bfWait(Math.min(800,300+S.fac.length*4*25));return}
   if(e.t==='win'){if(UI.tut)await tutPause('floor');await bfFloors();if(UI.tut)await tutPause('bonus');await bfBonus();if(UI.tut)await tutPause('final');sfx('win');return}}
 async function bfTake(x){let q=null;try{q=rvPre(x)}catch(e){}await bfTake0(x);try{if(q)rvPost(x,q)}catch(e){}}   // rival.js: the denial cheers
@@ -5848,7 +5848,7 @@ async function bfWall(x){const S=BF.disp,p=S.pl[x.p];const L=p.lines[x.r];if(!L|
   if(UI.tut)await tutPause('wall'+x.r,x);
   for(const [r,c] of run){const el=bfSlot(`w${x.p}_${r}_${c}`);if(el)el.classList.remove('lit')}}
 function bfRival(){const tb=BF.tbl;if(!tb||!BF.rv)return;let el=tb.querySelector('.bf-rvw');if(!el){el=document.createElement('div');el.className='bf-rvw';tb.appendChild(el)}const p=BF.disp.pl[BF.rv.p];
-  const sum=BF.rv.marks.reduce((a,m)=>a+m.pts,0);el.innerHTML=`<div class="bf-ph" style="--pc:${PCOL[p.i]}"><i></i><b>${esc(p.nm)}</b><span>★${p.score}</span><em class="bf-rvs">+${sum}</em></div>${phWallSVG(p,{marks:BF.rv.marks})}`}
+  const sum=BF.rv.marks.reduce((a,m)=>a+m.pts,0);el.innerHTML=`<div class="bf-ph" style="--pc:${PCOL[p.i]}"><i></i><b>${esc(p.nm)}</b><span>${p.score}</span><em class="bf-rvs">+${sum}</em></div>${phWallSVG(p,{marks:BF.rv.marks})}`}
 async function bfFloors(){BF.rv=null;const S=BF.disp;BF.say='Floor tiles cost points';
   const ls=S.pl.filter(p=>p.floor.length).map(p=>({p,l:Math.min(p.score,-floorPenalty(p.floor.length))})).filter(o=>o.l);
 
@@ -5923,7 +5923,7 @@ function bfBoardHTML(S,p,hp){const pi=p.i,live=!BF.busy;const sel=live&&hp&&hp.i
 function bfProj(S,p){let pts=0;if(!S.ex.gray){const w=p.wall.map(r=>r.slice());for(let r=0;r<5;r++){const L=p.lines[r];if(L.length!==cap(r))continue;const lc=lineColour(L);if(lc<0)continue;const c=WALLCOL(lc,r);if(w[r][c]>=0)continue;pts+=adjPts2(w,r,c);w[r][c]=lc}}
   return Math.max(0,p.score+pts+floorPenalty(Math.min(7,p.floor.length)))}
 function bfTopHTML(S){const s=BF.busy?BF.actor:sideToAct();
-  return `<button class="bf-ib" data-bf="menu" aria-label="Menu">${IC('menu')}</button><div class="bf-chips">${S.pl.map(p=>`<button class="bf-chip${p.i===s?' cur':''}" data-bfchip="${p.i}" style="--pc:${PCOL[p.i]}" aria-label="${esc(p.nm)}: ${p.score} points${S.markerIn===p.i?', has the Sun token: goes first next round':''}">${(()=>{const pc=!isYou(p.i)&&typeof sgPicOf==='function'&&sgPicOf(p.nm);return pc?`<i class="pic" style="background-image:url(media/${pc})"></i>`:'<i></i>'})()}<b>${isYou(p.i)?'You':S.pl.length>=4?'':esc(p.nm)}</b>${S.markerIn===p.i?`<em title="Sun token: goes first next round">${bfSun()}</em>`:''}<span class="bf-sc" data-bfsc="${p.i}">★${p.score}</span></button>`).join('')}</div><span class="bf-sack" title="Tiles left in the clay sack" aria-label="${G.bag.length} tiles left in the sack"><i class="sg-back" aria-hidden="true"></i><b>${G.bag.length}</b></span><button class="bf-ib" data-gx="rulesd" aria-label="How to play">${IC('rules')}</button>`}
+  return `<button class="bf-ib" data-bf="menu" aria-label="Menu">${IC('menu')}</button><div class="bf-chips">${S.pl.map(p=>`<button class="bf-chip${p.i===s?' cur':''}" data-bfchip="${p.i}" style="--pc:${PCOL[p.i]}" aria-label="${esc(p.nm)}: ${p.score} points${S.markerIn===p.i?', has the Sun token: goes first next round':''}">${(()=>{const pc=!isYou(p.i)&&typeof sgPicOf==='function'&&sgPicOf(p.nm);return pc?`<i class="pic" style="background-image:url(media/${pc})"></i>`:'<i></i>'})()}<b>${isYou(p.i)?'You':S.pl.length>=4?'':esc(p.nm)}</b>${S.markerIn===p.i?`<em title="Sun token: goes first next round">${bfSun()}</em>`:''}<span class="bf-sc" data-bfsc="${p.i}">${p.score}</span></button>`).join('')}</div><span class="bf-sack" title="Tiles left in the clay sack" aria-label="${G.bag.length} tiles left in the sack"><i class="sg-back" aria-hidden="true"></i><b>${G.bag.length}</b></span><button class="bf-ib" data-gx="rulesd" aria-label="How to play">${IC('rules')}</button>`}
 function bfWinLine(){if(!G.over)return '';const w=G.over.win.map(i=>P(i));const sc=G.over.scores.map(s=>s.s.total);const you=w.some(p=>isYou(p.i));
   return (you?(w.length>1?'You share the win':'You win'):w.map(p=>p.nm).join(' & ')+(w.length>1?' share it':' wins'))+' '+sc.slice(0,2).join(' to ')+'!'}
 function bfHintHTML(S,hp){let say='',chip='',tg='',thk='';const live=!BF.busy;
@@ -5953,7 +5953,7 @@ function bfResHTML(L,you){const w=bfWhy(L,you);const ord=L.slice().sort((x,y)=>(
   return `<div class="bf-card bf-res" role="dialog" aria-label="Result"><div class="bf-rt">${IC('trophy')}<b>${esc(you?(G.over.win.length>1?'You share the win!':'You win!'):G.winner+(G.over.win.length>1?' share the win':' wins'))}</b></div>
     <div class="bf-rs" style="--n:${n}"><div class="bf-rs-h"><span></span>${ord.map(r=>`<b style="--pc:${PCOL[r.p]}"><i></i>${name(r)}</b>`).join('')}</div>
     ${BF_CAT.map(([k,lab])=>`<div class="bf-rs-r"><span>${lab}</span>${ord.map(r=>cell(r,k)).join('')}</div>`).join('')}
-    <div class="bf-rs-r bf-rs-t"><span>Total</span>${ord.map(r=>`<b class="t">★${r.s.total}</b>`).join('')}</div></div>
+    <div class="bf-rs-r bf-rs-t"><span>Total</span>${ord.map(r=>`<b class="t">${r.s.total}</b>`).join('')}</div></div>
     ${(()=>{const up=bfLvUp();return up&&you?`<div class="bf-lvup">You beat ${esc(up.nm)} on ${up.from}. Ready for ${up.to}?</div>`:''})()}
     ${w.why?`<p class="bf-rs-why">${esc(w.why)}</p><p class="bf-rs-tip">${esc(w.tip)}</p>`:''}
     <div class="bf-btns">${(()=>{const up=bfLvUp();return up&&you?`<button class="bf-go" data-bf="lvup">Try ${up.to}</button>`:''})()}${isClient()?'':`<button class="bf-go${bfLvUp()&&you?' ghost':''}" data-a="new">Play again</button>`}<button class="bf-go ghost" data-bf="close">See boards</button></div></div>`}
@@ -5962,7 +5962,7 @@ function bfOvHTML(){if(!G)return '';
   if(BF.busy)return '';
   if(BF.menu){const nh=!human();const b=(ic,lab,attr)=>`<button class="bf-mi" ${attr}>${IC(ic)}<span>${lab}</span></button>`;
     return `<div class="bf-card bf-menu" role="dialog" aria-label="Menu">${b('rules','How to play','data-gx="rulesd"')}${typeof tutBtn==='function'?tutBtn('bf-mi',false):''}${b(SND.on?'snd':'mute','Sound: '+(SND.on?'on':'off'),'data-a="snd"')}${b(SND.music?'music':'nomusic','Music: '+(SND.music?'on':'off'),'data-a="mus"')}${b('music','Choose songs','data-a="musicpick"')}${b('speed','Speed: '+({0.5:'slow',1:'normal',3:'fast'}[UI.speed]||'normal'),'data-a="speed"')}${nh?b(UI.pause?'play':'pause',UI.pause?'Resume':'Pause','data-a="pause"'):''}${b('log','Every move','data-gx="logd"')}${b('tiles','Tile list','data-gx="refd"')}${b('new','New game','data-a="new"')}${typeof GXH!=='undefined'?GXH.settingsHTML({rowClass:'bf-set',btnClass:'bf-mi'}):''}</div>`}
-  if(BF.peek!=null&&P(BF.peek)){const p=P(BF.peek);return `<div class="bf-card bf-peek" role="dialog" aria-label="${esc(p.nm)}'s board"><div class="bf-ph" style="--pc:${PCOL[p.i]}">${(()=>{const pc=!isYou(p.i)&&typeof sgPicOf==='function'&&sgPicOf(p.nm);return pc?`<i class="pic" style="background-image:url(media/${pc})"></i>`:'<i></i>'})()}<b>${isYou(p.i)?'You':esc(p.nm)}</b><span>★${p.score}</span>${G.markerIn===p.i?`<em>${bfSun()}</em>`:''}<button class="bf-ib" data-bf="close" aria-label="Close">✕</button></div>${phBoardSVG(p)}${phBonus(p)?`<div class="bf-pn">End bonus so far +${phBonus(p)}</div>`:''}</div>`}
+  if(BF.peek!=null&&P(BF.peek)){const p=P(BF.peek);return `<div class="bf-card bf-peek" role="dialog" aria-label="${esc(p.nm)}'s board"><div class="bf-ph" style="--pc:${PCOL[p.i]}">${(()=>{const pc=!isYou(p.i)&&typeof sgPicOf==='function'&&sgPicOf(p.nm);return pc?`<i class="pic" style="background-image:url(media/${pc})"></i>`:'<i></i>'})()}<b>${isYou(p.i)?'You':esc(p.nm)}</b><span>${p.score}</span>${G.markerIn===p.i?`<em>${bfSun()}</em>`:''}<button class="bf-ib" data-bf="close" aria-label="Close">✕</button></div>${phBoardSVG(p)}${phBonus(p)?`<div class="bf-pn">End bonus so far +${phBonus(p)}</div>`:''}</div>`}
   if(G.over&&!BF.resHide&&!UI.tut){const L=G.over.scores;const you=G.over.win.some(i=>isYou(i));
     return bfResHTML(L,you)}
   return ''}
@@ -6040,7 +6040,7 @@ BF.on=bfWanted();document.documentElement.classList.toggle('bf',BF.on);
  const _pr=phRender;phRender=function(){if(BF.on)return bfRender();return _pr.apply(this,arguments)};
  const _pf=phFx;phFx=function(f){if(BF.on)return bfFx(f);return _pf.apply(this,arguments)};
  const _mp=renderMap2D;renderMap2D=function(){if(BF.on){const el=document.getElementById('map2d');if(el)el.hidden=true;return}return _mp.apply(this,arguments)};
- const _st=storyHtml;storyHtml=function(){if(!BF.on)return _st.apply(this,arguments);return `<div class="mbox story bf-story">${storyPic()}<p class="q"><b>Win with the most ★ when a wall row is full.</b></p><ul class="bf-aim"><li>Take every tile of one colour from a kiln.</li><li>Fill a rack: one tile moves to your wall and scores.</li><li>Touching tiles score more. Extra tiles cost points.</li></ul><div class="acts"><button class="btn go" data-ui="story-ok">Play ▶</button></div></div>`};
+ const _st=storyHtml;storyHtml=function(){if(!BF.on)return _st.apply(this,arguments);return `<div class="mbox story bf-story">${storyPic()}<p class="q"><b>Win with the most stars when a wall row is full.</b></p><ul class="bf-aim"><li>Take every tile of one colour from a kiln.</li><li>Fill a rack: one tile moves to your wall and scores.</li><li>Touching tiles score more. Extra tiles cost points.</li></ul><div class="acts"><button class="btn go" data-ui="story-ok">Play ▶</button></div></div>`};
  const _sh=startHtml;startHtml=function(){let h=_sh.apply(this,arguments);if(!BF.on)return h;const i=h.indexOf('<h3>Variants</h3>'),j=h.indexOf('</div>',h.indexOf('class="exs"'));if(i<0||j<0)return h;return h.slice(0,i)+'<details class="bf-more" ontoggle="var x=this.querySelector(\'.exs\');if(x)x.hidden=!this.open"><summary>Options</summary>'+h.slice(i+17,j+6).replace('class="exs"','class="exs" hidden')+'</details>'+h.slice(j+6)};
  const _to=toast;toast=function(t){if(!BF.on)return _to.apply(this,arguments)}}
 function bfRender(){if(!BF.on)return;bfEnsure();if(!G){BF.disp=null;bfDraw();return}const fresh=bfSync();
@@ -6100,7 +6100,7 @@ var _campFinish=finish;finish=function(){const had=!!G.over;_campFinish.apply(th
   p.score+=extra;p.st.cols+=extra;lg(`Boss rule: ${p.nm} earns ${extra} extra for ${b.cols} complete column${b.cols===1?'':'s'}.`,'good');
   const sc=G.pl.slice().sort((a,b)=>b.score-a.score||b.fr-a.fr);const top=sc[0];const winners=sc.filter(q=>q.score===top.score&&q.fr===top.fr);
   G.over={scores:sc.map(q=>({p:q.i,s:Object.assign({total:q.score,fr:q.fr},q.st)})),win:winners.map(w=>w.i),tie:sc.filter(q=>q.score===top.score).length>1};G.winner=winners.map(w=>w.nm).join(' & ');
-  G.winText=`${G.winner} ${winners.length>1?'share the win':'wins'} with ${top.score} points.`;lg('🏆 '+G.winText,'big')};
+  G.winText=`${G.winner} ${winners.length>1?'share the win':'wins'} with ${top.score} points.`;lg(' '+G.winText,'big')};
 // ---- starting a chapter ----
 function campStart(def){if(CMP_RES){GXC.scene=CMP_RES.s;GXC.bossCard=CMP_RES.b;const g=CMP_RES.g;CMP_RES=null;campLvlReset();G=g;UI.cmp=def;CMP_OVER=0;UI.guideNote=null;UI.fx.length=0;UI.fxSeen=0;UI.recap=[];UI.sel=null;UI.tgt=null;UI.adv=null;UI.coach=!!def.hints;
     const cb=$('#coachbtn');if(cb)cb.classList.toggle('on',UI.coach);UI.modal=null;const t=def.twist;if(t&&t.id==='boss-deep-sight'){LVL.hard.roll=t.param;LVL.hard.K=14}
@@ -6434,7 +6434,7 @@ function bfRivHTML(S){const i=rvSeat();if(i<0)return '';const p=S.pl[i];const c=
     rows+=`<div class="rv-row${need?' need':could?' could':''}"><div class="rv-rk">${rk}</div><div class="rv-wl">${wl}</div></div>`}
   let fl='';for(let k=0;k<7;k++){const key=`x${i}_${k}`;const t=p.floor[k];fl+=`<b class="rv-c f" data-s="${key}">${t!=null?bfTile(t,key):''}</b>`}
   const pen=floorPenalty(Math.min(7,p.floor.length));const s=rvSay(S,p);
-  return `<div class="rv-hd" style="--pc:${PCOL[i]}">${pc?`<i class="pic" style="background-image:url(media/${pc})"></i>`:'<i></i>'}<b>${esc(p.nm)}</b><span>★${p.score}</span>${S.markerIn===i?`<em>${bfSun()}</em>`:''}</div>
+  return `<div class="rv-hd" style="--pc:${PCOL[i]}">${pc?`<i class="pic" style="background-image:url(media/${pc})"></i>`:'<i></i>'}<b>${esc(p.nm)}</b><span>${p.score}</span>${S.markerIn===i?`<em>${bfSun()}</em>`:''}</div>
     <div class="rv-bd" title="${esc(p.nm)}'s board: racks on the left, wall on the right">${rows}<div class="rv-fl">${fl}${pen?`<span class="rv-pen">${String(pen).replace('-','−')}</span>`:''}</div></div>
     <div class="rv-say"><b>${s.a}</b>${s.b?`<span>${esc(s.b)}</span>`:''}</div>`}
 function bfRivDraw(){if(!BF.rvp||!BF.disp)return;const h0=bfRivHTML(BF.disp);const D=document.documentElement;

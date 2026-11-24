@@ -873,7 +873,7 @@ html,body{background:#3a1f0e}
 #draft .dnote{grid-column:1/-1}
 .zcard{overflow:visible}
 /* W597 board fit: every face-up card shows name + effect + cost; the Build/Sell/Wonder bar sits on your city row, never over the pyramid */
-#pyr .card.v4.flat .nm,#pyr .card.v4.rowm .nm{font-size:13px;line-height:1.05;padding:2px 3px;max-height:var(--nmh,33px);letter-spacing:-.02em}
+#pyr .card.v4.flat .nm,#pyr .card.v4.rowm .nm{font-size:14px;line-height:1.05;padding:2px 3px;max-height:var(--nmh,33px);letter-spacing:-.02em}
 #pyr .card.v4.flat .nm{top:0}
 #pyr .card.v4.flat .ef{top:33px;gap:2px}
 #pyr .card.v4.flat .e1,#pyr .card.v4.rowm .e1{height:22px}
@@ -890,7 +890,7 @@ html,body{background:#3a1f0e}
 #pyr .card.v4.rowm .e1.sm{padding:0}
 #pyr .card.v4.flat .nm.t1,#pyr .card.v4.rowm .nm.t1{letter-spacing:-.05em;padding-left:2px;padding-right:1px}
 #pyr .card.v4.flat .nm.t2,#pyr .card.v4.rowm .nm.t2{letter-spacing:-.07em;overflow-wrap:normal}
-#pyr .card.v4.flat .nm.t3,#pyr .card.v4.rowm .nm.t3{font-size:12px;letter-spacing:-.06em}
+#pyr .card.v4.flat .nm.t3,#pyr .card.v4.rowm .nm.t3{font-size:14px;letter-spacing:-.09em}
 #zoom{background:transparent!important;pointer-events:none}
 #zoom .zcard{height:auto!important;flex:0 0 auto!important}
 #zoom .lift{pointer-events:auto;flex-direction:row;align-items:stretch;gap:6px;padding:4px;box-sizing:border-box;border-radius:12px;background:rgba(12,23,27,.96);box-shadow:0 0 0 2px #f2c230,0 6px 14px rgba(0,0,0,.6);filter:none;animation:none}
@@ -900,8 +900,8 @@ html,body{background:#3a1f0e}
 #zoom .zb3 .zb{min-height:46px;height:100%;font-size:15px;border-radius:10px;padding:0 2px;box-shadow:0 2px 0 #8a6a12}
 #zoom .zb3 .zb.sell{box-shadow:0 2px 0 #8f7e58}
 #zoom .zb3 .zb small{font-size:13px;line-height:1.05;text-align:center}
-#pyr .card.v4.rowm .nm{font-size:12px;line-height:1.05;padding:1px 3px;max-height:var(--nmh,27px);letter-spacing:-.03em}
-#pyr .card.v4.rowm .nm.t3{font-size:11px}
+#pyr .card.v4.rowm .nm{font-size:14px;line-height:1.02;padding:0 2px;max-height:var(--nmh,27px);letter-spacing:-.05em}
+#pyr .card.v4.rowm .nm.t3{font-size:14px;letter-spacing:-.1em}
 #pyr .card.v4.rowm .ef{top:var(--nmh,27px);left:2px;right:auto;max-width:50%;overflow:hidden;gap:1px;height:22px}
 #pyr .card.v4.rowm .pr{top:var(--nmh,27px);right:1px;max-width:52%;overflow:hidden;justify-content:flex-end;gap:1px;height:22px}
 #pyr .card.v4.rowm .e1,#pyr .card.v4.rowm .e1.sh,#pyr .card.v4.rowm .e1.vp,#pyr .card.v4.rowm .e1.sc{height:21px;font-size:13px;padding:0 3px 0 1px;gap:0}
@@ -909,8 +909,8 @@ html,body{background:#3a1f0e}
 /* W611: effect chips are never clipped (the +1 badge was cut 3px) and never sit under the price chip */
 #pyr .card.v4.rowm .ef,#pyr .card.v4.flat .ef{overflow:visible;min-height:24px;height:auto;padding:1px 0;box-sizing:border-box}
 #pyr .card.v4.rowm .ef{max-width:46%}#pyr .card.v4.rowm .pr{max-width:52%;z-index:3}
-#pyr .card.v4.rowm .pr .fr{font-size:12px;padding:0 5px;line-height:21px}
-#pyr .card.v4.rowm.sm .pr .fr{font-size:11px;padding:0 3px;letter-spacing:-.02em}#pyr .card.v4.rowm.sm .e1{font-size:12px;padding:0 2px 0 1px}#pyr .card.v4.rowm.sm .e1 .art{width:14px;height:14px;flex-basis:14px}
+#pyr .card.v4.rowm .pr .fr{font-size:13px;padding:0 4px;line-height:21px}
+#pyr .card.v4.rowm.sm .pr .fr{font-size:13px;padding:0 2px;letter-spacing:-.04em}#pyr .card.v4.rowm.sm .e1{font-size:13px;padding:0 1px 0 0}#pyr .card.v4.rowm.sm .e1 .art{width:14px;height:14px;flex-basis:14px}
 /* overlapped (cov) rows: the strip under the name is ONE line; the price of a card you cannot take yet is not shown (a hidden card's text must not sit under the row below) */
 #pyr .card.v4.rowm.cov .pr{display:none}
 #pyr .card.v4.rowm.cov .ef{flex-wrap:nowrap;max-width:calc(100% - 4px);height:22px;min-height:0}
@@ -2303,7 +2303,7 @@ const GX={key:'gx',open:null,
   }
   function starRow(n, max, total) {
     var r = el('div', 'gxc-stars'); r.setAttribute('aria-label', n + ' of ' + (total || 3) + ' stars');
-    for (var i = 0; i < (total || 3); i++) r.appendChild(el('i', 'gxc-st' + (i < n ? ' on' : '') + (max != null && i >= max ? ' cap' : ''), '★'));
+    for (var i = 0; i < (total || 3); i++) r.appendChild(el('i', 'gxc-st' + (i < n ? ' on' : '') + (max != null && i >= max ? ' cap' : ''), '◆'));
     return r;
   }
   // twist text without its 'Boss rule:' prefix (the label shows it), first letter upper-case
@@ -2324,7 +2324,7 @@ const GX={key:'gx',open:null,
     head.appendChild(back);
     var tt = el('div', 'gxc-htitle'); tt.appendChild(el('b', null, D.title || 'Story')); head.appendChild(tt);
     var got = 0; list.forEach(function (c) { got += (P.ch[c.id] && P.ch[c.id].stars) || 0; });
-    var sc = btn('gxc-ib gxc-score', '★ ' + got + '/' + list.length * 3, function () { rewards(); });
+    var sc = btn('gxc-ib gxc-score', '◆ ' + got + '/' + list.length * 3, function () { rewards(); });
     sc.setAttribute('aria-label', got + ' stars of ' + list.length * 3 + '. Show rewards'); head.appendChild(sc);
     if (O.headButtons) { try { O.headButtons().forEach(function (b) { head.insertBefore(b, sc); }); } catch (e) {} }
     s.appendChild(head);
@@ -2405,7 +2405,7 @@ const GX={key:'gx',open:null,
     var g = el('div', 'gxc-goal'); g.appendChild(el('b', null, 'Goal')); g.appendChild(el('span', null, c.goal.text)); sh.appendChild(g);
     if (c.twist) { var tw = el('div', 'gxc-twist'); tw.appendChild(el('b', null, c.boss ? 'Boss rule' : 'Special rule')); tw.appendChild(el('span', null, ruleText(c.twist.text))); sh.appendChild(tw); }
     var sl = el('ul', 'gxc-slist');
-    c.stars.forEach(function (s, i) { var li = el('li', i < (st.stars || 0) ? 'on' : ''); li.appendChild(el('i', null, '★')); li.appendChild(el('span', null, s.text)); sl.appendChild(li); });
+    c.stars.forEach(function (s, i) { var li = el('li', i < (st.stars || 0) ? 'on' : ''); li.appendChild(el('i', null, '◆')); li.appendChild(el('span', null, s.text)); sl.appendChild(li); });
     sh.appendChild(sl);
     var row = el('div', 'gxc-row');
     var x = btn('gxc-btn ghost', 'Close', close); x.setAttribute('data-gxc-esc', ''); row.appendChild(x);
@@ -2560,7 +2560,7 @@ const GX={key:'gx',open:null,
       var sr = starRow(r.stars, def.maxStars, 3); sr.classList.add('big'); box.appendChild(sr);
       if (r.won && def.easy) box.appendChild(el('div', 'gxc-dim gxc-small', 'Easier mode: up to ' + def.maxStars + ' stars. Play it normally for 3.'));
       var sl = el('ul', 'gxc-slist');
-      def.stars.forEach(function (st, i) { var li = el('li', i < r.stars ? 'on' : ''); li.appendChild(el('i', null, '★')); li.appendChild(el('span', null, st.text)); sl.appendChild(li); });
+      def.stars.forEach(function (st, i) { var li = el('li', i < r.stars ? 'on' : ''); li.appendChild(el('i', null, '◆')); li.appendChild(el('span', null, st.text)); sl.appendChild(li); });
       box.appendChild(sl);
       var op = def.opponent, line = r.won ? op.praise : op.taunt;
       if (line) {

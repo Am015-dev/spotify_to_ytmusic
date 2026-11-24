@@ -532,33 +532,116 @@ body.tut #bulbbtn{visibility:hidden}
 @media (max-height:620px) and (orientation:portrait){#dock{gap:4px;padding-top:4px}#msg{font-size:1rem;min-height:1.2em}.act{flex-basis:22%;min-width:80px;min-height:44px;padding:2px 7px}.act small{display:none}.act b{font-size:.98rem;white-space:normal;line-height:1.05}.die{width:44px;height:44px}#drow{min-height:44px}#acts{min-height:44px;max-height:96px}}
 @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
 @media (orientation:landscape) and (max-height:500px){
- .gx-app{grid-template-columns:minmax(0,1fr) 300px;grid-template-rows:auto minmax(0,1fr)}
- #top{grid-column:1/3}#board{grid-column:1;grid-row:2}#dock{grid-column:2;grid-row:2;border-top:0;border-left:2px solid var(--ink);overflow:auto}
+ .gx-app{grid-template-columns:minmax(0,1fr) 300px;grid-template-rows:minmax(0,1fr)}
+ #board{grid-column:1;grid-row:1}#dock{grid-column:2;grid-row:1;border-top:0;border-left:2px solid var(--ink);overflow:auto}
  #dock::before{display:none}#drow{flex-wrap:wrap}
 }
+
+/* ---------- game HUD (v3): map is the screen, HUD floats over it */
+:root{--hud:rgba(18,20,26,.9);--hud2:#262a33;--hudln:rgba(255,255,255,.16);--hudtx:#f3efe6;--hudmu:#b9b3a6;--gold2:#ffcf5a;--dawnc:#1d4fae;--gloamc:#b3161c}
+.gx-app{grid-template-rows:minmax(0,1fr) auto}
+#board{background:#1f3d55}
+.rg{stroke:#14100c;stroke-width:1.6;stroke-opacity:.55}
+.rb{width:48px;height:48px;border-radius:50%;border:2px solid var(--hudln);background:var(--hud);color:var(--hudtx);display:inline-flex;align-items:center;justify-content:center;font-family:Arial,sans-serif;font-weight:700;font-size:1.2rem;box-shadow:0 2px 6px rgba(0,0,0,.45);padding:0}
+.rb svg{width:24px;height:24px}.rb svg path{stroke:var(--hudtx)}
+#hudL{position:absolute;left:8px;top:calc(8px + env(safe-area-inset-top,0px));z-index:5;display:flex;gap:8px}
+#logB{position:static;width:48px;height:48px;border-radius:50%;border:2px solid var(--hudln);background:var(--hud);font-size:0}
+#msg{position:absolute;left:8px;right:140px;top:calc(64px + env(safe-area-inset-top,0px));z-index:4;pointer-events:none;background:var(--hud);color:var(--hudtx);border:1px solid var(--hudln);border-left:4px solid var(--gold2);border-radius:10px;font-family:Arial,sans-serif;font-size:.95rem;line-height:1.3;padding:8px 12px;min-height:44px;text-align:left;box-shadow:0 2px 8px rgba(0,0,0,.4)}
+#msg:empty{display:none}#msg .who{color:var(--gold2)}#vturn{display:none}
+#side{position:absolute;right:8px;top:calc(8px + env(safe-area-inset-top,0px));z-index:5;width:124px;display:flex;flex-direction:column;gap:6px}
+.pc{display:flex;align-items:center;gap:7px;min-height:52px;padding:5px 7px;border-radius:10px;background:var(--hud);color:var(--hudtx);border:1px solid var(--hudln);box-shadow:0 2px 6px rgba(0,0,0,.45);cursor:pointer;font-family:Arial,sans-serif}
+.pc .pt{flex:0 0 28px;height:28px;border-radius:50%;border:2.5px solid #fff;display:flex;align-items:center;justify-content:center;font-style:normal;font-weight:700;font-size:.87rem;color:#fff}
+.pc.d .pt{background:var(--dawnc)}.pc.d .pt::after{content:'D'}.pc.g .pt{background:var(--gloamc)}.pc.g .pt::after{content:'G'}.pc.t .pt{background:#14100c;border-color:var(--gold2);color:var(--gold2)}.pc.t .pt::after{content:'T'}
+.pc div{display:flex;flex-wrap:wrap;align-items:baseline;column-gap:5px;min-width:0;line-height:1.15}.pc div small,.pc div .bar{flex-basis:100%}
+.pc span{font-size:.87rem;color:var(--hudmu);text-transform:uppercase;letter-spacing:.04em}
+.pc b{font-size:1.05rem;font-variant-numeric:tabular-nums}
+.pc small{font-size:.87rem;color:var(--hudmu);line-height:1.15}
+.pc.me{border-color:var(--gold2)}
+.pc .bar{display:block;width:62px;height:6px;background:#3a3f49;border-radius:3px;overflow:hidden;margin-top:2px}.pc .bar u{display:block;height:100%;width:0;background:linear-gradient(90deg,#ffcf5a,#ff4b2b)}
+#rival{position:static;background:var(--hud);border:1px solid var(--hudln);border-radius:10px;padding:4px 6px;color:var(--hudtx)}
+#rival .rl{color:var(--hudmu);font-family:Arial,sans-serif;font-size:.87rem}
+#zoomb{position:absolute;left:8px;top:50%;bottom:auto;transform:translateY(-50%);z-index:4;display:flex;flex-direction:column;gap:8px}
+#zoomb button{width:48px;height:48px;border-radius:50%;border:2px solid var(--hudln);background:var(--hud);color:var(--hudtx);font-family:Arial,sans-serif;font-size:1.25rem}
+#zoomb #keyB{font-size:.9rem}
+#zoomb #bulbbtn{background:var(--hud);border:2px solid var(--hudln);opacity:1;visibility:visible}#zoomb #bulbbtn svg{width:26px;height:26px;display:block;fill:#ffd95a;stroke:#ffd95a;stroke-width:1.6}#zoomb #bulbbtn svg path{stroke:#ffd95a}
+#phase{position:absolute;left:50%;bottom:8px;transform:translateX(-50%);z-index:4;min-width:200px;max-width:calc(100% - 132px);padding:6px 14px 8px;border-radius:12px;background:var(--hud);color:var(--hudtx);border:1px solid var(--hudln);text-align:center;font-family:Arial,sans-serif;box-shadow:0 2px 8px rgba(0,0,0,.45)}
+#phase b{display:block;font-size:.95rem}#phase b.mine{color:var(--gold2)}
+#phS{display:flex;gap:3px;margin-top:5px}#phS i{flex:1;height:5px;border-radius:3px;background:#3a3f49;font-style:normal}#phS i.on{background:var(--gold2)}#phS i.done{background:#7d766a}
+.mlbl{font-family:Arial,sans-serif;font-weight:700;fill:#fff;stroke:#0d0a07;stroke-width:4px;paint-order:stroke;stroke-linejoin:round}
+.mlbl.minor{fill:#ece6d8;font-weight:400}
+.zoomed-out .mlbl.minor{display:none}
+.rgglow{fill:rgba(255,230,140,.28);stroke:#ffe27a;stroke-width:7;animation:gwpulse 1.2s ease-in-out infinite}
+.rgsel{fill:rgba(255,255,255,.18);stroke:#fff;stroke-width:6}
+.rgnb{fill:none;stroke:#fff;stroke-width:3;stroke-dasharray:6 6;opacity:.8}
+@keyframes gwpulse{0%,100%{stroke-opacity:1}50%{stroke-opacity:.35}}
+.tokring{stroke:#ffe27a;stroke-width:6;stroke-dasharray:none}
+.tok.legal .tokring{stroke:#ffe27a;animation:gwpulse 1s ease-in-out infinite}
+.tok.sel .tokring{stroke:#fff;stroke-width:8}
+#dock{background:var(--hud);color:var(--hudtx);border-top:1px solid var(--hudln);padding:6px 8px calc(6px + env(safe-area-inset-bottom,0px))}
+#dock::before{display:none}
+#drow{display:flex;align-items:center;gap:8px;min-height:48px}
+#mydice{display:flex;gap:6px;flex-wrap:wrap}
+#tabs{display:flex;gap:6px;margin-left:6px}
+.tab{flex:0 0 48px;width:48px;height:48px;border-radius:12px;border:2px solid var(--hudln);background:var(--hud2);color:var(--hudtx);position:relative;padding:0;font-size:0}
+.tab svg{width:26px;height:26px}.tab svg path{fill:var(--hudtx)}
+.tab em{position:absolute;right:-5px;top:-6px;min-width:20px;height:20px;border-radius:10px;background:var(--gold2);color:#14100c;font-size:.87rem;font-style:normal;font-weight:700;font-family:Arial,sans-serif;display:flex;align-items:center;justify-content:center;padding:0 4px;line-height:1}
+.tab.can{border-color:var(--gold2)}
+.act{background:var(--hud2);color:var(--hudtx);border:1.5px solid var(--hudln);border-radius:10px}
+.act b{font-family:Arial,sans-serif;font-weight:700;font-size:.98rem}.act small{color:var(--hudmu)}
+.act.pri{background:var(--gold2);color:#14100c;border-color:var(--gold2)}.act.pri small{color:#3a2e12}
+.act.red{background:var(--gloamc);color:#fff;border-color:#ff6b6b}.act.red small{color:#ffd9d9}
+.die{background:#f4f1ea;border-color:#0d0a07}
+.die.sel{box-shadow:0 6px 0 var(--gold2)}
+@media (min-width:900px){#msg{left:50%;right:auto;transform:translateX(-50%);top:calc(8px + env(safe-area-inset-top,0px));width:min(560px,calc(100% - 420px));text-align:center}#side{width:150px}.pc b{font-size:1.25rem}}
+@media (orientation:landscape) and (max-height:500px){#msg{right:170px;top:8px;left:180px}}
+/* ---------- tutorial windows: float, drag, minimise, close; never block the board */
+.tw{position:fixed;z-index:80;width:min(320px,calc(100vw - 24px));background:#fbf7ee;color:#1a1612;border-radius:14px;border:2px solid #14100c;box-shadow:0 8px 24px rgba(0,0,0,.45);font-family:Arial,sans-serif;font-size:.95rem;line-height:1.35}
+.tw header{display:flex;align-items:center;gap:6px;padding:4px 4px 4px 12px;background:#14100c;color:#ffcf5a;border-radius:11px 11px 0 0;cursor:grab;touch-action:none}
+.tw header b{flex:1;font-size:.95rem}
+.tw header button{width:44px;height:44px;border:0;background:transparent;color:#fff;font-size:1.2rem;border-radius:8px}
+.tw .twb{padding:10px 12px 12px;max-height:calc(100vh - 150px);overflow:auto}
+.tw .twb p{margin:0 0 8px}.tw .why{color:#5b4a2c;font-size:.87rem}
+.tw .row2{display:flex;gap:8px;margin-top:8px}.tw .row2 button{flex:1;min-height:44px;border-radius:10px;border:2px solid #14100c;background:#fff;font-weight:700}
+.tw .row2 button.pri{background:#ffcf5a}
+.tw ul{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:1fr 1fr;gap:6px}.tw li button{font-size:.87rem!important;line-height:1.15;padding:4px 6px!important}
+.tw li button{width:100%;min-height:44px;display:flex;align-items:center;gap:8px;text-align:left;border:1.5px solid #c9bfa8;border-radius:10px;background:#fff;padding:4px 10px;font-size:.95rem}
+.tw li button i{flex:0 0 22px;height:22px;border-radius:50%;border:2px solid #14100c;font-style:normal;display:flex;align-items:center;justify-content:center;font-size:.87rem}
+.tw li.done button i{background:#2e8b3d;border-color:#2e8b3d;color:#fff}.tw li.done button{color:#4a4a4a}
+.twchip{position:fixed;z-index:80;min-height:44px;min-width:44px;padding:0 14px;border-radius:22px;border:2px solid #14100c;background:#ffcf5a;font-family:Arial,sans-serif;font-weight:700;font-size:.95rem;box-shadow:0 4px 12px rgba(0,0,0,.4)}
+.pring{position:fixed;z-index:58;pointer-events:none;border-radius:50%;border:4px solid #ffcf5a;box-shadow:0 0 0 4px rgba(255,207,90,.35);animation:pring 1.3s ease-out infinite}
+@keyframes pring{0%{transform:scale(.85);opacity:1}100%{transform:scale(1.35);opacity:0}}
+#guide{position:fixed;inset:0;z-index:57;pointer-events:none}
+#guide svg{position:absolute;inset:0;width:100%;height:100%}
+#guide .gl{position:absolute;pointer-events:auto;min-height:44px;display:flex;align-items:center;padding:0 10px;border-radius:10px;background:#ffcf5a;color:#14100c;border:2px solid #14100c;font-family:Arial,sans-serif;font-weight:700;font-size:.87rem;white-space:nowrap;box-shadow:0 2px 6px rgba(0,0,0,.45)}
+#guide .gl.on{background:#fff}
+#legend .lg{display:flex;align-items:center;gap:10px;padding:6px 0;border-bottom:1px solid rgba(0,0,0,.08)}
+#legend .lg svg{flex:0 0 40px;width:40px;height:40px}
+#legend .lg b{display:block;font-size:.95rem}#legend .lg span{font-size:.87rem;color:#4a4033}
+.gwb.rcard .what{font-family:Arial,sans-serif;font-weight:700;color:#1d4fae;margin:0 0 6px}
 </style>
 </head>
 <body>
 <div class="gx-app" id="app">
-  <div id="top">
-    <button class="ib" data-gx="setd" id="menuB" type="button" aria-label="Menu"></button>
-    <div id="race">
-      <div class="chip" id="cD" role="button" tabindex="0" aria-label="Dawn victory points"><span>Dawn</span><b id="vD">0/4</b></div>
-      <div class="chip g" id="cG" role="button" tabindex="0" aria-label="Gloam victory points"><span>Gloam</span><b id="vG">0/10</b></div>
-      <div class="chip t" id="cT" role="button" tabindex="0" aria-label="Taint and the Company"><span>Taint</span><b id="vT">0/12</b></div>
+  <div class="gx-board" id="board" data-board>
+    <div id="map"></div>
+    <div id="hudL"><button class="rb" data-gx="setd" id="menuB" type="button" aria-label="Menu"></button><button class="rb" id="helpB" type="button" aria-label="Help: screen guide, lessons, map key, rules">?</button><button class="rb" type="button" id="logB" aria-label="War log and last dice"></button></div>
+    <div id="msg" aria-live="polite" role="button" tabindex="0" aria-label="What to do now"></div>
+    <div id="side">
+      <div class="pc d" id="cD" role="button" tabindex="0" aria-label="Dawn League: points, armies, regions"><i class="pt"></i><div><span>Dawn</span><b id="vD">0/4</b><small id="sD"></small></div></div>
+      <div class="pc g" id="cG" role="button" tabindex="0" aria-label="Gloam: points, armies, regions"><i class="pt"></i><div><span>Gloam</span><b id="vG">0/10</b><small id="sG"></small></div></div>
+      <div class="pc t" id="cT" role="button" tabindex="0" aria-label="Taint track and the Company"><i class="pt"></i><div><span>Taint</span><b id="vT">0/12</b><em class="bar"><u id="tBar"></u></em></div></div>
+      <div id="rival" aria-label="Rival dice"><span class="rl" id="rlab">Rival dice</span><div id="rdice"></div><div id="hunt" title="Dice in the hunt box"></div></div>
     </div>
-    <button class="ib gx-ibtn gxh-bulb" id="bulbbtn" data-help type="button" aria-label="Hint"></button>
-    <button class="ib" id="helpB" type="button" aria-label="Rules">?</button>
+    <div id="zoomb"><button type="button" id="keyB" class="rb" aria-label="Map key: what every icon means">Key</button><button type="button" id="bulbbtn" class="rb gx-ibtn gxh-bulb" data-help aria-label="Hint"></button><button type="button" id="zin" class="rb" aria-label="Zoom in">+</button><button type="button" id="zout" class="rb" aria-label="Zoom out">−</button></div>
+    <div id="phase" role="status"><b id="phT"></b><span id="phS"></span></div>
   </div>
-  <div class="gx-board" id="board" data-board><div id="msg" aria-live="polite" role="button" tabindex="0" aria-label="Current prompt"></div><button type="button" id="logB" aria-label="Open the war log">Log</button><div id="map"></div><div id="zoomb"><button type="button" id="zin" aria-label="Zoom in">+</button><button type="button" id="zout" aria-label="Zoom out">−</button></div><div id="rival" aria-label="Rival dice"><span class="rl" id="rlab">Rival dice</span><div id="rdice"></div><div id="hunt" title="Dice in the hunt box"></div></div></div>
   <div id="dock">
-    <div id="drow"><div id="mydice" style="display:flex;gap:6px"></div></div>
+    <div id="drow"><div id="mydice"></div><div id="tabs">
+      <button class="tab" id="tCards" type="button" aria-label="Your cards"></button>
+      <button class="tab" id="tNat" type="button" aria-label="Nations: how close each is to war"></button>
+      <button class="tab" id="tComp" type="button" aria-label="The Company and the hunt"></button>
+    </div></div>
     <div id="acts"></div>
-    <div id="tabs">
-      <button class="tab" id="tCards" type="button"></button>
-      <button class="tab" id="tNat" type="button"></button>
-      <button class="tab" id="tComp" type="button"></button>
-    </div>
   </div>
 </div>
 <div id="scrim"></div>
@@ -1160,7 +1243,7 @@ const GX={key:'gx',open:null,
   GX.buzz = function (pat) { try { if (P.haptics && root.navigator && typeof root.navigator.vibrate === 'function') return root.navigator.vibrate(pat == null ? 12 : pat); } catch (e) { } return false; };
   GX.canBuzz = function () { try { return !!(root.navigator && typeof root.navigator.vibrate === 'function'); } catch (e) { return false; } };
   // colour-blind hook: one symbol per seat / colour index, shown next to colour-coded pieces when html.cb is on
-  GX.SYMBOLS = ['●', '▲', '■', '◆', '★', '✚', '⬟', '✱'];
+  GX.SYMBOLS = ['●', '▲', '■', '◆', '◆', '✚', '⬟', '✱'];
   GX.mark = function (i) { return GX.SYMBOLS[((i | 0) % GX.SYMBOLS.length + GX.SYMBOLS.length) % GX.SYMBOLS.length]; };
   GX.applyPrefs = function () {
     try {
@@ -3881,118 +3964,101 @@ var ROAD_PTS = null;
 function icoPath(name, x, y, size, fill, extra) { var s = size / 512; return '<path d="' + ICONS[name] + '" transform="translate(' + (x - size / 2).toFixed(1) + ',' + (y - size / 2).toFixed(1) + ') scale(' + s.toFixed(4) + ')" fill="' + (fill || '#1f1812') + '"' + (extra || '') + '/>'; }
 function smoothPath(pts) { var d = 'M' + pts[0][0] + ',' + pts[0][1]; for (var i = 0; i < pts.length - 1; i++) { var p0 = pts[i - 1] || pts[i], p1 = pts[i], p2 = pts[i + 1], p3 = pts[i + 2] || p2; d += ' C' + (p1[0] + (p2[0] - p0[0]) / 6).toFixed(1) + ',' + (p1[1] + (p2[1] - p0[1]) / 6).toFixed(1) + ' ' + (p2[0] - (p3[0] - p1[0]) / 6).toFixed(1) + ',' + (p2[1] - (p3[1] - p1[1]) / 6).toFixed(1) + ' ' + p2[0] + ',' + p2[1]; } return d; }
 function polyD(p) { return 'M' + p.map(function (q) { return q[0] + ',' + q[1]; }).join('L') + 'Z'; }
-var HATCH = { gr: [45, '#2f4a24', 0.28], df: [-45, '#5a3a18', 0.26], au: [0, '#3a4652', 0.22], hl: [90, '#475a22', 0.22], va: [30, '#6e5418', 0.25], pt: [-30, '#7a1e1e', 0.34], cv: [60, '#333', 0.28], sh: [-60, '#8a3a1a', 0.28] };
-var TINT = { gr: '#e3dcb0', df: '#e6d4a8', au: '#e9e0c4', hl: '#e7dfb4', va: '#ecdcaa', pt: '#dfc0a0', cv: '#ddd2bb', sh: '#e8c9a2' };
+/* Map language (owner will replace art; shapes and colours carry the meaning):
+   region fill = nation colour (Dawn cool, Gloam warm), thick dark border between nations; settlement plate colour = who holds it now;
+   army = round token with a big white number (blue Dawn, red Gloam); hero/minion = shield; Company = lantern disc. Every shape has a class ico-* listed in LEGEND. */
+var TINT = { gr: '#3e8c47', df: '#2c8f8a', au: '#3f6fb5', hl: '#8fae3a', va: '#c9a227', pt: '#8f1f22', cv: '#5e3a85', sh: '#c4561c' };
+var SIDECOL = { D: '#1d4fae', G: '#b3161c' };
+var LAND = '#6d785c', SEA = '#1f3d55';
 function mapStatic() {
   var h = [];
   h.push('<defs>');
-  Object.keys(HATCH).forEach(function (n) { var x = HATCH[n]; h.push('<pattern id="h-' + n + '" width="9" height="9" patternUnits="userSpaceOnUse" patternTransform="rotate(' + x[0] + ')"><line x1="0" y1="0" x2="0" y2="9" stroke="' + x[1] + '" stroke-width="1.4" opacity="' + x[2] + '"/></pattern>'); });
-  h.push('<pattern id="waves" width="40" height="18" patternUnits="userSpaceOnUse"><path d="M0,9 q5,-5 10,0 t10,0" fill="none" stroke="#5e5037" stroke-width="1.2" opacity=".45"/></pattern>');
-  h.push('<filter id="rough" x="-5%" y="-5%" width="110%" height="110%"><feTurbulence type="fractalNoise" baseFrequency=".035" numOctaves="2" seed="4"/><feDisplacementMap in="SourceGraphic" scale="5"/></filter>');
-  h.push('<filter id="paper" x="0" y="0" width="100%" height="100%"><feTurbulence type="fractalNoise" baseFrequency=".8" numOctaves="3" seed="9" result="n"/><feColorMatrix type="matrix" values="0 0 0 0 .35  0 0 0 0 .25  0 0 0 0 .12  0 0 0 .22 0"/><feComposite in2="SourceGraphic" operator="in"/></filter>');
+  h.push('<pattern id="tex" width="14" height="14" patternUnits="userSpaceOnUse"><circle cx="3" cy="4" r="1.1" fill="#000" opacity=".10"/><circle cx="10" cy="9" r="0.9" fill="#fff" opacity=".10"/><circle cx="6" cy="12" r="0.7" fill="#000" opacity=".08"/></pattern>');
+  h.push('<pattern id="waves" width="40" height="18" patternUnits="userSpaceOnUse"><path d="M0,9 q5,-5 10,0 t10,0" fill="none" stroke="#9cc2dc" stroke-width="1.2" opacity=".22"/></pattern>');
   h.push('<clipPath id="land"><path d="' + polyD(COAST) + '"/></clipPath>');
-  h.push('<radialGradient id="age" cx="50%" cy="45%" r="75%"><stop offset="60%" stop-color="#000" stop-opacity="0"/><stop offset="100%" stop-color="#4a3416" stop-opacity=".35"/></radialGradient>');
   h.push('</defs>');
-  h.push('<rect width="' + MAPW + '" height="' + MAPH + '" fill="#cdbf98"/><rect width="' + MAPW + '" height="' + MAPH + '" fill="url(#waves)"/>');
-  // coastal ripples (woodcut sea lines hugging the shore)
-  [46, 30, 16].forEach(function (w, i) { h.push('<path d="' + polyD(COAST) + '" fill="none" stroke="#3b2f1f" stroke-width="' + w + '" opacity="' + (0.06 + i * 0.05) + '" stroke-linejoin="round"/>'); });
+  h.push('<rect width="' + MAPW + '" height="' + MAPH + '" fill="' + SEA + '"/><rect width="' + MAPW + '" height="' + MAPH + '" fill="url(#waves)"/>');
+  h.push('<path d="' + polyD(COAST) + '" fill="none" stroke="#9cc2dc" stroke-width="22" opacity=".18" stroke-linejoin="round"/>');
   h.push('<g clip-path="url(#land)" id="cells">');
-  REGIONS.forEach(function (r) {
-    var base = r.nat ? TINT[r.nat] : '#eee0bb';
-    h.push('<path class="rg" data-tap="r:' + r.id + '" id="rg-' + r.id + '" d="' + polyD(r.poly) + '" fill="' + base + '"/>');
-    if (r.nat) h.push('<path d="' + polyD(r.poly) + '" fill="url(#h-' + r.nat + ')" pointer-events="none"/>');
-  });
+  REGIONS.forEach(function (r) { h.push('<path class="rg" data-tap="r:' + r.id + '" id="rg-' + r.id + '" d="' + polyD(r.poly) + '" fill="' + (r.nat ? TINT[r.nat] : LAND) + '" stroke="#14100c" stroke-width="1.6" stroke-opacity=".55"/>'); });
+  h.push('<rect width="' + MAPW + '" height="' + MAPH + '" fill="url(#tex)" pointer-events="none"/>');
   h.push('</g>');
-  LAKES.forEach(function (l) { h.push('<path d="' + polyD(l) + '" fill="#cdbf98" stroke="#1f1812" stroke-width="2.5"/><path d="' + polyD(l) + '" fill="url(#waves)"/>'); });
-  // nation borders (thicker ink where the nation changes)
+  LAKES.forEach(function (l) { h.push('<path d="' + polyD(l) + '" fill="' + SEA + '" stroke="#0d0a07" stroke-width="3"/><path d="' + polyD(l) + '" fill="url(#waves)"/>'); });
+  // nation borders: thick dark line where the nation changes
   var seen = {};
   REGIONS.forEach(function (r) {
     for (var i = 0; i < r.poly.length; i++) {
-      var a = r.poly[i], b = r.poly[(i + 1) % r.poly.length], key = [a, b].map(String).sort().join('|'); if (seen[key]) { var o = seen[key]; if (o.nat !== r.nat) h.push('<line x1="' + a[0] + '" y1="' + a[1] + '" x2="' + b[0] + '" y2="' + b[1] + '" stroke="#1f1812" stroke-width="3.2" stroke-dasharray="1 0" clip-path="url(#land)" pointer-events="none"/>'); continue; }
+      var a = r.poly[i], b = r.poly[(i + 1) % r.poly.length], key = [a, b].map(String).sort().join('|'); if (seen[key]) { var o = seen[key]; if (o.nat !== r.nat) h.push('<line x1="' + a[0] + '" y1="' + a[1] + '" x2="' + b[0] + '" y2="' + b[1] + '" stroke="#0d0a07" stroke-width="5" stroke-linecap="round" clip-path="url(#land)" pointer-events="none"/>'); continue; }
       seen[key] = r;
     }
   });
-  // rivers: double ink line
-  RIVERS.forEach(function (rv) { var d = smoothPath(rv.pts); h.push('<path d="' + d + '" fill="none" stroke="#1f1812" stroke-width="7" stroke-linecap="round" clip-path="url(#land)" pointer-events="none"/><path d="' + d + '" fill="none" stroke="#cdbf98" stroke-width="3.6" stroke-linecap="round" clip-path="url(#land)" pointer-events="none"/>'); });
-  // trees in forest realms
-  var woods = ['sailhaven', 'lanternvale', 'silverbough', 'oakthrone', 'whisperwood', 'gallowmere'];
-  woods.forEach(function (id, wi) { var r = REG[id], dead = id === 'gallowmere'; for (var i = 0; i < 7; i++) { var a = i * 2.4 + wi, rr = 26 + (i % 3) * 14, x = r.x + Math.cos(a) * rr, y = r.y + Math.sin(a) * rr * 0.8 + 6; h.push(tree(x, y, 15 + (i % 2) * 4, dead)); } });
-  // mountains: carved peaks along the walls (impassable)
-  MOUNTAINS.forEach(function (m) { for (var i = 1; i < m.pts.length; i++) { var a = m.pts[i - 1], b = m.pts[i], L = Math.hypot(b[0] - a[0], b[1] - a[1]), n = Math.max(1, Math.round(L / 20)); for (var j = 0; j <= n; j++) { var t = j / n, x = a[0] + (b[0] - a[0]) * t, y = a[1] + (b[1] - a[1]) * t; h.push(peak(x + ((j * 37) % 9 - 4), y + ((j * 53) % 7 - 3), 30 + ((i + j) % 3) * 6)); } } });
-  // the Ashen Road
+  h.push('<path d="' + polyD(COAST) + '" fill="none" stroke="#0d0a07" stroke-width="5" stroke-linejoin="round" pointer-events="none"/>');
+  RIVERS.forEach(function (rv) { var d = smoothPath(rv.pts); h.push('<path class="ico-river" d="' + d + '" fill="none" stroke="#0d0a07" stroke-width="8" stroke-linecap="round" clip-path="url(#land)" pointer-events="none"/><path d="' + d + '" fill="none" stroke="#6fb0dc" stroke-width="4.4" stroke-linecap="round" clip-path="url(#land)" pointer-events="none"/>'); });
+  // mountain walls: impassable
+  MOUNTAINS.forEach(function (m) { for (var i = 1; i < m.pts.length; i++) { var a = m.pts[i - 1], b = m.pts[i], L = Math.hypot(b[0] - a[0], b[1] - a[1]), n = Math.max(1, Math.round(L / 22)); for (var j = 0; j <= n; j++) { var t = j / n; h.push(peak(a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t, 30)); } } });
+  // the Ashen Road: 5 numbered steps to the Kiln
   ROAD_PTS = roadPts();
-  h.push('<path d="' + smoothPath([[REG.blackgate.x, REG.blackgate.y]].concat(ROAD_PTS)) + '" fill="none" stroke="#9a2117" stroke-width="4" stroke-dasharray="3 9" stroke-linecap="round" pointer-events="none"/>');
-  h.push('<path d="' + smoothPath([[REG.wraithpass.x, REG.wraithpass.y], ROAD_PTS[1], ROAD_PTS[2]]) + '" fill="none" stroke="#9a2117" stroke-width="4" stroke-dasharray="3 9" stroke-linecap="round" pointer-events="none"/>');
-  ROAD_PTS.forEach(function (p, i) { if (i < ROAD_PTS.length - 1) h.push('<circle cx="' + p[0] + '" cy="' + p[1] + '" r="11" fill="#eadbb4" stroke="#9a2117" stroke-width="2.5" pointer-events="none"/><text x="' + p[0] + '" y="' + (p[1] + 5) + '" text-anchor="middle" font-size="14" fill="#9a2117" font-family="IM Fell English, Georgia, serif" pointer-events="none">' + (i + 1) + '</text>'); });
-  h.push(icoPath('volcano', KILN[0], KILN[1], 64, '#6e130d', ' pointer-events="none"'));
-  // settlements: stamp + banner
+  h.push('<path d="' + smoothPath([[REG.blackgate.x, REG.blackgate.y]].concat(ROAD_PTS)) + '" fill="none" stroke="#ffcf5a" stroke-width="5" stroke-dasharray="4 10" stroke-linecap="round" pointer-events="none"/>');
+  h.push('<path d="' + smoothPath([[REG.wraithpass.x, REG.wraithpass.y], ROAD_PTS[1], ROAD_PTS[2]]) + '" fill="none" stroke="#ffcf5a" stroke-width="5" stroke-dasharray="4 10" stroke-linecap="round" pointer-events="none"/>');
+  ROAD_PTS.forEach(function (p, i) { if (i < ROAD_PTS.length - 1) h.push('<g class="ico-road" data-tap="k:road" pointer-events="all"><circle cx="' + p[0] + '" cy="' + p[1] + '" r="13" fill="#1a1410" stroke="#ffcf5a" stroke-width="3"/><text x="' + p[0] + '" y="' + (p[1] + 6) + '" text-anchor="middle" font-size="17" font-weight="700" fill="#ffcf5a" font-family="Arial, sans-serif" pointer-events="none">' + (i + 1) + '</text></g>'); });
+  h.push('<g class="ico-kiln" data-tap="k:kiln" pointer-events="all"><circle cx="' + KILN[0] + '" cy="' + KILN[1] + '" r="40" fill="#1a1410" stroke="#ff7a1a" stroke-width="5"/>' + icoPath('volcano', KILN[0], KILN[1], 56, '#ff7a1a', ' pointer-events="none"') + '</g>');
+  // settlement plates (drawn in MV.render: their colour follows who holds them)
+  REGIONS.forEach(function (r) { if (r.set) h.push('<g id="ban-' + r.id + '"></g>'); });
+  // labels: small, high-contrast; minor ones only when zoomed in
   REGIONS.forEach(function (r) {
-    if (!r.set) return; var c = setPos(r);
-    var ic = r.set === 'strong' ? 'strong' : r.set === 'city' ? 'city' : r.set === 'fort' ? 'fort' : 'watch', sz = r.set === 'strong' ? 50 : r.set === 'city' ? 42 : 34;
-    h.push('<circle cx="' + c[0] + '" cy="' + c[1] + '" r="' + (sz * 0.62) + '" fill="#f1e5c4" stroke="#1f1812" stroke-width="2" pointer-events="none"/>');
-    h.push(icoPath(ic, c[0], c[1], sz * 0.9, natSide(r.nat) === 'G' ? '#6e130d' : '#1f1812', ' pointer-events="none"'));
-    h.push('<g id="ban-' + r.id + '" pointer-events="none"></g>');
-  });
-  // labels
-  REGIONS.forEach(function (r) {
-    var major = !!r.set || ['whisperwood', 'cinderplain'].indexOf(r.id) >= 0, c = setPos(r), fs = r.set === 'strong' ? 30 : r.set === 'city' ? 28 : major ? 25 : 19;
-    var y = r.set ? c[1] + (r.set === 'strong' ? 56 : 48) : r.y + 34;
+    var major = !!r.set || ['whisperwood', 'cinderplain'].indexOf(r.id) >= 0, c = setPos(r), fs = r.set === 'strong' ? 26 : r.set === 'city' ? 24 : major ? 22 : 18;
+    var y = r.set ? c[1] + (r.set === 'strong' ? 50 : 44) : r.y + 34;
     h.push('<text class="mlbl' + (major ? '' : ' minor') + '" style="--b:' + fs + '" x="' + (r.set ? c[0] : r.x) + '" y="' + y + '" font-size="' + fs + '" text-anchor="middle">' + r.n + '</text>');
   });
-  // cartouche, compass, sea names
-  h.push('<g pointer-events="none" font-family="IM Fell English, Georgia, serif" fill="#3b2f1f"><text x="60" y="1075" font-size="30" font-style="italic" transform="rotate(-80 60 1075)">The Pale Sea</text><text x="900" y="530" font-size="18" font-style="italic" text-anchor="middle">Bitter Mere</text></g>');
-  h.push(compass(150, 1290));
-  h.push('<rect width="' + MAPW + '" height="' + MAPH + '" fill="url(#age)" pointer-events="none"/>');
-  h.push('<rect x="6" y="6" width="' + (MAPW - 12) + '" height="' + (MAPH - 12) + '" fill="none" stroke="#1f1812" stroke-width="4" pointer-events="none"/><rect x="14" y="14" width="' + (MAPW - 28) + '" height="' + (MAPH - 28) + '" fill="none" stroke="#1f1812" stroke-width="1.5" pointer-events="none"/>');
+  h.push('<g pointer-events="none" font-family="Arial, sans-serif" fill="#9cc2dc" opacity=".8"><text x="60" y="1075" font-size="26" font-style="italic" transform="rotate(-80 60 1075)">The Pale Sea</text><text x="912" y="528" font-size="16" font-style="italic" text-anchor="middle">Bitter Mere</text></g>');
   return h.join('');
 }
-function roadPts() { var a = [REG.cinderplain.x + 10, REG.cinderplain.y + 8], pts = []; var s = [REG.blackgate.x, REG.blackgate.y + 30]; var cp = [[788, 800], [812, 850], [836, 885], [858, 915], [866, 938], KILN]; return cp; }
-function tree(x, y, s, dead) {
-  if (dead) return '<path d="M' + x + ',' + (y + s) + ' L' + x + ',' + (y - s) + ' M' + x + ',' + (y - s * 0.3) + ' l' + (-s * 0.6) + ',' + (-s * 0.5) + ' M' + x + ',' + y + ' l' + (s * 0.55) + ',' + (-s * 0.6) + '" stroke="#2a0805" stroke-width="2.4" fill="none" pointer-events="none"/>';
-  return '<g pointer-events="none"><path d="M' + x + ',' + (y + s * 0.9) + ' L' + x + ',' + (y + s * 0.2) + '" stroke="#1f1812" stroke-width="2.4"/><ellipse cx="' + x + '" cy="' + (y - s * 0.15) + '" rx="' + (s * 0.62) + '" ry="' + (s * 0.72) + '" fill="#d9c995" stroke="#1f1812" stroke-width="2"/><path d="M' + (x - s * 0.1) + ',' + (y - s * 0.7) + ' q' + (s * 0.5) + ',' + (s * 0.4) + ' ' + (s * 0.3) + ',' + (s * 1.05) + '" stroke="#1f1812" stroke-width="1.6" fill="none"/></g>';
-}
+function roadPts() { return [[788, 800], [812, 850], [836, 885], [858, 915], [866, 938], KILN]; }
 function peak(x, y, s) {
-  var l = x - s * 0.55, r = x + s * 0.55, t = y - s * 0.7, b = y + s * 0.3, hs = '';
-  for (var i = 1; i <= 4; i++) { var f = i / 5; hs += 'M' + (x + (r - x) * f * 0.92).toFixed(1) + ',' + (t + (b - t) * f).toFixed(1) + ' L' + (x + (r - x) * f * 0.2).toFixed(1) + ',' + b.toFixed(1) + ' '; }
-  return '<g pointer-events="none"><path d="M' + l + ',' + b + ' L' + x + ',' + t + ' L' + r + ',' + b + 'Z" fill="#efe2bd" stroke="#1f1812" stroke-width="2.6" stroke-linejoin="round"/><path d="' + hs + '" stroke="#1f1812" stroke-width="1.5"/><path d="M' + (x - s * 0.12) + ',' + (t + s * 0.18) + ' L' + x + ',' + t + ' L' + (x + s * 0.15) + ',' + (t + s * 0.22) + '" fill="#fff8e6" stroke="none"/></g>';
+  var l = x - s * 0.55, r = x + s * 0.55, t = y - s * 0.7, b = y + s * 0.3;
+  return '<g class="ico-mountain" pointer-events="none"><path d="M' + l + ',' + b + ' L' + x + ',' + t + ' L' + r + ',' + b + 'Z" fill="#8d8a83" stroke="#0d0a07" stroke-width="2.6" stroke-linejoin="round"/><path d="M' + x + ',' + t + ' L' + r + ',' + b + ' L' + x + ',' + b + 'Z" fill="#5f5c57"/><path d="M' + (x - s * 0.16) + ',' + (t + s * 0.24) + ' L' + x + ',' + t + ' L' + (x + s * 0.16) + ',' + (t + s * 0.24) + 'Z" fill="#f4f1ea"/></g>';
 }
-function compass(x, y) {
-  var g = '<g pointer-events="none" transform="translate(' + x + ',' + y + ')"><circle r="54" fill="#efe2bd" stroke="#1f1812" stroke-width="2.5"/><circle r="44" fill="none" stroke="#1f1812" stroke-width="1"/>';
-  [[0, -50], [50, 0], [0, 50], [-50, 0]].forEach(function (p, i) { g += '<path d="M0,0 L' + (p[1] ? 8 : -8) * (i === 1 || i === 3 ? 0 : 1) + ',0 L' + p[0] + ',' + p[1] + 'Z" fill="' + (i % 2 ? '#1f1812' : '#9a2117') + '"/>'; });
-  g += '<path d="M-7,0 L0,-50 L7,0 L0,50Z" fill="#9a2117" stroke="#1f1812" stroke-width="1.5"/><path d="M0,-7 L50,0 L0,7 L-50,0Z" fill="#1f1812"/><text y="-60" text-anchor="middle" font-size="22" font-family="IM Fell English, Georgia, serif" fill="#1f1812">N</text></g>';
-  return g;
+var SETICO = { strong: 'strong', city: 'city', fort: 'fort', town: 'watch' };
+function plateSvg(set, x, y, col) {
+  var s = set === 'strong' ? 46 : set === 'city' ? 40 : set === 'fort' ? 36 : 30, h2 = s / 2, shape;
+  if (set === 'strong') shape = '<rect x="' + (x - h2) + '" y="' + (y - h2) + '" width="' + s + '" height="' + s + '" rx="7"';
+  else if (set === 'fort') shape = '<path d="M' + x + ',' + (y - h2 - 4) + ' L' + (x + h2 + 4) + ',' + y + ' L' + x + ',' + (y + h2 + 4) + ' L' + (x - h2 - 4) + ',' + y + 'Z"';
+  else shape = '<circle cx="' + x + '" cy="' + y + '" r="' + h2 + '"';
+  return shape + ' fill="' + col + '" stroke="#fff" stroke-width="3.5"/>' + icoPath(SETICO[set], x, y, s * 0.68, '#fff', ' pointer-events="none"');
 }
 function setPos(r) { return [r.x, r.y - 6]; }
-function tokPos(rid) { var r = REG[rid]; if (r.set && r.y < 118) return [r.x + (r.x > 500 ? -62 : 62), r.y + 4]; return r.set ? [r.x, r.y - 66] : [r.x, Math.max(52, r.y - 22)]; }
+function tokPos(rid) { var r = REG[rid]; if (r.set && r.y < 118) return [r.x + (r.x > 500 ? -62 : 62), r.y + 4]; return r.set ? [r.x, r.y - 62] : [r.x, Math.max(52, r.y - 22)]; }
+function shieldD(w) { var h = w * 1.15; return 'M' + (-w / 2) + ',' + (-h / 2) + ' H' + (w / 2) + ' V' + (h * 0.05) + ' Q' + (w / 2) + ',' + (h * 0.38) + ' 0,' + (h / 2) + ' Q' + (-w / 2) + ',' + (h * 0.38) + ' ' + (-w / 2) + ',' + (h * 0.05) + 'Z'; }
+var NUMF = ' font-family="Arial, Helvetica, sans-serif" font-weight="700"';
 // ---------------------------------------------------------------- dynamic layer
 function tokenSvg(G, rid, side, a, garrison) {
   var p = tokPos(rid); if (garrison) p = [REG[rid].x + 2, REG[rid].y - 4];
   var u = units(a), l = leaders(a), riders = side === 'G' && a.pt ? a.pt[2] : 0, el = 0; for (var n in a) el += a[n][1];
-  var g = side === 'G', fill = g ? '#7c1810' : '#f3e7c6', ink = g ? '#f3e2be' : '#1f1812', r = 31;
+  var fill = SIDECOL[side], r = 30;
   var s = '<g class="tok" data-tap="t:' + rid + (garrison ? ':in' : '') + '" id="tok-' + rid + (garrison ? '-in' : '') + '-' + side + '" transform="translate(' + p[0] + ',' + p[1] + ')"><circle class="hit" r="64"/><g class="ts">';
   if (u > 0) {
-    if (garrison) s += '<rect x="-30" y="-30" width="60" height="60" rx="4" fill="' + fill + '" stroke="#1f1812" stroke-width="4"/><path d="M-30,-30 h12 v-8 h12 v8 h12 v-8 h12 v8 h12" fill="none" stroke="#1f1812" stroke-width="3"/>';
-    else s += '<circle r="' + (r + 4) + '" fill="#1f1812"/><circle r="' + r + '" fill="' + fill + '" stroke="' + ink + '" stroke-width="2" stroke-dasharray="4 3"/>';
-    s += '<text y="11" pointer-events="none" text-anchor="middle" font-size="34" fill="' + ink + '" font-family="IM Fell English, Georgia, serif">' + u + '</text>';
-    if (el) s += '<g transform="translate(-26,-24)"><circle r="13" fill="' + (g ? '#f3e2be' : '#1f1812') + '"/><text y="5.5" text-anchor="middle" font-size="16" fill="' + (g ? '#7c1810' : '#f3e7c6') + '" font-family="IM Fell English, Georgia, serif">' + el + '</text></g>';
-    if (l - riders > 0) s += '<g transform="translate(26,-24)"><circle r="13" fill="#a8842c" stroke="#1f1812" stroke-width="1.5"/>' + icoPath('leader', 0, 0, 18, '#1f1812') + '</g>';
+    if (garrison) s += '<g class="ico-garrison"><rect x="-30" y="-30" width="60" height="60" rx="5" fill="' + fill + '" stroke="#fff" stroke-width="4"/><path d="M-30,-30 h12 v-9 h12 v9 h12 v-9 h12 v9 h12" fill="none" stroke="#fff" stroke-width="3.5"/></g>';
+    else s += '<g class="ico-army"><circle r="' + (r + 5) + '" fill="#0d0a07"/><circle r="' + r + '" fill="' + fill + '" stroke="#fff" stroke-width="4"/></g>';
+    s += '<text y="12" pointer-events="none" text-anchor="middle" font-size="34" fill="#fff"' + NUMF + '>' + u + '</text>';
+    if (el) s += '<g class="ico-elite" transform="translate(-28,-26)"><rect x="-13" y="-13" width="26" height="26" rx="4" fill="#f2c230" stroke="#0d0a07" stroke-width="2.5"/><text y="7" text-anchor="middle" font-size="18" fill="#0d0a07"' + NUMF + '>' + el + '</text></g>';
+    if (l - riders > 0) s += '<g class="ico-leader" transform="translate(28,-26)"><path d="' + shieldD(26) + '" fill="#fff" stroke="#0d0a07" stroke-width="2.5"/><text y="7" text-anchor="middle" font-size="18" fill="' + fill + '"' + NUMF + '>' + (l - riders) + '</text></g>';
   }
-  if (riders) s += '<g transform="translate(' + (u ? 30 : 0) + ',' + (u ? 22 : 0) + ')"><circle r="' + (u ? 15 : 24) + '" fill="#1f1812" stroke="#9a2117" stroke-width="2"/>' + icoPath('wraith', 0, -1, u ? 22 : 34, '#e9d9b8') + (riders > 1 ? '<text x="' + (u ? 14 : 20) + '" y="' + (u ? 16 : 22) + '" font-size="18" fill="#9a2117" font-family="IM Fell English, Georgia, serif" stroke="#eadbb4" stroke-width="3" paint-order="stroke">' + riders + '</text>' : '') + '</g>';
-  s += '<circle class="tokring" r="40" opacity="0"/></g></g>';
+  if (riders) s += '<g class="ico-rider" transform="translate(' + (u ? 30 : 0) + ',' + (u ? 24 : 0) + ')"><circle r="' + (u ? 16 : 24) + '" fill="#0d0a07" stroke="#ff4b4b" stroke-width="2.5"/>' + icoPath('wraith', 0, -1, u ? 22 : 34, '#fff') + (riders > 1 ? '<text x="' + (u ? 15 : 22) + '" y="' + (u ? 17 : 24) + '" font-size="17" fill="#fff" stroke="#0d0a07" stroke-width="3" paint-order="stroke"' + NUMF + '>' + riders + '</text>' : '') + '</g>';
+  s += '<circle class="tokring" r="42" opacity="0"/></g></g>';
   return s;
 }
 function charBadges(G, rid, list) {
-  var r0 = REG[rid], s = ''; list.forEach(function (c, i) { var d = CHARS[c], g = d.side === 'G', x = r0.x + 46 + (i % 3) * 32, y = (r0.set ? r0.y - 46 : r0.y - 26) - Math.floor(i / 3) * 32;
-    s += '<g class="tok ch" data-tap="c:' + c + '" transform="translate(' + x + ',' + y + ')"><circle class="hit" r="30"/><g class="tc"><circle r="17" fill="' + (g ? '#7c1810' : '#f3e7c6') + '" stroke="#1f1812" stroke-width="2.5"/>' + icoPath(d.icon, 0, 0, 24, g ? '#f3e2be' : '#1f1812') + '</g></g>'; });
+  var r0 = REG[rid], s = ''; list.forEach(function (c, i) { var d = CHARS[c], g = d.side === 'G', x = r0.x + 48 + (i % 3) * 34, y = (r0.set ? r0.y - 44 : r0.y - 26) - Math.floor(i / 3) * 38;
+    s += '<g class="tok ch" data-tap="c:' + c + '" transform="translate(' + x + ',' + y + ')"><circle class="hit" r="30"/><g class="tc ' + (g ? 'ico-minion' : 'ico-hero') + '"><path d="' + shieldD(32) + '" fill="' + (g ? '#2a0d0d' : '#f4f1ea') + '" stroke="' + SIDECOL[g ? 'G' : 'D'] + '" stroke-width="3.5"/>' + icoPath(d.icon, 0, -1, 22, g ? '#ff6b6b' : '#1d4fae') + '</g></g>'; });
   return s;
 }
 function companySvg(G, viewer) {
   var F = G.F, p;
   if (F.road >= 0) p = ROAD_PTS[Math.min(F.road, ROAD_PTS.length - 1)]; else { var r = REG[F.loc]; p = r.set ? [r.x + 50, r.y + 6] : [r.x - 60, r.y - 18]; }
-  var s = '<g class="tok co" id="company" data-tap="co:' + F.loc + '" transform="translate(' + p[0] + ',' + p[1] + ')"><circle class="hit" r="54"/><g class="ts">';
-  s += '<circle r="27" fill="' + (F.hid ? '#1f1812' : '#9a2117') + '" stroke="#efe2bd" stroke-width="3"/>' + icoPath('lantern', 0, -1, 34, '#f6dd8a');
-  if (F.prog > 0 && F.road < 0) s += '<g transform="translate(24,-22)"><circle r="14" fill="#efe2bd" stroke="#1f1812" stroke-width="2"/><text y="6" text-anchor="middle" font-size="18" fill="#1f1812" font-family="IM Fell English, Georgia, serif">+' + F.prog + '</text></g>';
-  s += '<circle class="tokring" r="38" opacity="0"/></g></g>';
+  var s = '<g class="tok co" id="company" data-tap="co:' + F.loc + '" transform="translate(' + p[0] + ',' + p[1] + ')"><circle class="hit" r="54"/><g class="ts ico-company">';
+  s += '<circle r="29" fill="' + (F.hid ? '#14100c' : '#b3161c') + '" stroke="#ffcf5a" stroke-width="4"/>' + icoPath('lantern', 0, -1, 34, '#ffcf5a');
+  if (F.prog > 0 && F.road < 0) s += '<g class="ico-progress" transform="translate(26,-24)"><circle r="14" fill="#ffcf5a" stroke="#0d0a07" stroke-width="2"/><text y="6" text-anchor="middle" font-size="16" fill="#0d0a07"' + NUMF + '>+' + F.prog + '</text></g>';
+  s += '<circle class="tokring" r="40" opacity="0"/></g></g>';
   return s;
 }
 MV.render = function (G, hl, viewer) {
@@ -4001,12 +4067,11 @@ MV.render = function (G, hl, viewer) {
   var s = [];
   (hl.regions || []).forEach(function (rid) { s.push('<path class="rgglow" d="' + polyD(REG[rid].poly) + '"/>'); });
   if (hl.sel) s.push('<path class="rgsel" d="' + polyD(REG[hl.sel].poly) + '"/>');
-  // banners show who holds each settlement
+  // settlement plates: colour = who holds it now (blue Dawn, red Gloam)
   REGIONS.forEach(function (r) {
-    if (!r.set || !r.nat) return; var b = document.getElementById('ban-' + r.id); if (!b) return; var c = setPos(r), own = controller(G, r.id), lost = own !== ownerSide(r.id);
-    var col = lost ? (own === 'G' ? '#7c1810' : '#1f1812') : NATIONS[r.nat].col; var key = col + lost;
+    if (!r.set) return; var b = document.getElementById('ban-' + r.id); if (!b) return; var c = setPos(r), own = r.nat ? controller(G, r.id) : 'N', key = own;
     if (b.getAttribute('data-k') === key) return; b.setAttribute('data-k', key);
-    var x = c[0] - 48, y = c[1] - 58; b.innerHTML = '<path d="M' + x + ',' + (y + 46) + ' L' + x + ',' + y + '" stroke="#1f1812" stroke-width="3"/><path d="M' + x + ',' + y + ' h26 l-7,9 l7,9 h-26z" fill="' + col + '" stroke="#1f1812" stroke-width="2"/>' + (lost ? '<path d="M' + (x + 4) + ',' + (y + 4) + ' l12,10 M' + (x + 16) + ',' + (y + 4) + ' l-12,10" stroke="#f1e5c4" stroke-width="2.4"/>' : '');
+    b.setAttribute('class', 'ico-' + r.set); b.setAttribute('data-tap', 's:' + r.id); b.innerHTML = plateSvg(r.set, c[0], c[1], own === 'N' ? '#4b4b4b' : SIDECOL[own]);
   });
   Object.keys(G.A).forEach(function (rid) { var a = G.A[rid], sd = armySide(a); if (sd && units(a) + leaders(a) > 0) s.push(tokenSvg(G, rid, sd, a, false)); });
   Object.keys(G.IN).forEach(function (rid) { var a = G.IN[rid]; if (a && units(a)) s.push(tokenSvg(G, rid, armySide(a), a, true)); });
@@ -4067,7 +4132,7 @@ MV.init = function () {
 </script>
 <script>
 /* Gloamwar page: board-first. Tap a die, pick what it does, then tap the glowing place on the map. The rival's moves play out one at a time. */
-var G = null, AIDELAY = 700, ANIM = true;
+var G = null, AIDELAY = 260, ANIM = true;
 var UI = { side: 'D', level: 'normal', die: null, src: null, split: 0, hold: false, timer: null, fast: /[?&]fast=1/.test(location.search), mode: 'quick', busy: false, lastEv: [] };
 if (UI.fast) AIDELAY = 40;
 var $ = function (s) { return document.querySelector(s); };
@@ -4089,7 +4154,7 @@ function buzz(ms) { try { if (window.GX && GX.buzz) GX.buzz(ms || 12); } catch (
 // ---------------------------------------------------------------- start
 function startGame(o) {
   o = o || {}; clearTimeout(UI.timer);
-  if (o.mode !== 'tut') { try { if (window.GXT && GXT.active()) GXT.stop(); } catch (e) { } }
+  if (o.mode !== 'tut') { try { if (window.TUT) TUT.stop(); } catch (e) { } }
   UI.side = o.side || UI.side || 'D'; UI.level = o.level || UI.level || 'normal'; UI.mode = o.mode || 'quick'; UI.die = null; UI.src = null; UI.hold = false; UI.ended = false;
   AI.s = (o.seed || Date.now()) & 0xffff;
   G = newGame({ seed: o.seed || (Date.now() & 0x7fffffff), deal: o.deal });
@@ -4136,10 +4201,10 @@ function apply(m, byAI) {
   try { performMove(G, m); } catch (e) { console.error(e, m); }
   var evs = G.ev.slice(); G.ev = [];
   UI.die = null; UI.src = null; UI.split = 0; UI.sub = null; UI.asFace = null;
-  try { if (window.GXT && GXT.active()) GXT.act({ type: 'event', what: 'move', m: m }); } catch (e) { }
+  try { if (window.TUT && TUT.on) TUT.act({ type: 'event', what: 'move', m: m, evs: evs, side: byAI ? other(UI.side) : UI.side }); } catch (e) { }
   var wait = playEvents(evs, byAI);
   render();
-  later(step, UI.fast ? 20 : Math.max(byAI ? AIDELAY : 120, wait));
+  later(step, UI.fast ? 20 : byAI ? Math.min(Math.max(AIDELAY, wait), 650) : Math.max(120, Math.min(wait, 900)));
 }
 function playEvents(evs, byAI) {
   var wait = 0, said = null;
@@ -4172,7 +4237,9 @@ function phaseId() { if (!G) return null; if (G.pend) return G.pend.h; return G.
 function render() {
   if (!G) return;
 $('#vD').textContent = vpOf(G, 'D') + '/' + VPWIN.D; $('#vG').textContent = vpOf(G, 'G') + '/' + VPWIN.G;
-  $('#vT').textContent = G.F.taint + '/12';
+  $('#vT').textContent = G.F.taint + '/12'; $('#tBar').style.width = (G.F.taint / 12 * 100).toFixed(0) + '%';
+  ['D', 'G'].forEach(function (sd) { var u = 0, n = 0; Object.keys(G.A).forEach(function (r) { var a = G.A[r]; if (armySide(a) === sd && units(a)) { u += units(a); n++; } }); $('#s' + sd).innerHTML = u + ' troops<br>' + n + ' regions'; $('#c' + sd).classList.toggle('me', sd === UI.side); });
+  phaseBanner();
   var s = sideToAct(G), me = UI.side, ms = human(s) && !UI.hold ? validMoves(G) : [];
   var hl = { regions: [], tokens: [] };
   var acts = [], msg = '';
@@ -4208,13 +4275,22 @@ function renderActs(acts) {
   var a = $('#acts'); a.innerHTML = '';
   acts.forEach(function (x) { var b = mk('button', 'act' + (x.cls ? ' ' + x.cls : ''), '<b>' + x.t + '</b>' + (x.s ? '<small>' + x.s + '</small>' : '')); b.type = 'button'; if (x.id) b.id = x.id; if (x.dis) b.disabled = true; b.dataset.key = x.key || ''; b.onclick = function () { if (!tutOk({ type: 'tap', what: 'act', key: x.key })) return; sfx('tap'); x.f(); }; a.appendChild(b); });
 }
+function phaseBanner() {
+  var s = sideToAct(G), ph = G.pend ? (G.pend.h === 'battle' ? 'Battle' : 'Action') : { company: 'Company', hunt: 'Hunt', act: 'Action', over: 'Game over' }[G.phase] || 'Action';
+  var who = G.win ? '' : human(s) ? 'Your turn' : sideName(s) + "'s turn", order = ['Company', 'Hunt', 'Action'], cur = ph === 'Battle' ? 2 : order.indexOf(ph);
+  var me = UI.side, used = (G.used[me] || []).filter(Boolean).length, tot = (G.dice[me] || []).length;
+  $('#phT').textContent = 'Turn ' + G.turn + ' · ' + ph + ' phase' + (who ? ' · ' + who : '') + (ph === 'Action' && tot ? ' · ' + (tot - used) + ' dice left' : '');
+  $('#phT').className = human(s) && !UI.hold ? 'mine' : '';
+  $('#phS').innerHTML = order.map(function (o, i) { return '<i class="' + (i < cur ? 'done' : i === cur ? 'on' : '') + '" title="' + o + '"></i>'; }).join('');
+}
 function renderTabs(ms) {
   var n = G.hand[UI.side].length, canPlay = ms.some(function (m) { return m.a === 'card' && (UI.die == null || m.i === UI.die); });
-  $('#tCards').innerHTML = ico('event', '#1f1812', 20) + 'Cards <em>' + n + '</em>';
-  $('#tNat').innerHTML = ico('watch', '#1f1812', 20) + 'Nations';
-  $('#tComp').innerHTML = ico('lantern', '#1f1812', 20) + 'Company';
+  var atWar = NAT_ORDER.filter(function (k) { return NATIONS[k].side === UI.side && G.pol[k].s === 0; }).length;
+  $('#tCards').innerHTML = ico('event', '#fff', 26) + '<em>' + n + '</em>'; $('#tCards').classList.toggle('can', canPlay);
+  $('#tNat').innerHTML = ico('strong', '#fff', 26) + '<em>' + atWar + '</em>'; $('#tNat').title = atWar + ' of your nations at war';
+  $('#tComp').innerHTML = ico('lantern', '#fff', 26) + '<em>' + G.F.taint + '</em>'; $('#tComp').title = 'Company: taint ' + G.F.taint;
 }
-function tutOk(a) { try { if (window.GXT && GXT.active()) return GXT.act(a); } catch (e) { } return true; }
+function tutOk(a) { try { if (window.TUT && TUT.on) TUT.act(a); } catch (e) { } return true; } /* the tutorial never blocks a tap */
 // ---------------------------------------------------------------- phase UIs (return the one-line message)
 function companyUI(ms, hl, acts) {
   var decl = ms.filter(function (m) { return m.t === 'declare'; });
@@ -4391,12 +4467,14 @@ function effectUI(ms, hl, acts) {
 // ---------------------------------------------------------------- map taps
 function onMapTap(kind, rid, extra, ev, under) {
   if (!G) return;
-  if (kind === 't') kind = 'r';
-  if (kind === 'co') kind = 'r';
+  var orig = kind;
+  if (kind === 'k') { infoKey(rid); return; }
+  if (kind === 't' || kind === 's' || kind === 'co') kind = 'r';
   if (human(sideToAct(G)) && !UI.hold && UI.tap) { if (UI.tap(kind, rid, extra)) return; if (under && under !== rid && UI.tap('r', under)) return; }
-  if (human(sideToAct(G)) && !UI.hold && MV.hl && (MV.hl.regions || []).length) { tip('Not here: tap a glowing red region', ev && ev.clientX != null ? { left: ev.clientX - 14, right: ev.clientX + 14, top: ev.clientY - 14, bottom: ev.clientY + 14 } : MV.rectOf(rid)); return; }
+  var hint = human(sideToAct(G)) && !UI.hold && MV.hl && (MV.hl.regions || []).length ? 'Not a target now: the glowing places are.' : '';
+  try { if (window.TUT && TUT.on) TUT.act({ type: 'tap', what: 'info', kind: orig, rid: rid }); } catch (e) { }
   if (kind === 'c') { charInfo(rid); return; }
-  regionInfo(rid);
+  regionInfo(rid, orig, extra, hint);
 }
 // ---------------------------------------------------------------- battle overlay
 function battleRender(ms) {
@@ -4440,8 +4518,8 @@ function showResult() {
   [['Play again', function () { startGame({ side: UI.side, level: UI.level }); }, 'pri'], ['Switch sides', function () { startGame({ side: other(UI.side), level: UI.level }); }, ''], ['Title', showTitle, '']].forEach(function (x) { var b = mk('button', 'btn big ' + x[2], x[0]); b.type = 'button'; b.onclick = x[1]; row.appendChild(b); });
   $('#res').classList.add('on'); document.body.classList.add('scr-on');
 }
-function showTitle() { clearTimeout(UI.timer); try { if (window.GXT && GXT.active()) GXT.stop(); } catch (e) { } closeSheet(); battleClose(); $('#res').classList.remove('on'); $('#title').classList.add('on'); document.body.classList.add('scr-on'); tutMenu(); }
-function tutMenu() { try { $('#tutSlot').innerHTML = GXT.menuHTML({ game: 'gloamwar', first: !ls('gw-played'), cls: 'btn', launch: function () { startTutorial(); } }); } catch (e) { } }
+function showTitle() { clearTimeout(UI.timer); try { if (window.TUT) TUT.stop(); } catch (e) { } closeSheet(); battleClose(); $('#res').classList.remove('on'); $('#title').classList.add('on'); document.body.classList.add('scr-on'); tutMenu(); }
+function tutMenu() { $('#tutSlot').innerHTML = '<button class="btn' + (ls('gw-played') ? '' : ' pri') + '" type="button" id="tutB">Learn to play</button>'; $('#tutB').onclick = function () { startTutorial(); }; }
 // ---------------------------------------------------------------- boot
 function crest() {
   var s = '<circle cx="100" cy="100" r="94" fill="#eadbb4" stroke="#1f1812" stroke-width="4"/><circle cx="100" cy="100" r="86" fill="none" stroke="#1f1812" stroke-width="1.5"/><circle cx="100" cy="100" r="58" fill="#1f1812"/>';
@@ -4457,10 +4535,11 @@ function boot() {
   $('#playD').onclick = function () { ls('gw-played', 1); startGame({ side: 'D', level: UI.level }); };
   $('#playG').onclick = function () { ls('gw-played', 1); startGame({ side: 'G', level: UI.level }); };
   $('#howB').onclick = function () { GXH.rules(); };
-  $('#helpB').onclick = function () { GXH.rules(phaseId() || undefined); };
+  $('#helpB').onclick = function () { helpMenu(); };
   $('#menuB').innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6h18M3 12h18M3 18h18" stroke="#1f1812" stroke-width="2.4" stroke-linecap="round"/></svg>';
   $('#tCards').onclick = function () { openCards(); }; $('#tNat').onclick = openNations; $('#tComp').onclick = openCompany;
-  $('#cT').onclick = openCompany; $('#logB').onclick = openLog;
+  $('#cT').onclick = openCompany; $('#logB').onclick = openLog; $('#logB').innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 4h10l3 3v13H6zM9 9h7M9 13h7M9 17h5" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+  $('#keyB').onclick = function () { openLegend(); };
   $('#zin').onclick = function () { MV.zoomBy(1.4); }; $('#zout').onclick = function () { MV.zoomBy(1 / 1.4); }; $('#cD').onclick = function () { openVP('D'); }; $('#cG').onclick = function () { openVP('G'); };
   $('#scrim').onclick = function (e) { closeSheet(e); };
   document.addEventListener('keydown', function (e) { if (e.key === 'Escape') { closeSheet(); } });
@@ -4484,7 +4563,7 @@ function cardHtml(cid, extra, cls) {
     '<div class="cb">In battle: <b>' + c.cb.t + '</b> ' + c.cb.text + ' Goes ' + ordinal(c.cb.i) + '.</div>' + (extra || '') + '</div>';
 }
 function ordinal(n) { return n + (n === 1 ? 'st' : n === 2 ? 'nd' : n === 3 ? 'rd' : 'th'); }
-function openCards(discard) {
+function openCards(discard) { try { if (window.TUT && TUT.on) TUT.act({ what: 'cards' }); } catch (e) { }
   UI.discardMode = !!discard; var me = UI.side, ms = human(sideToAct(G)) && !UI.hold ? validMoves(G) : [], body = '';
   if (discard) body += '<p>Your hand holds more than 6 cards. Tap one to discard it.</p>';
   else body += '<p>' + (UI.die != null ? 'Cards your ' + FACE_NAME[G.dice[me][UI.die]] + ' die can play glow red.' : 'Pick a die first to play a card. An Event die plays any card; Character, Army and Muster dice play their own type.') + '</p>';
@@ -4512,7 +4591,7 @@ function openNations() {
   openSheet('nations', { title: 'Nations', body: body });
 }
 function tileHtml(t) { var cls = 'tile' + (t.r ? ' r' : '') + (t.sp ? (HUNT_SPECIAL[t.sp].side === 'D' ? ' d' : ' sp') : ''); var face = t.v === 'eye' ? ico('eye', '#9a2117', 20) : t.v === 'die' ? 'd6' : t.v; return '<span class="' + cls + '" title="' + tileName(t) + '">' + face + '</span>'; }
-function openCompany() {
+function openCompany() { try { if (window.TUT && TUT.on) TUT.act({ what: 'taint' }); } catch (e) { }
   var F = G.F, me = UI.side, g = guideOf(G), body = '';
   body += '<p>The Company carries the Hollow Crown. Walk it to the Kiln of Kaldur: reach a gate (Blackgate or Wraithpass), then take 5 steps on the Ashen Road. <b>12 taint</b> and the Gloam wins.</p>';
   body += '<div class="ctype" style="font-size:.9rem;text-transform:uppercase;letter-spacing:.06em">Taint</div><div class="track">'; for (var i = 0; i <= 12; i++) body += '<span class="' + (i === F.taint ? 'on' : i === 12 ? 'end' : '') + '">' + i + '</span>'; body += '</div>';
@@ -4526,22 +4605,29 @@ function openCompany() {
   openSheet('company', { title: 'The Company', body: body });
 }
 function openLog() { var body = '<div style="font-size:.95rem;line-height:1.4">' + G.log.slice(-60).reverse().map(function (l) { return '<div>' + (l.k === 'turn' ? '<b>' + l.x + '</b>' : '<span style="color:' + (l.s === 'G' ? 'var(--red)' : 'var(--ink)') + '">' + l.x + '</span>') + '</div>'; }).join('') + '</div>'; openSheet('log', { title: 'Chronicle', body: body }); }
-function openVP(side) {
+function openVP(side) { try { if (window.TUT && TUT.on) TUT.act({ what: 'vp' }); } catch (e) { }
   var lst = REGIONS.filter(function (r) { return VP[r.set] && r.nat && natSide(r.nat) !== side; });
   var body = '<p>' + (side === 'D' ? 'The Dawn League wins at <b>4 points</b> of Gloam cities and strongholds.' : 'The Gloam wins at <b>10 points</b> of Dawn cities and strongholds.') + ' Strongholds are 2, cities 1. Checked at the end of each turn.</p>';
   body += '<p>' + lst.map(function (r) { return (G.ctl[r.id] === side ? '<b style="color:var(--red)">✓ ' : '') + r.n + ' (' + VP[r.set] + ')' + (G.ctl[r.id] === side ? '</b>' : ''); }).join(' · ') + '</p>';
   openSheet('vp', { title: (side === 'D' ? 'Dawn' : 'Gloam') + ' victory points', body: body });
 }
 function armyText(a) { if (!a) return ''; return natsIn(a).map(function (n) { var x = a[n]; return NATIONS[n].short + ': ' + [x[0] ? x[0] + ' regular' : '', x[1] ? x[1] + ' elite' : '', x[2] ? x[2] + (n === 'pt' ? ' Gloamrider' : ' leader') : ''].filter(Boolean).join(', '); }).join('<br>'); }
-function regionInfo(rid) {
-  var r = REG[rid]; if (!r) return; var body = '<p>' + (r.nat ? NATIONS[r.nat].n : 'No nation') + (r.set ? ' · ' + { strong: 'stronghold (2 VP)', city: 'city (1 VP)', town: 'town', fort: 'fortification' }[r.set] : '') + (r.set && controller(G, rid) !== ownerSide(rid) ? ' · held by the ' + (controller(G, rid) === 'G' ? 'Gloam' : 'Dawn League') : '') + '</p>';
+var WHAT = {
+  t: ['Army', 'A round token: the number is its troops. It moves and attacks with an Army die.'],
+  'in': ['Besieged garrison', 'Troops shut inside their stronghold walls. Attackers need a siege to get in.'],
+  co: ['The Company', 'Carries the Hollow Crown. Walk it to the Kiln to win; the Hunt adds taint.'],
+  s: ['Settlement', 'Its plate colour shows who holds it. Strongholds give 2 points, cities 1.'],
+  r: ['Region', 'One space of the map. Armies move one region per step.'] };
+function regionInfo(rid, kind, extra, hint) {
+  var r = REG[rid]; if (!r) return; kind = kind === 't' && extra === 'in' ? 'in' : kind || 'r'; if (kind === 's') WHAT.s[0] = { strong: 'Stronghold', city: 'City', town: 'Town', fort: 'Fortification' }[r.set] || 'Settlement';
+  var w = WHAT[kind] || WHAT.r, body = '<p class="what">' + w[0] + ': ' + w[1] + '</p>' + (hint ? '<p><b>' + hint + '</b></p>' : '') + '<p>' + (r.nat ? NATIONS[r.nat].n : 'No nation') + (r.set ? ' · ' + { strong: 'stronghold (2 VP)', city: 'city (1 VP)', town: 'town', fort: 'fortification' }[r.set] : '') + (r.set && controller(G, rid) !== ownerSide(rid) ? ' · held by the ' + (controller(G, rid) === 'G' ? 'Gloam' : 'Dawn League') : '') + '</p>';
   if (G.A[rid]) body += '<p>' + armyText(G.A[rid]) + '</p>'; if (G.IN[rid]) body += '<p><b>Behind the walls:</b><br>' + armyText(G.IN[rid]) + '</p>';
   var cs = Object.keys(G.C).filter(function (c) { return G.C[c] === rid; }); if (cs.length) body += '<p>' + cs.map(function (c) { return '<b>' + CHARS[c].n + '</b>: ' + CHARS[c].out; }).join('<br>') + '</p>';
   if (G.F.loc === rid && G.F.road < 0) body += '<p>The Company was last seen here.</p>';
   if (!G.A[rid] && !G.IN[rid] && !cs.length) body += '<p>Empty land. Dotted outlines are its neighbours.</p>';
   regionCard(rid, r.n, body);
 }
-function charInfo(c) { var d = CHARS[c]; openSheet('char', { title: d.n, body: '<p>Level ' + (d.lv > 50 ? 'flies' : d.lv) + ' · leadership ' + d.ld + '</p>' + (d.guide ? '<p><b>As guide:</b> ' + d.guide + '</p>' : '') + (d.out ? '<p><b>On the map:</b> ' + d.out + '</p>' : '') }); }
+function charInfo(c) { var d = CHARS[c]; openSheet('char', { title: d.n, body: '<p class="what">' + (d.side === 'G' ? 'Minion (dark shield): a Gloam champion. Each one gives the Gloam +1 action die.' : 'Hero (light shield): a Dawn champion. Leads armies and protects the Company.') + '</p><p>Level ' + (d.lv > 50 ? 'flies' : d.lv) + ' · leadership ' + d.ld + '</p>' + (d.guide ? '<p><b>As guide:</b> ' + d.guide + '</p>' : '') + (d.out ? '<p><b>On the map:</b> ' + d.out + '</p>' : '') }); }
 // ---------------------------------------------------------------- menu + rules
 function menuInit() {
   try {
@@ -4617,42 +4703,162 @@ function regionCard(rid, title, body) {
 
 </script>
 <script>
-/* Gloamwar staged first turn (gx-tutor.js): fixed seed and fixed first dice. Teaches the goal, the Company, dice, politics, armies and cards. */
+/* Gloamwar teaching layer: map key, help menu, screen guide (labelled callouts) and a free-order lesson checklist.
+   Every window floats, drags, minimises to a chip and closes. Nothing dims the screen or blocks a tap. */
 var TUT_DICE = { D: ['C', 'M', 'X', 'E'], G: ['A', 'M', 'C', 'E', 'X', 'A', 'M'] };
+var LEGEND = [
+  ['ico-army', 'Army', 'Round token, big number = troops. Blue is Dawn, red is Gloam.', function () { return '<circle cx="20" cy="20" r="17" fill="#0d0a07"/><circle cx="20" cy="20" r="14" fill="#1d4fae" stroke="#fff" stroke-width="2.5"/><text x="20" y="26" text-anchor="middle" font-size="17" font-weight="700" fill="#fff" font-family="Arial">3</text>'; }],
+  ['ico-elite', 'Elite troops', 'Gold square on an army: how many elites. An elite takes two hits.', function () { return '<rect x="7" y="7" width="26" height="26" rx="4" fill="#f2c230" stroke="#0d0a07" stroke-width="2.5"/><text x="20" y="26" text-anchor="middle" font-size="17" font-weight="700" font-family="Arial">2</text>'; }],
+  ['ico-leader', 'Leader', 'White shield on an army: leaders let you re-roll misses.', function () { return '<path transform="translate(20,20)" d="' + shieldD(28) + '" fill="#fff" stroke="#0d0a07" stroke-width="2.5"/><text x="20" y="26" text-anchor="middle" font-size="17" font-weight="700" fill="#1d4fae" font-family="Arial">1</text>'; }],
+  ['ico-garrison', 'Besieged garrison', 'Square token: troops inside their walls. Hard to attack.', function () { return '<rect x="6" y="9" width="28" height="26" rx="4" fill="#b3161c" stroke="#fff" stroke-width="2.5"/><path d="M6,9 h6 v-4 h6 v4 h6 v-4 h6 v4 h4" fill="none" stroke="#fff" stroke-width="2"/>'; }],
+  ['ico-rider', 'Gloamrider', 'Black disc with a wraith: a Gloam leader that flies anywhere.', function () { return '<circle cx="20" cy="20" r="16" fill="#0d0a07" stroke="#ff4b4b" stroke-width="2.5"/>' + icoPath('wraith', 20, 19, 24, '#fff'); }],
+  ['ico-hero', 'Hero', 'Light shield: a Dawn champion who leads armies.', function () { return '<path transform="translate(20,20)" d="' + shieldD(30) + '" fill="#f4f1ea" stroke="#1d4fae" stroke-width="3"/>' + icoPath('sword', 20, 19, 20, '#1d4fae'); }],
+  ['ico-minion', 'Minion', 'Dark shield: a Gloam champion. Each gives the Gloam +1 die.', function () { return '<path transform="translate(20,20)" d="' + shieldD(30) + '" fill="#2a0d0d" stroke="#b3161c" stroke-width="3"/>' + icoPath('skull', 20, 19, 20, '#ff6b6b'); }],
+  ['ico-company', 'The Company', 'Lantern disc: carries the Crown. Black while hidden, red once found.', function () { return '<circle cx="20" cy="20" r="16" fill="#14100c" stroke="#ffcf5a" stroke-width="3"/>' + icoPath('lantern', 20, 19, 20, '#ffcf5a'); }],
+  ['ico-progress', 'Company steps', 'Gold +N on the lantern: steps walked since it was last seen.', function () { return '<circle cx="20" cy="20" r="14" fill="#ffcf5a" stroke="#0d0a07" stroke-width="2"/><text x="20" y="26" text-anchor="middle" font-size="15" font-weight="700" font-family="Arial">+2</text>'; }],
+  ['ico-strong', 'Stronghold', 'Square castle plate, 2 points. Plate colour = who holds it.', function () { return plateSvg('strong', 20, 20, '#1d4fae').replace(/46/g, '30'); }],
+  ['ico-city', 'City', 'Round town plate, 1 point. Plate colour = who holds it.', function () { return '<circle cx="20" cy="20" r="16" fill="#b3161c" stroke="#fff" stroke-width="3"/>' + icoPath('city', 20, 20, 22, '#fff'); }],
+  ['ico-fort', 'Fortification', 'Diamond plate: a river crossing that defends well. No points.', function () { return '<path d="M20,3 L37,20 L20,37 L3,20Z" fill="#1d4fae" stroke="#fff" stroke-width="3"/>' + icoPath('fort', 20, 20, 18, '#fff'); }],
+  ['ico-town', 'Town', 'Small round plate: musters troops. No points.', function () { return '<circle cx="20" cy="20" r="13" fill="#1d4fae" stroke="#fff" stroke-width="3"/>' + icoPath('watch', 20, 20, 16, '#fff'); }],
+  ['ico-mountain', 'Mountain wall', 'Grey peaks: nobody crosses them.', function () { return peak(20, 26, 30); }],
+  ['ico-river', 'River', 'Blue line: only a border, armies may cross.', function () { return '<path d="M2,30 C12,10 26,34 38,12" fill="none" stroke="#0d0a07" stroke-width="7"/><path d="M2,30 C12,10 26,34 38,12" fill="none" stroke="#6fb0dc" stroke-width="4"/>'; }],
+  ['ico-road', 'Ashen Road step', 'Numbered gold dots: the last 5 steps to the Kiln.', function () { return '<circle cx="20" cy="20" r="13" fill="#1a1410" stroke="#ffcf5a" stroke-width="3"/><text x="20" y="26" text-anchor="middle" font-size="16" font-weight="700" fill="#ffcf5a" font-family="Arial">3</text>'; }],
+  ['ico-kiln', 'The Kiln', 'Orange mountain: bring the Company here to win.', function () { return '<circle cx="20" cy="20" r="17" fill="#1a1410" stroke="#ff7a1a" stroke-width="3"/>' + icoPath('volcano', 20, 20, 24, '#ff7a1a'); }]];
+function infoKey(k) { var x = LEGEND.filter(function (l) { return l[0] === 'ico-' + k; })[0]; if (x) TUT.win('info', x[1], '<p>' + x[2] + '</p>', { near: true }); }
+var TUT = { on: false, done: {}, cur: null };
+TUT.stop = function () { TUT.on = false; ['lessons', 'guide', 'lesson'].forEach(function (k) { TUT.close(k); }); TUT.ring(null); TUT.guideOff(); document.body.classList.remove('tut'); };
+/* ---- floating window: drag by the header, minimise to a chip, close */
+TUT.wins = {};
+TUT.win = function (id, title, html, o) {
+  o = o || {}; var w = TUT.wins[id];
+  if (!w) { w = document.createElement('div'); w.className = 'tw'; w.id = 'tw-' + id; w.setAttribute('role', 'dialog'); w.setAttribute('aria-modal', 'false'); document.body.appendChild(w); TUT.wins[id] = w; }
+  w.innerHTML = '<header><b>' + title + '</b><button type="button" class="tmin" aria-label="Minimise">–</button><button type="button" class="tx" aria-label="Close">✕</button></header><div class="twb">' + html + '</div>';
+  w.style.display = ''; var chip = document.getElementById('chip-' + id); if (chip) chip.remove();
+  if (o.width) w.style.width = o.width + 'px';
+  if (!w._placed) { var W = innerWidth, H = innerHeight, ww = o.width || Math.min(320, W - 24); w.style.left = (o.left != null ? o.left : W < 700 ? (W - ww) / 2 : W - ww - 180) + 'px'; w.style.top = (o.top != null ? o.top : W < 700 ? H * 0.40 : 70) + 'px'; w._placed = true; }
+  TUT.keepIn(w);
+  w.querySelector('.tx').onclick = function () { TUT.close(id); if (o.onClose) o.onClose(); };
+  w.querySelector('.tmin').onclick = function () { TUT.minimise(id, o.chip || title); };
+  var hd = w.querySelector('header'), st = null;
+  hd.onpointerdown = function (e) { if (e.target.tagName === 'BUTTON') return; st = { x: e.clientX, y: e.clientY, l: w.offsetLeft, t: w.offsetTop }; try { hd.setPointerCapture(e.pointerId); } catch (er) { } };
+  hd.onpointermove = function (e) { if (!st) return; w._moved = true; w.style.left = st.l + e.clientX - st.x + 'px'; w.style.top = st.t + e.clientY - st.y + 'px'; TUT.keepIn(w); };
+  hd.onpointerup = hd.onpointercancel = function () { st = null; };
+  return w;
+};
+TUT.keepIn = function (w) { var r = w.getBoundingClientRect(); w.style.left = Math.max(6, Math.min(innerWidth - r.width - 6, r.left)) + 'px'; w.style.top = Math.max(6, Math.min(innerHeight - Math.min(r.height, 120) - 6, r.top)) + 'px'; };
+TUT.close = function (id) { var w = TUT.wins[id]; if (w) { w.remove(); delete TUT.wins[id]; } var c = document.getElementById('chip-' + id); if (c) c.remove(); if (id === 'lesson') TUT.ring(null); if (id === 'guide') TUT.guideOff(); };
+TUT.minimise = function (id, label) {
+  var w = TUT.wins[id]; if (!w) return; w.style.display = 'none'; if (id === 'guide') TUT.guideOff();
+  var c = document.createElement('button'); c.type = 'button'; c.className = 'twchip'; c.id = 'chip-' + id; c.textContent = label; c.style.left = '8px'; c.style.bottom = (document.getElementById('dock').offsetHeight + 70) + 'px';
+  c.onclick = function () { c.remove(); w.style.display = ''; if (id === 'guide') TUT.guideOn(); }; document.body.appendChild(c);
+};
+/* ---- pulse ring on the suggested target (never blocks taps) */
+TUT.ring = function (fn) { TUT.ringFn = fn; clearInterval(TUT.ringT); var r = document.getElementById('pring'); if (!fn) { if (r) r.remove(); return; }
+  if (!r) { r = document.createElement('div'); r.className = 'pring'; r.id = 'pring'; document.body.appendChild(r); }
+  var upd = function () { var e = null; try { e = TUT.ringFn && TUT.ringFn(); } catch (er) { } if (!e || !e.getBoundingClientRect) { r.style.display = 'none'; return; } var b = e.getBoundingClientRect(), d = Math.max(52, Math.min(140, Math.max(b.width, b.height) + 14)); r.style.display = ''; r.style.width = r.style.height = d + 'px'; r.style.left = (b.left + b.width / 2 - d / 2) + 'px'; r.style.top = (b.top + b.height / 2 - d / 2) + 'px'; };
+  upd(); TUT.ringT = setInterval(upd, 300); };
+/* ---- help menu (from the ? button) */
+function helpMenu() {
+  TUT.win('help', 'Help', '<div class="row2" style="flex-direction:column"><button type="button" id="hmG" class="pri">Screen guide: what is on screen</button><button type="button" id="hmL">Lessons checklist</button><button type="button" id="hmK">Map key: every icon</button><button type="button" id="hmR">Full rules</button></div>', { chip: 'Help' });
+  $('#hmG').onclick = function () { TUT.close('help'); TUT.guide(); }; $('#hmL').onclick = function () { TUT.close('help'); TUT.lessons(); };
+  $('#hmK').onclick = function () { TUT.close('help'); openLegend(); }; $('#hmR').onclick = function () { TUT.close('help'); try { GXH.rules(phaseId() || undefined); } catch (e) { } };
+}
+function openLegend() {
+  var present = {}; document.querySelectorAll('#map [class*="ico-"]').forEach(function (e) { (e.getAttribute('class') || '').split(/\s+/).forEach(function (c) { if (c.indexOf('ico-') === 0) present[c] = 1; }); });
+  var html = '<div id="legend">' + LEGEND.map(function (l) { return '<div class="lg" data-k="' + l[0] + '"><svg viewBox="0 0 40 40" aria-hidden="true">' + l[3]() + '</svg><div><b>' + l[1] + '</b><span>' + l[2] + '</span></div></div>'; }).join('') + '</div><p class="why"><b>Region colour = nation.</b> Tap anything on the map for its name.</p><div style="display:flex;flex-wrap:wrap;gap:6px">' + NAT_ORDER.map(function (k) { return '<span style="display:inline-flex;align-items:center;gap:5px;font-size:.87rem"><i style="width:16px;height:16px;border-radius:4px;border:2px solid #14100c;background:' + TINT[k] + '"></i>' + NATIONS[k].short + ' (' + (NATIONS[k].side === 'D' ? 'Dawn' : 'Gloam') + ')</span>'; }).join('') + '</div>';
+  TUT.win('key', 'Map key', html, { chip: 'Key' });
+  try { if (window.TUT && TUT.on) TUT.act({ what: 'legend' }); } catch (e) { }
+}
+/* ---- screen guide: a callout label with a leader line for every HUD element */
+var HUD_PARTS = [
+  ['#menuB', 'Menu', 'Settings, sound, new game and quit.'],
+  ['#helpB', 'Help', 'Opens this guide, the lessons, the map key and the rules.'],
+  ['#logB', 'War log', 'Everything that happened, including every dice roll.'],
+  ['#msg', 'What to do now', 'One line that always says your next step.'],
+  ['#cD', 'Dawn card', 'Dawn points to win, troops and regions held. Tap for the list.'],
+  ['#cG', 'Gloam card', 'Gloam points to win, troops and regions held. Tap for the list.'],
+  ['#cT', 'Taint track', 'At 12 taint the Gloam wins. The Hunt pushes it up.'],
+  ['#rival', 'Rival dice', 'The dice the rival rolled this turn, and its hunt box.'],
+  ['#keyB', 'Map key', 'What every token and icon on the map means.'],
+  ['#bulbbtn', 'Hint', 'Suggests a good move when you are stuck.'],
+  ['#zin', 'Zoom', 'Zoom in and out; you can also pinch and drag the map.'],
+  ['#phase', 'Phase banner', 'Which phase it is, whose turn, and how far the turn is.'],
+  ['#mydice', 'Your dice', 'Your action dice. Tap one, then choose what it does.'],
+  ['#tCards', 'Cards', 'Your hand of cards; the number is how many.'],
+  ['#tNat', 'Nations', 'How close each nation is to war; the number is how many fight.'],
+  ['#tComp', 'Company', 'The Company and its taint; the number is the taint.'],
+  ['#acts', 'Choices', 'The things you can do right now.']];
+TUT.guideOff = function () { var g = document.getElementById('guide'); if (g) g.remove(); };
+TUT.guideOn = function () {
+  TUT.guideOff(); var g = document.createElement('div'); g.id = 'guide'; document.body.appendChild(g);
+  var placed = [], lines = [], W = innerWidth, H = innerHeight, tw = TUT.wins.guide;
+  var avoid = tw && tw.style.display !== 'none' ? [tw.getBoundingClientRect()] : [];
+  HUD_PARTS.forEach(function (p) { var e = document.querySelector(p[0]); if (e) { var r = e.getBoundingClientRect(); if (r.width) avoid.push(r); } }); document.querySelectorAll('#acts .act,#side .pc,#hudL .rb,#zoomb .rb').forEach(function (e) { avoid.push(e.getBoundingClientRect()); });
+  var hit = function (a, b) { return a.left < b.right + 3 && a.right > b.left - 3 && a.top < b.bottom + 3 && a.bottom > b.top - 3; };
+  HUD_PARTS.forEach(function (p) {
+    var e = document.querySelector(p[0]); if (!e) return; var r = e.getBoundingClientRect(); if (!r.width || !r.height) return;
+    var l = document.createElement('button'); l.type = 'button'; l.className = 'gl'; l.textContent = p[1]; l.dataset.for = p[0]; g.appendChild(l);
+    var w = l.offsetWidth, h = l.offsetHeight, cx = r.left + r.width / 2, cy = r.top + r.height / 2, best = null;
+    for (var dist = 8; dist < 480 && !best; dist += 10) {
+      var c = [[cx - w / 2, r.bottom + dist], [cx - w / 2, r.top - dist - h], [r.right + dist, cy - h / 2], [r.left - dist - w, cy - h / 2]];
+      for (var an = 0; an < 16; an++) { var A = an * Math.PI / 8, ex = Math.cos(A) * (dist + r.width / 2 + w / 2), ey = Math.sin(A) * (dist + r.height / 2 + h / 2); c.push([cx + ex - w / 2, cy + ey - h / 2]); }
+      for (var i = 0; i < c.length; i++) { var b = { left: c[i][0], top: c[i][1], right: c[i][0] + w, bottom: c[i][1] + h }; if (b.left < 4 || b.top < 4 || b.right > W - 4 || b.bottom > H - 4) continue; if (placed.some(function (q) { return hit(b, q); }) || avoid.some(function (q) { return hit(b, q); })) continue; best = b; break; }
+    }
+    if (!best) { l.remove(); return; }
+    l.style.left = best.left + 'px'; l.style.top = best.top + 'px'; placed.push(best);
+    var lx = Math.max(best.left, Math.min(best.right, cx)), ly = Math.max(best.top, Math.min(best.bottom, cy)), tx = Math.max(r.left, Math.min(r.right, lx)), ty = Math.max(r.top, Math.min(r.bottom, ly));
+    lines.push('<line x1="' + lx + '" y1="' + ly + '" x2="' + tx + '" y2="' + ty + '" stroke="#14100c" stroke-width="4"/><line x1="' + lx + '" y1="' + ly + '" x2="' + tx + '" y2="' + ty + '" stroke="#ffcf5a" stroke-width="2"/><circle cx="' + tx + '" cy="' + ty + '" r="4" fill="#ffcf5a" stroke="#14100c" stroke-width="1.5"/>');
+    l.onclick = function () { g.querySelectorAll('.gl').forEach(function (x) { x.classList.remove('on'); }); l.classList.add('on'); var t = document.getElementById('gtext'); if (t) t.innerHTML = '<b>' + p[1] + ':</b> ' + p[2]; TUT.seenParts[p[0]] = 1; };
+  });
+  var sv = document.createElementNS(SVGNS, 'svg'); sv.innerHTML = lines.join(''); g.insertBefore(sv, g.firstChild);
+};
+TUT.seenParts = {};
+TUT.guide = function () {
+  var W = innerWidth, H = innerHeight;
+  TUT.win('guide', 'Screen guide', '<p id="gtext">Every yellow label names a part of the screen. Tap a label to hear what it does.</p><div class="row2"><button type="button" class="pri" id="gNext">Got it: lessons</button></div>', { chip: 'Guide', width: W < 700 ? 230 : 320, left: W < 700 ? W - 240 : (W - 320) / 2, top: W < 700 ? H * 0.42 : H * 0.36, onClose: function () { TUT.guideOff(); } });
+  $('#gNext').onclick = function () { TUT.close('guide'); TUT.done.guide = 1; TUT.lessons(); };
+  TUT.guideOn();
+};
+/* ---- lessons: a tick-off checklist on the real board, any order */
+var q = function (s) { return function () { return document.querySelector(s); }; };
+var LESSONS = [
+  { id: 'win', t: 'What wins', target: q('#cD'), say: ['The Dawn League wins by carrying the Company into the Kiln, or by taking 4 points of Gloam strongholds and cities.', 'The Gloam wins with 10 points of Dawn places, or when taint reaches 12.'], why: 'So every move either walks the Company or guards your points.', ok: function (a) { return a.what === 'vp'; } },
+  { id: 'turn', t: 'How a turn works', target: q('#phase'), say: ['Each turn has phases: Company (hide or reveal it), Hunt (the Gloam sets dice aside to hunt), then Actions.', 'In Actions both sides take turns, one die each, until all dice are used.'], why: 'The strip under the banner shows where you are in the turn.', ok: function (a) { return a.what === 'move' && G && G.phase === 'act'; } },
+  { id: 'dice', t: 'Your action dice', target: function () { return document.querySelector('#mydice .die.can') || document.querySelector('#mydice'); }, say: ['Each die face is a kind of action: hood = Character (the Company and heroes), crossed swords = Army, scroll = Muster (troops and nations), helmet = Muster or Army, raven = Event (cards).', 'Tap a die to see what it can do.'], why: 'Dice are your whole budget: plan which job each one does.', ok: function (a) { return a.what === 'die'; } },
+  { id: 'move', t: 'Move an army', target: function () { return document.querySelector('#mydice .die.can[data-f="X"]') || document.querySelector('#acts .act[data-key="amove"]') || document.querySelector('#dyn .tok.legal'); }, say: ['Tap the helmet or crossed-swords die, then Move armies.', 'Tap a glowing army, then a glowing region next to it.'], why: 'Armies must stand next to a target before they can attack it.', ok: function (a) { return a.what === 'move' && a.side === UI.side && (a.evs || []).some(function (e) { return e.k === 'move' && e.s === UI.side; }); } },
+  { id: 'attack', t: 'Attack and dice', target: q('#cG'), say: ['An attack rolls one die per troop, up to 5. Each 5 or 6 is a hit (a 1 always misses); leaders re-roll misses.', 'Each hit removes a troop. Only nations at war can attack.'], why: 'Big armies hit more often, so gather troops before you strike.', ok: function (a) { return a.what === 'move' && (a.evs || []).some(function (e) { return e.k === 'battle' || e.k === 'round'; }); } },
+  { id: 'card', t: 'Use a card', target: q('#tCards'), say: ['The Event die draws a card or plays one. The badge shows how many you hold.', 'Cards also help in battles: one is played each round.'], why: 'Cards bend the rules in your favour at the right moment.', ok: function (a) { return a.what === 'move' && (a.evs || []).some(function (e) { return e.k === 'card' || e.k === 'draw'; }) || a.what === 'cards'; } },
+  { id: 'track', t: 'The taint track', target: q('#cT'), say: ['When the Company moves, the Gloam rolls its hunt dice. Each 6 finds it and adds taint.', 'Taint never goes down easily: at 12 the Gloam wins.'], why: 'Move the Company in bursts, and hide again when the hunt grows.', ok: function (a) { return a.what === 'taint'; } },
+  { id: 'end', t: 'What ends the game', target: q('#cG'), say: ['The game ends at once when the Company reaches the Kiln or taint hits 12.', 'Points are checked at the end of each turn.'], why: 'A race: the Dawn sprints, the Gloam counts points and taint.', ok: function () { return false; } }];
+TUT.lessons = function () {
+  var n = LESSONS.filter(function (l) { return TUT.done[l.id]; }).length;
+  var html = '<p>' + n + ' of ' + LESSONS.length + ' done. Pick any lesson; you can keep playing while you learn.</p><ul>' + LESSONS.map(function (l) { return '<li class="' + (TUT.done[l.id] ? 'done' : '') + '"><button type="button" data-l="' + l.id + '"><i>' + (TUT.done[l.id] ? '✓' : '') + '</i>' + l.t + '</button></li>'; }).join('') + '</ul>';
+  var w = TUT.win('lessons', 'Lessons ' + n + '/' + LESSONS.length, html, { chip: 'Lessons ' + n + '/' + LESSONS.length, top: innerWidth < 700 ? 124 : 70 });
+  w.querySelectorAll('[data-l]').forEach(function (b) { b.onclick = function () { TUT.lesson(b.dataset.l); }; });
+  if (innerWidth < 700 && !w._moved) { var dt = document.getElementById('dock').getBoundingClientRect().top; w.style.top = Math.max(150, dt - w.offsetHeight - 64) + 'px'; }
+};
+TUT.lesson = function (id) {
+  var l = LESSONS.filter(function (x) { return x.id === id; })[0]; TUT.cur = id; TUT.minimise('lessons', 'Lessons');
+  TUT.win('lesson', l.t, l.say.map(function (t) { return '<p>' + t + '</p>'; }).join('') + '<p class="why">Why: ' + l.why + '</p><div class="row2"><button type="button" id="lBack">List</button><button type="button" class="pri" id="lNext">Next</button></div>', { chip: l.t });
+  TUT.ring(l.target);
+  $('#lNext').onclick = function () { TUT.tick(id); }; $('#lBack').onclick = function () { TUT.close('lesson'); TUT.lessons(); };
+};
+TUT.tick = function (id) {
+  TUT.done[id] = 1; TUT.close('lesson'); TUT.cur = null; TUT.close('lessons');
+  var left = LESSONS.filter(function (l) { return !TUT.done[l.id]; });
+  if (!left.length) { TUT.win('lesson', 'You know the basics', '<p>Hide the Company, wake the nations, and reach the Kiln.</p><p class="why">The ? button reopens the guide, the lessons and the map key at any time.</p><div class="row2"><button type="button" class="pri" id="lDone">Play on</button></div>', {}); $('#lDone').onclick = function () { TUT.close('lesson'); TUT.on = false; ls('gw-played', 1); }; return; }
+  TUT.lessons();
+};
+TUT.act = function (a) {
+  if (!TUT.on || !TUT.cur) return true; var l = LESSONS.filter(function (x) { return x.id === TUT.cur; })[0];
+  try { if (l && l.ok(a)) setTimeout(function () { if (TUT.cur === l.id) TUT.tick(l.id); }, 400); } catch (e) { }
+  return true;
+};
 function startTutorial() {
-  var q = function (s) { return function () { return document.querySelector(s); }; };
-  var die = function (f) { return function () { return document.querySelector('#mydice .die[data-f="' + f + '"]:not(.used)'); }; };
-  var act = function (k) { return function () { return document.querySelector('#acts .act[data-key="' + k + '"]'); }; };
-  var myTurn = function () { return G && G.phase === 'act' && sideToAct(G) === 'D' && !G.pend && !UI.hold; };
-  try { if (GXT.active()) GXT.stop(); } catch (e) { }
-  GXT.start({ game: 'gloamwar',
-    setup: function () { document.body.classList.add('tut'); startGame({ side: 'D', level: 'easy', seed: 4242, mode: 'tut', dice: TUT_DICE }); },
-    live: function () { return [document.getElementById('battle'), document.getElementById('acts')]; },
-    steps: [
-      { id: 'company', title: 'The Company', say: 'This lantern is the Company. It carries the Hollow Crown.', target: q('#company'), wait: null },
-      { id: 'kiln', title: 'Your goal', say: 'Walk it to the Kiln, the red mountain in the south-east.', target: function () { MV.focus('cinderplain'); return document.getElementById('rg-cinderplain'); }, wait: null },
-      { id: 'lose', title: 'The danger', say: 'The Hunt adds taint. At 12 taint the Gloam wins.', target: q('#cT'), wait: null, onNext: function () { MV.focus('lanternvale'); } },
-      { id: 'phase', title: 'Company phase', say: 'Each turn starts here. Tap Stay hidden.', target: act('cdone'), wait: { type: 'tap', match: function (a) { return a.what === 'act' && a.key === 'cdone'; } } },
-      { id: 'dice', title: 'Action dice', say: 'These are your dice. The Gloam rolled the small red ones.', target: q('#mydice'), ready: myTurn, wait: null },
-      { id: 'char', title: 'Character die', say: 'Tap the hooded Character die.', target: die('C'), ready: myTurn, wait: { type: 'tap', match: function (a) { return a.what === 'die' && a.f === 'C'; } } },
-      { id: 'move', title: 'Move on', say: 'Move the Company one step. A hunt 6 finds it.', target: act('cmove'), wait: { type: 'tap', match: function (a) { return a.what === 'act' && a.key === 'cmove'; } } },
-      { id: 'rival', title: 'Rival turn', say: 'You take turns, one die each. The Gloam just moved.', target: q('#msg'), ready: myTurn, wait: null },
-      { id: 'muster', title: 'Muster die', say: 'Tap the Muster die with the scroll.', target: die('M'), ready: myTurn, wait: { type: 'tap', match: function (a) { return a.what === 'die' && a.f === 'M'; } } },
-      { id: 'stir', title: 'Stir a nation', say: 'Tap Stir a nation. Only nations at war can attack.', target: act('dip'), wait: { type: 'tap', match: function (a) { return a.what === 'act' && String(a.key).indexOf('dip') === 0; } } },
-      { id: 'stir2', title: 'Aurelmont', say: 'Pick Aurelmont, the white-walled kingdom.', target: function () { return act('dip-au')() || document.querySelector('#acts .act[data-key^="dip-"]'); }, ready: function () { return !!document.querySelector('#acts .act[data-key^="dip-"]') || G.used.D[1]; }, wait: { type: 'tap', match: function (a) { return a.what === 'act' && String(a.key).indexOf('dip-') === 0; } } },
-      { id: 'nations', title: 'Nations', say: 'The Nations tab shows how close each nation is to war.', target: q('#tNat'), ready: myTurn, wait: null },
-      { id: 'army', title: 'Army die', say: 'Tap the helmet die: Muster or Army.', target: die('X'), ready: myTurn, wait: { type: 'tap', match: function (a) { return a.what === 'die' && a.f === 'X'; } } },
-      { id: 'march', title: 'March', say: 'Tap Move armies.', target: act('amove'), wait: { type: 'tap', match: function (a) { return a.what === 'act' && a.key === 'amove'; } } },
-      { id: 'pick', title: 'Pick an army', say: 'Tap an army with a dashed red ring.', target: function () { var L = [].slice.call(document.querySelectorAll('#dyn .tok.legal')); if (!L.length) return null; var b = document.getElementById('board').getBoundingClientRect(), cx = b.left + b.width / 2, cy = b.top + b.height / 2; L.sort(function (x, y) { var a = x.getBoundingClientRect(), c = y.getBoundingClientRect(); return Math.hypot(a.left - cx, a.top - cy) - Math.hypot(c.left - cx, c.top - cy); }); var t = L[0], r = t.getBoundingClientRect(); if (r.left < b.left || r.right > b.right || r.top < b.top || r.bottom > b.bottom) { var rid = t.id.split('-')[1]; MV.focus(rid, null, false); } return t; }, ready: function () { return G.pend && G.pend.h === 'amove' && !!document.querySelector('#dyn .tok.legal'); }, wait: { type: 'tap', match: function (a) { return a.what === 'src'; } } },
-      { id: 'dest', title: 'Where to', say: 'Tap a glowing region next to it.', target: function () { var r = MV.hl && MV.hl.regions && MV.hl.regions[0]; if (r && !MV.seen(r)) MV.focus(r, null, false); return r ? document.getElementById('rg-' + r) : null; }, ready: function () { return UI.src && UI.src.kind === 'two'; }, wait: { type: 'tap', match: function (a) { return a.what === 'dest'; } } },
-      { id: 'stop', title: 'One more?', say: 'An Army die moves two armies. Tap Stop moving.', target: act('mvdone'), ready: function () { return !G.pend || !!document.querySelector('#acts .act[data-key="mvdone"]'); }, wait: { type: 'tap', match: function (a) { return a.what === 'act' && a.key === 'mvdone' || a.what === 'src' || a.what === 'dest'; } } },
-      { id: 'event', title: 'Event die', say: 'Last die: the Event die draws or plays a card.', target: die('E'), ready: myTurn, wait: { type: 'tap', match: function (a) { return a.what === 'die' && a.f === 'E'; } } },
-      { id: 'draw', title: 'Cards', say: 'Tap Draw a card. Cards also fight in battles.', target: act('draw'), wait: { type: 'tap', match: function (a) { return a.what === 'act' && (String(a.key).indexOf('draw') === 0 || a.key === 'card'); } } },
-      { id: 'draw2', title: 'Two decks', say: 'Character cards help heroes. Strategy cards help armies.', target: function () { return act('draw-DS')() || document.querySelector('#acts .act[data-key^="draw-"]'); }, ready: function () { return !!document.querySelector('#acts .act[data-key^="draw-"]'); }, wait: { type: 'tap', match: function (a) { return a.what === 'act' && String(a.key).indexOf('draw-') === 0; } } },
-      { id: 'end', title: 'Your war', say: 'The bulb suggests moves. Rules are under the ? button.', target: q('#bulbbtn'), wait: null }],
-    endTitle: 'You know the basics', endText: 'Hide the Company, wake the nations, and reach the Kiln.',
-    onDone: function () { document.body.classList.remove('tut'); ls('gw-played', 1); UI.mode = 'quick'; step(); },
-    onExit: function () { document.body.classList.remove('tut'); ls('gw-played', 1); showTitle(); } });
+  TUT.stop(); TUT.on = true; TUT.done = {}; TUT.seenParts = {};
+  document.body.classList.add('tut');
+  startGame({ side: 'D', level: 'easy', seed: 4242, mode: 'tut', dice: TUT_DICE });
+  setTimeout(function () { TUT.guide(); }, 350);
 }
 
 </script>
