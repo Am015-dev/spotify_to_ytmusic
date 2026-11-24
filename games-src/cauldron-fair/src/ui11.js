@@ -40,7 +40,7 @@ const TUT_RULES = [
 const TUT_GAME = 'cauldron-fair', TUT_SEED = 23;
 const tutOn = () => typeof GXT !== 'undefined' && GXT.active() && UI.mode === 'tutorial';
 const firstTime = () => !UI.prefs.played;
-const tutBtn = cls => typeof GXT === 'undefined' ? '' : GXT.menuHTML({ game: TUT_GAME, first: firstTime(), cls, launch: tutStart });
+const tutBtn = cls => '<button type="button" class="' + cls + ' gxt-menu" data-lessons-open="1" data-help><b>Lessons</b></button>';   // the old dimming guided game is retired: this opens the scenario lessons (lessons.js)
 function tutNode(cls, row) { const w = document.createElement('div'); w.innerHTML = tutBtn(cls); const b = w.firstChild; if (!b) return null; return row ? h('div.mrow', b) : b; }
 // the game's input handlers ask the kit BEFORE they act; false = not what this step asks (the click is ignored)
 function tutAct(x) { if (!tutOn()) return true; return GXT.act(Object.assign({ type: 'tap' }, x)); }
@@ -138,9 +138,10 @@ function tutSteps() {
 // Story is preceded by the tutorial (Chapter 0) until it has been finished once; a finished player goes straight to the chapter map
 function storyOpen() {
   if (typeof GXC === 'undefined') return;
-  if (typeof GXT !== 'undefined' && !GXT.isDone(TUT_GAME)) tutStart({ prologue: true }); else campOpen();
+  campOpen();   // the scenario lessons (lessons.js) replace the old prologue: Story goes straight to the chapter map
 }
 function tutStart(o) {
+  if (typeof GXST !== 'undefined') { GXST.picker(); return; }   // retired: the scenario lessons (lessons.js) replace the staged game
   if (typeof GXT === 'undefined') return; o = o && o.prologue ? o : null;
   const first = window.CAMPAIGN && window.CAMPAIGN.chapters && window.CAMPAIGN.chapters[0];
   GXT.start({
