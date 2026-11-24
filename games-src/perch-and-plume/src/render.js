@@ -75,6 +75,7 @@ function render() {
   try { rateStart(); showRate(); } catch (e) { }
   try { if (window.GXH && GXH.phase) GXH.phase(helpPhase()); } catch (e) { }
   try { coachState(); } catch (e) { }
+  try { hudBump(); } catch (e) { }   // +N floats from a score that grew (hud.js)
   // F2: the 250 ms tap guard starts when a question (or a chosen bird) appears, changes or ends; the plain start of your turn is not guarded (its banner is the buffer)
   try { var qk = qKey(); if (qk !== UI.qk) { var was = UI.qk && UI.qk.split('|')[2] !== '-', now = !!(G.q || UI.sel != null || UI.pend || UI.gsDie != null); UI.qk = qk; if (was || now) UI.qT = Date.now(); } } catch (e) { }
   document.body.classList.toggle('q-egg', !!(G.q && G.q.h === 'egg' && myTurn()));

@@ -1,0 +1,60 @@
+{
+ "402x874": {
+  "n": 16,
+  "items": [
+   "bulbbtn:Hintsoff",
+   "goalsbtn:Goals",
+   "gx-ibtn:Log",
+   "mapbtn:?Map",
+   "rulesbtn:Rules",
+   "menubtn:Menu",
+   "gx-ibtn gxst-q:Lessons",
+   "scb:You0·Fern0boardRou",
+   "deckb:Deck107",
+   "gx-grab:",
+   "gx-ibtn:⇥",
+   "trk:Round 1 of 4Your t",
+   "fd:1grub",
+   "fd:1rodent",
+   "fd bon:★ Ground Keeper 0 ",
+   "act4:Play a birdcan pay"
+  ]
+ },
+ "1366x768": {
+  "n": 32,
+  "items": [
+   "bulbbtn:Hintsoff",
+   "goalsbtn:Goals",
+   "gx-ibtn:Log",
+   "mapbtn:?Map",
+   "rulesbtn:Rules",
+   "menubtn:Menu",
+   "gx-ibtn gxst-q:Lessons",
+   "scb:You0·Fern0boardRou",
+   "deckb:Deck107",
+   "H3:Fern's board",
+   "fb h0:forestnothing yet",
+   "fb h1:grasslandnothing y",
+   "fb h2:wetlandnothing yet",
+   "H3:Round goals",
+   "sg now:R1 Birds in your w",
+   "sg:R2 Platform nests ",
+   "sg:R3 Eggs in your we",
+   "sg:R4 Ground nests wi",
+   "H3:Your bonus card",
+   "sg:Ground Keeper0 cou",
+   "dt:Your turn",
+   "gx-ibtn:⇥",
+   "trk:Round 1 of 4Your t",
+   "fl:Your food",
+   "fd:1grub",
+   "fd:1rodent",
+   "fd bon:★ Ground Keeper 0 ",
+   "prompt:Choose one action:",
+   "act4:Play a birdcan pay",
+   "hpb:‹",
+   "SPAN:Bird 1 of 3",
+   "hpb:›"
+  ]
+ }
+}

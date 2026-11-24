@@ -102,17 +102,15 @@ function gameOver() { hideHelp(); UI.cap = null; try { var pr = $('#prompt'); if
       '<ul class="goalstars">' + sl + '</ul>' + (gwin ? '' : '<small>Stars are earned once the goal is met.</small>') + '</div>';
     var cid = UI.camp.id; if (!gwin && STORY.lose[cid]) voice = sayB(STORY.lose[cid]); else if (gwin && STORY.bossWin[cid]) voice = sayB(STORY.bossWin[cid]);
   }
-  var h = artHTML('bg-result', 'bgart', '') + (UI.camp && UI.camp.goal ? '<h2>' + esc(gwin ? 'Goal met!' : 'Goal missed') + '</h2><p class="yr">' + esc(line) + '</p>' + goalHTML : '<h2>' + esc(line) + '</h2>') + voice + '<table class="stand"><tr><th>Player</th><th>Birds</th><th>Bonus</th><th>Goals</th><th>Eggs</th><th>Stored food</th><th>Tucked</th><th>Total</th></tr>' +
-    order.map(function (i) { var s = sc[i]; return '<tr class="' + (winners.indexOf(i) >= 0 ? 'win' : '') + '"><td>' + esc(G.pl[i].name) + '</td><td>' + s.birds + '</td><td>' + s.bonus + '</td><td>' + s.goals + '</td><td>' + s.eggs + '</td><td>' + s.cache + '</td><td>' + s.tuck + (s.lead ? '+' + s.lead : '') + '</td><td><b data-engine="G.final[' + i + '].total">' + s.total + '</b></td></tr>'; }).join('') + '</table>';
-  if (G.gres && G.gres.length) h += '<div class="gbreak"><b>Round goals</b>' + G.gres.map(function (r, k) { return '<p><span>Round ' + (k + 1) + ': ' + esc(PP.GOL[r.gid || G.goals[k]].n) + '</span> ' + r.pts.map(function (v, i) { return esc(isHuman(i) && humans().length <= 1 ? 'You' : G.pl[i].name) + ' ' + v; }).join(', ') + '</p>'; }).join('') + '</div>';
-  h += '<p class="rnote">Birds = card points. Stored food = food cached on birds. Ties go to the most food left over in your supply (the solo rival too).</p><div class="tmenu">' +
+  var h = artHTML('bg-result', 'bgart', '') + (UI.camp && UI.camp.goal ? '<h2>' + esc(gwin ? 'Goal met!' : 'Goal missed') + '</h2><p class="yr">' + esc(line) + '</p>' + goalHTML : '<h2>' + esc(line) + '</h2>') + voice + hudPodium(sc, winners);
+  h += '<p class="rnote">Tied on points? Most food left over wins.</p><div class="tmenu">' +
     (UI.camp ? '<button type="button" class="btn big primary" id="again">Continue the story</button>' : '<button type="button" class="btn big primary" id="again">Play again</button><button type="button" class="btn" id="totitle">Title screen</button>') + '</div>';
   el.innerHTML = h;
   setTimeout(function () {
     el.hidden = false; $('#toast').innerHTML = '';
     $('#again').onclick = function () { el.hidden = true; if (UI.camp) { try { GXC.finish(G); } catch (e) { showTitle(); } } else quickStart(); };
     var tt = $('#totitle'); if (tt) tt.onclick = function () { el.hidden = true; showTitle(); };
-    if (UI.mode === 'tutfree' && !UI.fast) $$('.stand b[data-engine]', el).forEach(function (bb) { var v = +bb.textContent, t0 = Date.now(); bb.textContent = '0'; var iv = setInterval(function () { var k = Math.min(1, (Date.now() - t0) / 1100); bb.textContent = Math.round(v * k); if (k >= 1) clearInterval(iv); }, 40); });   // the prologue's climax: the totals count up
+    hudCount(el);   // every total counts up
   }, aMs(700));
 }
 // ---------------- drawers: rules, goals, log, opponent board

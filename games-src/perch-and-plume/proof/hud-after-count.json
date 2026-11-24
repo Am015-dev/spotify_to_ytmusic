@@ -1,0 +1,45 @@
+{
+ "402x874": {
+  "n": 14,
+  "items": [
+   "goalsbtn:Goals",
+   "gx-ibtn:Log",
+   "rulesbtn:Rules",
+   "menubtn:Menu",
+   "gx-ibtn gxst-q:Lessons",
+   "race mine:You0Level0FernYour",
+   "deckb:Deck107",
+   "gx-grab:",
+   "gx-ibtn:⇥",
+   "trk:Round 1 of 4Your t",
+   "fd:1grub",
+   "fd:1rodent",
+   "fd bon:★ Ground Keeper 0 ",
+   "act4:Play a birdcan pay"
+  ]
+ },
+ "1366x768": {
+  "n": 19,
+  "items": [
+   "goalsbtn:Goals",
+   "gx-ibtn:Log",
+   "rulesbtn:Rules",
+   "menubtn:Menu",
+   "gx-ibtn gxst-q:Lessons",
+   "race mine:You0Level0FernYour",
+   "deckb:Deck107",
+   "dt:Your turn",
+   "gx-ibtn:⇥",
+   "trk:Round 1 of 4Your t",
+   "fl:Your food",
+   "fd:1grub",
+   "fd:1rodent",
+   "fd bon:★ Ground Keeper 0 ",
+   "prompt:Choose one action:",
+   "act4:Play a birdcan pay",
+   "hpb:‹",
+   "SPAN:Bird 1 of 3",
+   "hpb:›"
+  ]
+ }
+}
