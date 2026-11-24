@@ -300,7 +300,7 @@
       laySelf: 'Lay 1 egg on this bird.',
       layNest: 'Lay 1 egg on each of your birds with a ' + NESTN[x[0]] + ' nest.',
       draw1: 'Draw 1 card from the deck.',
-      hunt: 'Peek at the top deck card. Wingspan under ' + x[0] + ' cm? It slides under this bird for 1 point. Otherwise it is discarded.',
+      hunt: 'Peek at the top deck card. Wings narrower than ' + x[0] + ' cm? It slides under this bird for 1 point. Otherwise it is discarded.',
       huntDie: 'Shake the dice that are outside the feeder. A ' + FN[x[0]] + ' lands? Store 1 ' + FN[x[0]] + ' on this bird.',
       allFood: 'Every player gains 1 ' + FN[x[0]] + ' from the supply.',
       allDraw: 'Every player draws 1 card from the deck.',
