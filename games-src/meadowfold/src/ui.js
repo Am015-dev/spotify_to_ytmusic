@@ -611,7 +611,7 @@ function showTitle() {
     '</div></details></div>';
   $$('[data-set]', st).forEach(function (b) { b.onclick = function () { var k = b.dataset.set, v = b.dataset.v, same = b.classList.contains('on'); c[k] = k === 'np' ? +v : k === 'spirits' ? v === 'true' : v; if (k === 'mode') c.np = v === 'hot' ? Math.max(2, c.np) : c.np; UI.optOpen = true; showTitle(); if (same) bump('[data-set="' + k + '"][data-v="' + v + '"]'); }; });
   $('#goB').onclick = function () { startFromSetup(); };
-  $('#tutB').onclick = function () { if (window.tutStart) tutStart(); };
+  $('#tutB').onclick = function () { if (window.GXST) GXST.picker(); };
   var rb = $('#resB'); if (rb) rb.onclick = function () { if (!load()) newGame(); };
 }
 function optSum(c) { var m = { quick: 'vs computer', solo: 'solo', hot: 'pass & play' }[c.mode]; return m + (c.mode === 'quick' ? ', ' + c.ai.toLowerCase() + ', ' + (c.np - 1) + (c.np > 2 ? ' rivals' : ' rival') : c.mode === 'hot' ? ', ' + c.np + ' players' : '') + ', side ' + c.side + (c.spirits ? ', spirits' : ''); }
@@ -635,10 +635,10 @@ function boot() {
   try {
     GX.settings({ id: 'setd', title: 'Menu',
       game: function (S) { var a = document.createElement('button'); a.type = 'button'; a.className = 'gx-sb'; a.textContent = 'Title screen'; a.onclick = function () { GX.close(); showTitle(); };
-        var rs = document.createElement('button'); rs.type = 'button'; rs.className = 'gx-sb'; rs.textContent = 'Restart'; rs.onclick = function () { GX.close(); if (UI.mode === 'tut' && window.tutStart) tutStart(); else newGame(Object.assign({}, UI.cfg, { seed: null })); };
+        var rs = document.createElement('button'); rs.type = 'button'; rs.className = 'gx-sb'; rs.textContent = 'Restart'; rs.onclick = function () { GX.close(); if (UI.mode === 'tut' && window.GXST) GXST.picker(); else newGame(Object.assign({}, UI.cfg, { seed: null })); };
         S.appendChild(GX.row('This game', [rs, a])); },
       sound: function (S) { S.appendChild(GX.row('Sound effects', GX.onoff(!UI.prefs.mute, function (v) { UI.prefs.mute = !v; try { localStorage.setItem('mf_prefs', JSON.stringify(UI.prefs)); } catch (e) { } }))); },
-      help: function (S) { var r = document.createElement('button'); r.type = 'button'; r.className = 'gx-sb'; r.textContent = 'Rules'; r.onclick = function () { GX.close(); setTimeout(function () { fillRules(); GX.show('rulesd'); }, 50); }; var tu = document.createElement('button'); tu.type = 'button'; tu.className = 'gx-sb'; tu.textContent = 'Tutorial'; tu.onclick = function () { GX.close(); if (window.tutStart) tutStart(); }; S.appendChild(GX.row('Read', [r, tu])); },
+      help: function (S) { var r = document.createElement('button'); r.type = 'button'; r.className = 'gx-sb'; r.textContent = 'Rules'; r.onclick = function () { GX.close(); setTimeout(function () { fillRules(); GX.show('rulesd'); }, 50); }; var tu = document.createElement('button'); tu.type = 'button'; tu.className = 'gx-sb'; tu.textContent = 'Tutorial'; tu.onclick = function () { GX.close(); if (window.GXST) GXST.picker(); }; S.appendChild(GX.row('Read', [r, tu])); },
       about: { name: 'Meadowfold', version: '1.0', text: 'Paper art drawn in code. Animal silhouettes: game-icons.net (CC BY 3.0).' } });
     AIDELAY = GX.aiDelay ? GX.aiDelay(650) : 650; if (GX.onPref) GX.onPref(function (k) { if (k === 'ai') AIDELAY = GX.aiDelay(650); });
     if (GX.applyPrefs) GX.applyPrefs();
