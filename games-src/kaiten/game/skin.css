@@ -54,7 +54,9 @@ html.sk .gxh-set button.btn[aria-pressed=true],html.sk .btn.on{background-color:
 @media (min-width:1024px){.logl .ll,.lt,#rivald .btn,#rivald .chipb,#rivald button,#rulesd p,#rulesd li,#start .tbtn span,#start .tbtn b,#rivald *{font-size:16px}}
 @media (min-width:1024px){#setd .lbl,#setd small,.gx-dt,.gx-dock *{font-size:16px}}
 @media (min-width:1024px){.gx-drawer *:not(svg):not(svg *),.gx-dock *:not(svg):not(svg *){font-size:max(1em,16px)!important}}
-@media (min-width:1024px){.gx-dock{align-self:start;max-height:100%}.gx-dock-body{flex:0 1 auto}}
+@media (min-width:1024px){.gx-dock{align-self:stretch;max-height:100%;display:flex;flex-direction:column}.gx-dock-body{flex:1 1 auto;overflow-y:auto}
+#recent{margin-top:auto;border-top:2px solid rgba(74,42,34,.18);padding-top:8px;display:flex;flex-direction:column;gap:6px}#recent:empty{display:none}
+#recent .rh{font-weight:800;color:var(--wood2);letter-spacing:.02em}#recent .ri{line-height:1.3;color:var(--ink)}#recent .lt{font-weight:800;color:var(--red);margin-right:4px}}
 
 /* ===== PLAYABLE layer (ui13.js): turn banner + instruction line, guide card, result card ===== */
 #prompt.kk2{display:flex;align-items:center;gap:8px;text-align:left}
@@ -205,3 +207,5 @@ html.kkend #beltz{background:#2f1f1a!important;border-top-color:#1c1210!importan
 
 /* QA W659: story Next button label was white on pale art */
 html.sk .gxc-btn.go{color:#3a1604;text-shadow:0 1px 0 rgba(255,255,255,.6);font-weight:800}
+/* coach bubbles never sit over an open panel (the kk-art fixture bubble is placed on its row on purpose) */
+body:has(.gx-drawer.on) .gxh-bub:not(#art-bub){visibility:hidden!important}
