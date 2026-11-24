@@ -13,7 +13,7 @@
 /* audit B: solid plates behind intent numbers and the campaign act header (the owner art is brighter than the old backgrounds) */
 .intent,.intent.atk,.intent.def,.intent.buf,.intent.deb{background:#140e0a!important}
 .intent>span{background:#140e0a;color:#fff1e6!important;text-shadow:none!important;border-radius:6px;padding:0 2px}
-.gxc-act{background:rgba(14,10,8,.9)!important;border-radius:10px}.gxc-act b{color:#f6ead8!important}.gxc-act small{opacity:1!important;color:#e9dcc6!important}
+.gxc-act{background:#0e0a08!important;border-radius:10px}.gxc-act b{color:#f6ead8!important}.gxc-act small{opacity:1!important;color:#e9dcc6!important}
 /* Addendum 7: Play is clean; previews, value tags, ratings, incoming chips, map hints and coach bubbles need Hints on (or Learn to play) */
 body:not(.hints-on):not(.learn) :is(.w4pv,.w4hb,.w4hbf,.w4inc,.w4vt,.w4rate,.w4ntag,.ec-say,.toast){display:none!important}
 #hintsB.on{border-color:var(--ember2,#f2872b);color:var(--ember2,#f2872b);box-shadow:0 0 0 2px rgba(242,135,43,.35)}
@@ -118,7 +118,7 @@ h1,h2,.btn,.ct,.cname{font-family:'Cinzel',Georgia,serif}h1{margin:0;font-size:c
 #stage .bg{position:absolute;inset:0;--ph:linear-gradient(#2d1d17,#17110e)}
 .enemies{position:relative;z-index:2;flex:1.1;display:flex;align-items:center;justify-content:center;gap:clamp(4px,2vw,20px);padding:6px 6px 0;min-height:0}
 .en{position:relative;display:flex;flex-direction:column;align-items:center;flex:1;max-width:190px;min-width:0;padding:4px 2px;border-radius:12px}
-.en .art{width:min(100%,calc(var(--cw)*2.3));aspect-ratio:1;border-radius:14px}
+.en .art{width:min(100%,calc(var(--cw)*2.3),192px);max-width:192px;aspect-ratio:1;border-radius:14px}
 .en.dead{opacity:.25;pointer-events:none;filter:grayscale(1)}
 .en.glow{animation:pulse 1s infinite;outline:3px solid var(--ember2)}
 .en .nm{font-size:13px;color:var(--mute);margin-top:2px}
@@ -548,6 +548,8 @@ html body.ec-stagemap #dockact{flex-wrap:wrap!important;gap:6px 12px}
 .shopdet .card.big .cb{min-height:0!important;height:auto!important;flex:0 0 auto!important;padding-bottom:8px}
 /* G3: short phones (375x667): figures shrink so the enemy intent badge always sits below the potion / relic bar */
 @media (max-height:760px){html body.ec-stage #stage .en .art,html body.ec-stage #stage .w485fig .art{max-width:max(110px,calc(100dvh - 500px))!important;margin-left:auto!important;margin-right:auto!important}}
+html body.ec-stage #stage .en .art,html body.ec-stage #stage .w485fig .art{max-width:192px!important;margin-left:auto!important;margin-right:auto!important}
+html body .gx-dock,html body .gx-dock-head,html body .gx-dock-body{background-color:#14100e;background-image:none}html body #dockt,html body #dockmsg{color:#f5e9d8;opacity:1}html body .gx-set .gx-row-l{background:#f4ecd8;color:#1a1208;opacity:1}
 /* card names wrap only between words (no "Sweepin g"), shrinking instead */
 html body .card .ct{overflow-wrap:normal!important;word-break:normal!important;hyphens:manual}
 html body .card .cl.stb{color:#1f6b1f;font-weight:800}
@@ -643,4 +645,5 @@ html body.ec-stage #stage.w24ls .en>.art,html body.ec-stage #stage.w24ls .w485fi
 html body.ec-stage #stage.w24ls .enemies.w24many .en>.art{max-width:min(70px,calc((100dvh - 300px) / 2))!important}
 .itip-scrim{position:fixed;inset:0;z-index:69;background:rgba(0,0,0,.18)}
 .itip-x{position:absolute;top:4px;right:4px;width:44px;height:44px;border:none;border-radius:50%;background:rgba(255,255,255,.08);color:#ffd9b0;font-size:20px;cursor:pointer}
+
 </style></head>

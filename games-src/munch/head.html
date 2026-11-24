@@ -360,8 +360,8 @@ html.baked .gx-app{background:var(--img-wall) center/cover #1a0e07}
 html.baked .gx-bar,html.baked .gx-dock-head,html.baked .gx-drawer-head{background:var(--img-bar) center/100% 100% #24140a}
 html.baked .gx-dock,html.baked .gx-drawer,html.baked .paper,html.baked .card .cx{background:var(--img-parch) center/100% 100% var(--paper)}
 html.baked .card .cx{background-color:#f3e3bd}
-html.baked .opp.paper,html.baked .mine.paper{background:var(--img-mat) center/100% 100% #4a2616}
-html.baked .felt{background:var(--img-table) center/100% 100% #5a3520}
+html.baked .opp.paper,html.baked .mine.paper{background:var(--img-mat) center/cover #4a2616}
+html.baked .felt{background:var(--img-table) center/cover #5a3520}
 html.baked .felt::after,html.baked .felt::before{display:none}
 html.baked[data-gfx="high"] .felt::before{display:block;background:radial-gradient(60% 70% at 18% -5%,rgba(255,196,120,.22),transparent 65%);will-change:opacity}
 /* embers over the table (High only) */
@@ -585,5 +585,10 @@ html.ph #prompt>.sellbar .acts{display:flex;gap:8px;margin-top:6px}html.ph #prom
 /* help kit: compact coach bubbles (no picture, button beside the title): the table is crowded with glowing cards and spots */
 .gxh-bub[data-phase] .gxh-sp{display:none}.gxh-bub[data-phase] .gxh-tt{padding-right:84px;min-height:24px;line-height:24px;margin:0}
 .gxh-bub[data-phase] .gxh-row2{position:absolute;right:6px;top:4px;margin:0}.gxh-bub[data-phase] .gxh-ok{min-height:28px;padding:0 12px}
+
+.card .cn{background:rgba(20,10,4,.88)!important;border-radius:4px}
+button.card>.aw>.tag,.card .aw .tag{background:#2b1405!important;color:#ffe9a8!important;text-shadow:none!important}
+#dkRulesBody li,#dkRulesBody ol{background:#fff6dc!important;color:#2a1a0a!important;text-shadow:none!important;border-radius:6px}
+#dkMenuBody .menu .btn{background:#3a1c0e!important;border-image:none!important;color:#fff4d8!important;border:1px solid #c9a227!important}
 </style>
 </head>
