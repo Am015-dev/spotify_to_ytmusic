@@ -92,7 +92,7 @@ function actInfo(G, s) {
   if (lay > 0 && lay < ye.n) out.eggs.what = '+' + lay + ' pts, nests full';
   var cardsCan = G.deck.length + G.tray.filter(Boolean).length > 0;
   out.cards = { h: 2, ok: cardsCan, v: yd.n * (p.hand.length <= 2 ? .8 : p.hand.length >= 6 ? .1 : .4), what: '+' + yd.n + (yd.n === 1 ? ' card' : ' cards'), gain: '+' + yd.n + ' cards', why: cardsCan ? '' : 'No cards left' };
-  out.play = { h: -1, ok: nPl > 0, plain: 'can pay for ' + nPl, v: bp ? bp.v + (p.cubes > 1 ? 1 : 0) : 0, what: bp ? 'up to +' + bp.pts + (bp.pts === 1 ? ' pt' : ' pts') + ' (' + nPl + ' birds)' : '', gain: bp ? '+' + bp.pts + ' pts' : '',
+  out.play = { h: -1, ok: nPl > 0, plain: 'can pay for ' + nPl, v: bp ? bp.v + (p.cubes > 1 ? 1 : 0) : 0, what: bp ? 'up to +' + bp.pts + (bp.pts === 1 ? ' pt' : ' pts') + (nPl === 1 ? ' (1 bird you can play)' : ' (' + nPl + ' birds you can play)') : '', gain: bp ? '+' + bp.pts + ' pts' : '',
     why: p.hand.length ? 'Get food first' : 'Draw birds first' };
   var best = null; Object.keys(out).forEach(function (k) { if (out[k].ok && (!best || out[k].v > out[best].v)) best = k; });
   var hm = s === UI.view && !G.q ? hintMove() : null;   // Best follows the strong player's plan (engines, round goal, bonus card), not this quick estimate
@@ -159,6 +159,7 @@ function trackerHTML() {
   var tok = ''; for (var k = 0; k < total; k++) tok += '<i class="cube' + (k < p.cubes ? ' on' : '') + '"></i>';
   var whoT = isHuman(cur) ? (humans().length > 1 ? G.pl[cur].name + "'s turn" : 'Your turn') : G.pl[cur].name + "'s turn";
   var last = G.round + 1 >= G.rounds;
+  if (UI.mode === 'tutfree') return '<div class="trk trk-l" role="status"><span class="tr-c"><span class="cubes" aria-hidden="true">' + tok + '</span><span><b>' + p.cubes + '</b> of ' + total + ' turns left</span></span><span class="tr-w' + (isHuman(cur) ? ' me' : '') + '">' + esc(whoT) + '</span></div>';
   return '<div class="trk" role="status" aria-label="Round ' + (G.round + 1) + ' of ' + G.rounds + ', ' + p.cubes + ' actions left">' +
     '<span class="tr-r"><b>Round ' + (G.round + 1) + ' of ' + G.rounds + '</b><span class="tr-w' + (isHuman(cur) ? ' me' : '') + '">' + esc(whoT) + '</span></span>' +
     '<span class="tr-c"><span class="cubes" aria-hidden="true">' + tok + '</span><span>' + p.cubes + (p.cubes === 1 ? ' action' : ' actions') + ' left</span></span>' +
@@ -178,7 +179,7 @@ function scoreHTML() {   // F2: real points now, in plain words ("You 32 · Fern
   return '<div class="scb" role="group" aria-label="Score now: ' + esc(ord.map(function (i) { return lbl[i] + ' ' + sc[i]; }).join(', ')) + '">' +
     ord.map(function (i) { return '<button type="button" class="sr2' + (i === me ? ' me' : ' opp') + '" data-a="' + (i === me ? 'mysc' : 'opp') + '" data-s="' + i + '" aria-label="' + esc(lbl[i] + ' ' + sc[i] + ' points now' + (i === me ? ', tap for how it adds up' : ', tap to see their board')) + '">' +
       '<span>' + esc(lbl[i]) + '</span><b>' + sc[i] + '</b>' + (i === me ? '' : '<small>board</small>') + '</button>'; }).join('<i aria-hidden="true">&middot;</i>') +
-    '<span class="scnow" title="Round and actions left">' + (G.phase === 'over' ? 'Game over' : 'Round ' + (G.round + 1) + '/' + G.rounds + ' · ' + G.pl[me].cubes + (G.pl[me].cubes === 1 ? ' action' : ' actions') + ' left') + '</span></div>';
+    '<span class="scnow" title="Round and actions left">' + (G.phase === 'over' ? 'Game over' : UI.mode === 'tutfree' ? '' : 'Round ' + (G.round + 1) + '/' + G.rounds + ' · ' + G.pl[me].cubes + (G.pl[me].cubes === 1 ? ' action' : ' actions') + ' left') + '</span></div>';
 }
 document.addEventListener('click', function (e) {
   var t = e.target.closest('[data-a="mysc"]'); if (!t || !G) return;

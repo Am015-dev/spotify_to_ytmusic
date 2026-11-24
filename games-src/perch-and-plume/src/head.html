@@ -595,5 +595,23 @@ body.q-egg .bc[data-a="bird"][data-legal]::after{content:"+1 egg";position:absol
 #hand.more-r{-webkit-mask-image:linear-gradient(90deg,#000 calc(100% - 36px),transparent);mask-image:linear-gradient(90deg,#000 calc(100% - 36px),transparent)}
 #hand.more-l.more-r{-webkit-mask-image:linear-gradient(90deg,transparent,#000 24px,#000 calc(100% - 36px),transparent);mask-image:linear-gradient(90deg,transparent,#000 24px,#000 calc(100% - 36px),transparent)}
 #hand.more-l:not(.more-r){-webkit-mask-image:linear-gradient(90deg,transparent,#000 24px);mask-image:linear-gradient(90deg,transparent,#000 24px)}
+
+/* ---- W602 clarity: the guided first game shows only what the current step needs ---- */
+body.tutlite .tr-g,body.tutlite .tr-why,body.tutlite .fd.bon,body.tutlite .sr2.opp small,body.tutlite .scnow,body.tutlite .deck{display:none!important}
+body.tutlite:not(.tl-feed) #feeder,body.tutlite:not(.tl-feed) #foodrow{display:none!important}
+body.tutlite:not(.tl-tray) #tray{display:none!important}
+body.tutlite:not(.tl-feed):not(.tl-tray) #mid{display:none!important}
+body.tutlite.tl-play .a4:not(.a4-play){display:none!important}
+body.tutlite.tl-play #act4,body.tutlite.tl-play #acts{grid-template-columns:1fr}
+body.tutlite .a4:not(.tutpoint):not(.a4-play){opacity:.5}
+body.tutlite #goalbar{font-size:15px;min-height:36px}
+body.tutlite .ract{min-width:64px;font-size:11px}
+body.tutlite .ract .rn{font-size:12px;letter-spacing:-.2px}
+body.tutlite .ract span{font-size:10.5px}
+body.tutlite .slot .ec{font-size:11px}
+body.tutlite .trk-l{display:flex;justify-content:space-between;font-size:16px}
+body.tutlite .coachb .saytx .tgoal{font-size:17px;color:#1f3d1a}
+body.tutlite .coachb .saytx .tres{font-size:14px;color:#2f6a22;font-weight:800;min-height:0}
+body.tutlite .coachb .saytx .tres:empty{display:none}
 </style>
 </head>
