@@ -30,3 +30,13 @@
 .gxst-q{min-height:44px;padding:0 12px;font-weight:700;cursor:pointer}
 .gxst-q.gxst-qfix{position:fixed;left:8px;bottom:8px;z-index:var(--gxst-z);border-radius:22px;background:var(--gxst-head);color:var(--gxst-on);border:2px solid var(--gxst-on)}
 @media (prefers-reduced-motion:reduce){.gxst-ring{animation:none;opacity:1}}
+
+/* phoneSlot (function/selector form): card inside a rect the game keeps free: compact, header/footer fixed, middle scrolls */
+.gxst-card.gxst-inslot{display:flex;flex-direction:column;overflow:hidden}
+.gxst-inslot .gxst-hd,.gxst-inslot .gxst-ft{flex:none}
+.gxst-inslot .gxst-ib{width:36px;height:34px;font-size:22px}
+.gxst-inslot .gxst-say,.gxst-inslot .gxst-goal{margin:6px 10px 2px;font-size:15px;overflow:auto;flex:0 1 auto;min-height:0}
+.gxst-inslot .gxst-hint,.gxst-inslot .gxst-msg,.gxst-inslot .gxst-rule{margin:2px 10px;font-size:13px;overflow:auto;flex:0 1 auto;min-height:0}
+.gxst-inslot .gxst-stars{margin:4px 10px 0;font-size:20px}
+.gxst-inslot .gxst-ft{padding:4px 8px 6px}
+.gxst-inslot .gxst-btn{min-height:38px;padding:0 12px}

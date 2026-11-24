@@ -132,7 +132,7 @@ GXS.add({
     id: 'sq-art', name: 'Painted plates and glyphs', ask: 'Are the painted pieces sharp and in place?', seed: 9, when: booted, group: 'Art',
     setup: function () {
       return table(9).then(function () {
-        var h = document.createElement('div'); h.id = 'artprobe'; h.style.cssText = 'position:fixed;left:-999px;top:0;width:200px'; h.innerHTML = PROBE.map(function (p) { return p[0]; }).join(''); document.body.appendChild(h);
+        var h = document.createElement('div'); h.id = 'artprobe'; h.style.cssText = 'position:fixed;left:-999px;top:0;width:200px;visibility:hidden';   /* hidden: the fixed #summon probe must never show 'Name' on the board */ h.innerHTML = PROBE.map(function (p) { return p[0]; }).join(''); document.body.appendChild(h);
         var files = ART.map(function (a) { return a[2]; }).concat(PROBE.map(function (p) { return p[3]; }), GLYPH.map(function (k) { return 'glyph-' + k; }), Object.keys(ITEMS).map(function (k) { return 'item-' + k; }), ['ui-trophy']);
         return Promise.all(files.map(loaded)).then(function (r) { artOut = {}; files.forEach(function (f, i) { artOut[f] = r[i]; }); return idle(300); });
       });
