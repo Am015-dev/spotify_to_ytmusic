@@ -75,6 +75,22 @@ function play(G, maxSteps = 4000) {
     ok(r.ok && pp.board[0][0].eggs === 0 && pp.food.grub === 0, 'playing paid food and egg');
   }
 })();
+// ---- W649 rules diff (proof/RULES-DIFF.md): one check per row verified against the published rulebook
+(function w649_rules_diff() {
+  ok(JSON.stringify(PP.YIELD) === '[[1,1,2,2,3,3],[2,2,3,3,4,4],[1,1,2,2,3,3]]', 'row yields by birds in the row (forest/grassland/wetland)');
+  ok(PP.BONUSSP.map(Number).join() === '0,1,0,1,0,1', 'optional trade on the spaces with 1, 3 and 5 birds');
+  ok(JSON.stringify(PP.GOALPTS) === '[[4,1,0],[5,2,1],[6,3,2],[7,4,3]]', 'competitive goal points per round');
+  const G = PP.newGame({ seats: seats(3, 'normal'), seed: 21 });
+  while (G.q && G.q.h === 'setup') PP.performMove(G, AI.setup(G, G.q.seat), G.q.seat);
+  G.feeder = ['fish']; ok(PP.allSame(G), 'a single die left counts as all one face (reroll allowed)');
+  G.feeder = ['gs', 'grub']; ok(!PP.allSame(G), 'the grub-or-seed face is its own face for the reroll rule');
+  G.disc = G.deck.splice(0); const n0 = G.disc.length; ok(PP.drawCard(G) && G.deck.length === n0 - 1 && !G.disc.length, 'an empty deck is reshuffled from the discards');
+  const gb = PP.DATA.birds.filter(b => b.h.indexOf('G') >= 0).map(b => b.id); let k = 0;
+  G.goals = ['birds-G', 'birds-G']; G.pl.forEach(p => { p.board = [[], [], []]; });
+  [2, 2, 1].forEach((n, i) => { for (let j = 0; j < n; j++) G.pl[i].board[1].push({ id: gb[k++], eggs: 0, cache: 0, tuck: 0 }); });
+  const r = PP.placeGoal(G, 1); ok(r.pts.join() === '3,3,1', 'goal tie: 2 tied for 1st on 5/2/1 get 3 each, the next player takes 3rd = 1 (got ' + r.pts.join() + ')');
+  G.pl[2].board[1] = []; const r2 = PP.placeGoal(G, 1); ok(r2.pts[2] === 0, 'zero items scores nothing');
+})();
 // ---- full games
 // ---- rules-check fixes (games-src/rules-check/perch-and-plume.md), one case per MISSING item
 const strip = (G, id) => { [G.deck, G.disc].forEach(a => { const k = a.indexOf(id); if (k >= 0) a.splice(k, 1); }); const t = G.tray.indexOf(id); if (t >= 0) G.tray[t] = null; G.pl.forEach(q => { const h = q.hand.indexOf(id); if (h >= 0) q.hand.splice(h, 1); }); };
