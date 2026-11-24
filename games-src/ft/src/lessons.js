@@ -15,7 +15,7 @@ const lsWhere=()=>G&&G.act?tileCoord(G.act.tile):'';
 function lsStage(sp){LS.on=true;try{GX.close()}catch(e){}clearTimeout(aiTimer);aiTimer=null;clearTimeout(UI.autoT);UI.autoT=0;UI.modal=null;UI.fx.length=0;UI.fxSeen=0;
   try{guideEnd()}catch(e){}try{coachEnd()}catch(e){}try{GXH.hide()}catch(e){}resetScene();
   commNew(-1,Object.assign({me:{camels:8,coins:10},rivalSet:{camels:8,coins:10}},sp));G.comm=null;G.lsn=sp.id;G.log=[];LS.c0=lsMe().coins;
-  UI.snap=null;document.body.classList.add('lesson');refresh();render();schedule()}
+  UI.snap=null;document.body.classList.add('lesson');refresh();render();try{fit()}catch(e){}setTimeout(()=>{try{fit()}catch(e){}},60);schedule()}
 const LESSONS=[
  {id:'move',title:'Lift and drop',par:3,
   rule:'Lift every person on a tile. Drop one per tile (up, down, left or right), never straight back. The last one lands on its own colour.',
@@ -97,14 +97,24 @@ const LESSONS=[
   wrong:[{act:'start',tile:8},{act:'step',tile:9,c:'merchant'},{act:'tribe'},{act:'tile',skip:1}]}];
 // the one highlighted target: a class on the real element (no overlay, never steals a tap)
 function lsMark(){const s=window.GXST&&GXST.state();const on=s&&s.open&&s.phase==='play';const a=on?GXST.active():null;let el=null;try{el=a&&a.target?a.target():null}catch(e){}
-  if(LS.hl&&LS.hl!==el)LS.hl.classList.remove('ls-target');if(el)el.classList.add('ls-target');LS.hl=el}
+  if(LS.hl&&LS.hl!==el)LS.hl.classList.remove('ls-target');if(el)el.classList.add('ls-target');LS.hl=el;
+  const w=document.querySelector('.gxst-card'),r=s&&s.open?lsSlot():null;if(w&&r&&Math.abs(w.getBoundingClientRect().top-r.top)>2)window.dispatchEvent(new Event('resize'))}   // the board row moved (goods, legend): re-seat the card in its strip
 function lsInit(){if(!window.GXST||LS.init)return;LS.init=1;
   GXST.init({game:'sands',scenarios:LESSONS,storageKey:'soq_lessons',keepClear:['.ls-target','.ls-target','.ls-target','.ls-target','#acts','.gx-bar','#seats','#line','#mkt','#mine','#grid'],   // the target is listed 4 times: covering it costs 4x any other area
-    settled:()=>!aiTimer});
+    settled:()=>!aiTimer,goalAlways:true,phoneSlot:lsSlot});
   const q=document.querySelector('.gxst-q');if(q)q.classList.add('nar-hide');   // phone bar holds at most 5 buttons; Learn to play (menu) and the card reopen the lessons
   setInterval(lsMark,250)}
+// the card lives in a free rect, never over board, HUD or bubbles. Phone: the board shrinks (board.css body.lesson) and the card takes the strip
+// between the board and the next row under it. PC (land): right of the board, under the market and the claims legend, above your goods / actions.
+function lsSlot(){const s=GXST.state();if(!s||s.phase==='picker')return null;const v=sel=>{const e=document.querySelector(sel),r=e&&e.getBoundingClientRect();return r&&r.width>2&&r.height>2?r:null};
+  const g=v('#gw');if(!g)return null;let r;
+  if(document.documentElement.classList.contains('land')){const top=Math.max(...['#mkt','#cleg','#line','#seats'].map(v).filter(Boolean).map(q=>q.bottom))+6,bot=Math.min(...['#mine','#acts'].map(v).filter(Boolean).map(q=>q.top),innerHeight)-6;
+    r={left:Math.max(g.right,(v('#grid')||g).right)+6,top,right:innerWidth-6,bottom:bot}}
+  else{let n=document.querySelector('#gw').nextElementSibling;while(n&&!(n.getBoundingClientRect().height>2))n=n.nextElementSibling;
+    r={left:4,top:Math.max(g.bottom,(v('#grid')||g).bottom)+4,right:innerWidth-4,bottom:(n?n.getBoundingClientRect().top:innerHeight)-4}}
+  return r.right-r.left>200&&r.bottom-r.top>90?r:null}
 function lsOpen(){lsInit();if(window.GXST)GXST.picker()}
-window.addEventListener('gxst',e=>{if(e.detail.type==='close'){LS.on=false;document.body.classList.remove('lesson');lsMark()}});
+window.addEventListener('gxst',e=>{if(e.detail.type==='close'){LS.on=false;document.body.classList.remove('lesson');lsMark();try{fit()}catch(x){}}});
 document.addEventListener('DOMContentLoaded',()=>{try{lsInit()}catch(e){}});
 // ?lesson=menu | <id>[&step=n|win]: open the picker, or a lesson after n moves of its scripted solution (contact sheets, screenshots)
 document.addEventListener('DOMContentLoaded',()=>{let q;try{q=new URLSearchParams(location.search)}catch(e){return}const id=q.get('lesson');if(!id)return;

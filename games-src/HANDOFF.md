@@ -306,3 +306,9 @@ Live fix: original-name phrase removed from shelf blurb + sands page (15:2x).
 - Content rule finding: doorkick-dungeon (live) copied the original card pool 1:1 (R98). F18 (Opus) redesigning our own 168 cards; then UI fixes; redeploy needs owner yes. COPYAUDIT running over all games.
 - Closest to done: short-fuse (4/5, F3 polish+PC then review), kaiten-kitchen (4/5-ish, F3 polish+PC then review), crown-city-smash (R97 7.4, F2), perch-and-plume (F3), lantern-dive (F2).
 - Pending: approve baselines (sunglaze, rampart: proof/baselines-new) before deploy; hollowbough R96 list after PLAY2; calm-audit doesn't count #coach/#toast.
+
+## W749 (sands lessons: card never over board/HUD/bubble)
+- Done: shell phoneSlot accepts a function (any width, null = opt out) or selector (<700px); new opt-in goalAlways (win/fail cards start with "Your goal:"). Sands lsSlot: phone = strip between board and next row (board.css body.lesson #gw margin-bottom:214px); pc = right of board under market/legend, above goods/actions; Last moves feed hidden in lessons on pc.
+- Test: node ft/lessons-layout-test.js (turbo, ~6 s): 58/66 steps clear. Remaining fails are a one-tick lag: after a move the board row height changes (goods/legend appear) and the card is seated in the previous strip, so it touches the board or legend by up to ~95 px until the next re-seat. Fix next: compute the strip from a fixed reserve (not from live sibling rects), or have GXST expose place() and call it from the game after each go().
+- Phone sheet: before 33/33 lesson cells had the card over the board; after 0 visible overlaps, but ~6 cells (sell step 0, palace steps) show the board shrunk further than needed (fit 'sq' toggling), leaving an empty band.
+- First lesson step 0 on a cold page: card sits at 8,8 for the first tick (slot not ready) in the test.
