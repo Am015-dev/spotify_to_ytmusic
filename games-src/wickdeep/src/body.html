@@ -1,0 +1,51 @@
+<body>
+<div class="gx-app">
+<header class="gx-bar">
+  <h1><span class="tt" id="sctitle">Wickdeep</span></h1>
+  <span id="roundc" class="chip rnum" data-engine="G.round"></span>
+  <div id="els" aria-label="Elements"></div>
+  <span class="gx-sp"></span>
+  <button class="gx-ibtn" data-gx="logd" aria-expanded="false" aria-label="Log" title="Log"><svg viewBox="0 0 24 24"><path d="M6 3h11a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6zM6 3v18M10 8h6M10 12h6M10 16h4"/></svg><span>Log</span></button>
+  <button class="gx-ibtn" data-gx="rulesd" aria-expanded="false" aria-label="How to play" title="How to play"><svg viewBox="0 0 24 24"><path d="M4 5c3-1 6-1 8 1 2-2 5-2 8-1v13c-3-1-6-1-8 1-2-2-5-2-8-1z M12 6v13"/></svg><span>Rules</span></button>
+  <button class="gx-ibtn" data-gx="setd" aria-expanded="false" aria-label="Menu" title="Menu"><svg viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></svg><span>Menu</span></button>
+</header>
+<div class="gx-main">
+  <main class="gx-board" id="board" data-board aria-label="The dungeon map">
+    <canvas id="cv" aria-label="Hex map"></canvas>
+    <canvas id="fxc" aria-hidden="true"></canvas>
+    <div id="order" aria-label="Turn order"></div>
+    <button id="goalchip" type="button" aria-label="Goal"></button>
+    <div id="hot"></div>
+    <button id="legend" type="button" hidden><b>Card corner number</b> = initiative, low goes first · <b>Green bar</b> = HP<span> · tap to hide</span></button>
+    <div id="floats" aria-hidden="true"></div>
+    <div id="modc" aria-live="polite" hidden></div>
+    <div id="zoombox"><button id="zin" type="button" aria-label="Zoom in">+</button><button id="zout" type="button" aria-label="Zoom out">−</button></div>
+  </main>
+  <aside class="gx-dock" id="dock" aria-label="Your cards">
+    <div class="gx-dock-body" id="dockbody">
+      <div id="promptrow"><p id="prompt" aria-live="polite"></p><div id="pbtns"></div></div>
+      <div id="lesson" hidden></div>
+      <div id="tray"></div>
+    </div>
+  </aside>
+</div>
+</div>
+<div id="start" class="ov" hidden></div>
+<div id="camp" class="ov" hidden></div>
+<div id="rs" class="ov" hidden></div>
+<div id="insp" role="dialog" aria-label="Details" hidden></div>
+<div id="toast" role="status"></div>
+<script src="gx-scenario.js"></script>
+<script src="scn.js"></script>
+<script src="shell.js"></script>
+<script src="gx-kit.js"></script>
+<script src="gx-viewport.js"></script>
+<script src="fx.js"></script>
+<script src="data.js"></script>
+<script src="scen.js"></script>
+<script src="engine.js"></script>
+<script src="ai.js"></script>
+<script src="camp.js"></script>
+<script src="ui.js"></script>
+</body>
+</html>

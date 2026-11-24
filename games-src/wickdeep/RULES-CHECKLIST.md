@@ -1,0 +1,24 @@
+# Wickdeep rules checklist (each line has a check in rules-test.js)
+
+- [x] 4 heroes, hand sizes 10/10/9/11, HP curves high/mid/mid/low
+- [x] per hero: hand-size level-1 cards, 3 X cards, 2 cards per level 2-9; every card text parses
+- [x] 16 monster types, 4 bosses, monster decks of 8 with 2 reshuffle cards
+- [x] 25 scenarios, 4 boss scenarios, every scenario reachable through the branching campaign
+- [x] modifier deck: 20 cards, 6/5/5/1/1/1/1 mix; x2 doubles, MISS is 0, rolling adds, never below 0
+- [x] 30 items, 10 secret goals, 6 elements, XP thresholds, trap/coin/bonus tables
+- [x] scenario level = ceil(average level / 2); monster placement by party size (normal/elite/none)
+- [x] round starts with card choice; initiative order lowest first, heroes win ties
+- [x] top of one card + bottom of the other; played cards to the played pile
+- [x] LOST halves send the card to the lost pile (also when skipped); persistent halves stay active
+- [x] long rest: initiative 99, lose chosen card, heal 2, hand back
+- [x] short rest: random card shown, swap once for 1 damage, the rest back
+- [x] exhaustion when a hero cannot play 2 cards or rest
+- [x] infusion strong at end of turn; wanes at round end; consume clears it
+- [x] poison +1 damage; shield reduces; strengthen draws two and keeps the better
+- [x] heal cures poison without healing
+- [x] monster focus: least movement, then closest
+- [x] doors open on entry, reveal the room, spawn its monsters
+- [x] traps deal 2+L once and disappear; coins picked up at end of turn
+- [x] a lethal hit offers a block; blocking loses a hand card and takes no damage
+- [x] campaign: win unlocks, XP levels at 45, goal check, new card keeps hand size, perk per level, slots limit items
+- [x] 300 headless test games (25 scenarios x 4 party shapes x 3 seeds) finish with invariants intact after every move
