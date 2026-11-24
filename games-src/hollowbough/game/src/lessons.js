@@ -127,13 +127,18 @@
       return oc.apply(this, arguments);
     };
     var os = save; save = function () { if (!GXST.active()) return os.apply(this, arguments); };
+    // once a lesson is won or failed Bramble stops: the board holds still, so the result card does not jump while you reach for its buttons
+    var oa = aiStep; aiStep = function () { if (GXST.active() && GXST.state().phase !== 'play') { UI.tm = 0; return; } return oa.apply(this, arguments); };
     // title card, Menu, Rules and the first-time offer all open the same lesson picker (no floating tour any more)
     tutStart = function () { try { GX.close(); } catch (e) { } closePop(); GXST.picker(); };
     tutOffer = function () { return false; };
     tutDone = function () { try { var b = JSON.parse(localStorage.getItem('gxst-hollowbough') || '{}').best || {}; return Object.keys(b).length >= lessons.length; } catch (e) { return false; } };
-    GXST.init({ game: 'hollowbough', scenarios: lessons, storageKey: 'gxst-hollowbough', keepClear: ['#bd .tile', '#bd .strip.hand', '#bd .strip.city', '#acts'],
+    GXST.init({ game: 'hollowbough', scenarios: lessons, storageKey: 'gxst-hollowbough', keepClear: ['.pv-hud', '.pv-tabs', '#bd .pv-panel', '#bd .strip.hand .hc', '#acts'], keepPlace: true,
       settled: function () { return !!G && !UI.animBusy && !UI.cards.length && !G.q && HB.actor(G) === 0 && !UI.sel; } });
+    // the phone layout makes room for the card while a lesson runs: lay out again when a lesson starts, ends or the card changes size
+    addEventListener('gxst', function () { if ($('#bd.pv.tall')) setTimeout(function () { try { render(); } catch (e) { } }, 0); });
     var rq = /[?&]lessons=1/.test(location.search); if (rq) GXST.picker();
+    var lq = location.search.match(/[?&]lesson=(\w+)/); if (lq) GXST.start(lq[1]);   // contact sheets: ?lesson=<id> opens that lesson
   };
   setTimeout(go, 300);
 })();
