@@ -146,4 +146,6 @@
   }
   window.__RVL = { SPECS: SPECS, build: build, tiles: tiles, figL: figL, tid: tid, lessons: lessons,
     open: function () { var go = function () { if (!ready()) { setTimeout(go, 200); return; } boot(); GXST.picker(); }; go(); } };
+  // boot at load so the Lessons button is always there (and ?lessons=1 opens the picker, via GXST.init)
+  (function early() { if (!ready() || !window.GXST) { setTimeout(early, 300); return; } boot(); })();
 })();

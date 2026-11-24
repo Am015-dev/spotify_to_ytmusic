@@ -9,7 +9,8 @@ const fs = require('fs'), path = require('path');
 const html = fs.readFileSync(path.join(__dirname, 'tidewake.html'));
 const SIZES = (process.argv[2] || '402x874,1366x768').split(',').map(s => s.split('x').map(Number));
 const PROOF = path.join(__dirname, '..', 'proof'); fs.mkdirSync(PROOF, { recursive: true });
-const sleep = ms => new Promise(r => setTimeout(r, ms)); const probs = []; const T0 = Date.now(), lap = m => process.env.LAP && console.log('  ' + ((Date.now() - T0) / 1000).toFixed(1) + 's ' + m);
+const { turbo } = require('../../scripts/turbo'); const SLEEPDIV = +(process.env.SLEEPDIV || 2);   // game time runs TURBO x faster, so test waits shrink too
+const sleep = ms => new Promise(r => setTimeout(r, Math.max(1, ms / SLEEPDIV))); const probs = []; const T0 = Date.now(), lap = m => process.env.LAP && console.log('  ' + ((Date.now() - T0) / 1000).toFixed(1) + 's ' + m);
 // the scripted solutions: tile t turned r times; start marks; question answers (q:'fire' picks the option whose label has the word)
 const SOLVE = {
   mark: [{ mark: [3, 6, 4] }], lay: [{ t: 2, r: 1 }], chain: [{ t: 2, r: 1 }], push: [{ t: 2, r: 1 }], wake: [{ t: 0, r: 0 }],
@@ -21,7 +22,7 @@ const WRONG = {
 };
 async function run(b, W, H) {
   const tag = W + 'x' + H, phone = W < 600, note = m => probs.push(tag + ': ' + m), shots = [];
-  const ctx = await b.newContext({ viewport: { width: W, height: H }, deviceScaleFactor: 1, isMobile: phone, hasTouch: true });
+  const ctx = await b.newContext({ viewport: { width: W, height: H }, deviceScaleFactor: 1, isMobile: phone, hasTouch: true }); await turbo(ctx, +(process.env.TURBO || 50));
   await ctx.route('**/*', r => new URL(r.request().url()).host === 'gns.test' ? r.fulfill({ status: 200, contentType: 'text/html', body: html }) : r.abort());
   const p = await ctx.newPage(); p.setDefaultTimeout(15000);
   p.on('pageerror', e => note('PAGE ERROR ' + e.message));
@@ -126,7 +127,7 @@ async function run(b, W, H) {
   await ctx.close();
 }
 (async () => {
-  const b = await PW.chromium.launch();
+  const b = await PW.chromium.launch({ executablePath: fs.existsSync('/opt/pw-browsers/chromium') ? '/opt/pw-browsers/chromium' : undefined, args: ['--no-sandbox'] });
   for (const [W, H] of SIZES) { const n = probs.length, t0 = Date.now(); await run(b, W, H).catch(e => probs.push(W + 'x' + H + ': CRASH ' + e.message.split('\n')[0])); console.log((probs.length === n ? 'PASS ' : 'FAIL ') + W + 'x' + H + ' ' + ((Date.now() - t0) / 1000).toFixed(1) + 's'); }
   await b.close(); probs.forEach(x => console.log('  ' + x)); process.exit(probs.length ? 1 : 0);
 })();
