@@ -7,7 +7,11 @@ function fit(){const gw=$('#gw'),g=$('#grid');if(!gw||!g||!G)return;const W=G.W,
   // how many people fit on a tile in two rows: past that they are drawn smaller
   const cap=Math.max(1,Math.floor((cw-10)/(ms+2)))*Math.max(1,Math.floor((ch-27)/(ms*1.18+2)));
   for(const e of g.querySelectorAll('.tile[data-n]')){const n=+e.dataset.n;e.classList.toggle('m7',n>cap&&n<=cap*1.7);e.classList.toggle('m10',n>cap*1.7)}}
-function relayout(sz){const R=document.documentElement;R.classList.toggle('land',sz.w>sz.h&&sz.w>=520);R.classList.toggle('short',sz.h<=600);if(G){fit();placeChz();placeFinger()}}
+function vvFit(R){const v=window.visualViewport;if(!v||Math.abs(v.scale-1)>.02)return;const h=Math.round(v.height),t=Math.round(v.offsetTop);   // follow the visible viewport (Safari bottom bar, keyboard, rotation), never a stale or taller layout box
+  if(h>=200&&Math.abs(h-innerHeight)>1)R.style.setProperty('--vvh',h+'px');else R.style.removeProperty('--vvh');
+  if(t>0&&t<400)R.style.setProperty('--vvt',t+'px');else R.style.removeProperty('--vvt')}
+if(window.visualViewport)visualViewport.addEventListener('resize',()=>{vvFit(document.documentElement);if(G)fit()});
+function relayout(sz){const R=document.documentElement;vvFit(R);R.classList.toggle('land',sz.w>sz.h&&sz.w>=520);R.classList.toggle('short',sz.h<=600);if(G){fit();placeChz();placeFinger()}}
 if(typeof GXV!=='undefined')GXV.watch(relayout);else addEventListener('resize',()=>relayout({w:innerWidth,h:innerHeight}));
 // ---------- flights ----------
 const ctr=r=>({x:r.left+r.width/2,y:r.top+r.height/2});

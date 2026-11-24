@@ -565,3 +565,6 @@ html.land .tile.hasmk .tn{display:block}
 /* readable bid spots that are shut/free (audit B: contrast) */
 .spot.shut small.ord,.spot.shut .sp-c,.spot .sp-c{color:#4a2a14}
 .spot.shut{opacity:1}
+/* full-viewport root (iPhone Safari): the app always equals the visible viewport, safe-area padding only, no bands above or below */
+html.gx,html.gx body{height:100vh;height:100svh;height:100dvh;min-height:0;margin:0;padding:0}
+html.gx .gx-app{position:fixed;left:0;top:var(--vvt,0px);right:auto;bottom:auto;width:100%;height:100vh;height:100svh;height:100dvh;height:var(--vvh,100dvh);box-sizing:border-box;padding-left:env(safe-area-inset-right,0px);padding-right:env(safe-area-inset-left,0px);padding-left:env(safe-area-inset-left,0px);padding-right:env(safe-area-inset-right,0px);transform:none;zoom:1}
