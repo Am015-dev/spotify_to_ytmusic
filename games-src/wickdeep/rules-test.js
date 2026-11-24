@@ -176,6 +176,14 @@ ok('a perk per level', C.perksLeft(camp.party[0]) === 1);
 camp.party[0].gold = 100; ok('buy an item', C.buy(camp, camp.party[0], 'i10') === '' && camp.party[0].items.length === 1);
 ok('one body slot only', C.buy(camp, camp.party[0], 'i04') === '' && C.buy(camp, camp.party[0], 'i05') !== '');
 
+// scenario end: won at the END of the round in which the goal is met, not the moment it is met (RULES-DIFF.md)
+{ let seen = null, goalRound = 0, wonAt = null;
+  for (let sd = 1; sd < 40 && !wonAt; sd++) { const g = E.newScenario(1, [{ cls: 'warden', lvl: 3 }, { cls: 'ringer', lvl: 3 }], { seed: sd }); let n = 0, gm = false;
+    while (!g.done && n++ < 8000) { E.apply(g, AI.choose(g)); if (g.goalMet && !gm) { gm = true; seen = { done: !!g.done, phase: g.phase }; goalRound = g.goalMet; } }
+    if (g.done && g.done.won) wonAt = { round: g.done.round, met: goalRound, seen }; }
+  ok('goal met: play goes on to the end of the round', wonAt && wonAt.seen && !wonAt.seen.done, JSON.stringify(wonAt));
+  ok('goal met: won at the end of that same round', wonAt && wonAt.round === wonAt.met, JSON.stringify(wonAt)); }
+
 // ---------- test games ----------
 const N = process.env.QUICK === '1' ? 1 : 3, scs = process.env.QUICK === '1' ? [1, 2, 3, 4, 5] : D.SCEN_LIST.map(s => s.id);
 const parties = [['warden', 'ringer'], ['ratter', 'lamp'], ['warden', 'ringer', 'ratter', 'lamp'], ['lamp']];
