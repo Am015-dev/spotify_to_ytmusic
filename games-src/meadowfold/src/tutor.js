@@ -41,10 +41,10 @@ function tq(sel) { return sel ? document.querySelector(sel) : null; }
 function tHit(a, b) { return a.left < b.right && a.right > b.left && a.top < b.bottom && a.bottom > b.top; }
 function tutTarget(st) {
   var tk = tq('#takeB'); if (tk && getComputedStyle(tk).visibility === 'visible') return { sel: '#takeB', say: 'Tap Invite. The duck joins you.' };
-  if (st.end) return { sel: '#dock .acard', say: st.say, btn: 'Got it' };
+  if (st.end) return { sel: '#railScore', say: st.say + ' Scoring shows how points work.', btn: 'Got it' };
   if (st.pocketHas || TUT.i === 0) return { sel: '.pocket.glow', say: st.say };
-  if (st.card !== undefined) return { sel: '.acard[data-row="0"]', say: st.say };
-  if (TUT.i === 5) return UI.sel && UI.sel.kind === 'card' ? { sel: '#map .hx.glow', say: 'Tap the glowing hex to settle it.' } : { sel: '.acard.ready', say: st.say };
+  if (st.card !== undefined) return UI.pp === 'dock' && UI.tab === 'row' ? { sel: '.acard[data-row="0"]', say: st.say } : { sel: '#railRow', say: 'Tap Animals: see who can move in.' };
+  if (TUT.i === 5) return UI.sel && UI.sel.kind === 'card' ? { sel: '#map .hx.glow', say: 'Tap the glowing hex to settle it.' } : UI.pp === 'dock' && UI.tab === 'mine' ? { sel: '.acard.ready', say: st.say } : { sel: '#railMine', say: 'The duck is ready! Tap My cards.' };
   if (TUT.i === 6) return { sel: '#endB', say: st.say };
   return { sel: '#map .hx.glow', say: st.say };
 }
@@ -74,8 +74,8 @@ window.tutBubbleAnchor = function () { var c = document.getElementById('tbub'); 
 window.tutAfter = function (m) {
   var st = tutCur(); if (!st || UI.mode !== 'tut') return;
   var me = G.seats[0], d = E.score(me).total - (TUT.sc0 || 0); TUT.sc0 = E.score(me).total;
-  var r = { take: ['You took 3 tokens: +0 points, ' + G.turn.hand.length + ' left to place', '#hand'], place: ['Placed: +' + d + ' points, ' + G.turn.hand.length + ' left to place', '#map [data-k="' + m.k + '"]'],
-    card: ['You invited it: ' + me.cards.length + ' of 4 cards kept', '#mycards'], cube: ['Animal settled: +' + d + ' points', '#map [data-k="' + m.k + '"]'], end: ['Turn over: the rival plays', '#seats'] }[m.t];
+  var r = { take: ['You took 3 tokens: +0 points, ' + G.turn.hand.length + ' left to place', '#central'], place: ['Placed: +' + d + ' points, ' + G.turn.hand.length + ' left to place', '#map [data-k="' + m.k + '"]'],
+    card: ['You invited it: ' + me.cards.length + ' of 4 cards kept', '#railMine'], cube: ['Animal settled: +' + d + ' points', '#map [data-k="' + m.k + '"]'], end: ['Turn over: the rival plays', '#barstat'] }[m.t];
   if (r) TUT.res = { text: r[0], sel: r[1], until: m.t === 'end' ? Infinity : Date.now() + 1800 };
   if (r && m.t !== 'end') setTimeout(function () { if (TUT) tutShow(); }, 1850);
   if (!st.end) TUT.i++;

@@ -60,7 +60,7 @@ function act(m, how) {   // a human move
   var s = G.seats[UI.view], gain = G.over ? 0 : E.score(s).total - sc0;
   if (m.t === 'take') { SND.take(); UI.sel = { kind: 'tok', h: 0 }; }
   if (m.t === 'place') { SND.place(); UI.flash = m.k; buzz(8); var T = G.turn; UI.sel = T.hand.length ? { kind: 'tok', h: Math.min(m.h, T.hand.length - 1) } : null; }
-  if (m.t === 'card') { SND.card(); UI.tab = 'mine'; }
+  if (m.t === 'card') { SND.card(); UI.tab = 'mine'; if (UI.pp) { UI.pp = null; document.documentElement.removeAttribute('data-pp'); } }
   if (m.t === 'cube') { SND.animal(); UI.flash = m.k; buzz([10, 40, 10]); UI.sel = null; }
   if (m.t === 'spirit') UI.tab = 'mine';
   render();
@@ -102,7 +102,7 @@ function buzz(p) { try { if (GX.buzz) GX.buzz(p); } catch (e) { } }
 // ---------- rendering ----------
 function render() {
   if (!G) return;
-  renderBar(); renderCentral(); renderEnd(); renderMap(); renderChips(); renderRivals(); renderDock(); renderLine();
+  renderBar(); renderCentral(); renderEnd(); renderMap(); renderRail(); renderScorep(); renderDock(); renderLine();
   if (window.tutRender) tutRender();
 }
 function myTurn() { return G && !G.over && !E.seat().ai && UI.view === G.cur && !UI.busy; }
@@ -113,6 +113,48 @@ function renderBar() {
     h += '<button type="button" class="pill' + (i === G.cur && !G.over ? ' cur' : '') + (i === UI.view ? ' view' : '') + '" data-seat="' + i + '" aria-label="' + esc(s.name) + ' ' + sc + ' points"><span>' + esc(s.name) + '</span><b data-engine="E.score(G.seats[' + i + ']).total">' + sc + '</b></button>';
   });
   $('#barstat').innerHTML = h;
+}
+
+// ---------- panels: info the player opens, reads while deciding and closes (X, tap outside, Esc). Nothing closes by itself. ----------
+UI.pp = null;
+function openPanel(id, tab) {
+  if (tab) UI.tab = tab;
+  UI.pp = id; if (id === 'dock') renderDock(); if (id === 'scorep') renderScorep();
+  document.documentElement.setAttribute('data-pp', id); syncPanels();
+}
+function closePanel() { if (!UI.pp) return; UI.pp = null; document.documentElement.removeAttribute('data-pp'); syncPanels(); if (G) render(); }
+function syncPanels() {
+  ['dock', 'scorep'].forEach(function (id) { var e = document.getElementById(id); if (e) e.classList.toggle('on', UI.pp === id); });
+  $$('#rail [data-pp]').forEach(function (b) { var on = UI.pp === (b.dataset.pp === 'score' ? 'scorep' : 'dock') && (b.dataset.pp === 'score' || UI.tab === b.dataset.pp); b.classList.toggle('on', on); b.setAttribute('aria-expanded', on ? 'true' : 'false'); });
+  var t = $('#ppt'); if (t) t.textContent = UI.tab === 'mine' ? 'My animal cards' : 'Animals to invite';
+}
+function renderRail() {
+  if (!G) return; var s = G.seats[firstHuman()], act = s.cards.length + (s.spirit && !s.spirit.placed ? 1 : 0), cs = E.seat();
+  var ready = !s.ai && (s.cards.some(function (c) { return Object.keys(E.cubeSpots(s, c.id)).length; }) || (s.spirit && !s.spirit.placed && Object.keys(E.cubeSpots(s, s.spirit.id)).length > 0));
+  var canTake = myTurn() && !G.turn.tookCard && !G.turn.swapped && E.active(cs) < 4;
+  var a = $('#bdRow'), b = $('#bdMine');
+  if (a) { a.textContent = canTake ? '1' : ''; a.hidden = !canTake; }
+  if (b) { var go = ready && myTurn(); b.textContent = go ? '!' : act + '/4'; b.className = 'bd' + (go ? ' go' : ''); b.hidden = !act && !go; }
+  syncPanels();
+}
+function ladder(a) { return a.map(function (x) { return '<span class="lad"><b>' + x[0] + '</b>' + x[1] + '</span>'; }).join(''); }
+function renderScorep() {
+  var b = $('#scorebody'); if (!b || !G || UI.pp !== 'scorep') return;
+  var me = firstHuman(), foe = G.np > 1 ? chipFoe() : -1, A = E.score(G.seats[me]), B = foe >= 0 ? E.score(G.seats[foe]) : null, ei = endInfo();
+  var rows = {
+    trees: ['A tree is leaves on 0-2 trunks.', ladder([['1 high', '1'], ['2 high', '3'], ['3 high', '7']]) + '<em>Bare trunks score 0.</em>'],
+    mounts: ['Grey tokens stack up to 3.', ladder([['1 high', '1'], ['2 high', '3'], ['3 high', '7']]) + '<em>Only when touching another mountain.</em>'],
+    fields: ['Yellow fields never stack.', ladder([['group of 2+', '5']]) + '<em>A lone field scores 0.</em>'],
+    builds: ['A red building sits on one grey, trunk or red.', ladder([['3+ colours touch it', '5']])],
+    water: G.side === 'A' ? ['Blue water: your longest river counts.', ladder([['2', '2'], ['3', '5'], ['4', '8'], ['5', '11'], ['6', '15'], ['+1', '+4']])] : ['Water splits your valley into islands.', ladder([['each island', '5']]) + '<em>Empty hexes count as land.</em>'],
+    animals: ['Each animal card scores its highest number showing.', '<em>Settle animals to uncover bigger numbers.</em>'],
+    spirit: ['Your spirit card scores its own bonus once settled.', '<em>See it under My cards.</em>']
+  };
+  var h = '<div class="endbox ' + (ei && ei.last ? 'last' : '') + '"><h3>When the game ends</h3><p>' + (ei ? esc(ei.t) + ' ' : '') + 'It ends when the pouch cannot refill a pocket, or a player finishes a turn with 2 or fewer empty hexes. The round always finishes, so turns stay equal.</p></div>';
+  h += '<table class="sctab"><tr><th></th><th></th><th class="n">You</th>' + (B ? '<th class="n">' + esc(G.seats[foe].name) + '</th>' : '') + '</tr>';
+  cats().forEach(function (c) { var r = rows[c[0]]; h += '<tr><td class="ic">' + catIcon(c, 'sp' + c[0]) + '</td><td><b>' + c[1] + '</b><div class="sl">' + r[0] + '</div><div class="sd">' + r[1] + '</div></td><td class="n">' + A[c[0]] + '</td>' + (B ? '<td class="n foe">' + B[c[0]] + '</td>' : '') + '</tr>'; });
+  h += '<tr class="tot"><td></td><td><b>Total</b></td><td class="n">' + A.total + '</td>' + (B ? '<td class="n foe">' + B.total + '</td>' : '') + '</tr></table>';
+  b.innerHTML = h;
 }
 function renderCentral() {
   if (myTurn() && G.turn.took >= 0) return renderHand();
@@ -126,7 +168,7 @@ function renderCentral() {
   h += '<span class="pouch" title="Tokens left in the pouch"><b>' + E.bagCount() + '</b> left</span>';
   $('#central').innerHTML = h;
 }
-function wide() { return window.innerWidth >= 1000; }
+function wide() { return false; }   // one layout everywhere: the board is the screen, info lives in panels
 // one valley drawing for the big board and the small rival boards. o: glow{k:1|2}, gain{k:n}, ghost, hint, plan{k:label}, marks{k:1}, f (filter id prefix)
 function valleySVG(s, o) {
   o = o || {}; var r = 40, wh = boardWH(r), pad = 12, f = o.f || 'm', glow = o.glow || {}, gain = o.gain || {}, plan = o.plan || {}, hp = o.hint;
@@ -170,7 +212,7 @@ function renderMap() {
 }
 // the small boards beside yours on a PC: every rival, live, with its score chips and cards
 function renderRivals() {
-  var p = $('#rivalp'); if (!wide()) { p.innerHTML = ''; return; }
+  var p = $('#rivalp'); if (!p || !wide()) return;
   var h = '';
   G.seats.forEach(function (s, i) {
     if (i === UI.view) return;
@@ -221,14 +263,13 @@ function flyGains(s, si, k, ex, svgSel) {
   if (!ANIM || UI.fast) return;
   var p = k ? hexScreen(k, svgSel) : null;
   ex.forEach(function (e, j) {
-    var tgt = $('#chips [data-chip="' + e.c + '"] [data-cs="' + si + '"]') || $('.rv1[data-rv="' + si + '"] [data-chip="' + e.c + '"]');
-    if (wide()) { var t2 = $('.rv1[data-rv="' + si + '"] [data-chip="' + e.c + '"]'); if (t2) tgt = t2; }
+    var tgt = $('.pill[data-seat="' + si + '"] b');
     if (!tgt) return; var tb = tgt.getBoundingClientRect(); if (!tb.width) return;
     var d = document.createElement('div'); d.className = 'flyn' + (e.d < 0 ? ' neg' : '') + (s.ai ? ' rv' : ''); d.textContent = (e.d > 0 ? '+' : '') + e.d;
     var sx = p ? p[0] : tb.left + tb.width / 2, sy = p ? p[1] - 10 : tb.top - 30;
     d.style.left = sx + 'px'; d.style.top = sy + 'px'; d.style.setProperty('--dx', (tb.left + tb.width / 2 - sx) + 'px'); d.style.setProperty('--dy', (tb.top + tb.height / 2 - sy) + 'px'); d.style.animationDelay = (j * 120) + 'ms';
     document.body.appendChild(d);
-    setTimeout(function () { d.remove(); var c2 = $('#chips [data-chip="' + e.c + '"]'); [c2, tgt].forEach(function (x) { if (!x) return; x.classList.remove('bumpc'); void x.offsetWidth; x.classList.add('bumpc'); }); }, 900 + j * 120);
+    setTimeout(function () { d.remove(); var c2 = null; [c2, tgt].forEach(function (x) { if (!x) return; x.classList.remove('bumpc'); void x.offsetWidth; x.classList.add('bumpc'); }); }, 900 + j * 120);
   });
 }
 // ---------- planning: how far a card is from your valley ----------
@@ -315,7 +356,7 @@ function renderHand() {
   $('#central').innerHTML = h + '</div>';
 }
 function renderDock() {
-  var T = G.turn, s = G.seats[UI.view], mine = myTurn(), h = '', cs = E.seat(), both = wide();
+  var T = G.turn, s = G.seats[UI.view], mine = myTurn(), h = '', cs = E.seat(), both = false;
   var act = s.cards.length + (s.spirit && !s.spirit.placed ? 1 : 0);
   var canTake = mine && !T.tookCard && !T.swapped && E.active(cs) < 4;
   var rowL = 'Animals to invite' + (canTake ? ' <em>take 1</em>' : ''), mineL = (s.name === 'You' ? 'Your' : esc(s.name) + '\'s') + ' cards <em>' + act + '/4</em>' + (!both && UI.tab === 'row' && mine && s.cards.some(function (c) { return Object.keys(E.cubeSpots(s, c.id)).length; }) ? ' <em class="rd">home ready</em>' : '');
@@ -371,6 +412,10 @@ function toast(t) { var e = $('#toast'); e.textContent = t; e.classList.add('on'
 // ---------- input ----------
 function onTap(e) {
   var t = e.target;
+  var xb = t.closest('[data-ppx]'); if (xb) { closePanel(); return; }
+  var rb = t.closest('#rail [data-pp]');
+  if (rb) { if (!G) return; var w = rb.dataset.pp, id = w === 'score' ? 'scorep' : 'dock', same = UI.pp === id && (id === 'scorep' || UI.tab === w); if (same) closePanel(); else openPanel(id, id === 'dock' ? w : null); return; }
+  if (UI.pp && !t.closest('.pp') && !t.closest('.gx-drawer') && !t.closest('#tbub') && !t.closest('[data-k],.pocket,.htok,#endB,#undoB,.pill')) { closePanel(); return; }
   if (UI.dragged && Date.now() - UI.dragged < 400) return;
   if (UI.busy && G && !G.over && E.seat().ai && !UI.skip && !t.closest('.gx-drawer,.gx-bar')) { UI.skip = true; toast('Speeding up the rival.'); return; }
   if (t.closest('#backB')) { UI.view = firstHuman(); UI.sel = null; render(); return; }
@@ -381,7 +426,7 @@ function onTap(e) {
   var ht = t.closest('[data-h]'); if (ht && myTurn()) { UI.sel = { kind: 'tok', h: +ht.dataset.h }; SND.card(); render(); return; }
   var tb = t.closest('[data-tab]'); if (tb) { var same = UI.tab === tb.dataset.tab; UI.tab = tb.dataset.tab; render(); if (same) bump('[data-tab="' + UI.tab + '"]'); return; }
   var rw = t.closest('[data-row]'); if (rw) { bigCard(+rw.dataset.row); return; }
-  var ci = t.closest('[data-ci]'); if (ci && myTurn()) { var v = ci.dataset.ci === 'S' ? 'S' : +ci.dataset.ci; UI.sel = (UI.sel && UI.sel.kind === 'card' && UI.sel.ci === v) ? null : { kind: 'card', ci: v }; render(); if (UI.sel && !$$('#map .glow').length) { var pl = planFor(G.seats[UI.view], ci.dataset.ci === 'S' ? G.seats[UI.view].spirit.id : G.seats[UI.view].cards[v].id); toast(pl ? 'Needs ' + planText(pl) + '. See the dashed hexes.' : 'This habitat no longer fits.'); } return; }
+  var ci = t.closest('[data-ci]'); if (ci && myTurn()) { var v = ci.dataset.ci === 'S' ? 'S' : +ci.dataset.ci; UI.sel = (UI.sel && UI.sel.kind === 'card' && UI.sel.ci === v) ? null : { kind: 'card', ci: v }; if (UI.sel && UI.pp === 'dock') { UI.pp = null; document.documentElement.removeAttribute('data-pp'); syncPanels(); } render(); if (UI.sel && !$$('#map .glow').length) { var pl = planFor(G.seats[UI.view], ci.dataset.ci === 'S' ? G.seats[UI.view].spirit.id : G.seats[UI.view].cards[v].id); toast(pl ? 'Needs ' + planText(pl) + '. See the dashed hexes.' : 'This habitat no longer fits.'); } return; }
   if (ci) { var sv = G.seats[UI.view], cid = ci.dataset.ci === 'S' ? sv.spirit.id : (sv.cards[+ci.dataset.ci] || {}).id; if (cid) bigCard(null, cid); return; }
   var hx = t.closest('[data-k]');
   if (hx && myTurn()) {
@@ -579,6 +624,7 @@ function boot() {
   } catch (e) { }
   try { UI.prefs = Object.assign(UI.prefs, JSON.parse(localStorage.getItem('mf_prefs') || '{}')); } catch (e) { }
   document.addEventListener('click', onTap); dragInit();
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && UI.pp && !(window.GX && GX.open)) closePanel(); });
   $('#hintB').onclick = hint;
   GX.onResize(function () { });
   if (window.GXV) GXV.watch(function () { });
