@@ -306,3 +306,6 @@ Live fix: original-name phrase removed from shelf blurb + sands page (15:2x).
 - Content rule finding: doorkick-dungeon (live) copied the original card pool 1:1 (R98). F18 (Opus) redesigning our own 168 cards; then UI fixes; redeploy needs owner yes. COPYAUDIT running over all games.
 - Closest to done: short-fuse (4/5, F3 polish+PC then review), kaiten-kitchen (4/5-ish, F3 polish+PC then review), crown-city-smash (R97 7.4, F2), perch-and-plume (F3), lantern-dive (F2).
 - Pending: approve baselines (sunglaze, rampart: proof/baselines-new) before deploy; hollowbough R96 list after PLAY2; calm-audit doesn't count #coach/#toast.
+
+## W746
+End screens rebuilt (doorkick-dungeon endHTML in munch/ui.js, vinegrave showResult in src/ui3.js, wildmark showResult in src/ui.js): headline, margin, totals, <=3 highlights, Play again + Menu, stats behind Details. Scenarios: dk-win-<hero>, vg-result, wm-result (checks now assert Details is closed). Not done: before-sheets for pc; wildmark scenario ends in a tie ("shared win"), so no portrait/emblem beyond the existing result art; doorkick scenario stats are all zero so highlights show the fallback line. Quick-build failures left: missing snapshot baselines, wildmark "menu" overlap (pre-existing).

@@ -645,6 +645,11 @@ function standHTML(sc, me) {   // final totals up top, winner first
   var ord = sc.map(function (x, i) { return i; }).sort(function (a, b) { return (sc[b].total * 100 + sc[b].acorns) - (sc[a].total * 100 + sc[a].acorns); });
   return '<ol class="stand">' + ord.map(function (i, r) { return '<li class="' + (r === 0 && G.winner !== -2 ? 'w' : '') + (i === me ? ' me' : '') + '"><span>' + esc(i === me ? 'You' : G.seats[i].name) + '</span><b>' + sc[i].total + '</b></li>'; }).join('') + '</ol>';
 }
+function marginLine(sc) {   // who won, by how much
+  if (sc.length < 2 || G.solo || G.winner === -2) return '';
+  var o = sc.map(function (x, i) { return i === G.winner ? -1 : x.total; }), d = sc[G.winner].total - Math.max.apply(null, o);
+  return '<p class="rmargin">' + (d > 0 ? 'Won by ' + d + ' point' + (d === 1 ? '' : 's') + '.' : 'Won on the acorn tiebreak.') + '</p>';
+}
 function showResult() {
   if (!G || !G.over || UI.resultShown === G.seed + ':' + G.logN) return; UI.resultShown = G.seed + ':' + G.logN;
   sfx('end'); save(); musicSync(); $('#toast').classList.remove('on');
@@ -652,7 +657,7 @@ function showResult() {
   if (G.solo) { var best = UI.prefs.best || 0; title = 'You scored ' + sc[0].total + (UI.mode === 'quick' && sc[0].total > best ? ': new best!' : best ? ' (best ' + best + ')' : ''); if (UI.mode === 'quick' && sc[0].total > best) { UI.prefs.best = sc[0].total; savePrefs(); } } else if (G.winner === -2) title = 'A shared win'; else title = (G.winner === me && UI.humans === 1 ? 'You win!' : G.seats[G.winner].name + ' wins!');
   var rs = $('#rs'); rs.hidden = false;
   var camp = UI.mode === 'camp' && window.GXC && GXC.active();
-  rs.innerHTML = '<div class="rbox" data-art="' + (G.winner === 0 || G.solo ? 'result-win' : 'result-lose') + '"><h2 class="rbig">' + esc(title) + '</h2>' + standHTML(sc, me) + quickLine() + (typeof coachFinalHTML === 'function' ? coachFinalHTML() : '') + whyLine(sc, me) + '<div class="rbtn">' + (camp ? '<button type="button" class="big" id="campCont">Continue</button>' : '<button type="button" class="big" id="againB">Play again</button><button type="button" class="ab" id="titleB">Title</button>') + '</div><details class="rdet"' + (innerWidth >= 720 && innerWidth > innerHeight ? '' : ' open') + '><summary>Score breakdown: how each point was won</summary>' + scoresHTML() + '</details></div>';
+  rs.innerHTML = '<div class="rbox" data-art="' + (G.winner === 0 || G.solo ? 'result-win' : 'result-lose') + '"><h2 class="rbig">' + esc(title) + '</h2>' + marginLine(sc) + standHTML(sc, me) + quickLine() + (typeof coachFinalHTML === 'function' ? coachFinalHTML() : '') + whyLine(sc, me) + '<div class="rbtn">' + (camp ? '<button type="button" class="big" id="campCont">Continue</button>' : '<button type="button" class="big" id="againB">Play again</button><button type="button" class="ab" id="titleB">Menu</button>') + '</div><details class="rdet"><summary>Details: how each point was won</summary>' + scoresHTML() + '</details></div>';
   try { if (!camp && window.GNS && GNS.result) GNS.result({ game: 'wildmark', mode: UI.mode === 'tutorial' || UI.mode === 'coach' ? 'tutorial' : G.solo ? 'solo' : 'vs', seats: G.seats.map(function (s, i) { return { name: s.name, me: i === 0, ai: s.ai || undefined }; }), winner: G.winner, scores: sc.map(function (x) { return x.total; }), turns: G.turns }); } catch (e) { }
   if (typeof coachEnd === 'function') coachEnd();
 }

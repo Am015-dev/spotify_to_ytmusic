@@ -22,5 +22,5 @@
     checks: [{ kind: 'play', name: 'buy', snap: function () { return { c: G.p[0].res.coin }; }, steps: [{ sel: '#row .cd.glow' }, { sel: '#gobtn' }], idle: function () { return !UI.busy; }, verify: function (b) { return G.p[0].res.coin < b.c || 'coins unchanged'; } }] });
   GXS.add({ id: 'vg-result', name: 'Result: score breakdown', ask: 'Can you read every score row?', seed: 3, when: booted,
     setup: function () { UI.fast = true; startGame('vs', { np: 3, lvl: 'normal', seed: 3 }); var n = 0; while (G.phase === 'play' && n++ < 4000) VG.apply(G, VAI.choose(G, 'easy')); render(); showResult(); return calm(); },
-    checks: [{ kind: 'visible', sel: '#rs .rplayers', name: 'score breakdown' }, { kind: 'visible', sel: '#rs .tbtn', name: 'Play again' }] });
+    checks: [{ kind: 'visible', sel: '#rs .rplayers', name: 'totals' }, { kind: 'visible', sel: '#rs .tbtn', name: 'Play again' }, { kind: 'fn', name: 'breakdown sits behind Details (closed)', fn: function () { var d = document.querySelector('#rs .rdet'); return !!(d && !d.open && d.querySelector('.rcats')) || 'details missing or open'; } }] });
 })();
