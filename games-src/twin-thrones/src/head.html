@@ -490,7 +490,7 @@ html,body{background:#3a1f0e}
 #draft .wcard .art{position:relative;inset:auto;display:block;opacity:1;flex:1 1 auto;min-height:56px;max-height:150px;background-size:cover;background-position:center;border-bottom:2px solid rgba(242,194,48,.45)}
 #draft .wcard .art img{width:100%;height:100%;object-fit:cover;display:block}
 #draft .wcard b,#draft .wcard small{background:none;border-radius:0;padding:0 8px;display:block;color:#fff6dc}
-#draft .wcard b{padding-top:6px;font-size:max(15px,var(--fmin))}
+#draft .wcard b{padding-top:4px;font-size:max(15px,var(--fmin))}
 #draft .wcard small{font-size:max(14px,var(--fmin));line-height:1.25;opacity:.92;margin-top:2px}
 #draft .wcard .costs{padding:6px 8px 8px;margin-top:0;flex:0 0 auto}
 /* W492 result: the winner's city first, the table folded */
@@ -547,13 +547,29 @@ html,body{background:#3a1f0e}
 .strip .pts::before,.strip .who::before{content:"";position:absolute;left:-3px;right:-3px;top:50%;height:44px;transform:translateY(-50%)}
 #goal{position:relative}#goal::before{content:"";position:absolute;left:0;right:0;top:50%;height:44px;transform:translateY(-50%)}
 /* IPH: wonder cards grow to fit their full text; art keeps a fixed 16:9 shape, never squashed */
-#draft{display:flex;flex-wrap:wrap;align-content:flex-start;align-items:flex-start;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch}
-#draft .wcard{overflow:visible;height:auto;align-self:flex-start;flex:0 0 calc(50% - 4px);box-sizing:border-box;min-width:0}
-#draft .dnote{flex:1 1 100%}
-#draft .wcard>.art{flex:0 0 auto;height:0;padding-top:min(52%,120px);min-height:0;max-height:none;width:100%;box-sizing:border-box;position:relative;border-radius:8px 8px 0 0;overflow:hidden}
-#draft .wcard>.art img{position:absolute;left:0;top:0;width:100%;height:100%;object-fit:cover}
-#draft .wcard .chip .art{position:absolute;inset:0;display:block;flex:none;min-height:0;max-height:none;aspect-ratio:auto;width:auto;border:0;border-radius:inherit;background-size:contain}
-#draft .wcard>b,#draft .wcard>small{overflow:visible;white-space:normal;overflow-wrap:break-word}
-#draft .wcard .costs{flex-wrap:wrap;overflow:visible}
+#draft .dnote{grid-column:1/-1}
 .zcard{overflow:visible}
+/* W607 wonder draft: cost chips wrap in rows with the icon BESIDE the words, art keeps its aspect, nothing is cut, 4-up on wide screens, 44px+ targets */
+#draft{overflow-y:auto;overflow-x:hidden;grid-auto-rows:minmax(0,auto);align-content:start;gap:8px;padding:6px;-webkit-overflow-scrolling:touch}
+#draft .wcard{min-height:44px;height:auto;overflow:hidden}
+#draft .wcard>.art{flex:0 0 auto;height:74px;padding:0;position:relative;max-height:none;width:100%;background-size:contain;background-repeat:no-repeat;background-position:center;background-color:#20343a}
+#draft .wcard>.art img{position:static;width:100%;height:100%;object-fit:contain}
+#draft .wcard small{overflow-wrap:anywhere}
+#draft .wcard .costs{display:flex;flex-wrap:wrap;gap:4px;align-items:center;padding:4px 6px 6px;min-height:40px;--cw:60px}
+#draft .wcard .chip{position:relative;flex:0 0 auto;display:inline-flex;align-items:center;gap:5px;height:auto;min-height:26px;padding:2px 6px 2px 3px;border-radius:8px;font-size:14px;line-height:1.1;white-space:nowrap;clip-path:none;box-sizing:border-box}
+#draft .wcard .chip .art{position:static;inset:auto;flex:0 0 20px;width:20px;height:20px;max-height:none;min-height:0;background-size:contain;background-color:transparent;border:0;display:block}
+#draft .wcard .chip>b{position:static;display:inline;padding:0;background:none;font-size:14px;line-height:1.1;color:inherit;text-shadow:none}
+#draft .wcard .chip.r-papyrus>b{color:#2b2013}
+@media (min-width:1000px){#draft{grid-template-columns:repeat(4,1fr)}#draft .wcard>.art{height:150px}#draft .wcard b,#draft .wcard small{font-size:16px}#draft .wcard .chip,#draft .wcard .chip>b{font-size:16px}}
+/* the goal bubble: a short note under the header, never over the wonders being chosen */
+#peek.pkb{background:none;pointer-events:none;align-items:flex-start;padding:0}
+#peek.pkb .pk{pointer-events:auto;position:absolute;left:12px;right:12px;width:auto;max-width:none;margin:0 auto;padding:10px 12px;border-radius:12px}
+@media (min-width:1000px){#peek.pkb .pk{max-width:520px}}
+#peek.pkb .pk::before{content:"";position:absolute;top:-9px;right:46px;width:14px;height:14px;background:#13252a;border-left:2px solid #f2c230;border-top:2px solid #f2c230;transform:rotate(45deg)}
+#peek.pkb .pk{display:flex;align-items:center;gap:10px}#peek.pkb h3{display:none}#peek.pkb p{flex:1 1 auto;font-size:15px;margin:0;line-height:1.3}
+#peek.pkb .btn{flex:0 0 auto;min-height:44px;padding:0 14px}
+/* Quick rules: first screen of the rules drawer */
+#rulesbox .qr{margin:0 0 10px;padding:0 0 0 22px;font-size:16px;line-height:1.4}#rulesbox .qr li{margin:3px 0}
+#rulesbox details{border-top:1px solid rgba(255,255,255,.15)}#rulesbox summary{min-height:44px;display:flex;align-items:center;font-weight:800;font-size:16px;cursor:pointer;color:#f2c230}
+#rulesbox details p,#rulesbox details li{font-size:15px;line-height:1.4;margin:4px 0}#rulesbox details ul{margin:2px 0 8px;padding-left:20px}
 </style></head>

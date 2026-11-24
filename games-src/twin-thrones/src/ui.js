@@ -551,7 +551,7 @@ var TT_TEST = {};
     $('start').hidden = true; $('res').hidden = true; buildBoard(); render();
     var fl = camp ? 'Goal: ' + camp.goal.text + (tw ? ' ' + tw.text : '') : FLAVOUR[Math.floor(Math.random() * FLAVOUR.length)];
     if (U.tut) { after(); return; }
-    if (!camp && delay() >= 300) { U.busy = true; peek(goalHtml() + '<button class="btn" data-goalgo="1">Start the duel</button>', true); return; }
+    if (!camp && delay() >= 300) { U.busy = true; peek(goalHtml() + '<button class="btn" data-goalgo="1">Got it</button>', true, true); return; }
     U.busy = true; narrate([{ tag: 'The duel', kind: 'info', text: fl, extra: camp ? 1500 : 500 }], function () { U.busy = false; after(); });
   }
   // the climax: totals count up row by row (tap anywhere on the table to jump to the end)
@@ -638,8 +638,23 @@ var TT_TEST = {};
     var b = $('menubody'); if (!b) return;
     b.innerHTML = '<div class="mrow"><button class="btn" data-menu="rules">Rules</button>' + tutBtn() + '<button class="btn alt" data-menu="cards">All cards</button><button class="btn alt" data-menu="restart">Restart game</button><button class="btn alt" data-snd="1">' + sndLabel() + '</button>' + (SND.hasMusic() ? '<button class="btn alt" data-menu="music">Music</button>' : '') + '<button class="btn alt" data-menu="title">Back to title</button></div>';
   }
+  // W607: the rules, checked line by line against RULES-CHECKLIST.md. First screen = 6 short lines; the full list sits behind it.
+  var QUICK = ['Take one open card each turn. Then your rival takes one.', 'Use it to <b>Build</b> it, <b>Sell</b> it for 2 coins (+1 per yellow card you own), or raise a <b>wonder</b>.', 'Short of a resource? Pay 2 coins per unit, plus 1 per unit your rival makes. The bank gets the coins.', 'A chain mark you already own builds a later card free.', 'Win at once with 9 war steps or 6 different science symbols.', 'Otherwise most points after Age III wins. Only 7 wonders get built.'];
+  var FULL = [
+    ['Setup', ['Each player starts with 7 coins.', 'Eight wonders are dealt in two groups of four. You end with four wonders each.', 'Group 1: the first player takes 1, the second takes 2, the first gets the last one. Group 2: the second player takes 1, the first takes 2, the second gets the last one.', 'Five progress tokens lie face up. The war pawn starts in the middle of the track.']],
+    ['Your turn', ['Take one card that nothing covers (a glowing card). Face-down cards turn up once nothing covers them.', '<b>Build</b> it: pay its cost and add it to your city. A card with no cost is free.', '<b>Sell</b> it: take 2 coins, plus 1 for each yellow card you own. The card is discarded.', '<b>Wonder</b>: pay the wonder\u2019s cost and tuck the card under it. Only 7 wonders can be built in the whole game; after that the rest are lost.', 'Then your rival moves, unless a wonder or token gives you an extra turn.']],
+    ['Costs and coins', ['Brown and grey cards you own make resources for free. A coin cost is paid in coins.', 'Each resource you still lack costs 2 coins plus 1 for every unit of it your rival makes with brown or grey cards. Yellow cards and wonders do not raise the price.', 'These coins go to the bank, not to your rival.', 'Depot cards make one resource cost 1 coin per unit. Customs Quay does the same for glass and papyrus.', 'A resource-choice card or wonder gives one unit of one resource per purchase.']],
+    ['Chains', ['Many cards show a chain mark. If you own the card that gives it, the new card is built for free: no coins, no resources.']],
+    ['War', ['Each shield moves the pawn one step toward your rival.', 'Crossing the 3-step mark makes your rival lose 2 coins. Crossing the 6-step mark: 5 coins. Each mark pays out only once, and never below 0 coins.', 'Reaching 9 steps wins the game at once.', 'At the end, the pawn on your side scores for you: 1-2 steps = 2 points, 3-5 = 5, 6-8 = 10.']],
+    ['Science', ['Green cards carry science symbols. A second card with the same symbol lets you take one face-up progress token. Each symbol does this only once.', 'Six different symbols win the game at once. The Law token counts as one symbol.']],
+    ['Progress tokens and wonders', ['Tokens give coins, points, cheaper building or extra rules. Tap one to read it.', 'Wonders give points and often coins, shields, an extra turn or a removed rival card. Tap one to read it.']],
+    ['Ages and who starts', ['There are three ages. Each deals a new pyramid of cards, 20 per age. Age III also has purple guild cards, which score from the richest city.', 'The pawn decides who starts the next age: the player the pawn is closer to is behind, and chooses who starts. With the pawn in the middle, whoever took the last card chooses.', 'The first player opens Age I.']],
+    ['Scoring and ties', ['After Age III, add up points on cards, wonders and tokens, plus 1 per 3 coins, plus the war points above.', 'Most points wins. A tie goes to the player with more blue-card points. Still tied: you share the win.', 'A war or science win ends the game at once, whatever the points.']]
+  ];
   function rulesRender() {
-    $('rulesbox').innerHTML = '<div class="mrow">' + tutBtn() + '</div><h3>The goal</h3><p>Have the most points after Age III. War or 6 science symbols win at once.</p><h3>A turn</h3><ol class="turn5"><li>Take one glowing card. Covered cards must wait.</li><li>Tap it, or drag it to Build, Sell or a wonder.</li><li><b>Build</b>: pay its cost. Missing resources cost coins.</li><li><b>Sell</b>: get 2 coins, plus 1 per yellow card.</li><li><b>Wonder</b>: tuck the card under one of your wonders.</li></ol><h3>Chains</h3><p>A chain mark makes a later card free.</p><h3>War</h3><p>Shields push the pawn toward your rival. Marked spaces steal coins.</p><h3>Science</h3><p>Two matching symbols earn a bonus token.</p><h3>Wonders</h3><p>Four each. Only seven can be built in total.</p>';
+    var h = '<div class="mrow">' + tutBtn() + '</div><h3>Quick rules</h3><ol class="qr">'; QUICK.forEach(function (t) { h += '<li>' + t + '</li>'; });
+    h += '</ol><h3>All the rules</h3>'; FULL.forEach(function (sec, i) { h += '<details' + (i === 1 ? ' open' : '') + '><summary>' + sec[0] + '</summary><ul>'; sec[1].forEach(function (t) { h += '<li>' + t + '</li>'; }); h += '</ul></details>'; });
+    $('rulesbox').innerHTML = h;
   }
 
   function showCity(p) {
@@ -648,8 +663,8 @@ var TT_TEST = {};
     if (!c.children.length) c.textContent = 'No cards yet.'; GX.show('cityd');
   }
 
-  function goalHtml() { return '<h3>How to win</h3><p class="gl">Have the most points after 3 ages.</p><ul class="gb"><li>Cards and wonders give points.</li><li>Shields push the pawn. Reach their city to end it early.</li><li>6 different science symbols also end it early.</li></ul>'; }
-  function peek(html, noX) { var b = $('peek'); if (!b) { b = document.createElement('div'); b.id = 'peek'; document.body.appendChild(b); } b.innerHTML = '<div class="pk" role="dialog" aria-modal="true">' + html + (noX ? '' : '<button class="btn pkx" data-peekx="1">Close</button>') + '</div>'; b.hidden = false; fillArt(b); }
+  function goalHtml() { return '<h3>How to win</h3><p><b>Win:</b> most points after 3 ages, 9 war steps, or 6 science symbols.</p>'; }
+  function peek(html, noX, bubble) { var b = $('peek'); if (!b) { b = document.createElement('div'); b.id = 'peek'; document.body.appendChild(b); } b.classList.toggle('pkb', !!bubble); b.innerHTML = '<div class="pk" role="dialog" aria-modal="true">' + html + (noX ? '' : '<button class="btn pkx" data-peekx="1">Close</button>') + '</div>'; b.hidden = false; fillArt(b); if (bubble) { var pk = b.firstChild, ins = $('instr'), r = ins && ins.getBoundingClientRect(); if (r && r.height) { pk.style.top = Math.round(r.bottom + 12) + 'px'; var pw = pk.getBoundingClientRect(); pk.style.setProperty('--ax', Math.max(14, Math.round(r.right - pw.left - 60)) + 'px'); } } }
   function peekScore() {
     var G = U.G, a = sbreak(G, 0), b = sbreak(G, 1), rows = [['Civic and trade cards, guilds', 'civ'], ['Science cards and tokens', 'sci'], ['War: pawn on their side', 'war'], ['Wonders', 'won'], ['Coins (1 point per 3)', 'coin']];
     var h = '<h3>How the points add up</h3><table class="pkt"><tr><th></th><th>' + esc(U.mode === 'cpu' ? 'You' : name(0)) + '</th><th>' + esc(name(1)) + '</th></tr>';
