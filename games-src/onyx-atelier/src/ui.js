@@ -154,14 +154,20 @@ var UI = (function () {
     el.textContent = s;
   }
   function layout() {
-    var app = $('#app'), W = Math.min(app.clientWidth - 12, 548), H = app.clientHeight;
+    var app = $('#app'), W = Math.min(app.clientWidth - 12, 548), H = app.clientHeight - parseFloat(getComputedStyle(app).paddingTop) - parseFloat(getComputedStyle(app).paddingBottom), rs = document.documentElement.style;
     var used = $('#bar').offsetHeight + $('#rival').offsetHeight + $('#me').offsetHeight + 12;
-    var avail = H - used, cellMax = Math.floor(Math.min((W - 90 - 16) / 5, 58));
-    var cell = Math.max(40, Math.min(cellMax, Math.floor((avail - 18 - (3 * 66 + 16)) / 5)));
-    document.documentElement.style.setProperty('--cell', cell + 'px');
-    var ph = H - used - (cell * 5 + 18), rowH = Math.floor((ph - 12) / 3);
-    var ch = Math.max(44, Math.min(rowH, 118)), cw = Math.floor(Math.min((W - 5 * 4) / 6, ch < 70 ? ch * 1.3 : ch * 0.8));
-    var r = document.documentElement.style; r.setProperty('--ch', ch + 'px'); r.setProperty('--cw', cw + 'px'); r.setProperty('--rg', Math.max(3, Math.min(10, (ph - ch * 3) / 4)) + 'px');
+    var cellMax = Math.floor(Math.min((W - 100 - 16) / 5, 58)), cell = Math.max(30, cellMax), ch, cw, rg, tries = 0;
+    // fit the whole stack (market 3 rows, then board + side, inside the viewport): shrink the board until the measured middle row and the market both fit
+    do {
+      rs.setProperty('--cell', cell + 'px');
+      var mh = $('#mid').offsetHeight, ph = H - used - mh, rowH = Math.floor((ph - 12) / 3);
+      ch = Math.max(40, Math.min(rowH, 118)); cw = Math.floor(Math.min((W - 5 * 4) / 6, ch < 70 ? ch * 1.3 : ch * 0.8));
+      rg = Math.max(3, Math.min(10, (ph - ch * 3) / 4));
+      if (rowH >= 48 || cell <= 30) break;
+      cell = Math.max(30, cell - Math.max(2, Math.ceil((48 - rowH) * 3 / 5)));
+    } while (++tries < 12);
+    rs.setProperty('--ch', ch + 'px'); rs.setProperty('--cw', cw + 'px'); rs.setProperty('--rg', rg + 'px');
+    var bar = $('#bar'), ob = $('#obj'); if (bar && ob) ob.style.top = Math.round(bar.getBoundingClientRect().top + 46) + 'px';   // the goal card sits in the bar's lower strip, below the title and the safe area
   }
 
   // ---------- fx ----------

@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en"><head><meta charset="utf-8">
+<html lang="en"><head><!-- Copyright (c) 2026 Am015-dev. All rights reserved. Not licensed for copying, modification or redistribution; see LICENSE in the source repository. --><meta name="copyright" content="&copy; 2026 Am015-dev. All rights reserved."><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#0b0a0c">
 <title>Onyx Atelier</title>
@@ -170,7 +170,7 @@ body{background-color:var(--lac);background-image:
  linear-gradient(135deg,rgba(216,180,90,.05) 25%,transparent 25%),linear-gradient(225deg,rgba(216,180,90,.05) 25%,transparent 25%),
  linear-gradient(45deg,rgba(216,180,90,.05) 25%,transparent 25%),linear-gradient(315deg,rgba(216,180,90,.05) 25%,transparent 25%);
  background-size:28px 28px;background-position:14px 0,14px 0,0 0,0 0}
-#app{position:fixed;inset:0;display:flex;flex-direction:column;max-width:560px;margin:0 auto;padding:env(safe-area-inset-top) 6px env(safe-area-inset-bottom)}
+#app{position:fixed;top:0;left:0;right:0;bottom:auto;height:100vh;height:100dvh;box-sizing:border-box;display:flex;flex-direction:column;max-width:560px;margin:0 auto;padding:env(safe-area-inset-top) 6px env(safe-area-inset-bottom)}
 /* top bar: menu, the one status line, hint, rules */
 #bar{flex:0 0 44px;display:flex;align-items:center;gap:4px;border-bottom:1px solid var(--gold3)}
 .ib{flex:0 0 44px;height:44px;border:0;background:none;display:flex;align-items:center;justify-content:center;border-radius:8px;color:var(--gold)}
@@ -224,7 +224,7 @@ body{background-color:var(--lac);background-image:
 .cell.sel::after{content:"";position:absolute;inset:3px;border:2px solid var(--gold2);border-radius:50%}
 .cell.dim .gm{opacity:.35}
 .cell.rv::after{content:"";position:absolute;inset:3px;border:2px solid #f08a9a;border-radius:50%}
-#side{display:flex;flex-direction:column;gap:5px;align-items:stretch;justify-content:flex-start;min-width:84px;flex:1 1 0;max-width:130px}
+#side{display:flex;flex-direction:column;gap:5px;align-items:stretch;justify-content:flex-start;min-width:100px;flex:1 1 0;max-width:130px}
 .sbox{border:1px solid rgba(216,180,90,.35);border-radius:8px;padding:3px 4px;background:rgba(20,18,22,.85);text-align:center;font-size:13px;color:var(--mute)}
 .sbox .row{display:flex;justify-content:center;gap:2px;flex-wrap:wrap}
 .sbox svg{width:22px;height:22px}
@@ -1462,14 +1462,20 @@ var UI = (function () {
     el.textContent = s;
   }
   function layout() {
-    var app = $('#app'), W = Math.min(app.clientWidth - 12, 548), H = app.clientHeight;
+    var app = $('#app'), W = Math.min(app.clientWidth - 12, 548), H = app.clientHeight - parseFloat(getComputedStyle(app).paddingTop) - parseFloat(getComputedStyle(app).paddingBottom), rs = document.documentElement.style;
     var used = $('#bar').offsetHeight + $('#rival').offsetHeight + $('#me').offsetHeight + 12;
-    var avail = H - used, cellMax = Math.floor(Math.min((W - 90 - 16) / 5, 58));
-    var cell = Math.max(40, Math.min(cellMax, Math.floor((avail - 18 - (3 * 66 + 16)) / 5)));
-    document.documentElement.style.setProperty('--cell', cell + 'px');
-    var ph = H - used - (cell * 5 + 18), rowH = Math.floor((ph - 12) / 3);
-    var ch = Math.max(44, Math.min(rowH, 118)), cw = Math.floor(Math.min((W - 5 * 4) / 6, ch < 70 ? ch * 1.3 : ch * 0.8));
-    var r = document.documentElement.style; r.setProperty('--ch', ch + 'px'); r.setProperty('--cw', cw + 'px'); r.setProperty('--rg', Math.max(3, Math.min(10, (ph - ch * 3) / 4)) + 'px');
+    var cellMax = Math.floor(Math.min((W - 100 - 16) / 5, 58)), cell = Math.max(30, cellMax), ch, cw, rg, tries = 0;
+    // fit the whole stack (market 3 rows, then board + side, inside the viewport): shrink the board until the measured middle row and the market both fit
+    do {
+      rs.setProperty('--cell', cell + 'px');
+      var mh = $('#mid').offsetHeight, ph = H - used - mh, rowH = Math.floor((ph - 12) / 3);
+      ch = Math.max(40, Math.min(rowH, 118)); cw = Math.floor(Math.min((W - 5 * 4) / 6, ch < 70 ? ch * 1.3 : ch * 0.8));
+      rg = Math.max(3, Math.min(10, (ph - ch * 3) / 4));
+      if (rowH >= 48 || cell <= 30) break;
+      cell = Math.max(30, cell - Math.max(2, Math.ceil((48 - rowH) * 3 / 5)));
+    } while (++tries < 12);
+    rs.setProperty('--ch', ch + 'px'); rs.setProperty('--cw', cw + 'px'); rs.setProperty('--rg', rg + 'px');
+    var bar = $('#bar'), ob = $('#obj'); if (bar && ob) ob.style.top = Math.round(bar.getBoundingClientRect().top + 46) + 'px';   // the goal card sits in the bar's lower strip, below the title and the safe area
   }
 
   // ---------- fx ----------
@@ -2636,6 +2642,7 @@ var OST = (function () {
     var h = document.createElement('b'); h.textContent = 'Chapter ' + n + ' · ' + def.goal.text; el.appendChild(h);
     var p = document.createElement('span'); p.textContent = def.tip && m.turns < 3 ? def.tip : prog; el.appendChild(p);
     el.classList.toggle('bad', g.key === 'kept' && m.kept > 0 || g.key === 'turns' && m.turns > g.max);
+    UI.layout();   // places the card under the title
   }
   function over(G) {
     var c = camp(); U().camp = null; render();
