@@ -15,13 +15,6 @@ const RULES_HTML=`<div class="rules">
 <h3>Variant · Unmarked wall</h3><p>Everyone uses a plain grey wall. A full rack goes to any empty space in that row. No colour may appear twice in any row or column. With no legal space, a full rack drops all tiles to the floor.</p>
 <h3>Variant · Prism tiles (promo)</h3><p>Prisms are wild tiles. With 2 players, remove 1 tile of each colour. Add 5 prism tiles. With 3 or 4 players, remove 2 of each colour. Add 10 prisms. You may take all the prisms from a kiln or the middle. Then you may also take all of one other colour there. Everything goes on one rack. A rack may hold one colour plus prisms. A full rack with a prism sends a prism to the wall. It goes on that colour's space. A rack of only prisms may use any empty row space. A prism blocks that colour in its row. It counts for rows and columns. It never counts for the +10 full-colour bonus.</p>
 <h3>Not included</h3><p>Expansion wall boards (C and D sides) are left out. We could not confirm where their coloured spaces sit. The special-kiln promo is left out too. Its kiln powers are not documented in any source we could reach.</p>
-<h3>Credits</h3>
-<section class="credits-audio">
-<h4>Audio</h4>
-<ul>
-<li>Art and music by Am015-dev.</li></ul>
-<p class="small muted">All sounds were trimmed, loudness-normalised and converted to MP3 for this game.</p>
-</section>
 <p class="small muted">Names, card text and art are original. The rules follow the published game.</p></div>`;
 // the reference list: every tile, token and table, with counts (also dumped for the shared reference page)
 const REF=[

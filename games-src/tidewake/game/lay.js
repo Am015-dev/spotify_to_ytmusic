@@ -5,7 +5,7 @@ const PW=require((process.env.PW||require('child_process').execSync('npm root -g
 const fs=require('fs'),path=require('path');const HERE=__dirname,OUT=path.join(HERE,'shots');fs.mkdirSync(OUT,{recursive:true});fs.mkdirSync(path.join(HERE,'out'),{recursive:true});
 const html=fs.readFileSync(path.join(HERE,'tidewake.html'));
 const SIZES=(process.argv[2]||'1366x768,1920x1080,768x1024,390x844').split(',').map(s=>s.split('x').map(Number));const TWO=process.argv.includes('--2d');
-const DRAWERS=['crewd','logd','rulesd','piecesd','setd','credd'];
+const DRAWERS=['crewd','logd','rulesd','piecesd','setd'];
 (async()=>{const b=await PW.chromium.launch({args:['--use-gl=angle','--use-angle=swiftshader','--enable-unsafe-swiftshader']});let bad=0;const report=[];
 for(const [W,H] of SIZES){const t=W+'x'+H+(TWO?'_2d':'');const ctx=await b.newContext({viewport:{width:W,height:H},deviceScaleFactor:1});
   await ctx.route('**/*',r=>{const u=new URL(r.request().url());return u.host==='gns.test'?r.fulfill({status:200,contentType:'text/html',body:html}):r.abort()});
