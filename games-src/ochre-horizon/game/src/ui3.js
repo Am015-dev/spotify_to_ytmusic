@@ -71,7 +71,7 @@ function playEvents() {
         var gid = e.k === 'temp' ? 'gTemp' : 'gOxy'; $(gid).classList.remove('pulse'); void $(gid).offsetWidth; $(gid).classList.add('pulse');
         var c2 = elCenter(e.p === 0 ? 'syou' : 'sriv'); floatAt(c2[0], c2[1] + 20, '+1 rating'); sfx('raise');
       } else if (e.k === 'tr' && e.p >= 0) { var c3 = elCenter(e.p === 0 ? 'syou' : 'sriv'); floatAt(c3[0], c3[1] + 20, '+' + e.n + ' rating'); if ($('gOcean')) { $('gOcean').classList.remove('pulse'); void $('gOcean').offsetWidth; $('gOcean').classList.add('pulse'); } }
-      else if (e.k === 'production') { toast('<b>Income!</b>Credits = credit production + rating', true, 2200, { key: 'inc' }); sfx('win'); }
+      else if (e.k === 'production') sfx('win');   // the closable round summary (ui9) says what came in
     }, d);
     if (e.k === 'tile' || e.k === 'temp' || e.k === 'oxy') d += UI.AIDELAY > 100 ? 260 : 0;
   })(evs[i]);
