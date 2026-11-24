@@ -3,7 +3,7 @@ Tutorials are games: each lesson stacks a tiny real position with ONE goal; the 
 from the consequence. Spec and authoring checklist: orch/TUTORIAL-SPEC.md. Global is GXST (GXS is the ?scn= registry).
 - Build: add `gx-scenario-tutor.js` to the game's script ORDER/SRC and `gx-scenario-tutor.css` to its inlined CSS (see kaiten/game/build.py). ES5, no deps.
 - `GXST.init({game, scenarios, storageKey?, settled?, keepClear?, qParent?})` once; adds a `Lessons` button (into `.gx-bar`, or `qParent`, else fixed bottom-left).
-  `settled()` returns true when the game is idle (animations done); results are judged only then. `keepClear` = selectors the card keeps off (board areas the lesson is about). `goal` may be a function.
+  `settled()` returns true when the game is idle (animations done); results are judged only then. `phoneSlot` = {after, before, avoid}: on phones (<600px) the minimised chip sits just under `after` or just above `before` (fewest `avoid` items covered), in its own band. `keepClear` = selectors the card keeps off (board areas the lesson is about). `goal` may be a function.
 - Scenario: `{id, title, rule, goal, setup()->Promise?, success()->bool, fail()->false|'message', par?, moves?(), hints:[nudge, {say, target}], debrief}`.
 - `GXST.picker()` `GXST.start(id|index)` `GXST.retry()` `GXST.next()` `GXST.hint()` `GXST.close()` `GXST.active()` (running scenario or null).
 - Card: never dims, never blocks taps outside itself; drag by header (saved), `-` chip, `x` close. Win/fail are the same small card.
