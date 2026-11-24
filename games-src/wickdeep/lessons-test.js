@@ -17,17 +17,17 @@ const c = name => ({ sel: '#tray .cd', name }), h = (name, re) => ({ sel: '#tray
   ready = { sel: '#readybtn' }, play = { sel: '#playbtn', opt: 1 }, g = (sel, near) => ({ sel, near }), ENGINE = { engine: 1 };
 const SOLVE = {
   pick: [c('Holdfast'), c('Candle Guard'), ready],
-  halves: [c('Lantern Swing'), c('Tallow Bash'), ready, h('Lantern Swing', /Move 4/), play, g('#hot .glow', 'mon'), h('Tallow Bash', /Hit 3|Attack 3/), play, g('#hot .glow.atk')],
-  shield: [c('Brazier Rush'), c('Tallow Bash'), ready, h('Brazier Rush', /Hit 4|Attack 4/), play, g('#hot .glow.atk')],
-  retal: [c('Hot Wax Hurl'), c('Tallow Bash'), ready, h('Hot Wax Hurl', /Hit 2|Attack 2/), play, g('#hot .glow.atk')],
-  door: [c('Lantern Swing'), c('Wickflare'), ready, h('Lantern Swing', /Move 4/), play, g('#hot .glow', 'door')],
-  coin: [c('Tallow Bash'), c('Wickflare'), ready, h('Tallow Bash', /Move 3/), play, g('#hot .glow', 'coin')],
+  halves: [c('Lantern Swing'), c('Tallow Bash'), ready, h('Lantern Swing', /Move 4/), g('#hot .glow', 'mon'), h('Tallow Bash', /Hit 3|Attack 3/), g('#hot .glow.atk')],
+  shield: [c('Brazier Rush'), c('Tallow Bash'), ready, h('Brazier Rush', /Hit 4|Attack 4/), g('#hot .glow.atk')],
+  retal: [c('Hot Wax Hurl'), c('Tallow Bash'), ready, h('Hot Wax Hurl', /Hit 2|Attack 2/), g('#hot .glow.atk')],
+  door: [c('Lantern Swing'), c('Wickflare'), ready, h('Lantern Swing', /Move 4/), g('#hot .glow', 'door')],
+  coin: [c('Tallow Bash'), c('Wickflare'), ready, h('Tallow Bash', /Move 3/), g('#hot .glow', 'coin')],
   finish: [c('Tallow Bash'), c('Candle Guard'), ready, ENGINE]
 };
 const WRONG = {
   pick: [c('Vigil'), c('Ember Oath'), ready],
-  shield: [c('Tallow Bash'), c('Holdfast'), ready, h('Tallow Bash', /Hit 3|Attack 3/), play, g('#hot .glow.atk')],
-  retal: [c('Tallow Bash'), c('Lantern Swing'), ready, h('Tallow Bash', /Move 3/), play, g('#hot .glow', 'mon'), h('Lantern Swing', /Hit 2/), play]
+  shield: [c('Tallow Bash'), c('Holdfast'), ready, h('Tallow Bash', /Hit 3|Attack 3/), g('#hot .glow.atk')],
+  retal: [c('Tallow Bash'), c('Lantern Swing'), ready, h('Tallow Bash', /Move 3/), g('#hot .glow', 'mon'), h('Lantern Swing', /Hit 2/)]
 };
 
 async function run(b, W, H) {
@@ -136,7 +136,8 @@ async function run(b, W, H) {
 (async () => {
   const b = await PW.chromium.launch({ args: ['--use-gl=swiftshader', '--enable-unsafe-swiftshader'] });
   const all = {};
-  for (const [W, H] of SIZES) all[W + 'x' + H] = await run(b, W, H);
+  // both sizes run side by side (separate contexts), so the suite stays well under 45 s
+  await Promise.all(SIZES.map(async ([W, H]) => { all[W + 'x' + H] = await run(b, W, H); }));
   await b.close();
   for (const tag of Object.keys(all)) for (const [id, r] of Object.entries(all[tag])) console.log((r.ok ? 'PASS ' : 'FAIL ') + tag + ' ' + id + ' ' + r.sec + 's');
   const secs = ((Date.now() - T0) / 1000).toFixed(1);
