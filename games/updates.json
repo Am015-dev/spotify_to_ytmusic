@@ -1,6 +1,107 @@
 [
  {
   "date": "2026-11-24",
+  "game": "twinthrones",
+  "title": "Twin Thrones: learn by playing",
+  "items": [
+   "New lessons: small scenarios, one rule each, with a retry and a short debrief"
+  ],
+  "check": "Open Lessons and play the first scenario"
+ },
+ {
+  "date": "2026-11-24",
+  "game": "tidewake",
+  "title": "Tidewake: learn by playing",
+  "items": [
+   "New lessons: small scenarios, one rule each, with a retry and a short debrief"
+  ],
+  "check": "Open Lessons and play the first scenario"
+ },
+ {
+  "date": "2026-11-24",
+  "game": "cauldron",
+  "title": "Cauldron Fair: learn by playing",
+  "items": [
+   "New lessons: small scenarios, one rule each, with a retry and a short debrief"
+  ],
+  "check": "Open Lessons and play the first scenario"
+ },
+ {
+  "date": "2026-11-24",
+  "game": "rampart",
+  "title": "Rampart: learn by playing",
+  "items": [
+   "New lessons: small scenarios, one rule each, with a retry and a short debrief"
+  ],
+  "check": "Open Lessons and play the first scenario"
+ },
+ {
+  "date": "2026-11-24",
+  "game": "short-fuse",
+  "title": "Short Fuse: learn by playing",
+  "items": [
+   "New lessons: small scenarios, one rule each, with a retry and a short debrief"
+  ],
+  "check": "Open Lessons and play the first scenario"
+ },
+ {
+  "date": "2026-11-24",
+  "game": "lantern",
+  "title": "Lantern Dive: learn by playing",
+  "items": [
+   "New lessons: small scenarios, one rule each, with a retry and a short debrief"
+  ],
+  "check": "Open Lessons and play the first scenario"
+ },
+ {
+  "date": "2026-11-24",
+  "game": "sunglaze",
+  "title": "Sunglaze: learn by playing",
+  "items": [
+   "New lessons: small scenarios, one rule each, with a retry and a short debrief"
+  ],
+  "check": "Open Lessons and play the first scenario"
+ },
+ {
+  "date": "2026-11-24",
+  "game": "emberclimb",
+  "title": "Emberclimb: learn by playing",
+  "items": [
+   "New lessons: small scenarios, one rule each, with a retry and a short debrief"
+  ],
+  "check": "Open Lessons and play the first scenario"
+ },
+ {
+  "date": "2026-11-24",
+  "game": "kaiten",
+  "title": "Kaiten Kitchen: learn by playing",
+  "items": [
+   "New lessons: small scenarios, one rule each, with a retry and a short debrief"
+  ],
+  "check": "Open Lessons and play the first scenario"
+ },
+ {
+  "date": "2026-11-24",
+  "game": "meadowfold",
+  "title": "Meadowfold: clearer main button",
+  "items": [
+   "Each guide instruction is attached to its glowing target",
+   "Main button text is easier to read"
+  ],
+  "check": "Start a game and read the main button"
+ },
+ {
+  "date": "2026-11-24",
+  "game": "crown",
+  "title": "Crown City Smash: playable lessons",
+  "items": [
+   "10 short lessons, each a real move with feedback",
+   "PC without 3D: dice and hints no longer cover the board"
+  ],
+  "check": "Menu > Lessons, play lesson 1"
+ },
+ {
+  "date": "2026-11-24",
   "game": "gloamwar",
   "title": "More readable map and guide",
   "items": [
@@ -19,15 +120,6 @@
    "Map fits the screen and labels are no longer cut off"
   ],
   "check": "Play the guided game on your phone and tell me what is still unclear"
- },
- {
-  "date": "2026-11-24",
-  "game": "meadowfold",
-  "title": "Guide next to what it points at",
-  "items": [
-   "Each guide instruction is attached to its glowing target"
-  ],
-  "check": "Start the guided game and tap only what is glowing"
  },
  {
   "date": "2026-11-24",

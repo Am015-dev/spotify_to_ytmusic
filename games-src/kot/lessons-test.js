@@ -92,7 +92,8 @@ async function run(b, W, H) {
   await smash(); await myTurn(); await endT(); if (!(await phase('fail'))) note('buy: ending the turn unspent did not fail');
   // 6) close, Lessons reopens the picker
   await tapSel('.gxst-hd .gxst-ib[aria-label="Close"]', 'close'); if ((await st()).open || await p.$('.gxst-card')) note('close left the card');
-  await tapSel('.gxst-q', 'Lessons'); s = await st(); if (!s.open || s.phase !== 'picker') note('Lessons did not reopen the picker');
+  if (phone) { await tapSel('header.gx-bar [aria-label^="Menu"]', 'Menu'); await p.waitForFunction(() => { const b = document.querySelector('[data-gxt-open]'), d = b && b.closest('.gx-drawer'); return d && d.getBoundingClientRect().top < innerHeight - 100; }, null, { timeout: 5000 }).catch(() => note('menu drawer did not open')); for (let k = 0; k < 2 && !(await st()).open; k++) await tapSel('[data-gxt-open]', 'menu: lessons');   // a phone's first tap reads it, the second opens it
+  } else await tapSel('.gxst-q', 'Lessons'); s = await st(); if (!s.open || s.phase !== 'picker') note('Lessons did not reopen the picker');
   const ev = await p.evaluate(() => __ev.join(',')); ['start', 'fail', 'retry', 'hint', 'win', 'close', 'picker'].forEach(t => { if (ev.indexOf(t + ':') < 0) note('no ' + t + ' event'); });
   // contact sheet of lesson starts
   const cols = phone ? 5 : 3, cw = phone ? 260 : 455, ch = Math.round(cw * H / W);
@@ -103,8 +104,9 @@ async function run(b, W, H) {
   await ctx.close();
 }
 (async () => {
-  const stop = budget(+process.env.BUDGET || 150000, 'crown lessons');
-  const b = await PW.chromium.launch({ executablePath: fs.existsSync('/opt/pw-browsers/chromium') ? '/opt/pw-browsers/chromium' : undefined });
-  for (const [W, H] of SIZES) { const n = probs.length, t0 = Date.now(); await run(b, W, H).catch(e => probs.push(W + 'x' + H + ': CRASH ' + e.message.split('\n')[0])); console.log((probs.length === n ? 'PASS ' : 'FAIL ') + W + 'x' + H + ' ' + ((Date.now() - t0) / 1000).toFixed(1) + 's'); }
-  await b.close(); stop(); probs.forEach(x => console.log('  ' + x)); process.exit(probs.length ? 1 : 0);
+  // ?gl=0 alone does not stop the 3D arena; software WebGL made every tap ~0.5 s. Logic runs on the game's own no-WebGL board (GL=1 keeps 3D);
+  // the real 3D look is checked by the contact sheets (scripts/contact-sheet.js).
+  const b = await PW.chromium.launch({ executablePath: fs.existsSync('/opt/pw-browsers/chromium') ? '/opt/pw-browsers/chromium' : undefined, args: process.env.GL ? [] : ['--disable-3d-apis'] });
+  for (const [W, H] of SIZES) { const n = probs.length, t0 = Date.now(), stop = budget(60000, 'crown lessons ' + W + 'x' + H); await run(b, W, H).catch(e => probs.push(W + 'x' + H + ': CRASH ' + e.message.split('\n')[0])); console.log((probs.length === n ? 'PASS ' : 'FAIL ') + W + 'x' + H + ' ' + ((Date.now() - t0) / 1000).toFixed(1) + 's'); stop(); }
+  await b.close(); probs.forEach(x => console.log('  ' + x)); process.exit(probs.length ? 1 : 0);
 })();
