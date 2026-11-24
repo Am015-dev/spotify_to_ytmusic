@@ -115,7 +115,7 @@ function renderWorkers(){
  const ws=W.workers.filter(w=>F==='all'||(F==='active'?w.bucket==='working':w.bucket!=='working'));
  const sum=k=>W.workers.reduce((a,w)=>a+(w[k]||0),0);
  $('tot').innerHTML=`<div><b>${act.length}</b><span>working now</span></div><div><b>${W.workers.length-act.length}</b><span>finished today</span></div>`+
-  `<div><b>$${sum('cost_usd').toFixed(0)}</b><span>cost reported so far</span></div><div><b>${fmtN(sum('tokens_out'))}</b><span>tokens written</span></div><div><b>${fmtN(sum('cache_read'))}</b><span>tokens re-read</span></div>`;
+  `<div><b>$${sum('cost_usd').toFixed(0)}</b><span>cost reported so far</span></div><div><b>${fmtN(sum('tokens_out'))}</b><span>tokens written</span></div><div><b>${fmtN(sum('cache_read'))}</b><span>cached re-reads (cheap, not billed as new)</span></div>`;
  const cls=w=>w.bucket==='working'?'run':w.bucket==='failed'?'fail':w.bucket==='review_ready'?'rev':'';
  const lab=w=>({working:'working',failed:'failed',review_ready:'ready',completed:'finished',blocked:'waiting'})[w.bucket]||w.bucket;
  ws.sort((a,b)=>(b.bucket==='working')-(a.bucket==='working')||new Date(b.created)-new Date(a.created));
