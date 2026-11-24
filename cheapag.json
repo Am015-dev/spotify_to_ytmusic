@@ -1,3 +1,3 @@
 {
-  "limits": { "max_cost_usd": 1.5, "max_turns": 40, "max_minutes": 25 }
+  "limits": { "max_cost_usd": 1.0, "max_turns": 30, "max_minutes": 20, "max_parallel": 1 }
 }
