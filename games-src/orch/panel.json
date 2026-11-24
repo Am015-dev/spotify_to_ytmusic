@@ -1,5 +1,5 @@
 {
- "updated": "2026-11-24T01:21:33Z",
+ "updated": "2026-11-24T01:23:54Z",
  "live_base": "https://am015-dev.github.io/spotify_to_ytmusic/",
  "decisions": [
   {
@@ -13,6 +13,10 @@
   }
  ],
  "notes": [
+  {
+   "at": "01:23",
+   "text": "WEEKLY METER (owner: 9% used at this time): my measured estimate since 22:26 UTC is at least $52, so 1% of the weekly limit is roughly $5.8 of estimate and the whole week about $580 (rough; the old orchestrator's unknown share makes it a bit lower). Burn so far about $17 per hour with many workers running: at that pace the weekly limit would be reached in about 1.5 days, before the reset. The week resets Mon 30 Nov 22:00 UTC."
+  },
   {
    "at": "01:24",
    "text": "EXACT COST SINCE 22:26 UTC (measured, as reported by each session): workers $32.73 (26 workers, all finished ones exact) + this orchestrator $14.68 + old orchestrator at least $4.71 = about $52.1 at the very least. Not yet counted: Twin Thrones rules worker and Credits B (rerun) worker, which are still running and report their cost only when they finish a turn; and whatever the old orchestrator spent between 22:26 and 23:10. These are API-price estimates; your plan's weekly % is computed differently by Anthropic."
