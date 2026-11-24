@@ -124,3 +124,13 @@ Live check URL form: https://am015-dev.github.io/spotify_to_ytmusic/<slug>/ (gam
 - build-all --quick on 17 tutor games: 1/17 PASS (rampart-and-vine). Others FAIL on: missing ui-baselines snapshots (cauldron-fair, kaiten, redline, tidewake, vale, wildmark: baseline-only) and look-check findings (text under/overlapping other text; thornbound reports the "Lessons" pill overlapping text: W726 pill regression to fix before any deploy) in crown, doorkick, emberclimb, hollowbough, lantern-dive, short-fuse, sunglaze, thornbound, twin-thrones, vinegrave.
 - Held by critic: all 29. Defects: see games-src/orch/CRITIC-R15.md (empty panels, 7-9px text, label-value strips, pc dead space).
 - Not done: contact sheets per game (no deploy, so skipped); hollowbough art untouched.
+
+## ORCH session_01RR7mnZ3Hj6twBG9rg6E2C6 (orch #5, 24 Nov 2026, 18:08 UTC)
+- BLOCKED: this session is at lineage depth 8 (hard limit 8). It cannot create sessions, triggers or send_later reminders. So no new fixers, no integrators, no 10-min checks from here.
+- Fix: the owner starts orch #6 as a NEW top-level session (claude.ai/code, repo am015-dev/spotify_to_ytmusic, branch alex/brave-carson-rbpmlk). Orch #6 must not be spawned by any orchestrator, or it hits the same limit after 1 more level.
+- Running at 18:07 UTC (all push shelf/<branch>, none deploys): W759 sands, W760 cauldron, W761r short-fuse, W763 hollowbough (owner card art 48/48), W764 lantern, W765r crown, W766r gloamwar, W767 stitchwise HUD, W768 nebula, W769 doorkick, W770 emberclimb, W758 kaiten Act 4, INT22.
+- Stuck: W762r vinegrave (idle, could not git push its branch: permission). W734 wickdeep (could not schedule its DONE ping; work is on d7b638a2 / PR #316).
+- Waiting for an integrator: W755 tidewake HUD, W746-final-approach, W733 ochre tutorial, W732 wildmark, W757r hollowbough art, INT21r.
+- Gate unchanged: 0/29 games pass the R15 critic; last deploy 17:17 UTC.
+- Queue for fixers: onyx-atelier, twin-thrones, redline-rally, ochre-horizon (on W733), wildmark (on W732), vale, final-approach (on W746), meadowfold, sunglaze, via-tessera, tidewake (after W755), perch (after W731), kaiten (after W758).
+- 18:09 UTC relay: W746-final-approach@e9cdffa3 lessons 7/7 phone+pc, sheets 0 flags. Its diff carries shared shell/gx-scenario-tutor.* (from W709/W729): reconcile with W726/W752 before merge. Weak: phone pilot tray shows 2 of 4 dice faces in some shots. R15 live: phone 6/6/7/7/6, pc 5/6/6/6/6.
