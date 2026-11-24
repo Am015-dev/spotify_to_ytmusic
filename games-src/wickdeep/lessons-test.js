@@ -3,44 +3,46 @@
 // Asserts: every lesson in WDL.lessons is solved with REAL touchscreen taps (finish: engine moves via WDAI.choose), phase 'win';
 // pick, shield and retal: one WRONG sequence ends in 'fail' with a message, GXST.retry() returns to 'play';
 // every tap lands on its target (elementFromPoint); Rules opens mid-lesson; hint twice draws a ring; 0 JS page errors.
-// Proof: games-src/wickdeep/proof/lesson-<id>-<WxH>.png (the start of each lesson).
+// No screenshots are written (contact sheets come from scripts/contact-sheet.js).
 const PW = (() => { try { return require(process.env.PW_DIR || 'playwright'); } catch (e) { return require('../node_modules/playwright'); } })();
 const fs = require('fs'), path = require('path');
 const html = fs.readFileSync(path.join(__dirname, 'wickdeep.html'));
 const SIZES = (process.argv[2] || '402x874,1366x768').split(',').map(s => s.split('x').map(Number));
-const PROOF = path.join(__dirname, 'proof'); fs.mkdirSync(PROOF, { recursive: true });
-const sleep = ms => new Promise(r => setTimeout(r, ms)); const probs = []; const T0 = Date.now();
+const { turbo, tick, budget } = require('../scripts/turbo'); const stopBudget = budget(60000, 'wickdeep lessons');
+let sleep = ms => new Promise(r => setTimeout(r, ms)); const probs = []; const T0 = Date.now();
 
 // Steps: c(name) = tap a card in the tray; h(name, re) = tap that card's half matching re; ready / play = buttons; g(sel) = a board hex glow.
 const c = name => ({ sel: '#tray .cd', name }), h = (name, re) => ({ sel: '#tray .half.can', name, re }),
-  ready = { sel: '#readybtn' }, play = { sel: '#playbtn' }, g = sel => ({ sel }), ENGINE = { engine: 1 };
+  ready = { sel: '#readybtn' }, play = { sel: '#playbtn', opt: 1 }, g = (sel, pick) => ({ sel, pick }), ENGINE = { engine: 1 };
 const SOLVE = {
   pick: [c('Holdfast'), c('Candle Guard'), ready],
-  halves: [c('Lantern Swing'), c('Tallow Bash'), ready, h('Lantern Swing', /m4|Move 4/), play, g('#hot .glow'), h('Tallow Bash', /a3|Attack 3/), play, g('#hot .glow.atk')],
-  shield: [c('Brazier Rush'), c('Tallow Bash'), ready, h('Brazier Rush', /a4|Attack 4/), play, g('#hot .glow.atk')],
-  retal: [c('Hot Wax Hurl'), c('Tallow Bash'), ready, h('Hot Wax Hurl', /a2|Attack 2/), play, g('#hot .glow.atk')],
-  door: [c('Lantern Swing'), c('Wickflare'), ready, h('Lantern Swing', /m4|Move 4/), play, g('#hot .glow')],
-  coin: [c('Tallow Bash'), c('Wickflare'), ready, h('Tallow Bash', /m3|Move 3/), play, g('#hot .glow')],
+  halves: [c('Lantern Swing'), c('Tallow Bash'), ready, h('Lantern Swing', /Move 4/), play, g('#hot .glow', 'near'), h('Tallow Bash', /Hit 3/), play, g('#hot .glow.atk')],
+  shield: [c('Brazier Rush'), c('Tallow Bash'), ready, h('Brazier Rush', /Hit 4/), play, g('#hot .glow.atk')],
+  retal: [c('Hot Wax Hurl'), c('Tallow Bash'), ready, h('Hot Wax Hurl', /Hit 2/), play, g('#hot .glow.atk')],
+  door: [c('Lantern Swing'), c('Wickflare'), ready, h('Lantern Swing', /Move 4/), play, g('#hot .glow', 'far')],
+  coin: [c('Tallow Bash'), c('Wickflare'), ready, h('Tallow Bash', /Move 3/), play, g('#hot .glow', 'far')],
   finish: [c('Tallow Bash'), c('Candle Guard'), ready, ENGINE]
 };
 const WRONG = {
   pick: [c('Vigil'), c('Ember Oath'), ready],
-  shield: [c('Tallow Bash'), c('Holdfast'), ready, h('Tallow Bash', /a3|Attack 3/), play, g('#hot .glow.atk')],
-  retal: [c('Tallow Bash'), c('Lantern Swing'), ready, h('Tallow Bash', /a3|Attack 3/), play, g('#hot .glow.atk')]
+  shield: [c('Tallow Bash'), c('Holdfast'), ready, h('Tallow Bash', /Hit 3/), play, g('#hot .glow.atk'), ENGINE],
+  retal: [c('Tallow Bash'), c('Lantern Swing'), ready, h('Tallow Bash', /Hit 3/), play, g('#hot .glow.atk'), ENGINE]
 };
 
 async function run(b, W, H) {
   const tag = W + 'x' + H, phone = W < 600, note = m => probs.push(tag + ': ' + m);
   const ctx = await b.newContext({ viewport: { width: W, height: H }, deviceScaleFactor: 1, isMobile: phone, hasTouch: true });
   await ctx.route('**/*', r => new URL(r.request().url()).host === 'gns.test' ? r.fulfill({ status: 200, contentType: 'text/html', body: html }) : r.abort());
-  const p = await ctx.newPage(); p.setDefaultTimeout(15000);
+  await turbo(ctx);
+  const p = await ctx.newPage(); p.setDefaultTimeout(15000); sleep = ms => tick(p, ms);
   p.on('pageerror', e => note('PAGE ERROR ' + e.message));
   p.on('console', m => { if (m.type() === 'error' && !/net::|Failed to load|favicon/.test(m.text())) note('console error ' + m.text().slice(0, 140)); });
   await p.goto('https://gns.test/?2d=1');
   await p.waitForFunction(() => window.GXST && GXST.state() && window.WDL, null, { timeout: 30000 });
   await p.evaluate(() => { try { window.AIDELAY = 40; UI.speed = 8; } catch (e) { } });
+  const lg = m => { if (process.env.DBG) console.log('   ', ((Date.now() - T0) / 1000).toFixed(1), m); };
   const st = () => p.evaluate(() => GXST.state());
-  const busy = () => p.waitForFunction(() => !UI.busy, null, { timeout: 15000 }).catch(() => { });
+  const busy = () => p.waitForFunction(() => !UI.busy, null, { timeout: 3000 }).catch(() => { });
   const phaseIs = (want, ms) => p.waitForFunction(w => GXST.state().phase === w, want, { timeout: ms || 15000 }).then(() => true, () => false);
   const live = id => p.waitForFunction(id => { const s = GXST.state(); return s.id === id && s.phase === 'play' && s.live; }, id, { timeout: 20000 });
 
@@ -50,11 +52,20 @@ async function run(b, W, H) {
     const pt = await p.evaluate(a => {
       const vis = e => { const r = e.getBoundingClientRect(); return r.width > 8 && r.height > 8 && r.bottom > 0 && r.top < innerHeight && !e.closest('[hidden]'); };
       const re = a.re ? new RegExp(a.re) : null;
-      const e = [...document.querySelectorAll(a.sel)].find(x => vis(x) && (!a.name || (x.closest('.cd') || x).textContent.includes(a.name)) && (!re || re.test(x.textContent)));
+      const dd = (u, v) => { const A = u.split(',').map(Number), B = v.split(',').map(Number), q = A[0] - B[0], r = A[1] - B[1]; return (Math.abs(q) + Math.abs(r) + Math.abs(q + r)) / 2; };
+      let list = [...document.querySelectorAll(a.sel)];
+      if (a.pick && list.length) {   // choose among move hexes: 'near' = closest to a monster, 'far' = farthest from the hero
+        const hero = G.figs.find(f => f.team === 'h' && f.pos), mons = G.figs.filter(f => f.team === 'm' && f.pos);
+        const score = x => a.pick === 'near' ? Math.min(...mons.map(m => dd(x.dataset.k, m.pos))) : -dd(x.dataset.k, hero.pos);
+        list = [list.slice().sort((x, y) => score(x) - score(y))[0]];
+      }
+      const e = list.find(x => vis(x) && (!a.name || (x.closest('.cd') || x).textContent.includes(a.name)) && (!re || re.test(x.textContent)));
       if (!e) return null;
+      try { e.scrollIntoView({ inline: 'center', block: 'nearest' }); } catch (x) { }
       const r = e.getBoundingClientRect(), x = r.left + r.width / 2, y = r.top + r.height / 2, u = document.elementFromPoint(x, y);
       return { x, y, ok: !!u && (u === e || e.contains(u)), by: u && (u.id || String(u.className).slice(0, 40)) };
-    }, s);
+    }, { ...s, re: s.re ? s.re.source : null });
+    if (!pt && s.opt) return true;
     if (!pt) { note('nothing to tap: ' + JSON.stringify(s)); return false; }
     if (!pt.ok) note('something covers ' + JSON.stringify(s) + ' (' + pt.by + ')');
     await p.touchscreen.tap(pt.x, pt.y); await sleep(160); return true;
@@ -78,17 +89,17 @@ async function run(b, W, H) {
   const res = {};
   for (const lesson of ['pick', 'halves', 'shield', 'retal', 'door', 'coin', 'finish']) {
     const t0 = Date.now(), before = probs.length;
+    if (process.env.DBG) console.log('lesson', lesson, ((Date.now() - T0) / 1000).toFixed(1));
     await p.evaluate(id => GXST.start(id), lesson);
     await live(lesson);
-    await p.screenshot({ path: path.join(PROOF, 'lesson-' + lesson + '-' + tag + '.png') });
 
     if (WRONG[lesson]) {
-      await runSteps(WRONG[lesson]);
-      const failed = await phaseIs('fail', 20000);
+      lg('wrong start'); await runSteps(WRONG[lesson]); lg('wrong done ' + JSON.stringify(await st()) + probs.join('|'));
+      const failed = await phaseIs('fail', 3000);
       const s = await st();
       if (!failed) note(lesson + ': wrong sequence did not end in fail (phase ' + s.phase + ')');
       else if (!s.msg) note(lesson + ': fail has an empty message');
-      await p.evaluate(() => GXST.retry());
+      lg('failed=' + failed); await p.evaluate(() => GXST.retry());
       if (!(await p.waitForFunction(() => GXST.state().phase === 'play', null, { timeout: 15000 }).then(() => true, () => false)))
         note(lesson + ': GXST.retry() did not return to play');
       else await live(lesson);
@@ -107,8 +118,8 @@ async function run(b, W, H) {
       if (!(await p.$('.gxst-ring'))) note('hint twice drew no ring');
     }
 
-    await runSteps(SOLVE[lesson]);
-    const won = await phaseIs('win', 15000);
+    lg('solve start'); await runSteps(SOLVE[lesson]); lg('G ' + await p.evaluate(() => JSON.stringify([G.phase, G.ask && G.ask.h, G.figs.map(f => f.id + ':' + f.hp + '@' + f.pos)]))); lg('solve done ' + JSON.stringify((await st()).phase) + ' ' + probs.join(' | '));
+    const won = await phaseIs('win', 3000);
     const s = await st();
     if (!won) note(lesson + ': not solved (phase ' + s.phase + ')');
     await p.evaluate(() => GXST.picker && GXST.picker());
@@ -127,5 +138,5 @@ async function run(b, W, H) {
   for (const tag of Object.keys(all)) for (const [id, r] of Object.entries(all[tag])) console.log((r.ok ? 'PASS ' : 'FAIL ') + tag + ' ' + id + ' ' + r.sec + 's');
   const secs = ((Date.now() - T0) / 1000).toFixed(1);
   if (probs.length) { console.log('FAIL ' + probs.length + ' problem(s) in ' + secs + 's:'); probs.forEach(m => console.log('  ' + m)); process.exit(1); }
-  console.log('PASS all lessons in ' + secs + 's');
+  stopBudget(); console.log('PASS all lessons in ' + secs + 's');
 })().catch(e => { console.log('FAIL ' + e.message); process.exit(1); });
