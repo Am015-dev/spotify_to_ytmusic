@@ -126,3 +126,10 @@ table.dial th,table.dial th.cw,table.dial th.sp,.mv .rs,.mv small,.na-guide b,.g
 .gx-dock div:has(>.btn.sm[data-dial]){display:flex;flex-wrap:wrap;gap:6px;max-width:100%;box-sizing:border-box;padding-right:8px}
 
 .kico{display:inline-block;vertical-align:-.12em}
+/* descendants of an open coach bubble/drawer must not keep a stale inherited visibility:hidden (empty bubble/blank cards in screenshots) */
+.gxh-bub.on *,.gx-drawer.on *{visibility:visible}
+/* ---- pc rules modal: readable two-column layout (phone layout untouched) ---- */
+html:not(.ph) .dlg.rules{max-width:min(1040px,calc(100vw - 48px));font-size:16px;line-height:1.5;display:block;columns:2;column-gap:32px}
+html:not(.ph) .dlg.rules>h2,html:not(.ph) .dlg.rules>.turn5,html:not(.ph) .dlg.rules>.acts{column-span:all}
+html:not(.ph) .dlg.rules h3{font-size:17px;font-weight:700;color:var(--gold);margin:14px 0 6px;break-after:avoid}
+html:not(.ph) .dlg.rules p{max-width:62ch}
