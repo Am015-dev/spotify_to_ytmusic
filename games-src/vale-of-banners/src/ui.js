@@ -818,12 +818,17 @@ function showResult() {
   c.appendChild(h('div', { 'data-art': won && you ? 'ui-result-win' : 'ui-result-lose', style: 'height:8px' }));
   c.appendChild(h('h2', { text: G.solo ? (won ? 'Every space built. You win.' : 'So close: ' + G.soloFilled + ' of 37 spaces') : G.teams ? (won ? 'Your team wins, ' + G.teamVP[0] + ' to ' + G.teamVP[1] : G.seats[1].name + ' and ' + G.seats[3].name + ' win, ' + G.teamVP[1] + ' to ' + G.teamVP[0]) : you ? (w === 0 ? 'You win!' : G.seats[w].name + ' wins this time') : G.seats[w].name + ' wins' }));
   var tb = h('table.rsrc'), SR = G.rank.map(function (s) { return srcOf(s); });
+  var wn = G.teams ? (won ? 0 : 1) : w, vp = G.teams ? G.teamVP : G.P.map(function (x) { return x.vp; });   /* hero: emblem, the score, at most 3 highlights; the table goes behind Details */
+  var hero = h('div.hero', {}, [h('div.emb', { text: (G.teams ? (won ? 'Y' : G.seats[1].name) : G.seats[w].name).charAt(0).toUpperCase() }),
+    h('div.hbig', { text: G.solo ? G.P[0].vp + ' points' : G.teams ? vp[0] + ' \u2013 ' + vp[1] : G.seats.map(function (s, i) { return G.P[i].vp; }).join(' \u2013 ') + (G.seats.length === 2 && !G.teams ? ', by ' + Math.abs(G.P[0].vp - G.P[1].vp) : '') })]);
+  var hl = SRC_ORDER.map(function (k) { return [SRC_LBL[k], SR[0] ? SR[0][k] || 0 : 0]; }).filter(function (x) { return x[1] > 0; }).sort(function (x, y) { return y[1] - x[1]; }).slice(0, 3);
+  var hul = h('ul.hl', {}, hl.map(function (x) { return h('li', { text: x[0] + ' ' + x[1] }); })); hero.appendChild(hul); c.appendChild(hero);
   tb.appendChild(h('tr', {}, [''].concat(G.rank.map(function (s) { return G.seats[s].name; })).map(function (x) { return h('th', { text: x }); })));
   SRC_ORDER.forEach(function (k) { if (!SR.some(function (o) { return o[k] > 0; })) return; tb.appendChild(h('tr', {}, [h('td', { text: SRC_LBL[k] })].concat(SR.map(function (o) { return h('td', { text: String(o[k] || 0) }); })))); });
   tb.appendChild(h('tr.tot', {}, [h('td', { text: 'Total' })].concat(G.rank.map(function (s) { return h('td', { text: String(G.P[s].vp) }); }))));
-  c.appendChild(tb); countUp(tb);
+  var det = h('details.det', {}, [h('summary', { text: 'Details' })]); det.appendChild(tb); countUp(tb);
   var p0 = G.P[0]; var pl = function (n, a, b) { return n + ' ' + (n === 1 ? a : b); };
-  c.appendChild(h('p.tip', { text: 'You filled ' + pl(p0.stat.regions, 'region', 'regions') + ' and sold ' + pl(p0.stat.sales, 'time', 'times') + '.' }));
+  det.appendChild(h('p.tip', { text: 'You filled ' + pl(p0.stat.regions, 'region', 'regions') + ' and sold ' + pl(p0.stat.sales, 'time', 'times') + '.' })); c.appendChild(det);
   if (UI.mode === 'tutorial') {   /* the final count, rule by rule with your real numbers, then what you have not met yet */
     var e0 = G.P[0].end || {}, ul0 = h('ul.walk');
     [['Points during the game', G.P[0].vpPlay], ['Silver, 1 each (' + G.P[0].silver + ')', e0.silver], ['Unsold goods, 1 each', e0.goods], ['Workers, 1 per 2 (' + G.P[0].workers + ')', e0.workers], ['Lore scrolls', e0.lore]].forEach(function (x) { ul0.appendChild(h('li', { text: x[0] + ': ' + (x[1] || 0) })); });
@@ -847,7 +852,7 @@ function showResult() {
   else if (UI.mode === 'tutorial') { ac.appendChild(h('button.btn', { type: 'button', id: 'realB', text: 'Play a real game', onclick: function () { UI.mode = 'quick'; UI.lastOpts = { n: 2, ai: 'gentle' }; startGame(UI.lastOpts); } })); }
   else ac.appendChild(h('button.btn', { type: 'button', id: 'again', text: 'Play again', onclick: function () { startGame(UI.lastOpts || {}); } }));
   ac.appendChild(h('button.btn.alt', { type: 'button', id: 'lookB', text: 'Look at the board', onclick: function () { rs.hidden = true; } }));
-  if (!UI.camp) ac.appendChild(h('button.btn.alt', { type: 'button', id: 'titleB', text: 'Title', onclick: showTitle }));
+  if (!UI.camp) ac.appendChild(h('button.btn.alt', { type: 'button', id: 'titleB', text: 'Menu', onclick: showTitle }));
   c.appendChild(ac); rs.appendChild(c); rs.hidden = false; try { artApply(rs); } catch (e) { }
   try { if (!UI.camp && window.GNS && GNS.result) GNS.result({ game: 'vale-of-banners', mode: 'quick', won: won, score: p0.vp }); } catch (e) { }
 }
