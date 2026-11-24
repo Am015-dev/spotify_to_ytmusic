@@ -4,6 +4,7 @@ from the consequence. Spec and authoring checklist: orch/TUTORIAL-SPEC.md. Globa
 - Build: add `gx-scenario-tutor.js` to the game's script ORDER/SRC and `gx-scenario-tutor.css` to its inlined CSS (see kaiten/game/build.py). ES5, no deps.
 - `GXST.init({game, scenarios, storageKey?, settled?, keepClear?, qParent?, phoneSlot?})` once; adds a `Lessons` button (into `.gx-bar`, or `qParent`, else fixed bottom-left). `phoneSlot` = selector; when innerWidth < 700 and it matches a visible element, the card sits inside that element's rect (width clamped to it) and the saved drag position is ignored; otherwise unchanged.
   `settled()` returns true when the game is idle (animations done); results are judged only then. `keepClear` = selectors the card keeps off (board areas the lesson is about). `goal` may be a function.
+  `phoneSlot` may instead be an object {after, before, avoid}: on phones (<600px) the minimised chip sits just under `after` or just above `before` (fewest `avoid` items covered).
 - Scenario: `{id, title, rule, goal, setup()->Promise?, success()->bool, fail()->false|'message', par?, moves?(), hints:[nudge, {say, target}], debrief}`.
 - `GXST.picker()` `GXST.start(id|index)` `GXST.retry()` `GXST.next()` `GXST.hint()` `GXST.close()` `GXST.active()` (running scenario or null).
 - Card: never dims, never blocks taps outside itself; drag by header (saved), `-` chip, `x` close. Win/fail are the same small card.
