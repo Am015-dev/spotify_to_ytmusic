@@ -1,0 +1,1111 @@
+{
+ "game": "onyx-atelier",
+ "title": "The Guild Throne",
+ "version": 1,
+ "note": "All Onyx Atelier story text. Plain words. Rival play styles are extra AI weights (opponent.ai).",
+ "cast": {
+  "odile": {
+   "name": "Mistress Odile",
+   "color": "#8f7231",
+   "role": "Your teacher. Kind, dry, and never wrong about a stone."
+  },
+  "pip": {
+   "name": "Pip Larkin",
+   "color": "#5a7f9a",
+   "role": "The other apprentice on your street. Eager, a little careless."
+  },
+  "bastien": {
+   "name": "Bastien Coil",
+   "color": "#4c5a3a",
+   "role": "The Hoarder. Sits on gems and keeps jewels so you cannot have them."
+  },
+  "saffi": {
+   "name": "Saffi Vane",
+   "color": "#a3402d",
+   "role": "The Rusher. Buys anything cheap, as fast as she can."
+  },
+  "verena": {
+   "name": "Lady Verena",
+   "color": "#5b3a6e",
+   "role": "The Patron Collector. Wins friends at court and takes your Favours."
+  },
+  "corwin": {
+   "name": "Corwin Thale",
+   "color": "#2e5d6b",
+   "role": "The Crown Chaser. Wants crowns, and nothing else."
+  },
+  "master": {
+   "name": "The Guild Master",
+   "color": "#1d1a1f",
+   "role": "Head of every atelier in the city. Plays every style at once."
+  }
+ },
+ "cardbacks": {
+  "ruby": "#4a1018",
+  "sapphire": "#10284a",
+  "gold": "#5a4512"
+ },
+ "acts": [
+  {
+   "act": 1,
+   "title": "Lantern Row",
+   "blurb": "An apprentice learns the trade."
+  },
+  {
+   "act": 2,
+   "title": "The Market and the Court",
+   "blurb": "Faster rivals, richer friends."
+  },
+  {
+   "act": 3,
+   "title": "The Guild Hall",
+   "blurb": "The road to the guild's throne."
+  }
+ ],
+ "twists": [
+  {
+   "id": "rival-gems",
+   "how": "rival starts with param gems from the board"
+  },
+  {
+   "id": "rival-favours",
+   "how": "rival starts with param Favours from the supply"
+  },
+  {
+   "id": "rival-ring",
+   "how": "rival starts with param Rings from the deck already bought"
+  }
+ ],
+ "chapters": [
+  {
+   "id": "c1",
+   "act": 1,
+   "title": "The First Bench",
+   "boss": false,
+   "lesson": "take",
+   "intro": [
+    {
+     "who": "odile",
+     "text": "Welcome to my atelier. A bench, a lamp, and a bag of gems. That is all a jeweller needs."
+    },
+    {
+     "who": "odile",
+     "text": "Take gems in a straight line, then buy a jewel. Pip will sit across from you today."
+    }
+   ],
+   "outro": [
+    {
+     "who": "odile",
+     "text": "Clean work. Pip is still sweeping up his spilled pearls."
+    }
+   ],
+   "lose": "Pip got there first. Take gems in a line and buy the cheap jewels early.",
+   "opponent": {
+    "name": "Pip Larkin",
+    "cast": "pip",
+    "color": "#5a7f9a",
+    "personality": "Friendly and careless. Takes whatever is shiny.",
+    "aiLevel": "easy",
+    "aiStyle": "gentle",
+    "taunt": "Ha! Beat you to it. Again?",
+    "praise": "You are quick. I need more practice."
+   },
+   "setup": {
+    "seed": 101,
+    "first": 0
+   },
+   "twist": null,
+   "goal": {
+    "type": "win",
+    "text": "Win the duel: 20 points, 10 crowns, or 10 points in one colour."
+   },
+   "hints": true,
+   "stars": [
+    {
+     "text": "Win the duel",
+     "test": {
+      "k": "won",
+      "op": "truthy"
+     }
+    },
+    {
+     "text": "Win within 18 turns",
+     "test": {
+      "k": "turns",
+      "op": "<=",
+      "v": 18
+     }
+    },
+    {
+     "text": "Own 6 or more jewels",
+     "test": {
+      "k": "jewels",
+      "op": ">=",
+      "v": 6
+     }
+    }
+   ],
+   "easier": {
+    "text": "Pip plays even more loosely",
+    "twist": null
+   },
+   "unlock": [
+    {
+     "type": "title",
+     "id": "apprentice",
+     "text": "Title: Apprentice"
+    }
+   ],
+   "tip": "Lesson 2: tap 1-3 gems in a straight line, then Take."
+  },
+  {
+   "id": "c2",
+   "act": 1,
+   "title": "Cheaper by the Colour",
+   "boss": false,
+   "lesson": "bonus",
+   "intro": [
+    {
+     "who": "odile",
+     "text": "Every jewel you own makes the next one of its colour cheaper. That is your bonus."
+    },
+    {
+     "who": "odile",
+     "text": "Build one colour and watch the big pieces fall into your hands."
+    }
+   ],
+   "outro": [
+    {
+     "who": "odile",
+     "text": "See? The third Sapphire nearly paid for itself."
+    }
+   ],
+   "lose": "Pick one colour and keep buying it. The bonus does the rest.",
+   "opponent": {
+    "name": "Pip Larkin",
+    "cast": "pip",
+    "color": "#5a7f9a",
+    "personality": "Still eager. Now he copies what you buy.",
+    "aiLevel": "easy",
+    "aiStyle": "gentle",
+    "taunt": "My colours beat your colours!",
+    "praise": "All right, all right. Bonuses matter."
+   },
+   "setup": {
+    "seed": 202,
+    "first": 0
+   },
+   "twist": null,
+   "goal": {
+    "type": "win",
+    "text": "Win the duel."
+   },
+   "hints": true,
+   "stars": [
+    {
+     "text": "Win the duel",
+     "test": {
+      "k": "won",
+      "op": "truthy"
+     }
+    },
+    {
+     "text": "Get a bonus of 3 in one colour",
+     "test": {
+      "k": "bonus",
+      "op": ">=",
+      "v": 3
+     }
+    },
+    {
+     "text": "Win within 18 turns",
+     "test": {
+      "k": "turns",
+      "op": "<=",
+      "v": 18
+     }
+    }
+   ],
+   "easier": {
+    "text": "Pip plays even more loosely",
+    "twist": null
+   },
+   "unlock": [],
+   "tip": "Lesson 4: each jewel you own is a bonus gem of its colour."
+  },
+  {
+   "id": "c3",
+   "act": 1,
+   "title": "Gold in the Drawer",
+   "boss": false,
+   "lesson": "keep",
+   "intro": [
+    {
+     "who": "odile",
+     "text": "Gold is the only wild gem. You get it by keeping a jewel for later."
+    },
+    {
+     "who": "odile",
+     "text": "A kept jewel is safe in your drawer. Keep one today, and buy it before the end."
+    }
+   ],
+   "outro": [
+    {
+     "who": "odile",
+     "text": "A jeweller who plans ahead never runs short. Good."
+    }
+   ],
+   "lose": "Take a gold coin to keep a jewel, then save up and buy it.",
+   "opponent": {
+    "name": "Pip Larkin",
+    "cast": "pip",
+    "color": "#5a7f9a",
+    "personality": "Has started to think. Watch the jewel you want.",
+    "aiLevel": "normal",
+    "aiStyle": "steady",
+    "taunt": "I took the one you wanted, didn't I?",
+    "praise": "You saw that coming. Clever."
+   },
+   "setup": {
+    "seed": 303,
+    "first": 0
+   },
+   "twist": null,
+   "goal": {
+    "type": "win",
+    "text": "Win the duel."
+   },
+   "hints": true,
+   "stars": [
+    {
+     "text": "Win the duel",
+     "test": {
+      "k": "won",
+      "op": "truthy"
+     }
+    },
+    {
+     "text": "Keep at least one jewel",
+     "test": {
+      "k": "kept",
+      "op": ">=",
+      "v": 1
+     }
+    },
+    {
+     "text": "Win within 20 turns",
+     "test": {
+      "k": "turns",
+      "op": "<=",
+      "v": 20
+     }
+    }
+   ],
+   "easier": {
+    "aiLevel": "easy",
+    "text": "Pip goes back to playing loosely",
+    "twist": null
+   },
+   "unlock": [],
+   "tip": "Lesson 5: tap a gold coin, then a jewel, to keep it."
+  },
+  {
+   "id": "c4",
+   "act": 1,
+   "title": "The Hoarder of Lantern Row",
+   "boss": true,
+   "lesson": "fav",
+   "intro": [
+    {
+     "who": "odile",
+     "text": "Bastien Coil runs the shop at the end of the row. He hoards gems so nobody else can buy."
+    },
+    {
+     "who": "bastien",
+     "text": "Your teacher sends a child? Fine. Everything on this board will end up in my drawer."
+    },
+    {
+     "who": "odile",
+     "text": "Watch the Favours. Each greedy grab of his hands you a free gem."
+    }
+   ],
+   "outro": [
+    {
+     "who": "bastien",
+     "text": "Hmph. Keep the street, then. I keep my stones."
+    },
+    {
+     "who": "odile",
+     "text": "Lantern Row knows your name now."
+    }
+   ],
+   "lose": "Bastien sits on gems. Buy cheap jewels so you need fewer of them.",
+   "opponent": {
+    "name": "Bastien Coil",
+    "cast": "bastien",
+    "color": "#4c5a3a",
+    "personality": "Holds lots of gems and keeps jewels you want.",
+    "aiLevel": "normal",
+    "aiStyle": "hoarder",
+    "taunt": "Every stone you need is in my drawer.",
+    "praise": "You found a way past my drawer. Well done.",
+    "ai": {
+     "tok": 0.6,
+     "res": 1.4
+    }
+   },
+   "setup": {
+    "seed": 404,
+    "first": 0
+   },
+   "twist": {
+    "id": "rival-gems",
+    "param": 2,
+    "text": "Bastien starts with 2 gems in his hand."
+   },
+   "goal": {
+    "type": "win",
+    "text": "Win the duel against Bastien."
+   },
+   "hints": true,
+   "stars": [
+    {
+     "text": "Win the duel",
+     "test": {
+      "k": "won",
+      "op": "truthy"
+     }
+    },
+    {
+     "text": "Use at least one Favour",
+     "test": {
+      "k": "favUsed",
+      "op": ">=",
+      "v": 1
+     }
+    },
+    {
+     "text": "Win within 20 turns",
+     "test": {
+      "k": "turns",
+      "op": "<=",
+      "v": 20
+     }
+    }
+   ],
+   "easier": {
+    "text": "Bastien plays one level gentler and starts with no gems",
+    "twist": null
+   },
+   "unlock": [
+    {
+     "type": "cardback",
+     "id": "ruby",
+     "text": "Ruby card backs"
+    }
+   ],
+   "tip": "Lesson 6: a Favour takes any one gem before your move."
+  },
+  {
+   "id": "c5",
+   "act": 2,
+   "title": "The Market Arcade",
+   "boss": false,
+   "lesson": "power",
+   "intro": [
+    {
+     "who": "odile",
+     "text": "The arcade is loud and fast. Saffi Vane sells more rings than anyone."
+    },
+    {
+     "who": "saffi",
+     "text": "Slow hands, empty shelves. Try to keep up."
+    },
+    {
+     "who": "odile",
+     "text": "Some jewels have powers. Encore gives you another turn. Use them."
+    }
+   ],
+   "outro": [
+    {
+     "who": "saffi",
+     "text": "Fine. You are faster than you look."
+    }
+   ],
+   "lose": "Saffi buys fast. Grab jewels with powers to get extra gems and turns.",
+   "opponent": {
+    "name": "Saffi Vane",
+    "cast": "saffi",
+    "color": "#a3402d",
+    "personality": "Buys the cheapest jewel every turn. Races for 20 points.",
+    "aiLevel": "normal",
+    "aiStyle": "rusher",
+    "taunt": "Too slow, apprentice!",
+    "praise": "You out-ran me. That never happens.",
+    "ai": {
+     "pts": 1.6,
+     "tok": -0.25
+    }
+   },
+   "setup": {
+    "seed": 505,
+    "first": 0,
+    "favours": 1
+   },
+   "twist": null,
+   "goal": {
+    "type": "win",
+    "text": "Win the duel. You start with a Favour."
+   },
+   "hints": false,
+   "stars": [
+    {
+     "text": "Win the duel",
+     "test": {
+      "k": "won",
+      "op": "truthy"
+     }
+    },
+    {
+     "text": "Buy 2 jewels with a power",
+     "test": {
+      "k": "powers",
+      "op": ">=",
+      "v": 2
+     }
+    },
+    {
+     "text": "Win within 20 turns",
+     "test": {
+      "k": "turns",
+      "op": "<=",
+      "v": 20
+     }
+    }
+   ],
+   "easier": {
+    "aiLevel": "easy",
+    "text": "Saffi plays loosely",
+    "twist": null
+   },
+   "unlock": [],
+   "tip": "Lesson 7: a jewel's power happens once, when you buy it."
+  },
+  {
+   "id": "c6",
+   "act": 2,
+   "title": "A Word at Court",
+   "boss": false,
+   "lesson": "patron",
+   "intro": [
+    {
+     "who": "odile",
+     "text": "Crowns on a jewel catch the eye of the court. At 3 crowns a patron joins you."
+    },
+    {
+     "who": "odile",
+     "text": "A patron is free points. Win one today."
+    }
+   ],
+   "outro": [
+    {
+     "who": "odile",
+     "text": "A patron's name opens doors. Lady Verena will have heard."
+    }
+   ],
+   "lose": "Look for jewels with crowns. Three crowns brings a patron.",
+   "opponent": {
+    "name": "Saffi Vane",
+    "cast": "saffi",
+    "color": "#a3402d",
+    "personality": "Still rushing. She ignores the court.",
+    "aiLevel": "normal",
+    "aiStyle": "rusher",
+    "taunt": "Patrons? I just sell rings.",
+    "praise": "Huh. Maybe crowns are worth it.",
+    "ai": {
+     "pts": 1.6,
+     "tok": -0.25
+    }
+   },
+   "setup": {
+    "seed": 606,
+    "first": 0
+   },
+   "twist": null,
+   "goal": {
+    "type": "win",
+    "text": "Win the duel."
+   },
+   "hints": false,
+   "stars": [
+    {
+     "text": "Win the duel",
+     "test": {
+      "k": "won",
+      "op": "truthy"
+     }
+    },
+    {
+     "text": "Win a patron",
+     "test": {
+      "k": "patrons",
+      "op": ">=",
+      "v": 1
+     }
+    },
+    {
+     "text": "Reach 5 crowns",
+     "test": {
+      "k": "crowns",
+      "op": ">=",
+      "v": 5
+     }
+    }
+   ],
+   "easier": {
+    "aiLevel": "easy",
+    "text": "Saffi plays loosely",
+    "twist": null
+   },
+   "unlock": [],
+   "tip": "Lesson 7: at 3 crowns, choose a patron."
+  },
+  {
+   "id": "c7",
+   "act": 2,
+   "title": "Open Hands",
+   "boss": false,
+   "intro": [
+    {
+     "who": "saffi",
+     "text": "A rematch, here in the open. No keeping jewels in drawers. Only what is on the table."
+    },
+    {
+     "who": "odile",
+     "text": "She wants a clean race. Buy straight from the table and stay ahead."
+    }
+   ],
+   "outro": [
+    {
+     "who": "saffi",
+     "text": "No tricks, and you still won. I will tell the arcade."
+    },
+    {
+     "who": "odile",
+     "text": "Good. Now the court is watching."
+    }
+   ],
+   "lose": "No keeping this time. Plan two buys ahead so you never need the drawer.",
+   "opponent": {
+    "name": "Saffi Vane",
+    "cast": "saffi",
+    "color": "#a3402d",
+    "personality": "Races for points. Never keeps a jewel.",
+    "aiLevel": "normal",
+    "aiStyle": "rusher",
+    "taunt": "Told you. Speed wins.",
+    "praise": "Fair and square. Well played.",
+    "ai": {
+     "pts": 1.6,
+     "tok": -0.25
+    }
+   },
+   "setup": {
+    "seed": 707,
+    "first": 0
+   },
+   "twist": null,
+   "goal": {
+    "type": "custom",
+    "key": "kept",
+    "max": 0,
+    "text": "Win without keeping any jewel."
+   },
+   "hints": false,
+   "stars": [
+    {
+     "text": "Win the duel",
+     "test": {
+      "k": "won",
+      "op": "truthy"
+     }
+    },
+    {
+     "text": "Win within 20 turns",
+     "test": {
+      "k": "turns",
+      "op": "<=",
+      "v": 20
+     }
+    },
+    {
+     "text": "Own 7 or more jewels",
+     "test": {
+      "k": "jewels",
+      "op": ">=",
+      "v": 7
+     }
+    }
+   ],
+   "easier": {
+    "aiLevel": "easy",
+    "text": "Saffi plays loosely",
+    "twist": null
+   },
+   "unlock": []
+  },
+  {
+   "id": "c8",
+   "act": 2,
+   "title": "The Lady's Salon",
+   "boss": true,
+   "intro": [
+    {
+     "who": "verena",
+     "text": "So you are the apprentice everyone whispers about. Sit. Let us see your manners."
+    },
+    {
+     "who": "odile",
+     "text": "Verena collects patrons and Favours. She starts with two of them already."
+    },
+    {
+     "who": "odile",
+     "text": "Do not hand her more. Avoid big refills and greedy grabs."
+    }
+   ],
+   "outro": [
+    {
+     "who": "verena",
+     "text": "Charming. You may call on me again."
+    },
+    {
+     "who": "odile",
+     "text": "The court is yours. Next, the Guild Hall."
+    }
+   ],
+   "lose": "Verena feeds on Favours. Take smaller handfuls and refill less.",
+   "opponent": {
+    "name": "Lady Verena",
+    "cast": "verena",
+    "color": "#5b3a6e",
+    "personality": "Hoards Favours and chases patrons. Smiles while she steals.",
+    "aiLevel": "normal",
+    "aiStyle": "patron collector",
+    "taunt": "Thank you for the Favours, dear.",
+    "praise": "You kept your Favours and your nerve. Impressive.",
+    "ai": {
+     "fav": 2.2,
+     "roy": 4
+    }
+   },
+   "setup": {
+    "seed": 808,
+    "first": 0
+   },
+   "twist": {
+    "id": "rival-favours",
+    "param": 2,
+    "text": "Lady Verena starts with 2 Favours."
+   },
+   "goal": {
+    "type": "win",
+    "text": "Win the duel against Lady Verena."
+   },
+   "hints": false,
+   "stars": [
+    {
+     "text": "Win the duel",
+     "test": {
+      "k": "won",
+      "op": "truthy"
+     }
+    },
+    {
+     "text": "End with a Favour in hand",
+     "test": {
+      "k": "favours",
+      "op": ">=",
+      "v": 1
+     }
+    },
+    {
+     "text": "Win a patron",
+     "test": {
+      "k": "patrons",
+      "op": ">=",
+      "v": 1
+     }
+    }
+   ],
+   "easier": {
+    "text": "Verena plays one level gentler and starts with no Favours",
+    "twist": null
+   },
+   "unlock": [
+    {
+     "type": "cardback",
+     "id": "sapphire",
+     "text": "Sapphire card backs"
+    }
+   ]
+  },
+  {
+   "id": "c9",
+   "act": 3,
+   "title": "The Guild Hall Steps",
+   "boss": false,
+   "intro": [
+    {
+     "who": "corwin",
+     "text": "Crowns, apprentice. Ten of them, and the hall bows. Nothing else matters."
+    },
+    {
+     "who": "odile",
+     "text": "Corwin got here first and he has a head start. Do not chase his crowns. Race your own way."
+    }
+   ],
+   "outro": [
+    {
+     "who": "corwin",
+     "text": "Points? You beat me with points? Unthinkable."
+    }
+   ],
+   "lose": "Corwin starts ahead. Buy cheap jewels early and catch up with bonuses.",
+   "opponent": {
+    "name": "Corwin Thale",
+    "cast": "corwin",
+    "color": "#2e5d6b",
+    "personality": "Chases crowns above all. Grabs every jewel with a crown.",
+    "aiLevel": "normal",
+    "aiStyle": "crown chaser",
+    "taunt": "Ten crowns. Kneel.",
+    "praise": "You never chased my crowns. Smart.",
+    "ai": {
+     "cr": 2.6
+    }
+   },
+   "setup": {
+    "seed": 909,
+    "first": 0
+   },
+   "twist": {
+    "id": "rival-gems",
+    "param": 3,
+    "text": "Corwin starts with 3 gems in his hand."
+   },
+   "goal": {
+    "type": "win",
+    "text": "Win the duel against Corwin."
+   },
+   "hints": false,
+   "stars": [
+    {
+     "text": "Win the duel",
+     "test": {
+      "k": "won",
+      "op": "truthy"
+     }
+    },
+    {
+     "text": "Win within 22 turns",
+     "test": {
+      "k": "turns",
+      "op": "<=",
+      "v": 22
+     }
+    },
+    {
+     "text": "Win without keeping a jewel",
+     "test": {
+      "k": "kept",
+      "op": "<=",
+      "v": 0
+     }
+    }
+   ],
+   "easier": {
+    "aiLevel": "easy",
+    "text": "Corwin plays loosely, head start stays",
+    "twist": null
+   },
+   "unlock": []
+  },
+  {
+   "id": "c10",
+   "act": 3,
+   "title": "The Short Commission",
+   "boss": false,
+   "intro": [
+    {
+     "who": "odile",
+     "text": "A buyer from the palace wants a finished piece by nightfall. Work fast."
+    },
+    {
+     "who": "bastien",
+     "text": "I am back, and I am bidding too. My drawer is full again."
+    }
+   ],
+   "outro": [
+    {
+     "who": "odile",
+     "text": "Delivered before the bells. The palace will remember."
+    },
+    {
+     "who": "bastien",
+     "text": "Next time, apprentice."
+    }
+   ],
+   "lose": "Win within 20 turns. Buy jewels with points and skip slow plans.",
+   "opponent": {
+    "name": "Bastien Coil",
+    "cast": "bastien",
+    "color": "#4c5a3a",
+    "personality": "Hoards gems and keeps jewels. Harder than before.",
+    "aiLevel": "hard",
+    "aiStyle": "hoarder",
+    "taunt": "Too slow. The palace buys from me.",
+    "praise": "Fast and sharp. I underrated you.",
+    "ai": {
+     "tok": 0.6,
+     "res": 1.4
+    }
+   },
+   "setup": {
+    "seed": 1010,
+    "first": 0
+   },
+   "twist": null,
+   "goal": {
+    "type": "custom",
+    "key": "turns",
+    "max": 20,
+    "text": "Win within 20 of your turns."
+   },
+   "hints": false,
+   "stars": [
+    {
+     "text": "Win the duel",
+     "test": {
+      "k": "won",
+      "op": "truthy"
+     }
+    },
+    {
+     "text": "Win within 16 turns",
+     "test": {
+      "k": "turns",
+      "op": "<=",
+      "v": 16
+     }
+    },
+    {
+     "text": "Reach 20 points",
+     "test": {
+      "k": "points",
+      "op": ">=",
+      "v": 20
+     }
+    }
+   ],
+   "easier": {
+    "aiLevel": "normal",
+    "text": "Bastien plays one level gentler",
+    "twist": null
+   },
+   "unlock": []
+  },
+  {
+   "id": "c11",
+   "act": 3,
+   "title": "Ten Crowns",
+   "boss": false,
+   "intro": [
+    {
+     "who": "corwin",
+     "text": "A rematch, on my terms. Crowns only. Win with ten crowns, or do not win at all."
+    },
+    {
+     "who": "odile",
+     "text": "Then beat him at his own game. Every crown you take is one he cannot."
+    }
+   ],
+   "outro": [
+    {
+     "who": "corwin",
+     "text": "Ten crowns, on your head. I yield."
+    },
+    {
+     "who": "odile",
+     "text": "Only one door is left. The Guild Master's."
+    }
+   ],
+   "lose": "Count crowns. Patrons help you reach ten faster.",
+   "opponent": {
+    "name": "Corwin Thale",
+    "cast": "corwin",
+    "color": "#2e5d6b",
+    "personality": "Chases crowns, now at full strength.",
+    "aiLevel": "hard",
+    "aiStyle": "crown chaser",
+    "taunt": "The crowns are mine. They always were.",
+    "praise": "You out-crowned the crown chaser. Remarkable.",
+    "ai": {
+     "cr": 2.6
+    }
+   },
+   "setup": {
+    "seed": 1111,
+    "first": 0
+   },
+   "twist": null,
+   "goal": {
+    "type": "custom",
+    "key": "crownWin",
+    "min": 1,
+    "text": "Win by reaching 10 crowns."
+   },
+   "hints": false,
+   "stars": [
+    {
+     "text": "Win the duel",
+     "test": {
+      "k": "won",
+      "op": "truthy"
+     }
+    },
+    {
+     "text": "Win a patron",
+     "test": {
+      "k": "patrons",
+      "op": ">=",
+      "v": 1
+     }
+    },
+    {
+     "text": "Win within 24 turns",
+     "test": {
+      "k": "turns",
+      "op": "<=",
+      "v": 24
+     }
+    }
+   ],
+   "easier": {
+    "aiLevel": "normal",
+    "text": "Corwin plays one level gentler",
+    "twist": null
+   },
+   "unlock": [
+    {
+     "type": "title",
+     "id": "master-jeweller",
+     "text": "Title: Master Jeweller"
+    }
+   ]
+  },
+  {
+   "id": "c12",
+   "act": 3,
+   "title": "The Guild Throne",
+   "boss": true,
+   "intro": [
+    {
+     "who": "master",
+     "text": "Every atelier in this city answers to me. You want my chair? Earn it."
+    },
+    {
+     "who": "odile",
+     "text": "The Master hoards, rushes and chases crowns, all at once. And already owns a Ring."
+    },
+    {
+     "who": "odile",
+     "text": "Everything I taught you, use it now. I will be watching from the gallery."
+    }
+   ],
+   "outro": [
+    {
+     "who": "master",
+     "text": "The chair is yours. Guard it better than I did."
+    },
+    {
+     "who": "odile",
+     "text": "Guild Master. I always knew."
+    },
+    {
+     "who": "pip",
+     "text": "Can I be your apprentice now?"
+    }
+   ],
+   "lose": "The Master starts ahead. Build bonuses early and guard your Favours.",
+   "opponent": {
+    "name": "The Guild Master",
+    "cast": "master",
+    "color": "#1d1a1f",
+    "personality": "Plays every style at once. Starts with a Ring and a Favour.",
+    "aiLevel": "hard",
+    "aiStyle": "every style",
+    "taunt": "Sit down, apprentice. The chair is not for you.",
+    "praise": "Well played. The guild is yours.",
+    "ai": {
+     "tok": 0.3,
+     "res": 0.5,
+     "cr": 1.0,
+     "pts": 0.6,
+     "fav": 0.8
+    }
+   },
+   "setup": {
+    "seed": 1212,
+    "first": 0
+   },
+   "twist": {
+    "id": "rival-ring",
+    "param": 1,
+    "text": "The Guild Master starts with one Ring already bought."
+   },
+   "goal": {
+    "type": "win",
+    "text": "Beat the Guild Master."
+   },
+   "hints": false,
+   "stars": [
+    {
+     "text": "Win the duel",
+     "test": {
+      "k": "won",
+      "op": "truthy"
+     }
+    },
+    {
+     "text": "Win within 24 turns",
+     "test": {
+      "k": "turns",
+      "op": "<=",
+      "v": 24
+     }
+    },
+    {
+     "text": "Win a patron",
+     "test": {
+      "k": "patrons",
+      "op": ">=",
+      "v": 1
+     }
+    }
+   ],
+   "easier": {
+    "aiLevel": "normal",
+    "text": "The Master plays one level gentler and starts with no Ring",
+    "twist": null
+   },
+   "unlock": [
+    {
+     "type": "cardback",
+     "id": "gold",
+     "text": "Gold card backs"
+    }
+   ]
+  }
+ ]
+}
