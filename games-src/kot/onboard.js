@@ -86,7 +86,7 @@ function obOwn(){const el=$ob('obown');if(!el)return;if(!G){el.innerHTML='';retu
 // ---- labels: the words on the board say what the button does ----
 function obSync(){const ob=$ob('ob'),dk=document.querySelector('.gx-dock');if(!ob)return;const v=dk&&dk.dataset.bf;if(v)ob.dataset.bf=v;else delete ob.dataset.bf}
 function obLabels(){const pa=$ob('pacts');if(!pa||!G||!humanTurn())return;
-  const d=pa.querySelector('[data-act="resolve"]');if(d){d.innerHTML='<span class="bl">💥 SMASH!</span>';d.setAttribute('aria-label','Smash: use these dice');d.classList.toggle('pulse',G.rolls<=0||!G.dice.some(x=>!x.k))}
+  const d=pa.querySelector('[data-act="resolve"]');if(d){d.innerHTML='<span class="bl"> SMASH!</span>';d.setAttribute('aria-label','Smash: use these dice');d.classList.toggle('pulse',G.rolls<=0||!G.dice.some(x=>!x.k))}
   const e=pa.querySelector('[data-act="end"]');if(e&&G.phase==='buy'){const win=!G.bug&&cur().vp>=20;e.innerHTML=`<span class="bl">✔ ${G.bug?'Finish turn':'End turn'}</span><small>${win?'end your turn to win':'save your ⚡'}</small>`}
 }
 function obRender(){if(!obBuild())return;const ob=$ob('ob');

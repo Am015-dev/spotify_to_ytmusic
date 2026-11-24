@@ -117,8 +117,8 @@ function pickEvo(p,init,done){if(!G.evoOn||!p.alive){done();return}
     lg(p.i,`${mname(p)} ${init?'starts with':'evolves and picks'} an evolution card${p.human||G.mode==='ai'?` (${evoName(e)})`:''}.`);if(!init)fx(p.i,'EVOLVE!','heal');cov('evodraw');done()};
   if(two.length===1){fin(two[0]);return}
   const rec=String(aiEvoPick(p,two));const opts=two.map(e=>({k:String(e),l:evoName(e)+(EVO[e].t==='P'?' · PERMANENT':' · ONE-SHOT'),g:evoGist(e),d:evoText(e),rec:String(e)===rec}));
-  if(isHuman(p.i))opts.unshift({k:rec,l:'✨ Pick for me',d:`Takes ${evoName(+rec)}: ${evoWhy(+rec)}`,primary:true});
-  ask(p.i,init?'Pick a secret power':'Evolution!',`${mname(p)}, evolutions are secret powers only you can see. Keep one of these two (the other is discarded). You play it later with the 🧬 button when it is allowed.`,
+  if(isHuman(p.i))opts.unshift({k:rec,l:' Pick for me',d:`Takes ${evoName(+rec)}: ${evoWhy(+rec)}`,primary:true});
+  ask(p.i,init?'Pick a secret power':'Evolution!',`${mname(p)}, evolutions are secret powers only you can see. Keep one of these two (the other is discarded). You play it later with the  button when it is allowed.`,
     opts,()=>rec,fin,{nocancel:true,why:`Take ${evoName(+rec)}: ${evoWhy(+rec)}`})}
 
 /* ---------- turn flow ---------- */
@@ -250,11 +250,11 @@ function brainjackWindow(roller,done){if(!mbOn()||G.bug){done(roller);return}
   seq(cands,(q,next)=>{if(by||!q.alive){next();return}
     const mine=scoreDice(q,G.dice),theirs=scoreDice(roller,G.dice);const rec=aiBrainjack(q,roller);
     if(isHuman(q.i)&&!rec&&typeof mbHold==='function'&&mbHold(q,mine)){next();return}
-    const steal=[];if(q.mb>0)steal.push({k:'y',l:`🧠 Steal this roll (uses your ${q.mb===1?'only ':''}Brainjack token)`,d:`You would get: ${mine.text}. You resolve it and shop; your own turn still comes.`,rec:!!rec&&!has(q,'m_evade')});
-    if(has(q,'m_evade'))steal.push({k:'e',l:`🧠 Steal it with ${CARDS.m_evade.n} (keeps your token)`,d:`You would get: ${mine.text}. The card goes to ${mname(roller)}.`,rec:!!rec});
-    const letgo={k:'n',l:rec?'Let it go':'Let it go (save your 🧠)',d:`${mname(roller)} gets: ${theirs.text}.${rec?'':' Save your token for a roll worth 3+ ★ or 4+ damage.'}`,rec:!rec};
+    const steal=[];if(q.mb>0)steal.push({k:'y',l:` Steal this roll (uses your ${q.mb===1?'only ':''}Brainjack token)`,d:`You would get: ${mine.text}. You resolve it and shop; your own turn still comes.`,rec:!!rec&&!has(q,'m_evade')});
+    if(has(q,'m_evade'))steal.push({k:'e',l:` Steal it with ${CARDS.m_evade.n} (keeps your token)`,d:`You would get: ${mine.text}. The card goes to ${mname(roller)}.`,rec:!!rec});
+    const letgo={k:'n',l:rec?'Let it go':'Let it go (save your )',d:`${mname(roller)} gets: ${theirs.text}.${rec?'':' Save your token for a roll worth 3+ ★ or 4+ damage.'}`,rec:!rec};
     const opts=rec?[...steal,letgo]:[letgo,...steal];
-    const why=rec?`Steal it: ${mine.text}. You resolve these dice and shop, then ${mname(roller)} rolls again, and your own turn still comes.`:`Save your 🧠: for you this roll is only ${mine.text}. Spend it on a roll worth 3+ ★ or 4+ claws.`;
+    const why=rec?`Steal it: ${mine.text}. You resolve these dice and shop, then ${mname(roller)} rolls again, and your own turn still comes.`:`Save your : for you this roll is only ${mine.text}. Spend it on a roll worth 3+ ★ or 4+ claws.`;
     ask(q.i,'Brainjack: steal this roll?',`${mname(roller)} finished rolling. You may spend your Brainjack token to use these dice as if you rolled them. ${mname(roller)} then rolls again from scratch.`,opts,
       ()=>rec?(has(q,'m_evade')?'e':'y'):'n',k=>{if(k==='n'){next();return}
       if(k==='e'){const j=q.cards.findIndex(c=>base(c)==='m_evade');const c=q.cards.splice(j,1)[0];roller.cards.push(c);cov('card:m_evade');lg(q.i,`${mname(q)} uses its ${CN(c)} and hands it to ${mname(roller)}.`)}else q.mb--;
@@ -324,7 +324,7 @@ function resolveCore(p){
     ask(p.i,'Dice order','The rules let you resolve dice in any order. Which first?',[{k:'h',l:'♥ Hearts, then claws'},{k:'c',l:'Claws, then hearts'}],()=>'h',k=>{if(k==='c')steps.unshift(steps.splice(4,1)[0]);go()});
   else go()}
 function finishResolve(R){const p=R.p;deaths();
-  UI.banner=typeof storyBanner==='function'?storyBanner(R):`${R.bug?'🧠 ':''}<b>${esc(mname(p))}</b>${R.bug?' (Brainjack)':''}: ${R.out.length?esc(R.out.join(' · ')):'nothing useful'}`;
+  UI.banner=typeof storyBanner==='function'?storyBanner(R):`${R.bug?' ':''}<b>${esc(mname(p))}</b>${R.bug?' (Brainjack)':''}: ${R.out.length?esc(R.out.join(' · ')):'nothing useful'}`;
   if(R.out.length)lg(p.i,`${mname(p)} resolves${R.bug?' the stolen dice':''}: ${R.out.join(', ')}.`);
   flushQ(()=>{deaths();UI.busy=false;if(G.winner){refresh();return}if(!cur().alive){endTurn();return}G.phase='buy';G.step=4;G.aiSwept=false;refresh()})}
 /* heart dice: heal yourself, remove poison/shrink tokens, or (Mending Beam) heal others */
@@ -633,7 +633,7 @@ function evoUsable(p,k){const e=p.hand[k];if(e===undefined||!G.evoOn||p!==cur()|
 function mirrorTargets(p){const L=[];G.pl.forEach(q=>{if(q.alive)q.evo.forEach(e=>{if(EVO[e].t==='P'&&e!==18&&!(q.i===p.i&&false))L.push({o:q.i,e})})});return L}
 function playEvo(p,k){if(!evoUsable(p,k))return;UI.busy=true;playEvoNow(p,k,()=>{UI.busy=false;deaths();flushQ(()=>{if(G.winner){refresh();return}if(!cur().alive){endTurn();return}refresh()})})}
 function playEvoNow(p,k,done){const e=p.hand.splice(k,1)[0];const E=EVO[e];cov('evo:'+e);
-  lg(p.i,`${mname(p)} plays its evolution “${E.n}”.`);fx(p.i,'EVOLVE!','heal');UI.banner=`🧬 <b>${esc(mname(p))}</b> evolves: ${esc(E.n)}`;
+  lg(p.i,`${mname(p)} plays its evolution “${E.n}”.`);fx(p.i,'EVOLVE!','heal');UI.banner=` <b>${esc(mname(p))}</b> evolves: ${esc(E.n)}`;
   if(E.t==='P'||EVO_STAYS.includes(e))p.evo.push(e);else p.edisc.push(e);
   const oth=others(p);
   switch(e){
@@ -694,8 +694,8 @@ function actionsFor(p){const A=[];const roll=G.phase==='roll',buy=G.phase==='buy
   if(has(p,'mend'))add('mend','Quick Mend',p.en<2||p.hp>=maxhp(p),'2 ⚡ → heal 1');
   if(G.tf.ances&&G.tf.ances[p.i])add('ances','Elder Ward',p.en<2||p.hp>=maxhp(p),'2 ⚡ → heal 1');
   if(hasE(p,27))add('mother',evoName(27),onceUsed('mother')||p.en<1||p.hp>=maxhp(p),'1 ⚡ → heal 1, once');
-  if(p.cult){add('cult:h','🕯 Cultist → heart',p.hp>=maxhp(p),`${p.cult} cultist${p.cult>1?'s':''}`,'cons');add('cult:e','🕯 Cultist → energy','',`${p.cult} left`,'cons');if(roll)add('cult:r','🕯 Cultist → reroll','','one extra reroll','cons')}
-  p.hand.forEach((e,k)=>{const E=EVO[e];if(['perm','city','now','roll'].includes(E.w))add('evo:'+k,`🧬 Play evolution: ${evoName(e)}`,!evoUsable(p,k),E.x,'evo')});
+  if(p.cult){add('cult:h',' Cultist → heart',p.hp>=maxhp(p),`${p.cult} cultist${p.cult>1?'s':''}`,'cons');add('cult:e',' Cultist → energy','',`${p.cult} left`,'cons');if(roll)add('cult:r',' Cultist → reroll','','one extra reroll','cons')}
+  p.hand.forEach((e,k)=>{const E=EVO[e];if(['perm','city','now','roll'].includes(E.w))add('evo:'+k,` Play evolution: ${evoName(e)}`,!evoUsable(p,k),E.x,'evo')});
   return A}
 function clownReady(){const c=countsOf(G.dice);return FACES.every(f=>c[f]>0)}
 function paraList(p){const L=[];others(p).forEach(q=>q.cards.forEach(id=>{const b=base(id);if(CARDS[b].t==='K'&&p.en>=costOf(p,id))L.push({o:q.i,id})}));return L}

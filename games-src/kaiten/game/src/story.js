@@ -2,7 +2,7 @@
 // Voice: warm, punchy, two short lines at most per bubble. No "click here" wording: the glow shows where.
 // Tutorial = the PROLOGUE: "The Staff Lunch". Auntie Suzu (guide) teaches Mina; Odile, the dessert chef, bets the last custard on the lunch.
 KK.STORY = {
-  guide: { name: 'Auntie Suzu', emoji: '🍵', color: '#b5452a', portrait: 'camp-suzu.webp' },
+  guide: { name: 'Auntie Suzu', emoji: '', color: '#b5452a', portrait: 'camp-suzu.webp' },
   rivalId: 'odile',
   // one line in the game's own voice when a Quick game starts and ends
   quickIntro: 'Welcome to the Turning Plate. The belt rolls!',

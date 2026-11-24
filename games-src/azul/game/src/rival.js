@@ -33,7 +33,7 @@ function bfRivHTML(S){const i=rvSeat();if(i<0)return '';const p=S.pl[i];const c=
     rows+=`<div class="rv-row${need?' need':could?' could':''}"><div class="rv-rk">${rk}</div><div class="rv-wl">${wl}</div></div>`}
   let fl='';for(let k=0;k<7;k++){const key=`x${i}_${k}`;const t=p.floor[k];fl+=`<b class="rv-c f" data-s="${key}">${t!=null?bfTile(t,key):''}</b>`}
   const pen=floorPenalty(Math.min(7,p.floor.length));const s=rvSay(S,p);
-  return `<div class="rv-hd" style="--pc:${PCOL[i]}">${pc?`<i class="pic" style="background-image:url(media/${pc})"></i>`:'<i></i>'}<b>${esc(p.nm)}</b><span>★${p.score}</span>${S.markerIn===i?`<em>${bfSun()}</em>`:''}</div>
+  return `<div class="rv-hd" style="--pc:${PCOL[i]}">${pc?`<i class="pic" style="background-image:url(media/${pc})"></i>`:'<i></i>'}<b>${esc(p.nm)}</b><span>${p.score}</span>${S.markerIn===i?`<em>${bfSun()}</em>`:''}</div>
     <div class="rv-bd" title="${esc(p.nm)}'s board: racks on the left, wall on the right">${rows}<div class="rv-fl">${fl}${pen?`<span class="rv-pen">${String(pen).replace('-','−')}</span>`:''}</div></div>
     <div class="rv-say"><b>${s.a}</b>${s.b?`<span>${esc(s.b)}</span>`:''}</div>`}
 function bfRivDraw(){if(!BF.rvp||!BF.disp)return;const h0=bfRivHTML(BF.disp);const D=document.documentElement;

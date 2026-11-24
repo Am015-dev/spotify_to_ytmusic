@@ -23,7 +23,7 @@ var _campFinish=finish;finish=function(){const had=!!G.over;_campFinish.apply(th
   p.score+=extra;p.st.cols+=extra;lg(`Boss rule: ${p.nm} earns ${extra} extra for ${b.cols} complete column${b.cols===1?'':'s'}.`,'good');
   const sc=G.pl.slice().sort((a,b)=>b.score-a.score||b.fr-a.fr);const top=sc[0];const winners=sc.filter(q=>q.score===top.score&&q.fr===top.fr);
   G.over={scores:sc.map(q=>({p:q.i,s:Object.assign({total:q.score,fr:q.fr},q.st)})),win:winners.map(w=>w.i),tie:sc.filter(q=>q.score===top.score).length>1};G.winner=winners.map(w=>w.nm).join(' & ');
-  G.winText=`${G.winner} ${winners.length>1?'share the win':'wins'} with ${top.score} points.`;lg('🏆 '+G.winText,'big')};
+  G.winText=`${G.winner} ${winners.length>1?'share the win':'wins'} with ${top.score} points.`;lg(' '+G.winText,'big')};
 // ---- starting a chapter ----
 function campStart(def){if(CMP_RES){GXC.scene=CMP_RES.s;GXC.bossCard=CMP_RES.b;const g=CMP_RES.g;CMP_RES=null;campLvlReset();G=g;UI.cmp=def;CMP_OVER=0;UI.guideNote=null;UI.fx.length=0;UI.fxSeen=0;UI.recap=[];UI.sel=null;UI.tgt=null;UI.adv=null;UI.coach=!!def.hints;
     const cb=$('#coachbtn');if(cb)cb.classList.toggle('on',UI.coach);UI.modal=null;const t=def.twist;if(t&&t.id==='boss-deep-sight'){LVL.hard.roll=t.param;LVL.hard.K=14}

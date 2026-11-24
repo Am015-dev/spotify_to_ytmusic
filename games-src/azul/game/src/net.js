@@ -123,17 +123,17 @@ function netStatus(){const n=NET.peers.length;
   if(isClient()&&!NET.lastRx)return 'Looking for the host…';
   if(n<=1)return 'Looking for players…';return `${n} players connected`}
 function netDockHtml(){if(!NET.on)return '';const s=NET.mySeat>=0&&G?G.pl[NET.mySeat]:null;
-  return `<div class="netst small"><span>🌐 Room <b>${esc(NET.code)}</b>${s?` · you are <b style="color:${PCOL[s.i]}">${esc(s.nm)}</b>`:G?' · watching':''}${isHost()?' · you host':''} · <span class="nst">${netStatus()}</span></span><button class="btn sm ghost" data-a="netopen">Lobby</button><button class="btn sm ghost" data-a="netleave">Leave</button></div>`}
+  return `<div class="netst small"><span> Room <b>${esc(NET.code)}</b>${s?` · you are <b style="color:${PCOL[s.i]}">${esc(s.nm)}</b>`:G?' · watching':''}${isHost()?' · you host':''} · <span class="nst">${netStatus()}</span></span><button class="btn sm ghost" data-a="netopen">Lobby</button><button class="btn sm ghost" data-a="netleave">Leave</button></div>`}
 function lobbyHTML(){const host=isHost();const ps=lobbyPlayers();const o=host?lobbyOpt():(NET.opt||null);
   const rows=ps.map((p,i)=>`<li>${i<4?`<i style="background:${PCOL[i]}"></i>`:'<i class="w"></i>'}<b>${esc(p.nm||'Player')}</b>${p.me?' (you)':''}${p.host?' · host':''}${i>=4?' · watching':''}</li>`).join('')||'<li class="muted">Connecting…</li>';
   let opts='';if(o){const np=Math.min(4,Math.max(o.np|0,ps.length));const vs=[o.ex&&o.ex.gray?'unmarked mosaic':'',o.ex&&o.ex.prism?'prism tiles':''].filter(Boolean).join(', ')||'none';
     const ai=np-Math.min(4,ps.length);const lvs=(o.lv||[]).slice(Math.min(4,ps.length),np).map(x=>esc(String(x))).join(', ');
     opts=`<p class="small">Game: <b>${np} glaziers</b> · variants: <b>${vs}</b>${ai>0?` · ${ai} computer seat${ai>1?'s':''} (<b>${lvs}</b>)`:''}.${host?' To change this, close this panel and use the start screen.':''}</p>`}
   const inGame=!!G;
-  return `<div class="mbox lobby" role="dialog" aria-modal="true" aria-label="Online game"><button class="gx-x lbx" data-a="netclose" aria-label="Close">×</button><h2>🌐 Online game</h2>
+  return `<div class="mbox lobby" role="dialog" aria-modal="true" aria-label="Online game"><button class="gx-x lbx" data-a="netclose" aria-label="Close">×</button><h2> Online game</h2>
    <p>Invite code: <b class="code">${esc(NET.code)}</b></p>
    <div class="invrow"><input class="invlink" readonly value="${esc(NetRoom.inviteLink(NET.code))}" aria-label="Invite link"><button class="btn sm" data-a="netcopy">${NET.copied?'Copied ✓':'Copy link'}</button></div>
-   <p class="small muted">Send friends the link, or they open Sunglaze, choose 🌐 Play online and type the code.</p>
+   <p class="small muted">Send friends the link, or they open Sunglaze, choose  Play online and type the code.</p>
    <p class="small nst">${netStatus()}</p>
    <h3>Players (${ps.length})</h3><ul class="plist">${rows}</ul>${opts}
    ${host?`<div class="acts"><button class="btn go" data-a="netstart">${inGame?'Start a new game':'Start the game'} with ${Math.min(4,ps.length)} player${ps.length===1?'':'s'}</button><button class="btn" data-a="netleave">Close the room</button></div>`
@@ -145,7 +145,7 @@ function onlineBlock(){let h='';
   else h=`<p class="small muted">Free and direct: your browsers connect to each other. Host a game, then send friends the code or the link.</p>
     <div class="nrow"><input id="netname" placeholder="Your name" maxlength="24" autocomplete="off" value="${esc(NET.myName||'')}"><button class="btn sm go" data-a="nethost">Host a game</button></div>
     <div class="nrow"><input id="joincode" placeholder="Invite code" maxlength="10" autocomplete="off" autocapitalize="off" value="${esc(UI.joinCode||'')}"><button class="btn sm" data-a="netjoin">Join</button></div>${NET.busy?'<p class="small muted">Opening the room…</p>':''}${NET.err?`<p class="small warn">${esc(NET.err)}</p>`:''}`;
-  return `<details class="online" id="onl"${UI.onl||NET.on?' open':''}><summary>🌐 Play online</summary>${h}</details>`}
+  return `<details class="online" id="onl"${UI.onl||NET.on?' open':''}><summary> Play online</summary>${h}</details>`}
 function netCopy(){const t=NetRoom.inviteLink(NET.code);const sel=()=>{const i=document.querySelector('.invlink');if(i){i.focus();i.select()}};
   const done=()=>{NET.copied=true;render();setTimeout(()=>{NET.copied=false;render()},2500)};
   try{navigator.clipboard.writeText(t).then(done,sel)}catch(e){sel()}}

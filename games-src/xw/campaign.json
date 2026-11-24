@@ -3,17 +3,17 @@
   "title": "The Crown Rift Run",
   "version": 1,
   "cast": {
-    "brecken":  { "name": "Marshal Odile Brecken", "portrait": "camp-brecken.webp", "emoji": "🎖️", "color": "#3a6ea5" },
-    "kael":     { "name": "Kael Varro", "portrait": "camp-kael.webp", "emoji": "🧑‍✈️", "color": "#e08a2c" },
-    "quill":    { "name": "Quill Marren", "portrait": "camp-quill.webp", "emoji": "📦", "color": "#5f9e6e" },
-    "drill":    { "name": "Drill Wing Flight Officer", "portrait": "camp-drill.webp", "emoji": "🎯", "color": "#7d8590" },
-    "knife":    { "name": "\"Knifepoint\"", "portrait": "camp-knife.webp", "emoji": "🗡️", "color": "#b0413e" },
-    "hammer":   { "name": "Hammer Squadron Lead", "portrait": "camp-hammer.webp", "emoji": "🔨", "color": "#8a5a3c" },
-    "hex":      { "name": "\"Hex\"", "portrait": "camp-hex.webp", "emoji": "🕸️", "color": "#6b4c9a" },
-    "sorin":    { "name": "Sorin Vael", "portrait": "camp-sorin.webp", "emoji": "⚡", "color": "#c23b5a" },
-    "kira":     { "name": "Kira Scald", "portrait": "camp-kira.webp", "emoji": "🦅", "color": "#9e6b2f" },
-    "wailer":   { "name": "\"Wailer\"", "portrait": "camp-wailer.webp", "emoji": "📢", "color": "#a33d2e" },
-    "castigan": { "name": "Lord Castigan", "portrait": "camp-castigan.webp", "emoji": "👁️", "color": "#2b2b3a" }
+    "brecken":  { "name": "Marshal Odile Brecken", "portrait": "camp-brecken.webp", "emoji": "", "color": "#3a6ea5" },
+    "kael":     { "name": "Kael Varro", "portrait": "camp-kael.webp", "emoji": "", "color": "#e08a2c" },
+    "quill":    { "name": "Quill Marren", "portrait": "camp-quill.webp", "emoji": "", "color": "#5f9e6e" },
+    "drill":    { "name": "Drill Wing Flight Officer", "portrait": "camp-drill.webp", "emoji": "", "color": "#7d8590" },
+    "knife":    { "name": "\"Knifepoint\"", "portrait": "camp-knife.webp", "emoji": "", "color": "#b0413e" },
+    "hammer":   { "name": "Hammer Squadron Lead", "portrait": "camp-hammer.webp", "emoji": "", "color": "#8a5a3c" },
+    "hex":      { "name": "\"Hex\"", "portrait": "camp-hex.webp", "emoji": "", "color": "#6b4c9a" },
+    "sorin":    { "name": "Sorin Vael", "portrait": "camp-sorin.webp", "emoji": "", "color": "#c23b5a" },
+    "kira":     { "name": "Kira Scald", "portrait": "camp-kira.webp", "emoji": "", "color": "#9e6b2f" },
+    "wailer":   { "name": "\"Wailer\"", "portrait": "camp-wailer.webp", "emoji": "", "color": "#a33d2e" },
+    "castigan": { "name": "Lord Castigan", "portrait": "camp-castigan.webp", "emoji": "", "color": "#2b2b3a" }
   },
   "acts": [
     { "act": 1, "title": "Convoy Run", "blurb": "Learn to fly, shoot and act on the edge of Sector Nebula-7." },
@@ -39,7 +39,7 @@
       "outro": [
         { "who": "brecken", "text": "Clean flying. You kept your nose on the target. That is half of every dogfight." }
       ],
-      "opponent": { "name": "Drill Wing Flight Officer", "portrait": "camp-drill.webp", "emoji": "🎯", "cast": "drill",
+      "opponent": { "name": "Drill Wing Flight Officer", "portrait": "camp-drill.webp", "emoji": "", "cast": "drill",
         "personality": "A rookie in a target-practice fighter. Flies straight and panics when chased.",
         "aiLevel": "easy", "aiStyle": "cautious" },
       "setup": { "fac": [0, 1], "seed": null, "ex": { "noRocks": true },
@@ -66,7 +66,7 @@
         { "who": "kael", "text": "Range 1 hurts. I can feel the difference in the dice." },
         { "who": "brecken", "text": "Good. Tomorrow we add the rocks." }
       ],
-      "opponent": { "name": "Drill Wing Flight Officer", "portrait": "camp-drill.webp", "emoji": "🎯", "cast": "drill",
+      "opponent": { "name": "Drill Wing Flight Officer", "portrait": "camp-drill.webp", "emoji": "", "cast": "drill",
         "personality": "Two drones flying in a loose pair; they rarely cover each other.",
         "aiLevel": "easy", "aiStyle": "cautious" },
       "setup": { "fac": [0, 1], "seed": null, "ex": { "noRocks": true },
@@ -92,7 +92,7 @@
       "outro": [
         { "who": "brecken", "text": "Moving, shooting and acting. You are ready for the real convoy." }
       ],
-      "opponent": { "name": "Onyx Squadron Pilot", "portrait": "camp-drill.webp", "emoji": "🎯", "cast": "drill",
+      "opponent": { "name": "Onyx Squadron Pilot", "portrait": "camp-drill.webp", "emoji": "", "cast": "drill",
         "personality": "Armada patrol pair that likes to hide behind asteroids.",
         "aiLevel": "easy", "aiStyle": "cautious" },
       "setup": { "fac": [0, 1], "seed": null, "ex": {},
@@ -119,7 +119,7 @@
         { "who": "kael", "text": "Gate's clear. Convoy, you are free to jump." },
         { "who": "brecken", "text": "The Armada will notice this. Expect bombers next." }
       ],
-      "opponent": { "name": "\"Knifepoint\"", "portrait": "camp-knife.webp", "emoji": "🗡️", "cast": "knife",
+      "opponent": { "name": "\"Knifepoint\"", "portrait": "camp-knife.webp", "emoji": "", "cast": "knife",
         "personality": "Fast and fragile. Dives straight for range 1 and gambles on the extra die.",
         "aiLevel": "easy", "aiStyle": "bold",
         "taunt": "Too slow, Varro. Range 1 always wins.",
@@ -146,7 +146,7 @@
       "outro": [
         { "who": "kael", "text": "Bomber down. The convoy slips through." }
       ],
-      "opponent": { "name": "Hammer Squadron Lead", "portrait": "camp-hammer.webp", "emoji": "🔨", "cast": "hammer",
+      "opponent": { "name": "Hammer Squadron Lead", "portrait": "camp-hammer.webp", "emoji": "", "cast": "hammer",
         "personality": "Methodical bomber crew that trusts its armour and flies the straight line.",
         "aiLevel": "normal", "aiStyle": "balanced" },
       "setup": { "fac": [0, 1], "seed": null, "ex": { "w3": true },
@@ -173,7 +173,7 @@
         { "who": "kael", "text": "Ambush broken. Ember, good flying." },
         { "who": "brecken", "text": "Their best ace is coming for you now, Varro." }
       ],
-      "opponent": { "name": "\"Hex\"", "portrait": "camp-hex.webp", "emoji": "🕸️", "cast": "hex",
+      "opponent": { "name": "\"Hex\"", "portrait": "camp-hex.webp", "emoji": "", "cast": "hex",
         "personality": "A jinx who leads a swarm. Attackers cannot spend focus or reroll against her.",
         "aiLevel": "normal", "aiStyle": "balanced" },
       "setup": { "fac": [0, 1], "seed": null, "ex": {},
@@ -201,7 +201,7 @@
         { "who": "kael", "text": "The Red Streak is down. The Belt is ours." },
         { "who": "brecken", "text": "Next stop is the Crown Rift. Castigan is waiting there." }
       ],
-      "opponent": { "name": "Sorin Vael", "portrait": "camp-sorin.webp", "emoji": "⚡", "cast": "sorin",
+      "opponent": { "name": "Sorin Vael", "portrait": "camp-sorin.webp", "emoji": "", "cast": "sorin",
         "personality": "Proud and fearless. Takes red maneuvers on purpose and turns the stress into focus.",
         "aiLevel": "normal", "aiStyle": "bold",
         "taunt": "You flew well. I flew better. Go home, Compact.",
@@ -230,7 +230,7 @@
       "outro": [
         { "who": "kael", "text": "Gunship silenced. The Rift is open." }
       ],
-      "opponent": { "name": "Kira Scald", "portrait": "camp-kira.webp", "emoji": "🦅", "cast": "kira",
+      "opponent": { "name": "Kira Scald", "portrait": "camp-kira.webp", "emoji": "", "cast": "kira",
         "personality": "Patient hunter. Parks the gunship where both arcs cover the approach.",
         "aiLevel": "hard", "aiStyle": "cautious" },
       "setup": { "fac": [0, 1], "seed": null, "ex": { "w2": true },
@@ -258,7 +258,7 @@
         { "who": "quill", "text": "Codes delivered. The blockade's gate will open for us." },
         { "who": "brecken", "text": "Then there is only Castigan left." }
       ],
-      "opponent": { "name": "\"Wailer\"", "portrait": "camp-wailer.webp", "emoji": "📢", "cast": "wailer",
+      "opponent": { "name": "\"Wailer\"", "portrait": "camp-wailer.webp", "emoji": "", "cast": "wailer",
         "personality": "Loud wing leader who keeps his swarm tight and hunts the weakest ship.",
         "aiLevel": "hard", "aiStyle": "bold" },
       "setup": { "fac": [0, 1], "seed": null, "ex": { "w1": true, "w3": true },
@@ -287,7 +287,7 @@
         { "who": "castigan", "text": "Retreat. All ships, retreat. This is not over, Varro." },
         { "who": "brecken", "text": "The Rift is ours and the convoy is home. Well flown, all of you." }
       ],
-      "opponent": { "name": "Lord Castigan", "portrait": "camp-castigan.webp", "emoji": "👁️", "cast": "castigan",
+      "opponent": { "name": "Lord Castigan", "portrait": "camp-castigan.webp", "emoji": "", "cast": "castigan",
         "personality": "Cold and exact. Never takes a risk he does not need and always finishes a crippled ship.",
         "aiLevel": "hard", "aiStyle": "balanced",
         "taunt": "Kneel, Varro. The Rift belongs to the Armada.",

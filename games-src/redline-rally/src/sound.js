@@ -51,7 +51,7 @@ function sfx(name) {
   if (!SND.on || !SFX[name]) return; var now = Date.now(); if (SND.last[name] && now - SND.last[name] < 40) return; SND.last[name] = now;
   try { if (audioCtx()) { wake(); SFX[name](); } } catch (e) { }
 }
-function sndLabel() { return SND.on ? '♪ On' : '♪ Off'; }
+function sndLabel() { return SND.on ? 'Sound on' : 'Sound off'; }
 function setSound(on, quiet) {
   SND.on = !!on; try { localStorage.setItem('rr_snd', on ? '1' : '0'); } catch (e) { }
   if (SND.master) SND.master.gain.value = SND.on ? SND.vol : 0;

@@ -15,7 +15,7 @@ function campStart(def){
   const t=def.twist,sh=campTwistShip(def);
   if(t&&sh&&sh.side===1){if(t.id==='ace-shields'){sh.sh+=t.param;sh.shMax+=t.param}else if(t.id==='opening-focus')sh.focus=t.param;else if(t.id==='veteran-skill')sh.ps=Math.min(12,sh.ps+t.param)}
   else if(t&&t.id==='opening-focus'&&!t.pilot)G.ships.filter(x=>x.side===1).forEach(x=>{x.focus=t.param});
-  resetGuide();camView('tilt');try{const hb=document.getElementById('hintbtn');if(hb)hb.textContent=UI.hints?'💡 On':'💡 Off'}catch(e){}render();
+  resetGuide();camView('tilt');try{const hb=document.getElementById('hintbtn');if(hb)hb.textContent=UI.hints?' On':' Off'}catch(e){}render();
   try{banner('<b>Goal</b> '+esc(def.goal.text),4200)}catch(e){}}
 // called by render() once a battle is decided; true = the story result screen takes over from the debrief
 function campDone(){if(!campOn()||!G||G.camp!==UI.camp.id)return false;try{GXC.finish(G)}catch(e){console.error(e);return false}return true}

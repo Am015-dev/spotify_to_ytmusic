@@ -6,37 +6,37 @@
     "hask": {
       "name": "Granny Hask",
       "portrait": "camp-hask.webp",
-      "emoji": "🧓",
+      "emoji": "",
       "color": "#7a5c3e"
     },
     "wynne": {
       "name": "Wynne",
       "portrait": "camp-wynne.webp",
-      "emoji": "🌿",
+      "emoji": "",
       "color": "#3fa04a"
     },
     "odo": {
       "name": "Odo",
       "portrait": "camp-odo.webp",
-      "emoji": "🥕",
+      "emoji": "",
       "color": "#e8b425"
     },
     "tamsin": {
       "name": "Tamsin",
       "portrait": "camp-tamsin.webp",
-      "emoji": "🪶",
+      "emoji": "",
       "color": "#3b82d6"
     },
     "mirabel": {
       "name": "Mirabel",
       "portrait": "camp-mirabel.webp",
-      "emoji": "🔥",
+      "emoji": "",
       "color": "#d6392f"
     },
     "vesper": {
       "name": "Madame Vesper",
       "portrait": "camp-vesper.webp",
-      "emoji": "🥄",
+      "emoji": "",
       "color": "#8a55c4"
     }
   },
@@ -115,7 +115,7 @@
       "opponent": {
         "name": "Wynne",
         "portrait": "camp-wynne.webp",
-        "emoji": "🌿",
+        "emoji": "",
         "cast": "wynne",
         "personality": "Patient and kind. Stops early, buys whatever Mossbacks she can afford.",
         "aiLevel": "easy",
@@ -202,7 +202,7 @@
       "opponent": {
         "name": "Wynne",
         "portrait": "camp-wynne.webp",
-        "emoji": "🌿",
+        "emoji": "",
         "cast": "wynne",
         "personality": "Patient and kind. Stops early, buys whatever Mossbacks she can afford.",
         "aiLevel": "easy",
@@ -292,7 +292,7 @@
       "opponent": {
         "name": "Odo",
         "portrait": "camp-odo.webp",
-        "emoji": "🥕",
+        "emoji": "",
         "cast": "odo",
         "personality": "Loud root dealer. Draws one chip too many and brags about it either way.",
         "aiLevel": "easy",
@@ -386,7 +386,7 @@
       "opponent": {
         "name": "Tamsin",
         "portrait": "camp-tamsin.webp",
-        "emoji": "🪶",
+        "emoji": "",
         "cast": "tamsin",
         "personality": "Quiet feather seer. Counts every Fizzpod left in her bag before she draws.",
         "aiLevel": "normal",
@@ -475,7 +475,7 @@
       "opponent": {
         "name": "Odo",
         "portrait": "camp-odo.webp",
-        "emoji": "🥕",
+        "emoji": "",
         "cast": "odo",
         "personality": "Loud root dealer. Draws one chip too many and brags about it either way.",
         "aiLevel": "normal",
@@ -570,7 +570,7 @@
       "opponent": {
         "name": "Tamsin",
         "portrait": "camp-tamsin.webp",
-        "emoji": "🪶",
+        "emoji": "",
         "cast": "tamsin",
         "personality": "Quiet feather seer. Counts every Fizzpod left in her bag before she draws.",
         "aiLevel": "normal",
@@ -664,7 +664,7 @@
       "opponent": {
         "name": "Mirabel",
         "portrait": "camp-mirabel.webp",
-        "emoji": "🔥",
+        "emoji": "",
         "cast": "mirabel",
         "personality": "Fire brewer. Pushes every pot to the brink and loves Scarlet Caps.",
         "aiLevel": "hard",
@@ -753,7 +753,7 @@
       "opponent": {
         "name": "Mirabel",
         "portrait": "camp-mirabel.webp",
-        "emoji": "🔥",
+        "emoji": "",
         "cast": "mirabel",
         "personality": "Fire brewer. Pushes every pot to the brink and loves Scarlet Caps.",
         "aiLevel": "hard",
@@ -842,7 +842,7 @@
       "opponent": {
         "name": "Odo",
         "portrait": "camp-odo.webp",
-        "emoji": "🥕",
+        "emoji": "",
         "cast": "odo",
         "personality": "Loud root dealer. Draws one chip too many and brags about it either way.",
         "aiLevel": "hard",
@@ -941,7 +941,7 @@
       "opponent": {
         "name": "Madame Vesper",
         "portrait": "camp-vesper.webp",
-        "emoji": "🥄",
+        "emoji": "",
         "cast": "vesper",
         "personality": "Nine-time holder of the Golden Ladle. Cold, exact, never wastes a coin.",
         "aiLevel": "hard",

@@ -127,7 +127,7 @@ function renderNetBar(){const el=document.getElementById('netbar');if(!el)return
   else if(isHost()&&G.players.some(p=>p.away))st='<span class="warn">Your friend left: the computer flies their ships</span>';
   else st=`${n} connected`;
   const who=me>=0?`you: <b>${esc(sideName(me))}</b>`:'watching';
-  el.innerHTML=`${isHost()&&G.winner?'<button class="btn sm" data-a="netlobby">🌐 Rematch lobby</button> ':''}<span class="nb-dot ${st.includes('bad')||st.includes('warn')?'off':''}"></span>Online · ${who} · ${st}`;el.title=el.textContent}
+  el.innerHTML=`${isHost()&&G.winner?'<button class="btn sm" data-a="netlobby"> Rematch lobby</button> ':''}<span class="nb-dot ${st.includes('bad')||st.includes('warn')?'off':''}"></span>Online · ${who} · ${st}`;el.title=el.textContent}
 // the planning line: who is still setting dials; otherwise whose decision it is
 function netWaitHTML(){if(!NET.on||!G||G.winner||NET.inLobby||G.round<1&&G.phase!=='ask')return '';
   if(G.phase==='plan'){const chips=[0,1].map(k=>{const done=planDone(k);return `<span class="nw ${done?'ok':''}">${esc(netWho(k)==='you'?'You':netWho(k))}: ${done?'✓ dials locked':'setting dials…'}</span>`}).join('');return `<p class="netwait small">${chips}</p>`}
@@ -138,7 +138,7 @@ function lobbyHTML(){const host=isHost();const ps=NET.peers;const r=netRemote();
   const rows=ps.map(p=>{const k=seat(p);return `<li><b>${esc(peerName(p))}</b>${p.isMe?' (you)':''}${p.presence&&p.presence.role==='host'?' · host':''} · ${k>=0&&I?`flies the ${esc(FACTIONS[I.fac[k]].n)}`:'watches'}</li>`}).join('');
   const status=ps.length<2?'<span class="nb-dot off"></span> Looking for players…':`<span class="nb-dot"></span> ${ps.length} players here`;
   const size=I&&SIZES.find(z=>z.k===I.size);const exs=I?EXPS.filter(e=>I.ex[e.k]).map(e=>e.n).join(', ')||'none':'';
-  return `<div class="dlg lobby" role="dialog" aria-modal="true" aria-label="Online battle"><div class="launchbar"><h2>🌐 Online battle</h2><button class="btn ghost x" data-a="netmin" aria-label="Close">✕</button></div>
+  return `<div class="dlg lobby" role="dialog" aria-modal="true" aria-label="Online battle"><div class="launchbar"><h2> Online battle</h2><button class="btn ghost x" data-a="netmin" aria-label="Close">✕</button></div>
    <p>Invite code: <b class="code">${esc(NET.code)}</b> <span class="small muted">Your friend opens this game, presses <b>Join</b> and types the code, or opens the link.</span></p>
    <div class="row invrow"><input class="invlink" readonly value="${esc(NetRoom.inviteLink(NET.code))}" aria-label="Invite link"><button class="btn" data-a="netcopy">Copy link</button>${NET.copied?'<span class="muted small">Copied.</span>':''}</div>
    ${NET.err?`<p class="warn">${esc(NET.err)}</p>`:''}<p class="small netst">${status}</p>
@@ -147,9 +147,9 @@ function lobbyHTML(){const host=isHost();const ps=NET.peers;const r=netRemote();
    ${host?`<p class="small muted">To change factions, size or expansions, close this box (✕), change them on the start screen, then come back.</p><div class="acts"><button class="btn primary" data-a="netstart">Start the battle${r.length?'':'<small>against the computer until a friend joins</small>'}</button><button class="btn" data-a="netleave">Close the room</button></div>`
    :`<p class="tip">Waiting for the host to start the battle…</p><div class="acts"><button class="btn" data-a="netleave">Leave</button></div>`}</div>`}
 function onlineBlock(){if(!NET.ready)return '<p class="small muted">Checking online play…</p>';
-  if(typeof navigator!=='undefined'&&navigator.onLine===false)return '<p class="small muted">🌐 Online play is hidden while you are offline.</p>';
-  if(!netAvail())return '<p class="small muted">🌐 Online play needs a recent browser with WebRTC (any current Chrome, Edge, Firefox or Safari).</p>';
-  if(NET.on)return `<div class="online on"><p class="small">You are in online room <b class="code">${esc(NET.code)}</b>.</p><div class="row"><button class="btn primary" data-a="netopen">🌐 Back to the lobby</button><button class="btn" data-a="netleave">Leave the room</button></div></div>`;
+  if(typeof navigator!=='undefined'&&navigator.onLine===false)return '<p class="small muted"> Online play is hidden while you are offline.</p>';
+  if(!netAvail())return '<p class="small muted"> Online play needs a recent browser with WebRTC (any current Chrome, Edge, Firefox or Safari).</p>';
+  if(NET.on)return `<div class="online on"><p class="small">You are in online room <b class="code">${esc(NET.code)}</b>.</p><div class="row"><button class="btn primary" data-a="netopen"> Back to the lobby</button><button class="btn" data-a="netleave">Leave the room</button></div></div>`;
   return `<div class="online ${UI.netOpen?'hl':''}" id="onlinebox"><p class="small muted">Free and direct: your browsers connect to each other. Host a battle and send a friend the code or link. You fly the first faction below, your friend the second.</p>
     <div class="row"><input id="netname" placeholder="your name" maxlength="24" autocomplete="off" value="${esc(NET.myName||'')}" aria-label="Your name"><button class="btn" data-a="nethost">Host</button><input id="joincode" placeholder="invite code" maxlength="10" autocomplete="off" value="${esc(UI.joinCode||'')}" aria-label="Invite code"><button class="btn ${UI.joinCode?'primary':''}" data-a="netjoin">Join</button></div>${NET.err&&!NET.on?`<p class="warn">${esc(NET.err)}</p>`:''}</div>`}
 function netCopy(){const t=NetRoom.inviteLink(NET.code);const sel=()=>{const i=document.querySelector('.invlink');if(i){i.focus();i.select()}};const done=()=>{NET.copied=true;render();setTimeout(()=>{NET.copied=false;render()},2500)};

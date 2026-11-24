@@ -22,7 +22,7 @@ function optHtml(l){l=String(l==null?'':l).replace(/\s+/g,' ').trim();let main=l
   const c=/^([^:]{2,40}):\s+(.+)$/.exec(main);if(c&&!sub){main=c[1];sub=c[2]}else if(c&&sub){main=c[1];sub=c[2]+'. '+sub}
   sub=sub.split(/;\s*|,\s+(?=[a-z])|\.\s+/).map(x=>cap1(x.trim())).filter(Boolean).join('. ');if(sub&&!/[.!?]$/.test(sub))sub+='.';
   return `<b class="ol">${E(w12(main))}</b>${sub?`<small class="os">${E(w12(sub))}</small>`:''}`}
-const FINGER='<u class="rg"></u><span class="fg">👆</span>';
+const FINGER='<u class="rg"></u><span class="fg"></span>';
 // ---------- one-time DOM: tray, overlay, zoom buttons, ghost finger ----------
 function init(){if(BF.ready)return;BF.ready=true;const app=q('.gx-app'),board=q('.gx-board'),view=q('.gx-board .view');if(!app||!board)return;
   const tray=document.createElement('div');tray.id='bf';tray.setAttribute('role','region');tray.setAttribute('aria-label','Your move');app.appendChild(tray);
@@ -36,7 +36,7 @@ function init(){if(BF.ready)return;BF.ready=true;const app=q('.gx-app'),board=q(
   // the labels loop moves the chips and the finger with the camera
   if(typeof placeLabels==='function'){const pl0=placeLabels;placeLabels=function(){pl0.apply(this,arguments);if(BF.on)BF.place()}}
   // short messages go to the status line, never into the hidden dock
-  if(typeof toast==='function'){const t0=toast;toast=function(t,ms,keep){if(BF.on){const s=/^✨ Every pawn/.test(t||'')?'Plan ready. Check it, then start.':brief(t);BF.say(s,ms)}else t0.apply(this,arguments)}}}
+  if(typeof toast==='function'){const t0=toast;toast=function(t,ms,keep){if(BF.on){const s=/^ Every pawn/.test(t||'')?'Plan ready. Check it, then start.':brief(t);BF.say(s,ms)}else t0.apply(this,arguments)}}}
 // ---------- geometry ----------
 function tilePt(id){const ov=q('#bfov');if(!ov)return null;const r0=ov.getBoundingClientRect();
   if(typeof V3!=='undefined'&&V3.on&&V3.cam&&V3.r&&typeof MAP!=='undefined'&&MAP[id]){const p=hexPos(MAP[id].q,MAP[id].r);const v=new THREE.Vector3(p.x,HEXH,p.z);V3.cam.updateMatrixWorld();v.project(V3.cam);
@@ -76,7 +76,7 @@ function capFor(i){const b=UI.beats[i];if(!b)return '';const d=b.data||{};const 
   case 'over':{const w=G.over&&G.over.win;return w?'Rescued!':'Lost on the island'}
   default:return ''}}
 function planCap(st){const cur=curPawn();const pb=planProblems();
-  if(UI.confirm&&planOpen())return brief(String(UI.confirm).replace(/^⚠\s*/,''));
+  if(UI.confirm&&planOpen())return brief(String(UI.confirm).replace(/^\s*/,''));
   if(cur){const n=pawnLabel(cur).split(' ')[0];const lt=legalTiles(cur);if(!lt.length)return `No job for ${n} now`;return pb.length||cur.c!=null?`${n}: tap a glowing place`:`${n}: tap a place, or start`}
   if(pb.length)return badActs().size?'Tap a pulsing pawn to fix it':brief(pb[0]);return 'All set. Start the day!'}
 BF.status=function(){if(BF.msg&&Date.now()<BF.msg.until)return BF.msg.t;BF.msg=null;
@@ -95,7 +95,7 @@ function turnBanner(){const st=PHO.st;if(st==='plan'||st==='plan2')return ['you'
   return ['isl','The island’s turn']}
 function resStrip(){let o=null;try{withView(()=>{o={f:food(),need:eatersNeed(),w:G.res.wood,low:(()=>{let m=99;for(const c of G.chars){if(c.npc&&G.scen!=='stranded'||c.dead)continue;m=Math.min(m,CHARS[c.k].die-c.w)}return m===99?0:m})(),sh:hasShelter(),mo:G.morale,d:G.round,r:G.rounds}})}catch(e){}if(!o)return '';
   const c=(bad,t)=>`<span class="${bad?'bad':''}">${t}</span>`;
-  return c(false,`<b>Day ${o.d}</b><small> of ${o.r}</small>`)+c(o.f<o.need,`🍖 Food <b>${o.f}</b><small> (eat ${o.need})</small>`)+c(false,`🪵 Wood <b>${o.w}</b>`)+c(o.low<=3,`♥ Life <b>${o.low}</b>`)+(o.sh?c(false,'🏠 Shelter'):c(true,'No shelter'))}
+  return c(false,`<b>Day ${o.d}</b><small> of ${o.r}</small>`)+c(o.f<o.need,` Food <b>${o.f}</b><small> (eat ${o.need})</small>`)+c(false,` Wood <b>${o.w}</b>`)+c(o.low<=3,`♥ Life <b>${o.low}</b>`)+(o.sh?c(false,' Shelter'):c(true,'No shelter'))}
 BF.paint=function(){if(G&&R.dataset.scen!==G.scen)R.dataset.scen=G.scen;const rs=q('#bfres');if(rs&&G){const h=resStrip();if(rs.dataset.h!==h){rs.dataset.h=h;rs.innerHTML=h}}const lb=q('#phlabel');if(!lb||!BF.on)return;const s=BF.status();const bn=turnBanner();const key=bn[0]+'|'+bn[1]+'|'+s;if(lb.dataset.k===key)return;lb.dataset.k=key;
   lb.innerHTML=(bn[1]?`<small class="bfb ${bn[0]}">${E(bn[1])}</small>`:'')+`<span class="bft">${E(s)}</span>`};
 // ---------- the tray: your pawns and one big button ----------
@@ -108,15 +108,15 @@ function trayHtml(st){
     const nextL=b.kind==='daysum'&&!last?`Start day ${b.data.round+1} ▶`:last?(G.over?'See how it ended ▶':'Plan the day ▶'):'Continue ▶';
     return `<div class="bf-main"><button class="gx-ibtn bf-s ${UI.auto?'on':''}" data-a="auto" aria-pressed="${!!UI.auto}" aria-label="Play by itself">⏩</button><button class="btn go" data-a="next">${nextL}</button>${i<UI.beats.length-2?'<button class="gx-ibtn bf-s" data-a="skip" aria-label="Skip ahead">⏭</button>':''}</div>`}
   if(st==='plan'||st==='plan2'){const cur=curPawn();const pb=planProblems();
-    if(UI.confirm&&planOpen())return `<div class="bf-main"><button class="gx-ibtn bf-s" data-a="suggest" aria-label="Plan it for me" title="Plan it for me">✨</button><button class="btn ghost" data-a="goback">Go back</button><button class="btn go" data-a="go" data-force="1">Start anyway ▶</button></div>`;
-    return `<div class="pawnrow bf-pw" aria-label="Your pawns">${(()=>{const bd=badActs();return wizPawns().map(p=>tokHtml(p,cur,bd)).join('')})()}</div><div class="bf-main"><button class="gx-ibtn bf-s" data-a="suggest" aria-label="Plan it for me" title="Plan it for me">✨</button><button class="btn go ${pb.length?'dim':''}" data-a="go">Start day ▶</button></div>`}
+    if(UI.confirm&&planOpen())return `<div class="bf-main"><button class="gx-ibtn bf-s" data-a="suggest" aria-label="Plan it for me" title="Plan it for me"></button><button class="btn ghost" data-a="goback">Go back</button><button class="btn go" data-a="go" data-force="1">Start anyway ▶</button></div>`;
+    return `<div class="pawnrow bf-pw" aria-label="Your pawns">${(()=>{const bd=badActs();return wizPawns().map(p=>tokHtml(p,cur,bd)).join('')})()}</div><div class="bf-main"><button class="gx-ibtn bf-s" data-a="suggest" aria-label="Plan it for me" title="Plan it for me"></button><button class="btn go ${pb.length?'dim':''}" data-a="go">Start day ▶</button></div>`}
   if(allAI()&&!G.over)return `<div class="bf-main"><button class="gx-ibtn bf-s" data-a="pause" aria-label="Pause">${UI.pause?'▶':'⏸'}</button><button class="gx-ibtn bf-s" data-a="speed" aria-label="Speed">⏩</button></div>`;
   return ''}
 // ---------- chips on the island: the plan, then the day's jobs ----------
 function actPos(a){let p=null;try{p=pawnSpot(a)}catch(e){}return p!=null&&MAP[p]?p:G.camp.pos}
 function chipsFor(st){const out=[];
   if(st==='plan'||st==='plan2'){for(const a of G.plan.acts){if(!a.pw.length)continue;const n=actNeed(a);const k=a.pw.length;const risk=k<n.need?'warn':(n.roll&&k<n.max)?'dice':'sure';
-    out.push({pos:actPos(a),a,risk,badge:risk==='warn'?`needs +${n.need-k}`:risk==='dice'?'🎲 risky':'✔ sure',rm:a.pw[a.pw.length-1],cur:UI.lastAct===a.id,done:false})}return out}
+    out.push({pos:actPos(a),a,risk,badge:risk==='warn'?`needs +${n.need-k}`:risk==='dice'?' risky':'✔ sure',rm:a.pw[a.pw.length-1],cur:UI.lastAct===a.id,done:false})}return out}
   if(st==='story'){const i=storyIdx();if(i<0)return out;const b=UI.beats[i];if(!['go','act','finds'].includes(b.kind))return out;const s=beatState(i);if(!s||!s.plan)return out;
     for(const a of s.plan.acts){if(!a.pw.length)continue;const here=b.kind==='act'&&b.data.id===a.id;out.push({pos:(()=>{let p=null;try{p=pawnSpot(a)}catch(e){}return p!=null&&MAP[p]?p:s.camp.pos})(),a,risk:'sure',badge:a.done&&!here?'✓':'',rm:null,cur:here,done:!!a.done&&!here})}return out}
   return out}
@@ -139,22 +139,22 @@ function deltas(A,B){const o=[];if(!A||!B)return o;
   B.chars.forEach((c,j)=>{const x=A.chars[j];if(!x||(c.npc&&G.scen!=='stranded'))return;const d=lifeOf(B,c)-lifeOf(A,x);if(d)o.push({t:`<i style="background:${PCOL[c.i%6]}"></i>${d>0?'+':''}${d}♥`,c:d>0?'good':'bad'})});
   if(A.fri&&B.fri&&A.fri.w!==B.fri.w){const d=A.fri.w-B.fri.w;o.push({t:`${d>0?'+':''}${d}♥`,c:d>0?'good':'bad'})}
   if(A.morale!==B.morale)o.push({t:`${B.morale>A.morale?'☺ +':'☹ '}${B.morale-A.morale}`,c:B.morale>A.morale?'good':'bad'});
-  for(const [k,ic] of [['roof','☂'],['pal','🧱']])if(A.camp[k]!==B.camp[k])o.push({t:`${ic} ${B.camp[k]>A.camp[k]?'+':''}${B.camp[k]-A.camp[k]}`,c:B.camp[k]>A.camp[k]?'good':'bad'});
-  if(A.weapon!==B.weapon)o.push({t:`🗡 ${B.weapon>A.weapon?'+':''}${B.weapon-A.weapon}`,c:B.weapon>A.weapon?'good':'bad'});
-  const sa=withState(A,()=>hasShelter()),sz=withState(B,()=>hasShelter());if(sa!==sz)o.push({t:sz?'🏠 built':'🏠 lost',c:sz?'good':'bad'});
-  if(G.scen==='marooned'&&A.sc&&B.sc&&A.sc.pile!==B.sc.pile)o.push({t:`🔥 +${B.sc.pile-A.sc.pile}`,c:'good'});
+  for(const [k,ic] of [['roof','☂'],['pal','']])if(A.camp[k]!==B.camp[k])o.push({t:`${ic} ${B.camp[k]>A.camp[k]?'+':''}${B.camp[k]-A.camp[k]}`,c:B.camp[k]>A.camp[k]?'good':'bad'});
+  if(A.weapon!==B.weapon)o.push({t:` ${B.weapon>A.weapon?'+':''}${B.weapon-A.weapon}`,c:B.weapon>A.weapon?'good':'bad'});
+  const sa=withState(A,()=>hasShelter()),sz=withState(B,()=>hasShelter());if(sa!==sz)o.push({t:sz?' built':' lost',c:sz?'good':'bad'});
+  if(G.scen==='marooned'&&A.sc&&B.sc&&A.sc.pile!==B.sc.pile)o.push({t:` +${B.sc.pile-A.sc.pile}`,c:'good'});
   if(G.scen==='hexed'&&A.sc&&B.sc&&A.sc.crosses.length!==B.sc.crosses.length)o.push({t:'✝ raised',c:'good'});
-  const ea=A.map.filter(m=>m.tile!=null).length,ez=B.map.filter(m=>m.tile!=null).length;if(ez>ea)o.push({t:'🧭 new land',c:'good'});
+  const ea=A.map.filter(m=>m.tile!=null).length,ez=B.map.filter(m=>m.tile!=null).length;if(ez>ea)o.push({t:' new land',c:'good'});
   return o}
 BF.beatFx=function(i){const b=UI.beats[i];if(!b||!G)return;const d=b.data||{};let arr=[],pos=null;
   try{const B=beatState(i);pos=d.pos!=null?d.pos:(B&&B.camp?B.camp.pos:G.camp.pos);
     if(b.kind==='daysum'){const x=daySumData(i);arr=x.A&&x.B?deltas(x.A,x.B).slice(0,6):[]}
     else if(!['intro','plan','dawn','go'].includes(b.kind)&&i>0)arr=deltas(beatState(i-1),B);
     let k=0,t=0;
-    if(b.kind==='act'&&d.dice){const dd=d.dice;BF.pop(pos,'🎲','dice',0,k++);BF.pop(pos,dd.s?'✔':'✖',dd.s?'good big':'bad big',380,k++);if(dd.w)BF.pop(pos,'🩸','bad big',700,k++);if(dd.q)BF.pop(pos,'❓','big',1000,k++);t=1100}
+    if(b.kind==='act'&&d.dice){const dd=d.dice;BF.pop(pos,'','dice',0,k++);BF.pop(pos,dd.s?'✔':'✖',dd.s?'good big':'bad big',380,k++);if(dd.w)BF.pop(pos,'','bad big',700,k++);if(dd.q)BF.pop(pos,'❓','big',1000,k++);t=1100}
     arr.forEach((x,j)=>{BF.pop(pos,x.t,x.c,t+j*240,k+j);if(x.fly)BF.fly(pos,x.fly,x.up,t+j*240+350)})}catch(e){console.error(e)}}
 // a pending choice with dice shows the dice on the island too
-BF.qFx=function(){const qq=G.q;if(!qq||qq.kind!=='dice'||!qq.dice)return;const dd=qq.dice;const pos=G.camp.pos;BF.pop(pos,'🎲','dice',0,0);BF.pop(pos,dd.s?'✔':'✖',dd.s?'good big':'bad big',380,1);if(dd.w)BF.pop(pos,'🩸','bad big',700,2);if(dd.q)BF.pop(pos,'❓','big',1000,3)};
+BF.qFx=function(){const qq=G.q;if(!qq||qq.kind!=='dice'||!qq.dice)return;const dd=qq.dice;const pos=G.camp.pos;BF.pop(pos,'','dice',0,0);BF.pop(pos,dd.s?'✔':'✖',dd.s?'good big':'bad big',380,1);if(dd.w)BF.pop(pos,'','bad big',700,2);if(dd.q)BF.pop(pos,'❓','big',1000,3)};
 
 // ---------- gains fly to the resource row, losses fly away ----------
 BF.fly=function(id,icon,up,delay){if(!BF.on||!q('#bfov'))return;const p=tilePt(id),chip=q('#phchip');if(!p||!chip||!chip.getBoundingClientRect().width)return;const cr=chip.getBoundingClientRect();
@@ -164,14 +164,14 @@ BF.fly=function(id,icon,up,delay){if(!BF.on||!q('#bfov'))return;const p=tilePt(i
 // ---------- weather on the camp: rain drops, snow, a flash ----------
 BF.rain=function(pos,r,s,storm){const ov=q('#bfov');if(!ov||!BF.on)return;const p=tilePt(pos);if(!p)return;const n=Math.min(18,(r||0)*5+(s||0)*5+(storm?8:0));if(!n)return;
   const w=document.createElement('div');w.className='bfrain';w.style.left=Math.round(p.x-60)+'px';w.style.top=Math.round(p.y-120)+'px';
-  let h='';for(let i=0;i<n;i++)h+=`<i style="left:${(i*37)%120}px;animation-delay:${(i*83)%600}ms">${s&&!r?'❄':'💧'}</i>`;w.innerHTML=h+(storm?'<b>⚡</b>':'');ov.appendChild(w);setTimeout(()=>w.remove(),2400)};
+  let h='';for(let i=0;i<n;i++)h+=`<i style="left:${(i*37)%120}px;animation-delay:${(i*83)%600}ms">${s&&!r?'❄':''}</i>`;w.innerHTML=h+(storm?'<b>⚡</b>':'');ov.appendChild(w);setTimeout(()=>w.remove(),2400)};
 // ---------- the event / weather card flips onto the board ----------
-const CARDICON={event:'🎴',threat:'⏳',adventure:'🧭',mystery:'❓',fight:'⚔️'};const TYICON={book:'📖',build:'🔨',explore:'🧭',gather:'🌿',wreck:'⚓'};
+const CARDICON={event:'',threat:'⏳',adventure:'',mystery:'❓',fight:''};const TYICON={book:'',build:'',explore:'',gather:'',wreck:''};
 BF.cardClear=function(){const c=q('#bfcard');if(c)c.remove()};
 BF.card=function(i){BF.cardClear();const b=UI.beats[i];const ov=q('#bfov');if(!b||!ov||!BF.on)return;const k=b.kind;if(!['event','threat','adventure','mystery','fight','weather'].includes(k))return;const d=b.data||{};
-  let ic=CARDICON[k]||'🎴',cls=k,pos=G.camp.pos;
-  try{if(k==='weather'){const w=(viewState()||G).lastWx;const r=w&&w.rain||0,s=w&&w.snow||0;ic=w&&w.storm?'⛈️':r?'🌧️'.repeat(Math.min(3,r)):s?'❄️'.repeat(Math.min(3,s)):'☀️';BF.rain(pos,r,s,w&&w.storm);if(w&&w.storm)cls+=' storm'}
-    else if(d.card!=null&&CARD[d.card]){const c=CARD[d.card];const ti=c.icon&&TYICON[c.icon];ic=(CARDICON[k]||'🎴')+(ti?ti:'')}}catch(e){}
+  let ic=CARDICON[k]||'',cls=k,pos=G.camp.pos;
+  try{if(k==='weather'){const w=(viewState()||G).lastWx;const r=w&&w.rain||0,s=w&&w.snow||0;ic=w&&w.storm?'⛈️':r?''.repeat(Math.min(3,r)):s?'❄️'.repeat(Math.min(3,s)):'☀️';BF.rain(pos,r,s,w&&w.storm);if(w&&w.storm)cls+=' storm'}
+    else if(d.card!=null&&CARD[d.card]){const c=CARD[d.card];const ti=c.icon&&TYICON[c.icon];ic=(CARDICON[k]||'')+(ti?ti:'')}}catch(e){}
   const el=document.createElement('div');el.id='bfcard';el.className='bfcard '+cls;el.setAttribute('role','button');el.setAttribute('aria-label',w8(capFor(i))+' (hold for the full text)');
   let scene='';try{if(k==='weather'){const w=(viewState()||G).lastWx||{};scene=w.storm?'gale':w.snow?'winter':w.rain?'rain':'horizon'}
     else if(k==='threat'||k==='fight')scene='prowlers';else if(k==='mystery')scene='altar';
@@ -202,10 +202,10 @@ function fillInfo(){const d=document.getElementById('detd');if(!d)return;const b
   if(b.dataset.h!==h){b.dataset.h=h;b.innerHTML=h}}
 // ---------- the pop-up for a tapped place: only jobs this pawn can do ----------
 BF.tilePop=function(id){const cur=curPawn();if(!cur)return null;const rec=recPlan().map[cur.id];const rows=legalRows(id,cur);const camp=id===G.camp.pos;let h='';
-  if(camp&&G.scen==='marooned'){let room=0,why=null;try{room=SCEN.marooned.pileRoom();why=pileWhy(1)}catch(e){}if(room>0)h+=`<button class="bfr pile ${why?'no':''}" data-a="pilemax"><span class="t">🔥 Add wood to the signal pile</span><span class="b">+${Math.max(1,Math.min(room,Math.max(0,G.res.wood-committed().wood)))}</span></button>`}
+  if(camp&&G.scen==='marooned'){let room=0,why=null;try{room=SCEN.marooned.pileRoom();why=pileWhy(1)}catch(e){}if(room>0)h+=`<button class="bfr pile ${why?'no':''}" data-a="pilemax"><span class="t"> Add wood to the signal pile</span><span class="b">+${Math.max(1,Math.min(room,Math.max(0,G.res.wood-committed().wood)))}</span></button>`}
   const isRec=r=>rec&&rec.type===r.type&&JSON.stringify(rec.tgt)===JSON.stringify(r.tgt)&&(rec.alt||0)===(r.alt||0);
   h+=rows.map(r=>{const key=encodeURIComponent(JSON.stringify({type:r.type,tgt:r.tgt,alt:r.alt}));const a=findActAny(r.type,r.tgt,r.alt);const k=(a?a.pw.length:0)+1;const n=actNeed({type:r.type,tgt:r.tgt,alt:r.alt,pw:[]});
-      const badge=k<n.need?`needs ${n.need}`:(n.roll&&k<n.max)?'🎲':'✔';const cost=(()=>{try{const c=actCost({type:r.type,tgt:r.tgt,alt:r.alt,pw:[cur.id]});return Object.entries(c).filter(([x,v])=>v).map(([x,v])=>v+RICON[x]).join(' ')}catch(e){return ''}})();
+      const badge=k<n.need?`needs ${n.need}`:(n.roll&&k<n.max)?'':'✔';const cost=(()=>{try{const c=actCost({type:r.type,tgt:r.tgt,alt:r.alt,pw:[cur.id]});return Object.entries(c).filter(([x,v])=>v).map(([x,v])=>v+RICON[x]).join(' ')}catch(e){return ''}})();
       return `<button class="bfr ${isRec(r)?'rec':''} ${a?'has':''}" data-place="${key}" ${isRec(r)?'data-rec="1"':''}><span class="t">${isRec(r)?'⭐ ':''}${E(r.title)}</span><span class="b">${cost?E(cost)+' · ':''}${badge}</span></button>`}).join('');
   if(!h)return null;const t=tileAt(id);return {title:`${pawnLabel(cur).split(' ')[0]} → place ${id+1}${t?' · '+t.terr:''}`,html:`<div class="bfrows">${h}</div>`,cls:'tile bf'}};
 // a tap on a place while planning (the old tile handler has already selected it)

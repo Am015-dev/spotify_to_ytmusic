@@ -81,7 +81,7 @@ function musicTick(){const c=SND.ctx;if(!c||c.state!=='running')return;const bar
     SND.nextT+=bar;SND.beat++}}
 function toggleSound(){SND.on=!SND.on;try{localStorage.setItem('swi_snd',SND.on?'1':'0')}catch(e){}audioInit();if(window.GA){GA.setSfx(SND.on);GA.setMusic(SND.on&&SND.music);musicForget();musicSync();audioMood()}if(SND.master)SND.master.gain.value=SND.on?SND.vol:0;if(SND.on)sfx('click');soundBtns()}
 function toggleMusic(){SND.music=!SND.music;try{localStorage.setItem('swi_mus',SND.music?'1':'0')}catch(e){}if(window.GA)GA.setMusic(SND.on&&SND.music);if(SND.music){audioInit();musicStart()}else musicStop();soundBtns()}
-function soundBtns(){const a=document.getElementById('sndbtn'),b=document.getElementById('musbtn');if(typeof setBtn==='function'){setBtn(a,SND.on?'snd':'mute','');setBtn(b,'wave',SND.music?'On':'Off');return}if(a)a.textContent=SND.on?'🔊':'🔇';if(b)b.textContent=SND.music?'🌊 On':'🌊 Off'}
+function soundBtns(){const a=document.getElementById('sndbtn'),b=document.getElementById('musbtn');if(typeof setBtn==='function'){setBtn(a,SND.on?'snd':'mute','');setBtn(b,'wave',SND.music?'On':'Off');return}if(a)a.textContent=SND.on?'Sound':'Muted';if(b)b.textContent=SND.music?' On':' Off'}
 // ---------- recorded audio: init, and the weather / night / camp-fire mood ----------
 // GA shares the synth's AudioContext (created on the first gesture only), so nothing plays before the player touches the page.
 if(window.GA&&typeof GA_DATA!=='undefined'){GA.init({sfx:GA_DATA.sfx,music:GA_DATA.music,key:'swi',ctx:()=>{audioInit();return SND.ctx}});GA.setSfx(SND.on);GA.setMusic(SND.on&&SND.music)}

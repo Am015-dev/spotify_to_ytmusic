@@ -10,7 +10,7 @@ function flowSync(){if(G&&UI.flowG!==G)flowReset()}
 // ---- guidance level: "full" explains every step, "light" keeps one line. Auto = full for the first round of the first battle ----
 const guideMode=()=>LS.get('na_guide')||'auto';
 function guided(){const m=guideMode();if(m==='full')return true;if(m==='light')return false;return !tourOff()&&(!G||roundShown()<=1)}
-function guideBtn(){const b=document.querySelector('.na-guide');if(b){const on=guided();b.innerHTML=`📘 Guide: <b>${on?'full':'light'}</b>`;b.setAttribute('aria-pressed',String(on));b.title=on?'Step-by-step help is on. Tap for short help only.':'Short help. Tap for step-by-step help.'}}
+function guideBtn(){const b=document.querySelector('.na-guide');if(b){const on=guided();b.innerHTML=` Guide: <b>${on?'full':'light'}</b>`;b.setAttribute('aria-pressed',String(on));b.title=on?'Step-by-step help is on. Tap for short help only.':'Short help. Tap for step-by-step help.'}}
 // ---- where we are: the summary of round N shows at the start of round N+1, before any dial is set ----
 function sumPending(){return !!(G&&!(typeof BF!=="undefined"&&BF.on)&&!G.winner&&G.phase==='plan'&&planSide()>=0&&G.round>=2&&UI.sumSeen<G.round-1&&!UI.info)}
 function roundShown(){return G?(sumPending()?G.round-1:G.round):0}
@@ -147,7 +147,7 @@ function actionHTML(s){const acts=actionsFor(s);const g=guided();const rec=recAc
   if(g)h+=`<p class="now-t"><b>${nm(s)}</b> moved ${i===ord.length-1?'last':'now'}. Its pilot skill is ${psOf(s)}; low skill moves first. Now it may take <b>one action</b>. Each button says what it does. ★ is recommended.</p>`;
   else h+=`<p class="now-t">You flew <b>${s.rev?mvWords(s.rev):''}</b>. Take one action.</p>`;
   h+='<div class="acts col">'+actOpts(s,acts).sort((x,y)=>(/^RP\d/.test(y.a)?1:0)-(/^RP\d/.test(x.a)?1:0)).map(o=>{const a=acts.find(x=>x.a===o.a);const r=o.a===rec&&(o.a!=='TL')?' rec':'';
-    if(/^RP\d/.test(o.a)){const x=s.dmg[+o.a.slice(2)],D=DAMAGE[x.c];return `<button class="btn rep${r}" data-act="action" data-a2="${o.a}" title="${esc(D.t)}">${r?'★ ':''}🔧 Repair ${esc(D.n)}<small>${D.fix==='any'?'Always works':`Roll 1 attack die: ${D.fix==='hit'?'a hit':'a hit or crit'} fixes it`}. Right now: ${esc(critPlain(x.c,s))}</small></button>`}
+    if(/^RP\d/.test(o.a)){const x=s.dmg[+o.a.slice(2)],D=DAMAGE[x.c];return `<button class="btn rep${r}" data-act="action" data-a2="${o.a}" title="${esc(D.t)}">${r?'★ ':''} Repair ${esc(D.n)}<small>${D.fix==='any'?'Always works':`Roll 1 attack die: ${D.fix==='hit'?'a hit':'a hit or crit'} fixes it`}. Right now: ${esc(critPlain(x.c,s))}</small></button>`}
     const lab=o.a==='F'?'◉ Focus':o.a==='E'?'✦ Evade':o.a==='TL'?'⌖ '+esc(o.l):esc(o.l);
     return `<button class="btn${r}" data-act="action" data-a2="${o.a}" ${o.arg!=null?`data-arg="${esc(o.arg)}"`:''} ${o.p?`data-hov="${o.a}:${o.arg}"`:''} title="${esc(a&&a.d||'')}">${r?'★ ':''}${lab}<small>${actNow(s,o,a)}</small></button>`}).join('')+
     `<button class="btn ghost" data-act="action" data-a2="skip">Skip action<small>Take nothing this time.</small></button></div>`;
@@ -157,7 +157,7 @@ function targetHTML(s){const g=guided();const ws=weaponsFor(s);const opts=[];for
   let h=`<p class="head">Combat · ${esc(shortName(s))}: choose a target</p>${stepList(['Choose a target','Roll and modify dice','Result'],0)}`;
   if(g)h+=`<p class="now-t"><b>${nm(s)}</b> shoots ${ord.indexOf(s.id)===0?'first':'now'}: ships shoot from highest to lowest pilot skill (its skill is ${psOf(s)}). You may shoot <b>one</b> enemy inside your arc (the yellow wedge) at range 1-3; the valid targets are marked on the board. Range 1: +1 attack die. Range 3 or a rock in the way: +1 defence die.</p>`;
   else h+=`<p class="now-t">Pick a target${G.bonus?' (bonus attack, primary weapon only)':''}.</p>`;
-  h+='<div class="acts col">'+opts.map(o=>`<button class="btn${o===best?' rec':''}" data-act="fire" data-w="${o.w.k}" data-t="${o.t.id}">${o===best?'★ ':''}🎯 Shoot ${nm(o.d)}${o.w.k!=='P'?' with '+esc(o.w.n):''}<small>range ${o.t.rg}${o.t.obstructed?' · a rock is in the way: +1 defence die':''} · you roll ${o.n} attack ${o.n===1?'die':'dice'}, it rolls ${o.m} defence · expected ≈${o.e.toFixed(1)} damage</small></button>`).join('');
+  h+='<div class="acts col">'+opts.map(o=>`<button class="btn${o===best?' rec':''}" data-act="fire" data-w="${o.w.k}" data-t="${o.t.id}">${o===best?'★ ':''} Shoot ${nm(o.d)}${o.w.k!=='P'?' with '+esc(o.w.n):''}<small>range ${o.t.rg}${o.t.obstructed?' · a rock is in the way: +1 defence die':''} · you roll ${o.n} attack ${o.n===1?'die':'dice'}, it rolls ${o.m} defence · expected ≈${o.e.toFixed(1)} damage</small></button>`).join('');
   const cant=enemiesOf(s).filter(e=>!opts.some(o=>o.d===e));
   h+=`<button class="btn ghost" data-act="fire" data-w="skip">Hold fire<small>Skip this attack.</small></button></div>`;
   if(cant.length)h+=`<p class="small muted">Can't shoot: ${cant.map(e=>`${nm(e)} is ${whyNot(s,e)}`).join('; ')}.</p>`;
@@ -201,9 +201,9 @@ function summaryHTML(){const R=G.round-1,me=soloSide()>=0?soloSide():planSide();
   let h=`<p class="head">Round ${R} summary</p>`;
   if(g)h+=`<p class="now-t">That was one full round: <b>Planning</b> (secret dials) → <b>Activation</b> (move and act, lowest skill first) → <b>Combat</b> (shoot, highest skill first) → <b>End</b>. Every round works the same way.</p>`;
   h+=`<div class="sumgrid"><div><b>${dealt}</b><span>damage dealt</span></div><div class="${taken?'hurt':''}"><b>${taken}</b><span>damage taken</span></div><div class="${stress?'hurt':''}"><b>${stress}</b><span>stress on your ship${my.length>1?'s':''}</span></div></div>`;
-  const ev=[];for(const r of res)ev.push('🎯 '+resultHTML(r,true));
-  for(const n of (UI.notes[R]||[]))if(n.kind!=='red'||!(UI.notes[R]||[]).some(x=>x.id===n.id&&x.kind==='stressed'))ev.push((n.lost||n.kind==='noshot'?'⚠ ':'')+n.t);
-  for(const t of roundHarm(R,me))ev.push((/restores|patches|repair/.test(t)?'✚ ':'💥 ')+esc(t));
+  const ev=[];for(const r of res)ev.push(' '+resultHTML(r,true));
+  for(const n of (UI.notes[R]||[]))if(n.kind!=='red'||!(UI.notes[R]||[]).some(x=>x.id===n.id&&x.kind==='stressed'))ev.push((n.lost||n.kind==='noshot'?' ':'')+n.t);
+  for(const t of roundHarm(R,me))ev.push((/restores|patches|repair/.test(t)?'✚ ':' ')+esc(t));
   if(!res.length)ev.push('No shots were fired this round.');
   h+=`<h4>What happened</h4><ul class="sumlist">${ev.slice(0,8).map(x=>`<li>${x}</li>`).join('')}</ul>`;
   h+=`<h4>Your ship${my.length>1?'s':''} now</h4><ul class="sumlist">${my.map(s=>s.alive?`<li><b>${nm(s)}</b>: hull ${s.hull-hullDmg(s)}/${s.hull} · shields ${s.sh}/${s.shMax}${s.stress?` · <span class="warn">stress ${s.stress}</span>`:''}${s.dmg.filter(x=>x.up).map(x=>` · <span class="crit">${esc(DAMAGE[x.c].n)}: ${esc(critPlain(x.c,s))}</span>`).join('')}</li>`:`<li class="muted"><b>${nm(s)}</b>: destroyed</li>`).join('')}</ul>`;

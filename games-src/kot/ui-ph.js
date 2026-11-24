@@ -41,7 +41,7 @@ function phChips(){const el=$ph('pchips');if(!el)return;if(!G){el.innerHTML='';r
   const n=G.pl.length,dk=document.querySelector('.gx-dock');const w=(dk?dk.clientWidth:PHONE.aw)-16;const maxc=Math.max(2,Math.floor((w+5)/(innerHeight<640&&innerHeight>innerWidth?86:93)));const rows=Math.ceil(n/maxc);el.style.setProperty('--cc',Math.ceil(n/rows));
   el.setAttribute('role','tablist');el.innerHTML=G.pl.map(p=>{const me=(G.mode==='solo'&&p.human)||(NET.on&&p.i===NET.mySeat);const c=inCity(p.i),b=G.bay===p.i;const nm=esc(mname(p));
     const lab=`${mname(p)}${me?' (you)':''}: ${p.alive?`${p.hp} hearts, ${p.vp} stars, ${p.en} energy, ${p.cards.length} power cards${c?', in Downtown':b?', in the Harbor':''}`:'knocked out'}. ${p.i===G.active&&!G.winner?'Its turn. ':''}Tap for details.`;
-    return `<div role="tab" tabindex="0" class="pchip ${me?'me':''} ${p.cards.length?'hasn':''} ${p.i===G.active&&!G.winner?'on':''} ${p.alive?'':'ko'} ${c?'city':''}" data-pm="${p.i}" style="--mc:${MONS[p.m].c}" aria-label="${esc(lab)}">${(window.CCMedia&&CCMedia.avatar(p.m))?`<img class="pav" src="${CCMedia.avatar(p.m)}" alt="" draggable="false">`:''}<b>${c?'<i class="crn" role="img" aria-label="In Downtown"></i>':b?'⚓':''}${nm}</b>${p.alive?`<span><em class="h">♥${p.hp}</em><em class="v">★${p.vp}</em><em class="e" data-engine="G.pl[${p.i}].en">⚡${p.en}</em></span>${p.cards.length?`<i class="pn" aria-hidden="true">🃏${p.cards.length}</i>`:''}`:'<span>K.O.</span>'}${me?'<u aria-hidden="true">YOU</u>':''}</div>`}).join('')}
+    return `<div role="tab" tabindex="0" class="pchip ${me?'me':''} ${p.cards.length?'hasn':''} ${p.i===G.active&&!G.winner?'on':''} ${p.alive?'':'ko'} ${c?'city':''}" data-pm="${p.i}" style="--mc:${MONS[p.m].c}" aria-label="${esc(lab)}">${(window.CCMedia&&CCMedia.avatar(p.m))?`<img class="pav" src="${CCMedia.avatar(p.m)}" alt="" draggable="false">`:''}<b>${c?'<i class="crn" role="img" aria-label="In Downtown"></i>':b?'':''}${nm}</b>${p.alive?`<span><em class="h">♥${p.hp}</em><em class="v">★${p.vp}</em><em class="e" data-engine="G.pl[${p.i}].en">⚡${p.en}</em></span>${p.cards.length?`<i class="pn" aria-hidden="true">🃏${p.cards.length}</i>`:''}`:'<span>K.O.</span>'}${me?'<u aria-hidden="true">YOU</u>':''}</div>`}).join('')}
 // ---- the shop: three tiles in the buy step, a pop-up with enlarged cards ----
 function phShopOK(){return !!(G&&!G.winner&&humanTurn()&&G.phase==='buy')}
 function phTiles(){const el=$ph('pshop');if(!el)return;if(!phShopOK()||!G.market.length){el.innerHTML='';return}
@@ -61,7 +61,7 @@ function phPopHTML(){if(!G||UI.info){PHN.pop=null;return null}
     let h=monDetail(p).replace(/ id="mon-\d+"/,'');
     {const tmp=document.createElement('div');tmp.innerHTML=h;const hands=[...tmp.querySelectorAll('.mc.hand')];hands.forEach(e=>e.dataset.owner=String(p.i));
      // hot-seat: only the monster whose turn it is may see its hand (the device is shared)
-     if(G.mode==='hot'&&p.i!==G.active&&hands.length&&p.hand.length){hands.forEach((e,j)=>{if(j)e.remove()});const e0=hands[0];e0.innerHTML=`<b>🧬 ${p.hand.length} evolution card${p.hand.length===1?'':'s'} in hand</b> <i>hidden</i>`}
+     if(G.mode==='hot'&&p.i!==G.active&&hands.length&&p.hand.length){hands.forEach((e,j)=>{if(j)e.remove()});const e0=hands[0];e0.innerHTML=`<b> ${p.hand.length} evolution card${p.hand.length===1?'':'s'} in hand</b> <i>hidden</i>`}
      h=tmp.innerHTML}
     return {t:`${MONS[p.m].n}${p.i===G.active&&!G.winner?' · its turn':''}`,a:'',b:`<div class="monwrap">${h}</div>`}}
   if(PHN.pop==='banner'){return {t:'What just happened',a:'',b:`<div class="banwrap">${UI.banner||''}</div>`}}
@@ -80,9 +80,9 @@ function phCard(){const dk=document.querySelector('.gx-dock');if(!dk)return;
 function phActs(){if(!G)return;const pa=$ph('pacts');if(!pa)return;
   const set=(sel,html,al)=>{const b=pa.querySelector(sel);if(!b)return;b.innerHTML=html;if(al)b.setAttribute('aria-label',al)};
   if(humanTurn()&&G.phase==='roll'){const nk=G.dice.filter(d=>!d.k).length;
-    set('[data-act="reroll"]',`<span class="bl">🎲 Roll</span><small>${nk} ${nk===1?'die':'dice'} · ${G.rolls} left</small>`,`Roll the ${nk} unkept ${nk===1?'die':'dice'} again, ${G.rolls} rerolls left`);
+    set('[data-act="reroll"]',`<span class="bl"> Roll</span><small>${nk} ${nk===1?'die':'dice'} · ${G.rolls} left</small>`,`Roll the ${nk} unkept ${nk===1?'die':'dice'} again, ${G.rolls} rerolls left`);
     set('[data-act="resolve"]','<span class="bl">✔ Done</span><small>use these dice</small>','Done: resolve these dice');
-    set('[data-act="hint"]','<span aria-hidden="true">💡</span>','Keep the suggested dice')}
+    set('[data-act="hint"]','<span aria-hidden="true"></span>','Keep the suggested dice')}
   if(humanTurn()&&G.phase==='buy'){const win=!G.bug&&cur().vp>=20;set('[data-act="end"]',`<span class="bl">✔ ${G.bug?'Finish turn':'End turn'}</span>${win?`<small>you have ${cur().vp}★ (20 wins): end your turn to win</small>`:G.market.length?'<small>or tap a card above to read and buy it</small>':''}`,G.bug?'Finish the borrowed turn':win?'End your turn: you have 20 stars and win if you survive it':'End your turn')}
   const dk=document.querySelector('.gx-dock');if(!dk)return;
   const n=G.dice.length,land=document.documentElement.classList.contains('ph-l');const railW=dk.clientWidth-16;

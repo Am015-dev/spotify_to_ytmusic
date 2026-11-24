@@ -91,7 +91,7 @@ function atkPopHTML(d){const s=ship(G.cur);const rows=[];for(const w of weaponsF
   <div class="pp-b"><p class="pp-l"><b>Range ${t0.t.rg}</b> · inside your ${s.arc==='T'?'turret':'front'} arc · ${esc(SHIPS[d.type].n)} · hull ${d.hull-hullDmg(d)}/${d.hull}${d.shMax?` · shields ${d.sh}/${d.shMax}`:''}</p>
   ${rows.map(o=>`<div class="pp-r${o===best?' rec':''}"><div class="dice-n"><b>${o.sd.atk}</b> attack dice <span class="vs">vs</span> <b>${o.sd.def}</b> defence</div><div class="small muted">${o.w.k==='P'?'Primary weapon':esc(o.w.n)} · expected ≈${o.e.toFixed(1)} damage</div></div>`).join('')}
   <ul class="pp-m">${mods.map(m=>`<li>${m}</li>`).join('')||'<li class="muted">No modifiers right now.</li>'}</ul></div>
-  <div class="pp-f">${rows.map(o=>`<button class="btn ${o===best?'primary':''}" data-act="fire" data-w="${o.w.k}" data-t="${d.id}">🎯 Fire${o.w.k!=='P'?' '+esc(o.w.n):''}<small>${o.sd.atk} dice, range ${o.t.rg}</small></button>`).join('')}</div>`}
+  <div class="pp-f">${rows.map(o=>`<button class="btn ${o===best?'primary':''}" data-act="fire" data-w="${o.w.k}" data-t="${d.id}"> Fire${o.w.k!=='P'?' '+esc(o.w.n):''}<small>${o.sd.atk} dice, range ${o.t.rg}</small></button>`).join('')}</div>`}
 // pilot portraits (owner art, media/camp-*.webp) on the ship card
 const PORTRAIT={kael:'kael',knife:'knife',hex:'hex',drill:'drill',slate:'drill',onyx:'hammer',nightjar:'wailer',ember:'sorin',cadet:'kira',brink:'quill'};
 function porHTML(s){const k=PORTRAIT[s.pilot];return k?`<img class="pp-por" src="media/camp-${k}.webp" alt="" width="44" height="44">`:''}
@@ -114,7 +114,7 @@ function stripHTML(){const ps=planSide();const my=alive().filter(s=>s.side===ps)
 function stage(){if(!G)return 'none';if(UI.info)return 'start';return 'game'}
 function chipHTML(){if(!G)return 'Nebula Aces';const st=G.winner?'Over':G.round===0?'Setup':['','Plan','Move','Fire','End'][stepShown()]||'';const r=G.round===0||G.winner?'':'R'+roundShown()+(G.ex&&G.ex.roundCap?'/'+G.ex.roundCap:'');
   const who=G.winner?'':(planSide()>=0||humanTurn())?'<i class="you">you</i>':'';return `${r?`<b>${r}</b>`:''}<span>${st}</span>${who}`}
-function cardHTML(){if(UI.advOpen){const a=advice();return {key:'adv',h:`<div class="pc-b"><div class="adv2"><b>🧭 ${a.say}</b> ${a.why}</div></div><div class="pp-f"><button class="btn primary" data-a="advise">Got it</button></div>`}}
+function cardHTML(){if(UI.advOpen){const a=advice();return {key:'adv',h:`<div class="pc-b"><div class="adv2"><b> ${a.say}</b> ${a.why}</div></div><div class="pp-f"><button class="btn primary" data-a="advise">Got it</button></div>`}}
   if(G&&G.round===0&&!G.winner&&PHN.briefSeen!==G.seed&&(isHuman(0)||isHuman(1))&&typeof briefingHTML==='function')return {key:'brief'+G.seed,h:`<div class="pc-b">${briefingHTML()}</div><div class="pp-f"><button class="btn primary" data-ph="briefok">Continue ▶</button></div>`};
   return null}
 function phRender(){if(!PHN.on)return;PHN.build();const dock=document.querySelector('.gx-dock');if(!dock)return;

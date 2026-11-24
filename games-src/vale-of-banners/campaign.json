@@ -6,37 +6,37 @@
   "wren": {
    "name": "Wren",
    "portrait": "portrait-wren",
-   "emoji": "📜",
+   "emoji": "",
    "color": "#4f86c6"
   },
   "odo": {
    "name": "Old Odo",
    "portrait": "portrait-odo",
-   "emoji": "🧓",
+   "emoji": "",
    "color": "#7a5c3e"
   },
   "cass": {
    "name": "Cass Ferrow",
    "portrait": "portrait-cass",
-   "emoji": "⚓",
+   "emoji": "",
    "color": "#2f6fa8"
   },
   "hask": {
    "name": "Lord Haskel",
    "portrait": "portrait-hask",
-   "emoji": "🏰",
+   "emoji": "",
    "color": "#2f5d3a"
   },
   "ivo": {
    "name": "Ivo Grath",
    "portrait": "portrait-ivo",
-   "emoji": "🪙",
+   "emoji": "",
    "color": "#b8892b"
   },
   "marla": {
    "name": "Marla Venn",
    "portrait": "portrait-marla",
-   "emoji": "🐑",
+   "emoji": "",
    "color": "#8fbf5a"
   }
  },
@@ -119,7 +119,7 @@
    ],
    "opponent": {
     "name": "Tobin Reed",
-    "emoji": "🌾",
+    "emoji": "",
     "cast": "tobin",
     "personality": "Cheerful neighbour. Builds whatever is closest and sells late.",
     "aiLevel": "easy",
@@ -202,7 +202,7 @@
    ],
    "opponent": {
     "name": "Dilly Hart",
-    "emoji": "🧺",
+    "emoji": "",
     "cast": "dilly",
     "personality": "Chatty trader. Sells early, rarely plans a region.",
     "aiLevel": "easy",
@@ -295,7 +295,7 @@
    ],
    "opponent": {
     "name": "Cass Ferrow",
-    "emoji": "⚓",
+    "emoji": "",
     "cast": "cass",
     "personality": "Brash barge-mistress. Rushes barges and bonus landings.",
     "aiLevel": "easy",
@@ -386,7 +386,7 @@
    ],
    "opponent": {
     "name": "Brannoc Dyer",
-    "emoji": "🎨",
+    "emoji": "",
     "cast": "brannoc",
     "personality": "Steady dyer. Fills one colour at a time and never rushes.",
     "aiLevel": "normal",
@@ -478,7 +478,7 @@
    ],
    "opponent": {
     "name": "Marla Venn",
-    "emoji": "🐑",
+    "emoji": "",
     "cast": "marla",
     "personality": "Patient shepherd queen. Fills regions of pasture, sells wool.",
     "aiLevel": "normal",
@@ -571,7 +571,7 @@
    ],
    "opponent": {
     "name": "Lord Haskel",
-    "emoji": "🏰",
+    "emoji": "",
     "cast": "hask",
     "personality": "Proud castle-builder. Packs Keeps and Moot Halls into long chains.",
     "aiLevel": "normal",
@@ -668,7 +668,7 @@
    ],
    "opponent": {
     "name": "Marla Venn",
-    "emoji": "🐑",
+    "emoji": "",
     "cast": "marla",
     "personality": "Patient shepherd queen. Fills regions of pasture, sells wool.",
     "aiLevel": "hard",
@@ -760,7 +760,7 @@
    ],
    "opponent": {
     "name": "Lord Haskel",
-    "emoji": "🏰",
+    "emoji": "",
     "cast": "hask",
     "personality": "Proud castle-builder. Packs Keeps and Moot Halls into long chains.",
     "aiLevel": "hard",
@@ -853,7 +853,7 @@
    ],
    "opponent": {
     "name": "Sibyl Quarry",
-    "emoji": "⛏️",
+    "emoji": "",
     "cast": "sibyl",
     "personality": "Dry quarry-master. Hoards workers, then builds in bursts.",
     "aiLevel": "hard",
@@ -950,7 +950,7 @@
    ],
    "opponent": {
     "name": "Ivo Grath",
-    "emoji": "🪙",
+    "emoji": "",
     "cast": "ivo",
     "personality": "Cold silver baron. Buys from the back lane every round and sells late.",
     "aiLevel": "hard",

@@ -72,4 +72,4 @@ function musicTick(){const c=SND.ctx;if(!c||c.state!=='running')return;if(gaMusi
     SND.nextT+=step;SND.beat++}}
 function toggleSound(){SND.on=!SND.on;try{localStorage.setItem('na_snd',SND.on?'1':'0')}catch(e){}if(GAOK){GA.setSfx(SND.on);if(SND.on&&typeof V3!=='undefined'&&V3.engOn)sndEngine(true)}audioInit();if(SND.master)SND.master.gain.value=SND.on?SND.vol:0;if(SND.on)sfx('click');soundBtns()}
 function toggleMusic(){SND.music=!SND.music;try{localStorage.setItem('na_mus',SND.music?'1':'0')}catch(e){}if(GAOK)GA.setMusic(SND.music);if(SND.music){audioInit();musicStart()}else musicStop();soundBtns()}
-function soundBtns(){const a=document.getElementById('sndbtn'),b=document.getElementById('musbtn');if(a)a.textContent=SND.on?'🔊':'🔇';if(b)b.textContent=SND.music?'🎵 On':'🎵 Off'}
+function soundBtns(){const a=document.getElementById('sndbtn'),b=document.getElementById('musbtn');if(a)a.textContent=SND.on?'Sound':'Muted';if(b)b.textContent=SND.music?'Music on':'Music off'}

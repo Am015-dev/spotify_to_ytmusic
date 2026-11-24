@@ -172,7 +172,7 @@ FN.outcome=fr=>{const a=G.plan.acts.find(x=>x.id===fr.id);const d=fr.d;const c=f
 function advCtx(a){if(a.type==='gather'){const s=srcs(a.tgt.pos).find(x=>x.i===a.tgt.i);return {pos:a.tgt.pos,srcI:a.tgt.i,gres:s&&s.s==='wood'?'wood':'food'}}if(a.type==='explore')return {pos:a.tgt,explore:1};return {}}
 FN.success=fr=>{const a=G.plan.acts.find(x=>x.id===fr.id);const ctx=fr.ctx;const c=ctx.actor>=0?P(ctx.actor):null;
   if(a.type==='build'){const cost=actCost(a);for(const r in cost)if(cost[r])pay(r,cost[r],(ctx.pay||[]).map(P),false);if(G.tok.build.wood&&cost.wood)delete G.tok.build.wood;
-    const t=a.tgt.k;if(t==='shelter'){G.camp.shelter=true;lg('🏠 A shelter is built!','big');fx('build')}else if(t==='roof')roofPal('roof',1);else if(t==='pal')roofPal('pal',1);else if(t==='weapon')weapon(1);
+    const t=a.tgt.k;if(t==='shelter'){G.camp.shelter=true;lg(' A shelter is built!','big');fx('build')}else if(t==='roof')roofPal('roof',1);else if(t==='pal')roofPal('pal',1);else if(t==='weapon')weapon(1);
     else if(t==='cross')SC().built&&SC().built('cross',ctx.actor,a.tgt.cross);else completeInv(t,ctx.actor,false,true);return}
   if(a.type==='gather'){const s=srcs(a.tgt.pos).find(x=>x.i===a.tgt.i);if(!s)return;const r=s.s==='wood'?'wood':'food';let n=1;const m=G.map[a.tgt.pos];if(m.tok[r]&&s.s!=='parrot'||(r==='food'&&m.tok.food&&!s.tok))n++;
     for(const it of ['basket','sack'])if(has(it)&&!G.plan.used[it]){G.plan.used[it]=1;n++}
@@ -181,7 +181,7 @@ FN.success=fr=>{const a=G.plan.acts.find(x=>x.id===fr.id);const ctx=fr.ctx;const
   if(a.type==='special'){lg(`${actLabel(a)}: success!`,'good');SPEC(a.tgt).win(ctx)}};
 function exploreTile(pos,ctx){const no=G.tileDeck.shift();if(no==null)return;const m=G.map[pos];m.tile=no;const t=TILES.find(x=>x.no===no);G.stats.explored++;
   const before=new Set();for(const x of G.map)if(x.id!==pos){const tt=tileAt(x.id);if(tt&&!x.cov)before.add(tt.terr)}
-  lg(`🗺 New land at place ${pos+1}: ${t.terr}${t.src.length?' with '+t.src.join(' and '):''}${t.shelter?', a natural shelter':''}.`,'big');fx('explore',pos);
+  lg(` New land at place ${pos+1}: ${t.terr}${t.src.length?' with '+t.src.join(' and '):''}${t.shelter?', a natural shelter':''}.`,'big');fx('explore',pos);
   if(!before.has(t.terr))lg(`First ${t.terr} found: new inventions may now be possible.`,'good');
   if(m.tok.scorch){delete m.tok.scorch;if(t.src.length)m.exh[0]=1}
   if(t.beast&&G.beast.length){G.hunt.push(G.beast.shift());shuffle(G.hunt);lg('Animal tracks: a new beast joins the hunting grounds.')}
@@ -210,7 +210,7 @@ FN.weather=fr=>{G.phase='weather';beat('weather');const S=SCENARIOS[G.scen];cons
   if(!dice.includes('animals'))G.wxAnimal=null;
   G.wxNow={rain,snow,storm:G.wx.storm,animal:G.wxAnimal,out};G.lastWx=Object.assign({},G.wxNow,{round:G.round});
   if(!dice.length&&!rain&&!snow&&!G.wx.storm){lg('Weather: calm.');G.wx={rain:0,snow:0,storm:0,animals:0};return}
-  lg(`Weather: ${out.map(x=>x.replace(/^rain die: /,'🌧 rain die shows ').replace(/^winter die: /,'❄️ winter die shows ').replace(/^animals die: /,'🐾 animals die: ')).join(', ')||'no weather dice'}${G.wx.rain||G.wx.snow||G.wx.storm?', plus clouds from event cards':''} → ${rain} rain cloud${rain===1?'':'s'}, ${snow} snow cloud${snow===1?'':'s'}${G.wx.storm?', a storm':''}.`,'big');fx('weather');
+  lg(`Weather: ${out.map(x=>x.replace(/^rain die: /,' rain die shows ').replace(/^winter die: /,'❄️ winter die shows ').replace(/^animals die: /,' animals die: ')).join(', ')||'no weather dice'}${G.wx.rain||G.wx.snow||G.wx.storm?', plus clouds from event cards':''} → ${rain} rain cloud${rain===1?'':'s'}, ${snow} snow cloud${snow===1?'':'s'}${G.wx.storm?', a storm':''}.`,'big');fx('weather');
   push({f:'fn',k:'weather2'});
   // optional helps: the Cook's moonshine
   const cook=living().find(c=>c.k==='cook'&&!c.used.moonshine&&!c.noSkills&&c.det>=3);if(cook&&(rain+snow>G.camp.roof||snow)){ask(cook.i,'Use Moonshine in this weather?',[{l:'No',frames:[]},{l:'Ignore 1 rain cloud (3 determination)',frames:[{f:'fn',k:'moon',m:'rain',c:cook.i}]}].concat(snow?[{l:'Turn 1 snow cloud into rain (3 determination)',frames:[{f:'fn',k:'moon',m:'snow',c:cook.i}]}]:[]),{kind:'weather'})}};

@@ -2,7 +2,7 @@
 // Cast: Marshal Brecken (guide, camp-brecken), Slate (the rival raider in the tutorial, camp-drill art), Kael Varro (you).
 // Bubble rules: title <= 4 words, say <= 20 words, warm and punchy, a story reason first, then what to do (the glow shows where).
 const LORE={
-  guide:{name:'Brecken',art:'camp-brecken.webp',emoji:'🎖️'},rival:{name:'Slate',art:'camp-drill.webp',emoji:'🎯'},
+  guide:{name:'Brecken',art:'camp-brecken.webp',emoji:''},rival:{name:'Slate',art:'camp-drill.webp',emoji:''},
   // tutorial prologue "Convoy Run": chapters open with a title line, the payoff comes with the next step's first words
   tut:{
     goal:{t:'Ch 1 · Scramble',s:'Slate is raiding our convoy. Smash his ship before it reaches the freighters. Yours is at the bottom.'},

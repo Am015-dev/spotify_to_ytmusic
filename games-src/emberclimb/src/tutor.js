@@ -19,7 +19,7 @@
     var tw = document.querySelector('.toast');   // a toast still being read is never removed: the bubble waits (R1: relic toast cut after 250 ms)
     if ((old && Date.now() < (+old.getAttribute('data-until') || 0)) || (tw && Date.now() < (+tw.getAttribute('data-until') || 0))) { C.q.unshift({ key: 'say', text: text, ms: ms }); return null; }
     if (old) old.remove(); if (tw) tw.remove();
-    var c = (ST.cast || {})[who || 'guide'] || { name: 'Warden Ashgrove', emoji: '🔥', color: '#a8431f' }, d = document.createElement('div'); d.className = 'ec-say'; d.setAttribute('role', 'status'); if (gs) d.setAttribute('data-scr', gs.scr || '');
+    var c = (ST.cast || {})[who || 'guide'] || { name: 'Warden Ashgrove', emoji: '', color: '#a8431f' }, d = document.createElement('div'); d.className = 'ec-say'; d.setAttribute('role', 'status'); if (gs) d.setAttribute('data-scr', gs.scr || '');
     var pic = window.EC_A ? EC_A('cast-' + (who || 'guide'), c.emoji || '', { kind: 'portrait', ph: c.color || '#a8431f' }) : document.createElement('div'); d.appendChild(pic);
     var t = document.createElement('div'), b = document.createElement('b'), sp = document.createElement('span'); b.textContent = c.name; sp.textContent = text; t.appendChild(b); t.appendChild(sp); d.appendChild(t);
     d.addEventListener('click', function (e) { e.stopPropagation(); d.remove(); });

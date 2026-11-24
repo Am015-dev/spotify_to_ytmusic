@@ -22,14 +22,14 @@ function storyNext(){const i=storyIdx();if(i<0)return;if(i===UI.beats.length-1&&
 function skipStop(i){for(let k=i+1;k<UI.beats.length;k++){if(skippable(k))continue;const b=UI.beats[k];if(b.kind==='daysum'||b.kind==='over'||beatLines(k).some(l=>l.c==='bad'))return k}return -1}
 function storySkip(){const i=storyIdx();const k=i<0?-1:skipStop(i);if(k>=0)UI.shown=k-1;else if(humanQ())UI.shown=UI.beats.length-2;else UI.shown=UI.beats.length-1;UI.seenBeat=null;refresh()}
 function charBark(ci,kind,seed){const c=ci!=null&&ci>=0?P(ci):null;if(!c)return '';const f=FL().chars&&FL().chars[c.k];const l=f&&pickL(f[kind],seed);return l?`<div class="bark" style="--pc:${PCOL[c.i%6]}"><b>${esc(c.nm)}:</b> “${esc(l)}”</div>`:''}
-const KIND_ICON={prod:'🧺',daysum:'📋',go:'🧭',finds:'🎒',intro:'🏝️',dawn:'🌅',event:'📜',threat:'⚠️',morning:'☀️',act:'🧭',adventure:'❓',mystery:'🗝️',fight:'⚔️',weather:'⛈️',night:'🌙',over:'🏁'};
-const ACT_ICON={threat:'⚠️',hunt:'🏹',build:'🔨',gather:'🧺',explore:'🧭',camp:'🏕️',rest:'😴',special:'⭐',tmap:'🗺️'};
+const KIND_ICON={prod:'',daysum:'',go:'',finds:'',intro:'',dawn:'',event:'',threat:'',morning:'☀️',act:'',adventure:'❓',mystery:'',fight:'',weather:'⛈️',night:'',over:''};
+const ACT_ICON={threat:'',hunt:'',build:'',gather:'',explore:'',camp:'',rest:'',special:'⭐',tmap:''};
 const AI=t=>`<i class="ai" data-a="${t}">${ACT_ICON[t]||'•'}</i>`;   // painted icon once html.sk-acts is set
 function beatHtml(i){const b=UI.beats[i];const d=b.data;const F=FL();const lines=beatLines(i).filter(MEANINGFUL);const S=SCENARIOS[G.scen];const fs=(F.scen||{})[G.scen]||{};
-  let kicker='',title='',story='',card='',extra='',icon=KIND_ICON[b.kind]||'📖';
+  let kicker='',title='',story='',card='',extra='',icon=KIND_ICON[b.kind]||'';
   switch(b.kind){
   case 'intro':kicker=`Chapter ${SCEN_ORDER.indexOf(G.scen)+1} · ${esc(S.n)}`;title=esc(fs.title||S.n);story=esc(fillCrew(d.text,d.page));if(d.page===d.of-1)extra=`<div class="goalbox"><b>Your goal</b> ${esc(S.x)}</div>`;break;
-  case 'dawn':kicker=`Day ${d.round} of ${G.rounds}`;title=esc((fs.days&&fs.days[d.round])||pickL((F.phase||{}).dawn,b.id)||'A new day');{const wx=wxTab()[d.round]||[];extra=`<div class="fore">Weather dice tonight: ${wx.length?wx.map(x=>({rain:'🌧 rain die',snow:'❄️ winter die',animals:'🐾 hungry-animals die'}[x])).join(' · '):'none, calm unless a card adds clouds'}</div>`+threadHtml(d.round)}break;
+  case 'dawn':kicker=`Day ${d.round} of ${G.rounds}`;title=esc((fs.days&&fs.days[d.round])||pickL((F.phase||{}).dawn,b.id)||'A new day');{const wx=wxTab()[d.round]||[];extra=`<div class="fore">Weather dice tonight: ${wx.length?wx.map(x=>({rain:' rain die',snow:'❄️ winter die',animals:' hungry-animals die'}[x])).join(' · '):'none, calm unless a card adds clouds'}</div>`+threadHtml(d.round)}break;
   case 'event':case 'threat':{const c=CARD[d.card];const fe=(F.ev||{})[d.card]||(F.adv||{})[d.card]||(F.mys||{})[d.card]||{};
     if(b.kind==='threat'){kicker='Too late';title=esc(c.th?c.th.n:c.n)+' — we never got to it';story=esc(fe.x||'')}
     else if(d.late){kicker='It comes back to haunt us';title=esc(c.ev.n);story=esc(fe.e||'')}
@@ -59,7 +59,7 @@ function beatHtml(i){const b=UI.beats[i];const d=b.data;const F=FL();const lines
   case 'over':{const w=G.over&&G.over.win;const ck=G.cmp&&G.cmp.goal&&G.cmp.goal.type==='custom';kicker=ck?'End of the chapter':'The end';title=ck?(w?'Chapter goal reached!':'Chapter lost'):w?'Rescued!':'Lost on the island';story=esc(ck?(w?'We did what we set out to do. The island still has more to teach us.':'Not this time. The island keeps its secrets a little longer.'):endLine());extra=`<p class="why">${esc(G.over?G.over.why:'')}</p>`;break}}
   const chips=lines.slice(0,14).map(l=>`<li class="${l.c}">${esc(l.t)}</li>`).join('');
   return {icon,kicker,title,story,card,extra,chips}}
-function diceHtml(d,seed){const f=[['wound',d.w,d.w?'🩸':'·','wound','no wound'],['success',d.s,d.s?'✔':'✖','success','failure'],['adventure',d.q,d.q?'❓':'·','adventure','no adventure']];
+function diceHtml(d,seed){const f=[['wound',d.w,d.w?'':'·','wound','no wound'],['success',d.s,d.s?'✔':'✖','success','failure'],['adventure',d.q,d.q?'❓':'·','adventure','no adventure']];
   return `<div class="dice3">${f.map(([k,v,g,a,n],j)=>`<div class="d3 ${k} ${k==='success'?(v?'good':'bad'):(v?'bad':'good')}" style="animation-delay:${j*.12}s"><span>${g}</span><small>${v?a:n}</small></div>`).join('')}</div>`}
 function renderStory(){const el=$('#story');if(!el)return;if(!G||UI.modal==='start'){el.hidden=true;document.body.classList.remove('storying');return}const i=storyIdx();document.body.classList.toggle('storying',i>=0);if(i<0){el.hidden=true;el.dataset.id='';if(V3.on)V3.focus=null;return}
   const b=UI.beats[i];const h=beatHtml(i);const q=i===UI.beats.length-1&&humanQ()?G.q:null;
@@ -103,10 +103,10 @@ function threadHtml(round){let t='';const pileW=p=>p>=15?'ready to light':p>=10?
   if(G.scen==='hexed')t=`Crosses raised: ${G.sc.crosses.length} of 5.`;
   if(G.scen==='stranded')t=G.sc.rescued?'Ada is safe in camp. Now the Lifeboat.':`Ada has ${CHARS.ada.die-G.sc.ada} life left on the rock.`;
   if(G.scen==='settlers')t=`Settlement goals made: ${G.sc.goals.filter(k=>has(k)).length} of ${G.sc.goals.length}.`;
-  return t?`<div class="fore thread">🧵 ${esc(t)}</div>`:''}
+  return t?`<div class="fore thread"> ${esc(t)}</div>`:''}
 const DEATH_LINE={hunger:'wasted away from hunger','sleeping in the open':'caught a deadly chill sleeping in the open','soaked and cold':'never got dry again','the cold':'froze in the night','low morale':'lost the will to go on','not enough determination':'lost the will to go on','a mishap':'was hurt once too often at work','no palisade left':'was crushed when the storm tore through the camp','hungry animals':'was mauled by hungry animals','fever':'burned up with fever'};
 function endLine(){const fs=(FL().scen||{})[G.scen]||{};if(!G.over)return '';if(G.over.win)return fs.win||'';const w=G.over.why;
-  if(/died\.$/.test(w)){const m=G.log.map(l=>/☠ (.+) dies(?: \(([^)]*)\))?/.exec(l.t)).find(Boolean);const who=m?m[1]:w.replace(/ died\.$/,'');const why=m&&m[2]||'';
+  if(/died\.$/.test(w)){const m=G.log.map(l=>/ (.+) dies(?: \(([^)]*)\))?/.exec(l.t)).find(Boolean);const who=m?m[1]:w.replace(/ died\.$/,'');const why=m&&m[2]||'';
     const how=DEATH_LINE[why]||(BEASTS.some(b=>b.n===why)?`was killed by the ${why}`:why?`died (${why})`:'died of their wounds');
     return `${who} ${how}. We bury our friend above the tide line. Without them the rest of us cannot hold out, and the journal ends here.`}
   if(/cut off/.test(w))return 'The ground gives way beneath the camp. Everything we built slides into the dark, and the journal ends here.';

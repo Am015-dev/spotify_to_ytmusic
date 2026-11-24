@@ -39,7 +39,7 @@ function musicInit() {
 function musSync() { try { GXMUS.sync(); } catch (e) { } }
 
 /* ---------------- helpers ---------------- */
-var GLYPH = { castle: '🏰', mine: '⛏️', know: '📜', ship: '⛵', hall: '🏛️', carp: '🪚', chapel: '🔔', mkt: '🎪', inn: '🍺', mint: '🪙', tower: '🗼', store: '🌾', sheep: '🐑', goat: '🐐', pig: '🐖', goose: '🪿' };
+var GLYPH = { castle: '', mine: '⛏️', know: '', ship: '⛵', hall: '', carp: '', chapel: '', mkt: '', inn: '', mint: '', tower: '', store: '', sheep: '', goat: '', pig: '', goose: '' };
 var GCOL = ['', '#f7f4ec', '#f6dc92', '#f3c27e', '#f0b0a0', '#c7dbf2', '#e6e6e6'];
 var SHORT = { hall: 'Moot Hall', carp: 'Joiner', chapel: 'Chapel', mkt: 'Fair', inn: 'Inn', mint: 'Mint', tower: 'Beacon', store: 'Granary' };
 function tlabel(t) { if (!t) return ''; if (t.t === 'bld') return SHORT[t.k] || VB.BLD[t.k].name.split(' ')[0]; if (t.t === 'pas') return t.n + ' ' + VB.ANIMALS[t.k]; return VB.COLNAME[t.t]; }
@@ -458,7 +458,7 @@ function renderMarket() {
     st.appendChild(gd);
     mk.appendChild(st);
   })(d);
-  var lane = h('div.stall.lane', { id: 'lane' }); lane.appendChild(h('div.sth', { text: G.noBlack ? 'Closed' : '🪙' + VB.blackCost(G.P[VB.actor(G)] || G.P[0]) }));
+  var lane = h('div.stall.lane', { id: 'lane' }); lane.appendChild(h('div.sth', { text: G.noBlack ? 'Closed' : '' + VB.blackCost(G.P[VB.actor(G)] || G.P[0]) }));
   var lt = h('div.sttiles');
   G.black.forEach(function (t, k) {
     if (!t) return; var ok = mt && !top && VB.validMoves(G).some(function (m) { return m.k === 'buy' && m.slot === k; });
@@ -860,7 +860,7 @@ function showTitle() {
   c.appendChild(h('h1', { text: 'Vale of Banners' }));
   c.appendChild(h('p.sub', { text: 'Roll two dice. Grab tiles. Build the best estate.' }));
   c.appendChild(h('button.big.btn', { type: 'button', id: 'quickB', 'data-a': 'start', text: '▶ Play', onclick: showSetup }));
-  c.appendChild(h('button.btn.sec', { type: 'button', id: 'storyB', text: '📖 Story', onclick: storyOpen }));
+  c.appendChild(h('button.btn.sec', { type: 'button', id: 'storyB', text: ' Story', onclick: storyOpen }));
   if (hasSave()) c.appendChild(h('button.btn.alt', { type: 'button', id: 'resumeB', text: 'Continue saved game', onclick: resume }));
   c.appendChild(h('button.btn.alt', { type: 'button', id: 'tutB', 'data-a': 'tut', text: (tutDone() ? 'Learn to play' : 'New? Learn to play'), onclick: function () { tutStart(); } }));
   c.appendChild(h('button.btn.alt', { type: 'button', id: 'howB', text: 'How to play', onclick: function () { GX.show('rulesd'); } }));

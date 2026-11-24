@@ -72,7 +72,7 @@ function lobbyHTML(){const host=isHost();const ps=NET.peers;const o=host?netOpts
   const seats=o&&Array.isArray(o.seats)?o.seats.slice(0,4).map((x,i)=>`<li><b>${esc(String(x&&x.c||'?'))}</b> · ${x&&x.p?esc(String(x.p)):'<span class="muted">computer</span>'}</li>`).join(''):'';
   const opt=o?`<p class="small">Scenario: <b>${esc(String(o.scen||''))}</b> · ${esc({easy:'Easier',standard:'Standard',hard:'Harder'}[o.diff]||'Standard')} · Friday ${o.fri?'helps':'stays away'} · the dog ${o.dog?'helps':'stays home'}</p><ol class="netseats">${seats}</ol>${o.extra?`<p class="small muted">${o.extra|0} more ${o.extra>1?'people watch':'person watches'}: a game has 4 castaways at most.</p>`:''}`:'<p class="small muted">Waiting for the host’s options…</p>';
   const link=NetRoom.inviteLink(NET.code);
-  return `<div class="mbox lobby" role="dialog" aria-modal="true" aria-labelledby="lobbyh"><button class="x" data-a="netclose" aria-label="Close">×</button><h2 id="lobbyh">🌐 Online game</h2>
+  return `<div class="mbox lobby" role="dialog" aria-modal="true" aria-labelledby="lobbyh"><button class="x" data-a="netclose" aria-label="Close">×</button><h2 id="lobbyh"> Online game</h2>
    <p class="netst2">${esc(netStatus())}</p>
    <p>Invite code: <b class="code">${esc(NET.code)}</b> <span class="small muted">Friends open this game, choose <b>Play online</b> and type the code, or open the link.</span></p>
    <div class="invrow"><input class="invlink" readonly value="${esc(link)}" aria-label="Invite link"><button class="btn" data-a="netcopy">Copy link</button>${NET.copied?'<span class="muted small">Copied.</span>':''}</div>
@@ -83,14 +83,14 @@ function lobbyHTML(){const host=isHost();const ps=NET.peers;const o=host?netOpts
    ${host?`<p class="small muted">To change the scenario or castaways, close this window, change them on the start screen, then open the lobby again.</p><div class="mb"><button class="btn go" data-a="netstart">Start with ${Math.min(4,ps.length)} player${Math.min(4,ps.length)===1?'':'s'}</button><button class="btn" data-a="netleave">Close the room</button></div>`
    :`<p class="tip">Waiting for the host to start the game…</p><div class="mb"><button class="btn" data-a="netleave">Leave</button></div>`}</div>`}
 function goneHTML(){return `<div class="mbox" role="dialog" aria-modal="true"><h2>The host left</h2><p>The host’s page ran the game, so the game is over.</p><div class="mb"><button class="btn go" data-a="netleave">Back to the start</button></div></div>`}
-function onlineBlock(){if(!NET.ready)return '';if(!NET.p2p)return '<p class="small muted netna">🌐 Online play needs a recent browser (Chrome, Edge, Firefox or Safari).</p>';
-  if(NET.on)return `<div class="online"><b>🌐 Online room <span class="code">${esc(NET.code)}</span></b> <span class="small muted">${esc(netStatus())}</span><div class="netrow"><button class="btn go" data-a="netlobby">Open the lobby</button><button class="btn" data-a="netleave">Leave the room</button></div>${NET.err?`<p class="warn">${esc(NET.err)}</p>`:''}</div>`;
-  return `<details class="online" id="netdet" ${UI.netOpen?'open':''}><summary>🌐 Play online with friends</summary><p class="small muted">Free and direct: your browsers connect to each other. Each friend plays their own castaway; empty seats go to the computer. Choose the scenario and castaways below, press Host, then send friends the code or link.</p>
+function onlineBlock(){if(!NET.ready)return '';if(!NET.p2p)return '<p class="small muted netna"> Online play needs a recent browser (Chrome, Edge, Firefox or Safari).</p>';
+  if(NET.on)return `<div class="online"><b> Online room <span class="code">${esc(NET.code)}</span></b> <span class="small muted">${esc(netStatus())}</span><div class="netrow"><button class="btn go" data-a="netlobby">Open the lobby</button><button class="btn" data-a="netleave">Leave the room</button></div>${NET.err?`<p class="warn">${esc(NET.err)}</p>`:''}</div>`;
+  return `<details class="online" id="netdet" ${UI.netOpen?'open':''}><summary> Play online with friends</summary><p class="small muted">Free and direct: your browsers connect to each other. Each friend plays their own castaway; empty seats go to the computer. Choose the scenario and castaways below, press Host, then send friends the code or link.</p>
    <div class="netrow"><input id="netname" placeholder="Your name" maxlength="24" autocomplete="off" value="${esc(NET.myName||'')}" aria-label="Your name"><button class="btn go" data-a="nethost">Host a game</button></div>
    <div class="netrow"><input id="joincode" placeholder="Invite code" maxlength="10" autocomplete="off" value="${esc(UI.joinCode||'')}" aria-label="Invite code"><button class="btn" data-a="netjoin">Join a game</button></div>${NET.err?`<p class="warn">${esc(NET.err)}</p>`:''}</details>`}
 function netCopy(){const t=NetRoom.inviteLink(NET.code);const sel=()=>{const i=document.querySelector('.invlink');if(i){i.focus();i.select()}};const done=()=>{NET.copied=true;render();setTimeout(()=>{NET.copied=false;render()},2500)};
   try{navigator.clipboard.writeText(t).then(done,sel)}catch(e){sel()}}
-function netPill(){if(NET.scrollJoin){const d=document.getElementById('netdet');if(d){NET.scrollJoin=false;setTimeout(()=>{try{d.scrollIntoView({block:'center'})}catch(e){}},50)}}const el=document.getElementById('netst');if(!el)return;const t=NET.on?`🌐 ${NET.code} · ${netStatus()}`:'';el.hidden=!t;if(el.textContent!==t)el.textContent=t;el.classList.toggle('bad',/Reconnecting|left/.test(t))}
+function netPill(){if(NET.scrollJoin){const d=document.getElementById('netdet');if(d){NET.scrollJoin=false;setTimeout(()=>{try{d.scrollIntoView({block:'center'})}catch(e){}},50)}}const el=document.getElementById('netst');if(!el)return;const t=NET.on?` ${NET.code} · ${netStatus()}`:'';el.hidden=!t;if(el.textContent!==t)el.textContent=t;el.classList.toggle('bad',/Reconnecting|left/.test(t))}
 setInterval(()=>{if(NET.on){netPill();if(isClient()&&NET.inLobby&&UI.modal!=='start'){const s=document.querySelector('.netst2');if(s&&s.textContent!==netStatus())render()}}},1000);
 // ---------- host: start ----------
 function netStart(){if(!isHost())return;const sp=netSeatPlan();if(!sp.hum.length)return;const s=UI.setup;const keep=JSON.stringify(s);
@@ -186,7 +186,7 @@ function netAct(m,seat){if(!G||!G.net||!m||typeof m.t!=='string')return null;con
 // ---------- the page's buttons in an online game ----------
 function netTryStart(force){if(!planOpen())return;const seat=NET.lens;if(!netStarter(seat)){netDo({t:'ready',v:1});return}
   const w=netNotReady(seat);if(w.length){toast(`Still planning: ${w.map(netWho).join(', ')}.`);return}
-  if(!force){const red=uncoveredRed();if(red.length){UI.confirm=red.map(p=>p.confirm||('⚠ '+p.title+' is not covered.')).join(' ');UI.confirmSig=planSig();renderStep();GX.showDock();return}}
+  if(!force){const red=uncoveredRed();if(red.length){UI.confirm=red.map(p=>p.confirm||(' '+p.title+' is not covered.')).join(' ');UI.confirmSig=planSig();renderStep();GX.showDock();return}}
   UI.confirm=null;sfx('click');netDo({t:'start'})}
 function netClick(b,d,e){
   switch(d.a){case 'nethost':NET.myName=NetRoom.setName((document.getElementById('netname')||{}).value||NET.myName);netJoin('host',NetRoom.newCode());return true;
@@ -214,7 +214,7 @@ function netClick(b,d,e){
   case 'skip':return act({t:'skip'});
   case 'auto':return isClient();
   case 'quick':if(isClient()){e.preventDefault();toast('The host chooses whether to skip the automatic steps.');return true}setQuick(b.checked);render();netPush(true);return true;
-  case 'suggest':act({t:'suggest'});setPStep(3);toast('✨ Your castaway’s pawns have jobs now. Check them below and change anything you like.',5000);render();return true;
+  case 'suggest':act({t:'suggest'});setPStep(3);toast(' Your castaway’s pawns have jobs now. Check them below and change anything you like.',5000);render();return true;
   case 'rec':{const c=curPawn();const r=c&&recPlan().map[c.id];if(!r){toast('No job to recommend: choose one below.');UI.ps.pick=true;render();return true}if(r.why)UI.sugWhy[JSON.stringify([r.type,r.tgt])]=r.why;UI.sel=null;sfx('place');return act({t:'place',pid:c.id,type:r.type,tgt:r.tgt,alt:r.alt||0})}
   case 'clear':return act({t:'clear'});
   case 'pile':return act({t:'pile',n:1});case 'pilemax':return act({t:'pile',n:SCEN.marooned.pileRoom()});
@@ -245,8 +245,8 @@ function netStoryCtl(i,nextL,jn){if(!netOn())return '';const last=i>=UI.beats.le
 // planning: every castaway's jobs, live, and who is still planning
 function netPlanBar(){if(!netOn())return '';const lead=netLead();const placed=placedIds();
   const rows=G.chars.filter(c=>!c.npc&&!c.dead).map(c=>{const left=allPawns().filter(p=>p.c===c.i&&!placed.has(p.id)).length;const rd=hum(c)&&G.net.ready[c.i]===G.round;
-    const jobs=G.plan.acts.filter(a=>a.pw.some(id=>{const q=pawnInfo(id);return q&&q.c===c.i})).map(a=>actLabel(a).replace(/^Threat: /,'⚠ '));
-    const st=!hum(c)?(left?'🤖 planning…':'🤖 done'):rd?'✓ ready':left?`planning · ${left} to place`:'planning';
+    const jobs=G.plan.acts.filter(a=>a.pw.some(id=>{const q=pawnInfo(id);return q&&q.c===c.i})).map(a=>actLabel(a).replace(/^Threat: /,' '));
+    const st=!hum(c)?(left?' planning…':' done'):rd?'✓ ready':left?`planning · ${left} to place`:'planning';
     return `<li class="${c.i===NET.lens?'me':''} ${rd||(!hum(c)&&!left)?'ok':''}" style="--pc:${PCOL[c.i%6]}"><b>${esc(c.nm.split(' ')[0])}${c.i===G.first?' ★':''}</b><span>${c.i===NET.lens?'you':hum(c)?esc((c.pn||'friend').split(' ')[0]):'computer'}</span><em>${st}</em>${jobs.length?`<small>${esc(jobs.join(' · '))}</small>`:''}</li>`}).join('');
   const help=[...new Set(allPawns().filter(p=>p.c==null).map(pawnLabel))];const hp=help.length?help.join(' and '):'';
   const who=lead===NET.lens?'★ You start the day once everyone is ready'+(hp?`, and you plan ${esc(hp)}`:'')+'.':`★ ${esc(netWho(lead))} starts the day once everyone is ready${hp?` and plans ${esc(hp)}`:''}.`;

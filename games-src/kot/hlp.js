@@ -64,7 +64,7 @@ const HLP_ALL=[].concat(HLP_RULES,
     {title:'Downtown',text:'The monster in Downtown earns 2 ★ each turn, but every rival’s claws hit it.',pic:()=>hlpIcons([HLP_CROWN],'',60)}]),
   HLP_PH('power',[
     {title:'Secret powers',text:'Evolutions are secret powers only you can see. Keep one of the two offered.',pic:()=>hlpIcons([HLP_DNA,HLP_DNA],'keep one')},
-    {title:'Playing one',text:'Play it later with the 🧬 button, when its rules allow. Details are on the card.',pic:()=>hlpIcons([HLP_DNA,HLP_ARROW,HLP_STAR],'')}]),
+    {title:'Playing one',text:'Play it later with the  button, when its rules allow. Details are on the card.',pic:()=>hlpIcons([HLP_DNA,HLP_ARROW,HLP_STAR],'')}]),
   HLP_PH('yield',[
     {title:'Yield or stay',text:'When claws hit you in Downtown you may yield: leave the city, and the attacker moves in.',pic:()=>hlpIcons([HLP_CROWN,HLP_ARROW],'yield = leave')},
     {title:'Why stay?',text:'Starting your turn in Downtown pays 2 ★. But you cannot heal there, and every rival’s claws hit you.',pic:()=>hlpIcons([HLP_CROWN,HLP_STAR,HLP_HEART],'2 ★ a turn, no healing')}]),

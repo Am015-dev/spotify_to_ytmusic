@@ -1,6 +1,6 @@
 // ---------- online multiplayer (room capability). The host runs the game; everyone else sends actions. ----------
 const NET={on:false,role:null,code:'',room:null,lobby:null,user:null,uid:null,peer:null,mySeat:-1,seq:0,applied:0,last:0,timer:null,parts:{},hostPeer:null,names:{},peers:[],inLobby:false,err:'',conn:false,ready:false,busy:false,ep:0,safe:null,lastRx:0,dead:[],expect:null};
-const EMOTES=['😂','😱','👏','😡','🔥','💤'];
+const EMOTES=['','','','','',''];
 async function netInit(){try{if(!window.claude||!window.claude.use){if(typeof NetRoom!=='undefined'&&NetRoom.available()){NET.lobby=NetRoom.lobby('ccs');NET.p2p=true;NET.uid=NetRoom.uid();NET.myName=NetRoom.name();const lc=NetRoom.linkCode();if(lc){UI.joinCode=lc;setTimeout(()=>{const d=[...document.querySelectorAll('details')].find(x=>x.querySelector('.online'));if(d)d.open=true;const o=document.querySelector('.online');if(o){o.scrollIntoView({block:'center'});const n=document.getElementById(NET.myName?'joincode':'netname');if(n)n.focus()}},400)}}NET.ready=true;render();return}const [room,user]=await Promise.all([window.claude.use('room'),window.claude.use('user')]);NET.lobby=room;NET.user=user;if(user)NET.uid=await user.id();NET.ready=true;render()}catch(e){NET.ready=true}}
 netInit();
 const netAvail=()=>!!NET.lobby;
@@ -102,7 +102,7 @@ function onNetEmo(msg){const e=msg.data&&msg.data.e;if(!EMOTES.includes(e)||!G)r
 function lobbyHTML(){const host=isHost();const ps=NET.peers.filter(p=>p.kind==='viewer');
   const rows=ps.map(p=>{const pr=p.presence||{};const m=Number.isInteger(pr.mon)?MONS[pr.mon]:null;return `<li><b>${esc(peerName(p))}</b>${p.isMe&&p.sameTab?' (you)':''}${pr.role==='host'?' · host':''}${p.guest?' · guest':''}${m?` · wants ${esc(m.n)}`:''}</li>`}).join('')||'<li class="muted">Connecting…</li>';
   const exs=EXPS.filter(e=>e.k==='evo'?UI.evo:UI.ex[e.k]).map(e=>e.n).join(', ')||'none';
-  return `<div class="dlg start" role="dialog" aria-modal="true"><h2>🌐 Online game</h2>
+  return `<div class="dlg start" role="dialog" aria-modal="true"><h2> Online game</h2>
    <p>Invite code: <b class="code">${esc(NET.code)}</b> <span class="small muted">Friends open this same page, press <b>Join a game</b> and type the code.</span></p>${NET.p2p?`<p class="small">Or send them this link: <input class="invlink" readonly value="${esc(NetRoom.inviteLink(NET.code))}" onclick="this.select()"> <button class="btn" data-a="netcopy">Copy link</button>${NET.copied?' <span class="muted">Copied.</span>':''}</p>`:''}
    ${NET.err?`<p class="warn">${esc(NET.err)}</p>`:''}${NET.conn===false&&NET.on?'<p class="small muted">Connecting to the room…</p>':''}
    <h3 style="margin:.4rem 0 .2rem">Players here (${ps.length})</h3><ul class="plist">${rows}</ul>${NET.p2p&&ps.length<2?'<p class="small muted">⏳ Waiting for friends to join… Send them the code or link.</p>':''}
@@ -112,10 +112,10 @@ function lobbyHTML(){const host=isHost();const ps=NET.peers.filter(p=>p.kind==='
      <div class="acts"><button class="btn primary" data-a="netstart" ${ps.length<1?'disabled':''}>Start the game with ${ps.length} player${ps.length===1?'':'s'}</button><button class="btn" data-a="netleave">Close the room</button></div>`
    :`<p class="tip">Waiting for the host to start the game…</p><div class="acts"><button class="btn" data-a="netleave">Leave</button></div>`}</div>`}
 function onlineBlock(){if(!NET.ready)return '<p class="small muted">Checking online play…</p>';
-  if(!netAvail())return '<p class="small muted">🌐 Online play needs a browser with WebRTC (any recent Chrome, Edge, Firefox or Safari).</p>';
-  if(NET.p2p)return `<div class="online"><b>🌐 Play online with friends</b><span class="small muted"> Free and direct: your browsers connect to each other. Host a game and send friends the code or link.</span>
+  if(!netAvail())return '<p class="small muted"> Online play needs a browser with WebRTC (any recent Chrome, Edge, Firefox or Safari).</p>';
+  if(NET.p2p)return `<div class="online"><b> Play online with friends</b><span class="small muted"> Free and direct: your browsers connect to each other. Host a game and send friends the code or link.</span>
     <div class="row"><input id="netname" placeholder="your name" maxlength="24" autocomplete="off" value="${esc(NET.myName||'')}"><button class="btn" data-a="nethost">Host a game</button><input id="joincode" placeholder="invite code" maxlength="10" autocomplete="off" value="${esc(UI.joinCode||'')}"><button class="btn" data-a="netjoin">Join a game</button></div>${NET.err&&!NET.on?`<p class="warn">${esc(NET.err)}</p>`:''}</div>`;
-  return `<div class="online"><b>🌐 Play online with friends</b><span class="small muted"> Share this page with them first (as Contributors or Editors).</span>
+  return `<div class="online"><b> Play online with friends</b><span class="small muted"> Share this page with them first (as Contributors or Editors).</span>
     <div class="row"><button class="btn" data-a="nethost">Host a game</button><input id="joincode" placeholder="invite code" maxlength="10" autocomplete="off" value="${esc(UI.joinCode||'')}"><button class="btn" data-a="netjoin">Join a game</button></div>${NET.err&&!NET.on?`<p class="warn">${esc(NET.err)}</p>`:''}</div>`}
 
 document.addEventListener('input',e=>{if(e.target&&e.target.id==='joincode')UI.joinCode=e.target.value;if(e.target&&e.target.id==='netname'&&typeof NetRoom!=='undefined'){NET.myName=NetRoom.setName(e.target.value)}});

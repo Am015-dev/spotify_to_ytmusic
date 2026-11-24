@@ -3,15 +3,15 @@
   "title": "The Crown of Crown City",
   "version": 1,
   "cast": {
-    "dot": { "name": "Dot Inkwell", "portrait": "camp-dot.webp", "emoji": "📰", "color": "#e8c547" },
-    "shroomhulk": { "name": "Shroomhulk", "portrait": "camp-shroomhulk.webp", "emoji": "🍄", "color": "#6ad16a" },
-    "squidrik": { "name": "Squidrik", "portrait": "camp-squidrik.webp", "emoji": "🦑", "color": "#b57bff" },
-    "boltbox": { "name": "Boltbox", "portrait": "camp-boltbox.webp", "emoji": "🤖", "color": "#4fa3ff" },
-    "magmaw": { "name": "Baron Magmaw", "portrait": "camp-magmaw.webp", "emoji": "🦀", "color": "#ff6b4a" },
-    "voltusk": { "name": "Voltusk", "portrait": "camp-voltusk.webp", "emoji": "🐗", "color": "#ffd23f" },
-    "glacyx": { "name": "Glacyx, the Harbor Frost", "portrait": "camp-glacyx.webp", "emoji": "🧊", "color": "#8fe9f2" },
-    "bramblebat": { "name": "Bramblebat", "portrait": "camp-bramblebat.webp", "emoji": "🦇", "color": "#9ad35a" },
-    "cortexa": { "name": "Cortexa, Mind of the Portal", "portrait": "camp-cortexa.webp", "emoji": "🧠", "color": "#ff8fc7" }
+    "dot": { "name": "Dot Inkwell", "portrait": "camp-dot.webp", "emoji": "", "color": "#e8c547" },
+    "shroomhulk": { "name": "Shroomhulk", "portrait": "camp-shroomhulk.webp", "emoji": "", "color": "#6ad16a" },
+    "squidrik": { "name": "Squidrik", "portrait": "camp-squidrik.webp", "emoji": "", "color": "#b57bff" },
+    "boltbox": { "name": "Boltbox", "portrait": "camp-boltbox.webp", "emoji": "", "color": "#4fa3ff" },
+    "magmaw": { "name": "Baron Magmaw", "portrait": "camp-magmaw.webp", "emoji": "", "color": "#ff6b4a" },
+    "voltusk": { "name": "Voltusk", "portrait": "camp-voltusk.webp", "emoji": "", "color": "#ffd23f" },
+    "glacyx": { "name": "Glacyx, the Harbor Frost", "portrait": "camp-glacyx.webp", "emoji": "", "color": "#8fe9f2" },
+    "bramblebat": { "name": "Bramblebat", "portrait": "camp-bramblebat.webp", "emoji": "", "color": "#9ad35a" },
+    "cortexa": { "name": "Cortexa, Mind of the Portal", "portrait": "camp-cortexa.webp", "emoji": "", "color": "#ff8fc7" }
   },
   "acts": [
     { "act": 1, "title": "Portal Night", "blurb": "You crawl out of the portal. Learn to roll, smash, shop and hold Downtown." },
@@ -38,7 +38,7 @@
       "outro": [
         { "who": "dot", "text": "Tomorrow's headline: NEWCOMER FLATTENS SPORE BRUTE. Keep that up and I'll need more ink." }
       ],
-      "opponent": { "name": "Shroomhulk", "portrait": "camp-shroomhulk.webp", "emoji": "🍄", "cast": "shroomhulk",
+      "opponent": { "name": "Shroomhulk", "portrait": "camp-shroomhulk.webp", "emoji": "", "cast": "shroomhulk",
         "personality": "Slow and sleepy; keeps the wrong dice and rarely buys anything.",
         "aiLevel": "easy", "aiStyle": "mistakes" },
       "setup": { "mode": "solo", "n": 2, "xp": "base", "evo": false, "ex": {}, "rival": 3 },
@@ -64,7 +64,7 @@
       "outro": [
         { "who": "dot", "text": "You held the city and kept your head. That's the whole trick of Crown City." }
       ],
-      "opponent": { "name": "Squidrik", "portrait": "camp-squidrik.webp", "emoji": "🦑", "cast": "squidrik",
+      "opponent": { "name": "Squidrik", "portrait": "camp-squidrik.webp", "emoji": "", "cast": "squidrik",
         "personality": "Loves Downtown and stays too long; yields at random.",
         "aiLevel": "easy", "aiStyle": "mistakes" },
       "setup": { "mode": "solo", "n": 2, "xp": "base", "evo": false, "ex": {}, "rival": 1 },
@@ -90,7 +90,7 @@
       "outro": [
         { "who": "dot", "text": "Three monsters, one winner, and a fistful of power cards. Nice shopping." }
       ],
-      "opponent": { "name": "Boltbox", "portrait": "camp-boltbox.webp", "emoji": "🤖", "cast": "boltbox",
+      "opponent": { "name": "Boltbox", "portrait": "camp-boltbox.webp", "emoji": "", "cast": "boltbox",
         "personality": "Hoards energy, then buys whatever it sees first.",
         "aiLevel": "easy", "aiStyle": "mistakes" },
       "setup": { "mode": "solo", "n": 3, "xp": "base", "evo": false, "ex": {}, "rival": 4 },
@@ -117,7 +117,7 @@
         { "who": "dot", "text": "MAGMAW COOLS INTO ROCK! Front page, all editions." },
         { "who": "dot", "text": "But my harbor stringer says something cold is moving in off the water..." }
       ],
-      "opponent": { "name": "Baron Magmaw", "portrait": "camp-magmaw.webp", "emoji": "🦀", "cast": "magmaw",
+      "opponent": { "name": "Baron Magmaw", "portrait": "camp-magmaw.webp", "emoji": "", "cast": "magmaw",
         "personality": "Proud and greedy; buys big cards and sits in Downtown until it is nearly cooked.",
         "aiLevel": "easy", "aiStyle": "mistakes",
         "taunt": "Ha! Downtown stays hot, and it stays mine.",
@@ -145,7 +145,7 @@
       "outro": [
         { "who": "dot", "text": "Four monsters, all evolving, and you came out on top. The city is paying attention." }
       ],
-      "opponent": { "name": "Voltusk", "portrait": "camp-voltusk.webp", "emoji": "🐗", "cast": "voltusk",
+      "opponent": { "name": "Voltusk", "portrait": "camp-voltusk.webp", "emoji": "", "cast": "voltusk",
         "personality": "Charges into Downtown and plays its evolutions as soon as it can.",
         "aiLevel": "normal", "aiStyle": "rules" },
       "setup": { "mode": "solo", "n": 4, "xp": "base", "evo": true, "ex": {}, "rival": 0 },
@@ -171,7 +171,7 @@
       "outro": [
         { "who": "dot", "text": "Twenty stars the honest way. My readers love a points race." }
       ],
-      "opponent": { "name": "Squidrik", "portrait": "camp-squidrik.webp", "emoji": "🦑", "cast": "squidrik",
+      "opponent": { "name": "Squidrik", "portrait": "camp-squidrik.webp", "emoji": "", "cast": "squidrik",
         "personality": "Back for revenge; squats in the city and slithers out the moment it is badly hurt.",
         "aiLevel": "normal", "aiStyle": "rules" },
       "setup": { "mode": "solo", "n": 5, "xp": "base", "evo": false, "ex": {}, "rival": 1 },
@@ -198,7 +198,7 @@
         { "who": "dot", "text": "GLACYX MELTS AWAY. The harbor thaws and the boats come home." },
         { "who": "dot", "text": "One odd thing: the ice had thoughts frozen in it. Someone was steering Glacyx." }
       ],
-      "opponent": { "name": "Glacyx, the Harbor Frost", "portrait": "camp-glacyx.webp", "emoji": "🧊", "cast": "glacyx",
+      "opponent": { "name": "Glacyx, the Harbor Frost", "portrait": "camp-glacyx.webp", "emoji": "", "cast": "glacyx",
         "personality": "Cold and stubborn; grabs Downtown and refuses to leave while it has hearts to spare.",
         "aiLevel": "normal", "aiStyle": "rules",
         "taunt": "Winter always wins. Go home and thaw out, little one.",
@@ -226,7 +226,7 @@
       "outro": [
         { "who": "dot", "text": "You stole the right roll at the right time. That's how the smart ones play." }
       ],
-      "opponent": { "name": "Bramblebat", "portrait": "camp-bramblebat.webp", "emoji": "🦇", "cast": "bramblebat",
+      "opponent": { "name": "Bramblebat", "portrait": "camp-bramblebat.webp", "emoji": "", "cast": "bramblebat",
         "personality": "Sharp and sneaky; saves its Brainjack token for your best roll.",
         "aiLevel": "hard", "aiStyle": "lookahead" },
       "setup": { "mode": "solo", "n": 3, "xp": "trial", "evo": false, "ex": {}, "rival": 8 },
@@ -252,7 +252,7 @@
       "outro": [
         { "who": "dot", "text": "Curse, armour and all, you came through. Only the Crown Spire is left." }
       ],
-      "opponent": { "name": "Boltbox Mk II", "portrait": "camp-boltbox.webp", "emoji": "🤖", "cast": "boltbox",
+      "opponent": { "name": "Boltbox Mk II", "portrait": "camp-boltbox.webp", "emoji": "", "cast": "boltbox",
         "personality": "Methodical; tests every reroll and shrugs off small hits.",
         "aiLevel": "hard", "aiStyle": "lookahead" },
       "setup": { "mode": "solo", "n": 4, "xp": "trial", "evo": false, "ex": { "curse": true }, "rival": 4 },
@@ -279,7 +279,7 @@
         { "who": "dot", "text": "CORTEXA LOSES ITS MIND! The portal flickers shut." },
         { "who": "dot", "text": "And the crown? It's yours. Long live the monarch of Crown City." }
       ],
-      "opponent": { "name": "Cortexa, Mind of the Portal", "portrait": "camp-cortexa.webp", "emoji": "🧠", "cast": "cortexa",
+      "opponent": { "name": "Cortexa, Mind of the Portal", "portrait": "camp-cortexa.webp", "emoji": "", "cast": "cortexa",
         "personality": "A cold schemer; hoards Brainjack tokens and steals the roll that would win you the game.",
         "aiLevel": "hard", "aiStyle": "lookahead",
         "taunt": "I saw that coming three rolls ago. The crown was always mine.",
