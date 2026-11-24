@@ -813,7 +813,9 @@
     if (G.done) return true;
     if (!liveHeroes(G).length) { finish(G, false); return true; }
     var sc = D.SCEN[G.sc];
-    if (goalState(G)) { finish(G, true); return true; }
+    // published rule: the scenario is won at the END of the round in which its goal is met (heroes still finish the round)
+    if (!G.goalMet && goalState(G)) { G.goalMet = G.round; ev(G, { e: 'goalmet', n: G.round }); }
+    if (G.goalMet && roundEnd) { finish(G, true); return true; }
     if (roundEnd && sc.goal.limit && G.round >= sc.goal.limit) { finish(G, false); return true; }
     return false;
   }

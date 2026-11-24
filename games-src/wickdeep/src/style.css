@@ -251,3 +251,73 @@ body.coach-on #promptrow{justify-content:flex-end}
 #herobar .hst{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 @media (min-width:1024px){#coach{font-size:17px}#herobar .hinfo{font-size:16px}#herobar .hinfo b{font-size:17px}}
 #coach.left .ca{bottom:auto;left:auto!important;right:-12px;border-top:10px solid transparent;border-bottom:10px solid transparent;border-left:12px solid #1d1408;border-right:0}
+
+/* v2 game screen: the dungeon fills the screen; the hand is a spread of real cards over the bottom edge (wide screens),
+   heroes are a portrait strip on the left, turn order sits top centre like a tabletop initiative track. */
+.cd{background:linear-gradient(#f3e8cf,#e2d2b0);border:2px solid #120d10;box-shadow:inset 0 0 0 2px #8a6a3e,inset 0 0 0 4px #efe0bf,0 4px 10px rgba(0,0,0,.6)}
+.cd .nm{text-align:center;padding:4px 6px 2px;font-weight:700;color:#2a1a10;background:linear-gradient(#5a3a20,#3a2414);color:#ffe7b0;margin:3px 3px 0;border-radius:3px}
+.cd .in{left:50%;top:50%;transform:translate(-50%,-50%);width:28px;height:28px;border-radius:50%;line-height:26px;border:2px solid #8a6a3e;background:#1d1619;color:#ffe7b0;z-index:2;box-shadow:0 0 0 2px #efe0bf}
+.cd .lv{top:auto;bottom:3px;right:5px}
+.half{text-align:center;align-items:center}
+.half.top{border-bottom:2px solid #8a6a3e}
+#order{left:50%;right:auto;transform:translateX(-50%);max-width:calc(100% - 200px);justify-content:center}
+@media (min-width:800px) and (hover:hover) and (pointer:fine){
+  .gx-main{grid-template-columns:minmax(0,1fr)!important}
+  .gx-dock{position:absolute;left:0;right:0;bottom:0;z-index:5;max-height:56vh;border:0!important;box-shadow:none;background:linear-gradient(rgba(5,4,7,0),rgba(5,4,7,.88) 34%,rgba(5,4,7,.96));pointer-events:none}
+  .gx-dock-body{height:auto;overflow:visible;padding:26px 14px 10px 236px;gap:6px}
+  .gx-dock-body>*{pointer-events:auto}
+  #promptrow{justify-content:center}
+  #tray{display:flex!important;flex-wrap:nowrap;gap:0;overflow-x:auto;overflow-y:visible;padding:14px 8px 4px;justify-content:safe center;align-items:flex-end}
+  #tray>.htabs{flex-direction:column;margin-right:12px;align-self:center}
+  #tray>.side{flex-direction:column;margin-left:12px;align-self:center}
+  #tray>.inspd,#tray>.info,#tray>p,#tray>.mcardv{flex:0 1 520px;align-self:center}
+  #tray .cd{flex:0 0 132px;height:184px;max-height:none;margin-left:-10px;transition:transform .12s,margin .12s}
+  #tray .cd:first-of-type{margin-left:0}
+  #tray .cd:hover{transform:translateY(-14px);z-index:3}
+  #tray .cd.sel{transform:translateY(-18px);z-index:2}
+  #tray .cd .half{min-height:0;font-size:13px}
+  #tray .cd.play{height:auto;min-height:184px}
+  #herobar{position:fixed;left:8px;top:calc(var(--gx-bar-h) + 56px);width:214px;flex-direction:column;padding:0;z-index:6;pointer-events:auto}
+  #herobar .hcard{background:rgba(20,15,24,.9)}
+  #toast{left:50%}
+}
+@media (max-height:600px) and (min-width:800px) and (hover:hover){#tray .cd{height:150px;flex-basis:116px}.gx-dock-body{padding-top:10px}}
+@media (max-width:700px){
+  #tray.hand2{display:flex!important;flex-wrap:nowrap;overflow-x:auto;gap:6px;padding:4px 2px 2px}
+  #tray.hand2>.hrow{flex:0 0 auto;display:flex}#tray.hand2 .cdet{display:none}#tray.hand2 .hrow .htabs{flex-direction:column}
+  #tray.hand2 .cd{flex:0 0 112px;min-height:150px;max-height:none}
+  #tray.hand2 .cd .half{display:flex;font-size:11.5px;min-height:0;padding:2px 4px}
+  #tray.hand2 .cd .nm{margin:3px 3px 0;padding:3px 4px;white-space:nowrap;text-overflow:ellipsis;max-height:none;font-size:11px}
+  #tray.hand2 .cd .in{left:50%;top:50%;transform:translate(-50%,-50%)}
+  #tray.hand2 .cd .lv{display:block}
+  .gx-dock{background:linear-gradient(#1a1410,#0c0a0d)}
+}
+/* ui5 tutorial: floating, draggable, minimisable lesson window; never dims or blocks the game */
+#tutor{position:fixed;z-index:70;width:min(330px,calc(100vw - 16px));background:#fff4d6;color:#1d1408;border:3px solid #1d1408;border-radius:12px;box-shadow:0 8px 24px rgba(0,0,0,.6);font:15px/1.3 var(--tx)}
+#tutor[hidden]{display:none}
+#tutor.min{width:auto;max-width:calc(100vw - 16px)}
+#tutor .tth{display:flex;align-items:center;gap:6px;padding:0 0 0 10px;background:#3a2414;color:#ffe7b0;border-radius:8px 8px 0 0;cursor:move;touch-action:none;user-select:none}
+#tutor.min .tth{border-radius:8px}
+#tutor .ttn{font:700 10px/1 var(--px);opacity:.8;white-space:nowrap}
+#tutor .ttt{flex:1;min-width:0;font:700 13px/1.1 var(--px);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#tutor .tth button{width:44px;height:44px;flex:none;border:0;background:transparent;color:#ffe7b0;font:700 18px/1 var(--tx);cursor:pointer}
+#tutor .ttb{padding:8px 12px 10px}
+#tutor .tts{margin:0 0 6px;font-weight:700}
+#tutor .tty{margin:0 0 8px;color:#5a4128}#tutor .tty i{font-style:normal;font-weight:700}
+#tutor .ttf{display:flex;gap:6px;justify-content:space-between}
+#tutor .ttl{margin:8px 0 0;padding:0;list-style:none;max-height:34vh;overflow:auto;columns:2;column-gap:6px}
+#tutor .ttl button{width:100%;min-height:32px;text-align:left;border:0;background:none;font:13px/1.1 var(--tx);color:#5a4128;padding:2px 4px;cursor:pointer}
+#tutor .ttl button.ok{color:#2d6a1e;font-weight:700}#tutor .ttl button.now{background:#f0d9a0;border-radius:4px}
+#tring{position:fixed;z-index:65;display:none;pointer-events:none;border:3px solid #ffd98a;border-radius:10px;animation:tring 1.4s ease-out infinite}
+@keyframes tring{0%{box-shadow:0 0 0 0 rgba(255,217,138,.7)}100%{box-shadow:0 0 0 14px rgba(255,217,138,0)}}
+@media (prefers-reduced-motion:reduce){#tring{animation:none}}
+#hudmap{position:fixed;inset:0;z-index:66;pointer-events:none}
+#hudmap[hidden]{display:none}
+#hudmap svg{position:absolute;inset:0}
+#hudmap line{stroke:#ffd98a;stroke-width:2;stroke-dasharray:4 3}#hudmap circle{fill:#ffd98a}
+#hudmap .hlab{position:absolute;height:30px;pointer-events:auto;border:2px solid #1d1408;border-radius:15px;background:#ffd98a;color:#1d1408;font:700 11px/1 var(--px);padding:0 6px;white-space:nowrap;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.6)}
+#tutq b{font:700 18px/1 var(--px);color:var(--flame)}
+body.tutor-on #coach{display:none!important}
+body.tutor-on #prompt{position:static;width:auto;height:auto;overflow:visible;clip:auto}
+body.tutor-on #promptrow{justify-content:flex-start}
+@media (min-width:800px) and (hover:hover) and (pointer:fine){#zoombox{left:8px;right:auto;top:auto;bottom:240px;flex-direction:row}}

@@ -428,6 +428,7 @@ async function playEv(e) {
     case 'special': toast(e.text); logLine(figName(E.fig(G, e.id)) + ': ' + e.text); return sleep(speed(600));
     case 'pers': float(e.id, 'Lasting bonus', 'info'); return;
     case 'item': float(e.id, D.ITEM_BY[e.item].n, 'info'); return sleep(speed(150));
+    case 'goalmet': logLine('Goal met: you win at the end of this round.'); toast('Goal met! You win when this round ends.'); return sleep(speed(400));
     case 'endround': renderBar(); return;
     case 'noop': float(e.id, e.why, 'info'); toast(e.why); return sleep(speed(700));
     case 'over': return;
