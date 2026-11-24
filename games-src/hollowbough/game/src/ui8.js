@@ -30,7 +30,7 @@ function kitSettings() {
       if (typeof hlpInit === 'function') { hlpInit(); if (typeof GXH !== 'undefined') S.appendChild(GXH.settingsRow({ rowClass: 'gx-row', btnClass: 'gx-sb' })); }
       S.appendChild(GX.row('Hints', GX.onoff(!!UI.hints, v => { UI.hints = !!v; try { localStorage.setItem('hb_hints', v ? '1' : '0'); } catch (x) { } UI.gtop = null; UI.recKey = ''; render(); }, 'Hints'), 'Finger on the best move, previews and ratings'));
     },
-    about: { name: 'Hollowbough', version: 'preview', text: 'A woodland city-building game. Art and music by Am015-dev.' }
+    about: { name: 'Hollowbough', version: 'preview', text: 'A woodland city-building game.' }
   });
 }
 // ---- component reference

@@ -33,8 +33,7 @@ function buildRules() {
     ['Live score', 'the number on each diner during a round: what their counter would score if the round ended now. The roll race can still change it.'],
     ['Order slip / score pad', 'the paper that adds up every diner\'s rounds and the custard at the end.'],
     ['+N', 'the small green number on a plate: what serving it would score you right now.']].map(([t, d]) => [h('dt', t), h('dd', d)]).flat()));
-  root.appendChild(h('div', { html: '<section class="credits-audio"><h3>Credits</h3><p>Art and music by Am015-dev. Sounds were trimmed, loudness-normalised and converted for this game.</p><p>Online play uses Trystero (MIT). The painted table is drawn with PixiJS (MIT). Names, card text and art are original; the paintings were made for this game.</p></section>' }));
-  root.appendChild(h('p.sm', 'Kaiten Kitchen is an original conveyor-belt card game. Names, card text and art are original; the audio credits are above.'));
+  root.appendChild(h('p.sm', 'Kaiten Kitchen is an original conveyor-belt card game. Names, card text and art are original.'));
   root.insertBefore(h('div.kkturn', h('h3', 'How a turn works'), h('ol', ...KK.STORY.turn.map(t => h('li', t.replace(/^\d\.\s*/, ''))))), root.firstChild);
   sec('What we simplified', h('ul', ...[
     'Twin Sticks: your two dishes are put down in the best order automatically (Fire Paste first, then the best nigiri). You cannot choose the order.',

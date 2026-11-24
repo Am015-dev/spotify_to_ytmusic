@@ -1,0 +1,262 @@
+{
+ "updated": "2026-11-24T00:55:48Z",
+ "live_base": "https://am015-dev.github.io/spotify_to_ytmusic/",
+ "decisions": [
+  {
+   "id": "thornbound-rules",
+   "title": "Thornbound: 5 rule mismatches need your call",
+   "detail": "The worker found 5 places where the game and the rules notes disagree. Tell me for each: follow the rules notes, or keep the game as is.",
+   "options": [
+    "Follow the rules notes",
+    "Keep as is"
+   ]
+  }
+ ],
+ "notes": [
+  {
+   "at": "00:58",
+   "text": "Cost today since 22:26 UTC: about $31.6 = 27 workers $22.4 + this orchestrator $9.2 (finished workers are exact; the 9 running ones show $0 until they finish a turn, so the real total is higher). The old orchestrator's cost today is not included."
+  },
+  {
+   "at": "00:55",
+   "text": "Merged and building now: Twin Thrones board, Sands claims + paths, Wildmark readability, Perch clarity, credits removal (shelf + group A). Running: new games (Via Tessera, Onyx, Meadowfold, Gloamwar), Thornbound tutorial, Ochre guide, Twin Thrones rules, Wickdeep redesign, credits group B."
+  }
+ ],
+ "games": [
+  {
+   "slug": "pc-layout",
+   "name": "PC layout for all games",
+   "live": true,
+   "stage": "live",
+   "step": "live (not changed today)"
+  },
+  {
+   "slug": "tv",
+   "name": "Game Night TV (living room)",
+   "live": true,
+   "stage": "live",
+   "step": "live (not changed today)"
+  },
+  {
+   "slug": "copy-audit",
+   "name": "Own-content audit (all games)",
+   "live": true,
+   "stage": "live",
+   "step": "live (not changed today)"
+  },
+  {
+   "slug": "twin-thrones",
+   "name": "Twin Thrones",
+   "live": true,
+   "stage": "live",
+   "step": "iPhone draft cards fit, live 23:42 UTC"
+  },
+  {
+   "slug": "meadowfold",
+   "name": "Meadowfold",
+   "live": true,
+   "stage": "live",
+   "step": "live (not changed today)"
+  },
+  {
+   "slug": "hollowbough",
+   "name": "Hollowbough",
+   "live": true,
+   "stage": "live",
+   "step": "live (not changed today)"
+  },
+  {
+   "slug": "lantern-dive",
+   "name": "Lantern Dive",
+   "live": true,
+   "stage": "live",
+   "step": "live (not changed today)"
+  },
+  {
+   "slug": "crown-city-smash",
+   "name": "Crown City Smash",
+   "live": true,
+   "stage": "live",
+   "step": "live (not changed today)"
+  },
+  {
+   "slug": "doorkick-dungeon",
+   "name": "Doorkick Dungeon",
+   "live": true,
+   "stage": "live",
+   "step": "live (not changed today)"
+  },
+  {
+   "slug": "thornbound",
+   "name": "Thornbound",
+   "live": false,
+   "stage": "review",
+   "step": "tutorial + phase lines done; 5 rule mismatches need your call"
+  },
+  {
+   "slug": "redline-rally",
+   "name": "Redline Rally",
+   "live": true,
+   "stage": "live",
+   "step": "live (not changed today)"
+  },
+  {
+   "slug": "perch-and-plume",
+   "name": "Perch and Plume",
+   "live": false,
+   "stage": "building",
+   "step": "iPhone full game done, deploying",
+   "focus": true
+  },
+  {
+   "slug": "stitchwise",
+   "name": "Stitchwise",
+   "live": true,
+   "stage": "live",
+   "step": "live (not changed today)"
+  },
+  {
+   "slug": "cauldron-fair",
+   "name": "Cauldron Fair",
+   "live": true,
+   "stage": "live",
+   "step": "live (not changed today)"
+  },
+  {
+   "slug": "shipwreck-isle",
+   "name": "Shipwreck Isle",
+   "live": true,
+   "stage": "live",
+   "step": "live (not changed today)"
+  },
+  {
+   "slug": "short-fuse",
+   "name": "Short Fuse",
+   "live": true,
+   "stage": "live",
+   "step": "live (not changed today)"
+  },
+  {
+   "slug": "kaiten-kitchen",
+   "name": "Kaiten Kitchen",
+   "live": true,
+   "stage": "live",
+   "step": "passed review, live",
+   "focus": true
+  },
+  {
+   "slug": "nebula-aces",
+   "name": "Nebula Aces",
+   "live": true,
+   "stage": "live",
+   "step": "live (not changed today)"
+  },
+  {
+   "slug": "final-approach",
+   "name": "Final Approach",
+   "live": true,
+   "stage": "live",
+   "step": "live (not changed today)"
+  },
+  {
+   "slug": "emberclimb",
+   "name": "Emberclimb",
+   "live": true,
+   "stage": "live",
+   "step": "live (not changed today)"
+  },
+  {
+   "slug": "sunglaze",
+   "name": "Sunglaze",
+   "live": true,
+   "stage": "live",
+   "step": "iPhone taps fixed, live",
+   "focus": true
+  },
+  {
+   "slug": "sands-of-qamar",
+   "name": "Sands of Qamar",
+   "live": false,
+   "stage": "review",
+   "step": "claims done (b9ee0aaf); walk paths worker blocked on a commit"
+  },
+  {
+   "slug": "vale-of-banners",
+   "name": "Vale of Banners",
+   "live": true,
+   "stage": "live",
+   "step": "live (not changed today)"
+  },
+  {
+   "slug": "wildmark",
+   "name": "Wildmark",
+   "live": false,
+   "stage": "building",
+   "step": "Tip fix done, deploying",
+   "focus": true
+  },
+  {
+   "slug": "tidewake",
+   "name": "Tidewake",
+   "live": true,
+   "stage": "live",
+   "step": "live (not changed today)"
+  },
+  {
+   "slug": "rampart-and-vine",
+   "name": "Rampart and Vine",
+   "live": true,
+   "stage": "live",
+   "step": "live (not changed today)"
+  },
+  {
+   "slug": "vinegrave",
+   "name": "Vinegrave",
+   "live": true,
+   "stage": "live",
+   "step": "live (not changed today)"
+  },
+  {
+   "slug": "ochre-horizon",
+   "name": "Ochre Horizon (new)",
+   "live": false,
+   "stage": "building",
+   "step": "guided first game done, deploying"
+  },
+  {
+   "slug": "roman-trade",
+   "name": "Roman trade game (new)",
+   "live": true,
+   "stage": "live",
+   "step": "live (not changed today)"
+  },
+  {
+   "slug": "onyx-atelier",
+   "name": "Onyx Atelier (new)",
+   "live": true,
+   "stage": "live",
+   "step": "live (not changed today)"
+  },
+  {
+   "slug": "dungeon-crawler",
+   "name": "Co-op dungeon crawler (new)",
+   "live": true,
+   "stage": "live",
+   "step": "live (not changed today)"
+  },
+  {
+   "slug": "epic-war",
+   "name": "Fantasy war game (new)",
+   "live": true,
+   "stage": "live",
+   "step": "live (not changed today)"
+  },
+  {
+   "slug": "wickdeep",
+   "name": "Wickdeep",
+   "live": true,
+   "stage": "live",
+   "step": "door guidance live (test.html)"
+  }
+ ]
+}

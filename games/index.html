@@ -552,11 +552,6 @@ html.ph #feat .fb{padding:12px 14px 10px;min-height:150px;align-content:end}
 html.ph #feat .fs{background:linear-gradient(0deg,rgba(14,8,5,.92) 0%,rgba(14,8,5,.5) 55%,rgba(14,8,5,.05) 100%)}
 html.ph #feat .ft{max-width:none}
 @media (max-height:600px){html.ph #feat .fb{min-height:0;padding:10px 12px 8px}html.ph #feat .fn{font-size:1.15rem}}
-/* support the shelf */
-.kofi{display:inline-flex;align-items:center;gap:8px;min-height:44px;padding:0 16px;border-radius:99px;background:#29abe0;color:#fff!important;font:800 .95rem "Chivo",system-ui,sans-serif;text-decoration:none;box-shadow:0 4px 12px rgba(0,0,0,.25)}
-.kofi:hover{filter:brightness(1.08)}
-.support{margin-top:14px;display:flex;flex-wrap:wrap;gap:10px 14px;align-items:center}
-.support p{margin:0;max-width:52ch}
 /* What's new */
 .upd{position:absolute;left:3%;top:3%;padding:.28em .55em;border-radius:.4em;background:var(--brass);color:#2a1a0c;font:800 .62em/1 var(--body);letter-spacing:.02em;box-shadow:0 .1em .3em rgba(0,0,0,.5);transform:rotate(-6deg);z-index:2;pointer-events:none}
 .vchip{display:inline-block;font:700 .7rem var(--mono);letter-spacing:.04em;color:var(--brass);border:1px solid #6b5238;border-radius:99px;padding:1px 8px;margin-left:8px;vertical-align:middle;white-space:nowrap;text-transform:none}.vchip:empty{display:none}.pl-t .vchip{margin:4px 0 0;display:inline-block}#tver{margin-left:4px;font-size:.68rem;flex:none}
@@ -669,7 +664,7 @@ html.ph #feat .ft{max-width:none}
 </div>
 <div id="listview" hidden></div>
 </main>
-<footer>Each game keeps its own save, sound and difficulty settings. Every board game can be played online with friends for free: open it, press Host, and send them the invite code or link.<br><a href="credits.html">Credits &amp; licences</a> · <a href="lab.html">🧪 LAB</a> · <a href="privacy.html">Privacy</a> · <a href="terms.html">Terms</a> · <a href="suggest.html">Suggestion box</a><span id="devlinks" hidden> · <a href="screen-test.html">Phone screen test</a> · <a href="status.html">Status</a></span><br><small>&copy; 2026 Am015-dev. All rights reserved. Original games inspired by published board games; not affiliated with their designers or publishers.</small><div class="support" id="support" hidden><p>These games are free and ad-free. If they made your game night, you can help cover the hosting and development costs.</p><a class="kofi kofi-link" target="_blank" rel="noopener" href="#">☕ Support on Ko-fi</a></div></footer>
+<footer>Each game keeps its own save, sound and difficulty settings. Every board game can be played online with friends for free: open it, press Host, and send them the invite code or link.<br><a href="lab.html">🧪 LAB</a> · <a href="privacy.html">Privacy</a> · <a href="terms.html">Terms</a> · <a href="suggest.html">Suggestion box</a><span id="devlinks" hidden> · <a href="screen-test.html">Phone screen test</a> · <a href="status.html">Status</a></span><br><small>&copy; 2026 Am015-dev. All rights reserved.</small></footer>
 
 <div id="inspect" hidden></div>
 <div id="tip" role="status" hidden></div>
@@ -689,7 +684,7 @@ html.ph #feat .ft{max-width:none}
   <iframe id="frame" title="Game" allow="fullscreen; autoplay"></iframe>
   <div id="ck" role="region" aria-label="Test checklist" hidden><div class="ckg" id="ckgrip" aria-hidden="true"><i></i></div><div class="ckh"><h2 id="ckttl">Test</h2><button type="button" id="ckmin" aria-label="Collapse checklist">&#9662;</button><button type="button" id="ckx" aria-label="Close checklist">&#10005;</button></div><div id="ckbody"></div></div>
   <button type="button" id="ckpill" hidden>&#10004; Test<i class="ckbadge" hidden></i></button><div id="cktoast" role="status" hidden></div>
-  <div id="loader" class="done" aria-live="polite"><div class="lc"><div class="lt" id="lname">Game</div><div class="lb" role="progressbar" aria-label="Loading"><i id="lbar"></i></div><div class="lm">Made with <b aria-label="love">♥</b> by Alex</div><div class="lk" id="lkofi" hidden>Enjoying the shelf? <a class="kofi-link" target="_blank" rel="noopener" href="#">Buy Alex a coffee ☕</a></div></div></div>
+  <div id="loader" class="done" aria-live="polite"><div class="lc"><div class="lt" id="lname">Game</div><div class="lb" role="progressbar" aria-label="Loading"><i id="lbar"></i></div><div class="lm">Made with <b aria-label="love">♥</b> by Alex</div></div></div>
 </div>
 
 <script>
@@ -1529,9 +1524,6 @@ addEventListener('resize',fit);
 renderFilters();initWn();initCk();fit();render();
 {const start=GAMES.find(g=>'#'+g.id===location.hash);if(start)openGame(start)}
 
-/* Ko-fi support: set the page name to switch the support links on */
-const KOFI='am015dev';
-if(KOFI){for(const a of document.querySelectorAll('.kofi-link'))a.href='https://ko-fi.com/'+KOFI;const s=document.getElementById('support');if(s)s.hidden=false;const k=document.getElementById('lkofi');if(k)k.hidden=false}
 /* loading card while a game starts: "Made with love by Alex" */
 var lt0=0,ltick=0;
 function showLoader(name){const loader=document.getElementById('loader'),lbar=document.getElementById('lbar');if(!loader)return;document.getElementById('lname').textContent=name;loader.classList.remove('done');lt0=performance.now();let p=8;lbar.style.width=p+'%';clearInterval(ltick);

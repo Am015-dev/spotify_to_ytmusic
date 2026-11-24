@@ -90,6 +90,7 @@ function campGoalLive(g, def) {
 }
 function renderGoalbar() {
   var el = $('#goalbar'); if (!el) return;
+  if (G && UI.mode === 'tutfree') { el.hidden = false; el.className = ''; el.innerHTML = '<span class="gk">Goal</span><span class="gt">Finish with more points than Pip.</span>'; el.setAttribute('aria-label', 'Goal: finish with more points than Pip'); return; }
   var def = UI.camp && G && UI.mode === 'campaign' ? UI.camp : null;
   if (!def || !def.goal) { el.hidden = true; return; }
   var r = campGoalLive(G, def); el.hidden = false; el.className = r.met ? 'met' : '';
@@ -128,6 +129,7 @@ function renderMid() {
 }
 function rowLabel(p, h) {
   var y = PP.rowYield(p, h), word = h === 0 ? 'food' : h === 1 ? 'eggs' : 'cards', ic = h === 0 ? foodIcon('any') : h === 1 ? eggIcon() : '▤';
+  if (UI.mode === 'tutfree') return '<b class="rn">' + ['Forest', 'Grassland', 'Wetland'][h] + '</b><span>tap: +' + y.n + ' ' + word + '</span>' + (y.bonus ? '<span class="bon">+1 trade</span>' : '');
   return '<b>+' + y.n + '</b><span>' + word + '</span>' + (y.bonus ? '<span class="bon">+1 trade</span>' : '');
 }
 function renderMat(p, vs) {
@@ -138,7 +140,7 @@ function renderMat(p, vs) {
     for (var c = 0; c < 5; c++) {
       var s = p.board[r][c];
       if (s) h += '<div class="slot">' + cardHTML(s.id, 'slot', s, 'data-a="bird" data-h="' + r + '" data-c="' + c + '" role="button" tabindex="0"') + '</div>';
-      else h += '<div class="slot' + (c === p.board[r].length ? ' next' : '') + '" data-a="slot" data-h="' + r + '" data-c="' + c + '">' + (c === p.board[r].length ? '<span class="ec">' + (PP.EGGCOST[c] ? eggIcon() + PP.EGGCOST[c] + (PP.EGGCOST[c] === 1 ? ' egg' : ' eggs') : 'free') + '</span>' : '') + '</div>';
+      else h += '<div class="slot' + (c === p.board[r].length ? ' next' : '') + '" data-a="slot" data-h="' + r + '" data-c="' + c + '">' + (c === p.board[r].length ? '<span class="ec">' + (PP.EGGCOST[c] ? eggIcon() + PP.EGGCOST[c] + (PP.EGGCOST[c] === 1 ? ' egg' : ' eggs') : (UI.mode === 'tutfree' ? 'free spot' : 'free')) + '</span>' : '') + '</div>';
     }
     h += '</div>';
   }

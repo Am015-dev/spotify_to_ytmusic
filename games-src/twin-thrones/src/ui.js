@@ -204,10 +204,12 @@ var TT_TEST = {};
   function layoutDims() {
     var P = $('pyr'), W = P.clientWidth, H = P.clientHeight, rows = TT.LAYOUT[U.G.age] || TT.LAYOUT[1], n = rows.length, xm = 0;
     rows.forEach(function (r) { r.xs.forEach(function (x) { xm = Math.max(xm, Math.abs(x)); }); });
-    var span = 2 * xm + 1.9, w = Math.min(1.9 * W / span, 124), h = Math.min(1.95 * w, 186), ms = Math.max(70, 0.5 * h);
-    if (h + (n - 1) * ms > H) { h = Math.max(40, H - (n - 1) * ms); if (h < 1.4 * w) { var ovr = H < 190 ? 0.3 : n >= 6 ? 0.36 : 0.5; /* FIXED2: short phones overlap the covered rows more so takeable cards stay >= 44 px */ h = H / (1 + ovr * (n - 1)); ms = ovr * h; w = Math.min(w, h / 1.1); } }
-    var step = Math.max(ms, Math.min(0.8 * h, (H - h) / Math.max(1, n - 1))), u = w / 1.9;
-    return { u: u, w: w, h: h, step: step, W: W, H: H, n: n, ox: W / 2, oy: Math.max(0, (H - (h + (n - 1) * step)) / 2) };
+    var span = 2 * xm + 1.9, w = Math.min(1.9 * W / span, 124), gap = 2, mode, h, step, nmh = 33;
+    var flatStep = Math.floor(H / n);
+    if (flatStep >= 76) { /* W597: every card fully visible: rows sit side by side, no card is covered by the row below */ mode = 'flat'; h = Math.min(flatStep - gap, 1.95 * w, 186); step = h + gap; if (n > 1 && step * n > H) step = (H - h) / (n - 1); }
+    else { /* too many rows for that (Age III on a phone): rows overlap, but each card shows name + effect + cost in the strip that stays visible */ mode = 'rowm'; h = Math.max(76, Math.min(1.5 * w, 100)); step = Math.max(50, (H - h) / Math.max(1, n - 1)); if (h + (n - 1) * step > H) h = Math.max(50, H - (n - 1) * step); nmh = Math.max(14, Math.min(27, Math.floor(step - 24))); }
+    var u = w / 1.9;
+    return { u: u, w: w, h: h, step: step, W: W, H: H, n: n, mode: mode, nmh: nmh, ox: W / 2, oy: Math.max(0, (H - (h + (n - 1) * step)) / 2) };
   }
 
   // ---------- render
@@ -281,13 +283,13 @@ var TT_TEST = {};
     $('tokrow').innerHTML = '<span class="tl">Science bonus</span>' + h + '<span class="tsp"></span><span id="bank" aria-label="Bank: sell cards here">' + slot('coin', 'b1') + slot('coin', 'b2') + slot('coin', 'b3') + '<em>Sell +' + (U.G.phase === 'play' ? E.discardGain(U.G, U.mode === 'two' ? E.sideToAct(U.G) : 0) : 2) + '</em></span>'; fillArt($('tokrow'));
   }
   function renderPyr(flips) {
-    var G = U.G, P = $('pyr'), d = layoutDims(); P.innerHTML = ''; if (U.pyrRO) U.pyrRO.observe(P); P.classList.toggle('tight', d.step < 68); P.classList.toggle('vtight', d.step < 44);
+    var G = U.G, P = $('pyr'), d = layoutDims(); P.innerHTML = ''; if (U.pyrRO) U.pyrRO.observe(P); P.classList.toggle('tight', false); P.classList.toggle('vtight', false);
     var av = E.available(G).map(function (c) { return c.i; }), human = canAct(), hintCell = -1;
     var bestCell = -1; if (U.hintsOn && U.hintShow && human && G.phase === 'play' && !G.pend.length) { try { var bm = hintMove(G); if (bm && bm.i != null) bestCell = bm.i; } catch (e) { } }
     if (U.camp && U.camp.hints && U.hintShow && human && !U.tut && G.phase === 'play' && !G.pend.length) { try { var hm = hintMove(G); if (hm && hm.i != null) hintCell = hm.i; } catch (e) { } }
     G.pyr.forEach(function (cell) {
       var c = BY[cell.id], e = document.createElement('div');
-      e.className = 'card v4' + (d.w < 76 ? ' sm' : ''); e.dataset.col = c.col; e.id = 'c' + cell.i; e.style.setProperty('--cw', d.w + 'px'); e.style.setProperty('--cc', 'var(--c-' + c.col + ')');
+      e.className = 'card v4 ' + d.mode + (d.w < 76 ? ' sm' : ''); e.style.setProperty('--nmh', d.nmh + 'px'); e.dataset.col = c.col; e.id = 'c' + cell.i; e.style.setProperty('--cw', d.w + 'px'); e.style.setProperty('--cc', 'var(--c-' + c.col + ')');
       e.style.width = d.w + 'px'; e.style.height = d.h + 'px'; e.style.left = (d.ox + cell.x * d.u - d.w / 2) + 'px'; e.style.top = (d.oy + cell.r * d.step) + 'px'; e.style.zIndex = cell.r + 1;
       if (cell.taken) e.classList.add('taken');
       else if (!cell.up) { e.classList.add('down', 'a' + G.age); e.innerHTML = slot('back-age' + G.age) + '<div class="dn">Age ' + AGE[G.age] + '</div>'; fillArt(e); }
@@ -390,24 +392,17 @@ var TT_TEST = {};
     if (!G || U.sel == null || G.over || G.phase !== 'play' || G.pend.length || !canAct()) { if (!z.hidden) { z.hidden = true; z.innerHTML = ''; } return; }
     var p = E.sideToAct(G), cell = G.pyr[U.sel], c = BY[cell.id], zs = dropZones(cell.i), bi = E.buildInfo(G, p, c), M = E.validMoves(G), gain = E.discardGain(G, p);
     var okB = M.some(function (m) { return m.t === 'build' && m.i === cell.i; }), wz = zs.filter(function (q) { return q.m.t === 'wonder'; }), wok = wz.filter(function (q) { return q.ok; });
-    var pr = $('pyr').getBoundingClientRect(), cw = Math.min(140, Math.round(pr.width * 0.38)), ch = Math.round(cw * 1.4), bw = Math.min(pr.width - 12, 360);
-    if (U.liftCh && U.liftCh < ch) { ch = U.liftCh; cw = Math.round(ch / 1.4); }
+    var pr = $('pyr').getBoundingClientRect(), tb = document.querySelector('#s' + p + ' .tab'), tr = tb ? tb.getBoundingClientRect() : pr, bh = Math.max(54, tr.height + 4), bt = Math.min(innerHeight - bh - 2, tr.top + tr.height / 2 - bh / 2), bl = Math.max(4, tr.left - 4), bw = Math.min(innerWidth - 2 * bl, tr.width + 8);
     var free = bi.chain || !bi.coins, pay = free ? '<span class="pay fr">Free</span>' : '<span class="pay' + (okB ? '' : ' no') + '">' + slot('coin') + '<b>' + bi.coins + '</b></span>';
     var why = free ? (bi.chain ? 'Free: you own ' + chainOwned(G, p, c) + '.' : Object.keys(c.cost).length ? 'Free: your city makes what it needs.' : 'It costs nothing.') : okB ? 'You pay ' + plural(bi.coins, 'coin') + (bi.trade ? ' for what you lack.' : '.') : 'You need ' + plural(bi.coins, 'coin') + '. You have ' + G.players[p].coins + '.';
-    var top = Math.max(pr.top + 4, pr.top + (pr.height - ch - 150) / 2);
-    var h = '<div class="lift" style="left:' + (pr.left + pr.width / 2 - bw / 2) + 'px;top:' + top + 'px;width:' + bw + 'px"><div class="zcard" id="zcard" style="width:' + cw + 'px;height:' + ch + 'px">' + pay + '</div>';
-    h += '<p class="lt"><b>' + esc(short8(cap(describe(c)) + '.')) + '</b> <span>' + esc(short8(why)) + '</span></p><div class="zb3">';
+    var h = '<div class="lift" title="' + esc(cap(describe(c)) + '. ' + why) + '" style="left:' + bl + 'px;top:' + bt + 'px;width:' + bw + 'px;height:' + bh + 'px"><div class="zcard" id="zcard">' + pay + '</div><div class="zb3">';
     var hm = (U.hintsOn && U.hintShow && !U.tut && !isAI(p)) ? hintMove(G) : null; if (hm && hm.i !== cell.i) hm = null; // FIXED2: read before the Build button (was declared after it, so Build never glowed)
     h += '<button class="btn zb' + (okB ? '' : ' off') + (hm && hm.t === 'build' ? ' hint' : '') + '" data-a="build"' + (okB ? '' : ' aria-disabled="true" data-why="' + esc(why) + '"') + '>Build<small>' + (free ? 'free' : okB ? 'pay ' + bi.coins : 'too costly') + '</small></button>';
     h += '<button class="btn zb sell' + (hm && hm.t === 'discard' ? ' hint' : '') + '" data-a="discard">Sell<small>+' + plural(gain, 'coin') + '</small></button>';
     var w0 = (hm && hm.t === 'wonder' && wok.filter(function (q) { return q.m.w === hm.w; })[0]) || wok[0];
     h += '<button class="btn zb won' + (w0 ? '' : ' off') + (hm && hm.t === 'wonder' ? ' hint' : '') + '" data-a="wonder"' + (w0 ? ' data-w="' + w0.m.w + '"' : ' aria-disabled="true" data-why="' + (wz.length ? 'No wonder you can afford right now. Sell the card for coins, or build it.' : 'You have no wonders left to build.') + '"') + '>Wonder<small>' + (w0 ? (function (wi) { return (wi.coins ? 'pay ' + wi.coins : 'free') + (wok.length > 1 ? ', pick below' : ' \u00b7 ' + esc(BY[w0.m.w].nm)); })(E.wonderInfo(G, p, w0.m.w)) : wz.length ? 'too costly' : 'none left') + '</small></button></div></div>';
     if (wok.length > 1) h += placesHtml(wok, 'button', function (q) { return 'data-a="wonder" data-w="' + q.m.w + '" aria-label="Wonder: ' + esc(BY[q.m.w].nm) + '"'; });
-    z.innerHTML = h; z.hidden = false; var bn0 = $('banner'); if (bn0) bn0.style.display = 'none'; fillArt(z); var ce = cardEl(c, cw); ce.style.width = cw + 'px'; ce.style.height = ch + 'px'; $('zcard').appendChild(ce);
-    // the lift may rise over the war track and token row (not over either city) before the card shrinks
-    var le = z.querySelector('.lift'), lt0 = parseFloat(le.style.top), lb = { top: lt0, bottom: lt0 + le.offsetHeight }, s1 = $('mil'), rt = s1 ? s1.getBoundingClientRect().bottom + 4 : pr.top + 4, /* FIXED2: never over the war track */ over = lb.bottom - (pr.bottom - 4);
-    if (over > 0 && lb.top > rt) { var up = Math.min(over, lb.top - rt); le.style.top = (parseFloat(le.style.top) - up) + 'px'; over -= up; }
-    if (over > 1 && ch > 60 && !U.liftFit) { U.liftCh = Math.max(60, Math.floor(ch - over)); U.liftFit = true; zoomRender(); U.liftFit = false; return; }
+    z.innerHTML = h; z.hidden = false; var bn0 = $('banner'); if (bn0) bn0.style.display = 'none'; fillArt(z);
   }
   function liftDust(i) { var u = TTA.url('fx-lift-dust'), e = $('c' + i); if (!u || !e) return; var r = e.getBoundingClientRect(), f = document.createElement('div'); f.className = 'fxa'; f.style.cssText = 'left:' + (r.left + r.width / 2 - 23) + 'px;top:' + (r.bottom - 30) + 'px;background-image:url("' + u + '")'; document.body.appendChild(f); setTimeout(function () { f.remove(); }, 1000); }
   function closeZoom() { if (U.sel == null) return; U.sel = null; renderPyr(); dock(); }
