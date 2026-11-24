@@ -247,7 +247,7 @@ var OTUT = (function () {
     var sh = R('#sheet') || R('.modal'); if (sh) avoid.push(sh);
     if (s.cells) s.cells.forEach(function (k) { var r = R('.cell[data-cell="' + k + '"]'); if (r) avoid.push(r); });
     var tb = R('#takebtn'); if (tb) avoid.push(tb);
-    if (innerWidth >= 1000) { var bd = R('#board'); if (bd) avoid.push(bd); }   // PC: the guide never sits on the gem board
+    if (innerWidth >= 1000) { var bd = R('#board'); if (bd && !T.mapOn) avoid.push(bd); ['#rival', '#pyr'].forEach(function (q) { var rv = R(q); if (rv && T.mapOn) avoid.push(rv); }); }   // PC: the guide never sits on the gem board
     if (T.mapOn) { if (mapPick !== null) { var pr = R(MAP[mapPick].sel); if (pr) avoid.push(pr); } ['#board', '#pyr', '#me', '#side'].forEach(function (q) { var r = R(q); if (r) soft.push(r); }); }
     else ['#board', '#pyr', '#me', '#side'].forEach(function (q) { var r = R(q); if (r) soft.push(r); });
     if (!mini) placeWin(w, avoid, soft);
