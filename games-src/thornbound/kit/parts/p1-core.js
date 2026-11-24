@@ -9,10 +9,10 @@ function hex2(h) { h = h.replace('#', ''); if (h.length === 3) h = h[0] + h[0] +
 function mix(a, b, t) { var A = hex2(a), B = hex2(b); return '#' + [0, 1, 2].map(function (i) { var v = Math.round(A[i] + (B[i] - A[i]) * t); return (v < 16 ? '0' : '') + v.toString(16); }).join(''); }
 
 var FAC = {
-  gilded: { id: 'gilded', name: 'The Gilded Court', short: 'Gilded Court', blurb: 'Fading nobility', main: '#7c1b2c', dark: '#3a0912', light: '#b8404f', accent: '#d4ad55', accent2: '#8f7330', paper: '#f1e3c3', ink: '#2b1511', glyph: '#f1d98a' },
-  heath: { id: 'heath', name: 'The Heathbound Clans', short: 'Heathbound Clans', blurb: 'Old clans of the land', main: '#4e6c33', dark: '#1d2c15', light: '#88a85a', accent: '#e8dfc4', accent2: '#a9a083', paper: '#eee5c9', ink: '#1f2a15', glyph: '#efe6c9' },
-  lantern: { id: 'lantern', name: 'The Lantern Rising', short: 'Lantern Rising', blurb: "The people's uprising", main: '#d9622a', dark: '#2b2422', light: '#f49a52', accent: '#ffd079', accent2: '#8d8178', paper: '#f2e3c2', ink: '#2a1b12', glyph: '#fff0c0' },
-  choir: { id: 'choir', name: 'The Pale Choir', short: 'Pale Choir', blurb: 'Moon cult', main: '#7f72b4', dark: '#171230', light: '#c5bde8', accent: '#d9dcea', accent2: '#8c90ad', paper: '#ece6dc', ink: '#1a1530', glyph: '#e9e8f6' },
+  gilded: { id: 'gilded', name: 'The Salt Crown', short: 'Salt Crown', blurb: 'Salt-pan lords', main: '#7c1b2c', dark: '#3a0912', light: '#b8404f', accent: '#d4ad55', accent2: '#8f7330', paper: '#f1e3c3', ink: '#2b1511', glyph: '#f1d98a' },
+  heath: { id: 'heath', name: 'The Reedfolk', short: 'Reedfolk', blurb: 'Marsh riders', main: '#4e6c33', dark: '#1d2c15', light: '#88a85a', accent: '#e8dfc4', accent2: '#a9a083', paper: '#eee5c9', ink: '#1f2a15', glyph: '#efe6c9' },
+  lantern: { id: 'lantern', name: 'The Ember Guild', short: 'Ember Guild', blurb: 'Forge conspirators', main: '#d9622a', dark: '#2b2422', light: '#f49a52', accent: '#ffd079', accent2: '#8d8178', paper: '#f2e3c2', ink: '#2a1b12', glyph: '#fff0c0' },
+  choir: { id: 'choir', name: 'The Hollow Synod', short: 'Hollow Synod', blurb: 'A silent order', main: '#7f72b4', dark: '#171230', light: '#c5bde8', accent: '#d9dcea', accent2: '#8c90ad', paper: '#ece6dc', ink: '#1a1530', glyph: '#e9e8f6' },
   neutral: { id: 'neutral', name: 'The Market', short: 'Market', blurb: 'Neutral wares', main: '#7b5b37', dark: '#33220f', light: '#b48c57', accent: '#cfa84e', accent2: '#8a6f3a', paper: '#efe0bd', ink: '#2a1c0e', glyph: '#f0dba0' }
 };
 var FIDS = ['gilded', 'heath', 'lantern', 'choir', 'neutral'];

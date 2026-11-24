@@ -1,0 +1,11 @@
+# Rules checklist (each line has an assertion in game/rules-test.js)
+- [x] 208 cards, 118/48/42 split; 12 + 1 corporations; 61 spaces; 12 ocean spaces; 4 volcanic, 1 reserved, 2 off-map; 5 milestones, 5 awards
+- [x] Setup: 2 corps + beginner, 10 cards, 3 credits per kept card; TR 20; no starting production; globals at start
+- [x] Up to 2 actions per turn; end after 1; passed player skipped
+- [x] Production: energy→heat, credits = production + TR; research 4 cards at 3 each; first player rotates; draft variant
+- [x] Standard project costs; comet strike +temp +TR; city +1 credit prod; sell 1 each
+- [x] Temperature bonuses (-24, -20 heat prod; 0°C ocean); oxygen 8% → temperature; maxed globals; 8 heat; 8 plants; 9 oceans max
+- [x] Oceans only on ocean spaces; no city next to city; greenery next to own tile; placement bonuses; 2 credits per adjacent ocean; reserved/off-map only by card
+- [x] Requirements min/max; steel 2 / titanium 3; event tags don't count; actions once per generation; discounts; negative production needs production
+- [x] Milestones 8 credits / goal / 5 VP / max 3; awards 8-14-20 / max 3; 2-player award scoring and ties
+- [x] Greenery and city scoring; VP per resource; end trigger → final greenery → game over; tie-break by credits; invariants

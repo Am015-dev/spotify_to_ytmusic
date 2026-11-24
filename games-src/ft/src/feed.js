@@ -10,6 +10,7 @@ function feedPlace(e){if((typeof PLQB!=='undefined'&&PLQB)||document.querySelect
     // between the status rows above and the buttons below, never over either
   let top=0;for(const id of ['seats','line','trk','trk2','whatbtn']){const x=document.getElementById(id);if(x&&!x.hidden&&x.getClientRects().length){const r=x.getBoundingClientRect();if(r.bottom>top&&r.left>innerWidth*.6)top=r.bottom}}
   let bot=innerHeight;for(const id of ['acts','mine']){const x=document.getElementById(id);if(x&&!x.hidden&&x.getClientRects().length){const r=x.getBoundingClientRect();if(r.top<bot&&r.height>4&&r.left>innerWidth*.6)bot=r.top}}
+  for(const x of document.querySelectorAll('#acts button,#acts .arow,#mine button,#skipai')){if(x.hidden||!x.getClientRects().length)continue;const r=x.getBoundingClientRect();if(r.height>4&&r.right>innerWidth*.6&&r.top<bot)bot=r.top}   // F3: every button row counts (the path confirm row sits above the box)
   const h=bot-top-24;if(h<130){e.style.visibility='hidden';return}e.style.visibility='';e.style.top=(top+10)+'px';e.style.bottom='auto';e.style.maxHeight=h+'px';while(e.scrollHeight>e.clientHeight+1&&e.querySelectorAll('.fd-row').length>1)e.lastElementChild.remove()}
 function feedHtml(e,rows){
   const dot=t=>{for(const p of G.pl)if(t.indexOf(p.nm)>=0)return PCOL[p.i];return '#b0702a'};

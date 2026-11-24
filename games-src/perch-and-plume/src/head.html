@@ -42,6 +42,7 @@ svg{display:block}
 .deck{appearance:none;flex:0 0 auto;width:52px;min-height:56px;border-radius:8px;border:2px solid var(--paper);background:var(--moss2);color:var(--paper);font-size:var(--fs);font-weight:700;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;line-height:1.1;padding:2px}
 /* ---- the mat: three habitat rows */
 #mat{flex:1 1 auto;min-height:0;display:flex;flex-direction:column;gap:4px}
+@media (max-width:999px) and (orientation:portrait){.row{min-height:52px}#mat{min-height:168px}}   /* rows never collapse; the panel scrolls instead (render.js fitDock) */
 .row{flex:1 1 0;min-height:0;display:grid;grid-template-columns:var(--rh,64px) repeat(5,var(--sw,minmax(0,1fr)));justify-content:center;gap:4px;padding:3px;border-radius:12px;position:relative}
 .row[data-h="0"]{background:linear-gradient(90deg,rgba(79,122,69,.95),rgba(79,122,69,.55))}
 .row[data-h="1"]{background:linear-gradient(90deg,rgba(201,164,67,.95),rgba(201,164,67,.55))}
@@ -124,7 +125,8 @@ body:has(#title:not([hidden])) #barstat{display:none}
 .bc .pwt.brown{border-left-color:#8a5a32;background:#f1e0c8}.bc .pwt.pink{border-left-color:#d77aa0;background:#f8e2ec}.bc .pwt.white{border-left-color:#c9c3b2;background:#f4f1e8}
 .bc.on-board .hband{height:4px}
 /* glowing legal targets */
-.glow{outline:3px solid #ffd76a;outline-offset:1px;box-shadow:0 0 14px 3px rgba(255,215,106,.85);animation:gl 1.2s ease-in-out infinite}
+.glow{outline:3px solid #ffd76a;outline-offset:1px;box-shadow:0 0 14px 3px rgba(255,215,106,.85);animation:gl 1.2s ease-in-out 3}   /* the ONE suggested target (hints on): 3 pulses, then a still outline */
+.slot[data-legal]{outline:2px dashed rgba(255,215,106,.9);outline-offset:-3px}   /* where a chosen bird can go: a still dashed edge, no glow */
 @keyframes gl{50%{box-shadow:0 0 4px 1px rgba(255,215,106,.5)}}
 .sel{transform:translateY(-6px);outline:3px solid #fff;box-shadow:0 0 16px #fff}
 .firing{animation:firing .65s ease;z-index:5}
@@ -262,7 +264,7 @@ html.gx-noanim .firing,html.gx-noanim .popfx,html.gx-noanim .glow,html.gx-reduce
 .reveal .bc .pwt{font-size:14px;-webkit-line-clamp:6}
 .reveal.out{opacity:0;transform:translate(-50%,-140%) scale(.4)}
 @keyframes revin{from{opacity:0;transform:translate(-50%,-20%) scale(.6)}to{opacity:1;transform:translate(-50%,-50%) scale(1)}}
-body.focus .ract:not(.glow),body.focus #hand .bc:not(.glow),body.focus .die:not(.glow),body.focus .bc[data-a="tray"]:not(.glow),body.focus #deckb:not(.glow),body.focus .bc[data-a="bird"]:not(.glow){filter:brightness(.55) saturate(.45);transition:filter .25s}
+body.focus .ract:not([data-legal]),body.focus #hand .bc:not([data-legal]),body.focus .die:not([data-legal]),body.focus .bc[data-a="tray"]:not([data-legal]),body.focus #deckb:not([data-legal]),body.focus .bc[data-a="bird"]:not([data-legal]){filter:brightness(.55) saturate(.45);transition:filter .25s}
 .bc.landed{animation:landin .42s ease-out}
 @keyframes landin{from{transform:translateY(-40px) scale(1.15);opacity:.3}to{transform:none;opacity:1}}
 .die{flex-direction:column;gap:0;height:auto!important;min-height:44px;padding:3px 2px!important;width:48px!important}
@@ -345,10 +347,12 @@ body.confirming #prompt{display:none}
 .a4.best{border-color:#7a4a06;box-shadow:0 0 0 2px #e0a948}
 .bestt{position:relative;outline:3px solid #7a4a06;outline-offset:2px}.bestx{z-index:3;pointer-events:none}
 .bestb{position:absolute;top:-8px;right:8px;font-style:normal;font-weight:800;font-size:14px;background:#7a4a06;color:#fff;border-radius:9px;padding:0 8px;line-height:20px}
-.tutpoint{min-width:44px;min-height:44px;box-sizing:border-box;outline:4px solid #e0a948!important;outline-offset:2px;animation:tutp 1.2s ease-in-out infinite}
+.tutpoint{min-width:44px;min-height:44px;box-sizing:border-box;outline:4px solid #e0a948!important;outline-offset:2px;animation:tutp 1.2s ease-in-out 3}
 .tutpulse{animation:tutpz .45s ease-out 2}
 @keyframes tutpz{50%{box-shadow:0 0 0 3px #fff,0 0 14px 4px #ffd76a}}
-.a4.tutpoint{outline:4px solid #e0a948;outline-offset:2px;animation:tutp 1.2s ease-in-out infinite}
+.need{position:relative;min-width:44px;min-height:44px;box-sizing:border-box;outline:4px solid #e0a948!important;outline-offset:2px;animation:tutp 1.2s ease-in-out 3}
+.wdots{display:flex;gap:6px;justify-content:center;margin-top:6px}.wdots u{width:8px;height:8px;border-radius:50%;background:currentColor;opacity:.25;animation:wd .6s ease-in-out 3 both}.wdots u:nth-child(2){animation-delay:.2s}.wdots u:nth-child(3){animation-delay:.4s}@keyframes wd{50%{opacity:1}}
+.a4.tutpoint{outline:4px solid #e0a948;outline-offset:2px;animation:tutp 1.2s ease-in-out 3}
 .a4.tutpoint::after{content:"\25B6  Ottilie";position:absolute;left:-4px;top:-12px;background:#4f7a45;color:#fff;font-size:14px;font-weight:700;border-radius:9px;padding:0 7px;line-height:20px}
 @keyframes tutp{50%{outline-color:#fff}}
 #foodrow{gap:8px}
@@ -461,6 +465,7 @@ body.confirming #prompt{display:none}
 .bump{animation:bump .42s ease-out}@keyframes bump{40%{transform:scale(1.12)}}
 @media (prefers-reduced-motion:reduce){.flyfx{display:none}.bump{animation:none}}
 .ovl p.rnote{font-size:15px!important;line-height:1.4;opacity:1}
+.gbreak{margin:8px 0;font-size:14px;line-height:1.35;text-align:left}.gbreak p{margin:2px 0}.gbreak span{opacity:.85}.gnote{font-size:14px;margin:0 0 8px;opacity:.9}
 .a4.glow{box-shadow:0 0 0 3px #ffd76a,0 0 12px #ffd76a}
 /* R19 phone sizes: the feeder takes one full row; the tray gets its own row of named cards (name, points, habitats), every card
    and board bird at least 44 px to tap. */
@@ -474,7 +479,7 @@ body.confirming #prompt{display:none}
 .tcard .bc .vp{top:1px;right:1px;min-width:20px;height:20px;font-size:14px}
 .deck{width:56px!important;min-height:64px!important}
 .slot .bc{inset:-2px}
-#toast{top:auto;bottom:calc(var(--gx-sheet-h) + 8px)}   /* pills sit just above the dock, never over the score chips or food */
+#toast{top:calc(env(safe-area-inset-top,0px) + 4px);bottom:auto;z-index:90}   /* phones: pills sit over the top bar, never over the board rows, the keep cards or the score */
 #toast .t{padding:6px 12px}}
 /* R27: a turn opens on the 4 actions. The dock never anchors-scrolls, "What should I do?" sits under them, and on short screens the
    2x2 is compact (one-line note) so tracker, food and all 4 actions fit without scrolling */
@@ -514,5 +519,81 @@ body.confirming #prompt{display:none}
 #hand .bc.big:not(.sel) .bk-st{display:none}
 #hand .bc.big:not(.sel) .bestb{top:-8px;left:2px;right:auto}
 }
+body:has(.gxh-bulbb) .bestb{display:none}
+@media (max-height:620px){.gx-app:not(.gx-dock-min) .gx-dock-head .gx-ibtn{top:0}
+#setup .tmenu:last-child{flex-direction:row;gap:8px;width:100%;background:linear-gradient(to top,#16231b 78%,rgba(22,35,27,0));z-index:3;padding:10px 0 6px}#setup .tmenu:last-child .btn{flex:1;min-height:48px;font-size:calc(var(--fs)*1.1)}#setup .tmenu:last-child .btn.big{flex:1.6}}
+@media (min-width:1000px){#opps .scnow{display:none}}
+.rvsum{pointer-events:none}.rvsum button{pointer-events:auto}   /* a tap on the board while the rival recap is up goes through to the board: never a dead tap */
+@media (max-width:520px){#result .stand th,#result .stand td{padding:6px 2px;font-size:14px}#result .stand th:first-child,#result .stand td:first-child{max-width:64px;overflow:hidden;text-overflow:ellipsis}}
+#keepgo{box-shadow:0 -10px 14px 6px rgba(22,35,27,.85)}
+/* F3: bonus-card progress chip, birds that advance it, "Always skip" */
+#foodrow .fd.bon{min-width:44px;max-width:100%;text-align:left;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:14px;flex:0 1 auto;min-width:0}
+.bc.bonadv,.tcard.bonadv .bc{outline:3px solid #e0a948;outline-offset:-1px}
+.bc.bonadv .bk-nm::before{content:"\2605 ";color:#b8801f}
+.bonb{position:absolute;left:4px;top:4px;max-width:58%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;z-index:3;background:#e0a948;color:#2a2116;font:700 12px/1.2 system-ui,sans-serif;padding:3px 6px;border-radius:7px;font-style:normal;text-align:center;pointer-events:none}
+.tcard.bonadv{position:relative}.tcard.bonadv::after{content:"\2605";position:absolute;top:2px;right:4px;background:#e0a948;color:#2a2116;border-radius:50%;width:20px;height:20px;font-size:13px;line-height:20px;text-align:center;font-weight:700;pointer-events:none;z-index:3}
+.btn.alw{font-size:14px;opacity:.9}
+#toast .t{max-width:100%}
+#side{display:none}
+/* F3 PC (>=1100 wide, >=600 high): the board in the centre, rival board + feeder + tray + goals in a left panel, the hand and actions in the dock on the right. */
+@media (min-width:1100px) and (min-height:600px){
+#bd{display:grid;grid-template-columns:clamp(260px,22vw,360px) minmax(0,1fr);grid-template-rows:auto auto auto minmax(0,1fr);gap:8px 10px;padding:8px 10px;align-content:stretch}
+#goalbar{grid-column:1/-1}
+#opps{grid-column:1;grid-row:2;flex-direction:column;overflow:visible;gap:4px}
+#opps .opp{border-radius:12px}
+#mid{grid-column:1;grid-row:3;flex-direction:column;align-items:stretch;gap:8px;padding:8px;border-radius:12px;background:rgba(0,0,0,.18)}
+#feeder{width:100%;grid-template-columns:repeat(5,1fr)}
+#tray{flex-wrap:wrap;justify-content:flex-start;gap:6px}
+.tcard{width:calc(33% - 6px)!important;min-height:0}
+.deck{width:100%!important;min-height:44px!important;flex-direction:row;gap:8px}
+#side{display:flex;flex-direction:column;gap:6px;grid-column:1;grid-row:4;min-height:0;overflow:auto;color:var(--paper);font-size:13px}
+#side h3{margin:4px 0 2px;font-size:13px;font-weight:700;color:#e0a948;text-transform:none}
+#fernbd .fb{display:flex;flex-wrap:wrap;gap:3px;align-items:center;padding:3px 5px;border-radius:8px;margin-bottom:3px;min-height:28px;font-size:12px}
+#fernbd .fb.h0{background:rgba(70,120,70,.45)}#fernbd .fb.h1{background:rgba(160,130,50,.45)}#fernbd .fb.h2{background:rgba(50,110,130,.5)}
+#fernbd .fbn{font-weight:700;text-transform:capitalize;min-width:62px}
+#fernbd .fbc{background:rgba(255,255,255,.14);border-radius:6px;padding:1px 5px}#fernbd .fbc b{font-weight:700}
+#fernbd .fbe{opacity:.75}
+#sidegoals .sg{display:flex;flex-direction:column;padding:4px 7px;border-radius:8px;background:rgba(0,0,0,.22);margin-bottom:3px;font-size:12px}
+#sidegoals .sg.now{outline:2px solid #e0a948}#sidegoals .sg b{font-weight:700}
+#mat{grid-column:2;grid-row:2/5}
+#foodrow .fd.bon{font-size:14px}
+}
+
+/* ===== F2 (Nov 2026): plain score line, tap feedback, egg targets, rival summary, tutorial goals ===== */
+#opps .scb{display:flex;align-items:center;gap:6px;width:100%;min-height:44px;padding:2px 8px;border-radius:12px;background:rgba(0,0,0,.35);border:1px solid rgba(255,255,255,.3)}
+#opps .scb>i{font-style:normal;color:#fff6e0;opacity:.8;font-size:18px}
+.sr2{appearance:none;display:inline-flex;align-items:baseline;gap:6px;min-height:44px;padding:0 8px;border:0;border-radius:10px;background:none;color:#fff6e0;font:inherit;font-size:16px;font-weight:700;cursor:pointer}
+.sr2 b{font-size:22px;color:#ffe2a0}.sr2.me span{text-decoration:none}
+.sr2 small{font-size:14px;font-weight:600;opacity:.9;text-decoration:underline}
+.sr2:active{background:rgba(255,255,255,.12)}
+#opps .scnow{margin-left:auto;font-size:14px;font-weight:700;color:#fff6e0;opacity:.9;white-space:nowrap}
+.nope{animation:nope .36s ease-in-out 1}
+@keyframes nope{20%{transform:translateX(-6px)}45%{transform:translateX(6px)}70%{transform:translateX(-4px)}}
+.nopefx{position:fixed;z-index:90;transform:translate(-50%,-100%);background:#3a1e14;color:#fff3e0;font-weight:800;font-size:14px;padding:4px 10px;border-radius:10px;pointer-events:none;box-shadow:0 4px 10px rgba(0,0,0,.4);white-space:nowrap}
+/* egg question: each bird that can take an egg wears a big "+1 egg" tag; empty spaces drop their egg-cost labels so the two never look alike */
+body.q-egg .slot .ec{visibility:hidden}
+body.q-egg .bc[data-a="bird"][data-legal]{outline:3px solid #ffd76a;outline-offset:-3px}
+body.q-egg .bc[data-a="bird"][data-legal]::after{content:"+1 egg";position:absolute;left:50%;bottom:2px;transform:translateX(-50%);min-width:44px;min-height:22px;padding:1px 6px;border-radius:11px;background:#fff4d2;color:#3b2a08;font-weight:800;font-size:13px;line-height:20px;text-align:center;box-shadow:0 1px 4px rgba(0,0,0,.45);pointer-events:none;white-space:nowrap}
+#acts .btn.eggall{display:inline-flex;align-items:center;gap:6px}
+#acts .btn.eggall .egi{width:14px;height:18px}
+.rvsum{position:fixed;left:50%;top:max(150px,26dvh);transform:translateX(-50%);z-index:78;width:min(92vw,400px);background:#fbf3df;color:#2a2418;border:2px solid #4f7a45;border-radius:14px;padding:10px 14px;box-shadow:0 12px 34px rgba(0,0,0,.5);animation:banin2 .25s ease-out 1;cursor:pointer}
+.rvsum>b{font-size:17px}
+.rvsum ul{margin:4px 0 4px 18px;padding:0;font-size:15px;line-height:1.35}
+.rvsum .rvpts{margin:2px 0 8px;font-weight:700;font-size:14px}
+.rvsum .rvb{display:flex;gap:8px;justify-content:flex-end}.rvsum .rvb .btn{min-height:44px}
+/* the panel's hide button sits top-right: the lines that can reach the panel top keep clear of it, so nothing overlaps on a phone */
+@media (max-width:999px) and (orientation:portrait){.gx-app:not(.gx-dock-min) #dockbody>#prompt,body:not(.idle4) .gx-app:not(.gx-dock-min) #dockbody>#acts,.gx-app:not(.gx-dock-min) #dockbody>#foodrow,.gx-app:not(.gx-dock-min) #dockbody>#rate,.gx-app:not(.gx-dock-min) #dockbody>#trk{margin-right:52px}
+.gx-app:not(.gx-dock-min) #dockbody>#whatbtn:not([hidden]){align-self:flex-start;margin-right:52px}}
+#result .stand{box-sizing:border-box;max-width:calc(100% - 24px);margin-left:auto;margin-right:auto}
+.bc.on-board .meta .fi{width:15px;height:15px}
+.coachb .saytx .stepn{display:block;font-size:13px;opacity:.85}
+.coachb .saytx .tgoal{display:block;font-size:15px;color:#2f5a27}
+@media (min-width:1000px){.sr2{font-size:18px}.sr2 b{font-size:24px}#opps .scnow,.sr2 small{font-size:14px}.rvsum{top:120px}}
+@media (max-width:640px){#foodrow .fd.bon .bcn,#foodrow .fd.bon .bcp{display:none}}
+/* F5: no empty picture box in rule tips; the hand shows it scrolls (edge fade) */
+.gxh-rules .gxh-pic:empty{display:none}
+#hand.more-r{-webkit-mask-image:linear-gradient(90deg,#000 calc(100% - 36px),transparent);mask-image:linear-gradient(90deg,#000 calc(100% - 36px),transparent)}
+#hand.more-l.more-r{-webkit-mask-image:linear-gradient(90deg,transparent,#000 24px,#000 calc(100% - 36px),transparent);mask-image:linear-gradient(90deg,transparent,#000 24px,#000 calc(100% - 36px),transparent)}
+#hand.more-l:not(.more-r){-webkit-mask-image:linear-gradient(90deg,transparent,#000 24px);mask-image:linear-gradient(90deg,transparent,#000 24px)}
 </style>
 </head>

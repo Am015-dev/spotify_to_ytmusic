@@ -40,3 +40,4 @@ thornbound/game/src/ui.js
 MODULES.md
 .look-live-cache/
 .baselines/
+orch/raw-sessions.jsonl

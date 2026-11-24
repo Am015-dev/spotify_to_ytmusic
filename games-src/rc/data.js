@@ -89,12 +89,12 @@ const DISCS={
  sc1:{n:'Scenario find I',cp:1,sc:0,x:''},sc2:{n:'Scenario find II',cp:1,sc:1,x:''},sc3:{n:'Scenario find III',cp:1,sc:2,x:''},sc4:{n:'Scenario find IV',cp:1,sc:3,x:''}};
 // scenarios: weather dice per round, goal, special rules; book and totem effects are code in scen.js
 const SCENARIOS={
- marooned:{ref:'scen-1-castaways',n:'Marooned',no:1,rounds:12,x:'Keep a signal fire ready. Build Fire. Stack a signal pile of 15 wood. Add 1, then 2, 3, 4, 5 wood, one stage a day. Have both on day 10, 11 or 12. Then a ship sees you.',
+ marooned:{ref:'scen-1',n:'Marooned',no:1,rounds:12,x:'Keep a signal fire ready. Build Fire. Stack a signal pile of 15 wood. Add 1, then 2, 3, 4, 5 wood, one stage a day. Have both on day 10, 11 or 12. Then a ship sees you.',
   wx:{4:['rain'],5:['rain'],6:['rain'],7:['rain','snow','animals'],8:['rain','snow','animals'],9:['rain','snow','animals'],10:['rain','snow','animals'],11:['rain','snow','animals'],12:['rain','snow','animals']},
   finds:[{n:'Healing Moss',x:'Heal 1 wound.',ops:[['heal','choose',1]]},{n:'Lamp Oil',x:'2 wood, only for the signal pile.',ops:[['pileWood',2]]},{n:'Rusty Cutlass',x:'Weapon +1.',ops:[['weapon',1]]},{n:'Silver Medallion',x:'3 determination.',ops:[['det','choose',3]]}],
   invs:{hatchet:{n:'Hatchet',kind:'scen',t:'mountains',r:{wood:1},x:'The camp tile makes 1 more wood.'},mast:{n:'Mast',kind:'scen',it:['rope'],r:{wood:1,fur:1},x:'3 wood straight onto the signal pile.'}},
   book:'none',totem:'none'},
- hexed:{ref:'scen-2-cursed-island',n:'The Hexed Isle',no:2,rounds:10,x:'Break the curse: raise a Cross on five different island tiles.',
+ hexed:{ref:'scen-2',n:'The Hexed Isle',no:2,rounds:10,x:'Break the curse: raise a Cross on five different island tiles.',
   wx:{6:['snow'],7:['snow'],8:['snow'],9:['snow'],10:['snow']},
   finds:[{n:'Cultist Candle',x:'A one-time extra pawn.',ops:[['keepPawn','any',1]]},{n:'Strange Vial',x:'Make Medicine for free.',ops:[['buildFree',['medicine']]]},{n:'Carved Bell',x:'Remove up to 2 fog tokens.',ops:[['unfog',2]]},{n:'Ritual Knife',x:'+3 weapon in fights (you take 1 wound each time).',ops:[['keep','ritualknife']]}],
   invs:{cross:{n:'Cross',kind:'scen',r:{wood:2},multi:1,x:'Raise a cross on a tile (one per tile). Five wins.'},bell:{n:'Sacred Bell',kind:'scen',t:'hills',it:['rope'],multi:1,x:'Remove up to 3 fog tokens.'}},

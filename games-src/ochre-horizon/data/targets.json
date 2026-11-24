@@ -1,0 +1,13 @@
+{
+  "_note": "Structure of the original base game incl. corporate-era cards, from memory; all values [unverified] (see ../COMPONENTS.md). tolerance applies to tags.",
+  "total": 208,
+  "types": { "auto": 118, "active": 48, "event": 42 },
+  "tags": { "building": 58, "space": 50, "science": 36, "power": 26, "earth": 32, "jovian": 15, "plant": 30, "microbe": 16, "animal": 11, "city": 15 },
+  "noTag": 16,
+  "tolerance": 3,
+  "costBands": { "0-6": 50, "7-12": 66, "13-19": 50, "20-29": 30, "30-45": 12 },
+  "req": { "temp": 22, "oxy": 24, "ocean": 16, "tags": 18, "prod": 4, "cities": 2, "greeneries": 1 },
+  "res": { "microbe": 10, "animal": 10, "science": 3, "fighter": 1 },
+  "vpCards": 72,
+  "corps": 12
+}

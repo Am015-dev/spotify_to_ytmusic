@@ -29,9 +29,9 @@ all 22 rules taught in this order, walk-through shown, tutorial marked done, the
 | 16 | hawk | 5 | Hawks score alone, touching no other hawk. Take the hawk. | column 3, spot, Place, settle |
 | 17 | fox | 6 | A fox scores 1 per different animal beside it. | column 2, spot, Place, settle |
 | 18 | majority | 7 | Biggest land of a kind beats Bram: plus 2 points. | Next |
-| 19 | return | 7 | No good spot? Return the animal to the bag. | Return token |
-| 20 | end20 | 7 | Real games last 20 turns each, then everything scores. | Next |
-| 21 | acornsEnd | 7 | Every acorn you still hold is worth 1 point. | Next |
-| 22 | tiebreak | 7 | Tied on points? More acorns wins. | Next |
+| 19 | end20 | 7 | Real games last 20 turns each, then everything scores. | Next |
+| 20 | acornsEnd | 7 | Every acorn you still hold is worth 1 point. | Next |
+| 21 | tiebreak | 7 | Tied on points? More acorns wins. | Next |
+| 22 | return | 7 | No good spot? Tap Skip animal: it goes back to the bag. | Skip animal |
 
 Not in the tutorial: solo-mode market discard (help drawer, "Solo"); card sets B-D (help drawer, mixed cards). Shots: playable-shots/gameplay/tut-*.png.
