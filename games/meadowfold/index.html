@@ -317,7 +317,7 @@ button{font:inherit;color:inherit}
 .passc h2{font-size:28px;margin:6px 0}
 .tutold{position:fixed;z-index:45;left:50%;transform:translateX(-50%);top:calc(var(--gx-bar-h) + 70px);width:min(360px,92vw);background:#4a3b2e;color:#fffaf0;border-radius:16px;padding:10px 14px;font-size:16px;font-weight:700;text-align:center;box-shadow:0 6px 18px rgba(0,0,0,.25);pointer-events:none}
 .tut small{display:block;font-weight:400;font-size:13px;opacity:.85;margin-top:2px}
-.tut .tskip{pointer-events:auto;margin-top:6px;min-height:36px;background:transparent;border:1px solid rgba(255,255,255,.4);color:#fffaf0;border-radius:10px;padding:2px 12px;font-size:13px}
+.tut .tskip{pointer-events:auto;margin-top:6px;min-height:44px;min-width:44px;background:transparent;border:1px solid rgba(255,255,255,.4);color:#fffaf0;border-radius:10px;padding:2px 12px;font-size:13px}
 @media (max-width:999px){
   .gx-bar .tt,.gx-bar h1{display:none}
   .pill{padding:3px 8px}.pill span{max-width:52px;overflow:hidden;text-overflow:ellipsis}
@@ -342,7 +342,7 @@ button{font:inherit;color:inherit}
 .htok{touch-action:none}
 #line.tutline{background:#4a3b2e;color:#fffaf0;border-radius:14px;margin:0 8px 4px;padding:8px 12px;font-size:15px;box-shadow:0 4px 12px rgba(0,0,0,.2)}
 #line.tutline small{font-weight:400;font-size:12px;opacity:.8}
-#line .tskip{min-height:36px;background:#e8907e;border:2px solid #fff;color:#fff;border-radius:10px;padding:2px 12px;font-size:14px;font-weight:700;margin-left:6px}
+#line .tskip{min-height:44px;min-width:64px;background:#e8907e;border:2px solid #fff;color:#fff;border-radius:10px;padding:2px 12px;font-size:14px;font-weight:700;margin-left:6px}
 #endB{white-space:nowrap}
 .bump{animation:mfbump .3s ease-out 1}
 @keyframes mfbump{50%{transform:scale(.94)}}
@@ -1238,7 +1238,7 @@ const GX={key:'gx',open:null,
     if (a.name) S.appendChild(el('p', 'gx-about-n', a.name + (a.version ? ' · ' + a.version : '')));
     if (a.text) { var p = el('p', 'gx-small'); p.textContent = a.text; S.appendChild(p); }
     var links = el('div', 'gx-links');
-    [['credits.html', 'Credits & licences'], ['privacy.html', 'Privacy'], ['terms.html', 'Terms'], ['reference.html', 'All cards on the shelf']].forEach(function (l) {
+    [['privacy.html', 'Privacy'], ['terms.html', 'Terms'], ['reference.html', 'All cards on the shelf']].forEach(function (l) {
       var x = el('a', 'gx-chip', l[1]); x.href = shelf + l[0]; x.target = '_blank'; x.rel = 'noopener'; links.appendChild(x);
     });
     S.appendChild(links);

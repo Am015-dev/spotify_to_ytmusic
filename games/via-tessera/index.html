@@ -24,20 +24,21 @@ button:focus-visible, [tabindex]:focus-visible { outline: 3px solid var(--gold);
 
 #app { position: fixed; inset: 0; display: flex; flex-direction: column; padding: env(safe-area-inset-top) env(safe-area-inset-right) 0 env(safe-area-inset-left); }
 /* top bar: a strip of marble with the race */
-.bar { flex: none; height: 46px; display: flex; align-items: center; gap: 6px; padding: 0 6px; background: linear-gradient(#3b2a1e, #2b2018); color: var(--marble); border-bottom: 3px solid var(--terra2); }
-.brand { display: flex; align-items: center; gap: 6px; background: none; border: 0; padding: 0 4px; height: 38px; min-width: 44px; color: var(--gold); font-family: var(--serif); font-weight: 700; font-size: 15px; letter-spacing: .04em; }
+.bar { flex: none; height: 50px; display: flex; align-items: center; gap: 6px; padding: 0 6px; background: linear-gradient(#3b2a1e, #2b2018); color: var(--marble); border-bottom: 3px solid var(--terra2); }
+.brand { display: flex; align-items: center; gap: 6px; background: none; border: 0; padding: 0 4px; height: 44px; min-width: 44px; color: var(--gold); font-family: var(--serif); font-weight: 700; font-size: 15px; letter-spacing: .04em; }
 .brand span { white-space: nowrap; }
 .race { flex: 1; display: flex; gap: 6px; justify-content: center; min-width: 0; }
 .chip { display: flex; align-items: center; gap: 5px; height: 32px; padding: 0 9px 0 5px; border-radius: 16px; background: rgba(241,233,218,.12); font-size: 14px; white-space: nowrap; }
 .chip .dot { width: 18px; height: 18px; border-radius: 4px; border: 2px solid var(--marble); }
 .chip b { font-size: 17px; font-variant-numeric: tabular-nums; }
 .chip.turn { background: rgba(226,180,79,.28); box-shadow: inset 0 0 0 2px var(--gold); }
-.tb { height: 38px; min-width: 44px; display: flex; align-items: center; gap: 4px; padding: 0 8px; border-radius: 8px; border: 1px solid rgba(241,233,218,.35); background: rgba(241,233,218,.08); color: var(--marble); font-size: 14px; position: relative; }
+.tb { height: 44px; min-width: 44px; display: flex; align-items: center; gap: 4px; padding: 0 8px; border-radius: 8px; border: 1px solid rgba(241,233,218,.35); background: rgba(241,233,218,.08); color: var(--marble); font-size: 14px; position: relative; }
 .tb.sq { width: 44px; justify-content: center; padding: 0; }
 .tb b { position: absolute; top: -5px; right: -5px; min-width: 18px; height: 18px; border-radius: 9px; background: var(--terra); color: #fff; font-size: 12px; line-height: 18px; text-align: center; }
 .tb.glow { box-shadow: 0 0 0 3px var(--gold); }
 .tb.low b { background: #e2b44f; color: var(--ink); animation: pop .5s ease-out 2; }
-@media (max-width: 400px) { .brand span { display: none; } .tb span { display: none; } }
+@media (max-width: 460px) { .brand span { display: none; } }
+@media (max-width: 380px) { .tb span { display: none; } }
 
 /* board: the mosaic map */
 .board { position: relative; flex: 1 1 auto; min-height: 0; min-width: 0; overflow: hidden; background: #1b467f; touch-action: none; }
@@ -221,6 +222,7 @@ button:focus-visible, [tabindex]:focus-visible { outline: 3px solid var(--gold);
   .panel .tgrid { display: grid; grid-template-columns: 1fr 1fr; gap: 0 8px; }
   .ov { padding: 8px; } .panel { padding: 10px 12px; } .panel > p { margin-bottom: 4px; }
 }
+
 
 </style>
 </head>
@@ -1575,12 +1577,20 @@ function canBuildFrom(G, pi, rid) {
 }
 // ---------- camera ----------
 function boardBox() { var b = $('#board'); return { w: b.clientWidth || 375, h: b.clientHeight || 400 }; }
+// keep every tap area at least 46 screen px (k = map units per screen px)
+function growHits(k) {
+  document.querySelectorAll('#map .hit, #map .slothit, #map .colhit').forEach(function (e) {
+    if (e.tagName === 'circle') e.setAttribute('r', Math.max(26, 23 * k).toFixed(1));
+    else { var w = Math.max(96, 62 * k), h = Math.max(64, 50 * k); e.setAttribute('x', (-w / 2).toFixed(1)); e.setAttribute('y', (-38 - (h - 64) / 2).toFixed(1)); e.setAttribute('width', w.toFixed(1)); e.setAttribute('height', h.toFixed(1)); }
+  });
+}
 function setView(v, anim) {
   var bb = boardBox(), asp = bb.h / bb.w;
   v.w = Math.max(260, Math.min(1100, v.w)); v.h = v.w * asp;
   // keep some of the map in view
-  v.x = Math.max(-v.w * 0.3, Math.min(VTART.W - v.w * 0.7, v.x)); v.y = Math.max(-v.h * 0.3, Math.min(VTART.H - v.h * 0.7, v.y));
+  v.x = v.w >= VTART.W ? (VTART.W - v.w) / 2 : Math.max(0, Math.min(VTART.W - v.w, v.x)); v.y = v.h >= VTART.H ? (VTART.H - v.h) / 2 : Math.max(0, Math.min(VTART.H - v.h, v.y));   // the mosaic always fills the board
   UI.view = v;
+  growHits(v.w / bb.w);
   $('#map').setAttribute('viewBox', v.x.toFixed(1) + ' ' + v.y.toFixed(1) + ' ' + v.w.toFixed(1) + ' ' + v.h.toFixed(1));
 }
 function fitPoints(pts, pad, minW) {
@@ -1692,6 +1702,7 @@ function renderRival() {
   $('#rivalcard').innerHTML = top != null && UI.mode !== 'hot' ? '<div class="mini">' + cardHTML(top, '', 'tabindex="-1" disabled').replace('<button', '<span').replace('</button>', '</span>') + '</div>' : '';
 }
 function render() {
+  setTimeout(function () { if (UI.view) growHits(UI.view.w / boardBox().w); }, 0);
   if (!G) return;
   renderRace(); renderStore(); renderHand(); renderRival(); renderMap(); renderPrompt();
 }
@@ -1886,6 +1897,7 @@ function openSheet(title, html, closable) {
   s.innerHTML = '<div class="sh-head"><h2>' + esc(title) + '</h2>' + (closable !== false ? '<button type="button" class="x" data-x aria-label="Close">×</button>' : '') + '</div>' + html;
   s.hidden = false;
   var x = s.querySelector('[data-x]'); if (x) x.onclick = closeSheet;
+  if (UI.learn && UI.hints) setTimeout(placeFinger, 60);
 }
 function closeSheet() { var s = $('#sheet'); if (!s.hidden) { s.hidden = true; } UI.sheet = null; UI.mktSel = null; }
 function priceHTML(slot, consul) {
@@ -1995,6 +2007,7 @@ function hintTarget() {
     if (UI.sheet && UI.sheet.indexOf('New in') === 0) return document.querySelector('#sheet [data-k="' + m.k + '"]');
     return document.querySelector('.city[data-c="' + m.c + '"] .hit');
   }
+  if (m.t === 'trade') return UI.sheet === 'Trade' ? $('#tgo') : $('#acts .btn');
   if (m.t === 'take') return document.querySelector('#sheet [data-g="' + m.g + '"]');
   if (m.t === 'prov') return UI.selProv === m.p ? $('#acts .btn') : document.querySelector('.prov[data-p="' + m.p + '"] .hit');
   if (m.t === 'buy') return UI.sheet ? document.querySelector('#sheet .cd[data-s="' + m.s + '"]') : $('#acts .btn');

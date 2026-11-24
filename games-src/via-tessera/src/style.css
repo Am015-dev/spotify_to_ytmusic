@@ -17,20 +17,21 @@ button:focus-visible, [tabindex]:focus-visible { outline: 3px solid var(--gold);
 
 #app { position: fixed; inset: 0; display: flex; flex-direction: column; padding: env(safe-area-inset-top) env(safe-area-inset-right) 0 env(safe-area-inset-left); }
 /* top bar: a strip of marble with the race */
-.bar { flex: none; height: 46px; display: flex; align-items: center; gap: 6px; padding: 0 6px; background: linear-gradient(#3b2a1e, #2b2018); color: var(--marble); border-bottom: 3px solid var(--terra2); }
-.brand { display: flex; align-items: center; gap: 6px; background: none; border: 0; padding: 0 4px; height: 38px; min-width: 44px; color: var(--gold); font-family: var(--serif); font-weight: 700; font-size: 15px; letter-spacing: .04em; }
+.bar { flex: none; height: 50px; display: flex; align-items: center; gap: 6px; padding: 0 6px; background: linear-gradient(#3b2a1e, #2b2018); color: var(--marble); border-bottom: 3px solid var(--terra2); }
+.brand { display: flex; align-items: center; gap: 6px; background: none; border: 0; padding: 0 4px; height: 44px; min-width: 44px; color: var(--gold); font-family: var(--serif); font-weight: 700; font-size: 15px; letter-spacing: .04em; }
 .brand span { white-space: nowrap; }
 .race { flex: 1; display: flex; gap: 6px; justify-content: center; min-width: 0; }
 .chip { display: flex; align-items: center; gap: 5px; height: 32px; padding: 0 9px 0 5px; border-radius: 16px; background: rgba(241,233,218,.12); font-size: 14px; white-space: nowrap; }
 .chip .dot { width: 18px; height: 18px; border-radius: 4px; border: 2px solid var(--marble); }
 .chip b { font-size: 17px; font-variant-numeric: tabular-nums; }
 .chip.turn { background: rgba(226,180,79,.28); box-shadow: inset 0 0 0 2px var(--gold); }
-.tb { height: 38px; min-width: 44px; display: flex; align-items: center; gap: 4px; padding: 0 8px; border-radius: 8px; border: 1px solid rgba(241,233,218,.35); background: rgba(241,233,218,.08); color: var(--marble); font-size: 14px; position: relative; }
+.tb { height: 44px; min-width: 44px; display: flex; align-items: center; gap: 4px; padding: 0 8px; border-radius: 8px; border: 1px solid rgba(241,233,218,.35); background: rgba(241,233,218,.08); color: var(--marble); font-size: 14px; position: relative; }
 .tb.sq { width: 44px; justify-content: center; padding: 0; }
 .tb b { position: absolute; top: -5px; right: -5px; min-width: 18px; height: 18px; border-radius: 9px; background: var(--terra); color: #fff; font-size: 12px; line-height: 18px; text-align: center; }
 .tb.glow { box-shadow: 0 0 0 3px var(--gold); }
 .tb.low b { background: #e2b44f; color: var(--ink); animation: pop .5s ease-out 2; }
-@media (max-width: 400px) { .brand span { display: none; } .tb span { display: none; } }
+@media (max-width: 460px) { .brand span { display: none; } }
+@media (max-width: 380px) { .tb span { display: none; } }
 
 /* board: the mosaic map */
 .board { position: relative; flex: 1 1 auto; min-height: 0; min-width: 0; overflow: hidden; background: #1b467f; touch-action: none; }
@@ -214,3 +215,4 @@ button:focus-visible, [tabindex]:focus-visible { outline: 3px solid var(--gold);
   .panel .tgrid { display: grid; grid-template-columns: 1fr 1fr; gap: 0 8px; }
   .ov { padding: 8px; } .panel { padding: 10px 12px; } .panel > p { margin-bottom: 4px; }
 }
+

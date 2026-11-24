@@ -18,6 +18,7 @@ function vib(ms) { try { if (navigator.vibrate) navigator.vibrate(ms); } catch (
 var HQ = [], HCUR = null;
 function toast(html, me, ms, o) {
   o = o || {};
+  if (typeof GD !== 'undefined' && GD.on) { guideResult(html, me); return; }
   var it = { html: html, me: me, ms: ms || 2400, key: o.key || '' };
   if (it.key) HQ = HQ.filter(function (x) { return x.key !== it.key; });
   if (o.drop) HQ = HQ.filter(function (x) { return o.drop.indexOf(x.key) < 0; });
@@ -73,6 +74,12 @@ function playEvents() {
     }, d);
     if (e.k === 'tile' || e.k === 'temp' || e.k === 'oxy') d += UI.AIDELAY > 100 ? 260 : 0;
   })(evs[i]);
+  // guided game: plain result of the player's own move, shown next to what changed
+  if (typeof GD !== 'undefined' && GD.on) {
+    var mine = logs.filter(function (l) { return l.p === 0; }), me = G.ev.slice(seen).filter(function (e) { return e.p === 0; }), anc = '';
+    me.forEach(function (e) { if (e.k === 'tile') anc = 'hex:' + e.s; else if (!anc && (e.k === 'temp' || e.k === 'oxy')) anc = e.k === 'temp' ? '#gTemp' : '#gOxy'; });
+    if (mine.length) { var tx = mine[mine.length - 1].s.replace(/\.$/, ''); GD.tapAt = Date.now(); guideResult(tx.replace(/\s*\([^)]*\)/g, '') + '.', true, anc); }
+  }
   // rival lines become toasts
   var rl = logs.filter(function (l) { return l.p === 1; });
   if (rl.length) { UI.rivalLine = rl[rl.length - 1].s.replace(/\.$/, '').split(' ').slice(0, 8).join(' '); UI.rivalLines = (UI.rivalLines || []).concat(rl.map(function (l) { return l.s; })).slice(-6); }
