@@ -47,3 +47,11 @@ special (Inn + that critter claim the staged special event) → stack (berries o
 (drop two cards) → havendone → havenres (pick a good) → gossip (last worker) → prep3 (Prepare for Autumn) → autumn (says the
 real production: workers and goods gained) → journey → road (pick Long Road 2) → journeyq ×2 (drop two cards) → pass ×2 in Autumn.
 Tray choice chips now report to the coach too (tutGate in ui12.js), so only the asked-for chip answers.
+
+## W734: scenario lessons replace the guided tour
+`tutStart` (title card, Menu, Rules) now opens the Lessons picker (`game/src/lessons.js`, engine `shell/gx-scenario-tutor.js`). 8 playable lessons,
+one rule each, real moves on the real board: twig (one worker = one turn, exclusive place), shared, forest, draw, points, build (card from hand costs goods),
+meadow (buy a critter), prepare (Spring). Each has a wrong-move fail message and a scripted win. Not taught (gaps): events, Haven, Journey, Inn/destinations,
+Summer meadow draw, Autumn pass, special events, scoring breakdown. The old GXT tour code (ui12.js) is still in the file but no longer reachable from the menu;
+`tutor-test.js` / `learn-touch.js` test it and are obsolete.
+Test: `node hollowbough/game/lessons-test.js` (402x874 and 1366x768, machine speed, ~9 s each). Sheets: `hollowbough/proof/lessons-*-sheet.jpg`.
