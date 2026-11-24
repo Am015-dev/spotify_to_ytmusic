@@ -758,6 +758,7 @@ html.sk .btn.gxt-menu>*{color:inherit;text-shadow:inherit}
 /* speech badge on the coach bubble, vellum sheet behind the detail popup */
 html.sk .gxh-bub::before{content:'';position:absolute;left:-9px;top:-11px;width:26px;height:20px;background:url(media/ui-bubble-tail.webp) center/contain no-repeat;pointer-events:none}
 html.sk .ppop:not([hidden]){background:#e9d7a8 url(media/ui-sheet-c.webp) center/100% 100% no-repeat;border-top:0}
+html.sk .ppop:not([hidden]){padding:30px 34px calc(26px + var(--sab,0px));box-sizing:border-box}  /* text stays inside the painted vellum, off the burnt edge */
 /* one instruction line: the coach tip replaces the status caption; no tip floats over an open drawer */
 body:has(.gxh-bub.on) #barstat .st-t{visibility:hidden}
 body:has(.gx-drawer.on) .gxh-bub{visibility:hidden}
