@@ -150,9 +150,10 @@ function tutSteps(){
 function tutHold(c){if(typeof GXT==='undefined'||!GXT.active())return false;const st=GXT.current();return !!(st&&st.hold&&st.hold(c))}
 // Story is preceded by the tutorial (Chapter 0) until it has been finished once; a finished player goes straight to the chapter map
 function storyOpen(){if(typeof GXC==='undefined')return;
-  if(typeof GXT!=='undefined'&&!GXT.isDone(TUT_GAME))tutStart({prologue:true});else GXC.open()}
+  GXC.open()}
 // Learn to play = the spotlight steps above on a staged one-round game; it ends by handing over a real (guided, 5-round) game. UI.cfg.coachTut=true brings back the old coached game.
-function tutStart(o){if(typeof GXT==='undefined'||window.TB_COACH_TUT){if(window.tbCoachStart)window.tbCoachStart(o);return}
+function tutStart(o){if(typeof GXST!=='undefined'&&!NET.on){try{GX.close()}catch(e){}try{GXT.markDone(TUT_GAME)}catch(e){}GXST.picker();return}   // the tutorial is the scenario lessons (lessons.js)
+  if(typeof GXT==='undefined'||window.TB_COACH_TUT){if(window.tbCoachStart)window.tbCoachStart(o);return}
   const pro=!!(o&&o.prologue);
   GXT.start({game:TUT_GAME,steps:tutSteps().map(st=>{const oe=st.onEnter;st.onEnter=function(){if(oe)oe.apply(this,arguments);try{if(window.tbStripPaint)window.tbStripPaint()}catch(e){}};return st}),endTitle:'You know the rules',endText:'Bid, steal, Herald, hide, fight, ties, Autumn, Lore. Now play for real.',
     endButtons:pro&&window.CAMPAIGN?[{id:'chapter',label:'Start chapter 1'}]:null,story:!!(window.CAMPAIGN&&typeof GXC!=='undefined'),
