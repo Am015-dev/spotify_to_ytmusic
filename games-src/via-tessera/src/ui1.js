@@ -98,9 +98,10 @@ function renderMap() {
     el('circle', { 'class': 'disc', r: cap ? 19 : 15, fill: cap ? '#f1e9da' : GOOD_COL[st.g] }, g);
     el('use', { href: '#i-' + (cap ? 'gate' : st.g), x: cap ? -13 : -10, y: cap ? -13 : -10, width: cap ? 26 : 20, height: cap ? 26 : 20, fill: cap ? '#3b2416' : '#fff' }, g);
     var lab = el('text', { 'class': 'lab' + (cap ? ' cap' : ''), x: 0, y: cap ? 36 : 30 }, g); lab.textContent = c.n;
-    if (st) st.h.forEach(function (pi, k) {
-      var hx = (k === 0 ? -1 : 1) * 15 - 7, hy = -30;
-      el('path', { 'class': 'house popin', d: 'M' + hx + ' ' + (hy + 7) + 'l7 -7 7 7v8h-14z', fill: PCOL[pi] }, g);
+    // one house slot per player above every badge: outline while empty, filled once that player builds there
+    if (st) G.pl.forEach(function (pl, pi) {
+      var hx = (pi === 0 ? -1 : 1) * 15 - 7, hy = -30, built = st.h.indexOf(pi) >= 0;
+      el('path', { 'class': built ? 'house popin' : 'house hslot', d: 'M' + hx + ' ' + (hy + 7) + 'l7 -7 7 7v8h-14z', fill: built ? PCOL[pi] : 'rgba(241,233,218,.55)', stroke: built ? null : PCOL[pi] }, g);
     });
     if (tg.city[c.id] && tg.city[c.id].cost) costBadge(g, tg.city[c.id].cost);
     el('circle', { 'class': 'hit', r: 26 }, g);
@@ -180,7 +181,7 @@ function labelScale(k) {
 }
 function setView(v, anim) {
   var bb = boardBox(), asp = bb.h / bb.w;
-  v.w = Math.max(260, Math.min(2200, v.w)); v.h = v.w * asp;
+  v.w = Math.max(260, Math.min(coverW(), v.w)); v.h = v.w * asp;   // never zoom out past the point where the map fills the screen
   // keep some of the map in view
   v.x = v.w >= VTART.W ? (VTART.W - v.w) / 2 : Math.max(0, Math.min(VTART.W - v.w, v.x)); var fb = freeBox(), kk = v.w / bb.w; v.y = v.h >= VTART.H + (fb.top + fb.bot) * kk ? (VTART.H - v.h) / 2 - (fb.top - fb.bot) * kk / 2 : Math.max(-fb.top * kk, Math.min(VTART.H - v.h + fb.bot * kk, v.y));   // the mosaic always fills the board
   UI.view = v;
@@ -216,14 +217,15 @@ function animView(to) {
 }
 function zoomBy(f, cx, cy) {
   var v = UI.view; if (!v) return; cx = cx == null ? v.x + v.w / 2 : cx; cy = cy == null ? v.y + v.h / 2 : cy;
-  var w = Math.max(260, Math.min(1200, v.w * f)), k = w / v.w;
+  var w = Math.max(260, Math.min(coverW(), v.w * f)), k = w / v.w;
   setView({ x: cx - (cx - v.x) * k, y: cy - (cy - v.y) * k, w: w });
 }
-// first view: the whole map, with a margin so the outer labels stay inside
+// widest view that still fills the whole board with map (no empty sea bands)
+function coverW() { var bb = boardBox(); return Math.min(VTART.W, VTART.H * bb.w / Math.max(1, bb.h)); }
+// first view: the map fills the screen; on a phone, centred on the capital (drag to look around)
 function fitMap() {
-  var bb = boardBox();
-  if (bb.h / bb.w > 1.15) animView({ x: 170, y: 0, w: 640 });   // phone portrait: big readable map, drag to look around
-  else animView({ x: -135, y: 0, w: Math.max(1250, 600 * bb.w / Math.max(1, bb.h) * 1.12) });
+  var w = coverW(), cap = VT.CITY[D.CAPITAL], bb = boardBox();
+  animView({ x: cap.x - w / 2, y: cap.y - w * bb.h / bb.w / 2, w: w });
 }
 function homeView() {
   fitMap(); return;

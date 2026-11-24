@@ -12,6 +12,7 @@ Every component of the original 2-player game, its count and effect, mapped to o
 | Trader | Trader | Wing | 1 x2 players | start (each player) | none | take 3 coins, trade 2 kinds |
 | Envoy | Envoy | Eagle | 1 x2 players | start (each player) | none | Copy the rival’s last card |
 | Patron | Patron | Hearth | 1 x2 players | start (each player) | none | Buy up to 2 cards from the market |
+| Settler | Settler | Shield | 1 x2 players | start (each player) | none | New carts or ships, or take coins |
 | Builder | Builder | Eagle | 1 | market deck I | 1 tools | Move carts and ships, then build houses |
 | Governor | Governor | Sickle | 1 | market deck I | 1 wine | A region produces, or collect taxes |
 | Trader | Trader | Wing | 1 | market deck I | 1 wine | take 5 coins, trade 2 kinds |
