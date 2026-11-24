@@ -7,7 +7,7 @@ var UI = (function () {
   var ABT = { again: 'Take another turn right after this one.', token: 'Take one more gem of this colour from the board.', priv: 'Gain a Favour scroll.', steal: 'Take one gem or pearl from your rival.' };
   var PAT = [{ n: 'The Impresario' }, { n: 'The Duchess' }, { n: 'The Banker' }, { n: 'The Countess' }];
   var HOW = { points: '20 points', crowns: '10 crowns' };
-  var U = { G: null, sel: [], mode: null, resGold: null, busy: false, level: 'easy', tut: null, snd: true };
+  var U = { G: null, sel: [], mode: null, resGold: null, busy: false, level: 'normal', tut: null, snd: true };
   var LS = function (k, v) { try { if (v === undefined) return localStorage.getItem(k); if (v === null) localStorage.removeItem(k); else localStorage.setItem(k, v); } catch (e) { return null; } };
   function delay(ms) { return new Promise(function (r) { setTimeout(r, ms); }); }
   function aiMs(ms) { return typeof window.AIDELAY === 'number' ? Math.min(ms, window.AIDELAY) : ms; }
@@ -69,7 +69,7 @@ var UI = (function () {
   function strip(p) {
     var g = G(), P = g.pl[p], el = $(p ? '#rival' : '#me'), b = E.bonuses(P), bc = E.bestColour(P), q = g.pend, me = p === 0, h = '';
     el.classList.toggle('turn', g.turn === p && !g.over);
-    h += '<div class="top"><span class="nm">' + (me ? 'You' : 'Rival') + '</span><span class="race">' +
+    h += '<div class="top"><button class="pbtn" data-panel="' + p + '" aria-label="' + (me ? 'Your' : 'Rival') + ' panel: gems, bonuses, kept jewels"><span class="av"><span class="nm">' + (me ? 'You' : 'Rival') + '</span><b class="sc">' + E.points(P) + '</b></span></button><span class="race">' +
       '<span title="Points: 20 wins" aria-label="' + E.points(P) + ' of 20 points"><b data-engine="OA_TEST.pts.' + p + '">' + E.points(P) + '</b>/20 pts</span>' +
       '<span title="Crowns: 10 wins" aria-label="' + E.crowns(P) + ' of 10 crowns">' + OART.icon('crown') + '<b>' + E.crowns(P) + '</b>/10</span>' +
       '<span title="Points on jewels of one colour: 10 wins" aria-label="' + bc.v + ' of 10 points on one colour">' + OART.gm(bc.c) + '<b>' + bc.v + '</b>/10</span></span><span class="favs">';
@@ -120,9 +120,9 @@ var UI = (function () {
   }
   function side() {
     var g = G(), el = $('#side'), h = '', P = g.pl[0];
-    h += '<div class="sbox" aria-label="Favours left">Favours<div class="row">';
+    h += '<button class="sbox" data-info="fav" aria-label="Favours left in supply: tap to learn">Favours in supply<div class="row">';
     for (var i = 0; i < 3; i++) h += OART.icon(i < g.fav ? 'scroll' : 'scroll0');
-    h += '</div></div>';
+    h += '</div></button>';
     if (U.sel.length && human()) {
       var run = runFor(U.sel), got = U.sel.map(function (s) { return g.board[s]; }), warn = got.length === 3 && got[0] === got[1] && got[1] === got[2] || got.filter(function (x) { return x === 'p'; }).length >= 2;
       h += '<button class="btn pri" id="takebtn"' + (run ? '' : ' disabled') + '>Take ' + got.length + '<span class="pv">' + got.map(function (c) { return OART.gm(c); }).join('') + '</span>' + (warn ? '<small>Rival gets a Favour</small>' : '') + (E.tokens(P) + got.length > 10 ? '<small>Over 10: return ' + (E.tokens(P) + got.length - 10) + '</small>' : '') + '</button>';
@@ -135,7 +135,7 @@ var UI = (function () {
       h += '</div></div>';
     }
     var rf = human() && !g.pend && canRefill() && !U.sel.length && !U.mode;
-    h += '<button class="btn' + (rf && onlyRefill() ? ' pri glow' : '') + '" id="refillbtn"' + (rf ? '' : ' disabled') + '>Refill<small>Bag ' + g.bag.length + ' · rival +1 scroll</small></button>';
+    h += '<button class="btn' + (rf && onlyRefill() ? ' pri glow' : '') + '" id="refillbtn"' + (rf ? '' : ' disabled') + '>Refill<small>Bag ' + g.bag.length + ' · rival +1 Favour</small></button>';
     el.innerHTML = h;
   }
   function status() {
@@ -218,7 +218,8 @@ var UI = (function () {
     if (g.pend && g.pend.h === 'royal') patronPick();
     render();
   }
-  function act(m) { if (!human() || !legalMove(m)) { SND.bad(); return; } if (U.tut && U.tut.allow && !U.tut.allow(m)) { SND.bad(); return; } closeSheet(); doMove(m); after(); }
+  function act(m) { if (!human() || !legalMove(m)) { SND.bad(); return; } if (U.tut && U.tut.allow && !U.tut.allow(m)) { SND.bad(); return; } closeSheet(); logMove(m, 0); doMove(m); after(); }
+  function logMove(m, p) { try { var g = G(); (U.hist = U.hist || []).push((p ? 'Rival ' : 'You ') + rivalLine(m, g).replace(/^Rival /, '')); if (U.hist.length > 60) U.hist.shift(); } catch (e) { } }
 
   // ---------- the rival ----------
   function rivalLine(m, g) {
@@ -244,15 +245,15 @@ var UI = (function () {
   function aiTurn() {
     var run = ++aiRun, lines = []; U.busy = true; U.recap = null; render();
     (async function () {
-      await delay(aiMs(500));
+      await delay(aiMs(250));
       while (run === aiRun && G() && G().turn === 1 && !G().over) {
         var seq = A.pick(G(), U.level);
         if (!seq.length) break;
         for (var i = 0; i < seq.length && run === aiRun; i++) {
-          rivalShow(seq[i]); lines.push(rivalLine(seq[i], G()).replace(/^Rival /, '').replace(/^takes /, 'took ').replace(/^buys /, 'bought ').replace(/^keeps /, 'kept ').replace(/^refills/, 'refilled').replace(/^uses /, 'used ').replace(/^wins /, 'won ').replace(/^returns /, 'returned ').replace(/^matches /, 'matched '));
-          await delay(aiMs(seq[i].t === 'take' || seq[i].t === 'buy' ? 1300 : 1000));
+          logMove(seq[i], 1); rivalShow(seq[i]); lines.push(rivalLine(seq[i], G()).replace(/^Rival /, '').replace(/^takes /, 'took ').replace(/^buys /, 'bought ').replace(/^keeps /, 'kept ').replace(/^refills/, 'refilled').replace(/^uses /, 'used ').replace(/^wins /, 'won ').replace(/^returns /, 'returned ').replace(/^matches /, 'matched '));
+          await delay(aiMs(seq[i].t === 'take' || seq[i].t === 'buy' ? 750 : 550));
           if (run !== aiRun) return;
-          doMove(seq[i]); U.say = null; await delay(aiMs(550));
+          doMove(seq[i]); U.say = null; await delay(aiMs(300));
         }
       }
       if (run !== aiRun) return;
@@ -293,6 +294,33 @@ var UI = (function () {
     var r = d.querySelector('[data-res]'); if (r) r.onclick = function () { act(resM); };
   }
   function deckInfo(l) { var g = G(); sheet('<div class="zoom"><div class="card back" style="--cw:90px;--ch:118px"><span class="tier">' + ROMAN[l] + '</span><span class="left">' + g.decks[l].length + '</span></div><div class="info"><h3>' + TIER[l] + ' deck</h3><p>' + g.decks[l].length + ' left.</p><p>Tap a gold coin, then this deck, to keep the top jewel unseen.</p></div></div>'); }
+  function bar(v, max) { return '<div class="meter"><i style="width:' + Math.min(100, v / max * 100) + '%"></i></div>'; }
+  function playerPanel(p) {
+    var g = G(), P = g.pl[p], me = p === 0, b = E.bonuses(P), bc = E.bestColour(P), h = '';
+    h += '<h2>' + (me ? 'You' : 'Rival') + '</h2><div class="goals">' +
+      '<div><span>Points</span><b>' + E.points(P) + '/20</b>' + bar(E.points(P), 20) + '</div>' +
+      '<div><span>Crowns</span><b>' + E.crowns(P) + '/10</b>' + bar(E.crowns(P), 10) + '</div>' +
+      '<div><span>One colour (' + NAME[bc.c] + ')</span><b>' + bc.v + '/10</b>' + bar(bc.v, 10) + '</div></div>' +
+      '<h3>Gems ' + E.tokens(P) + '/10 · Favours ' + P.fav + '</h3><div class="pcols">';
+    E.TOK.forEach(function (c) { h += '<div class="pc">' + OART.gm(c) + '<b>' + P.t[c] + '</b><span>' + (c === 'p' || c === 'o' ? '&nbsp;' : '+' + (b[c] || 0) + ' bonus') + '</span></div>'; });
+    h += '</div><h3>Jewels owned: ' + P.cards.length + '</h3><p>Each jewel gives a permanent discount in its colour.</p>';
+    h += '<h3>Kept jewels ' + P.res.length + '/3</h3>';
+    if (!P.res.length) h += '<p>None.</p>';
+    else if (me) { h += '<div class="pats">'; P.res.forEach(function (id, i) { var c = E.card(id); h += '<button class="card t' + c.lvl + (E.price(P, id).ok && human() ? ' can' : '') + '" style="--cw:70px;--ch:92px" data-r="' + i + '" aria-label="' + esc(cardLabel(id)) + '">' + cardHtml(id) + '</button>'; }); h += '</div><p>Tap a kept jewel to buy it.</p>'; }
+    else h += '<p>The rival keeps ' + P.res.length + ' jewel' + (P.res.length === 1 ? '' : 's') + '.</p>';
+    if (P.roy.length) h += '<h3>Patrons</h3><div class="pats">' + P.roy.map(function (i) { return patHtml(i); }).join('') + '</div>';
+    var d = sheet(h, true);
+    [].forEach.call(d.querySelectorAll('[data-r]'), function (b2) { b2.onclick = function () { zoom({ res: +b2.dataset.r }); }; });
+  }
+  function logPanel() {
+    var L = (U.hist || []).slice(-30).reverse();
+    sheet('<h2>Game log</h2>' + (L.length ? '<ol class="log">' + L.map(function (l) { return '<li>' + esc(l) + '</li>'; }).join('') + '</ol>' : '<p>No moves yet.</p>'), true);
+  }
+  function infoPanel(k) {
+    var T = { fav: '<h2>Favours</h2><p>A Favour lets you take any one gem or pearl (never gold) before your move, and goes back to the supply when used. The second player starts with one.</p><p>You gain one when your rival refills the board, or takes three of one colour or two pearls.</p>',
+      refill: '<h2>Refill</h2><p>Put every token from the bag back on the board. Your rival gains a Favour. Only possible while the bag is not empty, and before you spend a Favour.</p>' };
+    sheet(T[k] || '', true);
+  }
   function reserved() {
     var g = G(), P = g.pl[0]; if (!P.res.length) return;
     var h = '<h2>Kept jewels</h2><p style="text-align:center">Tap one to buy it.</p><div class="pats">';
@@ -320,7 +348,7 @@ var UI = (function () {
     var h = '<h2>How to play</h2><h3>How you win</h3><p>' + X.win + '</p>' +
       '<h3>Your turn</h3><p>' + X.order + '</p><ul><li>' + X.fav + '</li><li>' + X.refill + '</li>' +
       '<li>' + X.take + '</li><li>' + X.takeFav + '</li><li>' + X.keep + '</li><li>' + X.buy + '</li><li>' + X.bonus + '</li><li>' + X.limit + '</li>' +
-      '<li>If you can do nothing else, you must refill. Gold only comes from keeping a jewel. A Favour you spend goes back to the supply.</li></ul>' +
+      '<li>The game ends the moment you reach a goal at the end of your own turn, so there are no ties. You can keep at most 3 jewels. If the bag is empty and nothing else is possible you pass.</li><li>If you can do nothing else, you must refill. Gold only comes from keeping a jewel. A Favour you spend goes back to the supply.</li></ul>' +
       '<h3>Jewel powers</h3><p>' + X.power + '</p><ul><li><b>Encore:</b> take another turn.</li><li><b>Polish:</b> take a gem of that colour from the board.</li><li><b>Favour:</b> gain a Favour.</li><li><b>Pinch:</b> take a gem or pearl from your rival.</li><li><b>Matching jewel</b> (rainbow gem): you need a coloured jewel to buy it; it joins one colour you own.</li></ul>' +
       '<h3>Crowns and patrons</h3><p>' + X.crowns + '</p>' +
       '<h3>Everything in the box</h3><p>25 board spaces. 4 each of Diamond, Sapphire, Emerald, Ruby, Onyx. 2 Pearls, 3 Gold. 3 Favours. 4 Patrons. 67 jewels: 30 Rings, 24 Brooches, 13 Tiaras.</p><div class="pats">' + [0, 1, 2, 3].map(function (i) { return patHtml(i); }).join('') + '</div>';
@@ -357,6 +385,9 @@ var UI = (function () {
     var g = G(); if (!g) return;
     if (U.recap && t.closest('#board,#pyr,#me,#side')) U.recap = null;
     if (t.id === 'menubtn') return menu();
+    if (t.id === 'logbtn') return logPanel();
+    if (t.closest('[data-panel]')) return playerPanel(+t.closest('[data-panel]').dataset.panel);
+    if (t.dataset.info) return infoPanel(t.dataset.info);
     if (t.id === 'rulesbtn') return rules();
     if (t.id === 'hintbtn') return hint();
     if (t.id === 'resbtn') return reserved();
@@ -402,7 +433,7 @@ var UI = (function () {
     $('#title').hidden = true; render(); save();
     if (U.G.turn === 1) aiTurn(); else toast('You start');
   }
-  function resume() { try { var s = JSON.parse(LS('oa_save')); U.G = s.G; U.level = s.level || 'easy'; } catch (e) { return newGame(U.level); } $('#title').hidden = true; render(); after(); }
+  function resume() { try { var s = JSON.parse(LS('oa_save')); U.G = s.G; U.level = s.level || 'normal'; } catch (e) { return newGame(U.level); } $('#title').hidden = true; render(); after(); }
   function startTut() { if (window.OTUT) { $('#title').hidden = true; OTUT.start(); } else newGame('easy'); }
   function showTitle() {
     aiRun++; U.busy = false; closeSheet(); var c = document.getElementById('coach'); if (c) c.remove(); U.tut = null;
