@@ -206,7 +206,8 @@ var TT_TEST = {};
     rows.forEach(function (r) { r.xs.forEach(function (x) { xm = Math.max(xm, Math.abs(x)); }); });
     var span = 2 * xm + 1.9, w = Math.min(1.9 * W / span, 124), gap = 2, mode, h, step, nmh = 33;
     var flatStep = Math.floor(H / n);
-    if (flatStep >= 76) { /* W597: every card fully visible: rows sit side by side, no card is covered by the row below */ mode = 'flat'; h = Math.min(flatStep - gap, 1.95 * w, 186); step = h + gap; if (n > 1 && step * n > H) step = (H - h) / (n - 1); }
+    var flatH = Math.min(flatStep - gap, 1.95 * w, 186), flatSt = (n > 1 && (flatH + gap) * n > H) ? (H - flatH) / (n - 1) : flatH + gap; /* FIX W611: an overlapped row must keep its name+effect+cost strip (33+22px) clear of the row below */
+    if (flatStep >= 76 && flatSt >= 58) { /* W597: every card fully visible: rows sit side by side, no card is covered by the row below */ mode = 'flat'; h = Math.min(flatStep - gap, 1.95 * w, 186); step = h + gap; if (n > 1 && step * n > H) step = (H - h) / (n - 1); }
     else { /* too many rows for that (Age III on a phone): rows overlap, but each card shows name + effect + cost in the strip that stays visible */ mode = 'rowm'; h = Math.max(76, Math.min(1.5 * w, 100)); step = Math.max(50, (H - h) / Math.max(1, n - 1)); if (h + (n - 1) * step > H) h = Math.max(50, H - (n - 1) * step); nmh = Math.max(14, Math.min(27, Math.floor(step - 24))); }
     var u = w / 1.9;
     return { u: u, w: w, h: h, step: step, W: W, H: H, n: n, mode: mode, nmh: nmh, ox: W / 2, oy: Math.max(0, (H - (h + (n - 1) * step)) / 2) };
