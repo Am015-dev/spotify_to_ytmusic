@@ -1,6 +1,36 @@
 [
  {
   "date": "2026-11-24",
+  "game": "rampart-and-vine",
+  "title": "Slimmer top bar",
+  "items": [
+   "Top bar cut to 7 items; Rules and Diary open as closable windows"
+  ],
+  "check": "Tap the top bar buttons, then close the Rules window"
+ },
+ {
+  "date": "2026-11-24",
+  "game": "onyx-atelier",
+  "title": "Tidier guide, wide PC layout",
+  "items": [
+   "The guide shows one callout at a time instead of a cloud of chips",
+   "On PC the board sits left with rival, jewels and you stacked right"
+  ],
+  "check": "Play: first game teaches you, on a wide screen"
+ },
+ {
+  "date": "2026-11-24",
+  "game": "thornbound",
+  "title": "Lighter screen, lessons go live",
+  "items": [
+   "Top bar down to 5 buttons; Lessons now sit in the Menu",
+   "Goal, rival sub-stats, empty council boxes and the PC side log are hidden",
+   "Ten scenario lessons: learn bidding, stealing, placing, supporters, ties, herald, journey, favour, governing and a short game"
+  ],
+  "check": "Menu > Lessons: learn by playing"
+ },
+ {
+  "date": "2026-11-24",
   "game": "twinthrones",
   "title": "Twin Thrones: learn by playing",
   "items": [

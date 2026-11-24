@@ -312,3 +312,10 @@ Live fix: original-name phrase removed from shelf blurb + sands page (15:2x).
 - Test: node ft/lessons-layout-test.js (turbo, ~6 s): 58/66 steps clear. Remaining fails are a one-tick lag: after a move the board row height changes (goods/legend appear) and the card is seated in the previous strip, so it touches the board or legend by up to ~95 px until the next re-seat. Fix next: compute the strip from a fixed reserve (not from live sibling rects), or have GXST expose place() and call it from the game after each go().
 - Phone sheet: before 33/33 lesson cells had the card over the board; after 0 visible overlaps, but ~6 cells (sell step 0, palace steps) show the board shrunk further than needed (fit 'sq' toggling), leaving an empty band.
 - First lesson step 0 on a cold page: card sits at 8,8 for the first tick (slot not ready) in the test.
+## W735 thornbound HUD diet (shelf/W735-hud-thornbound)
+- tb-story-start failure was NOT the HUD diet: parent commit fails the same. Story now opens the chapter map directly (tutorial = lesson row, scenario lessons); the scenario still waited for the old Skip-tutorial spotlight. Scenario rewritten (scn.js), HUD cuts untouched.
+- Test against a build-all staged build (python3 scripts/build-all.py thornbound --no-check), not games/thornbound (deployed copy).
+- Still failing, same before and after W717: phone-s tb-board/help/rivals/buttons ("hc glow pl" tap not responding, hint bubble over Purse), pc tb-zoom/tb-art (pp-x Close under drawer), menu (axe contrast on hint bubble). Contact sheets phone+pc NOT run (time).
+## W740 onyx-atelier visual fix (24 Nov)
+Done: tutorial part names now a tidy list inside the guide window, ONE callout on the board for the picked part (no chip cloud); PC (>=1000px) grid layout: board left (cell up to 112px), rival/jewels/you stacked right; guide never sits on the PC board.
+Weak: PC guide window still covers the rival jewel rows on lesson 1; HUD pips and phone start menu not changed. Sheets: onyx-atelier/proof/w740-*-sheet.jpg. Integrator: build.py then copy onyx-atelier.html to games/onyx-atelier/index.html (not in build-all).
