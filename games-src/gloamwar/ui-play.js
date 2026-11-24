@@ -5,7 +5,7 @@ const side = process.argv[2] || 'D', TURNS = +(process.argv[3] || 4), url = proc
 // proof mode: VIDEO=<dir> records a webm at 375x667, SECS=<n> stops after n seconds, SLOW=1 plays at human pace, SHOTS=<dir> saves screenshots of key moments
 const VIDEO = process.env.VIDEO, SECS = +(process.env.SECS || 0), SLOW = !!process.env.SLOW, SHOTS = process.env.SHOTS, T0 = Date.now(); let shotN = 0; const shotDone = {};
 (async () => {
-  const b = await chromium.launch(); const ctx = await b.newContext({ viewport: { width: 375, height: 667 }, hasTouch: true, isMobile: true, deviceScaleFactor: SHOTS ? 2 : 1, recordVideo: VIDEO ? { dir: VIDEO, size: { width: 375, height: 667 } } : undefined }); const p = await ctx.newPage();
+  const b = await chromium.launch(); const ctx = await b.newContext({ viewport: { width: +(process.env.W||375), height: +(process.env.H||667) }, hasTouch: true, isMobile: true, deviceScaleFactor: SHOTS ? 2 : 1, recordVideo: VIDEO ? { dir: VIDEO, size: { width: +(process.env.W||375), height: +(process.env.H||667) } } : undefined }); const p = await ctx.newPage();
   const shot = async (k) => { if (!SHOTS || shotDone[k]) return; shotDone[k] = 1; await p.waitForTimeout(500); await p.screenshot({ path: path.join(SHOTS, (++shotN) + '-' + k + '.png') }); };
   const errs = []; p.on('pageerror', e => errs.push(e.message));
   await p.goto(SLOW ? url : url + (url.includes('?') ? '&' : '?') + 'fast=1'); await p.waitForTimeout(SLOW ? 2500 : 500); await shot('title');
@@ -22,7 +22,10 @@ const VIDEO = process.env.VIDEO, SECS = +(process.env.SECS || 0), SLOW = !!proce
   const actKey = k => '#acts .act[data-key="' + k + '"]';
   for (let guard = 0; guard < 900; guard++) {
     const st = await p.evaluate(() => ({ win: !!G.win, turn: G.turn, me: sideToAct(G) === UI.side && !UI.hold, pend: G.pend && G.pend.h, stage: G.pend && G.pend.d && G.pend.d.stage }));
+    if (st.win) { await p.waitForTimeout(1500); await shot('result'); }
     if (st.win || st.turn > TURNS || (SECS && Date.now() - T0 > SECS * 1000)) break;
+    if (st.turn >= 5) await shot('midgame');
+    if (st.pend === 'battle') await shot('battle');
     if (SLOW && st.pend === 'battle') await shot('battle');
     if (!st.me) { await p.waitForTimeout(120); continue; }
     const m = await p.evaluate(() => { const m = AI.move(G, 'normal'); return m; });

@@ -42,3 +42,4 @@ MODULES.md
 .baselines/
 gloamwar/gloamwar.html
 orch/raw-sessions.jsonl
+gloamwar/x.js
