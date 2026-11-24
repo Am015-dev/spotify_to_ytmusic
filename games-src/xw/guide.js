@@ -85,14 +85,14 @@ function coachTag(){const el=document.getElementById('coachtag');if(el)el.remove
 // ---- end-of-round recap ----
 function recapItems(R){const me=soloSide()>=0?soloSide():planSide();const ev=UI.ev[R]||[];const out=[];const isMine=n=>G.ships.some(s=>s.name===n&&s.side===me);
   for(const e of ev){let m;const t=e.t;
-    if(m=t.match(/^(.+) bumps into (.+) and skips its action\./)){const a=e.s===me,b=isMine(m[2])&&!a;out.push(` ${a?`You (${esc(m[1])}) bumped into ${esc(m[2])}`:b?`${esc(m[1])} bumped into you (${esc(m[2])})`:`${esc(m[1])} bumped into ${esc(m[2])}`}. The ship that bumps skips its action, and ships touching each other can't fire at each other.${a?' <i>Tip: plan a longer or sideways move.</i>':''}`)}
-    else if((m=t.match(/^(.+) is stressed and can't take an action/))&&e.s===me)out.push(` You (${esc(m[1])}) were stressed from a red move, so no action. Fly a green move to clear it.`);
+    if(m=t.match(/^(.+) bumps into (.+) and skips its action\./)){const a=e.s===me,b=isMine(m[2])&&!a;out.push(`💥 ${a?`You (${esc(m[1])}) bumped into ${esc(m[2])}`:b?`${esc(m[1])} bumped into you (${esc(m[2])})`:`${esc(m[1])} bumped into ${esc(m[2])}`}. The ship that bumps skips its action, and ships touching each other can't fire at each other.${a?' <i>Tip: plan a longer or sideways move.</i>':''}`)}
+    else if((m=t.match(/^(.+) is stressed and can't take an action/))&&e.s===me)out.push(`😵 You (${esc(m[1])}) were stressed from a red move, so no action. Fly a green move to clear it.`);
     else if((m=t.match(/^(.+) flies a red maneuver and takes a stress/))&&e.s===me)out.push(`❗ ${esc(m[1])} flew a red move and took stress: no action this turn, and no red moves until a green one clears it.`);
     else if((m=t.match(/^(.+) flies a green maneuver and clears/))&&e.s===me)out.push(`✅ ${esc(m[1])} cleared its stress with a green move.`);
-    else if(m=t.match(/^(.+) (flies through|lands on) an asteroid/))out.push(` ${esc(m[1])} ${m[2]==='lands on'?'landed on':'flew through'} an asteroid: a damage roll and no action${m[2]==='lands on'?', and no shooting this round':''}.`);
-    else if(m=t.match(/^(.+) is stressed and can't fly the red/))out.push(` ${esc(m[1])} revealed a red move while stressed, so the other side picked a white one for it.`);
-    else if(m=t.match(/^(.+) flies off the battlefield/))out.push(` ${esc(m[1])} flew off the battlefield and was destroyed.`)}
-  const res=UI.results.filter(r=>r.r===R).reverse();res.forEach(r=>out.push(' '+resultHTML(r,true)));
+    else if(m=t.match(/^(.+) (flies through|lands on) an asteroid/))out.push(`🪨 ${esc(m[1])} ${m[2]==='lands on'?'landed on':'flew through'} an asteroid: a damage roll and no action${m[2]==='lands on'?', and no shooting this round':''}.`);
+    else if(m=t.match(/^(.+) is stressed and can't fly the red/))out.push(`🔁 ${esc(m[1])} revealed a red move while stressed, so the other side picked a white one for it.`);
+    else if(m=t.match(/^(.+) flies off the battlefield/))out.push(`🚫 ${esc(m[1])} flew off the battlefield and was destroyed.`)}
+  const res=UI.results.filter(r=>r.r===R).reverse();res.forEach(r=>out.push('🎯 '+resultHTML(r,true)));
   if(!res.length)out.push('No shots were fired: nobody had an enemy inside its arc at range 1-3.');
   for(const s of alive().filter(s=>s.side===me&&s.stress))out.push(`<span class="warn">Now: ${esc(s.name)} is stressed: no red moves and no action; a green move clears it.</span>`);
   return out}
@@ -118,7 +118,7 @@ function advice(){if(!G)return {say:'Press Launch.',why:'The defaults are a good
     else{say=`${esc(near.name)} is at range ${rg}.`;why=`Everyone rolls +1 attack die at range 1${pilotHas(near,'knife')?`, and ${esc(near.name)} one more`:''}. Stay at range 2, or line up so it's in your arc but you're not in its arc.`}
     const bumped=(UI.ev[G.round-1]||[]).some(e=>e.t.startsWith(s.name+' bumps into'));if(bumped)why='You bumped last round: no action, and touching ships can\'t fire. Pick a shorter or sideways move this time. '+why;
     const rp=s.dmg.find(x=>x.up&&DAMAGE[x.c].fix);if(rp)why+=` After your crit (${DAMAGE[rp.c].n}): ${critPlain(rp.c,s)}`;
-    const sg=suggestDial(s),si=sugInfo(s,sg);why+=` <br> ${mText(dialOf(s)[sg])}: ${si.why}. ${si.cost}`;return {say,why}}
+    const sg=suggestDial(s),si=sugInfo(s,sg);why+=` <br>💡 ${mText(dialOf(s)[sg])}: ${si.why}. ${si.cost}`;return {say,why}}
   if(!humanTurn())return {say:'Wait: the computer is acting.',why:'Watch the mat. The result cards and the radio tell you what happened.'};
   const s=G.cur&&ship(G.cur);
   if(P==='action'&&s){const acts=actionsFor(s);const rp=acts.find(a=>/^RP\d/.test(a.a));
@@ -145,7 +145,7 @@ function advice(){if(!G)return {say:'Press Launch.',why:'The defaults are a good
   return {say:'Follow the highlighted button.',why:''}}
 // ---- the guidance box in the dock ----
 function renderCoach(){const el=$('coach');if(!el)return;const rc=$('recap');if(rc)rc.innerHTML='';if(!G||UI.info){el.innerHTML='';return}let h='';
-  if(UI.advOpen){const a=advice();h+=`<div class="adv" role="status"><button class="gx-x" data-a="advise" aria-label="Close advice">×</button><b> ${a.say}</b> ${a.why}</div>`}
+  if(UI.advOpen){const a=advice();h+=`<div class="adv" role="status"><button class="gx-x" data-a="advise" aria-label="Close advice">×</button><b>🧭 ${a.say}</b> ${a.why}</div>`}
   if(G.round===0&&!G.winner)h+=briefingHTML();
   el.innerHTML=h;coachTag();
-  const rd=$('radio');if(rd){const r=UI.radio;rd.innerHTML=r&&G.round-r.r<=1&&!G.winner?` Radio · <b class="f${G.fac[r.side]}">${esc(r.who)}</b>: “${esc(r.t)}”`:''}}
+  const rd=$('radio');if(rd){const r=UI.radio;rd.innerHTML=r&&G.round-r.r<=1&&!G.winner?`📻 Radio · <b class="f${G.fac[r.side]}">${esc(r.who)}</b>: “${esc(r.t)}”`:''}}
