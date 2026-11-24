@@ -1,0 +1,6 @@
+start:  offscreen "About"
+menu:  offscreen "About" | small 0px "🔒" | small 0px "🔒" | small 0px "🔒" | small 0px "🔒" | small 0px "🔒"
+vb-board:  offscreen "About"
+vb-chain:  offscreen "About"
+vb-result:  offscreen "About"
+story-scene:  offscreen "About"

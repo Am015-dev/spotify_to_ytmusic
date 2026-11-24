@@ -1,0 +1,8 @@
+start:  offscreen "Scores" | offscreen "×" | offscreen "No game yet." | offscreen "Log" | offscreen "×" | offscreen "How to play"
+menu:  offscreen "Scores" | offscreen "×" | offscreen "No game yet." | offscreen "Log" | offscreen "×" | offscreen "How to play"
+vg-board:  offscreen "Scores" | offscreen "×" | offscreen "No game yet." | offscreen "Log" | offscreen "×" | offscreen "How to play"
+vg-guardian:  offscreen "Scores" | offscreen "×" | offscreen "No game yet." | offscreen "Log" | offscreen "×" | offscreen "How to play"
+vg-overcome:  offscreen "Scores" | offscreen "×" | offscreen "No game yet." | offscreen "Log" | offscreen "×" | offscreen "How to play"
+vg-market:  offscreen "Scores" | offscreen "×" | offscreen "No game yet." | offscreen "Log" | offscreen "×" | offscreen "How to play"
+vg-result:  small 0px "73 pts" | small 0px "61 pts" | small 0px "17 pts" | offscreen "Scores" | offscreen "×" | offscreen "No game yet."
+story-scene:  offscreen "Scores" | offscreen "×" | offscreen "No game yet." | offscreen "Log" | offscreen "×" | offscreen "How to play"

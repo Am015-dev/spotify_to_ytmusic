@@ -1,0 +1,8 @@
+start:  offscreen "Guardians 15" | offscreen "Ruins 16" | offscreen "Camp sites 5" | offscreen "Idols 16" | offscreen "Boat" | offscreen "Idol"
+menu:  offscreen "Guardians 15" | offscreen "Ruins 16" | offscreen "Camp sites 5" | offscreen "Idols 16" | offscreen "Boat" | offscreen "Idol"
+vg-board:  clipped "Round 1 of 5" | offscreen "Guardians 15" | offscreen "Ruins 16" | offscreen "Camp sites 5" | offscreen "Idols 16" | offscreen "Boat"
+vg-guardian:  clipped "Round 1 of 5" | offscreen "Guardians 15" | offscreen "Ruins 16" | offscreen "Camp sites 5" | offscreen "Idols 16" | offscreen "Boat"
+vg-overcome:  clipped "Round 1 of 5" | offscreen "Guardians 15" | offscreen "Ruins 16" | offscreen "Camp sites 5" | offscreen "Idols 16" | offscreen "Boat"
+vg-market:  clipped "Round 1 of 5" | offscreen "Guardians 15" | offscreen "Ruins 16" | offscreen "Camp sites 5" | offscreen "Idols 16" | offscreen "Boat"
+vg-result:  clipped "Game over" | small 0px "73 pts" | small 0px "61 pts" | small 0px "17 pts" | offscreen "Guardians 15" | offscreen "Ruins 16"
+story-scene:  offscreen "Guardians 15" | offscreen "Ruins 16" | offscreen "Camp sites 5" | offscreen "Idols 16" | offscreen "Boat" | offscreen "Idol"

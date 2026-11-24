@@ -1,0 +1,8 @@
+menu:  offscreen "Lessons"
+wm-board:  offscreen "Lessons"
+wm-place:  offscreen "Lessons"
+wm-token:  offscreen "Lessons"
+wm-sweep:  offscreen "Lessons"
+wm-boss:  offscreen "Lessons"
+wm-cards:  offscreen "Lessons"
+wm-result:  offscreen "Lessons"

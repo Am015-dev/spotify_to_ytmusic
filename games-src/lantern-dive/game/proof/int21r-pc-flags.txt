@@ -1,0 +1,7 @@
+start:  offscreen "How to play" | offscreen "×" | offscreen "How a turn works" | offscreen "Read the line at the top" | offscreen "Glowing cards are playab" | offscreen "Tap a glowing card. It s"
+menu:  offscreen "How to play" | offscreen "×" | offscreen "How a turn works" | offscreen "Read the line at the top" | offscreen "Glowing cards are playab" | offscreen "Tap a glowing card. It s"
+ld-board:  offscreen "How to play" | offscreen "×" | offscreen "How a turn works" | offscreen "Read the line at the top" | offscreen "Glowing cards are playab" | offscreen "Tap a glowing card. It s"
+ld-zoom:  offscreen "How to play" | offscreen "×" | offscreen "How a turn works" | offscreen "Read the line at the top" | offscreen "Glowing cards are playab" | offscreen "Tap a glowing card. It s"
+ld-help:  offscreen "How to play" | offscreen "×" | offscreen "How a turn works" | offscreen "Read the line at the top" | offscreen "Glowing cards are playab" | offscreen "Tap a glowing card. It s"
+ld-art:  offscreen "How to play" | offscreen "×" | offscreen "How a turn works" | offscreen "Read the line at the top" | offscreen "Glowing cards are playab" | offscreen "Tap a glowing card. It s"
+story-scene:  offscreen "How to play" | offscreen "×" | offscreen "How a turn works" | offscreen "Read the line at the top" | offscreen "Glowing cards are playab" | offscreen "Tap a glowing card. It s"
