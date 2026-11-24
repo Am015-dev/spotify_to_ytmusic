@@ -210,21 +210,34 @@ table.sc2 tr.tot td{border:0;font-size:20px;color:var(--sun2)}
 }
 
 /* ===== guide (what to tap now) ===== */
-#guide{display:none;position:fixed;left:0;right:0;top:0;z-index:90;padding:calc(var(--st) + 6px) 10px 6px;background:var(--cream);color:var(--ink);border-bottom:4px solid var(--sun);box-shadow:0 4px 14px rgba(0,0,0,.45);gap:8px;align-items:center}
+#guide{display:none;position:fixed;left:0;right:0;top:0;z-index:90;height:calc(var(--st) + 24px);padding:var(--st) 10px 0;background:var(--ink);color:var(--gold);align-items:center;justify-content:center;pointer-events:none}
 body.gd #guide{display:flex}
-#guide .k{flex:none;background:var(--ink);color:var(--gold);font-family:var(--hd);font-size:11px;padding:4px 7px;border-radius:8px;letter-spacing:.04em;text-transform:uppercase}
-#guide .tx{flex:1;min-width:0}
-#gdT{display:block;font-weight:800;font-size:16px;line-height:1.15;overflow-wrap:anywhere}
-#gdW{display:block;font-weight:500;font-size:12.5px;line-height:1.2;opacity:.85;margin-top:1px}
-#gdW:empty{display:none}
-#guide.nudge{background:#ffd9c9;border-bottom-color:var(--rust)}
-#guide.nudge .k{background:var(--rust);color:#fff}
+#guide .k{font-family:var(--hd);font-size:13px;letter-spacing:.05em;text-transform:uppercase;line-height:24px}
+#gdB,#gdR{display:none;position:fixed;left:0;top:0;z-index:95;box-sizing:border-box;padding:9px 12px;border-radius:14px;background:var(--cream);color:var(--ink);border:3px solid var(--sun);box-shadow:0 6px 18px rgba(0,0,0,.5);pointer-events:none}
+body.gd #gdB.on,body.gd #gdR.on{display:block}
+#gdT,#gdRT{display:block;font-weight:800;font-size:16px;line-height:1.2;overflow-wrap:anywhere}
+#gdB.has-m #gdT{padding-right:40px}
+#gdW{display:none;font-weight:500;font-size:13.5px;line-height:1.25;margin-top:4px}
+#gdB.more #gdW{display:block}
+#gdM{display:none;position:absolute;right:2px;top:0;width:44px;height:44px;border:0;background:transparent;pointer-events:auto;font:800 16px var(--hd);color:var(--ink);cursor:pointer}
+#gdM{z-index:1;color:var(--gold);background:radial-gradient(circle at 50% 50%,var(--ink) 15px,transparent 16px)}
+#gdB.has-m #gdM{display:block}
+#gdB.nudge{background:#ffd9c9;border-color:var(--rust)}
+#gdR{background:#d9f3c8;border-color:#3f8a2e}
+#gdB .ar,#gdR .ar{position:absolute;width:0;height:0;border:10px solid transparent}
+#gdB[data-side=below]>.ar,#gdR[data-side=below]>.ar{top:-13px;border-bottom-color:var(--sun);border-top-width:0}
+#gdB[data-side=above]>.ar,#gdR[data-side=above]>.ar{bottom:-13px;border-top-color:var(--sun);border-bottom-width:0}
+#gdB[data-side=right]>.ar,#gdR[data-side=right]>.ar{left:-13px;border-right-color:var(--sun);border-left-width:0}
+#gdB[data-side=left]>.ar,#gdR[data-side=left]>.ar{right:-13px;border-left-color:var(--sun);border-right-width:0}
+#gdR[data-side=below]>.ar{border-bottom-color:#3f8a2e}#gdR[data-side=above]>.ar{border-top-color:#3f8a2e}#gdR[data-side=right]>.ar{border-right-color:#3f8a2e}#gdR[data-side=left]>.ar{border-left-color:#3f8a2e}
+#gdM{font-size:15px}
 body.gd:not(.pc) #app{padding-top:calc(var(--st) + var(--gd,0px))}
 body.gd #modal{top:var(--gd,0px)}
 body.gd #hint{display:none!important}
 body.gd .coach,body.gd .coach.on{display:none!important}
-body.gd #toast{bottom:auto;top:calc(var(--st) + var(--gd,0px) + 96px)}
+body.gd #toast{display:none!important}
 body.gd.placing #toast{bottom:auto}
+body.gd .gdhide{display:none!important}
 body.gd.gd-ov #toast{display:none!important}
 .gd-glow{outline:3px solid #ffe27a!important;outline-offset:2px;box-shadow:0 0 0 5px rgba(255,226,122,.5),0 0 22px 8px rgba(255,200,60,.75)!important;animation:gdp 1s ease-in-out infinite;position:relative;z-index:3}
 @keyframes gdp{50%{box-shadow:0 0 0 8px rgba(255,226,122,.75),0 0 30px 12px rgba(255,200,60,.95)}}
@@ -237,9 +250,15 @@ g.hex.gd-glow path:first-child{fill:rgba(255,214,90,.55)!important}
 .hex.sel .ho{stroke:#fff!important;stroke-width:6!important;animation:none!important}
 .hex.sel>path:first-child{fill:rgba(255,255,255,.4)!important}
 </style>
+<style>
+body.pc #guide{left:auto;right:10px;top:0;width:auto;height:22px;padding:0 12px;border-radius:0 0 10px 10px}
+body.pc #guide .k{line-height:22px}
+</style>
 </head>
 <body>
-<div id="guide" role="status" aria-live="polite"><span class="k" id="gdK">Guided</span><span class="tx"><span id="gdT"></span><span id="gdW"></span></span></div>
+<div id="guide" role="status"><span class="k" id="gdK">Guided game</span></div>
+<div id="gdB" role="status" aria-live="polite" data-side="below"><span id="gdT"></span><button type="button" id="gdM" aria-label="More detail" aria-expanded="false">?</button><span id="gdW"></span><i class="ar"></i></div>
+<div id="gdR" role="status" aria-live="polite" data-side="below"><span id="gdRT"></span><i class="ar"></i></div>
 <div id="app" class="gx-app">
   <div id="top">
     <button class="ib" id="bmenu" aria-label="Menu"></button>
@@ -2053,6 +2072,7 @@ function vib(ms) { try { if (navigator.vibrate) navigator.vibrate(ms); } catch (
 var HQ = [], HCUR = null;
 function toast(html, me, ms, o) {
   o = o || {};
+  if (typeof GD !== 'undefined' && GD.on) { guideResult(html, me); return; }
   var it = { html: html, me: me, ms: ms || 2400, key: o.key || '' };
   if (it.key) HQ = HQ.filter(function (x) { return x.key !== it.key; });
   if (o.drop) HQ = HQ.filter(function (x) { return o.drop.indexOf(x.key) < 0; });
@@ -2108,6 +2128,12 @@ function playEvents() {
     }, d);
     if (e.k === 'tile' || e.k === 'temp' || e.k === 'oxy') d += UI.AIDELAY > 100 ? 260 : 0;
   })(evs[i]);
+  // guided game: plain result of the player's own move, shown next to what changed
+  if (typeof GD !== 'undefined' && GD.on) {
+    var mine = logs.filter(function (l) { return l.p === 0; }), me = G.ev.slice(seen).filter(function (e) { return e.p === 0; }), anc = '';
+    me.forEach(function (e) { if (e.k === 'tile') anc = 'hex:' + e.s; else if (!anc && (e.k === 'temp' || e.k === 'oxy')) anc = e.k === 'temp' ? '#gTemp' : '#gOxy'; });
+    if (mine.length) { var tx = mine[mine.length - 1].s.replace(/\.$/, ''); GD.tapAt = Date.now(); guideResult(tx.replace(/\s*\([^)]*\)/g, '') + '.', true, anc); }
+  }
   // rival lines become toasts
   var rl = logs.filter(function (l) { return l.p === 1; });
   if (rl.length) { UI.rivalLine = rl[rl.length - 1].s.replace(/\.$/, '').split(' ').slice(0, 8).join(' '); UI.rivalLines = (UI.rivalLines || []).concat(rl.map(function (l) { return l.s; })).slice(-6); }
@@ -2359,12 +2385,12 @@ function showSetup() {
   if (st.step === 0) {
     var cs = P.offer.corps.slice(); if (cs.indexOf('c00') < 0 && UI.tut) cs.push('c00');
     var first = UI.tut || !LS.get('oh_done'); if (cs.indexOf('c00') >= 0) { cs.splice(cs.indexOf('c00'), 1); cs.unshift('c00'); }
-    modal('<h3>Pick your company</h3><p class="note">Each company has one power. ' + (first ? '<b>First game? Take Open Charter</b> (marked): no power to learn.' : 'Pick one that fits the cards you like.') + '</p><div class="grid">' + cs.map(function (id) { var rec = first && id === 'c00'; return '<button class="cw pickable" data-corp="' + id + '">' + (rec ? '<span class="recb">Best for a first game</span>' : '') + cardHTML(id, { pick: rec, chk: 'Pick' }) + '<span class="cgood"><b>Good at:</b> ' + esc(CORP_GOOD[id] || '') + '</span></button>'; }).join('') + '</div>', false);
+    modal('<h3>Pick your company</h3><p class="note gdhide">Each company has one power. ' + (first ? '<b>First game? Take Open Charter</b> (marked): no power to learn.' : 'Pick one that fits the cards you like.') + '</p><div class="grid">' + cs.map(function (id) { var rec = first && id === 'c00'; return '<button class="cw pickable" data-corp="' + id + '">' + (rec ? '<span class="recb">Best for a first game</span>' : '') + cardHTML(id, { pick: rec, chk: 'Pick' }) + '<span class="cgood gdhide"><b>Good at:</b> ' + esc(CORP_GOOD[id] || '') + '</span></button>'; }).join('') + '</div>', false);
     $('mb').querySelectorAll('[data-corp]').forEach(function (b) { b.addEventListener('click', function () { st.corp = b.getAttribute('data-corp'); st.step = 1; if (P.offer.corps.indexOf(st.corp) < 0) P.offer.corps.push(st.corp); var C = OH.CORPS[st.corp]; st.keep = {}; if (!C.beginner) suggestBuys(P.offer.cards, C.mc - 14).forEach(function (id) { st.keep[id] = 1; }); if (!OH.CORPS[st.corp].beginner) coachShow('keep'); showSetup(); }); });
     coachShow('corp'); return;
   }
   var C = OH.CORPS[st.corp], n = Object.keys(st.keep).length, beg = !!C.beginner;
-  modal('<h3>Keep cards</h3><p style="margin:0 0 8px;opacity:.85">' + (beg ? 'Open Charter keeps all 10 free.' : '3 credits each. Marked cards are our suggestion: change them if you like.') + '</p><div class="grid">' + P.offer.cards.map(function (id) { return '<button class="cw pickable" data-keep="' + id + '">' + cardHTML(id, { pick: beg || st.keep[id] }) + '</button>'; }).join('') + '</div><div class="stick"><button class="btn pickable" id="mKeep">' + (beg ? 'Keep all 10' : 'Keep ' + plural(n, 'card')) + '<small>' + (beg ? 'Start with 42 credits' : 'Pay ' + 3 * n + ', start with ' + (C.mc - 3 * n) + ' credits') + '</small></button><button class="btn alt" id="mBack">Other company</button></div>', false);
+  modal('<h3>Keep cards</h3><p class="gdhide" style="margin:0 0 8px;opacity:.85">' + (beg ? 'Open Charter keeps all 10 free.' : '3 credits each. Marked cards are our suggestion: change them if you like.') + '</p><div class="grid">' + P.offer.cards.map(function (id) { return '<button class="cw pickable" data-keep="' + id + '">' + cardHTML(id, { pick: beg || st.keep[id] }) + '</button>'; }).join('') + '</div><div class="stick"><button class="btn pickable" id="mKeep">' + (beg ? 'Keep all 10' : 'Keep ' + plural(n, 'card')) + '<small>' + (beg ? 'Start with 42 credits' : 'Pay ' + 3 * n + ', start with ' + (C.mc - 3 * n) + ' credits') + '</small></button><button class="btn alt" id="mBack">Other company</button></div>', false);
   $('mb').querySelectorAll('[data-keep]').forEach(function (b) { b.addEventListener('click', function () { if (beg) { b.querySelector('.card').classList.remove('pop'); void b.offsetWidth; b.querySelector('.card').classList.add('pop'); toast('<b>' + esc(OH.card(b.getAttribute('data-keep')).name) + ': kept</b>Open Charter keeps all 10 cards for free.', true, 2000, { now: true, key: 'beg' }); return; } var id = b.getAttribute('data-keep'); if (st.keep[id]) delete st.keep[id]; else if ((n + 1) * 3 <= C.mc) st.keep[id] = 1; else { toast('Not enough credits: each card costs 3.', true, 2000, { now: true, key: 'buy' }); return; } showSetup(); }); });
   $('mKeep').addEventListener('click', function () { var m = { t: 'setup', corp: st.corp, buy: Object.keys(st.keep) }; UI.setup = null; closeModal(); doMove(m); });
   $('mBack').addEventListener('click', function () { st.step = 0; showSetup(); });
@@ -2584,7 +2610,7 @@ var GD_IDEA = {   // first-time teaching line for each idea (shown in gens 1-2 u
 };
 function guideTitle(m) { try { return suggestWords(m); } catch (e) { return ['Make a move', '']; } }
 function guideNow() {
-  var P = G.pl[0], p = OH.sideToAct(), early = G.gen <= 2, sheetOn = $('sheet').classList.contains('on'), modalOn = $('modal').classList.contains('on'), m;
+  var P = G.pl[0], p = OH.sideToAct(), early = G.gen <= 2, sheetOn = $('sheet').classList.contains('on'), modalOn = $('modal').classList.contains('on'), xOk = getComputedStyle($('shX')).visibility !== 'hidden', m;
   if (p === 1) return { t: 'Rival is playing', w: 'Wait a moment. It is quick.', sel: [] };
   if (G.pending) {
     var h = G.pending.h;
@@ -2624,7 +2650,7 @@ function guideNow() {
       if (UI.tab !== 'play' && UI.tab !== 'all' || !document.querySelector('#shB [data-card="' + m.id + '"]')) return { t: 'Tap "Can play"', w: 'These are the cards you can afford.', sel: ['#shTabs [data-tab="play"]'], nm: 'Can play' };
       return { t: 'Tap ' + nm, w: 'Play it: ' + (t[1] || GD_IDEA.play), sel: ['#shB [data-card="' + m.id + '"]'], nm: nm };
     }
-    if (sheetOn) return { t: 'Tap X to close', w: 'You want your cards, not this list.', sel: ['#shX'], nm: 'X' };
+    if (sheetOn && xOk) return { t: 'Tap X to close', w: 'You want your cards, not this list.', sel: ['#shX'], nm: 'X' };
     return { t: 'Tap Cards: play ' + nm, w: why('play'), sel: ['#bCards'], nm: 'Cards' };
   }
   if (tk === 'std' || tk === 'mile' || tk === 'award') {
@@ -2634,20 +2660,20 @@ function guideNow() {
       if (document.querySelector('#shB ' + q + ':not([disabled])')) return { t: 'Tap ' + (tk === 'std' ? '' : 'Claim ') + nice, w: why('std'), sel: ['#shB ' + q], nm: 'the button' };
       return { t: 'Tap the ' + (tk === 'std' ? 'Standard' : tk === 'mile' ? 'Milestones' : 'Awards') + ' tab', w: '', sel: ['#shTabs [data-tab="' + (tk === 'std' ? 'std' : tk) + '"]'], nm: 'the tab' };
     }
-    if (sheetOn) return { t: 'Tap X to close', w: '', sel: ['#shX'], nm: 'X' };
+    if (sheetOn && xOk) return { t: 'Tap X to close', w: '', sel: ['#shX'], nm: 'X' };
     return { t: 'Tap Projects: ' + nice, w: why('std'), sel: ['#bProj'], nm: 'Projects' };
   }
   if (tk === 'act') {
     if (sheetOn && UI.sheet === 'act') return { t: 'Tap Use on ' + OH.card(m.id).name, w: why('act'), sel: ['#shB [data-act="' + m.id + '"][data-i="' + (m.i || 0) + '"]:not([disabled])', '#shB [data-act="' + m.id + '"]:not([disabled])'], nm: 'Use' };
-    if (sheetOn) return { t: 'Tap X to close', w: '', sel: ['#shX'], nm: 'X' };
+    if (sheetOn && xOk) return { t: 'Tap X to close', w: '', sel: ['#shX'], nm: 'X' };
     return { t: 'Tap Actions: ' + OH.card(m.id).name, w: why('act'), sel: ['#bAct'], nm: 'Actions' };
   }
   if (tk === 'green' || tk === 'heat') {
-    if (sheetOn) return { t: 'Tap X to close', w: '', sel: ['#shX'], nm: 'X' };
+    if (sheetOn && xOk) return { t: 'Tap X to close', w: '', sel: ['#shX'], nm: 'X' };
     var r = tk === 'green' ? 'plant' : 'heat';
     return { t: tk === 'green' ? 'Tap your plants' : 'Tap your heat', w: why(tk), sel: ['#res .rc[data-r="' + r + '"]'], nm: r };
   }
-  if (sheetOn) return { t: 'Tap X to close', w: 'Nothing here helps now.', sel: ['#shX'], nm: 'X' };
+  if (sheetOn && xOk) return { t: 'Tap X to close', w: 'Nothing here helps now.', sel: ['#shX'], nm: 'X' };
   return { t: G.acts === 1 ? 'Tap Done to end your turn' : 'Tap Pass to end the round', w: why('end'), sel: ['#bPass'], nm: G.acts === 1 ? 'Done' : 'Pass' };
 }
 function guideVisibleHex(best, spaces) {   // keep the guided hex well inside the map view, away from the buttons
@@ -2659,26 +2685,102 @@ function guideVisibleHex(best, spaces) {   // keep the guided hex well inside th
 function guideEls(sel) { var out = []; sel.some(function (s) { var l = document.querySelectorAll(s); if (l.length) { Array.prototype.forEach.call(l, function (e) { out.push(e); }); return true; } return false; }); return out; }
 function guideRefresh() {
   var on = guideEnabled(); document.body.classList.toggle('gd', on);
-  if (!on) { GD.on = false; Array.prototype.forEach.call(document.querySelectorAll('.gd-glow'), function (e) { e.classList.remove('gd-glow'); }); return; }
+  if (!on) { GD.on = false; Array.prototype.forEach.call(document.querySelectorAll('.gd-glow'), function (e) { e.classList.remove('gd-glow'); }); $('gdB').classList.remove('on'); $('gdR').classList.remove('on'); return; }
   GD.on = true; document.body.classList.toggle('gd-ov', $('sheet').classList.contains('on') || $('modal').classList.contains('on')); var g = guideNow(); GD.g = g;
   var els = guideEls(g.sel);
   Array.prototype.forEach.call(document.querySelectorAll('.gd-glow'), function (e) { if (els.indexOf(e) < 0) e.classList.remove('gd-glow'); });
   els.forEach(function (e) { e.classList.add('gd-glow'); });
   GD.els = els;
   var key = g.t + '|' + els.length; if (els[0] && key !== GD.scrolled && els[0].closest('#shB, #mb')) { GD.scrolled = key; try { els[0].scrollIntoView({ block: 'center', behavior: 'auto' }); } catch (e) { } }
-  if (!GD.nudging) { $('gdT').textContent = g.t; $('gdW').textContent = g.w || ''; $('guide').classList.remove('nudge'); }
-  $('guide').setAttribute('data-gd', g.t);
-  var gen = G.gen <= 2 ? 'Step ' : ''; $('gdK').textContent = G.gen <= 2 ? 'Guided' : 'Next';
+  if (key !== GD.key) { GD.key = key; GD.more = false; }
+  var bb = $('gdB');
+  if (!GD.nudging) { $('gdT').textContent = g.t; $('gdW').textContent = g.w || ''; bb.classList.remove('nudge'); }
+  bb.classList.toggle('has-m', !!g.w && !GD.nudging); bb.classList.toggle('more', !!GD.more && !GD.nudging);
+  $('gdM').setAttribute('aria-expanded', GD.more ? 'true' : 'false');
+  bb.setAttribute('data-gd', g.t);
+  guidePlace();
+}
+// ---- bubbles: placed next to the glowing target, arrow touching it, never over the target ----
+function gdVis(e) { var r = e.getBoundingClientRect(); return r.width > 3 && r.height > 3 && r.bottom > 0 && r.top < innerHeight && r.right > 0 && r.left < innerWidth && getComputedStyle(e).visibility !== 'hidden'; }
+function gdRect(e) { var r = e.getBoundingClientRect(); return { l: r.left, t: r.top, r: r.right, b: r.bottom }; }
+function gdOver(a, b) { var w = Math.min(a.r, b.r) - Math.max(a.l, b.l), h = Math.min(a.b, b.b) - Math.max(a.t, b.t); return w > 0 && h > 0 ? w * h : 0; }
+function gdObstacles(skip) {
+  var root = $('modal').classList.contains('on') ? $('mb') : $('sheet').classList.contains('on') ? $('sheet') : $('app'), out = [];
+  Array.prototype.forEach.call(root.querySelectorAll('button, .cw, [data-card], g.hex.tgt'), function (e) {
+    if (skip.indexOf(e) >= 0 || skip.some(function (s) { return s.contains(e) || e.contains(s); }) || !gdVis(e)) return;
+    var r = gdRect(e); if ((r.r - r.l) * (r.b - r.t) > innerWidth * innerHeight * 0.5) return; out.push(r);
+  });
+  return out;
+}
+function gdPlaceBubble(bub, tgts, avoid, anchor) {
+  var vw = innerWidth, vh = innerHeight, top = (parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--st')) || 0) + 28, G0 = 12, best = null;
+  var obs = gdObstacles(tgts), a = gdRect(anchor), acx = (a.l + a.r) / 2, acy = (a.t + a.b) / 2, tr = tgts.map(gdRect);
+  var maxW = Math.min(270, vw - 16);
+  [maxW, Math.min(220, maxW)].forEach(function (W, wi) {
+    bub.style.width = W + 'px'; var w = bub.offsetWidth, h = bub.offsetHeight;
+    ['below', 'above', 'right', 'left'].forEach(function (sd, si) {
+      var x, y;
+      if (sd === 'below') { x = acx - w / 2; y = a.b + G0; } else if (sd === 'above') { x = acx - w / 2; y = a.t - G0 - h; }
+      else if (sd === 'right') { x = a.r + G0; y = acy - h / 2; } else { x = a.l - G0 - w; y = acy - h / 2; }
+      x = Math.max(8, Math.min(vw - 8 - w, x)); y = Math.max(top, Math.min(vh - 8 - h, y));
+      var R = { l: x, t: y, r: x + w, b: y + h }, sc = wi * 8 + si * 6, bad = false;
+      tr.forEach(function (t) { if (gdOver(R, t) > 0) bad = true; }); if (bad) return;
+      var dx = Math.max(a.l - R.r, R.l - a.r, 0), dy = Math.max(a.t - R.b, R.t - a.b, 0); if (Math.max(dx, dy) > 60) sc += 400;   // got pushed away from the target by the screen edge
+      obs.forEach(function (o) { sc += gdOver(R, o) / 20; }); avoid.forEach(function (o) { sc += gdOver(R, o) / 2; });
+      if (!best || sc < best.sc) best = { sc: sc, sd: sd, x: x, y: y, w: w, h: h, W: W };
+    });
+  });
+  if (!best) return null;
+  bub.style.width = best.W + 'px'; bub.style.transform = 'translate(' + Math.round(best.x) + 'px,' + Math.round(best.y) + 'px)'; bub.setAttribute('data-side', best.sd);
+  var ar = bub.querySelector('.ar'), horiz = best.sd === 'below' || best.sd === 'above';
+  if (horiz) { ar.style.left = Math.max(14, Math.min(best.w - 34, acx - best.x - 10)) + 'px'; ar.style.top = ''; }
+  else { ar.style.top = Math.max(14, Math.min(best.h - 34, acy - best.y - 10)) + 'px'; ar.style.left = ''; }
+  if (horiz) ar.style[best.sd === 'below' ? 'bottom' : 'top'] = ''; else ar.style[best.sd === 'right' ? 'right' : 'left'] = '';
+  return { l: best.x, t: best.y, r: best.x + best.w, b: best.y + best.h };
+}
+function guidePlace() {
+  var bb = $('gdB'), rb = $('gdR'); if (!GD.on || !GD.els) return;
+  var tg = GD.els.filter(gdVis); if (!tg.length || document.hidden) { bb.classList.remove('on'); GD.rect = null; return; }
+  var rr = null;
+  if (GD.res && Date.now() < GD.res.until) {
+    var an = GD.res.fn(); an = an && an.isConnected && gdVis(an) ? an : null;
+    if (an) { $('gdRT').textContent = GD.res.txt; rb.classList.add('on'); rr = gdPlaceBubble(rb, [an], [], an); if (!rr) rb.classList.remove('on'); }
+    else rb.classList.remove('on');
+  } else { rb.classList.remove('on'); GD.res = null; }
+  bb.classList.add('on');
+  GD.rect = gdPlaceBubble(bb, tg, rr ? [rr] : [], tg[0]);
+  if (!GD.rect) bb.classList.remove('on');
+}
+function guideResult(html, me, anchor) {
+  if (!me || /rival|your turn/i.test(String(html))) return;
+  if (Date.now() - (GD.tapAt || 0) > 2500) return;
+  var txt = String(html).replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim(); if (!txt) return;
+  var tapEl = GD.tapEl, tapHex = GD.tapHex;
+  var fn = function () {
+    var q = anchor && (anchor.charAt(0) === '#' || anchor.charAt(0) === '.' ? $(anchor.slice(1)) || document.querySelector(anchor) : null);
+    if (anchor && anchor.indexOf('hex:') === 0) { var h = document.querySelector('#hexes [data-s="' + anchor.slice(4) + '"]'); if (h) return h; }
+    if (q && gdVis(q)) return q;
+    if (tapEl && tapEl.isConnected && gdVis(tapEl)) return tapEl;
+    if (tapHex) { var h2 = document.querySelector('#hexes [data-s="' + tapHex + '"]'); if (h2 && gdVis(h2)) return h2; }
+    return $('bCards') && gdVis($('bCards')) ? $('bCards') : null;
+  };
+  GD.res = { txt: txt.length > 64 ? txt.slice(0, 62) + '…' : txt, fn: fn, until: Date.now() + 3400 };
+  guideRefresh();
 }
 function guideNudge(msg) {
-  GD.nudging = true; $('gdT').textContent = msg; $('gdW').textContent = ''; $('guide').classList.add('nudge');
-  clearTimeout(GD.nudgeTm); GD.nudgeTm = setTimeout(function () { GD.nudging = false; guideRefresh(); }, 2600);
+  GD.nudging = true; $('gdT').textContent = msg; $('gdW').textContent = ''; $('gdB').classList.add('nudge');
+  clearTimeout(GD.nudgeTm); GD.nudgeTm = setTimeout(function () { GD.nudging = false; guideRefresh(); }, 2600); guidePlace();
 }
+document.addEventListener('click', function (e) {
+  var m = e.target && e.target.closest && e.target.closest('#gdM'); if (!m) return;
+  GD.more = !GD.more; guideRefresh();
+}, false);
 // a tap that is not on the glowing thing gets one nudge line (the tap itself still works)
 document.addEventListener('click', function (e) {
   if (!GD.on || !GD.g || !GD.els || !GD.els.length) return;
   var t = e.target; if (!t || !t.closest) return;
-  if (t.closest('#guide') || t.closest('#bmenu')) return;
+  GD.tapAt = Date.now(); GD.tapEl = t.closest('button, [data-s], .cw, [data-r]') || null; GD.tapHex = UI.sel != null ? UI.sel : (t.closest('[data-s]') ? t.closest('[data-s]').getAttribute('data-s') : null);
+  if (t.closest('#guide') || t.closest('#gdB') || t.closest('#bmenu')) return;
   var hit = t.closest('button, [data-s], .cw, [data-r], .gx-board'); if (!hit) return;
   if (t.closest('.gx-board') && !t.closest('[data-s]') && !t.closest('button')) return;   // dragging the map is fine
   if (GD.g.sel.some(function (q) { try { return !!t.closest(q); } catch (x) { return false; } }) || GD.els.some(function (el) { return el === t || el.contains(t); })) return;
@@ -2688,7 +2790,7 @@ document.addEventListener('click', function (e) {
   var go = function () { if (GD.raf) return; GD.raf = requestAnimationFrame(function () { GD.raf = 0; try { guideRefresh(); } catch (e) { } }); };
   ['mb', 'shB', 'shTabs', 'board', 'res', 'bar', 'confirm'].forEach(function (id) { var el = $(id); if (el) new MutationObserver(go).observe(el, { childList: true, subtree: id === 'board' || id === 'bar' }); });
   ['modal', 'sheet', 'confirm'].forEach(function (id) { new MutationObserver(go).observe($(id), { attributes: true, attributeFilter: ['class'] }); });
-  setInterval(go, 500);
+  setInterval(go, 500); setInterval(function () { try { if (GD.on) guidePlace(); } catch (e) { } }, 120); window.addEventListener('resize', go); document.addEventListener('scroll', function () { if (GD.on) guidePlace(); }, true);
   if (window.ResizeObserver) new ResizeObserver(function () { document.documentElement.style.setProperty('--gd', (document.body.classList.contains('gd') ? $('guide').offsetHeight : 0) + 'px'); }).observe($('guide'));
 })();
 

@@ -210,21 +210,34 @@ table.sc2 tr.tot td{border:0;font-size:20px;color:var(--sun2)}
 }
 
 /* ===== guide (what to tap now) ===== */
-#guide{display:none;position:fixed;left:0;right:0;top:0;z-index:90;padding:calc(var(--st) + 6px) 10px 6px;background:var(--cream);color:var(--ink);border-bottom:4px solid var(--sun);box-shadow:0 4px 14px rgba(0,0,0,.45);gap:8px;align-items:center}
+#guide{display:none;position:fixed;left:0;right:0;top:0;z-index:90;height:calc(var(--st) + 24px);padding:var(--st) 10px 0;background:var(--ink);color:var(--gold);align-items:center;justify-content:center;pointer-events:none}
 body.gd #guide{display:flex}
-#guide .k{flex:none;background:var(--ink);color:var(--gold);font-family:var(--hd);font-size:11px;padding:4px 7px;border-radius:8px;letter-spacing:.04em;text-transform:uppercase}
-#guide .tx{flex:1;min-width:0}
-#gdT{display:block;font-weight:800;font-size:16px;line-height:1.15;overflow-wrap:anywhere}
-#gdW{display:block;font-weight:500;font-size:12.5px;line-height:1.2;opacity:.85;margin-top:1px}
-#gdW:empty{display:none}
-#guide.nudge{background:#ffd9c9;border-bottom-color:var(--rust)}
-#guide.nudge .k{background:var(--rust);color:#fff}
+#guide .k{font-family:var(--hd);font-size:13px;letter-spacing:.05em;text-transform:uppercase;line-height:24px}
+#gdB,#gdR{display:none;position:fixed;left:0;top:0;z-index:95;box-sizing:border-box;padding:9px 12px;border-radius:14px;background:var(--cream);color:var(--ink);border:3px solid var(--sun);box-shadow:0 6px 18px rgba(0,0,0,.5);pointer-events:none}
+body.gd #gdB.on,body.gd #gdR.on{display:block}
+#gdT,#gdRT{display:block;font-weight:800;font-size:16px;line-height:1.2;overflow-wrap:anywhere}
+#gdB.has-m #gdT{padding-right:40px}
+#gdW{display:none;font-weight:500;font-size:13.5px;line-height:1.25;margin-top:4px}
+#gdB.more #gdW{display:block}
+#gdM{display:none;position:absolute;right:2px;top:0;width:44px;height:44px;border:0;background:transparent;pointer-events:auto;font:800 16px var(--hd);color:var(--ink);cursor:pointer}
+#gdM{z-index:1;color:var(--gold);background:radial-gradient(circle at 50% 50%,var(--ink) 15px,transparent 16px)}
+#gdB.has-m #gdM{display:block}
+#gdB.nudge{background:#ffd9c9;border-color:var(--rust)}
+#gdR{background:#d9f3c8;border-color:#3f8a2e}
+#gdB .ar,#gdR .ar{position:absolute;width:0;height:0;border:10px solid transparent}
+#gdB[data-side=below]>.ar,#gdR[data-side=below]>.ar{top:-13px;border-bottom-color:var(--sun);border-top-width:0}
+#gdB[data-side=above]>.ar,#gdR[data-side=above]>.ar{bottom:-13px;border-top-color:var(--sun);border-bottom-width:0}
+#gdB[data-side=right]>.ar,#gdR[data-side=right]>.ar{left:-13px;border-right-color:var(--sun);border-left-width:0}
+#gdB[data-side=left]>.ar,#gdR[data-side=left]>.ar{right:-13px;border-left-color:var(--sun);border-right-width:0}
+#gdR[data-side=below]>.ar{border-bottom-color:#3f8a2e}#gdR[data-side=above]>.ar{border-top-color:#3f8a2e}#gdR[data-side=right]>.ar{border-right-color:#3f8a2e}#gdR[data-side=left]>.ar{border-left-color:#3f8a2e}
+#gdM{font-size:15px}
 body.gd:not(.pc) #app{padding-top:calc(var(--st) + var(--gd,0px))}
 body.gd #modal{top:var(--gd,0px)}
 body.gd #hint{display:none!important}
 body.gd .coach,body.gd .coach.on{display:none!important}
-body.gd #toast{bottom:auto;top:calc(var(--st) + var(--gd,0px) + 96px)}
+body.gd #toast{display:none!important}
 body.gd.placing #toast{bottom:auto}
+body.gd .gdhide{display:none!important}
 body.gd.gd-ov #toast{display:none!important}
 .gd-glow{outline:3px solid #ffe27a!important;outline-offset:2px;box-shadow:0 0 0 5px rgba(255,226,122,.5),0 0 22px 8px rgba(255,200,60,.75)!important;animation:gdp 1s ease-in-out infinite;position:relative;z-index:3}
 @keyframes gdp{50%{box-shadow:0 0 0 8px rgba(255,226,122,.75),0 0 30px 12px rgba(255,200,60,.95)}}
@@ -236,5 +249,9 @@ g.hex.gd-glow path:first-child{fill:rgba(255,214,90,.55)!important}
 .hex.tgt>path:first-child{fill:rgba(255,214,90,.28)}
 .hex.sel .ho{stroke:#fff!important;stroke-width:6!important;animation:none!important}
 .hex.sel>path:first-child{fill:rgba(255,255,255,.4)!important}
+</style>
+<style>
+body.pc #guide{left:auto;right:10px;top:0;width:auto;height:22px;padding:0 12px;border-radius:0 0 10px 10px}
+body.pc #guide .k{line-height:22px}
 </style>
 </head>
