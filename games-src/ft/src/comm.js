@@ -86,7 +86,7 @@ const COMMS=[
   check:R=>R.over&&R.me>R.rival,
   why:R=>R.me>R.rival?`You placed your last camel while ahead. The game ended: ${R.me} to ${R.rival}.`:`You waited. Farid got another round and caught you: ${R.me} to ${R.rival}.`}];
 // ---------- build the state ----------
-function commNew(i){const c=COMMS[i];const keep=DEFSEED;setSeed(6240+i);
+function commNew(i,spec){const c=spec||COMMS[i];const keep=DEFSEED;setSeed(6240+(i<0?0:i));   // spec: a lesson (lessons.js) reuses this state builder
   try{newGame({np:2,seats:['human','ai'],lv:['normal','normal'],mode:'x',names:['You','Farid']})}finally{DEFSEED=keep}
   for(const t of G.board){G.bag.push(...t.m);t.m=[]}
   G.board=COMM_LAYOUT.split('').map((ch,i)=>{const k=COMM_KIND[ch];return {k,v:k==='sacred'?(COMM_SV[i]||6):({oasis:8,small:6,large:4,village:5})[k],blue:TILEDEF[k].blue,ex:'base',i,m:[],camel:null,tent:null,palm:0,pal:0,block:0}});
