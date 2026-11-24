@@ -7,7 +7,8 @@
 //   chain symbol makes a linked card free ............. chain     | sell: 2 coins + 1 per yellow card ....................... sell
 //   shields move the pawn, loot at 3 steps ............ war       | science pair: second symbol = progress token ............ pair
 //   wonder: card tucked under, play again ............. wonder    | scoring and the winner after the last card .............. game
-//   NOT a lesson (rules drawer only): 9-step war win, six-symbol science win, 7-wonder cap, who starts the next age, guilds,
+//   board tour: every region named before any move .. board | 9-step war win ........ warwin | six symbols win ........ sciwin
+//   NOT a lesson (rules drawer only): 7-wonder cap, who starts the next age, guilds,
 //   the other progress tokens, blue-point tie-break.
 (function () {
   if (!window.GXST || !window.TT_UI) return;
@@ -24,7 +25,7 @@
   }
   // ---- the position: a fresh game, then every piece placed by hand (the engine's own state shape)
   function stack(sp) {
-    try { GX.close(); } catch (e) { }
+    try { GX.close(); } catch (e) { } tourEnd(true);
     U.tut = true; U.rivalName = 'Pell'; U.lvl = 'easy'; L.on = 1; L.n = 0; L.r = 0; L.last = null;
     layout(false); if (sp.rows) layout(true, sp.age, sp.rows);
     $('res').hidden = true; $('start').hidden = true;
@@ -54,7 +55,62 @@
   var built = function () { return me().cards.length > L.cards0; };
   var tokPend = function () { var p = G().pend[0]; return !!p && p.type === 'token'; };
   var FRONT4 = [-3, -1, 1, 3];
+  // ---- W771 board tour (lesson 1): before any move, a bubble names each board region in turn, its arrow touching the region.
+  // One short sentence per step; tap anywhere for the next. The lesson is won when the last region has been named.
+  var TOUR = [
+    ['#pyr', 'This is the board: a pyramid of cards. You and Pell share it.'],
+    ['#pyr .card.av', 'Glowing cards are uncovered. Only these can be taken.'],
+    ['#s1', 'Top: Pell’s throne. Pell’s coins, wonders and city.'],
+    ['#s0 .tab', 'Bottom: your throne. Cards you build land in your city.'],
+    ['#coins0', 'Your coins. Cards cost coins or resources.'],
+    ['#s0 .wrow', 'Your wonders. Build them later for big rewards.'],
+    ['#s0 .scis', 'Your science symbols. Six different ones win the game at once.'],
+    ['#mil', 'The war track. Shields push this pawn toward Pell.'],
+    ['#mil .mend.r', 'Push the pawn to this end and you win at once.'],
+    ['#tokrow', 'Science bonus tokens. Two matching symbols earn you one.'],
+    ['#pts0', 'Your points. After three ages, most points wins.'],
+    ['#pts1', 'Pell’s points. Stay ahead of this number.'],
+    ['#instr', 'This line says whose turn it is and what to do.'],
+    ['.gx-bar [data-gx="rulesd"]', 'Full rules and every card live here, any time.']
+  ];
+  var T = { i: -1, el: null, hl: null, done: false };
+  function tourEnd(quiet) {
+    if (T.hl) T.hl.classList.remove('tt-hl'); T.hl = null;
+    if (T.el) T.el.remove(); T.el = null; T.i = -1;
+    document.documentElement.classList.remove('tt-touring'); var bd = $('bd'); if (bd) bd.classList.remove('tour');
+    if (!quiet) T.done = true;
+  }
+  function tourShow() {
+    if (T.hl) T.hl.classList.remove('tt-hl'); T.hl = null;
+    var st = TOUR[T.i]; if (!st) { tourEnd(); return; }
+    var tg = document.querySelector(st[0]), r = tg && tg.getBoundingClientRect();
+    if (!r || r.width < 4 || r.height < 4) { T.i++; tourShow(); return; }
+    tg.classList.add('tt-hl'); T.hl = tg;
+    var b = T.el.firstChild, vw = innerWidth, vh = innerHeight, bw = Math.min(340, vw - 24);
+    b.style.width = bw + 'px'; b.querySelector('.tx').textContent = st[1]; b.querySelector('.n').textContent = (T.i + 1) + ' of ' + TOUR.length + ' · tap to go on';
+    var bh = b.offsetHeight, x = Math.max(12, Math.min(vw - bw - 12, r.left + r.width / 2 - bw / 2)), y, up;
+    if (r.bottom + 16 + bh <= vh - 8) { y = r.bottom + 14; up = '1'; }          // below, arrow up
+    else if (r.top - 16 - bh >= 8) { y = r.top - bh - 14; up = '0'; }           // above, arrow down
+    else { y = Math.max(8, Math.min(vh - bh - 8, r.top + 16)); up = 'in'; }     // a big region (the pyramid): inside its top edge
+    b.style.left = x + 'px'; b.style.top = y + 'px'; b.dataset.up = up;
+    b.querySelector('i').style.left = Math.max(14, Math.min(bw - 30, r.left + r.width / 2 - x - 8)) + 'px';
+  }
+  function tourStart() {
+    tourEnd(true); T.done = false; T.i = 0;
+    document.documentElement.classList.add('tt-touring'); var bd = $('bd'); if (bd) bd.classList.add('tour');
+    var o = document.createElement('div'); o.id = 'tt-tour'; o.setAttribute('role', 'dialog'); o.setAttribute('aria-label', 'Board tour');
+    o.innerHTML = '<div class="bub" aria-live="polite"><i></i><span class="tx"></span><span class="n"></span></div>';
+    o.addEventListener('click', function (e) { e.stopPropagation(); T.i++; tourShow(); });
+    document.body.appendChild(o); T.el = o; setTimeout(tourShow, 60);
+  }
   var lessons = [
+    { id: 'board', title: 'The board', rule: 'Meet the board first: the card pyramid, both thrones, the war track, science and points.',
+      goal: 'Tap to see each part of the board.', par: 0,
+      setup: function () { return stack({ age: 1, rows: rows([[[-1, 1], 0, ['a1-lookout', 'a1-open-stage']], [FRONT4, 1, ['a1-timber-stand', 'a1-pony-pen', 'a1-roadside-inn', 'a1-scribe-room']]]), coins: [7, 7], cards: [['a1-herb-garden', 'a1-weights-hall'], ['a1-rock-face']], wonders: [['w-sky-tomb', 'w-terraced-orchard', 'w-moon-grove', 'w-merchant-road'], ['w-bronze-titan', 'w-stone-riddle', 'w-archive-of-dust', 'w-thunder-idol']] }).then(tourStart); },
+      success: function () { return T.done; },
+      fail: function () { return false; },
+      hints: ['Tap anywhere: the next part of the board lights up.'],
+      debrief: 'That is the whole board. Next: take your first card.' },
     { id: 'draft', title: 'Wonder draft', rule: 'Wonders are drafted before play: you take one, your rival takes two, the last one comes to you.',
       goal: 'Claim the Sky Tomb, the wonder worth 9 points.', par: 1,
       setup: function () { return stack({ draft: ['w-sky-tomb', 'w-bronze-titan', 'w-moon-grove', 'w-stone-riddle', 'w-terraced-orchard', 'w-merchant-road', 'w-archive-of-dust', 'w-thunder-idol'] }); },
@@ -111,6 +167,20 @@
       fail: function () { return did() && !tokPend() && me().tokens.length === 0 ? 'No token: that card carries a different symbol. You need a second scale.' : false; },
       hints: ['You own the scale symbol. Which green card shows a scale too?', { say: 'Tap the Measure Hall: a second scale is a pair.', target: step(card('a2-measure-hall'), 'build') }],
       debrief: 'Two scales make a pair: a progress token is yours.' },
+    { id: 'warwin', title: 'War victory', rule: 'Push the war pawn all the way to your rival’s end (9 steps) and you win at once.',
+      goal: 'Win the game with the war pawn.', par: 1,
+      setup: function () { return stack({ age: 2, mil: 7, rows: rows([[[0], 0, ['a2-sawpit']], [FRONT4, 1, ['a1-lookout', 'a2-city-wall', 'a1-open-stage', 'a1-roadside-inn']]]), coins: [8, 7], cards: [[], []] }).then(function () { U.G.loot = [[1, 1], [0, 0]]; UI.render(); }); },
+      success: function () { return !!G().over && G().winner === 0; },
+      fail: function () { return did() && !G().over ? 'The pawn is on step ' + G().mil + ' of 9. Two shields were needed.' : false; },
+      hints: ['The pawn is 2 steps from Pell’s end. Which card has 2 shields?', { say: 'Tap the City Wall, then Build: 2 shields reach the end.', target: step(card('a2-city-wall'), 'build') }],
+      debrief: 'The pawn reached Pell’s end: a war win, no points counted.' },
+    { id: 'sciwin', title: 'Science victory', rule: 'Own six different science symbols and you win at once.',
+      goal: 'Win the game with your sixth science symbol.', par: 1,
+      setup: function () { return stack({ age: 2, rows: rows([[[0], 0, ['a2-sawpit']], [FRONT4, 1, ['a2-herbarium', 'a1-open-stage', 'a2-chart-room', 'a1-lookout']]]), coins: [12, 7], cards: [['a1-herb-garden', 'a1-weights-hall', 'a1-scribe-room', 'a1-remedy-shop', 'a2-star-gazers'], []] }); },
+      success: function () { return !!G().over && G().winner === 0; },
+      fail: function () { return did() && !G().over && !tokPend() ? 'Still five symbols. You need a new one: the globe.' : false; },
+      hints: ['You own five symbols. Which green card shows one you lack?', { say: 'Tap the Chart Room, then Build: the globe is your sixth.', target: step(card('a2-chart-room'), 'build') }],
+      debrief: 'Six different symbols: a science win, no points counted.' },
     { id: 'wonder', title: 'Build a wonder', rule: 'Any card can build a wonder: pay its cost and the card goes underneath. Some wonders give another turn.',
       goal: 'Build your wonder and keep your turn.', par: 1,
       setup: function () { return stack({ age: 2, rows: rows([[[0], 0, ['a2-city-wall']], [FRONT4, 1, ['a1-lookout', 'a1-open-stage', 'a1-roadside-inn', 'a1-scribe-room']]]), coins: [5, 7], cards: [['a2-sawpit', 'a1-glass-kiln', 'a1-reed-press'], []], wonders: [['w-terraced-orchard', 'w-sky-tomb'], []] }); },
@@ -150,7 +220,7 @@
   addEventListener('gxst', function (e) {
     if (e.detail.type !== 'close' || !L.on) return;
     var fin = GXST.state() && GXST.state().i === lessons.length - 1;   // closed from the last lesson: go on into a real game (Easy), not back to the title
-    L.on = 0; layout(false); U.tut = false; U.rivalName = null;
+    L.on = 0; tourEnd(true); layout(false); U.tut = false; U.rivalName = null;
     if (fin) { try { U.lvl = 'easy'; $('start').hidden = true; $('res').hidden = true; UI.newGame('cpu'); return; } catch (er) { } }
     try { UI.showStart(); } catch (er) { }
   });

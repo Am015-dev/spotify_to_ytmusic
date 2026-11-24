@@ -12,15 +12,16 @@ const PROOF = path.join(__dirname, 'proof'); fs.mkdirSync(PROOF, { recursive: tr
 const probs = []; const stop = budget(120000, 'twin-thrones lessons');
 // scripted solutions: {pick:wonderId} | {card:id, act:build|discard|wonder} | {token:1} | {play:1}
 const SOLVE = {
-  draft: [{ pick: 'w-sky-tomb' }], take: [{ card: 'a1-timber-stand', act: 'build' }], own: [{ card: 'a1-pony-pen', act: 'build' }],
+  board: [{ tour: 1 }], draft: [{ pick: 'w-sky-tomb' }], take: [{ card: 'a1-timber-stand', act: 'build' }], own: [{ card: 'a1-pony-pen', act: 'build' }],
   trade: [{ card: 'a1-barrack-yard', act: 'build' }], chain: [{ card: 'a2-horse-yard', act: 'build' }], sell: [{ card: 'a1-timber-stand', act: 'discard' }],
   war: [{ card: 'a3-war-pavilion', act: 'build' }], pair: [{ card: 'a2-measure-hall', act: 'build' }, { token: 1 }],
+  warwin: [{ card: 'a2-city-wall', act: 'build' }], sciwin: [{ card: 'a2-chart-room', act: 'build' }],
   wonder: [{ card: 'a1-lookout', act: 'wonder' }], game: [{ play: 1 }]
 };
 const WRONG = {
   draft: { pick: 'w-bronze-titan' }, take: { card: 'a1-roadside-inn', act: 'build' }, own: { card: 'a1-bathhouse', act: 'build' },
   trade: { card: 'a1-bathhouse', act: 'build' }, chain: { card: 'a2-sawpit', act: 'build' }, sell: { card: 'a1-pony-pen', act: 'build' },
-  war: { card: 'a1-lookout', act: 'build' }, pair: { card: 'a1-scribe-room', act: 'build' }, wonder: { card: 'a1-open-stage', act: 'build' }
+  war: { card: 'a1-lookout', act: 'build' }, warwin: { card: 'a1-lookout', act: 'build' }, sciwin: { card: 'a1-open-stage', act: 'build' }, pair: { card: 'a1-scribe-room', act: 'build' }, wonder: { card: 'a1-open-stage', act: 'build' }
 };
 async function run(b, W, H) {
   const tag = W + 'x' + H, phone = W < 600, note = m => probs.push(tag + ': ' + m), shots = [];
@@ -52,6 +53,14 @@ async function run(b, W, H) {
     await tap(sel); await tick(p, 200); await tap('#zoom [data-a="' + act + '"]:not([disabled])'); await tick(p, 300);
   };
   const doPick = async w => { await myTurn(); await tap('[data-pick="' + w + '"]'); await tick(p, 300); };
+  const doTour = async () => {   // W771 board tour: every step's bubble sits next to (touches) the region it names, then a tap goes on
+    for (let k = 0; k < 20 && await p.$('#tt-tour'); k++) {
+      const g = await p.evaluate(() => { const b = document.querySelector('#tt-tour .bub'), h = document.querySelector('.tt-hl'); if (!b || !h) return null; const r = b.getBoundingClientRect(), t = h.getBoundingClientRect(), f = parseFloat(getComputedStyle(b).fontSize); const gap = Math.max(t.top - r.bottom, r.top - t.bottom, t.left - r.right, r.left - t.right); return { gap: Math.round(gap), f, words: b.querySelector('.tx').textContent.split(/\s+/).length, tx: b.querySelector('.tx').textContent }; });
+      if (g) { if (g.gap > 20) note('tour bubble ' + g.gap + 'px from its region: ' + g.tx); if (g.words > 15) note('tour step over 15 words: ' + g.tx); if (g.f < (phone ? 12 : 16)) note('tour text ' + g.f + 'px'); }
+      await tap('#tt-tour .bub'); await tick(p, 150);
+    }
+    if (await p.$('#tt-tour')) note('tour did not end');
+  };
   const doToken = async () => { await myTurn(); await tap('[data-token]'); await tick(p, 300); };
   const playGame = async () => {
     for (let k = 0; k < 14; k++) {
@@ -63,7 +72,7 @@ async function run(b, W, H) {
   };
   const solve = async id => {
     for (const s of SOLVE[id]) {
-      if (s.pick) await doPick(s.pick); else if (s.token) await doToken(); else if (s.play) await playGame(); else await doCard(s.card, s.act);
+      if (s.tour) await doTour(); else if (s.pick) await doPick(s.pick); else if (s.token) await doToken(); else if (s.play) await playGame(); else await doCard(s.card, s.act);
       if ((await st()).phase !== 'play') break;
     }
     if (!(await phase('win'))) { const s = await st(); note(id + ': scripted solution did not win (phase ' + s.phase + (s.msg ? ', ' + s.msg : '') + ')' + (process.env.DBG ? JSON.stringify(await p.evaluate(() => { const U = TT_UI.U, g = U.G; return { busy: U.busy, narr: U.narr, side: TT_UI.E.sideToAct(g), over: g.over, w: g.winner, left: g.pyr.filter(c => !c.taken).length, sc: [TT_UI.E.score(g, 0).total, TT_UI.E.score(g, 1).total], res: !document.getElementById('res').hidden }; })) : '')); }

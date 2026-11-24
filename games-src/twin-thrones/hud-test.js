@@ -13,11 +13,12 @@ const URL0 = process.argv[2] || 'http://localhost:8779/twin-thrones/';
     await p.goto(URL0 + '?seed=11'); await tick(p, 500);
     await tap('[data-start="1"]'); if (await p.locator('[data-goalgo]').count()) await tap('[data-goalgo]');
     await p.evaluate(() => { window.AIDELAY = 0; }); await tick(p, 400);
-    const bar = await p.evaluate(() => [...document.querySelectorAll('header.gx-bar button')].map(e => { const r = e.getBoundingClientRect(); return [e.getAttribute('aria-label'), Math.round(r.width), Math.round(r.height), r.right <= innerWidth]; }));
+    const bar = await p.evaluate(() => [...document.querySelectorAll('header.gx-bar button')].filter(e => e.getBoundingClientRect().width > 0).map(e => { const r = e.getBoundingClientRect(); return [e.getAttribute('aria-label'), Math.round(r.width), Math.round(r.height), r.right <= innerWidth]; }));
     bar.forEach(x => { if (x[1] < 44 || x[2] < 44 || !x[3]) bad.push('bar button ' + x.join(' ')); }); if (bar.length > 5) bad.push('bar has ' + bar.length + ' buttons');
     const openN = () => p.evaluate(() => document.querySelectorAll('.gx-drawer.on').length + (document.getElementById('peek') && !document.getElementById('peek').hidden ? 1 : 0));
-    for (const [sel, how] of [['[aria-label="Rival city"]', 'x'], ['[aria-label="All cards"]', 'out'], ['[aria-label="Log"]', 'x'], ['[aria-label="How to play"]', 'out'], ['#menubtn', 'x'], ['[aria-label="Rival city"]', 'out'], ['#pts0', 'peek'], ['#pts1', 'peekout']]) {
-      await tap('header ' + sel); await p.waitForTimeout(60); /* let the drawer finish its slide (real time) before measuring the X */ const n = await openN(); if (n !== 1) bad.push(sel + ' open count ' + n);
+    // W771 HUD diet: Log and All cards open from the Menu, the rival city from the rival plate (no bar icons for them any more)
+    for (const [sel, how] of [['#s1 .who', 'x'], ['menu:cards', 'out'], ['menu:log', 'x'], ['header [aria-label="How to play"]', 'out'], ['header #menubtn', 'x'], ['#s1 .who', 'out'], ['header #pts0', 'peek'], ['header #pts1', 'peekout']]) {
+      if (sel.startsWith('menu:')) { await tap('header #menubtn'); await tap('[data-menu="' + sel.slice(5) + '"]'); } else await tap(sel); await p.waitForTimeout(60); /* let the drawer finish its slide (real time) before measuring the X */ const n = await openN(); if (n !== 1) bad.push(sel + ' open count ' + n);
       if (how === 'x') { const xb = await p.evaluate(() => { const x = document.querySelector('.gx-drawer.on .gx-x'), r = x && x.getBoundingClientRect(); return r ? [r.width, r.height] : null; }); if (!xb || xb[0] < 44 || xb[1] < 44) bad.push(sel + ' X ' + JSON.stringify(xb)); if (xb) await tap('.gx-drawer.on .gx-x'); }
       else if (how === 'out') { const r = await p.evaluate(() => { const e = document.querySelector('.gx-drawer.on'); if (!e) return [8, innerHeight - 8]; const d = e.getBoundingClientRect(); return d.left > 60 ? [20, innerHeight / 2] : [innerWidth / 2, Math.max(10, d.top - 20)]; }); if (mob) await p.touchscreen.tap(r[0], r[1]); else await p.mouse.click(r[0], r[1]); await tick(p, 300); }
       else if (how === 'peek') await tap('[data-peekx]');

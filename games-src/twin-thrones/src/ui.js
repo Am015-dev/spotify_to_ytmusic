@@ -283,7 +283,9 @@ var TT_TEST = {};
   function renderTokens() {
     var h = ''; U.G.tokensUp.forEach(function (t) { var d = BY[t]; var pk = U.G.pend[0] && U.G.pend[0].type === 'token' && U.G.pend[0].from !== 'lib' && canAct(); h += '<button class="tok' + (pk ? ' pickable' : '') + (pk && U.tokArm === t ? ' arm' : '') + '" data-tok="' + t + '" aria-label="' + (pk ? (U.tokArm === t ? 'Tap again to take ' : 'Pick progress token: ') : 'Science bonus: ') + esc(d.nm) + '">' + slot(d.stem) + '</button>'; });
     $('tokrow').innerHTML = '<span class="tl">Science bonus</span>' + h + '<span class="tsp"></span><span id="bank" aria-label="Bank: sell cards here">' + slot('coin', 'b1') + slot('coin', 'b2') + slot('coin', 'b3') + '<em>Sell +' + (U.G.phase === 'play' ? E.discardGain(U.G, U.mode === 'two' ? E.sideToAct(U.G) : 0) : 2) + '</em></span>'; fillArt($('tokrow'));
+    var bd0 = $('bd'); if (bd0) bd0.classList.toggle('tokpick', !!(U.G.pend[0] && U.G.pend[0].type === 'token'));   // W771: the token row shows only while a token is to be picked
   }
+  function bankEl() { var b = $('bank'); return b && b.getBoundingClientRect().width > 4 ? b : $('pyr'); }   // W771: the bank pill is off the main screen; coins fly to the pyramid instead
   function renderPyr(flips) {
     var G = U.G, P = $('pyr'), d = layoutDims(); P.innerHTML = ''; if (U.pyrRO) U.pyrRO.observe(P); P.classList.toggle('tight', false); P.classList.toggle('vtight', false);
     var av = E.available(G).map(function (c) { return c.i; }), human = canAct(), hintCell = -1;
@@ -377,7 +379,7 @@ var TT_TEST = {};
   function placeRects(z) {
     var p = E.sideToAct(U.G), pad = 3;
     return z.map(function (q) {
-      var el = q.m.t === 'build' ? document.querySelector('#s' + p + ' .tab') : q.m.t === 'discard' ? $('bank') : document.querySelector('#s' + p + ' [data-wonder="' + q.m.w + '"]');
+      var el = q.m.t === 'build' ? document.querySelector('#s' + p + ' .tab') : q.m.t === 'discard' ? bankEl() : document.querySelector('#s' + p + ' [data-wonder="' + q.m.w + '"]');
       var r = el ? el.getBoundingClientRect() : { left: 10, top: 10, width: 80, height: 44 }, w = Math.max(r.width + 2 * pad, q.m.t === 'wonder' ? 0 : 56), h = Math.max(r.height + 2 * pad, 46);
       return { l: r.left + r.width / 2 - w / 2, t: r.top + r.height / 2 - h / 2, w: w, h: h };
     });
@@ -436,7 +438,7 @@ var TT_TEST = {};
       an.onfinish = function () { c.remove(); };
     })(k);
   }
-  function landAt(p, ev) { var s = $('s' + p); if (!s) return null; if (ev.t === 'wonder') return s.querySelector('[data-wonder="' + ev.w + '"]') || s; if (ev.t === 'discard') return $('bank') || s; var c = BY[ev.id]; var e = (c && s.querySelector('.stk[data-col="' + c.col + '"]')) || s.querySelector('.tab'); return e && e.offsetWidth ? e : s; }
+  function landAt(p, ev) { var s = $('s' + p); if (!s) return null; if (ev.t === 'wonder') return s.querySelector('[data-wonder="' + ev.w + '"]') || s; if (ev.t === 'discard') return bankEl() || s; var c = BY[ev.id]; var e = (c && s.querySelector('.stk[data-col="' + c.col + '"]')) || s.querySelector('.tab'); return e && e.offsetWidth ? e : s; }
   function popNum(txt, near, kind) {
     var r = near.getBoundingClientRect(), e = document.createElement('div'); e.className = 'pop-n' + (kind ? ' ' + kind : ''); e.textContent = txt; document.body.appendChild(e);
     e.style.left = Math.max(4, Math.min(innerWidth - e.offsetWidth - 4, r.left + r.width / 2 - e.offsetWidth / 2)) + 'px'; e.style.top = Math.max(4, r.top - (kind ? 6 : 0)) + 'px'; setTimeout(function () { e.remove(); }, kind ? 4200 : 1000);
@@ -477,9 +479,9 @@ var TT_TEST = {};
       if (ev.t === 'build' || ev.t === 'wonder') { SND.play('take'); setTimeout(function () { SND.play(ev.t === 'wonder' ? 'wonder' : (ev.paid ? 'coin' : 'build')); }, 110); }
       else if (ev.t === 'discard') { SND.play('take'); setTimeout(function () { SND.play('coin'); }, 110); }
       else if (ev.t === 'loot') SND.play('coin'); else if (ev.t === 'mil') SND.play('pawn');
-      if (ev.t === 'build' || ev.t === 'wonder') { if (pre) flyCard(pre, preHtml, landAt(p, ev)); if (ev.paid) { flyCoins($('coins' + p), $('bank'), ev.paid); popNum('-' + ev.paid + '$', $('coins' + p) || tgt); } }
-      else if (ev.t === 'discard') { if (pre) flyCard(pre, preHtml, $('bank') || tgt); flyCoins($('bank'), $('coins' + p), ev.n); popNum('+' + ev.n + '$', $('coins' + p) || tgt); }
-      else if (ev.t === 'loot') { flyCoins($('coins' + ev.p), $('bank'), ev.n); popNum('-' + ev.n + '$', $('coins' + ev.p) || $('s' + ev.p)); }
+      if (ev.t === 'build' || ev.t === 'wonder') { if (pre) flyCard(pre, preHtml, landAt(p, ev)); if (ev.paid) { flyCoins($('coins' + p), bankEl(), ev.paid); popNum('-' + ev.paid + '$', $('coins' + p) || tgt); } }
+      else if (ev.t === 'discard') { if (pre) flyCard(pre, preHtml, bankEl() || tgt); flyCoins(bankEl(), $('coins' + p), ev.n); popNum('+' + ev.n + '$', $('coins' + p) || tgt); }
+      else if (ev.t === 'loot') { flyCoins($('coins' + ev.p), bankEl(), ev.n); popNum('-' + ev.n + '$', $('coins' + ev.p) || $('s' + ev.p)); }
       else if (ev.t === 'mil') { $('pawn').classList.add('slide'); var gu = TTA.url('fx-pawn-glow'); if (gu) { var gl = document.createElement('i'); gl.className = 'pawnglow'; gl.style.backgroundImage = 'url("' + gu + '")'; $('pawn').appendChild(gl); setTimeout(function () { gl.remove(); }, 1000); } setTimeout(function () { $('pawn').classList.remove('slide'); }, 900); }
     });
     if (G.ev.some(function (e) { return e.t === 'age'; })) $('pyr').querySelectorAll('.card').forEach(function (e) { e.classList.add('pop'); });
@@ -633,7 +635,7 @@ var TT_TEST = {};
   }
   function menuRender() {
     var b = $('menubody'); if (!b) return;
-    b.innerHTML = '<div class="mrow"><button class="btn" data-menu="rules">Rules</button>' + tutBtn() + '<button class="btn alt" data-menu="cards">All cards</button><button class="btn alt" data-menu="restart">Restart game</button><button class="btn alt" data-snd="1">' + sndLabel() + '</button>' + (SND.hasMusic() ? '<button class="btn alt" data-menu="music">Music</button>' : '') + '<button class="btn alt" data-menu="title">Back to title</button></div>';
+    b.innerHTML = '<div class="mrow"><button class="btn" data-menu="rules">Rules</button>' + tutBtn() + '<button class="btn alt" data-menu="cards">All cards</button><button class="btn alt" data-menu="log">Log</button><button class="btn alt" data-menu="restart">Restart game</button><button class="btn alt" data-snd="1">' + sndLabel() + '</button>' + (SND.hasMusic() ? '<button class="btn alt" data-menu="music">Music</button>' : '') + '<button class="btn alt" data-menu="title">Back to title</button></div>';
   }
   // W607: the rules, checked line by line against RULES-CHECKLIST.md. First screen = 6 short lines; the full list sits behind it.
   var QUICK = ['Take one open card each turn. Then your rival takes one.', 'Use it to <b>Build</b> it, <b>Sell</b> it for 2 coins (+1 per yellow card you own), or raise a <b>wonder</b>.', 'Short of a resource? Pay 2 coins per unit, plus 1 per unit your rival makes. The bank gets the coins.', 'A chain mark you already own builds a later card free.', 'Win at once with 9 war steps or 6 different science symbols.', 'Otherwise most points after Age III wins. Only 7 wonders get built.'];
@@ -688,6 +690,7 @@ var TT_TEST = {};
     if ((b = q('#hintbtn')) && U.hintsOn && !U.hintShow && U.G && !U.G.over && !U.tut && canAct()) { showHint(); return; } // FIXED2: Hints = show the best move now; tap again to turn hints off
     if ((b = q('#hintbtn'))) { U.hintsOn = !U.hintsOn; U.hintShow = U.hintsOn; clearTimeout(U.idleT); try { localStorage.setItem('tt_hints', U.hintsOn ? '1' : '0'); } catch (e) { } b.setAttribute('aria-pressed', U.hintsOn); b.classList.toggle('on', U.hintsOn); if (U.G && !U.G.over) { if (U.G.phase !== 'draft') renderPyr(); dock(); markBest(); } return; }
     if (q('[data-menu="cards"]')) { GX.close(); GX.show('cardsd'); return; }
+    if (q('[data-menu="log"]')) { GX.close(); GX.show('logd'); return; }
     if (q('[data-menu="title"]')) { GX.close(); showStart(); return; }
     if ((b = q('[data-snd]'))) { SND.setOn(!SND.isOn()); SND.play('coin'); b.textContent = sndLabel(); return; }
     if (q('[data-menu="rules"]')) { GX.close(); GX.show('rulesd'); return; }
