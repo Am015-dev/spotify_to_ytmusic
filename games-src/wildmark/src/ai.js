@@ -20,11 +20,13 @@
     return best;
   }
   function habGain(env, c, t, before) { var g = 0; t.forEach(function (tt) { g += W.corridor(env, tt) - before[tt]; }); return g; }
-  var BW = 0.6, EASY_RANDOM = 0.4, GENTLE_NOISE = +(window.WM_GENTLE_NOISE || 25), GENTLE_TOK = 0.5;   // gentle = the default first-game rival (random pair, very loose placement)   // hard: points per majority-bonus swing (2-player)
+  var BW = 0.6, EASY_RANDOM = 0.4, GENTLE_NOISE = +(window.WM_GENTLE_NOISE || 1.5), GENTLE_TOK = +(window.WM_GENTLE_TOK || 0.15);
+  // F3: easy and novice play like gentle (the full evaluator) with a looser eye, so a hint follower meets a close game instead of a walkover. [noise, chance the animal goes anywhere it fits]
+  var LOOSE = { gentle: [GENTLE_NOISE, GENTLE_TOK], easy: [+(window.WM_EASY_NOISE || 1), +(window.WM_EASY_TOK || 0.1)], novice: [+(window.WM_NOV_NOISE || 1.5), +(window.WM_NOV_TOK || 0.15)] };   // gentle = the default first-game rival: plays like normal but with a loose eye (noisy pair and tile choice, the animal sometimes goes anywhere)   // hard: points per majority-bonus swing (2-player)
   W.AI = {
     plan: function (G, level) {
       W.curCards = G.cards;
-      var s = G.seats[G.cur], env = s.env, lv = level || s.ai || 'normal', gentle = lv === 'gentle', novice = lv === 'novice' || gentle; if (novice) lv = 'easy'; var noise = gentle ? GENTLE_NOISE : lv === 'easy' ? 6 : lv === 'normal' ? 0.6 : 0;
+      var s = G.seats[G.cur], env = s.env, lv = level || s.ai || 'normal', gentle = lv === 'gentle' || lv === 'easy' || lv === 'novice', novice = false, LS = LOOSE[lv]; if (gentle) lv = 'normal'; var noise = gentle ? LS[0] : lv === 'easy' ? 6 : lv === 'normal' ? 0.6 : 0;
       var pot = lv === 'easy' ? 0.15 : lv === 'normal' ? 0.45 : 0.6, rnd = function () { return W.rnd(G); };
       var bagTot = 0; for (var a in G.bag) bagTot += G.bag[a];
       var ctx = { bag: G.bag, bagTot: bagTot }, before = {}; W.TER.forEach(function (t) { before[t] = W.corridor(env, t); });
@@ -54,7 +56,7 @@
           var tb = 0, tc = null;
           W.tokSpots(env, tok).forEach(function (tc0) { var g = gainTok(env, tc0, tok) + (env[tc0].key ? kb : 0); if (!endGame) g -= pot * slotVal(env, tc0, ctx) * 0.5; if (tc === null || g > tb) { tb = g; tc = tc0; } });
           if (tc !== null && tb < -0.5 && lv !== 'easy') tc = null;
-          if (gentle && rnd() < GENTLE_TOK) { var tsg = W.tokSpots(env, tok); tc = tsg.length ? tsg[Math.floor(rnd() * tsg.length)] : null; tb = tc !== null ? gainTok(env, tc, tok) : 0; }   // gentle: half the time settles the animal wherever it fits   // returning beats ruining a pattern
+          if (gentle && rnd() < LS[1]) { var tsg = W.tokSpots(env, tok); tc = tsg.length ? tsg[Math.floor(rnd() * tsg.length)] : null; tb = tc !== null ? gainTok(env, tc, tok) : 0; }   // gentle: some turns settles the animal wherever it fits   // returning beats ruining a pattern
           base += tc !== null ? tb : 0;
           for (var j = 0; j < rots.length; j++) {
             env[c].rot = rots[j];
@@ -75,13 +77,14 @@
       if (s.acorns > 0 && lv !== 'easy') {
         for (var a1 = 0; a1 < 4; a1++) for (var b1 = 0; b1 < 4; b1++) { if (a1 === b1 || !G.market.tiles[a1] || !G.market.toks[b1]) continue; var e2 = evalPair(G.market.tiles[a1], G.market.toks[b1], acornV); if (e2.v > best.v + 0.01) best = Object.assign(e2, { m: { t: 'free', ti: a1, ki: b1 } }); }
       }
+      if (G.tutRival) { var lo = 1e9; for (var q = 0; q < 4; q++) { if (!G.market.tiles[q] || !G.market.toks[q]) continue; var eq = evalPair(G.market.tiles[q], G.market.toks[q], 0); if (eq.v < lo) { lo = eq.v; best = Object.assign(eq, { m: { t: 'take', i: q } }); } } }   // the guided first game: Bram takes the weakest pair, so a player who follows Rowan wins
       return { pick: best.m, place: { t: 'place', c: best.c, rot: best.rot }, tokC: best.tok, v: best.v };
     },
     // one move for the current stage (used by tests and the UI). Wipe 3 when it helps (hard/normal), never at easy.
     choose: function (G, level) {
       var s = G.seats[G.cur], lv = level || s.ai || 'normal';
       if (G.stage === 'pick') {
-        if (!G.used3 && !G.opts.no3 && W.triple(G) && lv !== 'easy' && lv !== 'gentle') {
+        if (!G.used3 && !G.opts.no3 && W.triple(G) && lv !== 'easy' && lv !== 'gentle' && lv !== 'novice') {
           var p0 = W.AI.plan(G, lv); if (p0.v < 2) return { t: 'wipe3' };
           G._plan = p0; return p0.pick;
         }

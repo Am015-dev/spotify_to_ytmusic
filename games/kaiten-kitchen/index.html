@@ -6,7 +6,7 @@
 /* ===== Board-first shell (shared by every game on the shelf) =====
    The page never scrolls. The board fills what the bar and the dock leave; the dock is in flow (never over the board);
    everything else opens in a closable popup (drawer). Games theme it with the --gx-* variables. */
-:root{--gx-bar-h:52px;--gx-dock-w:clamp(300px,30vw,420px);--gx-bg:#10151c;--gx-bar:#0b1016;--gx-panel:#f4ecd8;--gx-ink:#231a10;--gx-line:rgba(0,0,0,.25);--gx-accent:#e0a948;--gx-shadow:0 20px 60px rgba(0,0,0,.5);--gx-radius:14px}
+:root{--gx-bar-h:52px;--gx-dock-w:clamp(300px,28vw,520px);--gx-bg:#10151c;--gx-bar:#0b1016;--gx-panel:#f4ecd8;--gx-ink:#231a10;--gx-line:rgba(0,0,0,.25);--gx-accent:#e0a948;--gx-shadow:0 20px 60px rgba(0,0,0,.5);--gx-radius:14px}
 html.gx,html.gx body{height:100%;margin:0;overflow:hidden;overscroll-behavior:none}
 .gx-app{position:fixed;inset:0;display:grid;grid-template-rows:auto minmax(0,1fr);background:var(--gx-bg)}
 .gx-bar{min-height:var(--gx-bar-h);display:flex;align-items:center;gap:6px;padding:4px 10px;padding-top:calc(4px + env(safe-area-inset-top,0px));overflow-x:auto;overflow-y:hidden;scrollbar-width:none;position:relative;z-index:6}
@@ -36,8 +36,9 @@ html.gx,html.gx body{height:100%;margin:0;overflow:hidden;overscroll-behavior:no
 .gx-drawer-head h2{margin:0;font-size:1.15rem;flex:1;min-width:0}
 .gx-x{appearance:none;border:0;background:transparent;font-size:1.6rem;line-height:1;cursor:pointer;color:inherit;min-width:44px;min-height:44px;border-radius:10px}
 .gx-drawer-body{flex:1;min-height:0;overflow:auto;padding:10px 12px 16px;overscroll-behavior:contain}
-/* narrow screens: the dock becomes a sheet under the board (still in flow), the drawers slide up from the bottom */
-@media (max-width:999px){
+/* phones (portrait, or anything under 720 px wide): the dock becomes a sheet under the board (still in flow), the drawers slide up
+   from the bottom. Any landscape window >= 720 px wide (a 1366 laptop at 150 % = 910x512) keeps the side dock: board left at full height. */
+@media (max-width:719px),(max-width:999px) and (orientation:portrait){
   .gx-main{grid-template-columns:minmax(0,1fr);grid-template-rows:minmax(0,1fr) auto}
   .gx-app.gx-dock-min .gx-main{grid-template-columns:minmax(0,1fr)}
   .gx-dock{max-height:var(--gx-sheet-h,40dvh);border-radius:var(--gx-radius) var(--gx-radius) 0 0;padding-bottom:env(safe-area-inset-bottom,0px)}
@@ -50,11 +51,13 @@ html.gx,html.gx body{height:100%;margin:0;overflow:hidden;overscroll-behavior:no
   .gx-drawer.wide{width:auto}
   .gx-hide-narrow{display:none!important}
 }
-@media (min-width:1000px){.gx-grab{display:none}}
+@media (min-width:1000px),(min-width:720px) and (orientation:landscape){.gx-grab{display:none}}
+/* big screens: popups grow with the screen instead of staying a phone-width column */
+@media (min-width:1280px) and (orientation:landscape){.gx-drawer{width:min(640px,36vw)}.gx-drawer.wide{width:min(1180px,calc(100vw - 16px))}}
 @media (prefers-reduced-motion:reduce){.gx-drawer,.gx-scrim{transition:none}}
 
 *{box-sizing:border-box}
-:root{--ink:#4a2a22;--paper:#fbf0da;--paper2:#f3e0bd;--wood:#a96b3a;--wood2:#7d4a27;--red:#e5553a;--gold:#e0a31c;--teal:#2a97a0;--green:#3f9a4a;--gx-bg:#3a231d;--gx-bar:#33201a;--gx-panel:#fbf0da;--gx-ink:#4a2a22;--gx-accent:#e0a31c;--gx-dock-w:clamp(330px,30vw,410px);--gx-bar-h:48px;
+:root{--ink:#4a2a22;--paper:#fbf0da;--paper2:#f3e0bd;--wood:#a96b3a;--wood2:#7d4a27;--red:#e5553a;--gold:#e0a31c;--teal:#2a97a0;--green:#3f9a4a;--gx-bg:#3a231d;--gx-bar:#33201a;--gx-panel:#fbf0da;--gx-ink:#4a2a22;--gx-accent:#e0a31c;--gx-dock-w:clamp(310px,24vw,350px);--gx-bar-h:48px;
   --font:'Nunito','Trebuchet MS','Segoe UI',system-ui,'DejaVu Sans',sans-serif;--pd:44px;--hw:84px}
 html,body{font-family:var(--font);color:var(--ink);font-size:15px;-webkit-text-size-adjust:100%;-webkit-tap-highlight-color:transparent}
 body{background:#3a231d}
@@ -99,9 +102,10 @@ svg{display:block}
 .grp.dim .hn{opacity:.8;font-weight:700}
 .grp.ok .hn{background:#d8f1c9;border-color:#3f9a4a}
 .grp.wait .hn{background:#ffe9a8;border-color:#c98a10}
-.grp.waitf .pl{animation:kkpulse 1.4s ease-in-out infinite}
+.grp.waitf .pl{animation:kkpulse 1.4s ease-in-out 3}
 .grp.shelf{margin-left:auto;border:2px dashed rgba(255,250,240,.7);background:rgba(58,35,29,.25);padding:1px 4px;border-radius:10px}
 .grp.shelf .hn{background:rgba(255,250,240,.92)}
+.grp.shelf.first{margin-left:0;order:-1}
 .grp.land .pl{animation:kk-land .35s ease-out both}
 .ctr .none{white-space:nowrap;font-size:14px;font-weight:700;color:#fff6e0;text-shadow:0 1px 2px rgba(0,0,0,.55);align-self:center;padding:0 6px}
 @keyframes kkpulse{50%{transform:scale(1.08)}}
@@ -109,7 +113,7 @@ svg{display:block}
 .slot .sbox{position:relative;width:var(--sl,46px);height:calc(var(--sl,46px)*1.4);display:flex;align-items:center;justify-content:center}
 .slot .sbox.empty{border:2px dashed rgba(74,42,34,.5);border-radius:9px;font-weight:900;font-size:15px;color:rgba(74,42,34,.65)}
 .slot .sbox.empty .kkp3{position:absolute;left:50%;top:50%;width:150%;max-width:none;aspect-ratio:1;transform:translate(-50%,-50%);object-fit:contain;opacity:.9;pointer-events:none}.slot .sbox.empty .kkp3t{position:relative}
-.slot .sbox.empty.mine{border-color:#e0a31c;color:#9a6a05;animation:kkpulse 1.6s ease-in-out infinite}
+.slot .sbox.empty.mine{border-color:#e0a31c;color:#9a6a05;animation:kkpulse 1.6s ease-in-out 3}
 .slot .sbox>svg{width:100%;height:100%;position:absolute;inset:0}
 .slot .sbox .cv{position:absolute;inset:0}
 .slot .sbox .cv>svg{width:100%;height:100%}
@@ -250,7 +254,7 @@ html.ph.ph-l #rs{top:0!important}html.ph.ph-l .gx-bar{z-index:56}   /* landscape
 .win svg{width:52px;height:52px;flex:0 0 auto}
 .win .crown{width:34px;height:34px}
 .conf{position:absolute;inset:0;pointer-events:none;overflow:hidden}
-.conf i{position:absolute;top:-12px;width:9px;height:14px;border-radius:2px;animation:conf 2.6s linear infinite}
+.conf i{position:absolute;top:-12px;width:9px;height:14px;border-radius:2px;animation:conf 2.6s linear 3}
 @keyframes conf{to{transform:translateY(110vh) rotate(540deg)}}
 /* ---- online play ---- */
 #netst{display:inline-flex;align-items:center;gap:6px;flex:0 1 auto;min-width:0;max-width:36vw;background:rgba(255,255,255,.1);color:#fbf0da;border:1px solid rgba(255,255,255,.22);border-radius:14px;padding:3px 10px;font-size:13px;white-space:nowrap;cursor:pointer;min-height:30px}
@@ -269,7 +273,11 @@ html.ph.ph-l #rs{top:0!important}html.ph.ph-l .gx-bar{z-index:56}   /* landscape
 .online summary{cursor:pointer;font-weight:800;min-height:44px;display:flex;align-items:center}
 .online .nrow{margin:6px 0}.online p{margin:4px 0}
 .muted{opacity:.75}
-@media (max-width:999px){html:not(.ph) .gx-dock{max-height:43dvh}}
+@media (max-width:719px),(max-width:999px) and (orientation:portrait){html:not(.ph) .gx-dock{max-height:43dvh}}
+/* landscape 720-999 px (a 910x512 laptop window): side dock, board at full height (same as the shell's own fix on W592) */
+@media (min-width:720px) and (max-width:999px) and (orientation:landscape){html:not(.ph){--gx-dock-w:clamp(300px,30vw,380px)}
+html:not(.ph) .gx-main{grid-template-columns:minmax(0,1fr) var(--gx-dock-w);grid-template-rows:none}html:not(.ph) .gx-app.gx-dock-min .gx-main{grid-template-columns:minmax(0,1fr) 0}
+html:not(.ph) .gx-dock{max-height:none;border-radius:0}html:not(.ph) .gx-app.gx-dock-min .gx-dock{visibility:hidden}html:not(.ph) .gx-app.gx-dock-min .gx-dock-body{display:flex}}
 /* ================= PHONE (html.ph) ================= */
 html.ph{--gx-bar-h:44px;--gx-dock-w:0px;--dockh:206px;--rail:clamp(236px,31vw,292px);font-size:14px}
 html.ph .gx-bar{min-height:44px;height:44px;padding:0 6px;padding-top:env(safe-area-inset-top,0px);box-sizing:content-box;gap:4px}
@@ -327,6 +335,7 @@ html.ph #netst{min-width:44px;min-height:44px;padding:0 8px;justify-content:cent
 html.ph.ph-l.net #barstat{display:none}
 html.ph #beltz .lab{font-size:13px;padding:1px 6px 0;min-height:17px}
 html.ph #belt{padding:24px 6px 4px;gap:5px}
+html.ph.ph-p #belt{gap:0}html.ph.ph-p #belt .hc+.hc{margin-left:-3px}html.ph.ph-p #belt.two{row-gap:6px}
 html.ph.ph-p.kk-short.kk-sel #roster,html.ph.ph-p.kk-short.kk-sel #rt{display:none}
 html.ph .rsbox{padding:8px;gap:6px}
 html.ph .cat td.n{font-size:15px;min-width:34px}
@@ -406,6 +415,18 @@ html.ph .dgrid{grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:8px
 html.ph .dcard{padding:8px;gap:6px}html.ph .dimg{width:64px;height:64px}
 html.ph.ph-l .setup.scard{width:min(820px,100%)}
 @media (prefers-reduced-motion:reduce){.tbtn:active{transform:none}}
+/* tall desktop windows (1920x1080): tables sit together, no empty middle band */
+@media (min-height:800px) and (min-width:1000px){html:not(.ph) #tbl{grid-auto-rows:auto;align-content:center;row-gap:20px}html:not(.ph) .seat:not(.me){height:clamp(150px,20dvh,215px)}html:not(.ph) .seat.me{height:clamp(190px,24dvh,260px)}}
+@media (max-height:600px) and (min-width:720px){html:not(.ph) .seat:not(.me){align-self:stretch}html:not(.ph) #tbl{gap:4px}html:not(.ph) #beltz .lab{display:none}
+html:not(.ph) .seat:not(.me){height:124px;align-self:start}html:not(.ph) .seat.me{height:142px;max-height:142px;align-self:start}html:not(.ph) .seat.me .ctr{flex-wrap:nowrap;overflow-x:auto;overflow-y:hidden;align-items:center;scrollbar-width:thin}}
+/* short landscape desktop (910x512): setup fits without scrolling, Start stays on screen */
+@media (max-height:640px) and (min-width:720px){html:not(.ph) #start[data-v=setup]{padding:6px}html:not(.ph) .setup.scard{padding:8px 12px;gap:6px}
+html:not(.ph) .setup .kkflav,html:not(.ph) .setup .ssub,html:not(.ph) .dtx .story,html:not(.ph) .dtx .enjoy{display:none}
+html:not(.ph) .setup .shead h2{font-size:1.2rem}html:not(.ph) .setup .sback{font-size:24px;line-height:30px}
+html:not(.ph) .dgrid{grid-template-columns:repeat(4,1fr);gap:6px}html:not(.ph) .dcard{padding:6px;gap:4px}
+html:not(.ph) .dtop{gap:6px}html:not(.ph) .dimg{width:44px;height:44px}html:not(.ph) .dtop h3{font-size:16px}
+html:not(.ph) .dcard .drow{flex-direction:column;flex-wrap:nowrap;align-items:stretch;gap:4px}html:not(.ph) .dcard .drow>.chipb.seatb{min-height:34px;padding:2px 8px}html:not(.ph) .dcard .lvs{flex:0 0 auto;min-width:0}html:not(.ph) .dcard .lvs .chipb{flex:1 1 0;min-width:0;min-height:34px}html:not(.ph) .lvs .chipb{padding:2px 2px;font-size:12px;min-height:30px}
+html:not(.ph) .sgo .sbtn.big{min-height:46px}html:not(.ph) .sgo .sbtn.big b{font-size:17px}html:not(.ph) .sgo{gap:6px}html:not(.ph) .sgo .sbtn{min-height:44px}}
 
 /* clarity pass: race, last-turn feed, inline tips, wrapped counters, score change badges, two-row belt */
 .pudl{flex:1 1 100%;font-size:13px;font-weight:700;line-height:1.2;opacity:.9}
@@ -419,7 +440,7 @@ html.ph.ph-l .setup.scard{width:min(820px,100%)}
 #selinfo .news .nd.up{background:#d8f1c9;color:#22662b}#selinfo .news .nd.down{background:#ffd6c9;color:#9b2b14}
 .seat.wrap .ctr{flex-wrap:wrap!important;align-content:center;overflow:hidden}
 .seat.wrap{align-self:stretch}
-.sh .dl{position:absolute;left:50%;bottom:-6px;transform:translateX(-50%);background:#2e8a3a;color:#fff;font-weight:900;font-size:14px;border-radius:10px;padding:0 6px;z-index:3;animation:kkdl 2.6s ease-out forwards;pointer-events:none;white-space:nowrap}
+.sh .dl{position:absolute;left:50%;top:-9px;transform:translateX(-50%);background:#2e8a3a;color:#fff;font-weight:900;font-size:14px;border-radius:10px;padding:0 6px;z-index:3;animation:kkdl 2.6s ease-out forwards;pointer-events:none;white-space:nowrap}
 .sh .dl.neg{background:#b5361c}
 @keyframes kkdl{0%{opacity:0;transform:translate(-50%,4px)}12%{opacity:1;transform:translate(-50%,0)}75%{opacity:1}100%{opacity:0;transform:translate(-50%,0)}}
 #belt.two{flex-wrap:wrap;overflow-x:hidden;row-gap:6px;align-content:flex-end;justify-content:center;min-height:calc(var(--hw)*2.8 + 40px)}
@@ -435,11 +456,11 @@ html.ph.ph-l .setup.scard{width:min(820px,100%)}
 .lbtn{border:2px solid #1c1210;border-radius:22px;min-height:44px;min-width:44px;padding:0 12px;font-weight:900;font-size:14px;background:#fbf0da;color:#4a2a22;display:inline-flex;align-items:center;justify-content:center;cursor:pointer}
 .lbtn.go{background:#3f9a4a;color:#fff;border-color:#1f5a26}
 .lbtn.bulb{padding:0;width:44px;background:#fff3c4}
-.grp.usable{animation:glowp 1.4s ease-in-out infinite;outline:3px solid #e0a31c;outline-offset:1px;border-radius:10px}
+.grp.usable{animation:glowp 1.4s ease-in-out 3;outline:3px solid #e0a31c;outline-offset:1px;border-radius:10px}
 @keyframes glowp{50%{box-shadow:0 0 0 5px rgba(224,163,28,.55),0 0 14px 4px rgba(255,210,58,.7)}}
 .grp.usable.on{background:#ffe9a6;animation:none}
 .grp.usable .hn{background:#e0a31c!important;color:#fff!important;font-weight:900}
-.slot .sbox.drop{outline:3px dashed #3f9a4a;outline-offset:3px;border-radius:10px;background:rgba(63,154,74,.18);animation:glowp .9s ease-in-out infinite}
+.slot .sbox.drop{outline:3px dashed #3f9a4a;outline-offset:3px;border-radius:10px;background:rgba(63,154,74,.18);animation:glowp .9s ease-in-out 3}
 .seat .slot .sbox>svg{animation:covIn .38s cubic-bezier(.2,.9,.3,1.3) both}
 @keyframes covIn{from{transform:translateY(-14px) scale(.6);opacity:0}to{transform:none;opacity:1}}
 #dragc{position:fixed;z-index:60;pointer-events:none;filter:drop-shadow(0 10px 10px rgba(0,0,0,.45));transition:none}
@@ -452,8 +473,8 @@ html.ph.ph-l .setup.scard{width:min(820px,100%)}
 #tipb.free::after{display:none}
 @keyframes tipIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
 #ghost{position:fixed;z-index:46;pointer-events:none;width:0;height:0}
-#ghost .gfin{position:absolute;left:-13px;top:-3px;width:44px;height:57px;animation:ghostTap 1.5s ease-in-out infinite;filter:drop-shadow(0 4px 4px rgba(0,0,0,.4))}
-#ghost .gring{position:absolute;left:-22px;top:-22px;width:44px;height:44px;border-radius:50%;border:4px solid #ffd23a;animation:ghostRing 1.5s ease-out infinite;opacity:0}
+#ghost .gfin{position:absolute;left:-13px;top:-3px;width:44px;height:57px;animation:ghostTap 1.5s ease-in-out 3;filter:drop-shadow(0 4px 4px rgba(0,0,0,.4))}
+#ghost .gring{position:absolute;left:-22px;top:-22px;width:44px;height:44px;border-radius:50%;border:4px solid #ffd23a;animation:ghostRing 1.5s ease-out 3;opacity:0}
 @keyframes ghostTap{0%{transform:translate(26px,40px) rotate(-12deg);opacity:0}25%{opacity:1}50%{transform:translate(0,0) rotate(-12deg)}58%{transform:translate(0,3px) rotate(-12deg) scale(.92)}70%{transform:translate(0,0) rotate(-12deg)}100%{transform:translate(0,0) rotate(-12deg);opacity:1}}
 @keyframes ghostRing{0%,55%{transform:scale(.3);opacity:0}60%{opacity:.95}100%{transform:scale(1.4);opacity:0}}
 #stage{position:absolute;left:0;right:0;z-index:6;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;background:radial-gradient(ellipse at 50% 50%,rgba(255,236,190,.12),rgba(42,18,12,.5) 80%),url(media/stage.webp) center/cover no-repeat #2a120c;cursor:pointer;animation:stIn .25s ease-out both}
@@ -472,7 +493,7 @@ html.ph.ph-l .setup.scard{width:min(820px,100%)}
 #stage .sban{font-size:30px;font-weight:900;color:#fff3b0;-webkit-text-stroke:1.5px #5b3221;text-shadow:0 3px 0 #5b3221;opacity:0;transform:scale(.6)}
 #stage.up .sban{animation:banIn .5s cubic-bezier(.2,.9,.3,1.4) forwards}
 @keyframes banIn{to{opacity:1;transform:none}}
-#stage.wob .kk-cloche{animation:wob .26s ease-in-out infinite}
+#stage.wob .kk-cloche{animation:wob .26s ease-in-out 3}
 @keyframes wob{0%,100%{transform:rotate(0)}25%{transform:rotate(-4deg) translateY(-2px)}75%{transform:rotate(4deg) translateY(-2px)}}
 .fpop{position:fixed;z-index:44;pointer-events:none;transform:translate(-50%,0);font-weight:900;font-size:20px;color:#fff3b0;-webkit-text-stroke:1px #5b3221;text-shadow:0 2px 0 #5b3221;white-space:nowrap;animation:fpop 2s ease-out forwards}
 .fpop.neg{color:#ffb3a3;font-size:17px}
@@ -665,6 +686,9 @@ html:not(.kkmy) #belt .hc{filter:saturate(.75) brightness(.9)}
 #stage.seq .pod.done,#stage.seq .pod.cur{opacity:1}
 #stage.seq .pod.cur{transform:scale(1.06)}
 #stage .sgain small{display:block;margin:2px auto 0;background:#2a1710;color:#fff3d6;-webkit-text-stroke:0;text-shadow:none;font-size:14px;font-weight:800;line-height:1.2;padding:2px 8px;border-radius:10px;white-space:nowrap;max-width:150px;overflow:hidden;text-overflow:ellipsis}
+/* R80: on phones and tablets the score and its reason stay inside the card: full card width, centred, the reason wraps (2-3 short lines) */
+@media (max-width:1023px){#stage .sgain{left:0;right:0;width:auto;transform:translateY(-50%);text-align:center;white-space:normal;animation-name:gainInM}#stage .sgain small{max-width:100%;box-sizing:border-box;white-space:normal;overflow:hidden;text-overflow:clip;font-size:12px;padding:2px 4px;border-radius:8px;overflow-wrap:anywhere}}
+@keyframes gainInM{from{opacity:0;transform:translateY(-10%) scale(.4)}to{opacity:1;transform:translateY(-50%) scale(1)}}
 /* the guide: a code-drawn portrait disc with the painted portrait over it */
 .kkport{position:relative;display:inline-flex;align-items:center;justify-content:center;border-radius:50%;border:2px solid #4a2a22;flex:none;overflow:hidden;font-style:normal}
 .kkport i{font-style:normal;font-size:60%}
@@ -769,6 +793,9 @@ html.sk-kki .sh .av .sc{min-width:38px;height:38px;line-height:38px;top:-12px;ri
 #kkguide:not(.on){visibility:hidden}
 /* R5 fixes: phone hand rows never cover names; empty counters say so on phone; PC reveal captions wrap under the score */
 #belt.two{row-gap:18px;min-height:calc(var(--hw)*2.8 + 52px)}
+@media (min-height:640px){#belt.two{row-gap:24px;min-height:calc(var(--hw)*2.8 + 58px)}html.ph.ph-p #beltw{padding-bottom:30px}}
+/* F6: phone portrait: no decorative belt sushi under the hand (cut at the edge), hand ends above y=640 */
+html.ph.ph-p #beltw .kk-belt{display:none}
 html.ph .ctr .none{display:block;font-size:14px}
 #kkgoal .kgh{display:flex;gap:12px;align-items:center;margin-bottom:12px}
 #kkgoal .kgh h2{margin:2px 0 0}
@@ -792,6 +819,59 @@ html.kkend #beltz{background:#2f1f1a!important;border-top-color:#1c1210!importan
 /* the result card scrolls on short screens (phone landscape) but Play again / Menu stay in reach */
 #rs.kkfin .rsbox.bar .btn{position:sticky;bottom:0;z-index:3;box-shadow:0 -6px 8px -2px #fff3d6}
 @media (max-height:520px){.kkbd{font-size:13px;border-spacing:0 1px}.kkbd th,.kkbd td{padding:1px 4px}.kkbd .cr{display:none}.kkbd tr.tot td{font-size:17px;padding:2px 4px}.kkbd td small{display:none}.kkr1 div{font-size:13px}.kkr1 b{font-size:17px}}
+/* F6: phone portrait reveal: the +N sits on the card's top edge, the why-caption lives in the Last-turn line below (it covered the name) */
+html.ph.ph-p #stage .sgain{top:18%}
+html.ph.ph-p #stage .sgain small{display:none}
+html.ph.ph-p #rs{padding-bottom:calc(8px + env(safe-area-inset-bottom,0px))}
+html.ph.ph-p #rs .rsbox.bar .btn{min-height:50px}
+/* F6: scoring: an empty hand leaves no dead band under the tables */
+#belt:not(:has(.hc)){min-height:0!important;padding-top:0;padding-bottom:0}
+html.ph.ph-p #beltz .lab:has(+ #beltw #belt:not(:has(.hc))){min-height:0}
+
+/* round-scored summary (real games): same card as the result, above the Next round button */
+#rs.kkrnd{align-items:flex-end!important;padding-bottom:8px!important}
+#rs.kkrnd .rsbox.bar{flex-flow:row wrap;align-items:center;justify-content:center;gap:8px;background:#fff3d6;border:3px solid #4a2a22;border-radius:16px;padding:10px 12px;width:min(420px,calc(100vw - 20px));pointer-events:auto;box-shadow:0 14px 44px rgba(0,0,0,.55)}
+#rs.kkrnd .kkrsum{flex-basis:100%;color:#3a1f17;font-size:14px;line-height:1.3}
+#rs.kkrnd .kmine b{display:block;font-size:17px;font-weight:900}
+#rs.kkrnd .kd{display:flex;flex-wrap:wrap;gap:4px 6px;margin-top:3px}
+#rs.kkrnd .kd i{font-style:normal;font-weight:800;background:#f1e0bd;border-radius:8px;padding:1px 7px;font-size:14px}
+#rs.kkrnd .kriv{display:flex;flex-wrap:wrap;gap:2px 12px;margin-top:5px;font-weight:700;font-size:14px}
+#rs.kkrnd .kriv em{font-style:normal;color:#a8561a;font-weight:900}
+#rs.kkrnd .rsbox.bar .btn{flex:1 1 100%;min-height:48px;min-width:0;border-image:none!important;border:3px solid #4a2a22;border-radius:14px;box-shadow:none;background:linear-gradient(180deg,#f47a5f,#d9452c);color:#fff;font-size:18px}
+/* PC: one roster chip per line so "choosing" / "ready" never clips in the narrower side panel */
+@media (min-width:1024px){html:not(.ph) #roster{flex-direction:column;flex-wrap:nowrap}html:not(.ph) #roster .chip{width:100%;min-width:0}html:not(.ph) #roster .chip .ct{min-width:0;overflow:hidden;text-overflow:ellipsis}}
+/* R82 cold-play fixes (ui13.js): live race line, round-over panel in the tutorial, Next on look steps, no bulb in the tutorial */
+#kkrace{display:flex;flex-wrap:wrap;justify-content:center;gap:0 14px;min-height:22px;padding:2px 8px 0;font-weight:800;font-size:14px;line-height:20px;color:#ffe7a8;white-space:nowrap;box-sizing:border-box}
+#kkrace[hidden]{display:none}
+#kkrace.kq{visibility:hidden}
+html.kktut #bulbbtn{display:none!important}
+.kktp{margin:0 auto;align-self:center;background:#fff3d6;color:#3a1f17;border:3px solid #4a2a22;border-radius:14px;padding:10px 16px;width:min(320px,calc(100vw - 32px));text-align:center;box-sizing:border-box}
+.kktp b{font-size:16px}
+.kktp ol{list-style:none;margin:6px 0;padding:0;display:grid;gap:4px}
+.kktp li{display:flex;justify-content:space-between;font-weight:800;font-size:18px}
+.kktp li.me{color:#8c3b27}
+.kktp .kts{font-size:14px;opacity:.85}
+@media (max-height:620px){.gxt-bub.kkhasnext .gxh-tt{padding-right:84px!important}.gxt-bub.kkhasnext .gxh-tx{padding-right:92px!important}}
+#toast[data-race="1"]{top:calc(52px + env(safe-area-inset-top,0px));bottom:auto}
+html.ph.ph-p #belt{padding-bottom:10px}
+/* F5: the popup layer covers the board only (side panel stays readable); tie-break line; dish rows are the "where from" part */
+html:not(.ph) #rs{right:var(--kkdock,0)}
+.kkr1 .ktie{font-size:13px;font-weight:900;color:#a8561a;margin-top:1px}
+.kkbd tr.by th{text-align:left;font-size:12px;font-weight:900;color:#6b5238;text-transform:uppercase;letter-spacing:.04em;padding:3px 6px 0}
+.kkbd tr.dsh th{font-weight:600;color:#5a4330}.kkbd tr.dsh td{background:#efe0bf;font-weight:700}
+@media (max-height:620px) and (min-width:720px){html:not(.ph) #rs.kkrnd{right:0;left:calc(100% - var(--kkdock,100%));padding:0 8px 12px!important}html:not(.ph) #rs.kkrnd .rsbox.bar{width:100%}html:not(.ph) #rs.kkrnd .kkrsum{font-size:13px}html:not(.ph) #rs.kkrnd .rsbox.bar .btn{min-height:44px}}
+@media (max-height:520px){.kkbd tr.by th{padding-top:1px}.kkr1 .ktie{font-size:12px}}
+html:not(.ph) #rs.kkfin{right:var(--kkdock,0)!important}
+/* F5: rival tables never show a clipped "Nothing served yet"; Next round sits clear of the screen edge */
+.seat.tight .ctr .none{display:none}
+@media (max-height:620px){#rs.kkrnd{padding-bottom:20px!important}}
+html.ph.ph-p #belt.two{row-gap:20px}
+/* F7: while the hand is handed on (reveal) the belt panel keeps its dark table colour, never the cream board behind it */
+html.ph #beltz:has(#belt:not(:has(.hc))){background:#2f1f1a!important;border-top-color:#1c1210!important}
+html.kkpx #beltz:has(#belt:not(:has(.hc))){background:rgba(47,31,26,.92)!important}
+html.ph.ph-p:has(#stage:not([hidden])) #beltz,html.ph.ph-p:has(.kk-cloche) #beltz{background:#2f1f1a!important;border-top-color:#1c1210!important}
+.kkbd .cr{font-size:13px}.kkbd tr.by th{font-size:13px}
+html:has(.gx-drawer.on) .gxh-bub{visibility:hidden!important;pointer-events:none!important}
 /* ===== GX campaign styles: chapter map, story scenes, boss card, result. Theme with the --gxc-* variables. ===== */
 :root{--gxc-bg:#1b1410;--gxc-paper:#efe0bd;--gxc-paper2:#e2cc9b;--gxc-ink:#2a1d10;--gxc-dim:rgba(42,29,16,.68);--gxc-line:rgba(60,38,14,.28);
   --gxc-go:#c9662a;--gxc-go-ink:#fff8ec;--gxc-gold:#f2b93b;--gxc-a1:#4f8a4b;--gxc-a2:#c07a2c;--gxc-a3:#8e3b46;--gxc-road:#b98a52;--gxc-radius:16px;
@@ -932,6 +1012,14 @@ html.kkend #beltz{background:#2f1f1a!important;border-top-color:#1c1210!importan
 }
 html.gx-reduce .gxc *,html.gx-noanim .gxc *{animation:none!important;transition:none!important}
 @media (prefers-reduced-motion:reduce){.gxc *{animation:none!important}}
+/* desktop: the campaign is a centred wide page, not a phone column */
+@media (min-width:1000px) and (orientation:landscape){
+  .gxc-screen{max-width:min(760px,64vw)}
+  .gxc-map-on .gxc-screen{max-width:min(960px,72vw)}
+  .gxc-path{max-width:min(860px,66vw)}
+  .gxc-sheet{max-width:min(760px,60vw)}
+  .gxc-lab{max-width:220px}
+}
 
 /* gx-help.css: coach bubbles, the lightbulb, the ghost finger and the rules cards (see gx-help.js and GX-KIT.md section 9).
    Everything the kit draws carries data-help. Override the look with the --gxh-* variables on :root. */
@@ -1075,7 +1163,15 @@ html.sk .gx-bar .gx-ibtn,html.sk .gx-bar{text-shadow:0 1px 2px rgba(0,0,0,.75)}
 html.sk .gxc-act b,html.sk .gxc-act small{text-shadow:0 1px 3px rgba(0,0,0,.9)}
 /* panels never swallow the art on phones: docks are capped, sheets slide not fade */
 @media (max-width:999px) and (orientation:portrait){.gx-dock{max-height:min(var(--gx-sheet-h,40dvh),44dvh)}}
-@media (max-width:999px) and (orientation:landscape){.gx-dock{max-height:min(var(--gx-sheet-h,40dvh),34dvh)}}
+@media (max-width:719px) and (orientation:landscape){.gx-dock{max-height:min(var(--gx-sheet-h,40dvh),34dvh)}}
+/* short desktop windows (landscape, 720-999 px wide): side dock, board at full height. This file loads last, so it also undoes
+   per-game "(max-width:999px)" sheet heights/rows; games in their own phone layout (html.ph) keep theirs. */
+@media (min-width:720px) and (max-width:999px) and (orientation:landscape){
+  html:not(.ph) body .gx-main{grid-template-columns:minmax(0,1fr) var(--gx-dock-w);grid-template-rows:minmax(0,1fr)}
+  html:not(.ph) body .gx-app.gx-dock-min .gx-main{grid-template-columns:minmax(0,1fr) 0}
+  html:not(.ph) body .gx-app .gx-dock,html:not(.ph) body .gx-app.gx-sheet-full .gx-dock{height:auto;max-height:none;border-radius:0}
+  html:not(.ph) body .gx-app.gx-dock-min .gx-dock{visibility:hidden}
+}
 /* calm motion: no looping pulses for people who asked for less, nothing flashes faster than ~1 Hz */
 @media (prefers-reduced-motion:reduce){
   html body :is(.gxh-ring,.gxt-ring,.gxc-node.next .gxc-disc,.gxh-bub,.gxt-bub){animation:none!important}
@@ -4062,10 +4158,24 @@ const GX={key:'gx',open:null,
     document.addEventListener('click',e=>{const t=e.target.closest('[data-gx]');if(!t)return;const a=t.dataset.gx;
       if(a==='dock')this.toggleDock();else if(a==='sheet')this.cycleSheet();else if(a==='close')this.close();else this.toggle(a)});
     document.addEventListener('keydown',e=>{if(e.key==='Escape'&&this.open){this.close();e.stopImmediatePropagation()}},true);
+    // keyboard basics: Enter/Space presses the focused control, or the main action when nothing is focused. Runs last (window, bubble)
+    // and only if the game did not handle the key itself (preventDefault); games can opt out with GX.noKeys=true.
+    window.addEventListener('keydown',e=>this.key1(e));
     // resize hook for boards
     const b=document.querySelector('.gx-board');if(b&&window.ResizeObserver)new ResizeObserver(()=>{for(const f of this._rs)try{f(b.clientWidth,b.clientHeight)}catch(e){}}).observe(b)},
   // a drawer is modal: the page behind it is inert and hidden from assistive tech, so nothing under the sheet is a live tap target
   bg(on){const a=this.app;if(!a)return;if(on){a.setAttribute('aria-hidden','true');a.inert=true}else{a.removeAttribute('aria-hidden');a.inert=false}},
+  PRIMARY:'[data-gx-primary],.gx-primary,.gxh-ok,.gxc-btn.go,button.pri,.btn.pri,.pb.pri,button.primary,.btn.primary,button.go,.btn.go',
+  key1(e){if(this.noKeys||e.defaultPrevented||e.repeat||e.ctrlKey||e.metaKey||e.altKey||(e.key!=='Enter'&&e.key!==' '))return;
+    const t=e.target;if(t&&t.closest&&t.closest('input,textarea,select,[contenteditable=""],[contenteditable="true"]'))return;
+    if(t&&t!==document.body&&t!==document.documentElement){if(t.matches('button,a[href],summary,input'))return; // native controls press themselves
+      if(t.matches('[role=button],[role=menuitem],[role=tab],[role=option],[tabindex]')){e.preventDefault();t.click()}return}
+    const b=this.primary();if(b){e.preventDefault();b.click()}},
+  // the main action: the first visible, enabled primary button (inside the open popup if there is one)
+  primary(){const root=this.open&&document.getElementById(this.open)||document;
+    for(const b of root.querySelectorAll(this.PRIMARY)){if(b.disabled||b.getAttribute('aria-disabled')==='true'||b.closest('[inert],[aria-hidden="true"],[hidden]'))continue;
+      const r=b.getBoundingClientRect();if(r.width<4||r.height<4||r.bottom<0||r.right<0||r.top>innerHeight||r.left>innerWidth)continue;
+      const s=getComputedStyle(b);if(s.visibility==='hidden'||s.pointerEvents==='none'||+s.opacity<.1)continue;return b}return null},
   _rs:[],onResize(f){this._rs.push(f)},
   boardSize(){const b=document.querySelector('.gx-board');return b?{w:b.clientWidth,h:b.clientHeight}:{w:innerWidth,h:innerHeight}},
   toggleDock(force){const min=force!=null?!force:!this.app.classList.contains('gx-dock-min');this.app.classList.toggle('gx-dock-min',min);this.app.classList.remove('gx-sheet-full');try{localStorage.setItem(this.key+'_dockmin',min?'1':'0')}catch(e){}},
@@ -5318,7 +5428,7 @@ window.GXGLBQ = window.GXGLBQ || [];
 
 </script>
 <script>
-window.CAMPAIGN = {"game":"kaiten","title":"The Golden Plate","version":1,"cast":{"suzu":{"name":"Auntie Suzu","portrait":"camp-suzu.webp","emoji":"🍵","color":"#b5452a"},"mina":{"name":"Mina","portrait":"camp-mina.webp","emoji":"🍣","color":"#e5553a"},"pip":{"name":"Pip","portrait":"camp-pip.webp","emoji":"🥟","color":"#5aa83c"},"kofi":{"name":"Kofi","portrait":"camp-kofi.webp","emoji":"🚌","color":"#7a5ac8"},"odile":{"name":"Odile","portrait":"camp-odile.webp","emoji":"🍮","color":"#e0a31c"},"taro":{"name":"Taro","portrait":"camp-taro.webp","emoji":"🍜","color":"#2a97a0"}},"acts":[{"act":1,"title":"The Lunch Belt","blurb":"Learn what every plate is worth, one dish at a time."},{"act":2,"title":"The Dinner Rush","blurb":"Fuller tables, sharper regulars, and dessert on the line."},{"act":3,"title":"The Midnight Belt","blurb":"Only the night-shift regulars remain. Win the Golden Plate."}],"twists":[{"id":"custard-head-start","where":"setup","how":"Right after the deal, move `param` Custard Cups from the deck into the boss seat's kept cups (p.pud), so they count at the end of the game."},{"id":"boss-head-start","where":"scoring","how":"At the end of the game, add `param` points to the boss seat's final total before the winner is decided."},{"id":"roll-banner","where":"scoring","how":"When each round is scored, the boss seat counts `param` extra roll icons in the roll race (the extra icons alone never score)."},{"id":"roll-fever","where":"ai","how":"While the chapter is played, multiply the computer's roll-race weight (AI.params.makiFut) by `param`, so it chases Seaweed Rolls harder."},{"id":"sweet-tooth","where":"ai","how":"While the chapter is played, multiply the computer's custard weight (AI.params.pudFut) by `param`, so it hoards Custard Cups."},{"id":"long-think","where":"ai","how":"Hard computer seats pass opts.units = `param` (default 250) to KK.AI.choose, so they test more possible hands before each pick."}],"chapters":[{"id":"c1","act":1,"title":"First Plates","boss":false,"intro":[{"who":"suzu","text":"Welcome to the Turning Plate, Mina. Lunch is quiet, so let's practise."},{"who":"suzu","text":"Pick one plate, then pass the rest of your hand along the belt. That's all there is to it."},{"who":"pip","text":"I want one of everything! Hi! Can I sit here?"}],"outro":[{"who":"suzu","text":"See? Steam Buns get better the more you stack. Remember that ladder."},{"who":"pip","text":"You beat me! Next time I'm taking ALL the buns."}],"opponent":{"name":"Pip","portrait":"camp-pip.webp","emoji":"🥟","cast":"pip","personality":"Cheerful and hungry, picks whichever plate looks happiest.","aiLevel":"easy","aiStyle":"standard"},"setup":{"np":2,"seats":[4],"level":"easy","lv":["easy","easy","easy","easy"]},"twist":null,"goal":{"type":"win","value":null,"text":"Win the meal against Pip."},"hints":true,"stars":[{"text":"Win the meal","test":{"k":"won"}},{"text":"Score 6 or more from Steam Buns","test":{"k":"bunPts","op":">=","v":6}},{"text":"Score 40 points or more","test":{"k":"score","op":">=","v":40}}],"easier":{"aiLevel":"easy","twist":null,"setup":{},"maxStars":2,"text":"Pip is already as gentle as can be; the hints stay on."},"unlock":[{"type":"portrait","id":"pip","text":"Pip's portrait"}]},{"id":"c2","act":1,"title":"Sets of Three","boss":false,"intro":[{"who":"suzu","text":"Fish Slices are fussy: one or two score nothing, three make 10 points."},{"who":"suzu","text":"If you start a set, watch what's coming round. Finish it or don't start it."},{"who":"pip","text":"I don't get it, but fish are pretty."}],"outro":[{"who":"suzu","text":"A finished set is the biggest single plate on the belt. Well timed."}],"opponent":{"name":"Pip","portrait":"camp-pip.webp","emoji":"🥟","cast":"pip","personality":"Grabs what looks nice, so half-built sets often survive the trip round.","aiLevel":"easy","aiStyle":"standard"},"setup":{"np":2,"seats":[4],"level":"easy","lv":["easy","easy","easy","easy"]},"twist":null,"goal":{"type":"custom","value":10,"text":"Win, scoring at least 10 points from Fish Slices."},"hints":true,"stars":[{"text":"Win with 10+ points from Fish Slices","test":{"k":"fishPts","op":">=","v":10}},{"text":"Score 20 or more from Fish Slices","test":{"k":"fishPts","op":">=","v":20}},{"text":"Win by 10 or more","test":{"k":"margin","op":">=","v":10}}],"easier":{"aiLevel":"easy","twist":null,"setup":{},"maxStars":2,"text":"Just win the meal; the Fish Slice target becomes a bonus star."},"unlock":[{"type":"title","id":"set-builder","text":"Title: Set Builder"}]},{"id":"c3","act":1,"title":"The Roll Race","boss":false,"intro":[{"who":"kofi","text":"Room for one more? I just finished my bus route and I want rolls!"},{"who":"suzu","text":"Each round, most roll icons scores 6 and second most scores 3. Count the icons, not the cards."},{"who":"suzu","text":"Three diners now: hands pass round faster than you think."}],"outro":[{"who":"kofi","text":"Ha! You out-rolled me. I'm cheering anyway!"},{"who":"suzu","text":"Rolls are a race. Sometimes the smart move is second place for 3."}],"opponent":{"name":"Kofi","portrait":"camp-kofi.webp","emoji":"🚌","cast":"kofi","personality":"Loud, friendly, and he loves a roll race.","aiLevel":"easy","aiStyle":"standard"},"setup":{"np":3,"seats":[3,4],"level":"easy","lv":["easy","easy","easy","easy"]},"twist":null,"goal":{"type":"custom","value":2,"text":"Win, taking the 6-point roll prize in at least 2 of the 3 rounds."},"hints":true,"stars":[{"text":"Take the roll prize in 2 rounds","test":{"k":"rollWins","op":">=","v":2}},{"text":"Score 12 or more from Seaweed Rolls","test":{"k":"rollPts","op":">=","v":12}},{"text":"Score 40 points or more","test":{"k":"score","op":">=","v":40}}],"easier":{"aiLevel":"easy","twist":null,"setup":{"np":2,"seats":[3]},"maxStars":2,"text":"Just you and Kofi, so there is only one rival in the roll race."},"unlock":[{"type":"portrait","id":"kofi","text":"Kofi's portrait"}]},{"id":"c4","act":1,"title":"Kofi's Lunch Rush","boss":true,"intro":[{"who":"kofi","text":"Lunch rush! Everyone on my route comes here. Let's make it a contest."},{"who":"suzu","text":"Fire Paste triples the next nigiri you serve on it. A Moon Nigiri becomes 9."},{"who":"suzu","text":"Kofi will chase rolls. Let him, and feed your paste instead."}],"outro":[{"who":"suzu","text":"You've learned every plate on the lunch belt. The dinner crowd is tougher."},{"who":"kofi","text":"Best lunch of the week, even though I lost. Come for dinner!"}],"opponent":{"name":"Kofi","portrait":"camp-kofi.webp","emoji":"🚌","cast":"kofi","personality":"Bus driver, knows every regular, throws everything at the roll race.","aiLevel":"easy","aiStyle":"roll-fever","taunt":"Ding ding! All aboard the roll express. Better luck next stop!","praise":"Ha! You cleaned me out. That's the best ride I've had all week."},"setup":{"np":2,"seats":[3],"level":"easy","lv":["easy","easy","easy","easy"]},"twist":{"id":"roll-fever","param":1.4,"text":"Boss rule: Kofi chases Seaweed Rolls even harder than usual."},"goal":{"type":"win","value":null,"text":"Win the meal against Kofi."},"hints":true,"stars":[{"text":"Win the meal","test":{"k":"won"}},{"text":"Earn 4 or more bonus points from Fire Paste","test":{"k":"pasteBonus","op":">=","v":4}},{"text":"Score 45 points or more","test":{"k":"score","op":">=","v":45}}],"easier":{"aiLevel":"easy","twist":null,"setup":{},"maxStars":2,"text":"Kofi plays his usual game; no extra roll chasing."},"unlock":[{"type":"act","id":"2","text":"Act 2: The Dinner Rush"},{"type":"cardback","id":"lunch-belt","text":"Lunch Belt card back"}]},{"id":"c5","act":2,"title":"Dessert First","boss":false,"intro":[{"who":"odile","text":"Young lady, I have never left this belt without dessert. Not once in forty years."},{"who":"suzu","text":"Custard Cups stay with you to the end. With two diners, most cups scores 6."},{"who":"suzu","text":"The dinner regulars play properly. No more gentle passes."}],"outro":[{"who":"odile","text":"Well! You ate your vegetables and your dessert. I approve."}],"opponent":{"name":"Odile","portrait":"camp-odile.webp","emoji":"🍮","cast":"odile","personality":"Retired baker in a tall hat; fair, steady, never skips dessert.","aiLevel":"normal","aiStyle":"standard"},"setup":{"np":2,"seats":[2],"level":"normal","lv":["normal","normal","normal","normal"]},"twist":null,"goal":{"type":"win","value":null,"text":"Win the meal against Odile."},"hints":false,"stars":[{"text":"Win the meal","test":{"k":"won"}},{"text":"Score the 6 custard points","test":{"k":"custardPts","op":">=","v":6}},{"text":"Win by 5 or more","test":{"k":"margin","op":">=","v":5}}],"easier":{"aiLevel":"easy","twist":null,"setup":{},"maxStars":2,"text":"Odile is in a generous mood tonight."},"unlock":[{"type":"portrait","id":"odile","text":"Odile's portrait"}]},{"id":"c6","act":2,"title":"Table for Three","boss":false,"intro":[{"who":"kofi","text":"Dinner shift's over. Budge up, Odile!"},{"who":"suzu","text":"Three at the belt again, and now both of them play well."},{"who":"suzu","text":"With three diners, fewest Custard Cups loses 6. Don't end with none."}],"outro":[{"who":"suzu","text":"Forty points at a full dinner table. The midnight crowd has noticed you."}],"opponent":{"name":"Kofi and Odile","portrait":"camp-kofi.webp","emoji":"🚌","cast":"kofi","personality":"Kofi races for rolls while Odile quietly collects dessert.","aiLevel":"normal","aiStyle":"standard"},"setup":{"np":3,"seats":[2,3],"level":"normal","lv":["normal","normal","normal","normal"]},"twist":null,"goal":{"type":"score","value":40,"text":"Win with at least 40 points."},"hints":false,"stars":[{"text":"Win with 40 or more","test":{"k":"score","op":">=","v":40}},{"text":"Don't lose points for fewest Custard Cups","test":{"k":"custardPts","op":">=","v":0}},{"text":"Score 20 or more in a single round","test":{"k":"bestRound","op":">=","v":20}}],"easier":{"aiLevel":"easy","twist":null,"setup":{},"maxStars":2,"text":"Kofi and Odile have had a long day and play more loosely."},"unlock":[{"type":"table","id":"dinner-counter","text":"Dinner counter table skin"}]},{"id":"c7","act":2,"title":"Odile's Sweet Table","boss":true,"intro":[{"who":"odile","text":"Tonight I brought my own custard from the bakery. A head start, dear."},{"who":"suzu","text":"She'll hoard cups. You can fight her for them, or out-score the 6 points she wins."},{"who":"suzu","text":"Either way, count her cups before you pass her a hand full of dessert."}],"outro":[{"who":"odile","text":"Forty years, and you are the first to beat me at my own dessert."},{"who":"suzu","text":"There's one regular left. He only comes in after midnight."}],"opponent":{"name":"Odile","portrait":"camp-odile.webp","emoji":"🍮","cast":"odile","personality":"Polite, patient, and utterly unwilling to give up a Custard Cup.","aiLevel":"normal","aiStyle":"sweet-tooth","taunt":"Dessert always wins, dear. Do come again tomorrow.","praise":"Bravo. Take the last custard, you've earned it."},"setup":{"np":2,"seats":[2],"level":"normal","lv":["normal","normal","normal","normal"]},"twist":{"id":"custard-head-start","param":1,"text":"Boss rule: Odile starts the meal with 1 Custard Cup already kept."},"goal":{"type":"win","value":null,"text":"Win the meal against Odile."},"hints":false,"stars":[{"text":"Win the meal","test":{"k":"won"}},{"text":"Score 50 points or more","test":{"k":"score","op":">=","v":50}},{"text":"Win by 8 or more","test":{"k":"margin","op":">=","v":8}}],"easier":{"aiLevel":"easy","twist":null,"setup":{},"maxStars":2,"text":"Odile plays gently and leaves her own custard at home."},"unlock":[{"type":"act","id":"3","text":"Act 3: The Midnight Belt"},{"type":"cardback","id":"custard","text":"Custard card back"}]},{"id":"c8","act":3,"title":"The Night Shift","boss":false,"intro":[{"who":"taro","text":"Suzu says you're good. I count every plate. Let's see."},{"who":"suzu","text":"Taro remembers every hand he has seen. Don't leave him easy pairs."},{"who":"suzu","text":"No tricks tonight: just you, him, and a clean belt."}],"outro":[{"who":"taro","text":"Hm. You took the last prawn on purpose. I noticed."}],"opponent":{"name":"Taro","portrait":"camp-taro.webp","emoji":"🍜","cast":"taro","personality":"Quiet noodle cook who eats at midnight and punishes every loose plate.","aiLevel":"hard","aiStyle":"standard"},"setup":{"np":2,"seats":[1],"level":"hard","lv":["hard","hard","hard","hard"]},"twist":null,"goal":{"type":"win","value":null,"text":"Win the meal against Taro."},"hints":false,"stars":[{"text":"Win the meal","test":{"k":"won"}},{"text":"Score 50 points or more","test":{"k":"score","op":">=","v":50}},{"text":"Never leave Fire Paste unused at a round's end","test":{"k":"wastedPaste","op":"<=","v":0}}],"easier":{"aiLevel":"normal","twist":null,"setup":{"level":"normal","lv":["normal","normal","normal","normal"]},"maxStars":2,"text":"Taro is tired after his shift and plays at normal strength."},"unlock":[{"type":"portrait","id":"taro","text":"Taro's portrait"}]},{"id":"c9","act":3,"title":"Full Belt at Midnight","boss":false,"intro":[{"who":"kofi","text":"Night bus is parked! Is this the big one? I brought Odile and Pip."},{"who":"suzu","text":"Five diners, seven cards each. Plates come back to you far less often."},{"who":"suzu","text":"Taro plays at full strength; the others are here for fun, mostly."}],"outro":[{"who":"pip","text":"That was the loudest dinner ever. You won it!"},{"who":"taro","text":"Tomorrow, the Golden Plate. Just us."}],"opponent":{"name":"Taro and friends","portrait":"camp-taro.webp","emoji":"🍜","cast":"taro","personality":"Taro hunts points while the regulars scramble for rolls and custard.","aiLevel":"hard","aiStyle":"standard"},"setup":{"np":5,"seats":[1,2,3,4],"level":"hard","lv":["hard","normal","normal","easy"]},"twist":null,"goal":{"type":"win","value":null,"text":"Win the meal with all five diners at the belt."},"hints":false,"stars":[{"text":"Win the meal","test":{"k":"won"}},{"text":"Don't lose points for fewest Custard Cups","test":{"k":"custardPts","op":">=","v":0}},{"text":"Win by 5 or more","test":{"k":"margin","op":">=","v":5}}],"easier":{"aiLevel":"normal","twist":null,"setup":{"level":"normal","lv":["normal","normal","easy","easy"]},"maxStars":2,"text":"Taro plays at normal strength and Kofi and Pip play gently."},"unlock":[{"type":"table","id":"midnight-belt","text":"Midnight belt table skin"}]},{"id":"c10","act":3,"title":"The Golden Plate","boss":true,"intro":[{"who":"suzu","text":"Once a year, the best diner at my belt eats from the Golden Plate."},{"who":"taro","text":"I've held it three years. The house gives the champion a little head start."},{"who":"suzu","text":"He's sharp, Mina, but he can only take one plate a turn. Same as you."}],"outro":[{"who":"taro","text":"The plate is yours. I'll be here tomorrow night. And the next."},{"who":"suzu","text":"The Golden Plate, Mina. The whole belt is clapping."}],"opponent":{"name":"Taro","portrait":"camp-taro.webp","emoji":"🍜","cast":"taro","personality":"Three-time champion; silent, exact, never wastes a pick.","aiLevel":"hard","aiStyle":"standard","taunt":"Every plate counted. Every plate mine. Come back next year.","praise":"You counted better than me tonight. Eat well, champion."},"setup":{"np":2,"seats":[1],"level":"hard","lv":["hard","hard","hard","hard"]},"twist":{"id":"boss-head-start","param":3,"text":"Boss rule: the reigning champion Taro adds 3 points to his final total."},"goal":{"type":"win","value":null,"text":"Win the meal against Taro, champion's bonus and all."},"hints":false,"stars":[{"text":"Win the Golden Plate","test":{"k":"won"}},{"text":"Score 55 points or more","test":{"k":"score","op":">=","v":55}},{"text":"Win by 5 or more","test":{"k":"margin","op":">=","v":5}}],"easier":{"aiLevel":"normal","twist":null,"setup":{"level":"normal","lv":["normal","normal","normal","normal"]},"maxStars":2,"text":"Taro plays at normal strength and gets no champion's bonus."},"unlock":[{"type":"title","id":"golden-plate","text":"Title: Keeper of the Golden Plate"},{"type":"cardback","id":"golden","text":"Golden card back"}]}]};
+window.CAMPAIGN = {"game":"kaiten","title":"The Golden Plate","version":1,"cast":{"suzu":{"name":"Auntie Suzu","portrait":"camp-suzu.webp","emoji":"🍵","color":"#b5452a"},"mina":{"name":"Mina","portrait":"camp-mina.webp","emoji":"🍣","color":"#e5553a"},"pip":{"name":"Pip","portrait":"camp-pip.webp","emoji":"🥟","color":"#5aa83c"},"kofi":{"name":"Kofi","portrait":"camp-kofi.webp","emoji":"🚌","color":"#7a5ac8"},"odile":{"name":"Odile","portrait":"camp-odile.webp","emoji":"🍮","color":"#e0a31c"},"taro":{"name":"Taro","portrait":"camp-taro.webp","emoji":"🍜","color":"#2a97a0"}},"acts":[{"act":1,"title":"The Lunch Belt","blurb":"Learn what every plate is worth, one dish at a time."},{"act":2,"title":"The Dinner Rush","blurb":"Fuller tables, sharper regulars, and dessert on the line."},{"act":3,"title":"The Midnight Belt","blurb":"Only the night-shift regulars remain. Win the Golden Plate."}],"twists":[{"id":"custard-head-start","where":"setup","how":"Right after the deal, move `param` Custard Cups from the deck into the boss seat's kept cups (p.pud), so they count at the end of the game."},{"id":"boss-head-start","where":"scoring","how":"At the end of the game, add `param` points to the boss seat's final total before the winner is decided."},{"id":"roll-banner","where":"scoring","how":"When each round is scored, the boss seat counts `param` extra roll icons in the roll race (the extra icons alone never score)."},{"id":"roll-fever","where":"ai","how":"While the chapter is played, multiply the computer's roll-race weight (AI.params.makiFut) by `param`, so it chases Seaweed Rolls harder."},{"id":"sweet-tooth","where":"ai","how":"While the chapter is played, multiply the computer's custard weight (AI.params.pudFut) by `param`, so it hoards Custard Cups."},{"id":"long-think","where":"ai","how":"Hard computer seats pass opts.units = `param` (default 250) to KK.AI.choose, so they test more possible hands before each pick."}],"chapters":[{"id":"c1","act":1,"title":"First Plates","boss":false,"intro":[{"who":"suzu","text":"Welcome to the Turning Plate, Mina. Lunch is quiet, so let's practise."},{"who":"suzu","text":"Pick one plate, then pass the rest of your hand along the belt. That's all there is to it."},{"who":"pip","text":"I want one of everything! Hi! Can I sit here?"}],"outro":[{"who":"suzu","text":"See? Steam Buns get better the more you stack. Remember that ladder."},{"who":"pip","text":"You beat me! Next time I'm taking ALL the buns."}],"opponent":{"name":"Pip","portrait":"camp-pip.webp","emoji":"🥟","cast":"pip","personality":"Cheerful and hungry, picks whichever plate looks happiest.","aiLevel":"easy","aiStyle":"standard"},"setup":{"np":2,"seats":[4],"level":"easy","lv":["easy","easy","easy","easy"]},"twist":null,"goal":{"type":"win","value":null,"text":"Win the meal against Pip."},"hints":true,"stars":[{"text":"Win the meal","test":{"k":"won"}},{"text":"Score 6 or more from Steam Buns","test":{"k":"bunPts","op":">=","v":6}},{"text":"Score 40 points or more","test":{"k":"score","op":">=","v":40}}],"easier":{"aiLevel":"easy","twist":null,"setup":{},"maxStars":2,"text":"Pip is already as gentle as can be; the hints stay on."},"unlock":[{"type":"portrait","id":"pip","text":"Pip's portrait"}]},{"id":"c2","act":1,"title":"Sets of Three","boss":false,"intro":[{"who":"suzu","text":"Fish Slices are fussy: one or two score nothing, three make 10 points."},{"who":"suzu","text":"If you start a set, watch what's coming round. Finish it or don't start it."},{"who":"pip","text":"I don't get it, but fish are pretty."}],"outro":[{"who":"suzu","text":"A finished set is the biggest single plate on the belt. Well timed."}],"opponent":{"name":"Pip","portrait":"camp-pip.webp","emoji":"🥟","cast":"pip","personality":"Grabs what looks nice, so half-built sets often survive the trip round.","aiLevel":"easy","aiStyle":"standard"},"setup":{"np":2,"seats":[4],"level":"easy","lv":["easy","easy","easy","easy"]},"twist":null,"goal":{"type":"custom","value":10,"text":"Win, scoring at least 10 points from Fish Slices."},"hints":true,"stars":[{"text":"Win with 10+ points from Fish Slices","test":{"k":"fishPts","op":">=","v":10}},{"text":"Score 20 or more from Fish Slices","test":{"k":"fishPts","op":">=","v":20}},{"text":"Win by 10 or more","test":{"k":"margin","op":">=","v":10}}],"easier":{"aiLevel":"easy","twist":null,"setup":{},"maxStars":2,"text":"Just win the meal; the Fish Slice target becomes a bonus star."},"unlock":[{"type":"title","id":"set-builder","text":"Title: Set Builder"}]},{"id":"c3","act":1,"title":"The Roll Race","boss":false,"intro":[{"who":"kofi","text":"Room for one more? I just finished my bus route and I want rolls!"},{"who":"suzu","text":"Each round, most roll icons scores 6 and second most scores 3. Count the icons, not the cards."},{"who":"suzu","text":"Three diners now: each hand comes back to you every third turn. Remember what was in it."}],"outro":[{"who":"kofi","text":"Ha! You out-rolled me. I'm cheering anyway!"},{"who":"suzu","text":"Rolls are a race. Sometimes the smart move is second place for 3."}],"opponent":{"name":"Kofi","portrait":"camp-kofi.webp","emoji":"🚌","cast":"kofi","personality":"Loud, friendly, and he loves a roll race.","aiLevel":"easy","aiStyle":"standard"},"setup":{"np":3,"seats":[3,4],"level":"easy","lv":["easy","easy","easy","easy"]},"twist":null,"goal":{"type":"custom","value":2,"text":"Win, finishing first in rolls (alone or tied) in at least 2 of the 3 rounds."},"hints":true,"stars":[{"text":"Take the roll prize in 2 rounds","test":{"k":"rollWins","op":">=","v":2}},{"text":"Score 12 or more from Seaweed Rolls","test":{"k":"rollPts","op":">=","v":12}},{"text":"Score 40 points or more","test":{"k":"score","op":">=","v":40}}],"easier":{"aiLevel":"easy","twist":null,"setup":{"np":2,"seats":[3]},"maxStars":2,"text":"Just you and Kofi, so there is only one rival in the roll race."},"unlock":[{"type":"portrait","id":"kofi","text":"Kofi's portrait"}]},{"id":"c4","act":1,"title":"Kofi's Lunch Rush","boss":true,"intro":[{"who":"kofi","text":"Lunch rush! Everyone on my route comes here. Let's make it a contest."},{"who":"suzu","text":"Fire Paste triples the next nigiri you serve on it. A Moon Nigiri becomes 9."},{"who":"suzu","text":"Kofi will chase rolls. Let him, and feed your paste instead."}],"outro":[{"who":"suzu","text":"You've learned every plate on the lunch belt. The dinner crowd is tougher."},{"who":"kofi","text":"Best lunch of the week, even though I lost. Come for dinner!"}],"opponent":{"name":"Kofi","portrait":"camp-kofi.webp","emoji":"🚌","cast":"kofi","personality":"Bus driver, knows every regular, throws everything at the roll race.","aiLevel":"easy","aiStyle":"roll-fever","taunt":"Ding ding! All aboard the roll express. Better luck next stop!","praise":"Ha! You cleaned me out. That's the best ride I've had all week."},"setup":{"np":2,"seats":[3],"level":"easy","lv":["easy","easy","easy","easy"]},"twist":{"id":"roll-fever","param":1.4,"text":"Boss rule: Kofi chases Seaweed Rolls even harder than usual."},"goal":{"type":"win","value":null,"text":"Win the meal against Kofi."},"hints":true,"stars":[{"text":"Win the meal","test":{"k":"won"}},{"text":"Earn 4 or more bonus points from Fire Paste","test":{"k":"pasteBonus","op":">=","v":4}},{"text":"Score 45 points or more","test":{"k":"score","op":">=","v":45}}],"easier":{"aiLevel":"easy","twist":null,"setup":{},"maxStars":2,"text":"Kofi plays his usual game; no extra roll chasing."},"unlock":[{"type":"act","id":"2","text":"Act 2: The Dinner Rush"},{"type":"cardback","id":"lunch-belt","text":"Lunch Belt card back"}]},{"id":"c5","act":2,"title":"Dessert First","boss":false,"intro":[{"who":"odile","text":"Young lady, I have never left this belt without dessert. Not once in forty years."},{"who":"suzu","text":"Custard Cups stay with you to the end. With two diners, most cups scores 6."},{"who":"suzu","text":"The dinner regulars play properly. No more gentle passes."}],"outro":[{"who":"odile","text":"Well! You ate your vegetables and your dessert. I approve."}],"opponent":{"name":"Odile","portrait":"camp-odile.webp","emoji":"🍮","cast":"odile","personality":"Retired baker in a tall hat; fair, steady, never skips dessert.","aiLevel":"normal","aiStyle":"standard"},"setup":{"np":2,"seats":[2],"level":"normal","lv":["normal","normal","normal","normal"]},"twist":null,"goal":{"type":"win","value":null,"text":"Win the meal against Odile."},"hints":false,"stars":[{"text":"Win the meal","test":{"k":"won"}},{"text":"Score the 6 custard points","test":{"k":"custardPts","op":">=","v":6}},{"text":"Win by 5 or more","test":{"k":"margin","op":">=","v":5}}],"easier":{"aiLevel":"easy","twist":null,"setup":{},"maxStars":2,"text":"Odile is in a generous mood tonight."},"unlock":[{"type":"portrait","id":"odile","text":"Odile's portrait"}]},{"id":"c6","act":2,"title":"Table for Three","boss":false,"intro":[{"who":"kofi","text":"Dinner shift's over. Budge up, Odile!"},{"who":"suzu","text":"Three at the belt again, and now both of them play well."},{"who":"suzu","text":"With three or more diners, fewest Custard Cups loses 6. Don't end with none."}],"outro":[{"who":"suzu","text":"Forty points at a full dinner table. The midnight crowd has noticed you."}],"opponent":{"name":"Kofi and Odile","portrait":"camp-kofi.webp","emoji":"🚌","cast":"kofi","personality":"Kofi races for rolls while Odile quietly collects dessert.","aiLevel":"normal","aiStyle":"standard"},"setup":{"np":3,"seats":[2,3],"level":"normal","lv":["normal","normal","normal","normal"]},"twist":null,"goal":{"type":"score","value":40,"text":"Win with at least 40 points."},"hints":false,"stars":[{"text":"Win with 40 or more","test":{"k":"score","op":">=","v":40}},{"text":"Don't lose points for fewest Custard Cups","test":{"k":"custardPts","op":">=","v":0}},{"text":"Score 20 or more in a single round","test":{"k":"bestRound","op":">=","v":20}}],"easier":{"aiLevel":"easy","twist":null,"setup":{},"maxStars":2,"text":"Kofi and Odile have had a long day and play more loosely."},"unlock":[{"type":"table","id":"dinner-counter","text":"Dinner counter table skin"}]},{"id":"c7","act":2,"title":"Odile's Sweet Table","boss":true,"intro":[{"who":"odile","text":"Tonight I brought my own custard from the bakery. A head start, dear."},{"who":"suzu","text":"She'll hoard cups. You can fight her for them, or out-score the 6 points she wins."},{"who":"suzu","text":"Either way, count her cups before you pass her a hand full of dessert."}],"outro":[{"who":"odile","text":"Forty years, and you are the first to beat me at my own dessert."},{"who":"suzu","text":"There's one regular left. He only comes in after midnight."}],"opponent":{"name":"Odile","portrait":"camp-odile.webp","emoji":"🍮","cast":"odile","personality":"Polite, patient, and utterly unwilling to give up a Custard Cup.","aiLevel":"normal","aiStyle":"sweet-tooth","taunt":"Dessert always wins, dear. Do come again tomorrow.","praise":"Bravo. Take the last custard, you've earned it."},"setup":{"np":2,"seats":[2],"level":"normal","lv":["normal","normal","normal","normal"]},"twist":{"id":"custard-head-start","param":1,"text":"Boss rule: Odile starts the meal with 1 Custard Cup already kept."},"goal":{"type":"win","value":null,"text":"Win the meal against Odile."},"hints":false,"stars":[{"text":"Win the meal","test":{"k":"won"}},{"text":"Score 50 points or more","test":{"k":"score","op":">=","v":50}},{"text":"Win by 8 or more","test":{"k":"margin","op":">=","v":8}}],"easier":{"aiLevel":"easy","twist":null,"setup":{},"maxStars":2,"text":"Odile plays gently and leaves her own custard at home."},"unlock":[{"type":"act","id":"3","text":"Act 3: The Midnight Belt"},{"type":"cardback","id":"custard","text":"Custard card back"}]},{"id":"c8","act":3,"title":"The Night Shift","boss":false,"intro":[{"who":"taro","text":"Suzu says you're good. I count every plate. Let's see."},{"who":"suzu","text":"Taro remembers every hand he has seen. Don't leave him easy pairs."},{"who":"suzu","text":"No tricks tonight: just you, him, and a clean belt."}],"outro":[{"who":"taro","text":"Hm. You took the last prawn on purpose. I noticed."}],"opponent":{"name":"Taro","portrait":"camp-taro.webp","emoji":"🍜","cast":"taro","personality":"Quiet noodle cook who eats at midnight and punishes every loose plate.","aiLevel":"hard","aiStyle":"standard"},"setup":{"np":2,"seats":[1],"level":"hard","lv":["hard","hard","hard","hard"]},"twist":null,"goal":{"type":"win","value":null,"text":"Win the meal against Taro."},"hints":false,"stars":[{"text":"Win the meal","test":{"k":"won"}},{"text":"Score 50 points or more","test":{"k":"score","op":">=","v":50}},{"text":"Never leave Fire Paste unused at a round's end","test":{"k":"wastedPaste","op":"<=","v":0}}],"easier":{"aiLevel":"normal","twist":null,"setup":{"level":"normal","lv":["normal","normal","normal","normal"]},"maxStars":2,"text":"Taro is tired after his shift and plays at normal strength."},"unlock":[{"type":"portrait","id":"taro","text":"Taro's portrait"}]},{"id":"c9","act":3,"title":"Full Belt at Midnight","boss":false,"intro":[{"who":"kofi","text":"Night bus is parked! Is this the big one? I brought Odile and Pip."},{"who":"suzu","text":"Five diners, seven cards each. Plates come back to you far less often."},{"who":"suzu","text":"Taro plays at full strength; the others are here for fun, mostly."}],"outro":[{"who":"pip","text":"That was the loudest dinner ever. You won it!"},{"who":"taro","text":"Tomorrow, the Golden Plate. Just us."}],"opponent":{"name":"Taro and friends","portrait":"camp-taro.webp","emoji":"🍜","cast":"taro","personality":"Taro hunts points while the regulars scramble for rolls and custard.","aiLevel":"hard","aiStyle":"standard"},"setup":{"np":5,"seats":[1,2,3,4],"level":"hard","lv":["hard","normal","normal","easy"]},"twist":null,"goal":{"type":"win","value":null,"text":"Win the meal with all five diners at the belt."},"hints":false,"stars":[{"text":"Win the meal","test":{"k":"won"}},{"text":"Don't lose points for fewest Custard Cups","test":{"k":"custardPts","op":">=","v":0}},{"text":"Win by 5 or more","test":{"k":"margin","op":">=","v":5}}],"easier":{"aiLevel":"normal","twist":null,"setup":{"level":"normal","lv":["normal","normal","easy","easy"]},"maxStars":2,"text":"Taro plays at normal strength and Kofi and Pip play gently."},"unlock":[{"type":"table","id":"midnight-belt","text":"Midnight belt table skin"}]},{"id":"c10","act":3,"title":"The Golden Plate","boss":true,"intro":[{"who":"suzu","text":"Once a year, the best diner at my belt eats from the Golden Plate."},{"who":"taro","text":"I've held it three years. The house gives the champion a little head start."},{"who":"suzu","text":"He's sharp, Mina. Twin Sticks let him take two plates in one turn, so watch for them."}],"outro":[{"who":"taro","text":"The plate is yours. I'll be here tomorrow night. And the next."},{"who":"suzu","text":"The Golden Plate, Mina. The whole belt is clapping."}],"opponent":{"name":"Taro","portrait":"camp-taro.webp","emoji":"🍜","cast":"taro","personality":"Three-time champion; silent, exact, never wastes a pick.","aiLevel":"hard","aiStyle":"standard","taunt":"Every plate counted. Every plate mine. Come back next year.","praise":"You counted better than me tonight. Eat well, champion."},"setup":{"np":2,"seats":[1],"level":"hard","lv":["hard","hard","hard","hard"]},"twist":{"id":"boss-head-start","param":3,"text":"Boss rule: the reigning champion Taro adds 3 points to his final total."},"goal":{"type":"win","value":null,"text":"Win the meal against Taro, champion's bonus and all."},"hints":false,"stars":[{"text":"Win the Golden Plate","test":{"k":"won"}},{"text":"Score 55 points or more","test":{"k":"score","op":">=","v":55}},{"text":"Win by 5 or more","test":{"k":"margin","op":">=","v":5}}],"easier":{"aiLevel":"normal","twist":null,"setup":{"level":"normal","lv":["normal","normal","normal","normal"]},"maxStars":2,"text":"Taro plays at normal strength and gets no champion's bonus."},"unlock":[{"type":"title","id":"golden-plate","text":"Title: Keeper of the Golden Plate"},{"type":"cardback","id":"golden","text":"Golden card back"}]}]};
 </script>
 <script>
 // ---------- PerfHUD: one speed tool for every game on the shelf ----------
@@ -5621,7 +5731,7 @@ const TYPES = {
   egg:      { name: 'Sun Nigiri',     l: ['Sun', 'Nigiri'],     c: '#f3c933', rule: 'v1',     ruleText: 'Worth 1 point (x3 on Fire Paste)', rim: 'scallops', group: 'nigiri', v: 1 },
   wasabi:   { name: 'Fire Paste',     l: ['Fire', 'Paste'],     c: '#94c83d', rule: 'x3',     ruleText: 'Your next Nigiri is worth x3', rim: 'zigzag', group: 'wasabi' },
   chop:     { name: 'Twin Sticks',    l: ['Twin', 'Sticks'],    c: '#9a5b3c', rule: 'swap',   ruleText: 'Later: serve 2 plates; sticks pass on', rim: 'dashes', group: 'chop' },
-  pudding:  { name: 'Custard Cup',    l: ['Custard', 'Cup'],    c: '#f4b6d2', rule: 'dessert',ruleText: 'End of game: most +6, fewest -6', rim: 'dots', group: 'pudding' }
+  pudding:  { name: 'Custard Cup',    l: ['Custard', 'Cup'],    c: '#f4b6d2', rule: 'dessert',ruleText: 'End of game: most +6, fewest -6 (no -6 with 2 diners)', rim: 'dots', group: 'pudding' }
 };
 const ORDER = ['tempura', 'sashimi', 'dumpling', 'roll1', 'roll2', 'roll3', 'salmon', 'squid', 'egg', 'wasabi', 'chop', 'pudding'];
 const PLAYERS = [
@@ -6831,7 +6941,7 @@ if (typeof module === 'object' && module.exports) module.exports = KK;
 </script>
 <script>
 // ===================== Kaiten Kitchen computer players =====================
-// KK.AI.choose(G, seat, level?, opts?) -> one of KK.moves(G, seat)      level: 'easy' | 'normal' | 'hard' (default G.players[seat].ai || 'normal')
+// KK.AI.choose(G, seat, level?, opts?) -> one of KK.moves(G, seat)      level: 'easy' | 'easy+' | 'normal' | 'hard' (default G.players[seat].ai || 'normal')
 // KK.AI.step(G, seat) = choose + apply for one seat; KK.AI.stepAll(G) = every undecided AI seat picks (returns number of picks made).
 // The AI only reads public information (tables, discards, hand sizes, played history) and the seat's own hand and own memory of the hands it held.
 // Randomness is seeded from that same information, so the same view always gives the same answer.
@@ -6984,25 +7094,22 @@ function normalPick(G, seat) {
   return best.pick;
 }
 
-// ---------- easy: greedy with a lot of randomness ----------
-function easyPick(G, seat) {
-  const rng = mkRng(seedOf(G, seat, 11)), p = G.players[seat], h = p.hand, t = tc(p.table);
-  const vals = h.map(id => {
-    const k = key(id);
-    let v = 0;
-    switch (k) {
-      case 'tempura': v = t.tempura % 2 === 1 ? 5 : 1.5; break;
-      case 'sashimi': v = t.sashimi % 3 === 2 ? 10 : t.sashimi % 3 === 1 ? 3.5 : 2; break;
-      case 'dumpling': v = DUMP_F(t.dumpling + 1) - DUMP_F(t.dumpling) + 0.5; break;
-      case 'roll1': v = 1.2; break; case 'roll2': v = 2.2; break; case 'roll3': v = 3.2; break;
-      case 'salmon': case 'squid': case 'egg': v = NIG[k] * (t.u > 0 ? 3 : 1); break;
-      case 'wasabi': v = 2.2; break; case 'chop': v = 1.2; break; case 'pudding': v = 2; break;
-    }
-    return v + (rng() - 0.5) * 2.4;
-  });
-  let i = 0; if (rng() < 0.1) i = Math.floor(rng() * h.length); else for (let j = 1; j < h.length; j++) if (vals[j] > vals[i]) i = j;
-  if (h.length >= 2 && KK._.hasChop(p) && (h.length === 2 || rng() < 0.12)) { let j = i === 0 ? 1 : 0; for (let x = 0; x < h.length; x++) if (x !== i && vals[x] > vals[j]) j = x; return [Math.min(i, j), Math.max(i, j)]; }
-  return [i];
+// ---------- easy: a fellow newcomer (R80, Nov 2026) ----------
+// Plays like a first-timer reading the green +N on the belt: takes the dish that scores the most points right now (ties at random),
+// and now and then just grabs a dish it likes. It never plans sets ahead, races custard or saves Twin Sticks, so a newcomer
+// who follows the +N plays it as an equal (bench: games-src/kaiten/game/bench-newplayer.js, "hint-follower" line).
+const SMART = { easy: 0.42, 'easy+': 0.65 };   // share of picks where this chef plays like the normal chef (bench-newplayer.js)
+function easyPick(G, seat, level) {
+  const rng = mkRng(seedOf(G, seat, 11)), h = G.players[seat].hand;
+  if (rng() < (SMART[level] || 0)) return normalPick(G, seat);   // now and then it sees the whole picture, like the normal chef
+  if (rng() < 0.12) return [Math.floor(rng() * h.length)];
+  const tab = G.players.map(q => q.table.map(e => ({ id: e.id, w: e.w }))), tot = t => KK.roundScores({ players: t.map(x => ({ table: x })) })[seat].total;
+  const base = tot(tab); let bi = 0, bv = -1e9;
+  for (let i = 0; i < h.length; i++) {
+    const t2 = tab.slice(); t2[seat] = tab[seat].map(e => ({ id: e.id, w: e.w })); KK._.place({ table: t2[seat] }, h[i]);
+    const v = tot(t2) - base + rng() * 0.6; if (v > bv) { bv = v; bi = i; }
+  }
+  return [bi];
 }
 
 // ---------- hard: determinized Monte Carlo with normal-level rollouts ----------
@@ -7084,7 +7191,7 @@ function choose(G, seat, level, opts) {
   level = level || G.players[seat].ai || 'normal';
   const ms = KK.moves(G, seat); if (!ms.length) return null;
   if (ms.length === 1) return ms[0];
-  let pk = level === 'easy' ? easyPick(G, seat) : level === 'hard' ? hardPick(G, seat, opts) : normalPick(G, seat);
+  let pk = level === 'easy' || level === 'easy+' ? easyPick(G, seat, level) : level === 'hard' ? hardPick(G, seat, opts) : normalPick(G, seat);
   return asMove(G, seat, pk) || ms[0];
 }
 function step(G, seat) { const m = choose(G, seat); return m ? KK.apply(G, seat, m) : { ok: false, error: 'no move' }; }
@@ -7108,11 +7215,11 @@ KK.STORY = {
   turn: ['1. Everyone looks at their own hand of plates.', '2. Pick ONE plate. Everybody picks at the same time.', '3. The covers lift, one diner after another, and each plate lands on its owner\'s counter.', '4. Your points pop up with the reason.', '5. Your leftover hand slides to the next diner, theirs comes to you. Repeat until the hands are empty.'],
   // the live-turn instruction line (banner | text, 8 words at most together: gate rule 5); %N = next diner, %R = a rival
   say: {
-    mine: 'Your turn|Tap a dish to take it.',
+    mine: 'Your turn|Tap a dish for the dashed slot.',
     twin: 'Your turn|Tap two dishes.',
     twin2: 'Your turn|Tap a second dish.',
     tap2: 'Your turn|Tap it again.',
-    wait: '%R\'s turn|Waiting for %R.',
+    wait: 'Dish taken|Waiting for %R.',
     cover: 'Picks are in|Covers lift one by one.',
     land: 'Scoring|Dishes land on counters.',
     pass: 'Hands pass|Leftovers go to %N.',
@@ -7127,14 +7234,12 @@ KK.STORY = {
   },
   // the staged tutorial (ui11.js): per step t = bubble title, s = ONE sentence of 12 words or fewer; the glowing thing is the one tap
   tut: {
-    goal: { t: 'Your goal', s: 'Most points after three rounds wins the meal.' },
-    chef: { t: 'Odile' },
+    goal: { t: 'Your goal' },
     pick1: { t: 'Take one dish', s: 'Each turn, take one dish. Nobody sees your pick.' },
     passed: { t: 'Flip and pass', s: 'Picks flip together. Then the hands pass on.' },
     pick2: { t: 'A pair scores 5', s: 'Two Crispy Prawns make a pair: 5 points.' },
     paste: { t: 'Fire Paste', s: 'Fire Paste triples the next nigiri you take.' },
-    nigiri: { t: 'Nigiri on paste', s: 'Moon Nigiri is 3. On your Fire Paste it scores 9.' },
-    nigiriVals: { t: 'Nigiri values', s: 'Nigiri alone: Sun 1, Sunset 2, Moon 3.' },
+    nigiri: { t: 'Nigiri on paste', s: 'Moon 3, Sunset 2, Sun 1; on Fire Paste, Moon scores 9.' },
     sticksTake: { t: 'Twin Sticks', s: 'Twin Sticks let you take two dishes on a later turn.' },
     sticksUse: { t: 'Use the sticks', s: 'Tap your sticks: two dishes this turn.' },
     twinA: { t: 'First dish', s: 'Three Fish Slices score 10. One or two score nothing.' },
@@ -7144,16 +7249,10 @@ KK.STORY = {
     bun: { t: 'Steam Buns', s: 'Steam Buns climb: 1, 3, 6, 10, then 15.' },
     custard: { t: 'Custard Cup', s: 'Custard Cups stay on your table until the meal ends.' },
     scoreSets: { t: 'Sets scored' },
-    scoreRoll: { t: 'Roll race' },
-    rollTie: { t: 'Roll tie', s: 'A tie for most icons splits 6, and nobody gets second.' },
-    scoreNigiri: { t: 'Nigiri and paste' },
-    scoreChef: { t: 'Odile scored' },
-    clear: { t: 'Round over', s: 'After a round, every dish except custard leaves the table.' },
-    rounds: { t: 'Three rounds', s: 'A real meal has three rounds. Each round deals fresh hands.' },
-    custardEnd: { t: 'Custard counts', s: 'At the very end, most Custard Cups scores 6.' },
-    penalty: { t: 'Fewest cups', s: 'With three or more diners, fewest cups loses 6.' },
-    custardTie: { t: 'Custard ties', s: 'Custard ties split the points, rounded down.' },
-    tieBreak: { t: 'Equal totals', s: 'Equal totals? The diner with more Custard Cups wins.' }
+    rollTie: { t: 'Roll tie' },
+    clear: { t: 'Round over' },
+    custardEnd: { t: 'Custard counts', s: 'Most Custard Cups scores 6 at the end. Ties split.' },
+    penalty: { t: 'Fewest cups', s: 'Fewest loses 6 with 3+ diners. Equal totals: more cups wins.' },
   },
   // chapter payoff lines (shown with the first step of the next chapter)
   payoff: {
@@ -7177,7 +7276,8 @@ KK.STORY = {
     paste: { w: 's', t: 'Fire Paste triples your NEXT nigiri. Paste first, nigiri after!' },
     pasteNigiri: { w: 's', t: 'Nigiri on Fire Paste: tripled! The best trick on the belt.' },
     sticks: { w: 's', t: 'Twin Sticks: tap them later to take two dishes.' },
-    custard: { w: 's', t: 'Custard pays at the very end: most +6, fewest -6.' },
+    custard: { w: 's', t: 'Custard pays at the very end: most +6, fewest -6 (not with 2 diners).' },
+    custard2p: { w: 's', t: 'Custard pays at the very end: most cups +6.' },
     rival: { w: 'o', t: 'Fire Paste for me. My next nigiri triples, Mina!' },
     rival2: { w: 'o', t: 'Rolls are mine this round. You will have to race me!' },
     good: { w: 's', t: 'Lovely pick! The green +N shows what a plate scores now.' },
@@ -7187,7 +7287,8 @@ KK.STORY = {
     walk: { w: 's', t: 'Round scored. Let us count it together, rule by rule.' },
     makiTie: { w: 's', t: 'A roll tie! The tied diners split 6. Nobody gets second.' },
     custardEnd: { w: 's', t: 'Custard: most cups +6, fewest -6. Ties split.' },
-    penalty: { w: 's', t: 'With three diners, the fewest cups LOSES 6.' },
+    custardEnd2p: { w: 's', t: 'Custard: most cups +6. Ties split. Two diners: no -6.' },
+    penalty: { w: 's', t: 'With three or more diners, the fewest cups LOSES 6.' },
     custardTie: { w: 's', t: 'Custard ties split the points, rounded down.' },
     tieBreak: { w: 's', t: 'Equal totals? More Custard Cups wins the meal.' }
   }
@@ -7737,7 +7838,7 @@ function netLobbyEl() {
     if (host) {
       const oo = UI.opt = UI.opt || Object.assign({}, DEF, { lv: DEF.lv.slice() });
       const seg = (l, key, vals) => h('div.seg', h('span.lbl', l), vals.map(v => h('button.chipb' + (oo[key] === v ? '.on' : ''), { 'data-a': 'netopt', 'data-k': key, 'data-v': v, type: 'button' }, v)));
-      box.appendChild(h('div.opts', seg('Diners', 'np', [2, 3, 4, 5]), seg('Computer level', 'level', ['easy', 'normal', 'hard'])));
+      box.appendChild(h('div.opts', seg('Diners', 'np', [2, 3, 4, 5]), seg('Computer level', 'level', ['easy', 'easy+', 'normal', 'hard'])));
     }
     box.appendChild(h('p.sm', o.np + ' diners' + (ai > 0 ? ' · ' + ai + ' computer seat' + (ai > 1 ? 's' : '') + ' (' + (o.lv || 'normal') + ')' : '') + '. Empty seats go to the computer; a friend who leaves is replaced by it.'));
   }
@@ -7862,7 +7963,8 @@ const $$ = s => Array.from(document.querySelectorAll(s));
 const esc = s => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 const PN = KIT.PLAYERS.map(p => p.name);
 const DEF = { np: 3, level: 'easy', lv: ['easy', 'easy', 'easy', 'easy'], seats: [2, 3] };   // easy chefs until the player has won once (bench-newplayer.js)
-const DEF_WON = { level: 'normal', lv: ['hard', 'normal', 'normal', 'easy'] };
+const DEF_WON = { level: 'normal', lv: ['hard', 'normal', 'normal', 'easy'] };   // from the 3rd win on
+const DEF_WON1 = { level: 'easy+', lv: ['normal', 'easy+', 'easy+', 'easy'] }, DEF_WON2 = { level: 'easy+', lv: ['hard', 'normal', 'easy+', 'easy'] };   // 1st and 2nd win: step up one chef at a time
 const NIG = { salmon: 2, squid: 3, egg: 1 };
 const ICONS = { roll1: 1, roll2: 2, roll3: 3 };
 const tkey = id => KK.cardKey(id);
@@ -7943,7 +8045,7 @@ function groupsOf(s, tab, sc) {
   if (c.tempura) { const n = c.tempura, p = Math.floor(n / 2) * 5; mk('tempura', { type: 'tempura', n, pts: p, hint: n % 2 === 0 ? '= ' + p : (p ? '= ' + p : 'need 1'), cls: p ? 'ok' : 'wait', tip: n + ' Crispy Prawn' + (n > 1 ? 's' : '') + '. Each pair scores 5.' + (n % 2 ? ' One more makes a pair.' : '') }); }
   if (c.sashimi) { const n = c.sashimi, p = Math.floor(n / 3) * 10, r = n % 3; mk('sashimi', { type: 'sashimi', n, pts: p, hint: r === 0 ? '= ' + p : (p ? '= ' + p : 'need ' + (3 - r)), cls: p ? 'ok' : 'wait', tip: n + ' Fish Slice' + (n > 1 ? 's' : '') + '. Three score 10.' + (r ? ' ' + (3 - r) + ' more for a set.' : '') }); }
   if (c.dumpling) { const n = c.dumpling, p = KK.dumplingPts(n); mk('dumpling', { type: 'dumpling', n, pts: p, hint: '= ' + p, cls: 'ok', tip: n + ' Steam Bun' + (n > 1 ? 's' : '') + ' = ' + p + ' points.' + (n < 5 ? ' Next bun: ' + KK.dumplingPts(n + 1) + '.' : ' That is the top.') }); }
-  if (c.icons) { const rk = sc.mk[s]; mk('roll', { type: 'roll2', n: c.icons, pts: rk.pts, hint: rk.rank ? ORD[rk.rank] + ' +' + rk.pts : 'no pts', cls: rk.rank ? 'ok' : 'wait', tip: c.icons + ' roll icons. ' + (rk.rank === 1 ? 'Most right now: ' + rk.pts + ' points.' : rk.rank === 2 ? 'Second right now: ' + rk.pts + ' points.' : 'Most scores 6, second 3.') + (rk.rank && sc.rs.filter(r => r.icons === c.icons).length > 1 ? ' Tied, so points split.' : '') }); }
+  if (c.icons) { const rk = sc.mk[s]; mk('roll', { type: 'roll2', n: c.icons, pts: rk.pts, hint: rk.rank ? (sc.rs.filter(r => r.icons === c.icons).length > 1 ? 'tied ' + ORD[rk.rank] + ' +' + rk.pts : ORD[rk.rank] + ' +' + rk.pts) : 'behind', cls: rk.rank ? 'ok' : 'wait', tip: c.icons + ' roll icons. ' + (rk.rank === 1 ? 'Most right now: ' + rk.pts + ' points.' : rk.rank === 2 ? 'Second right now: ' + rk.pts + ' points.' : 'Most scores 6, second 3.') + (rk.rank && sc.rs.filter(r => r.icons === c.icons).length > 1 ? ' Tied, so points split.' : '') }); }
   const by = { salmon: [0, 0], squid: [0, 0], egg: [0, 0] };
   for (const e of t) { const k = tkey(e.id); if (NIG[k]) by[k][e.w >= 0 ? 1 : 0]++; }
   for (const k of ['salmon', 'squid', 'egg']) {
@@ -7971,6 +8073,17 @@ function gainOf(seat, ids) {
     return liveScores(tab)[seat].total - base;
   } catch (e) { return 0; }
 }
+// roll race standing if this plate were served now: {rank: 0/1/2, pts, tied, lead}
+function rollStand(seat, ids) {
+  try {
+    const tab = tables().map(t => t.map(e => ({ id: e.id, w: e.w })));
+    const holder = { table: tab[seat] };
+    for (const id of KK.placeOrder(ids)) KK._.place(holder, id);
+    const rs = liveScores(tab), ic = rs.map(r => r.icons), mk = makiRank(ic), me = mk[seat];
+    return { rank: me.rank, pts: me.pts, tied: ic.filter(x => x === ic[seat]).length > 1 && me.rank > 0, lead: Math.max.apply(null, ic) };
+  } catch (e) { return { rank: 0, pts: 0, tied: false, lead: 0 }; }
+}
+const rollWords = (r, short) => r.rank ? (r.tied ? 'tied ' + ORD[r.rank] + (short ? ' +' + r.pts : ': +' + r.pts + ' each') : ORD[r.rank] + ' +' + r.pts) : (short ? 'top ' + r.lead : 'behind: top has ' + r.lead);
 function whyPick(ids) {
   const v = viewSeat(), g = gainOf(v, ids), k = ids.map(tkey);
   const t = tables()[v], c = KK.tableCounts(t);
@@ -7979,12 +8092,12 @@ function whyPick(ids) {
   const x = k[0];
   if (x === 'tempura') return c.tempura % 2 ? 'This finishes a pair of prawns: +5.' : 'The start of a prawn pair (5 points once you have two).';
   if (x === 'sashimi') return c.sashimi % 3 === 2 ? 'This finishes a set of fish slices: +10.' : 'Fish slices only score in sets of three.';
-  if (x === 'dumpling') return 'Each extra bun is worth more: now ' + KK.dumplingPts(c.dumpling) + ' after, then ' + KK.dumplingPts(c.dumpling + 1) + '.';
+  if (x === 'dumpling') return 'Each bun is worth more, up to five (15): now ' + KK.dumplingPts(c.dumpling) + ' after, then ' + KK.dumplingPts(c.dumpling + 1) + '.';
   if (ICONS[x]) return 'Roll icons race for the most this round (6 points, second 3).';
   if (NIG[x]) return c.wasabiUnused ? 'Your Fire Paste is waiting: this nigiri scores triple (+' + NIG[x] * 3 + ').' : 'A nigiri is worth ' + NIG[x] + ' point' + (NIG[x] > 1 ? 's' : '') + ' straight away.';
   if (x === 'wasabi') return 'Fire Paste triples the next nigiri you serve.';
   if (x === 'chop') return 'Twin Sticks let you serve two plates on a later turn.';
-  if (x === 'pudding') return 'Custard is kept to the end of the game: most scores +6, fewest loses 6.';
+  if (x === 'pudding') return 'Custard is kept to the end of the game: most scores +6' + (G && G.np === 2 ? ' (2 diners: no -6).' : ', fewest loses 6.');
   return '';
 }
 function logSince(i) { return G.log.filter(x => x.i > i).map(x => x.t); }
@@ -7992,11 +8105,13 @@ function logSince(i) { return G.log.filter(x => x.i > i).map(x => x.t); }
 function toast(t) { const el = $('#toast'); if (!el) return; el.textContent = t; el.classList.add('on'); clearTimeout(toast.t); toast.t = setTimeout(() => el.classList.remove('on'), 4000 + Math.ceil(String(t).trim().split(/\s+/).length / 10) * 1000); }
 function lsGet(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
 function lsSet(k, v) { try { localStorage.setItem(k, v); } catch (e) { } }
-function loadPrefs() { try { if (lsGet('kk_won')) Object.assign(DEF, { level: DEF_WON.level, lv: DEF_WON.lv.slice() }); const p = JSON.parse(lsGet('kk_prefs') || '{}'); Object.assign(UI.prefs, p); if (p.speed) AIDELAY = p.speed; } catch (e) { } }
+function loadPrefs() { try { const wn = +lsGet('kk_won') || 0; if (wn) { const W = wn >= 3 ? DEF_WON : wn === 2 ? DEF_WON2 : DEF_WON1; Object.assign(DEF, { level: W.level, lv: W.lv.slice() }); } const p = JSON.parse(lsGet('kk_prefs') || '{}'); Object.assign(UI.prefs, p); if (p.speed) AIDELAY = p.speed; } catch (e) { } }
 function savePrefs() { lsSet('kk_prefs', JSON.stringify(Object.assign({}, UI.prefs, { speed: AIDELAY }))); }
 // UI.fast: the player tapped the table to hurry this reveal / pass along
-const PACE = .34;   // default pause scale: a pick -> reveal -> pass cycle is about 2 s; tap the table to skip the rest
-const wait = ms => ANIM ? new Promise(r => setTimeout(r, ms * PACE * (AIDELAY > 0 ? Math.max(.35, AIDELAY / 650) : .35) * (UI.fast ? .3 : 1))) : Promise.resolve();
+const PACE = .28;   // default pause scale: a pick -> reveal -> pass cycle is about 2 s; tap the table to skip the rest
+// late in a round the choices are few and the pauses shorter (the last turns were 5-6 s each)
+const lateK = () => { const left = G && G.hand && G.turn ? G.hand - G.turn : 9; return left <= 1 ? .5 : left <= 3 ? .72 : 1; };
+const wait = ms => ANIM ? new Promise(r => setTimeout(r, ms * PACE * (AIDELAY > 0 ? Math.max(.35, AIDELAY / 650) : .35) * lateK() * (UI.fast ? .3 : 1))) : Promise.resolve();
 // ---- "what just happened": after every reveal, one line per diner with the score change and its cause
 const CATN = { maki: 'roll race', tempura: 'prawn pair', sashimi: 'fish set', dumpling: 'buns', nigiri: 'nigiri', wasabi: 'Fire Paste ×3' };
 function buildNews(before, after, picks, scored) {
@@ -8007,7 +8122,7 @@ function buildNews(before, after, picks, scored) {
     const plays = keys.some(k => ICONS[k]);
     for (const k of ['tempura', 'sashimi', 'dumpling', 'nigiri', 'wasabi']) { const x = b[s][k] - a[s][k]; if (x) why.push((x > 0 ? '+' : '−') + Math.abs(x) + ' ' + CATN[k]); }
     const mx = b[s].maki - a[s].maki;
-    if (mx) why.push((mx > 0 ? '+' : '−') + Math.abs(mx) + ' roll race' + (mkB[s].rank ? ' (now ' + ORD[mkB[s].rank] + ')' : ' (lost the lead)'));
+    if (mx) { const ics = b.map(r => r.icons), top = ics.indexOf(Math.max.apply(null, ics)), by = top !== s && mx < 0 ? ', ' + pname(top) + ' took more icons' : ''; why.push((mx > 0 ? '+' : '−') + Math.abs(mx) + ' roll race' + (mkB[s].rank ? ' (now ' + ORD[mkB[s].rank] + by + ')' : ' (lost the lead' + by + ')')); }
     const notes = [];
     if (keys.includes('wasabi') && !pk.cards.some(c => NIG[c.key])) notes.push('the Fire Paste waits to triple ' + (s === viewSeat() ? 'your' : 'their') + ' next nigiri');
     if (keys.includes('chop') && keys.length === 1) notes.push('Twin Sticks: two plates on a later turn');
@@ -8042,13 +8157,48 @@ function render() {
   try { netRenderHook(); } catch (e) { }
   try { boardFX(); } catch (e) { }
   try { hlpAfter(); } catch (e) { }
+  try { kkRace(); } catch (e) { }
   if (PX.on) pxDirty();
+}
+// ---- 4. running set races made visible: a live "Rolls: you 4 · Odile 5" line, and a toast saying why your points moved
+function kkRaceLine(info) {
+  const v = viewSeat(), np = G.np, ic = s => info.rs[s].icons, pc = pudCounts();
+  const nm = s => s === v ? 'you' : pname(s).replace(/^Auntie /, '').slice(0, 8);
+  const seats = Array.from({ length: np }, (_, s) => s).sort((a, b) => (a === v ? -1 : b === v ? 1 : 0) || 0);
+  const list = (f, fmt) => { const o = seats.filter(s => s !== v).sort((a, b) => f(b) - f(a)); return [v].concat(o.slice(0, 2)).map(s => nm(s) + ' ' + (fmt ? fmt(s) : f(s))).join(' · ') + (o.length > 2 ? ' · +' + (o.length - 2) : ''); };
+  const out = [];
+  if (seats.some(s => ic(s) > 0)) out.push('Rolls: ' + list(ic));
+  if (pc.some(n => n > 0)) { const pp = KK.puddingPoints(pc, np), lvl = Math.max(...pc) === Math.min(...pc), sg = x => x > 0 ? ' +' + x : x < 0 ? ' \u2212' + -x : ''; out.push('Custard at the end: ' + list(s => pc[s], s => pc[s] + (lvl ? '' : ' → ' + (sg(pp[s]).trim() || '0'))) + (lvl ? ' · level' : '')); }
+  return out;
+}
+function kkRace() {
+  let el = $('#kkrace'); const bz = $('#beltz');
+  const on = !!(G && UI.started && G.phase !== 'over' && viewSeat() >= 0 && !tutOn() && bz);
+  if (!on) { if (el) el.hidden = true; return; }
+  if (!el) { el = h('div#kkrace', { role: 'status', 'aria-live': 'off' }); bz.insertBefore(el, bz.firstChild); }
+  el.hidden = false;
+  const info = seatScoreInfo(tables()), parts = kkRaceLine(info);
+  const sig = parts.join('|'); if (el.dataset.sig !== sig) { el.dataset.sig = sig; el.replaceChildren(...(parts.length ? parts.map(t => h('span', t)) : [h('span.kq', 'Rolls and custard: nobody has any yet')])); }
+  el.classList.toggle('kq', !parts.length);
+  if (UI.rsOpen || (G.phase === 'pick' && G.turn >= G.hand)) { const t = $('#toast'); if (t && t.dataset.race) { t.classList.remove('on'); } }
+  // why did my points move? only when the picture has settled (not mid-reveal) and a roll race flipped
+  if (UI.fz || G.phase !== 'pick') return;
+  const v = viewSeat(), R = UI.kkRace && UI.kkRace.g === G && UI.kkRace.round === G.round ? UI.kkRace : (UI.kkRace = { g: G, round: G.round, pts: null });
+  const cur = info.rs[v].maki;
+  if (R.pts != null && cur !== R.pts) {
+    const top = G.players.map((p, s) => s).filter(s => s !== v).sort((a, b) => info.rs[b].icons - info.rs[a].icons)[0], d = cur - R.pts, mine = info.rs[v].icons, theirs = top == null ? 0 : info.rs[top].icons;
+    const ic = info.rs.map(r => r.icons), me = makiRank(ic)[v], tied = ic.filter(x => x === mine).length > 1 && me.rank > 0;
+    const place = me.rank ? (tied ? 'tied ' + ORD[me.rank] : ORD[me.rank]) : 'behind', lead = (top == null ? 'Nobody' : pname(top)) + ' leads rolls, ' + theirs + ' to ' + mine;
+    const msg = me.rank ? (d > 0 ? (me.rank === 1 && !tied ? 'You lead the roll race. You +' + d + '.' : 'You\'re now ' + place + ' in rolls. You +' + d + '.') : 'Down to ' + place + ' in rolls. You \u2212' + (-d) + '.') : lead + '. You \u2212' + (-d) + '.';
+    if (top != null && !UI.rsOpen && G.turn < G.hand) { $('#toast').dataset.race = '1'; toast(msg); }
+  }
+  R.pts = cur;
 }
 function renderBar() {
   const s = $('#barstat'); if (!s) return;
   // fz.scoring: the engine has already scored this round and dealt the next, but the last reveal is still on screen
   const re = UI.fz && (UI.fz.roundEnd || UI.fz.scoring), rd = re ? (G.phase === 'over' ? (G.len || D.rounds) : G.round - 1) : G.round, RN = G.len || D.rounds;
-  s.textContent = G.phase === 'over' && !re ? 'Game over' : re ? (isPh() ? 'Round ' + rd + '/' + RN : 'Round ' + rd + ' of ' + RN) + (UI.fz.roundEnd ? ' · scoring' : ' · last turn') : (isPh() ? 'Round ' + G.round + '/' + RN + ' · Turn ' + G.turn + '/' + G.hand : 'Round ' + G.round + ' of ' + RN + ' · Turn ' + G.turn + ' of ' + G.hand);
+  s.textContent = G.phase === 'over' && !re ? 'Game over' : re && isPh() && UI.fz.roundEnd ? 'Round ' + rd + '/' + RN : re ? (isPh() ? 'Round ' + rd + '/' + RN : 'Round ' + rd + ' of ' + RN) + (UI.fz.roundEnd ? ' · scoring' : ' · last turn') : (isPh() ? 'Round ' + G.round + '/' + RN + ' · Turn ' + G.turn + '/' + G.hand : 'Round ' + G.round + ' of ' + RN + ' · Turn ' + G.turn + ' of ' + G.hand);
   barTwoLines();
 }
 function barTwoLines() { const s = $('#barstat'); if (s && isPh() && s.textContent.indexOf(' \u00b7 ') > 0 && !s.querySelector('br')) { const a = s.textContent.split(' \u00b7 '); s.replaceChildren(h('b', a[0]), h('br'), a[1].replace('/', ' of ')); } }
@@ -8058,7 +8208,8 @@ function bankedOf(s) {
   return list.reduce((a, r) => a + r[s].total, 0);
 }
 function totalOf(s, info) {
-  if (UI.fz && UI.fz.tally) return bankedOf(s) + UI.fz.tally[s];   // the round-end count: chips climb as each set scores
+  if (UI.fz && UI.fz.tally) return bankedOf(s) + UI.fz.tally[s];
+  if (UI.fz && UI.fz.tables && (UI.fz.roundEnd || UI.fz.scoring)) return bankedOf(s);   // before the count: show what is banked, so chips only ever climb   // the round-end count: chips climb as each set scores
   if (G.phase === 'over' && !(UI.fz && UI.fz.tables)) return G.final.totals[s];
   return bankedOf(s) + (G.phase === 'over' && !(UI.fz && UI.fz.tables) ? 0 : info.rs[s].total);
 }
@@ -8070,6 +8221,7 @@ function layoutNums(np, hasMe, tblH) {
   if (w < 560 && !land) cols = 1;
   else for (const c of [1, 2, 3]) { if (c > Math.max(1, o)) break; const rows = Math.ceil(o / c) + meW; if ((tblH - 6 * (Math.ceil(o / c) + (hasMe ? 1 : 0))) / rows >= 86) { cols = c; break; } if (c === 3) cols = 2; }
   if (o <= 1) cols = 1;
+  if (!ph && w >= 640 && o >= 2) cols = Math.min(o, 4);   // PC: every rival's counter side by side, never a phone column
   return { w, h: hgt, cols, orows: Math.ceil(o / cols), ph, land };
 }
 function renderTable() {
@@ -8081,7 +8233,10 @@ function renderTable() {
   const L = layoutNums(np, hasMe, tblH0);
   const order = []; if (hasMe) { for (let k = 1; k < np; k++) order.push((f + k) % np); order.push(f); } else for (let k = 0; k < np; k++) order.push(k);
   tbl.style.setProperty('--cols', L.cols);
-  const meW = 1.35, rowsTpl = hasMe ? (L.orows ? 'repeat(' + L.orows + ',minmax(0,1fr)) minmax(0,' + meW + 'fr)' : 'minmax(0,1fr)') : 'repeat(' + L.orows + ',minmax(0,1fr))';
+  // R80: on a phone, when your own groups cannot fit one row (each tap target is at least 44 px), your row gets the height for two rows
+  let meW = 1.35;
+  if (hasMe && isPh() && L.orows) { const ngMe = groupsOf(f, tab, info).list.length + (pcs[f] ? 1 : 0), wMe = L.w - 16 - 150; if (ngMe * 50 > wMe) { const A = Math.max(120, L.h - (beltH || 150) - 10) - 6 * (L.orows + 1); meW = Math.max(1.35, Math.min(100 * L.orows / Math.max(40, A - 100), A / 46 - L.orows)); } }   // rivals keep >= 46 px rows
+  const rowsTpl = hasMe ? (L.orows ? 'repeat(' + L.orows + ',minmax(0,1fr)) minmax(0,' + meW + 'fr)' : 'minmax(0,1fr)') : 'repeat(' + L.orows + ',minmax(0,1fr))';
   tbl.style.gridTemplateRows = rowsTpl;
   const tblH = Math.max(120, L.h - (beltH || (L.ph ? 150 : 210)) - 10), tblW = L.w - 16;
   const nrow = L.orows + (hasMe ? meW : 0), rH = Math.max(44, (tblH - 6 * (L.orows + (hasMe ? 1 : 0))) / nrow);
@@ -8096,7 +8251,7 @@ function renderTable() {
     const ctrW = cw - shw - sl - 25;
     // plates on the counter: one row, or two rows of bigger plates when the seat is tall enough (nothing clipped, labels readable)
     // (a layout that fits wins over bigger plates that overflow past the edge)
-    const ng = groupsOf(s, tab, info).list.length + (pcs[s] || !isPh() ? 1 : 0), cap = isMe ? 84 : 68, slotW = p => Math.max(p + 18, 58);   // a group is never narrower than its tag ("need 2 more")
+    const ng = groupsOf(s, tab, info).list.length + (pcs[s] || !isPh() ? 1 : 0), cap = isMe ? (isPh() ? 84 : 112) : (isPh() ? 68 : 92), slotW = p => Math.max(p + 18, 58);   // a group is never narrower than its tag ("need 2 more")
     let tight = false;
     const sw = p => tight ? Math.max(p + 12, 48) : slotW(p), gp = () => tight ? 12 : 18;
     const fit = (rows, hgt) => { const k = Math.ceil(ng / rows); let p = Math.max(24, Math.min(hgt, cap)); if (k * sw(p) > ctrW) p = Math.max(24, (ctrW / k) - gp()); return { p, ok: sw(p) * k <= ctrW + 4 && hgt >= 24 }; };
@@ -8108,13 +8263,33 @@ function renderTable() {
     const sg = seatSig(s, tab, info, pcs, isMe, dm) + '|' + sigAll;
     const old = oldSeats[s];
     if (old && old.dataset.sg === sg) { els.push(old); continue; }
-    const e = seatEl(s, tab, info, pcs, isMe, dm); e.dataset.rk = s; e.dataset.sg = sg; els.push(e);
+    const e = seatEl(s, tab, info, pcs, isMe, dm); e.dataset.rk = s; e.dataset.sg = sg; e.__fit = { s, isMe, dm }; els.push(e);
   }
   let same = tbl.children.length === els.length; if (same) for (let i = 0; i < els.length; i++) if (tbl.children[i] !== els[i]) { same = false; break; }
   if (!same) tbl.replaceChildren(...els);
+  for (let i = 0; i < els.length; i++) if (els[i].__fit) { els[i] = fitSeat(els[i], tab, info, pcs); els[i].__fit = null; }
   if (UI.land && PX.on) for (const k of UI.land) PX.landSet.add(k);
   UI.land = null;
   if (!tbl.__ap) { tbl.__ap = 1; try { KIT.applyTable($('#bd'), 'day'); } catch (e) { } }
+}
+// R80: the size estimate above can be too wide (long tags like "2nd +1", the custard shelf), and an overflowing counter paints past
+// the screen edge and under the pick slot. Measure the real seat and rebuild it with smaller plates (then two rows) until it fits.
+function seatOver(e) {
+  const c = e.querySelector('.ctr'); if (!c || !c.children.length) return false;
+  const r = c.getBoundingClientRect(); if (r.width < 4) return false;
+  if (c.scrollWidth > c.clientWidth + 2 || c.scrollHeight > c.clientHeight + 2) return true;
+  for (const k of c.children) { const q = k.getBoundingClientRect(); if (q.right > r.right + 1 || q.left < r.left - 1 || q.bottom > r.bottom + 1) return true; }
+  return false;
+}
+function fitSeat(e, tab, info, pcs) {
+  const f = e.__fit; let dm = f.dm, n = 0;
+  while (n++ < 10 && seatOver(e)) {
+    if (dm.pd > 24) dm = Object.assign({}, dm, { pd: Math.max(24, dm.pd - 4), tight: true });
+    else if (!dm.wrap) dm = Object.assign({}, dm, { wrap: true, tight: true, pd: Math.max(24, f.dm.pd - 8) });
+    else { if (!f.dm.wrap) dm = Object.assign({}, dm, { wrap: false, pd: 24 }); else break; n = 99; }   // two rows did not fit either: smallest single row
+    const ne = seatEl(f.s, tab, info, pcs, f.isMe, dm); ne.dataset.rk = e.dataset.rk; ne.dataset.sg = e.dataset.sg; e.replaceWith(ne); e = ne;
+  }
+  return e;
 }
 function seatSig(s, tab, info, pcs, isMe, dm) {
   const p = G.players[s], fz = UI.fz && UI.fz.slots, sl = fz ? JSON.stringify(fz[s]) : (G.phase === 'pick' ? (p.picked ? 'p' : 'w') : 'x');
@@ -8136,12 +8311,25 @@ function seatEl(s, tab, info, pcs, isMe, dm) {
   const ctr = h('div.ctr');
   const land = UI.land || new Set();
   const gl = gs.list.slice(); if (isMe && twinReady()) gl.sort((x, y) => (y.k === 'chop') - (x.k === 'chop'));   // the glowing Twin Sticks come first, never scrolled out of the tray
+  const shf = pcs[s] || !isPh() ? shelfEl(s, pcs[s], dm.pd, land.has(s + '|pud')) : null;
+  if (shf && isPh() && dm.tight) { shf.classList.add('first'); ctr.appendChild(shf); }   // R80: a crowded phone counter shows custard first (next to the avatar), so it is never scrolled out of sight
   for (const g of gl) ctr.appendChild(grpEl(g, dm.pd, land.has(s + '|' + g.k)));
-  if (pcs[s] || !isPh()) ctr.appendChild(shelfEl(s, pcs[s], dm.pd, land.has(s + '|pud')));   // phones: the custard spot appears with the first cup (the dock lists custard)
+  if (shf && !shf.parentNode) ctr.appendChild(shf);   // phones: the custard spot appears with the first cup (the dock lists custard)
   if (!gs.list.length && !pcs[s] && !(s === viewSeat() && (G.players[s].picked || UI.busy))) ctr.insertBefore(h('span.none', G.phase === 'pick' ? 'Nothing served yet' : ''), ctr.firstChild);   // your tray drops the label once your dish is on its way
   el.appendChild(ctr);
   el.appendChild(slotEl(s, dm.sl, dm.cmp));
   return el;
+}
+// F6: the first time a short label shows on your own counter, one plain line says what it means (once per visit; never in tests)
+const TIPS = { grab2: 'Grab 2: tap this, then two dishes.', need1: 'Need 1: one more scores this set.', behind: 'Behind: others have more rolls. Take more.' };
+function firstTip(g) {
+  if (!G || g.seat !== viewSeat() || !ANIM || /[?&]scn=/.test(location.search)) return;
+  const k = g.k === 'chop' ? 'grab2' : /^need/.test(g.hint || '') ? 'need1' : g.k === 'roll' && g.hint === 'no pts' ? 'behind' : null;
+  firstTip.seen = firstTip.seen || {}; if (!k || firstTip.seen[k]) return; firstTip.seen[k] = 1;
+  // one helper at a time: wait while a tutorial / help bubble is up, and show the tip under the top bar, never over the hand labels
+  const bub = () => tutOn() || [...document.querySelectorAll('.gxt-bub,.gxh-bub')].some(e => e.offsetParent !== null && getComputedStyle(e).visibility !== 'hidden' && getComputedStyle(e).opacity !== '0');
+  const show = n => setTimeout(() => { try { if (!G || UI.busy) return; if (bub()) { if (n < 8) show(n + 1); else firstTip.seen[k] = 0; return; } const t = $('#toast'); t.dataset.race = '1'; toast(TIPS[k]); setTimeout(() => { if (t.dataset.race) delete t.dataset.race; }, 6500); } catch (e) { } }, n ? 2000 : 1200);
+  show(0);
 }
 function grpEl(g, pd, landing) {
   const layers = Math.min(g.n, 3);
@@ -8151,6 +8339,7 @@ function grpEl(g, pd, landing) {
   for (let i = 0; i < layers; i++) pl.appendChild(plateN(g.type, pd, g.on));
   b.appendChild(pl);
   if (g.n > 1 || g.k === 'roll') b.appendChild(h('span.bg', (g.k === 'roll' ? '' : '×') + g.n));
+  firstTip(g);
   b.appendChild(h('span.hn', sticks ? (UI.twin ? 'tap 2 dishes' : 'tap: grab 2') : g.hint));
   return b;
 }
@@ -8201,11 +8390,11 @@ function renderBelt() {
   const sl = belt.scrollLeft;
   const hand = v >= 0 ? dispHand() : (G.phase === 'over' ? [] : new Array(UI.fz && UI.fz.backN != null ? UI.fz.backN : G.players[f].hand.length).fill(-1));
   const hidden = v < 0;
-  const m = Math.max(hand.length, 1), avail = beltWidth() - 20;
-  const land = ph && boardSize().w >= boardSize().h; const hwMax = ph ? (land ? 74 : 84) : Math.max(84, Math.min(118, Math.floor((boardSize().h * .3 - 34) / 1.4))); let hw = Math.max(ph ? (land || innerHeight < 700 ? 54 : 60) : 62, Math.min(hwMax, Math.floor((avail - (m - 1) * 6) / m)));
+  const m = Math.max(hand.length, 1), avail = beltWidth() - 20, GAP = ph && boardSize().w < boardSize().h ? -3 : 6;   // tall phone: plates overlap a little so up to 6 fit one row, bigger
+  const land = ph && boardSize().w >= boardSize().h; const hwMax = ph ? (land ? 74 : 84) : Math.max(innerHeight < 600 ? 62 : 84, Math.min(innerWidth >= 1500 ? 150 : 118, Math.floor((boardSize().h * .3 - 34) / 1.4))); let hw = Math.max(ph ? (land || innerHeight < 700 ? 54 : 60) : 62, Math.min(hwMax, Math.floor((avail - (m - 1) * GAP) / m)));
   // a tall phone: two rows of plates instead of a belt that scrolls sideways and hides plates off the edge
-  const one = Math.floor((avail - (m - 1) * 6) / m), two = ph && !land && one < 72 && boardSize().h >= 440 && m > 4 && G.phase !== 'over';   // sized for a full hand all round: the belt and the dishes never jump between turns
-  if (two) { const k = Math.ceil(m / 2); hw = Math.max(54, Math.min(boardSize().h < 500 ? 62 : 80, Math.floor((avail - (k - 1) * 6) / k))); }
+  const one = Math.floor((avail - (m - 1) * GAP) / m), two = ph && !land && one < 72 && boardSize().h >= 440 && m > 6 && G.phase !== 'over';   // sized for a full hand all round: the belt and the dishes never jump between turns
+  if (two) { const k = Math.ceil(m / 2); hw = Math.max(54, Math.min(boardSize().h < 500 ? 62 : 80, Math.floor((avail - (k - 1) * GAP) / k))); }
   else if (ph && hand.length && land) { const fitN = Math.floor((avail - (hand.length - 1) * 6) / hand.length); if (fitN < hw) hw = Math.max(44, fitN); }   // shrink a little rather than hide plates past the edge
   // the belt never takes more than about half the board: the counters stay readable on short phones
   if (ph && !land) { const H2 = boardSize().h * .5, cap = Math.floor(two ? (H2 - 92) / 2.8 : (H2 - 84) / 1.4); if (cap < hw) hw = Math.max(44, cap); }
@@ -8221,12 +8410,12 @@ function renderBelt() {
     const idx = hp && !UI.fz ? hp.hand.indexOf(id) : -1;
     const ty = tkey(id), selPos = UI.sel.indexOf(idx);
     const g = UI.prefs.hint && can ? gainOf(v, [id]) : null;
-    const key = 'c' + id, sg = [id, idx, selPos, rec.indexOf(id) >= 0 ? 1 : 0, can ? 1 : 0, g, UI.twin ? 1 : 0, hw, UI.prefs.tap2 ? 1 : 0].join('|');
+    const key = 'c' + id, sg = [id, idx, selPos, rec.indexOf(id) >= 0 ? 1 : 0, can ? 1 : 0, g, UI.twin ? 1 : 0, hw, UI.prefs.tap2 ? 1 : 0, ICONS[ty] && can ? rollWords(rollStand(v, [id]), 1) : ''].join('|');
     const o = oldC.get(key); if (o && o.dataset.sg === sg && !enter) { frag.push(o); return; }
     const b = h('button.hc' + (selPos >= 0 ? '.sel' : '') + (rec.indexOf(id) >= 0 ? '.rec' : '') + (can ? '' : '.locked'), { type: 'button', 'data-a': 'hcard', 'data-i': idx, 'data-id': id, 'data-owner': v, 'data-up': '1', 'aria-pressed': selPos >= 0 ? 'true' : 'false', 'aria-label': TY[ty].name + '. ' + TY[ty].ruleText + (can ? (UI.prefs.grab1 === false ? '. Tap to lift it' + (selPos >= 0 ? (UI.prefs.tap2 ? ', tap again to serve' : ', then press Serve') : '') : '. Tap to grab it') : '') });
     b.style.setProperty('--k', k);
     b.appendChild(cardNode(ty, hw));
-    if (g != null) b.appendChild(ty === 'pudding' ? h('span.gn.z', { title: 'Custard scores at the end of the game' }, pudLead(v) ? 'end +6' : 'end') : h('span.gn' + (g > 0 ? '' : '.z'), g > 0 ? '+' + g : zeroTag(v, ty)));
+    if (g != null) b.appendChild(ty === 'pudding' ? h('span.gn.z', { title: 'Custard scores at the end of the game' }, pudLead(v) ? 'end +6' : 'end') : (() => { if (ICONS[ty]) { const rr = rollStand(v, [id]); return h('span.gn.roll' + (rr.rank ? '' : '.z'), { title: 'Roll race if served: ' + rollWords(rr) }, rollWords(rr, true)); } return h('span.gn' + (g > 0 ? '' : '.z'), g > 0 ? '+' + g : zeroTag(v, ty)); })());
     if (UI.twin && selPos >= 0) b.appendChild(h('span.pn', String(selPos + 1)));
     if (enter) b.classList.add('ent-' + enter);
     b.dataset.rk = key; b.dataset.sg = sg;
@@ -8239,6 +8428,12 @@ function renderBelt() {
   UI.enter = '';
   belt.scrollLeft = sl;
   try { const s = belt.querySelector('.hc.sel') || belt.querySelector('.hc.rec'); if (s) { const bl = belt.getBoundingClientRect(), sr = s.getBoundingClientRect(); if (sr.left < bl.left) belt.scrollLeft += sr.left - bl.left - 8; else if (sr.right > bl.right) belt.scrollLeft += sr.right - bl.right + 8; } } catch (e) { }
+  // tutorial, after the round is counted: the empty belt shows the round result instead of a dark gap
+  if (tutOn() && UI.tutOver && G.rs && G.rs[0]) {
+    const rs = G.rs[0], order = G.players.map((p, s) => s).sort((a, b) => rs[b].total - rs[a].total);
+    belt.replaceChildren(h('div.kktp', h('b', 'Round 1 scored'), h('ol', ...order.map(s => h('li' + (s === v ? '.me' : ''), h('span.n', s === v ? 'You' : pname(s)), h('span.p', '+' + rs[s].total)))), h('div.kts', 'Custard waits until the meal ends.')));
+    return;
+  }
 }
 // would one more custard put this diner alone in front (worth +6 at the end of the game)?
 function pudLead(v) { const pc = pudCounts(); return pc.every((n, i) => i === v || n < pc[v] + 1) && !pc.every((n, i) => i === v || n < pc[v]); }
@@ -8293,7 +8488,7 @@ function placePrompt() {
 function renderDock() {
   const pr = $('#prompt'); if (pr) { const t = promptText(); pr.textContent = t; const v = viewSeat(); pr.className = canPick() && v >= 0 ? 'mine' : ''; try { decoratePrompt(); } catch (e) { console.error(e); } }
   renderLabActs();
-  const dt = document.querySelector('.gx-dt'); if (dt) dt.textContent = G.phase === 'over' ? 'Game over' : (canPick() ? 'Your turn' : 'Table');
+  const dt = document.querySelector('.gx-dt'); if (dt) dt.textContent = G.phase === 'over' && !(UI.fz && UI.fz.tables && !UI.fz.crown) ? 'Game over' : G.phase === 'over' ? 'Counting' : (canPick() ? 'Your turn' : 'Table');
   // round track
   const rt = $('#rt'); if (rt) { const re = UI.fz && (UI.fz.roundEnd || UI.fz.scoring); rt.innerHTML = KIT.roundTrackSVG(Math.min(re ? (G.phase === 'over' ? (G.len || D.rounds) : G.round - 1) : G.round, D.rounds), { size: isPh() ? 24 : 30 }); rt.appendChild(h('span', G.phase === 'over' && !re ? 'Final' : re ? 'Round scoring' : 'Turn ' + G.turn + ' of ' + G.hand + ' · hands pass on')); }
   // roster chips
@@ -8336,7 +8531,7 @@ function openGroup(seat, k) {
   const tab = tables(), info = seatScoreInfo(tab), gs = groupsOf(seat, tab, info).list, g = gs.find(x => x.k === k);
   const p = G.players[seat];
   let type, title, line;
-  if (k === 'pud') { type = 'pudding'; title = 'Custard Cups'; line = 'End: most +6, fewest −6'; }
+  if (k === 'pud') { type = 'pudding'; title = 'Custard Cups'; line = G && G.np === 2 ? 'End: most +6 (2 diners: no −6)' : 'End: most +6, fewest −6'; }
   else if (g) { type = g.k === 'roll' ? 'roll2' : g.type; title = g.k === 'roll' ? 'Seaweed Rolls' : g.on ? 'Fire Paste + ' + TY[g.on].name : TY[g.type].name + (g.n > 1 ? 's' : ''); line = /^= /.test(g.hint) ? 'Scores ' + g.hint.slice(2) + ' now' : g.hint.charAt(0).toUpperCase() + g.hint.slice(1); if (g.k === 'wasabi') line = 'Next nigiri scores triple'; if (g.k === 'chop') line = 'Later: grab two dishes'; }
   else return;
   UI.pop = { kind: 'group', seat, k }; clearTimeout(UI.popT); UI.popT = setTimeout(() => { if (UI.pop && UI.pop.k === k) closePop(); }, 3500);
@@ -8393,7 +8588,7 @@ function schedule() {
   if (UI.cards.length && !NET.on) return;
   const ai = KK.pending(G).filter(s => G.players[s].ai);
   if (ai.length) {
-    const d = AIDELAY <= 0 ? 0 : Math.round(AIDELAY * (.12 + .3 * Math.random()));
+    const d = AIDELAY <= 0 ? 0 : Math.round(AIDELAY * (.12 + .3 * Math.random()) * lateK());
     const tok = UI.seq; UI.tm = setTimeout(() => { if (tok === UI.seq) aiPick(ai[0]); }, d); return;
   }
   if (hotSeat()) hotNext();
@@ -8644,7 +8839,7 @@ function tallyPop(txt, from, to, cls) {
   const el = h('div.tpop' + (cls ? '.' + cls : ''), txt); el.style.left = Math.round(a.x) + 'px'; el.style.top = Math.round(a.y) + 'px'; document.body.appendChild(el);
   const dx = b ? b.x - a.x : 0, dy = b ? b.y - a.y : -26, f = UI.fast ? .35 : 1;
   const an = el.animate([{ transform: 'translate(-50%,-50%) scale(.4)', opacity: 0 }, { transform: 'translate(-50%,-80%) scale(1.3)', opacity: 1, offset: .28 }, { transform: 'translate(-50%,-60%) scale(1.05)', opacity: 1, offset: .5 },
-    { transform: 'translate(calc(-50% + ' + dx + 'px),calc(-50% + ' + dy + 'px)) scale(' + (b ? .55 : 1) + ')', opacity: b ? .95 : 0 }], { duration: 700 * f, easing: 'ease-in-out' });
+    { transform: 'translate(calc(-50% + ' + dx + 'px),calc(-50% + ' + dy + 'px)) scale(' + (b ? .4 : 1) + ')', opacity: 0 }], { duration: 700 * f, easing: 'ease-in-out' });
   return new Promise(res => { const done = () => { el.remove(); res(); }; an.onfinish = done; an.oncancel = done; setTimeout(done, 1500); });
 }
 // one tray element per (seat, kind of pile); a seat whose pile is not drawn (small tray) falls back to its counter
@@ -8668,7 +8863,7 @@ async function runTally(sc, last, tok) {
   const np = G.np, F = UI.fz, flights = [];
   UI.news = null; UI.fast = false; F.tally = new Array(np).fill(0); F.msg = 'Counting round ' + sc.round; render();
   const ok = () => tok === UI.seq && UI.rsOpen && UI.fz === F;
-  const bump = s => { const c = chipOf(s); if (!c) return; c.textContent = String(bankedOf(s) + F.tally[s]); if (ANIM && c.animate && !pxRM()) c.animate([{ transform: 'scale(1)' }, { transform: 'scale(1.6)' }, { transform: 'scale(1)' }], { duration: 300 }); snd('coin', { vol: .45 }); };
+  const bump = s => { const c = chipOf(s); if (!c) return; c.textContent = String(bankedOf(s) + F.tally[s]); if (ANIM && c.animate && !pxRM()) c.animate([{ transform: 'scale(1)' }, { transform: 'scale(1.22)' }, { transform: 'scale(1)' }], { duration: 300 }); snd('coin', { vol: .45 }); };
   const give = (s, el, v, z) => {
     z = z || !v;
     if (el && el.classList) el.classList.add(z ? 'tl0' : 'tl');
@@ -8702,12 +8897,14 @@ async function runTally(sc, last, tok) {
   }
   return true;
 }
+// on desktop the side panel stays clear: the popup layer covers only the board (--kkdock = panel width)
+function rsFit() { const rs = $('#rs'); if (!rs) return; rs.style.removeProperty('--kkdock'); const d = document.querySelector('.gx-dock'); if (!d || isPh()) return; const r = d.getBoundingClientRect(); if (r.width > 0 && r.left > innerWidth * .4) rs.style.setProperty('--kkdock', Math.round(innerWidth - r.left) + 'px'); }
 function rsBar(btns) {
-  const rs = $('#rs'); UI.rsOpen = true; rs.hidden = false;
+  const rs = $('#rs'); UI.rsOpen = true; rs.hidden = false; rsFit();
   rs.replaceChildren(h('div.rsbox.bar', { role: 'group', 'aria-label': 'Next' }, btns.map(b => h('button.btn' + (b.cls ? '.' + b.cls : ''), { type: 'button', 'data-a': b.a }, b.label))));
 }
 function showRound(sc, ge) {
-  const rs = $('#rs'); UI.rsOpen = true; rs.hidden = false; rs.innerHTML = '';
+  const rs = $('#rs'); rs.classList.remove('kkrnd'); UI.rsOpen = true; rs.hidden = false; rs.innerHTML = ''; rsFit();
   const last = G.phase === 'over', tok = UI.seq, F = UI.fz;
   UI.rsInfo = { sc, ge, skip: !ANIM, done: false, last };
   if (!(F && F.tables)) {   // online: the next round is already dealt, so there is no frozen table to count on
@@ -8727,8 +8924,23 @@ function showRound(sc, ge) {
     }
     F.msg = 'Round ' + sc.round + ' scored'; renderDock();
     rsBar([{ label: 'Next round', a: 'rsnext', cls: 'go' }]);
+    try { if (UI.mode !== 'tutorial') roundSummary(sc); } catch (e) { console.error(e); }
     try { document.querySelector('#rs [data-a=rsnext]').focus({ preventScroll: true }); } catch (e) { }
   })();
+}
+// after each real round: your points by dish, then every rival's total (one short panel above the Next button)
+function roundSummary(sc) {
+  const rs = $('#rs'), box = rs.querySelector('.rsbox'), v = viewSeat(), F = UI.fz; if (!box) return;
+  const tot = s => bankedOf(s) + (F && F.tally ? F.tally[s] : sc.seats[s].total);
+  const dish = [['Rolls', 'maki'], ['Prawns', 'tempura'], ['Fish', 'sashimi'], ['Buns', 'dumpling'], ['Nigiri', 'nigiri']];
+  const pts = (r, k) => (r[k] || 0) + (k === 'nigiri' ? (r.wasabi || 0) : 0);
+  const seats = G.players.map((p, s) => s).filter(s => s !== v), el = h('div.kkrsum');
+  if (v >= 0) {
+    const me = sc.seats[v], got = dish.filter(d => pts(me, d[1]));
+    el.appendChild(h('div.kmine', h('b', 'Round ' + sc.round + ': you +' + me.total), h('span.kd', got.length ? got.map(d => h('i', d[0] + ' ' + (pts(me, d[1]) > 0 ? '+' : '') + pts(me, d[1]))) : 'No points this round')));
+  } else el.appendChild(h('div.kmine', h('b', 'Round ' + sc.round + ' scored')));
+  el.appendChild(h('div.kriv', seats.map(s => h('span', h('b', pname(s)), ' ' + tot(s) + ' ', h('em', '+' + sc.seats[s].total)))));
+  box.insertBefore(el, box.firstChild); rs.classList.add('kkrnd');
 }
 function skipCount() { UI.fast = true; }
 // winners get a crown and a glow on their seat
@@ -8740,16 +8952,16 @@ function markWinners() {
 function breakdownEl(order, ws, v, tot) {
   const F = G.final, sum = (s, k) => G.rs.reduce((a, r) => a + (r[s][k] || 0), 0);
   const rows = [['Round 1', s => G.rs[0] ? G.rs[0][s].total : 0], ['Round 2', s => G.rs[1] ? G.rs[1][s].total : 0], ['Round 3', s => G.rs[2] ? G.rs[2][s].total : 0], null,
-    ['Rolls', s => sum(s, 'maki')], ['Prawns', s => sum(s, 'tempura')], ['Fish', s => sum(s, 'sashimi')], ['Buns', s => sum(s, 'dumpling')], ['Nigiri', s => sum(s, 'nigiri') + sum(s, 'wasabi')], null,
-    ['Custard', s => F.puddingPts[s], s => F.pudding[s] + ' cup' + (F.pudding[s] === 1 ? '' : 's')]];
+    ['Custard', s => F.puddingPts[s], s => F.pudding[s] + ' cup' + (F.pudding[s] === 1 ? '' : 's')], 'tot', 'by',
+    ['Roll race', s => sum(s, 'maki'), null, 1], ['Prawns', s => sum(s, 'tempura'), null, 1], ['Fish', s => sum(s, 'sashimi'), null, 1], ['Buns', s => sum(s, 'dumpling'), null, 1], ['Nigiri', s => sum(s, 'nigiri') + sum(s, 'wasabi'), null, 1]];
   const nm = s => s === v ? 'You' : pname(s), sg = n => n > 0 ? '+' + n : n < 0 ? '\u2212' + -n : '0';
   const head = h('tr', h('th'), ...order.map(s => h('th' + (ws.indexOf(s) >= 0 ? '.w' : ''), h('span.who', nm(s)), ws.indexOf(s) >= 0 ? h('span.cr', 'winner') : null)));
-  const body = rows.map(r => r ? h('tr', h('th', r[0]), ...order.map(s => { const n = r[1](s); return h('td' + (n < 0 ? '.neg' : n === 0 ? '.z' : ''), r[0] === 'Custard' ? sg(n) : String(n), r[2] ? h('small', r[2](s)) : null); })) : h('tr.sep', h('td', { colspan: order.length + 1 })));
   const tr = h('tr.tot', h('th', 'Total'), ...order.map(s => h('td' + (ws.indexOf(s) >= 0 ? '.w' : ''), String(tot[s]))));
-  return h('table.kkbd', { 'aria-label': 'Points by round, by dish and from custard' }, h('thead', head), h('tbody', body, tr));
+  const body = rows.map(r => r === 'tot' ? tr : r === 'by' ? h('tr.sep.by', h('th', { colspan: order.length + 1 }, 'Where the points came from')) : r ? h('tr' + (r[3] ? '.dsh' : ''), h('th', r[0]), ...order.map(s => { const n = r[1](s); return h('td' + (n < 0 ? '.neg' : n === 0 ? '.z' : ''), r[0] === 'Custard' ? sg(n) : String(n), r[2] ? h('small', r[2](s)) : null); })) : h('tr.sep', h('td', { colspan: order.length + 1 })));
+  return h('table.kkbd', { 'aria-label': 'Points by round and from custard, then by dish' }, h('thead', head), h('tbody', body));
 }
 function showFinal() {
-  const rs = $('#rs'); UI.rsOpen = true; rs.hidden = false;
+  const rs = $('#rs'); rs.classList.remove('kkrnd'); UI.rsOpen = true; rs.hidden = false; rsFit();
   const ws = G.winners || [], me = viewSeat(), iWin = me >= 0 && ws.includes(me);
   if (UI.fz) UI.fz.crown = true; UI.overShown = true; renderDock(); markWinners();
   const bs = NET.on ? netOverButtons() : [{ label: 'Play again', a: 'again', cls: 'go' }, { label: 'Menu', a: 'menu', cls: 'alt' }];
@@ -8759,15 +8971,15 @@ function showFinal() {
       const box = rs.querySelector('.rsbox');
       const ws2 = G.winners || [], v2 = viewSeat(), win = ws2.indexOf(v2) >= 0, tie = ws2.length > 1, rv = pname(ws2.find(s => s !== v2) != null ? ws2.find(s => s !== v2) : (v2 === 0 ? 1 : 0));
       const line = tie ? KK.STORY.quickResult.tie : (win ? KK.STORY.quickResult.win : KK.STORY.quickResult.lose).replace(/%R/g, rv);
-      const tot = G.final && G.final.totals ? G.final.totals : G.players.map(() => 0), order = G.players.map((p, s) => s).sort((a, b) => tot[b] - tot[a]);
-      box.insertBefore(h('div.kkres', h('div.kkr1', portraitEl(null, 44), h('div', h('b', winLine()), h('span', line))),
+      const tot = G.final && G.final.totals ? G.final.totals : G.players.map(() => 0), order = G.players.map((p, s) => (focusSeat() + s) % G.players.length), top = Math.max(...tot), tied = tot.filter(t => t === top).length > 1;
+      box.insertBefore(h('div.kkres', h('div.kkr1', portraitEl(null, 44), h('div', h('b', winLine()), h('span', line), (tied && ws2.length === 1) ? h('span.ktie', 'Tie on ' + top + ': ' + (ws2[0] === v2 ? 'you win' : pname(ws2[0]) + ' wins') + ' on more custard cups') : null)),
         breakdownEl(order, ws2, v2, tot)), box.firstChild); rs.classList.add('kkfin');
     }
   } catch (e) { console.error(e); }
   const humanWin = NET.on ? iWin : ws.some(s => G.players[s] && !G.players[s].ai);
   if (humanWin) { snd('win', { duck: true }); celebrate($('#rs')); } else snd('round', { duck: true });
   if (humans().length || NET.on) lsSet('kk_done', '1');
-  if (humanWin && UI.mode !== 'tutorial' && !UI.camp) lsSet('kk_won', '1');
+  if (humanWin && UI.mode !== 'tutorial' && !UI.camp) lsSet('kk_won', String(Math.min(9, (+lsGet('kk_won') || 0) + 1)));
   if (UI.mode !== 'net') lsSet('kk_save', '');
 }
 function celebrate(box) {
@@ -8775,7 +8987,7 @@ function celebrate(box) {
   for (let i = 0; i < 40; i++) { const e = h('i'); e.style.left = Math.round(Math.random() * 100) + '%'; e.style.background = cols[i % cols.length]; e.style.animationDelay = (Math.random() * 2) + 's'; e.style.animationDuration = (2 + Math.random() * 2) + 's'; c.appendChild(e); }
   $('#rs').appendChild(c); setTimeout(() => c.remove(), 6000);
 }
-function closeRS() { const rs = $('#rs'); rs.hidden = true; rs.innerHTML = ''; UI.rsOpen = false; clearTimeout(UI.rsT); }
+function closeRS() { const rs = $('#rs'); rs.classList.remove('kkrnd'); rs.hidden = true; rs.innerHTML = ''; UI.rsOpen = false; clearTimeout(UI.rsT); }
 // ===================== part 5: drawers (diners, log, rules, menu), start screen, events, phone mode, boot =====================
 function logHTML() { const e = h('div.logl'); for (let i = G.log.length - 1; i >= Math.max(0, G.log.length - 150); i--) e.appendChild(h('div.ll', h('span.lt', 'R' + G.log[i].round + '.' + G.log[i].turn), ' ' + G.log[i].t)); return e; }
 function buildRules() {
@@ -8806,7 +9018,7 @@ function buildRules() {
     ['Roll race', 'the Seaweed Roll contest: add up the roll icons on each counter. Most icons scores 6, second most 3.'],
     ['Nigiri', 'the Sunset, Moon and Sun plates. They score their number straight away.'],
     ['Fire Paste bonus', 'a nigiri served onto a waiting Fire Paste scores triple; the extra points show as this row on the score pad.'],
-    ['Custard', 'Custard Cups. They stay on your counter until the end of the meal, then most scores 6 and fewest loses 6.'],
+    ['Custard', 'Custard Cups. They stay on your counter until the end of the meal, then most scores 6 and fewest loses 6 (with 2 diners nobody loses).'],
     ['Last turn', 'the lines in the panel after every reveal: what each diner served and why their score went up or down.'],
     ['Live score', 'the number on each diner during a round: what their counter would score if the round ended now. The roll race can still change it.'],
     ['Order slip / score pad', 'the paper that adds up every diner\'s rounds and the custard at the end.'],
@@ -8910,7 +9122,7 @@ function dinerCard(c, o) {
   card.style.setProperty('--dc', pc.c);
   card.append(h('div.dtop', campPic(h('div.dimg', { html: avatarC(c, 120) }), c), h('h3', PN[c], h('small', on ? lv : 'not invited'))), h('div.dtx', h('p.story', d.story), h('p.enjoy', d.enjoy),
     h('div.drow', h('button.chipb.seatb' + (on ? '.on' : ''), { 'data-a': 'seatchef', 'data-c': c, type: 'button', 'aria-pressed': on ? 'true' : 'false' }, on ? 'At the table ✓' : 'Invite'),
-      on ? h('span.lvs', ['easy', 'normal', 'hard'].map(v => h('button.chipb' + (lv === v ? '.on' : ''), { 'data-a': 'lv', 'data-seat': c, 'data-v': v, type: 'button', 'aria-pressed': lv === v ? 'true' : 'false', 'aria-label': PN[c] + ' plays ' + v }, v))) : null)));
+      on ? h('span.lvs', ['easy', 'easy+', 'normal', 'hard'].map(v => h('button.chipb' + (lv === v ? '.on' : ''), { 'data-a': 'lv', 'data-seat': c, 'data-v': v, type: 'button', 'aria-pressed': lv === v ? 'true' : 'false', 'aria-label': PN[c] + ' plays ' + v }, v))) : null)));
   return card;
 }
 function setupEl() {
@@ -8994,7 +9206,8 @@ document.addEventListener('keydown', e => { if (e.key === 'Escape') { if (UI.pop
 // ---------- phone mode ----------
 function applyPhone() {
   const q = /[?&]phone=(\d)/.exec(location.search); const vm = GXV.now(), w = vm.w, hh = vm.h, short = Math.min(w, hh);
-  let ph = short <= 500 || (window.matchMedia && matchMedia('(pointer:coarse)').matches && short <= 600);
+  const coarse = window.matchMedia && matchMedia('(pointer:coarse)').matches;
+  let ph = (short <= 500 && (w < hh || w < 720)) || (coarse && short <= 600);
   if (q) ph = q[1] === '1';
   const r = document.documentElement.classList, was = r.contains('ph');
   r.toggle('ph', ph); if (UI.prefs.tap2 == null) UI.prefs.tap2 = !ph;   // phones: Serve button only by default (no accidental second tap)
@@ -9260,8 +9473,9 @@ function pxDrawSeat(o, s, R, Cr, me, ch) {
 function pxDrawBelt(Rz, Rw) {
   const g = PX.beltBg; g.clear(); g.rect(Rz.x, Rz.y, Rz.w, Rz.h).fill(0x2f1f1a); g.rect(Rz.x, Rz.y, Rz.w, 3).fill(0x1c1210);
   const ch = PX.hw ? PX.hw * 1.4 : 100, bh = Math.max(40, Math.min(Rw.h - 14, ch * .62)), by = Rw.y + Rw.h - bh - 6;
-  PX.belt.visible = true; PX.belt.x = Rw.x; PX.belt.y = by; PX.belt.width = Rw.w; PX.belt.height = bh; const k = bh / 128; PX.belt.tileScale.set(k, k);
-  PX.beltShade.clear(); PX.beltShade.rect(Rw.x, by - 4, Rw.w, 4).fill({ color: 0x000000, alpha: .35 }); PX.beltShade.rect(Rw.x, by + bh, Rw.w, 4).fill({ color: 0x000000, alpha: .3 });
+  const noBelt = document.documentElement.classList.contains('ph-p') || !document.querySelector('#belt .hc');   // F6: no sushi strip on a portrait phone (cut at the edge) or under an empty hand (scoring)
+  PX.belt.visible = !noBelt; PX.belt.x = Rw.x; PX.belt.y = by; PX.belt.width = Rw.w; PX.belt.height = bh; const k = bh / 128; PX.belt.tileScale.set(k, k);
+  PX.beltShade.clear(); if (!noBelt) { PX.beltShade.rect(Rw.x, by - 4, Rw.w, 4).fill({ color: 0x000000, alpha: .35 }); PX.beltShade.rect(Rw.x, by + bh, Rw.w, 4).fill({ color: 0x000000, alpha: .3 }); }
 }
 // ---- plates (groups on a counter): up to 3 stacked painted plates
 function pxPlateObj(key, s) {
@@ -9408,6 +9622,8 @@ function pxStepParts(dt) {
   }
   PX.parts = keep;
 }
+// calm (owner, Nov 2026): a waiting Fire Paste pulses and flames for 3 beats (about 4.2 s) after it lands, then rests; nothing loops
+function pxBeat(o) { if (!(o.pulse || o.kind !== 'plate')) { o.p0 = 0; return false; } if (!o.p0) o.p0 = PX.t || 1e-6; return PX.t - o.p0 < 4.2; }
 // ambient life: steam over buns, flames on waiting Fire Paste, a glint on paste + nigiri
 function pxAmbient(dt) {
   const q = PXQ[PX.q]; if (!q.fx || pxRM()) return;
@@ -9417,7 +9633,7 @@ function pxAmbient(dt) {
     const isPlate = o.kind === 'plate', d = isPlate ? o.d : o.w, cx = o.x + d / 2, cy = isPlate ? o.y + d / 2 : o.y + o.w * .55;
     const type = o.type; if (!type) continue;
     if (type === 'dumpling' && Math.random() < step * 2.2 * q.fx) pxPart('puff', cx + (Math.random() - .5) * d * .4, cy - d * .25, { vx: (Math.random() - .5) * 8, vy: -26 - Math.random() * 14, life: 1.4, s0: d / 160, s1: d / 70, a0: .55 });
-    if (type === 'wasabi' && !o.on && (o.pulse || !isPlate) && Math.random() < step * 3 * q.fx) pxPart('flame', cx + (Math.random() - .5) * d * .45, cy - d * .12, { vx: (Math.random() - .5) * 10, vy: -34 - Math.random() * 20, life: .55, s0: d / 90, s1: d / 260, a0: .9, noFilter: true });
+    if (type === 'wasabi' && !o.on && pxBeat(o) && Math.random() < step * 3 * q.fx) pxPart('flame', cx + (Math.random() - .5) * d * .45, cy - d * .12, { vx: (Math.random() - .5) * 10, vy: -34 - Math.random() * 20, life: .55, s0: d / 90, s1: d / 260, a0: .9, noFilter: true });
     if (type === 'wasabi' && o.on && Math.random() < step * 1.2 * q.fx) pxPart('spark', cx + (Math.random() - .5) * d * .6, cy + (Math.random() - .5) * d * .6, { life: .7, s0: .1, s1: d / 110, a0: 1, rot: 2, noFilter: true });
   }
 }
@@ -9455,7 +9671,7 @@ function pxFrame(ts) {
     } else if (o.kind === 'plate') {
       if (!o.detached && !o.flying && !o.busy) { o.x += (o.tx - o.x) * kf; o.y += (o.ty - o.y) * kf; o.w += (o.d - o.w) * kf; if (Math.abs(o.x - o.tx) > .4 || Math.abs(o.y - o.ty) > .4) moving = true; }
       if (o.s != null && o.s < 1 && !o.busy && !o.detached) { o.s += (1 - o.s) * kf; o.a += (1 - o.a) * kf; moving = true; }
-      const d = o.w, c = o.c, sq = o.sq || 0, pul = o.pulse && q.fx && !snap ? 1 + .05 * Math.sin(PX.t * 4.5) : 1;
+      const d = o.w, c = o.c, sq = o.sq || 0, pul = o.pulse && q.fx && !snap && pxBeat(o) ? 1 + .05 * Math.sin((PX.t - o.p0) * 4.5) : 1;
       c.x = o.x + d / 2; c.y = o.y + d / 2; c.alpha = (o.dim ? .45 : 1) * (o.a == null ? 1 : o.a) * (o.vis === 0 && !o.flying ? 0 : 1); c.rotation = o.rot || 0;
       const sc = (o.s == null ? 1 : o.s) * pul;
       const nL = Math.max(1, o.layers - (o.hideTop ? 1 : 0));
@@ -9541,7 +9757,7 @@ function tipTarget(tp) {
 }
 function placeTip() { const b = $('#tipb'); if (b) b.hidden = true; }   // no tip bubbles: the board and a ghost finger do the teaching
 // ---- press and hold a dish: read it (two short lines); drag it up onto the table: grab it
-const SHORT = { tempura: 'Pairs: two = 5', sashimi: 'Sets of three = 10', dumpling: '1, 3, 6, 10, 15 for 1-5 buns', roll1: 'Roll race: 1 icon', roll2: 'Roll race: 2 icons', roll3: 'Roll race: 3 icons', salmon: 'Nigiri: 2 (×3 on paste)', squid: 'Nigiri: 3 (×3 on paste)', egg: 'Nigiri: 1 (×3 on paste)', wasabi: 'Next nigiri ×3', chop: 'Later: grab two dishes', pudding: 'End: most +6, fewest −6' };
+const SHORT = { tempura: 'Pairs: two = 5', sashimi: 'Sets of three = 10', dumpling: '1, 3, 6, 10, 15 for 1-5 buns', roll1: 'Roll race: 1 icon', roll2: 'Roll race: 2 icons', roll3: 'Roll race: 3 icons', salmon: 'Nigiri: 2 (×3 on paste)', squid: 'Nigiri: 3 (×3 on paste)', egg: 'Nigiri: 1 (×3 on paste)', wasabi: 'Next nigiri ×3', chop: 'Later: grab two dishes', pudding: 'End: most +6, fewest −6 (not with 2 diners)' };
 function peekShow(b) {
   const id = +b.dataset.id; if (isNaN(id)) return; const k = tkey(id);
   let p = $('#peek'); if (!p) { p = h('div#peek', { 'aria-hidden': 'true' }); document.body.appendChild(p); }
@@ -9613,7 +9829,7 @@ function stageClear() { const s = $('#stage'); if (s) s.remove(); }
 const cap1 = t => t ? t.charAt(0).toUpperCase() + t.slice(1) : '';
 function revealCaption(sd, l) {
   const me = sd === viewSeat(), nm = me ? 'You' : pname(sd), served = l ? l.served : 'a dish', d = l ? l.d : 0;
-  return (me ? 'Your turn' : pname(sd) + '\'s turn') + '|' + nm + (me ? ' serve ' : ' serves ') + served + '.' + (d > 0 ? ' +' + d : '');
+  return (me ? 'Your dish' : pname(sd) + '\'s dish') + '|' + nm + (me ? ' serve ' : ' serves ') + served + '.' + (d > 0 ? ' +' + d : '');
 }
 async function stageReveal(picks, tok, gains) {
   stageClear();
@@ -9657,7 +9873,7 @@ async function stageReveal(picks, tok, gains) {
     pods.forEach((q, j) => q.pod.classList.toggle('cur', j === i)); if (UI.fz) UI.fz.msg = revealCaption(p.s, l); renderDock();
     snd('cloche'); covers[i].lift({ delay: 0 });   // lifts overlap; the pause below is the pace
     const why = l ? l.why.map(w => w.replace(/^[+\u2212]\d+ /, '')).join(' and ') : '';
-    const g = h('div.sgain' + (d < 0 ? '.neg' : d === 0 ? '.z' : '') + '.cur', d > 0 ? '+' + d : d < 0 ? '\u2212' + -d : '+0', h('small', d !== 0 && why ? why : 'no points yet'));
+    const g = h('div.sgain' + (d < 0 ? '.neg' : d === 0 ? '.z' : '') + '.cur', d > 0 ? '+' + d : d < 0 ? '\u2212' + -d : '+0', d !== 0 && why ? h('small', why) : null);   // R80: no caption at +0, and the caption wraps inside the card (skin.css)
     p.host.appendChild(g); p.pod.classList.add('done'); if (d > 0) snd('coin', { vol: .5 });
     await wait(560 * stp); if (tok !== UI.seq) return stageClear();
   }
@@ -9735,8 +9951,8 @@ function passDone() {
 }
 // ---- the guide card: a portrait and two short lines (the tutorial reaction beats, the quick game opening, the result)
 function portraitEl(who, px) {
-  const w = who || ST.guide, el = h('span.kkport', { style: 'width:' + px + 'px;height:' + px + 'px;background:' + w.color }, h('i', w.name.replace(/^Auntie /, '').charAt(0)));
-  const im = new Image(); im.alt = ''; im.src = MEDIA + w.portrait; im.onload = () => { el.appendChild(im); }; return el;
+  const w = who || ST.guide, el = h('span.kkport', { style: 'display:none;width:' + px + 'px;height:' + px + 'px;background:' + w.color });
+  const im = new Image(); im.alt = ''; im.src = MEDIA + w.portrait; im.onload = () => { el.appendChild(im); el.style.display = ''; }; return el;   // F6: no painted portrait = no disc (the bare letter read as a broken icon)
 }
 function guideSay(text, ms, who) {
   let g = $('#kkguide'); if (!g) { g = h('div#kkguide', { role: 'status', 'aria-live': 'polite' }); document.body.appendChild(g); }
@@ -9815,14 +10031,14 @@ const HLP_STEPS = {
   tally: { target: () => document.querySelector('#rs [data-a=rsnext]'), title: 'Round scored', text: 'Every set, roll race and nigiri was just counted. Tap for the next round.' }
 };
 const HLP_RULES = [
-  { phase: 'pick', title: 'Pick and pass', text: 'Everyone takes one dish at the same time. Then every hand passes to the next diner.', pic: HPIC.belt },
-  { phase: 'pick', title: 'Sets and buns', text: 'Two Prawns score 5, three Fish Slices 10. Steam Buns score 1, 3, 6, 10, then 15.', pic: () => HPIC.row(['tempura', 'sashimi', 'dumpling']) },
-  { phase: 'pick', title: 'Rolls and nigiri', text: 'Most roll icons score 6, second most 3. Nigiri score 1 to 3, tripled on Fire Paste.', pic: () => HPIC.row(['roll2', 'salmon', 'wasabi']) },
-  { phase: 'pick', title: 'Custard at the end', text: 'Custard Cups score only when the game ends: most scores 6, fewest loses 6.', pic: () => HPIC.card('pudding', 64) },
+  { title: 'Pick and pass', text: 'Everyone takes one dish at the same time. Then every hand passes to the next diner.', pic: HPIC.belt },
+  { title: 'Sets and buns', text: 'Two Prawns score 5, three Fish Slices 10. Steam Buns score 1, 3, 6, 10, then 15.', pic: () => HPIC.row(['tempura', 'sashimi', 'dumpling']) },
+  { title: 'Rolls and nigiri', text: 'Most roll icons score 6, second most 3. Nigiri score 1 to 3, tripled on Fire Paste.', pic: () => HPIC.row(['roll2', 'salmon', 'wasabi']) },
+  { title: 'Custard at the end', text: 'Custard Cups score only when the game ends: most scores 6, fewest loses 6 (not with 2 diners).', pic: () => HPIC.card('pudding', 64) },
   { phase: 'twin', title: 'Twin Sticks', text: 'Keep them on the table. On a later turn take two dishes from your hand at once.', pic: () => HPIC.card('chop', 64) },
   { phase: 'twin', title: 'How to use them', text: 'Tap the glowing sticks, then tap two dishes. The sticks return to the hand you pass.', pic: HPIC.belt },
   { phase: 'twin2', title: 'Two dishes', text: 'Tap two dishes from your hand. You take both, then the hand passes on.', pic: () => HPIC.row(['tempura', 'tempura']) },
-  { phase: 'twin2', title: 'Sticks go back', text: 'The Twin Sticks are put back into your hand, so the next diner can use them.', pic: () => HPIC.card('chop', 64) },
+  { phase: 'twin2', title: 'Sticks go back', text: 'The Twin Sticks ride back in the hand you pass. Whoever takes them can use them on a later turn.', pic: () => HPIC.card('chop', 64) },
   { phase: 'tally', title: 'Counting a round', text: 'Sets, rolls, buns and nigiri are scored now. Custard waits until the game ends.', pic: () => HPIC.row(['tempura', 'roll2', 'dumpling']) },
   { phase: 'tally', title: 'Three rounds', text: 'The meal lasts three rounds. The highest total after round three wins.', pic: () => HPIC.num(3) }
 ];
@@ -9842,19 +10058,31 @@ function hlpWhy(v, mv) {
   let t;
   if (k === 'tempura') t = g > 0 ? 'Pairs up with your Crispy Prawn:' + plus : 'Two Crispy Prawns score 5; you need a partner.';
   else if (k === 'sashimi') t = g > 0 ? 'Completes three Fish Slices:' + plus : 'Three Fish Slices score 10; this starts a set.';
-  else if (k === 'dumpling') t = 'Every Steam Bun scores more than the last.' + plus;
+  else if (k === 'dumpling') t = 'Each bun is worth more, up to five (15).' + plus;
   else if (k === 'roll1' || k === 'roll2' || k === 'roll3') t = 'Roll icons: the most this round scores 6.';
   else if (k === 'salmon' || k === 'squid' || k === 'egg') t = c.wasabiUnused > 0 ? 'Lands on your Fire Paste and scores triple:' + plus : TY[k].name + ' scores' + plus.replace(' now.', ' now.');
-  else if (k === 'wasabi') t = 'Fire Paste triples the next nigiri you take.';
+  else if (k === 'wasabi') { const n = G.players[v].hand.filter(i => NIG[tkey(i)]).length; t = n ? 'Triples your next nigiri; this hand has ' + n + '.' : 'Fire Paste triples the next nigiri you take.'; }
   else if (k === 'chop') t = 'Twin Sticks let you take two dishes later.';
-  else if (k === 'pudding') t = 'Custard Cups pay at the end: most scores 6.';
+  else if (k === 'pudding') t = 'Custard pays at the end: most +6, fewest loses 6 (3+ diners).';
   else t = 'The best dish for you right now.';
-  return hlpCap(t.replace(/:\s*\+/, ': +'), 15);
+  let alt = -1; try { const hd = G.players[v].hand; for (const o of hd) if (tkey(o) !== k) alt = Math.max(alt, gainOf(v, [o])); } catch (e) { }
+  if (g > 0 && alt >= 0) { const b = t.replace(/\s*\+\d+ now\.?$/, '').replace(/[:.]$/, ''); t = alt > g ? b + ': +' + g + ' now, sets up more.' : b + ': +' + g + ' now, next best +' + alt + '.'; }
+  else if (g === 0 && alt > 0) t = t.replace(/[.]$/, '') + ' (sets up a later score).';
+  return hlpCap(t.replace(/:\s*\+/, ': +'), 20);
+}
+// R82: never open with Fire Paste when there is no nigiri in this hand to land on it: take the next best dish by the same values
+function hlpSane(v, mv) {
+  if (mv.pick.length !== 1 || tkey(mv.ids[0]) !== 'wasabi') return mv;
+  if (G.players[v].hand.filter(i => NIG[tkey(i)]).length >= 2 && KK.tableCounts(G.players[v].table).wasabiUnused === 0) return mv;
+  try { const cx = KK.AI._.makeCtx(G, v), cs = KK.AI._.candidates(cx).filter(x => !x.pair && x.keys[0] !== 'wasabi').sort((a, b) => b.v - a.v);
+    const m = cs[0] && KK.moves(G, v).find(x => x.pick.join() === cs[0].pick.join()); if (m) return m; } catch (e) { }
+  return mv;
 }
 function hlpSuggest() {
   if (tutOn() || !G || !canPick() || UI.drag || UI.twin && UI.sel.length >= 2) return null;
   const v = viewSeat(); let mv; try { mv = KK.AI.choose(G, v, 'normal'); } catch (e) { return null; }
   if (!mv || !mv.pick || !mv.pick.length) return null;
+  mv = hlpSane(v, mv);
   const why = hlpWhy(v, mv), cardAt = i => () => document.querySelector('#belt .hc[data-i="' + i + '"]');
   if (mv.pick.length === 2 && !UI.twin) { if (!hlpSticks()) return null; return { why, key: mv.pick.join(','), target: hlpSticks }; }
   const idx = mv.pick.find(i => UI.sel.indexOf(i) < 0); if (idx == null || !document.querySelector('#belt .hc[data-i="' + idx + '"]')) return null;
@@ -9864,7 +10092,7 @@ let _hlpInit = false;
 function hlpInit() {
   if (_hlpInit || typeof GXH === 'undefined') return; _hlpInit = true;
   GXH.init({ game: 'kaiten-kitchen', defaultOn: false, steps: HLP_STEPS, rules: HLP_RULES, avoid: '#belt .hc[data-up="1"],#tbl .grp.usable,#rs .btn,#acts .btn,#labacts .lbtn' });
-  GXH.bulb({ el: '#bulbbtn', suggest: hlpSuggest, rulesFor: () => hlpPhase() || 'pick' });
+  GXH.bulb({ el: '#bulbbtn', suggest: hlpSuggest, rulesFor: hlpPhase });   // no '|| pick' fallback: the 450 ms tick calls GXH.phase(null) on a plain pick, which hides any bulb bubble tagged with a phase (R80 dead bulb). Phase null opens the plain-pick rules (phase-less cards below).
 }
 function hlpAfter() { hlpInit(); if (typeof GXH !== 'undefined') GXH.phase(hlpPhase()); }
 hlpInit(); setInterval(() => { try { hlpAfter(); } catch (e) { } }, 450);
@@ -9877,7 +10105,8 @@ const GOAL = {
   how: [
     ['tempura', 'Take one dish, then pass your hand on.'],
     ['sashimi', 'Dishes score in sets: two prawns make 5.'],
-    ['pudding', 'Custard counts at the end: most cups wins 6.']
+    ['pudding', 'Custard counts at the end: most cups wins 6, fewest loses 6 (3+ diners).'],
+    ['tempura', 'Plate tags: need N = N more scores a set; 1st +6 / tied 1st +3 = roll race; end +6 = custard; top 4 / behind = rank; grab 2 = Twin Sticks.']
   ]
 };
 function goalOpen() { return !!document.querySelector('#kkgoal.on'); }
@@ -9899,6 +10128,26 @@ document.addEventListener('click', e => { if (e.target.closest && e.target.close
 document.addEventListener('click', e => { const el = $('#toast'); if (el && el.classList.contains('on') && e.target.closest && e.target.closest('#toast')) { clearTimeout(toast.t); el.classList.remove('on'); } });
 // A short vibrate tick when a dish snaps onto your tray, and a softer one when you lift it.
 const buzz = ms => { try { if (navigator.vibrate && !pxRM()) navigator.vibrate(ms); } catch (e) { } };
+
+// ---- 1. no bubble is ever clipped: the shell places a bubble before the guide portrait / Next button are added, so clamp it into the screen afterwards (and on every resize)
+function kkFitBubbles() {
+  const vw = innerWidth, vh = innerHeight, m = 6;
+  document.querySelectorAll('.gxh-bub').forEach(b => {
+    if (!b.offsetWidth) return;
+    if (b.offsetWidth > vw - 2 * m) b.style.maxWidth = (vw - 2 * m) + 'px';
+    const w = b.offsetWidth, hh = b.offsetHeight, left = parseFloat(b.style.left) || 0, top = parseFloat(b.style.top) || 0;
+    const nl = Math.max(m, Math.min(vw - m - w, left)), nt = Math.max(0, Math.min(vh - m - hh, top));
+    if (nl !== left) {
+      b.style.left = Math.round(nl) + 'px';
+      const arr = b.querySelector('.gxh-arr'); if (arr && arr.style.left) arr.style.left = Math.round(Math.max(14, Math.min(w - 26, (parseFloat(arr.style.left) || 0) + left - nl))) + 'px';
+    }
+    if (nt !== top) b.style.top = Math.round(nt) + 'px';
+  });
+}
+new MutationObserver(() => { try { kkFitBubbles(); } catch (e) { } }).observe(document.body, { childList: true, subtree: true });
+addEventListener('resize', () => { setTimeout(kkFitBubbles, 120); setTimeout(kkFitBubbles, 500); });
+setInterval(() => { try { kkFitBubbles(); } catch (e) { } }, 300);
+
 // ===================== part 11: the tutorial (shell/gx-tutor.js): a staged one-round meal that teaches every rule by doing it once =====================
 // RULES CHECKLIST (from the rules drawer, the help-kit rules cards and rules-test.js); the step that teaches each one is in [brackets]:
 //  [goal]     the goal: most points wins; a meal is 3 rounds (the tutorial is one round); a tie goes to more Custard Cups [end]
@@ -9923,8 +10172,8 @@ function tutNode(cls, o) { const t = h('div'); t.innerHTML = tutBtn(cls, o); ret
 // ---------------------------------------------------------------- the script
 // [my picks, chef's picks] by turn. Types; a pair is two types in one turn (Twin Sticks).
 const TUT_ME = { 1: 'tempura', 2: 'tempura', 3: 'wasabi', 4: 'squid', 5: 'chop', 6: ['sashimi', 'sashimi'], 7: 'sashimi', 8: 'roll3', 9: 'dumpling', 10: 'pudding' };
-const TUT_CHEF = { 1: 'roll1', 2: 'sashimi', 3: 'dumpling', 4: 'dumpling', 5: 'salmon', 6: 'egg', 7: 'tempura', 8: 'tempura', 9: 'chop', 10: 'salmon' };
-const TUT_X = ['tempura', 'sashimi', 'dumpling', 'egg', 'wasabi', 'tempura', 'chop', 'salmon', 'dumpling', 'sashimi'];                       // hand X: odd turns for you, even turns for the chef
+const TUT_CHEF = { 1: 'roll1', 2: 'sashimi', 3: 'dumpling', 4: 'dumpling', 5: 'salmon', 6: 'egg', 7: 'tempura', 8: 'roll2', 9: 'chop', 10: 'salmon' };
+const TUT_X = ['tempura', 'sashimi', 'dumpling', 'egg', 'wasabi', 'roll2', 'chop', 'salmon', 'dumpling', 'sashimi'];                       // hand X: odd turns for you, even turns for the chef
 const TUT_Y = ['roll1', 'tempura', 'squid', 'sashimi', 'dumpling', 'roll3', 'salmon', 'sashimi', 'tempura', 'pudding'];                    // hand Y: even turns for you, odd turns for the chef
 var TUT = null;   // { me: {turn: [ids]}, chef: {turn: id} } once dealt
 function tutDeal(Gm) {
@@ -9971,18 +10220,16 @@ const pickStep = (id, t, title, say, extra) => Object.assign({ id, title, say, t
 const lookStep = (id, title, say, target, ready, extra) => Object.assign({ id, title, say, target, look: true, wait: { type: 'tap', match: a => a.what === 'look' && a.step === id }, ready }, extra || {});
 const shelfOrMe = () => tq('#tbl .seat.me .grp.shelf')() || tq('#tbl .seat.me .ctr')();
 // every rule id the tutorial must teach, in order (tut-walk.js checks each appears as a step)
-const TUT_RULES = ['goal', 'chef', 'pick1', 'passed', 'pick2', 'paste', 'nigiri', 'nigiriVals', 'sticksTake', 'sticksUse', 'twinA', 'twinB', 'fish3', 'roll', 'bun', 'custard', 'scoreSets', 'scoreRoll', 'rollTie', 'scoreNigiri', 'scoreChef', 'clear', 'rounds', 'custardEnd', 'penalty', 'custardTie', 'tieBreak'];
+const TUT_RULES = ['goal', 'pick1', 'passed', 'pick2', 'paste', 'nigiri', 'sticksTake', 'sticksUse', 'twinA', 'twinB', 'fish3', 'roll', 'bun', 'custard', 'scoreSets', 'rollTie', 'clear', 'custardEnd', 'penalty'];   // 19 steps; the chef, nigiri values, chef score, rounds, custard ties and tie-break ride inside these
 function tutStepsRaw() {
   const R = () => pname(1);
   return [
-    lookStep('goal', 'Your goal', 'Most points after three rounds wins the meal.', tq('#tbl .seat.me .av'), () => turnIs(1)),
-    lookStep('chef', 'The chef', () => R() + ' picks at the same time, by the same rules.', tq('#tbl .seat:not(.me) .av'), () => turnIs(1)),
+    lookStep('goal', 'Your goal', () => 'Most points after three rounds wins. ' + R() + ' plays by the same rules.', tq('#tbl .seat:not(.me) .av'), () => turnIs(1)),
     pickStep('pick1', 1, 'Take one dish', 'Each turn, take one dish. Nobody sees your pick.'),
-    lookStep('passed', 'Flip and pass', 'Picks flip together. Then the hands pass on.', tq('#belt'), () => turnIs(2)),
+    lookStep('passed', 'Flip and pass', 'Picks flipped together. Then the hands passed on.', tq('#belt'), () => turnIs(2), { side: 'top' }),
     pickStep('pick2', 2, 'A pair scores 5', 'Two Crispy Prawns make a pair: 5 points.'),
     pickStep('paste', 3, 'Fire Paste', 'Fire Paste triples the next nigiri you take.'),
-    pickStep('nigiri', 4, 'Nigiri on paste', 'Moon Nigiri is 3. On your Fire Paste it scores 9.'),
-    lookStep('nigiriVals', 'Nigiri values', 'Nigiri alone: Sun 1, Sunset 2, Moon 3.', trayStarts('pn-'), () => turnIs(5)),
+    pickStep('nigiri', 4, 'Nigiri on paste', 'Moon 3, Sunset 2, Sun 1; on Fire Paste, Moon scores 9.'),
     pickStep('sticksTake', 5, 'Twin Sticks', 'Twin Sticks let you take two dishes on a later turn.'),
     { id: 'sticksUse', title: 'Use the sticks', say: 'Tap your sticks: two dishes this turn.', target: tq('#tbl .seat.me .grp.usable'), wait: { type: 'tap', match: a => a.what === 'twin' }, ready: () => turnIs(6) && !!document.querySelector('#tbl .seat.me .grp.usable') && !UI.twin },
     { id: 'twinA', title: 'First dish', say: 'Three Fish Slices score 10. One or two score nothing.', target: () => beltCard(myPick(6)[0])(), wait: { type: 'tap', match: a => a.what === 'pick' && a.id === myPick(6)[0] }, ready: () => turnIs(6) && UI.twin && UI.sel.length === 0 },
@@ -9991,17 +10238,11 @@ function tutStepsRaw() {
     pickStep('roll', 8, 'Seaweed Rolls', 'Most roll icons scores 6. Second most scores 3.'),
     pickStep('bun', 9, 'Steam Buns', 'Steam Buns climb: 1, 3, 6, 10, then 15.'),
     pickStep('custard', 10, 'Custard Cup', 'Custard Cups stay on your table until the meal ends.'),
-    lookStep('scoreSets', 'Sets scored', () => 'Prawn pair ' + RS(0).tempura + ', Fish set ' + RS(0).sashimi + ', one bun ' + RS(0).dumpling + '.', tq('#tbl .seat.me .ctr'), tutDone, { pending: 'Counting the round' }),
-    lookStep('scoreRoll', 'Roll race', () => 'Your ' + RS(0).icons + ' icons beat ' + R() + '\'s ' + RS(1).icons + ': +' + RS(0).maki + ' for you.', myTray('roll'), tutDone),
-    lookStep('rollTie', 'Roll tie', 'A tie for most icons splits 6, and nobody gets second.', myTray('roll'), tutDone),
-    lookStep('scoreNigiri', 'Nigiri and paste', () => 'Moon Nigiri on Fire Paste: ' + (RS(0).nigiri + RS(0).wasabi) + ' points.', trayStarts('pn-'), tutDone),
-    lookStep('scoreChef', 'The chef scored', () => R() + ' scored ' + RS(1).total + '. A lone Fish Slice scores nothing.', tq('#tbl .seat:not(.me)'), tutDone),
-    lookStep('clear', 'Round over', 'After a round, every dish except custard leaves the table.', tq('#tbl .seat.me .ctr'), tutDone),
-    lookStep('rounds', 'Three rounds', 'A real meal has three rounds. Each round deals fresh hands.', tq('#tbl .seat.me .av'), tutDone),
-    lookStep('custardEnd', 'Custard counts', 'At the very end, most Custard Cups scores 6.', shelfOrMe, tutDone),
-    lookStep('penalty', 'Fewest cups', 'With three or more diners, fewest cups loses 6.', shelfOrMe, tutDone),
-    lookStep('custardTie', 'Custard ties', 'Custard ties split the points, rounded down.', shelfOrMe, tutDone),
-    lookStep('tieBreak', 'Equal totals', 'Equal totals? The diner with more Custard Cups wins.', tq('#tbl .seat.me .av'), tutDone)
+    lookStep('scoreSets', 'Sets scored', () => 'Pair ' + RS(0).tempura + ', Fish set ' + RS(0).sashimi + ', Moon on paste ' + (RS(0).nigiri + RS(0).wasabi) + ', one bun ' + RS(0).dumpling + '.', tq('#tbl .seat.me .ctr'), tutDone, { pending: 'Counting the round' }),
+    lookStep('rollTie', 'Roll tie', () => 'Tied at ' + RS(0).icons + ' icons: the 6 splits, +' + RS(0).maki + ' each, no second.', myTray('roll'), tutDone, { side: 'bottom' }),
+    lookStep('clear', 'Round over', () => R() + ' scored ' + RS(1).total + '. Only custard stays; three rounds make a meal.', tq('#tbl .seat.me .ctr'), tutDone, { side: 'top' }),
+    lookStep('custardEnd', 'Custard counts', 'Most Custard Cups scores 6 at the end. Ties split.', shelfOrMe, tutDone),
+    lookStep('penalty', 'Fewest cups', 'Fewest loses 6 with 3+ diners. Equal totals: more cups wins.', shelfOrMe, tutDone),
   ];
 }
 // titles and fixed sentences live in story.js (KK.STORY.tut); steps with live numbers keep their own sentence
@@ -10058,7 +10299,7 @@ if (typeof GXT !== 'undefined') { const r0 = GXT.running, s0 = GXT.state; GXT.ru
 function coachStop() { COACH.on = false; clearInterval(COACH.iv); clearTimeout(COACH.tm); COACH.q = []; COACH.cur = null; window.GXCOACH.running = false; guideHide(); }
 function coachSay(id, n) {
   if (COACH.seen[id] || !KK.STORY.coach[id]) return; COACH.seen[id] = 1; window.GXCOACH.explained.push(id);
-  const c = KK.STORY.coach[id]; COACH.q.push({ id, t: c.t.replace(/%n/g, n == null ? '' : n).replace(/%r/g, rivalName()), w: c.w }); coachPump();
+  const c = (G && G.np === 2 && KK.STORY.coach[id + '2p']) || KK.STORY.coach[id]; COACH.q.push({ id, t: c.t.replace(/%n/g, n == null ? '' : n).replace(/%r/g, rivalName()), w: c.w }); coachPump();
 }
 function rivalName() { return G ? pname(1) : 'Odile'; }
 function coachPump() {
@@ -10139,8 +10380,27 @@ function coachEnd() {
 // the final score pad is not shown in the tutorial: the table stays under the steps, and the end card closes it
 { const o = showFinal; showFinal = function () {
   if (UI.mode === 'coached') { UI.overShown = true; try { renderDock(); markWinners(); } catch (e) { } coachEnd(); return; }
-  if (UI.mode === 'tutorial') { const rs = $('#rs'); if (rs) { rs.hidden = true; rs.innerHTML = ''; } UI.overShown = true; UI.tutOver = true; try { renderDock(); markWinners(); } catch (e) { } return; }
+  if (UI.mode === 'tutorial') { const rs = $('#rs'); if (rs) { rs.hidden = true; rs.innerHTML = ''; } UI.overShown = true; UI.tutOver = true; try { renderDock(); renderBelt(); markWinners(); } catch (e) { } return; }
   return o.apply(this, arguments); }; }
+
+// ---- 2. tutorial: a step with nothing required (a "look" step) says Next, and a tap on its bubble moves on; the bulb is hidden while the tutorial runs
+function kkTutLook() { if (!tutOn()) return null; const st = GXT.current(); return st && st.look ? st : null; }
+function kkTutStepOn() { const st = kkTutLook(); if (st) GXT.act({ type: 'tap', what: 'look', step: st.id }); }
+function kkTutNext() {
+  const html = document.documentElement; html.classList.toggle('kktut', tutOn());
+  const st = kkTutLook(), b = document.querySelector('.gxt-bub'); if (!st || !b || b.querySelector('.kknext')) return;
+  const btn = h('button.gxh-ok.kknext', { type: 'button' }, 'Next');
+  btn.addEventListener('click', e => { e.stopPropagation(); e.preventDefault(); kkTutStepOn(); });
+  b.appendChild(h('div.gxh-row2', btn)); b.classList.add('kkhasnext');
+  b.querySelectorAll('[data-help]').length || b.setAttribute('data-help', '');
+  setTimeout(() => window.dispatchEvent(new Event('resize')), 0);   // the kit re-places the bubble now that it is taller
+}
+setInterval(() => { try { kkTutNext(); } catch (e) { } }, 150);
+window.addEventListener('click', e => {
+  const b = e.target && e.target.closest && e.target.closest('.gxt-bub'); if (!b || e.target.closest('.kknext')) return;
+  if (!kkTutLook()) return; e.stopPropagation(); e.preventDefault(); kkTutStepOn();
+}, true);
+
 // ===================== part 12: painted extras (unlocked card backs and table, end art) and music (per screen + the Music picker) =====================
 const MEDIA = 'media/';
 const unlAll = t => { try { return GXC.unlocked().filter(x => x.type === t).map(x => x.id).reverse(); } catch (e) { return []; } };

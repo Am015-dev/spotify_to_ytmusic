@@ -138,3 +138,11 @@
 }
 html.gx-reduce .gxc *,html.gx-noanim .gxc *{animation:none!important;transition:none!important}
 @media (prefers-reduced-motion:reduce){.gxc *{animation:none!important}}
+/* desktop: the campaign is a centred wide page, not a phone column */
+@media (min-width:1000px) and (orientation:landscape){
+  .gxc-screen{max-width:min(760px,64vw)}
+  .gxc-map-on .gxc-screen{max-width:min(960px,72vw)}
+  .gxc-path{max-width:min(860px,66vw)}
+  .gxc-sheet{max-width:min(760px,60vw)}
+  .gxc-lab{max-width:220px}
+}

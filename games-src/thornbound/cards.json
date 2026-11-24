@@ -37,16 +37,15 @@
  },
  "factions": {
   "nobility": {
-   "original_faction": "Nobility",
-   "name_new": "The Gilded Line",
+   "name_new": "The Salt Crown",
    "deck_total": 19,
    "deck_composition": "14 Basic (incl. Heir that starts in hand) + 5 Site-of-Power cards (advanced and HQ)",
    "site_of_power": [
     {
      "id": "nob_a1",
      "kind": "advanced",
-     "name_new": "Hand of the Regent",
-     "lore_cost": 2,
+     "name_new": "Salt Chancellor",
+     "lore_cost": 3,
      "copies": 1,
      "strength": 11,
      "archetype": "champion",
@@ -54,24 +53,24 @@
       "resilient"
      ],
      "commands": [],
-     "votes": 0,
-     "lore": 2,
-     "confidence": "confirmed (card image); trait/votes/lore icon reading as per icon_assumptions",
+     "votes": 1,
+     "lore": 1,
      "effects": [
       {
-       "timing": "passive",
-       "text": "When this card is used to steal a Kingdom Card, treat the Occupying card's Strength as 0.",
-       "ops": [
-        "when stealing_with(self): occupier.strength:=0"
-       ]
+       "timing": "card_text",
+       "text": "When this card steals a Kingdom Card, the occupier's Strength counts as half (rounded down)."
       }
-     ]
+     ],
+     "engine_fx": [
+      "stealHalf"
+     ],
+     "confidence": "new design (W489 rewrite); own text and numbers"
     },
     {
      "id": "nob_a2",
      "kind": "advanced",
-     "name_new": "Hall of Seats",
-     "lore_cost": 3,
+     "name_new": "Shifting Bench",
+     "lore_cost": 4,
      "copies": 1,
      "strength": 5,
      "archetype": "trader",
@@ -81,22 +80,22 @@
      "commands": [],
      "votes": 2,
      "lore": 0,
-     "confidence": "confirmed (card image); trait/votes/lore icon reading as per icon_assumptions",
      "effects": [
       {
-       "timing": "autumn_action",
-       "text": "If this card is in a Council, move it to a different Council.",
-       "ops": [
-        "if self.in_council: move(self,other_council)"
-       ]
+       "timing": "card_text",
+       "text": "Autumn, in a Council: move this card to another Council, then gain 1 Lore."
       }
-     ]
+     ],
+     "engine_fx": [
+      "hallseats"
+     ],
+     "confidence": "new design (W489 rewrite); own text and numbers"
     },
     {
      "id": "nob_a3",
      "kind": "advanced",
-     "name_new": "The Drowned Matriarch",
-     "lore_cost": 4,
+     "name_new": "Brine Queen",
+     "lore_cost": 3,
      "copies": 1,
      "strength": 10,
      "archetype": "heir",
@@ -107,27 +106,27 @@
      "commands": [
       {
        "name": "rally_self",
-       "timing": "autumn_action"
+       "x": 1
       }
      ],
-     "votes": 1,
-     "lore": 1,
-     "confidence": "confirmed (card image); trait/votes/lore icon reading as per icon_assumptions",
+     "votes": 2,
+     "lore": 0,
      "effects": [
       {
-       "timing": "on_acquire",
-       "text": "When you acquire this card, Govern with up to three of your cards from the Lost Pile and/or Discard Pile, each into a different Council.",
-       "ops": [
-        "govern_from(sources=[lost_pile,discard],max=3,distinct_councils=true)"
-       ]
+       "timing": "card_text",
+       "text": "When you acquire this card, Govern up to two cards from your Discard Pile, each into a different Council."
       }
-     ]
+     ],
+     "engine_fx": [
+      "acqGovern2"
+     ],
+     "confidence": "new design (W489 rewrite); own text and numbers"
     },
     {
      "id": "nob_a4",
      "kind": "advanced",
-     "name_new": "Ivory Rampart",
-     "lore_cost": 2,
+     "name_new": "Pan Bulwark",
+     "lore_cost": 3,
      "copies": 1,
      "strength": 3,
      "archetype": "war_machine",
@@ -137,137 +136,126 @@
      "commands": [
       {
        "name": "deploy",
-       "x": 1,
-       "timing": "autumn_action"
+       "x": 1
       }
      ],
      "votes": 0,
      "lore": 0,
-     "confidence": "confirmed (card image); trait/votes/lore icon reading as per icon_assumptions",
      "effects": [
       {
-       "timing": "autumn_action",
-       "text": "If you have two or more Supporters in this card's Region, place 1 influence token on this card (token is removed in Winter cleanup per Active-card rule).",
-       "ops": [
-        "if count(my.supporters in self.region)>=2: place_inf_on(self,1)"
-       ]
+       "timing": "card_text",
+       "text": "Autumn: with at least one of your Supporters in its Region, place 1 Influence token on it. Tokens leave in Winter."
       }
-     ]
+     ],
+     "engine_fx": [
+      "rampart"
+     ],
+     "confidence": "new design (W489 rewrite); own text and numbers"
     },
     {
      "id": "nob_hq",
      "kind": "hq",
-     "name_new": "Counting House",
-     "lore_cost": 3,
+     "name_new": "Salt Exchange",
+     "lore_cost": 4,
      "copies": 1,
      "effects": [
       {
-       "timing": "passive",
-       "text": "Your Faction Cards with no printed Votes gain +1 Vote.",
-       "ops": [
-        "my.cards.where(printed.votes==0).votes+=1"
-       ]
+       "timing": "card_text",
+       "text": "Your Followers gain +1 Vote. Action: return a Captain from Discard to Hand, OR gain 1 Influence. Last on the Order Track? Do both."
       }
      ],
-     "actions": [
-      {
-       "timing": "autumn_action",
-       "text": "Choose one: move one Captain from your Discard Pile to your Hand, OR gain 1 influence. If you are NOT first on the Order Track you may do both.",
-       "ops": [
-        "choose(a: move captain discard->hand, b: gain inf 1) ; if not first_on_order: allow both"
-       ]
-      }
+     "engine_fx": [
+      "counting"
      ],
      "placed_in": "supply",
-     "confidence": "confirmed (card image)"
+     "confidence": "new design (W489 rewrite); own text and numbers"
     }
    ],
    "tactics": [
     {
      "id": "nob_t1",
-     "name_new": "Doctrine of Masonry",
+     "name_new": "Salt Levy",
      "effect": {
       "timing": "spring_action",
-      "text": "Rest of the Round each of your Supporters gives +1 extra Strength (2 total). Winter-effect rider: this Round your Supporters on the Map stay on their Regions and are not moved to the Lost Pile.",
-      "ops": [
-       "supporters.strength:=2 until end_round",
-       "winter: skip supporters->lost_pile for me"
-      ]
+      "text": "This Round your Supporters give +1 extra Strength, up to +3 per Clash. In Winter your Supporters on the Map stay put."
      },
      "setup_markers": 0,
      "exhaust": "on_use",
-     "confidence": "confirmed (tile image)"
+     "confidence": "new design (W489 rewrite); own text and numbers"
     },
     {
      "id": "nob_t2",
-     "name_new": "Martial Writ",
+     "name_new": "Closed Gates",
      "effect": {
       "timing": "spring_action",
-      "text": "SETUP place 2 Faction Markers here. Remove a marker: choose a Region where you have an Active War Machine. Opponents may not swap, add or move Faction Cards into that Region during its first Clash this Round. Exhaust when all markers are gone.",
-      "ops": [
-       "remove marker",
-       "lock_region(region, first_clash, opponents:no swap/add/move cards)"
-      ]
+      "text": "Choose a Region where you have 2+ Supporters. Rivals cannot add, move or swap cards into it during its first Clash. Single use."
      },
-     "setup_markers": 2,
-     "exhaust": "when_markers_gone",
-     "confidence": "confirmed (tile image)"
+     "setup_markers": 1,
+     "exhaust": "when markers are gone",
+     "confidence": "new design (W489 rewrite); own text and numbers"
     },
     {
      "id": "nob_t3",
-     "name_new": "Crown's Edict",
+     "name_new": "Royal Audit",
      "effect": {
       "timing": "passive",
-      "text": "When resolving Bids, after all Bidding cards are revealed, immediately set each opponent's total Bidding Strength this Round to 0. (Single use then Exhausted.)",
-      "ops": [
-       "bid_resolve: opponents.bid_strength:=0"
-      ]
+      "text": "When Bids are revealed, halve each rival's Bidding Strength (rounded down) this Round. Single use."
      },
      "setup_markers": 0,
      "exhaust": "on_use",
-     "confidence": "confirmed (tile image)"
+     "confidence": "new design (W489 rewrite); own text and numbers"
     },
     {
      "id": "nob_t4",
-     "name_new": "Inquest",
+     "name_new": "Purge the Benches",
      "effect": {
       "timing": "autumn_action",
-      "text": "Choose a Council: discard all opponents' cards in it. Move any number of your cards in Councils to the top of your Deck, any order; gain 1 lore per card moved.",
-      "ops": [
-       "council(choice).opponent_cards->discard",
-       "my.council_cards->deck_top(any order); lore+=count"
-      ]
+      "text": "Choose a Council: discard all rivals' cards there. Then move up to two of your Council cards to your Deck top, 1 Lore each."
      },
      "setup_markers": 0,
      "exhaust": "on_use",
-     "confidence": "confirmed (tile image)"
+     "confidence": "new design (W489 rewrite); own text and numbers"
     }
    ],
    "favour_action": {
-    "name_new": "Sovereign Mandate",
+    "name_new": "Royal Grace",
     "effect": {
      "timing": "spring_action",
-     "text": "Choose one: gain 1 influence; OR for the rest of the Round your Heirs gain Invulnerable.",
-     "ops": [
-      "choose(inf+1 | my.heirs.gain(invulnerable) until end_round)"
-     ]
+     "text": "Choose one: gain 2 Lore, OR your Heirs gain Invulnerable this Round."
     }
    },
    "herald": 1,
    "supporters": 5,
-   "faction_markers": 10
+   "faction_markers": 10,
+   "short_new": "Salt Crown",
+   "blurb_new": "Salt-pan lords who hold ground and buy votes. Sturdy Followers, crowded Councils and slow, steady coin.",
+   "basic_names_new": [
+    "Salt Mirage",
+    "Brine Factor",
+    "Pan Rakers",
+    "Toll Boys",
+    "Dyke Wardens",
+    "Crystal Guard",
+    "Bitter Taster",
+    "Dune Lancers",
+    "Salt Ballista",
+    "Weir Captain",
+    "Pan Steward",
+    "Tide Marshal",
+    "Lord of Pans",
+    "Salt Heir"
+   ]
   },
   "clans": {
-   "original_faction": "Clans",
-   "name_new": "The Tidebound",
+   "name_new": "The Reedfolk",
    "deck_total": 19,
    "deck_composition": "14 Basic (incl. Heir that starts in hand) + 5 Site-of-Power cards (advanced and HQ)",
    "site_of_power": [
     {
      "id": "cln_a1",
      "kind": "advanced",
-     "name_new": "Verse-Keeper",
-     "lore_cost": 2,
+     "name_new": "Reed Herald",
+     "lore_cost": 3,
      "copies": 1,
      "strength": 11,
      "archetype": "champion",
@@ -277,54 +265,52 @@
      ],
      "commands": [],
      "votes": 0,
-     "lore": 2,
-     "confidence": "confirmed (card image); trait/votes/lore icon reading as per icon_assumptions",
+     "lore": 3,
      "effects": [
       {
-       "timing": "passive",
-       "text": "When this card is used to steal a Kingdom Card, treat the Occupying card's Strength as 0.",
-       "ops": [
-        "when stealing_with(self): occupier.strength:=0"
-       ]
+       "timing": "card_text",
+       "text": "When this card steals a Kingdom Card, the occupier's Strength counts as half (rounded down)."
       }
-     ]
+     ],
+     "engine_fx": [
+      "stealHalf"
+     ],
+     "confidence": "new design (W489 rewrite); own text and numbers"
     },
     {
      "id": "cln_a2",
      "kind": "advanced",
-     "name_new": "Torchbearer Raiders",
-     "lore_cost": 3,
+     "name_new": "Marsh Outriders",
+     "lore_cost": 2,
      "copies": 1,
      "strength": 3,
      "archetype": "cavalry",
      "traits": [],
      "commands": [
       {
-       "name": "flank",
-       "timing": "day_action"
+       "name": "flank"
       },
       {
-       "name": "deadly",
-       "timing": "night_effect"
+       "name": "deadly"
       }
      ],
      "votes": 0,
-     "lore": 0,
-     "confidence": "confirmed (card image); trait/votes/lore icon reading as per icon_assumptions",
+     "lore": 1,
      "effects": [
       {
-       "timing": "passive",
-       "text": "When this card Flanks, you may move any number of your Supporters from its current Region to the new Region.",
-       "ops": [
-        "on flank(self): move supporters(my, from=old_region,to=new_region,count<=any)"
-       ]
+       "timing": "card_text",
+       "text": "When this card Flanks, up to two of your Supporters may move with it to the new Region."
       }
-     ]
+     ],
+     "engine_fx": [
+      "flankSupp"
+     ],
+     "confidence": "new design (W489 rewrite); own text and numbers"
     },
     {
      "id": "cln_a3",
      "kind": "advanced",
-     "name_new": "Skyrunners",
+     "name_new": "Heron Lancers",
      "lore_cost": 5,
      "copies": 1,
      "strength": 11,
@@ -335,162 +321,135 @@
      ],
      "commands": [
       {
-       "name": "flank",
-       "timing": "day_action"
+       "name": "flank"
       }
      ],
      "votes": 0,
-     "lore": 2,
-     "confidence": "confirmed (card image); trait/votes/lore icon reading as per icon_assumptions",
+     "lore": 1,
      "effects": [
       {
-       "timing": "passive",
-       "text": "When you win a Clash in a Region where this card is Active, before claiming rewards, gain 1 influence.",
-       "ops": [
-        "on win_clash(region) and self.active_in(region): before rewards: gain inf 1"
-       ]
+       "timing": "card_text",
+       "text": "Win a Clash where this card is Active? Before rewards, gain 1 Influence and 1 Lore."
       }
-     ]
+     ],
+     "engine_fx": [
+      "skyrun"
+     ],
+     "confidence": "new design (W489 rewrite); own text and numbers"
     },
     {
      "id": "cln_hq1",
      "kind": "hq",
-     "name_new": "Roving Mission",
-     "lore_cost": 2,
+     "name_new": "Ferry Network",
+     "lore_cost": 3,
      "copies": 1,
      "effects": [
       {
-       "timing": "passive",
-       "text": "Your Traders gain Flank (Day).",
-       "ops": [
-        "my.traders.gain(flank)"
-       ]
-      },
-      {
-       "timing": "passive",
-       "text": "Whenever any of your cards are removed from a Council, you may move them to your Hand.",
-       "ops": [
-        "on remove_from_council(my card): optional move to hand"
-       ]
+       "timing": "card_text",
+       "text": "Traders and Ruses gain Flank. Cards leaving a Council may go to Hand. Action: move any Active Flank cards into one Council."
       }
      ],
-     "actions": [
-      {
-       "timing": "day_action",
-       "text": "Move any number of your Active cards that have Flank into a Council.",
-       "ops": [
-        "move(my.active.where(has flank),to=council(choice))"
-       ]
-      }
+     "engine_fx": [
+      "roving"
      ],
      "placed_in": "supply",
-     "confidence": "confirmed (card image)"
+     "confidence": "new design (W489 rewrite); own text and numbers"
     },
     {
      "id": "cln_hq2",
      "kind": "hq",
-     "name_new": "Haven Quay",
-     "lore_cost": 2,
+     "name_new": "Stilt Village",
+     "lore_cost": 3,
      "copies": 1,
      "effects": [
       {
-       "timing": "passive",
-       "text": "All your cards without Resilient gain Resilient.",
-       "ops": [
-        "my.cards.where(not resilient).gain(resilient)"
-       ]
+       "timing": "card_text",
+       "text": "All your cards gain Resilient. Action (Spring): move up to three Supporters from your Lost Pile to one Region."
       }
      ],
-     "actions": [
-      {
-       "timing": "spring_action",
-       "text": "Move up to two of your Supporters from the Lost Pile to a Region.",
-       "ops": [
-        "move_supporters(from=lost_pile,to=region(choice),max=2)"
-       ]
-      }
+     "engine_fx": [
+      "haven"
      ],
      "placed_in": "supply",
-     "confidence": "confirmed (card image)"
+     "confidence": "new design (W489 rewrite); own text and numbers"
     }
    ],
    "tactics": [
     {
      "id": "cln_t1",
-     "name_new": "Doctrine of Tempests",
+     "name_new": "Horn Call",
      "effect": {
       "timing": "spring_action",
-      "text": "You place the Clash Markers this Round (instead of last-placed player). For the rest of the Round, when a Region is resolved (before rewards) gain 1 influence if you have the most Supporters there and 1 lore if you have the most Active cards there.",
-      "ops": [
-       "override clash_marker_placer=me",
-       "per region before rewards: if most supporters: inf+1; if most active cards: lore+1"
-      ]
+      "text": "You place the Clash Markers this Round. Before rewards per Region: most Supporters gains 1 Influence and 1 Lore, most Active cards 1 Lore."
      },
      "setup_markers": 0,
      "exhaust": "on_use",
-     "confidence": "confirmed (tile image)"
+     "confidence": "new design (W489 rewrite); own text and numbers"
     },
     {
      "id": "cln_t2",
-     "name_new": "Open Waterways",
+     "name_new": "Hidden Fords",
      "effect": {
       "timing": "day_action",
-      "text": "SETUP 3 Faction Markers here. Remove a marker: choose one of your Active Heirs/Captains/War Machines in the current Region; it gains Flank for the rest of the Round. Exhaust when markers are gone.",
-      "ops": [
-       "marker-=1",
-       "give(flank, target=my.active.where(arch in [heir,captain,war_machine]) in region, until=end_round)"
-      ]
+      "text": "SETUP 2 markers. Remove one: an Active Heir, Captain or Follower of yours here gains Flank this Round. Exhaust when markers are gone."
      },
-     "setup_markers": 3,
-     "exhaust": "when_markers_gone",
-     "confidence": "confirmed (tile image)"
+     "setup_markers": 2,
+     "exhaust": "when markers are gone",
+     "confidence": "new design (W489 rewrite); own text and numbers"
     },
     {
      "id": "cln_t3",
-     "name_new": "Riverbank Raiders",
+     "name_new": "Reed Ambush",
      "effect": {
       "timing": "autumn_action",
-      "text": "Move an opponent's Occupied Kingdom Card to your Player Board and Occupy it with a card from your Hand.",
-      "ops": [
-       "steal_occupied_kc(any opp) ; occupy(with=hand card)"
-      ]
+      "text": "Take a rival's Kingdom Card whose occupier has Strength 8 or less. Occupy it with a card from your Hand."
      },
      "setup_markers": 0,
      "exhaust": "on_use",
-     "confidence": "confirmed (tile image)"
+     "confidence": "new design (W489 rewrite); own text and numbers"
     },
     {
      "id": "cln_t4",
-     "name_new": "Brine-Hardened",
+     "name_new": "Mud Recovery",
      "effect": {
       "timing": "autumn_action",
-      "text": "Choose any number of your cards that are Active and/or in your Discard Pile; move them to your Hand, up to your Hand Size.",
-      "ops": [
-       "move(my.active+discard, any n, ->hand, limit=hand_size)"
-      ]
+      "text": "Return up to four cards from your Discard or Lost Pile to your Hand, within your Hand Size."
      },
      "setup_markers": 0,
      "exhaust": "on_use",
-     "confidence": "confirmed (tile image)"
+     "confidence": "new design (W489 rewrite); own text and numbers"
     }
    ],
    "favour_action": {
-    "name_new": "Tide-Seer's Call",
+    "name_new": "Rising Waters",
     "effect": {
      "timing": "day_action",
-     "text": "Move your Herald to a Location in the current Region and move up to two of your Supporters from other Regions to the current Region.",
-     "ops": [
-      "move herald->location in current region",
-      "move supporters(from other regions, max 2)->current region"
-     ]
+     "text": "Move your Herald to a Location in the current Region. Then bring up to three Supporters here, from your board or other Regions."
     }
    },
    "herald": 1,
    "supporters": 5,
-   "faction_markers": 10
+   "faction_markers": 10,
+   "short_new": "Reedfolk",
+   "blurb_new": "Marsh riders of the reed beds. Fast Flanks, crowds of Supporters and a quick way home through the fords.",
+   "basic_names_new": [
+    "Reed Decoy",
+    "Ferry Trader",
+    "Marsh Pickets",
+    "Eel Catchers",
+    "Heron Watch",
+    "Reed Shields",
+    "Mud Stalker",
+    "Otter Riders",
+    "Punt Catapult",
+    "Fen Captain",
+    "Bog Chieftain",
+    "Mire Warlord",
+    "Stilt Lord",
+    "Reed Heir"
+   ]
   },
   "uprising": {
-   "original_faction": "Uprising",
    "name_new": "The Ember Guild",
    "deck_total": 19,
    "deck_composition": "14 Basic (incl. Heir that starts in hand) + 5 Site-of-Power cards (advanced and HQ)",
@@ -498,31 +457,31 @@
     {
      "id": "upr_a1",
      "kind": "advanced",
-     "name_new": "Firebrand Orator",
-     "lore_cost": 2,
+     "name_new": "Guild Firebrand",
+     "lore_cost": 3,
      "copies": 1,
      "strength": 11,
      "archetype": "champion",
      "traits": [],
      "commands": [],
-     "votes": 2,
+     "votes": 1,
      "lore": 2,
-     "confidence": "confirmed (card image); trait/votes/lore icon reading as per icon_assumptions",
      "effects": [
       {
-       "timing": "passive",
-       "text": "When this card is used to steal a Kingdom Card, treat the Occupying card's Strength as 0.",
-       "ops": [
-        "when stealing_with(self): occupier.strength:=0"
-       ]
+       "timing": "card_text",
+       "text": "When this card steals a Kingdom Card, the occupier's Strength counts as half (rounded down)."
       }
-     ]
+     ],
+     "engine_fx": [
+      "stealHalf"
+     ],
+     "confidence": "new design (W489 rewrite); own text and numbers"
     },
     {
      "id": "upr_a2",
      "kind": "advanced",
-     "name_new": "Cellar Fuse",
-     "lore_cost": 3,
+     "name_new": "Blast Charge",
+     "lore_cost": 4,
      "copies": 1,
      "strength": 5,
      "archetype": "agent",
@@ -532,23 +491,22 @@
      "commands": [],
      "votes": 0,
      "lore": 0,
-     "confidence": "confirmed (card image); trait/votes/lore icon reading as per icon_assumptions",
      "effects": [
       {
-       "timing": "night_effect",
-       "text": "Eliminate all opponent Heirs and Captains in the current Clash. If at least one card was Eliminated this way, choose one: gain 1 influence or gain 1 lore.",
-       "ops": [
-        "eliminate(opp.active.where(arch in [heir,captain]))",
-        "if eliminated>=1: choose(gain inf 1 | gain lore 1)"
-       ]
+       "timing": "card_text",
+       "text": "Night: Eliminate every rival Captain and Cavalry in this Clash. If any card was Eliminated this way, gain 1 Lore."
       }
-     ]
+     ],
+     "engine_fx": [
+      "cellar"
+     ],
+     "confidence": "new design (W489 rewrite); own text and numbers"
     },
     {
      "id": "upr_a3",
      "kind": "advanced",
-     "name_new": "Hedge Skirmishers",
-     "lore_cost": 5,
+     "name_new": "Soot Saboteurs",
+     "lore_cost": 4,
      "copies": 1,
      "strength": 5,
      "archetype": "agent",
@@ -557,164 +515,144 @@
      ],
      "commands": [
       {
-       "name": "ambush",
-       "timing": "day_action"
+       "name": "retreat"
       }
      ],
      "votes": 0,
      "lore": 0,
-     "confidence": "confirmed (card image); trait/votes/lore icon reading as per icon_assumptions",
      "effects": [
       {
-       "timing": "passive",
-       "text": "While this card is Active in a Clash, treat all printed information (except Strength) on opponents' non-Heir Faction Cards in the Region as blank.",
-       "ops": [
-        "blank(opp.cards.in_region.where(arch!=heir), printed, except=strength)"
-       ]
-      },
-      {
-       "timing": "night_effect",
-       "text": "If any opponent Heir is Active in the Clash, Eliminate this card.",
-       "ops": [
-        "if exists opp.active.heir in clash: eliminate(self)"
-       ]
+       "timing": "card_text",
+       "text": "While Active in a Clash, rival Captains, Champions and Cavalry count as blank except Strength. An opposing Heir in the Clash Eliminates this card."
       }
-     ]
+     ],
+     "engine_fx": [
+      "hedge"
+     ],
+     "confidence": "new design (W489 rewrite); own text and numbers"
     },
     {
      "id": "upr_hq1",
      "kind": "hq",
-     "name_new": "Smugglers' Hollow",
-     "lore_cost": 2,
+     "name_new": "Secret Foundry",
+     "lore_cost": 3,
      "copies": 1,
      "effects": [
       {
-       "timing": "passive",
-       "text": "This card acts as an additional space on which to Occupy a Kingdom Card.",
-       "ops": [
-        "occupy_slots+=1 (only for cards acquired via this card's action)"
-       ]
+       "timing": "card_text",
+       "text": "Extra space to Occupy a Kingdom Card. Action: acquire a face-up Great Road card with a Hand Captain, Champion or Agent. It stays here."
       }
      ],
-     "actions": [
-      {
-       "timing": "autumn_action",
-       "text": "Choose a face-up Kingdom Card on the Great Road; acquire it with a Captain or Champion from your Hand. A card acquired this way may only be Occupied on this card's space.",
-       "ops": [
-        "acquire(great_road.choice, bidder=hand.where(arch in [captain,champion]), slot=hq_slot)"
-       ]
-      }
+     "engine_fx": [
+      "hollow"
      ],
      "placed_in": "supply",
-     "confidence": "confirmed (card image)"
+     "confidence": "new design (W489 rewrite); own text and numbers"
     },
     {
      "id": "upr_hq2",
      "kind": "hq",
-     "name_new": "Underground Ring",
-     "lore_cost": 2,
+     "name_new": "Guild Ledger",
+     "lore_cost": 3,
      "copies": 1,
      "effects": [
       {
-       "timing": "passive",
-       "text": "Whenever you acquire a Kingdom Card, place a Faction Marker on the Council matching that card's Suit (max 2 per Council). Each marker gives +1 Vote in its Council. Abilities that remove cards from a Council can also remove your markers from Councils.",
-       "ops": [
-        "on acquire(kc): if markers[council(kc.suit)]<2: add_marker",
-        "council votes += markers"
-       ]
+       "timing": "card_text",
+       "text": "When you acquire a Kingdom Card, mark the Council of its Suit (max 1 each). Each marker is +1 Vote there."
       }
      ],
-     "actions": [],
+     "engine_fx": [
+      "ring"
+     ],
      "placed_in": "supply",
-     "confidence": "confirmed (card image)"
+     "confidence": "new design (W489 rewrite); own text and numbers"
     }
    ],
    "tactics": [
     {
      "id": "upr_t1",
-     "name_new": "Doctrine of Back Lanes",
+     "name_new": "Hot Iron",
      "effect": {
       "timing": "spring_action",
-      "text": "Your Heirs gain Deadly this Round. For the rest of the Round, whenever any of your cards Eliminate one or more cards, gain 1 influence and 1 lore.",
-      "ops": [
-       "my.heirs.gain(deadly) until end_round",
-       "on my_card eliminates>=1 : inf+1, lore+1 (until end_round)"
-      ]
+      "text": "Your Heirs gain Deadly this Round. Each time your cards Eliminate this Round, gain 2 Lore."
      },
      "setup_markers": 0,
      "exhaust": "on_use",
-     "confidence": "confirmed (tile image)"
+     "confidence": "new design (W489 rewrite); own text and numbers"
     },
     {
      "id": "upr_t2",
-     "name_new": "Hideouts",
+     "name_new": "Smoke Exits",
      "effect": {
       "timing": "day_action",
-      "text": "SETUP 3 Faction Markers here. Remove one marker: choose one of your Active cards in the current Clash; it gains Retreat until end of the Clash. Exhaust when markers are gone.",
-      "ops": [
-       "marker-=1",
-       "give(retreat,target=my.active in clash,until=end_clash)"
-      ]
+      "text": "SETUP 2 markers. Remove one: one of your Active cards in this Clash gains Retreat for the Round. Exhaust when markers are gone."
      },
-     "setup_markers": 3,
-     "exhaust": "when_markers_gone",
-     "confidence": "confirmed (tile image)"
+     "setup_markers": 2,
+     "exhaust": "when markers are gone",
+     "confidence": "new design (W489 rewrite); own text and numbers"
     },
     {
      "id": "upr_t3",
-     "name_new": "Midnight Pressure",
+     "name_new": "Work Stoppage",
      "effect": {
       "timing": "spring_action",
-      "text": "Each opponent discards a card from their Hand for each Kingdom Card you Occupy.",
-      "ops": [
-       "for each opp: discard hand card x occupied_kc_count(me)"
-      ]
+      "text": "If you Occupy a Kingdom Card, each rival discards 1 Hand card, or 2 if you Occupy two or more."
      },
      "setup_markers": 0,
      "exhaust": "on_use",
-     "confidence": "confirmed (tile image)"
+     "confidence": "new design (W489 rewrite); own text and numbers"
     },
     {
      "id": "upr_t4",
-     "name_new": "Forged Dispatches",
+     "name_new": "False Orders",
      "effect": {
       "timing": "spring_action",
-      "text": "Choose an opponent; swap the positions of two of their face-down Faction Cards next to Regions. You may repeat this with any number of other opponents.",
-      "ops": [
-       "swap_facedown(opponent X, two cards) ; repeatable for other opponents"
-      ]
+      "text": "Up to two rivals: swap two of their face-down cards next to Regions. You see the cards you swapped."
      },
      "setup_markers": 0,
      "exhaust": "on_use",
-     "confidence": "confirmed (tile image)"
+     "confidence": "new design (W489 rewrite); own text and numbers"
     }
    ],
    "favour_action": {
-    "name_new": "Watchers in the Wall",
+    "name_new": "Spyglass",
     "effect": {
      "timing": "spring_action",
-     "text": "Look at all face-down cards in one Region. You may swap one of your face-down cards in any Region with either one of your Occupying cards or a card from your Hand.",
-     "ops": [
-      "peek(region facedown)",
-      "optional swap(my facedown any region, with=occupier or hand card)"
-     ]
+     "text": "Look at all face-down cards in two Regions. You may swap one of your face-down cards with a Hand card."
     }
    },
    "herald": 1,
    "supporters": 5,
-   "faction_markers": 10
+   "faction_markers": 10,
+   "short_new": "Ember Guild",
+   "blurb_new": "Smiths and stokers plotting in the forges. Deadly irons, smoke screens and knowing what rivals hide.",
+   "basic_names_new": [
+    "Smoke Screen",
+    "Coal Broker",
+    "Bellows Crew",
+    "Ash Sweepers",
+    "Anvil Hands",
+    "Forge Guard",
+    "Slag Knife",
+    "Cinder Riders",
+    "Kiln Engine",
+    "Furnace Boss",
+    "Guild Steward",
+    "Hammer Marshal",
+    "Master Smith",
+    "Ember Heir"
+   ]
   },
   "gathering": {
-   "original_faction": "Gathering",
-   "name_new": "The Pale Vigil",
+   "name_new": "The Hollow Synod",
    "deck_total": 19,
    "deck_composition": "14 Basic (incl. Heir that starts in hand) + 5 Site-of-Power cards (advanced and HQ)",
    "site_of_power": [
     {
      "id": "gth_a1",
      "kind": "advanced",
-     "name_new": "Veil Carver",
-     "lore_cost": 2,
+     "name_new": "Synod Inquisitor",
+     "lore_cost": 3,
      "copies": 1,
      "strength": 11,
      "archetype": "champion",
@@ -722,24 +660,24 @@
       "resilient"
      ],
      "commands": [],
-     "votes": 1,
-     "lore": 2,
-     "confidence": "confirmed (card image); trait/votes/lore icon reading as per icon_assumptions",
+     "votes": 2,
+     "lore": 1,
      "effects": [
       {
-       "timing": "passive",
-       "text": "When this card is used to steal a Kingdom Card, treat the Occupying card's Strength as 0.",
-       "ops": [
-        "when stealing_with(self): occupier.strength:=0"
-       ]
+       "timing": "card_text",
+       "text": "When this card steals a Kingdom Card, the occupier's Strength counts as half (rounded down)."
       }
-     ]
+     ],
+     "engine_fx": [
+      "stealHalf"
+     ],
+     "confidence": "new design (W489 rewrite); own text and numbers"
     },
     {
      "id": "gth_a2",
      "kind": "advanced",
-     "name_new": "Whisperer of Names",
-     "lore_cost": 2,
+     "name_new": "Keeper of Seals",
+     "lore_cost": 3,
      "copies": 1,
      "strength": 5,
      "archetype": "captain",
@@ -747,26 +685,24 @@
       "invulnerable"
      ],
      "commands": [],
-     "votes": 1,
-     "lore": 0,
-     "confidence": "confirmed (card image); trait/votes/lore icon reading as per icon_assumptions",
+     "votes": 0,
+     "lore": 1,
      "effects": [
       {
-       "timing": "autumn_action",
-       "text": "If this card is in a Council, place a Faction Marker on any Council. While this card is in a Council, each marker on a Council counts as 1 Vote. When this card is removed from a Council you may move it to the Lost Pile.",
-       "ops": [
-        "if self.in_council: add_marker(any_council)",
-        "passive: markers on councils = 1 vote each while self in council",
-        "on remove_from_council(self): optional move lost_pile"
-       ]
+       "timing": "card_text",
+       "text": "Autumn, in a Council: seal another Council. While this is in a Council, each seal is 1 Vote. Leaving, it may go to Hand."
       }
-     ]
+     ],
+     "engine_fx": [
+      "whisperer"
+     ],
+     "confidence": "new design (W489 rewrite); own text and numbers"
     },
     {
      "id": "gth_a3",
      "kind": "advanced",
-     "name_new": "Rite of the Fang",
-     "lore_cost": 3,
+     "name_new": "Relic Theft",
+     "lore_cost": 5,
      "copies": 1,
      "strength": 5,
      "archetype": "cavalry",
@@ -776,23 +712,22 @@
      "commands": [],
      "votes": 0,
      "lore": 0,
-     "confidence": "confirmed (card image); trait/votes/lore icon reading as per icon_assumptions",
      "effects": [
       {
-       "timing": "day_action",
-       "text": "Burn one of your cards in the Lost Pile. Until the end of the Round this card adds the Burned card's printed Strength, Traits, Commands and rules text to its own.",
-       "ops": [
-        "burn(my lost_pile card X)",
-        "self.copy_printed(X, additive, until=end_round)"
-       ]
+       "timing": "card_text",
+       "text": "Day: burn a card from your Discard Pile. Until end of Round, this card adds its Strength, Traits, Commands and text."
       }
-     ]
+     ],
+     "engine_fx": [
+      "fang"
+     ],
+     "confidence": "new design (W489 rewrite); own text and numbers"
     },
     {
      "id": "gth_a4",
      "kind": "advanced",
-     "name_new": "Rite of the Watcher",
-     "lore_cost": 4,
+     "name_new": "Vow of Smallness",
+     "lore_cost": 3,
      "copies": 1,
      "strength": 3,
      "archetype": "agent",
@@ -802,127 +737,116 @@
      "commands": [],
      "votes": 0,
      "lore": 0,
-     "confidence": "confirmed (card image); trait/votes/lore icon reading as per icon_assumptions",
      "effects": [
       {
-       "timing": "passive",
-       "text": "If this card is Active in the current Clash, the player with the lowest total Strength above 0 wins the Clash instead of the player with the highest.",
-       "ops": [
-        "if self.active_in(clash): winner=min(total_strength>0) (instead of max)"
-       ]
+       "timing": "card_text",
+       "text": "While Active in a Clash, the lowest total Strength of 4 or more wins instead of the highest."
       }
-     ]
+     ],
+     "engine_fx": [
+      "watcher"
+     ],
+     "confidence": "new design (W489 rewrite); own text and numbers"
     },
     {
      "id": "gth_hq",
      "kind": "hq",
-     "name_new": "Threshold Gate",
-     "lore_cost": 2,
+     "name_new": "Hidden Cloister",
+     "lore_cost": 3,
      "copies": 1,
      "effects": [
       {
-       "timing": "passive",
-       "text": "When you acquire this card, place three Faction Markers here.",
-       "ops": [
-        "on_acquire: markers=3"
-       ]
+       "timing": "card_text",
+       "text": "Place three seal markers here when acquired. Action: remove one; an Active card gains Ambush this Clash. Remove another to Ambush from your Discard Pile."
       }
      ],
-     "actions": [
-      {
-       "timing": "day_action",
-       "text": "Remove a marker from here to give one of your Active cards in the current Clash Ambush until end of Round. You may then remove one more marker so that card Ambushes with a card from your Discard Pile instead of your Hand.",
-       "ops": [
-        "markers-=1; give(active card,ambush,until=end_round)",
-        "optional markers-=1: ambush source=discard"
-       ]
-      }
+     "engine_fx": [
+      "gate"
      ],
      "placed_in": "supply",
-     "confidence": "confirmed (card image)"
+     "confidence": "new design (W489 rewrite); own text and numbers"
     }
    ],
    "tactics": [
     {
      "id": "gth_t1",
-     "name_new": "Doctrine of Starlight",
+     "name_new": "Toll of Bells",
      "effect": {
       "timing": "day_action",
-      "text": "Move two of your Supporters from the current Region to the Lost Pile. If you do, move one of your cards from the Lost Pile to the current Region (it becomes Active).",
-      "ops": [
-       "supporters(2,current region)->lost_pile",
-       "if done: my lost_pile card->active in current region"
-      ]
+      "text": "Send two of your Supporters here to the Lost Pile. Then bring your Lost Pile card of Strength 6 or less here, Active."
      },
      "setup_markers": 0,
      "exhaust": "on_use",
-     "confidence": "confirmed (tile image)"
+     "confidence": "new design (W489 rewrite); own text and numbers"
     },
     {
      "id": "gth_t2",
-     "name_new": "Night Gleaners",
+     "name_new": "Alms Sifting",
      "effect": {
       "timing": "spring_action",
-      "text": "Shuffle the Kingdom Discard face-down and look at five random cards from it. Acquire one of them with a card from your Hand. Return the rest to the Kingdom Discard.",
-      "ops": [
-       "shuffle kdiscard; reveal 5 to me",
-       "acquire(one,with=hand card)",
-       "return rest"
-      ]
+      "text": "Look at four random Kingdom Discard cards. Acquire one with a Hand card, or take none and gain 1 Lore."
      },
      "setup_markers": 0,
      "exhaust": "on_use",
-     "confidence": "confirmed (tile image)"
+     "confidence": "new design (W489 rewrite); own text and numbers"
     },
     {
      "id": "gth_t3",
-     "name_new": "Beyond the Lamp-Line",
+     "name_new": "Silent Passage",
      "effect": {
       "timing": "day_action",
-      "text": "Swap the positions of two of your Active cards.",
-      "ops": [
-       "swap_positions(my.active x2)"
-      ]
+      "text": "Move one of your Active cards to another unresolved Region, then gain 1 Lore."
      },
      "setup_markers": 0,
      "exhaust": "on_use",
-     "confidence": "confirmed (tile image)"
+     "confidence": "new design (W489 rewrite); own text and numbers"
     },
     {
      "id": "gth_t4",
-     "name_new": "Offering",
+     "name_new": "Ash Vigil",
      "effect": {
       "timing": "autumn_action",
-      "text": "Move up to three of your cards that are Active and/or in your Discard Pile to the Lost Pile; gain 1 lore for each. Then you may move a card from your Discard Pile to your Hand.",
-      "ops": [
-       "move(my.active+discard,max 3)->lost_pile; lore+=n",
-       "optional discard->hand x1"
-      ]
+      "text": "Send up to four of your Active or Discard cards to the Lost Pile. Gain 1 Lore for each."
      },
      "setup_markers": 0,
      "exhaust": "on_use",
-     "confidence": "confirmed (tile image)"
+     "confidence": "new design (W489 rewrite); own text and numbers"
     }
    ],
    "favour_action": {
-    "name_new": "Moon-Herald's Boon",
+    "name_new": "Quiet Return",
     "effect": {
      "timing": "autumn_action",
-     "text": "Move one of your Active cards in the Region where your Herald is to your Hand.",
-     "ops": [
-      "move(my.active in region(herald)) ->hand x1"
-     ]
+     "text": "Return one Active card in your Herald's Region to your Hand, then gain 1 Lore."
     }
    },
    "herald": 1,
    "supporters": 5,
-   "faction_markers": 10
+   "faction_markers": 10,
+   "short_new": "Hollow Synod",
+   "blurb_new": "A silent order that hoards relics and vows. Cards come back from loss, Councils fill with seals, small strength can win.",
+   "basic_names_new": [
+    "Empty Shroud",
+    "Candle Seller",
+    "Hush Pilgrims",
+    "Wick Bearers",
+    "Ash Novices",
+    "Cloister Guard",
+    "Quiet Needle",
+    "Owl Riders",
+    "Bell Wagon",
+    "Abbey Warden",
+    "Grey Abbess",
+    "Night Prior",
+    "Hierophant",
+    "Veiled Heir"
+   ]
   }
  },
  "basic_deck_per_faction": {
   "copies_each": 1,
   "cards_per_faction": 14,
-  "note": "Rulebook: every faction's 14 Basic cards are identical in function (cosmetic differences only). Verified numerically for 2 factions fully/partially + all 4 factions' Heir (10).",
+  "note": "Every faction's 14 Basic cards share the same numbers (names differ per faction, see factions.*.basic_names_new).",
   "cards": [
    {
     "slot": 1,
@@ -934,22 +858,15 @@
     ],
     "commands": [
      {
-      "name": "ambush",
-      "timing": "day_action",
-      "note": "either Ambush OR Retreat (choose per activation)"
-     },
-     {
-      "name": "retreat",
-      "timing": "day_action"
+      "name": "ambush_or_retreat"
      }
     ],
     "votes": 0,
-    "lore": 0,
+    "lore": 1,
     "starts_in_hand": false,
     "effect": null,
-    "confidence": "confirmed numbers (card image); trait icon->name mapping ASSUMPTION high",
-    "note": "Ruse has Ambush OR Retreat: one printed option block with 'OR' between.",
-    "note2": "Votes/Lore of slot 1 and 9: no icons printed -> 0."
+    "confidence": "new design (W489 rewrite); own text and numbers",
+    "text_new": "Day: Ambush OR Retreat."
    },
    {
     "slot": 2,
@@ -959,15 +876,16 @@
     "traits": [],
     "commands": [
      {
-      "name": "rally_any_two",
-      "timing": "autumn_action"
+      "name": "rally",
+      "x": 3
      }
     ],
     "votes": 2,
-    "lore": 2,
+    "lore": 1,
     "starts_in_hand": false,
     "effect": null,
-    "confidence": "confirmed numbers (card image); trait icon->name mapping ASSUMPTION high"
+    "confidence": "new design (W489 rewrite); own text and numbers",
+    "text_new": "Autumn: Rally (up to three)."
    },
    {
     "slot": 3,
@@ -979,10 +897,11 @@
     ],
     "commands": [],
     "votes": 0,
-    "lore": 1,
+    "lore": 2,
     "starts_in_hand": false,
     "effect": null,
-    "confidence": "confirmed numbers (card image); trait icon->name mapping ASSUMPTION high"
+    "confidence": "new design (W489 rewrite); own text and numbers",
+    "text_new": ""
    },
    {
     "slot": 4,
@@ -993,11 +912,12 @@
      "invulnerable"
     ],
     "commands": [],
-    "votes": 0,
-    "lore": 1,
+    "votes": 1,
+    "lore": 0,
     "starts_in_hand": false,
     "effect": null,
-    "confidence": "confirmed numbers (card image); trait icon->name mapping ASSUMPTION high"
+    "confidence": "new design (W489 rewrite); own text and numbers",
+    "text_new": ""
    },
    {
     "slot": 5,
@@ -1008,11 +928,12 @@
      "invulnerable"
     ],
     "commands": [],
-    "votes": 0,
+    "votes": 1,
     "lore": 1,
     "starts_in_hand": false,
     "effect": null,
-    "confidence": "confirmed numbers (card image); trait icon->name mapping ASSUMPTION high"
+    "confidence": "new design (W489 rewrite); own text and numbers",
+    "text_new": ""
    },
    {
     "slot": 6,
@@ -1024,10 +945,11 @@
     ],
     "commands": [],
     "votes": 0,
-    "lore": 1,
+    "lore": 2,
     "starts_in_hand": false,
     "effect": null,
-    "confidence": "confirmed numbers (card image); trait icon->name mapping ASSUMPTION high"
+    "confidence": "new design (W489 rewrite); own text and numbers",
+    "text_new": ""
    },
    {
     "slot": 7,
@@ -1037,11 +959,10 @@
     "traits": [],
     "commands": [
      {
-      "name": "deadly",
-      "timing": "night_effect"
+      "name": "deadly"
      }
     ],
-    "votes": 2,
+    "votes": 1,
     "lore": 1,
     "starts_in_hand": false,
     "effect": {
@@ -1051,7 +972,8 @@
       "night: if exists opp.active.follower in clash: eliminate(self)"
      ]
     },
-    "confidence": "confirmed numbers (card image); trait icon->name mapping ASSUMPTION high"
+    "confidence": "new design (W489 rewrite); own text and numbers",
+    "text_new": "Deadly (Night). Drawback: at Night, an Active rival Follower Eliminates this card."
    },
    {
     "slot": 8,
@@ -1063,15 +985,15 @@
     ],
     "commands": [
      {
-      "name": "flank",
-      "timing": "day_action"
+      "name": "flank"
      }
     ],
     "votes": 1,
-    "lore": 1,
+    "lore": 0,
     "starts_in_hand": false,
     "effect": null,
-    "confidence": "confirmed numbers (card image); trait icon->name mapping ASSUMPTION high"
+    "confidence": "new design (W489 rewrite); own text and numbers",
+    "text_new": "Day: Flank."
    },
    {
     "slot": 9,
@@ -1084,15 +1006,15 @@
     "commands": [
      {
       "name": "deploy",
-      "x": 1,
-      "timing": "autumn_action"
+      "x": 1
      }
     ],
     "votes": 0,
-    "lore": 0,
+    "lore": 1,
     "starts_in_hand": false,
     "effect": null,
-    "confidence": "confirmed numbers (card image); trait icon->name mapping ASSUMPTION high"
+    "confidence": "new design (W489 rewrite); own text and numbers",
+    "text_new": "Autumn: Deploy (1)."
    },
    {
     "slot": 10,
@@ -1104,10 +1026,11 @@
     ],
     "commands": [],
     "votes": 1,
-    "lore": 1,
+    "lore": 2,
     "starts_in_hand": false,
     "effect": null,
-    "confidence": "confirmed numbers (card image); trait icon->name mapping ASSUMPTION high"
+    "confidence": "new design (W489 rewrite); own text and numbers",
+    "text_new": ""
    },
    {
     "slot": 11,
@@ -1119,10 +1042,11 @@
     ],
     "commands": [],
     "votes": 1,
-    "lore": 1,
+    "lore": 0,
     "starts_in_hand": false,
     "effect": null,
-    "confidence": "confirmed numbers (card image); trait icon->name mapping ASSUMPTION high"
+    "confidence": "new design (W489 rewrite); own text and numbers",
+    "text_new": ""
    },
    {
     "slot": 12,
@@ -1133,11 +1057,12 @@
      "pathfinder"
     ],
     "commands": [],
-    "votes": 1,
+    "votes": 0,
     "lore": 1,
     "starts_in_hand": false,
     "effect": null,
-    "confidence": "confirmed numbers (card image); trait icon->name mapping ASSUMPTION high"
+    "confidence": "new design (W489 rewrite); own text and numbers",
+    "text_new": ""
    },
    {
     "slot": 13,
@@ -1148,11 +1073,12 @@
      "pathfinder"
     ],
     "commands": [],
-    "votes": 1,
+    "votes": 0,
     "lore": 1,
     "starts_in_hand": false,
     "effect": null,
-    "confidence": "confirmed numbers (card image); trait icon->name mapping ASSUMPTION high"
+    "confidence": "new design (W489 rewrite); own text and numbers",
+    "text_new": ""
    },
    {
     "slot": 14,
@@ -1166,80 +1092,81 @@
     "commands": [
      {
       "name": "rally_self",
-      "timing": "autumn_action"
+      "x": 1
      }
     ],
-    "votes": 1,
-    "lore": 1,
+    "votes": 2,
+    "lore": 0,
     "starts_in_hand": true,
     "effect": null,
-    "confidence": "confirmed numbers (card image); trait icon->name mapping ASSUMPTION high"
+    "confidence": "new design (W489 rewrite); own text and numbers",
+    "text_new": "Autumn: Rally (self)."
    }
   ],
   "names_new_by_faction": {
    "nobility": [
-    "Decoy Pennon",
-    "Steward of Coin",
-    "Gate Servants",
-    "Scullery Hands",
-    "Estate Wardens",
-    "Stonewarders",
-    "Poison Physician",
-    "Pasture Lancers",
-    "Rampart Engine",
-    "Keeper of the Sluice",
-    "Seneschal",
-    "Warden-General",
-    "Lord Marshal",
-    "Heir of the Long Dusk"
+    "Salt Mirage",
+    "Brine Factor",
+    "Pan Rakers",
+    "Toll Boys",
+    "Dyke Wardens",
+    "Crystal Guard",
+    "Bitter Taster",
+    "Dune Lancers",
+    "Salt Ballista",
+    "Weir Captain",
+    "Pan Steward",
+    "Tide Marshal",
+    "Lord of Pans",
+    "Salt Heir"
    ],
    "clans": [
-    "Mist Totem",
-    "Dockside Broker",
-    "Shoreline Watchers",
-    "Net Menders",
-    "Hearth Priestesses",
-    "Shield Daughters",
-    "Silent Harpoon",
-    "Ice Sledge Riders",
-    "Sailing Hall",
-    "Steppe Prophetess",
-    "Rune-Reader",
-    "Deep Sleeper",
-    "Fist of the Fells",
-    "Sea-Mother Heir"
+    "Reed Decoy",
+    "Ferry Trader",
+    "Marsh Pickets",
+    "Eel Catchers",
+    "Heron Watch",
+    "Reed Shields",
+    "Mud Stalker",
+    "Otter Riders",
+    "Punt Catapult",
+    "Fen Captain",
+    "Bog Chieftain",
+    "Mire Warlord",
+    "Stilt Lord",
+    "Reed Heir"
    ],
    "uprising": [
-    "Paper Mask",
-    "Back-Alley Chemist",
-    "Picket Line",
-    "Leaflet Runners",
-    "Dockhands' Union",
-    "Barricade Crew",
-    "Rooftop Knife",
-    "Courier Cavalry",
-    "Printing-Press Rig",
-    "Night Ferry Captain",
-    "Foundry Steward",
-    "Strike Marshal",
-    "Smoke-Lane Pilot",
-    "Masked Heir"
+    "Smoke Screen",
+    "Coal Broker",
+    "Bellows Crew",
+    "Ash Sweepers",
+    "Anvil Hands",
+    "Forge Guard",
+    "Slag Knife",
+    "Cinder Riders",
+    "Kiln Engine",
+    "Furnace Boss",
+    "Guild Steward",
+    "Hammer Marshal",
+    "Master Smith",
+    "Ember Heir"
    ],
    "gathering": [
-    "Hollow Effigy",
-    "Moon Apothecary",
-    "Wandering Sleepers",
-    "Lantern Carriers",
-    "Dream Acolytes",
-    "Vigil Keepers",
-    "Whisper Blade",
-    "Antler Riders",
-    "Procession Carriage",
-    "Antlered Warden",
-    "Oracle of Stars",
-    "Moth Priest",
-    "Pale Stag-King",
-    "Unveiled Heir"
+    "Empty Shroud",
+    "Candle Seller",
+    "Hush Pilgrims",
+    "Wick Bearers",
+    "Ash Novices",
+    "Cloister Guard",
+    "Quiet Needle",
+    "Owl Riders",
+    "Bell Wagon",
+    "Abbey Warden",
+    "Grey Abbess",
+    "Night Prior",
+    "Hierophant",
+    "Veiled Heir"
    ]
   }
  },
@@ -1247,7 +1174,7 @@
   "regions": [
    {
     "id": "highlands",
-    "name_new": "The Uplands",
+    "name_new": "The North Reach",
     "order": 0,
     "locations": [
      "castle",
@@ -1256,7 +1183,7 @@
    },
    {
     "id": "plateau",
-    "name_new": "The Tablelands",
+    "name_new": "The Crossroads",
     "order": 1,
     "locations": [
      "harvest_field",
@@ -1265,7 +1192,7 @@
    },
    {
     "id": "lowlands",
-    "name_new": "The Sinks",
+    "name_new": "The South Weald",
     "order": 2,
     "locations": [
      "shrine",
@@ -1277,84 +1204,65 @@
    {
     "id": "castle",
     "region": "highlands",
-    "name_new": "Spire Court",
-    "influence": 1,
+    "name_new": "Bell Tower",
+    "influence": 2,
     "extra": {
      "timing": "on_claim",
-     "text": "Govern with one of your cards that is Active or in Hand; if you do, discard every other card at the chosen Council (including your own).",
-     "ops": [
-      "govern(source=active_or_hand,count=1)",
-      "if_governed: discard_all_other_cards_in(chosen_council)"
-     ]
+     "text": "Govern with one Active or Hand card. If you do, discard every other card in that Council, including your own."
     },
-    "confidence": "confirmed (publisher card library image, read privately)"
+    "confidence": "new design (W489 rewrite); own text and numbers"
    },
    {
     "id": "wilderness",
     "region": "highlands",
-    "name_new": "Thornwild",
-    "influence": 1,
+    "name_new": "Standing Stones",
+    "influence": 0,
     "extra": {
      "timing": "on_claim",
-     "text": "Journey with one card that is Active or in Hand.",
-     "ops": [
-      "journey(source=active_or_hand,count=1)"
-     ]
+     "text": "Journey with one Active or Hand card and gain 1 extra Lore."
     },
-    "confidence": "confirmed (publisher card library image, read privately)"
+    "confidence": "new design (W489 rewrite); own text and numbers"
    },
    {
     "id": "harvest_field",
     "region": "plateau",
-    "name_new": "Gleaning Meadow",
-    "influence": 1,
+    "name_new": "Market Cross",
+    "influence": 0,
     "extra": {
      "timing": "on_claim",
-     "text": "Claim the Favour disc (take it from the board or from its holder; if already yours, reset its uses to 3).",
-     "ops": [
-      "claim_favour()"
-     ]
+     "text": "Claim the Favour disc from the board or its holder. If already yours, reset its uses to 3."
     },
-    "confidence": "confirmed (publisher card library image, read privately)"
+    "confidence": "new design (W489 rewrite); own text and numbers"
    },
    {
     "id": "battlefield",
     "region": "plateau",
-    "name_new": "Cairn Field",
-    "influence": 2,
+    "name_new": "Broken Shield",
+    "influence": 3,
     "extra": null,
-    "confidence": "confirmed (publisher card library image, read privately)"
+    "confidence": "new design (W489 rewrite); own text and numbers"
    },
    {
     "id": "shrine",
     "region": "lowlands",
-    "name_new": "Moss Altar",
+    "name_new": "Wishing Well",
     "influence": 1,
     "extra": {
      "timing": "on_claim",
-     "text": "Move up to three cards (Active and/or in Hand) to the bottom of your Deck, in any order.",
-     "ops": [
-      "move_to_deck_bottom(sources=[active,hand],max=3,order=player_choice)"
-     ]
+     "text": "Put up to two Active or Hand cards at your Deck bottom."
     },
-    "confidence": "confirmed (publisher card library image, read privately)"
+    "confidence": "new design (W489 rewrite); own text and numbers"
    },
    {
     "id": "necropolis",
     "region": "lowlands",
-    "name_new": "Ossuary",
+    "name_new": "Ash Heap",
     "influence": 1,
     "extra": {
      "timing": "on_claim",
-     "text": "Shuffle your Discard Pile into a face-down pile, then draw up to three cards from it (hand-limit rules apply); you may then discard any number of cards from Hand.",
-     "ops": [
-      "shuffle(discard)",
-      "draw_to_hand(count=3,from=discard)?",
-      "optional discard(hand,any)"
-     ]
+     "text": "Shuffle your Discard Pile. Draw up to two cards from it, within Hand Size. Then you may discard any Hand cards."
     },
-    "confidence": "confirmed (publisher card library image, read privately)",
-    "note": "ASSUMPTION on exact flow: text is 'Shuffle your Discard Pile and draw up to three cards. You may discard any number of cards from your Hand.' Whether the shuffled pile becomes a new Deck or the draw is from the Discard Pile is not fully clear from the card alone; a reasonable reading is: shuffle the Discard Pile and draw three from it, leaving the rest as Discard (face-down)."
+    "confidence": "new design (W489 rewrite); own text and numbers"
    }
   ],
   "adjacency": "NONE - the map has no adjacency or movement graph. Three horizontal Regions (rows), two Locations each. Heralds are placed on any Location; Supporters on any Region; cards next to any Region. Only 'Flank' etc. move things between Regions, and any unresolved Region is a legal target.",
@@ -1364,23 +1272,23 @@
   {
    "id": "relics",
    "suit": "relics",
-   "name_new": "Council of Coin",
-   "benefit": "When you claim your Herald Reward you may remove any number of your cards/markers here; gain influence equal to total Votes removed (extra to the Herald Reward's own gain). Cards go to Discard; markers to Supply. A card/marker worth 2+ votes must be removed whole.",
+   "name_new": "Purse Council",
+   "benefit": "With your Herald Reward, you may cash in your cards or markers here: gain 1 Influence per Vote, at most 3. Cards go to Discard.",
    "kind": "modifier_on_herald_reward"
   },
   {
    "id": "secrets",
    "suit": "secrets",
-   "name_new": "Council of Whispers",
-   "benefit": "Action (Autumn): place Faction Markers from Supply equal to your Votes here onto Locations of your choice (any split). Any Location with 4+ of your markers: remove them all and resolve that Location's Reward ignoring its influence value (Location text only, no Herald Reward). Markers persist round to round. Need >=1 vote to use.",
+   "name_new": "Veil Council",
+   "benefit": "Action (Autumn): place one marker per Vote here on Locations. At 5+ of your markers, clear them and take that reward, without Influence.",
    "kind": "autumn_action",
    "timing": "autumn_action"
   },
   {
    "id": "oaths",
    "suit": "oaths",
-   "name_new": "Council of Pledges",
-   "benefit": "Action (Autumn): move Supporters from Map and/or Lost Pile to your Player Board equal to your Votes here; +1 extra if you have strictly the most Votes here (need >=1 vote).",
+   "name_new": "Bond Council",
+   "benefit": "Action (Autumn): return Supporters from the Map or Lost Pile to your board, as many as your Votes here, at least 2.",
    "kind": "autumn_action",
    "timing": "autumn_action"
   }
@@ -1388,1010 +1296,925 @@
  "kingdom_cards": [
   {
    "suit": "relics",
-   "name_new": "Roaming Company",
+   "name_new": "Wayfarer Camp",
    "copies": 1,
    "placement": "player_board_occupied",
    "effects": [
     {
      "timing": "passive",
-     "text": "All your cards gain Pathfinder. Your Active cards also count as being in your Hand for the purposes of Journeying.",
+     "text": "You may Journey with your Active cards. A Journey from the board gives 1 extra Lore.",
      "ops": [
-      "my.cards.gain(pathfinder)",
-      "journey source includes my.active"
+      "see engine.js kc1"
      ]
     }
    ],
    "on_acquire": null,
-   "confidence": "confirmed (card image, read privately)",
+   "confidence": "own design (rewritten Nov 2026)",
    "id": "kc01"
   },
   {
    "suit": "relics",
-   "name_new": "Statue Wrights",
+   "name_new": "Marble Gallery",
    "copies": 1,
    "placement": "player_board_occupied",
    "effects": [
     {
      "timing": "spring_action",
-     "text": "Gain 1 influence if you have a card in any Council. If you have a card in each of the three Councils you may discard this card to gain 2 more influence.",
+     "text": "Spring: with cards in two Councils, gain 1 Influence. With cards in all three, you may discard this for 2 more.",
      "ops": [
-      "if my cards in any council: inf+1",
-      "if in all 3: optional discard(self); inf+2"
+      "see engine.js kc2"
      ]
     }
    ],
    "on_acquire": null,
-   "confidence": "confirmed (card image, read privately)",
+   "confidence": "own design (rewritten Nov 2026)",
    "id": "kc02"
   },
   {
    "suit": "relics",
-   "name_new": "Paper Diadems",
+   "name_new": "Ribbon Charter",
    "copies": 1,
    "placement": "player_board_occupied",
    "effects": [
     {
      "timing": "passive",
-     "text": "If you are first on the Order Track, your Followers gain +1 Vote; if you are not first, they gain +2 Votes.",
+     "text": "Your Followers and Cavalry gain +1 Vote.",
      "ops": [
-      "followers.votes += (1 if first_on_order else 2)"
+      "see engine.js kc3"
      ]
     }
    ],
    "on_acquire": null,
-   "confidence": "confirmed (card image, read privately)",
+   "confidence": "own design (rewritten Nov 2026)",
    "id": "kc03"
   },
   {
    "suit": "relics",
-   "name_new": "Veiled Patron",
+   "name_new": "Hidden Granary",
    "copies": 1,
    "placement": "supply",
    "effects": [
     {
      "timing": "passive",
-     "text": "Bold: Discard your Bidding card; place this card in your Supply. Passive: when resolving Attrition, instead of reducing Hand Size you may/must discard this card (it absorbs one Attrition).",
+     "text": "Bold: discard your bid; put this in your Supply. It absorbs one Attrition, then you gain 1 Lore and discard it.",
      "ops": [
-      "on_acquire: discard(bidding card); place in supply",
-      "on attrition: discard self INSTEAD of hand_size-=1"
+      "see engine.js kc4"
      ]
     }
    ],
    "on_acquire": "discard_bid_card; place_in_supply",
-   "confidence": "confirmed (card image, read privately)",
+   "confidence": "own design (rewritten Nov 2026)",
    "id": "kc04"
   },
   {
    "suit": "relics",
-   "name_new": "Sentinel Towers",
+   "name_new": "Ward Towers",
    "copies": 1,
    "placement": "player_board_occupied",
    "effects": [
     {
      "timing": "passive",
-     "text": "+5 Strength to your Bidding card and Occupying cards. When you are the first to resolve your Bid, gain 1 influence. Bold: you may not steal Kingdom Cards.",
+     "text": "+3 Strength to your bid and your occupiers. First to resolve a Bid? Gain 1 Lore. You may not steal.",
      "ops": [
-      "my bidding_card.str+=5; my occupying cards.str+=5",
-      "if first_to_resolve_bid: inf+1",
-      "steal_forbidden"
+      "see engine.js kc5"
      ]
     }
    ],
    "on_acquire": null,
-   "confidence": "confirmed (card image, read privately)",
+   "confidence": "own design (rewritten Nov 2026)",
    "id": "kc05"
   },
   {
    "suit": "relics",
-   "name_new": "Buried Hall",
+   "name_new": "Sunken Vault",
    "copies": 1,
    "placement": "player_board_occupied",
    "effects": [
     {
      "timing": "spring_action",
-     "text": "Burn one of your Tactics to gain 1 lore; if that Tactic was Unexhausted gain 2 more lore.",
+     "text": "Spring: burn one of your Tactics. Gain 1 Influence, plus 1 Lore if it was Unexhausted.",
      "ops": [
-      "burn(my tactic); lore+=1; if was_unexhausted: lore+=2"
+      "see engine.js kc6"
      ]
     }
    ],
    "on_acquire": null,
-   "confidence": "confirmed (card image, read privately)",
+   "confidence": "own design (rewritten Nov 2026)",
    "id": "kc06"
   },
   {
    "suit": "relics",
-   "name_new": "The Lighthouse",
+   "name_new": "Beacon Spire",
    "copies": 1,
    "placement": "none (discarded)",
    "effects": [
     {
      "timing": "on_acquire",
-     "text": "Bold: Discard your Bidding card. Acquire the Site of Power card with the lowest (or tied lowest) Lore cost. Discard this card.",
+     "text": "Bold: discard your bid. Gain 1 Influence and 2 Lore, then discard this.",
      "ops": [
-      "discard(bid card)",
-      "acquire(site_of_power.lowest_cost) free",
-      "discard(self)"
+      "see engine.js kc7"
      ]
     }
    ],
    "on_acquire": "see effect",
-   "confidence": "confirmed (card image, read privately)",
+   "confidence": "own design (rewritten Nov 2026)",
    "id": "kc07"
   },
   {
    "suit": "relics",
-   "name_new": "Vast Archive",
+   "name_new": "Scribes' Loft",
    "copies": 1,
    "placement": "player_board_occupied",
    "effects": [
     {
      "timing": "passive",
-     "text": "Your Faction Cards with exactly 1 printed Lore gain +1 Lore.",
+     "text": "Your Faction Cards with Strength 3 or less gain +1 Lore.",
      "ops": [
-      "my.cards.where(printed.lore==1).lore+=1"
+      "see engine.js kc8"
      ]
     }
    ],
    "on_acquire": null,
-   "confidence": "confirmed (card image, read privately)",
+   "confidence": "own design (rewritten Nov 2026)",
    "id": "kc08"
   },
   {
    "suit": "relics",
-   "name_new": "Cutthroat Crew",
+   "name_new": "Knife Guild",
    "copies": 1,
    "placement": "player_board_occupied",
    "effects": [
     {
      "timing": "passive",
-     "text": "When you attempt to steal a Kingdom Card, add +3 Strength to the stealing card. Whenever a Kingdom Card is stolen, gain 1 influence; if an opponent steals THIS card, they gain that influence instead.",
+     "text": "+2 Strength when you steal a Kingdom Card. Whenever any Kingdom Card is stolen, gain 1 Lore.",
      "ops": [
-      "steal_attempt: stealer.str+=3",
-      "on any steal: inf+1 to me (to thief if stolen card is this one)"
+      "see engine.js kc9"
      ]
     }
    ],
    "on_acquire": null,
-   "confidence": "confirmed (card image, read privately)",
+   "confidence": "own design (rewritten Nov 2026)",
    "id": "kc09"
   },
   {
    "suit": "relics",
-   "name_new": "Shadow Assembly",
+   "name_new": "Pilgrim Chapel",
    "copies": 1,
    "placement": "region",
    "effects": [
     {
      "timing": "autumn_action",
-     "text": "Bold: Discard your Bidding card; place this card on a Region. Action: Govern with one of your Active cards in this Region.",
+     "text": "Bold: discard your bid; place this on a Region. Autumn: Journey with one of your Active cards there.",
      "ops": [
-      "on_acquire: discard bid; place on region",
-      "autumn: govern(source=my.active in self.region)"
+      "see engine.js kc10"
      ]
     }
    ],
    "on_acquire": "discard bid; place on a Region",
-   "confidence": "confirmed (card image, read privately)",
+   "confidence": "own design (rewritten Nov 2026)",
    "id": "kc10"
   },
   {
    "suit": "relics",
-   "name_new": "Trade League Hall",
+   "name_new": "Toll Bridge",
    "copies": 1,
    "placement": "location",
    "effects": [
     {
      "timing": "passive",
-     "text": "Bold: Discard your Bidding card; place this card on a Location. Whenever any player claims this Location's Reward, this card's owner gains 1 influence.",
+     "text": "Bold: discard your bid; place this on a Location. When a rival claims its Reward, you gain 1 Lore.",
      "ops": [
-      "on_acquire: discard bid; place on location",
-      "on any claim(location): owner.inf+=1"
+      "see engine.js kc11"
      ]
     }
    ],
    "on_acquire": "discard bid; place on a Location",
-   "confidence": "confirmed (card image, read privately)",
+   "confidence": "own design (rewritten Nov 2026)",
    "id": "kc11"
   },
   {
    "suit": "relics",
-   "name_new": "Crystal Warrens",
+   "name_new": "Glow Caves",
    "copies": 1,
    "placement": "player_board_occupied",
    "effects": [
     {
      "timing": "passive",
-     "text": "Whenever you Journey with a card that has Pathfinder, gain 1 influence and 1 additional lore.",
+     "text": "When you Journey with a card worth 2 or more Lore, gain 1 Influence.",
      "ops": [
-      "on journey(my card with pathfinder): inf+1; lore+=1"
+      "see engine.js kc12"
      ]
     }
    ],
    "on_acquire": null,
-   "confidence": "confirmed (card image, read privately)",
+   "confidence": "own design (rewritten Nov 2026)",
    "id": "kc12"
   },
   {
    "suit": "relics",
-   "name_new": "Faraway Hermitage",
+   "name_new": "Hilltop Retreat",
    "copies": 1,
    "placement": "player_board_occupied",
    "effects": [
     {
      "timing": "spring_action",
-     "text": "If you have no lore in your Supply, gain 1 influence; otherwise gain 1 lore.",
+     "text": "Spring: with 3 or more Lore, gain 1 Influence. Otherwise gain 1 Lore.",
      "ops": [
-      "if supply.lore==0: inf+1 else lore+1"
+      "see engine.js kc13"
      ]
     }
    ],
    "on_acquire": null,
-   "confidence": "confirmed (card image, read privately)",
+   "confidence": "own design (rewritten Nov 2026)",
    "id": "kc13"
   },
   {
    "suit": "relics",
-   "name_new": "Counterfeit Amnesties",
+   "name_new": "Pardon Scroll",
    "copies": 1,
    "placement": "player_board_occupied",
    "effects": [
     {
      "timing": "spring_action",
-     "text": "Move any one card from your Discard Pile to your Hand.",
+     "text": "Spring: move a card with Strength 5 or less from your Discard Pile to your Hand.",
      "ops": [
-      "move(my.discard any 1)->hand"
+      "see engine.js kc14"
      ]
     }
    ],
    "on_acquire": null,
-   "confidence": "confirmed (card image, read privately)",
+   "confidence": "own design (rewritten Nov 2026)",
    "id": "kc14"
   },
   {
    "suit": "relics",
-   "name_new": "Honour Guard of Sixes",
+   "name_new": "Favour Wardens",
    "copies": 1,
    "placement": "player_board_occupied",
    "effects": [
     {
      "timing": "passive",
-     "text": "You may activate your Favour even if you do not hold it. If you do hold it you may activate it twice; each activation is a separate Action.",
+     "text": "Use your Favour even without its disc. When you use it while holding the disc, gain 1 Lore.",
      "ops": [
-      "favour usable w/o holding (does not consume uses?)",
-      "if holding: 2 activations per round"
+      "see engine.js kc15"
      ]
     }
    ],
    "on_acquire": null,
-   "confidence": "confirmed (card image, read privately)",
+   "confidence": "own design (rewritten Nov 2026)",
    "note": "ASSUMPTION: when activated without holding it, there is no disc to rotate (card text says nothing else).",
    "id": "kc15"
   },
   {
    "suit": "relics",
-   "name_new": "Derelict Manor",
+   "name_new": "Old Barracks",
    "copies": 1,
    "placement": "player_board_occupied",
    "effects": [
     {
      "timing": "autumn_action",
-     "text": "Discard one of your cards from a Council to increase your Hand Size by one. Discard this card.",
+     "text": "Autumn, Hand Size 6 or less: send a Hand card to the Lost Pile. Hand Size +1. Discard this.",
      "ops": [
-      "discard(my council card); hand_size+=1; discard(self)"
+      "see engine.js kc16"
      ]
     }
    ],
    "on_acquire": null,
-   "confidence": "confirmed (card image, read privately)",
+   "confidence": "own design (rewritten Nov 2026)",
    "id": "kc16"
   },
   {
    "suit": "relics",
-   "name_new": "Monarch's Seal-Ring",
+   "name_new": "Crown Signet",
    "copies": 1,
    "placement": "player_board_occupied",
    "effects": [
     {
      "timing": "passive",
-     "text": "On acquire: increase Hand Size by 1; when you no longer Occupy this card decrease Hand Size by 1. Whenever you win a Clash in a Region where you have an Active Heir, gain 1 influence.",
+     "text": "On acquire: Hand Size +1; -1 when it leaves. Win a Clash with an Active Captain there? Gain 1 Lore.",
      "ops": [
-      "on_acquire: hand_size+=1; on_leave: hand_size-=1",
-      "on win_clash(region) with my.active.heir in region: inf+1"
+      "see engine.js kc17"
      ]
     }
    ],
    "on_acquire": null,
-   "confidence": "confirmed (card image, read privately)",
+   "confidence": "own design (rewritten Nov 2026)",
    "id": "kc17"
   },
   {
    "suit": "secrets",
-   "name_new": "Sky Harbour",
+   "name_new": "Cloud Dock",
    "copies": 1,
    "placement": "player_board_occupied",
    "effects": [
     {
      "timing": "passive",
-     "text": "Whenever any of your cards are removed from a Council you may move them to your Hand. Whenever you Journey with any of your cards you may move it to the bottom of your Deck.",
+     "text": "After a Journey, you may put the card at your Deck bottom, then draw 1 card.",
      "ops": [
-      "on remove_from_council(my card): optional ->hand",
-      "on journey(my card): optional ->deck bottom"
+      "see engine.js kc18"
      ]
     }
    ],
    "on_acquire": null,
-   "confidence": "confirmed (card image, read privately)",
+   "confidence": "own design (rewritten Nov 2026)",
    "id": "kc18"
   },
   {
    "suit": "secrets",
-   "name_new": "Rumours Underground",
+   "name_new": "Tavern Gossip",
    "copies": 1,
    "placement": "player_board_occupied",
    "effects": [
     {
      "timing": "spring_action",
-     "text": "Choose any number of players; each moves all cards in their Hand to the bottom of their Deck (any order) then draws that many cards.",
+     "text": "Spring: put your Hand at your Deck bottom, then draw that many cards plus 1.",
      "ops": [
-      "for each chosen player: hand->deck_bottom(any order); draw(n)"
+      "see engine.js kc19"
      ]
     }
    ],
    "on_acquire": null,
-   "confidence": "confirmed (card image, read privately)",
+   "confidence": "own design (rewritten Nov 2026)",
    "id": "kc19"
   },
   {
    "suit": "secrets",
-   "name_new": "Cog-Wing Couriers",
+   "name_new": "Messenger Kites",
    "copies": 1,
    "placement": "player_board_occupied",
    "effects": [
     {
      "timing": "spring_action",
-     "text": "Swap a card in your Hand with one of your cards that is in a Council or Occupying a Kingdom Card.",
+     "text": "Spring: swap a Hand card with one of yours in a Council or occupying a card. Gain 1 Lore.",
      "ops": [
-      "swap(hand card, my council or occupying card)"
-     ]
-    },
-    {
-     "timing": "autumn_action",
-     "text": "Repeat the spring Action of this card.",
-     "ops": [
-      "repeat spring action"
+      "see engine.js kc20"
      ]
     }
    ],
    "on_acquire": null,
-   "confidence": "confirmed (card image, read privately)",
+   "confidence": "own design (rewritten Nov 2026)",
    "id": "kc20"
   },
   {
    "suit": "secrets",
-   "name_new": "Tome of Real Names",
+   "name_new": "True Ledger",
    "copies": 1,
    "placement": "player_board_occupied",
    "effects": [
     {
      "timing": "day_action",
-     "text": "Reveal your Hand. Return to owners' Hands all opponents' cards in the current Clash that have the same printed Strength and/or Archetype as a card you revealed. Discard this card.",
+     "text": "Day: reveal your Hand. Rival cards here sharing a shown Strength return to their Hands. Discard this.",
      "ops": [
-      "reveal(hand)",
-      "for opp cards in clash matching strength or archetype of any revealed: ->owner hand",
-      "discard(self)"
+      "see engine.js kc21"
      ]
     }
    ],
    "on_acquire": null,
-   "confidence": "confirmed (card image, read privately)",
+   "confidence": "own design (rewritten Nov 2026)",
    "id": "kc21"
   },
   {
    "suit": "secrets",
-   "name_new": "Dead Lamp",
+   "name_new": "Smoke Signal",
    "copies": 1,
    "placement": "player_board_occupied",
    "effects": [
     {
      "timing": "day_action",
-     "text": "Move any number of your Supporters in the current Region to either another unresolved Region or your Supply (Player Board).",
+     "text": "Day: move up to 2 of your Supporters here to another unresolved Region or your board.",
      "ops": [
-      "supporters(current region)->other unresolved region OR player board"
+      "see engine.js kc22"
      ]
     }
    ],
    "on_acquire": null,
-   "confidence": "confirmed (card image, read privately)",
+   "confidence": "own design (rewritten Nov 2026)",
    "note": "Card text says 'Your Supply'; Supporters normally return to Player Board; ASSUMPTION: Player Board/Supply equivalent.",
    "id": "kc22"
   },
   {
    "suit": "secrets",
-   "name_new": "Tavern Keeper",
+   "name_new": "Lookout Post",
    "copies": 1,
    "placement": "player_board_occupied",
    "effects": [
     {
      "timing": "spring_action",
-     "text": "Choose a Region; look at all face-down cards there. You may choose two of your face-down cards next to any Regions and swap their positions.",
+     "text": "Spring: look at all face-down cards in one Region and gain 1 Lore.",
      "ops": [
-      "peek(region facedown)",
-      "optional swap(my facedown x2 any regions)"
+      "see engine.js kc23"
      ]
     }
    ],
    "on_acquire": null,
-   "confidence": "confirmed (card image, read privately)",
+   "confidence": "own design (rewritten Nov 2026)",
    "id": "kc23"
   },
   {
    "suit": "secrets",
-   "name_new": "Chamberlain's Ledger",
+   "name_new": "Steward's Seal",
    "copies": 1,
    "placement": "player_board_occupied",
    "effects": [
     {
      "timing": "autumn_action",
-     "text": "Move one of your Active cards into a Council. Discard any number of cards in that Council. Discard this card.",
+     "text": "Autumn: move an Active card into a Council. Discard up to 1 rival card there. Discard this.",
      "ops": [
-      "move(my.active x1)->council(choice)",
-      "discard(any n cards in that council)",
-      "discard(self)"
+      "see engine.js kc24"
      ]
     }
    ],
    "on_acquire": null,
-   "confidence": "confirmed (card image, read privately)",
+   "confidence": "own design (rewritten Nov 2026)",
    "id": "kc24"
   },
   {
    "suit": "secrets",
-   "name_new": "The Ferryman",
+   "name_new": "River Boat",
    "copies": 1,
    "placement": "player_board_occupied",
    "effects": [
     {
      "timing": "spring_action",
-     "text": "Swap a card in your Hand with one of your cards in the Lost Pile.",
+     "text": "Spring: swap a Hand card with one of yours in the Lost Pile. The Hand card goes to your Discard Pile.",
      "ops": [
-      "swap(hand card, my lost_pile card)"
+      "see engine.js kc25"
      ]
     }
    ],
    "on_acquire": null,
-   "confidence": "confirmed (card image, read privately)",
+   "confidence": "own design (rewritten Nov 2026)",
    "id": "kc25"
   },
   {
    "suit": "secrets",
-   "name_new": "Crone of Autumn",
+   "name_new": "Harvest Witch",
    "copies": 1,
    "placement": "player_board_occupied",
    "effects": [
     {
      "timing": "spring_action",
-     "text": "Burn this card. Then acquire up to two cards from the Great Road and Occupy them with cards from your Hand.",
+     "text": "Spring: discard this and gain 1 Lore. Acquire 1 Great Road card; occupy it with a Hand card.",
      "ops": [
-      "burn(self)",
-      "acquire up to 2 from great_road; occupy with hand cards"
+      "see engine.js kc26"
      ]
     }
    ],
    "on_acquire": null,
-   "confidence": "confirmed (card image, read privately)",
+   "confidence": "own design (rewritten Nov 2026)",
    "note": "ASSUMPTION: the burn frees this card's slot, so up to two Kingdom Cards can be taken (given max-2 rule).",
    "id": "kc26"
   },
   {
    "suit": "secrets",
-   "name_new": "Herald of Applause",
+   "name_new": "Crier's Bell",
    "copies": 1,
    "placement": "player_board_occupied",
    "effects": [
     {
      "timing": "passive",
-     "text": "When adjusting the Order Track at the Start of the Year, you choose the position of each marker on the track.",
+     "text": "At Start of Year, you choose who goes first on the Order Track. The rest follow by Influence.",
      "ops": [
-      "start_of_year: order_track = chosen by me"
+      "see engine.js kc27"
      ]
     }
    ],
    "on_acquire": null,
-   "confidence": "confirmed (card image, read privately)",
+   "confidence": "own design (rewritten Nov 2026)",
    "id": "kc27"
   },
   {
    "suit": "secrets",
-   "name_new": "Wax Pretender",
+   "name_new": "Mask Maker",
    "copies": 1,
    "placement": "player_board_occupied",
    "effects": [
     {
      "timing": "passive",
-     "text": "Once per Round you may activate an opponent's Favour during its associated Step. If that opponent currently holds the Favour disc, do not rotate it.",
+     "text": "Once per Round, pay 1 Lore to use a rival's Favour in its step. Their disc does not turn.",
      "ops": [
-      "once/round: activate(opponent.favour_action) ; if opp holds disc: no rotate"
+      "see engine.js kc28"
      ]
     }
    ],
    "on_acquire": null,
-   "confidence": "confirmed (card image, read privately)",
+   "confidence": "own design (rewritten Nov 2026)",
    "id": "kc28"
   },
   {
    "suit": "secrets",
-   "name_new": "Mirror of Many Faces",
+   "name_new": "Glass Double",
    "copies": 1,
    "placement": "player_board_occupied",
    "effects": [
     {
      "timing": "day_action",
-     "text": "Choose one of your Active cards in the current Clash. For the rest of the Round it becomes a copy of any card in the Lost Pile, except its Strength stays unchanged.",
+     "text": "Day: your Active card here copies a card in any Discard Pile this Round. Its Strength stays.",
      "ops": [
-      "self_active.copy(printed except strength, from=lost_pile any) until end_round"
+      "see engine.js kc29"
      ]
     }
    ],
    "on_acquire": null,
-   "confidence": "confirmed (card image, read privately)",
+   "confidence": "own design (rewritten Nov 2026)",
    "id": "kc29"
   },
   {
    "suit": "secrets",
-   "name_new": "Sirens' Mere",
+   "name_new": "Lure Song",
    "copies": 1,
    "placement": "player_board_occupied",
    "effects": [
     {
      "timing": "spring_action",
-     "text": "Choose a Location. Move any number of Heralds to that Location. Discard this card.",
+     "text": "Spring: choose a Location. Move up to 2 Heralds there. Discard this.",
      "ops": [
-      "move(any heralds)->location(choice)",
-      "discard(self)"
+      "see engine.js kc30"
      ]
     }
    ],
    "on_acquire": null,
-   "confidence": "confirmed (card image, read privately)",
+   "confidence": "own design (rewritten Nov 2026)",
    "id": "kc30"
   },
   {
    "suit": "secrets",
-   "name_new": "Dawn-Blue Chime",
+   "name_new": "Morning Bell",
    "copies": 1,
    "placement": "player_board_occupied",
    "effects": [
     {
      "timing": "autumn_action",
-     "text": "Move all your cards from the Lost Pile to the top or bottom of your Deck, in any order. Discard this card.",
+     "text": "Autumn: move up to 3 of your Lost Pile cards to your Discard Pile. Discard this.",
      "ops": [
-      "my lost_pile->deck(top or bottom, any order)",
-      "discard(self)"
+      "see engine.js kc31"
      ]
     }
    ],
    "on_acquire": null,
-   "confidence": "confirmed (card image, read privately)",
+   "confidence": "own design (rewritten Nov 2026)",
    "id": "kc31"
   },
   {
    "suit": "secrets",
-   "name_new": "Rusted Colossus",
+   "name_new": "Iron Giant",
    "copies": 1,
    "placement": "player_board_occupied",
    "effects": [
     {
      "timing": "autumn_action",
-     "text": "Move one of your Active cards to your Hand.",
+     "text": "Autumn: return one of your Active cards with Strength 5 or less to your Hand.",
      "ops": [
-      "my.active x1 ->hand"
+      "see engine.js kc32"
      ]
     }
    ],
    "on_acquire": null,
-   "confidence": "confirmed (card image, read privately)",
+   "confidence": "own design (rewritten Nov 2026)",
    "id": "kc32"
   },
   {
    "suit": "secrets",
-   "name_new": "Dead King's Helm",
+   "name_new": "Grave Candle",
    "copies": 1,
    "placement": "player_board_occupied",
    "effects": [
     {
      "timing": "passive",
-     "text": "Whenever one of your cards is Eliminated you may move it to your Hand.",
+     "text": "Once per Round, when one of your cards is Eliminated, gain 1 Lore.",
      "ops": [
-      "on eliminate(my card): optional ->hand"
+      "see engine.js kc33"
      ]
     }
    ],
    "on_acquire": null,
-   "confidence": "confirmed (card image, read privately)",
+   "confidence": "own design (rewritten Nov 2026)",
    "id": "kc33"
   },
   {
    "suit": "secrets",
-   "name_new": "Dead King's Gaze",
+   "name_new": "Seer's Eye",
    "copies": 1,
    "placement": "supply",
    "effects": [
     {
      "timing": "passive",
-     "text": "Bold: Discard your Bidding card; place this card in your Supply. When acquiring a card from the Great Road you may look at the top two face-down Kingdom Deck cards and treat them as face-up.",
+     "text": "Bold: discard your bid; put this in your Supply. When you take a card, you may take one of the top 3 Kingdom Deck cards.",
      "ops": [
-      "on_acquire: discard bid; supply",
-      "when acquiring from great_road: may look at top 2 of kingdom deck, treat as face-up (acquirable?)"
+      "see engine.js kc34"
      ]
     }
    ],
    "on_acquire": "discard bid; place in supply",
-   "confidence": "confirmed (card image, read privately)",
+   "confidence": "own design (rewritten Nov 2026)",
    "note": "ASSUMPTION: treating them as face-up means they can be chosen as acquisition targets (to be confirmed).",
    "id": "kc34"
   },
   {
    "suit": "oaths",
-   "name_new": "Knives' Fellowship",
+   "name_new": "Night Blades",
    "copies": 1,
    "placement": "player_board_occupied",
    "effects": [
     {
      "timing": "passive",
-     "text": "Your Heirs gain Deadly (Night) and Retreat (Day). When your Heir Eliminates one or more cards, gain 1 influence.",
+     "text": "Your Heirs gain Deadly. When your Heir Eliminates a card, gain 1 Lore.",
      "ops": [
-      "my.heirs.gain(deadly,retreat)",
-      "on heir eliminates>=1: inf+1"
-     ]
-    },
-    {
-     "timing": "night_effect",
-     "text": "If any Active opponent Follower is in a Clash with your Heir, Eliminate your Heir.",
-     "ops": [
-      "if opp.active.follower in clash w/ my heir: eliminate(my heir)"
+      "see engine.js kc35"
      ]
     }
    ],
    "on_acquire": null,
-   "confidence": "confirmed (card image, read privately)",
+   "confidence": "own design (rewritten Nov 2026)",
    "id": "kc35"
   },
   {
    "suit": "oaths",
-   "name_new": "Village Muster",
+   "name_new": "Militia Call",
    "copies": 1,
    "placement": "player_board_occupied",
    "effects": [
     {
      "timing": "passive",
-     "text": "Your Followers/Cavalry gain Deploy (1) (Autumn).",
+     "text": "Your Followers gain Deploy (2). Autumn: move a Follower from your Discard Pile to your Hand.",
      "ops": [
-      "my.followers+cavalry.gain(deploy 1)"
-     ]
-    },
-    {
-     "timing": "autumn_action",
-     "text": "Move a Follower from your Discard Pile to your Hand.",
-     "ops": [
-      "discard.follower x1 ->hand"
+      "see engine.js kc36"
      ]
     }
    ],
    "on_acquire": null,
-   "confidence": "confirmed (card image, read privately)",
+   "confidence": "own design (rewritten Nov 2026)",
    "id": "kc36"
   },
   {
    "suit": "oaths",
-   "name_new": "Siege Workshop",
+   "name_new": "Engine Yard",
    "copies": 1,
    "placement": "player_board_occupied",
    "effects": [
     {
      "timing": "passive",
-     "text": "Your cards with Deploy(1) (Autumn) also gain Deploy(1) as a Spring action.",
+     "text": "Your Deploy cards may also Deploy in Spring. Autumn: put 1 token on one of your Active War Machines.",
      "ops": [
-      "cards with autumn deploy1 gain spring deploy1"
-     ]
-    },
-    {
-     "timing": "autumn_action",
-     "text": "Place 1 influence token on one of your Active cards that has Deploy.",
-     "ops": [
-      "place_inf(on my.active with deploy,1)"
+      "see engine.js kc37"
      ]
     }
    ],
    "on_acquire": null,
-   "confidence": "confirmed (card image, read privately)",
+   "confidence": "own design (rewritten Nov 2026)",
    "id": "kc37"
   },
   {
    "suit": "oaths",
-   "name_new": "Grand Joust",
+   "name_new": "Melee Trial",
    "copies": 1,
    "placement": "player_board_occupied",
    "effects": [
     {
      "timing": "spring_action",
-     "text": "All players choose a card from Hand and place it face-down; reveal. 1) All cards with the same Strength are discarded. 2) The remaining card with highest Strength wins. 3) Return non-discarded cards to Hands. The winner claims any Location Reward. Discard this card.",
+     "text": "Spring: all play a Hand card face-down. Equal Strengths are discarded. Lowest remaining wins any Location Reward. Discard this.",
      "ops": [
-      "all players secretly pick hand card",
-      "remove duplicates by strength",
-      "highest remaining wins; others return to hand",
-      "winner claims a Location Reward of choice (no Herald reward?)",
-      "discard(self)"
+      "see engine.js kc38"
      ]
     }
    ],
    "on_acquire": null,
-   "confidence": "confirmed (card image, read privately)",
+   "confidence": "own design (rewritten Nov 2026)",
    "note": "ASSUMPTION: 'any Location Reward' = winner chooses any of the 6 Locations; whether Herald reward applies is not stated (assume not).",
    "id": "kc38"
   },
   {
    "suit": "oaths",
-   "name_new": "Goose-Rider Post",
+   "name_new": "Swift Stables",
    "copies": 1,
    "placement": "player_board_occupied",
    "effects": [
     {
      "timing": "passive",
-     "text": "Your Heirs gain Flank (Day).",
+     "text": "Your Captains gain Flank.",
      "ops": [
-      "my.heirs.gain(flank)"
+      "see engine.js kc39"
      ]
     }
    ],
    "on_acquire": null,
-   "confidence": "confirmed (card image, read privately)",
+   "confidence": "own design (rewritten Nov 2026)",
    "id": "kc39"
   },
   {
    "suit": "oaths",
-   "name_new": "Concealed Ways",
+   "name_new": "Secret Stair",
    "copies": 1,
    "placement": "player_board_occupied",
    "effects": [
     {
      "timing": "day_action",
-     "text": "Swap one of your Active cards in the current Clash with one of your cards that is in a Council or Occupying a Kingdom Card.",
+     "text": "Day: swap your Active card here with one of yours in a Council.",
      "ops": [
-      "swap(active in clash, my council or occupying card)"
+      "see engine.js kc40"
      ]
     }
    ],
    "on_acquire": null,
-   "confidence": "confirmed (card image, read privately)",
+   "confidence": "own design (rewritten Nov 2026)",
    "id": "kc40"
   },
   {
    "suit": "oaths",
-   "name_new": "Banner Marshal",
+   "name_new": "War Banner",
    "copies": 1,
    "placement": "player_board_occupied",
    "effects": [
     {
      "timing": "passive",
-     "text": "Your Heirs gain Deploy (1) (Autumn). If your Heir is Eliminated, move it to your Hand and discard this card.",
+     "text": "Your Heirs gain Deploy (2). If your Heir is Eliminated, gain 1 Lore and discard this.",
      "ops": [
-      "my.heirs.gain(deploy 1)",
-      "on heir eliminated: ->hand ; discard(self)"
+      "see engine.js kc41"
      ]
     }
    ],
    "on_acquire": null,
-   "confidence": "confirmed (card image, read privately)",
+   "confidence": "own design (rewritten Nov 2026)",
    "id": "kc41"
   },
   {
    "suit": "oaths",
-   "name_new": "Rally Standard",
+   "name_new": "Muster Horn",
    "copies": 1,
    "placement": "player_board_occupied",
    "effects": [
     {
-     "timing": "autumn_action",
-     "text": "Move up to two of your Supporters from the Map and/or Lost Pile to your Player Board.",
+     "timing": "spring_action",
+     "text": "Spring: return up to 3 of your Supporters from the Map or Lost Pile to your board.",
      "ops": [
-      "supporters(map/lost_pile, max 2)->board"
+      "see engine.js kc42"
      ]
     }
    ],
    "on_acquire": null,
-   "confidence": "confirmed (card image, read privately)",
+   "confidence": "own design (rewritten Nov 2026)",
    "id": "kc42"
   },
   {
    "suit": "oaths",
-   "name_new": "Frozen Bastion",
+   "name_new": "Ice Wall",
    "copies": 1,
    "placement": "region",
    "effects": [
     {
      "timing": "passive",
-     "text": "Bold: Discard your Bidding card; place this card on a Region. All opponents' total Strength in this Region is halved (rounded up).",
+     "text": "Bold: discard your bid; place this on a Region. Rivals there lose 3 total Strength (not below 0). Discard in Winter.",
      "ops": [
-      "on_acquire: discard bid; place on region",
-      "opp total_strength in region := ceil(x/2)"
-     ]
-    },
-    {
-     "timing": "winter_effect",
-     "text": "Discard this card.",
-     "ops": [
-      "discard(self) in winter"
+      "see engine.js kc43"
      ]
     }
    ],
    "on_acquire": "discard bid; place on a Region",
-   "confidence": "confirmed (card image, read privately)",
+   "confidence": "own design (rewritten Nov 2026)",
    "id": "kc43"
   },
   {
    "suit": "oaths",
-   "name_new": "Contraband Gap",
+   "name_new": "Escape Tunnel",
    "copies": 1,
    "placement": "player_board_occupied",
    "effects": [
     {
      "timing": "day_action",
-     "text": "Choose one of your Active cards in the current Clash; it gains Retreat until end of Clash. When that card Retreats you may Journey with it.",
+     "text": "Day: your Active card here gains Retreat this Clash. If it Retreats, gain 1 Lore.",
      "ops": [
-      "give(retreat, active card, until=end_clash)",
-      "on that card retreats: optional journey(card)"
+      "see engine.js kc44"
      ]
     }
    ],
    "on_acquire": null,
-   "confidence": "confirmed (card image, read privately)",
+   "confidence": "own design (rewritten Nov 2026)",
    "id": "kc44"
   },
   {
    "suit": "oaths",
-   "name_new": "Hunting-Horn of the Swans",
+   "name_new": "Signal Horn",
    "copies": 1,
    "placement": "player_board_occupied",
    "effects": [
     {
      "timing": "day_action",
-     "text": "Choose one of your Active cards in the current Clash; it gains Ambush until end of Clash.",
+     "text": "Day: your Active card here gains Ambush this Clash, and you gain +1 Strength.",
      "ops": [
-      "give(ambush, active card, until=end_clash)"
+      "see engine.js kc45"
      ]
     }
    ],
    "on_acquire": null,
-   "confidence": "confirmed (card image, read privately)",
+   "confidence": "own design (rewritten Nov 2026)",
    "id": "kc45"
   },
   {
    "suit": "oaths",
-   "name_new": "Blade That Dreamed",
+   "name_new": "Dream Blade",
    "copies": 1,
    "placement": "player_board_occupied",
    "effects": [
     {
      "timing": "day_action",
-     "text": "Gain +5 Strength in the current Clash. Discard this card and its Occupying card.",
+     "text": "Day: +4 Strength in this Clash. Discard this; its occupier returns to your Hand.",
      "ops": [
-      "clash_strength+=5",
-      "discard(self); discard(occupying card)"
+      "see engine.js kc46"
      ]
     }
    ],
    "on_acquire": null,
-   "confidence": "confirmed (card image, read privately)",
+   "confidence": "own design (rewritten Nov 2026)",
    "id": "kc46"
   },
   {
    "suit": "oaths",
-   "name_new": "Broken Gnomon",
+   "name_new": "Stopped Clock",
    "copies": 1,
    "placement": "region",
    "effects": [
     {
      "timing": "spring_action",
-     "text": "Place this card on a Region and discard your Occupying card. Skip the Day and Night steps of all Clashes in this card's Region (for the Round).",
+     "text": "Spring: place this on a Region; its occupier returns to Hand. No Day or Night steps there this Round.",
      "ops": [
-      "place self on region; discard(occupying card)",
-      "skip day_action and night_effect steps for all clashes in region this round"
-     ]
-    },
-    {
-     "timing": "winter_effect",
-     "text": "Discard this card.",
-     "ops": [
-      "discard(self)"
+      "see engine.js kc47"
      ]
     }
    ],
    "on_acquire": null,
-   "confidence": "confirmed (card image, read privately)",
+   "confidence": "own design (rewritten Nov 2026)",
    "id": "kc47"
   },
   {
    "suit": "oaths",
-   "name_new": "Oddment Band",
+   "name_new": "Tinker Troupe",
    "copies": 1,
    "placement": "player_board_occupied",
    "effects": [
     {
-     "timing": "autumn_action",
-     "text": "Unexhaust one of your Tactics (follow any SETUP text on it). Discard this card and its Occupying card.",
+     "timing": "spring_action",
+     "text": "Spring: make one of your Tactics Unexhausted again. Discard this and its occupier.",
      "ops": [
-      "unexhaust(my tactic) incl. setup markers",
-      "discard(self); discard(occupying card)"
+      "see engine.js kc48"
      ]
     }
    ],
    "on_acquire": null,
-   "confidence": "confirmed (card image, read privately)",
+   "confidence": "own design (rewritten Nov 2026)",
    "id": "kc48"
   },
   {
    "suit": "oaths",
-   "name_new": "Feast of Thorns",
+   "name_new": "Bramble Feast",
    "copies": 1,
    "placement": "region",
    "effects": [
     {
      "timing": "passive",
-     "text": "Bold: Discard your Bidding card; place this card on a Region. Treat any printed information on opponents' cards in this Region as blank, except Strength and Archetype.",
+     "text": "Bold: discard your bid; place this on a Region. Rivals' non-Heir cards there count as blank. Discard in Winter.",
      "ops": [
-      "on_acquire: discard bid; place on region",
-      "blank(opp cards in region, printed, except strength/archetype)"
-     ]
-    },
-    {
-     "timing": "winter_effect",
-     "text": "Discard this card.",
-     "ops": [
-      "discard(self)"
+      "see engine.js kc49"
      ]
     }
    ],
    "on_acquire": "discard bid; place on a Region",
-   "confidence": "confirmed (card image, read privately)",
+   "confidence": "own design (rewritten Nov 2026)",
    "id": "kc49"
   },
   {
    "suit": "oaths",
-   "name_new": "Dead King's Lance",
+   "name_new": "Bone Spear",
    "copies": 1,
    "placement": "player_board_occupied",
    "effects": [
     {
      "timing": "day_action",
-     "text": "Choose one of your Active cards in the current Clash; it gains Deadly until end of Clash. Discard this card and its Occupying card.",
+     "text": "Day: your Active card here with Strength 5 or less gains Deadly. Discard this; its occupier returns to Hand.",
      "ops": [
-      "give(deadly, active card, until=end_clash)",
-      "discard(self); discard(occupying card)"
+      "see engine.js kc50"
      ]
     }
    ],
    "on_acquire": null,
-   "confidence": "confirmed (card image, read privately)",
+   "confidence": "own design (rewritten Nov 2026)",
    "id": "kc50"
   },
   {
    "suit": "oaths",
-   "name_new": "Dead King's Aegis",
+   "name_new": "Guardian Cloak",
    "copies": 1,
    "placement": "player_board_occupied",
    "effects": [
     {
      "timing": "day_action",
-     "text": "Choose one of your Active cards in the current Clash; it gains Invulnerable until end of Clash. Discard this card.",
+     "text": "Day: your Active card here gains Invulnerable and Retreat this Clash. Discard this and its occupier.",
      "ops": [
-      "give(invulnerable, active card, until=end_clash)",
-      "discard(self)"
+      "see engine.js kc51"
      ]
     }
    ],
    "on_acquire": null,
-   "confidence": "confirmed (card image, read privately)",
+   "confidence": "own design (rewritten Nov 2026)",
    "id": "kc51"
   }
  ],
@@ -2400,206 +2223,201 @@
   "threat_cards": [
    {
     "id": "T1",
-    "name_new": "Drawn Blades",
-    "effect_text_new": "All Active Sim cards in Regions with Fog gain Deadly.",
-    "fog_pips": 2,
-    "confidence": "effect confirmed (card library image); 'fog_pips' = count of wave icons at card bottom, meaning NOT confirmed (ASSUMPTION: threat 'weight'/draw cost)"
+    "name_new": "Bared Steel",
+    "effect_text_new": "Active Sim cards with Strength 6 or more in Fog Regions gain Deadly.",
+    "fog_pips": 3,
+    "confidence": "new design (W489 rewrite); own text and numbers; solo mode is not implemented in the engine"
    },
    {
     "id": "T2",
-    "name_new": "Cloaked in Haze",
-    "effect_text_new": "All Active Sim cards in Regions with Fog gain Invulnerable.",
-    "fog_pips": 2,
-    "confidence": "effect confirmed (card library image); 'fog_pips' = count of wave icons at card bottom, meaning NOT confirmed (ASSUMPTION: threat 'weight'/draw cost)"
+    "name_new": "Mist Mantle",
+    "effect_text_new": "Active Sim Captains and Heirs in Fog Regions gain Invulnerable.",
+    "fog_pips": 1,
+    "confidence": "new design (W489 rewrite); own text and numbers; solo mode is not implemented in the engine"
    },
    {
     "id": "T3",
-    "name_new": "Smoke Redoubts",
-    "effect_text_new": "Autumn: before the Sim Rallies any cards, it places 1 influence on its highest-Strength card in each Fog Region; it won't Rally cards with influence on them this Round.",
-    "fog_pips": 2,
-    "confidence": "effect confirmed (card library image); 'fog_pips' = count of wave icons at card bottom, meaning NOT confirmed (ASSUMPTION: threat 'weight'/draw cost)"
+    "name_new": "Smoke Pickets",
+    "effect_text_new": "Autumn: the Sim puts 1 Influence token on its two strongest cards in Fog Regions and will not Rally them this Round.",
+    "fog_pips": 3,
+    "confidence": "new design (W489 rewrite); own text and numbers; solo mode is not implemented in the engine"
    },
    {
     "id": "T4",
-    "name_new": "Lure Songs",
-    "effect_text_new": "After resolving a Clash in a Fog Region but before rewards: if the Sim lost, it places 1 influence on the Council matching its current Ambition; if it won, it gains influence equal to the influence on that Council.",
-    "fog_pips": 3,
-    "confidence": "effect confirmed (card library image); 'fog_pips' = count of wave icons at card bottom, meaning NOT confirmed (ASSUMPTION: threat 'weight'/draw cost)"
+    "name_new": "Siren Call",
+    "effect_text_new": "After a Fog Clash: if the Sim lost, mark its Ambition Council; if it won, it gains 1 Influence per 2 marks there.",
+    "fog_pips": 2,
+    "confidence": "new design (W489 rewrite); own text and numbers; solo mode is not implemented in the engine"
    },
    {
     "id": "T5",
-    "name_new": "Towering Stride",
-    "effect_text_new": "The Sim gains +3 Strength in each Fog Region.",
-    "fog_pips": 3,
-    "confidence": "effect confirmed (card library image); 'fog_pips' = count of wave icons at card bottom, meaning NOT confirmed (ASSUMPTION: threat 'weight'/draw cost)"
+    "name_new": "Giant's Step",
+    "effect_text_new": "The Sim gains +2 Strength in each Fog Region.",
+    "fog_pips": 2,
+    "confidence": "new design (W489 rewrite); own text and numbers; solo mode is not implemented in the engine"
    },
    {
     "id": "T6",
-    "name_new": "Out of the Pall",
-    "effect_text_new": "Day: if the Sim only has Bronze and/or Silver Tier cards Active in the current Region, it draws the top card of its Deck and makes it Active.",
-    "fog_pips": 3,
-    "confidence": "effect confirmed (card library image); 'fog_pips' = count of wave icons at card bottom, meaning NOT confirmed (ASSUMPTION: threat 'weight'/draw cost)"
+    "name_new": "From the Murk",
+    "effect_text_new": "Day: if the Sim has no Gold Tier card Active here, it reveals its top Deck card and makes it Active if its Strength is 5 or less.",
+    "fog_pips": 2,
+    "confidence": "new design (W489 rewrite); own text and numbers; solo mode is not implemented in the engine"
    },
    {
     "id": "T7",
-    "name_new": "Lost Fog",
-    "effect_text_new": "The player may not activate any Rally or Retreat Commands in Fog Regions.",
-    "fog_pips": 2,
-    "confidence": "effect confirmed (card library image); 'fog_pips' = count of wave icons at card bottom, meaning NOT confirmed (ASSUMPTION: threat 'weight'/draw cost)"
+    "name_new": "Lost Paths",
+    "effect_text_new": "You may not use Retreat Commands in Fog Regions.",
+    "fog_pips": 3,
+    "confidence": "new design (W489 rewrite); own text and numbers; solo mode is not implemented in the engine"
    },
    {
     "id": "T8",
-    "name_new": "Plans Unrolled",
-    "effect_text_new": "If the Sim wins a Clash in a Fog Region it gains 1 influence.",
-    "fog_pips": 3,
-    "confidence": "effect confirmed (card library image); 'fog_pips' = count of wave icons at card bottom, meaning NOT confirmed (ASSUMPTION: threat 'weight'/draw cost)"
+    "name_new": "Charts Revealed",
+    "effect_text_new": "When the Sim wins a Fog Clash, it gains 1 Influence and 1 Lore.",
+    "fog_pips": 2,
+    "confidence": "new design (W489 rewrite); own text and numbers; solo mode is not implemented in the engine"
    },
    {
     "id": "T9",
-    "name_new": "Fraying Lines",
-    "effect_text_new": "Day: if there is Fog in the Region, for each Active player card in the Region the player must discard a card from Hand; for each they cannot, they must discard a card from the current Region.",
-    "fog_pips": 2,
-    "confidence": "effect confirmed (card library image); 'fog_pips' = count of wave icons at card bottom, meaning NOT confirmed (ASSUMPTION: threat 'weight'/draw cost)"
+    "name_new": "Thinning Ranks",
+    "effect_text_new": "Day: in a Fog Region, discard one Hand card per two of your Active cards there; if you cannot, discard an Active card instead.",
+    "fog_pips": 3,
+    "confidence": "new design (W489 rewrite); own text and numbers; solo mode is not implemented in the engine"
    },
    {
     "id": "T10",
-    "name_new": "Looming Shape",
-    "effect_text_new": "The Sim gains +5 Strength in each Fog Region.",
-    "fog_pips": 2,
-    "confidence": "effect confirmed (card library image); 'fog_pips' = count of wave icons at card bottom, meaning NOT confirmed (ASSUMPTION: threat 'weight'/draw cost)"
+    "name_new": "Shadow Colossus",
+    "effect_text_new": "The Sim gains +4 Strength in each Fog Region.",
+    "fog_pips": 3,
+    "confidence": "new design (W489 rewrite); own text and numbers; solo mode is not implemented in the engine"
    },
    {
     "id": "T11",
-    "name_new": "Whispers in Court",
-    "effect_text_new": "Autumn: in each Fog Region the player chooses either to move one Active card in that Region to the Lost Pile, or to discard a card from a Council; if the player can do neither, the Sim gains 2 influence.",
-    "fog_pips": 2,
-    "confidence": "effect confirmed (card library image); 'fog_pips' = count of wave icons at card bottom, meaning NOT confirmed (ASSUMPTION: threat 'weight'/draw cost)"
+    "name_new": "Court Rumours",
+    "effect_text_new": "Autumn: in each Fog Region, send one Active card to the Lost Pile or discard one Council card; if you can do neither, the Sim gains 1 Influence.",
+    "fog_pips": 3,
+    "confidence": "new design (W489 rewrite); own text and numbers; solo mode is not implemented in the engine"
    },
    {
     "id": "T12",
-    "name_new": "Hearts Waver",
-    "effect_text_new": "The Sim gains twice as much influence when resolving its Herald Reward in Fog Regions, including Council of Relics bonuses.",
-    "fog_pips": 3,
-    "confidence": "effect confirmed (card library image); 'fog_pips' = count of wave icons at card bottom, meaning NOT confirmed (ASSUMPTION: threat 'weight'/draw cost)"
+    "name_new": "Faltering Hearts",
+    "effect_text_new": "The Sim's Herald Reward in Fog Regions gives 2 extra Influence.",
+    "fog_pips": 2,
+    "confidence": "new design (W489 rewrite); own text and numbers; solo mode is not implemented in the engine"
    },
    {
     "id": "T13",
-    "name_new": "Pyres Sighted",
-    "effect_text_new": "After a Clash in a Fog Region, before rewards: if the Sim lost, the player must Burn a random card from their Site of Power (if none left, they return all lore from Supply to the Reserve).",
-    "fog_pips": 2,
-    "confidence": "effect confirmed (card library image); 'fog_pips' = count of wave icons at card bottom, meaning NOT confirmed (ASSUMPTION: threat 'weight'/draw cost)"
+    "name_new": "Pyre Smoke",
+    "effect_text_new": "After a Fog Clash the Sim won, you discard your cheapest Site of Power card; if none is left, return 2 Lore.",
+    "fog_pips": 3,
+    "confidence": "new design (W489 rewrite); own text and numbers; solo mode is not implemented in the engine"
    },
    {
     "id": "T14",
-    "name_new": "Beacon Fires",
-    "effect_text_new": "Autumn: before the Sim Rallies, if it has Active cards in a Fog Region it immediately gains 3 lore.",
-    "fog_pips": 1,
-    "confidence": "effect confirmed (card library image); 'fog_pips' = count of wave icons at card bottom, meaning NOT confirmed (ASSUMPTION: threat 'weight'/draw cost)"
+    "name_new": "Signal Fires",
+    "effect_text_new": "Autumn: if the Sim has 2 or more Active cards in Fog Regions, it gains 2 Lore.",
+    "fog_pips": 2,
+    "confidence": "new design (W489 rewrite); own text and numbers; solo mode is not implemented in the engine"
    },
    {
     "id": "T15",
-    "name_new": "Black Night",
-    "effect_text_new": "Autumn: if the player has Active cards in Fog Regions, they must move one of their cards from each Fog Region to the Lost Pile.",
-    "fog_pips": 1,
-    "confidence": "effect confirmed (card library image); 'fog_pips' = count of wave icons at card bottom, meaning NOT confirmed (ASSUMPTION: threat 'weight'/draw cost)"
+    "name_new": "Moonless Night",
+    "effect_text_new": "Autumn: send one of your Active cards from one Fog Region of your choice to the Lost Pile.",
+    "fog_pips": 2,
+    "confidence": "new design (W489 rewrite); own text and numbers; solo mode is not implemented in the engine"
    },
    {
     "id": "T16",
-    "name_new": "Overrun",
-    "effect_text_new": "Player cards in Fog Regions treat their printed Invulnerable and Resilient as blank.",
-    "fog_pips": 2,
-    "confidence": "effect confirmed (card library image); 'fog_pips' = count of wave icons at card bottom, meaning NOT confirmed (ASSUMPTION: threat 'weight'/draw cost)"
+    "name_new": "Overwhelmed",
+    "effect_text_new": "Your cards in Fog Regions lose printed Resilient.",
+    "fog_pips": 1,
+    "confidence": "new design (W489 rewrite); own text and numbers; solo mode is not implemented in the engine"
    },
    {
     "id": "T17",
-    "name_new": "The Great Work",
-    "effect_text_new": "Each time the Sim wins a Clash in a Fog Region it gains 3 influence and 3 lore.",
-    "fog_pips": 1,
-    "confidence": "effect confirmed (card library image); 'fog_pips' = count of wave icons at card bottom, meaning NOT confirmed (ASSUMPTION: threat 'weight'/draw cost)"
+    "name_new": "The Grand Design",
+    "effect_text_new": "Each Fog Clash the Sim wins gives it 2 Influence and 2 Lore.",
+    "fog_pips": 2,
+    "confidence": "new design (W489 rewrite); own text and numbers; solo mode is not implemented in the engine"
    },
    {
     "id": "T18",
-    "name_new": "Time Slips",
-    "effect_text_new": "For each Fog Region, if the first Clash is a win for the player, treat it as a Tied Clash and begin a new Clash.",
-    "fog_pips": 2,
-    "confidence": "effect confirmed (card library image); 'fog_pips' = count of wave icons at card bottom, meaning NOT confirmed (ASSUMPTION: threat 'weight'/draw cost)"
+    "name_new": "Slipping Hours",
+    "effect_text_new": "The first Fog Region you win each Round counts as a Tied Clash instead.",
+    "fog_pips": 3,
+    "confidence": "new design (W489 rewrite); own text and numbers; solo mode is not implemented in the engine"
    },
    {
     "id": "T19",
-    "name_new": "Fog Walls",
-    "effect_text_new": "The player may not activate Ambush or Flank Commands in Fog Regions.",
-    "fog_pips": 2,
-    "confidence": "effect confirmed (card library image); 'fog_pips' = count of wave icons at card bottom, meaning NOT confirmed (ASSUMPTION: threat 'weight'/draw cost)"
+    "name_new": "Walls of Mist",
+    "effect_text_new": "You may not use Flank Commands in Fog Regions.",
+    "fog_pips": 1,
+    "confidence": "new design (W489 rewrite); own text and numbers; solo mode is not implemented in the engine"
    },
    {
     "id": "T20",
-    "name_new": "Picked Off",
-    "effect_text_new": "Day: in Fog Regions, Active player cards in the current Clash with Strength 4 or less are moved to the Lost Pile.",
-    "fog_pips": 2,
-    "confidence": "effect confirmed (card library image); 'fog_pips' = count of wave icons at card bottom, meaning NOT confirmed (ASSUMPTION: threat 'weight'/draw cost)"
+    "name_new": "Picked Apart",
+    "effect_text_new": "Day: in Fog Regions, your Active cards with Strength 3 or less in the current Clash go to the Lost Pile.",
+    "fog_pips": 3,
+    "confidence": "new design (W489 rewrite); own text and numbers; solo mode is not implemented in the engine"
    },
    {
     "id": "T21",
-    "name_new": "Vanishing Landmarks",
-    "effect_text_new": "In Fog Regions the player may not claim Location Rewards from the left or right side of the Map, chosen by the arrow on the Sim's current Ambition card.",
-    "fog_pips": 3,
-    "confidence": "effect confirmed (card library image); 'fog_pips' = count of wave icons at card bottom, meaning NOT confirmed (ASSUMPTION: threat 'weight'/draw cost)"
+    "name_new": "Shifting Ground",
+    "effect_text_new": "In Fog Regions you may not claim the left-hand Location Reward.",
+    "fog_pips": 2,
+    "confidence": "new design (W489 rewrite); own text and numbers; solo mode is not implemented in the engine"
    },
    {
     "id": "T22",
-    "name_new": "Rolling Mist",
-    "effect_text_new": "Immediately after revealing this Threat, reveal another Threat.",
-    "fog_pips": 3,
-    "confidence": "effect confirmed (card library image); 'fog_pips' = count of wave icons at card bottom, meaning NOT confirmed (ASSUMPTION: threat 'weight'/draw cost)"
+    "name_new": "Thickening Mist",
+    "effect_text_new": "When revealed, reveal another Threat, then shuffle this one back into the Threat deck.",
+    "fog_pips": 2,
+    "confidence": "new design (W489 rewrite); own text and numbers; solo mode is not implemented in the engine"
    },
    {
     "id": "T23",
-    "name_new": "Show of Force",
-    "effect_text_new": "After all Night Effects: in Fog Regions, the Sim steals 1 influence for each of its Active cards in the current Clash whose Strength is higher than the player's highest-Strength card there.",
-    "fog_pips": 2,
-    "confidence": "effect confirmed (card library image); 'fog_pips' = count of wave icons at card bottom, meaning NOT confirmed (ASSUMPTION: threat 'weight'/draw cost)"
+    "name_new": "Iron Display",
+    "effect_text_new": "After Night in a Fog Region, the Sim steals 1 Influence if its strongest card there beats your strongest card.",
+    "fog_pips": 3,
+    "confidence": "new design (W489 rewrite); own text and numbers; solo mode is not implemented in the engine"
    },
    {
     "id": "T24",
-    "name_new": "We Are Many",
-    "effect_text_new": "All Sim cards in Fog Regions gain the Follower Archetype. If the Sim wins a Clash in a Fog Region it gains 1 influence.",
-    "fog_pips": 2,
-    "confidence": "effect confirmed (card library image); 'fog_pips' = count of wave icons at card bottom, meaning NOT confirmed (ASSUMPTION: threat 'weight'/draw cost)"
+    "name_new": "Endless Ranks",
+    "effect_text_new": "Sim cards in Fog Regions count as Followers. Each Fog Clash the Sim wins gives it 1 Lore.",
+    "fog_pips": 3,
+    "confidence": "new design (W489 rewrite); own text and numbers; solo mode is not implemented in the engine"
    }
   ],
   "sim_faction_cards_seen": [
    {
-    "name_new": "Shard Figures",
-    "strength": 3,
+    "name_new": "Glass Puppets",
+    "strength": 2,
     "archetype": "follower",
     "traits": [
      "invulnerable"
     ],
-    "tier": "unknown",
-    "copies": "unknown"
+    "tier": "unknown"
    },
    {
-    "name_new": "Chiselled Masks",
-    "strength": 8,
+    "name_new": "Carved Visages",
+    "strength": 7,
     "archetype": "captain",
     "traits": [],
-    "tier": "unknown",
-    "copies": "unknown"
+    "tier": "unknown"
    },
    {
-    "name_new": "Whisper Doll",
-    "strength": 5,
+    "name_new": "Hush Doll",
+    "strength": 4,
     "archetype": "agent",
-    "commands": [
-     "deadly"
-    ],
-    "effect_text_new": "Night: if any Active player Follower is in the Clash, Eliminate this card.",
+    "traits": [],
     "tier": "unknown",
-    "copies": "unknown"
+    "effect_text_new": "Deadly. Night: if two or more Active player Followers are in the Clash, Eliminate this card."
    },
    {
-    "name_new": "Gilded Muse",
-    "strength": 10,
+    "name_new": "Gilt Effigy",
+    "strength": 9,
     "archetype": "heir",
     "traits": [
      "resilient"
@@ -2607,29 +2425,27 @@
     "tier": "unknown"
    },
    {
-    "name_new": "Scarecrow Ruse A",
-    "strength": 3,
+    "name_new": "Straw Decoy A",
+    "strength": 2,
     "archetype": "ruse",
     "traits": [
      "invulnerable"
     ],
-    "effect_text_new": "Day: draw the top two cards of the Sim deck face-down; play the higher-Tier one face-down next to the Region, discard the other; ties go to the first drawn.",
-    "tier": "unknown"
+    "tier": "unknown",
+    "effect_text_new": "Day: draw the top two Sim cards face-down; play the stronger next to the Region, discard the other."
    },
    {
-    "name_new": "Sun Idol",
-    "strength": 11,
+    "name_new": "Dawn Idol",
+    "strength": 12,
     "archetype": "heir",
     "traits": [
      "invulnerable"
     ],
-    "lore_cost_icon_present": true,
-    "tier": "unknown",
-    "note": "has a triangle (Lore-cost-style) icon in top right: probably marks Gold Tier or an 'advanced' Sim card; ASSUMPTION"
+    "tier": "unknown"
    },
    {
-    "name_new": "Colossus Idol",
-    "strength": 13,
+    "name_new": "Titan Idol",
+    "strength": 14,
     "archetype": "champion",
     "traits": [
      "resilient"
@@ -2637,51 +2453,49 @@
     "tier": "unknown"
    },
    {
-    "name_new": "Puppeteer Doll",
-    "strength": 6,
+    "name_new": "Marionette",
+    "strength": 7,
     "archetype": "agent",
     "traits": [
      "resilient"
     ],
-    "commands": [
-     "deadly"
-    ],
-    "tier": "unknown"
+    "tier": "unknown",
+    "effect_text_new": "Deadly."
    },
    {
-    "name_new": "Black Monolith",
-    "strength": 6,
+    "name_new": "Obsidian Pillar",
+    "strength": 7,
     "archetype": "ruse",
     "traits": [
      "invulnerable"
     ],
-    "effect_text_new": "Day: if this is Active in the current Clash, before the Sim does anything else, reveal a Threat; then if the Region has no Fog, place Fog in it.",
-    "tier": "unknown"
+    "tier": "unknown",
+    "effect_text_new": "Day: if Active in the current Clash, reveal a Threat first; then if the Region has no Fog, place Fog in it."
    },
    {
-    "name_new": "Ember-Headed Walker",
-    "strength": 5,
+    "name_new": "Cinder Walker",
+    "strength": 4,
     "archetype": "war_machine",
     "traits": [
      "invulnerable"
     ],
-    "effect_text_new": "Autumn: if this is the only Active Sim card in the Region matching the Sim's current Ambition, move it to the Region matching the current Ambition and place 1 influence on it.",
-    "tier": "unknown"
+    "tier": "unknown",
+    "effect_text_new": "Autumn: if it is the only Active Sim card in its Region, move it to the Ambition Region and put 2 Influence tokens on it."
    },
    {
-    "name_new": "Scarecrow Ruse B",
-    "strength": 1,
+    "name_new": "Straw Decoy B",
+    "strength": 0,
     "archetype": "ruse",
     "traits": [
      "invulnerable"
     ],
-    "effect_text_new": "(same Day effect as Scarecrow Ruse A)",
-    "tier": "unknown"
+    "tier": "unknown",
+    "effect_text_new": "Same Day effect as Straw Decoy A."
    }
   ],
   "sim_site_of_power": {
-   "name_new": "Fog Nest",
-   "text_new": "Winter-style effect: when no cards remain here, the Sim removes 2 lore from its Supply and gains 1 influence, repeating while able."
+   "name_new": "Mist Hatchery",
+   "text_new": "When no cards remain here, the Sim removes 3 Lore from its Supply and gains 1 Influence, repeating while able."
   },
   "sim_notes": "Sim also has Ambition cards, Scheme (Plan) cards, Fog markers, bid tokens, Forge difficulty cards (30 double-sided) - contents NOT captured."
  }

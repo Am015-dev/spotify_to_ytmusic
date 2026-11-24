@@ -39,7 +39,7 @@ const URL = process.env.WM_URL || 'file://' + __dirname + '/wildmark.html', SHOT
     }
     await p.waitForTimeout(1200);
     if (SHOTS && name === '390x844') await p.screenshot({ path: SHOTS + '/tut-' + (++shot) + '.png' });
-    const res = await p.evaluate(() => ({ over: !!(window.G && G.over), rs: !document.getElementById('rs').hidden, cov: window.WM_COACH || null, rules: window.COACH_RULES, done: (() => { try { return GXT.isDone('wildmark'); } catch (e) { return false; } })(), final: !!document.querySelector('#rs .cfinal'), again: (document.getElementById('againB') || {}).textContent }));
+    const res = await p.evaluate(() => ({ over: !!(window.G && G.over), sc: window.G && G.res ? G.res.map(x => x.total).join('-') : '',  rs: !document.getElementById('rs').hidden, cov: window.WM_COACH || null, rules: window.COACH_RULES, done: (() => { try { return GXT.isDone('wildmark'); } catch (e) { return false; } })(), final: !!document.querySelector('#rs .cfinal'), again: (document.getElementById('againB') || {}).textContent }));
     const shown = (res.cov && res.cov.shown || []).filter(x => (res.rules || []).indexOf(x) >= 0), missing = (res.rules || []).filter(id => shown.indexOf(id) < 0);
     const inOrder = JSON.stringify(shown) === JSON.stringify(res.rules);
     // the main button starts a real 20-turn game
@@ -47,7 +47,7 @@ const URL = process.env.WM_URL || 'file://' + __dirname + '/wildmark.html', SHOT
     const pass = res.over && res.rs && res.final && res.done && !missing.length && inOrder && !bad.length && !errs.length && real;
     if (!pass) allOk = false;
     console.log((pass ? 'PASS' : 'FAIL') + ' guided tutorial ' + name + ': ' + taps + ' highlighted taps, rules taught ' + shown.length + '/' + (res.rules || []).length + (inOrder ? ' in order' : ' OUT OF ORDER') +
-      (missing.length ? ' MISSING ' + missing.join(',') : '') + (bad.length ? ' ISSUES ' + bad.slice(0, 4).join('; ') : '') + (errs.length ? ' errors ' + errs.slice(0, 2).join(' | ') : '') + ' walk-through ' + res.final + ' done ' + res.done + ' real game after ' + real);
+      (missing.length ? ' MISSING ' + missing.join(',') : '') + (bad.length ? ' ISSUES ' + bad.slice(0, 4).join('; ') : '') + (errs.length ? ' errors ' + errs.slice(0, 2).join(' | ') : '') + ' score ' + res.sc + ' walk-through ' + res.final + ' done ' + res.done + ' real game after ' + real);
     await ctx.close();
   }
   await b.close(); process.exit(allOk ? 0 : 1);

@@ -23,7 +23,7 @@ const URL = process.argv[2] || 'http://127.0.0.1:8765/perch-and-plume/', MAXS = 
         if (document.querySelector('.turnban,.reveal') || UI.busy || !myTurn()) { const pg = document.querySelector('#passgo'); return pg && vis(pg) ? '#passgo' : null; }
         const pop = document.querySelector('#pop'); if (!pop.hidden) return '[data-a="popx"]';
         const go = document.querySelector('[data-a="playgo"]'); if (vis(go)) return '[data-a="playgo"]';
-        const gl = [...document.querySelectorAll('.glow')].filter(vis);
+        const gl = [...document.querySelectorAll('[data-legal]')].filter(vis);
         const onScr = e => { const r = e.getBoundingClientRect(), t = document.elementFromPoint(r.left + r.width / 2, r.top + Math.min(r.height / 2, 24)); return r.top >= 0 && r.bottom <= innerHeight && r.left >= 0 && r.right <= innerWidth && !!t && (t === e || e.contains(t)); };
         const pickOne = (all) => { const seen = all.filter(onScr), arr = seen.length ? seen : all; const e = arr[Math.floor(Math.random() * arr.length)];   // a newcomer taps a glowing thing they can see; a scroll is counted only when none is on screen
  e.setAttribute('data-tt', '1'); document.querySelectorAll('[data-tt]').forEach(x => x !== e && x.removeAttribute('data-tt')); return '[data-tt="1"]'; };

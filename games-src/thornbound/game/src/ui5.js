@@ -3,7 +3,7 @@ function renderAll(){if(!G||!UI.started)return;
   try{UI.V=isClient()?G:TB.stripView(G,isPassing()?-1:vs())}catch(e){console.error('view '+e.message);return}  // a client's G is already its own stripped copy
   if(isPassing()){if(GX.open)GX.close();const bb=$('#boardbody');if(bb)bb.innerHTML='';if(UI.pop)closePop(true)}
   if(!(UI.card&&UI.card.kind==='event'))renderMap();else if(!MAP.m)renderMap();
-  renderMain();renderBar();renderHand();renderDeskRoad();renderRivals();renderSpots();setHB();renderCard();renderPop();updateLive();
+  renderCouncils();renderMain();renderBar();renderHand();renderDeskRoad();renderRivals();try{const rv=$('#rivals');if(rv&&UI.desk)document.documentElement.style.setProperty('--rvh',rv.offsetHeight+'px');renderSideLog()}catch(e){}renderSpots();setHB();renderCard();renderPop();updateLive();
   document.documentElement.dataset.step=String(roadIdx());
   if(typeof bfAfter==='function')bfAfter();
   netAfter();
@@ -11,6 +11,23 @@ function renderAll(){if(!G||!UI.started)return;
 function setHB(){}
 function updateLive(){const l=$('#live');if(!l)return;const last=G.log[G.log.length-1];if(last&&UI._liveN!==last.i){UI._liveN=last.i;l.textContent=last.t}}
 // ---------------------------------------------------------------- clicks
+// a button redrawn between finger-down and finger-up (a rival's step repaints the tray): the browser drops that click, so play it on the new button once
+document.addEventListener('pointerdown',e=>{const t=e.target.closest&&e.target.closest('#act [data-a],#main [data-a],#ppop [data-a]');UI._pd=t?{t,a:t.dataset.a,k:t.dataset.k||'',v:t.dataset.aut||t.dataset.v||'',x:e.clientX,y:e.clientY}:null},true);
+document.addEventListener('pointerup',e=>{const p=UI._pd;UI._pd=null;if(!p||p.t.isConnected||Math.hypot(e.clientX-p.x,e.clientY-p.y)>12)return;
+  const n=document.elementFromPoint(e.clientX,e.clientY),t=n&&n.closest&&n.closest('#act [data-a],#main [data-a],#ppop [data-a]');
+  if(!t||t.dataset.a!==p.a||(t.dataset.k||'')!==p.k||(t.dataset.aut||t.dataset.v||'')!==p.v||t.disabled)return;t.click();UI._ncT=Date.now()+350},true);
+// a new finger on the glass ends the previous tap's "swallow its click" window (a replayed tap whose real click never came must not eat the next tap)
+document.addEventListener('pointerdown',()=>{UI._ncT=0},true);
+// a clean tap whose click never comes (the browser drops the tap that stops a swipe's fling, e.g. a tap right after dragging a card):
+// pointerdown + pointerup landed on the same button and no click followed within 180 ms, so the tap is played as a click once
+(function(){let pd=null,mc=null;const sel='button,[data-a],#handw .hc';
+  document.addEventListener('pointerdown',e=>{if(mc){clearTimeout(mc);mc=null}const t=e.pointerType!=='mouse'&&e.target.closest&&e.target.closest(sel);pd=t?{t,x:e.clientX,y:e.clientY,at:Date.now()}:null},true);
+  document.addEventListener('pointerup',e=>{const p=pd;pd=null;if(!p||!p.t.isConnected||p.t.disabled||Date.now()-p.at>450||Math.hypot(e.clientX-p.x,e.clientY-p.y)>12)return;
+    if(UI._nc||(UI._ncT&&Date.now()<UI._ncT)||UI.dragging)return;   // a tap that skipped a narration, ended a hold or a drag: it must not act
+    const n=document.elementFromPoint(e.clientX,e.clientY);if(!n||!(n===p.t||p.t.contains(n)))return;const t=p.t;
+    mc=setTimeout(()=>{mc=null;if(!t.isConnected||t.disabled||(UI._ncT&&Date.now()<UI._ncT))return;t.click();UI._ncT=Date.now()+350},180)},true);
+  document.addEventListener('pointercancel',()=>{pd=null},true);
+  document.addEventListener('click',()=>{if(mc){clearTimeout(mc);mc=null}},true)})();
 document.addEventListener('click',e=>{
   const t=e.target.closest&&e.target.closest('[data-a]');
   // an open detail sheet closes on any tap outside it (that tap does nothing else)
@@ -31,7 +48,7 @@ document.addEventListener('click',e=>{
    case 'pclose':closePop();break;
    case 'newsok':newsOk();break;
    case 'hint':{const s=viewSeatForQ();if(s!=null){UI.hintQ=qKey(s,legal(s));renderAll()}break}
-   case 'confirm':{UI.pop='confirm';UI.popArg={k:t.dataset.k};renderPop();break}
+   case 'confirm':{UI.pop='confirm';UI.popArg={k:t.dataset.k};renderPop();const pp=$('#ppop');if(!pp||pp.hidden){UI.pop=null;UI.popArg=null;const ok=humanMove(t.dataset.k);if(!ok){toast('You can\u2019t use that now.');renderAll()}}break}   // no confirm sheet for this move: never a dead tap
    case 'take':{const s=+t.dataset.s;UI.holder=s;UI.passed=s;UI.card=null;UI._cardKey=null;UI.pop=null;pump();break}
    case 'evok':{evDone();break}
    case 'tipx':UI.tip[t.dataset.k]='x';renderAll();break;
@@ -86,6 +103,11 @@ function afterStart(){closePop(true);GX.close();UI.mapReset=true;renderAll();pum
 function renderLog(){const el=$('#logbody');if(!el||!G)return;const L=G.log.slice().reverse();let h='<p class="small">Newest first. Tap an underlined word for its meaning. <button class="btn" data-a="logall">'+(UI.logAll?'Show key events only':'Show everything')+'</button></p><ol class="log">';
   let r=-1;for(const e of L){if(!UI.logAll&&e.c!=='big'&&e.c!=='warn'&&!(e.m&&['inf','steal','elim','kcsteal','tac','fav','inv'].includes(e.m.k)))continue;if(e.r!==r){r=e.r;h+='<li class="lr">Round '+r+'</li>'}h+='<li class="'+(e.c||'')+'"><i style="background:'+(e.s>=0?fcol(e.s):'#777')+'"></i>'+gloss(plain(e.t))+'</li>'}
   el.innerHTML=h+'</ol>'}
+// PC: the left panel keeps the story of the game in view (what rivals did, who scored and why)
+function renderSideLog(){const el=$('#sidelog');if(!el)return;if(!UI.desk||!G||!UI.started){el.hidden=true;return}el.hidden=false;
+  const L=G.log.slice(-60);let h='<h4>What happened</h4><ol>',r=-1;
+  for(const e of L){if(e.c!=='big'&&e.c!=='warn'&&!(e.m&&['inf','steal','elim','kcsteal','tac','fav','inv','move'].includes(e.m.k)))continue;if(e.r!==r){r=e.r;h+='<li class="lr">Round '+r+'</li>'}h+='<li><i style="background:'+(e.s>=0?fcol(e.s):'#777')+'"></i><span>'+esc(plain(e.t))+'</span></li>'}
+  h+='</ol>';if(el._h!==h){el._h=h;el.innerHTML=h;const o=el.querySelector('ol');if(o)o.scrollTop=o.scrollHeight}}
 function renderMenu(){const el=$('#setbody');if(!el)return;
   const seg=(a,cur,opts)=>'<div class="seg">'+opts.map(([v,l])=>'<button class="'+(String(cur)===String(v)?'on':'')+'" data-a="'+a+'" data-v="'+v+'">'+l+'</button>').join('')+'</div>';
   el.innerHTML=(NET.on?'<div class="mrow"><button class="btn pri" data-a="netopen">Online lobby</button>'+(isHost()?'<button class="btn" data-a="newgame">Change setup</button>':'')+'<button class="btn" data-a="netleave">Leave the room</button></div>':'<div class="mrow"><button class="btn pri" data-a="newgame">New game / main menu</button><button class="btn" data-a="savenow">Save now</button></div>')+
@@ -112,6 +134,7 @@ const RULES_HTML=()=>`<div class="rules">
 <p><b>Goal:</b> hold the most <b>Influence</b> when the last round ends. Ties go to the Favour holder.</p>
 <p><b>Simplified on purpose:</b> Your starting hand is 6 cards.</p>
 <p>The guided first game walks you through this once. Underlined words in the game can be tapped for their meaning.</p></div>
+<details><summary>Glossary: every word in the game</summary><dl>${['lore','active','govern','journey','pledges','tactic'].map(k=>GLOSS.find(g=>g[0]===k)).concat(GLOSS.filter(g=>!['lore','active','govern','journey','pledges','tactic'].includes(g[0]))).filter(Boolean).map(g=>'<dt>'+g[2]+'</dt><dd>'+g[3]+'</dd>').join('')}</dl></details>
 <details><summary>The full rules</summary>
 <h3>The goal</h3><p>You lead one of four factions competing for the throne. The game lasts a fixed number of rounds (4, 5 or 6). When the last round ends, the player with the most <b>Influence</b> wins. Ties go to whoever holds the Kingdom's Favour, then to the better place on the Order Track.</p>
 <h3>How a round goes</h3><ol class="rl">
@@ -125,15 +148,15 @@ const RULES_HTML=()=>`<div class="rules">
 <li><b>Autumn.</b> Once each you may <b>Govern</b> (move a hand card that has votes into one of three Councils) and <b>Journey</b> (send a hand card that shows Lore away, gain that much Lore, and spend Lore on your faction's Site of Power cards). Other Autumn abilities such as Rally and Deploy also work now.</li>
 <li><b>Winter.</b> Heralds go home. Supporters on the map go to the Lost Pile. Every active card goes to its owner's discard pile, except cards that carry Influence tokens, which lose one token and stay.</li>
 </ol>
-<h3>Locations</h3><ul><li><b>Spire Court</b> +1 and Govern with a card from hand or the table (every other card in that Council is discarded).</li><li><b>Thornwild</b> +1 and Journey.</li><li><b>Gleaning Meadow</b> +1 and claim the Kingdom's Favour.</li><li><b>Cairn Field</b> +2, nothing else.</li><li><b>Moss Altar</b> +1 and put up to three cards at the bottom of your deck.</li><li><b>Ossuary</b> +1, reshuffle your discard pile and draw up to three from it.</li></ul>
-<h3>Councils</h3><p>Cards with votes go into Councils. <b>Coin</b>: when you claim a Herald reward you may remove your cards there for extra Influence equal to their votes. <b>Whispers</b>: in Autumn spread markers on locations; four on one location claims its bonus effect. <b>Pledges</b>: in Autumn bring Supporters back from the map or the Lost Pile, one per vote, and one more for the strictly largest voter.</p>
+<h3>Locations</h3><ul><li><b>Bell Tower</b> +2 and Govern with a card from hand or the table (every other card in that Council is discarded).</li><li><b>Standing Stones</b> no Influence, Journey and gain 1 extra Lore.</li><li><b>Market Cross</b> no Influence, claim the Kingdom's Favour.</li><li><b>Broken Shield</b> +3, nothing else.</li><li><b>Wishing Well</b> +1 and put up to two cards at the bottom of your deck.</li><li><b>Ash Heap</b> +1, reshuffle your discard pile and draw up to two from it.</li></ul>
+<h3>Councils</h3><p>Cards with votes go into Councils. <b>Purse</b>: when you claim a Herald reward you may cash in your cards there for 1 Influence per vote, at most 3. <b>Veil</b>: in Autumn spread markers on locations; five on one location claims its bonus effect. <b>Bond</b>: in Autumn bring Supporters back from the map or the Lost Pile, one per vote, at least two.</p>
 <h3>Attrition</h3><p>If you must draw and your deck is empty, your discard pile becomes your new deck and your hand size drops by one (never below 3, never above 8). A short game of 4 or 5 rounds usually hits this around round 3.</p>
-<h3>The Kingdom's Favour</h3><p>A disc with three uses. Claim it at the Gleaning Meadow. While you hold it you may use your faction's Favour action; each use spends one of three charges.</p>
+<h3>The Kingdom's Favour</h3><p>A disc with three uses. Claim it at the Market Cross. While you hold it you may use your faction's Favour action; each use spends one of three charges.</p>
 <h3>Reading your cards</h3><p>Top left: Strength. Top right: the Lore cost (Site of Power cards only). Bottom line: votes and lore. Invulnerable cards cannot be eliminated, Resilient cards go to the discard instead of the Lost Pile, Pathfinder cards go to the discard when used for a Journey.</p>
 <h3>Kept simple</h3><p>There is no solo mode and no advanced setup. Starting hand size is 6, and a few trait icons are read from the card text.</p>
-<h3>On this screen</h3><p>Tap a location or a region's card slots for details; tap the throne for the Great Road and Councils. Tap a card in your hand for a large view and its actions. The dots in the top bar show the seven steps of a round. The gold button at the bottom of the panel is the suggestion of a strong computer player, and the line above it says why.</p>
+<h3>On this screen</h3><p>Tap a location or a region's card slots for details; tap a Council or the Favour chip for the Great Road and Councils. Tap a card in your hand for a large view and its actions. The dots in the top bar show the seven steps of a round. The gold button at the bottom of the panel is the suggestion of a strong computer player, and the line above it says why.</p>
 </details>
-<details><summary>Words used in the game</summary><dl>${GLOSS.map(g=>'<dt>'+g[2]+'</dt><dd>'+g[3]+'</dd>').join('')}</dl></details>
+
 </div>`;
 function setupDrawers(){
   GX.drawer('rulesd','How to play',(()=>{const d=document.createElement('div');d.innerHTML=RULES_HTML();return d})(),true);

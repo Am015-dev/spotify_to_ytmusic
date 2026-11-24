@@ -27,10 +27,10 @@ const URL = process.argv[2] || 'http://127.0.0.1:8765/perch-and-plume/';
     await p.waitForFunction(() => myTurn() && document.querySelector('#act4') && !document.querySelector('.turnban') && !UI.busy, null, { timeout: 15000 });
     ok(await p.evaluate(() => document.querySelector('#pop').hidden), `${w}x${h} no pop-up covers the board when the first turn starts`);
     await tap1('.a4[data-k="play"]', () => UI.pickBird === true, 'Play a bird');
-    await tap1('#hand .bc.glow', () => UI.sel != null, 'a playable bird');
-    const sz = await p.evaluate(() => { const r = document.querySelector('.slot.glow').getBoundingClientRect(); return [Math.round(r.width), Math.round(r.height)]; });
+    await tap1('#hand .bc[data-legal]', () => UI.sel != null, 'a playable bird');
+    const sz = await p.evaluate(() => { const r = document.querySelector('.slot[data-legal]').getBoundingClientRect(); return [Math.round(r.width), Math.round(r.height)]; });
     ok(sz[0] >= 44 && sz[1] >= 44, `${w}x${h} board space is ${sz[0]}x${sz[1]} (44 px or more)`);
-    await tap1('.slot.glow', () => !!UI.pend, 'a glowing space');
+    await tap1('.slot[data-legal]', () => !!UI.pend, 'a glowing space');
     await p.waitForTimeout(150);
     const v = await p.evaluate(() => {
       const db = document.querySelector('#dockbody').getBoundingClientRect(), hd = document.querySelector('.gx-dock-head').getBoundingClientRect(), pr = document.querySelector('#prompt').getBoundingClientRect();
@@ -48,7 +48,7 @@ const URL = process.argv[2] || 'http://127.0.0.1:8765/perch-and-plume/';
     await tap1('.a4[data-k="food"]', () => !!(G.q && G.q.h === 'die') || UI.busy, 'Get food');
     if (await p.evaluate(() => !!(G.q && G.q.h === 'die'))) {
       await p.evaluate(() => { window.__f0 = G.feeder.filter(Boolean).length; });
-      await tap1('.die.glow', () => G.feeder.filter(Boolean).length !== window.__f0 || UI.gsDie != null || !G.q || G.q.h !== 'die', 'a food die');
+      await tap1('.die[data-legal]', () => G.feeder.filter(Boolean).length !== window.__f0 || UI.gsDie != null || !G.q || G.q.h !== 'die', 'a food die');
     }
     await ctx.close();
   }

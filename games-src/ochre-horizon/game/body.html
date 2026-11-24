@@ -1,0 +1,44 @@
+<body>
+<div id="guide" role="status" aria-live="polite"><span class="k" id="gdK">Guided</span><span class="tx"><span id="gdT"></span><span id="gdW"></span></span></div>
+<div id="app" class="gx-app">
+  <div id="top">
+    <button class="ib" id="bmenu" aria-label="Menu"></button>
+    <div id="gen" aria-label="Generation">Gen<b>1</b></div>
+    <button class="sc you" id="syou" aria-label="Your score"><span class="tr" id="trYou">20</span><span class="lb"><span class="nm" id="nmYou">You</span><br><span id="vpYou">TR 20</span></span></button>
+    <button class="sc riv" id="sriv" aria-label="Rival details"><span class="lb"><span class="nm" id="nmRiv">Rival</span><br><span id="vpRiv">TR 20</span></span><span class="tr" id="trRiv">20</span></button>
+  </div>
+  <div id="glob">
+    <div class="gauge" id="gTemp"></div><div class="gauge" id="gOxy"></div><div class="gauge" id="gOcean"></div>
+  </div>
+  <div id="bw" class="gx-board">
+    <svg id="board" aria-label="Map of Ochre"></svg>
+    <div id="hint"><span id="hintt">Pick your company</span></div>
+    <button id="hintbtn" aria-label="Suggest a move"></button>
+    <div id="zoom"><button id="zin" aria-label="Zoom in"></button><button id="zout" aria-label="Zoom out"></button><button id="zfit" aria-label="Fit map"></button></div>
+    <div id="confirm"><button id="confirmb">Place here</button></div>
+  </div>
+  <div id="res"></div>
+  <div id="bar">
+    <button class="main" id="bCards"><span>Cards</span><small id="bCardsS">0 in hand</small></button>
+    <button id="bProj"><span>Projects</span><small>& goals</small></button>
+    <button id="bAct"><span>Actions</span><small id="bActS">0 ready</small></button>
+    <button class="pass" id="bPass"><span id="bPassT">Pass</span><small id="bPassS">end round</small></button>
+  </div>
+</div>
+<aside id="rpanel" aria-label="Rival"></aside>
+<div id="scrim"></div>
+<div class="sheet" id="sheet" role="dialog" aria-modal="true"><div class="sh"><h2 id="shT">Cards</h2><button class="x" id="shX" aria-label="Close"></button></div><div class="tabs" id="shTabs"></div><div class="sb" id="shB"></div></div>
+<div id="modal" role="dialog" aria-modal="true"><div class="mb" id="mb"></div></div>
+<div id="toast"></div>
+<div class="coach" id="coach"><div><span id="coachT"></span><button id="coachB">OK</button></div></div>
+<div id="start"></div>
+<script src="gx-scenario.js"></script>
+<script src="scn.js"></script>
+<script src="gx-viewport.js"></script>
+<script src="map.js"></script>
+<script src="data.js"></script>
+<script src="engine.js"></script>
+<script src="ai.js"></script>
+<script src="art.js"></script>
+<script src="ui.js"></script>
+</body></html>

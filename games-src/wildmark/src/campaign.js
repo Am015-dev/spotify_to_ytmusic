@@ -7,7 +7,7 @@ function campStart(def) {
   if (tw && tw.id === 'boss-acorns') for (i = 1; i < np; i++) acorns[i] = tw.param || 2;
   if (tw && tw.id === 'you-acorns') acorns[0] = tw.param || 1;
   UI.mode = 'camp'; UI.camp = def; UI.sv = 'title';
-  var g = newGame({ cards: UI.prefs.variant ? s.cards || null : null,   // card set A unless the variant (house tables) cards are switched on
+  var g = newGame({ cards: UI.prefs.variant ? s.cards || null : null,   // card set A unless the variant B-D cards are switched on
  np: np, humans: 1, ai: op.aiLevel || 'normal', seed: s.seed != null ? s.seed : null, turns: tw && tw.id === 'short-season' ? tw.param : 20, acorns: acorns, no3: !!(tw && tw.id === 'no-sweep'), names: names });
   UI.mode = 'camp';
   try { if (window.GXH) GXH.setEnabled(def.hints !== false); } catch (e) { }

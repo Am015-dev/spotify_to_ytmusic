@@ -1,13 +1,13 @@
 // ===================== part 5: the tutorial (shell/gx-tutor.js): a staged first year that teaches every action once =====================
 // Fixed seed, fixed hand, two brown birds already in your forest so the first forest action shows the centrepiece: the row's powers fire
-// bird by bird, right to left. Pip (the computer) is scripted to draw cards so the feeder and your rows stay as the steps expect. Never saved.
+// bird by bird, right to left. Pip (the computer) is scripted to draw cards in the guided game (tutAIMove, mode tutfree) so the feeder and your rows stay as the steps expect. Never saved.
 // RULES TAUGHT -> steps: goal (goal), the three rows (rows), forest food + feeder (forest, die), brown chain right to left (chain),
 // playing a bird: food + egg cost by column (select, slot, pay), grassland eggs + nest limits (eggs, egg), wetland cards + tray (draw, tray), round goals (goals).
 var TUT = { on: false };
 function tutOn() { return typeof GXT !== 'undefined' && GXT.active() && UI.mode === 'tutorial'; }
 function tutAct(x) { if (!tutOn()) return true; return GXT.act(x); }
 function tutAIMove(s) {
-  if (UI.mode !== 'tutorial' || s !== 1 || G.q) return null;
+  if ((UI.mode !== 'tutorial' && UI.mode !== 'tutfree') || !G.tut || s !== 1 || G.q) return null;   // Pip always draws cards in the guided game
   return { t: 'act', a: 'cards' };
 }
 function tutPick() {

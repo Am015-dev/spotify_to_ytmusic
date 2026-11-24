@@ -50,7 +50,7 @@ const ARCH_LBL={ruse:'Ruse',trader:'Trader',agent:'Agent',follower:'Follower',ca
 const TRAIT_N={inv:'Invulnerable',res:'Resilient',path:'Pathfinder'};
 const TRAIT_T={inv:'cannot be Eliminated',res:'if Eliminated, goes to Discard, not the Lost Pile',path:'a Journey sends it to Discard, not the Lost Pile'};
 const CMD_N={ambush:'Ambush',retreat:'Retreat',flank:'Flank',rally:'Rally',deploy:'Deploy',deadly:'Deadly',ambret:'Ambush or Retreat'};
-const SUIT_N={relics:'Coin',secrets:'Whispers',oaths:'Pledges'};
+const SUIT_N={relics:'Purse',secrets:'Veil',oaths:'Bond'};
 const SUIT_ART={relics:['tribute','merchant','chalice','feast'],secrets:['tome','key','oath','vigil'],oaths:['blade','banner','crown','oath']};
 const SUIT_TYPE={relics:'trade',secrets:'rite',oaths:'edict'};
 function cinfo(id){return TB.cardInfo(G,id)}
@@ -67,6 +67,24 @@ function cardSpec(id,opt){opt=opt||{};
 function kcSpec(n){const k=TB.kingdomInfo(n),arts=SUIT_ART[k.suit]||['banner'];
   return {faction:'neutral',title:k.name,value:null,cost:null,type:SUIT_TYPE[k.suit]||'omen',typeLabel:SUIT_N[k.suit]+' · Kingdom',art:arts[n%arts.length],img:'kc'+String(n).padStart(2,'0'),text:k.text,num:'No. '+n}}
 function cardEl(id,w){return TBKit.card(cardSpec(id),w)}
+// the words printed on a hand card: its role and its power in one or two words; cardLine = the full one-line effect (tap/hold for the whole text)
+const ROLE_S={ruse:'Ruse',trader:'Trader',agent:'Agent',follower:'Follower',cavalry:'Cavalry',war_machine:'Engine',captain:'Captain',champion:'Champion',heir:'Heir',scheme:'Scheme'};
+const CMD_S={ambush:'Ambush',retreat:'Retreat',flank:'Flank',rally:'Rally',deploy:'Deploy',deadly:'Deadly',ambret:'Ambush'};
+const CMD_L={ambush:'Day: Ambush, adds a face-down card from your hand to this fight',retreat:'Day: Retreat, sends your cards here back to your hand (Herald and Supporters back to your board)',flank:'Day: Flank, moves this card to another region that has not fought yet',rally:'Autumn: Rally, returns your Active cards to hand',deploy:'Autumn: Deploy, puts this card from your hand face-up next to a region',deadly:'Night: Deadly, Eliminates ALL rival Active cards in this Clash',ambret:'Day: Ambush or Retreat, adds a face-down card from your hand to this fight, or sends your cards here back to your hand'};
+function cardWords(id){const i=cinfo(id);const c=(i.commands||[])[0];return {role:i.kind==='hq'?'HQ':(ROLE_S[i.archetype]||'Card'),fx:c?(CMD_S[c]||c):(i.traits||[]).includes('inv')?'Safe':'Strength'}}
+// one line per command, built from THIS card's own parameters (cmp: self / x, fx: drawbacks)
+function cmdLine(n,P,i){P=P||{};const fx=i.fx||[];
+  if(n==='rally')return P.self?'Autumn: Rally, returns this card to your hand':'Autumn: Rally, returns up to '+(P.x||1)+' of your Active cards to your hand';
+  if(n==='deploy'){const x=P.x||1;return 'Autumn: Deploy, puts this card from your hand face-up next to a region; it stays '+x+' more Winter'+(x>1?'s':'')}
+  if(n==='deadly')return CMD_L.deadly+(fx.includes('agentDrawback')?' (but a rival Active Follower Eliminates this card)':'');
+  return CMD_L[n]||null}
+function cardLineI(i){const cp=i.cmp||{};const L=(i.commands||[]).map(n=>cmdLine(n,cp[n],i)).filter(Boolean);
+  const extra=(i.kind!=='basic'&&i.kind!=='heir'&&i.text)?i.text:'';
+  if(L.length)return L.join('. ')+'.'+(extra?' '+extra:'');
+  if(extra)return extra;
+  if((i.traits||[]).includes('inv'))return 'Cannot be Eliminated. Fights with its Strength.';return 'No power: fights with its Strength.'}
+function cardLine(id){return cardLineI(cinfo(id))}
+function cardBand(id){const w=cardWords(id);return '<span class="hcb" aria-hidden="true"><b>'+esc(w.role)+'</b><i>'+esc(w.fx)+'</i></span>'}
 function kcEl(n,w){return TBKit.card(kcSpec(n),w)}
 // plain-words detail of a faction card (HTML), used by the enlarged card pop-up
 function cardDetail(id){const i=cinfo(id);const ar=ARCH_LBL[i.archetype]||'';const out=[];const g=t=>typeof gloss==='function'?gloss(t):esc(t);
@@ -83,15 +101,15 @@ function cardDetail(id){const i=cinfo(id);const ar=ARCH_LBL[i.archetype]||'';con
 const EV={cur:null};
 function snapInf(){return G.pl.map(p=>p.inf)}
 function logSince(n){return G.log.filter(e=>e.i>n)}
-function pushEv(e){e.at=G?G.logN+.5:0;UI.evq.push(e);if(typeof netEvent==='function')netEvent(e)}
+function pushEv(e){e.at=G?G.logN+.5:0;if(G&&e.round==null)e.round=Math.max(1,G.round);UI.evq.push(e);if(typeof netEvent==='function')netEvent(e)}
 function hookEngine(){const I=TB.internal;if(!I||!I.AG||I.__hooked)return;I.__hooked=1;const AG=I.AG,PK=I.PICKH;
   const wrap=(h,before,after)=>{const o=AG[h];if(!o)return;AG[h]=function(d){const mine=(()=>{const g=TB.internal.G;if(!G)G=g;return g===G})();try{mine&&before&&before(d)}catch(e){console.warn('hook',h,e.message)}const r=o.call(this,d);try{mine&&after&&after(d)}catch(e){console.warn('hook',h,e.message)}return r}};
   const flush=()=>{if(EV.cur&&EV.cur.t==='clash'&&EV.cur.tot){const c=EV.cur;c.logs=logSince(c.log0).map(e=>e.t);c.inf1=snapInf();pushEv(c)}EV.cur=null};
-  wrap('roundStart',()=>{flush()},()=>{UI.rs0=snapInf();UI.rsInfl=JSON.parse(JSON.stringify(G.infl||[]));UI.rsLog=G.logN;UI.clashRes={};UI.placed=[]});
+  wrap('roundStart',()=>{flush()},()=>{UI.rs0=snapInf();UI.rsInfl=JSON.parse(JSON.stringify(G.infl||[]));UI.rsLog=G.logN;UI.clashRes={};UI.rsReg={};UI.placed=[]});
   wrap(I.AG.bidOrder?'bidOrder':'bidReveal',null,()=>{pushEv({t:'bids',round:G.round,bids:G.pl.map(p=>({seat:p.seat,id:p.bid,str:G.bstr[p.seat]})).filter(b=>b.id!=null),order:G.order.slice()})});
   wrap('clashReveal',()=>{if(EV.cur&&EV.cur.tot)flush()},()=>{const c=G.clash;if(!c)return;if(!EV.cur)EV.cur={t:'clash',r:c.r,idx:G.cord.indexOf(c.r),rounds:0,log0:G.logN-c.parts.length,inf0:snapInf()};
     EV.cur.n=c.n;EV.cur.cards={};for(const s of c.parts)EV.cur.cards[s]=(c.cards[s]||[]).slice();EV.cur.supp={};for(const s of c.parts)EV.cur.supp[s]=G.pl[s].supp.r[c.r];EV.cur.parts=c.parts.slice();EV.cur.tot=null});
-  wrap('clashTally',null,()=>{const c=G.clash;if(!c||!EV.cur)return;EV.cur.tot=Object.assign({},c.tot);EV.cur.winner=c.winner;EV.cur.tied=c.tied?c.tied.slice():null;
+  wrap('clashTally',null,()=>{const c=G.clash;if(!c||!EV.cur)return;EV.cur.tot=Object.assign({},c.tot);EV.cur.winner=c.winner;EV.cur.tied=c.tied?c.tied.slice():null;UI.rsReg=UI.rsReg||{};UI.rsReg[c.r]={w:c.winner,tot:Object.assign({},c.tot),parts:c.parts.slice()};
     EV.cur.cardsF={};for(const s in EV.cur.cards)EV.cur.cardsF[s]=EV.cur.cards[s].slice();
     const ci=G.clash.cards;for(const s in ci)EV.cur.cardsF[s]=ci[s].slice();
     EV.cur.str={};for(const s in EV.cur.cardsF)EV.cur.str[s]=EV.cur.cardsF[s].map(id=>cinfo(id).strength);
@@ -100,7 +118,7 @@ function hookEngine(){const I=TB.internal;if(!I||!I.AG||I.__hooked)return;I.__ho
     flush()});  // the result card comes right after the tally, before the winner is asked to claim a location
   wrap('regionDone',()=>{flush()});
   wrap('cleanup',null,()=>{if(UI.rs0){const why=G.pl.map((p,s)=>{const a=(UI.rsInfl||[])[s]||{},b=(G.infl||[])[s]||{},o=[];for(const k in b){const d=b[k]-(a[k]||0);if(d)o.push([k,d])}for(const k in a)if(!(k in b)&&a[k])o.push([k,-a[k]]);return o.sort((x,y)=>y[1]-x[1])});
-    pushEv({t:'summary',round:G.round,rounds:G.rounds,inf0:UI.rs0,inf1:snapInf(),why,order:G.order.slice(),warns:logSince(UI.rsLog||0).filter(e=>e.c==='warn'&&!(e.m&&e.m.k==='elim')).map(e=>e.t),winter:logSince(UI.rsLog||0).filter(e=>e.m&&(e.m.k==='supp'||e.m.k==='rm'&&e.m.why==='Winter')).map(e=>e.t),big:[],last:G.round>=G.rounds})}});
+    pushEv({t:'summary',round:G.round,rounds:G.rounds,regs:JSON.parse(JSON.stringify(UI.rsReg||{})),inf0:UI.rs0,inf1:snapInf(),why,order:G.order.slice(),warns:logSince(UI.rsLog||0).filter(e=>e.c==='warn'&&!(e.m&&e.m.k==='elim')).map(e=>e.t),winter:logSince(UI.rsLog||0).filter(e=>e.m&&(e.m.k==='supp'||e.m.k==='rm'&&e.m.why==='Winter')).map(e=>e.t),big:[],last:G.round>=G.rounds})}});
   if(PK&&PK.bidRes){const o=PK.bidRes;PK.bidRes=function(seat,opt,d){const r=o.call(this,seat,opt,d);try{UI.toast=G.log.length?G.log[G.log.length-1].t:''}catch(e){}return r}}}
 // ---------------------------------------------------------------- AI adapter (the engine author's TB.ai when present, else a modest fallback)
 function legal(seat){return TB.moves(G,seat)}  // on a client this runs on its own stripped copy (same list as the host's, net-strip-test.js)
@@ -138,17 +156,17 @@ function newGame(mode,o){o=o||{};mode=mode||'me';UI.camp=o.camp||null;UI.campDon
   if(mode==='guided'){cfg.mode='me';cfg.guided=true;cfg.guide='full';cfg.levels=['easy','easy'];cfg.np=2;cfg.length='short';cfg.faction=GUIDED.faction;cfg.seed=GUIDED.seed;o.seatFactions=[GUIDED.faction,GUIDED.rival];UI.aiSeed=GUIDED.ai}
   const seats=mkSeats(cfg);
   const hn=cfg.mode==='hot'?(cfg.humanSeats||seats.map((_,i)=>i)):cfg.mode==='watch'?[]:[0];
-  seats.forEach((s,i)=>{s.human=hn.includes(i);s.level=cfg.levels[i]||cfg.levels[0]||'normal'});
+  seats.forEach((s,i)=>{s.human=hn.includes(i);s.level=cfg.levels[i]||cfg.levels[0]||'easy'});
   if(o.seatFactions)o.seatFactions.forEach((f,i)=>{if(seats[i])seats[i].faction=f});
   const cnt={};const pl=seats.map((s,i)=>{const base=DD.FSHORT[s.faction];
-    return {faction:s.faction,name:s.human&&(cfg.mode==='hot'||hn.length>1)?'Player '+(i+1)+' ('+DD.FSHORT[s.faction].replace('Gilded Court','Court').replace('Heathbound Clans','Clans').replace('Lantern Rising','Lanterns').replace('Pale Choir','Choir')+')':base,ai:s.human?null:s.level}});
+    return {faction:s.faction,name:s.human&&(cfg.mode==='hot'||hn.length>1)?'Player '+(i+1)+' ('+DD.FSHORT[s.faction].replace('Salt Crown','Crown').replace('Ember Guild','Guild').replace('Hollow Synod','Synod')+')':base,ai:s.human?null:s.level}});
   cfg.seats=seats;UI.cfg=cfg;UI.mode=cfg.mode;UI.guide=cfg.guide||(UI.guide||'off');
   hookEngine();
   G=null;const g=TB.newGame({players:pl,length:cfg.length,seed:cfg.seed!=null?cfg.seed:(o.seed!=null?o.seed:undefined),order:o.order});
   G=g;if(UI.camp&&typeof campApply==='function')campApply(UI.camp);resetUI();UI.coachDone={};UI.started=true;UI.holder=hn[0]!=null?hn[0]:0;
   UI.rs0=snapInf();UI.rsLog=0;
   try{localStorage.setItem('tb_played','1')}catch(e){}saveGame();hideStart();afterStart();return G}
-function resetUI(){UI.evq=[];UI.card=null;UI.pop=null;UI.popArg=null;UI.busy=false;UI.tip={};UI.seen={};UI.clashRes={};UI.placed=[];UI.sel={};UI.toast='';UI.lastLog=G?G.logN:0;UI.nowT=null;UI.moreOpen=false;UI.watchPaused=false;UI.passed=null;UI.lastShown=null;UI.mapReset=true}
+function resetUI(){UI.rush=0;UI.evq=[];UI.card=null;UI.pop=null;UI.popArg=null;UI.busy=false;UI.tip={};UI.seen={};UI.clashRes={};UI.placed=[];UI.sel={};UI.toast='';UI.lastLog=G?G.logN:0;UI.nowT=null;UI.moreOpen=false;UI.watchPaused=false;UI.passed=null;UI.lastShown=null;UI.mapReset=true}
 function saveGame(){try{if(NET.on||!G||G.over||!UI.cfg||UI.camp||UI.cfg.tutorial)return;localStorage.setItem('tb_save',JSON.stringify({v:1,G,cfg:UI.cfg,holder:UI.holder,guide:UI.guide,ai:UI.aiSeed,coach:UI.coachDone||{},tip:UI.tip,t:Date.now()}))}catch(e){}}
 function loadSave(){try{const s=localStorage.getItem('tb_save');return s?JSON.parse(s):null}catch(e){return null}}
 function clearSave(){try{localStorage.removeItem('tb_save')}catch(e){}}
@@ -170,15 +188,16 @@ function pump(){clearTimeout(_pumpT);_pumpT=0;if(!G||!UI.started)return;
   try{
     for(let guard=0;guard<4000;guard++){
       if(UI.card){renderAll();return}                       // a card (event, pass screen, coach) is waiting for Continue
-      if(UI.evq.length&&(vs()>=0||UI.mode==='watch')){const ev=UI.evq.shift();if(shouldShowEvent(ev)){showEvent(ev);renderAll();return}continue}
+      if(UI.evq.length&&(vs()>=0||UI.mode==='watch')){const ev=UI.evq.shift();if(UI.rush&&ev.t==='news'&&!ev.big&&!ev.keep)continue;if(shouldShowEvent(ev)){showEvent(ev);renderAll();return}continue}
       if(UI.evq.length){UI.evq.length=0}
       if(G.over){showOver();renderAll();return}
       if(!G.q){renderAll();return}
       const w=whoActs();
       if(w.ai.length){ // AI answers (simultaneous hidden decisions are collected in any order)
-        if(AIDELAY>0&&ANIM){renderAll();if(UI.mode==='watch'&&UI.watchPaused)return;_pumpT=setTimeout(()=>{aiStep(w);pump()},AIDELAY*(UI.mode==='watch'?1:.6)/UI.speed);return}
+        if(AIDELAY>0&&ANIM&&!UI.rush){renderAll();if(UI.mode==='watch'&&UI.watchPaused)return;_pumpT=setTimeout(()=>{aiStep(w);pump()},AIDELAY*(UI.mode==='watch'?1:.15)/UI.speed/(UI.cfg&&UI.cfg.tutorial?3:1));return}
         aiStep(w);continue}
-      // only humans are pending
+      // only humans are pending: a skip-all ends here, at your own decision
+      UI.rush=0;
       const h=pickHumanSeat(w.hum);
       if(h==null){renderAll();return}               // pass-the-device card up
       if(typeof maybeTip==='function'&&maybeTip()){renderAll();return}

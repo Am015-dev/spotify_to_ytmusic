@@ -43,9 +43,10 @@
     G.goals = opts.goals || pick;
     opts.seats.forEach(function (s, i) {
       var p = { name: s.name, kind: s.kind || 'ai', lvl: s.lvl || 'normal', hand: [], food: food0(), bonus: [], board: [[], [], []], pink: false, cubes: 0, ready: false, offer: null, cardsUsed: 0 };
-      if (p.kind === 'automa') { p.auto = { deck: [], birds: [], eggs: 0, tuck: 0, marks: 0, gpts: 0 }; p.ready = true; }
+      if (p.kind === 'automa') { p.ready = true; p.auto = {}; }
       G.pl.push(p);
     });
+    G.pl.forEach(function (p) { if (p.kind === 'automa') autoSetup(G, p, p.lvl); });   // its bonus card is drawn before yours
     rollAll(G);
     refillTray(G);
     G.pl.forEach(function (p, i) {
@@ -162,7 +163,7 @@
   }
   function goalCount(G, seat, gid) {
     var p = G.pl[seat], t = GOL[gid].test;
-    if (p.auto) return p.auto.marks;
+    if (p.auto) return autoGoal(G, seat, gid, G.round);
     var bs = birds(p);
     if (t.t === 'birds') return p.board[t.h].length;
     if (t.t === 'eggsIn') return p.board[t.h].reduce(function (a, s) { return a + s.eggs; }, 0);
@@ -192,21 +193,23 @@
     G.tray.forEach(function (id) { if (id) G.disc.push(id); }); G.tray = [null, null, null]; refillTray(G);
     G.round++;
     if (G.round >= G.rounds) { finish(G); return; }
-    G.first = (G.first + 1) % G.pl.length;
+    if (!G.pl.some(function (q) { return q.auto; })) G.first = (G.first + 1) % G.pl.length;   // solo: you always go first
     startRound(G);
   }
+  // does bird b (in slot s, or just b for a card in hand) count for the bonus card? (a hand bird: eggs/nest-egg tests count it as "could")
+  function bonusHit(id, b, s) {
+    var t = BON[id].test;
+    if (t.t === 'ws') return t.lt ? b.ws < t.lt : b.ws > t.gt;
+    if (t.t === 'nestEgg') return nestIs(b, t.n) && (!s || s.eggs > 0);
+    if (t.t === 'eats') return eats(b, t.f);
+    if (t.t === 'only') return b.h === t.h;
+    if (t.t === 'pts') return b.p <= t.le;
+    if (t.t === 'eggs') return !s || s.eggs >= t.ge;
+    if (t.t === 'power') return t.k.indexOf(b.pw) >= 0;
+    return false;
+  }
   function bonusScore(p, id) {
-    var bc = BON[id], t = bc.test, n = birds(p).filter(function (x) {
-      var b = x.b;
-      if (t.t === 'ws') return t.lt ? b.ws < t.lt : b.ws > t.gt;
-      if (t.t === 'nestEgg') return nestIs(b, t.n) && x.s.eggs > 0;
-      if (t.t === 'eats') return eats(b, t.f);
-      if (t.t === 'only') return b.h === t.h;
-      if (t.t === 'pts') return b.p <= t.le;
-      if (t.t === 'eggs') return x.s.eggs >= t.ge;
-      if (t.t === 'power') return t.k.indexOf(b.pw) >= 0;
-      return false;
-    }).length;
+    var bc = BON[id], n = birds(p).filter(function (x) { return bonusHit(id, x.b, x.s); }).length;
     if (typeof bc.sc === 'string') return { n: n, pts: n * (+bc.sc) };
     var pts = 0; bc.sc.forEach(function (tier) { if (n >= tier[0]) pts = tier[1]; });
     return { n: n, pts: pts };
@@ -214,7 +217,7 @@
   function scoreOf(G, seat) {
     var p = G.pl[seat], s = { birds: 0, bonus: 0, goals: 0, eggs: 0, cache: 0, tuck: 0, lead: p.lead || 0, total: 0 };
     G.gres.forEach(function (r) { s.goals += r.pts[seat] || 0; });
-    if (p.auto) { s.birds = p.auto.birds.reduce(function (a, id) { return a + B[id].p; }, 0); s.eggs = p.auto.eggs; s.tuck = p.auto.tuck; s.lead += p.auto.extra || 0; }
+    if (p.auto) { s.birds = p.auto.birds.reduce(function (a, id) { return a + B[id].p; }, 0) + p.auto.down.length * AUTO_DOWN[p.lvl]; s.eggs = p.auto.eggs; }
     else {
       birds(p).forEach(function (x) { s.birds += x.b.p; s.eggs += x.s.eggs; s.cache += x.s.cache; s.tuck += x.s.tuck; });
       p.bonus.forEach(function (id) { s.bonus += bonusScore(p, id).pts; });
@@ -226,7 +229,7 @@
     G.phase = 'over'; G.q = null; G.work = [];
     var sc = G.pl.map(function (p, i) { return scoreOf(G, i); });
     var best = -1, win = [];
-    sc.forEach(function (s, i) { var tb = s.total * 100 + (G.pl[i].auto ? 0 : foodN(G.pl[i])); if (tb > best) { best = tb; win = [i]; } else if (tb === best) win.push(i); });
+    sc.forEach(function (s, i) { var tb = s.total * 100 + (G.pl[i].auto ? 2 : foodN(G.pl[i]));   /* the solo rival counts 2 leftover food */ if (tb > best) { best = tb; win = [i]; } else if (tb === best) win.push(i); });
     G.final = sc; G.winner = win.length === 1 ? win[0] : win;
     log(G, 'Game over. ' + sc.map(function (s, i) { return nameOf(G, i) + ' ' + s.total; }).join(', ') + '.');
     fx(G, { k: 'over' });
@@ -297,8 +300,8 @@
       laySelf: 'Lay 1 egg on this bird.',
       layNest: 'Lay 1 egg on each of your birds with a ' + NESTN[x[0]] + ' nest.',
       draw1: 'Draw 1 card from the deck.',
-      hunt: 'Look at the top card of the deck. If its wings are under ' + x[0] + ' cm across, tuck it behind this bird. If not, discard it.',
-      huntDie: 'Roll all dice not in the birdfeeder. If any shows ' + FN[x[0]] + ', cache 1 ' + FN[x[0]] + ' on this bird.',
+      hunt: 'Peek at the top deck card. Wingspan under ' + x[0] + ' cm? It slides under this bird for 1 point. Otherwise it is discarded.',
+      huntDie: 'Shake the dice that are outside the feeder. A ' + FN[x[0]] + ' lands? Store 1 ' + FN[x[0]] + ' on this bird.',
       allFood: 'Every player gains 1 ' + FN[x[0]] + ' from the supply.',
       allDraw: 'Every player draws 1 card from the deck.',
       trade: 'Discard 1 egg from another of your birds to draw 2 cards.',
@@ -322,6 +325,8 @@
     var has = function (f) { return G.feeder.some(function (d) { return d === f || (d === 'gs' && (f === 'grub' || f === 'seed')); }); };
     var prep = function (f) { if (!G.feeder.length || (allSame(G) && !has(f))) rollAll(G); };
     var take = function (f) { prep(f); var i = G.feeder.findIndex(function (d) { return d === f || (d === 'gs' && (f === 'grub' || f === 'seed')); }); if (i < 0) return false; G.feeder.splice(i, 1); if (!G.feeder.length) rollAll(G); return true; };
+    // every brown power is optional ("may"); the game asks only when skipping can help you: a power that also feeds other players
+    if ((pw.k === 'allFood' || pw.k === 'allDraw') && !t.ok && G.pl.some(function (q, i) { return i !== t.seat && !q.auto; })) { G.q = { seat: t.seat, h: 'pwMay', d: { h: t.h, c: t.c, k: pw.k } }; fx(G, { k: 'pwAsk', seat: t.seat, h: t.h, c: t.c, id: s.id }); return; }
     switch (pw.k) {
       case 'gainF': if (take(x[0])) { p.food[x[0]]++; ev.txt = '+1 ' + x[0]; ev.f = x[0]; } else ev.txt = 'no ' + x[0] + ' in the feeder'; break;
       case 'gainS': p.food[x[0]]++; ev.txt = '+1 ' + x[0]; ev.f = x[0]; break;
@@ -354,7 +359,7 @@
       case 'wLaySelf': { var n = Math.min(+x[0], B[s.id].e - s.eggs); s.eggs += n; ev.txt = '+' + n + ' eggs'; ev.egg = n; break; }
       case 'wLayNest': { var m = 0; birds(p).forEach(function (y) { if (nestIs(y.b, x[0]) && y.s.eggs < y.b.e) { y.s.eggs++; m++; } }); ev.txt = '+' + m + ' eggs'; ev.egg = m; break; }
       case 'wBonus': G.work.unshift({ k: 'bonusPick', seat: t.seat }); ev.txt = 'draws 2 bonus cards'; break;
-      case 'wFeeder': { if (!G.feeder.length || (allSame(G) && !G.feeder.some(function (d) { return d === x[0] || (d === 'gs' && (x[0] === 'grub' || x[0] === 'seed')); }))) rollAll(G); var k2 = 0; for (var j = G.feeder.length - 1; j >= 0; j--) if (G.feeder[j] === x[0] || (G.feeder[j] === 'gs' && (x[0] === 'grub' || x[0] === 'seed'))) { G.feeder.splice(j, 1); k2++; } p.food[x[0]] += k2; if (!G.feeder.length) rollAll(G); ev.txt = '+' + k2 + ' ' + x[0]; ev.f = x[0]; break; }
+      case 'wFeeder': { if (!G.feeder.length || (allSame(G) && !G.feeder.some(function (d) { return d === x[0] || (d === 'gs' && (x[0] === 'grub' || x[0] === 'seed')); }))) rollAll(G); var k2 = 0; for (var j = G.feeder.length - 1; j >= 0; j--) if (G.feeder[j] === x[0] || (G.feeder[j] === 'gs' && (x[0] === 'grub' || x[0] === 'seed'))) { G.feeder.splice(j, 1); k2++; } p.food[x[0]] += k2; if (!G.feeder.length) rollAll(G); ev.txt = k2 ? '+' + k2 + ' ' + x[0] : 'no ' + x[0] + ' in the feeder'; ev.f = x[0]; break; }
       case 'wPlay': {
         var hab = 'FGW'.indexOf(x[0]);
         if (playable(G, t.seat, hab).length) { G.q = { seat: t.seat, h: 'play2', d: { hab: hab } }; fx(G, ev); ev.txt = 'may play another bird'; log(G, nameOf(G, t.seat) + ': ' + B[s.id].n + ' lets them play a second bird.'); return; }
@@ -371,7 +376,7 @@
       if (seat === actor || q.auto) return;
       birds(q).forEach(function (x) {
         var pw = power(x.s.id); if (pw.col !== 'pink' || x.s.pk) return;
-        if ((pw.k === 'pEgg' && kind === 'eggs') || (pw.k === 'pFood' && kind === 'food') || (pw.k === 'pTuck' && kind === 'play' && 'FGW'.indexOf(pw.x[0]) === hab)) G.work.push({ k: 'pink', seat: seat, h: x.h, c: x.c });   // each pink bird: once between its owner's turns
+        if (kind === 'all' || (pw.k === 'pEgg' && kind === 'eggs') || (pw.k === 'pFood' && kind === 'food') || (pw.k === 'pTuck' && kind === 'play' && 'FGW'.indexOf(pw.x[0]) === hab)) G.work.push({ k: 'pink', seat: seat, h: x.h, c: x.c });   // each pink bird: once between its owner's turns
       });
     });
   }
@@ -386,19 +391,79 @@
     fx(G, ev);
   }
 
-  // ---------------- automa (solo rival): a shuffled deck of action cards each round
-  var AUTO_CARDS = [{ a: 'play', m: 1 }, { a: 'play', m: 0 }, { a: 'food', m: 1 }, { a: 'eggs', m: 1 }, { a: 'eggs', m: 0 }, { a: 'draw', m: 1 }, { a: 'play', m: 1 }, { a: 'food', m: 0 }];
-  function autoDeal(G, p) { p.auto.deck = shuffle(G, AUTO_CARDS.map(function (c) { return clone(c); })); p.auto.marks = 0; }
+  // ---------------- automa (solo rival), the original solo structure with this game's own card faces:
+  // a deck of 10 action cards (+1 expert card on hard), each split into 4 round sections; one card per turn, only the current
+  // round's section counts. One card leaves the deck after each of rounds 1-3. Codes: P play a bird (tray birds that fit its bonus
+  // card, keep the best face up; none fit = top deck card face down), D draw (discard the whole tray, top deck card face down),
+  // F gain food (key order: first face found in the feeder, remove every die with it), E<n> lay n eggs, + / - a goal cube on or off,
+  // K activate all your pink powers. Face-down birds score 3/4/5 points (easy/normal/hard).
+  var AUTO_CARDS = [
+    { rm: 1, r: ['P+', 'E1', 'D', 'F:bfrgsx'] }, { rm: 2, r: ['E1', 'P', 'E1+', 'D'] }, { rm: 3, r: ['F:rgfsbx', 'D', 'P', 'E1+'] },
+    { r: ['D', 'F:sxgbrf+', 'E1K', 'P'] }, { r: ['E1K', 'E1', 'P+', 'F:fbrxgs'] }, { r: ['F:gxsfbr', 'E1-', 'F:bsrgfx', 'E1+'] },
+    { r: ['E1+', 'E1', 'E1', 'P-'] }, { r: ['E1', 'F:xrbgsf', 'D-', 'E2K'] }, { r: ['F:sgfrbx-', 'PK', 'E1+', 'F:rxbsgf'] }, { r: ['F:fsbgrx', 'E1+', 'F:gbxsrf', 'D+'] }];
+  var AUTO_XP = { r: ['E1+', 'D+', 'F:rbgfsx+', 'P+'] };
+  var AUTO_DOWN = { easy: 3, normal: 4, hard: 5 };
+  var AUTO_BASE = { birds: [0, 1, 1, 2], eggsIn: [0, 1, 1, 2], nestEgg: [0, 0, 1, 1], sets: [0, 0, 0, 0], total: [1, 2, 3, 4] };   // lowest count it ever has, by round
+  var FKEY = { g: 'grub', s: 'seed', f: 'fish', b: 'berry', r: 'rodent', x: 'gs' };
+  var AUTO_BONUS_OK = ['ws', 'eats', 'only', 'pts', 'power'];   // bonus tests about the bird card itself (egg ones are skipped)
+  function autoSetup(G, p, lvl) {
+    p.auto = { deck: [], all: AUTO_CARDS.map(function (c, i) { return i; }).concat(lvl === 'hard' ? ['xp'] : []), birds: [], down: [], eggs: 0, tuck: 0, marks: 0, gpts: 0, bonus: null, last: null };
+    var k = G.bdeck.findIndex(function (id) { return AUTO_BONUS_OK.indexOf(BON[id].test.t) >= 0; });
+    if (k >= 0) p.auto.bonus = G.bdeck.splice(k, 1)[0];
+    shuffle(G, G.bdeck);
+  }
+  function autoCard(k) { return k === 'xp' ? AUTO_XP : AUTO_CARDS[k]; }
+  function autoDeal(G, p) {
+    var a = p.auto;
+    if (G.round > 0) a.all = a.all.filter(function (k) { return k === 'xp' || AUTO_CARDS[k].rm !== G.round; });   // the card marked for the round just played leaves
+    a.deck = shuffle(G, a.all.slice()); a.marks = 0;
+  }
+  function autoFits(G, p, id) {
+    if (!p.auto.bonus) return false;
+    var t = BON[p.auto.bonus].test, b = B[id];
+    if (t.t === 'ws') return t.lt ? b.ws < t.lt : b.ws > t.gt;
+    if (t.t === 'eats') return eats(b, t.f);
+    if (t.t === 'only') return b.h === t.h;
+    if (t.t === 'pts') return b.p <= t.le;
+    if (t.t === 'power') return t.k.indexOf(b.pw) >= 0;
+    return false;
+  }
+  function autoDown(G, a) { var id = drawCard(G); if (id) a.down.push(id); return id; }
   function autoTurn(G, seat) {
-    var p = G.pl[seat], a = p.auto, card = a.deck.shift() || { a: 'eggs', m: 0 }, lv = p.lvl, txt = '';
-    if (card.m) a.marks += lv === 'hard' ? 2 : 1;
-    if (card.a === 'play') { var id = drawCard(G); if (id) { a.birds.push(id); txt = 'adds ' + B[id].n + ' (' + B[id].p + ' pts) to its flock'; if (lv === 'hard') a.extra = (a.extra || 0) + 1; } }
-    if (card.a === 'food') { if (!G.feeder.length) rollAll(G); var cnt = {}; G.feeder.forEach(function (f) { cnt[f] = (cnt[f] || 0) + 1; }); var best = Object.keys(cnt).sort(function (x, y) { return cnt[y] - cnt[x]; })[0]; G.feeder.splice(G.feeder.indexOf(best), 1); txt = 'takes a ' + (best === 'gs' ? 'grub/seed' : best) + ' die from the feeder'; queuePinks(G, seat, 'food'); }
-    if (card.a === 'eggs') { var e = lv === 'easy' ? 1 : 2; a.eggs += e; txt = 'lays ' + e + ' eggs'; queuePinks(G, seat, 'eggs'); }
-    if (card.a === 'draw') { var t = G.tray[0]; if (t) { G.tray[0] = null; a.tuck++; txt = 'takes ' + B[t].n + ' from the tray'; } else txt = 'rests'; }
+    var p = G.pl[seat], a = p.auto, k = a.deck.length ? a.deck.shift() : null, sec = k == null ? 'E1' : autoCard(k).r[G.round], parts = [];
+    a.last = sec;
+    var act = sec[0];
+    if (act === 'P') {
+      var fit = G.tray.filter(function (id) { return id && autoFits(G, p, id); });
+      if (fit.length) {
+        var best = fit.slice().sort(function (x, y) { return B[y].p - B[x].p; })[0];
+        G.tray = G.tray.map(function (id) { if (id && fit.indexOf(id) >= 0) { if (id !== best) G.disc.push(id); return null; } return id; });
+        a.birds.push(best); parts.push('plays ' + B[best].n + ' (' + B[best].p + ' pts)');
+      } else if (autoDown(G, a)) parts.push('plays a hidden bird (' + AUTO_DOWN[p.lvl] + ' pts)');
+    }
+    if (act === 'D') {
+      G.tray.forEach(function (id) { if (id) G.disc.push(id); }); G.tray = [null, null, null];
+      parts.push(autoDown(G, a) ? 'clears the tray and keeps a hidden bird (' + AUTO_DOWN[p.lvl] + ' pts)' : 'clears the tray');
+    }
+    if (act === 'F') {
+      if (!G.feeder.length || allSame(G)) rollAll(G);
+      var key = sec.slice(2).replace(/[+\-K]/g, '').split('').map(function (c) { return FKEY[c]; });
+      var face = key.find(function (f) { return G.feeder.indexOf(f) >= 0; });
+      if (face) { var n0 = G.feeder.length; G.feeder = G.feeder.filter(function (f) { return f !== face; }); parts.push('removes ' + (n0 - G.feeder.length) + ' ' + (face === 'gs' ? 'grub/seed' : face) + ' dice from the feeder'); }
+      if (!G.feeder.length) rollAll(G);
+    }
+    if (act === 'E') { var e = +sec[1] || 1; a.eggs += e; parts.push('lays ' + e + ' egg' + (e > 1 ? 's' : '')); }
+    if (sec.indexOf('+') >= 0) { a.marks++; parts.push('adds a goal cube'); }
+    if (sec.indexOf('-') >= 0) { if (a.marks > 0) { a.marks--; parts.push('removes a goal cube'); } }
+    if (sec.indexOf('K') >= 0) { parts.push('wakes your pink powers'); queuePinks(G, seat, 'all'); }
+    var txt = parts.join(', ') || 'rests';
     log(G, p.name + ' ' + txt + '.');
-    fx(G, { k: 'auto', seat: seat, a: card.a, txt: txt });
+    fx(G, { k: 'auto', seat: seat, a: { P: 'play', D: 'draw', F: 'food', E: 'eggs' }[act], txt: txt });
     G.q = null; run(G);
+  }
+  function autoGoal(G, seat, gid, r) {
+    var a = G.pl[seat].auto, t = GOL[gid].test.t, base = (AUTO_BASE[t] || [0, 0, 0, 0])[Math.min(r, 3)], n = base + a.marks;
+    return t === 'birds' ? Math.min(n, 5) : n;
   }
 
   // ---------------- legal moves
@@ -429,6 +494,7 @@
       case 'egg': birds(p).forEach(function (x) { if (x.s.eggs < x.b.e && (!q.d.nest || nestIs(x.b, q.d.nest))) o.push({ t: 'egg', h: x.h, c: x.c }); }); return o;
       case 'draw': G.tray.forEach(function (id, i) { if (id) o.push({ t: 'tray', i: i }); }); if (G.deck.length || G.disc.length) o.push({ t: 'deck' }); return o;
       case 'pwTuck': p.hand.forEach(function (id, i) { o.push({ t: 'tuck', i: i }); }); o.push({ t: 'skip' }); return o;
+      case 'pwMay': return [{ t: 'use' }, { t: 'skip' }];
       case 'pwTrade': birds(p).forEach(function (x) { if (x.s.eggs > 0 && !(x.h === q.d.h && x.c === q.d.c)) o.push({ t: 'trade', h: x.h, c: x.c }); }); o.push({ t: 'skip' }); return o;
       case 'play2': playable(G, seat, q.d.hab).forEach(function (x) { x.inf.pays.forEach(function (pay) { o.push({ t: 'play', i: x.i, id: x.id, h: x.h, pay: pay }); }); }); o.push({ t: 'skip' }); return o;
       case 'bonusPick': q.d.opts.forEach(function (id, i) { o.push({ t: 'pickb', i: i }); }); return o;
@@ -528,6 +594,12 @@
         log(G, nameOf(G, seat) + ': ' + B[cs.id].n + ' - ' + ev.txt + '.'); fx(G, ev);
         G.q = null; run(G); return { ok: true };
       }
+      case 'pwMay': {
+        G.q = null;
+        if (m.t === 'use') G.work.unshift({ k: 'pw', seat: seat, h: q.d.h, c: q.d.c, ok: 1 });
+        else { var ms = p.board[q.d.h][q.d.c]; log(G, nameOf(G, seat) + ': ' + B[ms.id].n + ' - skipped.'); fx(G, { k: 'pw', seat: seat, h: q.d.h, c: q.d.c, id: ms.id, txt: 'skipped' }); }
+        run(G); return { ok: true };
+      }
       case 'pwTrade': {
         var ts = p.board[q.d.h][q.d.c], ev2 = { k: 'pw', seat: seat, h: q.d.h, c: q.d.c, id: ts.id };
         if (m.t === 'trade') {
@@ -582,7 +654,7 @@
     G.pl.forEach(function (p, i) {
       p.hand.forEach(function (id) { see(id, 'hand' + i); });
       if (p.offer) p.offer.birds.forEach(function (id) { see(id, 'offer' + i); });
-      if (p.auto) p.auto.birds.forEach(function (id) { see(id, 'auto' + i); });
+      if (p.auto) p.auto.birds.concat(p.auto.down).forEach(function (id) { see(id, 'auto' + i); });
       p.board.forEach(function (row, h) { if (row.length > 5) bad.push('row over 5'); row.forEach(function (s) { see(s.id, 'board' + i); var b = B[s.id]; if (b.h.indexOf(HK[h]) < 0) bad.push('wrong habitat ' + s.id); if (s.eggs < 0 || s.eggs > b.e) bad.push('eggs out of range ' + s.id); }); });
       FOODS.forEach(function (f) { if (p.food[f] < 0) bad.push('negative food ' + f); });
     });
@@ -605,7 +677,7 @@
 
   var PP = { DATA: DATA, B: B, BON: BON, GOL: GOL, FOODS: FOODS, FACES: FACES, HABS: HABS, YIELD: YIELD, BONUSSP: BONUSSP, EGGCOST: EGGCOST, CUBES: CUBES, GOALPTS: GOALPTS,
     newGame: newGame, validMoves: validMoves, performMove: performMove, sideToAct: sideToAct, checkInvariants: checkInvariants, render_game_to_text: render_game_to_text,
-    payOptions: payOptions, playInfo: playInfo, playable: playable, eggSources: eggSources, rowYield: rowYield, power: power, scoreOf: scoreOf, bonusScore: bonusScore,
+    payOptions: payOptions, playInfo: playInfo, playable: playable, eggSources: eggSources, rowYield: rowYield, power: power, scoreOf: scoreOf, bonusScore: bonusScore, bonusHit: bonusHit,
     goalCount: goalCount, placeGoal: placeGoal, birds: birds, eggsOn: eggsOn, eggSpace: eggSpace, foodN: foodN, allSame: allSame, nestIs: nestIs, eats: eats, clone: clone, rnd: rnd, shuffle: shuffle };
   root.PP = PP;
   if (typeof module !== 'undefined') module.exports = PP;

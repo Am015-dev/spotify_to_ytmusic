@@ -14,31 +14,39 @@ function renderHand(){const el=$('#handw');if(!el)return;const s=vs();
   const qk=G.q?G.q.kind:'';let HS=UI.handSlots;if(!HS||HS.round!==G.round||HS.seat!==s||HS.kind!==qk||ids0.some(id=>!HS.order.includes(id))||!ids0.length)HS=UI.handSlots={round:G.round,seat:s,kind:qk,order:ids0.slice()};
   const ids=HS.order;const inHand=new Set(ids0);
   const use=M&&M.use?M.use:new Set();const rcId=M&&M.rec&&M.rec.id!=null?M.rec.id:null;
-  const PAD=UI.desk?32:16;const W=Math.max(160,(el.clientWidth||innerWidth)-8-2*PAD);const cw=cssPx('--cw',50),ch=Math.round(cw*1.4308);
-  const n=ids.length,step=n>1?Math.min(cw+6,(W-cw)/(n-1)):0;const tot=n>1?cw+step*(n-1):cw;const off=Math.max(0,(W-tot)/2);
+  // hints on and the suggestion is a button (Done, Pass, Keep...): the cards stay tappable but don't glow, so the glow always shows the suggestion
+  const quiet=!!(M&&M.rec&&M.rec.id==null);
+  // one helper at a time: with a card selected only its target (region / bid spot) glows; with a suggested card only that card pulses
+  const selH=UI.hand!=null&&ids0.includes(UI.hand);
+  const PAD=UI.desk?32:(UI.land?8:5);const W=Math.max(160,(el.clientWidth||innerWidth)-8-2*PAD);
+  const n=ids.length,GAP=UI.desk?12:3;let cw=cssPx('--cw',50);
+  if(n>1&&!UI.land)cw=Math.max(40,Math.min(cw,Math.floor((W-(n-1)*GAP)/n)));
+  else if(n>1&&UI.land&&!UI.desk)cw=Math.max(34,Math.min(cw,Math.floor(W-24*(n-1))));   // landscape phone: a narrow column, but every card keeps >= 24 px of itself visible   // the hand never overlaps: every card is as wide as the row allows (tap a card to see it enlarged)
+  const ch=Math.round(cw*1.4308);
+  const step=n>1?Math.min(cw+GAP,(W-cw)/(n-1)):0;const tot=n>1?cw+step*(n-1):cw;const off=Math.max(0,(W-tot)/2);
   let h='<div class="hand" role="list" aria-label="Your hand" style="height:'+(ch+24)+'px">';
-  ids.forEach((id,i)=>{if(!inHand.has(id))return;const on=UI.hand===id,pl=use.has(id);const mid=(n-1)/2,rot=n>1?(i-mid)*Math.min(3.6,22/n):0,ty=n>1?Math.round(Math.pow(Math.abs(i-mid)/Math.max(1,mid),2)*4):0;
-    h+='<button class="hc'+(on?' on':'')+(pl?' glow pl':'')+(rcId===id?' rg':'')+(use.size&&!pl?' dim':'')+'" role="listitem" data-a="hand" data-id="'+id+'" data-owner="'+s+'" data-up="1" style="left:'+Math.round(PAD+off+i*step)+'px;width:'+cw+'px;height:'+ch+'px;z-index:'+(on?50:i+1)+';--rot:'+rot.toFixed(1)+'deg;--ty:'+ty+'px" aria-label="'+esc(cinfo(id).name)+', strength '+cinfo(id).strength+'">'+cardEl(id,UI.desk?Math.min(cw,110):cw).outerHTML+'</button>'});
+  ids.forEach((id,i)=>{if(!inHand.has(id))return;const on=UI.hand===id,pl=use.has(id);const mid=(n-1)/2,rot=n>1&&UI.desk?(i-mid)*Math.min(3.6,22/n):0,ty=n>1&&UI.desk?Math.round(Math.pow(Math.abs(i-mid)/Math.max(1,mid),2)*4):0;   // a flat row on phones: no card overlaps its neighbour, not even by a tilted corner
+    h+='<button class="hc'+(on?' on':'')+(pl?((quiet||selH||(rcId!=null&&rcId!==id))?' pl':' glow pl'):'')+(rcId===id&&!selH?' rg':'')+(use.size&&!pl?' dim':'')+'" role="listitem" data-a="hand" data-id="'+id+'" data-owner="'+s+'" data-up="1" style="left:'+Math.round(PAD+off+i*step)+'px;width:'+cw+'px;height:'+ch+'px;z-index:'+(on?50:i+1)+';--rot:'+rot.toFixed(1)+'deg;--ty:'+ty+'px" aria-label="'+esc(cinfo(id).name)+', strength '+cinfo(id).strength+'. '+esc(cardLine(id))+'">'+cardEl(id,UI.desk?Math.min(cw,110):cw).outerHTML+cardBand(id)+'</button>'});
   h+='</div>';if(el._h!==h){el._h=h;el.innerHTML=h}}
 // bid resolution: the Great Road lies where the hand was; tap a glowing Kingdom Card to take it (a steal asks first)
-const roadX=()=>{const x=innerHeight<600?16:40;document.documentElement.style.setProperty('--roadx',x+'px');return x}; // extra height the kingdom-card row gets on a portrait phone, so the paintings and names can be read
+const roadX=()=>{const x=innerHeight<620?0:innerHeight<820?16:40;document.documentElement.style.setProperty('--roadx',x+'px');return x}; // extra height the kingdom-card row gets on a portrait phone, so the paintings and names can be read
 function roadRowHTML(s,M){const mv=M.mv;const take=mv.filter(m=>m.t==='take'),steal=mv.filter(m=>m.t==='steal');const V=UI.V;const items=[];
   for(let i=0;i<V.road.length;i++){const kc=V.road[i];if(!kc)continue;items.push({kc,m:take.find(x=>x.kc===kc&&x.i===i)||null})}
   for(const m of take)if(m.dk!=null)items.push({kc:m.kc,m,deck:1});
   for(const m of steal)items.push({kc:m.kc,m,steal:1});
   if(!items.length)return '<div class="hand roadrow"></div>';
-  const W=Math.max(180,((UI.land?(($('#handw')||{}).clientWidth||innerWidth*.38):innerWidth))-12);const zone=cssPx('--ch',72)+24+(UI.land?0:roadX());let w=Math.max(34,Math.min(UI.land?60:72,Math.floor((zone-(innerHeight<600?40:34))/1.4308),Math.floor(W/items.length)-8));if(UI.desk)w=Math.max(70,Math.min(124,Math.floor((($('.gx-dock')||{}).clientWidth||W)/Math.max(4,items.length))-26));const rk=recK();
+  const W=Math.max(180,((UI.land?(($('#handw')||{}).clientWidth||innerWidth*.38):innerWidth))-12);const shortP=!UI.land&&!UI.desk&&innerHeight<620&&!(($('#act')||{}).childElementCount);const zone=cssPx('--ch',72)+24+(UI.land?0:roadX())+(shortP?44:0);let w=Math.max(34,Math.min(UI.land?60:72,Math.floor((zone-(shortP?60:innerHeight<600?40:34))/1.4308),Math.floor(W/items.length)-8));if(UI.desk)w=Math.max(70,Math.min(124,Math.floor((($('.gx-dock')||{}).clientWidth||W)/Math.max(4,items.length))-26));const rk=recK();
   return '<div class="hand roadrow" role="list" aria-label="The Great Road">'+items.map(it=>{const m=it.m;const rec=m&&rk===m.k;const col=it.steal?fcol(m.s2):'';
-    const att=m?(it.steal?'data-a="confirm" data-k="'+esc(m.k)+'"':'data-a="mv" data-k="'+esc(m.k)+'"'):'data-a="kc" data-n="'+it.kc+'"';
-    return '<button class="kcb'+(m?' glow':' dim')+(rec?' rg':'')+(it.steal?' steal':'')+'" role="listitem" '+att+' data-n="'+it.kc+'" style="width:'+Math.max(w+4,Math.min(84,Math.floor(W/items.length)-6))+'px'+(col?';--fc:'+col:'')+'"'+' aria-label="'+esc((it.steal?'Steal ':m?'Take ':'')+TB.kingdomInfo(it.kc).name)+'">'+kcEl(it.kc,UI.desk?Math.min(w,110):w).outerHTML+'<span class="kn">'+esc(TB.kingdomInfo(it.kc).name)+'</span>'+(it.steal?'<i class="stl">'+ico('x')+'</i>':'')+'</button>'}).join('')+'</div>'}
+    const att=m?(it.steal&&!(typeof tutOn==='function'&&tutOn())?'data-a="confirm" data-k="'+esc(m.k)+'"':'data-a="mv" data-k="'+esc(m.k)+'"'):'data-a="kc" data-n="'+it.kc+'"';
+    return '<button class="kcb'+(m?((rk&&!rec)?'':' glow'):' dim')+(rec?' rg':'')+(it.steal?' steal':'')+'" role="listitem" '+att+' data-n="'+it.kc+'" style="width:'+Math.max(w+4,Math.min(84,Math.floor(W/items.length)-6))+'px'+(col?';--fc:'+col:'')+'"'+' aria-label="'+esc((it.steal?'Steal ':m?'Take ':'')+TB.kingdomInfo(it.kc).name)+'">'+kcEl(it.kc,UI.desk?Math.min(w,110):w).outerHTML+'<span class="kn">'+esc(TB.kingdomInfo(it.kc).name)+'</span>'+(it.steal?'<i class="stl">'+ico('x')+'</i>':'')+'</button>'}).join('')+'</div>'}
 // desktop: the Great Road stays on the table above the hand (taking a card, when it is your turn, happens here)
 function renderDeskRoad(){const el=$('#road');if(!el)return;
   if(!UI.desk||!G||!UI.V||isPassing()||G.over){if(UI.desk){el.hidden=true;el.innerHTML='';el._h=''}return}
   el.hidden=false;const s=vs(),M=UI.bf;const st=$('#barstat .st-t');const ins=st?st.textContent:'';
   let row;if(M&&M.kind==='bidRes')row=roadRowHTML(s,M);
-  else{const V=UI.V;const w=Math.max(70,Math.min(124,Math.floor((($('.gx-dock')||{}).clientWidth||600)/4)-30));
+  else{const V=UI.V;const pw=el.clientWidth||320,cols=pw>=520?4:2,ph=Math.max(180,(el.clientHeight||360)-40),rows=Math.ceil(4/cols);const w=Math.max(64,Math.min(124,Math.floor((pw-32-(cols-1)*14)/cols)-4,Math.floor((ph/rows-46)/1.43)));
     row='<div class="hand roadrow" role="list" aria-label="The Great Road">'+V.road.map(n=>n?'<button class="kcb" role="listitem" data-a="kc" data-n="'+n+'" style="width:'+(w+4)+'px" aria-label="'+esc(TB.kingdomInfo(n).name)+'">'+kcEl(n,Math.min(w,110)).outerHTML+'<span class="kn">'+esc(TB.kingdomInfo(n).name)+'</span></button>':'').join('')+'</div>'}
-  const h='<h4 class="dk-h">The Great Road</h4>'+row+(ins?'<p class="dk-ins">'+esc(ins)+'</p>':'');if(el._h!==h){el._h=h;el.innerHTML=h}}
+  const h='<h4 class="dk-h">The Great Road</h4>'+row;if(el._h!==h){el._h=h;el.innerHTML=h}}
 // ---------------------------------------------------------------- the seats: score, hand and the face-down bid, along the top
 function renderRivals(){const el=$('#rivals');if(!el)return;if(!G||!UI.V)return;const V=UI.V;
   const act=G.q?new Set(G.q.seats):new Set();const me=vs();const n=G.np;
@@ -122,12 +130,12 @@ function popKingdom(){const V=UI.V;let h='';
   if(!UI.lowGfx)h+='<img class="thr3" src="models/throne'+(innerWidth<700?'@512':'')+'.webp" alt="" width="110" height="110" draggable="false" decoding="async" aria-hidden="true" onerror="this.remove()">'; // 3D throne render (models/throne), the hero of the Kingdom sheet
   h+='<h5>The Great Road</h5><div class="road4">'+V.road.map(n=>n?'<button class="kcth" data-a="kc" data-n="'+n+'" aria-label="'+esc(TB.kingdomInfo(n).name)+'">'+kcEl(n,52).outerHTML+'</button>':'<span class="kcth empty"></span>').join('')+'</div><p class="hint">Kingdom Card deck: '+V.kdeck.length+' left. Tap a card to read it.</p>';
   h+='<h5>Councils</h5>';for(const c of DD.COUNCILS){const ids=V.council[c];h+='<p class="lc-h"><b>'+esc(DD.COUNCIL_NAMES[c])+'</b>: '+(ids.length?ids.map(id=>esc(TB.cardName(G,id))+' ('+esc(shortName(ownerOf(id)))+', '+cinfo(id).votes+')').join(', '):'<em>empty</em>')+'</p><p class="small">'+esc(DD.COUNCIL_TXT[c])+'</p>'}
-  h+='<h5>Favour and order</h5><p class="lc-h">Favour: '+(V.fav.h>=0?esc(nameOf(V.fav.h))+' ('+V.fav.u+' uses left)':'on the Gleaning Meadow')+'</p><p class="lc-h">Order this round: '+V.order.map((s,i)=>(i+1)+'. '+esc(shortName(s))).join(', ')+'</p><p class="lc-h">Lost Pile: '+V.lost.length+' card'+(V.lost.length===1?'':'s')+'.</p>';
+  h+='<h5>Favour and order</h5><p class="lc-h">Favour: '+(V.fav.h>=0?esc(nameOf(V.fav.h))+' ('+V.fav.u+' uses left)':'on the Market Cross')+'</p><p class="lc-h">Order this round: '+V.order.map((s,i)=>(i+1)+'. '+esc(shortName(s))).join(', ')+'</p><p class="lc-h">Lost Pile: '+V.lost.length+' card'+(V.lost.length===1?'':'s')+'.</p>';
   return popShell('The Kingdom',h,'kg-b')}
 // ---------------------------------------------------------------- the one card (events, pass the device, coach tips, game over)
 function shouldShowEvent(ev){if(ev.t==='clash')return true;if(ev.t==='bids')return true;if(ev.t==='summary')return true;if(ev.t==='news')return wantNews();return false}
 function showEvent(ev){if(ev.t==='news'){showNews(ev);return}UI.card={kind:'event',ev};if(ev.t==='clash'){UI.noAnim=true}}
-function showOver(){if(UI.cfg&&UI.cfg.tutorial)return;if(UI.card&&UI.card.kind==='over')return;UI.card={kind:'over'};clearSave();if(typeof campOver==='function')campOver()}
+function showOver(){if(UI.cfg&&UI.cfg.tutorial)return;try{if(!UI.camp&&UI.mode==='me')localStorage.setItem('tb_fin','1')}catch(e){}if(UI.card&&UI.card.kind==='over')return;UI.card={kind:'over'};clearSave();if(typeof campOver==='function')campOver()}
 const TIPS={bid:['Bids','Every round starts with a secret bid. The highest bid picks a Kingdom Card first. The card you bid then sits under it and cannot fight.'],
   herald:['Heralds','Your Herald is public. Win a region and claim the location where your Herald stands. You gain +1 Influence and take 1 from every rival Herald there.'],
   place:['Hidden cards','You hide one card at each of the three regions. Put big cards where the prize matters and cheap ones elsewhere.'],
@@ -149,8 +157,8 @@ function renderCard(){const el=$('#pc');if(!el)return;const c=UI.card;
   el.innerHTML=h;
   const b=el.querySelector('.btn.pri');if(b)try{b.focus({preventScroll:true})}catch(e){}}
 function cdWrap(cls,body,foot){return '<div class="cd '+cls+'"><div class="cd-sc">'+body+'</div><div class="cd-ft">'+foot+'</div></div>'}
-function bidWhy(b){const pr=cinfo(b.id).strength;if(b.str===pr)return '';const ed=G.log.filter(e=>e.r===G.round&&/Crown's Edict/.test(e.t)&&/plays/.test(e.t));
-  if(b.str===0&&pr>0&&ed.length)return 'printed '+pr+', set to 0 by '+plain(ed[ed.length-1].t.replace(/ plays .*$/,''))+'\'s Crown\'s Edict';if(b.str===pr+5)return 'printed '+pr+', +5 from Sentinel Towers';return 'printed '+pr}
+function bidWhy(b){const pr=cinfo(b.id).strength;if(b.str===pr)return '';const ed=G.log.filter(e=>e.r===G.round&&/Royal Audit/.test(e.t)&&/plays/.test(e.t));
+  if(b.str===0&&pr>0&&ed.length)return 'printed '+pr+', set to 0 by '+plain(ed[ed.length-1].t.replace(/ plays .*$/,''))+'\'s Royal Audit';if(b.str===pr+3)return 'printed '+pr+', +3 from Ward Towers';return 'printed '+pr}
 // the strength breakdown of one side of a Clash: every part is labelled and the parts add up to the total
 function brkHTML(ev,s){const B=(ev.brk&&ev.brk[s])||null;const dead=(ev.dead&&ev.dead[s])||[];let h='<ul class="bk">';
   if(B){for(const x of B)h+='<li><span>'+gloss(x.l)+'</span><i>'+(x.n<0?'−'+(-x.n):'+'+x.n)+'</i></li>';if(!B.length)h+='<li><span>no cards, no Supporters</span><i>0</i></li>'}
@@ -168,10 +176,17 @@ function eventHTML(ev){const note=typeof coachEvent==='function'?coachEvent(ev):
       '<div class="bkg'+(parts.length>2?' stack':'')+'" id="clbk" hidden>'+parts.map(s=>'<div class="bks'+(w===s?' win':'')+'" style="--fc:'+fcol(s)+'"><b>'+esc(s===me?'You':sideName(s))+'</b>'+brkHTML(ev,s)+'</div>').join('')+'</div>'+
       (night?'<ul class="cl-log" id="cllog" hidden><li class="cl-h">In this Clash</li>'+night+'</ul>':'<ul id="cllog" hidden></ul>')+cn+'<div class="cl-inf" id="clinf" hidden>'+infChips(ev.inf0,ev.inf1)+'</div>','<button class="btn pri" data-a="evok" id="clok" hidden>Continue</button>')}
   if(ev.t==='summary'){const why=ev.why||[];const order=youFirst(ev.inf1.map((_,s)=>s));
-    return cdWrap('cd-sum','<h3>End of round '+ev.round+' of '+ev.rounds+'</h3><table class="sumt"><thead><tr><th></th><th>This round</th><th>Total</th></tr></thead><tbody>'+order.map(s=>{const v=ev.inf1[s];const L=why[s]||[];return '<tr style="--fc:'+fcol(s)+'"><td><b>'+esc(s===me?'You':sideName(s))+'</b></td><td>'+sgn(v-ev.inf0[s])+'</td><td><b>'+v+'</b></td></tr>'+(L.length?'<tr class="sw"><td colspan="3">'+L.map(x=>gloss(x[0])+' '+(x[1]>0?'+':'−')+Math.abs(x[1])).join(', ')+'</td></tr>':'')}).join('')+'</tbody></table>'+cn+
+    return cdWrap('cd-sum','<h3>End of round '+ev.round+' of '+ev.rounds+'</h3>'+regsWhy(ev)+'<table class="sumt"><thead><tr><th></th><th>This round</th><th>Total</th></tr></thead><tbody>'+order.map(s=>{const v=ev.inf1[s];const L=why[s]||[];return '<tr style="--fc:'+fcol(s)+'"><td><b>'+esc(s===me?'You':sideName(s))+'</b></td><td>'+sgn(v-ev.inf0[s])+'</td><td><b>'+v+'</b></td></tr>'+(L.length?'<tr class="sw"><td colspan="3">'+L.map(x=>gloss(x[0])+' '+(x[1]>0?'+':'−')+Math.abs(x[1])).join(', ')+'</td></tr>':'')}).join('')+'</tbody></table>'+cn+
       ((ev.winter&&ev.winter.length)||ev.warns.length?'<ul class="cl-log warn">'+ev.warns.concat(ev.winter||[]).filter(t=>!/Winter: .* played cards/.test(t)||true).map(t=>'<li>'+gloss(plain(t))+'</li>').join('')+'</ul>':'')+
       '<p class="sub">'+(ev.last?'That was the last round: the final count follows.':gloss('Next round everyone refills their hand. The leader on the Order Track acts first. '+(ev.rounds-ev.round)+' round'+(ev.rounds-ev.round>1?'s':'')+' left.'))+'</p>','<button class="btn pri" data-a="evok">'+(ev.last?'See the result':'Start round '+(ev.round+1))+'</button>')}
   return ''}
+// F16b: why each Region went the way it did (who won, the Strength on each side)
+function regsWhy(ev){const R=ev.regs||{},me=vs();const rows=[0,1,2].filter(r=>R[r]).map(r=>{const x=R[r],t=x.tot||{},w=x.w;const others=(x.parts||[]).filter(s=>s!==w);const best=Math.max(0,...others.map(s=>t[s]||0));let h;
+    if(w==null||w<0)h='Nobody won: '+(x.parts||[]).map(s=>(s===me?'you':shortName(s))+' '+(t[s]||0)).join(', ')+' (tied)';
+    else if(w===me)h='<b>You won</b>: your '+(t[me]||0)+' beat '+(others.length?others.map(s=>shortName(s)+"'s "+(t[s]||0)).join(', '):'nobody')+(others.length&&(t[me]||0)-best<=1?' (just)':'');
+    else{const mine=(x.parts||[]).includes(me);h='<b>'+esc(shortName(w))+' won</b> with '+(t[w]||0)+(mine?((t[me]||0)?(': your '+(t[me]||0)+' was '+Math.max(0,(t[w]||0)-(t[me]||0))+' short'):': you had nothing there'):': you had no cards there')}
+    return '<li><span class="rg-n">'+esc(REG[r])+'</span> '+(h.indexOf('<b>')>=0?h:esc(h))+'</li>'}).join('');
+  return rows?'<ul class="regs">'+rows+'</ul>':''}
 function infChips(a,b){return a.map((v,s)=>b[s]!==v?'<span style="--fc:'+fcol(s)+'">'+esc(shortName(s))+' '+sgn(b[s]-v)+'</span>':'').join('')}
 function playClash(ev,root){const panel=root.querySelector('#clp');if(!panel)return;const w=ev.winner;
   const items=youFirst(ev.parts).map(s=>{const ids=(ev.cardsF&&ev.cardsF[s])||ev.cards[s]||[];const best=ids.slice().sort((a,b)=>cinfo(b).strength-cinfo(a).strength)[0];

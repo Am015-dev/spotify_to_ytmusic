@@ -22,22 +22,29 @@ function shortPower(id) {
     pTuck: 'when a rival plays in their ' + hab(x[0]) + ', tuck 1 card here.'
   };
   var when = pw.col === 'white' ? 'When played' : pw.col === 'pink' ? "On a rival's turn" : 'When its row is used';
+  var solo = typeof G !== 'undefined' && G && G.pl && G.pl.some(function (q) { return q.auto; });
+  if (solo && pw.col === 'pink') return { col: pw.col, when: 'Solo', txt: 'fires when the Rival Flock wakes your pink powers.' };   // solo: pinks fire only on the Flock's pink icon
   return { col: pw.col, when: when, txt: T[k] || pw.txt };
 }
-var HABW = { F: 'Forest', G: 'Meadow', W: 'Wetland' };
+var HABW = { F: 'Forest', G: 'Grassland', W: 'Wetland' };
 // ---------------- the value estimate (points now, plus a little for what an action sets up)
 function eggRoom(p) { return PP.birds(p).reduce(function (a, x) { return a + Math.max(0, x.b.e - x.s.eggs); }, 0); }
 // the Best hint = the hard computer's choice for this exact moment (look-ahead over engines, the round goal and bonus cards),
 // cached per decision so the badge does not jump between renders
 var HINT = { k: null, m: null };
 function hintMove() {
-  if (!G || G.phase === 'over' || !hintsOn() || !myTurn() || (typeof coachOn === 'function' && coachOn()) || !window.PPAI || !PPAI.hint) return null;
+  if (!G || G.phase === 'over' || !(hintsOn() || earlyBest()) || (typeof coachOn === 'function' && coachOn())) return null;
+  return hintAny();
+}
+function hintAny() {   // the one hint source: the Best badge and the bulb bubble both read this, so they always name the same move
+  if (!G || G.phase === 'over' || !myTurn() || !window.PPAI || !PPAI.hint) return null;
   var p = G.pl[UI.view], k = JSON.stringify([G.turn, G.round, G.q, p.cubes, p.hand, p.food, p.board.map(function (r) { return r.map(function (x) { return x.eggs; }); }), G.feeder, G.tray]);
   if (HINT.k !== k) { HINT.k = k; try { HINT.m = PPAI.hint(G, UI.view); } catch (e) { HINT.m = null; } }
   return HINT.m;
 }
 function markBest() {   // Best badge on the sub-choice the hint picks (die, egg nest, tray card, deck, tuck) and on the space to play into
   $$('.bestx').forEach(function (e) { e.parentNode.removeChild(e); }); $$('.bestt').forEach(function (e) { e.classList.remove('bestt'); });
+  if (!bestOn()) return;
   var m = hintMove(); if (!m) return;
   var el = null;
   if (G.q && m.t === 'die' && UI.gsDie != null) el = UI.gsDie === m.i ? $$('#acts [data-a="mv"]').filter(function (x) { try { return JSON.parse(x.dataset.m).f === m.f; } catch (e) { return false; } })[0] : null;   // grub-or-seed die: Best moves to the right button
@@ -109,7 +116,7 @@ function actIcon(k) {
 function act4HTML() {
   var inf = actInfo(G, UI.view), tp = tutPoint();
   return '<div id="act4" role="group" aria-label="Choose one action">' + ACTDEF.map(function (d) {
-    var a = inf[d.k], best = !tp && hintsOn() && !(typeof coachOn === 'function' && coachOn()) && inf.best === d.k, txt = a.ok ? (hintsOn() ? a.what : a.plain || a.what) : a.why;
+    var a = inf[d.k], best = !tp && bestOn() && inf.best === d.k, txt = a.ok ? (hintsOn() ? a.what : a.plain || a.what) : a.why;
     return '<button type="button" class="a4 a4-' + d.k + (best ? ' best' : '') + (tp === d.k ? ' tutpoint' : '') + '" data-a="a4" data-k="' + d.k + '"' + (a.ok ? '' : ' aria-disabled="true"') + ' data-val="' + a.v.toFixed(2) + '">' +
       '<span class="a4i" aria-hidden="true">' + actIcon(d.k) + '</span><span class="a4t"><b>' + d.t + '</b><span>' + esc(txt) + '</span></span>' +
       (best ? '<em class="bestb">Best</em>' : '') + '</button>';
@@ -131,8 +138,9 @@ function handGo(i) {
   var c = h.querySelectorAll('.bc')[i]; if (c) h.scrollTo({ left: c.offsetLeft - h.offsetLeft - 6, behavior: UI.fast ? 'auto' : 'smooth' });
   handPager();
 }
+function handFade() { var h = $('#hand'); if (!h) return; var r = h.scrollWidth - h.clientWidth - h.scrollLeft > 6, l = h.scrollLeft > 6; h.classList.toggle('more-r', r); h.classList.toggle('more-l', l); }
 function handPager() {
-  var pg = $('#hpg'); if (!pg) return; var n = G.pl[UI.view].hand.length;
+  handFade(); var pg = $('#hpg'); if (!pg) return; var n = G.pl[UI.view].hand.length;
   pg.innerHTML = n > 1 ? '<button type="button" class="hpb" data-a="hprev" aria-label="Previous bird"' + (UI.hix <= 0 ? ' disabled' : '') + '>&#8249;</button><span>Bird ' + (UI.hix + 1) + ' of ' + n + '</span><button type="button" class="hpb" data-a="hnext" aria-label="Next bird"' + (UI.hix >= n - 1 ? ' disabled' : '') + '>&#8250;</button>' : '';
 }
 document.addEventListener('click', function (e) {
@@ -141,7 +149,7 @@ document.addEventListener('click', function (e) {
 }, true);
 function handScrollSync() {
   var h = $('#hand'); if (!h || h.dataset.sync) return; h.dataset.sync = '1';
-  h.addEventListener('scroll', function () { clearTimeout(h._t); h._t = setTimeout(function () { var cs = h.querySelectorAll('.bc'); if (!cs.length) return; var w = cs[0].offsetWidth + 16; var i = Math.round(h.scrollLeft / w); if (i !== UI.hix) { UI.hix = i; handPager(); } }, 80); }, { passive: true });
+  h.addEventListener('scroll', function () { handFade(); clearTimeout(h._t); h._t = setTimeout(function () { var cs = h.querySelectorAll('.bc'); if (!cs.length) return; var w = cs[0].offsetWidth + 16; var i = Math.round(h.scrollLeft / w); if (i !== UI.hix) { UI.hix = i; handPager(); } }, 80); }, { passive: true });
 }
 // ---------------- turn tracker + score breakdown (top of the board)
 function trackerHTML() {
@@ -161,20 +169,16 @@ function trGoalHTML() {
   var gid = G.goals && G.goals[G.round], g = gid && PP_DATA.goals.filter(function (x) { return x.id === gid; })[0]; if (!g) return '';
   var me = UI.view, cnt = G.pl.map(function (p, i) { return (i === me ? 'you ' : p.name + ' ') + PP.goalCount(G, i, gid); });
   cnt.unshift(cnt.splice(me, 1)[0]);
-  return '<span class="tr-g" data-a="trgoal"><b>Round goal:</b> ' + esc(g.n) + ' · ' + esc(cnt.join(', ')) + '</span>';
+  return '<span class="tr-g" data-a="trgoal"><b>Goal at round end:</b> ' + esc(g.n) + ' · ' + esc(cnt.join(', ')) + '</span>';
 }
-function scoreHTML() {
-  var sc = G.pl.map(function (p, i) { return PP.scoreOf(G, i); }), top = Math.max.apply(null, sc.map(function (s) { return s.total; }));
-  var tot0 = G.cubes[Math.min(G.round, G.cubes.length - 1)] || 0, moved = G.round > 0 || G.pl.some(function (q) { return q.cubes < tot0; });
-  var lead = moved && sc.filter(function (s) { return s.total === top; }).length === 1 && top > 0;
-  var rows = G.pl.map(function (p, i) {
-    var s = sc[i], oth = s.goals + s.bonus + s.cache + s.tuck + s.lead, me = i === UI.view, L = lead && s.total === top;
-    return '<button type="button" class="sr' + (me ? ' me' : '') + (L ? ' lead' : '') + '" data-a="' + (me ? 'mysc' : 'opp') + '" data-s="' + i + '" data-br="birds ' + s.birds + ' · eggs ' + s.eggs + ' · other ' + oth + '" aria-label="' + esc((me ? 'You' : p.name) + ': ' + s.total + ' points' + (L ? ', leading' : '')) + '">' +
-      '<span class="sn">' + (L ? '<em class="crown" aria-hidden="true">&#9733;</em>' : '') + esc(me && humans().length === 1 ? 'You' : p.name) + '</span>' +
-      '<span class="sp"><b>' + s.birds + '</b><small>bird pts</small></span><span class="sp"><b>' + s.eggs + '</b><small>eggs</small></span><span class="sp"><b>' + oth + '</b><small>other</small></span>' +
-      '<span class="st"><b>' + s.total + '</b><small>' + (L ? 'leads' : 'pts') + '</small></span></button>';
-  }).join('');
-  return '<div class="scb" role="group" aria-label="Score">' + rows + '</div>';
+function scoreHTML() {   // F2: real points now, in plain words ("You 32 · Fern 28"); tap a name: you = how it adds up, a rival = their board
+  var sc = G.pl.map(function (p, i) { return PP.scoreOf(G, i).total; }), me = UI.view, ord = G.pl.map(function (p, i) { return i; });
+  ord.splice(ord.indexOf(me), 1); ord.unshift(me);
+  var lbl = G.pl.map(function (p, i) { return i === me && humans().length === 1 ? 'You' : p.name; });
+  return '<div class="scb" role="group" aria-label="Score now: ' + esc(ord.map(function (i) { return lbl[i] + ' ' + sc[i]; }).join(', ')) + '">' +
+    ord.map(function (i) { return '<button type="button" class="sr2' + (i === me ? ' me' : ' opp') + '" data-a="' + (i === me ? 'mysc' : 'opp') + '" data-s="' + i + '" aria-label="' + esc(lbl[i] + ' ' + sc[i] + ' points now' + (i === me ? ', tap for how it adds up' : ', tap to see their board')) + '">' +
+      '<span>' + esc(lbl[i]) + '</span><b>' + sc[i] + '</b>' + (i === me ? '' : '<small>board</small>') + '</button>'; }).join('<i aria-hidden="true">&middot;</i>') +
+    '<span class="scnow" title="Round and actions left">' + (G.phase === 'over' ? 'Game over' : 'Round ' + (G.round + 1) + '/' + G.rounds + ' · ' + G.pl[me].cubes + (G.pl[me].cubes === 1 ? ' action' : ' actions') + ' left') + '</span></div>';
 }
 document.addEventListener('click', function (e) {
   var t = e.target.closest('[data-a="mysc"]'); if (!t || !G) return;
@@ -216,6 +220,8 @@ function rateEnd() {   // after the turn is over: compare with the best-value es
   if (RATE.point && ch === RATE.point) grade = 'good';
   var line = RATE.point && ch === RATE.point ? 'Good: ' + pts + '. Lesson learned!' : grade === 'good' ? 'Good: ' + pts + (ch === best ? ', the best move this turn.' : ', as good as the best move.')
     : (grade === 'okay' ? 'Okay: ' : 'Poor: ') + pts + '. ' + cap1(nm[best]) + ' was worth more (' + inf[best].gain + ').';
+  if ((ch === 'food' || ch === 'cards') && gain <= 0 && grade === 'poor') line = 'Okay: ' + (ch === 'food' ? 'food' : 'new birds') + ' now, birds to play next turn.';   // a setup move scores later, so it is never "Poor: 0 points"
+  if (ch === 'cards' && gain === 0 && grade === 'good') line = 'Good: fills your hand for next turn.';
   if (ch === 'food' && gain === 0 && grade === 'good') line = 'Good: food now lets you play birds next turn.';
   RATE.k = null; RATE.last = { g: grade, t: line };
   showRate();
@@ -225,7 +231,7 @@ function pl(n, w) { return n + ' ' + w + (n === 1 ? '' : 's'); }
 function cap1(t) { t = String(t || ''); return t.charAt(0).toUpperCase() + t.slice(1); }
 function showRate() {
   var el = $('#rate'); if (!el) return;
-  if (!RATE.last || !G || G.phase === 'over' || !hintsOn()) { el.hidden = true; return; }
+  if (!RATE.last || !G || G.phase === 'over' || !bestOn()) { el.hidden = true; return; }
   el.hidden = false; el.className = 'rate r-' + RATE.last.g; el.innerHTML = '<b>' + ({ good: '&#10003;', okay: '~', poor: '!' })[RATE.last.g] + '</b><span>' + esc(RATE.last.t) + '</span>';
 }
 // the tutorial's pointer: which big button Ottilie points at right now (coach.js sets COACH.point)
@@ -234,23 +240,21 @@ function tutPoint() { try { return coachOn() ? COACH.point || null : null; } cat
 // ---------------- Addendum 7: three modes. PLAY is clean (board, hand, tracker, one score line, a Goal card, short pops);
 // HINTS (top-bar toggle, on by default since R19) adds previews, Best badges, the turn rating, toasts and "What should I do?";
 // LEARN TO PLAY (tutfree) is the coached game and always shows them.
-function hintsPref() { try { return localStorage.getItem('pp-hints') !== '0'; } catch (e) { return true; } }   // on by default (R19): a newcomer sees Best; the bulb turns it off
+function hintsPref() { try { return localStorage.getItem('pp-hints') === '1'; } catch (e) { return false; } }   // on by default (R19): a newcomer sees Best; the bulb turns it off
 function hintsOn() { return !!(UI.mode === 'tutfree' || UI.hintPref); }
+function earlyBest() { return !!(UI.first && G && G.round === 0 && G.pl[UI.view] && G.pl[UI.view].cubes >= G.cubes[0] - 1 && UI.mode !== 'tutfree' && UI.mode !== 'tutorial'); }   // F6: Best shows by itself on the first two turns of a first game; after that only when the bulb is on
+function bestOn() { return !!((UI.hintPref || earlyBest()) && UI.mode !== 'tutfree'); }   // Best badges, the glow and move ratings: never in the guided game (Ottilie is its one helper)
 UI.hintPref = hintsPref();
 function hintsBtn() { var b = $('#bulbbtn'); if (!b) return; var on = hintsOn(); b.setAttribute('aria-pressed', on ? 'true' : 'false'); b.setAttribute('aria-label', 'Hints: ' + (on ? 'on' : 'off')); b.classList.toggle('on', on); var t = b.querySelector('.hst'); if (t) t.textContent = on ? 'on' : 'off'; }
 document.addEventListener('click', function (e) {
   if (!e.target.closest('#bulbbtn')) return;
   if (UI.mode === 'tutfree') { toast('Learn to play always shows hints.', 0, 1); return; }
   UI.hintPref = !UI.hintPref; try { localStorage.setItem('pp-hints', UI.hintPref ? '1' : '0'); } catch (x) { }
-  render(); toast(UI.hintPref ? 'Hints on: previews, Best badges and a rating after each turn.' : 'Hints off.', 0, 1);
+  render(); var hm = UI.hintPref ? hintMove() : null, why = ''; try { why = hm ? ' Best: ' + PPAI.why(G, UI.view, hm) : ''; } catch (x) { }
+  toast(UI.hintPref ? 'Hints on.' + why : 'Hints off.', 0, 1);
 });
 // one compact score line: you vs the rival(s), leader starred; tap = the score drawer
-function scoreLineHTML() {
-  var sc = G.pl.map(function (p, i) { return PP.scoreOf(G, i).total; }), top = Math.max.apply(null, sc), one = sc.filter(function (v) { return v === top; }).length === 1 && top > 0;
-  return '<button type="button" class="sline" data-a="mysc" aria-label="Score: ' + esc(G.pl.map(function (p, i) { return (i === UI.view ? 'you' : p.name) + ' ' + sc[i]; }).join(', ')) + '. Tap for how it adds up">' +
-    G.pl.map(function (p, i) { return '<span class="sl' + (i === UI.view ? ' me' : '') + '">' + (one && sc[i] === top ? '<em aria-hidden="true">&#9733;</em>' : '') + esc(i === UI.view && humans().length === 1 ? 'You' : p.name) + ' <b>' + sc[i] + '</b></span>'; }).join('<i>vs</i>') +
-    (G.round === 0 && G.pl[UI.view].cubes === G.cubes[0] && UI.mode !== 'tutfree' ? '<span class="slw goal1">Goal: most points in ' + G.rounds + ' rounds</span>' : '<span class="slw">why?</span>') + '</button>';   // the first screen says the goal in one line
-}
+function scoreLineHTML() { return scoreHTML(); }
 // the score drawer: every number's why, for every player
 function showScore() {
   var rows = [['birds', 'Birds', 'points printed on birds played'], ['eggs', 'Eggs', '1 point each'], ['goals', 'Round goals', 'judged at each round end'], ['bonus', 'Bonus card', 'your secret card'], ['cache', 'Stored food', '1 point each'], ['tuck', 'Tucked cards', '1 point each']];
