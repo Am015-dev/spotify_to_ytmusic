@@ -306,3 +306,7 @@ Live fix: original-name phrase removed from shelf blurb + sands page (15:2x).
 - Content rule finding: doorkick-dungeon (live) copied the original card pool 1:1 (R98). F18 (Opus) redesigning our own 168 cards; then UI fixes; redeploy needs owner yes. COPYAUDIT running over all games.
 - Closest to done: short-fuse (4/5, F3 polish+PC then review), kaiten-kitchen (4/5-ish, F3 polish+PC then review), crown-city-smash (R97 7.4, F2), perch-and-plume (F3), lantern-dive (F2).
 - Pending: approve baselines (sunglaze, rampart: proof/baselines-new) before deploy; hollowbough R96 list after PLAY2; calm-audit doesn't count #coach/#toast.
+
+## W747 (end screens, perch-and-plume / vale-of-banners / stitchwise)
+Done: headline + score + max 3 highlights + Play again/Menu, stats behind a Details toggle. Scenarios: pp-result, vb-result, sw-result (checks updated). Proof: <game>/proof/endscreen-{phone,pc}.png.
+Still weak: build-all --quick fails on pre-existing issues (11px "Forest" in perch, missing vale/stitchwise baselines). Perch/vale have no winner-portrait art for AI wins beyond seat face/initial; stitchwise lose-case not shot. No lose-variant scenarios yet.
