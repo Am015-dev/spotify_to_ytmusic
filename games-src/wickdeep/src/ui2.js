@@ -176,7 +176,7 @@ function renderDock0() {
     case 'recover': setPrompt('Take one card back', [{ t: 'Skip', fn: function () { doMove({ t: 'skip' }); } }]); A.cs.forEach(function (c) { var el = cardEl(c); el.addEventListener('click', function () { doMove({ t: 'card', c: c }); }); tray.appendChild(el); }); return;
     case 'lrest': setPrompt(H.n + ' rests: lose one card', []); f.disc.forEach(function (c) { var el = cardEl(c); el.addEventListener('click', function () { doMove({ t: 'lose', c: c }); }); tray.appendChild(el); }); return;
     case 'srest': {
-      if (!A.must && (f.hand.length >= 4 || G.round <= 1)) { setTimeout(function () { if (G && G.ask === A) doMove({ t: 'nosrest' }); }, 0); setPrompt('', []); return; }
+      if (!A.must && UI.tut && G.round <= 1) { setTimeout(function () { if (G && G.ask === A) doMove({ t: 'nosrest' }); }, 0); setPrompt('', []); return; }
       setPrompt(H.n + ': short rest?', [{ t: 'Rest', cls: 'go', fn: function () { doMove({ t: 'srest' }); } }].concat(A.must ? [] : [{ t: 'No', fn: function () { doMove({ t: 'nosrest' }); } }]));
       tray.appendChild(infoP('Lose 1 random played card. Get the other ' + (f.disc.length - 1) + ' back.')); return;
     }

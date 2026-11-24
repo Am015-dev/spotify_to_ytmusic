@@ -84,7 +84,7 @@ function fitCam(force) {
   ks.forEach(function (k) { var w = hexWorld(k); x0 = Math.min(x0, w.x); x1 = Math.max(x1, w.x); y0 = Math.min(y0, w.y); y1 = Math.max(y1, w.y); });
   var bw = x1 - x0 + 2.2, bh = y1 - y0 + 2.6;
   var z = Math.min(BW / bw, (BH - 50) / bh);
-  CAM.z = Math.max(16, Math.min(innerWidth >= 800 ? 64 : 46, z)); CAM.x = (x0 + x1) / 2; CAM.y = (y0 + y1) / 2;
+  CAM.z = Math.max(16, Math.min(innerWidth >= 800 ? 64 : 54, z)); CAM.x = (x0 + x1) / 2; CAM.y = (y0 + y1) / 2;
   clampCam();
 }
 function clampCam() {
@@ -135,6 +135,17 @@ function drawNow() {
   var R = CAM.z, view = UI.view;
   var keys = Object.keys(G.hex).filter(function (k) { return E.seen(G, k); });
   var pat = CX.createPattern(STONE, 'repeat');
+  // fog: unrevealed rooms stay on the map as flat dark tiles (the layout is known, the contents are not)
+  Object.keys(G.hex).forEach(function (k) {
+    if (E.seen(G, k)) return; var s = toScreen(k);
+    if (s.x < -R * 2 || s.x > BW + R * 2 || s.y < -R * 2 || s.y > BH + R * 2) return;
+    hexPath(s.x, s.y, R * 0.96); CX.fillStyle = '#17131f'; CX.fill(); CX.strokeStyle = '#2c2538'; CX.lineWidth = Math.max(1.5, R * 0.05); CX.stroke();
+  });
+  Object.keys(Object.keys(G.hex).reduce(function (o, k) { if (G.hex[k].room != null) o[G.hex[k].room] = 1; return o; }, {})).forEach(function (r) {
+    if (G.rev[r]) return; var ks = Object.keys(G.hex).filter(function (k) { return G.hex[k].room == r && G.hex[k].t !== 'door'; }); if (!ks.length) return;
+    var x = 0, y = 0; ks.forEach(function (k) { var t = toScreen(k); x += t.x; y += t.y; }); x /= ks.length; y /= ks.length;
+    CX.fillStyle = '#4a3f5c'; CX.font = '700 ' + Math.round(Math.max(18, R * 0.8)) + 'px Silkscreen,monospace'; CX.textAlign = 'center'; CX.textBaseline = 'middle'; CX.fillText('?', x, y);
+  });
   // floors
   keys.forEach(function (k) {
     var s = toScreen(k), h = G.hex[k];
@@ -212,7 +223,7 @@ function drawFig(f) {
   var by = s.y + R * 0.66 * big;
   CX.fillStyle = '#000'; CX.fillRect(s.x - w / 2 - 1, by - 1, w + 2, Math.max(4, R * 0.16) + 2);
   CX.fillStyle = f.team === 'h' ? '#7fc46a' : '#d0533c'; CX.fillRect(s.x - w / 2, by, w * hpw, Math.max(4, R * 0.16));
-  if (R >= 16) { CX.font = '700 ' + Math.max(innerWidth >= 800 ? 12 : 11, Math.round(R * 0.36)) + 'px Silkscreen,monospace'; CX.textAlign = 'center'; CX.textBaseline = 'top'; CX.fillStyle = '#000'; CX.fillText(Math.max(0, f.hp), s.x + 1, by + Math.max(4, R * 0.16) + 2); CX.fillStyle = '#fff'; CX.fillText(Math.max(0, f.hp), s.x, by + Math.max(4, R * 0.16) + 1); }
+  if (R >= 16) { var br = Math.max(10, R * 0.3), bx = s.x - R * 0.62, bby = s.y + R * 0.2; CX.fillStyle = f.team === 'h' ? '#2f6b2a' : '#8a2418'; CX.strokeStyle = '#000'; CX.lineWidth = 2; CX.beginPath(); CX.arc(bx, bby, br, 0, 7); CX.fill(); CX.stroke(); CX.font = '700 ' + Math.round(Math.max(13, br * 1.1)) + 'px Silkscreen,monospace'; CX.textAlign = 'center'; CX.textBaseline = 'middle'; CX.fillStyle = '#fff'; CX.fillText(Math.max(0, f.hp), bx, bby + 1); }
   // monster number
   if (f.kind === 'mon') { var nx = s.x + R * 0.55, ny = s.y - R * 0.55; CX.fillStyle = f.elite ? '#f2c94c' : '#e9dfc8'; CX.fillRect(nx - 7, ny - 7, 14, 14); CX.fillStyle = '#000'; CX.font = '700 ' + (innerWidth >= 800 ? 12 : 11) + 'px Silkscreen,monospace'; CX.textAlign = 'center'; CX.textBaseline = 'middle'; CX.fillText(f.num, nx, ny + 1); }
   // conditions
