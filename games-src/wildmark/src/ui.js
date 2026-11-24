@@ -261,7 +261,7 @@ function overlayPads() {   // G5: fit between the chips really on screen at the 
 function safeRect() {
   var bd = $('#board'), wh = boardWH(), r = { l: 6, t: 6, r: wh[0] - 6, b: wh[1] - 6 }; if (!bd) return r; var br = bd.getBoundingClientRect();
   function vis(e) { if (!e || e.hidden) return null; var q = e.getBoundingClientRect(); if (q.width < 2 || q.height < 2 || q.right <= br.left + 1 || q.left >= br.right - 1) return null; var cs = getComputedStyle(e); if (cs.display === 'none' || cs.visibility === 'hidden' || +cs.opacity === 0) return null; return { l: q.left - br.left, t: q.top - br.top, r: q.right - br.left, b: q.bottom - br.top }; }
-  ['#cards', '#seats', '#terr', '#acorn', '#coachb'].forEach(function (s) { var q = vis($(s)); if (q && q.t < wh[1] * 0.45) r.t = Math.max(r.t, q.b + 4); });
+  ['#cards', '#seats', '#terr', '#acorn', '#coachb', '.gxst-card'].forEach(function (s) { var q = vis($(s)); if (q && q.t < wh[1] * 0.45) r.t = Math.max(r.t, q.b + 4); });
   ['#line', '#pv', '#acts'].forEach(function (s) { var q = vis($(s)); if (q && q.b > wh[1] * 0.55 && q.t < wh[1]) r.b = Math.min(r.b, q.t - 4); });
   var pvq = vis($('#pv')); if (pvq && getComputedStyle($('#pv')).position === 'fixed') pvq = null; if (!pvq && hintsOn() && !UI.tut && !matchMedia('(max-width:999px) and (orientation:portrait) and (max-height:620px)').matches) r.b -= wideUI() ? 64 : 48;   // F3: room for the preview strip that appears on steps 2-3, so it never sits on a spot
   var z = vis($('#zoom')); r.rw = r.r; r.zt = z ? z.t - 4 : 1e9; if (z) r.r = Math.min(r.r, z.l - 4);   // rw / zt: above the zoom column the full width is free
