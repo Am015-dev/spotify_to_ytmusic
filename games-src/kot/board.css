@@ -122,6 +122,7 @@ html.ph #choice .bfintro .goal .how li{position:relative;padding-left:20px;font-
 html.ph #choice .bfintro .goal .how li::before{content:'';position:absolute;left:4px;top:.45em;width:9px;height:9px;border-radius:50%;background:var(--mc,#ffd23f);box-shadow:0 0 0 2px #1a1320}
 html.ph .bfintro .you span{font-size:16px}
 html.ph-p header.gx-bar .pchip.me b{padding-right:24px}
+html.ph-p header.gx-bar .gxst-q{display:none}   /* phone header has no room: Lessons opens from the menu (tutStart -> picker) */
 html.ph #choice.bfpoke{animation:bfPoke .5s}
 @keyframes bfPoke{0%,100%{transform:none}30%{transform:translateY(-8px)}60%{transform:translateY(2px)}}
 html.ph-p .gx-dock[data-card="choice"] #choice h2{font-size:1.6rem}

@@ -119,6 +119,13 @@ html.ph-l #ob #pacts [data-act="end"]{min-height:60px}
 #ob .obbig .obbtns .btn{min-height:46px;min-width:110px;font-size:17px;font-weight:800;border-radius:12px;border:3px solid #1a1320;cursor:pointer}
 #ob .obbig .obbuy{background:#1f9d5c;color:#fff}
 #ob .obbig .obx{background:#fff;color:#1a1320}
+/* 2D board on desktop (body without .three): dice left of the monster cards, hint + SMASH right of them; the cards span x 418-948 at 1366 */
+@media (min-width:900px){
+html:not(.ph) body:not(.three) #ob #dicewrap{position:absolute;left:14px;right:14px;bottom:calc(10px + 90px);margin:0;pointer-events:none;z-index:4}
+html:not(.ph) body:not(.three) #ob #dice{display:grid;grid-template-columns:repeat(3,var(--dw));justify-content:center;gap:10px 8px;padding:0;width:calc(50% - 280px);pointer-events:auto}
+html:not(.ph) body:not(.three) #ob #preview{position:absolute;right:0;bottom:0;width:calc(50% - 290px);max-width:none;margin:0;font-size:15px}
+html:not(.ph) body:not(.three) #ob #pacts [data-act="resolve"]{justify-self:end}
+}
 
 /* W500: with a pinned card the big card lives in the space above the shop row; its art gives way when the screen is short */
 #ob #obcard.on{align-items:center;grid-template-rows:minmax(0,1fr);grid-template-columns:minmax(0,1fr)}
