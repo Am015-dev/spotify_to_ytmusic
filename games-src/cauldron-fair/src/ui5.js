@@ -52,7 +52,6 @@ function buildRules() {
     'The ring shows where you would score now. The box under the buttons shows your explosion chance.',
     'The small cauldrons at the top are the other players. Tap one to watch it. Hot-seat passes the device between players. Online, everybody brews at once.',
     'The lightbulb gives a hint for right now. The Menu turns tips on or off.'])));
-  root.appendChild(h('div', { html: typeof CF_CREDITS !== 'undefined' ? CF_CREDITS : '' }));
   root.appendChild(h('p.sm', 'Cauldron Fair is an original game.'));
   return root;
 }
@@ -113,7 +112,7 @@ function renderMenu() {
   { const gp = typeof gfxPref === 'function' ? gfxPref() : 'auto'; row('Graphics' + (typeof PX !== 'undefined' && PX.on ? (gp === 'auto' ? ' (now ' + PX.q + ')' : '') : ' (simple view)'), ...[['auto', 'Auto'], ['high', 'High'], ['medium', 'Medium'], ['low', 'Low']].map(([v, n]) => h('button.btn' + (gp === v ? '' : '.alt'), { 'data-a': 'gfx', 'data-v': v, type: 'button', 'aria-pressed': gp === v ? 'true' : 'false' }, n))); }
   let sp = ''; try { sp = window.PerfHUD && PerfHUD.buttonsHTML ? PerfHUD.buttonsHTML('btn alt') : ''; } catch (e) { }
   row('Info', h('button.btn.alt', { 'data-a': 'rules', type: 'button' }, 'How to play'), h('button.btn.alt', { 'data-a': 'drawer', 'data-v': 'logd', type: 'button' }, 'Log'), h('button.btn.alt', { 'data-a': 'drawer', 'data-v': 'refd', type: 'button' }, 'Chips and cards'), h('span.tinyc', { html: sp }));
-  b.appendChild(h('p.sm', 'Cauldron Fair is an original game. Names, text and art are original; the audio credits are in How to play.'));
+  b.appendChild(h('p.sm', 'Cauldron Fair is an original game.'));
 }
 // ---------- start screens: painted title -> setup (character cards) / online ----------
 const SETCHOICES = [[1, 'Beginner set', 'Easiest to learn. Best for a first game.'], [2, 'Set 2', 'Safe harbour, side pockets, double steps.'], [3, 'Set 3', 'Lucky sevens, pod pushers, roomier pots.'], [4, 'Set 4', 'Ruby treasure, upgrades, stretching roots.'], ['random', 'Random mix', 'Every colour gets a random set 1 to 4.']];

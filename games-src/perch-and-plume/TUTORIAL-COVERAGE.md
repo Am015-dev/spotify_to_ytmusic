@@ -13,7 +13,6 @@ Proof: `tests/tutorial-end.js phone|small|pc` taps only the highlighted target o
 in this order, with one sentence of 12 words or fewer and exactly one highlight, then that the last tap starts a real game.
 
 ## Steps (rule id = the step; logic: `src/coach.js` TSTEPS)
-1. step `goal`: most points wins; the round goal (grassland birds) counts live on the tracker; the practice is one short round (tap the score line).
 2. step `play` (one step, four taps, one sentence each): play a bird (Play a bird), the bird's food cost, the leftmost empty space, spaces 2-3 cost 1 egg and 4-5 cost 2 (tap Play).
 3. step `white`: a white power works once, when played (tap the new bird).
 4. step `food` (two sub-lines): get food, the forest takes feeder dice, one die = one food, more forest birds = more food (tap Get food, then two dice).
@@ -28,3 +27,5 @@ in this order, with one sentence of 12 words or fewer and exactly one highlight,
 
 Covered by the in-game instruction bar instead of a step (they depend on dice luck in a real game): the bonus-space trades,
 rerolling an all-same feeder, the empty-feeder reroll. The rules drawer explains each.
+
+(W602) The `goal` step is gone: the goal is a permanent line on screen ("Finish with more points than Pip."). Each step now shows a bold tap instruction (STORY.coachDo) plus one short reason; after each tap a green line says what happened. The guided game hides the feeder, food, tray, deck, goal chips and the 3 unused actions until a step needs them (`coachLayers`, body.tutlite). Proof: `tests/newcomer-run.js phone|pc` follows only the glowing target.

@@ -1,0 +1,59 @@
+<body>
+<div class="gx-app" id="app">
+  <div id="top">
+    <button class="ib" data-gx="setd" id="menuB" type="button" aria-label="Menu"></button>
+    <div id="race">
+      <div class="chip" id="cD" role="button" tabindex="0" aria-label="Dawn victory points"><span>Dawn</span><b id="vD">0/4</b></div>
+      <div class="chip g" id="cG" role="button" tabindex="0" aria-label="Gloam victory points"><span>Gloam</span><b id="vG">0/10</b></div>
+      <div class="chip t" id="cT" role="button" tabindex="0" aria-label="Taint and the Company"><span>Taint</span><b id="vT">0/12</b></div>
+    </div>
+    <button class="ib gx-ibtn gxh-bulb" id="bulbbtn" data-help type="button" aria-label="Hint"></button>
+    <button class="ib" id="helpB" type="button" aria-label="Rules">?</button>
+  </div>
+  <div class="gx-board" id="board" data-board><div id="map"></div><div id="zoomb"><button type="button" id="zin" aria-label="Zoom in">+</button><button type="button" id="zout" aria-label="Zoom out">−</button></div><div id="rival" aria-label="Rival dice"><span class="rl" id="rlab">Rival dice</span><div id="rdice"></div><div id="hunt" title="Dice in the hunt box"></div></div></div>
+  <div id="dock">
+    <div id="msg" aria-live="polite" role="button" tabindex="0" aria-label="Chronicle of the war"></div>
+    <div id="drow"><div id="mydice" style="display:flex;gap:6px"></div></div>
+    <div id="acts"></div>
+    <div id="tabs">
+      <button class="tab" id="tCards" type="button"></button>
+      <button class="tab" id="tNat" type="button"></button>
+      <button class="tab" id="tComp" type="button"></button>
+    </div>
+  </div>
+</div>
+<div id="scrim"></div>
+<div class="sheet" id="sheet" role="dialog" aria-modal="true" aria-label="Details"></div>
+<div id="battle" role="dialog" aria-modal="true" aria-label="Battle"></div>
+<div id="toast"></div>
+<div class="scr on" id="title">
+  <svg id="crest" viewBox="0 0 200 200" aria-hidden="true"></svg>
+  <h1 class="logo">GLOAM<i>WAR</i></h1>
+  <p class="tag">An old map. Two great alliances. One small Company carrying the Hollow Crown to the Kiln.</p>
+  <div class="trow"><button class="btn pri big" id="playD" type="button">Play the Dawn League</button></div>
+  <div class="trow"><button class="btn red big" id="playG" type="button">Play the Gloam</button></div>
+  <div class="trow"><span class="seg" id="segL"></span></div>
+  <div class="trow"><span id="tutSlot"></span><button class="btn" id="howB" type="button">How to play</button><button class="btn" data-gx="setd" type="button" id="tMenuB">Settings</button></div>
+</div>
+<div class="scr" id="res"><p class="big" id="resH"></p><p id="resP" style="max-width:34ch;font-family:var(--fell);font-size:1.15rem"></p><div class="row" id="resRow" style="justify-content:center"></div></div>
+<script src="gx-scenario.js"></script>
+<script src="scn.js"></script>
+<script src="shell.js"></script>
+<script src="gx-kit.js"></script>
+<script src="gx-viewport.js"></script>
+<script src="gx-help.js"></script>
+<script src="gx-tutor.js"></script>
+<script src="gameaudio.js"></script>
+<script src="icons.js"></script>
+<script src="map.js"></script>
+<script src="data.js"></script>
+<script src="cards.js"></script>
+<script src="engine.js"></script>
+<script src="combat.js"></script>
+<script src="effects.js"></script>
+<script src="ai.js"></script>
+<script src="mapview.js"></script>
+<script src="ui.js"></script>
+<script src="sheets.js"></script>
+<script src="tutor.js"></script>
+</body></html>

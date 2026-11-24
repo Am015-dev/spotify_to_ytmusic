@@ -153,7 +153,6 @@ function rulesHTML(){return `<div>
   <h3>Keyboard shortcuts</h3><p class="small"><b>R</b> reroll · <b>Space</b> resolve / end turn · <b>1–8</b> keep a die · <b>H</b> suggest dice · <b>P</b> pause the computer</p>
   <h3>Winning</h3><p>Reach <b>20 stars</b> and survive your turn, or be the last monster standing. If everyone falls at once, nobody wins.</p>
   <h3>About this version</h3><p class="small">All 66 classic cards, the 24 Brainjack cards, 72 evolutions, 12 costumes, 24 curses and 10 menace tiles follow the published cards, with new names and wording.</p>
-  <h3>Credits</h3><p class="small">Names, card text and art are original.</p><section class="credits-audio"><h4>Audio</h4><ul class="small"><li>Art and music by Am015-dev</li></ul><p class="small"><small>All sounds were trimmed, loudness-normalised and converted to MP3 for this game.</small></p></section>
   <h3>House rules (kept on purpose)</h3><ul class="hat"><li>The first player is picked at random, not by a dice roll-off.</li><li>The 20-star win is checked when the active monster ends its turn; it must survive the turn.</li><li>Dice order: Automatic resolves hearts before claws. Menu, Dice order: Ask me, lets you choose.</li><li>Evolutions: keep 1 of 2 cards at the start; resolving 3 hearts shows 2 and keeps 1.</li><li>Where an expansion card’s text was unclear, one reading is used (listed in rules-notes.md).</li></ul>
   <div class="acts"><button class="btn primary" data-gx="close">Got it</button></div></div>`}
 

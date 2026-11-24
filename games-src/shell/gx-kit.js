@@ -144,7 +144,7 @@
     if (a.name) S.appendChild(el('p', 'gx-about-n', a.name + (a.version ? ' · ' + a.version : '')));
     if (a.text) { var p = el('p', 'gx-small'); p.textContent = a.text; S.appendChild(p); }
     var links = el('div', 'gx-links');
-    [['credits.html', 'Credits & licences'], ['privacy.html', 'Privacy'], ['terms.html', 'Terms'], ['reference.html', 'All cards on the shelf']].forEach(function (l) {
+    [['privacy.html', 'Privacy'], ['terms.html', 'Terms'], ['reference.html', 'All cards on the shelf']].forEach(function (l) {
       var x = el('a', 'gx-chip', l[1]); x.href = shelf + l[0]; x.target = '_blank'; x.rel = 'noopener'; links.appendChild(x);
     });
     S.appendChild(links);

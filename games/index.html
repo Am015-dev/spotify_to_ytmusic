@@ -552,11 +552,6 @@ html.ph #feat .fb{padding:12px 14px 10px;min-height:150px;align-content:end}
 html.ph #feat .fs{background:linear-gradient(0deg,rgba(14,8,5,.92) 0%,rgba(14,8,5,.5) 55%,rgba(14,8,5,.05) 100%)}
 html.ph #feat .ft{max-width:none}
 @media (max-height:600px){html.ph #feat .fb{min-height:0;padding:10px 12px 8px}html.ph #feat .fn{font-size:1.15rem}}
-/* support the shelf */
-.kofi{display:inline-flex;align-items:center;gap:8px;min-height:44px;padding:0 16px;border-radius:99px;background:#29abe0;color:#fff!important;font:800 .95rem "Chivo",system-ui,sans-serif;text-decoration:none;box-shadow:0 4px 12px rgba(0,0,0,.25)}
-.kofi:hover{filter:brightness(1.08)}
-.support{margin-top:14px;display:flex;flex-wrap:wrap;gap:10px 14px;align-items:center}
-.support p{margin:0;max-width:52ch}
 /* What's new */
 .upd{position:absolute;left:3%;top:3%;padding:.28em .55em;border-radius:.4em;background:var(--brass);color:#2a1a0c;font:800 .62em/1 var(--body);letter-spacing:.02em;box-shadow:0 .1em .3em rgba(0,0,0,.5);transform:rotate(-6deg);z-index:2;pointer-events:none}
 .vchip{display:inline-block;font:700 .7rem var(--mono);letter-spacing:.04em;color:var(--brass);border:1px solid #6b5238;border-radius:99px;padding:1px 8px;margin-left:8px;vertical-align:middle;white-space:nowrap;text-transform:none}.vchip:empty{display:none}.pl-t .vchip{margin:4px 0 0;display:inline-block}#tver{margin-left:4px;font-size:.68rem;flex:none}
@@ -669,7 +664,7 @@ html.ph #feat .ft{max-width:none}
 </div>
 <div id="listview" hidden></div>
 </main>
-<footer>Each game keeps its own save, sound and difficulty settings. Every board game can be played online with friends for free: open it, press Host, and send them the invite code or link.<br><a href="credits.html">Credits &amp; licences</a> · <a href="lab.html">🧪 LAB</a> · <a href="privacy.html">Privacy</a> · <a href="terms.html">Terms</a> · <a href="suggest.html">Suggestion box</a><span id="devlinks" hidden> · <a href="screen-test.html">Phone screen test</a> · <a href="status.html">Status</a></span><br><small>&copy; 2026 Am015-dev. All rights reserved. Original games inspired by published board games; not affiliated with their designers or publishers.</small><div class="support" id="support" hidden><p>These games are free and ad-free. If they made your game night, you can help cover the hosting and development costs.</p><a class="kofi kofi-link" target="_blank" rel="noopener" href="#">☕ Support on Ko-fi</a></div></footer>
+<footer>Each game keeps its own save, sound and difficulty settings. Every board game can be played online with friends for free: open it, press Host, and send them the invite code or link.<br><a href="lab.html">🧪 LAB</a> · <a href="privacy.html">Privacy</a> · <a href="terms.html">Terms</a> · <a href="suggest.html">Suggestion box</a><span id="devlinks" hidden> · <a href="screen-test.html">Phone screen test</a> · <a href="status.html">Status</a></span><br><small>&copy; 2026 Am015-dev. All rights reserved.</small></footer>
 
 <div id="inspect" hidden></div>
 <div id="tip" role="status" hidden></div>
@@ -689,7 +684,7 @@ html.ph #feat .ft{max-width:none}
   <iframe id="frame" title="Game" allow="fullscreen; autoplay"></iframe>
   <div id="ck" role="region" aria-label="Test checklist" hidden><div class="ckg" id="ckgrip" aria-hidden="true"><i></i></div><div class="ckh"><h2 id="ckttl">Test</h2><button type="button" id="ckmin" aria-label="Collapse checklist">&#9662;</button><button type="button" id="ckx" aria-label="Close checklist">&#10005;</button></div><div id="ckbody"></div></div>
   <button type="button" id="ckpill" hidden>&#10004; Test<i class="ckbadge" hidden></i></button><div id="cktoast" role="status" hidden></div>
-  <div id="loader" class="done" aria-live="polite"><div class="lc"><div class="lt" id="lname">Game</div><div class="lb" role="progressbar" aria-label="Loading"><i id="lbar"></i></div><div class="lm">Made with <b aria-label="love">♥</b> by Alex</div><div class="lk" id="lkofi" hidden>Enjoying the shelf? <a class="kofi-link" target="_blank" rel="noopener" href="#">Buy Alex a coffee ☕</a></div></div></div>
+  <div id="loader" class="done" aria-live="polite"><div class="lc"><div class="lt" id="lname">Game</div><div class="lb" role="progressbar" aria-label="Loading"><i id="lbar"></i></div><div class="lm">Made with <b aria-label="love">♥</b> by Alex</div></div></div>
 </div>
 
 <script>
@@ -742,6 +737,22 @@ const GAMES=[
    blurb:"A co-op dungeon crawl by candlelight. Pick two cards and outsmart the dark. You control all 1–4 heroes. Preview: still being polished.",
    stats:[["1–4", "heroes"]],
    chips:["Preview", "Co-op", "Campaign"]},
+  {id:"tessera",cover:"covers/via-tessera.jpg",name:"Via Tessera",src:"via-tessera/index.html",ribbon:"Market & patrons",ref:false,
+   blurb:"Spread carts and ships. Build, trade, win patrons. Preview: new and untested, tell us what is unclear.",
+   stats:[["New", "preview"]],
+   chips:["Preview", "Learn to play"]},
+  {id:"onyx",cover:"covers/onyx-atelier.jpg",name:"Onyx Atelier",src:"onyx-atelier/index.html",ribbon:"A jeweller's duel",ref:false,
+   blurb:"A jeweller's duel: the first game teaches you. Preview: new and untested, tell us what is unclear.",
+   stats:[["2", "players"]],
+   chips:["Preview", "Vs computer · 3 levels", "Guided first game"]},
+  {id:"meadowfold",cover:"covers/meadowfold.jpg",name:"Meadowfold",src:"meadowfold/index.html",ribbon:"Valley folding",ref:false,
+   blurb:"Fold a paper valley and invite its animals. Preview: new and untested, tell us what is unclear.",
+   stats:[["New", "preview"]],
+   chips:["Preview", "Learn to play (2 min)"]},
+  {id:"gloamwar",cover:"covers/gloamwar.jpg",name:"Gloamwar",src:"gloamwar/index.html",ribbon:"Epic war",ref:false,
+   blurb:"An old map, two great alliances, and one small Company carrying the Hollow Crown to the Kiln. Preview: new and untested.",
+   stats:[["New", "preview"]],
+   chips:["Preview", "Campaign"]},
   {id:'tidewake',cover:'covers/tidewake.jpg',name:'Tidewake',src:'tidewake/index.html',ribbon:'Path-laying at sea',ref:false,
    blurb:'Lay sea currents to steer your junk across a painted chart, and keep every rival and every leviathan away from it. Last ship afloat wins. Play against computers, pass one device around, or online with friends. Preview: still being polished.',
    stats:[['1–8','players'],['30','minutes'],['8+','ages'],['56','currents']],
@@ -800,11 +811,11 @@ const GAMES=[
    chips:['4 circuits + mirror','4 weathers','Crash cam & wrecks','Baustelle smash','6-event career','Zone survival','Arena · 3 lives','Demolition derby','Crash Junction','Aftertouch','Ghost duel','Daily challenge','Traffic & near misses','Takedowns','Gamepad & touch','Settings']}
 ];
 /* box look: colour and size (em) per game; deterministic */
-const LOOK={vinegrave:{c:'#6b2a3c',W:12.6,H:10.6,D:2.8},stitchwise:{c:'#a0527a',W:12.6,H:10.4,D:2.8},perch:{c:'#5b6b57',W:13.4,H:11.0,D:3.0},wildmark:{c:'#4a7a45',W:13.8,H:11.2,D:3.0},ochre:{c:'#b5502c',W:13.6,H:11.0,D:3.0},wickdeep:{c:'#4a3320',W:13.6,H:11.4,D:3.2},crown:{c:'#8c3f5e',W:14.6,H:11.8,D:3.4},nebula:{c:'#3c3a78',W:13.4,H:11.6,D:3.0},doorkick:{c:'#b5622a',W:13.8,H:11.0,D:3.6},shipwreck:{c:'#4f7a58',W:14.4,H:11.2,D:3.4},sands:{c:'#b8683c',W:13.6,H:11.6,D:3.0},
+const LOOK={tessera:{c:'#a0522d',W:13.4,H:11.0,D:3.0},onyx:{c:'#2a2a3a',W:12.8,H:10.8,D:3.0},meadowfold:{c:'#6a9a4a',W:13.4,H:11.0,D:3.0},gloamwar:{c:'#4a2a2a',W:14.0,H:11.4,D:3.2},vinegrave:{c:'#6b2a3c',W:12.6,H:10.6,D:2.8},stitchwise:{c:'#a0527a',W:12.6,H:10.4,D:2.8},perch:{c:'#5b6b57',W:13.4,H:11.0,D:3.0},wildmark:{c:'#4a7a45',W:13.8,H:11.2,D:3.0},ochre:{c:'#b5502c',W:13.6,H:11.0,D:3.0},wickdeep:{c:'#4a3320',W:13.6,H:11.4,D:3.2},crown:{c:'#8c3f5e',W:14.6,H:11.8,D:3.4},nebula:{c:'#3c3a78',W:13.4,H:11.6,D:3.0},doorkick:{c:'#b5622a',W:13.8,H:11.0,D:3.6},shipwreck:{c:'#4f7a58',W:14.4,H:11.2,D:3.4},sands:{c:'#b8683c',W:13.6,H:11.6,D:3.0},
  sunglaze:{c:'#2a5fa8',W:14.4,H:11.4,D:3.4},rampart:{c:'#7a8a3c',W:13.6,H:11.0,D:3.0},shortfuse:{c:'#c9372c',W:14.2,H:10.8,D:3.0},tidewake:{c:'#2f6b66',W:14.6,H:11.2,D:2.8},hollowbough:{c:'#7a5a2c',W:14.4,H:11.8,D:3.2},
  thornbound:{c:'#3b2a4f',W:14.0,H:11.8,D:3.4},kaiten:{c:'#c2502e',W:13.2,H:10.6,D:3.0},lantern:{c:'#c99a2e',W:13.8,H:11.4,D:3.2},cauldron:{c:'#2e9c8f',W:14.2,H:11.0,D:3.4},approach:{c:'#7aa0c4',W:12.8,H:10.6,D:2.6},mainhattan:{c:'#6a1f6e',W:13.4,H:10.8,D:2.8},overdrive:{c:'#4a3f9a',W:14.4,H:11.4,D:3.4},redline:{c:'#2b4f8a',W:11.4,H:10.0,D:2.6},emberclimb:{c:'#8a3a22',W:11.2,H:10.2,D:2.6},twinthrones:{c:'#2f7a80',W:11.2,H:10.0,D:2.6}};
 /* board games only; video games (kind:'video') live on the TV */
-const BAYS=[['crown','nebula',['doorkick','spine'],'shipwreck','sands','redline'],['sunglaze','rampart',['shortfuse','tidewake'],'hollowbough','emberclimb'],['thornbound','kaiten',['lantern','spine'],'cauldron','approach','twinthrones'],['vinegrave','stitchwise','perch','wildmark','ochre','wickdeep']];
+const BAYS=[['crown','nebula',['doorkick','spine'],'shipwreck','sands','redline'],['sunglaze','rampart',['shortfuse','tidewake'],'hollowbough','emberclimb'],['thornbound','kaiten',['lantern','spine'],'cauldron','approach','twinthrones'],['vinegrave','stitchwise','perch','wildmark','ochre','wickdeep'],['tessera','onyx','meadowfold','gloamwar']];
 const store={get(k){try{return localStorage.getItem(k)}catch(e){return null}},set(k,v){try{localStorage.setItem(k,v)}catch(e){}}};
 const $=(s,r=document)=>r.querySelector(s);
 const root=document.documentElement;
@@ -1513,9 +1524,6 @@ addEventListener('resize',fit);
 renderFilters();initWn();initCk();fit();render();
 {const start=GAMES.find(g=>'#'+g.id===location.hash);if(start)openGame(start)}
 
-/* Ko-fi support: set the page name to switch the support links on */
-const KOFI='am015dev';
-if(KOFI){for(const a of document.querySelectorAll('.kofi-link'))a.href='https://ko-fi.com/'+KOFI;const s=document.getElementById('support');if(s)s.hidden=false;const k=document.getElementById('lkofi');if(k)k.hidden=false}
 /* loading card while a game starts: "Made with love by Alex" */
 var lt0=0,ltick=0;
 function showLoader(name){const loader=document.getElementById('loader'),lbar=document.getElementById('lbar');if(!loader)return;document.getElementById('lname').textContent=name;loader.classList.remove('done');lt0=performance.now();let p=8;lbar.style.width=p+'%';clearInterval(ltick);

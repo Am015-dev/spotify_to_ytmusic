@@ -556,4 +556,41 @@ html,body{background:#3a1f0e}
 #draft .wcard>b,#draft .wcard>small{overflow:visible;white-space:normal;overflow-wrap:break-word}
 #draft .wcard .costs{flex-wrap:wrap;overflow:visible}
 .zcard{overflow:visible}
+/* W597 board fit: every face-up card shows name + effect + cost; the Build/Sell/Wonder bar sits on your city row, never over the pyramid */
+#pyr .card.v4.flat .nm,#pyr .card.v4.rowm .nm{font-size:13px;line-height:1.05;padding:2px 3px;max-height:var(--nmh,33px);letter-spacing:-.02em}
+#pyr .card.v4.flat .nm{top:0}
+#pyr .card.v4.flat .ef{top:33px;gap:2px}
+#pyr .card.v4.flat .e1,#pyr .card.v4.rowm .e1{height:22px}
+#pyr .card.v4.flat .e1 .art,#pyr .card.v4.rowm .e1 .art{width:18px;height:18px;flex-basis:18px}
+#pyr .card.v4.flat .pr,#pyr .card.v4.rowm .pr{padding:1px 2px;gap:1px}
+#pyr .card.v4.flat .c1 .art,#pyr .card.v4.rowm .c1 .art{width:17px;height:17px}
+#pyr .card.v4.flat.cov .pr,#pyr .card.v4.rowm.cov .pr{display:flex}
+#pyr .card.v4.flat.cov .ef,#pyr .card.v4.rowm.cov .ef{height:auto;overflow:visible;opacity:1;flex-wrap:wrap}
+#pyr .card.v4.flat.cov{filter:none!important}
+#pyr .card.v4.flat.cov>.art{filter:brightness(.7) saturate(.8)}
+#pyr .card.v4.rowm .ef{top:var(--nmh,18px);left:2px;right:auto;flex-wrap:nowrap;max-width:62%}
+#pyr .card.v4.rowm .pr{top:var(--nmh,18px);bottom:auto;left:auto;right:0;background:none;width:auto;max-width:42%;flex-wrap:nowrap;padding:0 2px 0 0}
+#pyr .card.v4.rowm .pr .c1,#pyr .card.v4.rowm .pr .fr{background:rgba(8,14,16,.82);border-radius:11px;padding:1px 4px;height:22px;box-sizing:border-box}
+#pyr .card.v4.rowm .e1.sm{padding:0}
+#pyr .card.v4.flat .nm.t1,#pyr .card.v4.rowm .nm.t1{letter-spacing:-.05em;padding-left:2px;padding-right:1px}
+#pyr .card.v4.flat .nm.t2,#pyr .card.v4.rowm .nm.t2{letter-spacing:-.07em;overflow-wrap:normal}
+#pyr .card.v4.flat .nm.t3,#pyr .card.v4.rowm .nm.t3{font-size:12px;letter-spacing:-.06em}
+#zoom{background:transparent!important;pointer-events:none}
+#zoom .zcard{height:auto!important;flex:0 0 auto!important}
+#zoom .lift{pointer-events:auto;flex-direction:row;align-items:stretch;gap:6px;padding:4px;box-sizing:border-box;border-radius:12px;background:rgba(12,23,27,.96);box-shadow:0 0 0 2px #f2c230,0 6px 14px rgba(0,0,0,.6);filter:none;animation:none}
+#zoom .zcard{flex:0 0 auto;width:auto;display:flex;align-items:center;margin:0}
+#zoom .zcard .pay{position:relative;left:auto;top:auto;height:44px;min-width:44px;font-size:18px;box-shadow:none}
+#zoom .zb3{flex:1 1 0;min-width:0;margin:0;gap:5px}
+#zoom .zb3 .zb{min-height:46px;height:100%;font-size:15px;border-radius:10px;padding:0 2px;box-shadow:0 2px 0 #8a6a12}
+#zoom .zb3 .zb.sell{box-shadow:0 2px 0 #8f7e58}
+#zoom .zb3 .zb small{font-size:13px;line-height:1.05;text-align:center}
+#pyr .card.v4.rowm .nm{font-size:12px;line-height:1.05;padding:1px 3px;max-height:var(--nmh,27px);letter-spacing:-.03em}
+#pyr .card.v4.rowm .nm.t3{font-size:11px}
+#pyr .card.v4.rowm .ef{top:var(--nmh,27px);left:2px;right:auto;max-width:50%;overflow:hidden;gap:1px;height:22px}
+#pyr .card.v4.rowm .pr{top:var(--nmh,27px);right:1px;max-width:52%;overflow:hidden;justify-content:flex-end;gap:1px;height:22px}
+#pyr .card.v4.rowm .e1,#pyr .card.v4.rowm .e1.sh,#pyr .card.v4.rowm .e1.vp,#pyr .card.v4.rowm .e1.sc{height:21px;font-size:13px;padding:0 3px 0 1px;gap:0}
+#pyr .card.v4.rowm .tx,#pyr .card.v4.rowm .or{font-size:13px;padding:1px 3px}
+#pyr .card.v4.rowm .e1 .art{width:16px;height:16px;flex-basis:16px}
+#pyr .card.v4.rowm .pr .c1,#pyr .card.v4.rowm .pr .fr{height:21px;font-size:13px;padding:0 3px 0 1px;gap:0}
+#pyr .card.v4.rowm .c1 .art{width:15px;height:15px}
 </style></head>

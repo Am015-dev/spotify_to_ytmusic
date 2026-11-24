@@ -1,0 +1,25 @@
+# Gloamwar rules checklist (each line is asserted in rules-test.js unless marked "gauntlet" = exercised by AI-vs-AI games with invariants)
+
+- [x] 104 regions, symmetric adjacency, connected map
+- [x] 8 Dawn strongholds, 4 Dawn cities, 8 Gloam strongholds, 2 Gloam cities, 2 fortifications; 20 / 18 VP on the map
+- [x] 5 + 3 nations; political start positions; Greenhold and the Gloam start awake
+- [x] Unit totals 45/30/20 Dawn and 72/18/8 Gloam; per-nation totals
+- [x] Die faces and start/max dice; a minion adds a Gloam die
+- [x] 16 standard + 4 + 4 special hunt tiles; Gloam special tiles stop a road step
+- [x] 96 cards, 24 per deck, character decks all character type, strategy decks 12 muster + 12 army, every card has a combat half
+- [x] 7 companions with levels 3,3,2,2,2,1,1; 3 minions; road 5; taint 12; VP 10 / 4
+- [x] One card from each deck per turn; hand limit 6 forces a discard
+- [x] Hunt allocation 0..companions; at least 1 after the Dawn took a die back
+- [x] Sleeping nation cannot reach At War; awake nation can
+- [x] Being attacked wakes a nation and steps it toward war
+- [x] Field battle hits on 5+; city round 1 needs 6; siege needs 6 and lasts one round unless an elite presses on
+- [x] One hit turns an elite into a regular; two hits remove it; leader re-rolls capped at 5
+- [x] Stack limit 10
+- [x] Company move: +1 step and a Dawn die into the hunt box; the Gaze tile = successes; on the Ashen Road = all hunt-box dice
+- [x] 5th road step wins for the Dawn; 12 taint wins for the Gloam; the road starts at a gate; declare within unseen steps
+- [x] Military victory at 10 / 4 VP checked at the end of the turn
+- [x] Muster only for nations at war, in free settlements; one elite ends a muster
+- [x] Nations not at war stay out of other nations' regions
+- [x] A used Lamp changes a die and passes to the Gloam; one Lamp per turn
+- [x] Gauntlet: AI games finish with invariants (unit conservation, stack and siege limits, 96 cards, taint range) after every move
+- [x] Gauntlet: cards, sieges, sorties, minions, heroes, separation, reveal and road all occur in AI games

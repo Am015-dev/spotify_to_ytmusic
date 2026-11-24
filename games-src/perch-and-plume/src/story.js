@@ -21,31 +21,31 @@ var STORY = {
   },
   // the guided first game: one line per step, in teaching order (ids = TUTORIAL-COVERAGE.md, steps in coach.js). Max 12 words each.
   coach: {
-    goal: 'Most points wins. The round goal pays grassland birds.',
-    play_play: 'Tap the glowing Play a bird button.',
-    play_cost: 'It costs one food you already have. Tap the glowing bird.',
-    play_slot: 'Birds go in the leftmost empty space. Tap the glowing space.',
-    play_pay: 'Space two also costs one egg. Tap Play.',
-    white: 'White power: it worked once, when played. Tap your new bird.',
-    food_food: 'The forest takes dice from the feeder. Tap Get food.',
-    food_die: 'Two forest birds give two food. Tap a glowing die.',
-    food_die2: 'Now tap another glowing die.',
-    tuck: 'Brown powers fire right to left. Tap a card to tuck.',
-    cache: 'Tucked cards and stored food are 1 point each. Tap the forest.',
-    twofor1: 'Any 2 food pay for 1; some spaces trade food for eggs.',
-    eggs_eggs: 'The grassland lays eggs. Tap Lay eggs.',
-    eggs_nest: 'Each egg is 1 point, up to the nest. Tap a glowing bird.',
-    pink: "Pip's pink bird reacted to your eggs. Tap Pip's score.",
-    cards_cards: 'The wetland draws cards. Tap Draw birds.',
-    cards_tray: 'The tray refills after your turn. Tap a glowing tray card.',
-    final: 'Birds, eggs, round goal, bonus, food and tucks add up. Tap the total.',
-    real: 'Real games: keep 5 cards, then 8, 7, 6, 5 actions. Tap to play.'
+    play_play: 'Put a bird on your board to score its points.',
+    play_cost: 'It costs 1 food. You have it.',
+    play_slot: 'Birds go in the first free spot.',
+    play_pay: 'This spot also costs 1 egg.',
+    white: 'Its power already worked once, when you played it.',
+    food_food: 'Your Forest birds pick food from the feeder.',
+    food_die: 'Two Forest birds = take 2 food.',
+    food_die2: 'One more food.',
+    tuck: 'Your forest birds tuck it under a bird: 1 point.',
+    cache: 'Tucked cards and stored food are 1 point each.',
+    twofor1: 'Any 2 food can pay for 1 food.',
+    eggs_eggs: 'Your Grassland birds lay eggs. Each egg is 1 point.',
+    eggs_nest: 'Put the egg in a nest.',
+    pink: "Pip's pink bird reacted when you laid eggs.",
+    cards_cards: 'Your Wetland birds draw new bird cards.',
+    cards_tray: 'Take a card you can see, or draw from the deck.',
+    final: 'Birds, eggs, bonus, food and tucks add up to your score.',
+    real: 'Real games last 4 rounds. Start one now.'
   },
-  // F2: each step names its goal first (max 8 words), then says exactly what to tap
-  coachGoal: {
-    goal: 'Know how you win', play: 'Play your first bird', white: 'See what a white power does', food: 'Get food for more birds',
-    tuck: 'Use a brown power', cache: 'See what tucked cards are worth', twofor1: 'Learn the food and egg trades', eggs: 'Lay eggs for points',
-    pink: 'See a pink power react', cards: 'Draw new birds', final: 'See your final score', real: 'Start a real game'
+  // the bold "what to tap" line of each step (max 8 words)
+  coachDo: {
+    play_play: 'Tap the glowing "Play a bird" button', play_cost: 'Tap the glowing bird card', play_slot: 'Tap the glowing empty spot', play_pay: 'Tap "Play"',
+    white: 'Tap your new bird', food_food: 'Tap "Get food"', food_die: 'Tap a glowing food', food_die2: 'Tap another glowing food',
+    tuck: 'Tap a card in your hand', cache: 'Tap your Forest row', twofor1: 'Tap your food', eggs_eggs: 'Tap "Lay eggs"', eggs_nest: 'Tap a glowing bird',
+    pink: "Tap Pip's score", cards_cards: 'Tap "Draw birds"', cards_tray: 'Tap a glowing card', final: 'Tap your total', real: 'Tap "Play again"'
   },
 
   tutEnd: { title: 'Now it\'s your game', text: 'Ottilie: "From here every choice is yours: play a bird, or use a row. I\'ll pipe up when something new comes along."' },

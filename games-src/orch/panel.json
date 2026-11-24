@@ -1,5 +1,5 @@
 {
- "updated": "2026-11-24T00:26:11Z",
+ "updated": "2026-11-24T01:11:19Z",
  "live_base": "https://am015-dev.github.io/spotify_to_ytmusic/",
  "decisions": [
   {
@@ -14,16 +14,8 @@
  ],
  "notes": [
   {
-   "at": "00:27",
-   "text": "Cost today (since 22:26 UTC): $19.5 = 15 workers $14.5 + this orchestrator $5.1. The old orchestrator's cost today is not in it."
-  },
-  {
-   "at": "00:24",
-   "text": "Running: Twin Thrones board, Thornbound tutorial, Sands claims v2, Sands paths v2 (each must deliver a proof video)."
-  },
-  {
-   "at": "00:03",
-   "text": "Live: Perch, Wildmark, Thornbound, Sands claims, Ochre guided first game, Twin Thrones cards."
+   "at": "01:14",
+   "text": "Workers finished (not yet live): Wickdeep redesign, Ochre guide, Gloamwar, Onyx Atelier, Meadowfold, Thornbound tutorial. Still working: Via Tessera, Twin Thrones rules. Credits group B was blocked and needs a rerun. A fresh full rebuild of all games is running; nothing new is live until it passes my own phone and PC check. Costs of the newest finished workers are not counted yet."
   }
  ],
  "games": [

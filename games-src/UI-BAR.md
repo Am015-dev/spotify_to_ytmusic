@@ -18,6 +18,7 @@ campaign map, chapter/boss intros, board, hand, end/win/lose screen. At 5 sizes:
 8. Wide screens get a real layout, not the phone one stretched: cards and art at their natural aspect ratio (never stretched),
    the main card/piece large (>= 20% of board height), decks/discards/labels fully inside the board and readable.
 9. Nothing cut by the screen edge or an overflow:hidden parent; no text spilling out of its chip.
+10. Tutorial and guide text sits NEXT TO the thing it points at (owner, 24 Nov 2026): a bubble with an arrow touching the glowing target, on the side with room, never covering the target or the choices. Never a banner at the screen top or a panel at the bottom that the player must connect to a target far away. Applies to every tap-here, explain-this, result-of-your-tap message. Check at 402x874 and 1366x768.
 
 Proof: `?scn=menu` passes at all 5 projects (`SCN_SLUGS=<slug> node_modules/.bin/playwright test --project=phone-s --project=phone
 --project=tablet --project=pc --project=wide -g menu`). Where the test cannot see a rule (5, 6, 7), check it in the DOM with a small

@@ -15,7 +15,6 @@ function tOnBoard(id) { var b = G.pl[UI.view].board; for (var r = 0; r < 3; r++)
 function tQ(h) { return !!(G.q && G.q.h === h && PP.sideToAct(G) === UI.view); }
 // the steps, in teaching order. t() = the one element to tap; done() = the step is over (info steps: their target was tapped).
 var TSTEPS = [
-  { id: 'goal', info: 1, t: function () { return tq('#opps .sr2.me') || tq('#opps'); } },
   // one step, four taps: Play a bird, the bird, the space, Play. Its sentence follows where you are (sub).
   { id: 'play', sub: function () { return UI.pend ? 'pay' : UI.sel != null ? 'slot' : UI.pickBird ? 'cost' : 'play'; },
     t: function () { var k = this.sub(); return k === 'pay' ? tq('#acts [data-a="playgo"]') : k === 'slot' ? (tq('.row[data-h="1"] [data-legal].slot') || tq('[data-legal].slot')) : k === 'cost' ? tHandCard(TUT.ids.play) : tq('.a4[data-k="play"]'); },
@@ -33,8 +32,17 @@ var TSTEPS = [
   { id: 'final', res: 1, info: 1, t: function () { return tq('#result .walk li.tot'); } },
   { id: 'real', res: 1, t: function () { return tq('#result #again'); }, done: function () { return false; } }
 ];
+// progressive reveal: the guided game shows only what the current step needs (feeder + food from "Get food", tray from "Draw birds")
+function coachLayers() {
+  var ids = TSTEPS.map(function (x) { return x.id; }), at = COACH.i, b = document.body.classList, on = coachOn();
+  b.toggle('tutlite', on);
+  b.toggle('tl-play', on && at <= ids.indexOf('white'));
+  b.toggle('tl-feed', on && at >= ids.indexOf('food'));
+  b.toggle('tl-tray', on && at >= ids.indexOf('cards'));
+  b.toggle('tl-goals', on && at >= ids.indexOf('final'));
+}
 function coachReset() { COACH.on = true; COACH.i = 0; COACH.done = {}; COACH.finished = false; COACH.tapped = false; COACH.acted = {}; COACH.entered = -1; coachHide(); clearInterval(COACH.iv); COACH.iv = setInterval(coachTick, 200); }
-function coachHide() { if (COACH.cur && COACH.cur.parentNode) COACH.cur.parentNode.removeChild(COACH.cur); COACH.cur = null; $$('.tutpoint').forEach(function (e) { e.classList.remove('tutpoint'); }); }
+function coachHide() { document.body.classList.remove('tutlite', 'tl-play', 'tl-feed', 'tl-tray', 'tl-goals'); COACH.lastRes = null; if (COACH.cur && COACH.cur.parentNode) COACH.cur.parentNode.removeChild(COACH.cur); COACH.cur = null; $$('.tutpoint').forEach(function (e) { e.classList.remove('tutpoint'); }); }
 function coachStep() { return TSTEPS[COACH.i] || null; }
 function coachReady(s) { return s && (s.res ? tResult() : s.info ? tSee(s) : tPlaying()); }
 // a "see" step about your own board shows as soon as the animations stop, even before your next turn (the rival waits for it)
@@ -57,7 +65,8 @@ function coachSay(s) {
   if (COACH.cur && COACH.cur.dataset.rule === s.id && COACH.cur.dataset.sub === sk && COACH.cur.isConnected) return;
   if (COACH.cur && COACH.cur.parentNode) COACH.cur.parentNode.removeChild(COACH.cur);
   var d = document.createElement('div'); d.className = 'coachb'; d.setAttribute('data-help', 'coach'); d.setAttribute('role', 'status'); d.setAttribute('aria-live', 'polite'); d.dataset.rule = s.id; d.dataset.sub = sk;
-  d.innerHTML = faceHTML('ottilie', STORY.cast.ottilie) + '<span class="saytx"><small class="stepn">Step ' + n + ' of ' + TSTEPS.length + '</small><b class="tgoal">Goal: ' + esc((STORY.coachGoal || {})[s.id] || '') + '</b>' + esc(txt) + '</span>' + (s.info && !s.res ? '<button type="button" class="coachnext btn" data-coach-next="1">Next</button>' : '');
+  var dk = s.id + (sk ? '_' + sk : '');
+  d.innerHTML = faceHTML('ottilie', STORY.cast.ottilie) + '<span class="saytx"><small class="stepn tres">' + (COACH.lastRes ? '✓ ' + esc(COACH.lastRes) : '') + '</small><b class="tgoal">' + esc((STORY.coachDo || {})[dk] || '') + '</b>' + esc(txt) + '</span>' + (s.info && !s.res ? '<button type="button" class="coachnext btn" data-coach-next="1">Next</button>' : '');
   var host, at;
   if (s.res) { host = $('#result'); at = host && host.querySelector('.walk'); }
   else { host = $('#dockbody'); at = $('#prompt'); }
@@ -78,6 +87,7 @@ function coachTick() {
   }
   s = coachStep();
   $$('.tutpoint').forEach(function (e) { e.classList.remove('tutpoint'); });
+  coachLayers();
   if (!s) return;
   if (s.id === 'real') COACH.finished = true;
   if (!coachReady(s)) { if (!myTurn() || s.res || UI.busy) coachWait(s); return; }
@@ -119,6 +129,15 @@ document.addEventListener('click', function (e) {
 function coachFx(e, mine) {
   if (!coachOn()) return;
   if (e.k === 'action' && mine) COACH.acted[['food', 'eggs', 'cards'][e.h]] = 1;
+  if (mine) {   // one plain result line after every tap of yours: shown in the next bubble and as a toast
+    var r = null, b = e.id && PP.B[e.id];
+    if (e.k === 'play') r = 'You played ' + b.n + ': +' + b.p + (b.p === 1 ? ' point' : ' points');
+    else if (e.k === 'food') r = 'You took ' + (e.n || 1) + ' ' + e.f + ' (food)';
+    else if (e.k === 'egg') r = 'Egg laid: +1 point';
+    else if (e.k === 'pw' && e.txt) r = b.n + ': ' + e.txt;
+    else if (e.k === 'draw') r = 'You drew ' + (e.n || 1) + (e.n === 1 ? ' card' : ' cards');
+    if (r) { COACH.lastRes = r; try { toast(r, 2600, 1); } catch (x) { } var tr = document.querySelector('.coachb .tres'); if (tr) tr.textContent = '✓ ' + r; }
+  }
 }
 function coachState() { if (coachOn()) coachTick(); }
 function coachRate() { }
