@@ -30,7 +30,7 @@ async function run(size, base) {
   const ctx = await browser.newContext({ viewport: { width: W, height: H }, hasTouch: W < 800, isMobile: W < 800 });
   await turbo(ctx);
   // the 3D board repaints on every (1 ms) turbo frame and saturates the page: ~80 frames a second are plenty for the logic
-  await ctx.addInitScript(() => { window.requestAnimationFrame = f => setTimeout(() => f(performance.now()), W < 800 ? 2500 : 7000); });
+  await ctx.addInitScript(() => { window.requestAnimationFrame = f => setTimeout(() => f(performance.now()), W < 800 ? 2500 : 5500); });
   const p = await ctx.newPage(); const errs = [];
   p.on('pageerror', e => errs.push(e.message));
   await p.goto(base, { waitUntil: 'domcontentloaded' }); await p.waitForFunction(() => window.GXST && typeof G !== 'undefined' && window.GXH, null, { timeout: 30000 }); await tick(p, 3000);
