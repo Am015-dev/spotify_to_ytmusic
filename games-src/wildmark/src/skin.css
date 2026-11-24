@@ -582,6 +582,8 @@ html body .gx-set-nav{flex-wrap:wrap;overflow-x:visible}
   html.wm-anio .cc{background:#26302b}
   .anib{display:flex;align-items:center;position:absolute;top:8px;right:8px;z-index:6;min-height:44px;padding:4px 12px;border-radius:999px;border:1px solid rgba(255,255,255,.25);background:#1b221e;color:#f3ead2;font:inherit;font-size:15px;font-weight:700;cursor:pointer}
   html.wm-clean .anib{display:none}
+  #acorn{top:58px}
+  html.wm-clean #acorn{top:8px}
   #seats{top:8px!important;left:8px;right:150px;overflow:visible}
   .seat{font-size:16px!important;min-height:44px;background:#1b221e;color:#f3ead2}
   .seat b{font-size:18px;font-weight:800}
