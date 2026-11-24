@@ -98,7 +98,7 @@ function playEvents(evs, byAI) {
   if (said) UI.say = said;
   return UI.fast ? 20 : wait;
 }
-function toast(t, red) { var e = $('#toast'); e.textContent = t; e.className = 'on' + (red ? ' g' : ''); clearTimeout(UI.tt); UI.tt = setTimeout(function () { e.className = ''; }, UI.fast ? 50 : 1600); }
+function toast(t, red) { var e = $('#toast'); e.textContent = t; e.className = 'on' + (red ? ' g' : ''); clearTimeout(UI.tt); UI.tt = setTimeout(function () { e.className = ''; }, UI.fast ? 50 : 4500); e.onclick = function () { e.className = ''; }; }
 function phaseId() { if (!G) return null; if (G.pend) return G.pend.h; return G.phase; }
 // ---------------------------------------------------------------- render
 function render() {
@@ -392,7 +392,7 @@ function boot() {
   $('#helpB').onclick = function () { GXH.rules(phaseId() || undefined); };
   $('#menuB').innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6h18M3 12h18M3 18h18" stroke="#1f1812" stroke-width="2.4" stroke-linecap="round"/></svg>';
   $('#tCards').onclick = function () { openCards(); }; $('#tNat').onclick = openNations; $('#tComp').onclick = openCompany;
-  $('#cT').onclick = openCompany; $('#msg').onclick = openLog;
+  $('#cT').onclick = openCompany; $('#logB').onclick = openLog;
   $('#zin').onclick = function () { MV.zoomBy(1.4); }; $('#zout').onclick = function () { MV.zoomBy(1 / 1.4); }; $('#cD').onclick = function () { openVP('D'); }; $('#cG').onclick = function () { openVP('G'); };
   $('#scrim').onclick = function (e) { closeSheet(e); };
   document.addEventListener('keydown', function (e) { if (e.key === 'Escape') { closeSheet(); } });
