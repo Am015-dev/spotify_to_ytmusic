@@ -345,7 +345,7 @@ var UI = (function () {
   }
   function rules() {
     var X = OD.TXT;
-    var h = '<h2>How to play</h2><h3>How you win</h3><p>' + X.win + '</p>' +
+    var h = '<h2>How to play</h2>' + (window.OTUT ? '<button class="btn" data-mapbtn>? Screen map: what each part is</button>' : '') + '<h3>How you win</h3><p>' + X.win + '</p>' +
       '<h3>Your turn</h3><p>' + X.order + '</p><ul><li>' + X.fav + '</li><li>' + X.refill + '</li>' +
       '<li>' + X.take + '</li><li>' + X.takeFav + '</li><li>' + X.keep + '</li><li>' + X.buy + '</li><li>' + X.bonus + '</li><li>' + X.limit + '</li>' +
       '<li>The game ends the moment you reach a goal at the end of your own turn, so there are no ties. You can keep at most 3 jewels. If the bag is empty and nothing else is possible you pass.</li><li>If you can do nothing else, you must refill. Gold only comes from keeping a jewel. A Favour you spend goes back to the supply.</li></ul>' +
@@ -354,7 +354,7 @@ var UI = (function () {
       '<h3>Everything in the box</h3><p>25 board spaces. 4 each of Diamond, Sapphire, Emerald, Ruby, Onyx. 2 Pearls, 3 Gold. 3 Favours. 4 Patrons. 67 jewels: 30 Rings, 24 Brooches, 13 Tiaras.</p><div class="pats">' + [0, 1, 2, 3].map(function (i) { return patHtml(i); }).join('') + '</div>';
     [1, 2, 3].forEach(function (l) { h += '<h3>' + TIER[l - 1] + 's (' + OD.CARDS.filter(function (c) { return c.lvl === l; }).length + ')</h3><div class="ref">'; OD.CARDS.forEach(function (c) { if (c.lvl === l) h += '<div class="card t' + l + '" role="img" aria-label="' + esc(cardLabel(c.id)) + '">' + cardHtml(c.id) + '</div>'; }); h += '</div>'; });
     h += '<h3>Credits</h3><p>Game design adapted; names, art and code original. Fonts: Limelight and Josefin Sans (SIL Open Font License). All art drawn in code.</p>';
-    sheet(h, true);
+    var d = sheet(h, true), mb = d.querySelector('[data-mapbtn]'); if (mb) mb.onclick = function () { closeSheet(); OTUT.mapOnly(); };
   }
   function menu() {
     var d = sheet('<h2>Menu</h2><div style="display:flex;flex-direction:column;gap:8px"><button class="btn pri" data-a="resume">Resume</button><button class="btn" data-a="new">New game</button><button class="btn" data-a="learn">Learn to play</button><button class="btn" data-a="rules">How to play</button><button class="btn" data-a="snd">Sound: ' + (U.snd ? 'on' : 'off') + '</button><button class="btn" data-a="title">Title screen</button></div>', true);
