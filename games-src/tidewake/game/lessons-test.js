@@ -72,15 +72,15 @@ async function run(b, W, H) {
   };
   const wrong = async id => {
     const w = WRONG[id]; if (w.mark) await markTap(...w.mark); else if (w.q) await answer(w.q); else await place(w.t, w.r);
-    if (!(await phase('fail', 20000))) { note(id + ': a wrong move did not fail'); return false; }
+    if (!(await phase('fail', 20000))) { note(id + ': a wrong move did not fail ' + JSON.stringify(await p.evaluate(() => ({ q: !!G.q, busy: UI.busy, ag: G.ag.length, side: sideToAct(), alive: G.ships[0].alive, n: TWL.L.n, ph: GXST.state().phase })))); return false; }
     const s = await st(); if (!/\w{4}/.test(s.msg)) note(id + ': fail has no message'); return true;
   };
-  const ids = Object.keys(SOLVE);
+  const ids = Object.keys(SOLVE).filter(k => !process.env.ONLY || process.env.ONLY.split(',').indexOf(k) >= 0);
   // 1) picker
   let s = await st();
   const n = await p.evaluate(() => document.querySelectorAll('.gxst-pick').length);
   if (s.phase !== 'picker' || n !== s.count || n < 6) note('picker shows ' + n + ' of ' + s.count + ' lessons');
-  if (n !== ids.length) note('test knows ' + ids.length + ' solutions, game has ' + n + ' lessons');
+  if (!process.env.ONLY && n !== ids.length) note('test knows ' + ids.length + ' solutions, game has ' + n + ' lessons');
   await p.screenshot({ path: path.join(PROOF, 'lessons-' + tag + '-picker.png') });
   // 2) every lesson: start shot, wrong move fails with a message, Retry restarts, scripted solution wins with 3 stars; a non-lesson tap works
   let covered = 0, retried = 0;

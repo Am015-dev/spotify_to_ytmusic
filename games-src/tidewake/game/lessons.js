@@ -42,6 +42,7 @@
     s.seats[0] = { h: true, lv: 'normal', col: 0 }; s.seats[1] = { h: false, lv: 'easy', col: 3 };
     L.on = 1; L.n = 0; L.roll = sp.roll || null; L.mon = sp.mon || {}; L.wdie = sp.wdie || 5; L.co = sp.co || null; L.startN = 0;
     startGame(JSON.parse(JSON.stringify(s)), { first: sp.first == null ? 0 : sp.first, seed: 7, names: ['Vermilion', 'Cobalt'] });
+    if (L.qt == null) L.qt = UI.qTime; UI.qTime = 0;   // no answer timer in a lesson: nothing is decided for the player
     build(sp); UI.guide = 'off'; UI.sel = null; UI.busy = false; UI.sunk = []; UI.mph = null; PH.mphHide = null; UI.overSeen = 0; UI.dice = null; UI.res = null; UI.tut = 0;
     try { kitReset(); kitSync(); } catch (e) { }
     if (sp.bow) flow();
@@ -137,6 +138,7 @@
     };
     var oc = act; act = function (m, seat) { var ok = oc.apply(this, arguments); if (ok && seat === 0 && GXST.active()) L.n++; return ok; };
     var os = saveAll; saveAll = function () { if (!GXST.active()) return os.apply(this, arguments); };
+    addEventListener('gxst', function (e) { if (e.detail.type === 'close' && L.qt != null) { UI.qTime = L.qt; L.qt = null; } });
     window.TWL = { L: L, build: build, stack: stack };
   }
   var go = function () {
