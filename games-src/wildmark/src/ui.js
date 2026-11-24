@@ -271,10 +271,10 @@ function safeRect() {
 var HEX_MIN = 44, HEX_FIT = 30;   // F3: auto-fit may go down to a 30 px hex so a late valley fits without panning; taps snap to the nearest spot
 function fitView(now, force) {   // F2: your own valley gets one frame per turn (set when your turn starts, kept while you choose); now/force = refit anyway
   if (!G) return; var env = G.seats[UI.view].env, cells = Object.keys(env), tut = typeof tutOn === 'function' && tutOn(), hum = !G.seats[UI.view].ai;
-  var key = UI.view + ':' + G.seats[UI.view].done;
+  var key = UI.view + ':' + G.seats[UI.view].done + ':' + (G.stage === 'pick' ? 'p' : 't');   // W650: refit once when the spots appear, so the pick step shows the valley large
   if (!now && !force && !tut && hum && UI.turnFit === key && !G.over) { edgeArrows(); return; }
   UI.turnFit = key;
-  var spots = tut ? ((G.stage === 'tile' && UI.view === G.cur && !G.seats[G.cur].ai) ? WM.spots(env) : []) : hum && !G.over ? WM.spots(env) : [];
+  var spots = (G.stage === 'tile' && UI.view === G.cur && !G.seats[G.cur].ai) ? WM.spots(env) : [];   // W650: spots only count while there is a tile to place
   function box(list) { var b = { x0: 1e9, y0: 1e9, x1: -1e9, y1: -1e9 }; list.forEach(function (c) { var p = pix(c); b.x0 = Math.min(b.x0, p[0]); b.x1 = Math.max(b.x1, p[0]); b.y0 = Math.min(b.y0, p[1]); b.y1 = Math.max(b.y1, p[1]); }); return b; }
   var sr = safeRect(), aw = sr.r - sr.l, ah = sr.b - sr.t, zMin = Math.max(ZMIN, HEX_MIN / (SZ * SQ3));
   function zFor(b) { return Math.min(aw / (b.x1 - b.x0 + SZ * SQ3 + 4), ah / (b.y1 - b.y0 + SZ * 2 + 4)); }
