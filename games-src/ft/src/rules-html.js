@@ -34,9 +34,26 @@ const RULES_HTML=`<div class="rules">
 <li><b>Bazaar Stall</b>: you may pay 3 coins for one of the first 3 goods. <b>Grand Bazaar</b>: 6 coins for two of the first 6.</li>
 </ul>
 <h3>5. Goods and Mystics</h3>
-<p>Goods score in sets of different kinds: 1, 3, 6, 12, 20, 29, 39, 49 or 60 points for 1 to 9 kinds. Build as many sets as you can. Mystics never score. They boost Masons and Shadows, or replace a Sage.</p>
+<p>Goods score in sets of different kinds: 1, 3, 7, 13, 21, 30, 40, 50 or 60 points for 1 to 9 kinds. Build as many sets as you can. Mystics never score. They boost Masons and Shadows, or replace a Sage.</p>
 <h3>6. The end</h3>
 <p>When someone places their last camel, the round is finished and the game ends. It also ends if no legal move is left on the board. Add up coins, people, tiles, palms, palaces, djinns, goods and extras. Equal scores share the win.</p>
+<h3>Setup by player count</h3>
+<ul><li><b>2 players</b>: 11 camels each and two turn markers each, so you play twice a round.</li><li><b>3 or 4 players</b>: 8 camels and one marker each.</li><li><b>5 players</b>: 8 camels each, a 12-spot track (18, 12, 8, 5, 5, 3, 3, 1, 1, 0, 0, 0) and the Wonder Cities board.</li>
+<li>Everyone starts with 50 coins. 3 people on every tile, 9 goods face up, 3 djinns face up. Track: 18, 12, 8, 5, 3, 1, then three free spots.</li></ul>
+<h3>Small print</h3>
+<ul><li>Only three markers fit on the free spots; after that you must pay.</li><li>Next round you bid in the order you played.</li>
+<li>You must move if you can. You may pass through empty tiles and loop back later, but you may never end on an empty tile.</li>
+<li>A camel never leaves its tile. Empty a tile someone owns and you take the people, not the land. No camels left: no claim.</li>
+<li>Shadows may reach diagonally (2 steps). If your Shadow empties a tile, you claim it too, but only your final tile gives a tile action.</li>
+<li>Palms and palaces score only for the player who holds their tile. When the supply runs out, they are not built.</li>
+<li>Advisor ties give no +10. You may sell several sets in one turn. At the end, goods score as your best sets.</li>
+<li>Goods and djinns refill only after everyone has played. A djinn power works once per turn, from the turn you get it.</li>
+<li>Equal final scores share the win.</li></ul>
+<h3>Learn more: the expansions</h3>
+<ul><li><b>The Crafters</b>: 6×6 board. 3 Workshops (pay 1 Crafter or 2 Mystics for an item), 2 Spice Exchanges (4 coins for any face-up good), 1 Ravine nobody may cross, 2 mountains beside each Workshop. Your tent claims a tile: it scores the tile plus 1 per red tile around it. Precious items score 5, 7 or 9; magic items are one-shot powers.</li>
+<li><b>Wonder Cities</b>: 6×6 board (6×7 with the Crafters). 5 Wonder Cities: holding 1 to 5 scores 5, 20, 45, 80 or 125 on top of the tiles. Palms and palaces beside the Great Lake score double.</li>
+<li><b>Cutpurses</b>: one face-up cutpurse; hire it at a Shrine like a djinn. When you later take its colour, every rival gives something up and you keep the best.</li>
+<li><b>Djinns</b>: 22 in the base game, 3 promos, 2 with the Crafters, 1 with the Cutpurses (28 in all). Each card says its points and power: see Djinns in the top bar.</li></ul>
 <h3>Expansions (switch them on at the start)</h3>
 <ul>
 <li><b>The Crafters</b>: adds purple Crafters, Workshops, Spice Exchanges, a Ravine and a tent each. The player with the most Crafters scores 3 for each, everyone else 2. Precious items score points; magic items are one-shot powers.</li>

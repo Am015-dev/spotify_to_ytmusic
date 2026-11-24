@@ -106,6 +106,8 @@
       var o = ops[i];
       if (o.op === 'prod' && o.n < 0) { var fl = o.r === 'mc' ? -5 : 0; if (P.prod[o.r] + o.n < fl) return false; }
       if (o.op === 'lose' && P[o.r] < o.n) return false;
+      // decrease ANY player's production: someone (the rival, else yourself) must be able to lose the full amount
+      if (o.op === 'rprod') { var fl2 = o.r === 'mc' ? -5 : 0, R2 = G.pl[other(p)]; if (R2.prod[o.r] - o.n < fl2 && P.prod[o.r] - o.n < fl2) return false; }
       if (o.op === 'useres' && (P.res[c] || 0) < o.n) return false;
       if (o.op === 'tile' && o.where && /^(reserved|offmap)/.test(o.where) && !legalSpaces(p, o.t, o.where).length) return false;
     }
@@ -191,7 +193,9 @@
         case 'prod': P.prod[o.r] = Math.max(o.r === 'mc' ? -5 : 0, P.prod[o.r] + o.n); ev({ k: 'prod', p: p, r: o.r, n: o.n }); break;
         case 'gain': P[o.r] += o.n; ev({ k: 'gain', p: p, r: o.r, n: o.n }); break;
         case 'lose': P[o.r] = Math.max(0, P[o.r] - o.n); break;
-        case 'rprod': { var fl = o.r === 'mc' ? -5 : 0, cut = Math.min(o.n, R.prod[o.r] - fl); if (cut > 0) { R.prod[o.r] -= cut; ev({ k: 'prod', p: other(p), r: o.r, n: -cut }); log(p, (p === 0 ? 'You' : 'Rival') + ' cut ' + cut + ' ' + (RW[o.r] || o.r) + ' production.'); } else log(p, (p === 0 ? 'Rival' : 'You') + ' had no ' + (RW[o.r] || o.r) + ' production to lose.'); break; }
+        case 'rprod': { var fl = o.r === 'mc' ? -5 : 0;
+          if (R.prod[o.r] - o.n < fl && P.prod[o.r] - o.n >= fl) { P.prod[o.r] -= o.n; ev({ k: 'prod', p: p, r: o.r, n: -o.n }); log(p, (p === 0 ? 'Rival had too little, so you lost ' : 'You had too little, so the rival lost ') + o.n + ' ' + (RW[o.r] || o.r) + ' production.'); break; }
+          var cut = Math.min(o.n, R.prod[o.r] - fl); if (cut > 0) { R.prod[o.r] -= cut; ev({ k: 'prod', p: other(p), r: o.r, n: -cut }); log(p, (p === 0 ? 'You' : 'Rival') + ' cut ' + cut + ' ' + (RW[o.r] || o.r) + ' production.'); } else log(p, (p === 0 ? 'Rival' : 'You') + ' had no ' + (RW[o.r] || o.r) + ' production to lose.'); break; }
         case 'rres': { var c2 = Math.min(o.n, R[o.r]); if (c2 > 0) { R[o.r] -= c2; ev({ k: 'gain', p: other(p), r: o.r, n: -c2 }); log(p, (p === 0 ? 'You' : 'Rival') + ' removed ' + c2 + ' ' + (RW[o.r] || o.r) + '.'); } else log(p, (p === 0 ? 'Rival' : 'You') + ' had no ' + (RW[o.r] || o.r) + ' to lose.'); break; }
         case 'temp': raise(p, 'temp', o.n); break;
         case 'oxy': raise(p, 'oxy', o.n); break;

@@ -1,11 +1,11 @@
 // ===== part 5: start screen, menu, rules, coach (learn to play), suggestion, end screen, boot =====
 function menuHTML() {
-  var rows = [['new', 'New game', 'Same level, fresh planet'], ['learn', 'Learn to play', 'A guided first game'], ['rules', 'How to play', 'All the rules, short'], ['ref', 'All cards', '208 projects, 12 companies, map'], ['log', 'What happened', 'Every move so far'], ['sound', 'Sound: ' + (UI.sound ? 'on' : 'off'), 'Tap to switch'], ['home', 'Title screen', 'Change level or draft'], ['credits', 'Credits', 'Fonts and licences']];
+  var rows = [['new', 'New game', 'Same level, fresh planet'], ['learn', 'Learn to play', 'Three short charters: story + strategy'], ['rules', 'How to play', 'All the rules, short'], ['ref', 'All cards', '208 projects, 12 companies, map'], ['log', 'What happened', 'Every move so far'], ['sound', 'Sound: ' + (UI.sound ? 'on' : 'off'), 'Tap to switch'], ['home', 'Title screen', 'Change level or draft'], ['credits', 'Credits', 'Fonts and licences']];
   return rows.map(function (r) { return '<div class="row"><div class="rt"><b>' + r[1] + '</b><span>' + r[2] + '</span></div><button data-menu="' + r[0] + '">Open</button></div>'; }).join('');
 }
 function menuDo(k) {
   if (k === 'new') { closeSheet(); startGame({ level: UI.level, draft: UI.draft }); }
-  else if (k === 'learn') { closeSheet(); startGame({ level: 'easy', tut: true }); }
+  else if (k === 'learn') { closeSheet(); chStart(0); }
   else if (k === 'rules' || k === 'ref' || k === 'log') { UI.tab = k === 'ref' ? 'r-auto' : null; openSheet(k, UI.tab); }
   else if (k === 'sound') { UI.sound = !UI.sound; LS.set('oh_sound', UI.sound ? '1' : '0'); UI.refreshSheet(); }
   else if (k === 'home') { closeSheet(); showStart(); }
@@ -17,15 +17,15 @@ $('zin').innerHTML = A.icon('plus', 20); $('zout').innerHTML = A.icon('minus', 2
 $('hintbtn').innerHTML = A.icon('bulb', 22);
 function rulesHTML() {
   return '<div class="rules">' +
-    '<h4>Goal</h4><p>Make Ochre livable with your rival. Temperature to 8°C, oxygen to 14%, all 9 oceans. When all three are done, the round ends the game. Most points wins.</p>' +
+    '<h4>Goal</h4><p>Make Ochre livable with your rival. Temperature to 8°C, oxygen to 14%, all 9 oceans. When all three are done, that round is the last: income is paid, both may turn plants into greenery once more, then points are counted. Most points wins; a tie goes to the most credits.</p>' +
     '<h4>Points</h4><p>Your rating (starts at 20, +1 for every step you raise), milestones and awards, 1 per greenery, 1 per greenery next to your cities, and points on cards.</p>' +
-    '<h4>A round (generation)</h4><p>1. New cards: see 4, buy any for 3 credits each (round 1: pick a company and keep from 10).</p><p>2. Actions: take turns doing 1 or 2 actions, until both pass.</p><p>3. Income: energy turns into heat. Gain credits = credit production + rating, and every other production.</p>' +
+    '<h4>A round (generation)</h4><p>1. New cards: see 4, buy any for 3 credits each (round 1: pick a company and keep from 10).</p><p>2. Actions: take turns doing 1 or 2 actions, until both pass. Who goes first swaps every round.</p><p>3. Income: energy turns into heat. Gain credits = credit production + rating, and every other production.</p>' +
     '<h4>Actions</h4><p>Play a card (pay its cost; steel pays 2 for building cards, titanium 3 for space cards; meet its needs). Use a standard project. Plant greenery for 8 plants. Warm the air for 8 heat. Claim a milestone. Fund an award. Use a card action once per round. Pass.</p>' +
     '<h4>Standard projects</h4><p>Sell cards 1 each · Power plant 11 · Comet strike 14 · Aquifer 18 · Greenery 23 · City 25.</p>' +
-    '<h4>Bonus steps</h4><p>Temperature −24°C and −20°C: +1 heat production. 0°C: place an ocean. Oxygen 8%: +1 temperature.</p>' +
+    '<h4>Bonus steps</h4><p>Temperature −24°C and −20°C: +1 heat production. 0°C: place an ocean. Oxygen 8%: +1 temperature. A full gauge cannot go higher and pays no rating, but cards that would raise it can still be played.</p>' +
     '<h4>Tiles</h4><p>Oceans only on ocean spaces. Greenery next to your own tile if you can; it raises oxygen. Cities never next to another city. Spaces pay their bonus icons, and each ocean next to the new tile pays 2 credits.</p>' +
     '<h4>Milestones and awards</h4><p>Milestones: 8 credits, 5 points, only 3 claimed in a game. Awards: fund for 8, 14, then 20; only 3. At the end the leader gets 5 points (2 players: no second place; a tie pays both).</p>' +
-    '<h4>Card kinds</h4><p>Orange Projects act once. Teal Lasting cards stay with an effect or an action. Pink Events act once and their tags only count when played.</p></div>';
+    '<h4>Card kinds</h4><p>Orange Projects act once. Teal Lasting cards stay with an effect or an action. Pink Events act once and their tags only count when played. A card that cuts production takes it from the rival; if the rival has too little, it takes yours, and if neither has enough it cannot be played.</p></div>';
 }
 // ---------- start screen ----------
 function showStart() {
@@ -35,17 +35,17 @@ function showStart() {
   $('start').innerHTML = '<svg class="bg" viewBox="0 0 400 700" preserveAspectRatio="xMidYMid slice" aria-hidden="true">' + A.DEFS + A.backdrop(400, 700) + '<circle cx="200" cy="560" r="230" fill="url(#planet)"/><circle cx="200" cy="560" r="230" fill="url(#ht)" opacity=".7"/><path d="M60 420l40-30 30 20 50-40 40 30" fill="none" stroke="#1c120d" stroke-width="0"/></svg>' +
     '<div class="tt"><h1>OCHRE<br>HORIZON</h1><div class="sub">Terraform a red world. Outscore your rival.</div></div>' +
     '<div class="bt">' + (has ? '<button class="btn" id="stCont">Continue game</button>' : '') +
-    '<button class="btn' + (has ? ' cr' : '') + '" id="stNew">New game</button><button class="btn alt" id="stLearn">Learn to play<small>Guided first game, about 10 minutes</small></button>' +
+    '<button class="btn' + (has ? ' cr' : '') + '" id="stNew">New game</button><button class="btn alt" id="stLearn">Learn to play<small>Three charters, about 3 minutes each</small></button>' +
     '<div class="lv">' + ['easy', 'normal', 'hard'].map(function (l) { return '<button data-lv="' + l + '" class="' + (l === lv ? 'on' : '') + '">' + l[0].toUpperCase() + l.slice(1) + '</button>'; }).join('') + '<button data-draft="1" class="' + (UI.draft ? 'on' : '') + '">Draft ' + (UI.draft ? 'on' : 'off') + '</button></div></div>';
   if ($('stCont')) $('stCont').addEventListener('click', function () { loadGame(); });
   $('stNew').addEventListener('click', function () { startGame({ level: UI.level, draft: UI.draft }); });
-  $('stLearn').addEventListener('click', function () { startGame({ level: 'easy', tut: true }); });
+  $('stLearn').addEventListener('click', function () { chStart(0); });
   $('start').querySelectorAll('[data-lv]').forEach(function (b) { b.addEventListener('click', function () { UI.level = b.getAttribute('data-lv'); LS.set('oh_level', UI.level); showStart(); }); });
   $('start').querySelector('[data-draft]').addEventListener('click', function () { UI.draft = !UI.draft; showStart(); });
 }
 function hideStart() { $('start').style.display = 'none'; document.body.classList.remove('st'); }
 function startGame(o) {
-  o = o || {};
+  o = o || {}; if (window.chStop && UI.charter) chStop();
   UI.level = o.level || UI.level; UI.tut = !!o.tut; UI.draft = !!o.draft; UI.setup = null; UI.research = null; UI.coachDone = {};
   OH.newGame({ seed: o.seed || (o.tut ? 20261120 : (Date.now() % 1e9)), draft: UI.draft, beginner: true });
   UI.evSeen = 0; UI.logSeen = 0;
@@ -69,12 +69,12 @@ var COACH = {
   pass: 'Out of money? Pass. Income comes when both pass.',
   research: 'Marked cards are our pick. Tap to change. 3 credits each.',
   research2: 'Income = credit production + your rating. Grow both.',
-  bonus: 'White marks on gauges give a bonus: heat production, an ocean.',
+  bonus: 'White marks on gauges pay a bonus: heat production, an ocean, warmth.',
   vp: 'VP on a card means points at the end. Not rating.',
   plants: 'Glowing plants? Tap them: 8 plants make a greenery.',
   goals: 'Projects tab holds milestones and awards: 5 points each.',
   out: 'Rival is out. Keep taking turns until you pass too.',
-  end: 'Game ends when all three gauges hit their goals.'
+  end: 'When all three gauges are full, that round is the last.'
 };
 function coachShow(k) {
   if (!UI.tut || UI.coachDone[k] || UI.scn || (window.guideEnabled && guideEnabled())) return;

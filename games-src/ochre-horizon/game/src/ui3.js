@@ -103,6 +103,7 @@ function doMove(m) {
 var aiTimer = 0;
 function pump() {
   if (!G) return;
+  if (UI.charter) { render(); return; }
   render();
   if (G.over) { showEnd(); return; }
   var p = OH.sideToAct();
