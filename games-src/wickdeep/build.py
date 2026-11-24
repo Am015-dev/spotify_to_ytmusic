@@ -9,10 +9,10 @@ open(os.path.join(D, 'ui.js'), 'w', encoding='utf-8').write(''.join(rd(os.path.j
 art = 'window.WD_ART=' + repr('data:image/png;base64,' + base64.b64encode(open(os.path.join(D, 'art', 'tiny-dungeon.png'), 'rb').read()).decode()) + ';\n'
 fx = ''.join(rd(os.path.join(D, 'fx', f + '.js')) + '\n' for f in ('slash', 'impact', 'heal', 'shield'))
 SH = lambda f: os.path.join(SP, 'shell', f)
-SRC = {'gx-scenario.js': SH('gx-scenario.js'), 'scn.js': os.path.join(S, 'scn.js'), 'shell.js': SH('shell.js'), 'gx-kit.js': SH('gx-kit.js'), 'gx-viewport.js': SH('gx-viewport.js'),
+SRC = {'gx-scenario.js': SH('gx-scenario.js'), 'scn.js': os.path.join(S, 'scn.js'), 'shell.js': SH('shell.js'), 'gx-kit.js': SH('gx-kit.js'), 'gx-viewport.js': SH('gx-viewport.js'), 'gx-scenario-tutor.js': SH('gx-scenario-tutor.js'),
        'fx.js': None, 'data.js': os.path.join(S, 'data.js'), 'scen.js': os.path.join(S, 'scen.js'),
-       'engine.js': os.path.join(S, 'engine.js'), 'ai.js': os.path.join(S, 'ai.js'), 'camp.js': os.path.join(S, 'camp.js'), 'ui.js': os.path.join(D, 'ui.js')}
-css = '\n'.join(rd(SH(f)) for f in ('shell.css', 'gx-kit.css')) + '\n' + rd(os.path.join(S, 'style.css'))
+       'engine.js': os.path.join(S, 'engine.js'), 'ai.js': os.path.join(S, 'ai.js'), 'camp.js': os.path.join(S, 'camp.js'), 'ui.js': os.path.join(D, 'ui.js'), 'lessons.js': os.path.join(S, 'lessons.js')}
+css = '\n'.join(rd(SH(f)) for f in ('shell.css', 'gx-kit.css', 'gx-scenario-tutor.css')) + '\n' + rd(os.path.join(S, 'style.css'))
 b64 = lambda p: base64.b64encode(open(p, 'rb').read()).decode()
 fonts = ''.join("@font-face{font-family:'%s';font-weight:%s;font-display:swap;src:url(data:font/woff2;base64,%s) format('woff2')}\n" % (n, w, b64(p)) for n, w, p in (
     ('Silkscreen', 700, os.path.join(D, 'art', 'silkscreen-700.woff2')), ('Silkscreen', 400, os.path.join(D, 'art', 'silkscreen-400.woff2')),

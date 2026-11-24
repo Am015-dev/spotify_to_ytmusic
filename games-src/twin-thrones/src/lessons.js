@@ -47,6 +47,8 @@
     return new Promise(function (r) { setTimeout(r, 450); });
   }
   var card = function (id) { return function () { var g = U.G, i; if (!g) return null; for (i = 0; i < g.pyr.length; i++) if (g.pyr[i].id === id && !g.pyr[i].taken) return $('c' + i); return null; }; };
+  // multi-step move: ring the picked card first, then the action button (Build / Sell / Wonder) once a card is picked
+  var step = function (cf, act) { return function () { if (U.G && U.sel != null) { var b = document.querySelector('[data-a="' + act + '"]'); if (b) return b; } return cf(); }; };
   var pick = function (w) { return function () { return document.querySelector('[data-pick="' + w + '"]'); }; };
   var did = function () { return L.n > 0; };
   var built = function () { return me().cards.length > L.cards0; };
@@ -65,56 +67,56 @@
       setup: function () { return stack({ age: 1, rows: rows([[[0], 0, ['a1-lookout']], [FRONT4, 1, ['a1-open-stage', 'a1-timber-stand', 'a1-roadside-inn', 'a1-scribe-room']]]), coins: [7, 7], cards: [[], []] }); },
       success: function () { return me().cards.indexOf('a1-timber-stand') >= 0; },
       fail: function () { return did() ? (L.last && L.last.t === 'discard' ? 'You sold it for coins. Built, the Timber Stand would give you wood.' : 'That card makes no wood. Look for the wood symbol.') : false; },
-      hints: ['Only the front cards are uncovered. Which one shows a wood icon?', { say: 'Tap the Timber Stand, then Build.', target: card('a1-timber-stand') }],
+      hints: ['Only the front cards are uncovered. Which one shows a wood icon?', { say: 'Tap the Timber Stand, then Build.', target: step(card('a1-timber-stand'), 'build') }],
       debrief: 'Front cards are free to take. A built wood card now pays wood for you.' },
     { id: 'own', title: 'Your cards pay', rule: 'A resource card you own pays that resource for free on later cards. Missing resources cost coins.',
       goal: 'Build a card and keep all 5 coins.', par: 1,
       setup: function () { return stack({ age: 1, rows: rows([[[0], 0, ['a1-lookout']], [FRONT4, 1, ['a1-pony-pen', 'a1-barrack-yard', 'a1-bathhouse', 'a1-stake-fence']]]), coins: [5, 7], cards: [['a1-timber-stand'], []] }); },
       success: function () { return built() && me().coins >= L.c0; },
       fail: function () { return did() ? 'That card cost ' + Math.max(0, L.c0 - me().coins) + ' coins. You only own wood, so only a wood card is free.' : false; },
-      hints: ['You own a wood card. Which card here needs wood?', { say: 'Tap the Pony Pen: its wood is paid by your Timber Stand.', target: card('a1-pony-pen') }],
+      hints: ['You own a wood card. Which card here needs wood?', { say: 'Tap the Pony Pen: its wood is paid by your Timber Stand.', target: step(card('a1-pony-pen'), 'build') }],
       debrief: 'Your Timber Stand paid the wood: the Pony Pen was free.' },
     { id: 'trade', title: 'Buy a resource', rule: 'A resource you lack costs 2 coins, plus 1 for each card your rival has that makes it.',
       goal: 'Build a card and keep at least 4 coins.', par: 1,
       setup: function () { return stack({ age: 1, rows: rows([[[0], 0, ['a1-lookout']], [FRONT4, 1, ['a1-bathhouse', 'a1-barrack-yard', 'a1-timber-depot', 'a1-herb-garden']]]), coins: [6, 7], cards: [[], ['a1-rock-face', 'a1-gravel-pit']] }); },
       success: function () { return built() && me().coins >= 4; },
       fail: function () { return did() && !(built() && me().coins >= 4) ? 'You spent ' + Math.max(0, L.c0 - me().coins) + ' coins. Pell makes 2 stone, so stone costs 4. Clay and glass cost 2.' : false; },
-      hints: ['Pell makes stone, so stone is dear. Which cards need something else?', { say: 'The Barrack Yard needs clay, which Pell lacks: only 2 coins.', target: card('a1-barrack-yard') }],
+      hints: ['Pell makes stone, so stone is dear. Which cards need something else?', { say: 'The Barrack Yard needs clay, which Pell lacks: only 2 coins.', target: step(card('a1-barrack-yard'), 'build') }],
       debrief: 'Clay: 2 coins. Stone: 2 plus 1 for each of Pell’s stone cards.' },
     { id: 'chain', title: 'Chain symbols', rule: 'A card with a chain symbol you already own is free to build, even if it costs resources.',
       goal: 'Build a red card without spending coins.', par: 1,
       setup: function () { return stack({ age: 2, rows: rows([[[0], 0, ['a2-city-wall']], [FRONT4, 1, ['a2-sawpit', 'a2-horse-yard', 'a2-barracks', 'a2-kiln-yard']]]), coins: [2, 7], cards: [['a1-pony-pen'], []] }); },
       success: function () { return me().cards.indexOf('a2-horse-yard') >= 0 && me().coins >= L.c0; },
       fail: function () { return did() ? 'That cost coins. Your Pony Pen has the horse symbol: the Horse Yard links to it and is free.' : false; },
-      hints: ['Your Pony Pen shows a horse symbol. Which red card links to it?', { say: 'Tap the Horse Yard: its chain makes it free.', target: card('a2-horse-yard') }],
+      hints: ['Your Pony Pen shows a horse symbol. Which red card links to it?', { say: 'Tap the Horse Yard: its chain makes it free.', target: step(card('a2-horse-yard'), 'build') }],
       debrief: 'The horse symbol on your Pony Pen made the Horse Yard free.' },
     { id: 'sell', title: 'Sell a card', rule: 'Instead of building you can sell a card: 2 coins, plus 1 for each yellow card you own.',
       goal: 'Reach 7 coins this turn.', par: 1,
       setup: function () { return stack({ age: 1, rows: rows([[[0], 0, ['a1-lookout']], [FRONT4, 1, ['a1-timber-stand', 'a1-pony-pen', 'a1-open-stage', 'a1-herb-garden']]]), coins: [3, 7], cards: [['a1-roadside-inn', 'a2-brewhouse'], []] }); },
       success: function () { return me().coins >= 7; },
       fail: function () { return did() ? 'You have ' + me().coins + ' coins. Building gives none. Selling gives 2 plus 1 per yellow card: 4.' : false; },
-      hints: ['You own two yellow cards. How much does selling pay with them?', { say: 'Tap any card, then Sell: 2 + 2 yellow = 4 coins.', target: card('a1-timber-stand') }],
+      hints: ['You own two yellow cards. How much does selling pay with them?', { say: 'Tap any card, then Sell: 2 + 2 yellow = 4 coins.', target: step(card('a1-timber-stand'), 'sell') }],
       debrief: 'Sold for 2 + 2 yellow cards: 3 + 4 = 7 coins.' },
     { id: 'war', title: 'War pawn', rule: 'Shields push the pawn toward your rival. Passing 3 steps takes 2 coins from them, 6 steps takes 5, 9 steps wins.',
       goal: 'Take coins from your rival with the war pawn.', par: 1,
       setup: function () { return stack({ age: 3, rows: rows([[[0], 0, ['a3-arsenal']], [FRONT4, 1, ['a1-lookout', 'a3-war-pavilion', 'a1-open-stage', 'a1-stake-fence']]]), coins: [8, 7], cards: [[], []] }); },
       success: function () { return !!G().loot[0][0]; },
       fail: function () { return did() ? 'The pawn is on step ' + G().mil + '. Reach step 3 and your rival loses 2 coins.' : false; },
-      hints: ['Red cards show shields. Which one has the most?', { say: 'Tap the War Pavilion: 3 shields move the pawn 3 steps.', target: card('a3-war-pavilion') }],
+      hints: ['Red cards show shields. Which one has the most?', { say: 'Tap the War Pavilion: 3 shields move the pawn 3 steps.', target: step(card('a3-war-pavilion'), 'build') }],
       debrief: 'Three shields crossed the first coin space: Pell lost 2 coins.' },
     { id: 'pair', title: 'Science pair', rule: 'A second copy of a science symbol earns a progress token. Six different symbols win at once.',
       goal: 'Earn a progress token.', par: 2,
       setup: function () { return stack({ age: 1, rows: rows([[[0], 0, ['a1-lookout']], [FRONT4, 1, ['a2-measure-hall', 'a1-scribe-room', 'a1-remedy-shop', 'a1-open-stage']]]), coins: [6, 7], cards: [['a1-weights-hall', 'a1-timber-stand', 'a1-glass-kiln'], []] }); },
       success: function () { return me().tokens.length > 0; },
       fail: function () { return did() && !tokPend() && me().tokens.length === 0 ? 'No token: that card carries a different symbol. You need a second scale.' : false; },
-      hints: ['You own the scale symbol. Which green card shows a scale too?', { say: 'Tap the Measure Hall: a second scale is a pair.', target: card('a2-measure-hall') }],
+      hints: ['You own the scale symbol. Which green card shows a scale too?', { say: 'Tap the Measure Hall: a second scale is a pair.', target: step(card('a2-measure-hall'), 'build') }],
       debrief: 'Two scales make a pair: a progress token is yours.' },
     { id: 'wonder', title: 'Build a wonder', rule: 'Any card can build a wonder: pay its cost and the card goes underneath. Some wonders give another turn.',
       goal: 'Build your wonder and keep your turn.', par: 1,
       setup: function () { return stack({ age: 2, rows: rows([[[0], 0, ['a2-city-wall']], [FRONT4, 1, ['a1-lookout', 'a1-open-stage', 'a1-roadside-inn', 'a1-scribe-room']]]), coins: [5, 7], cards: [['a2-sawpit', 'a1-glass-kiln', 'a1-reed-press'], []], wonders: [['w-terraced-orchard', 'w-sky-tomb'], []] }); },
       success: function () { return G().built > 0 && L.r === 0; },
       fail: function () { return did() && G().built === 0 ? 'You built a card, not a wonder. Tap a card, then Wonder, to tuck it under.' : false; },
-      hints: ['Tap any card and look for the Wonder button.', { say: 'Pick a card, then tap Wonder: the Orchard gives 6 coins and a turn.', target: card('a1-lookout') }],
+      hints: ['Tap any card and look for the Wonder button.', { say: 'Pick a card, then tap Wonder: the Orchard gives 6 coins and a turn.', target: step(card('a1-lookout'), 'wonder') }],
       debrief: 'The Orchard is built and you play again at once.' },
     { id: 'game', title: 'Short game', rule: 'After the last card, points count: cards, wonders, tokens, war, and 1 per 3 coins. Most points wins.',
       goal: 'Win a short game against Pell.',
@@ -147,15 +149,16 @@
   E.apply = function (g, m) { if (L.on && g === U.G && GXST.active() && !g.over) { var p = E.sideToAct(g); if (p === 0) { L.n++; L.last = m; } else if (p === 1) L.r++; } return oa.apply(this, arguments); };
   addEventListener('gxst', function (e) {
     if (e.detail.type !== 'close' || !L.on) return;
-    L.on = 0; layout(false); U.tut = false; U.rivalName = null; try { UI.showStart(); } catch (er) { }
+    var fin = GXST.state() && GXST.state().i === lessons.length - 1;   // closed from the last lesson: go on into a real game (Easy), not back to the title
+    L.on = 0; layout(false); U.tut = false; U.rivalName = null;
+    if (fin) { try { U.lvl = 'easy'; $('start').hidden = true; $('res').hidden = true; UI.newGame('cpu'); return; } catch (er) { } }
+    try { UI.showStart(); } catch (er) { }
   });
   setInterval(function () { if (L.on && U.G && U.G.over && $('res') && !$('res').hidden) $('res').hidden = true; }, 200);   // the lesson card, not the result screen, ends a lesson
   function go() {
     if (!window.GXST || !document.body) { setTimeout(go, 200); return; }
     GXST.init({ game: 'twin-thrones', scenarios: lessons, keepClear: ['#pyr .card.av', '#zoom', '[data-pick]', '#instr', '#mil', '#s0', '#s1', '#dock', '.gx-bar', '#tokrow', '[data-token]', '[data-tok]'],
       settled: function () { var g = U.G; return !!g && (g.over || (!U.busy && !U.narr && E.sideToAct(g) === 0)); } });
-    // the top bar is full on a phone (nothing fits): there the lessons open from Menu > Learn to play, on wider screens from the bar button
-    var st = document.createElement('style'); st.textContent = '@media (max-width:640px){.gxst-q{display:none!important}}'; document.head.appendChild(st);
     window.TTL = { L: L, lessons: lessons, stack: stack };
   }
   setTimeout(go, 300);
