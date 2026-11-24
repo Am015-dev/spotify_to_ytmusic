@@ -40,7 +40,7 @@
     try { GX.close(); } catch (e) { } try { GXH.setEnabled(false); GXH.hide(); } catch (e) { }
     var s = defaultSetup(); s.mode = 'me'; s.np = 2; s.variant = null; s.noMon = false; s.exp = Object.assign({ rift: 0, wave: 0, maelstrom: 0, cannon: 0 }, sp.exp || {});
     s.seats[0] = { h: true, lv: 'normal', col: 0 }; s.seats[1] = { h: false, lv: 'easy', col: 3 };
-    L.on = 1; L.n = 0; L.roll = sp.roll || null; L.mon = sp.mon || {}; L.wdie = sp.wdie || 5; L.co = sp.co || null; L.startN = 0;
+    document.documentElement.classList.add('twl'); L.on = 1; L.n = 0; L.roll = sp.roll || null; L.mon = sp.mon || {}; L.wdie = sp.wdie || 5; L.co = sp.co || null; L.startN = 0;
     startGame(JSON.parse(JSON.stringify(s)), { first: sp.first == null ? 0 : sp.first, seed: 7, names: ['Vermilion', 'Cobalt'] });
     if (L.qt == null) L.qt = UI.qTime; UI.qTime = 0;   // no answer timer in a lesson: nothing is decided for the player
     build(sp); UI.guide = 'off'; UI.sel = null; UI.busy = false; UI.sunk = []; UI.mph = null; PH.mphHide = null; UI.overSeen = 0; UI.dice = null; UI.res = null; UI.tut = 0;
@@ -52,6 +52,7 @@
   // ---- each lesson's wrong answer says why, in the engine's own words
   var why = function () { var o = me().out || '', c = G.ships[COB].out || ''; if (!me().alive) return o; return c; };
   var lost = function (msg) { return function () { return !me().alive && did() ? msg : false; }; };
+  var rectEl = function (r) { return r ? { getBoundingClientRect: function () { return { left: r.left, top: r.top, right: r.left + r.width, bottom: r.top + r.height, width: r.width, height: r.height }; } } : null; };   // the engine rings anything with getBoundingClientRect; tcell gives a bare rect
   var T = function (i) { return tvis('[data-a=card][data-t="' + i + '"],[data-ph=pcard][data-t="' + i + '"]'); };
   var lessons = [
     { id: 'mark', title: 'Set out', rule: 'Every junk picks a gold start mark on the edge before any tile is laid. Leviathans roam the chart, so start away from them.', par: 1,
@@ -59,7 +60,7 @@
       setup: function () { return stack({ setup: 1, first: 1, sp: 1, ships: [{}, { x: 5, y: 6, e: 5 }], mons: [{ id: 0, x: 1, y: 4 }, { id: 3, x: 5, y: 2 }, { id: 6, x: 3, y: 3 }], hands: [[4, 7, 5], [8, 9, 10]] }); },
       success: function () { var m = me(); return did() && m.alive && m.x != null && G.mons.every(function (l) { return dist(m, l) >= 3; }); },
       fail: function () { var m = me(); if (!did() || m.x == null) return false; if (!m.alive) return 'Your junk was lost. ' + why(); var l = G.mons.filter(function (v) { return dist(m, v) < 3; })[0]; return l ? 'A leviathan is only ' + dist(m, l) + ' squares from your start. When they wake it can reach your bow.' : false; },
-      hints: ['Leviathans are the dark monsters on the chart. Look for a mark far from all three.', { say: 'The bottom middle is far from every leviathan.', target: function () { return tcell(3, 6); } }],
+      hints: ['Leviathans are the dark monsters on the chart. Look for a mark far from all three.', { say: 'The bottom middle is far from every leviathan.', target: function () { return tvis('[data-a=startmark][data-x="3"][data-y="6"][data-e="4"]') || rectEl(tcell(3, 6)); } }],
       debrief: 'Far from the leviathans, you have room to sail.' },
     { id: 'lay', title: 'Lay a current', rule: 'Pick a current tile, turn it, then Place it on the square in front of your junk. Your junk sails along its line.', par: 1,
       goal: 'Sail your junk one square north.',
@@ -138,13 +139,13 @@
     };
     var oc = act; act = function (m, seat) { var ok = oc.apply(this, arguments); if (ok && seat === 0 && GXST.active()) L.n++; return ok; };
     var os = saveAll; saveAll = function () { if (!GXST.active()) return os.apply(this, arguments); };
-    addEventListener('gxst', function (e) { if (e.detail.type === 'close' && L.qt != null) { UI.qTime = L.qt; L.qt = null; } });
+    addEventListener('gxst', function (e) { if (e.detail.type === 'close' || e.detail.type === 'picker') document.documentElement.classList.remove('twl'); if (e.detail.type === 'close' && L.qt != null) { UI.qTime = L.qt; L.qt = null; } });
     window.TWL = { L: L, build: build, stack: stack };
   }
   var go = function () {
     if (!ready()) { setTimeout(go, 200); return; }
     hook();
-    GXST.init({ game: 'tidewake', scenarios: lessons, keepClear: ['.gx-bar', '#board', '[data-a=card]', '[data-ph=pcard]', '[data-a=rot]', '[data-a=place]', '[data-a=q]', '[data-a=startmark]', '#cards', '#pc', '.prompt'], settled: function () { return !!G && UI.started && !UI.busy && (G.q && G.q.who === 0 || !G.ag.length && (G.over || sideToAct() === 0)); } });
+    GXST.init({ game: 'tidewake', scenarios: lessons, keepClear: ['.gx-bar', '#board', '[data-a=card]', '[data-ph=pcard]', '[data-a=rot]', '[data-a=place]', '[data-a=q]', '[data-a=startmark]', '#cards', '.prompt', '.opts'], settled: function () { return !!G && UI.started && !UI.busy && (G.q && G.q.who === 0 || !G.ag.length && (G.over || sideToAct() === 0)); } });
   };
   setTimeout(go, 300);
 })();

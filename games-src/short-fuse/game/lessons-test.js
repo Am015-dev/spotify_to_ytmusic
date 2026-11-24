@@ -9,7 +9,8 @@ const fs = require('fs'), path = require('path');
 const html = fs.readFileSync(path.join(__dirname, 'shortfuse.html'));
 const SIZES = (process.argv[2] || '402x874,1366x768').split(',').map(s => s.split('x').map(Number));
 const PROOF = path.join(__dirname, '..', 'proof'); fs.mkdirSync(PROOF, { recursive: true });
-const sleep = ms => new Promise(r => setTimeout(r, ms)); const probs = []; const T0 = Date.now(), dbg = m => { if (process.env.DBG) console.log(((Date.now() - T0) / 1000).toFixed(1) + 's ' + m); };
+const { turbo } = require('../../scripts/turbo'); const SLEEPDIV = +(process.env.SLEEPDIV || 1);   // game time runs TURBO x faster, so test waits shrink too
+const sleep = ms => new Promise(r => setTimeout(r, Math.max(1, ms / SLEEPDIV))); const probs = []; const T0 = Date.now(), dbg = m => { if (process.env.DBG) console.log(((Date.now() - T0) / 1000).toFixed(1) + 's ' + m); };
 // action: ['c', stand, value] tap a crew wire; ['m', value] tap my wire; ['gear'] tap the ready gear card; ['probe'] pick the personal tool
 const SOLVE = {
   dual: [['c', 1, 5], ['m', 5]], order: [['c', 1, 1], ['m', 1]], miss: [['c', 1, 8], ['m', 6], ['shot'], ['c', 1, 8], ['m', 8]], solo: [['m', 7]],
@@ -18,7 +19,7 @@ const SOLVE = {
 };
 async function run(b, W, H) {
   const tag = W + 'x' + H, phone = W < 600, note = m => { dbg('NOTE ' + m); probs.push(tag + ': ' + m); }, shots = [];
-  const ctx = await b.newContext({ viewport: { width: W, height: H }, deviceScaleFactor: 1, isMobile: phone, hasTouch: true });
+  const ctx = await b.newContext({ viewport: { width: W, height: H }, deviceScaleFactor: 1, isMobile: phone, hasTouch: true }); await turbo(ctx, +(process.env.TURBO || 20));
   await ctx.route('**/*', r => new URL(r.request().url()).host === 'sf.test' ? r.fulfill({ status: 200, contentType: 'text/html', body: html }) : r.abort());
   const p = await ctx.newPage(); p.setDefaultTimeout(15000);
   p.on('pageerror', e => note('PAGE ERROR ' + e.message));
