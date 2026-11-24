@@ -91,3 +91,4 @@ Conversions to scenarios: W710 wickdeep | W711 perch | W712 wildmark | W713 via-
 HUD diet (Opus): W717 thornbound | W718 rampart. Chores (Haiku): W719 contrast | W720 stitchwise baselines. Reviewer R13 (Opus): REVIEW-R13.md.
 Branches shelf/W7xx-*. Workers report via create_trigger "[DONE Wxxx]". W699/W702 pushes were denied (work lost) -> redone as W705/W706; briefs now say push per milestone or paste format-patch.
 Next: as branches land, one Sonnet integrator per 2-4 branches (shared gx-scenario-tutor.js changes -> one build-all). Onyx (has story tutorial) not converted.
+15:53 UTC DECISION: cheapag net-negative on feature work (W707 $1.22, W712 $1.5, nothing produced; W711 stalled). Kept only for one-file fixes; briefs updated.
