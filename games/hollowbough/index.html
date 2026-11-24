@@ -621,6 +621,9 @@ html.sk .gx-drawer-head{padding-left:16px;padding-right:12px}
 /* every mode: the bulb's ring pulses three times, then holds still */
 .gxh-ring:not(.from){animation-iteration-count:3}
 
+/* QA W659: story Next button label was white on pale art */
+html.sk .gxc-btn.go{color:#3a1604;text-shadow:0 1px 0 rgba(255,255,255,.6);font-weight:800}
+
 /* ===== W457 Play view (src/ui2.js pvRender; hooks in ui3.js / ui5.js): one focus at a time. Scoped to #bd.pv so ?board=old keeps the old board. ===== */
 #bd.pv{--pv-paper:#f8edd2;--pv-paper2:#efdcb2;--pv-ink:#3b2a1c;--pv-wood:#5a3c22;--pv-gold:#ffd25a;--pv-ok:#1f6a2b;--pv-no:#a2382a;
   background:linear-gradient(180deg,rgba(52,34,18,.55),rgba(38,24,12,.72) 75%);color:var(--pv-ink);font-family:inherit}
@@ -2214,7 +2217,7 @@ const GX={key:'gx',open:null,
   GX.buzz = function (pat) { try { if (P.haptics && root.navigator && typeof root.navigator.vibrate === 'function') return root.navigator.vibrate(pat == null ? 12 : pat); } catch (e) { } return false; };
   GX.canBuzz = function () { try { return !!(root.navigator && typeof root.navigator.vibrate === 'function'); } catch (e) { return false; } };
   // colour-blind hook: one symbol per seat / colour index, shown next to colour-coded pieces when html.cb is on
-  GX.SYMBOLS = ['●', '▲', '■', '◆', '★', '✚', '⬟', '✱'];
+  GX.SYMBOLS = ['●', '▲', '■', '◆', '◆', '✚', '⬟', '✱'];
   GX.mark = function (i) { return GX.SYMBOLS[((i | 0) % GX.SYMBOLS.length + GX.SYMBOLS.length) % GX.SYMBOLS.length]; };
   GX.applyPrefs = function () {
     try {
@@ -3582,7 +3585,7 @@ window.GXGLBQ = window.GXGLBQ || [];
   }
   function starRow(n, max, total) {
     var r = el('div', 'gxc-stars'); r.setAttribute('aria-label', n + ' of ' + (total || 3) + ' stars');
-    for (var i = 0; i < (total || 3); i++) r.appendChild(el('i', 'gxc-st' + (i < n ? ' on' : '') + (max != null && i >= max ? ' cap' : ''), '★'));
+    for (var i = 0; i < (total || 3); i++) r.appendChild(el('i', 'gxc-st' + (i < n ? ' on' : '') + (max != null && i >= max ? ' cap' : ''), '◆'));
     return r;
   }
   // twist text without its 'Boss rule:' prefix (the label shows it), first letter upper-case
@@ -3603,7 +3606,7 @@ window.GXGLBQ = window.GXGLBQ || [];
     head.appendChild(back);
     var tt = el('div', 'gxc-htitle'); tt.appendChild(el('b', null, D.title || 'Story')); head.appendChild(tt);
     var got = 0; list.forEach(function (c) { got += (P.ch[c.id] && P.ch[c.id].stars) || 0; });
-    var sc = btn('gxc-ib gxc-score', '★ ' + got + '/' + list.length * 3, function () { rewards(); });
+    var sc = btn('gxc-ib gxc-score', '◆ ' + got + '/' + list.length * 3, function () { rewards(); });
     sc.setAttribute('aria-label', got + ' stars of ' + list.length * 3 + '. Show rewards'); head.appendChild(sc);
     if (O.headButtons) { try { O.headButtons().forEach(function (b) { head.insertBefore(b, sc); }); } catch (e) {} }
     s.appendChild(head);
@@ -3684,7 +3687,7 @@ window.GXGLBQ = window.GXGLBQ || [];
     var g = el('div', 'gxc-goal'); g.appendChild(el('b', null, 'Goal')); g.appendChild(el('span', null, c.goal.text)); sh.appendChild(g);
     if (c.twist) { var tw = el('div', 'gxc-twist'); tw.appendChild(el('b', null, c.boss ? 'Boss rule' : 'Special rule')); tw.appendChild(el('span', null, ruleText(c.twist.text))); sh.appendChild(tw); }
     var sl = el('ul', 'gxc-slist');
-    c.stars.forEach(function (s, i) { var li = el('li', i < (st.stars || 0) ? 'on' : ''); li.appendChild(el('i', null, '★')); li.appendChild(el('span', null, s.text)); sl.appendChild(li); });
+    c.stars.forEach(function (s, i) { var li = el('li', i < (st.stars || 0) ? 'on' : ''); li.appendChild(el('i', null, '◆')); li.appendChild(el('span', null, s.text)); sl.appendChild(li); });
     sh.appendChild(sl);
     var row = el('div', 'gxc-row');
     var x = btn('gxc-btn ghost', 'Close', close); x.setAttribute('data-gxc-esc', ''); row.appendChild(x);
@@ -3839,7 +3842,7 @@ window.GXGLBQ = window.GXGLBQ || [];
       var sr = starRow(r.stars, def.maxStars, 3); sr.classList.add('big'); box.appendChild(sr);
       if (r.won && def.easy) box.appendChild(el('div', 'gxc-dim gxc-small', 'Easier mode: up to ' + def.maxStars + ' stars. Play it normally for 3.'));
       var sl = el('ul', 'gxc-slist');
-      def.stars.forEach(function (st, i) { var li = el('li', i < r.stars ? 'on' : ''); li.appendChild(el('i', null, '★')); li.appendChild(el('span', null, st.text)); sl.appendChild(li); });
+      def.stars.forEach(function (st, i) { var li = el('li', i < r.stars ? 'on' : ''); li.appendChild(el('i', null, '◆')); li.appendChild(el('span', null, st.text)); sl.appendChild(li); });
       box.appendChild(sl);
       var op = def.opponent, line = r.won ? op.praise : op.taunt;
       if (line) {
