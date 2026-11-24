@@ -133,3 +133,4 @@ Live check URL form: https://am015-dev.github.io/spotify_to_ytmusic/<slug>/ (gam
 - Waiting for an integrator: W755 tidewake HUD, W746-final-approach, W733 ochre tutorial, W732 wildmark, W757r hollowbough art, INT21r.
 - Gate unchanged: 0/29 games pass the R15 critic; last deploy 17:17 UTC.
 - Queue for fixers: onyx-atelier, twin-thrones, redline-rally, ochre-horizon (on W733), wildmark (on W732), vale, final-approach (on W746), meadowfold, sunglaze, via-tessera, tidewake (after W755), perch (after W731), kaiten (after W758).
+- 18:09 UTC relay: W746-final-approach@e9cdffa3 lessons 7/7 phone+pc, sheets 0 flags. Its diff carries shared shell/gx-scenario-tutor.* (from W709/W729): reconcile with W726/W752 before merge. Weak: phone pilot tray shows 2 of 4 dice faces in some shots. R15 live: phone 6/6/7/7/6, pc 5/6/6/6/6.
