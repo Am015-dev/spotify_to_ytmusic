@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en"><head><meta charset="utf-8">
+<html lang="en"><head><!-- Copyright (c) 2026 Am015-dev. All rights reserved. Not licensed for copying, modification or redistribution; see LICENSE in the source repository. --><meta name="copyright" content="&copy; 2026 Am015-dev. All rights reserved."><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#2b2018">
 <link rel="icon" href="data:,">
@@ -302,6 +302,39 @@ button:focus-visible, [tabindex]:focus-visible { outline: 3px solid var(--gold);
 #tutmap .tutlines circle { fill: var(--gold); stroke: var(--grout); stroke-width: 1.5; }
 .callout { position: absolute; pointer-events: auto; min-height: 30px; padding: 4px 10px; border-radius: 15px; border: 2px solid var(--gold); background: var(--grout); color: #fff8ec; font-size: 13px; font-weight: 700; white-space: nowrap; box-shadow: 0 2px 6px rgba(0,0,0,.5); }
 .callout:active { background: var(--terra2); }
+
+/* gx-scenario-tutor.css: scenario lesson card, picker, result card, hint ring (shell/gx-scenario-tutor.js, docs GXST.md).
+   Never dims, never blocks taps outside the card. Override with --gxst-* variables. */
+:root{--gxst-z:88;--gxst-bg:#fffaf0;--gxst-ink:#2e241c;--gxst-mute:#6b5a48;--gxst-head:#3b2f25;--gxst-on:#fffaf0;--gxst-acc:#e8907e;--gxst-ok:#5d9c58;--gxst-bad:#b5482f;--gxst-star:#e0a41c;--gxst-ring:#ffd36b}
+.gxst-card{position:fixed;left:8px;top:8px;z-index:var(--gxst-z);width:min(320px,calc(100vw - 16px));box-sizing:border-box;background:var(--gxst-bg);color:var(--gxst-ink);border:2px solid var(--gxst-head);border-radius:14px;box-shadow:0 8px 22px rgba(0,0,0,.3);font:15px/1.35 var(--gxh-font,system-ui,sans-serif);touch-action:none}
+.gxst-card.gxst-min{width:auto;background:none;border:0;box-shadow:none}
+.gxst-card.gxst-win{border-color:var(--gxst-ok)}.gxst-card.gxst-fail{border-color:var(--gxst-bad)}
+.gxst-hd{display:flex;align-items:center;padding:0 2px 0 12px;background:var(--gxst-head);color:var(--gxst-on);border-radius:11px 11px 0 0;cursor:move;user-select:none}
+.gxst-card.gxst-win .gxst-hd{background:var(--gxst-ok)}.gxst-card.gxst-fail .gxst-hd{background:var(--gxst-bad)}
+.gxst-hd b{font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.gxst-sp{flex:1}
+.gxst-ib{flex:none;width:44px;height:44px;border:0;background:none;color:var(--gxst-on);font-size:24px;line-height:1;border-radius:8px;cursor:pointer}
+.gxst-say,.gxst-goal{margin:10px 12px 4px;font-weight:700}
+.gxst-goal{font-size:16px}
+.gxst-hint{margin:4px 12px;padding:6px 8px;border-left:4px solid var(--gxst-star);background:rgba(224,164,28,.12);font-size:14px}
+.gxst-msg{margin:4px 12px 6px;font-size:14px}
+.gxst-rule{margin:2px 12px 6px;color:var(--gxst-mute);font-size:14px}
+.gxst-stars{margin:8px 12px 0;font-size:28px;line-height:1;color:var(--gxst-star);letter-spacing:4px}
+.gxst-ft{display:flex;gap:8px;padding:6px 10px 10px}
+.gxst-btn{min-height:44px;padding:0 14px;border-radius:10px;border:2px solid var(--gxst-head);background:transparent;color:var(--gxst-ink);font:700 15px/1 inherit;cursor:pointer}
+.gxst-btn.pri{background:var(--gxst-head);color:var(--gxst-on)}
+.gxst-btn:disabled{opacity:.5;cursor:default}
+.gxst-bulb::before{content:'';display:inline-block;width:10px;height:10px;margin-right:6px;border-radius:50%;background:var(--gxst-star);box-shadow:0 0 6px var(--gxst-star)}
+.gxst-list{margin:4px 8px 8px;padding:0;list-style:none;max-height:min(52vh,420px);overflow:auto}
+.gxst-pick{display:flex;align-items:center;gap:8px;width:100%;min-height:44px;margin:2px 0;padding:4px 8px;border:2px solid transparent;border-radius:10px;background:none;color:var(--gxst-ink);font:600 15px/1.2 inherit;text-align:left;cursor:pointer}
+.gxst-pick.rec{border-color:var(--gxst-acc)}
+.gxst-n{flex:none;width:26px;height:26px;border-radius:50%;background:var(--gxst-head);color:var(--gxst-on);display:grid;place-items:center;font-size:13px}
+.gxst-t{flex:1}.gxst-st{flex:none;color:var(--gxst-star);letter-spacing:1px}
+.gxst-chip{min-height:44px;max-width:calc(100vw - 16px);padding:4px 16px;border-radius:22px;background:var(--gxst-head);color:var(--gxst-on);border:2px solid var(--gxst-on);font:700 15px/1.2 var(--gxh-font,system-ui,sans-serif);box-shadow:0 4px 12px rgba(0,0,0,.3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:pointer}
+.gxst-ring{position:fixed;z-index:calc(var(--gxst-z) - 2);pointer-events:none;border-radius:14px;border:3px solid var(--gxst-ring);box-shadow:0 0 14px 3px var(--gxst-ring);animation:gxst-pulse 1.6s ease-in-out infinite}
+@keyframes gxst-pulse{0%,100%{opacity:.45;transform:scale(1)}50%{opacity:1;transform:scale(1.03)}}
+.gxst-q{min-height:44px;padding:0 12px;font-weight:700;cursor:pointer}
+.gxst-q.gxst-qfix{position:fixed;left:8px;bottom:8px;z-index:var(--gxst-z);border-radius:22px;background:var(--gxst-head);color:var(--gxst-on);border:2px solid var(--gxst-on)}
+@media (prefers-reduced-motion:reduce){.gxst-ring{animation:none;opacity:1}}
 
 </style>
 </head>
@@ -1503,6 +1536,165 @@ if (typeof module !== 'undefined') module.exports = VTD;
 
 </script>
 <script>
+// gx-scenario-tutor.js: scenario tutorials (owner verdict, Nov 2026: tutorials must be GAMES). Each scenario puts the real board in a
+// small, stacked position with ONE objective; the player makes real moves and learns the rule from the consequence. A floating
+// objective card never dims and never blocks taps. Needs gx-scenario-tutor.css. ES5, no dependencies. Docs: shell/GXST.md.
+// (Global is GXST because GXS is already the ?scn= test registry in gx-scenario.js.)
+//   GXST.init({game, scenarios:[...], storageKey?, settled?:()=>bool, keepClear?:[selectors], qParent?, phoneSlot?:{after,before,avoid:[selectors]}, keepPlace?:bool})   GXST.picker() GXST.start(id) GXST.retry()
+//   GXST.next() GXST.hint() GXST.close() GXST.state()      events: window 'gxst' CustomEvent, detail.type =
+//   picker | start | hint | win | fail | retry | close
+//   scenario: {id, title, rule, goal, setup(), success()->bool, fail()->false|'message', par?, moves?()->n, hints:[nudge, {say, target}],
+//              debrief, solve?(api) (tests only)}
+(function () {
+  'use strict';
+  var D = document, C = null, S = null, W = null, R = null, Q = null, tick = 0, drag = null;
+  function $(s) { try { return D.querySelector(s); } catch (e) { return null; } }
+  function mk(tag, cls, txt) { var e = D.createElement(tag); if (cls) e.className = cls; if (txt != null) e.textContent = txt; e.setAttribute('data-help', ''); return e; }
+  function btn(cls, txt, aria, f) { var b = mk('button', cls, txt); b.type = 'button'; if (aria) b.setAttribute('aria-label', aria); b.onclick = function (ev) { ev.stopPropagation(); f(); }; return b; }
+  function emit(type, x) { var d = { type: type, game: C && C.game }; for (var k in x) d[k] = x[k]; var e; try { e = new CustomEvent('gxst', { detail: d }); } catch (er) { e = D.createEvent('CustomEvent'); e.initCustomEvent('gxst', false, false, d); } window.dispatchEvent(e); }
+  function vis(e) { if (!e || !e.getBoundingClientRect) return null; var r = e.getBoundingClientRect(); if (r.width < 2 || r.height < 2) return null; return { left: r.left, top: r.top, right: r.right, bottom: r.bottom, width: r.width, height: r.height }; }
+  function find(t) { if (!t) return null; if (typeof t === 'function') { try { return t(); } catch (e) { return null; } } var a; try { a = D.querySelectorAll(t); } catch (e) { return null; } for (var i = 0; i < a.length; i++) if (vis(a[i])) return a[i]; return null; }
+  function hit(a, b) { return a.left < b.right && a.right > b.left && a.top < b.bottom && a.bottom > b.top; }
+  function call(f, d) { if (typeof f !== 'function') return d; try { return f(); } catch (e) { return d; } }
+  // ------------------------------------------------------------ progress: best stars per scenario, card position
+  function key() { return C.storageKey || 'gxst-' + C.game; }
+  function load() { var o = null; try { o = JSON.parse(localStorage.getItem(key()) || 'null'); } catch (e) { } return o && typeof o === 'object' ? o : {}; }
+  function save() { try { localStorage.setItem(key(), JSON.stringify({ best: S.best, pos: S.pos })); } catch (e) { } }
+  function sc(id) { for (var i = 0; i < C.scenarios.length; i++) if (C.scenarios[i].id === id) return i; return -1; }
+  function cur() { return S.i >= 0 ? C.scenarios[S.i] : null; }
+  function stars() { var s = cur(), n = 3 - S.hint; if (s && s.par && call(s.moves, 0) > s.par) n--; return Math.max(1, n); }
+  function firstOpen() { for (var i = 0; i < C.scenarios.length; i++) if (!S.best[C.scenarios[i].id]) return i; return 0; }
+  function txt(v) { return typeof v === 'function' ? call(v, '') : v; }
+  function starTxt(n) { var t = ''; for (var i = 0; i < 3; i++) t += i < n ? '★' : '☆'; return t; }
+  // ------------------------------------------------------------ Lessons button (reopens the picker)
+  function qBtn() {
+    if (Q && D.body.contains(Q)) return;
+    Q = btn('gxst-q', 'Lessons', 'Lessons: learn by playing', function () { GXST.picker(); });
+    var p = (C.qParent && $(C.qParent)) || $('.gx-bar');
+    if (p) { Q.className = 'gx-ibtn gxst-q'; p.appendChild(Q); } else { Q.className += ' gxst-qfix'; D.body.appendChild(Q); }
+  }
+  // ------------------------------------------------------------ the card: picker | play | win | fail
+  function render() {
+    if (!S.open) { if (W) { W.remove(); W = null; } ring(); return; }
+    if (!W) { W = mk('div', 'gxst-card'); W.setAttribute('role', 'dialog'); W.setAttribute('aria-label', 'Lesson'); D.body.appendChild(W); wireDrag(); }
+    W.innerHTML = ''; W.className = 'gxst-card gxst-' + S.phase + (S.min ? ' gxst-min' : '');
+    var s = cur();
+    if (S.min) { W.appendChild(btn('gxst-chip', s && S.phase === 'play' ? s.title + ': ' + txt(s.goal) : 'Lessons', 'Open lesson card', function () { S.min = false; render(); })); place(); return; }
+    var hd = mk('div', 'gxst-hd');
+    hd.appendChild(mk('b', null, S.phase === 'picker' ? 'Learn by playing' : (S.i + 1) + '/' + C.scenarios.length + ' ' + s.title));
+    hd.appendChild(mk('span', 'gxst-sp'));
+    hd.appendChild(btn('gxst-ib', '–', 'Minimise', function () { S.min = true; render(); }));
+    hd.appendChild(btn('gxst-ib', '×', 'Close', function () { GXST.close(); }));
+    W.appendChild(hd);
+    var ft = mk('div', 'gxst-ft');
+    if (S.phase === 'picker') {
+      W.appendChild(mk('p', 'gxst-say', 'Short games on the real board. Each one teaches one rule.'));
+      var ol = mk('ol', 'gxst-list');
+      C.scenarios.forEach(function (x, i) {
+        var li = mk('li'), b = btn('gxst-pick' + (i === firstOpen() ? ' rec' : ''), null, 'Lesson ' + (i + 1) + ': ' + x.title, function () { GXST.start(x.id); });
+        b.setAttribute('data-id', x.id); b.appendChild(mk('span', 'gxst-n', String(i + 1))); b.appendChild(mk('span', 'gxst-t', x.title)); b.appendChild(mk('span', 'gxst-st', starTxt(S.best[x.id] || 0)));
+        li.appendChild(b); ol.appendChild(li);
+      });
+      W.appendChild(ol);
+    } else if (S.phase === 'play') {
+      W.appendChild(mk('p', 'gxst-goal', txt(s.goal)));
+      if (S.hint) { var h = s.hints[S.hint - 1]; W.appendChild(mk('p', 'gxst-hint', typeof h === 'string' ? h : h.say)); }
+      var hb = btn('gxst-btn gxst-bulb', S.hint ? (S.hint < s.hints.length ? 'Show me' : 'Hint shown') : 'Hint', 'Hint', function () { GXST.hint(); });
+      if (S.hint >= s.hints.length) hb.disabled = true;
+      ft.appendChild(hb); ft.appendChild(mk('span', 'gxst-sp'));
+      ft.appendChild(btn('gxst-btn', 'Restart', null, function () { GXST.retry(); }));
+    } else if (S.phase === 'win') {
+      W.appendChild(mk('p', 'gxst-stars', starTxt(S.stars)));
+      W.appendChild(mk('p', 'gxst-say', s.debrief));
+      W.appendChild(mk('p', 'gxst-rule', 'Rule: ' + s.rule));
+      ft.appendChild(btn('gxst-btn', 'Retry', null, function () { GXST.retry(); })); ft.appendChild(mk('span', 'gxst-sp'));
+      ft.appendChild(btn('gxst-btn pri', S.i < C.scenarios.length - 1 ? 'Next lesson' : 'All lessons', null, function () { GXST.next(); }));
+    } else if (S.phase === 'fail') {
+      W.appendChild(mk('p', 'gxst-say', 'Not quite.'));
+      W.appendChild(mk('p', 'gxst-msg', S.msg));
+      ft.appendChild(btn('gxst-btn', 'Lessons', null, function () { GXST.picker(); })); ft.appendChild(mk('span', 'gxst-sp'));
+      ft.appendChild(btn('gxst-btn pri', 'Retry', null, function () { GXST.retry(); }));
+    }
+    if (ft.children.length) W.appendChild(ft);
+    place();
+  }
+  function hintTarget() { var s = cur(); if (!s || S.phase !== 'play' || S.hint < 2) return null; var h = s.hints[S.hint - 1]; return h && typeof h === 'object' ? vis(find(h.target)) : null; }
+  // keep the card off the hinted target and the keepClear areas; a dragged position is kept unless it covers the hinted target
+  function place() {
+    if (!W) return; var vw = innerWidth, vh = innerHeight, bw = W.offsetWidth, bh = W.offsetHeight, t = hintTarget(), av = [];
+    (C.keepClear || []).forEach(function (sel) { var a; try { a = D.querySelectorAll(sel); } catch (e) { a = []; } for (var i = 0; i < a.length; i++) { var r = vis(a[i]); if (r) av.push(r); } });
+    function clamp(p) { return [Math.max(4, Math.min(vw - bw - 4, p[0])), Math.max(4, Math.min(vh - bh - 4, p[1]))]; }
+    function box(p) { return { left: p[0], top: p[1], right: p[0] + bw, bottom: p[1] + bh }; }
+    function cost(p) { var b = box(p), c = t && hit(b, t) ? 1e6 : 0; av.forEach(function (r) { var x = Math.min(b.right, r.right) - Math.max(b.left, r.left), y = Math.min(b.bottom, r.bottom) - Math.max(b.top, r.top); if (x > 0 && y > 0) c += x * y; }); return c; }
+    if (S.pos && !(S.min && C.phoneSlot && vw < 600)) { var q = clamp(S.pos); if (!(t && hit(box(q), t))) return put(q); }
+    var top = 4, bar = $('.gx-bar'); if (bar) { var br = bar.getBoundingClientRect(); if (br.top < 4 && br.height < 90) top = br.bottom + 6; }
+    var sp = [[8, top], [vw - bw - 8, top], [vw - bw - 8, vh - bh - 8], [8, vh - bh - 8]];
+    av.concat(t ? [t] : []).forEach(function (r) { sp.push([8, r.bottom + 6], [vw - bw - 8, r.bottom + 6], [8, r.top - bh - 6], [r.right + 6, r.top]); });
+    var best = null; sp.forEach(function (p, i) { p = clamp(p); var c = cost(p) + i * 0.01; if (!best || c < best.c) best = { p: p, c: c }; });
+    if (S.min && C.phoneSlot && vw < 600) {   // phone chip: keep the card's own spot when it is clear (no jump on open); else the chip gets a band just under phoneSlot.after or just above phoneSlot.before, never over phoneSlot.avoid items or the dock
+      var ps = C.phoneSlot, an = vis($(ps.after)), bf = vis($(ps.before)), ob = [], cs = [best.p];
+      (ps.avoid || []).forEach(function (sel) { var a; try { a = D.querySelectorAll(sel); } catch (e) { a = []; } for (var i = 0; i < a.length; i++) { var r = vis(a[i]); if (r) ob.push(r); } });
+      if (an) cs.push([8, an.bottom + 4]); if (bf) cs.push([8, bf.top - bh - 6]);
+      var pb = null; cs.forEach(function (c, k) { c = clamp(c); var b = box(c), v = t && hit(b, t) ? 1e6 : 0; ob.forEach(function (r) { if (hit(b, r)) v += 1; }); if (bf && b.bottom > bf.top) v += 1; if (!pb || v < pb.v) pb = { p: c, v: v }; });
+      if (pb && pb.v < 1e6) { W.style.left = '8px'; return put(pb.p); }
+    }
+    var cx = C.keepPlace && W.style.left ? clamp([parseFloat(W.style.left), parseFloat(W.style.top)]) : null;   // stay where you are unless somewhere is clearly better: a card that jumps while you reach for Retry is worse than a small overlap (opt-in: keepPlace)
+    if (cx && cost(cx) <= best.c + 0.5) best = { p: cx, c: 0 };
+    put(best.p);
+  }
+  function put(p) { W.style.left = Math.round(p[0]) + 'px'; W.style.top = Math.round(p[1]) + 'px'; }
+  function wireDrag() {
+    W.addEventListener('pointerdown', function (e) { if (!e.target.closest('.gxst-hd') || e.target.closest('button')) return; var r = W.getBoundingClientRect(); drag = [e.clientX - r.left, e.clientY - r.top, false]; try { W.setPointerCapture(e.pointerId); } catch (x) { } });
+    W.addEventListener('pointermove', function (e) { if (!drag) return; drag[2] = true; S.pos = [e.clientX - drag[0], e.clientY - drag[1]]; put(S.pos); });
+    W.addEventListener('pointerup', function () { if (drag && drag[2]) { save(); place(); } drag = null; });
+  }
+  // ------------------------------------------------------------ the "show me" ring: pointer-events none, never steals a tap
+  function ring() {
+    var t = S && S.open ? hintTarget() : null;
+    if (!t) { if (R) { R.remove(); R = null; } return; }
+    if (!R) { R = mk('div', 'gxst-ring'); D.body.appendChild(R); }
+    R.style.left = (t.left - 4) + 'px'; R.style.top = (t.top - 4) + 'px'; R.style.width = (t.width + 8) + 'px'; R.style.height = (t.height + 8) + 'px';
+  }
+  // ------------------------------------------------------------ judge: success / fail only when the game has settled (animations done)
+  function loop() {
+    if (!S || !S.open) return;
+    var s = cur();
+    if (S.phase === 'play' && S.live && call(C.settled, true)) {
+      if (call(s.success, false)) { S.stars = stars(); if ((S.best[s.id] || 0) < S.stars) S.best[s.id] = S.stars; S.phase = 'win'; S.min = false; save(); render(); emit('win', { id: s.id, stars: S.stars }); return; }
+      var f = call(s.fail, false); if (f) { S.phase = 'fail'; S.msg = String(f); S.min = false; render(); emit('fail', { id: s.id, msg: S.msg }); return; }
+    }
+    if (!drag) place(); ring();
+  }
+  function begin(i, how) {
+    S.i = i; S.phase = 'play'; S.hint = 0; S.msg = ''; S.stars = 0; S.open = true; S.min = false; S.live = false;
+    var s = cur(), tok = ++S.tok; render();
+    var r = null; try { r = s.setup(); } catch (e) { console.error(e); }
+    var go = function () { if (tok === S.tok) { S.live = true; place(); emit(how, { id: s.id, i: i }); } };
+    if (r && typeof r.then === 'function') r.then(go, go); else go();
+  }
+  window.GXST = {
+    init: function (cfg) {
+      C = cfg; var o = load(); S = { open: false, phase: 'picker', i: -1, hint: 0, best: o.best || {}, pos: o.pos || null, min: false, live: false, tok: 0, msg: '', stars: 0 };
+      qBtn(); if (!tick) { tick = setInterval(loop, 250); addEventListener('resize', function () { if (S && S.open) render(); }); }
+      return GXST;
+    },
+    picker: function () { if (!C) return; qBtn(); S.open = true; S.phase = 'picker'; S.min = false; S.tok++; S.live = false; render(); emit('picker', {}); },
+    start: function (id) { var i = typeof id === 'number' ? id : sc(id); if (i < 0) return; begin(i, 'start'); },
+    retry: function () { if (S.i < 0) return; begin(S.i, 'retry'); },
+    next: function () { if (S.i < C.scenarios.length - 1) begin(S.i + 1, 'start'); else GXST.picker(); },
+    hint: function () { var s = cur(); if (!s || S.phase !== 'play' || S.hint >= s.hints.length) return; S.hint++; render(); ring(); emit('hint', { id: s.id, level: S.hint }); },
+    close: function () { if (!S || !S.open) return; S.open = false; S.live = false; S.tok++; render(); emit('close', {}); },
+    active: function () { var s = S && S.open && S.phase !== 'picker' ? cur() : null; return s; },
+    state: function () {
+      if (!S) return null; var s = cur(), wr = W && vis(W), tr = hintTarget();
+      return { open: S.open, phase: S.phase, id: s && S.phase !== 'picker' ? s.id : null, i: S.i, live: S.live, hint: S.hint, stars: S.stars, msg: S.msg,
+        best: JSON.parse(JSON.stringify(S.best)), min: S.min, pos: S.pos, card: wr, target: tr, overlap: !!(wr && tr && hit(wr, tr)), count: C.scenarios.length };
+    }
+  };
+})();
+
+</script>
+<script>
 // ui1: page state, icons, the map (SVG over the mosaic), the camera (pan, pinch, wheel, follow) and the dock (prompt, storehouse, hand).
 var G = null;
 var D = VTD;
@@ -2315,7 +2507,7 @@ function showTitle() {
   s.hidden = false;
   $('#tlvl').onclick = function () { var L = ['easy', 'normal', 'hard']; UI.lvl = L[(L.indexOf(UI.lvl) + 1) % 3]; LS.set('lvl', UI.lvl); showTitle(); };
   var c = $('#tcont'); if (c) c.onclick = function () { var o = JSON.parse(LS.get('save')); G = o.G; UI.mode = o.mode; UI.lvl = o.lvl; UI.learn = o.learn; UI.tipsSeen = {}; s.hidden = true; buildMap(); setView({ x: 0, y: 0, w: VTART.W }); homeView(); render(); if (!isHuman(VT.sideToAct(G))) setTimeout(runAI, 600); };
-  $('#tlearn').onclick = function () { UI.lvl = 'easy'; startGame('vs', { learn: true, lvl: 'easy' }); };
+  $('#tlearn').onclick = function () { $('#start').hidden = true; GXST.picker(); };
   $('#tvs').onclick = function () { startGame('vs', { lvl: UI.lvl }); };
   $('#thot').onclick = function () { startGame('hot', {}); };
   $('#trules').onclick = function () { showRules(); };
@@ -2663,7 +2855,7 @@ startGame = function (mode, o) {
   TUT.on = !!(o && o.learn);   // set first, so the old one-line tips stay quiet in a Learn game
   var r = _tutStart.apply(this, arguments);
   TUT.done = {}; TUT.started = !!(o && o.learn);
-  if (o && o.learn) tutOpen(0); else tutClose();
+  tutClose();   // never auto-open: lessons are opened from the title / ? button (lessons.js, GXST.picker)
   return r;
 };
 var _tutScore = showScoreNow; showScoreNow = function () { var r = _tutScore.apply(this, arguments); tutEvent('points'); return r; };
@@ -2671,8 +2863,574 @@ var _tutResult = showResult; showResult = function () { var r = _tutResult.apply
 var _tutTitle = showTitle; showTitle = function () { var r = _tutTitle.apply(this, arguments); tutDraw(); return r; };
 var _tutTip = tip; tip = function () { if (TUT.on) return; return _tutTip.apply(this, arguments); };   // the window replaces the old one-line tips
 var _tutRender = render; render = function () { var r = _tutRender.apply(this, arguments); if (TUT.on) setTimeout(function () { tutPlace(false); }, 0); return r; };
-window.addEventListener('load', function () { var hb = $('#helpb'); if (hb) { hb.setAttribute('aria-label', 'Help: lessons and the labelled screen'); hb.onclick = function () { if (G) tutOpen(0); else showRules(); }; } });
+window.addEventListener('load', function () { var hb = $('#helpb'); if (hb) { hb.setAttribute('aria-label', 'Help: lessons and the labelled screen'); hb.onclick = function () { if (window.GXST && GXST.state()) GXST.picker(); else showRules(); }; } });
 VTUI.startGame = startGame; VTUI.move = move; VTUI.render = render; VTUI.TUT = TUT; VTUI.LESSONS = LESSONS; VTUI.tutNext = tutNext; VTUI.tutOpen = tutOpen;
+
+</script>
+<script>
+// lessons-a.js: two scenario lessons for the scenario tutor (shell/gx-scenario-tutor.js, docs shell/GXST.md).
+// Each lesson is a real game on the real board (VTUI.startGame), staged so that ONE move solves it and the tempting wrong move fails.
+// Pushed onto window.VTSCN. ES5. Helpers stay inside this IIFE. Nothing is saved here; the tutor guards saves while GXST.active().
+(function () {
+  'use strict';
+  window.VTSCN = window.VTSCN || [];
+
+  var counted = 0, turn0 = 0, coins0 = 0, wired = false;
+
+  // id of the START_HAND card with this action
+  function cardId(act) {
+    var ids = VT.D.START_HAND;
+    for (var i = 0; i < ids.length; i++) if (VT.D.CARDS[ids[i]].act === act) return ids[i];
+    return -1;
+  }
+  function cardName(id) { return id == null ? 'no card' : VT.D.CARDS[id].n; }
+  function live() { return !!(window.GXST && GXST.active()); }
+  function sig() { return JSON.stringify([G.pl[0], G.pend, G.cur, G.phase, G.turn]); }
+
+  // count the player's own applied moves (taps and scripted calls both pass through VTUI.move)
+  function wire() {
+    if (wired || typeof VTUI === 'undefined') return;
+    wired = true;
+    var orig = VTUI.move;
+    VTUI.move = function () {
+      if (!live()) return orig.apply(this, arguments);
+      var b = sig(), r = orig.apply(this, arguments);
+      if (sig() !== b) counted++;
+      return r;
+    };
+  }
+
+  // a fresh real game, the player to act first (same start as scn.js)
+  function start(seed) {
+    VTUI.UI.fast = true;
+    VTUI.startGame('vs', { lvl: 'easy', seed: seed, first: 0 });
+    return new Promise(function (r) { setTimeout(r, 400); });
+  }
+  function settle() { return !VTUI.UI.busy; }
+  // the player's turn is over (the rival may already have moved; the judge runs only when settled)
+  function turnOver() { return G.turn > turn0; }
+
+  // ------------------------------------------------------------ Play a card: gain 3 coins this turn
+  // Start: hand = Trader, Herald, Governor. Trader gives 3 coins; Herald with an empty pile gives none.
+  // Tempting wrong: Herald (nothing to take back) or Governor (goods, no coins): the turn ends with 0 coins gained.
+  window.VTSCN.push({
+    id: 'play',
+    title: 'Play a card',
+    rule: 'One card per turn. A played card leaves your hand until a Herald brings it back.',
+    goal: 'Gain 3 coins this turn',
+    setup: function () {
+      wire();
+      return start(21).then(function () {
+        var p = G.pl[0];
+        p.hand = [cardId('trib'), cardId('merc'), cardId('pref')];
+        p.disc = [];
+        G.lastPlayed = null;
+        turn0 = G.turn; counted = 0; coins0 = p.coins;
+        VTUI.render();
+      });
+    },
+    success: function () { return settle() && G.pl[0].coins - coins0 >= 3; },
+    fail: function () {
+      if (!counted || !turnOver() || G.pl[0].coins - coins0 >= 3) return false;
+      return 'Played the ' + cardName(G.lastPlayed) + ', not the Trader: no coins came in, so the turn ended with ' + (G.pl[0].coins - coins0) + ' gained.';
+    },
+    par: 1,
+    moves: function () { return counted; },
+    hints: [
+      'Only one card can be played this turn. Which one pays coins?',
+      { say: 'Play the Trader for its coins.', target: '#hand .cd[data-i="1"]' }
+    ],
+    debrief: 'The Trader pays 3 coins; a played card then waits in your played pile until a Herald returns it.'
+  });
+
+  // ------------------------------------------------------------ Builder: move a cart next to a free city
+  // Start: one cart on the map, Builder in hand. The Builder steps carts along roads, one step per road.
+  // Tempting wrong: Builder then Build (no step taken): the cart stays where it was.
+  window.VTSCN.push({
+    id: 'move',
+    title: 'Builder: move',
+    rule: 'Builder steps your carts and ships along roads, then lets you build.',
+    goal: 'Put a cart next to a free city',
+    setup: function () {
+      wire();
+      return start(22).then(function () {
+        var p = G.pl[0], D = VT.D;
+        p.hand = [cardId('arch'), cardId('pref'), cardId('merc')];
+        p.disc = [];
+        p.cols = [
+          { t: 'L', at: { c: D.CAPITAL } }, { t: 'S', at: null }, { t: 'L', at: null },
+          { t: 'L', at: null }, { t: 'S', at: null }, { t: 'S', at: null }];
+        G.lastPlayed = null;
+        turn0 = G.turn; counted = 0;
+        VTUI.render();
+      });
+    },
+    success: function () {
+      if (!settle()) return false;
+      var p = G.pl[0], D = VT.D;
+      return p.cols.some(function (c) {
+        if (!c.at || c.at.r == null) return false;
+        var rt = D.ROUTES.filter(function (r) { return r.id === c.at.r; })[0];
+        return !!rt && G.city[rt.a] && !G.city[rt.a].houses && G.city[rt.b] && !G.city[rt.b].houses;
+      }) || false;
+    },
+    fail: function () {
+      if (!counted || !turnOver()) return false;
+      return 'Built without a Builder step: the cart stayed at Caput, so no city was reached and the turn ended.';
+    },
+    par: 2,
+    moves: function () { return counted; },
+    hints: [
+      'The Builder moves before it builds. Does your cart have to move first?',
+      { say: 'Play the Builder, then step your cart along a road.', target: '#hand .cd[data-i="0"]' }
+    ],
+    debrief: 'Steps come first: the Builder moves a cart along a road, and only then can you build beside it.'
+  });
+})();
+
+</script>
+<script>
+// lessons-b.js: two scenario lessons for the scenario tutor (shell/gx-scenario-tutor.js, docs shell/GXST.md).
+// Each lesson is a real game on the real board (VTUI.startGame), staged so that ONE move solves it and the tempting wrong move fails.
+// Pushed onto window.VTSCN. ES5. Helpers stay inside this IIFE. Nothing is saved while GXST.active().
+(function () {
+  'use strict';
+  window.VTSCN = window.VTSCN || [];
+
+  var counted = 0, turn0 = 0, wired = false;
+
+  // id of the START_HAND card with this action
+  function cardId(act) {
+    var ids = VT.D.START_HAND;
+    for (var i = 0; i < ids.length; i++) if (VT.D.CARDS[ids[i]].act === act) return ids[i];
+    return -1;
+  }
+  function cardName(id) { return id == null ? 'no card' : VT.D.CARDS[id].n; }
+  function live() { return !!(window.GXST && GXST.active()); }
+  function sig() { return JSON.stringify([G.pl[0], G.pend, G.cur, G.phase, G.turn]); }
+
+  // count the player's own applied moves (taps go through move(), scripted calls through VTUI.move)
+  function counting(orig) {
+    return function () {
+      if (!live()) return orig.apply(this, arguments);
+      var b = sig(), r = orig.apply(this, arguments);
+      if (sig() !== b) counted++;
+      return r;
+    };
+  }
+  function wire() {
+    if (wired || typeof VTUI === 'undefined' || typeof window.move !== 'function') return;
+    wired = true;
+    window.move = counting(window.move);
+    VTUI.move = counting(VTUI.move);
+  }
+
+  // a fresh real game, the player to act first (same start as scn.js)
+  function start(seed) {
+    VTUI.UI.fast = true;
+    VTUI.startGame('vs', { lvl: 'easy', seed: seed, first: 0 });
+    return new Promise(function (r) { setTimeout(r, 400); });
+  }
+  function settle() { return !VTUI.UI.busy; }
+  // the player's turn is over (the rival may already have moved; the judge runs only when settled)
+  function turnOver() { return G.turn > turn0; }
+
+  // ------------------------------------------------------------ Builder: build
+  // Start: Builder already played, its cart already beside a city, so the only choice left is the build.
+  // Tempting wrong: skip the build (done): the turn ends with no new house.
+  window.VTSCN.push({
+    id: 'build',
+    title: 'Builder: build',
+    rule: 'Builder moves carts, then builds a house in a city next to a cart. Paying is part of the build.',
+    goal: 'Build one house',
+    setup: function () {
+      wire();
+      return start(21).then(function () {
+        var p = G.pl[0], D = VT.D, route = null, i;
+        for (i = 0; i < D.ROUTES.length && !route; i++) {
+          var r = D.ROUTES[i];
+          if (r.t === 'land' && (G.city[r.a] || G.city[r.b])) route = r;
+        }
+        p.hand = [cardId('arch'), cardId('pref'), cardId('merc'), cardId('sen'), cardId('cons'), cardId('colo'), cardId('dipl')];
+        p.disc = [];
+        p.houses = [];
+        p.goods = { brick: 3, food: 3, tool: 2, wine: 2, cloth: 2 };
+        p.coins = 20;
+        p.cols = [
+          { t: 'L', at: { r: route.id } }, { t: 'S', at: { c: D.CAPITAL } },
+          { t: 'L', at: null }, { t: 'L', at: null }, { t: 'S', at: null }, { t: 'S', at: null }];
+        G.lastPlayed = null;
+        VTUI.move({ t: 'play', i: 0 });
+        VTUI.move({ t: 'mdone' });
+        turn0 = G.turn; counted = 0;
+        VTUI.render();
+      });
+    },
+    success: function () { return settle() && G.pl[0].houses.length >= 1; },
+    fail: function () {
+      if (!counted || !turnOver() || G.pl[0].houses.length >= 1) return false;
+      return 'Skipped the build: the turn ended with no new house, so the Builder paid nothing and placed nothing.';
+    },
+    par: 1,
+    moves: function () { return counted; },
+    hints: [
+      'The cart is already next to a city. A house needs that city and coins plus goods.',
+      { say: 'Tap the lit city next to your cart to build there.', target: '.city.glow' }
+    ],
+    debrief: 'A Builder turn is only worth it if you build: the cart is already in place.'
+  });
+
+  // ------------------------------------------------------------ Governor: produce
+  // Start: Governor in hand. Two provinces: one with 1 house of yours, one with 3 houses of yours.
+  // Each house makes 1 good for its owner, and the Governor adds the province bonus good (1). 3 houses + 1 = 4 goods.
+  // Tempting wrong: the 1-house province: 1 + 1 = 2 goods, and the turn ends short of 4.
+  window.VTSCN.push({
+    id: 'produce',
+    title: 'Governor: produce',
+    rule: 'Governor rules a province: each house there makes one good for its owner, plus the province bonus good.',
+    goal: 'Gain 4 goods in one turn',
+    setup: function () {
+      wire();
+      return start(22).then(function () {
+        var p = G.pl[0], D = VT.D, big = null, small = null, i, pv;
+        function cities(id) { return D.CITIES.filter(function (c) { return c.p === id && G.city[c.id]; }); }
+        for (i = 0; i < D.PROVS.length; i++) {
+          pv = D.PROVS[i];
+          if (!big && cities(pv.id).length >= 3) big = pv;
+        }
+        for (i = 0; i < D.PROVS.length; i++) {
+          pv = D.PROVS[i];
+          if (pv !== big && !small && cities(pv.id).length >= 1) small = pv;
+        }
+        p.hand = [cardId('pref'), cardId('arch'), cardId('merc'), cardId('sen'), cardId('cons'), cardId('colo'), cardId('dipl')];
+        p.disc = [];
+        p.goods = { brick: 0, food: 0, tool: 0, wine: 0, cloth: 0 };
+        p.coins = 0;
+        p.houses = [];
+        p.cols = [
+          { t: 'L', at: null }, { t: 'L', at: null }, { t: 'L', at: null }, { t: 'S', at: null }, { t: 'S', at: null }, { t: 'S', at: null }];
+        // the Grand Governor doubles the bonus; keep it with the rival so the player gets the plain bonus (1)
+        G.pm = 1;
+        D.PROVS.forEach(function (q) { G.prov[q.id] = { g: 'wine', up: true }; });
+        cities(big.id).slice(0, 3).forEach(function (c) { G.city[c.id].h.push(0); p.houses.push(c.id); });
+        cities(small.id).slice(0, 1).forEach(function (c) { G.city[c.id].h.push(0); p.houses.push(c.id); });
+        G.lastPlayed = null;
+        turn0 = G.turn; counted = 0;
+        VTUI.render();
+      });
+    },
+    success: function () { return settle() && VT.nGoods(G.pl[0]) >= 4; },
+    fail: function () {
+      if (!counted || !turnOver() || VT.nGoods(G.pl[0]) >= 4) return false;
+      return 'Ruled the one-house province: it gave 1 good plus the bonus, so the turn ended with ' + VT.nGoods(G.pl[0]) + ' goods, not 4.';
+    },
+    par: 2,
+    moves: function () { return counted; },
+    hints: [
+      'Count the houses in each province. Only the bonus is added once per province.',
+      { say: 'Play the Governor, then rule the province with 3 houses.', target: '.prov.glow' }
+    ],
+    debrief: 'Houses in a ruled province each make a good; the bonus good adds one more.'
+  });
+})();
+
+</script>
+<script>
+// lessons-c.js: two scenario lessons for the scenario tutor (shell/gx-scenario-tutor.js, docs shell/GXST.md).
+// Each lesson is a real game on the real board (VTUI.startGame), staged so that ONE correct move solves it and the tempting wrong move fails.
+// Pushed onto window.VTSCN. ES5. Helpers stay inside this IIFE. Saves are guarded while GXST.active().
+(function () {
+  'use strict';
+  window.VTSCN = window.VTSCN || [];
+
+  var counted = 0, turn0 = 0, wired = false;
+
+  // id of the START_HAND card with this action (every starting card has a unique id)
+  function cardId(act) {
+    var ids = VT.D.START_HAND;
+    for (var i = 0; i < ids.length; i++) if (VT.D.CARDS[ids[i]].act === act) return ids[i];
+    return -1;
+  }
+  // first card with this action in this market deck (deck 1 or 2)
+  function marketId(act, deck, extra) {
+    var cs = VT.D.CARDS;
+    for (var i = 0; i < cs.length; i++) {
+      if (cs[i].act === act && cs[i].deck === deck && (!extra || extra(cs[i]))) return cs[i].id;
+    }
+    return -1;
+  }
+  function cardName(id) { return id == null ? 'no card' : VT.D.CARDS[id].n; }
+  function live() { return !!(window.GXST && GXST.active()); }
+  function sig() { return JSON.stringify([G.pl[0], G.pend, G.cur, G.phase, G.turn]); }
+
+  // count the player's own applied moves: taps go through move(), scripted calls through VTUI.move; the AI never uses either
+  function counting(orig) {
+    return function () {
+      if (!live()) return orig.apply(this, arguments);
+      var b = sig(), r = orig.apply(this, arguments);
+      if (sig() !== b) counted++;
+      return r;
+    };
+  }
+  function wire() {
+    if (wired || typeof VTUI === 'undefined' || typeof window.move !== 'function') return;
+    wired = true;
+    window.move = counting(window.move);
+    VTUI.move = counting(VTUI.move);
+  }
+
+  // a fresh real game, the player to act first (same start as scn.js)
+  function start(seed) {
+    VTUI.UI.fast = true;
+    VTUI.startGame('vs', { lvl: 'easy', seed: seed, first: 0 });
+    return new Promise(function (r) { setTimeout(r, 400); });
+  }
+  function settle() { return !VTUI.UI.busy; }
+  // the player's turn is over (the rival may already have moved, the judge runs only when settled)
+  function turnOver() { return G.turn > turn0; }
+  function coinsOf() { return G.pl[0].coins; }
+
+  // ------------------------------------------------------------ Trader: 12 coins by the end of the turn
+  // Start: 1 coin, 1 brick, 1 grain, 1 wine. Trader gives 3 coins: 4 coins. Need 12.
+  // Tempting wrong: sell brick + grain (3 + 4): 4 + 7 = 11, short. Right: sell wine + brick (6 + 3): 4 + 9 = 13.
+  window.VTSCN.push({
+    id: 'trade',
+    title: 'Trader',
+    rule: 'Trader takes 3 coins, then trades up to 2 kinds of goods at printed prices: brick 3, grain 4, tools 5, wine 6, cloth 7.',
+    goal: 'Finish with 12 coins or more',
+    setup: function () {
+      wire();
+      return start(13).then(function () {
+        var p = G.pl[0];
+        p.hand = [cardId('merc'), cardId('sen'), cardId('arch'), cardId('pref'), cardId('trib'), cardId('dipl'), cardId('colo')];
+        p.disc = [];
+        p.coins = 1;
+        p.goods = { brick: 1, food: 1, tool: 0, wine: 1, cloth: 0 };
+        G.lastPlayed = null;
+        turn0 = G.turn; counted = 0;
+        VTUI.render();
+      });
+    },
+    success: function () { return settle() && coinsOf() >= 12; },
+    fail: function () {
+      if (!counted || !turnOver() || coinsOf() >= 12) return false;
+      if (G.lastPlayed !== cardId('merc')) return 'Played the ' + cardName(G.lastPlayed) + ', not the Trader: no goods were sold, so you ended with ' + coinsOf() + ' coins.';
+      return 'Sold the cheap kinds (brick and grain): you ended with ' + coinsOf() + ' coins, short of 12. Wine and brick reach 13.';
+    },
+    par: 2,
+    moves: function () { return counted; },
+    hints: [
+      'Trader pays coins first. Then the sales decide the total.',
+      { say: 'Play the Trader, then sell the two kinds that pay the most.', target: '#hand .cd[data-i="0"]' }
+    ],
+    debrief: 'Selling your two priciest kinds raises the total; the cheap kinds fall short.'
+  });
+
+  // ------------------------------------------------------------ Patron: buy the Wing card
+  // Market slot 0 is free; slot 1 costs one extra good of your choice. Player holds 1 grain + 1 wine.
+  // Wing card (Trader, deck I) costs wine + any 1 good at slot 1 = 2 goods. Settler at slot 0 costs only 1 grain.
+  // Tempting wrong: buy the free Settler first: only wine is left and the Wing needs 2 goods.
+  window.VTSCN.push({
+    id: 'buy',
+    title: 'Patron',
+    rule: 'Patron buys up to 2 market cards. A card costs its printed goods plus the extra for its slot.',
+    goal: 'Buy the Wing card',
+    setup: function () {
+      wire();
+      return start(14).then(function () {
+        var p = G.pl[0], D = VT.D;
+        p.hand = [cardId('sen'), cardId('merc'), cardId('arch'), cardId('pref'), cardId('trib'), cardId('dipl'), cardId('colo')];
+        p.disc = [];
+        p.coins = 6;
+        p.goods = { brick: 0, food: 1, tool: 0, wine: 1, cloth: 0 };
+        var wing = marketId('merc', 1);
+        var settler = marketId('colo', 1);
+        var tool = marketId('spec', 1, function (c) { return c.spec === 'tool'; });
+        var arch2 = marketId('arch', 2);
+        var cons2 = marketId('cons', 2);
+        G.disp = [settler, wing, arch2, cons2, tool, marketId('arch', 1), marketId('spec', 2, function (c) { return c.spec === 'wine'; })];
+        G.lastPlayed = null;
+        turn0 = G.turn; counted = 0;
+        VTUI.render();
+      });
+    },
+    success: function () {
+      var wing = marketId('merc', 1);
+      return settle() && G.pl[0].hand.indexOf(wing) >= 0;
+    },
+    fail: function () {
+      if (!counted || !turnOver() || G.pl[0].hand.indexOf(marketId('merc', 1)) >= 0) return false;
+      if (G.lastPlayed !== cardId('sen')) return 'Played the ' + cardName(G.lastPlayed) + ', not the Patron: no card was bought.';
+      return 'Bought the free Settler first: only wine was left, and the Wing needs 2 goods, so the Wing stayed in the market.';
+    },
+    par: 2,
+    moves: function () { return counted; },
+    hints: [
+      'Two cards cost little. Only one of them is the Wing.',
+      { say: 'Play the Patron, then buy the Wing in the second market slot (the one with an extra good).', target: '#mktb' }
+    ],
+    debrief: 'Buying the cheap card first leaves too few goods for the Wing: check what is left before you buy.'
+  });
+})();
+
+</script>
+<script>
+// lessons-d.js: two scenario lessons for the scenario tutor (shell/gx-scenario-tutor.js, docs shell/GXST.md).
+// Each lesson is a real game on the real board (VTUI.startGame), staged so that ONE move solves it and the tempting wrong move fails.
+// Pushed onto window.VTSCN. ES5. Helpers stay inside this IIFE. Saves are guarded by lessons.js while GXST.active().
+(function () {
+  'use strict';
+  window.VTSCN = window.VTSCN || [];
+
+  var counted = 0, turn0 = 0, wired = false;
+
+  // id of the START_HAND card with this action (every starting card has a unique id)
+  function cardId(act) {
+    var ids = VT.D.START_HAND;
+    for (var i = 0; i < ids.length; i++) if (VT.D.CARDS[ids[i]].act === act) return ids[i];
+    return -1;
+  }
+  function cardName(id) { return id == null ? 'no card' : VT.D.CARDS[id].n; }
+  function live() { return !!(window.GXST && GXST.active()); }
+  function sig() { return JSON.stringify([G.pl[0], G.pend, G.cur, G.phase, G.turn]); }
+
+  // count the player's own applied moves: taps go through move(), scripted calls through VTUI.move; the AI never uses either
+  function counting(orig) {
+    return function () {
+      if (!live()) return orig.apply(this, arguments);
+      var b = sig(), r = orig.apply(this, arguments);
+      if (sig() !== b) counted++;
+      return r;
+    };
+  }
+  function wire() {
+    if (wired || typeof VTUI === 'undefined' || typeof window.move !== 'function') return;
+    wired = true;
+    window.move = counting(window.move);
+    VTUI.move = counting(VTUI.move);
+  }
+
+  // a fresh real game, the player to act first (same start as scn.js)
+  function start(seed) {
+    VTUI.UI.fast = true;
+    VTUI.startGame('vs', { lvl: 'easy', seed: seed, first: 0 });
+    return new Promise(function (r) { setTimeout(r, 400); });
+  }
+  function settle() { return !VTUI.UI.busy; }
+  function onMap() { return VT.onBoard(G.pl[0]); }
+  // the player's turn is over (the rival may already have moved, the judge runs only when settled)
+  function turnOver() { return G.turn > turn0; }
+
+  // ------------------------------------------------------------ Settler: 3 carts or ships on the map
+  // Start: 2 pieces on the map, 1 spare cart at home, 2 grain and 2 tools. Settler + place the spare cart from Caput = 3.
+  // Tempting wrong: Settler for the 5 coins (or no piece): the turn ends with 2 on the map.
+  window.VTSCN.push({
+    id: 'settle',
+    title: 'Settler',
+    rule: 'Settler sends a cart or ship for 1 grain + 1 tool each, or takes coins instead of a piece.',
+    goal: 'Have 3 carts or ships on the map',
+    setup: function () {
+      wire();
+      return start(11).then(function () {
+        var p = G.pl[0], D = VT.D;
+        p.hand = [cardId('colo'), cardId('trib'), cardId('arch'), cardId('pref'), cardId('merc'), cardId('dipl'), cardId('sen')];
+        p.disc = [];
+        p.goods = { brick: 0, food: 2, tool: 2, wine: 0, cloth: 0 };
+        p.cols = [
+          { t: 'L', at: { c: D.CAPITAL } }, { t: 'S', at: { c: D.CAPITAL } },
+          { t: 'L', at: null }, { t: 'L', at: null }, { t: 'S', at: null }, { t: 'S', at: null }];
+        G.lastPlayed = null;
+        turn0 = G.turn; counted = 0;
+        VTUI.render();
+      });
+    },
+    success: function () { return settle() && onMap() >= 3; },
+    fail: function () {
+      if (!counted || !turnOver() || onMap() >= 3) return false;
+      if (G.lastPlayed === cardId('colo')) return 'The Settler sent no piece (coins or nothing): the turn ended with ' + onMap() + ' of 3 on the map.';
+      return 'Played the ' + cardName(G.lastPlayed) + ', not the Settler: no piece was sent, so the turn ended with ' + onMap() + ' of 3 on the map.';
+    },
+    par: 2,
+    moves: function () { return counted; },
+    hints: [
+      'The Settler has two options. Only one of them puts a piece on the map.',
+      { say: 'Play the Settler, then send your spare cart from Caput.', target: '#map .city[data-c="caput"]' }
+    ],
+    debrief: 'Paying 1 grain and 1 tool puts a piece on the map; the 5 coins do not.'
+  });
+
+  // ------------------------------------------------------------ Herald: 3 cards in hand again
+  // Start: 2 cards in hand, 5 played. Herald takes the whole played pile back: hand = 7.
+  // Tempting wrong: Governor (the pile stays out and the hand ends at 1 card).
+  window.VTSCN.push({
+    id: 'herald',
+    title: 'Herald',
+    rule: 'Herald takes your whole played pile back into hand, then pays 1 coin per card over 3.',
+    goal: 'Have 3 cards in hand again',
+    setup: function () {
+      wire();
+      return start(12).then(function () {
+        var p = G.pl[0], D = VT.D;
+        p.hand = [cardId('trib'), cardId('pref')];
+        p.disc = [cardId('arch'), cardId('dipl'), cardId('sen'), cardId('merc'), cardId('colo')];
+        p.cols = [
+          { t: 'L', at: { c: D.CAPITAL } }, { t: 'S', at: { c: D.CAPITAL } },
+          { t: 'L', at: null }, { t: 'L', at: null }, { t: 'S', at: null }, { t: 'S', at: null }];
+        G.lastPlayed = null;
+        turn0 = G.turn; counted = 0;
+        VTUI.render();
+      });
+    },
+    success: function () { return settle() && G.pl[0].hand.length >= 3; },
+    fail: function () {
+      if (!counted || !turnOver() || G.pl[0].hand.length >= 3) return false;
+      return 'Played the ' + cardName(G.lastPlayed) + ', not the Herald: the pile stays out, and your hand ends at ' + G.pl[0].hand.length + ' cards.';
+    },
+    par: 1,
+    moves: function () { return counted; },
+    hints: [
+      'Your played pile is not lost. Which card brings it back?',
+      { say: 'Play the Herald: it takes all played cards back into hand.', target: '#hand .cd[data-i="0"]' }
+    ],
+    debrief: 'The Herald returns the whole pile at once; each card over three pays 1 coin.'
+  });
+})();
+
+</script>
+<script>
+// lessons.js: wires the scenario tutor (shell/gx-scenario-tutor.js) to Via Tessera. Scenarios come from window.VTSCN
+// (lessons-a.js, lessons-b.js; both optional). ES5. Loaded last, after ui.js.
+// Title "Learn to play" and the ? button open the lesson picker (GXST.picker). ?lesson=<id> starts one lesson directly.
+(function () {
+  'use strict';
+  function ready() {
+    return typeof VTUI !== 'undefined' && typeof VT !== 'undefined' && typeof G !== 'undefined';
+  }
+  var go = function () {
+    if (!ready()) { setTimeout(go, 200); return; }
+    // a lesson is a real game on the real board: never save over the player's game while one runs
+    var oSave = save;
+    save = function () { if (window.GXST && GXST.active()) return; return oSave.apply(this, arguments); };
+    GXST.init({
+      game: 'via-tessera',
+      scenarios: window.VTSCN || [],
+      keepClear: ['.gx-bar', '#hand', '#acts', '#map', '#store', '#prompt'],
+      settled: function () { return !VTUI.UI.busy; }
+    });
+    // ?lesson=<id>: start that lesson directly (after the page has loaded, so the title screen does not cover it)
+    var m = /[?&]lesson=([^&#]+)/.exec(location.search);
+    if (m) {
+      var id = decodeURIComponent(m[1]);
+      var launch = function () {
+        VTUI.startGame('vs', { lvl: 'easy', seed: 3, first: 0 });
+        GXST.start(id);
+      };
+      if (document.readyState === 'complete') setTimeout(launch, 0);
+      else addEventListener('load', function () { setTimeout(launch, 0); });
+    }
+  };
+  setTimeout(go, 200);
+})();
 
 </script>
 </body>

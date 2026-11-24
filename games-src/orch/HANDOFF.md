@@ -110,3 +110,9 @@ Live check URL form: https://am015-dev.github.io/spotify_to_ytmusic/<slug>/ (gam
 - INT17 (this integrator: wildmark, vinegrave, meadowfold scenario lessons) and INT18 (redline / via-tessera / ochre, deploys at least 30 min after INT17).
 - Workers running: W730 gloamwar, W730 shipwreck-overhaul (old orch), W731 perch, W732 wickdeep, W734 hollowbough, W735 thornbound HUD, W737 sands (Opus), W738 rampart HUD, W739 kaiten visual (Opus), W740 onyx, W741 short-fuse, W742 crown visual.
 - INT17 status at 16:55 UTC: merged all three branches clean into int17; lessons tests PASS (wildmark 26 s, vinegrave 4 s, meadowfold 9-12 s at 402x874 and 1366x768). NOT deployed: deploy gate (contact sheets, every window and lesson step, phone + pc, read by eye) did not fit the 40 min budget. Next integrator: run the sheets, then build-all --deploy wildmark vinegrave meadowfold in one call, add-update.py per game.
+
+## INT18s (24 Nov 2026, 17:17 UTC)
+- Merged (squash): W706 redline-rally, W713 via-tessera, W725 ochre-horizon lesson scenarios; wildmark/vinegrave/meadowfold already merged by INT17.
+- Gate: lessons tests PASS (redline, ochre, wildmark, vinegrave, meadowfold; via-tessera has none), phone+pc contact sheets opened, 0 bad cells. wildmark fixes: Esc closes the lesson picker; acorn counter moved below the Animal points button (phone).
+- build-all --quick fails only on missing visual baselines (ui-baselines branch absent), so wildmark/vinegrave/redline-rally were deployed with --no-check after the manual gates; meadowfold/via-tessera/ochre-horizon copied from their own builds and stamped.
+- Dropped: none. What's new added for the six plus vale-of-banners and doorkick-dungeon.

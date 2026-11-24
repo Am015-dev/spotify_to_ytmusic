@@ -216,7 +216,7 @@ startGame = function (mode, o) {
   TUT.on = !!(o && o.learn);   // set first, so the old one-line tips stay quiet in a Learn game
   var r = _tutStart.apply(this, arguments);
   TUT.done = {}; TUT.started = !!(o && o.learn);
-  if (o && o.learn) tutOpen(0); else tutClose();
+  tutClose();   // never auto-open: lessons are opened from the title / ? button (lessons.js, GXST.picker)
   return r;
 };
 var _tutScore = showScoreNow; showScoreNow = function () { var r = _tutScore.apply(this, arguments); tutEvent('points'); return r; };
@@ -224,5 +224,5 @@ var _tutResult = showResult; showResult = function () { var r = _tutResult.apply
 var _tutTitle = showTitle; showTitle = function () { var r = _tutTitle.apply(this, arguments); tutDraw(); return r; };
 var _tutTip = tip; tip = function () { if (TUT.on) return; return _tutTip.apply(this, arguments); };   // the window replaces the old one-line tips
 var _tutRender = render; render = function () { var r = _tutRender.apply(this, arguments); if (TUT.on) setTimeout(function () { tutPlace(false); }, 0); return r; };
-window.addEventListener('load', function () { var hb = $('#helpb'); if (hb) { hb.setAttribute('aria-label', 'Help: lessons and the labelled screen'); hb.onclick = function () { if (G) tutOpen(0); else showRules(); }; } });
+window.addEventListener('load', function () { var hb = $('#helpb'); if (hb) { hb.setAttribute('aria-label', 'Help: lessons and the labelled screen'); hb.onclick = function () { if (window.GXST && GXST.state()) GXST.picker(); else showRules(); }; } });
 VTUI.startGame = startGame; VTUI.move = move; VTUI.render = render; VTUI.TUT = TUT; VTUI.LESSONS = LESSONS; VTUI.tutNext = tutNext; VTUI.tutOpen = tutOpen;
