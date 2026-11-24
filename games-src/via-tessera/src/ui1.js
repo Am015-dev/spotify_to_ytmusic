@@ -180,20 +180,30 @@ function labelScale(k) {
 }
 function setView(v, anim) {
   var bb = boardBox(), asp = bb.h / bb.w;
-  v.w = Math.max(260, Math.min(1200, v.w)); v.h = v.w * asp;
+  v.w = Math.max(260, Math.min(2200, v.w)); v.h = v.w * asp;
   // keep some of the map in view
-  v.x = v.w >= VTART.W ? (VTART.W - v.w) / 2 : Math.max(0, Math.min(VTART.W - v.w, v.x)); v.y = v.h >= VTART.H ? (VTART.H - v.h) / 2 : Math.max(0, Math.min(VTART.H - v.h, v.y));   // the mosaic always fills the board
+  v.x = v.w >= VTART.W ? (VTART.W - v.w) / 2 : Math.max(0, Math.min(VTART.W - v.w, v.x)); var fb = freeBox(), kk = v.w / bb.w; v.y = v.h >= VTART.H + (fb.top + fb.bot) * kk ? (VTART.H - v.h) / 2 - (fb.top - fb.bot) * kk / 2 : Math.max(-fb.top * kk, Math.min(VTART.H - v.h + fb.bot * kk, v.y));   // the mosaic always fills the board
   UI.view = v;
   growHits(v.w / bb.w); labelScale(v.w / bb.w);
   $('#map').setAttribute('viewBox', v.x.toFixed(1) + ' ' + v.y.toFixed(1) + ' ' + v.w.toFixed(1) + ' ' + v.h.toFixed(1));
+}
+// the part of the board not covered by the buttons on top and the dock below
+function freeBox() {
+  var bb = boardBox(), r = $('#board').getBoundingClientRect(), top = 8, bot = 8;
+  var pr = $('#prompt').getBoundingClientRect(), rs = $('#race').getBoundingClientRect(), pw = $('.prow').getBoundingClientRect();
+  if (pr.height) top = Math.max(top, pr.bottom - r.top + 8);
+  if (rs.height && bb.w < 900) top = Math.max(top, rs.bottom - r.top + 8);
+  if (pw.height) bot = Math.max(bot, r.bottom - pw.top + 8);
+  return { w: bb.w, h: bb.h, top: top, bot: bot };
 }
 function fitPoints(pts, pad, minW) {
   if (!pts.length) return;
   var x0 = 1e9, y0 = 1e9, x1 = -1e9, y1 = -1e9;
   pts.forEach(function (p) { x0 = Math.min(x0, p.x); y0 = Math.min(y0, p.y); x1 = Math.max(x1, p.x); y1 = Math.max(y1, p.y); });
   pad = pad == null ? 70 : pad; x0 -= pad; y0 -= pad; x1 += pad; y1 += pad;
-  var bb = boardBox(), asp = bb.h / bb.w, w = Math.max(minW || 360, x1 - x0, (y1 - y0) / asp);
-  animView({ x: (x0 + x1) / 2 - w / 2, y: (y0 + y1) / 2 - w * asp / 2, w: w });
+  var fb = freeBox(), hv = Math.max(160, fb.h - fb.top - fb.bot), asp = fb.h / fb.w, w = Math.max(minW || 360, x1 - x0, (y1 - y0) / (hv / fb.w)), k = w / fb.w;
+  var cy = (y0 + y1) / 2 + ((fb.top + hv / 2) - fb.h / 2) * -k;   // put the middle of the points in the middle of the free area
+  animView({ x: (x0 + x1) / 2 - w / 2, y: cy - w * asp / 2, w: w });
 }
 var camAnim = null;
 function animView(to) {
@@ -210,7 +220,11 @@ function zoomBy(f, cx, cy) {
   setView({ x: cx - (cx - v.x) * k, y: cy - (cy - v.y) * k, w: w });
 }
 // first view: the whole map, with a margin so the outer labels stay inside
-function fitMap() { animView({ x: -59, y: 0, w: 1100 }); }
+function fitMap() {
+  var bb = boardBox();
+  if (bb.h / bb.w > 1.15) animView({ x: 170, y: 0, w: 640 });   // phone portrait: big readable map, drag to look around
+  else animView({ x: -135, y: 0, w: Math.max(1250, 600 * bb.w / Math.max(1, bb.h) * 1.12) });
+}
 function homeView() {
   fitMap(); return;
   var pts = [], p = G.pl[0];
@@ -228,6 +242,7 @@ function frameTargets() {
   var pi = VT.sideToAct(G);
   if (UI.selCol != null && pi >= 0) { var col = G.pl[pi].cols[UI.selCol]; if (col.at) pts.push(col.at.r != null ? { x: GEO[col.at.r].mx, y: GEO[col.at.r].my } : VT.CITY[col.at.c]); }
   for (var k in t.col) { var a = k.split(':'), cc = G.pl[+a[0]].cols[+a[1]]; if (cc.at) pts.push(cc.at.r != null ? { x: GEO[cc.at.r].mx, y: GEO[cc.at.r].my } : VT.CITY[cc.at.c]); }
+  var hm0 = UI.hint; if (hm0 && hm0.t === 'mv' && GEO[hm0.r]) pts.push({ x: GEO[hm0.r].mx, y: GEO[hm0.r].my });
   if (!pts.length) return;
   // too spread out for a phone: frame the few targets nearest the hint (or the middle of the current view)
   var x0 = Math.min.apply(null, pts.map(function (q) { return q.x; })), x1 = Math.max.apply(null, pts.map(function (q) { return q.x; }));
@@ -258,7 +273,7 @@ function wireCamera() {
       setView({ x: v0.x + fx * v0.w - fx * w, y: v0.y + fy * v0.h - fy * w * asp, w: w });
     }
   });
-  var up = function (e) { delete pts[e.pointerId]; start = Object.keys(pts).length ? { v: Object.assign({}, UI.view), pts: JSON.parse(JSON.stringify(pts)) } : null; };
+  var up = function (e) { if (e.type === 'pointerup' && !moved && UI.sheet && UI.sheetX && Object.keys(pts).length === 1) closeSheet(); delete pts[e.pointerId]; start = Object.keys(pts).length ? { v: Object.assign({}, UI.view), pts: JSON.parse(JSON.stringify(pts)) } : null; };
   svg.addEventListener('pointerup', up); svg.addEventListener('pointercancel', up);
   svg.addEventListener('click', function (e) { if (moved) { moved = false; e.stopPropagation(); return; } onMapTap(e); }, true);
   svg.addEventListener('wheel', function (e) { e.preventDefault(); var p = toMap(e.clientX, e.clientY); zoomBy(e.deltaY > 0 ? 1.15 : 1 / 1.15, p.x, p.y); }, { passive: false });
@@ -269,12 +284,15 @@ function wireCamera() {
 // ---------- the dock ----------
 function renderRace() {
   if (!G) return;
-  var h = '';
-  G.pl.forEach(function (p, i) {
-    var turn = G.phase === 'play' && VT.sideToAct(G) === i;
-    h += '<span class="chip' + (turn ? ' turn' : '') + '" role="button" tabindex="0" data-score="1" title="' + esc(p.name) + ' points now"><span class="dot" style="background:' + PCOL[i] + '"></span>' + esc(p.name) + ' <b data-engine-score="' + i + '">' + VT.score(G, i).total + '</b></span>';
+  var h = '', order = UI.mode === 'hot' ? [0, 1] : [1, 0], cur = G.phase === 'play' ? VT.sideToAct(G) : -1;
+  order.forEach(function (i) {
+    var p = G.pl[i], turn = cur === i, onmap = VT.onBoard(p), ships = p.cols.filter(function (c) { return c.at && c.t === 'S'; }).length;
+    h += '<button type="button" class="strip' + (turn ? ' turn' : '') + '" data-pl="' + i + '" aria-label="' + esc(p.name) + ': ' + VT.score(G, i).total + ' points. Open details"><span class="dot" style="background:' + PCOL[i] + '"></span><span class="nm">' + esc(p.name) + (turn ? ' ▸' : '') + '</span><b class="sc" data-engine-score="' + i + '">' + VT.score(G, i).total + '</b>' +
+      '<span class="cnt"><span title="Houses">' + icon('house') + p.houses.length + '/15</span><span title="Carts and ships on the map">' + icon('meeple') + onmap + '</span><span title="Coins">' + icon('coins') + p.coins + '</span><span title="Cards in hand">' + icon('amphora') + p.hand.length + '</span></span>' +
+      (i === 1 && UI.mode !== 'hot' && UI.lastRecap ? '<span class="rc">' + esc(UI.lastRecap) + '</span>' : '') + '</button>';
   });
   $('#race').innerHTML = h;
+  document.documentElement.style.setProperty('--sh', Math.round($('#race').getBoundingClientRect().bottom) + 'px');
   var mleft = G.deck.length + G.disp.filter(function (x) { return x != null; }).length;
   $('#mktn').textContent = mleft; $('#mktb').setAttribute('aria-label', 'Market: ' + mleft + ' cards left, the game ends at 0'); $('#mktb').classList.toggle('low', mleft <= 3);
 }
@@ -290,7 +308,7 @@ function renderStore() {
 function renderHand() {
   var pi = UI.mode === 'hot' ? Math.max(0, VT.sideToAct(G)) : 0, p = G.pl[pi], t = targets(), h = '';
   var hintI = UI.hint && UI.hint.t === 'play' ? UI.hint.i : -1;
-  p.hand.forEach(function (id, i) { h += cardHTML(id, (t.cards[i] ? 'glow ' : '') + (UI.sel === i ? 'sel ' : '') + (hintI === i ? 'hint' : ''), 'data-i="' + i + '"'); });
+  var n = p.hand.length; p.hand.forEach(function (id, i) { var o = i - (n - 1) / 2; h += cardHTML(id, (t.cards[i] ? 'glow ' : '') + (UI.sel === i ? 'sel ' : '') + (hintI === i ? 'hint' : ''), 'data-i="' + i + '" style="--rot:' + (o * 2.2).toFixed(1) + 'deg;--dy:' + (o * o * 0.9).toFixed(1) + 'px"'); });
   if (p.disc.length) h += '<button type="button" class="pile" id="pileb" aria-label="Played cards"><b>' + p.disc.length + '</b>played</button>';
   $('#hand').innerHTML = h;
 }
@@ -301,5 +319,5 @@ function renderRival() {
 function render() {
   setTimeout(function () { if (UI.view) growHits(UI.view.w / boardBox().w); }, 0);
   if (!G) return;
-  renderRace(); renderStore(); renderHand(); renderRival(); renderMap(); renderPrompt();
+  renderRace(); renderStore(); renderHand(); renderRival(); renderMap(); renderPrompt(); syncHud();
 }

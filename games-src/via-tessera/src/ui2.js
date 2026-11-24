@@ -15,7 +15,7 @@ function renderPrompt() {
   computeHint();
   if (G.drop && G.drop.length) { say(me + 'Storehouse full: pick goods'); acts([]); openTake(); return; }
   if (!pd) {
-    if (UI.sel == null) { say(me + 'Pick a card to play'); acts([{ t: 'Points', alt: true, f: function () { showScoreNow(); } }, { t: 'Market', alt: true, f: function () { openMarket(false); } }]); }
+    if (UI.sel == null) { say(me + 'Pick a card to play'); acts([]); }
     else { var c = D.CARDS[p.hand[UI.sel]]; say(cardWhat(c)); acts([{ t: 'Play ' + c.n, glow: true, f: function () { playSel(); } }]); }
     return;
   }
@@ -108,8 +108,10 @@ document.addEventListener('click', function (e) {
 function snap() { return G.pl.map(function (p, i) { return { coins: p.coins, goods: Object.assign({}, p.goods), score: VT.score(G, i).total, houses: p.houses.length, hand: p.hand.length }; }); }
 function move(m) {
   if (!G || G.phase !== 'play') return;
-  var before = snap(), pi = VT.sideToAct(G), wasPend = G.pend && G.pend.h, t0 = Date.now();
+  var before = snap(), pi = VT.sideToAct(G), wasPend = G.pend && G.pend.h, t0 = Date.now(), pre = isHuman(pi) ? JSON.stringify(G) : null;
   try { VT.performMove(G, m); } catch (err) { console.warn(err.message); render(); return; }
+  if (pre) { UI.undo = UI.undo || []; UI.undo.push(pre); }
+  if (G.phase !== 'play' || VT.sideToAct(G) !== pi) UI.undo = [];
   if (m.t !== 'mv') UI.selCol = null;
   var human = isHuman(pi); if (human) UI.noteAt = noteAnchor(m, pi);
   afterMove(before, pi, m, wasPend);
@@ -220,7 +222,7 @@ function runAI() {
 
 // ---------- sheets ----------
 function openSheet(title, html, closable) {
-  var s = $('#sheet'); UI.sheet = title;
+  var s = $('#sheet'); UI.sheet = title; UI.sheetX = closable !== false;
   s.innerHTML = '<div class="sh-head"><h2>' + esc(title) + '</h2>' + (closable !== false ? '<button type="button" class="x" data-x aria-label="Close">×</button>' : '') + '</div>' + html;
   s.hidden = false;
   var x = s.querySelector('[data-x]'); if (x) x.onclick = closeSheet;
@@ -268,7 +270,7 @@ function needText(pi, s, consul) {
 // one line after the rival's turn: what they did and what it scored
 function recap(pi, start, list) {
   var now = VT.score(G, pi).total, d = now - start[pi].score, txt = G.pl[pi].name + (d ? (d > 0 ? ' +' : ' ') + d + ': ' : ': ') + (list.length ? list.slice(0, 3).join(', ') : 'passed');
-  UI.lastRecap = txt; banner(txt);
+  UI.lastRecap = txt;
 }
 function openTrade() {
   var pi = VT.sideToAct(G), p = G.pl[pi];
@@ -425,4 +427,24 @@ function sfx(k) {
   o.type = f[2]; o.frequency.setValueAtTime(f[0], t); if (k === 'coin' || k === 'win') o.frequency.exponentialRampToValueAtTime(f[0] * 1.5, t + f[1]);
   g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(k === 'build' ? 0.06 : 0.1, t + 0.01); g.gain.exponentialRampToValueAtTime(0.0001, t + f[1]);
   o.start(t); o.stop(t + f[1] + 0.02);
+}
+
+// undo: take back moves inside your own turn (the game state is plain data, so a copy is enough)
+function doUndo() {
+  if (!G || UI.busy || !UI.undo || !UI.undo.length || G.phase !== 'play' || !isHuman(VT.sideToAct(G))) return;
+  G = JSON.parse(UI.undo.pop()); UI.sel = null; UI.selCol = null; UI.selProv = null; UI.mktSel = null; closeSheet(); sfx('tick'); render(); save();
+}
+function ruleKey() {
+  if (!G) return null; var pi = VT.sideToAct(G), pd = G.pend;
+  if (pd) return { 'arch-move': 'arch', 'arch-build': 'arch', pref: 'pref', merc: 'merc', buy: pd.consul ? 'cons' : 'sen', colo: 'colo', trib: 'trib', dipl: 'dipl' }[pd.h] || null;
+  if (UI.sel != null && pi >= 0) { var c = D.CARDS[G.pl[pi].hand[UI.sel]]; return c ? (c.act === 'spec' ? 'spec' : c.act) : null; }
+  return null;
+}
+function showRule(k) {
+  var a = D.ACTS[k]; drawer(k === 'spec' ? 'Maker card' : a.n, '<div class="rules"><p>' + actRule(k) + '</p></div><button type="button" class="btn alt" id="allrules">All the rules</button>');
+  $('#allrules').onclick = showRules;
+}
+function syncHud() {
+  var k = ruleKey(), q = $('#promptq'); q.hidden = !k; q.onclick = function () { showRule(k); };
+  var u = $('#undob'); u.hidden = !(UI.undo && UI.undo.length && !UI.busy && G && G.phase === 'play' && isHuman(VT.sideToAct(G)));
 }

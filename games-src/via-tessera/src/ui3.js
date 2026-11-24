@@ -7,7 +7,7 @@ function startGame(mode, o) {
   var names = mode === 'hot' ? ['Red', 'Green'] : ['You', 'Rival'];
   G = VT.newGame({ seed: o.seed, names: names, ai: mode === 'hot' ? [null, null] : [null, UI.lvl], first: o.first != null ? o.first : (o.learn ? 0 : null) });
   if (o.first == null && !o.learn && o.seed == null) { /* random start player */ var f = Math.random() < 0.5 ? 0 : 1; G = VT.newGame({ seed: G.seed, names: names, ai: G.pl.map(function (p) { return p.ai; }), first: f }); }
-  UI.sel = null; UI.selCol = null; UI.selProv = null; UI.busy = false; UI.tipsSeen = {};
+  UI.sel = null; UI.selCol = null; UI.selProv = null; UI.busy = false; UI.tipsSeen = {}; UI.undo = []; UI.lastRecap = null;
   $('#start').hidden = true; $('#result').hidden = true; $('#drawer').hidden = true; closeSheet();
   buildMap(); setView({ x: 0, y: 0, w: VTART.W }); homeView(); render(); save();
   if (UI.learn) { tip('Goal: most points at the end', '#race'); setTimeout(function () { if (G && G.turn < 3) banner('Tap a score to see the points', '#race'); }, 5200); }
@@ -78,12 +78,18 @@ function showMenu() {
   $('#mrules').onclick = showRules; $('#mcards').onclick = showCards; $('#mlog').onclick = showLog; $('#mcred').onclick = showCredits; $('#mscore').onclick = showScoreNow;
   $('#mnew').onclick = function () { $('#drawer').hidden = true; showTitle(); };
 }
-function showScoreNow() {
-  if (!G) return;
+function showScoreNow() { if (G) drawer('Points so far', scoreTable()); }
+function scoreTable() {
   var sc = G.pl.map(function (p, i) { return VT.score(G, i); });
-  drawer('Score so far', '<table class="sc-table"><thead><tr><th>Patron</th>' + G.pl.map(function (p) { return '<th>' + esc(p.name) + '</th>'; }).join('') + '</tr></thead><tbody>' +
+  return ('<table class="sc-table"><thead><tr><th>Patron</th>' + G.pl.map(function (p) { return '<th>' + esc(p.name) + '</th>'; }).join('') + '</tr></thead><tbody>' +
     D.GODS.map(function (gd) { return '<tr><td><span class="gi">' + icon(gd.icon) + gd.n + '</span><br><span class="small">' + gd.rule + '</span></td>' + sc.map(function (s) { var b = s.by[gd.id]; return '<td>' + b.pts + (b.n ? '<br><span class="small">' + b.n + ' card' + (b.n > 1 ? 's' : '') + (b.each != null ? ' \u00D7 ' + b.each : '') + '</span>' : '') + '</td>'; }).join('') + '</tr>'; }).join('') +
     '<tr class="tot"><td>Total</td>' + sc.map(function (s) { return '<td>' + s.total + '</td>'; }).join('') + '</tr></tbody></table>' + (UI.lastRecap ? '<p class="small">Last rival turn: ' + esc(UI.lastRecap) + '</p>' : '') + '<p class="small">More cards with a patron multiply its points.</p>');
+}
+function showPlayer(i) {
+  var p = G.pl[i], goods = D.GOODS.map(function (g) { return '<span class="pg">' + gIcon(g) + ' ' + p.goods[g] + '</span>'; }).join(''), top = p.disc[p.disc.length - 1];
+  var facts = '<div class="pfacts"><span><b>' + VT.score(G, i).total + '</b> points now</span><span><b>' + p.coins + '</b> coins</span><span><b>' + p.houses.length + '/15</b> houses</span><span><b>' + VT.onBoard(p) + '</b> carts and ships on the map</span><span><b>' + p.hand.length + '</b> cards in hand</span></div><div class="pgoods">' + goods + '</div>';
+  var pile = p.disc.length ? '<h3 class="ph">Played pile (top card is public)</h3><div class="mrow">' + p.disc.slice().reverse().map(function (id) { return cardHTML(id, '', 'tabindex="-1" disabled'); }).join('') + '</div>' : '<p class="small">Nothing played yet.</p>';
+  drawer(p.name, facts + pile + '<h3 class="ph">Points by patron</h3>' + scoreTable());
 }
 function showLog() { drawer('What happened', '<div class="rules">' + (G ? G.log.slice(-30).reverse().map(function (l) { return '<p>' + esc(l) + '</p>'; }).join('') : '') + '</div>'); }
 function showRules() {
@@ -125,12 +131,12 @@ function showCredits() {
 // ---------- boot ----------
 function boot() {
   installIcons();
-  UI.hints = LS.get('hints') !== '0'; UI.mute = LS.get('mute') === '1'; UI.lvl = LS.get('lvl') || 'easy';
+  UI.hints = LS.get('hints') !== '0'; UI.mute = LS.get('mute') === '1'; UI.lvl = LS.get('lvl') || 'normal';
   wireCamera();
   $('#hand').addEventListener('click', onHandTap);
-  $('#menub').onclick = showMenu; $('#homeb').onclick = showMenu;
+  $('#menub').onclick = showMenu; $('#helpb').onclick = showRules; $('#plb').onclick = showScoreNow; $('#undob').onclick = doUndo;
   $('#mktb').onclick = function () { if (G) openMarket(!!(G.pend && G.pend.h === 'buy' && isHuman(VT.sideToAct(G)))); };
-  document.addEventListener('click', function (e) { if (e.target.closest('[data-score]') && G) showScoreNow(); });
+  document.addEventListener('click', function (e) { var st = e.target.closest('[data-pl]'); if (st && G) showPlayer(+st.getAttribute('data-pl')); });
   document.addEventListener('click', function (e) { if (e.target.closest('#pileb') && G) { var pp = G.pl[UI.mode === 'hot' ? Math.max(0, VT.sideToAct(G)) : 0]; drawer('Played cards', '<p class="small">They come back with the Herald.</p><div class="mrow">' + pp.disc.slice().reverse().map(function (id) { return cardHTML(id, '', 'tabindex="-1" disabled'); }).join('') + '</div>'); } });
   document.addEventListener('click', function (e) { if (e.target.closest('#storeb') && G) { var p = G.pl[UI.mode === 'hot' ? Math.max(0, VT.sideToAct(G)) : 0]; banner(VT.used(p) + ' of 12 spaces used'); } });
   var rl = function () { if (UI.view) setView(UI.view); placeFinger(); };
