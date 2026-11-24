@@ -502,3 +502,23 @@ body:has(.nudge,.gxh-ring,#finger:not([hidden])) #bd.pv .pv-tab.hot::after{displ
 html:has(#bd.pv.tall) .gxst-card:not(.gxst-min){width:calc(100vw - 16px)}
 html:has(#bd.pv.tall) .gxst-card .gxst-say,html:has(#bd.pv.tall) .gxst-card .gxst-goal{margin:6px 12px 2px}
 html:has(#bd.pv.tall) .gxst-card .gxst-ft{padding:4px 10px 8px}
+/* ---- W763 (R15 critic): panels fit their content, icon-only resource piles, pc empty city collapses, readable pc goals ---- */
+#logd,#rivald{height:auto!important;min-height:min(220px,50dvh);bottom:auto;max-height:calc(100dvh - var(--gx-bar-h) - 24px)}
+#logd .gx-drawer-body,#rivald .gx-drawer-body{flex:0 1 auto}
+html.ph #logd,html.ph #rivald{top:auto;bottom:0;max-height:88dvh}
+#logbody .ll{font-size:16px;padding:8px 0}
+#bd.pv .resrow .rs .rsw{display:none}
+#bd.pv .resrow .rs>b,#bd.pv .resrow .pv-wn b{font-size:26px}
+#bd.pv .resrow .rs.zero>b{color:var(--pv-ink);opacity:.85}
+#bd.pv.wide .pv-goals b,#bd.pv.wide .pv-goals .pv-sub,#bd.pv.wide .pv-goals span{font-size:16px!important}
+#bd.pv.wide .pv-stage.cityempty{grid-template-rows:auto minmax(0,1fr)}
+#bd.pv.wide .pv-stage.cityempty .strip.city .pv-grid{display:none}
+#bd.pv.wide .pv-stage.cityempty .strip.city{flex:none}
+#bd.pv.wide .mc.cant .pvc-aff{display:none}
+#bd.pv.wide .mc.cant .pvc{filter:saturate(.7) brightness(.9)}
+html.ph .gx-bar .gxst-q{font-size:0;width:44px;padding:0;position:relative}
+html.ph .gx-bar .gxst-q::before{content:"";position:absolute;inset:0;margin:auto;width:24px;height:24px;background:currentColor;-webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linejoin='round'%3E%3Cpath d='M2 9l10-5 10 5-10 5z'/%3E%3Cpath d='M6 11v5c3 2 9 2 12 0v-5M22 9v6'/%3E%3C/svg%3E") center/contain no-repeat;mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linejoin='round'%3E%3Cpath d='M2 9l10-5 10 5-10 5z'/%3E%3Cpath d='M6 11v5c3 2 9 2 12 0v-5M22 9v6'/%3E%3C/svg%3E") center/contain no-repeat}
+#bd.pv.wide .pvc.small .pvc-ci b,#bd.pv.wide .pvc.small .pvc-w,#bd.pv.wide .pvc-pts .pvc-w,#bd.pv.wide .pvc.small .pvc-free{font-size:16px!important}
+html:not(.ph) .gx-bar #prompt{font-size:16px!important}
+html:not(.ph) .gx-bar .gxst-q{font-size:16px}
+html:not(.ph) #acts button,html:not(.ph) #acts button *{font-size:16px!important}

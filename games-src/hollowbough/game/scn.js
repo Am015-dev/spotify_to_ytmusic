@@ -1,6 +1,8 @@
 // Hollowbough scenarios (see shell/gx-scenario.js): ?scn=<id> builds ONE state directly. Registered before the game scripts run; setup() runs after boot.
 (function () {
   if (!window.GXS) return;
+  // W763: wait until a drawer has finished sliding in (rAF-based, so turbo timers do not cut the animation short)
+  function settle(sel) { return new Promise(function (r) { var last = -1, same = 0, n = 0; (function f() { var e = document.querySelector(sel), t = e ? Math.round(e.getBoundingClientRect().top) : 0; same = t === last ? same + 1 : 0; last = t; if (same >= 6 || ++n > 240) r(); else requestAnimationFrame(f); })(); }); }
   var booted = function () { return typeof G !== 'undefined' && typeof newGame === 'function' && typeof UI !== 'undefined' && typeof render === 'function' && typeof HB !== 'undefined'; };
   var $ = function (s) { return document.querySelector(s); };
   // WCAG contrast of two css colours (rgb/rgba strings); used by the top-line check
@@ -137,7 +139,7 @@
   });
   GXS.add({
     id: 'ui-log', name: 'UI bar: diary panel', ask: 'Is the diary panel readable?', seed: 5, when: booted,
-    setup: function () { return table(5).then(function () { document.querySelector('[data-gx="logd"]').click(); return new Promise(function (r) { setTimeout(r, 800); }); }); },
+    setup: function () { return table(5).then(function () { document.querySelector('[data-gx="logd"]').click(); return settle('#logd'); }); },
     checks: [
       { kind: 'fn', name: 'rule 1: diary text at least 13/16 px', fn: function () { return minFont('#logd', ulim()); } },
       { kind: 'fn', name: 'rule 6: diary panel fits its content (no tall empty parchment)', fn: function () { var b = document.querySelector('#logd .gx-drawer-body'); return b.scrollHeight - b.clientHeight <= 2 || 'panel scrolls'; } }
@@ -145,7 +147,7 @@
   });
   GXS.add({
     id: 'ui-rivals', name: 'UI bar: rivals panel', ask: 'Is the rivals panel readable?', seed: 5, when: booted,
-    setup: function () { return table(5).then(function () { document.querySelector('[data-gx="rivald"]').click(); return new Promise(function (r) { setTimeout(r, 800); }); }); },
+    setup: function () { return table(5).then(function () { document.querySelector('[data-gx="rivald"]').click(); return settle('#rivald'); }); },
     checks: [
       { kind: 'fn', name: 'rule 1: rivals text at least 13/16 px', fn: function () { return minFont('#rivald', ulim()); } },
       { kind: 'fn', name: 'rule 6: rivals panel fits its content (no tall empty parchment)', fn: function () { var b = document.querySelector('#rivald .gx-drawer-body'); return b.scrollHeight - b.clientHeight <= 2 || 'panel scrolls'; } }
