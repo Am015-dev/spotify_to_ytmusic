@@ -312,6 +312,13 @@ Live fix: original-name phrase removed from shelf blurb + sands page (15:2x).
 - Test: node ft/lessons-layout-test.js (turbo, ~6 s): 58/66 steps clear. Remaining fails are a one-tick lag: after a move the board row height changes (goods/legend appear) and the card is seated in the previous strip, so it touches the board or legend by up to ~95 px until the next re-seat. Fix next: compute the strip from a fixed reserve (not from live sibling rects), or have GXST expose place() and call it from the game after each go().
 - Phone sheet: before 33/33 lesson cells had the card over the board; after 0 visible overlaps, but ~6 cells (sell step 0, palace steps) show the board shrunk further than needed (fit 'sq' toggling), leaving an empty band.
 - First lesson step 0 on a cold page: card sits at 8,8 for the first tick (slot not ready) in the test.
+## W751 nebula-aces (shelf/W751-nebula)
+- Gate (build-all --quick): 6/11 -> 8/11. nb-board + nb-art fixed: the Lessons button grew when the painted skin loaded (its min-width rule lost to the shared menu rule). Fixed in xw/skin.css: fixed width, phone shows "Learn" in 44 px, bar gap/padding tightened so the turn chip and its "you" pill no longer sit under the Squads button; PC keeps "Lessons" at 76 px.
+- Still failing, not code: title/menu/board need baseline images (.baselines missing, ui-baselines branch absent).
+- Lessons test: phone 28.4 s, 1366x768 35.5 s, both all-pass.
+- nb-art "empty stat chips": chips do carry text (Skill/Attack/Agility/Hull/Shields). The empty look was the contact sheet capturing at 450 ms before the scenario built the cards; added `--wait <ms>` to scripts/contact-sheet.js. Ship art is still one grey/orange silhouette per side, not per-hull paintings (weak, not fixed).
+- Weak: title screen cells (start, nb-tutorial-play) show dark empty-looking buttons in the sheets; not touched.
+- Proof: xw/proof/w751-phone-sheet.jpg, w751-pc-sheet.jpg (16 cells each, --wait 3000, takes ~2 min real).
 ## W735 thornbound HUD diet (shelf/W735-hud-thornbound)
 - tb-story-start failure was NOT the HUD diet: parent commit fails the same. Story now opens the chapter map directly (tutorial = lesson row, scenario lessons); the scenario still waited for the old Skip-tutorial spotlight. Scenario rewritten (scn.js), HUD cuts untouched.
 - Test against a build-all staged build (python3 scripts/build-all.py thornbound --no-check), not games/thornbound (deployed copy).

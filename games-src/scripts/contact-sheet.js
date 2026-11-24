@@ -49,6 +49,8 @@ const AUDIT = function (MINPX) {
     const p = await c.newPage(); const errs = []; p.on('pageerror', e => errs.push(String(e).slice(0, 80)));
     await p.goto(`${BASE}/${slug}/${q}`); await p.waitForTimeout(450);
     const au = await p.evaluate(`(${AUDIT})(${MINPX})`), f = au.lines; T += au.tiny; L += au.low; H += au.hard;
+    await p.goto(`${BASE}/${slug}/${q}`); await p.waitForTimeout(+arg('--wait', 450));
+    const f = await p.evaluate(() => { const bad = []; document.querySelectorAll('body *').forEach(e => { if (!e.offsetParent || !e.childNodes.length) return; const s = getComputedStyle(e); const t = [...e.childNodes].some(n => n.nodeType === 3 && n.textContent.trim()); if (!t) return; const r = e.getBoundingClientRect(); if (r.width < 2) return; const fs = parseFloat(s.fontSize); if (fs < 13) bad.push('small ' + fs + 'px "' + e.textContent.trim().slice(0, 24) + '"'); if ((s.overflow !== 'visible' || s.textOverflow === 'ellipsis') && e.scrollWidth > e.clientWidth + 2) bad.push('clipped "' + e.textContent.trim().slice(0, 24) + '"'); if (r.right > innerWidth + 2 || r.left < -2) bad.push('offscreen "' + e.textContent.trim().slice(0, 24) + '"'); }); return bad.slice(0, 6); });
     await p.screenshot({ path: path.join(dir, `${id}.png`) });
     if (f.length || errs.length) flags.push(`${id}: ${errs.join(' | ')} ${f.join(' | ')}`);
     await c.close();

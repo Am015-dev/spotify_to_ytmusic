@@ -85,6 +85,7 @@ async function run(size, base) {
     for (let i = 0; i < 80; i++) {
       await tick(p, 400);
       const s = await st(); await emptyBub(s.id + ' ' + s.phase); if (s.phase === 'win' || s.phase === 'fail') return s;
+      const s = await st(); if (s.phase === 'win' || s.phase === 'fail') return s;
       const q = await p.evaluate(() => ({ ph: G.phase, cur: G.cur, atk: G.atk && G.atk.step, ad: G.atk && G.atk.d, r: G.round, ev: ship('s1').evade, hp: ship('s1').sh + '/' + ship('s1').dmg.length, dice: G.atk && G.atk.dice.join(), def: G.atk && G.atk.def.join() }));
       if (process.env.DEBUG) console.log('  q', JSON.stringify(q));
       const sig = JSON.stringify(q); if (sig === last) same++; else { same = 0; last = sig; }
@@ -122,6 +123,8 @@ async function run(size, base) {
   await emptyBub('main screen');
   // picker lists the lessons, Lessons button opens it
   await p.evaluate(() => GXST.picker()); await tick(p, 500); await emptyBub('picker');
+  // picker lists the lessons, Lessons button opens it
+  await p.evaluate(() => GXST.picker()); await tick(p, 500);
   if (SHOTS) await p.screenshot({ path: path.join(SHOTS, size + '-picker.png') });
   let s = await st(); ok(s.open && s.phase === 'picker' && s.count === 7, size + ' picker lists 7 lessons');
   const ids = await p.evaluate(() => [...document.querySelectorAll('.gxst-pick [data-i], .gxst-row, [data-gxst-i]')].length);

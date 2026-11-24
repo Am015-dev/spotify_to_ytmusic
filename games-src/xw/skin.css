@@ -39,3 +39,10 @@ html.sk .btn.primary:disabled{color:#2a0a00;text-shadow:none}
 /* the Lessons button keeps one size before and after the painted skin loads (scenario gate: painted skin moves no box) */
 /* html:root body ... outranks the shelf's injected html:root body :is(.gx-ibtn){min-width:44px}; fixed 60 px (flex 0 0) so a crowded bar cannot squeeze it and the round chip keeps its room */
 html:root body .gx-ibtn.gxst-q{flex:0 0 60px;width:60px;min-width:60px;padding:0 4px;font-size:14px;text-shadow:0 1px 2px rgba(0,0,0,.75);background:linear-gradient(180deg,#2a2360,#14102e);color:#fff2cf}
+html.sk .btn.primary:disabled{color:#f3e6d4;text-shadow:0 1px 2px rgba(0,0,0,.8)}
+
+/* the Lessons button keeps one size before and after the painted skin loads (scenario gate: painted skin moves no box) */
+html:root body .gx-ibtn.gxst-q{min-width:76px;width:76px;flex:0 0 76px;padding:0;box-sizing:border-box;text-shadow:0 1px 2px rgba(0,0,0,.75)}
+html.ph:not(.ph-big):root body .gx-ibtn.gxst-q{min-width:44px;width:44px;flex:0 0 44px;font-size:0}
+html.ph:not(.ph-big):root body .gx-ibtn.gxst-q::after{content:"Learn";font-size:13px;font-weight:700}
+html:root body.ph .gx-bar,html.ph:root body .gx-bar{gap:1px;padding:0 2px}html.ph .gx-bar>.gx-sp,html.ph .gx-bar>.gx-more:empty{display:none}html.ph .gx-bar>.ph-chip{flex:0 0 auto}
