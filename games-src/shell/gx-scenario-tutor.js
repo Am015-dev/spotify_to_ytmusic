@@ -83,17 +83,27 @@
   function hintTarget() { var s = cur(); if (!s || S.phase !== 'play' || S.hint < 2) return null; var h = s.hints[S.hint - 1]; return h && typeof h === 'object' ? vis(find(h.target)) : null; }
   // keep the card off the hinted target and the keepClear areas; a dragged position is kept unless it covers the hinted target
   function place() {
-    if (!W) return; var vw = innerWidth, vh = innerHeight, bw = W.offsetWidth, bh = W.offsetHeight, t = hintTarget(), av = [];
+    if (!W) return;
+    // phoneSlot: on narrow screens (<700px) with a visible slot element, sit inside its rect (width clamped to it); saved pos ignored
+    var ps0 = C.phoneSlot, slot = innerWidth < 700 && ps0 ? (typeof ps0 === 'function' ? call(ps0, null) : typeof ps0 === 'string' ? vis(find(ps0)) : null) : null;
+    if (slot && slot.height == null && slot.bottom != null) slot.height = slot.bottom - slot.top;
+    if (slot && slot.width == null && slot.right != null) slot.width = slot.right - slot.left;
+    if (slot && slot.width > 2 && slot.height > 2) {   // phoneSlot (selector or function -> {left,top,width,height}): the card lives inside this rect, compact, body scrolls; never over the game
+      W.classList.add('gxst-inslot'); W.style.width = Math.round(slot.width) + 'px'; W.style.maxHeight = Math.round(slot.height) + 'px';
+      return put([slot.left, slot.top]);
+    }
+    W.classList.remove('gxst-inslot'); W.style.maxHeight = ''; W.style.width = '';
+    var vw = innerWidth, vh = innerHeight, bw = W.offsetWidth, bh = W.offsetHeight, t = hintTarget(), av = [];
     (C.keepClear || []).forEach(function (sel) { var a; try { a = D.querySelectorAll(sel); } catch (e) { a = []; } for (var i = 0; i < a.length; i++) { var r = vis(a[i]); if (r) av.push(r); } });
     function clamp(p) { return [Math.max(4, Math.min(vw - bw - 4, p[0])), Math.max(4, Math.min(vh - bh - 4, p[1]))]; }
     function box(p) { return { left: p[0], top: p[1], right: p[0] + bw, bottom: p[1] + bh }; }
     function cost(p) { var b = box(p), c = t && hit(b, t) ? 1e6 : 0; av.forEach(function (r) { var x = Math.min(b.right, r.right) - Math.max(b.left, r.left), y = Math.min(b.bottom, r.bottom) - Math.max(b.top, r.top); if (x > 0 && y > 0) c += x * y; }); return c; }
-    if (S.pos && !(S.min && C.phoneSlot && vw < 600)) { var q = clamp(S.pos); if (!(t && hit(box(q), t))) return put(q); }
+    if (S.pos && !(S.min && C.phoneSlot && typeof C.phoneSlot === 'object' && vw < 600)) { var q = clamp(S.pos); if (!(t && hit(box(q), t))) return put(q); }
     var top = 4, bar = $('.gx-bar'); if (bar) { var br = bar.getBoundingClientRect(); if (br.top < 4 && br.height < 90) top = br.bottom + 6; }
     var sp = [[8, top], [vw - bw - 8, top], [vw - bw - 8, vh - bh - 8], [8, vh - bh - 8]];
     av.concat(t ? [t] : []).forEach(function (r) { sp.push([8, r.bottom + 6], [vw - bw - 8, r.bottom + 6], [8, r.top - bh - 6], [r.right + 6, r.top]); });
     var best = null; sp.forEach(function (p, i) { p = clamp(p); var c = cost(p) + i * 0.01; if (!best || c < best.c) best = { p: p, c: c }; });
-    if (S.min && C.phoneSlot && vw < 600) {   // phone chip: keep the card's own spot when it is clear (no jump on open); else the chip gets a band just under phoneSlot.after or just above phoneSlot.before, never over phoneSlot.avoid items or the dock
+    if (S.min && C.phoneSlot && typeof C.phoneSlot === 'object' && vw < 600) {   // phone chip: keep the card's own spot when it is clear (no jump on open); else the chip gets a band just under phoneSlot.after or just above phoneSlot.before, never over phoneSlot.avoid items or the dock
       var ps = C.phoneSlot, an = vis($(ps.after)), bf = vis($(ps.before)), ob = [], cs = [best.p];
       (ps.avoid || []).forEach(function (sel) { var a; try { a = D.querySelectorAll(sel); } catch (e) { a = []; } for (var i = 0; i < a.length; i++) { var r = vis(a[i]); if (r) ob.push(r); } });
       if (an) cs.push([8, an.bottom + 4]); if (bf) cs.push([8, bf.top - bh - 6]);
