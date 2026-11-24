@@ -250,6 +250,7 @@ html.ph .sline .n{min-width:.9em}
 /* PC: after a bonus card the fight rows outgrow the arena; Fight!/Run/Help stay pinned inside it instead of being cut off and unclickable (scenario dk-fight-bonus @1366x768) */
 html:not(.ph) .arena .fbtns{position:sticky;bottom:0;z-index:3}
 html:not(.ph) .arena{border-radius:18px}
+html:not(.ph) .mine .hand .card .kind{display:none}
 
 /* 9+ cards: slices under 44px, so a card's price tag hides and its name ends in an ellipsis instead of running under the next card */
 html.ph .mine .hand.tight .card:not(:last-child) :is(.gold,.aw){display:none}
@@ -349,8 +350,19 @@ html:not(.ph) .mine .top .str .muted{display:none}
 html:not(.ph) .mine .top .you,html:not(.ph) .mine .gear .gl{font-size:13px}
 html:not(.ph) #prompt .acts.main{display:flex!important;flex-direction:row!important;align-items:center;margin-left:auto!important}
 /* a slimmer hand strip so the table (and a fight's Run / Help row) gets the height the dock took */
-html:not(.ph) .mine{--hw:clamp(62px,calc(17cqh/1.42),118px)}
+html:not(.ph) .mine{--hw:clamp(90px,calc(20cqh/1.42),122px)}
 html:not(.ph) .mine{grid-template-columns:auto minmax(0,1fr);grid-template-areas:"top gear" "hand hand";align-items:center;column-gap:18px}
 html:not(.ph) .mine>.top{grid-area:top}html:not(.ph) .mine>.gear{grid-area:gear}html:not(.ph) .mine>.hand{grid-area:hand}
 html.gx:not(.ph):not(.dk-title) .gx-app.gx-dock-min .gx-dock{visibility:visible}
 html:not(.ph) #prompt:not(.bfq) .acts.main{flex-wrap:nowrap}html:not(.ph) #prompt:not(.bfq) .acts.main .btn{width:auto!important;flex:0 0 auto!important}
+/* PC: readable cards in your hand and on the arena */
+html:not(.ph) :is(.mine .hand,.arena) .card .cn{font-size:max(12px,calc(var(--u)*10))!important;line-height:1.05}
+html:not(.ph) :is(.mine .hand,.arena) .card :is(.kind,.gold,.tag){font-size:max(11px,1em)}
+/* PC: rival seat chips, Doors/Treasure labels and the player strip text at 16px+ */
+html:not(.ph) .opp.seat .snm,html:not(.ph) .opp.seat .sbd,html:not(.ph) .opp.seat .lb{font-size:16px}
+html:not(.ph) .pile .stack .dn{font-size:16px}
+html:not(.ph) .mine .top .you,html:not(.ph) .mine .gear .gl{font-size:16px}
+/* PC fight at 1366x768: a smaller arena card row so the monster card, Run and Help all fit inside the visible arena; the arena clips nothing */
+html:not(.ph) .arena .card{--w:96px!important}
+html:not(.ph) .arena .fbtns{position:absolute;left:calc(50% + 66px);bottom:18px;right:auto;width:auto;flex-direction:column;gap:8px}
+html:not(.ph) .arena{overflow:visible}
