@@ -615,5 +615,48 @@ body.tutlite .coachb .saytx .tres{font-size:14px;color:#2f6a22;font-weight:800;m
 body.tutlite .coachb .saytx .tres:empty{display:none}
 /* W618 audit B: point badge always dark plate + white text */
 .bc .vp{background:#0b1a11;color:#fff}
+/* W649: a printed-mat look (egg cost on top, the row action below each space), dice that look like dice, floating lessons + screen map */
+.ract .rn{font-size:11px;letter-spacing:.02em;text-transform:uppercase;background:none!important;padding:0!important;opacity:.95}
+@media (min-width:1000px){.ract .rn{font-size:13px}}
+.slot{flex-direction:column;justify-content:space-between;padding:3px 1px}
+.slot .ec{font-size:11px;padding:1px 6px;opacity:.85}
+.slot.next .ec{opacity:1;background:#2c3a1e;box-shadow:0 0 0 2px rgba(255,226,160,.7)}
+.slot .yl{font-size:11px;font-weight:700;color:#fff8e6;background:rgba(10,18,10,.55);border-radius:6px;padding:0 4px;white-space:nowrap;opacity:.7}
+.slot.next .yl{opacity:1}
+.slot .yl i{font-style:normal;color:#ffe2a0}
+.slot>.bc~*{display:none}
+@media (min-width:1000px){.slot .ec,.slot .yl{font-size:14px}}
+#feeder{background:linear-gradient(180deg,#8a6238,#6b4a28);box-shadow:inset 0 2px 6px rgba(0,0,0,.45),0 2px 0 rgba(0,0,0,.3)}
+.die{background:linear-gradient(145deg,#fffaf0,#e9dcc0);border:1px solid #c9b48a;border-radius:10px;box-shadow:0 3px 0 #b39a6c,0 4px 6px rgba(0,0,0,.35)}
+.die:nth-child(2){transform:rotate(-4deg)}.die:nth-child(3){transform:rotate(3deg)}.die:nth-child(4){transform:rotate(-2deg)}.die:nth-child(5){transform:rotate(5deg)}
+.fbc{display:inline-block;background:#f6eedb;color:#2a2418;border-radius:6px;padding:2px 6px;margin:1px 2px;border-left:4px solid #e3b75a;box-shadow:0 1px 2px rgba(0,0,0,.3)}
+.fbc b{color:#2a2418}
+.gx-dock-head .gx-ibtn{min-width:44px;min-height:44px}
+.lsn{position:fixed;z-index:9000;background:#fffaf0;color:#2a2418;border:2px solid #e3b75a;border-radius:14px;box-shadow:0 8px 24px rgba(0,0,0,.45);max-width:calc(100vw - 16px);font-size:15px;line-height:1.35}
+.lsn-h{display:flex;align-items:center;gap:4px;padding:0 4px 0 12px;background:#1f3324;color:#f6eedb;border-radius:12px 12px 0 0;cursor:move;touch-action:none;min-height:44px}
+.lsn-n{flex:1;font-weight:700;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lsn-h .lsn-b{appearance:none;border:0;background:transparent;color:#f6eedb;min-width:44px;min-height:44px;font-size:20px;cursor:pointer;border-radius:8px}
+.lsn-body{padding:8px 12px 10px}
+.lsn.min .lsn-body{display:none}
+.lsn.min .lsn-h{border-radius:12px}
+.lsn-t{display:block;font-size:17px;margin-bottom:2px}
+.lsn-s,.lsn-w,.lsn-i{margin:2px 0}
+.lsn-w{color:#5a4a2a;font-size:14px}
+.lsn-i{background:#fff1c9;border-radius:8px;padding:4px 8px;font-weight:600}
+.lsn-f{display:flex;gap:8px;justify-content:flex-end;margin-top:6px}
+.lsn-f .btn{min-height:44px;min-width:88px}
+.lsn-list{max-height:34vh;overflow:auto;margin:6px 0;padding-left:0;list-style:none}
+.lsn-li{appearance:none;border:0;background:none;text-align:left;width:100%;min-height:36px;font:inherit;color:inherit;cursor:pointer;border-radius:6px;padding:2px 6px}
+.lsn-li.cur{background:#fff1c9;font-weight:700}
+.lsnring{position:fixed;z-index:8990;pointer-events:none;border:3px solid #ffd76a;border-radius:12px;animation:lsnp 1.6s ease-in-out infinite}
+@keyframes lsnp{0%,100%{box-shadow:0 0 0 0 rgba(255,215,106,.55)}50%{box-shadow:0 0 0 8px rgba(255,215,106,0)}}
+@media (prefers-reduced-motion:reduce){.lsnring{animation:none}}
+.hudmap{position:fixed;inset:0;z-index:8980;pointer-events:none}
+.hm-svg{position:absolute;inset:0;width:100%;height:100%}
+.hm-svg line{stroke:#ffd76a;stroke-width:2;filter:drop-shadow(0 0 1px #000)}
+.hm-svg circle{fill:#ffd76a;stroke:#1f3324;stroke-width:1.5}
+.hm-l{position:absolute;pointer-events:auto;appearance:none;border:2px solid #ffd76a;background:#1f3324;color:#fff8e6;border-radius:8px;font:700 13px/1 inherit;font-family:inherit;padding:0 6px;cursor:pointer;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;box-shadow:0 2px 6px rgba(0,0,0,.5)}
+.hm-l.on{background:#ffd76a;color:#1f3324}
+@media (min-width:1000px){.hm-l{font-size:15px}}
 </style>
 </head>

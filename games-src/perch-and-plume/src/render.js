@@ -129,8 +129,7 @@ function renderMid() {
 }
 function rowLabel(p, h) {
   var y = PP.rowYield(p, h), word = h === 0 ? 'food' : h === 1 ? 'eggs' : 'cards', ic = h === 0 ? foodIcon('any') : h === 1 ? eggIcon() : '▤';
-  if (UI.mode === 'tutfree') return '<b class="rn">' + ['Forest', 'Grassland', 'Wetland'][h] + '</b><span>tap: +' + y.n + ' ' + word + '</span>' + (y.bonus ? '<span class="bon">+1 trade</span>' : '');
-  return '<b>+' + y.n + '</b><span>' + word + '</span>' + (y.bonus ? '<span class="bon">+1 trade</span>' : '');
+  return '<b class="rn">' + ['Forest', 'Grassland', 'Wetland'][h] + '</b><b>+' + y.n + '</b><span>' + word + '</span>' + (y.bonus ? '<span class="bon">+1 trade</span>' : '');
 }
 function renderMat(p, vs) {
   var h = '';
@@ -140,7 +139,9 @@ function renderMat(p, vs) {
     for (var c = 0; c < 5; c++) {
       var s = p.board[r][c];
       if (s) h += '<div class="slot">' + cardHTML(s.id, 'slot', s, 'data-a="bird" data-h="' + r + '" data-c="' + c + '" role="button" tabindex="0"') + '</div>';
-      else h += '<div class="slot' + (c === p.board[r].length ? ' next' : '') + '" data-a="slot" data-h="' + r + '" data-c="' + c + '">' + (c === p.board[r].length ? '<span class="ec">' + (PP.EGGCOST[c] ? eggIcon() + PP.EGGCOST[c] + (PP.EGGCOST[c] === 1 ? ' egg' : ' eggs') : (UI.mode === 'tutfree' ? 'free spot' : 'free')) + '</span>' : '') + '</div>';
+      else h += '<div class="slot' + (c === p.board[r].length ? ' next' : '') + '" data-a="slot" data-h="' + r + '" data-c="' + c + '">' +   // like a printed mat: egg cost to play here on top, the row's action once this space is the next one below
+        '<span class="ec" title="Egg cost to play a bird here">' + (PP.EGGCOST[c] ? eggIcon() + PP.EGGCOST[c] : 'free') + '</span>' +
+        '<span class="yl" title="Row action when this is your next space">+' + PP.YIELD[r][c] + ' ' + (r === 0 ? 'food' : r === 1 ? 'eggs' : 'cards') + (PP.BONUSSP[c] ? ' <i title="optional trade">&#8644;</i>' : '') + '</span></div>';
     }
     h += '</div>';
   }
@@ -263,7 +264,7 @@ function bonusTiers(bc) { return typeof bc.sc === 'string' ? bc.sc + ' point' + 
 // legal targets carry data-legal (no glow: they stay bright while the rest dims); the single suggested one glows (glowOne)
 function glow() {
   $$('.glow').forEach(function (e) { e.classList.remove('glow'); }); $$('[data-legal]').forEach(function (e) { e.removeAttribute('data-legal'); });
-  document.body.classList.toggle('focus', !!(myTurn() && G && (G.q || UI.sel != null) && !UI.pend && UI.gsDie == null));
+  document.body.classList.toggle('focus', !!(UI.mode !== 'tutfree' && myTurn() && G && (G.q || UI.sel != null) && !UI.pend && UI.gsDie == null));
   if (!myTurn()) return;
   var Q = G.q, p = G.pl[UI.view], add = function (sel) { $$(sel).forEach(function (e) { e.setAttribute('data-legal', ''); }); };
   if (UI.pend || UI.gsDie != null) return;

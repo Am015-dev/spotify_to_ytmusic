@@ -153,6 +153,7 @@ function playFx(list, actor) {
     chain = chain.then(function () {
       var mine = e.seat === view;
       try { coachFx(e, mine); } catch (er) { }
+      try { lessonFx(e, mine); } catch (er) { }
       switch (e.k) {
         case 'action': {
           sfx('act');

@@ -19,7 +19,7 @@ Component counts and their mapping to our names: `COMPONENTS.md`. Each rule has 
   7 face up in the display, 8 in the deck.
 - 30 city tokens by letter (A 7, B 8, C 10, D 5), one random token of its letter per city. Caput has none.
 - Each region gets a bonus marker of its most valuable good (cloth 7 > wine 6 > tools 5 > grain 4 > brick 3), good side up.
-- Each player: 7 starting cards, 15 houses, 1 cart + 1 ship in Caput, 2 carts + 2 ships in the storehouse, goods 2 grain + 1 brick + 1 tool
+- Each player: 8 starting cards (Herald, Builder, 2 Governors, Trader, Envoy, Patron, Settler), 15 houses, 1 cart + 1 ship in Caput, 2 carts + 2 ships in the storehouse, goods 2 grain + 1 brick + 1 tool
   + 1 wine + 1 cloth (10 of 12 spaces used). Start player 5 coins, second player 6. The Grand Governor starts with the second player.
 
 ## A turn

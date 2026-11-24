@@ -300,7 +300,7 @@
       laySelf: 'Lay 1 egg on this bird.',
       layNest: 'Lay 1 egg on each of your birds with a ' + NESTN[x[0]] + ' nest.',
       draw1: 'Draw 1 card from the deck.',
-      hunt: 'Peek at the top deck card. Wingspan under ' + x[0] + ' cm? It slides under this bird for 1 point. Otherwise it is discarded.',
+      hunt: 'Peek at the top deck card. Wings narrower than ' + x[0] + ' cm? It slides under this bird for 1 point. Otherwise it is discarded.',
       huntDie: 'Shake the dice that are outside the feeder. A ' + FN[x[0]] + ' lands? Store 1 ' + FN[x[0]] + ' on this bird.',
       allFood: 'Every player gains 1 ' + FN[x[0]] + ' from the supply.',
       allDraw: 'Every player draws 1 card from the deck.',
@@ -678,7 +678,7 @@
   var PP = { DATA: DATA, B: B, BON: BON, GOL: GOL, FOODS: FOODS, FACES: FACES, HABS: HABS, YIELD: YIELD, BONUSSP: BONUSSP, EGGCOST: EGGCOST, CUBES: CUBES, GOALPTS: GOALPTS,
     newGame: newGame, validMoves: validMoves, performMove: performMove, sideToAct: sideToAct, checkInvariants: checkInvariants, render_game_to_text: render_game_to_text,
     payOptions: payOptions, playInfo: playInfo, playable: playable, eggSources: eggSources, rowYield: rowYield, power: power, scoreOf: scoreOf, bonusScore: bonusScore, bonusHit: bonusHit,
-    goalCount: goalCount, placeGoal: placeGoal, birds: birds, eggsOn: eggsOn, eggSpace: eggSpace, foodN: foodN, allSame: allSame, nestIs: nestIs, eats: eats, clone: clone, rnd: rnd, shuffle: shuffle };
+    goalCount: goalCount, placeGoal: placeGoal, birds: birds, eggsOn: eggsOn, eggSpace: eggSpace, foodN: foodN, allSame: allSame, drawCard: drawCard, nestIs: nestIs, eats: eats, clone: clone, rnd: rnd, shuffle: shuffle };
   root.PP = PP;
   if (typeof module !== 'undefined') module.exports = PP;
 })(typeof window !== 'undefined' ? window : globalThis);
