@@ -109,6 +109,7 @@ button{font-family:var(--bd);font-weight:700;font-size:14px;color:inherit;cursor
 .card .vp{position:absolute;right:6px;bottom:6px;background:var(--sun);color:var(--ink);border-radius:8px;padding:2px 7px;font-family:var(--hd);font-size:13px}
 .card .rs{display:inline-block;margin-top:4px;background:var(--teal);color:#fff;border-radius:6px;padding:1px 6px;font-size:12px}
 .card.no{filter:saturate(.45);opacity:.78}
+.card .why{position:absolute;left:6px;right:6px;top:44px;background:#3a1a12;color:#ffd9c7;border-radius:8px;padding:3px 7px;font-weight:700;font-size:12px;line-height:1.2;text-align:center;filter:none}
 .card.pick{outline:4px solid var(--sun);outline-offset:-1px}
 .card .chk{position:absolute;left:6px;top:46px;background:var(--sun);color:var(--ink);border-radius:8px;padding:2px 8px;font-weight:700;font-size:12px;display:none}
 .card.pick .chk{display:block}
@@ -249,6 +250,22 @@ g.hex.gd-glow path:first-child{fill:rgba(255,214,90,.55)!important}
 .hex.tgt>path:first-child{fill:rgba(255,214,90,.28)}
 .hex.sel .ho{stroke:#fff!important;stroke-width:6!important;animation:none!important}
 .hex.sel>path:first-child{fill:rgba(255,255,255,.4)!important}
+
+#chP{position:fixed;left:8px;right:8px;bottom:8px;z-index:40;display:none;background:rgba(28,18,13,.96);color:#fbeee4;border:1px solid rgba(255,190,140,.35);border-radius:16px;padding:10px 12px 12px;max-height:52vh;overflow:auto;box-shadow:0 10px 30px rgba(0,0,0,.45)}
+#chP.on{display:block}
+body.charter #bar{visibility:hidden}
+#chP .cht{font-family:var(--hd);font-size:14px;letter-spacing:.02em;color:#ffcf9a;display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap}
+#chP .cht span{font-family:var(--bd,inherit);font-size:12px;color:#fbeee4;opacity:.85}
+#chP .chs{font-style:italic;font-size:14px;line-height:1.35;margin:6px 0 4px;opacity:.95}
+#chP .chg{font-weight:700;font-size:14px;margin-bottom:4px;color:#ffe2b8}
+#chP .chf{margin:6px 0;font-size:14px;line-height:1.3}
+#chP .chl{padding:3px 0}
+#chP .chl.riv b{color:#9fd3ff}#chP .chl.you b{color:#ffcf9a}#chP .chl.sys{opacity:.75;font-size:13px}
+#chP .chq{font-weight:700;font-size:16px;margin:6px 0}
+#chP .chq.dim{opacity:.6;font-weight:400;font-size:14px}
+#chP .cho{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+#chP .cho .btn{min-height:56px;margin:0}
+.chlesson{font-size:15px;line-height:1.4;background:rgba(255,207,154,.12);border-radius:10px;padding:8px 10px}
 </style>
 <style>
 body.pc #guide{left:auto;right:10px;top:0;width:auto;height:22px;padding:0 12px;border-radius:0 0 10px 10px}
@@ -287,6 +304,7 @@ body.pc #guide .k{line-height:22px}
 <aside id="rpanel" aria-label="Rival"></aside>
 <div id="scrim"></div>
 <div class="sheet" id="sheet" role="dialog" aria-modal="true"><div class="sh"><h2 id="shT">Cards</h2><button class="x" id="shX" aria-label="Close"></button></div><div class="tabs" id="shTabs"></div><div class="sb" id="shB"></div></div>
+<div id="chP" aria-live="polite"></div>
 <div id="modal" role="dialog" aria-modal="true"><div class="mb" id="mb"></div></div>
 <div id="toast"></div>
 <div class="coach" id="coach"><div><span id="coachT"></span><button id="coachB">OK</button></div></div>
@@ -1027,6 +1045,8 @@ body.pc #guide .k{line-height:22px}
       var o = ops[i];
       if (o.op === 'prod' && o.n < 0) { var fl = o.r === 'mc' ? -5 : 0; if (P.prod[o.r] + o.n < fl) return false; }
       if (o.op === 'lose' && P[o.r] < o.n) return false;
+      // decrease ANY player's production: someone (the rival, else yourself) must be able to lose the full amount
+      if (o.op === 'rprod') { var fl2 = o.r === 'mc' ? -5 : 0, R2 = G.pl[other(p)]; if (R2.prod[o.r] - o.n < fl2 && P.prod[o.r] - o.n < fl2) return false; }
       if (o.op === 'useres' && (P.res[c] || 0) < o.n) return false;
       if (o.op === 'tile' && o.where && /^(reserved|offmap)/.test(o.where) && !legalSpaces(p, o.t, o.where).length) return false;
     }
@@ -1112,7 +1132,9 @@ body.pc #guide .k{line-height:22px}
         case 'prod': P.prod[o.r] = Math.max(o.r === 'mc' ? -5 : 0, P.prod[o.r] + o.n); ev({ k: 'prod', p: p, r: o.r, n: o.n }); break;
         case 'gain': P[o.r] += o.n; ev({ k: 'gain', p: p, r: o.r, n: o.n }); break;
         case 'lose': P[o.r] = Math.max(0, P[o.r] - o.n); break;
-        case 'rprod': { var fl = o.r === 'mc' ? -5 : 0, cut = Math.min(o.n, R.prod[o.r] - fl); if (cut > 0) { R.prod[o.r] -= cut; ev({ k: 'prod', p: other(p), r: o.r, n: -cut }); log(p, (p === 0 ? 'You' : 'Rival') + ' cut ' + cut + ' ' + (RW[o.r] || o.r) + ' production.'); } else log(p, (p === 0 ? 'Rival' : 'You') + ' had no ' + (RW[o.r] || o.r) + ' production to lose.'); break; }
+        case 'rprod': { var fl = o.r === 'mc' ? -5 : 0;
+          if (R.prod[o.r] - o.n < fl && P.prod[o.r] - o.n >= fl) { P.prod[o.r] -= o.n; ev({ k: 'prod', p: p, r: o.r, n: -o.n }); log(p, (p === 0 ? 'Rival had too little, so you lost ' : 'You had too little, so the rival lost ') + o.n + ' ' + (RW[o.r] || o.r) + ' production.'); break; }
+          var cut = Math.min(o.n, R.prod[o.r] - fl); if (cut > 0) { R.prod[o.r] -= cut; ev({ k: 'prod', p: other(p), r: o.r, n: -cut }); log(p, (p === 0 ? 'You' : 'Rival') + ' cut ' + cut + ' ' + (RW[o.r] || o.r) + ' production.'); } else log(p, (p === 0 ? 'Rival' : 'You') + ' had no ' + (RW[o.r] || o.r) + ' production to lose.'); break; }
         case 'rres': { var c2 = Math.min(o.n, R[o.r]); if (c2 > 0) { R[o.r] -= c2; ev({ k: 'gain', p: other(p), r: o.r, n: -c2 }); log(p, (p === 0 ? 'You' : 'Rival') + ' removed ' + c2 + ' ' + (RW[o.r] || o.r) + '.'); } else log(p, (p === 0 ? 'Rival' : 'You') + ' had no ' + (RW[o.r] || o.r) + ' to lose.'); break; }
         case 'temp': raise(p, 'temp', o.n); break;
         case 'oxy': raise(p, 'oxy', o.n); break;
@@ -1619,6 +1641,248 @@ body.pc #guide .k{line-height:22px}
 
 </script>
 <script>
+// Ochre Horizon charters: three short story puzzles on the REAL engine (window.OH / node). No rule is changed: each charter only
+// sets up a starting position, offers the player 2-3 real legal moves at the moments that matter, and plays the rival with a fixed,
+// explained plan. Everything between decisions (passing, income, the rival's turns) runs by itself with a one-line explanation,
+// so every tap the player makes is a decision. Design and per-tap lesson table: ../../proof/STORY-DESIGN.md
+(function (root) {
+  var isNode = typeof module !== 'undefined';
+  function OHx() { return root.OH || (isNode ? require('./engine.js') : null); }
+  var YOU = 'Lantern Cooperative', RIV = 'Greyline Holdings';
+
+  // ---------- setup helpers ----------
+  function base(seed, o) {
+    var OH = OHx(); OH.newGame({ seed: seed });
+    var G = OH.G;
+    G.pl.forEach(function (P) { G.deck = G.deck.concat(P.offer.cards); P.offer = null; P.corp = 'c00'; });
+    G.phase = 'action'; G.turn = 0; G.first = 0; G.acts = 0;
+    G.charter = true;   // marks the state (UI hides research etc.)
+    [0, 1].forEach(function (p) { var s = o.pl[p] || {}; var P = G.pl[p]; for (var k in s) { if (k === 'prod') for (var r in s.prod) P.prod[r] = s.prod[r]; else if (k === 'hand') s.hand.forEach(function (id) { give(p, id); }); else P[k] = s[k]; } });
+    if (o.temp !== undefined) G.temp = o.temp; if (o.oxy !== undefined) G.oxy = o.oxy;
+    if (o.oceans) { var M = OHx().MAP, os = M.order.filter(function (s) { return M.spaces[s].ocean; }); for (var j = 0; j < o.oceans; j++) G.tiles[os[os.length - 1 - j]] = { t: 'ocean', o: -1 }; G.oceans = o.oceans; }
+    G.log.push({ p: -1, t: 'Charter begins.' });
+    return G;
+  }
+  function give(p, id) { var G = OHx().G; [G.deck, G.discard].forEach(function (a) { var i = a.indexOf(id); if (i >= 0) a.splice(i, 1); }); G.pl[p].hand.push(id); }
+  function legal(m) { var OH = OHx(); return OH.validMoves().some(function (v) { return v.t === m.t && (v.k || '') === (m.k || '') && (v.id || '') === (m.id || ''); }); }
+  function money(n) { return n + ' credit' + (n === 1 ? '' : 's'); }
+
+  // the rival's fixed plans (real legal moves), each with its reason in one sentence
+  var PLANS = {
+    income: function (G) { var OH = OHx(), P = G.pl[1]; var c = P.hand.filter(function (id) { return OH.playable(1, id); })[0]; if (c && G.gen <= 2) return { m: { t: 'play', id: c }, why: RIV + ' buys income (' + OH.card(c).name + '): rich later, no points now.' }; return PLANS.comets(G); },
+    comets: function (G) { var OH = OHx(), P = G.pl[1]; if (OH.stdOk(1, 'asteroid')) return { m: { t: 'std', k: 'asteroid' }, why: RIV + ' buys a comet strike: +1 rating now, nothing for later.' }; return { m: { t: 'pass' }, why: RIV + ' is out of money and passes.' }; },
+    cities: function (G) {
+      var OH = OHx(), P = G.pl[1];
+      if (OH.stdOk(1, 'city') && OH.cities(1) < 1) return { m: { t: 'std', k: 'city' }, why: RIV + ' builds a city: it wants greenery next to it.', place: 'rivalCity' };
+      if (P.plant >= OH.greenCost(1) && OH.legalSpaces(1, 'greenery').length) return { m: { t: 'green' }, why: RIV + ' turns 8 plants into a greenery by its city.', place: 'rivalNear' };
+      if (OH.stdOk(1, 'asteroid')) return { m: { t: 'std', k: 'asteroid' }, why: RIV + ' buys a comet strike for 1 rating.' };
+      return { m: { t: 'pass' }, why: RIV + ' passes and waits for income.' };
+    },
+    rating: function (G) {
+      var OH = OHx(), P = G.pl[1];
+      if (P.plant >= OH.greenCost(1) && OH.legalSpaces(1, 'greenery').length) return { m: { t: 'green' }, why: RIV + ' turns 8 plants into a greenery: +1 oxygen, +1 rating.' };
+      return { m: { t: 'pass' }, why: RIV + ' sits on its credits and passes.' };
+    },
+    race: function (G) {
+      var OH = OHx();
+      if (G.pl[1].heat >= 8 && G.temp < OH.TEMP_MAX) return { m: { t: 'heat' }, why: RIV + ' burns 8 heat: +1 temperature, +1 rating.' };
+      if (OH.stdOk(1, 'aquifer')) return { m: { t: 'std', k: 'aquifer' }, why: RIV + ' pumps an aquifer: an ocean and +1 rating.', place: 'rivalOcean' };
+      if (OH.stdOk(1, 'asteroid')) return { m: { t: 'std', k: 'asteroid' }, why: RIV + ' buys a comet strike for 1 rating.' };
+      return { m: { t: 'pass' }, why: RIV + ' passes.' };
+    }
+  };
+
+  // ---------- the three charters ----------
+  var CH = [
+    {
+      id: 'seed', n: 1, title: 'Four Seasons', gens: 4, plan: 'income',
+      story: [
+        'The Assembly has signed your charter. ' + YOU + ' gets four seasons on Ochre and one rule: finish ahead of ' + RIV + '.',
+        RIV + ' starts level with you. They are buying income cards: they plan to be rich in season 10.',
+        'Your rating is your points, and every season it pays you its number in credits.'
+      ],
+      goal: 'Have more points than ' + RIV + ' when season 4 ends.',
+      lesson: 'Count the seasons left. An income card pays back after about 4-5 seasons; with only 4 left, raising the planet (rating) wins.',
+      hint: 'In a full game (12+ rounds) it flips: buy income in the first 3 rounds, terraform from the middle on.',
+      setup: function () { return base(7101, { pl: [{ mc: 31, tr: 20, hand: ['p009', 'p004'] }, { mc: 31, tr: 20, hand: ['p001', 'p181', 'p185'] }], temp: -30 }); },
+      decisions: [
+        { gen: 1, prompt: 'Season 1 of 4: grow, or score now?', options: [
+          { label: 'Quiet Money Company', sub: '17 credits · +4 income every season', moves: [{ t: 'play', id: 'p009' }], why: '+4 a season, 4 paydays left: 16 back for 17 spent. No points.', naive: 1 },
+          { label: 'Comet strike', sub: '14 credits · +1 rating now', moves: [{ t: 'std', k: 'asteroid' }], why: '+1 point now, and it pays 1 credit every season too.' }],
+          teach: 'An income card is worth its number times the paydays left; rating is points and also pays.' },
+        { gen: 2, prompt: 'Season 2 of 4: one more income card?', options: [
+          { label: 'Moonlit Ledger', sub: '15 credits · +3 income every season', moves: [{ t: 'play', id: 'p004' }], why: '+3 for 3 paydays: 9 back for 15 spent. A loss this late.', naive: 1 },
+          { label: 'Comet strike', sub: '14 credits · +1 rating now', moves: [{ t: 'std', k: 'asteroid' }], why: 'Another point that also pays you each season.' }],
+          teach: 'With fewer seasons left, the same card returns less: 3 paydays x 3 = 9 for a 15-credit card.' }
+      ],
+      auto: 'cashin',
+      check: function (G) { var OH = OHx(); var a = OH.score(0).total, b = OH.score(1).total; return { ok: a > b || (a === b && G.pl[0].mc > G.pl[1].mc), line: 'You ' + a + ' · ' + RIV.split(' ')[0] + ' ' + b }; }
+    },
+    {
+      id: 'garden', n: 2, title: 'The Garden Ring', gens: 3, plan: 'rating',
+      story: [
+        'Your settlers want a home, not a number. The Assembly will name the first garden city by season 3.',
+        RIV + ' is building one too. A city scores 1 point for every greenery that touches it, yours or anyone’s.',
+        'Where you put a tile matters as much as when.'
+      ],
+      goal: 'Score more points than ' + RIV + ' by the end of season 3.',
+      lesson: 'Cities and greenery feed each other: a city in open ground with room for greenery around it scores every leaf.',
+      hint: 'In a full game, plan your city where 3-4 greenery can follow, and plant next to it.',
+      setup: function () { return base(7202, { pl: [{ mc: 26, tr: 20, hand: ['p042'], plant: 24, prod: { plant: 8 } }, { mc: 26, tr: 27, plant: 24, prod: { plant: 8 } }], temp: -20, oxy: 2 }); },
+      decisions: [
+        { gen: 1, prompt: 'Season 1: what to build first?', options: [
+          { label: 'Terrace Settlement', sub: '17 credits · a city, +1 income', moves: [{ t: 'play', id: 'p042' }], why: 'A city: every greenery that touches it is +1 point at the end.' },
+          { label: 'Comet strike', sub: '14 credits · +1 rating now', moves: [{ t: 'std', k: 'asteroid' }], why: 'One rating now. No city means your greenery score only 1 each.', naive: 1 }],
+          teach: 'A city scores 1 point per greenery touching it.' },
+        { gen: 1, kind: 'place', tile: 'city', prompt: 'Where does the city go?', pick: 'cityRoom',
+          teach: 'Greenery must touch your own tiles, so the city decides where your greenery can grow.' },
+        { gen: 1, prompt: 'You have 24 plants. Plant now?', options: [
+          { label: 'Plant a greenery', sub: '8 plants · +1 oxygen, +1 rating, +1 point', moves: [{ t: 'green' }], why: 'Oxygen up: +1 rating, the tile is +1 point, and it touches your city: +1 more.' },
+          { label: 'Keep the plants', sub: 'save them for later', moves: [], why: 'Plants wait safely, but each season you wait is a season the tile is not scoring.', naive: 1 }],
+          teach: '8 plants make a greenery: it raises oxygen (+1 rating) and is worth 1 point, 2 next to your city.' }
+      ],
+      auto: 'plant',
+      check: function (G) { var OH = OHx(); var a = OH.score(0).total, b = OH.score(1).total; return { ok: a > b || (a === b && G.pl[0].mc > G.pl[1].mc), line: 'You ' + a + ' · ' + RIV.split(' ')[0] + ' ' + b }; }
+    },
+    {
+      id: 'thaw', n: 3, title: 'The Thaw', gens: 3, plan: 'race',
+      story: [
+        'Season 3 of the new world. The ice line is close: at 0°C the first sea breaks through, a free ocean for whoever gets there.',
+        RIV + ' raises the temperature every chance it gets. Every step is +1 rating for whoever raises it.',
+        'The white mark at 0°C pays its ocean to the player who lands on it, not to the one who did the work before.'
+      ],
+      goal: 'Finish season 3 with more rating than ' + RIV + '.',
+      lesson: 'Don’t set up your rival. One step short of a white mark is a gift to whoever moves next. Count the steps.',
+      hint: 'In a full game, before you raise a gauge, check the next white mark: land on it yourself or stop two steps short.',
+      setup: function () { return base(7303, { pl: [{ mc: 18, tr: 26, heat: 8, prod: { mc: 2, heat: 4 } }, { mc: 18, tr: 26, heat: 8, prod: { mc: 2, heat: 4 } }], temp: -4, oxy: 4, oceans: 3 }); },
+      decisions: [
+        { gen: 1, prompt: 'Temperature -4°C: 2 steps to the free ocean. Your move?', options: [
+          { label: 'Burn 8 heat', sub: 'free · +1 temperature, +1 rating', moves: [{ t: 'heat' }], why: 'Now -2°C: one step from the free ocean, and ' + RIV + ' moves next.', naive: 1 },
+          { label: 'Aquifer', sub: '18 credits · ocean, +1 rating', moves: [{ t: 'std', k: 'aquifer' }], why: 'Temperature stays at -4°C: two steps away, so no one can land on 0°C in one move.' }],
+          teach: 'Whoever lands on 0°C gets the free ocean (+1 more rating). Count steps before you raise.' },
+        { gen: 1, prompt: 'Temperature -2°C, one step from the free ocean.', when: function (G) { return G.temp === -2 && G.pl[0].heat >= 8; }, options: [
+          { label: 'Burn 8 heat', sub: 'lands on 0°C · +1 rating +1 ocean', moves: [{ t: 'heat' }], why: 'You landed on 0°C: +1 rating for the step, +1 for the free ocean.' },
+          { label: 'Keep the heat', sub: 'pass for now', moves: [], why: 'You kept the heat. ' + RIV + ' can take the 0°C step next season.', naive: 1 }],
+          teach: 'A white mark pays the one who lands on it: here, 2 rating for one move.' }
+      ],
+      auto: 'heat',
+      check: function (G) { var a = G.pl[0].tr, b = G.pl[1].tr; return { ok: a > b, line: 'Rating: you ' + a + ' · ' + RIV.split(' ')[0] + ' ' + b }; }
+    }
+  ];
+
+  // ---------- placement picks (decisions where the board space is the choice) ----------
+  function spaceScore(G, s, kind) {
+    var OH = OHx(), M = OH.MAP, sp = M.spaces[s]; if (!sp) return -9;
+    var free = sp.adj.filter(function (a) { return !G.tiles[a] && M.spaces[a] && !M.spaces[a].ocean; }).length;
+    var mine = sp.adj.filter(function (a) { return G.tiles[a] && G.tiles[a].o === 0 && G.tiles[a].t === 'city'; }).length;
+    if (kind === 'cityRoom') return free;
+    if (kind === 'nextToCity') return mine * 10 + free;
+    return 0;
+  }
+  // options for a placement decision: the best space and a worse one, both legal, with their consequence in words
+  function placeOptions(G, d) {
+    var OH = OHx(), sp = G.pending.d.spaces.filter(function (s) { return OH.MAP.spaces[s]; });
+    var ranked = sp.map(function (s) { return { s: s, v: spaceScore(G, s, d.pick) }; }).sort(function (a, b) { return b.v - a.v || (a.s < b.s ? -1 : 1); });
+    var good = ranked[0], bad = ranked[ranked.length - 1];
+    if (!good) return [];
+    var o = [];
+    if (d.pick === 'cityRoom') {
+      o.push({ space: good.s, label: 'Open ground', sub: good.v + ' free spaces around it', why: 'Room for ' + good.v + ' greenery around it: up to ' + good.v + ' points later.' });
+      if (bad && bad.s !== good.s) o.push({ space: bad.s, label: 'Tight corner', sub: bad.v + ' free spaces around it', why: 'Only ' + bad.v + ' spaces can ever touch it: the city can score at most ' + bad.v + '.', naive: 1 });
+    } else {
+      o.push({ space: good.s, label: 'Touching your city', sub: '+1 point, +1 for the city', why: 'It touches your city: worth 2 points instead of 1.' });
+      var far = ranked.filter(function (r) { return Math.floor(r.v / 10) === 0; })[0];
+      if (far) o.push({ space: far.s, label: 'Away from the city', sub: '+1 point', why: 'Worth 1 point. A tile touching the city would have been worth 2.', naive: 1 });
+    }
+    return o;
+  }
+  function rivalPlace(G, hint) {
+    var OH = OHx(), M = OH.MAP, sp = G.pending.d.spaces.slice();
+    function sc(s) { if (!M.spaces[s]) return -99; var a = M.spaces[s].adj; return hint === 'rivalNear' ? a.filter(function (x) { return G.tiles[x] && G.tiles[x].o === 1 && G.tiles[x].t === 'city'; }).length * 10 + a.filter(function (x) { return !G.tiles[x]; }).length : a.filter(function (x) { return !G.tiles[x]; }).length; }
+    sp.sort(function (a, b) { return sc(b) - sc(a) || (a < b ? -1 : 1); });
+    return sp[0];
+  }
+
+  // ---------- the driver (same code for the page and for node tests) ----------
+  // R = run state: { ch, step, done[], feed[], ended, result }
+  function start(i) { var ch = CH[i]; ch.setup(); return { i: i, ch: ch, taken: {}, feed: [], ended: false, result: null }; }
+  function auto(R) {
+    var OH = OHx(), G = OH.G, k = R.ch.auto;
+    if (k === 'cashin') { if (OH.stdOk(0, 'asteroid')) return { m: { t: 'std', k: 'asteroid' }, why: 'Your bank buys a comet strike: +1 rating.' }; }
+    if (k === 'plant' && G.pl[0].plant >= OH.greenCost(0) && OH.legalSpaces(0, 'greenery').length && R.taken['1:2'] !== undefined) return { m: { t: 'green' }, why: 'New plants grow into a greenery.' };
+    if (k === 'heat' && G.pl[0].heat >= 8 && G.temp < OH.TEMP_MAX) return { m: { t: 'heat' }, why: 'Your heat warms the air: +1 rating.' };
+    if (k !== 'cashin' && OH.stdOk(0, 'asteroid') && G.gen > lastDecisionGen(R)) return { m: { t: 'std', k: 'asteroid' }, why: 'Your bank buys a comet strike: +1 rating.' };
+    return { m: { t: 'pass' }, why: 'You keep the rest and pass.' };
+  }
+  function lastDecisionGen(R) { return R.ch.decisions.reduce(function (a, d) { return Math.max(a, d.gen); }, 0); }
+  // the decision waiting for the player now, or null
+  function decision(R) {
+    var OH = OHx(), G = OH.G;
+    if (R.ended || OH.sideToAct() !== 0) return null;
+    var list = R.ch.decisions;
+    for (var j = 0; j < list.length; j++) {
+      var d = list[j], key = d.gen + ':' + j;
+      if (R.taken[key] !== undefined || d.gen !== G.gen) continue;
+      if (d.kind === 'place') {
+        if (!(G.pending && G.pending.h === 'place' && G.pending.d.t === d.tile)) { if (j > 0 && R.taken[list[j - 1].gen + ':' + (j - 1)] === undefined) return null; continue; }
+        if (d.pick === 'nextToCity' && !OHx().cities(0)) { R.taken[key] = 'skip'; continue; }
+        var po = placeOptions(G, d); if (po.length < 2) { R.taken[key] = 'skip'; continue; }
+        return { key: key, d: d, options: po };
+      }
+      if (G.pending || G.phase !== 'action') return null;
+      if (d.when && !d.when(G)) continue;
+      var ok = d.options.filter(function (o) { return !o.moves.length || legal(o.moves[0]); });
+      if (ok.length < 2) { R.taken[key] = 'skip'; continue; }
+      return { key: key, d: d, options: ok };
+    }
+    return null;
+  }
+  function choose(R, dec, idx) {
+    var OH = OHx(), o = dec.options[idx];
+    R.taken[dec.key] = idx; R.lastNaive = !!o.naive;
+    if (o.space) OH.performMove({ t: 'place', s: o.space });
+    else if (!o.moves.length) OH.performMove({ t: OH.G.acts === 1 ? 'end' : 'pass' });
+    else o.moves.forEach(function (m) { OH.performMove(m); });
+    R.endAfter = true;   // one decision = one turn (ended in advance once any placement is done)
+    R.feed.push({ who: 0, t: o.why });
+    return o.why;
+  }
+  // run everything that needs no decision; returns the list of {who, t} lines it produced (for the UI to animate)
+  function advance(R, maxSteps) {
+    var OH = OHx(), out = [], guard = 0;
+    while (guard++ < (maxSteps || 400)) {
+      var G = OH.G;
+      if (G.gen > R.ch.gens || G.over || G.phase === 'final') { if (!R.ended) { R.ended = true; R.result = R.ch.check(G); } break; }
+      if (decision(R)) break;
+      var p = OH.sideToAct();
+      if (p < 0) break;
+      if (G.phase === 'research') { OH.performMove({ t: 'buy', ids: [] }); continue; }
+      if (R.endAfter && p === 0 && !G.pending && G.phase === 'action') { R.endAfter = false; if (G.acts === 1) { OH.performMove({ t: 'end' }); continue; } }
+      if (R.endAfter && p === 1) R.endAfter = false;
+      if (G.pending && G.pending.h === 'place') {
+        if (p === 1) { OH.performMove({ t: 'place', s: rivalPlace(G, R.rivalPlace) }); continue; }
+        var best = G.pending.d.spaces.filter(function (s) { return OH.MAP.spaces[s]; }).sort(function (a, b) { return spaceScore(G, b, 'nextToCity') - spaceScore(G, a, 'nextToCity') || (a < b ? -1 : 1); })[0] || G.pending.d.spaces[0];
+        OH.performMove({ t: 'place', s: best }); continue;
+      }
+      if (G.pending) { OH.performMove(G.pending.h === 'choose' ? { t: 'choose', i: G.pending.d.ok[0] } : { t: 'pickres', id: G.pending.d.cards[0] }); continue; }
+      var a = p === 1 ? PLANS[R.ch.plan](G) : auto(R);
+      if (p === 1) R.rivalPlace = a.place;
+      if (G.acts === 1 && a.m.t === 'pass') a.m = { t: 'end' };
+      if (!OH.performMove(a.m)) OH.performMove({ t: G.acts === 1 ? 'end' : 'pass' });
+      if (a.m.t !== 'pass' && a.m.t !== 'end' || p === 1) out.push({ who: p, t: a.why, m: a.m });
+    }
+    R.feed = R.feed.concat(out);
+    return out;
+  }
+  // a whole line for tests: pick(dec) returns the option index
+  function play(i, pick) { var R = start(i), n = 0; while (!R.ended && n++ < 60) { advance(R); var d = decision(R); if (d) choose(R, d, pick(d)); } return R; }
+
+  var OHC = root.OHC = { CH: CH, start: start, advance: advance, decision: decision, choose: choose, play: play, YOU: YOU, RIV: RIV };
+  if (isNode) module.exports = OHC;
+})(typeof window !== 'undefined' ? window : globalThis);
+
+</script>
+<script>
 // Ochre Horizon art kit: 1970s sci-fi poster look, all code art (SVG strings). Sunset orange + teal, halftone, grain, bold type.
 (function (root) {
   var C = { sun: '#ff7a2f', sun2: '#ffb347', gold: '#f2c14e', deep: '#0e2f38', teal: '#1f8a8a', teal2: '#57c4b8', cream: '#f6e7c8', ink: '#1c120d', rust: '#c2452d', plum: '#5b2a4a', magenta: '#d6456b', ocean: '#1f6f9a', green: '#6aa84f', rival: '#46c3d6', you: '#ff7a2f' };
@@ -1786,6 +2050,16 @@ function whyNot(p, id) {
   return '';
 }
 
+// short reason on a card you cannot play yet (shown on the card itself, 5 words or so)
+function whyShort(p, id) {
+  var c = OH.CARDS[id];
+  if (G.phase !== 'action') return '';
+  if (!OH.reqOk(p, c.req)) return 'Needs ' + reqWords(c.req);
+  if (!OH.opsPossible(p, c.play, id)) return 'Needs production you lack';
+  var cost = OH.cardCost(p, id), pay = OH.maxPay(p, c, cost);
+  if (pay.mc > G.pl[p].mc) return 'Short ' + (pay.mc - G.pl[p].mc) + ' credits';
+  return '';
+}
 // ---------- card html ----------
 function cardHTML(id, opt) {
   opt = opt || {};
@@ -1801,6 +2075,7 @@ function cardHTML(id, opt) {
   if (opt.flavor && c.flavor) h += '<div class="fl">' + esc(c.flavor) + '</div>';
   h += '</div>';
   if (c.vp) h += '<span class="vp">' + esc(vpWords(c.vp)) + '</span>';
+  if (opt.no && G && G.pl && OH.CARDS[id]) { var wn = whyShort(0, id); if (wn) h += '<span class="why">' + esc(wn) + '</span>'; }
   h += '<span class="chk">' + (opt.chk || 'Keep') + '</span></div>';
   return h;
 }
@@ -1849,7 +2124,7 @@ function renderBar() {
   $('bActS').textContent = ready ? ready + ' ready' : (P.played.some(function (id) { return OH.CARDS[id] && OH.CARDS[id].action && OH.CARDS[id].action.length; }) || P.corp && OH.card(P.corp).action ? 'used or none' : 'none yet');
   $('bPassT').textContent = G.acts === 1 ? 'Done' : 'Pass';
   $('bPassS').textContent = G.acts === 1 ? (G.pl[1].passed ? 'you go again' : 'end turn, play again') : 'out till next round';
-  $('bPass').setAttribute('aria-label', G.acts === 1 ? 'Done: end this turn, you play again next round' : 'Pass: you are out until the next generation. Income next round: ' + (P.prod.mc + P.tr) + ' credits');
+  $('bPass').setAttribute('aria-label', G.acts === 1 ? 'Done: end this turn after one action; you play again after the rival' : 'Pass: you are out until the next generation. Income next round: ' + (P.prod.mc + P.tr) + ' credits');
   ['bProj', 'bAct', 'bPass'].forEach(function (b) { $(b).disabled = !my; });
   $('bCards').disabled = false;
 }
@@ -2016,6 +2291,7 @@ function clientToSvg(cx, cy) { var svg = $('board'), pt = svg.createSVGPoint(); 
   svg.addEventListener('dblclick', function (e) { var q = clientToSvg(e.clientX, e.clientY); zoomBy(1.6, q[0], q[1]); });
 })();
 function tapSpace(s) {
+  if (UI.charter) { chTapSpace(s); return; }
   if (!G || UI.busy) return;
   var pend = G.pending && G.pending.h === 'place' && G.pending.p === 0 && OH.sideToAct() === 0 ? G.pending.d : null;
   if (pend && pend.spaces.indexOf(s) >= 0) {
@@ -2157,6 +2433,7 @@ function doMove(m) {
 var aiTimer = 0;
 function pump() {
   if (!G) return;
+  if (UI.charter) { render(); return; }
   render();
   if (G.over) { showEnd(); return; }
   var p = OH.sideToAct();
@@ -2440,12 +2717,12 @@ $('res').addEventListener('click', function (e) {
 });
 // ===== part 5: start screen, menu, rules, coach (learn to play), suggestion, end screen, boot =====
 function menuHTML() {
-  var rows = [['new', 'New game', 'Same level, fresh planet'], ['learn', 'Learn to play', 'A guided first game'], ['rules', 'How to play', 'All the rules, short'], ['ref', 'All cards', '208 projects, 12 companies, map'], ['log', 'What happened', 'Every move so far'], ['sound', 'Sound: ' + (UI.sound ? 'on' : 'off'), 'Tap to switch'], ['home', 'Title screen', 'Change level or draft'], ['credits', 'Credits', 'Fonts and licences']];
+  var rows = [['new', 'New game', 'Same level, fresh planet'], ['learn', 'Learn to play', 'Three short charters: story + strategy'], ['rules', 'How to play', 'All the rules, short'], ['ref', 'All cards', '208 projects, 12 companies, map'], ['log', 'What happened', 'Every move so far'], ['sound', 'Sound: ' + (UI.sound ? 'on' : 'off'), 'Tap to switch'], ['home', 'Title screen', 'Change level or draft'], ['credits', 'Credits', 'Fonts and licences']];
   return rows.map(function (r) { return '<div class="row"><div class="rt"><b>' + r[1] + '</b><span>' + r[2] + '</span></div><button data-menu="' + r[0] + '">Open</button></div>'; }).join('');
 }
 function menuDo(k) {
   if (k === 'new') { closeSheet(); startGame({ level: UI.level, draft: UI.draft }); }
-  else if (k === 'learn') { closeSheet(); startGame({ level: 'easy', tut: true }); }
+  else if (k === 'learn') { closeSheet(); chStart(0); }
   else if (k === 'rules' || k === 'ref' || k === 'log') { UI.tab = k === 'ref' ? 'r-auto' : null; openSheet(k, UI.tab); }
   else if (k === 'sound') { UI.sound = !UI.sound; LS.set('oh_sound', UI.sound ? '1' : '0'); UI.refreshSheet(); }
   else if (k === 'home') { closeSheet(); showStart(); }
@@ -2457,15 +2734,15 @@ $('zin').innerHTML = A.icon('plus', 20); $('zout').innerHTML = A.icon('minus', 2
 $('hintbtn').innerHTML = A.icon('bulb', 22);
 function rulesHTML() {
   return '<div class="rules">' +
-    '<h4>Goal</h4><p>Make Ochre livable with your rival. Temperature to 8°C, oxygen to 14%, all 9 oceans. When all three are done, the round ends the game. Most points wins.</p>' +
+    '<h4>Goal</h4><p>Make Ochre livable with your rival. Temperature to 8°C, oxygen to 14%, all 9 oceans. When all three are done, that round is the last: income is paid, both may turn plants into greenery once more, then points are counted. Most points wins; a tie goes to the most credits.</p>' +
     '<h4>Points</h4><p>Your rating (starts at 20, +1 for every step you raise), milestones and awards, 1 per greenery, 1 per greenery next to your cities, and points on cards.</p>' +
-    '<h4>A round (generation)</h4><p>1. New cards: see 4, buy any for 3 credits each (round 1: pick a company and keep from 10).</p><p>2. Actions: take turns doing 1 or 2 actions, until both pass.</p><p>3. Income: energy turns into heat. Gain credits = credit production + rating, and every other production.</p>' +
+    '<h4>A round (generation)</h4><p>1. New cards: see 4, buy any for 3 credits each (round 1: pick a company and keep from 10).</p><p>2. Actions: take turns doing 1 or 2 actions, until both pass. Who goes first swaps every round.</p><p>3. Income: energy turns into heat. Gain credits = credit production + rating, and every other production.</p>' +
     '<h4>Actions</h4><p>Play a card (pay its cost; steel pays 2 for building cards, titanium 3 for space cards; meet its needs). Use a standard project. Plant greenery for 8 plants. Warm the air for 8 heat. Claim a milestone. Fund an award. Use a card action once per round. Pass.</p>' +
     '<h4>Standard projects</h4><p>Sell cards 1 each · Power plant 11 · Comet strike 14 · Aquifer 18 · Greenery 23 · City 25.</p>' +
-    '<h4>Bonus steps</h4><p>Temperature −24°C and −20°C: +1 heat production. 0°C: place an ocean. Oxygen 8%: +1 temperature.</p>' +
+    '<h4>Bonus steps</h4><p>Temperature −24°C and −20°C: +1 heat production. 0°C: place an ocean. Oxygen 8%: +1 temperature. A full gauge cannot go higher and pays no rating, but cards that would raise it can still be played.</p>' +
     '<h4>Tiles</h4><p>Oceans only on ocean spaces. Greenery next to your own tile if you can; it raises oxygen. Cities never next to another city. Spaces pay their bonus icons, and each ocean next to the new tile pays 2 credits.</p>' +
     '<h4>Milestones and awards</h4><p>Milestones: 8 credits, 5 points, only 3 claimed in a game. Awards: fund for 8, 14, then 20; only 3. At the end the leader gets 5 points (2 players: no second place; a tie pays both).</p>' +
-    '<h4>Card kinds</h4><p>Orange Projects act once. Teal Lasting cards stay with an effect or an action. Pink Events act once and their tags only count when played.</p></div>';
+    '<h4>Card kinds</h4><p>Orange Projects act once. Teal Lasting cards stay with an effect or an action. Pink Events act once and their tags only count when played. A card that cuts production takes it from the rival; if the rival has too little, it takes yours, and if neither has enough it cannot be played.</p></div>';
 }
 // ---------- start screen ----------
 function showStart() {
@@ -2475,17 +2752,17 @@ function showStart() {
   $('start').innerHTML = '<svg class="bg" viewBox="0 0 400 700" preserveAspectRatio="xMidYMid slice" aria-hidden="true">' + A.DEFS + A.backdrop(400, 700) + '<circle cx="200" cy="560" r="230" fill="url(#planet)"/><circle cx="200" cy="560" r="230" fill="url(#ht)" opacity=".7"/><path d="M60 420l40-30 30 20 50-40 40 30" fill="none" stroke="#1c120d" stroke-width="0"/></svg>' +
     '<div class="tt"><h1>OCHRE<br>HORIZON</h1><div class="sub">Terraform a red world. Outscore your rival.</div></div>' +
     '<div class="bt">' + (has ? '<button class="btn" id="stCont">Continue game</button>' : '') +
-    '<button class="btn' + (has ? ' cr' : '') + '" id="stNew">New game</button><button class="btn alt" id="stLearn">Learn to play<small>Guided first game, about 10 minutes</small></button>' +
+    '<button class="btn' + (has ? ' cr' : '') + '" id="stNew">New game</button><button class="btn alt" id="stLearn">Learn to play<small>Three charters, about 3 minutes each</small></button>' +
     '<div class="lv">' + ['easy', 'normal', 'hard'].map(function (l) { return '<button data-lv="' + l + '" class="' + (l === lv ? 'on' : '') + '">' + l[0].toUpperCase() + l.slice(1) + '</button>'; }).join('') + '<button data-draft="1" class="' + (UI.draft ? 'on' : '') + '">Draft ' + (UI.draft ? 'on' : 'off') + '</button></div></div>';
   if ($('stCont')) $('stCont').addEventListener('click', function () { loadGame(); });
   $('stNew').addEventListener('click', function () { startGame({ level: UI.level, draft: UI.draft }); });
-  $('stLearn').addEventListener('click', function () { startGame({ level: 'easy', tut: true }); });
+  $('stLearn').addEventListener('click', function () { chStart(0); });
   $('start').querySelectorAll('[data-lv]').forEach(function (b) { b.addEventListener('click', function () { UI.level = b.getAttribute('data-lv'); LS.set('oh_level', UI.level); showStart(); }); });
   $('start').querySelector('[data-draft]').addEventListener('click', function () { UI.draft = !UI.draft; showStart(); });
 }
 function hideStart() { $('start').style.display = 'none'; document.body.classList.remove('st'); }
 function startGame(o) {
-  o = o || {};
+  o = o || {}; if (window.chStop && UI.charter) chStop();
   UI.level = o.level || UI.level; UI.tut = !!o.tut; UI.draft = !!o.draft; UI.setup = null; UI.research = null; UI.coachDone = {};
   OH.newGame({ seed: o.seed || (o.tut ? 20261120 : (Date.now() % 1e9)), draft: UI.draft, beginner: true });
   UI.evSeen = 0; UI.logSeen = 0;
@@ -2509,12 +2786,12 @@ var COACH = {
   pass: 'Out of money? Pass. Income comes when both pass.',
   research: 'Marked cards are our pick. Tap to change. 3 credits each.',
   research2: 'Income = credit production + your rating. Grow both.',
-  bonus: 'White marks on gauges give a bonus: heat production, an ocean.',
+  bonus: 'White marks on gauges pay a bonus: heat production, an ocean, warmth.',
   vp: 'VP on a card means points at the end. Not rating.',
   plants: 'Glowing plants? Tap them: 8 plants make a greenery.',
   goals: 'Projects tab holds milestones and awards: 5 points each.',
   out: 'Rival is out. Keep taking turns until you pass too.',
-  end: 'Game ends when all three gauges hit their goals.'
+  end: 'When all three gauges are full, that round is the last.'
 };
 function coachShow(k) {
   if (!UI.tut || UI.coachDone[k] || UI.scn || (window.guideEnabled && guideEnabled())) return;
@@ -2595,7 +2872,7 @@ function setPC() {
 
 // ===== part 6: guide (what to tap now): one banner, glowing target, wrong-tap nudge =====
 var GD = { on: false, sel: [], line: '', nudgeTm: 0, last: '' };
-function guideEnabled() { return !!G && !UI.scn && !G.over && (UI.tut || (!LS.get('oh_done') && !Q.get('play')) || !!Q.get('guide')); }
+function guideEnabled() { return !!G && !UI.scn && !UI.charter && !G.over && (UI.tut || (!LS.get('oh_done') && !Q.get('play')) || !!Q.get('guide')); }
 var GD_IDEA = {   // first-time teaching line for each idea (shown in gens 1-2 under the instruction)
   corp: 'Your company sets your start. This one is plain: easy to learn.',
   keep: 'Cards are your projects. You get all 10 free with this company.',
@@ -2793,6 +3070,86 @@ document.addEventListener('click', function (e) {
   setInterval(go, 500); setInterval(function () { try { if (GD.on) guidePlace(); } catch (e) { } }, 120); window.addEventListener('resize', go); document.addEventListener('scroll', function () { if (GD.on) guidePlace(); }, true);
   if (window.ResizeObserver) new ResizeObserver(function () { document.documentElement.style.setProperty('--gd', (document.body.classList.contains('gd') ? $('guide').offsetHeight : 0) + 'px'); }).observe($('guide'));
 })();
+// ===== part 7: Learn to play = three charters (story + strategy puzzles on the real engine). Logic in src/charters.js =====
+// Every tap here is a decision between real moves; the screen then says WHY in one sentence and plays the rival's reply with its reason.
+// Nothing asks for Next/OK: story beats ride along with the first decision, results ride along with the next one.
+var CHUI = { R: null, last: [], timer: 0, beat: 0, wins: {} };
+function chStart(i) {
+  closeModal(); closeSheet(); hideStart(); clearTimeout(CHUI.timer);
+  UI.tut = false; UI.scn = false; UI.charter = true; UI.setup = null; UI.research = null;
+  CHUI.R = OHC.start(i); CHUI.last = []; CHUI.beat = 0;
+  UI.evSeen = OH.G.ev.length; UI.logSeen = OH.G.log.length;
+  document.body.classList.add('charter');
+  fitView(); render(); chTick();
+}
+function chStop() { UI.charter = false; CHUI.R = null; clearTimeout(CHUI.timer); document.body.classList.remove('charter'); $('chP').classList.remove('on'); }
+function chLine(l) { return '<div class="chl ' + (l.who ? 'riv' : 'you') + '">' + (l.who ? '' : '<b>Why:</b> ') + esc(l.t) + '</div>'; }
+// one step at a watchable pace; stops at a decision or at the end
+function chTick() {
+  var R = CHUI.R; if (!R || !UI.charter) return;
+  clearTimeout(CHUI.timer); CHUI.lastTick = Date.now();
+  var d = OHC.decision(R);
+  if (d) { chShow(d); return; }
+  if (R.ended) { chDebrief(); return; }
+  var g0 = OH.G.gen, out = OHC.advance(R, 1);
+  var dl = playEvents(); render(); chDecor();
+  out.forEach(function (l) { var p = CHUI.last[CHUI.last.length - 1]; if (!p || p.t !== l.t) CHUI.last.push(l); });
+  if (CHUI.last.length > 5) CHUI.last = CHUI.last.slice(-5);
+  if (OH.G.gen !== g0 && OH.G.gen <= R.ch.gens) CHUI.last.push({ who: -1, t: 'Season ' + OH.G.gen + ' of ' + R.ch.gens + ': income paid (rating + income cards).' });
+  chPanel(null);
+  CHUI.timer = setTimeout(chTick, out.length ? Math.min(1500, Math.max(UI.AIDELAY * 6, dl, 650)) : 60);
+}
+function chGoalLine() { var R = CHUI.R, G = OH.G; return 'Season ' + Math.min(G.gen, R.ch.gens) + ' of ' + R.ch.gens + ' · You ' + OH.score(0).total + ' · Greyline ' + OH.score(1).total; }
+function chPanel(d) {
+  var R = CHUI.R, h = '<div class="cht">Charter ' + R.ch.n + ' · ' + esc(R.ch.title) + '<span>' + esc(chGoalLine()) + '</span></div>';
+  if (CHUI.beat < R.ch.story.length && d) h += '<div class="chs">' + R.ch.story.map(esc).join(' ') + '</div><div class="chg">Goal: ' + esc(R.ch.goal) + '</div>';
+  var lines = CHUI.last.slice(-4);
+  if (lines.length) h += '<div class="chf">' + lines.map(function (l) { return l.who === -1 ? '<div class="chl sys">' + esc(l.t) + '</div>' : chLine(l); }).join('') + '</div>';
+  if (d) {
+    h += '<div class="chq">' + esc(d.d.prompt) + '</div><div class="cho">' + d.options.map(function (o, i) { return '<button class="btn' + (i ? ' cr' : '') + '" data-cho="' + i + '">' + esc(o.label) + '<small>' + esc(o.sub) + '</small></button>'; }).join('') + '</div>';
+  } else h += '<div class="chq dim">' + (R.ended ? 'Charter over.' : 'Playing out…') + '</div>';
+  $('chP').innerHTML = h; $('chP').classList.add('on');
+  setHint(R.ch.goal.replace(/ when season.*| by the end.*/, '').slice(0, 60));
+  $('chP').querySelectorAll('[data-cho]').forEach(function (b) { b.addEventListener('click', function () { chPick(d, +b.getAttribute('data-cho')); }); });
+}
+function chShow(d) {
+  render(); chDecor(d); chPanel(d);
+  if (d.d.kind === 'place') { var sp = d.options.map(function (o) { return o.space; }); if (window.autoZoomPlace && hexPx() < 47) autoZoomPlace(sp); chDecor(d); }
+}
+// placement decisions: only the offered spaces glow, each tagged with its option letter
+function chDecor(d) {
+  document.querySelectorAll('#hexes .hex.chx').forEach(function (e) { e.classList.remove('chx', 'tgt'); e.removeAttribute('data-opt'); });
+  if (!d || d.d.kind !== 'place') return;
+  document.querySelectorAll('#hexes .hex.tgt').forEach(function (e) { e.classList.remove('tgt'); });
+  d.options.forEach(function (o, i) { var e = document.querySelector('#hexes .hex[data-s="' + o.space + '"]'); if (e) { e.classList.add('tgt', 'chx'); e.setAttribute('data-opt', i); } });
+}
+function chTapSpace(s) {
+  var d = CHUI.R && OHC.decision(CHUI.R); if (!d || d.d.kind !== 'place') return;
+  var i = d.options.map(function (o) { return o.space; }).indexOf(s); if (i >= 0) chPick(d, i);
+}
+function chPick(d, i) {
+  var R = CHUI.R; if (!R || OHC.decision(R) !== null && OHC.decision(R).key !== d.key) return;
+  CHUI.beat = 99; sfx('tick'); vib(12);
+  var why = OHC.choose(R, d, i);
+  CHUI.last = [{ who: 0, t: why }, { who: -1, t: 'Learned: ' + d.d.teach }];
+  playEvents(); render(); chDecor(); chPanel(null);
+  CHUI.timer = setTimeout(chTick, 700);
+}
+function chDebrief() {
+  var R = CHUI.R, res = R.result, n = R.i, next = OHC.CH[n + 1];
+  if (res.ok) CHUI.wins[R.ch.id] = 1; try { LS.set('oh_charters', JSON.stringify(CHUI.wins)); } catch (e) { }
+  chPanel(null);
+  var other = R.lastNaive ? 'the other plan' : 'the other plan, to see why it loses';
+  modal('<h3>' + (res.ok ? 'Charter won' : 'Charter lost') + ': ' + esc(R.ch.title) + '</h3><p><b>' + esc(res.line) + '</b></p><p class="chlesson">' + esc(R.ch.lesson) + '</p>' +
+    '<button class="btn' + (res.ok ? ' cr' : '') + '" id="chAgain">Replay with ' + other + '<small>Same start, same rival: only your choices change the result</small></button>' +
+    (next ? '<button class="btn' + (res.ok ? '' : ' cr') + '" id="chNext">Charter ' + next.n + ': ' + esc(next.title) + '<small>Next idea: ' + esc(next.goal) + '</small></button>'
+      : '<button class="btn' + (res.ok ? '' : ' cr') + '" id="chFull">First full game<small>' + esc(R.ch.hint) + '</small></button>'));
+  $('chAgain').addEventListener('click', function () { chStart(n); });
+  if ($('chNext')) $('chNext').addEventListener('click', function () { chStart(n + 1); });
+  if ($('chFull')) $('chFull').addEventListener('click', function () { chStop(); closeModal(); startGame({ level: 'easy' }); toast('<b>Your first full game</b>Early rounds: buy income. Middle: cities with room for greenery. Late: land on white marks.', true, 6000, { now: true, key: 'chfull' }); });
+}
+// watchdog: if a step timer is ever lost (tab throttling, idle saver), resume the play-out
+setInterval(function () { if (UI.charter && CHUI.R && !CHUI.R.ended && Date.now() - (CHUI.lastTick || 0) > 2500 && !OHC.decision(CHUI.R)) chTick(); }, 1000);
 
 </script>
 </body></html>
