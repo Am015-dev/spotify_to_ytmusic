@@ -1,5 +1,5 @@
 {
- "updated": "2026-11-24T01:23:54Z",
+ "updated": "2026-11-24T03:09:50Z",
  "live_base": "https://am015-dev.github.io/spotify_to_ytmusic/",
  "decisions": [
   {
@@ -13,6 +13,10 @@
   }
  ],
  "notes": [
+  {
+   "at": "03:09",
+   "text": "LIVE and verified (site files match the build): 22 games with credits removed + fixes (Wildmark readability, Perch clarity, Sands claims/paths, Thornbound tutorial); previews: Wickdeep redesign, Ochre guide, Via Tessera, Onyx Atelier, Meadowfold, Gloamwar (still Preview, not called finished). NOT live: Twin Thrones (old version stays; a fix worker for its board layout check is running)."
+  },
   {
    "at": "01:23",
    "text": "WEEKLY METER (owner: 9% used at this time): my measured estimate since 22:26 UTC is at least $52, so 1% of the weekly limit is roughly $5.8 of estimate and the whole week about $580 (rough; the old orchestrator's unknown share makes it a bit lower). Burn so far about $17 per hour with many workers running: at that pace the weekly limit would be reached in about 1.5 days, before the reset. The week resets Mon 30 Nov 22:00 UTC."
