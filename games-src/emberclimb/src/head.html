@@ -652,4 +652,6 @@ html body .gxc-path .gxc-act{background:#1b1208!important;background-image:none!
 html body .gxc-path .gxc-act b,html body .gxc-path .gxc-act small{color:#fff4d8!important;opacity:1!important;text-shadow:none!important}
 html body .gx-sec .gx-row-l,html body .gx-sec .gx-row-l small{background:#f4ecd8!important;color:#1a1208!important;opacity:1!important;text-shadow:none!important}
 html body aside.gx-dock #dockt,html body aside.gx-dock #dockmsg{background:#14100e!important;color:#f5e9d8!important;opacity:1!important}
+/* QA W659: phone, two heroes + two enemies: 22px intent chips made each enemy column 131px and pushed the second enemy off screen */
+@media (max-width:480px){html body.ec-stage #stage .en .intent{max-width:100%;min-width:0;padding-right:6px!important}html body.ec-stage #stage .en .intent>span{font-size:15px!important;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}html body.ec-stage #stage .en .intent .art{width:22px!important;height:22px!important}}
 </style></head>
