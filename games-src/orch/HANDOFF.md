@@ -92,3 +92,10 @@ HUD diet (Opus): W717 thornbound | W718 rampart. Chores (Haiku): W719 contrast |
 Branches shelf/W7xx-*. Workers report via create_trigger "[DONE Wxxx]". W699/W702 pushes were denied (work lost) -> redone as W705/W706; briefs now say push per milestone or paste format-patch.
 Next: as branches land, one Sonnet integrator per 2-4 branches (shared gx-scenario-tutor.js changes -> one build-all). Onyx (has story tutorial) not converted.
 15:53 UTC DECISION: cheapag net-negative on feature work (W707 $1.22, W712 $1.5, nothing produced; W711 stalled). Kept only for one-file fixes; briefs updated.
+
+## 15:56 UTC STATE (orchestrator session_01RR7mnbria2H5cZehPYYq6S; hand off here if context is full)
+LIVE 15:51: crown-city-smash (2D PC overlap fixed) + meadowfold (contrast) via INT16 790bf02a.
+Source merged but NOT deployed: vale (W704) + doorkick (W700) at 04392461 -> phone lessons fail after merge; W722 (Opus) fixing shared gx-scenario-tutor phoneSlot regression + deploying affected games (vale, doorkick, crown, thornbound, rampart).
+Reviewer R13 (shelf/R13-review REVIEW-R13.md): ochre 0 (no lessons) -> W725; thornbound lessons not live (W722 deploys); twin/emberclimb end->title, Lessons button 0x0, ?lessons=1, show-me ring -> W726 (waits for W722); tidewake phone + >60 s tests -> W727.
+Redos: W721 vinegrave, W723 perch, W724 wildmark (no cheapag). Running from 15:33/15:39 round: W701 nebula (1b5f03f5 pushed), W705 shipwreck, W706 redline, W708 hollowbough, W709 final-approach, W710 wickdeep, W713 via-tessera, W714 meadowfold (ca260ae0), W715 gloamwar, W716 sands, W717/W718 HUD diet (Opus), W719 contrast, W720 stitchwise.
+Merge plan: after W722 lands, one Sonnet integrator per 2-4 pushed branches; shared shell changes -> one build-all. cheapag: one-file fixes only.
