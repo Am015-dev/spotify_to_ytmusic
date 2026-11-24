@@ -124,9 +124,8 @@ function tutStory(steps){const wires=()=>G.st.reduce((a,s)=>a+s.w.length,0);
   return steps.map(st=>{const d=STORY.tut.s[st.id];if(!d)return st;const who=d[1]==='quill'?STORY.rival.name:STORY.guide.name;const txt=d[3];
     return Object.assign({},st,{chapter:d[0],who:d[1],title:()=>who+' · '+d[2],say:typeof txt==='function'?()=>txt(wires()):txt})})}
 // ---------------------------------------------------------------- the kit hooks
-function storyOpen(){if(typeof GXC==='undefined'||!window.CAMPAIGN)return;
-  if(typeof GXT!=='undefined'&&!GXT.isDone(TUT_GAME))tutStart({prologue:true});else GXC.open()}
-function tutStart(o){if(typeof GXT==='undefined')return;const pro=!!(o&&o.prologue);o=pro?o:null;const first=window.CAMPAIGN&&window.CAMPAIGN.chapters&&window.CAMPAIGN.chapters[0];
+function storyOpen(){if(typeof GXC==='undefined'||!window.CAMPAIGN)return;GXC.open()}
+function tutStart(o){if(typeof lessonsOpen==='function'){try{GXC.close()}catch(e){}lessonsOpen();return}if(typeof GXT==='undefined')return;const pro=!!(o&&o.prologue);o=pro?o:null;const first=window.CAMPAIGN&&window.CAMPAIGN.chapters&&window.CAMPAIGN.chapters[0];
   try{const d=document.getElementById('offer');if(d)d.remove()}catch(e){}
   GXT.start({game:TUT_GAME,steps:tutSteps(),story:!!(window.CAMPAIGN&&typeof GXC!=='undefined'),
     endTitle:STORY.tut.endTitle,endText:o?STORY.tut.endText:STORY.tut.endTextPlain,

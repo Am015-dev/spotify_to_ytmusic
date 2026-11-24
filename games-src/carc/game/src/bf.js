@@ -222,7 +222,7 @@ function syncTurn(){if(!G||G.over||!G.cur)return;const key=G.turn+':'+G.step;if(
   else{UI.legal=[];UI.hint=null;UI.hintFig=null;UI.sel=null}}
 // ---------- the main render ----------
 function render(){if(!G)return;syncTurn();renderTop();renderTiles();renderGlows();renderMeeples();renderFigSpots();renderHand();renderStatus();renderSheet();updateGhost();placeOverlay();ensureGlowVisible();setTimeout(ensureGlowVisible,500);hlpAfter()}
-function save(){if(UI.tut||UI.coach)return;try{if(G&&!G.over&&G.pl.some(p=>p.human)&&!UI.camp)localStorage.setItem(SAVE,JSON.stringify(G));else localStorage.removeItem(SAVE)}catch(e){}}
+function save(){if(UI.tut||UI.coach||UI.lesson)return;try{if(G&&!G.over&&G.pl.some(p=>p.human)&&!UI.camp)localStorage.setItem(SAVE,JSON.stringify(G));else localStorage.removeItem(SAVE)}catch(e){}}
 function refresh(){if(UI.sim||!G)return;render();save();playFx();if(UI.coach)try{coachTick()}catch(e){console.error(e)}if(G.over)finishUp();else schedAI()}
 // ---------- actions ----------
 function rotate(){if(!myTurn('place')||UI.rots.length<2){return}if(!tutGate({what:'rotate'}))return;const i=UI.rots.indexOf(UI.rot),n=UI.rots[(i+1)%UI.rots.length];UI.deg+=((n-UI.rot+4)%4||4)*90;UI.rot=n;sfx('click');if(UI.sel){if(UI.legal.some(g=>g.r===n&&g.x===UI.sel.x&&g.y===UI.sel.y))UI.sel.r=n;else UI.sel=null}renderGlows();renderHand();renderStatus();if(UI.sel){try{pvHighlight(prevCalc(UI.sel.x,UI.sel.y,n).hl)}catch(e){}}else{pvHighlight(null);camAim(350)}updateGhost();placeOverlay();ensureGlowVisible();const b=$('#htile');if(b)b.querySelector('.spin').style.transform=`rotate(${UI.deg}deg)`}
@@ -285,7 +285,7 @@ function finalPops(){const fs=finalScores();let n=0;const dets=fs.det.filter(d=>
   for(const d of dets){const pts=d.ty==='F'?d.n*(G.figs.some(f=>f.k==='pig'&&find(f.s)===d.r&&d.win.includes(f.p))?4:3):d.pts;if(!pts)continue;setTimeout(()=>scorePop({r:d.r,pts,win:d.win},true),FINAL0+n*FINALSTEP);n++}
   return n}
 function tutFinalPops(){if(UI.tut)finalPops()}
-function finishUp(){if(UI.endShown)return;UI.endShown=true;UI.aiT&&clearTimeout(UI.aiT);UI.aiT=0;if(UI.coach){const n=finalPops();setTimeout(()=>{try{coachEnd()}catch(e){console.error(e)}},Math.min(8000,1400+n*700));return}if(UI.tut)return;sfx('win');
+function finishUp(){if(UI.endShown)return;UI.endShown=true;UI.aiT&&clearTimeout(UI.aiT);UI.aiT=0;if(UI.coach){const n=finalPops();setTimeout(()=>{try{coachEnd()}catch(e){console.error(e)}},Math.min(8000,1400+n*700));return}if(UI.tut)return;if(UI.lesson){try{endView()}catch(e){}finalPops();return}sfx('win');
   try{endView()}catch(e){}const n=finalPops();
   const wait=Math.min(3400,FINAL0+n*FINALSTEP+1300);let gone=false;
   const plate=document.createElement('div');plate.id='endplate';plate.setAttribute('role','status');plate.innerHTML='<b>Final count</b><small>Tap to skip</small>';$('#app').appendChild(plate);
@@ -323,7 +323,7 @@ function menuAway(e){if(!e.target.closest('#menu,#menubtn'))closeMenu()}
 function closeMenu(){const d=$('#menu');if(d)d.remove();document.removeEventListener('pointerdown',menuAway,true);if(d)hlpAfter()}
 function showRules(){$('#modal').innerHTML=`<div class="scrim"><div class="card drawer" role="dialog" aria-label="How to play"><h2>How to play</h2><p class="raim">Score the most points by finishing roads and towns.</p><ul><li>Draw a tile. Turn it and lay it so edges match.</li><li>Then put a follower on a road, town, priory or field.</li><li>Or skip and keep your follower.</li><li>Finish a road or town. Its owner scores and the follower goes home.</li><li>A priory with eight tiles around it scores 9.</li><li>At the end, a farmer scores 3 per finished town.</li><li>Most followers on a road, town or field takes its points.</li><li>Equal followers: each scores in full.</li><li>A tile that fits nowhere is swapped for a new one.</li><li>Most points wins.</li></ul><button class="btn" data-a="x">Got it</button></div></div>`;$('#modal [data-a=x]').onclick=()=>{$('#modal').innerHTML=''}}
 // ---------- new game / continue ----------
-function beginGame(o){UI.camp=o&&o.camp?o.camp:null;if(o&&!o.camp||!o)o=o||setupOpts();UI.lastOpts=o;resetUI();DEFSEED=o.seed!=null?o.seed:null;newGame(o);$('#modal').innerHTML='';UI.humanTurns=0;refit(false);showGoal();}
+function beginGame(o){UI.lesson=!!(o&&o.lesson);UI.camp=o&&o.camp?o.camp:null;if(o&&!o.camp||!o)o=o||setupOpts();UI.lastOpts=UI.lesson?setupOpts():o;resetUI();DEFSEED=o.seed!=null?o.seed:null;newGame(o);$('#modal').innerHTML='';UI.humanTurns=0;refit(false);showGoal();}
 function showGoal(){const o=$('#goal');if(o)o.remove();if(UI.coach||UI.tut||UI.sim||!G||!human()||/[?&]scn=/.test(location.search))return;const d=document.createElement('section');d.id='goal';d.setAttribute('aria-label','Goal');
   d.innerHTML='<h2>How you win</h2><p class="gwin">Have the most points when the last tile is laid.</p><ul><li>Put a follower on a road, town or priory.</li><li>Finish it, and you score. Towns pay double.</li><li>Farmers in fields score at the very end.</li></ul><button type="button" id="goalok">Got it, start</button>';
   $('#app').appendChild(d);$('#goalok').addEventListener('click',()=>d.remove())}

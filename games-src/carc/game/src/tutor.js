@@ -113,7 +113,8 @@ function tutLeave(){UI.tut=false;UI.tutHold=false;UI.tutAuto=0;UI.aiT&&clearTime
 // Learn to play (owner, 8 Nov: gameplay first): a guided first game that teaches every core rule in order, one sentence + one highlighted tap
 // per step (shell/gx-tutor.js), then a real game. The coached free game (coach.js) is no longer launched from here.
 const TUT_RULES=['goal','turn','place1','fig_road','computer','claimed','place2','fig_priory','road_done','place3','fig_town','town_done','pennant','place4','fig_farmer','majority','tie','place5','discard','place6','skip','priory_done','final','winner'];
-function tutStart(o){const pro=!!(o&&o.prologue);if(typeof GXT==='undefined'){coachStart(o);return}
+function tutStart(o){if(window.__RVL&&window.__RVL.open){try{GXC.close()}catch(e){}closeMenu();$('#modal').innerHTML='';window.__RVL.open();return}   // scenario lessons (lessons.js) replace the old forced-tap tutorial; the code below is retired
+  const pro=!!(o&&o.prologue);if(typeof GXT==='undefined'){coachStart(o);return}
   try{GXC.close()}catch(e){}closeMenu();$('#modal').innerHTML='';
   GXT.start({game:TUT_GAME,story:true,setup:tutSetup,steps:tutSteps(),endTitle:STORY.tutEndTitle,endText:pro?STORY.tutEndStory:STORY.tutEndText,
     endButtons:pro?[{id:'chapter',label:'Start chapter 1'}]:[{id:'play',label:'Play a real game'}],
