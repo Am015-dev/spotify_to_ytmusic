@@ -16,8 +16,9 @@ SH = lambda f: os.path.join(SP, 'shell', f)
 SRC = {'gx-scenario.js': SH('gx-scenario.js'), 'scn.js': os.path.join(S, 'scn.js'), 'shell.js': SH('shell.js'), 'gx-kit.js': SH('gx-kit.js'), 'gx-help.js': SH('gx-help.js'),
        'gx-tutor.js': SH('gx-tutor.js'), 'gx-campaign.js': SH('gx-campaign.js'), 'campaign-data.js': None, 'gameaudio.js': os.path.join(SP, 'audio', 'gameaudio.js'),
        'gx-music.js': SH('gx-music.js'), 'data.js': os.path.join(S, 'data.js'), 'engine.js': os.path.join(S, 'engine.js'), 'ai.js': os.path.join(S, 'ai.js'),
-       'art.js': os.path.join(S, 'art.js'), 'story.js': os.path.join(S, 'story.js'), 'feel.js': os.path.join(S, 'feel.js'), 'phone.js': os.path.join(S, 'phone.js'), 'ui.js': os.path.join(S, 'ui.js')}
-css = rd(SH('shell.css')) + '\n' + rd(SH('gx-kit.css')) + '\n' + rd(SH('gx-campaign.css')) + '\n' + rd(SH('gx-help.css')) + '\n' + rd(SH('gx-tutor.css'))
+       'art.js': os.path.join(S, 'art.js'), 'story.js': os.path.join(S, 'story.js'), 'feel.js': os.path.join(S, 'feel.js'), 'phone.js': os.path.join(S, 'phone.js'), 'ui.js': os.path.join(S, 'ui.js'),
+       'gx-scenario-tutor.js': SH('gx-scenario-tutor.js'), 'lessons.js': os.path.join(S, 'lessons.js')}
+css = rd(SH('shell.css')) + '\n' + rd(SH('gx-kit.css')) + '\n' + rd(SH('gx-campaign.css')) + '\n' + rd(SH('gx-help.css')) + '\n' + rd(SH('gx-tutor.css')) + '\n' + rd(SH('gx-scenario-tutor.css'))
 h = rd(os.path.join(S, 'head.html')).replace('/*SHELL_CSS*/', css)
 body = rd(os.path.join(S, 'body.html'))
 for f, p in SRC.items():
