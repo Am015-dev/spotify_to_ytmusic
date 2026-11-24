@@ -695,7 +695,9 @@ function pvRender() {
   if (UI.cityOpen) { UI.cityOpen = null; UI.pvForce = 'city'; }
   const regTg = (tg, e) => { if (tg) { e.setAttribute('data-t', tg); e.setAttribute('data-a', 't'); UI.tgEls[tg] = e; } };
   const actsH = 54, R = { W, H, tall, acts: { x: 6, y: H - actsH, w: W - 12, h: actsH - 4 } }; UI.lay = R;
-  const col = h('div.pv-col'); col.style.height = (H - actsH) + 'px'; bd.appendChild(col);
+  // a running lesson on a tall phone: the lesson card gets its own band under the top bar, so it never lies over the HUD, tabs or places
+  const lc = document.querySelector('.gxst-card'), room = tall && !tiny && typeof GXST !== 'undefined' && GXST.active() ? Math.max(150, (lc ? lc.offsetHeight : 0)) + 8 : 0;
+  const col = h('div.pv-col'); col.style.height = (H - actsH - room) + 'px'; if (room) col.style.top = room + 'px'; bd.appendChild(col);
   // ---- top bar: scores, then my resource piles and my workers
   const hud = h('div.pv-hud'); col.appendChild(hud);
   { const c = h('div.chips'), n = G.np + (G.grim ? 1 : 0); c.setAttribute('data-n', n);
@@ -750,7 +752,7 @@ function pvRender() {
   cell(tile('haven', 0));
   // phone: the places are round clearings on the painted tree-stump table (owner art), not a grid of boxes; staggered so it reads as a board
   if (tiny) { spots.classList.add('pv-board', 'pv-board-s', 'pv-board-t', 'hscroll'); spots.style.setProperty('--cw', Math.floor((W - 16 - 8 - 12 - 16) / 4) + 'px'); }   // 4 whole columns, the 5th peeks in   // 3 across in a grid that fills the band: every place whole, none overlapping
-  else if (tall) { const short = H < 640, nc = short ? 4 : 3, xs = short ? [13, 38, 62, 87] : [19, 50, 81]; spots.classList.add('pv-board'); if (short) spots.classList.add('pv-board-s');   // short phones: 4 across, 3 rows
+  else if (tall) { const short = H < 640 || room > 0, nc = short ? 4 : 3, xs = short ? [13, 38, 62, 87] : [19, 50, 81]; spots.classList.add('pv-board'); if (short) spots.classList.add('pv-board-s');   // short phones (and a lesson's card band): 4 across, 3 rows
     const n = spots.children.length, rows = Math.ceil(n / nc), y0 = short ? 15 : 13, yr = short ? 66 : 74;
     Array.from(spots.children).forEach((c, k) => { const r = Math.floor(k / nc), col = k % nc; c.style.left = xs[col] + '%'; c.style.top = (0.6 + r * 99 / rows + (short ? 0 : col % 2 ? 1.2 : 0)) + '%';   /* rows hang from the top of their band, so nothing overlaps or leaves the board */ }); }
   // ---- goals (events): their own panel, so Places fits one screen
