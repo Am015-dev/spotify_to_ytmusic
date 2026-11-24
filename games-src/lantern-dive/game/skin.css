@@ -201,3 +201,6 @@ html.sk .gx-drawer-head button.gx-x{background:#0b1f3a!important;border-image:no
 }
 /* R13: a crewmate's job chip wraps instead of clipping at 3 lines ("Exactly three Lanterns") */
 @media (max-width:520px){html .seat .jc .t{display:block;-webkit-line-clamp:unset;overflow:visible;white-space:normal}html .seat .jc{overflow:visible;height:auto}}
+
+/* QA W659: story Next button label was white on pale art */
+html.sk .gxc-btn.go{color:#3a1604;text-shadow:0 1px 0 rgba(255,255,255,.6);font-weight:800}

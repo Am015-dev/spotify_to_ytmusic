@@ -93,18 +93,35 @@ function showPlayer(i) {
 }
 function showLog() { drawer('What happened', '<div class="rules">' + (G ? G.log.slice(-30).reverse().map(function (l) { return '<p>' + esc(l) + '</p>'; }).join('') : '') + '</div>'); }
 function showRules() {
+  var G5 = ['brick', 'food', 'tool', 'wine', 'cloth'], gi = function (g) { return '<span class="gi" style="color:' + GOOD_COL[g] + '">' + icon(g) + '</span>'; };
+  var role = function (k, txt) { return '<li class="rl"><span class="ri">' + icon(D.ACTS[k].icon) + '</span><span><b>' + D.ACTS[k].n + ':</b> ' + txt + '</span></li>'; };
+  var god = function (id, txt) { var g = D.GODS.filter(function (x) { return x.id === id; })[0]; return '<li class="rl"><span class="ri">' + icon(g.icon) + '</span><span><b>' + g.n + ':</b> ' + txt + '</span></li>'; };
   drawer('How to play', '<div class="rules">' +
-    '<h3>Goal</h3><p>Most points at the end. Points come from the patron on every card you own.</p>' +
-    '<h3>Your turn</h3><p>Play one card from your hand and do what it says. Played cards stay out until you play the Herald.</p>' +
-    '<h3>Carts and ships</h3><p>Carts use roads, ships use sea lanes. They stop on a line, one per line. A step goes to the next line. You may pass others.</p>' +
-    '<h3>Houses</h3><p>Build in cities at either end of a line you stand on. Cost: 1 brick + 1 of the city’s good (brick cities: just 1 grain), plus coins: brick 1, grain 2, tools 3, wine 4, cloth 5, times the houses there after yours. One house per city each. Never in Caput.</p>' +
-    '<h3>Storehouse</h3><p>12 spaces for goods and waiting carts and ships. If too much arrives, you pick what to keep.</p>' +
-    '<h3>Cards</h3><ul>' + Object.keys(D.ACTS).map(function (k) { return '<li><b>' + D.ACTS[k].n + ':</b> ' + actRule(k) + '</li>'; }).join('') + '</ul>' +
-    '<h3>Market</h3><p>Cards cost the goods printed on them plus an extra for the slot: slots 2–3 one good of your choice, 4–5 one cloth, 6 any + cloth, 7 two cloth. The Censor skips the extra. Gaps close and refill at the end of the turn.</p>' +
-    '<h3>Patrons at the end</h3><ul>' + D.GODS.map(function (g) { return '<li><b>' + g.n + ':</b> ' + g.rule + '. Each card with it counts.</li>'; }).join('') +
-    '<li><b>Owl cards:</b> brick and grain 3, tools 3, wine 4, cloth 5 per house in those cities.</li></ul>' +
-    '<h3>The end</h3><p>When someone buys the last market card or builds their 15th house, they take the Laurel (7 points). The other player gets one last turn.</p>' +
-    '<h3>Grand Governor</h3><p>Starts with the second player. When its holder makes a region produce, they get 2 bonus goods, then pass it on. It also wins ties.</p></div>');
+    '<h3>1. The goal</h3><p>Finish with the most points. You score at the end, and <b>every card you own</b> (in your hand or played) scores for the symbol printed on it. So buy cards that match how you play.</p>' +
+    '<h3>2. Your turn</h3><ol><li><b>Play ONE card</b> from your hand.</li><li><b>Do what it says</b> (see the roles below).</li><li>Your played cards pile up face up. Play the <b>Herald</b> to take them all back.</li></ol>' +
+    '<h3>3. The roles</h3><ul class="rls">' +
+    role('arch', 'moves your ' + icon('meeple') + ' carts and ' + icon('ship') + ' ships, then you build ' + icon('house') + ' houses next to them.') +
+    role('pref', 'a region with its good showing makes goods for every house there, and you get 1 extra. Or collect the coins on flipped regions.') +
+    role('merc', 'take 3 ' + icon('coins') + ' (5 if bought), then buy or sell goods, 2 kinds at most.') +
+    role('sen', 'buy up to 2 cards from the market.') +
+    role('cons', 'buy 1 card, but only pay the goods printed on it.') +
+    role('dipl', 'do the same as the top card of the rival’s pile.') +
+    role('colo', 'add carts or ships (1 ' + gi('food') + ' + 1 ' + gi('tool') + ' each), or take 5 ' + icon('coins') + ' + 1 per cart or ship on the map.') +
+    role('trib', 'take all your played cards back (+1 ' + icon('coins') + ' per card over 3). You may also buy 1 cart or ship.') +
+    role('spec', 'each of your houses in cities of its good makes 1 of that good.') + '</ul>' +
+    '<h3>4. Goods and coins</h3><p>' + G5.map(gi).join('') + ' brick, grain, tools, wine, cloth. Buy and sell price: 3, 4, 5, 6, 7 ' + icon('coins') + '. Your storehouse has 12 spaces. Each holds 1 good <i>or</i> 1 waiting cart or ship. If more arrives than fits, you choose what to keep.</p>' +
+    '<h3>5. Moving and building</h3><ol><li>Carts use roads, ships use sea lanes. You get 1 step per cart or ship on the map.</li><li>First step goes onto a line. Each next step goes through a city onto the next line.</li><li>You may pass a busy line, but never end on one.</li><li>Then build in cities at either end of a line you stand on.</li></ol>' +
+    '<p>A house costs 1 ' + gi('brick') + ' + 1 of the city’s good (brick cities: just 1 ' + gi('food') + '), plus coins: brick 1, grain 2, tools 3, wine 4, cloth 5, times the houses there after yours. One house per city each. Never in the capital (Caput).</p>' +
+    '<h3>6. The market</h3><p>A card costs the goods printed on it plus an extra for its slot: slot 1 none, 2–3 any 1 good, 4–5 1 ' + gi('cloth') + ', 6 any 1 good + 1 ' + gi('cloth') + ', 7 two ' + gi('cloth') + '. Gaps close and the market refills at the end of your turn.</p>' +
+    '<h3>7. The end</h3><ol><li>The game ends when someone <b>buys the last market card</b> or <b>builds their 15th house</b>.</li><li>That player takes the <b>Laurel: 7 points</b>.</li><li>The other player gets one last turn. Then count points.</li></ol>' +
+    '<h3>8. Points, per symbol</h3><p class="small">Work out the value once, then multiply by your cards that show the symbol.</p><ul class="rls">' +
+    god('hearth', '1 point per 10 coins. Your goods count at their price.') +
+    god('eagle', '1 point per house outside brick cities (up to 15).') +
+    god('sickle', '1 point per region where you have a house.') +
+    god('wing', '2 points per kind of good your houses make (up to 10).') +
+    god('shield', '2 points per cart or ship on the map (up to 12).') +
+    god('owl', 'Maker cards only: points per house in cities of its good: brick 3, grain 3, tools 3, wine 4, cloth 5.') + '</ul>' +
+    '<h3>9. Grand Governor</h3><p>Starts with the second player. Whoever makes a region produce while holding it gets 2 bonus goods, then passes it to the other player. It also wins a tie.</p></div>');
 }
 function actRule(k) {
   return { arch: 'move your carts and ships as many steps as you have on the map, then build houses.',

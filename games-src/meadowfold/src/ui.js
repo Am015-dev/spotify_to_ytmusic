@@ -58,7 +58,7 @@ function act(m, how) {   // a human move
   UI.recap = null;
   UI.hintMove = null;
   var s = G.seats[UI.view], gain = G.over ? 0 : E.score(s).total - sc0;
-  if (m.t === 'take') { SND.take(); UI.sel = { kind: 'tok', h: 0 }; }
+  if (m.t === 'take') { SND.take(); UI.fresh = true; UI.sel = { kind: 'tok', h: 0 }; }
   if (m.t === 'place') { SND.place(); UI.flash = m.k; buzz(8); var T = G.turn; UI.sel = T.hand.length ? { kind: 'tok', h: Math.min(m.h, T.hand.length - 1) } : null; }
   if (m.t === 'card') { SND.card(); UI.tab = 'mine'; if (UI.pp) { UI.pp = null; document.documentElement.removeAttribute('data-pp'); } }
   if (m.t === 'cube') { SND.animal(); UI.flash = m.k; buzz([10, 40, 10]); UI.sel = null; }
@@ -106,12 +106,15 @@ function render() {
   if (window.tutRender) tutRender();
 }
 function myTurn() { return G && !G.over && !E.seat().ai && UI.view === G.cur && !UI.busy; }
+var SEATC = ['#e8907e', '#3f7fb0', '#5d9c58', '#e3b23c'];
 function renderBar() {
   var h = '';
   G.seats.forEach(function (s, i) {
     var sc = E.score(s).total;
-    h += '<button type="button" class="pill' + (i === G.cur && !G.over ? ' cur' : '') + (i === UI.view ? ' view' : '') + '" data-seat="' + i + '" aria-label="' + esc(s.name) + ' ' + sc + ' points"><span>' + esc(s.name) + '</span><b data-engine="E.score(G.seats[' + i + ']).total">' + sc + '</b></button>';
+    var up = UI.lastSc && UI.lastSc[i] != null && sc > UI.lastSc[i];
+    h += '<button type="button" class="pill' + (i === G.cur && !G.over ? ' cur' : '') + (i === UI.view ? ' view' : '') + '" data-seat="' + i + '" style="--sc:' + SEATC[i % 4] + '" aria-label="' + esc(s.name) + ' ' + sc + ' points"><i class="stab" aria-hidden="true"></i><span>' + esc(s.name) + '</span><b class="badge' + (up ? ' tick' : '') + '" data-engine="E.score(G.seats[' + i + ']).total">' + sc + '</b></button>';
   });
+  UI.lastSc = G.seats.map(function (s) { return E.score(s).total; });
   $('#barstat').innerHTML = h;
 }
 
@@ -132,6 +135,7 @@ function renderRail() {
   if (!G) return; var s = G.seats[firstHuman()], act = s.cards.length + (s.spirit && !s.spirit.placed ? 1 : 0), cs = E.seat();
   var ready = !s.ai && (s.cards.some(function (c) { return Object.keys(E.cubeSpots(s, c.id)).length; }) || (s.spirit && !s.spirit.placed && Object.keys(E.cubeSpots(s, s.spirit.id)).length > 0));
   var canTake = myTurn() && !G.turn.tookCard && !G.turn.swapped && E.active(cs) < 4;
+  var rr = $('#railRow svg'); if (rr && G.row.length) { var an = E.card(G.row[0]).an; if (rr.dataset.an !== an) { rr.dataset.an = an; rr.setAttribute('viewBox', '0 0 30 30'); rr.setAttribute('class', 'an'); rr.innerHTML = ART.defs('rr') + ART.animal(an, 15, 15, 27, '#7a5a44', 'rr'); } }
   var a = $('#bdRow'), b = $('#bdMine');
   if (a) { a.textContent = canTake ? '1' : ''; a.hidden = !canTake; }
   if (b) { var go = ready && myTurn(); b.textContent = go ? '!' : act + '/4'; b.className = 'bd' + (go ? ' go' : ''); b.hidden = !act && !go; }
@@ -165,7 +169,7 @@ function renderCentral() {
     h += '<button type="button" class="pocket' + (can1 && sp.length ? ' glow' : '') + (taken ? ' taken' : '') + (hint ? ' hint' : '') + '" data-pocket="' + i + '"' + (can1 && sp.length ? '' : ' disabled') + ' aria-label="Pocket ' + (i + 1) + ': ' + sp.map(function (c) { return ART.NAME[c]; }).join(', ') + '">' +
       '<svg viewBox="0 0 46 42" aria-hidden="true">' + ART.defs('c' + i) + sp.map(function (c, j) { var xy = [[12, 29], [34, 29], [23, 12]][j]; return ART.token(c, xy[0], xy[1], 10.5, 'c' + i); }).join('') + '</svg></button>';
   });
-  h += '<span class="pouch" title="Tokens left in the pouch"><b>' + E.bagCount() + '</b> left</span>';
+  h += '<span class="pouch" title="Tokens left in the pouch"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 4h6l-1.5 3h-3zM7.5 8.5C4 11 3.5 20 12 20s8-9 4.5-11.5z"/></svg><b>' + E.bagCount() + '</b> left</span>';
   $('#central').innerHTML = h;
 }
 function wide() { return false; }   // one layout everywhere: the board is the screen, info lives in panels
@@ -186,6 +190,7 @@ function valleySVG(s, o) {
     if (g) h += '<polygon points="' + ART.hexPts(xy[0], xy[1], r - 4) + '" class="ring"/>';
     if (plan[k]) h += '<polygon points="' + ART.hexPts(xy[0], xy[1], r - 4) + '" class="pring"/><g class="plab"><rect x="' + (xy[0] - Math.max(25, plan[k].length * 3.6)) + '" y="' + (xy[1] + r * .3) + '" width="' + Math.max(50, plan[k].length * 7.2) + '" height="19" rx="9.5"/><text x="' + xy[0] + '" y="' + (xy[1] + r * .3 + 14) + '">' + esc(plan[k]) + '</text></g>';
     if (g && gain[k]) h += '<g class="gain"><rect x="' + (xy[0] - 15) + '" y="' + (xy[1] + r * .38) + '" width="30" height="18" rx="9"/><text x="' + xy[0] + '" y="' + (xy[1] + r * .38 + 13.5) + '">' + (gain[k] > 0 ? '+' : '') + gain[k] + '</text></g>';
+    if (g === 1 && o.tok) h += '<g class="ghost pv">' + ART.token(o.tok, xy[0], ART.topY(st, xy[1], r) - r * .1, r * .42, f) + '</g>';
     if (g === 2 && o.ghost) h += '<g class="ghost">' + ART.animal(o.ghost, xy[0], ART.topY(st, xy[1], r) - r * .05, r * .62, '#6b4e3a', f) + '</g>';
     h += '</g>';
   });
@@ -203,7 +208,7 @@ function renderMap() {
     else if (sel.ci === 'S') { c.cubes[k] = 'S'; c.spirit.placed = true; } else { c.cubes[k] = 1; c.cards[sel.ci].left--; }
     gain[k] = E.score(c).total - base;
   });
-  var v = valleySVG(s, { glow: glow, gain: gain, ghost: ghost, hint: UI.hintMove, plan: plan, marks: G.seats[UI.view].ai || UI.view !== firstHuman() ? UI.rivalMark : null, flash: UI.flash, f: 'm' });
+  var v = valleySVG(s, { glow: glow, gain: gain, ghost: ghost, tok: mine && sel && sel.kind === 'tok' ? G.turn.hand[sel.h] : null, hint: UI.hintMove, plan: plan, marks: G.seats[UI.view].ai || UI.view !== firstHuman() ? UI.rivalMark : null, flash: UI.flash, f: 'm' });
   svg.setAttribute('viewBox', v.vb); svg.innerHTML = v.html; UI.flash = null;
   svg.setAttribute('aria-label', (UI.view === firstHuman() && !s.ai ? 'Your' : s.name + '\'s') + ' valley');
   var vb = $('#vbanner'), other = UI.view !== firstHuman() && humans() === 1;
@@ -321,7 +326,7 @@ function endInfo() {   // the countdown line, or null while the end is far
   var who = G.seats[bi], nm = who.ai || humans() > 1 ? who.name + ' has' : 'you have';
   return { t: (bt <= 1 ? 'Could end next turn' : '~' + bt + ' turns left') + ': ' + nm + ' ' + be + ' empty hexes. End at 2.' };
 }
-function renderEnd() { var e = $('#endw'), i = endInfo(); e.hidden = !i; if (i) { e.textContent = i.t; e.classList.toggle('last', !!i.last); } }
+function renderEnd() { var e = $('#endw'), i = endInfo(); e.hidden = !i; if (i) { var c = i.t.indexOf(':'); e.innerHTML = c < 0 ? esc(i.t) : '<b>' + esc(i.t.slice(0, c)) + '</b><span class="ed">' + esc(i.t.slice(c)) + '</span>'; e.title = i.t; e.classList.toggle('last', !!i.last); } }
 function cardSVG(id, left, big) {
   var c = E.card(id), pat = c.pat, rr = big ? 15 : 9.5, pts = [], q = 0, ar = 0;
   pat.forEach(function (p, i) { if (i) { var d = E.DIRS[p.d]; q += d[0]; ar += d[1]; } pts.push([1.5 * q * rr, R3 * (ar + q / 2) * rr, p]); });
@@ -348,10 +353,11 @@ function cardHTML(id, o) {
 }
 function renderHand() {
   var T = G.turn, h = '<div class="handrow">' + (T.hand.length > 1 ? '<span class="anyo">Any<br>order</span>' : '');
-  T.hand.forEach(function (c, i) { var hint = UI.hintMove && UI.hintMove.t === 'place' && UI.hintMove.h === i; h += '<button type="button" class="htok' + (UI.sel && UI.sel.kind === 'tok' && UI.sel.h === i ? ' sel' : '') + (hint ? ' hint' : '') + '" data-h="' + i + '" aria-label="Place ' + ART.NAME[c] + '"><svg viewBox="0 0 40 40" aria-hidden="true">' + ART.defs('h' + i) + ART.token(c, 20, 20, 15, 'h' + i) + '</svg><span>' + ART.NAME[c] + '</span></button>'; });
+  T.hand.forEach(function (c, i) { var hint = UI.hintMove && UI.hintMove.t === 'place' && UI.hintMove.h === i; h += '<button type="button" class="htok' + (UI.fresh ? ' fresh' : '') + (UI.sel && UI.sel.kind === 'tok' && UI.sel.h === i ? ' sel' : '') + (hint ? ' hint' : '') + '" data-h="' + i + '" aria-label="Place ' + ART.NAME[c] + '"><svg viewBox="0 0 40 40" aria-hidden="true">' + ART.defs('h' + i) + ART.token(c, 20, 20, 15, 'h' + i) + '</svg><span>' + ART.NAME[c] + '</span></button>'; });
   if (!T.hand.length) h += '<span class="hn">' + (E.moves().some(function (m) { return m.t === 'cube'; }) ? 'All placed. An animal can move in!' : 'All placed.') + '</span>';
   h += '<span class="sp"></span>';
-  if (UI.undo.length) h += '<button type="button" class="btn ghostb" id="undoB">Undo</button>';
+  UI.fresh = false;
+  if (UI.undo.length) h += '<button type="button" class="btn ghostb" id="undoB" aria-label="Undo" title="Undo"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 7 4 12l5 5M4 12h10a5 5 0 0 1 0 10h-3"/></svg></button>';
   var canEnd = E.legal({ t: 'end' }); h += '<button type="button" class="btn primary' + (canEnd ? ' go' : '') + '" id="endB"' + (canEnd ? '' : ' aria-disabled="true"') + '>End turn</button>';
   $('#central').innerHTML = h + '</div>';
 }

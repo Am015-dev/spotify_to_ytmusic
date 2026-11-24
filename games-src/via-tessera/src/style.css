@@ -155,6 +155,9 @@ button:focus-visible, [tabindex]:focus-visible { outline: 3px solid var(--gold);
 .rules h3 { font-family: var(--serif); color: var(--terra2); font-size: 16px; margin: 12px 0 4px; }
 .rules p, .rules li { font-size: 15px; line-height: 1.4; }
 .rules ul { padding-left: 18px; margin: 4px 0 8px; }
+.rules ol { padding-left: 22px; margin: 4px 0 8px; } .rules ul.rls { list-style: none; padding-left: 0; }
+.rules .rl { display: flex; gap: 10px; align-items: flex-start; margin: 5px 0; } .rules .ri { flex: none; width: 26px; height: 26px; border-radius: 50%; background: var(--terra2); color: #fff; display: grid; place-items: center; } .rules .ri .ic { width: 16px; height: 16px; }
+.rules .gi { display: inline-block; vertical-align: -4px; } .rules p .ic, .rules li .ic { width: 16px; height: 16px; vertical-align: -3px; }
 .ref { display: flex; gap: 8px; align-items: center; padding: 5px 0; border-bottom: 1px solid var(--vein); font-size: 14px; }
 .ref .cd { transform: scale(.75); margin: -11px -7px; }
 .ref .t { flex: 1; } .ref .t b { display: block; font-size: 15px; }

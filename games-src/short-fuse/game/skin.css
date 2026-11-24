@@ -84,7 +84,8 @@ html.sk .gxh-a-right .gxh-arr{right:-17px;transform:rotate(0deg)}
 /* look check: crew tiles are wider than wire tiles; keep the frame's shape instead of stretching it (81% distortion) */
 html.sk-wire .tile.crew{background-size:auto 100%,100% 100%;background-repeat:no-repeat;background-position:center}
 /* look check: story speaker name readable on the painted panel (was 1.98:1) */
-html.sk .gxc-sc-name{color:#1d140c;text-shadow:0 0 3px #fff8e6,0 0 1px #fff8e6}
+html.sk .gxc-sc-name{color:#fff8e6;text-shadow:0 1px 3px #0a1220,0 0 2px #0a1220}
+html.sk .gxc-sc-text{color:#f6efdc;text-shadow:0 1px 2px rgba(5,12,28,.85)}   /* QA W659: dark text on the blue bubble was unreadable */
 /* painted plates: the art's border width must not exceed border+padding, or the label sits on the frame (menu test v2) */
 html.sk .big{border-image-width:9px 12.6px}
 html.sk .btn{border-image-width:8px 11.2px}

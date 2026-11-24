@@ -189,6 +189,7 @@ function scorePops(before, after) {
   if (!ANIM) return;
   const ib = seatScoreInfo(before), ia = seatScoreInfo(after);
   requestAnimationFrame(() => {
+    if (!G) return;   // game left (e.g. tutorial skipped) before the frame ran
     for (let s = 0; s < G.np; s++) {
       const pb = {}; groupsOf(s, before, ib).list.forEach(g => pb[g.k] = g.pts);
       for (const g of groupsOf(s, after, ia).list) {
