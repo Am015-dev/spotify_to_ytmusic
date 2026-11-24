@@ -648,7 +648,7 @@ var TT_TEST = {};
   ];
   function rulesRender() {
     var h = '<div class="mrow">' + tutBtn() + '</div><h3>Quick rules</h3><ol class="qr">'; QUICK.forEach(function (t) { h += '<li>' + t + '</li>'; });
-    h += '</ol><h3>All the rules</h3>'; FULL.forEach(function (sec, i) { h += '<details' + (i === 1 ? ' open' : '') + '><summary>' + sec[0] + '</summary><ul>'; sec[1].forEach(function (t) { h += '<li>' + t + '</li>'; }); h += '</ul></details>'; });
+    h += '</ol><h3>All the rules</h3>'; FULL.forEach(function (sec) { h += '<section class="rsec"><h4>' + sec[0] + '</h4><ul>'; sec[1].forEach(function (t) { h += '<li>' + t + '</li>'; }); h += '</ul></section>'; });
     $('rulesbox').innerHTML = h;
   }
 
