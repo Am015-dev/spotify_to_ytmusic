@@ -33,3 +33,4 @@ Old rules: `games-src/RULES-ARCHIVE.md`.
   read built html, x.js or joined ui.js. Edit the file that owns the function.
 - Prove a change on one game, owner says yes, then roll out. Shared/shell changes deploy all games in ONE build-all call.
 - Stamp deployed files (stamp-copyright.py). Live deploys that pass their checks are pre-approved.
+- Owner 24 Nov: the coordinator never asks him for approval (he approved the karpathy-guidelines skill, `.claude/skills/`): decide, act, report one short line.
