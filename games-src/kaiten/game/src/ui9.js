@@ -27,7 +27,7 @@ function campStart(def) {
   newGame('vs', { camp: def, np: s.np, seats: s.seats, level: s.level, lv: s.lv, twist: t });
   UI.camp = def;
   UI.coach.level = def.hints ? 'full' : 'off'; UI.coach.keep = !!def.hints; UI.coach.userOff = !def.hints; UI.tip = null; render();
-  try { const sg = { c2: 'Win with 10+ Fish Slice points.', c3: 'Win the roll prize twice.', c9: 'Win against all four diners.', c10: 'Win, champion bonus and all.' }; toast(sg[def.id] || def.goal.text); } catch (e) { }
+  try { const sg = { c2: 'Win with 10+ Fish Slice points.', c3: 'Win the roll prize twice.', c9: 'Win against all four diners.', c10: 'Win, champion bonus and all.', c11: 'Win despite the roll banner.', c12: 'Win; keep your custard up.', c13: 'Win with 35+ points.', c14: 'Beat the 6-point head start.', c15: 'Beat Taro at his sharpest.' }; toast(sg[def.id] || def.goal.text); } catch (e) { }
 }
 function campFinish() { try { GXC.finish(G); } catch (e) { console.error(e); } }
 function campOpen() { if (typeof GXC === 'undefined') return; closeRS(); GXC.open(); }
@@ -38,7 +38,7 @@ function campLine() {
   try {
     if (typeof GXC === 'undefined' || !window.CAMPAIGN) return '';
     const p = GXC.progress(), ch = window.CAMPAIGN.chapters, n = ch.filter(c => p.ch[c.id] && p.ch[c.id].beaten).length;
-    return n ? n + ' of ' + ch.length + ' chapters done' : 'Ten chapters, three bosses';
+    return n ? n + ' of ' + ch.length + ' chapters done' : ch.length + ' chapters, ' + ch.filter(c => c.boss).length + ' bosses';
   } catch (e) { return ''; }
 }
 function campInit() {

@@ -358,3 +358,15 @@ retire the unreachable GXT tour in ui12.js and its tests (tutor-test.js, learn-t
 - Leaf items on main screen, start of board: 17 -> 10 (phone and pc); own turn: ~20 -> 16 (3 hand tiles + Turn/Turn/Place count). Proof: games-src/tidewake/proof/w755-hud-{before,after}-{phone,pc}-sheet.jpg, w755-hud-windows-sheet.jpg.
 - Lessons: lessons-test.js PASS 402x874 and 1366x768 (~23 s each). Scenarios (phone, phone-s, pc): 19 pass, 2 fail, both same on the parent commit: phone-s menu (opip pickable marks over column numbers) and pc menu (menuAuditAll: "Lessons" under #setd while panels scroll). Visual baselines missing (expected).
 - Still weak: phone has empty space under the dock (board is width-bound); contact-sheet pc "menu" cell is captured while the bar is still visibility:hidden (loads at ~3 s; fine at 6 s).
+
+## W758 kaiten story Act 4 (shelf/W758-kaiten-story, 24 Nov)
+- No kaiten expansion exists anywhere (src, built site, kaiten branches): nothing to switch on. If the owner meant a
+  specific add-on, it has to be built first (new dish types touch data.js deck size, AI value(), art, rules help).
+- Story: Act 4 "The Late Menu", 5 stages c11-c15 (Kofi's Banner roll-banner 1, Custard Debt custard-head-start 2 at 3p,
+  Four at the Counter sweet-tooth 1.6 at 4p goal 35+, Head Start boss-head-start 6, boss Taro's Rematch long-think 400).
+  Sim, normal player, 40-60 games: 50 / 45 / 43 / 23 / 0 % (c15 easier = normal Taro, as c10).
+- Shell gx-campaign.js validator now allows 3-4 acts and up to 16 chapters with a 4th act (other games unchanged).
+- Scenarios: ?scn=kk-story-map, kk-story-c11..c15 (not yet in games/scenarios.json: add at integration).
+- Proof: game/story-act4-test.js wins all 5 (9-17 s each); sheets in kaiten-kitchen/proof/W758 (phone 0 flags; pc flags
+  are the pre-existing hidden-help "offscreen" flag, also 9/9 on the live build).
+- Left: pc hidden-help offscreen flag (all cells, pre-existing); kaiten skin.css bumps campaign pc text to 16 px locally.

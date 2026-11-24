@@ -209,3 +209,6 @@ html.kkend #beltz{background:#2f1f1a!important;border-top-color:#1c1210!importan
 html.sk .gxc-btn.go{color:#3a1604;text-shadow:0 1px 0 rgba(255,255,255,.6);font-weight:800}
 /* coach bubbles never sit over an open panel (the kk-art fixture bubble is placed on its row on purpose) */
 body:has(.gx-drawer.on) .gxh-bub:not(#art-bub){visibility:hidden!important}
+/* W758 story screens: pc text >= 16 px; phone map title wraps between words, not inside "Golden" */
+@media (min-width:1024px){ body .gxc-sc-title, body .gxc-node .gxc-st, body .gxc-lab{font-size:16px} html body .gxc-btn{font-size:16px!important} }
+@media (max-width:480px){ body .gxc-htitle{font-size:16px;overflow-wrap:normal;word-break:normal} }
