@@ -516,9 +516,8 @@ html.ph #logd,html.ph #rivald{top:auto;bottom:0;max-height:88dvh}
 #bd.pv.wide .pv-stage.cityempty .strip.city{flex:none}
 #bd.pv.wide .mc.cant .pvc-aff{display:none}
 #bd.pv.wide .mc.cant .pvc{filter:saturate(.7) brightness(.9)}
-html.ph .gx-bar .gxst-q{font-size:0;width:44px;padding:0;position:relative}
-html.ph .gx-bar .gxst-q::before{content:"";position:absolute;inset:0;margin:auto;width:24px;height:24px;background:currentColor;-webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linejoin='round'%3E%3Cpath d='M2 9l10-5 10 5-10 5z'/%3E%3Cpath d='M6 11v5c3 2 9 2 12 0v-5M22 9v6'/%3E%3C/svg%3E") center/contain no-repeat;mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linejoin='round'%3E%3Cpath d='M2 9l10-5 10 5-10 5z'/%3E%3Cpath d='M6 11v5c3 2 9 2 12 0v-5M22 9v6'/%3E%3C/svg%3E") center/contain no-repeat}
 #bd.pv.wide .pvc.small .pvc-ci b,#bd.pv.wide .pvc.small .pvc-w,#bd.pv.wide .pvc-pts .pvc-w,#bd.pv.wide .pvc.small .pvc-free{font-size:16px!important}
 html:not(.ph) .gx-bar #prompt{font-size:16px!important}
 html:not(.ph) .gx-bar .gxst-q{font-size:16px}
 html:not(.ph) #acts button,html:not(.ph) #acts button *{font-size:16px!important}
+html.ph .gx-bar .gxst-q{width:0;min-width:0;padding:0;border:0;overflow:hidden}   /* phone: no room in the bar; the shell moves Lessons to a floating pill in a free corner */
