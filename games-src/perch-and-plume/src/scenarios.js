@@ -48,11 +48,11 @@
     var seedF = pickOnce('seedF', only('F', 'seed')), fishW = pickOnce('fishW', only('W', 'fish')), fishW2 = pickOnce('fishW2', function (b) { return b.h === 'W' && b.c.length === 1 && b.c[0] === 'fish' && b.id !== B.fishW; });
     var seedG = pickOnce('seedG', function (b) { return b.h === 'G' && b.c.length === 1 && b.c[0] === 'seed'; });
     var seedG2 = pickOnce('seedG2', function (b) { return b.h === 'G' && b.c.length === 1 && b.c[0] === 'seed' && b.id !== B.seedG; });
-    var seedF2 = pickOnce('seedF2', function (b) { return b.h === 'F' && b.c.length === 1 && b.c[0] === 'seed' && b.id !== B.seedF; });
-    var seedG3 = pickOnce('seedG3', function (b) { return b.h === 'G' && b.c.length === 1 && b.c[0] === 'seed' && b.id !== B.seedG && b.id !== B.seedG2; });
+    var grubG = pickOnce('grubG', function (b) { return b.h === 'G' && b.c.length === 1 && b.c[0] === 'grub'; });
     var gSmall = pickOnce('gSmall', function (b) { return b.h === 'G' && b.e === 1; }) || seedG2, gBig = pickOnce('gBig', function (b) { return b.h === 'G' && b.e >= 4 && b.id !== B.gSmall; });
-    var bowlF = pickOnce('bowlF', function (b) { return b.h === 'F' && b.e >= 3 && b.c.length === 1; });
-    var costly = PP.DATA.birds.filter(function (b) { return plainCol(b.id) && b.h === 'W' && b.c.length >= 2 && b.c.indexOf('seed') < 0; }).slice(0, 3).map(function (b) { return b.id; });
+    var bowlF = pickOnce('bowlF', function (b) { return b.h === 'F' && b.e >= 3 && b.c.length === 1 && b.id !== B.seedF; });
+    var grubF = pickOnce('grubF', function (b) { return b.h === 'F' && b.c.length === 1 && b.c[0] === 'grub' && b.id !== B.bowlF; });
+    var costly = PP.DATA.birds.filter(function (b) { return plainCol(b.id) && b.h === 'W' && b.c.length >= 2 && b.c.join().indexOf('seed') < 0 && (PP.power(b.id).txt || '').indexOf('seed') < 0 && b.n.toLowerCase().indexOf('seed') < 0; }).slice(0, 3).map(function (b) { return b.id; });
     var cacheF = bd(function (b) { return b.h === 'F' && b.pw === 'cacheS'; }).slice(0, 2).map(function (b) { return b.id; });
     return [
       { id: 'play', title: 'Play a bird', rule: 'Birds join your board only with Play a bird, and you pay the food on the card.', par: 1,
@@ -85,9 +85,9 @@
         debrief: 'Wetland row, the bird you can pay for: ready to play next turn.' },
       { id: 'eggcost', title: 'Egg cost', rule: 'The second space in a row costs 1 egg: lay an egg first, then play.', par: 2,
         goal: 'Play the bird from your hand into the forest.',
-        setup: function () { return stack({ board: [[[bowlF]], [], []], hand: [seedF2], food: { seed: 2 }, cubes: 3 }); },
+        setup: function () { return stack({ board: [[[bowlF]], [], []], hand: [grubF], food: { grub: 1 }, cubes: 3 }); },
         success: function () { return me().board[0].length >= 2; },
-        fail: function () { return idle() && used() >= 2 && me().board[0].length < 2 ? 'Out of tries: the second space costs 1 egg and you had none. Lay an egg first.' : false; },
+        fail: function () { return idle() && used() >= 1 && PP.eggsOn(me()) === 0 && me().board[0].length < 2 ? 'Turn wasted: the 2nd forest space costs 1 egg, and you have none. Lay an egg first.' : false; },
         hints: ['The tag above the free space shows its cost. What do you need first?', { say: 'Use the grassland row to lay an egg, then Play a bird.', target: ract(1) }],
         debrief: 'Egg first, bird second: the 2nd space costs 1 egg.' },
       { id: 'brown', title: 'Brown powers', rule: 'Using a row fires every brown power in it, right to left.', par: 1,
@@ -99,7 +99,7 @@
         debrief: 'One action, two powers: that is your engine.' },
       { id: 'goal', title: 'Round goal', rule: 'Each round has a goal: most of the named thing scores. Play toward it.', par: 1,
         goal: 'Take the lead on the round goal.',
-        setup: function () { return stack({ goals: ['birds-G', 'birds-F', 'birds-W', 'eggs-G'], board: [[], [[seedG]], []], rboard: [[], [[seedG2]], []], hand: [seedF2, seedG3], food: { seed: 2 }, cubes: 4 }); },
+        setup: function () { return stack({ goals: ['birds-G', 'birds-F', 'birds-W', 'eggs-G'], board: [[], [[seedG, 1]], []], rboard: [[], [[seedG2]], []], hand: [grubG, seedF], food: { seed: 1, grub: 1 }, cubes: 4 }); },
         success: function () { return me().board[1].length > rival().board[1].length; },
         fail: function () { return idle() && used() >= 1 && me().board[1].length <= rival().board[1].length ? 'Level, not ahead. The goal counts grassland birds; that bird went to the forest.' : false; },
         hints: ['Read the round goal. Where do you both stand?', { say: 'Play a bird that lives in the grassland.', target: function () { return document.querySelector('#acts .a4[data-k="play"]'); } }],
@@ -111,8 +111,8 @@
     // Fern plays a quiet script (draws cards) so your board and the feeder stay as the lesson set them; lesson games are never saved
     var oc = PPAI.choose; PPAI.choose = function (Gm, seat, lvl) { if (GXST.active() && Gm === G && seat === 1 && !Gm.q) return { t: 'act', a: 'cards' }; return oc.apply(this, arguments); };
     var os = save; save = function () { if (!GXST.active()) return os.apply(this, arguments); };
-    var ls = lessons();
-    window.PPSCN = { ids: ls.map(function (s) { return s.id; }) };
+    var ls = lessons(), nm = function (id) { var b = PP.DATA.birds.filter(function (x) { return x.id === id; })[0]; return b ? b.n : ''; };
+    window.PPSCN = { ids: ls.map(function (s) { return s.id; }), ans: { cards: nm(B.seedF), goal: nm(B.grubG) } };
     GXST.init({ game: 'perch-and-plume', scenarios: ls, phoneSlot: { after: '.gx-bar', before: '#feeder', avoid: ['#feeder', '#tray', '#hand', '#acts', '.ract'] }, keepClear: ['#acts', '#hand', '#feeder', '#tray', '.row', '.ract', '#trk'], settled: function () { return !!G && !UI.busy && (G.phase === 'over' || PP.sideToAct(G) === 0); } });
     // on a phone the card would sit over the birdfeeder: fold it to its one-line chip after each start (tap the chip for Hint / Restart)
     addEventListener('gxst', function (e) { if (e.detail && e.detail.type === 'start' && innerWidth < 600) setTimeout(function () { var b = document.querySelector('.gxst-card [aria-label*="inimi"],.gxst-card .gxst-min'); if (b) b.click(); }, 60); });

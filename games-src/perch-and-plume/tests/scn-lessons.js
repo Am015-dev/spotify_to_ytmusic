@@ -9,7 +9,7 @@ const SOLVE = {
   food: [['.ract[data-h="0"]'], ['.die[aria-label="fish die"]']],
   eggs: [['.ract[data-h="1"]'], ['.bc[data-a="bird"][data-legal]', 3]],
   cards: [['.ract[data-h="2"]'], ['#tray .bc[data-legal]', 1, 'seed']],
-  eggcost: [['.ract[data-h="1"]'], ['.bc[data-a="bird"][data-legal]', 1], ['#acts .a4[data-k="play"]'], ['#hand .bc[data-legal]'], ['.slot.next[data-legal]'], ['#acts [data-a="playgo"]']],
+  eggcost: [['.ract[data-h="1"]'], ['.bc[data-a="bird"][data-legal]', 2], ['#acts .a4[data-k="play"]'], ['#hand .bc[data-legal]'], ['.slot.next[data-legal]'], ['#acts [data-a="playgo"]']],
   brown: [['.ract[data-h="0"]'], ['.die[data-legal]', 1], ['#acts [data-a="mv"]', 1], ['.die[data-legal]', 1]],
   goal: [['#acts .a4[data-k="play"]'], ['#hand .bc[data-legal]', 1, 'G'], ['.slot.next[data-legal]'], ['#acts [data-a="playgo"]']]
 };
@@ -27,8 +27,9 @@ async function run(b, W, H, URL) {
   const live = id => p.waitForFunction(id => { const s = GXST.state(); return s.id === id && s.phase === 'play' && s.live; }, id, { timeout: 12000 });
   const phase = w => p.waitForFunction(w => GXST.state().phase === w, w, { timeout: 8000 }).then(() => true, () => false);
   const tapEl = async (sel, nth, txt) => {
+    await p.waitForFunction(() => G && !UI.busy && PP.sideToAct(G) === 0, null, { timeout: 4000 }).catch(() => {});
     const pt = await p.evaluate(([sel, nth, txt]) => { const a = [...document.querySelectorAll(sel)].filter(e => { const r = e.getBoundingClientRect(); return r.width > 6 && r.height > 6 && (!txt || (e.dataset.id || e.textContent || '').length >= 0); });
-      let e = a[Math.min((nth || 1) - 1, a.length - 1)]; if (txt === 'seed') e = a.find(x => /seed/i.test(x.innerHTML)) || e; if (txt === 'G') e = a.find(x => /grass/i.test(x.innerHTML) && !/forest/i.test(x.className)) || e;
+      let e = a[Math.min((nth || 1) - 1, a.length - 1)]; if (txt && txt.length > 2) e = a.find(x => (x.textContent || '').indexOf(txt) >= 0) || e;
       if (!e) return null; e.scrollIntoView({ block: 'nearest' }); const r = e.getBoundingClientRect(), x = r.left + r.width / 2, y = r.top + r.height / 2, u = document.elementFromPoint(x, y); return { x, y, ok: !!u && (u === e || e.contains(u)) }; }, [sel, nth, txt]);
     if (!pt) return false; if (!pt.ok) note('something covers ' + sel); await p.touchscreen.tap(pt.x, pt.y); await p.evaluate(() => window.__turboAdvance(500)); return true;
   };
@@ -40,13 +41,14 @@ async function run(b, W, H, URL) {
     await tapEl(WRONG[id]); await p.evaluate(() => { const d = document.querySelector('.die[data-legal]'); }); 
     await p.evaluate(() => window.__turboAdvance(600));
     const s0 = await st(); if (id === 'eggcost') { /* needs two wasted actions */ }
-    if (s0.phase === 'play') { for (const sel of ['.die[data-legal]', '.bc[data-a="bird"][data-legal]', '#tray .bc[data-legal]']) { if (await p.evaluate(s => !!document.querySelector(s), sel)) { await tapEl(sel); break; } } if (id === 'eggcost') { await tapEl('.ract[data-h="2"]'); } await p.evaluate(() => window.__turboAdvance(900)); }
-    if (!(await phase('fail'))) note(id + ': wrong move did not fail (phase ' + (await st()).phase + ')'); else { const s = await st(); if (!/\w{6}/.test(s.msg || '')) note(id + ': fail has no message'); }
+    for (let k = 0; k < 4 && (await st()).phase === 'play'; k++) { let hit = false; for (const sel of ['.die[data-legal]', '.bc[data-a="bird"][data-legal]', '#tray .bc[data-legal]', '#acts [data-a="mv"]']) { if (await p.evaluate(s => !!document.querySelector(s), sel)) { await tapEl(sel); hit = true; break; } } if (!hit) break; await p.evaluate(() => window.__turboAdvance(600)); }
+    if (!(await phase('fail'))) note(id + ': wrong move did not fail (phase ' + (await st()).phase + ')'); else { const s = await st(); if ((s.msg || '').length < 20) note(id + ': fail has no message'); }
     await p.evaluate(() => GXST.retry()); await live(id);
     // solve with real taps
-    for (const [sel, nth, txt] of SOLVE[id]) { const n = nth || 1; let k = 0;
+    const ans = await p.evaluate(id => (PPSCN.ans || {})[id] || '', id);
+    for (const [sel, nth, txt0] of SOLVE[id]) { const txt = txt0 ? ans || txt0 : txt0; const n = nth || 1; let k = 0;
       do { if ((await st()).phase !== 'play') break; if (!(await tapEl(sel, 1, txt))) break; k++; } while (k < n && (await p.evaluate(s => !!document.querySelector(s), sel))); }
-    if (!(await phase('win'))) { const s = await st(); note(id + ': solution did not win (phase ' + s.phase + ' ' + (s.msg || '') + ')'); }
+    if (!(await phase('win'))) { const s = await st(); fs.writeFileSync(path.join(PROOF, 'scn-dbg-' + tag + '-' + id + '.jpg'), await p.screenshot({ type: 'jpeg', quality: 50 })); note(id + ': solution did not win (phase ' + s.phase + ' ' + (s.msg || '') + ')'); }
     else { const s = await st(); if (s.stars < 3 && s.stars !== 3) note(id + ': stars ' + s.stars); }
   }
   // sheet of lesson starts
@@ -64,7 +66,7 @@ async function run(b, W, H, URL) {
 }
 (async () => {
   const URL = await gx.url('perch-and-plume', { file: path.join(D, 'perch-and-plume.html') });
-  const b = await chromium.launch({executablePath:'/opt/pw-browsers/chromium'}); const sizes = [[402, 874], [1366, 768]];
+  const b = await chromium.launch({executablePath:'/opt/pw-browsers/chromium'}); const sizes = process.env.SIZES ? JSON.parse(process.env.SIZES) : [[402, 874], [1366, 768]];
   for (const [W, H] of sizes) await run(b, W, H, URL);
   await b.close(); stop(); const s = ((Date.now() - T0) / 1000).toFixed(1);
   console.log(probs.length ? 'FAIL ' + s + ' s\n' + probs.join('\n') : 'PASS ' + s + ' s'); process.exit(probs.length ? 1 : 0);
