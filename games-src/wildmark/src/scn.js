@@ -61,7 +61,7 @@
   });
   GXS.add({
     id: 'wm-cards', name: 'Mixed animal cards', ask: 'Do the cards show their new names?', seed: 8, when: booted,
-    setup: function () { UI.prefs.hints = 1; begin({ np: 2, humans: 1, ai: 'normal', seed: 8, cards: { bear: 'b', elk: 'c', salmon: 'd', hawk: 'c', fox: 'b' } }); return wait(300); },   // the card chips are part of Hints (A7)
+    setup: function () { UI.prefs.hints = 1; begin({ np: 2, humans: 1, ai: 'normal', seed: 8, cards: { bear: 'b', elk: 'c', salmon: 'd', hawk: 'c', fox: 'b' } }); document.documentElement.classList.add('wm-anio'); return wait(300); },   // W684: on a phone the chips live in the Animal points panel   // the card chips are part of Hints (A7)
     checks: [{ kind: 'fn', name: 'bear chip says Bear Trios', fn: function () { var e = document.querySelector('#cards .cc[data-card="bear"]'); return /Bear Trios/.test(e.getAttribute('aria-label')) || e.getAttribute('aria-label'); } },
       { kind: 'tap', sel: '#cards .cc[data-card="hawk"]', name: 'tap a card: its why', state: function () { return !!UI.whyA; }, expect: function (b, a) { var e = document.getElementById('whyp'); return a && e && !e.hidden && /Sight Lines/.test(e.textContent) || 'why panel ' + a; } }]
   });

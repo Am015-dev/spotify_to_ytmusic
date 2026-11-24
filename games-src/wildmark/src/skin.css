@@ -561,3 +561,41 @@ html body :is(.gxh-tt,.gxh-tx,.gxh-bd button,.gxt-say,.gxt-tt){font-size:16px!im
 @keyframes tsugs{0%,100%{filter:none}50%{filter:drop-shadow(0 0 6px #e3a33b) drop-shadow(0 0 3px #e3a33b)}}
 @media (prefers-reduced-motion:reduce){.tsug,#map .tsug{animation:none;box-shadow:0 0 0 4px rgba(227,163,59,.8)}}
 #tutQ{font-weight:800;font-size:20px;min-width:44px;justify-content:center}
+/* W684 READ pass: board fills the space on a calm plate, phone HUD = You / rival / turn + a tap-open animal panel, big numbers, readable result card */
+.gx-board,.gx-board.hasart{background:#26302b!important;background-image:none!important}
+html body .gx-drawer:not(.on){display:none}   /* closed panels leave the page (no offscreen text) */
+html body .gx-set-nav{flex-wrap:wrap;overflow-x:visible}
+.anib{display:none}
+.pair:has(.sel){transform:translateY(-6px);box-shadow:0 8px 16px rgba(0,0,0,.45),inset 0 0 0 3px #e6b04f}
+.gain{font-size:15px!important;font-weight:800;line-height:1.2;white-space:nowrap}
+#rs .st td.n b,#rs .st tr.tot b{font-size:20px;font-weight:800;display:block}
+#rs .st td.n small,#rs .st tr.tot small,#rs .st td.src small{display:none}
+#rs .st td,#rs .st th{font-size:15px;padding:6px 6px;vertical-align:middle}
+#rs .st td.src{font-weight:700;display:flex;align-items:center;gap:8px}
+#rs .st td.src svg{width:30px;height:30px;flex:0 0 auto}
+#rs .st .sw{width:22px;height:22px;border-radius:5px;display:inline-block;flex:0 0 auto}
+#rs .stand li{font-size:18px}#rs .stand li b{font-size:24px}
+@media (max-width:999px){
+  #cards,#terr{display:none!important}
+  html.wm-anio #cards{display:flex!important;top:62px;left:8px;right:8px;padding:6px;background:#1b221e;border:1px solid rgba(255,255,255,.2);border-radius:14px;z-index:6}
+  html.wm-anio #terr{display:flex!important;top:150px;left:8px;right:8px;background:#1b221e;z-index:6;min-height:48px}
+  html.wm-anio .cc{background:#26302b}
+  .anib{display:flex;align-items:center;position:absolute;top:8px;right:8px;z-index:6;min-height:44px;padding:4px 12px;border-radius:999px;border:1px solid rgba(255,255,255,.25);background:#1b221e;color:#f3ead2;font:inherit;font-size:15px;font-weight:700;cursor:pointer}
+  html.wm-clean .anib{display:none}
+  #seats{top:8px!important;left:8px;right:150px;overflow:visible}
+  .seat{font-size:16px!important;min-height:44px;background:#1b221e;color:#f3ead2}
+  .seat b{font-size:18px;font-weight:800}
+  .seat.on{background:var(--wm-cream);color:var(--gx-ink)}
+  .cc b,.cc .rv{font-size:16px!important;font-weight:800}
+  .cc i{font-size:14px!important}
+  #terr .tc b,#terr .tc .rv{font-size:16px!important;font-weight:800}
+  #terr .ti{width:24px;height:26px}
+  .mk i{font-size:14px}
+  #rs .st td,#rs .st th{font-size:14px;padding:5px 4px}
+}
+@media (min-width:1000px){
+  .cc svg{width:32px;height:32px}.cc b,.cc .rv{font-size:18px!important;font-weight:800}
+  .seat{font-size:16px}.seat b{font-size:18px;font-weight:800}
+  #rs .rbox{max-width:760px}
+}
+html body .gxc-lock{font-size:13px!important;text-indent:-99px;overflow:visible;clip-path:circle(50%);white-space:nowrap;line-height:18px}   /* W684: lock glyph hidden by indent, not a 0 px font */
