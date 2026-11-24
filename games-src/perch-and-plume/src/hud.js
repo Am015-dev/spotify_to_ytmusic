@@ -1,4 +1,4 @@
-// hud.js (W731): the clean play screen. Loaded last, so its scoreHTML / showScore win.
+// hud.js (W731): helpers for the clean play screen (score race: turnui.js scoreHTML; podium: screens.js gameOver).
 // Always on screen: the score race (you vs rival, who leads, by how much), whose turn + what to do, round and actions left.
 // Everything else (score breakdown, round goals, log, rules, bird details) opens in a window from a small icon button.
 // Feedback: every point you or the rival earn bumps that score and floats "+N" from it. End of the year: a podium, not a table.
@@ -12,20 +12,6 @@ function hudTurnLine() {
   if (G.q || UI.pend || UI.sel != null) return who + 'finish your move';
   return who + 'pick one action';
 }
-function scoreHTML() {
-  var me = UI.view, sc = G.pl.map(function (p, i) { return PP.scoreOf(G, i).total; });
-  var riv = G.pl.map(function (p, i) { return i; }).filter(function (i) { return i !== me; }).sort(function (a, b) { return sc[b] - sc[a]; })[0];
-  var r = riv == null ? 0 : sc[riv], d = sc[me] - r, pct = sc[me] + r === 0 ? 50 : Math.round(100 * sc[me] / (sc[me] + r));
-  var lead = d > 0 ? hudName(me) + (hudName(me) === 'You' ? ' lead by ' : ' leads by ') + d : d < 0 ? hudName(riv) + ' leads by ' + (-d) : 'Level';
-  var cur = PP.sideToAct(G), mine = G.phase !== 'over' && isHuman(cur);
-  return '<div class="race' + (mine ? ' mine' : '') + '" role="group" aria-label="Score race: ' + esc(hudName(me) + ' ' + sc[me] + (riv == null ? '' : ', ' + hudName(riv) + ' ' + r) + '. ' + lead) + '">' +
-    '<button type="button" class="rc me" data-a="mysc" data-seat="' + me + '" aria-label="' + esc(hudName(me) + ' ' + sc[me] + ' points: how it adds up') + '"><span>' + esc(hudName(me)) + '</span><b>' + sc[me] + '</b></button>' +
-    '<span class="rmid"><span class="rbar" aria-hidden="true"><i style="width:' + pct + '%"></i></span><span class="rlead">' + esc(lead) + '</span></span>' +
-    (riv == null ? '' : '<button type="button" class="rc opp" data-a="opp" data-s="' + riv + '" data-seat="' + riv + '" aria-label="' + esc(hudName(riv) + ' ' + r + ' points: see their board') + '"><b>' + r + '</b><span>' + esc(hudName(riv)) + '</span></button>') +
-    '<span class="rturn">' + esc(hudTurnLine()) + '</span>' +
-    '<span class="rround">' + (G.phase === 'over' ? '' : UI.mode === 'tutfree' ? G.pl[me].cubes + ' turns left' : 'Round ' + (G.round + 1) + ' of ' + G.rounds + ' · ' + G.pl[me].cubes + (G.pl[me].cubes === 1 ? ' action' : ' actions') + ' left') + '</span></div>';
-}
-function scoreLineHTML() { return scoreHTML(); }
 // "+N" floats up from a score that just grew, and the number pops
 function hudBump() {
   if (!G) return; var sc = G.pl.map(function (p, i) { return PP.scoreOf(G, i).total; }), was = HUD.last; HUD.last = sc;
@@ -39,8 +25,13 @@ function hudBump() {
     if (i === UI.view) try { sfx('goal'); } catch (e) { }
   });
 }
-(function () { var r0 = render; render = function () { r0.apply(this, arguments); try { hudBump(); } catch (e) { } }; })();
 // where the points came from: one stacked bar per player with the parts named under it (no table)
+function hudPodium(sc, winners) {
+  var order = sc.map(function (s, i) { return i; }).sort(function (a, b) { return (winners.indexOf(b) >= 0) - (winners.indexOf(a) >= 0) || sc[b].total - sc[a].total; });
+  return '<div class="podium">' + order.map(function (i, k) { var w = winners.indexOf(i) >= 0;
+    return '<div class="pod' + (w ? ' win' : '') + (i === UI.view ? ' me' : '') + '"><div class="pdhead"><span class="pdr">' + (w ? 'Winner' : ['1st', '2nd', '3rd', '4th', '5th'][k]) + '</span><span class="pdn">' + esc(G.pl[i].name) + '</span><b class="pdt" data-v="' + sc[i].total + '" data-engine="G.final[' + i + '].total">' + sc[i].total + '</b></div>' + hudSplit(sc[i], true) + '</div>'; }).join('') + '</div>';
+}
+function hudCount(el) { if (UI.fast || (window.GXS && GXS.on)) return; $$('.pdt', el).forEach(function (b) { var v = +b.dataset.v, t0 = Date.now(); b.textContent = '0'; var iv = setInterval(function () { var k = Math.min(1, (Date.now() - t0) / 1200); b.textContent = Math.round(v * (1 - Math.pow(1 - k, 3))); if (k >= 1) clearInterval(iv); }, 30); }); }
 function hudSplit(s, big) {
   var t = Math.max(1, s.total), bar = '', key = '';
   SRC.forEach(function (x) { var v = s[x[0]] || 0; if (x[0] === 'tuck' && s.lead) v += s.lead; if (!v) return;
@@ -48,32 +39,6 @@ function hudSplit(s, big) {
     key += '<span><i style="background:' + x[2] + '"></i>' + x[1] + ' <b>' + v + '</b></span>'; });
   return '<div class="split' + (big ? ' big' : '') + '"><div class="sbar">' + (bar || '<i style="width:100%;background:#999"></i>') + '</div><div class="skey">' + (key || '<span>No points yet</span>') + '</div></div>';
 }
-function showScore() {
-  var me = UI.view, ord = G.pl.map(function (p, i) { return i; }).sort(function (a, b) { return a === me ? -1 : b === me ? 1 : 0; });
-  var h = '<div class="card scored" role="dialog" aria-label="Where the points come from"><button type="button" class="ppx" data-a="popx" aria-label="Close">&times;</button><h3>Where the points come from</h3>' +
-    ord.map(function (i) { var s = PP.scoreOf(G, i); return '<div class="pscore"><div class="pshead"><span>' + esc(hudName(i)) + '</span><b>' + s.total + '</b></div>' + hudSplit(s) + '</div>'; }).join('') +
-    '<p class="snote">Birds score their printed points. Eggs, stored food and tucked cards are 1 each. Round goals pay at each round end.</p></div>';
-  var el = $('#pop'); el.innerHTML = h; el.hidden = false;
-}
-// the end of the year: a podium, each total counting up, and where the points came from
-(function () {
-  var g0 = gameOver;
-  gameOver = function () {
-    g0.apply(this, arguments);
-    setTimeout(function () { try {
-      var el = $('#result'), t = el && el.querySelector('table.stand'); if (!t || !G.final) return;
-      var sc = G.final, win = G.winner, winners = Array.isArray(win) ? win : [win];
-      var order = sc.map(function (s, i) { return i; }).sort(function (a, b) { return (winners.indexOf(b) >= 0) - (winners.indexOf(a) >= 0) || sc[b].total - sc[a].total; });
-      var pod = document.createElement('div'); pod.className = 'podium';
-      pod.innerHTML = order.map(function (i, k) { var w = winners.indexOf(i) >= 0;
-        return '<div class="pod' + (w ? ' win' : '') + (i === UI.view ? ' me' : '') + '"><div class="pdhead"><span class="pdr">' + (w ? 'Winner' : ['1st', '2nd', '3rd', '4th', '5th'][k]) + '</span><span class="pdn">' + esc(G.pl[i].name) + '</span><b class="pdt" data-v="' + sc[i].total + '" data-engine="G.final[' + i + '].total">' + sc[i].total + '</b></div>' + hudSplit(sc[i], true) + '</div>'; }).join('');
-      t.parentNode.replaceChild(pod, t);
-      var gb = el.querySelector('.gbreak'); if (gb) gb.parentNode.removeChild(gb);
-      var rn = el.querySelector('.rnote'); if (rn) rn.textContent = 'Tied on points? Most food left over wins.';
-      $$('.pdt', pod).forEach(function (b) { var v = +b.dataset.v, t0 = Date.now(); b.textContent = '0'; var iv = setInterval(function () { var k = Math.min(1, (Date.now() - t0) / 1200); b.textContent = Math.round(v * (1 - Math.pow(1 - k, 3))); if (k >= 1) clearInterval(iv); }, 30); });
-    } catch (e) { } }, 0);
-  };
-})();
 // close button on the pop-up card; the Menu gains Hints and Screen map (they left the top bar)
 document.addEventListener('click', function (e) { var t = e.target.closest && e.target.closest('[data-a="popx"]'); if (t) { var p = $('#pop'); if (p) p.hidden = true; } });
 (function () {

@@ -27,9 +27,11 @@ async function run(b, W, H, URL) {
   // each window
   const wins = await p.evaluate(() => [...document.querySelectorAll('.gx-bar button[data-gx], .gx-bar button[id], .hudbtn')].filter(e => e.getBoundingClientRect().width > 4).map(e => '#' + (e.id || '') + '|' + (e.dataset.gx || '') + '|' + (e.getAttribute('aria-label') || '')));
   for (const w of wins) { const [id, gxk, lab] = w.split('|'); if (/menu|hint/i.test(lab) && !/score/i.test(lab)) continue;
-    await p.evaluate(([id, gxk]) => { const e = id.length > 1 ? document.querySelector(id) : document.querySelector('.gx-bar button[data-gx="' + gxk + '"]'); e && e.click(); }, [id, gxk]); await adv(600);
+    const bs = id.length > 1 ? id : '.gx-bar button[data-gx="' + gxk + '"]'; const bb = await p.$(bs); if (bb) { const r = await bb.boundingBox(); await p.touchscreen.tap(r.x + r.width / 2, r.y + r.height / 2); } await adv(600); await p.waitForTimeout(150);
     await shot('2-win-' + (lab || id).replace(/\W+/g, '').slice(0, 14));
     await p.keyboard.press('Escape'); await adv(300); await p.evaluate(() => { try { GX.close(); } catch (e) { } try { lessonClose(); } catch (e) { } document.querySelectorAll('.ppwin:not([hidden]) .ppx').forEach(x => x.click()); }); await adv(300); }
+  { const bb = await p.$('#opps .rc.me'); const r = await bb.boundingBox(); await p.touchscreen.tap(r.x + r.width / 2, r.y + r.height / 2); await adv(600); await shot('2-win-Scores'); await p.evaluate(() => { const x = document.querySelector('#pop .ppx'); x && x.click(); }); await adv(300);
+    if (await p.evaluate(() => !document.getElementById('pop').hidden)) note('score window did not close'); }
   // the computer plays your seat too: a full game to the end screen
   await p.evaluate(() => { G.pl[0].kind = 'ai'; G.pl[0].lvl = 'normal'; UI.fast = true; try { pump(); } catch (e) { } });
   const done = await p.waitForFunction(() => G.phase === 'over', null, { timeout: 60000 }).then(() => true, () => false);

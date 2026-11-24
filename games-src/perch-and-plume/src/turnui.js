@@ -172,14 +172,18 @@ function trGoalHTML() {
   cnt.unshift(cnt.splice(me, 1)[0]);
   return '<span class="tr-g" data-a="trgoal"><b>Goal at round end:</b> ' + esc(g.n) + ' · ' + esc(cnt.join(', ')) + '</span>';
 }
-function scoreHTML() {   // F2: real points now, in plain words ("You 32 · Fern 28"); tap a name: you = how it adds up, a rival = their board
-  var sc = G.pl.map(function (p, i) { return PP.scoreOf(G, i).total; }), me = UI.view, ord = G.pl.map(function (p, i) { return i; });
-  ord.splice(ord.indexOf(me), 1); ord.unshift(me);
-  var lbl = G.pl.map(function (p, i) { return i === me && humans().length === 1 ? 'You' : p.name; });
-  return '<div class="scb" role="group" aria-label="Score now: ' + esc(ord.map(function (i) { return lbl[i] + ' ' + sc[i]; }).join(', ')) + '">' +
-    ord.map(function (i) { return '<button type="button" class="sr2' + (i === me ? ' me' : ' opp') + '" data-a="' + (i === me ? 'mysc' : 'opp') + '" data-s="' + i + '" aria-label="' + esc(lbl[i] + ' ' + sc[i] + ' points now' + (i === me ? ', tap for how it adds up' : ', tap to see their board')) + '">' +
-      '<span>' + esc(lbl[i]) + '</span><b>' + sc[i] + '</b>' + (i === me ? '' : '<small>board</small>') + '</button>'; }).join('<i aria-hidden="true">&middot;</i>') +
-    '<span class="scnow" title="Round and actions left">' + (G.phase === 'over' ? 'Game over' : UI.mode === 'tutfree' ? '' : 'Round ' + (G.round + 1) + '/' + G.rounds + ' · ' + G.pl[me].cubes + (G.pl[me].cubes === 1 ? ' action' : ' actions') + ' left') + '</span></div>';
+function scoreHTML() {
+  var me = UI.view, sc = G.pl.map(function (p, i) { return PP.scoreOf(G, i).total; });
+  var riv = G.pl.map(function (p, i) { return i; }).filter(function (i) { return i !== me; }).sort(function (a, b) { return sc[b] - sc[a]; })[0];
+  var r = riv == null ? 0 : sc[riv], d = sc[me] - r, pct = sc[me] + r === 0 ? 50 : Math.round(100 * sc[me] / (sc[me] + r));
+  var lead = d > 0 ? hudName(me) + (hudName(me) === 'You' ? ' lead by ' : ' leads by ') + d : d < 0 ? hudName(riv) + ' leads by ' + (-d) : 'Level';
+  var cur = PP.sideToAct(G), mine = G.phase !== 'over' && isHuman(cur);
+  return '<div class="race' + (mine ? ' mine' : '') + '" role="group" aria-label="Score race: ' + esc(hudName(me) + ' ' + sc[me] + (riv == null ? '' : ', ' + hudName(riv) + ' ' + r) + '. ' + lead) + '">' +
+    '<button type="button" class="rc me" data-a="mysc" data-seat="' + me + '" aria-label="' + esc(hudName(me) + ' ' + sc[me] + ' points: how it adds up') + '"><span>' + esc(hudName(me)) + '</span><b>' + sc[me] + '</b></button>' +
+    '<span class="rmid"><span class="rbar" aria-hidden="true"><i style="width:' + pct + '%"></i></span><span class="rlead">' + esc(lead) + '</span></span>' +
+    (riv == null ? '' : '<button type="button" class="rc opp" data-a="opp" data-s="' + riv + '" data-seat="' + riv + '" aria-label="' + esc(hudName(riv) + ' ' + r + ' points: see their board') + '"><b>' + r + '</b><span>' + esc(hudName(riv)) + '</span></button>') +
+    '<span class="rturn">' + esc(hudTurnLine()) + '</span>' +
+    '<span class="rround">' + (G.phase === 'over' ? '' : UI.mode === 'tutfree' ? G.pl[me].cubes + ' turns left' : 'Round ' + (G.round + 1) + ' of ' + G.rounds + ' · ' + G.pl[me].cubes + (G.pl[me].cubes === 1 ? ' action' : ' actions') + ' left') + '</span></div>';
 }
 document.addEventListener('click', function (e) {
   var t = e.target.closest('[data-a="mysc"]'); if (!t || !G) return;
@@ -258,12 +262,10 @@ document.addEventListener('click', function (e) {
 function scoreLineHTML() { return scoreHTML(); }
 // the score drawer: every number's why, for every player
 function showScore() {
-  var rows = [['birds', 'Birds', 'points printed on birds played'], ['eggs', 'Eggs', '1 point each'], ['goals', 'Round goals', 'judged at each round end'], ['bonus', 'Bonus card', 'your secret card'], ['cache', 'Stored food', '1 point each'], ['tuck', 'Tucked cards', '1 point each']];
-  var sc = G.pl.map(function (p, i) { return PP.scoreOf(G, i); });
-  var h = '<div class="card scored" role="dialog" aria-label="How the score adds up"><h3>How the score adds up</h3><table class="sctab"><tr><th></th>' + G.pl.map(function (p, i) { return '<th>' + esc(i === UI.view ? 'You' : p.name) + '</th>'; }).join('') + '</tr>' +
-    rows.map(function (r) { return '<tr><td><b>' + r[1] + '</b><small>' + r[2] + '</small></td>' + sc.map(function (s) { return '<td>' + s[r[0]] + '</td>'; }).join('') + '</tr>'; }).join('') +
-    '<tr class="tot"><td><b>Total</b></td>' + sc.map(function (s) { return '<td>' + s.total + '</td>'; }).join('') + '</tr></table>' +
-    '<div class="acts"><button type="button" class="btn pri" data-a="popx">Close</button></div></div>';
+  var me = UI.view, ord = G.pl.map(function (p, i) { return i; }).sort(function (a, b) { return a === me ? -1 : b === me ? 1 : 0; });
+  var h = '<div class="card scored" role="dialog" aria-label="Where the points come from"><button type="button" class="ppx" data-a="popx" aria-label="Close">&times;</button><h3>Where the points come from</h3>' +
+    ord.map(function (i) { var s = PP.scoreOf(G, i); return '<div class="pscore"><div class="pshead"><span>' + esc(hudName(i)) + '</span><b>' + s.total + '</b></div>' + hudSplit(s) + '</div>'; }).join('') +
+    '<p class="snote">Birds score their printed points. Eggs, stored food and tucked cards are 1 each. Round goals pay at each round end.</p></div>';
   var el = $('#pop'); el.innerHTML = h; el.hidden = false;
 }
 // before turn 1 of a Play game: one card with the aim and how points are earned

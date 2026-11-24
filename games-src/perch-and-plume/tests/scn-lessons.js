@@ -51,6 +51,8 @@ async function run(b, W, H, URL) {
     if (!(await phase('win'))) { const s = await st(); fs.writeFileSync(path.join(PROOF, 'scn-dbg-' + tag + '-' + id + '.jpg'), await p.screenshot({ type: 'jpeg', quality: 50 })); note(id + ': solution did not win (phase ' + s.phase + ' ' + (s.msg || '') + ')'); }
     else { const s = await st(); if (s.stars < 3 && s.stars !== 3) note(id + ': stars ' + s.stars); }
   }
+  // the last lesson's win card offers a real game
+  await p.evaluate(() => window.__turboAdvance(300)); if (!(await p.evaluate(() => !!document.querySelector('#scnreal')))) note('last lesson has no "Play a real game"');
   // sheet of lesson starts
   const prog = await p.evaluate(() => JSON.parse(localStorage.getItem('gxst-perch-and-plume') || '{}').best || {}); if (Object.keys(prog).length < ids.length) note('progress saved for ' + Object.keys(prog).length + '/' + ids.length);
   // non-lesson tap works while a lesson runs; board never covered
@@ -60,6 +62,16 @@ async function run(b, W, H, URL) {
   const dimmed = await p.evaluate(() => [...document.querySelectorAll('body > *')].filter(e => /brightness\(0?\.[0-8]/.test(getComputedStyle(e).filter)).length); if (dimmed) note('dimmed');
   await p.evaluate(() => { const b = document.querySelector('#rulesbtn'); b && b.click(); }); await p.evaluate(() => window.__turboAdvance(300));
   if (!(await p.evaluate(() => !!document.querySelector('.gx-drawer.open,.gx-drawer[open],#rulesbtn[aria-expanded="true"],.gx-set.open')))) note('Rules did not open during a lesson');
+  // Learn to play starts a lesson; "Play a real game" ends the lessons and starts a real game
+  await p.evaluate(() => { GXST.close(); tutStart(); }); await p.evaluate(() => window.__turboAdvance(900));
+  if (!(await p.evaluate(() => GXST.state().phase === 'play'))) note('Learn to play did not start a lesson');
+  await p.evaluate(id => { GXST.start(id); }, ids[ids.length - 1]); await live(ids[ids.length - 1]); await p.evaluate(() => window.__turboAdvance(600));
+  for (const [sel, nth, txt0] of SOLVE[ids[ids.length - 1]]) { const ans = await p.evaluate(() => PPSCN.ans.goal); await tapEl(sel, 1, txt0 ? ans : txt0); }
+  await phase('win'); await p.evaluate(() => window.__turboAdvance(300));
+  const rg = await p.evaluate(() => { const b = document.querySelector('#scnreal'); if (!b) return 'no button'; b.click(); return ''; }); await p.evaluate(() => window.__turboAdvance(1500));
+  const real = await p.evaluate(() => ({ open: GXST.state().open, mode: UI.mode, ph: G && G.phase }));
+  if (rg || real.open || real.mode === 'tutfree') note('real game did not start ' + rg + JSON.stringify(real)); else shots.push(await p.screenshot({ type: 'jpeg', quality: 60 }));
+  if (shots.length > ids.length) ids.push('realgame');
   fs.writeFileSync(path.join(PROOF, 'scn-' + tag + '-sheet-meta.json'), JSON.stringify({ ids }));
   shots.forEach((s, i) => fs.writeFileSync(path.join(PROOF, 'scn-' + tag + '-' + ids[i] + '.jpg'), s));
   await ctx.close();

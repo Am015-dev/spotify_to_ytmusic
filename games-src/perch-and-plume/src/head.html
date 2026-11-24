@@ -682,7 +682,7 @@ body.tutlite .coachb .saytx .tres:empty{display:none}
 #opps .race.mine .rturn{color:#ffe2a0}
 #opps .rround{grid-area:turn;justify-self:end;font-size:13px;opacity:.9;white-space:nowrap}
 @media (min-width:1000px){#opps .race{grid-template-columns:auto 1fr auto;grid-template-areas:"me mid opp" "turn turn turn" "rnd rnd rnd"}#opps .rround{grid-area:rnd;justify-self:start}#opps .rc b{font-size:34px}#opps .rturn{font-size:17px}#opps .rround,#opps .rlead{font-size:15px}}
-#pop .scored{position:relative;max-width:440px}
+#pop .scored{position:relative;max-width:440px}#pop .scored h3{padding-right:48px}
 #pop .ppx{position:absolute;right:8px;top:6px;width:44px;height:44px;border:0;background:none;font-size:28px;line-height:1;cursor:pointer;color:inherit}
 .pscore{margin:12px 0}.pshead{display:flex;justify-content:space-between;align-items:baseline;font-size:17px;font-weight:700}.pshead b{font-size:26px}
 .split .sbar{display:flex;height:16px;border-radius:8px;overflow:hidden;background:rgba(0,0,0,.15);margin:6px 0}
@@ -696,6 +696,10 @@ body.tutlite .coachb .saytx .tres:empty{display:none}
 .pdhead{display:flex;align-items:center;gap:10px}.pdr{font-size:13px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;padding:2px 8px;border-radius:8px;background:rgba(255,255,255,.14)}
 .pod.win .pdr{background:#e3b75a;color:#1e2a14}.pdn{font-size:19px;font-weight:700}.pdt{margin-left:auto;font-size:40px;line-height:1;color:#ffe2a0;font-variant-numeric:tabular-nums}
 .pod .split .skey{font-size:14px;color:#f3ead2}
+.scn-tgt{outline:3px solid #e3b75a!important;outline-offset:2px;animation:scntgt 1.1s ease-in-out infinite}
+@keyframes scntgt{0%,100%{box-shadow:0 0 0 0 rgba(227,183,90,.7)}50%{box-shadow:0 0 0 8px rgba(227,183,90,0)}}
+.gxst-goal::before{content:'Your goal: ';font-weight:800}
+@media (max-width:599px){.gxst-card.gxst-min{top:56px!important;left:8px!important;right:8px!important;bottom:auto!important;width:auto!important;transform:none!important}.gxst-card.gxst-min .gxst-chip{white-space:normal;text-align:left;line-height:1.25;width:100%}}
 .hudmore{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 12px}
 </style>
 </head>

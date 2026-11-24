@@ -116,6 +116,22 @@
     GXST.init({ game: 'perch-and-plume', scenarios: ls, phoneSlot: { after: '.gx-bar', before: '#feeder', avoid: ['#feeder', '#tray', '#hand', '#acts', '.ract'] }, keepClear: ['#acts', '#hand', '#feeder', '#tray', '.row', '.ract', '#trk'], settled: function () { return !!G && !UI.busy && (G.phase === 'over' || PP.sideToAct(G) === 0); } });
     // on a phone the card would sit over the birdfeeder: fold it to its one-line chip after each start (tap the chip for Hint / Restart)
     addEventListener('gxst', function (e) { if (e.detail && e.detail.type === 'start' && innerWidth < 600) setTimeout(function () { var b = document.querySelector('.gxst-card [aria-label*="inimi"],.gxst-card .gxst-min'); if (b) b.click(); }, 60); });
+    // the opening target: the one thing to look at pulses until your first action (the hint 'show' target)
+    setInterval(function () {
+      var st = GXST.state(), s = st.phase === 'play' && st.live ? ls[st.i] : null, h = s && s.hints && s.hints[s.hints.length - 1], t = null;
+      try { if (h && h.target && used() === 0 && PP.sideToAct(G) === 0 && !G.q && !UI.pend) t = typeof h.target === 'function' ? h.target() : document.querySelector(h.target); } catch (e) { }
+      $$('.scn-tgt').forEach(function (e) { if (e !== t) e.classList.toggle('scn-tgt', false); }); if (t) t.classList.toggle('scn-tgt', true);
+    }, 300);
+    // the last lesson flows straight into a real game against the easy computer
+    addEventListener('gxst', function (e) {
+      var d = e.detail || {}; if (d.type !== 'win' || d.id !== ls[ls.length - 1].id) return;
+      setTimeout(function () { var c = document.querySelector('.gxst-card .gxst-say'); if (!c || document.querySelector('#scnreal')) return;
+        var b = document.createElement('button'); b.type = 'button'; b.id = 'scnreal'; b.className = 'gxst-btn pri'; b.textContent = 'Play a real game';
+        b.onclick = function () { try { GXST.close(); } catch (x) { } try { CFG.n = 2; CFG.lvl = 'easy'; } catch (x) { } quickStart(); };
+        c.parentNode.insertBefore(b, c.nextSibling); }, 30);
+    });
+    // Learn to play now starts the first unsolved scenario lesson; the old guided year stays behind ?float=1
+    if (!/[?&]float=1/.test(location.search)) { var t0 = tutStart; tutStart = function () { try { localStorage.setItem('pp-played', '1'); } catch (e) { } if (!GXST.start) return t0.apply(this, arguments); var b = GXST.state().best || {}, k = 0; while (k < ls.length - 1 && b[ls[k].id]) k++; GXST.start(ls[k].id); }; }
     var m = /[?&]lesson=([\w-]+)/.exec(location.search);
     if (m) until(function () { return !$('#title').hidden; }, 4000).then(function () { setTimeout(function () { GXST.start(m[1]); }, 100); });
   };
