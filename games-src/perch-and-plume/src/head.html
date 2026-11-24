@@ -264,7 +264,7 @@ html.gx-noanim .firing,html.gx-noanim .popfx,html.gx-noanim .glow,html.gx-reduce
 .reveal .bc .pwt{font-size:14px;-webkit-line-clamp:6}
 .reveal.out{opacity:0;transform:translate(-50%,-140%) scale(.4)}
 @keyframes revin{from{opacity:0;transform:translate(-50%,-20%) scale(.6)}to{opacity:1;transform:translate(-50%,-50%) scale(1)}}
-body.focus .ract:not([data-legal]),body.focus #hand .bc:not([data-legal]),body.focus .die:not([data-legal]),body.focus .bc[data-a="tray"]:not([data-legal]),body.focus #deckb:not([data-legal]),body.focus .bc[data-a="bird"]:not([data-legal]){filter:brightness(.55) saturate(.45);transition:filter .25s}
+body.focus .ract:not([data-legal]),body.focus #hand .bc:not([data-legal]),body.focus .die:not([data-legal]),body.focus .bc[data-a="tray"]:not([data-legal]),body.focus #deckb:not([data-legal]),body.focus .bc[data-a="bird"]:not([data-legal]){filter:brightness(.72) saturate(.55);transition:filter .25s}
 .bc.landed{animation:landin .42s ease-out}
 @keyframes landin{from{transform:translateY(-40px) scale(1.15);opacity:.3}to{transform:none;opacity:1}}
 .die{flex-direction:column;gap:0;height:auto!important;min-height:44px;padding:3px 2px!important;width:48px!important}
@@ -613,5 +613,7 @@ body.tutlite .trk-l{display:flex;justify-content:space-between;font-size:16px}
 body.tutlite .coachb .saytx .tgoal{font-size:17px;color:#1f3d1a}
 body.tutlite .coachb .saytx .tres{font-size:14px;color:#2f6a22;font-weight:800;min-height:0}
 body.tutlite .coachb .saytx .tres:empty{display:none}
+/* W618 audit B: point badge always dark plate + white text */
+.bc .vp{background:#0b1a11;color:#fff}
 </style>
 </head>
