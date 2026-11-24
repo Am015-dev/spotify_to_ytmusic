@@ -189,6 +189,7 @@ function openSheet(title, html, closable) {
   s.innerHTML = '<div class="sh-head"><h2>' + esc(title) + '</h2>' + (closable !== false ? '<button type="button" class="x" data-x aria-label="Close">×</button>' : '') + '</div>' + html;
   s.hidden = false;
   var x = s.querySelector('[data-x]'); if (x) x.onclick = closeSheet;
+  if (UI.learn && UI.hints) setTimeout(placeFinger, 60);
 }
 function closeSheet() { var s = $('#sheet'); if (!s.hidden) { s.hidden = true; } UI.sheet = null; UI.mktSel = null; }
 function priceHTML(slot, consul) {
@@ -298,6 +299,7 @@ function hintTarget() {
     if (UI.sheet && UI.sheet.indexOf('New in') === 0) return document.querySelector('#sheet [data-k="' + m.k + '"]');
     return document.querySelector('.city[data-c="' + m.c + '"] .hit');
   }
+  if (m.t === 'trade') return UI.sheet === 'Trade' ? $('#tgo') : $('#acts .btn');
   if (m.t === 'take') return document.querySelector('#sheet [data-g="' + m.g + '"]');
   if (m.t === 'prov') return UI.selProv === m.p ? $('#acts .btn') : document.querySelector('.prov[data-p="' + m.p + '"] .hit');
   if (m.t === 'buy') return UI.sheet ? document.querySelector('#sheet .cd[data-s="' + m.s + '"]') : $('#acts .btn');

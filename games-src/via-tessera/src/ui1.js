@@ -156,12 +156,20 @@ function canBuildFrom(G, pi, rid) {
 }
 // ---------- camera ----------
 function boardBox() { var b = $('#board'); return { w: b.clientWidth || 375, h: b.clientHeight || 400 }; }
+// keep every tap area at least 46 screen px (k = map units per screen px)
+function growHits(k) {
+  document.querySelectorAll('#map .hit, #map .slothit, #map .colhit').forEach(function (e) {
+    if (e.tagName === 'circle') e.setAttribute('r', Math.max(26, 23 * k).toFixed(1));
+    else { var w = Math.max(96, 62 * k), h = Math.max(64, 50 * k); e.setAttribute('x', (-w / 2).toFixed(1)); e.setAttribute('y', (-38 - (h - 64) / 2).toFixed(1)); e.setAttribute('width', w.toFixed(1)); e.setAttribute('height', h.toFixed(1)); }
+  });
+}
 function setView(v, anim) {
   var bb = boardBox(), asp = bb.h / bb.w;
   v.w = Math.max(260, Math.min(1100, v.w)); v.h = v.w * asp;
   // keep some of the map in view
-  v.x = Math.max(-v.w * 0.3, Math.min(VTART.W - v.w * 0.7, v.x)); v.y = Math.max(-v.h * 0.3, Math.min(VTART.H - v.h * 0.7, v.y));
+  v.x = v.w >= VTART.W ? (VTART.W - v.w) / 2 : Math.max(0, Math.min(VTART.W - v.w, v.x)); v.y = v.h >= VTART.H ? (VTART.H - v.h) / 2 : Math.max(0, Math.min(VTART.H - v.h, v.y));   // the mosaic always fills the board
   UI.view = v;
+  growHits(v.w / bb.w);
   $('#map').setAttribute('viewBox', v.x.toFixed(1) + ' ' + v.y.toFixed(1) + ' ' + v.w.toFixed(1) + ' ' + v.h.toFixed(1));
 }
 function fitPoints(pts, pad, minW) {
@@ -273,6 +281,7 @@ function renderRival() {
   $('#rivalcard').innerHTML = top != null && UI.mode !== 'hot' ? '<div class="mini">' + cardHTML(top, '', 'tabindex="-1" disabled').replace('<button', '<span').replace('</button>', '</span>') + '</div>' : '';
 }
 function render() {
+  setTimeout(function () { if (UI.view) growHits(UI.view.w / boardBox().w); }, 0);
   if (!G) return;
   renderRace(); renderStore(); renderHand(); renderRival(); renderMap(); renderPrompt();
 }
