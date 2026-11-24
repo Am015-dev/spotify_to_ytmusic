@@ -231,6 +231,183 @@
   // a whole line for tests: pick(dec) returns the option index
   function play(i, pick) { var R = start(i), n = 0; while (!R.ended && n++ < 60) { advance(R); var d = decision(R); if (d) choose(R, d, pick(d)); } return R; }
 
-  var OHC = root.OHC = { CH: CH, start: start, advance: advance, decision: decision, choose: choose, play: play, YOU: YOU, RIV: RIV };
+  // ---------- SCENARIOS: the tutorial as a game. Each one = a built start position on the REAL engine, one objective, a par,
+  // a fail rule and two hints. The player makes every move with the normal controls; nothing is clicked for them.
+  function hexes(f) { var M = OHx().MAP; return M.order.filter(function (s) { var S = M.spaces[s]; return S && !S.reserved && f(S, s); }); }
+  function landN(s) { var M = OHx().MAP; return M.spaces[s].adj.filter(function (a) { return M.spaces[a] && !M.spaces[a].ocean && !M.spaces[a].reserved; }).length; }
+  function put(s, t, o) { OHx().G.tiles[s] = { t: t, o: t === 'ocean' ? -1 : o }; if (t === 'ocean') OHx().G.oceans++; }
+  function midCity() { var c = hexes(function (S) { return !S.ocean && !S.bonus.length; }).sort(function (a, b) { return landN(b) - landN(a) || (a < b ? -1 : 1); })[0]; put(c, 'city', 0); return c; }
+  function noRival(G) { G.pl[1].passed = true; G.noRival = true; return G; }
+  function adjOcean(s) { var OH = OHx(), G = OH.G; return OH.MAP.spaces[s].adj.filter(function (a) { return G.tiles[a] && G.tiles[a].t === 'ocean'; }).length; }
+  function myCities() { var G = OHx().G, o = []; for (var s in G.tiles) if (G.tiles[s].t === 'city' && G.tiles[s].o === 0 && OHx().MAP.spaces[s]) o.push(s); return o; }
+  function bestSpace(f) { var G = OHx().G; return G.pending.d.spaces.slice().sort(function (a, b) { return f(b) - f(a) || (a < b ? -1 : 1); })[0]; }
+  var SC = [
+    { id: 'tiles', title: 'First greenery', learn: 'Tiles and the board',
+      goal: 'Plant a greenery: +1 oxygen, +1 rating.', acts: 2, par: { acts: 1, mc: 0 },
+      setup: function () { var G = noRival(base(8101, { pl: [{ mc: 6, plant: 8, tr: 20 }, {}], temp: -30 })); G.scCity = midCity(); return G; },
+      win: function (G) { return OHx().greeneries(0) >= 1; },
+      why: 'Your plants turned into a greenery: oxygen +1 raised your rating.',
+      failWhy: 'No greenery yet. The leaf button under your plants turns 8 plants into a tile.',
+      hints: ['Your 8 plants are a greenery waiting to happen. Look at the plants in your resource bar.', 'Tap the plants (8) in the resource bar, then a glowing hex next to your city, then Place here.'],
+      learned: 'Greenery must go next to your own tiles when it can. Each one raises oxygen (+1 rating) and is 1 point.',
+      solve: [{ t: 'green' }, function () { return { t: 'place', s: bestSpace(function (s) { return 0; }) }; }], wrong: [{ t: 'pass' }] },
+    { id: 'stock', title: 'Stock and production', learn: 'Resources',
+      goal: 'Get titanium production: play Cobalt Trawler.', acts: 2, par: { acts: 1 },
+      setup: function () { return noRival(base(8102, { pl: [{ mc: 6, ti: 2, tr: 20, hand: ['p016', 'p031'] }, {}], temp: -30 })); },
+      win: function (G) { return G.pl[0].prod.ti >= 1; },
+      why: 'Titanium paid 6 of the 12: your titanium production is now +1, every round.',
+      failWhy: 'Hot Wire Barrage spent your titanium, so Cobalt Trawler now costs more credits than you have.',
+      fail: function (G) { return G.pl[0].played.indexOf('p031') >= 0 && !OHx().playable(0, 'p016'); },
+      hints: ['Titanium (stock 2) is worth 3 credits each, but only on space cards. Both cards are space cards.', 'Play Cobalt Trawler first: 2 titanium pay 6, your 6 credits pay the rest.'],
+      learned: 'Big number = stock you spend now. Small +N = production you get every round. Steel pays building cards, titanium space cards.',
+      solve: [{ t: 'play', id: 'p016' }], wrong: [{ t: 'play', id: 'p031' }] },
+    { id: 'global', title: 'The bonus dot', learn: 'Raise a global',
+      goal: 'Raise the temperature to -24 °C (bonus dot) in 2 actions.', acts: 2, par: { acts: 2, mc: 9 },
+      setup: function () { return noRival(base(8103, { pl: [{ mc: 16, heat: 5, tr: 20, hand: ['p031'] }, {}], temp: -28 })); },
+      win: function (G) { return G.temp >= -24; },
+      fail: function (G) { return G.pl[0].heat < 8 && G.pl[0].mc < 9; },
+      why: 'You landed on -24 °C: two rating and the dot gave you +1 heat production.',
+      failWhy: 'Out of fuel: under 8 heat and under 9 credits, nothing left can raise the temperature.',
+      hints: ['Each temperature step costs one action. Which two steps are cheapest?', 'Hot Wire Barrage (9) gives a step AND 3 heat: then burn 8 heat for the second step. Cheaper than a comet strike (14).'],
+      learned: 'Every global step is +1 rating. Landing on a dot pays a bonus to whoever lands there.',
+      solve: [{ t: 'play', id: 'p031' }, { t: 'heat' }], wrong: [{ t: 'std', k: 'power' }] },
+    { id: 'route', title: 'Card or project', learn: 'Standard projects vs cards',
+      goal: 'Gain +3 rating with 30 credits, in 2 actions.', acts: 2, par: { acts: 2, mc: 23 },
+      setup: function () { return noRival(base(8104, { pl: [{ mc: 30, tr: 20, prod: { energy: 1 }, hand: ['p039'] }, {}], temp: -20 })); },
+      win: function (G, S) { return G.pl[0].tr >= S.tr0 + 3; },
+      why: 'Mirror Tilt Program gave 2 steps for 9 credits; one comet strike gave the third.',
+      failWhy: 'Two comet strikes cost 28 for +2. The card gives +2 for 9.',
+      hints: ['Projects are always there, but a card can be cheaper per step. Compare credits per rating.', 'Play Mirror Tilt Program (+2 temperature for 9), then Projects > Comet strike (14).'],
+      learned: 'Standard projects are your fallback. A good card usually buys rating cheaper than a project.',
+      solve: [{ t: 'play', id: 'p039' }, { t: 'std', k: 'asteroid' }], wrong: [{ t: 'std', k: 'asteroid' }, { t: 'std', k: 'asteroid' }] },
+    { id: 'adj', title: 'Between two seas', learn: 'Adjacency',
+      goal: 'Build a city that touches 2 oceans (+2 credits each).', acts: 1, par: { acts: 1 },
+      setup: function () {
+        var G = noRival(base(8105, { pl: [{ mc: 27, tr: 20 }, {}], temp: -30 })), M = OHx().MAP;
+        var land = hexes(function (S, s) { return !S.ocean && S.adj.filter(function (a) { return M.spaces[a] && M.spaces[a].ocean; }).length >= 2; })[2];
+        M.spaces[land].adj.filter(function (a) { return M.spaces[a] && M.spaces[a].ocean; }).slice(0, 2).forEach(function (a) { put(a, 'ocean'); });
+        G.scLand = land; return G;
+      },
+      win: function (G) { return myCities().some(function (s) { return adjOcean(s) >= 2; }); },
+      fail: function (G) { return myCities().length > 0 && !myCities().some(function (s) { return adjOcean(s) >= 2; }); },
+      why: 'Your city touches 2 oceans: +4 credits on the spot.',
+      failWhy: 'Your city touches fewer than 2 oceans. Look for land between the two blue ocean tiles.',
+      hints: ['Every tile you place pays 2 credits for each ocean next to it.', 'Projects > City, then pick the land hex that touches BOTH ocean tiles.'],
+      learned: 'Placement is a decision: oceans next to a tile pay 2 credits each, and hex icons pay their bonus.',
+      solve: [{ t: 'std', k: 'city' }, function () { return { t: 'place', s: bestSpace(adjOcean) }; }],
+      wrong: [{ t: 'std', k: 'city' }, function () { return { t: 'place', s: bestSpace(function (s) { return -adjOcean(s); }) }; }] },
+    { id: 'req', title: 'Unlock a card', learn: 'Tags and requirements',
+      goal: 'Play Tray Garden Rows. It needs 2% oxygen; the air has 1%.', acts: 2, par: { acts: 2 },
+      setup: function () { var G = noRival(base(8106, { pl: [{ mc: 12, plant: 8, tr: 20, hand: ['p019'] }, {}], temp: -30, oxy: 1 })); midCity(); return G; },
+      win: function (G) { return G.pl[0].played.indexOf('p019') >= 0; },
+      fail: function (G) { return G.pl[0].mc < 11; },
+      why: 'Your greenery lifted oxygen to 2%, which unlocked the card.',
+      failWhy: 'You spent the credits the card needs (11).',
+      hints: ['A requirement is a gauge level. Can you raise oxygen without spending credits?', 'Plant a greenery with your 8 plants (oxygen 2%), then play the card.'],
+      learned: 'Requirements sit under a card name: meet the gauge or tag count first, then play it.',
+      solve: [{ t: 'green' }, function () { return { t: 'place', s: bestSpace(function () { return 0; }) }; }, { t: 'play', id: 'p019' }], wrong: [{ t: 'std', k: 'power' }] },
+    { id: 'mile', title: 'Milestone race', learn: 'Milestones',
+      goal: 'Claim Quartermaster (5 production kinds) before Greyline.', acts: 2, par: { acts: 2 },
+      setup: function () { var G = base(8107, { pl: [{ mc: 20, tr: 20, prod: { mc: 1, steel: 1, plant: 1, heat: 1 } }, { mc: 20, tr: 20, prod: { mc: 1, steel: 1, ti: 1, plant: 1, heat: 1 } }], temp: -30 }); G.scPlan = 'mile'; return G; },
+      win: function (G) { return G.milestones.quartermaster === 0; },
+      fail: function (G) { return G.milestones.quartermaster === 1; },
+      why: 'Power plant made energy your 5th production kind; you claimed first: 5 points for 8 credits.',
+      failWhy: 'Greyline claimed Quartermaster first. You needed a 5th production kind, then 8 credits to claim.',
+      hints: ['You have 4 production kinds. Which project adds a new one?', 'Projects > Power plant (11) adds energy production. Then Milestones > Quartermaster (8).'],
+      learned: 'Milestones cost 8 and give 5 points, but only the first claimer gets each one.',
+      solve: [{ t: 'std', k: 'power' }, { t: 'mile', k: 'quartermaster' }], wrong: [{ t: 'std', k: 'asteroid' }, { t: 'end' }] },
+    { id: 'gens', title: 'Two seasons ahead', learn: 'Generations',
+      goal: 'Plant a greenery from plants by the end of generation 3.', acts: 0, gens: 3, par: { acts: 2 },
+      setup: function () { return noRival(base(8108, { pl: [{ mc: 14, tr: 10, prod: { plant: 2, energy: 1 }, hand: ['p020'] }, {}], temp: -30, oxy: 4 })); },
+      win: function (G, S) { return S.greens > 0; },
+      why: '+2 plant production in round 1 doubled your harvest: 8 plants by round 3.',
+      failWhy: 'Plants grew too slowly. At +2 a round you reach 4 by round 3; +4 a round reaches 8.',
+      hints: ['Production pays at the end of every round. What makes 8 plants by round 3?', 'Play Hydroponic Spindle now (+2 plant production), pass twice, then plant in round 3.'],
+      learned: 'Production early pays every round after. Count rounds left before you choose engine or rating.',
+      solve: [{ t: 'play', id: 'p020' }, { t: 'pass' }, { t: 'pass' }, { t: 'green' }, function () { return { t: 'place', s: bestSpace(function () { return 0; }) }; }], wrong: [{ t: 'std', k: 'asteroid' }, { t: 'pass' }, { t: 'pass' }, { t: 'pass' }] },
+    { id: 'rival', title: 'The rival', learn: 'The rival',
+      goal: 'Outscore Greyline after 3 generations.', acts: 0, gens: 3, par: { margin: 4 },
+      setup: function () { var G = base(8109, { pl: [{ mc: 30, tr: 20, heat: 5, plant: 8, prod: { energy: 1, mc: 1 }, hand: ['p039', 'p031', 'p001'] }, { mc: 20, tr: 20 }], temp: -30 }); midCity(); G.scPlan = 'comets'; return G; },
+      win: function (G, S) { return S.over && OHx().score(0).total > OHx().score(1).total; },
+      fail: function (G, S) { return S.over && OHx().score(0).total <= OHx().score(1).total; },
+      why: 'You raised more than Greyline each round.',
+      failWhy: 'Greyline bought a comet strike every round while you waited.',
+      hints: ['Greyline buys a comet strike whenever it can. Every step you raise is a point.', 'Play your two temperature cards, burn heat, plant your greenery: 5 rating in round 1.'],
+      learned: 'The rival races for the same rating. Act every round; passing early only helps it.',
+      policy: 'hard', wrong: 'pass' },
+    { id: 'grad', title: 'Graduation', learn: 'A mini game',
+      goal: 'Beat the normal rival in a 5-generation game.', acts: 0, gens: 5, par: { margin: 6 },
+      setup: function () {
+        var G = base(8110, { pl: [{ mc: 40, tr: 22 }, { mc: 40, tr: 22 }], temp: -12, oxy: 6, oceans: 4 });
+        [0, 1].forEach(function (p) { for (var i = 0; i < 6; i++) G.pl[p].hand.push(G.deck.pop()); G.pl[p].prod.mc = 2; G.pl[p].prod.plant = 1; G.pl[p].prod.heat = 1; });
+        G.scPlan = 'ai'; return G;
+      },
+      win: function (G, S) { return S.over && OHx().score(0).total > OHx().score(1).total; },
+      fail: function (G, S) { return S.over && OHx().score(0).total <= OHx().score(1).total; },
+      why: 'You beat a real rival. You are ready for a full game.',
+      failWhy: 'The rival scored more. Count points: rating, tiles, cards, milestones.',
+      hints: ['Use the bulb at the top for a suggested move any time.', 'Raise globals with cheap cards first, claim a milestone if you can, plant every 8 plants.'],
+      learned: 'A full game is this, longer: about 10-12 generations to fill all three gauges.',
+      policy: 'hard', wrong: 'pass' }
+  ];
+  SC.forEach(function (c, i) { c.n = i + 1; });
+  function sStart(i) { var c = SC[i], G = c.setup(); G.scenario = c.id; G.log.push({ p: -1, s: 'Scenario: ' + c.title + '.' }); return { i: i, sc: c, acts: 0, spent: 0, greens: 0, tr0: G.pl[0].tr, ended: false, over: false, result: null }; }
+  // record one of the player's moves (call with the credits before the move)
+  function sNote(S, m, mc0) {
+    var G = OHx().G;
+    if (['pass', 'end', 'place', 'choose', 'pickres', 'buy', 'done'].indexOf(m.t) < 0) S.acts++;
+    if (m.t === 'green') S.greens++;
+    S.spent += Math.max(0, mc0 - G.pl[0].mc);
+  }
+  function stars(S) { var p = S.sc.par, G = OHx().G; if (p.margin !== undefined) { var d = OHx().score(0).total - OHx().score(1).total; return d >= p.margin ? 3 : d >= 2 ? 2 : 1; } return S.acts <= p.acts && (p.mc === undefined || S.spent <= p.mc) ? 3 : S.acts <= p.acts + 1 ? 2 : 1; }
+  // decide win/fail; returns the result once the scenario ended
+  function sCheck(S) {
+    if (S.ended) return S.result;
+    var OH = OHx(), G = OH.G, c = S.sc, gens = c.gens || 1;
+    S.over = G.over || G.phase === 'final' || G.gen > gens;
+    var placing = G.pending && G.pending.p === 0;
+    if (!placing && c.win(G, S)) { S.ended = true; S.result = { ok: true, stars: stars(S), line: c.why }; }
+    else if ((c.fail && c.fail(G, S)) || (c.acts && S.acts >= c.acts && !placing && !G.pending) || S.over) { S.ended = true; S.result = { ok: false, stars: 0, line: c.failWhy }; }
+    return S.result;
+  }
+  function rivalMove(S) {
+    var OH = OHx(), G = OH.G, k = G.scPlan;
+    if (G.noRival || !k) return { t: G.phase === 'final' ? 'done' : G.acts === 1 ? 'end' : 'pass' };
+    if (k === 'mile') return OH.mileOk(1, 'quartermaster') ? { t: 'mile', k: 'quartermaster' } : { t: 'pass' };
+    if (k === 'ai') return (root.OHAI || require('./ai.js')).decide('normal');
+    if (G.phase === 'final') return { t: 'done' };
+    var a = PLANS[k](G).m; return a.t === 'pass' && G.acts === 1 ? { t: 'end' } : a;
+  }
+  // play every move that is not the player's (research, the rival, its placements); returns rival moves made
+  function sAuto(S) {
+    var OH = OHx(), out = [], n = 0;
+    while (n++ < 200) {
+      var G = OH.G; if (sCheck(S) || G.over) break;
+      var p = OH.sideToAct(); if (p < 0) break;
+      if (G.phase === 'research') { OH.performMove({ t: 'buy', ids: [] }); continue; }
+      if (p === 0) break;
+      if (G.pending && G.pending.h === 'place') { OH.performMove({ t: 'place', s: rivalPlace(G, 'rivalNear') }); continue; }
+      if (G.pending) { OH.performMove(G.pending.h === 'choose' ? { t: 'choose', i: G.pending.d.ok[0] } : { t: 'pickres', id: G.pending.d.cards[0] }); continue; }
+      var m = rivalMove(S) || { t: 'pass' };
+      if (!OH.performMove(m)) OH.performMove({ t: G.phase === 'final' ? 'done' : G.acts === 1 ? 'end' : 'pass' });
+      out.push(m);
+    }
+    return out;
+  }
+  // node + tests: run a scenario with a list of moves (or a policy) and return the run state
+  function sRun(i, moves) {
+    var OH = OHx(), S = sStart(i), j = 0, guard = 0; sAuto(S);
+    while (!S.ended && guard++ < 300) {
+      var m;
+      if (moves === 'hard' || moves === 'pass') { var G = OH.G; m = moves === 'pass' ? (G.pending ? OH.validMoves()[0] : { t: G.phase === 'final' ? 'done' : G.acts === 1 ? 'end' : 'pass' }) : (root.OHAI || require('./ai.js')).decide('hard'); }
+      else { if (j >= moves.length) break; m = moves[j++]; if (typeof m === 'function') m = m(); }
+      var mc0 = OH.G.pl[0].mc;
+      if (!OH.performMove(m)) return { S: S, bad: m };
+      sNote(S, m, mc0); sAuto(S);
+    }
+    sCheck(S); return { S: S };
+  }
+
+  var OHC = root.OHC = { SC: SC, sStart: sStart, sNote: sNote, sCheck: sCheck, sAuto: sAuto, sRun: sRun, CH: CH, start: start, advance: advance, decision: decision, choose: choose, play: play, YOU: YOU, RIV: RIV };
   if (isNode) module.exports = OHC;
 })(typeof window !== 'undefined' ? window : globalThis);

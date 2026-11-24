@@ -1,7 +1,7 @@
 // ===== part 9: Learn to play = Interface tour (labelled HUD map) + floating lessons on a real game; feel (floats, dings, fanfares) =====
 // Owner rules (24 Nov): the tutorial is a small FLOATING window (drag, minimise to a chip, close). It never dims the screen and never
 // blocks a tap: the player can tap anything at any time. A pulse ring marks the suggested target; a step ticks when it is done OR on Next.
-var TW = { on: false, mode: '', min: false, cur: 0, done: {}, tapped: {}, base: null, pos: null, info: '', seen: {} };
+var TW = { on: false, mode: '', min: false, pos: null, info: '', seen: {} };
 // ---------- the HUD map: every element, one plain sentence each ----------
 var HUD = [
   ['bmenu', 'Menu', 'Menu: new game, rules, all cards, sound, this guide. Close it with the X.'],
@@ -83,40 +83,42 @@ function hudShow() {
   });
 }
 function hudHide() { $('hg').classList.remove('on'); $('hg').innerHTML = ''; document.body.classList.remove('hgon'); }
-// ---------- lessons: suggestions on the real board, any order ----------
-function myTiles() { var n = 0; for (var s in G.tiles) if (G.tiles[s] && G.tiles[s].p === 0) n++; return n; }
-function rivMoves() { return G.log.filter(function (l) { return l.p === 1; }).length; }
-var LESSONS = [
-  { k: 'goal', t: 'Goal: raise temperature, oxygen and oceans (the gauges). Your score = rating + points. The rival wants the same.', w: 'Why: every step you raise is +1 rating for you, and rating is both points and income.', tgt: function () { return $('glob'); }, tap: 'glob' },
-  { k: 'stock', t: 'Look at your resources: the big number is your stock, the small +N is production.', w: 'Why: production pays you every round, so a little production early adds up.', tgt: function () { return $('res'); }, tap: 'res' },
-  { k: 'inspect', t: 'Open your hand and tap a card. Cost is top left, tags top right, a requirement under the name, the effect below.', w: 'Why: a card can be played only if you can pay it and meet its requirement.', tgt: function () { return $('modal').classList.contains('on') ? null : $('sheet').classList.contains('on') && UI.sheet === 'cards' ? document.querySelector('#shB [data-card]') : $('bCards'); }, done: function () { return !!$('mPlay'); } },
-  { k: 'play', t: 'Play a card you can afford, then watch your production numbers change.', w: 'Why: production cards pay back every round for the rest of the game.', tgt: function () { return $('mPlay') && !$('mPlay').disabled ? $('mPlay') : $('sheet').classList.contains('on') ? document.querySelector('#shB [data-card]') : $('bCards'); }, done: function () { return G.pl[0].played.length > TW.base.played; } },
-  { k: 'std', t: 'Open Projects and buy a standard project. A tile one asks you to tap a glowing hex, then Place here.', w: 'Why: tiles score points and the icons on the hex pay you a bonus.', tgt: function () { return G.pending && G.pending.h === 'place' ? ($('confirm').offsetParent && UI.sel ? $('confirmb') : document.querySelector('#hexes .hex.tgt')) : $('sheet').classList.contains('on') && UI.sheet === 'proj' ? document.querySelector('#shB [data-std]:not([disabled])') : $('bProj'); }, done: function () { return myTiles() > TW.base.tiles || TW.base.std; } },
-  { k: 'pass', t: 'You get 1 or 2 actions per turn. Then tap Done (after 1 action) or Pass (out for this round).', w: 'Why: the rival then moves; passing early saves credits but gives up the round.', tgt: function () { return $('bPass'); }, done: function () { return TW.base.ended; } },
-  { k: 'rival', t: 'The rival’s turn: its tile flashes on the map and a line says what it did. Nothing to tap.', w: 'Why: watch what it races for: the same gauges, milestones and awards.', tgt: function () { return $('sriv'); }, done: function () { return rivMoves() > TW.base.riv; } },
-  { k: 'income', t: 'When both players pass, the round ends: credits = credit production + rating; other resources grow by production.', w: 'Why: energy turns into heat, so production you build now pays every round.', tgt: function () { return $('res'); }, done: function () { return G.gen > TW.base.gen; } },
-  { k: 'goals', t: 'Open Milestones or Awards. Milestone: 8 credits = 5 points. Award: fund it, lead it at the end, get 5.', w: 'Why: only 3 of each exist, and the rival can grab them first.', tgt: function () { return $('tMile'); }, done: function () { return UI.sheet === 'proj' && (UI.tab === 'mile' || UI.tab === 'award'); } },
-  { k: 'end', t: 'The game ends after the round where all three gauges are full. Most points wins.', w: 'Why: points = rating + greenery + cities + cards + milestones + awards; plan for all of them.', tgt: function () { return $('cVP'); }, tap: 'cVP' }
-];
-function lessonDone(L) {   // once done, stays done (latched)
-  if (TW.done[L.k]) return true;
-  var d = L.done ? (function () { try { return !!L.done(); } catch (e) { return false; } })() : !!TW.tapped[L.tap];
-  if (d) TW.done[L.k] = 1; return d;
+// ---------- scenarios: the tutorial is a game (logic + data in src/charters.js). The player makes every move; the card only shows the goal ----------
+var SCN = { S: null, hint: 0, prog: {} };
+try { SCN.prog = JSON.parse(LS.get('oh_scen') || '{}') || {}; } catch (e) { SCN.prog = {}; }
+function scSave() { try { LS.set('oh_scen', JSON.stringify(SCN.prog)); } catch (e) { } }
+function scUnlocked(i) { return i < 3 || [0, 1, 2].every(function (j) { return SCN.prog[OHC.SC[j].id]; }); }
+function scStart(i) {
+  closeModal(); closeSheet(); hideStart(); if (UI.charter) chStop(); clearTimeout(aiTimer);
+  UI.tut = false; UI.scen = true; UI.setup = null; UI.research = null; UI.busy = false; SCN.hint = 0;
+  SCN.S = OHC.sStart(i); OHC.sAuto(SCN.S);
+  UI.evSeen = OH.G.ev.length; UI.logSeen = OH.G.log.length;
+  fitView(); render(); TW.pos = null; TW.dragged = false; twOpen('scen'); pump();
 }
-var twDoMove0 = doMove;
-doMove = function (m) { var r = twDoMove0(m); if (r && TW.base && m) { if (m.t === 'std') TW.base.std = true; if (m.t === 'end' || m.t === 'pass') TW.base.ended = true; } return r; };
-// ---------- start / stop ----------
-function learnStart() {   // Learn to play: a real easy game, beginner company, then the tour, then lessons
-  try { startGame({ level: 'easy', seed: 20261124 }); } catch (e) { }
-  if (G && G.phase === 'setup' && OH.sideToAct() === 0) {
-    var off = G.pl[0].offer.corps, c = off.filter(function (x) { return OH.CORPS && OH.CORPS[x] && OH.CORPS[x].beginner; })[0] || off[0];
-    UI.setup = null; closeModal(); doMove({ t: 'setup', corp: c, buy: [] });
+function scStop() { UI.scen = false; SCN.S = null; if (TW.mode === 'scen') twClose(); }
+var scDoMove0 = doMove;
+doMove = function (m) {
+  var S = SCN.S, me = S && !S.ended && G && OH.sideToAct() === 0, mc0 = G ? G.pl[0].mc : 0;
+  var r = scDoMove0(m);
+  if (r && me && SCN.S === S) {
+    OHC.sNote(S, m, mc0);
+    var riv = OHC.sAuto(S);
+    if (riv.some(function (x) { return x.t !== 'pass' && x.t !== 'end' && x.t !== 'done'; })) { playEvents(); render(); }
+    if (S.ended) scEnd(); else twRender();
   }
-  TW.done = {}; TW.tapped = {}; TW.cur = 0; TW.info = ''; TW.base = null;
-  twOpen('tour');
+  return r;
+};
+function scEnd() {
+  var S = SCN.S, res = S.result; if (!res) return;
+  if (res.ok) { var id = S.sc.id; SCN.prog[id] = Math.max(SCN.prog[id] || 0, res.stars); scSave(); sfx('ding'); } else sfx('bad');
+  TW.min = false; twRender();
 }
-function twOpen(mode) { TW.y = null; TW.x = null; TW.on = true; TW.mode = mode; TW.min = false; TW.info = ''; TW.dragged = false; hudHide(); if (mode === 'lessons' && !TW.base) twBase(); twRender(); if (mode === 'tour') { hudShow(); twRender(); } }
-function twBase() { TW.base = { played: G.pl[0].played.length, tiles: myTiles(), riv: rivMoves(), gen: G.gen, std: false, ended: false }; }
+// ---------- start / stop ----------
+function learnStart() {   // Learn to play = scenario 1 (or the list once scenario 1 is won); the Interface tour is the optional first card of the list
+  if (SCN.prog.tiles) { if (!G) scStart(0); twOpen('pick'); return; }
+  scStart(0);
+}
+function twOpen(mode) { TW.y = null; TW.x = null; TW.on = true; TW.mode = mode; TW.min = false; TW.info = ''; TW.dragged = false; hudHide(); twRender(); if (mode === 'tour') { hudShow(); twRender(); } }
 function twClose() { TW.on = false; hudHide(); $('tw').classList.remove('on'); $('twChip').classList.remove('on'); $('twRing').classList.remove('on'); }
 function twMin(m) { TW.min = m; twRender(); }
 // ---------- the floating window ----------
@@ -124,30 +126,40 @@ function twRender() {
   var w = $('tw'); if (!TW.on) return twClose();
   $('twChip').classList.toggle('on', TW.min); w.classList.toggle('on', !TW.min); w.classList.toggle('tour', TW.mode === 'tour');
   if (TW.min) { $('twRing').classList.remove('on'); return; }
-  var h = '<div class="twh" id="twH"><b>' + (TW.mode === 'tour' ? 'Interface tour' : 'Lessons') + '</b><span class="twg">drag</span><button id="twMin" aria-label="Minimise guide">–</button><button id="twX" aria-label="Close guide">×</button></div><div class="twb">';
+  var h = '<div class="twh" id="twH"><b>' + (TW.mode === 'tour' ? 'Interface tour' : TW.mode === 'scen' && SCN.S ? 'Scenario ' + SCN.S.sc.n + ' · ' + esc(SCN.S.sc.title) : 'Scenarios') + '</b><span class="twg">drag</span><button id="twMin" aria-label="Minimise guide">–</button><button id="twX" aria-label="Close guide">×</button></div><div class="twb">';
   if (TW.mode === 'tour') {
     var hit = HUD.filter(function (x) { return x[0] === TW.info; })[0], n = Object.keys(TW.seen).length;
     h += hit ? '<p class="twt"><b>' + esc(hit[1]) + '.</b> ' + esc(hit[2].replace(/^[^:]*: /, '')) + '</p>' : '<p class="twt">This is the real screen. Tap any label to learn what it does. You can tap the game too.</p>';
     h += '<p class="tww">Seen ' + n + ' of ' + HUD.length + '. Panels open with a tap and close with their X or Close.</p>';
-    h += '<div class="twn"><button class="btn alt" id="twHide">' + ($('hg').classList.contains('on') ? 'Hide labels' : 'Show labels') + '</button><button class="btn" id="twNext">Lessons ›</button></div>';
-  } else if (TW.mode === 'lessons') {
-    var all = LESSONS.every(lessonDone), L = LESSONS[TW.cur];
-    if (all) h += '<p class="twt"><b>You know the game.</b> Keep playing this one, or try a practice puzzle.</p><div class="twn"><button class="btn alt" id="twPuz">Practice puzzles</button><button class="btn" id="twEnd">Keep playing</button></div>';
-    else h += '<p class="twt">' + esc(L.t) + '</p><p class="tww">' + esc(L.w) + '</p><div class="twn"><button class="btn alt" id="twTour">Tour</button><button class="btn" id="twNext">Next ›</button></div>';
-    h += '<ol class="twl">' + LESSONS.map(function (x, i) { return '<li class="' + (lessonDone(x) ? 'ok' : '') + (i === TW.cur && !all ? ' cur' : '') + '"><button data-twl="' + i + '">' + esc(x.k === 'goal' ? 'Goal' : x.k === 'stock' ? 'Stock vs production' : x.k === 'inspect' ? 'Read a card' : x.k === 'play' ? 'Play a card' : x.k === 'std' ? 'Project + tile' : x.k === 'pass' ? 'Done / Pass' : x.k === 'rival' ? 'Rival’s turn' : x.k === 'income' ? 'Income' : x.k === 'goals' ? 'Milestones, awards' : 'Game end') + '</button></li>'; }).join('') + '</ol>';
+    h += '<div class="twn"><button class="btn alt" id="twHide">' + ($('hg').classList.contains('on') ? 'Hide labels' : 'Show labels') + '</button><button class="btn" id="twNext">Scenarios ›</button></div>';
+  } else if (TW.mode === 'scen' && SCN.S) {
+    var S = SCN.S, c = S.sc, R = S.result, st = function (n) { return '<span class="scst" aria-label="' + n + ' of 3 stars">' + '★★★'.slice(0, n) + '<i>' + '★★★'.slice(n) + '</i></span>'; };
+    if (!R) {
+      h += '<p class="sco">' + esc(c.goal) + '</p><p class="tww">' + (c.gens ? 'Generation ' + Math.min(G.gen, c.gens) + ' of ' + c.gens : 'Actions ' + S.acts + ' of ' + c.acts) + (c.par.acts !== undefined ? ' · par ' + c.par.acts + ' action' + (c.par.acts > 1 ? 's' : '') : ' · par: win by ' + c.par.margin) + (c.par.mc !== undefined ? ', ' + c.par.mc + ' credits' : '') + '</p>';
+      if (SCN.hint) h += '<p class="twt sch">' + esc(c.hints[Math.min(SCN.hint, c.hints.length) - 1]) + '</p>';
+      h += '<div class="twn"><button class="btn alt" id="scHint" aria-label="Hint">' + (SCN.hint ? (SCN.hint < c.hints.length ? 'Show me' : 'Hint shown') : 'Hint') + '</button><button class="btn alt" id="scRe">Restart</button><button class="btn alt" id="scAll">All</button></div>';
+    } else {
+      var nx = OHC.SC[S.i + 1];
+      h += '<p class="scr ' + (R.ok ? 'win' : 'fail') + '">' + (R.ok ? 'WIN ' + st(R.stars) : 'FAIL') + '</p><p class="twt">' + esc(R.line) + '</p>' + (R.ok ? '<p class="tww"><b>What you learned:</b> ' + esc(c.learned) + '</p>' : '');
+      h += '<div class="twn"><button class="btn' + (R.ok ? ' alt' : '') + '" id="scRe">Retry</button>' + (R.ok ? (nx ? '<button class="btn" id="scNext">Next: ' + esc(nx.title) + '</button>' : '<button class="btn" id="scReal">Start a real game</button>') : '<button class="btn alt" id="scAll">All</button>') + '</div>';
+    }
+  } else if (TW.mode === 'pick' || TW.mode === 'scen') {
+    h += '<ol class="twl scl"><li><button data-sct="1">Interface tour<small>optional: what every button does</small></button></li>' + OHC.SC.map(function (c, i) { var p = SCN.prog[c.id] || 0, lk = !scUnlocked(i); return '<li class="' + (p ? 'ok' : '') + '"><button data-sci="' + i + '"' + (lk ? ' disabled' : '') + '>' + c.n + '. ' + esc(c.title) + '<small>' + esc(c.learn) + (p ? ' · ' + '★★★'.slice(0, p) : lk ? ' · win 1-3 first' : '') + '</small></button></li>'; }).join('') + '</ol>';
   }
   w.innerHTML = h + '</div>';
   var on = function (id, f) { var e = $(id); if (e) e.addEventListener('click', function (ev) { ev.stopPropagation(); f(); }); };
   on('twX', twClose); on('twMin', function () { twMin(true); });
   on('twHide', function () { if ($('hg').classList.contains('on')) hudHide(); else hudShow(); twRender(); });
-  on('twNext', function () { if (TW.mode === 'tour') { twOpen('lessons'); return; } TW.done[LESSONS[TW.cur].k] = 1; twAdvance(); });
-  on('twTour', function () { twOpen('tour'); });
-  on('twPuz', function () { twClose(); chStart(0); });
-  on('twEnd', twClose);
-  w.querySelectorAll('[data-twl]').forEach(function (b) { b.addEventListener('click', function (ev) { ev.stopPropagation(); TW.cur = +b.getAttribute('data-twl'); twRender(); }); });
+  on('twNext', function () { twOpen('pick'); });
+  on('scHint', function () { SCN.hint = Math.min(SCN.hint + 1, SCN.S.sc.hints.length); twRender(); });
+  on('scRe', function () { scStart(SCN.S.i); });
+  on('scAll', function () { TW.mode = 'pick'; twRender(); });
+  on('scNext', function () { scStart(SCN.S.i + 1); });
+  on('scReal', function () { scStop(); startGame({ level: 'normal' }); });
+  w.querySelectorAll('[data-sci]').forEach(function (b) { b.addEventListener('click', function (ev) { ev.stopPropagation(); scStart(+b.getAttribute('data-sci')); }); });
+  w.querySelectorAll('[data-sct]').forEach(function (b) { b.addEventListener('click', function (ev) { ev.stopPropagation(); twOpen('tour'); }); });
   twDrag(); twPlace(); twTick();
 }
-function twAdvance() { var i, n = LESSONS.length; for (i = 1; i <= n; i++) { var j = (TW.cur + i) % n; if (!lessonDone(LESSONS[j])) { TW.cur = j; break; } } twRender(); }
 function twDrag() {
   var hd = $('twH'), w = $('tw'); if (!hd) return;
   hd.onpointerdown = function (e) {
@@ -181,8 +193,7 @@ function twPlace() {
 function twTarget() {
   if (!TW.on || TW.min) return null;
   if (TW.mode === 'tour') return TW.info ? hudEl(TW.info) : null;
-  if (LESSONS.every(lessonDone)) return null;
-  try { return LESSONS[TW.cur].tgt(); } catch (e) { return null; }
+  return null;
 }
 function twRingAt(el) {
   var rg = $('twRing'); if (!el || !el.getBoundingClientRect) { rg.classList.remove('on'); return; }
@@ -192,18 +203,8 @@ function twRingAt(el) {
 function twTick() {
   if (!TW.on) return;
   $('hg').classList.toggle('pause', $('sheet').classList.contains('on') || $('modal').classList.contains('on'));   // labels describe the main screen: step aside while a panel is open
-  if (TW.mode === 'lessons' && G) {
-    if (!TW.base) twBase();
-    var was = $('tw').querySelectorAll('.twl li.ok').length, now = LESSONS.filter(lessonDone).length;
-    if (now !== was && !TW.min) { if (lessonDone(LESSONS[TW.cur])) { sfx('ding'); twAdvance(); return; } twRender(); return; }
-  }
   twRingAt(twTarget()); twPlace();
 }
-// never blocks: a capture listener only RECORDS which suggested thing was tapped; the tap itself goes through untouched
-document.addEventListener('pointerdown', function (e) {
-  if (!TW.on || !e.target.closest) return;
-  ['glob', 'res', 'cVP'].forEach(function (id) { var el = $(id); if (el && el.contains(e.target)) TW.tapped[id] = 1; });
-}, true);
 setInterval(function () { try { twTick(); } catch (e) { } }, 250);
 try { var twMO = new MutationObserver(function () { try { if (TW.on) { twRingAt(twTarget()); twPlace(); } } catch (e) { } }); twMO.observe($('modal'), { attributes: true, attributeFilter: ['class'], childList: true, subtree: true }); twMO.observe($('sheet'), { attributes: true, attributeFilter: ['class'] }); } catch (e) { }
 window.addEventListener('resize', function () { if (TW.on && $('hg').classList.contains('on')) hudShow(); });
@@ -274,3 +275,5 @@ setHint = function (t) { feelHint0(t); if (UI.hintOff && G && UI.hintOff === G.g
   var hb = document.createElement('button'); hb.id = 'bHelp'; hb.textContent = '?'; hb.setAttribute('aria-label', 'Interface tour and lessons'); $('bw').appendChild(hb);
   hb.addEventListener('click', function () { if (TW.on && TW.mode === 'tour' && !TW.min) { twClose(); return; } if (!G || G.phase === 'setup') { learnStart(); return; } twOpen('tour'); });
 })();
+// deep link for tests and contact sheets: ?learn=<n> opens scenario n
+if (Q.get('learn')) setTimeout(function () { try { scStart(Math.max(0, Math.min(OHC.SC.length - 1, (+Q.get('learn') || 1) - 1))); } catch (e) { } }, 30);

@@ -88,7 +88,7 @@ function playEvents() {
   pls.forEach(function (pl) { var c = OH.card(pl.id); toast('<b>Rival plays ' + esc(c.name) + '</b>' + esc(c.text), false, Math.max(2200, UI.AIDELAY * 2.2), { key: 'rv' + pl.id }); });
   return d;
 }
-function save() { if (!G || UI.scn) return; LS.set('oh_save', JSON.stringify({ G: OH.G, level: UI.level, tut: UI.tut, coach: UI.coachDone })); }
+function save() { if (!G || UI.scn || UI.scen) return; LS.set('oh_save', JSON.stringify({ G: OH.G, level: UI.level, tut: UI.tut, coach: UI.coachDone })); }
 function doMove(m) {
   if (UI.busy && !m.force) return false;
   var ok = OH.performMove(m);
@@ -104,7 +104,7 @@ function doMove(m) {
 var aiTimer = 0;
 function pump() {
   if (!G) return;
-  if (UI.charter) { render(); return; }
+  if (UI.charter || (UI.scen && SCN.S && SCN.S.ended)) { render(); return; }
   render();
   if (G.over) { showEnd(); return; }
   var p = OH.sideToAct();
