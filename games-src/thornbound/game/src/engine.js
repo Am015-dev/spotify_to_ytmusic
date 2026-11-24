@@ -384,7 +384,7 @@ AG.clashNight=()=>{const c=G.clash,R=G.reg[c.r];G.step='night';const all=[];for(
     if(eff0(id,'heir')&&holds(sd,41)){const j=slotOf(sd,41);if(j>=0){dropKC(sd,j,'hand','kdisc');stat('kc41');gainLore(sd,1,'War Banner');lg('War Banner is discarded: its Heir fell.',sd)}}
     if(holds(sd,33)&&!G.used[sd+':kc33']){G.used[sd+':kc33']=1;stat('kc33');gainLore(sd,1,'Grave Candle')}}
   for(const sc in kills){const id=+sc,sd=own(id);
-    if(G.rm.lanes.includes(sd)){gainLore(sd,2,'Hot Iron')}
+    if(G.rm.lanes.includes(sd)){gainLore(sd,2*kills[sc],'Hot Iron')}
     if(holds(sd,35)&&cdef(id).ar==='heir'){gainLore(sd,1,'Night Blades');stat('kc35')}
     if(cdef(id).fx.includes('cellar'))trig.push({t:'cellar',id,seat:sd})}
   for(const t of trig)now('elimTrig',t);now('clashTally')};
@@ -516,7 +516,7 @@ kcact(6,'spring','',seat=>G.pl[seat].tac.some(t=>!t.burn)?[{label:'Sunken Vault:
   askPick(seat,'burnTactic','Sunken Vault: which Tactic do you burn? (1 Influence; an Unexhausted one adds 1 Lore)',G.pl[seat].tac.map((t,i)=>t.burn?null:{k:'t'+i,i,label:'Burn '+D.TACTICS[G.pl[seat].fac][i].nm+(t.ex?' (Exhausted: 1 Influence)':' (Unexhausted: 1 Influence, 1 Lore)')}).filter(Boolean),'burnTactic',{})});
 PICKH.burnTactic=(seat,opt)=>{const t=G.pl[seat].tac[opt.i];const was=!t.ex;t.burn=true;t.ex=true;t.mk=0;gainInf(seat,1,'Sunken Vault');if(was)gainLore(seat,1,'Sunken Vault')};
 kcact(13,'spring','',()=>[{label:'Hilltop Retreat: gain 1 Influence with 3+ Lore. Otherwise gain 1 Lore'}],seat=>{if(G.pl[seat].lore>=3)gainInf(seat,1,'Hilltop Retreat');else gainLore(seat,1,'Hilltop Retreat')});
-kcact(14,'spring','',seat=>G.pl[seat].disc.length&&G.pl[seat].hand.length<G.pl[seat].hs?G.pl[seat].disc.filter(id=>cdef(id).s<=5).map(id=>({id,p:{id},label:'Pardon Scroll: move '+cardLbl(id)+' from your Discard Pile to your hand'})):[],(seat,p)=>{toHand(seat,p.id)});
+kcact(14,'spring','',seat=>G.pl[seat].disc.length?G.pl[seat].disc.filter(id=>cdef(id).s<=5).map(id=>({id,p:{id},label:'Pardon Scroll: move '+cardLbl(id)+' from your Discard Pile to your hand'})):[],(seat,p)=>{toHand(seat,p.id)});
 kcact(19,'spring','',seat=>G.pl[seat].hand.length?[{label:'Tavern Gossip: put your hand under your deck, draw that many plus 1'}]:[],seat=>{now('rumourOne',{seat,extra:1})});
 SELH.rumours=(seat,ch)=>{for(const s of seatsFrom(ch))now('rumourOne',{seat:s})};
 AG.rumourOne=d=>{const P=G.pl[d.seat];const n=P.hand.length;if(!n)return;const ids=P.hand.slice();orderThen(d.seat,ids,'bottom',n+(d.extra||0))};
@@ -668,7 +668,7 @@ PICKH.journeyDest=(seat,opt,d)=>{if(opt.deck)stat('kc18');finishJourney(seat,d.i
 function finishJourney(seat,id,L,pf,deck){const e0l=eff(id).l;if(pf)stat('pathfinder');if(deck)toDeckBottom(id);else if(pf)toDisc(id);else toLost(id);
   const to=deck?'the bottom of their deck':pf?'their Discard Pile (Pathfinder)':'the Lost Pile';
   if(deck)lg(nm(seat)+' Journeys with '+cname(id)+' and gains '+L+' Lore. The card goes to '+to+'.',seat,'big');else rmLog(nm(seat)+' Journeys with '+cname(id)+' and gains '+L+' Lore. The card goes to '+to+'.',seat,[id],pf?'disc':'lost','Journey','big');
-  if(L>=2&&holds(seat,12)){gainInf(seat,1,'Glow Caves','Journey worth 2+ Lore');stat('kc12')}gainLore(seat,L)}
+  if(e0l>=2&&holds(seat,12)){gainInf(seat,1,'Glow Caves','Journey worth 2+ Lore');stat('kc12')}gainLore(seat,L)}
 act('govern','autumn',seat=>{if(usedK(seat,'govern'))return[];const o=[];for(const id of G.pl[seat].hand)if(votesOf(id)>=1)for(const c of COUNCILS)o.push({id:id+c,p:{id,c},label:'Govern '+cname(id)+', '+vtxt(votesOf(id))+', into the '+councilName(c)});return o},(seat,p)=>{useK(seat,'govern');toCouncil(seat,p.id,p.c);stat('govern')});
 act('journey','autumn',seat=>usedK(seat,'journey')?[]:journeySources(seat,false).map(id=>({id,p:{id},label:'Journey: send '+cname(id)+' away for '+eff(id).l+' Lore'+(eff(id).tr.has('path')?' (Pathfinder: it goes to your Discard Pile)':' (it goes to the Lost Pile)')})),(seat,p)=>{useK(seat,'journey');doJourney(seat,p.id)});
 act('cmd:rally','autumn',seat=>{const o=[];for(const id of cardsOfSeatActive(seat)){const e=eff(id),R=e.cm.rally;if(!R||usedK(seat,'a:'+id+':rally'))continue;
@@ -698,7 +698,7 @@ tactic('nob_t4','autumn',seat=>COUNCILS.some(c=>G.council[c].some(id=>own(id)!==
 AG.inquest=d=>{const items=[];for(const c of COUNCILS)for(const id of G.council[c])if(own(id)===d.seat)items.push({v:id,label:cardLbl(id)+' ('+councilName(c)+')'});if(!items.length)return;
   askSel(d.seat,'inquest','Purge the Benches: choose Council cards to move to your deck top. First chosen goes on top. You gain 1 Lore each.',items,'inquest',{},{min:0,max:2})};
 SELH.inquest=(seat,ch)=>{if(!ch.length)return;placeOrdered(seat,ch,'top',0);gainLore(seat,ch.length,'Purge the Benches')};
-tactic('cln_t3','autumn',seat=>{if(holds(seat,5)||!G.pl[seat].hand.length)return[];const o=[];for(const s2 of others(seat))G.pl[s2].ks.forEach((T,j)=>{if(T&&T.occ!=null&&strOf(T.occ)<=8)o.push({id:s2+'s'+j,p:{s2,j},label:'Reed Ambush: take '+kname(T.kc)+' from '+nm(s2)})});return o},(seat,p)=>{
+tactic('cln_t3','autumn',seat=>{if(!G.pl[seat].hand.length)return[];const o=[];for(const s2 of others(seat))G.pl[s2].ks.forEach((T,j)=>{if(T&&T.occ!=null&&strOf(T.occ)+(holds(s2,5)?3:0)<=8)o.push({id:s2+'s'+j,p:{s2,j},label:'Reed Ambush: take '+kname(T.kc)+' from '+nm(s2)})});return o},(seat,p)=>{
   askPick(seat,'occupier','Reed Ambush: choose the card from your hand that will occupy it.',G.pl[seat].hand.map(id=>({k:'c'+id,id,label:cardLbl(id)})),'raiders',p)});
 PICKH.raiders=(seat,opt,d)=>{const V=G.pl[d.s2],T=V.ks[d.j];if(!T)return;const kc=T.kc,oc=T.occ;V.ks[d.j]=null;kcLeave(d.s2,kc);toHand(d.s2,oc);stat('steal');lg(nm(seat)+' takes '+kname(kc)+' from '+nm(d.s2)+' (Reed Ambush).',seat,'big');
   const crew=G.pl.findIndex((p,i)=>holds(i,9));if(crew>=0){stat('kc9');gainLore(crew,1,'Knife Guild')}acquireKC(seat,kc,opt.id,{stolen:true})};
@@ -746,7 +746,7 @@ AG.cleanup=()=>{G.step='cleanup';
     if(G.rm.masonry.includes(P.seat)){for(let r=0;r<NREG;r++){sp.r[r]+=sp.x[r];sp.x[r]=0}}
     else{let n=0;for(let r=0;r<NREG;r++){n+=sp.r[r]+sp.x[r];sp.l+=sp.r[r]+sp.x[r];sp.r[r]=0;sp.x[r]=0}if(n)lg('Winter: '+nm(P.seat)+'\'s '+n+' Supporter'+(n>1?'s':'')+' on the map go'+(n>1?'':'es')+' to the Lost Pile ('+sp.b+' left on their board).',P.seat,'',{k:'supp',s:P.seat,n})}}
   G.cord=[];const gone={};
-  for(let r=0;r<NREG;r++)for(const id of G.reg[r].up.slice()){const m=G.cmod[id];if(m&&m.tok>0){m.tok--;stat('tokenDecay')}else{G.reg[r].up.splice(G.reg[r].up.indexOf(id),1);G.pl[own(id)].disc.push(id);(gone[own(id)]=gone[own(id)]||[]).push(id)}}
+  for(let r=0;r<NREG;r++)for(const id of G.reg[r].up.slice()){const m=G.cmod[id];if(m&&m.tok>0){m.tok=0;stat('tokenDecay')}else{G.reg[r].up.splice(G.reg[r].up.indexOf(id),1);G.pl[own(id)].disc.push(id);(gone[own(id)]=gone[own(id)]||[]).push(id)}}
   for(const s in gone)rmLog('Winter: '+nm(+s)+'\'s played cards go to their Discard Pile ('+gone[s].map(cname).join(', ')+').',+s,gone[s],'disc','Winter');
   for(const id in G.cmod){const m=G.cmod[id];delete m.gc;delete m.gt;delete m.copy;delete m.add;delete m.ambD;delete m.ret;if(!m.tok)delete G.cmod[id]}
   for(const s in G.peek)G.peek[s]=[];
