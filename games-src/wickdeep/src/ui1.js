@@ -83,10 +83,12 @@ function fitCam(force) {
   var x0 = 1e9, x1 = -1e9, y0 = 1e9, y1 = -1e9;
   ks.forEach(function (k) { var w = hexWorld(k); x0 = Math.min(x0, w.x); x1 = Math.max(x1, w.x); y0 = Math.min(y0, w.y); y1 = Math.max(y1, w.y); });
   var bw = x1 - x0 + 2.2, bh = y1 - y0 + 2.6;
-  var z = Math.min(BW / bw, (BH - 50) / bh);
+  var dh = dockOver(), z = Math.min(BW / bw, (BH - 50 - dh) / bh);
   CAM.z = Math.max(16, Math.min(innerWidth >= 800 ? 64 : 54, z)); CAM.x = (x0 + x1) / 2; CAM.y = (y0 + y1) / 2;
-  clampCam();
+  clampCam(); CAM.y += dh / 2 / CAM.z;   // the hand overlays the board bottom on wide screens: centre the map above it
 }
+// height of the card hand drawn over the bottom of the board (wide screens only; on phones the hand sits below the board)
+function dockOver() { var d = document.getElementById('dock'); return d && getComputedStyle(d).position === 'absolute' ? d.offsetHeight : 0; }
 function clampCam() {
   if (!G) return;
   var ks = Object.keys(G.hex).filter(function (k) { return E.seen(G, k); }); if (!ks.length) return;

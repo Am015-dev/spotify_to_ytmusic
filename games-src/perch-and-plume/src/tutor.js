@@ -54,5 +54,5 @@ function tutStart() {   // the coached first game: 1 round of 4 turns vs Pip, ev
     hands: { 0: [T.play, T.h2, T.h3, T.w1, null].filter(Boolean) }, first: 0, goals: ['birds-G'], prep: tutPrep });
   try { localStorage.setItem('pp-played', '1'); } catch (e) { }
   try { if (typeof GXT !== 'undefined' && GXT.markDone) GXT.markDone('perch-and-plume'); } catch (e) { }
-  coachReset(); render();
+  render(); lessonsStart();   // floating lessons (lessons.js) replace the old blocking coach: nothing is dimmed or locked
 }
