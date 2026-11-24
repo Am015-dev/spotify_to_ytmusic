@@ -1,0 +1,8 @@
+{
+  "allow_commands": [
+    "node", "npx playwright", "npm test", "npm run",
+    "python3", "python",
+    "grep", "find", "sed -n", "awk", "sort", "diff", "md5sum", "jq"
+  ],
+  "limits": { "max_cost_usd": 1.5, "max_turns": 40, "max_minutes": 25, "max_parallel": 1 }
+}

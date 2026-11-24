@@ -118,3 +118,10 @@ html.desk:has(#main .opts) #road>*{visibility:hidden}
 .cd-sum .regs .rg-n{font-weight:700;color:#e8c867;margin-right:4px}
 /* F16b: phone portrait (taller than 620px): a slimmer turn strip gives the map ~10px more (two 16px lines still fit) */
 @media (min-height:621px) and (max-width:700px){html:not(.bf-w) #tbturn{height:62px;padding:3px 10px}html:not(.bf-w) #tbturn .tbt-line{max-height:54px}}
+/* W717 HUD diet: game screen shows only board, hand, whose turn, key resources */
+.tbt-goal{display:none!important}
+.rv .rv-t small{display:none!important}
+.cs-c:not(.cs-f):has(> span > em){display:none!important}
+#sidelog{display:none!important}
+@media (min-width:1024px){.st-t{display:none!important}}
+.gx-ibtn.gxst-q{display:none!important}
