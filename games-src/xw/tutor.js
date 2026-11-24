@@ -129,7 +129,9 @@ function tutGate(a){return !tutOn()||GXT.act(Object.assign({type:'tap'},a))}
 // Story is preceded by the tutorial (Chapter 0) until it has been finished once; a finished player goes straight to the chapter map
 function storyOpen(){if(typeof GXC==='undefined')return;
   if(typeof GXT!=='undefined'&&!GXT.isDone(TUT_GAME))tutStart({prologue:true});else GXC.open()}
-function tutStart(o){if(typeof GXT==='undefined')return;o=o&&o.prologue?o:null;const first=window.CAMPAIGN&&window.CAMPAIGN.chapters&&window.CAMPAIGN.chapters[0];
+// the staged duel is retired: every entry point opens the scenario lessons (lessons.js); the old staged game stays below as tutStartScripted
+function tutStart(o){if(window.GXST&&GXST.picker){try{GX.close()}catch(e){}try{GXT.markDone(TUT_GAME)}catch(e){}tutClearOffer();GXST.picker();return}tutStartScripted(o)}
+function tutStartScripted(o){if(typeof GXT==='undefined')return;o=o&&o.prologue?o:null;const first=window.CAMPAIGN&&window.CAMPAIGN.chapters&&window.CAMPAIGN.chapters[0];
   tutClearOffer();
   GXT.start({game:TUT_GAME,steps:tutSteps(),story:false,
     endTitle:LORE.coachIntro.title,endText:LORE.coachIntro.text,endButtons:[{id:'free',label:LORE.coachIntro.btn}],

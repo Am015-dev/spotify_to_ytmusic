@@ -490,6 +490,16 @@ html.gx-reduce .gxc *,html.gx-noanim .gxc *{animation:none!important;transition:
 .gxst-q.gxst-qfix{position:fixed;left:8px;bottom:8px;z-index:var(--gxst-z);border-radius:22px;background:var(--gxst-head);color:var(--gxst-on);border:2px solid var(--gxst-on)}
 @media (prefers-reduced-motion:reduce){.gxst-ring{animation:none;opacity:1}}
 
+/* phoneSlot (function/selector form): card inside a rect the game keeps free: compact, header/footer fixed, middle scrolls */
+.gxst-card.gxst-inslot{display:flex;flex-direction:column;overflow:hidden}
+.gxst-inslot .gxst-hd,.gxst-inslot .gxst-ft{flex:none}
+.gxst-inslot .gxst-ib{width:36px;height:34px;font-size:22px}
+.gxst-inslot .gxst-say,.gxst-inslot .gxst-goal{margin:6px 10px 2px;font-size:15px;overflow:auto;flex:0 1 auto;min-height:0}
+.gxst-inslot .gxst-hint,.gxst-inslot .gxst-msg,.gxst-inslot .gxst-rule{margin:2px 10px;font-size:13px;overflow:auto;flex:0 1 auto;min-height:0}
+.gxst-inslot .gxst-stars{margin:4px 10px 0;font-size:20px}
+.gxst-inslot .gxst-ft{padding:4px 8px 6px}
+.gxst-inslot .gxst-btn{min-height:38px;padding:0 12px}
+
 :root{--gx-bg:#1d2a1f;--gx-bar:#16201a;--gx-panel:#f4ecd8;--gx-ink:#2a2014;--gx-accent:#d9a21b;--fs:14px;--fs2:15px;--hex:46px;--gx-sheet-h:40dvh;
   --parch:#f4ecd8;--parch2:#e9dcbc;--ink:#2a2014;--river:#4f86c6;--meadow:#8fbf5a;--keep:#2f5d3a;--saffron:#d9a21b;--crimson:#c0392b}
 @media (min-width:1024px){:root{--fs:16px;--fs2:18px}}
@@ -667,6 +677,13 @@ html.gx-noanim .fly,html.gx-reduce .fly{transition:none}
 @media (min-width:1024px){html body .gx-drawer :is(p,span,label,button,small,li,td,th,a,div,i,b,select,input){font-size:max(16px,1em)}}
 .card.rwin{border-top:10px solid #d9a21b;background:linear-gradient(#fff3c4,var(--parch) 90px);animation:pop .5s ease}
 .card.rwin h2{color:#7a4410}.card.rwin h2::before{content:"\1F3C6  "}
+#rs .card h2{font-size:clamp(26px,6.5vw,38px);line-height:1.1}
+#rs .hero{display:flex;flex-direction:column;align-items:center;gap:6px;margin:6px 0}
+#rs .emb{width:64px;height:64px;border-radius:50%;display:flex;align-items:center;justify-content:center;font:800 32px Georgia,serif;color:#fff3c4;background:#7a4410;border:4px solid #d9a21b}
+#rs .rlose .emb{background:#3a444c;border-color:#8a949c}
+#rs .hbig{font-size:clamp(24px,6vw,32px);font-weight:800}
+#rs .hl{list-style:none;padding:0;margin:2px 0;display:flex;flex-wrap:wrap;gap:8px;justify-content:center}#rs .hl li{background:rgba(42,32,20,.1);border-radius:999px;padding:6px 14px;font-size:16px}
+#rs details.det{margin:8px 0;font-size:16px}#rs details.det summary{cursor:pointer;min-height:44px;line-height:44px;font-weight:700;text-decoration:underline}
 .card.rlose{border-top:10px solid #5b6770;filter:saturate(.8)}.card.rlose h2{color:#3a444c}
 .rtab td:last-child{font-weight:900}
 
@@ -1424,7 +1441,7 @@ html body :is(.gxh-ring,.gxt-ring){animation-duration:1.6s}
   GXS.add({
     id: 'vb-result', name: 'Result: scores', ask: 'Can you read the final scores?', seed: 3, when: booted,
     setup: function () { begin({ seed: 3 }); UI.forceEnd(); return new Promise(function (r) { setTimeout(r, 400); }); },
-    checks: [{ kind: 'visible', sel: '#again', name: 'Play again' }, { kind: 'visible', sel: '#rs table', name: 'score table' }]
+    checks: [{ kind: 'visible', sel: '#again', name: 'Play again' }, { kind: 'visible', sel: '#rs .hbig', name: 'big score' }, { kind: 'visible', sel: '#rs .hl li', name: 'a highlight' }, { kind: 'visible', sel: '#rs details summary', name: 'Details toggle' }, { kind: 'visible', sel: '#titleB', name: 'Menu' }]
   });
 })();
 
@@ -2689,13 +2706,13 @@ const GX={key:'gx',open:null,
     ['game', 'title'].forEach(function (k) { if (!data[k]) add('missing ' + k); });
     var cast = data.cast || {}, twists = {}, ids = {};
     (data.twists || []).forEach(function (t) { if (!t.id || !t.how) add('twist without id/how'); twists[t.id] = t; });
-    if (!data.acts || data.acts.length !== 3) add('needs 3 acts');
+    if (!data.acts || data.acts.length < 3 || data.acts.length > 4) add('needs 3 or 4 acts');
     var ch = data.chapters || [];
-    if (ch.length < 9 || ch.length > 10) add('needs 9 or 10 chapters (has ' + ch.length + ')');
+    if (ch.length < 9 || ch.length > (data.acts && data.acts.length === 4 ? 16 : 10)) add('needs 9-10 chapters (9-16 with a 4th act; has ' + ch.length + ')');
     ch.forEach(function (c, i) {
       var at = 'chapter ' + (c.id || i) + ': ';
       if (!c.id) add(at + 'no id'); else if (ids[c.id]) add(at + 'duplicate id'); ids[c.id] = 1;
-      if ([1, 2, 3].indexOf(c.act) < 0) add(at + 'act must be 1-3');
+      if ([1, 2, 3, 4].indexOf(c.act) < 0 || c.act > (data.acts || []).length) add(at + 'act must be 1-' + (data.acts || []).length);
       if (i && c.act < ch[i - 1].act) add(at + 'acts out of order');
       if (!c.title) add(at + 'no title');
       var intro = c.intro || [], outro = c.outro || [];
@@ -2712,13 +2729,13 @@ const GX={key:'gx',open:null,
       if (!c.stars || c.stars.length !== 3) add(at + 'needs exactly 3 stars');
       else c.stars.forEach(function (s) { if (!s.text || !s.test) add(at + 'star needs text and test'); });
       if (c.twist) { if (!twists[c.twist.id]) add(at + 'twist ' + c.twist.id + ' not in the twists menu'); if (!c.twist.text) add(at + 'twist needs text'); }
-      if (c.act === 3 && c.boss && !c.twist) add(at + 'act 3 boss needs a twist');
+      if (c.act >= 3 && c.boss && !c.twist) add(at + 'act 3 boss needs a twist');
       if (c.act === 1 && c.hints !== true) add(at + 'act 1 needs hints:true');
       if (!c.easier) add(at + 'no easier block');
       (c.unlock || []).forEach(function (u) { if (UNLOCKS.indexOf(u.type) < 0) add(at + 'unknown unlock type ' + u.type); if (!u.text) add(at + 'unlock needs text'); });
       if (!c.setup || typeof c.setup !== 'object') add(at + 'setup must be an object');
     });
-    [1, 2, 3].forEach(function (a) {
+    (data.acts || []).map(function (x, i) { return i + 1; }).forEach(function (a) {
       var inAct = ch.filter(function (c) { return c.act === a; });
       if (!inAct.length) return add('act ' + a + ' has no chapters');
       if (!inAct[inAct.length - 1].boss) add('act ' + a + ' must end with a boss');
@@ -5309,12 +5326,17 @@ function showResult() {
   c.appendChild(h('div', { 'data-art': won && you ? 'ui-result-win' : 'ui-result-lose', style: 'height:8px' }));
   c.appendChild(h('h2', { text: G.solo ? (won ? 'Every space built. You win.' : 'So close: ' + G.soloFilled + ' of 37 spaces') : G.teams ? (won ? 'Your team wins, ' + G.teamVP[0] + ' to ' + G.teamVP[1] : G.seats[1].name + ' and ' + G.seats[3].name + ' win, ' + G.teamVP[1] + ' to ' + G.teamVP[0]) : you ? (w === 0 ? 'You win!' : G.seats[w].name + ' wins this time') : G.seats[w].name + ' wins' }));
   var tb = h('table.rsrc'), SR = G.rank.map(function (s) { return srcOf(s); });
+  var wn = G.teams ? (won ? 0 : 1) : w, vp = G.teams ? G.teamVP : G.P.map(function (x) { return x.vp; });   /* hero: emblem, the score, at most 3 highlights; the table goes behind Details */
+  var hero = h('div.hero', {}, [h('div.emb', { text: (G.teams ? (won ? 'Y' : G.seats[1].name) : G.seats[w].name).charAt(0).toUpperCase() }),
+    h('div.hbig', { text: G.solo ? G.P[0].vp + ' points' : G.teams ? vp[0] + ' \u2013 ' + vp[1] : G.seats.map(function (s, i) { return G.P[i].vp; }).join(' \u2013 ') + (G.seats.length === 2 && !G.teams ? ', by ' + Math.abs(G.P[0].vp - G.P[1].vp) : '') })]);
+  var hl = SRC_ORDER.map(function (k) { return [SRC_LBL[k], SR[0] ? SR[0][k] || 0 : 0]; }).filter(function (x) { return x[1] > 0; }).sort(function (x, y) { return y[1] - x[1]; }).slice(0, 3);
+  var hul = h('ul.hl', {}, hl.map(function (x) { return h('li', { text: x[0] + ' ' + x[1] }); })); hero.appendChild(hul); c.appendChild(hero);
   tb.appendChild(h('tr', {}, [''].concat(G.rank.map(function (s) { return G.seats[s].name; })).map(function (x) { return h('th', { text: x }); })));
   SRC_ORDER.forEach(function (k) { if (!SR.some(function (o) { return o[k] > 0; })) return; tb.appendChild(h('tr', {}, [h('td', { text: SRC_LBL[k] })].concat(SR.map(function (o) { return h('td', { text: String(o[k] || 0) }); })))); });
   tb.appendChild(h('tr.tot', {}, [h('td', { text: 'Total' })].concat(G.rank.map(function (s) { return h('td', { text: String(G.P[s].vp) }); }))));
-  c.appendChild(tb); countUp(tb);
+  var det = h('details.det', {}, [h('summary', { text: 'Details' })]); det.appendChild(tb); countUp(tb);
   var p0 = G.P[0]; var pl = function (n, a, b) { return n + ' ' + (n === 1 ? a : b); };
-  c.appendChild(h('p.tip', { text: 'You filled ' + pl(p0.stat.regions, 'region', 'regions') + ' and sold ' + pl(p0.stat.sales, 'time', 'times') + '.' }));
+  det.appendChild(h('p.tip', { text: 'You filled ' + pl(p0.stat.regions, 'region', 'regions') + ' and sold ' + pl(p0.stat.sales, 'time', 'times') + '.' })); c.appendChild(det);
   if (UI.mode === 'tutorial') {   /* the final count, rule by rule with your real numbers, then what you have not met yet */
     var e0 = G.P[0].end || {}, ul0 = h('ul.walk');
     [['Points during the game', G.P[0].vpPlay], ['Silver, 1 each (' + G.P[0].silver + ')', e0.silver], ['Unsold goods, 1 each', e0.goods], ['Workers, 1 per 2 (' + G.P[0].workers + ')', e0.workers], ['Lore scrolls', e0.lore]].forEach(function (x) { ul0.appendChild(h('li', { text: x[0] + ': ' + (x[1] || 0) })); });
@@ -5338,7 +5360,7 @@ function showResult() {
   else if (UI.mode === 'tutorial') { ac.appendChild(h('button.btn', { type: 'button', id: 'realB', text: 'Play a real game', onclick: function () { UI.mode = 'quick'; UI.lastOpts = { n: 2, ai: 'gentle' }; startGame(UI.lastOpts); } })); }
   else ac.appendChild(h('button.btn', { type: 'button', id: 'again', text: 'Play again', onclick: function () { startGame(UI.lastOpts || {}); } }));
   ac.appendChild(h('button.btn.alt', { type: 'button', id: 'lookB', text: 'Look at the board', onclick: function () { rs.hidden = true; } }));
-  if (!UI.camp) ac.appendChild(h('button.btn.alt', { type: 'button', id: 'titleB', text: 'Title', onclick: showTitle }));
+  if (!UI.camp) ac.appendChild(h('button.btn.alt', { type: 'button', id: 'titleB', text: 'Menu', onclick: showTitle }));
   c.appendChild(ac); rs.appendChild(c); rs.hidden = false; try { artApply(rs); } catch (e) { }
   try { if (!UI.camp && window.GNS && GNS.result) GNS.result({ game: 'vale-of-banners', mode: 'quick', won: won, score: p0.vp }); } catch (e) { }
 }
@@ -5541,7 +5563,7 @@ boot();
 // small, stacked position with ONE objective; the player makes real moves and learns the rule from the consequence. A floating
 // objective card never dims and never blocks taps. Needs gx-scenario-tutor.css. ES5, no dependencies. Docs: shell/GXST.md.
 // (Global is GXST because GXS is already the ?scn= test registry in gx-scenario.js.)
-//   GXST.init({game, scenarios:[...], storageKey?, settled?:()=>bool, keepClear?:[selectors], qParent?, phoneSlot?:{after,before,avoid:[selectors]}, keepPlace?:bool})   GXST.picker() GXST.start(id) GXST.retry()
+//   GXST.init({game, scenarios:[...], storageKey?, settled?:()=>bool, keepClear?:[selectors], qParent?, phoneSlot?:{after,before,avoid:[selectors]}|fn()->rect|selector, keepPlace?:bool, goalAlways?:bool})   GXST.picker() GXST.start(id) GXST.retry()
 //   GXST.next() GXST.hint() GXST.close() GXST.state()      events: window 'gxst' CustomEvent, detail.type =
 //   picker | start | hint | win | fail | retry | close
 //   scenario: {id, title, rule, goal, setup(), success()->bool, fail()->false|'message', par?, moves?()->n, hints:[nudge, {say, target}],
@@ -5573,6 +5595,30 @@ boot();
     Q = btn('gxst-q', 'Lessons', 'Lessons: learn by playing', function () { GXST.picker(); });
     var p = (C.qParent && $(C.qParent)) || $('.gx-bar');
     if (p) { Q.className = 'gx-ibtn gxst-q'; p.appendChild(Q); } else { Q.className += ' gxst-qfix'; D.body.appendChild(Q); }
+    setTimeout(qCheck, 50);
+  }
+  // a Lessons button that renders smaller than a thumb, or off screen (hidden bar, 0x0 slot), moves to a fixed pill; the pill picks the screen corner
+  // that covers the fewest buttons, so it never hides the game's own controls
+  var QSEL = 'button,a,[role=button],[onclick],[tabindex],input,select,summary,.card,[data-c],[data-id],.chip,[class*=chip],#instr,#say,#status,.dock';
+  function qOver(r) {   // does the in-bar button sit on top of another control or chip?
+    var bs = D.querySelectorAll(QSEL), i, b; for (i = 0; i < bs.length; i++) { if (bs[i] === Q || bs[i].contains(Q) || Q.contains(bs[i])) continue; b = vis(bs[i]); if (b && hit(r, { left: b.left + 2, top: b.top + 2, right: b.right - 2, bottom: b.bottom - 2 })) return true; } return false;
+  }
+  function qCheck() {
+    if (!Q || !D.body.contains(Q)) return;
+    if (Q.className.indexOf('gxst-qfix') < 0) {
+      var r = Q.getBoundingClientRect(); if (r.width >= 44 && r.height >= 44 && r.left >= 0 && r.right <= innerWidth + 1 && r.top >= 0 && r.bottom <= innerHeight + 1 && !qOver(r)) return;
+      Q.className = 'gxst-q gxst-qfix'; D.body.appendChild(Q);
+    }
+    var vw = innerWidth, vh = innerHeight, w = Q.offsetWidth || 72, h = Q.offsetHeight || 44, bs = D.querySelectorAll(QSEL), rs = [], i;
+    for (i = 0; i < bs.length; i++) { if (bs[i] === Q || (W && W.contains(bs[i]))) continue; var q = vis(bs[i]); if (q) rs.push(q); }
+    var wr = W && vis(W); if (wr) rs.push(wr);
+    (C.keepClear || []).forEach(function (sel) { var a; try { a = D.querySelectorAll(sel); } catch (e) { a = []; } for (var j = 0; j < a.length; j++) { if (a[j] === Q || a[j].contains(Q)) continue; var kr = vis(a[j]); if (kr) rs.push(kr); } });
+    var cs = [[8, vh - h - 8], [vw - w - 8, vh - h - 8], [vw - w - 8, 8], [8, 8], [vw / 2 - w / 2, vh - h - 8], [vw / 2 - w / 2, 8], [vw - w - 8, 76], [8, 76], [vw / 2 - w / 2, 76]], best = null;
+    function cost(c) { var b = { left: c[0], top: c[1], right: c[0] + w, bottom: c[1] + h }, n = 0; for (var k = 0; k < rs.length; k++) if (hit(b, rs[k])) n++; return n; }
+    var cur = Q.getAttribute('data-pos'), cc = cur ? JSON.parse(cur) : null;
+    if (cc && cost(cc) === 0) return;
+    for (i = 0; i < cs.length; i++) { var v = cost(cs[i]) + i * 0.01; if (!best || v < best.v) best = { v: v, c: cs[i] }; }
+    Q.setAttribute('data-pos', JSON.stringify(best.c)); Q.style.left = Math.round(best.c[0]) + 'px'; Q.style.top = Math.round(best.c[1]) + 'px'; Q.style.bottom = 'auto';
   }
   // ------------------------------------------------------------ the card: picker | play | win | fail
   function render() {
@@ -5605,12 +5651,14 @@ boot();
       ft.appendChild(hb); ft.appendChild(mk('span', 'gxst-sp'));
       ft.appendChild(btn('gxst-btn', 'Restart', null, function () { GXST.retry(); }));
     } else if (S.phase === 'win') {
+      if (C.goalAlways) W.appendChild(mk('p', 'gxst-goal', txt(s.goal)));
       W.appendChild(mk('p', 'gxst-stars', starTxt(S.stars)));
       W.appendChild(mk('p', 'gxst-say', s.debrief));
       W.appendChild(mk('p', 'gxst-rule', 'Rule: ' + s.rule));
       ft.appendChild(btn('gxst-btn', 'Retry', null, function () { GXST.retry(); })); ft.appendChild(mk('span', 'gxst-sp'));
       ft.appendChild(btn('gxst-btn pri', S.i < C.scenarios.length - 1 ? 'Next lesson' : 'All lessons', null, function () { GXST.next(); }));
     } else if (S.phase === 'fail') {
+      if (C.goalAlways) W.appendChild(mk('p', 'gxst-goal', txt(s.goal)));
       W.appendChild(mk('p', 'gxst-say', 'Not quite.'));
       W.appendChild(mk('p', 'gxst-msg', S.msg));
       ft.appendChild(btn('gxst-btn', 'Lessons', null, function () { GXST.picker(); })); ft.appendChild(mk('span', 'gxst-sp'));
@@ -5622,17 +5670,24 @@ boot();
   function hintTarget() { var s = cur(); if (!s || S.phase !== 'play' || S.hint < 2) return null; var h = s.hints[S.hint - 1]; return h && typeof h === 'object' ? vis(find(h.target)) : null; }
   // keep the card off the hinted target and the keepClear areas; a dragged position is kept unless it covers the hinted target
   function place() {
-    if (!W) return; var vw = innerWidth, vh = innerHeight, bw = W.offsetWidth, bh = W.offsetHeight, t = hintTarget(), av = [];
+    if (!W) return;
+    // phoneSlot as a function (any width; return null to opt out) or selector string (narrow screens < 700px only): it gives the rect the game keeps free; the card lives inside it, compact, body scrolls; never over the game
+    var ps0 = C.phoneSlot, slot = typeof ps0 === 'function' ? call(ps0, null) : typeof ps0 === 'string' && innerWidth < 700 ? vis(find(ps0)) : null;
+    if (slot && slot.width == null) { slot.width = slot.right - slot.left; slot.height = slot.bottom - slot.top; }
+    if (slot && slot.width > 2 && slot.height > 2) { W.classList.add('gxst-inslot'); W.style.width = Math.round(slot.width) + 'px'; W.style.maxHeight = Math.round(slot.height) + 'px'; return put([slot.left, slot.top]); }
+    W.classList.remove('gxst-inslot'); W.style.maxHeight = ''; W.style.width = '';
+    var vw = innerWidth, vh = innerHeight, bw = W.offsetWidth, bh = W.offsetHeight, t = hintTarget(), av = [];
+    if (Q && Q.className.indexOf('gxst-qfix') >= 0) { var qr = vis(Q); if (qr) av.push(qr); }
     (C.keepClear || []).forEach(function (sel) { var a; try { a = D.querySelectorAll(sel); } catch (e) { a = []; } for (var i = 0; i < a.length; i++) { var r = vis(a[i]); if (r) av.push(r); } });
     function clamp(p) { return [Math.max(4, Math.min(vw - bw - 4, p[0])), Math.max(4, Math.min(vh - bh - 4, p[1]))]; }
     function box(p) { return { left: p[0], top: p[1], right: p[0] + bw, bottom: p[1] + bh }; }
     function cost(p) { var b = box(p), c = t && hit(b, t) ? 1e6 : 0; av.forEach(function (r) { var x = Math.min(b.right, r.right) - Math.max(b.left, r.left), y = Math.min(b.bottom, r.bottom) - Math.max(b.top, r.top); if (x > 0 && y > 0) c += x * y; }); return c; }
-    if (S.pos && !(S.min && C.phoneSlot && vw < 600)) { var q = clamp(S.pos); if (!(t && hit(box(q), t))) return put(q); }
+    if (S.pos && !(S.min && C.phoneSlot && typeof C.phoneSlot === 'object' && vw < 600)) { var q = clamp(S.pos); if (!(t && hit(box(q), t))) return put(q); }
     var top = 4, bar = $('.gx-bar'); if (bar) { var br = bar.getBoundingClientRect(); if (br.top < 4 && br.height < 90) top = br.bottom + 6; }
     var sp = [[8, top], [vw - bw - 8, top], [vw - bw - 8, vh - bh - 8], [8, vh - bh - 8]];
     av.concat(t ? [t] : []).forEach(function (r) { sp.push([8, r.bottom + 6], [vw - bw - 8, r.bottom + 6], [8, r.top - bh - 6], [r.right + 6, r.top]); });
     var best = null; sp.forEach(function (p, i) { p = clamp(p); var c = cost(p) + i * 0.01; if (!best || c < best.c) best = { p: p, c: c }; });
-    if (S.min && C.phoneSlot && vw < 600) {   // phone chip: keep the card's own spot when it is clear (no jump on open); else the chip gets a band just under phoneSlot.after or just above phoneSlot.before, never over phoneSlot.avoid items or the dock
+    if (S.min && C.phoneSlot && typeof C.phoneSlot === 'object' && vw < 600) {   // phone chip: keep the card's own spot when it is clear (no jump on open); else the chip gets a band just under phoneSlot.after or just above phoneSlot.before, never over phoneSlot.avoid items or the dock
       var ps = C.phoneSlot, an = vis($(ps.after)), bf = vis($(ps.before)), ob = [], cs = [best.p];
       (ps.avoid || []).forEach(function (sel) { var a; try { a = D.querySelectorAll(sel); } catch (e) { a = []; } for (var i = 0; i < a.length; i++) { var r = vis(a[i]); if (r) ob.push(r); } });
       if (an) cs.push([8, an.bottom + 4]); if (bf) cs.push([8, bf.top - bh - 6]);
@@ -5666,6 +5721,7 @@ boot();
     }
     if (!drag) place(); ring();
   }
+  function tickAll() { loop(); qCheck(); }
   function begin(i, how) {
     S.i = i; S.phase = 'play'; S.hint = 0; S.msg = ''; S.stars = 0; S.open = true; S.min = false; S.live = false;
     var s = cur(), tok = ++S.tok; render();
@@ -5676,7 +5732,8 @@ boot();
   window.GXST = {
     init: function (cfg) {
       C = cfg; var o = load(); S = { open: false, phase: 'picker', i: -1, hint: 0, best: o.best || {}, pos: o.pos || null, min: false, live: false, tok: 0, msg: '', stars: 0 };
-      qBtn(); if (!tick) { tick = setInterval(loop, 250); addEventListener('resize', function () { if (S && S.open) render(); }); }
+      qBtn(); if (!tick) { tick = setInterval(tickAll, 250); addEventListener('resize', function () { if (S && S.open) render(); }); }
+      if (/[?&]lessons=1/.test(location.search)) setTimeout(function () { if (S && !S.open) GXST.picker(); }, 0);   // ?lessons=1 opens the picker in every game
       return GXST;
     },
     picker: function () { if (!C) return; qBtn(); S.open = true; S.phase = 'picker'; S.min = false; S.tok++; S.live = false; render(); emit('picker', {}); },
@@ -5685,6 +5742,7 @@ boot();
     next: function () { if (S.i < C.scenarios.length - 1) begin(S.i + 1, 'start'); else GXST.picker(); },
     hint: function () { var s = cur(); if (!s || S.phase !== 'play' || S.hint >= s.hints.length) return; S.hint++; render(); ring(); emit('hint', { id: s.id, level: S.hint }); },
     close: function () { if (!S || !S.open) return; S.open = false; S.live = false; S.tok++; render(); emit('close', {}); },
+    place: function () { if (S && S.open && !drag) place(); },   // opt-in: a game calls this when its layout changes
     active: function () { var s = S && S.open && S.phase !== 'picker' ? cur() : null; return s; },
     state: function () {
       if (!S) return null; var s = cur(), wr = W && vis(W), tr = hintTarget();

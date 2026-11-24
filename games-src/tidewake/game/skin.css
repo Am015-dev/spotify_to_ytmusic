@@ -203,3 +203,10 @@ html.ph #ps.fit2 .ps-goal .race{overflow:hidden;text-overflow:ellipsis}
 
 /* lessons: on a phone the danger panel drops its warning line so the lesson card docks below it, clear of the answers */
 html.ph.twl #pc .prompt.alert .warn-l{display:none}
+/* W755 HUD diet: main screen = board, slim top bar, one prompt, the action dock. Log lines and crew cards live in their windows (bar icons). */
+html.ph .ps-riv,html.ph .ps-feed,html.ph .ps-crews{display:none!important}
+html.ph .gx-bar [data-gx=crewd],html.ph .gx-bar [data-gx=logd]{display:inline-flex!important}
+#crewbody .lg2{display:table!important}#crewbody .lg2 td,#crewbody .lg2 th{font-size:16px!important}
+@media (min-width:1024px){#crewbody .lg2 *{font-size:16px!important}}
+@media (min-width:1024px){html.ph .gx-drawer{top:52px!important;max-height:calc(100dvh - 60px)}html.ph .gx-drawer .gx-drawer-body{overflow:auto;min-height:0}}
+@media (min-width:1024px){#logbody,#logbody *{font-size:16px!important}}

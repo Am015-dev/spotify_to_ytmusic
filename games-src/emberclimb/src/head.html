@@ -655,4 +655,42 @@ html body aside.gx-dock #dockt,html body aside.gx-dock #dockmsg{background:#1410
 /* QA W659: phone, two heroes + two enemies: 22px intent chips made each enemy column 131px and pushed the second enemy off screen */
 @media (max-width:480px){html body.ec-stage #stage .en .intent{max-width:100%;min-width:0;padding-right:6px!important}html body.ec-stage #stage .en .intent>span{font-size:15px!important;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}html body.ec-stage #stage .en .intent .art{width:22px!important;height:22px!important}}
 /*W663 contrast plates*/html body .gx-row-l,html body .gx-row-l small,html body .gxc-path .gxc-act b,html body .gxc-path .gxc-act small,html body #dockt,html body #dockmsg{background:#1b1208!important;color:#fff4d8!important;opacity:1!important;text-shadow:none!important;border-radius:6px;padding:1px 6px;box-shadow:none!important;background-image:none!important}
+/*W770 critic fixes*/
+.pots .pot:not(.full){display:none}
+html body.w770nf .reward{justify-content:safe center}
+html body.ec-stage #stage .hand.fan.w770two{flex-wrap:wrap;align-content:flex-start;justify-content:center;gap:6px;padding:6px 8px 0}
+html body.ec-stage #stage .hand.fan.w770two .card{margin:0!important}
+.gxc.gxc-scene-on{background:#140d08 url(media/bg-title.webp) center/cover no-repeat}
+@media (min-width:1024px){
+  html body.w770nf:not(.learn):not(.hints-on) .gx-dock,html body.w770nf:not(.learn):not(.hints-on) .gx-reopen{display:none!important}
+  html body.w770nf:not(.learn):not(.hints-on) .gx-main{grid-template-columns:minmax(0,1fr)!important}
+  .gxc.gxc-scene-on{background-image:url(media/bg-title-wide.webp)}
+  html body header.gx-bar .gx-ibtn span{font-size:16px!important}
+  html body .reward .shoptile :is(.stn,.sty,.sds,.price){font-size:16px!important;line-height:1.2}
+  html body .gxc-scene .gxc-sc-title{font-size:16px}
+  html body #map .node{width:68px;height:68px;margin:-34px 0 0 -34px}
+  html body .w485leg{gap:10px 18px}html body .w485lgi{font-size:16px;gap:8px}html body .w485lgi .w485ni{width:32px;height:32px;padding:4px}html body .w485lgi .art{width:52px;height:52px;flex:none;border-radius:50%;border:3px solid #6b4a2e}html body .w485leg{display:grid;grid-template-columns:1fr 1fr;margin-top:6px}
+  html body .hand.w770fit{gap:6px}html body .hand.w770fit .card{margin:0}
+  .pcplan .rl{align-items:flex-start}.pcplan .rl .art{width:36px;height:36px}
+/* W748 pc layout (>= 1024 px only): no empty potion circles; phone untouched */
+@media (min-width:1024px){
+  html body .pots .pot:not(:has(.art)){display:none}
+  html body .pots:not(:has(.art)){display:none}
+}
+/* W748r pc fight layout (>= 1024 px wide, not short): hero left vs enemies right, bigger hand; phone untouched */
+@media (min-width:1024px) and (min-height:680px){
+  html body #stage:has(> .mid){display:grid;grid-template-columns:minmax(0,.85fr) minmax(0,1.25fr);grid-template-rows:minmax(0,1fr) auto auto;grid-template-areas:"hero en" "ctl ctl" "hand hand"}
+  html body #stage:has(> .mid)>.enemies{grid-area:en;padding:12px 16px 0 0}
+  html body #stage:has(> .mid)>.mid{grid-area:hero;max-width:none;margin:0;padding:12px 0 0 24px;align-items:center;justify-content:center;gap:14px}
+  html body #stage:has(> .mid) .heropan{flex:0 1 240px;width:240px;max-width:240px;flex-direction:column;align-items:stretch;padding:10px;gap:8px}
+  html body #stage:has(> .mid) .heropan>.art.k-portrait{width:100%!important;height:auto!important;aspect-ratio:3/4;max-height:250px}
+  html body #stage:has(> .mid) .heropan .inf{width:100%}
+  html body #stage:has(> .mid) .heropan .nm{font-size:20px}
+  html body #stage:has(> .mid) .heropan .bar{width:100%!important}
+  html body #stage:has(> .mid) .en{max-width:300px}
+  html body #stage:has(> .mid) .en>.art.k-portrait{width:min(230px,26vh)!important;height:min(230px,26vh)!important}
+  html body #stage:has(> .mid) .en .nm{font-size:20px}
+  html body #stage:has(> .mid)>.ctl{grid-area:ctl;max-width:none;width:100%;justify-content:center;gap:40px}
+  html body #stage:has(> .mid)>.hand{grid-area:hand;--cw:min(176px,15vw,24vh)}
+}
 </style></head>

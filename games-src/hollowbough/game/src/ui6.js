@@ -14,7 +14,7 @@ const RULES = `<h3>How a turn works</h3><ol class="hwt"><li>The banner shows who
 <h3>Tips</h3><ul><li>Build production early. It pays every Spring and Autumn.</li><li>Keep cheap cards in hand. Watch the meadow too.</li><li>Tap the lightbulb for a good move and why.</li></ul>`;
 function logHTML() { const e = h('div.logl'); for (let i = G.log.length - 1; i >= Math.max(0, G.log.length - 150); i--) e.appendChild(h('div.ll', h('span.lt', G.log[i].turn), ' ' + G.log[i].t)); return e; }
 function renderRival(seat) {
-  const b = $('#rivalbody'); if (!b || !G) return; b.innerHTML = ''; seat = seat == null ? (UI.rseat != null ? UI.rseat : 0) : seat; UI.rseat = seat;
+  const b = $('#rivalbody'); if (!b || !G) return; b.innerHTML = ''; seat = seat == null ? (UI.rseat != null ? UI.rseat : (G.np > 1 ? (Math.max(0, viewSeat()) + 1) % G.np : (G.grim ? 'G' : 0))) : seat;   // W763: the rivals button opens on a rival, not on you UI.rseat = seat;
   const tabs = h('div.rtabs'); for (let s = 0; s < G.np; s++) tabs.appendChild(h('button.btn' + (s === seat ? '.on' : '.alt'), { 'data-a': 'rtab', 'data-seat': s, type: 'button' }, pawn(s, 14), ' ' + G.players[s].name));
   if (G.grim) tabs.appendChild(h('button.btn' + (seat === 'G' ? '.on' : '.alt'), { 'data-a': 'rtab', 'data-seat': 'G', type: 'button' }, D.soloName));
   b.appendChild(tabs);

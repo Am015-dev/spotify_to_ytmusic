@@ -186,7 +186,7 @@
     var g = G(); app.innerHTML = ''; tscr.innerHTML = ''; modeCls();
     if (UI.mode === 'title' || !g) { gameEl.hidden = true; tscr.hidden = false; try { GX.close(); } catch (e) { } try { GXH.hide(); } catch (e) { } return title(); }
     tscr.hidden = true; gameEl.hidden = false;
-    document.body.classList.toggle('ec-stage', g.scr === 'battle' && STAGE()); document.body.classList.toggle('ec-stagemap', g.scr === 'map' && STAGE());
+    document.body.classList.toggle('ec-stage', g.scr === 'battle' && STAGE()); document.body.classList.toggle('ec-stagemap', g.scr === 'map' && STAGE()); document.body.classList.toggle('w770nf', g.scr !== 'battle' && g.scr !== 'map');   // W770 PC: no side panel outside fights
     if (g.scr !== 'battle') { var tb0 = document.querySelector('.turnban'); if (tb0) tb0.remove(); }
     if (g.scr === 'map') mapScr(); else if (g.scr === 'battle') battle(); else if (g.scr === 'reward') reward();
     else if (g.scr === 'rest') rest(); else if (g.scr === 'shop') shop(); else if (g.scr === 'event') event(); else if (g.scr === 'over') over();
@@ -308,11 +308,12 @@
     else if (g.scr === 'event') { txt = 'Choose one.'; ttl = 'Event'; }
     else if (g.scr === 'over') { txt = g.won ? 'You won this climb.' : 'This climb is over.'; ttl = 'Result'; }
     ecSlot(); m.textContent = txt; t.textContent = ttl; var nw = document.querySelector('.w7now'); if (nw) nw.textContent = txt;   // R7: the same one-line prompt on the phone stage var ap = document.getElementById('game'); if (ap) ap.classList.toggle('ec-over', g.scr === 'over');
-    if (g.scr === 'map' && STAGE()) { var lg = h('div', 'w485leg'); 'm e r s t v'.split(' ').forEach(function (k) { lg.appendChild(h('span', 'w485lgi t-' + k, null, [nodeIc(k), document.createTextNode(k === 'v' ? 'Event' : NODEL[k])])); }); a.appendChild(lg); }
+    if (g.scr === 'map') { var lg = h('div', 'w485leg'); 'm e r s t v'.split(' ').forEach(function (k) { lg.appendChild(h('span', 'w485lgi t-' + k, null, [STAGE() ? nodeIc(k) : A(NODEN[k], '', { ph: '#5a3a24' }), document.createTextNode(k === 'v' ? 'Event' : NODEL[k])])); }); a.appendChild(lg); }
     if (g.scr !== 'over') a.appendChild(potRow());
-    if (g.scr === 'battle' && g.relics && g.relics.length) { var pi = h('div', 'pcinfo', null, [h('b', '', 'Relics')]); g.relics.forEach(function (id) { pi.appendChild(h('div', 'rl', null, [A('relic-' + id, '✦', { ph: '#8a6a2a' }), h('span', '', null, [h('b', '', D.RELICS[id].name), document.createTextNode(D.RELICS[id].t)])])); }); a.parentNode.appendChild(pi); }
+    if (g.scr === 'battle' && window.innerWidth >= 1024 && g.b) { var ep = h('div', 'pcinfo pcplan', null, [h('b', '', 'Enemy next move')]); g.b.en.forEach(function (e) { if (e.dead) return; var P = intentParts(e); ep.appendChild(h('div', 'rl', null, [IA(P[0].s, P[0].k), h('span', '', null, [h('b', '', D.ENEMIES[e.id].name), document.createTextNode(P.map(function (p) { return p.say; }).join(' '))])])); }); a.parentNode.appendChild(ep); }   // W770
+    if ((g.scr === 'battle' || g.scr === 'map') && g.relics && g.relics.length) { var pi = h('div', 'pcinfo', null, [h('b', '', 'Relics')]); g.relics.forEach(function (id) { pi.appendChild(h('div', 'rl', null, [A('relic-' + id, '✦', { ph: '#8a6a2a' }), h('span', '', null, [h('b', '', D.RELICS[id].name), document.createTextNode(D.RELICS[id].t)])])); }); a.parentNode.appendChild(pi); }
     // PC side panel: the deck you climb with, as small card pictures (R1 polish: fill the panel with something useful)
-    if (g.scr === 'battle' && window.innerWidth >= 1024) { var hd = g.hs[g.b && g.b.cur >= 0 ? g.b.cur : 0], cnt = {}, ord = []; hd.deck.forEach(function (c) { if (!cnt[c.id]) { cnt[c.id] = 0; ord.push(c); } cnt[c.id]++; }); var dp = h('div', 'pcinfo pcdeck', null, [h('b', '', 'Your deck (' + hd.deck.length + ')')]), dg = h('div', 'pcdg'); ord.forEach(function (c) { var t = h('div', 'pcdc', null, [A(c.id, '', { cls: 'pcda', kind: 'card', noph: 1 }), h('span', '', D.CARDS[c.id].name + (cnt[c.id] > 1 ? ' x' + cnt[c.id] : ''))]); dg.appendChild(t); }); dp.appendChild(dg); a.parentNode.appendChild(dp); }
+    if ((g.scr === 'battle' || g.scr === 'map') && window.innerWidth >= 1024) { var hd = g.hs[g.b && g.b.cur >= 0 ? g.b.cur : 0], cnt = {}, ord = []; hd.deck.forEach(function (c) { if (!cnt[c.id]) { cnt[c.id] = 0; ord.push(c); } cnt[c.id]++; }); var dp = h('div', 'pcinfo pcdeck', null, [h('b', '', 'Your deck (' + hd.deck.length + ')')]), dg = h('div', 'pcdg'); ord.forEach(function (c) { var t = h('div', 'pcdc', null, [A(c.id, '', { cls: 'pcda', kind: 'card', noph: 1 }), h('span', '', D.CARDS[c.id].name + (cnt[c.id] > 1 ? ' x' + cnt[c.id] : ''))]); dg.appendChild(t); }); dp.appendChild(dg); a.parentNode.appendChild(dp); }
     UI.endBtn = null;
   }
   var NODEG = { m: '', e: '', r: '', s: '', v: '?', t: '', b: '' }, NODEN = { m: 'node-monster', e: 'node-elite', r: 'node-rest', s: 'node-shop', v: 'node-event', t: 'node-treasure', b: 'node-boss' };
@@ -502,10 +503,12 @@
     st.appendChild(ctl);
     var hand = h('div', 'hand'), hc = b.ph === 'p' ? cur.hand : []; var nn = hc.length;
     if (SG && LSC()) { hand.classList.add('fan'); var cwl = Math.max(60, Math.min(78, Math.floor((document.documentElement.clientWidth - 300) / (1 + .7 * Math.max(0, nn - 1))))); hand.style.setProperty('--cw', cwl + 'px'); st.style.setProperty('--hh', Math.round(cwl * 0.95 + 10) + 'px'); st.classList.add('w24ls'); }   // R24: short landscape phone: a low hand that peeks up, controls in the bottom corners
-    else if (SG) { hand.classList.add('fan'); var cw0 = Math.max(64, Math.min(112, Math.floor((document.documentElement.clientWidth - 16) / (1 + .7 * Math.max(0, nn - 1))))); hand.style.setProperty('--cw', cw0 + 'px'); st.style.setProperty('--hh', Math.round(Math.min(112, Math.floor((document.documentElement.clientWidth - 16) / 3.8)) * 1.5 + 26) + 'px'); } else if (nn > 5) { hand.classList.add('dense'); hand.style.setProperty('--cw', 'min(var(--hw),' + Math.floor((document.documentElement.clientWidth - 12) / (1 + .82 * (nn - 1))) + 'px)'); }
+    else if (SG && nn > 5) { hand.classList.add('fan', 'w770two'); var pr = Math.ceil(nn / 2), cw2 = Math.max(64, Math.min(100, Math.floor((document.documentElement.clientWidth - 16) / pr) - 6)); hand.style.setProperty('--cw', cw2 + 'px'); st.style.setProperty('--hh', (Math.round(cw2 * 1.5) * 2 + 18) + 'px'); }   // W770: no overlapping names
+    else if (SG) { hand.classList.add('fan'); var cw0 = Math.max(64, Math.min(112, Math.floor((document.documentElement.clientWidth - 16) / (1 + .7 * Math.max(0, nn - 1))))); hand.style.setProperty('--cw', cw0 + 'px'); st.style.setProperty('--hh', Math.round(Math.min(112, Math.floor((document.documentElement.clientWidth - 16) / 3.8)) * 1.5 + 26) + 'px'); } else if (nn > 5 && window.innerWidth >= 1024 && Math.floor((app.clientWidth - 16) / nn) - 6 >= 110) { hand.classList.add('w770fit'); hand.style.setProperty('--cw', 'min(var(--hw),' + (Math.floor((app.clientWidth - 16) / nn) - 6) + 'px)'); }   // W770 PC: 6-8 cards side by side, rule text kept
+    else if (nn > 5) { hand.classList.add('dense'); hand.style.setProperty('--cw', 'min(var(--hw),' + Math.floor((document.documentElement.clientWidth - 12) / (1 + .82 * (nn - 1))) + 'px)'); }
     hc.forEach(function (c, i) {
       var ok = E.canPlay(cur, c) && (E.cost(cur, c) <= cur.en || E.eff(c).cost === 'X'), co = { str: E.eff(c).type === 'A' ? (cur.st.str || 0) : 0 }, el = cardEl(c, co); el.classList.add(ok ? 'ok' : 'no'); if (UI.sel === i) el.classList.add('sel');
-      if (SG) { var off = i - (nn - 1) / 2; el.style.setProperty('--rot', (off * (nn > 6 ? 3.5 : 5)) + 'deg'); el.style.setProperty('--dy', Math.min(22, off * off * (nn > 6 ? 2 : 4)) + 'px'); el.style.zIndex = 10 + i; }
+      if (SG && !hand.classList.contains('w770two')) { var off = i - (nn - 1) / 2; el.style.setProperty('--rot', (off * (nn > 6 ? 3.5 : 5)) + 'deg'); el.style.setProperty('--dy', Math.min(22, off * off * (nn > 6 ? 2 : 4)) + 'px'); el.style.zIndex = 10 + i; }
       el.setAttribute('data-c', i); holdPeek(el, c, co); if (ok) dragPlay(el, i); on(el, function () { if (UI.peeked && Date.now() - UI.peeked < 700) return; onCard(i); }); hand.appendChild(el);
     });
     if (UI.sel >= 0) hand.classList.add('hassel');
@@ -731,7 +734,7 @@
     ov.appendChild(gr); return ov;
   }
   function rest() {
-    var g = G(), s = h('div', 'reward'); s.appendChild(A('bg-rest', '', { cls: 'bg', kind: 'bg' }));
+    var g = G(), s = h('div', 'reward'); s.appendChild(window.innerWidth > window.innerHeight * 1.1 && (window.MEDIA_PRESENT || []).indexOf('bg-rest-wide') < 0 ? BG('bg-map') : A('bg-rest', '', { cls: 'bg', kind: 'bg' }));   // W770 PC: the wide tavern table, not the stretched phone one
     var hi = g.rest.todo[0], hh = g.hs[hi], H = D.H[hh.k];
     s.appendChild(h('h2', '', 'Campfire')); s.appendChild(host('cast-healer', 'Sit, climber. Rest to heal ' + E.restHeal(g.hs[hi]) + ' HP, or smith: upgrade one card for good.'));
     if (g.hs.length > 1) s.appendChild(h('div', 'chip', H.name));

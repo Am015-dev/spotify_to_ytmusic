@@ -307,6 +307,36 @@ Live fix: original-name phrase removed from shelf blurb + sands page (15:2x).
 - Closest to done: short-fuse (4/5, F3 polish+PC then review), kaiten-kitchen (4/5-ish, F3 polish+PC then review), crown-city-smash (R97 7.4, F2), perch-and-plume (F3), lantern-dive (F2).
 - Pending: approve baselines (sunglaze, rampart: proof/baselines-new) before deploy; hollowbough R96 list after PLAY2; calm-audit doesn't count #coach/#toast.
 
+## W749 (sands lessons: card never over board/HUD/bubble)
+- Done: shell phoneSlot accepts a function (any width, null = opt out) or selector (<700px); new opt-in goalAlways (win/fail cards start with "Your goal:"). Sands lsSlot: phone = strip between board and next row (board.css body.lesson #gw margin-bottom:214px); pc = right of board under market/legend, above goods/actions; Last moves feed hidden in lessons on pc.
+- Test: node ft/lessons-layout-test.js (turbo, ~6 s): 58/66 steps clear. Remaining fails are a one-tick lag: after a move the board row height changes (goods/legend appear) and the card is seated in the previous strip, so it touches the board or legend by up to ~95 px until the next re-seat. Fix next: compute the strip from a fixed reserve (not from live sibling rects), or have GXST expose place() and call it from the game after each go().
+- Phone sheet: before 33/33 lesson cells had the card over the board; after 0 visible overlaps, but ~6 cells (sell step 0, palace steps) show the board shrunk further than needed (fit 'sq' toggling), leaving an empty band.
+- First lesson step 0 on a cold page: card sits at 8,8 for the first tick (slot not ready) in the test.
+## W751 nebula-aces (shelf/W751-nebula)
+- Gate (build-all --quick): 6/11 -> 8/11. nb-board + nb-art fixed: the Lessons button grew when the painted skin loaded (its min-width rule lost to the shared menu rule). Fixed in xw/skin.css: fixed width, phone shows "Learn" in 44 px, bar gap/padding tightened so the turn chip and its "you" pill no longer sit under the Squads button; PC keeps "Lessons" at 76 px.
+- Still failing, not code: title/menu/board need baseline images (.baselines missing, ui-baselines branch absent).
+- Lessons test: phone 28.4 s, 1366x768 35.5 s, both all-pass.
+- nb-art "empty stat chips": chips do carry text (Skill/Attack/Agility/Hull/Shields). The empty look was the contact sheet capturing at 450 ms before the scenario built the cards; added `--wait <ms>` to scripts/contact-sheet.js. Ship art is still one grey/orange silhouette per side, not per-hull paintings (weak, not fixed).
+- Weak: title screen cells (start, nb-tutorial-play) show dark empty-looking buttons in the sheets; not touched.
+- Proof: xw/proof/w751-phone-sheet.jpg, w751-pc-sheet.jpg (16 cells each, --wait 3000, takes ~2 min real).
+## W748 pc layout
+- emberclimb: empty potion circles hidden at >= 1024 px (css in src/head.html). Fight stage stays phone-sized in the middle: scaling enemy art overlapped the hero panel, so it was reverted; needs a stage re-layout.
+- lantern-dive: pool job cards and Pass button larger, seat chips 16 px at >= 1024 px (game/skin.css). Trick/felt geometry (tableGeo in src/ui2.js) still leaves the felt mostly empty.
+- meadowfold: start card scaled up at >= 1024 px (src/skin.css). In-game PC board already has strip/map/rail columns; not changed.
+- Phone sheets: flags identical before/after; pixel diffs only on animated water (also differ between two unchanged runs).
+
+## W748r pc layout (real desktop layouts, >= 1024/1100 px only; phone sheets identical apart from image-load timing)
+- emberclimb (src/head.html, end): fights at >= 1024x680 are a grid: hero panel (240 px portrait) left vs enemies right (230 px portraits), hand cards 176 px. Bad pc cells 6 -> 2.
+- lantern-dive (skin.css end, ui2.js tableGeo): table no longer capped at 1180 px (black side bars gone); job card 420x150 / 30 px; seats 240x132 at >= 1300 px. Bad 6 -> 4.
+- meadowfold (src/skin.css end): >= 1100 px puts scores, cards and pockets in a left column; the valley gets the full height (hex board ~490x500 -> ~680x730). Bad 6 -> 1.
+- Dead space (flat backdrop blocks, 1366x768 mean): emberclimb 27 -> 26, lantern-dive 40 -> 35, meadowfold 34 -> 33. The pixel metric counts the side column and
+  painted background as dead, so it barely moves although the boards grew; the 15% target is NOT met by that metric.
+- Still weak: lantern-dive job phase is one card on an empty felt (needs a real design: job row across the felt); emberclimb dock below the deck is empty
+  black, 6+ card hand overlaps at pc although it would fit (dense --cw uses the full viewport width, ui.js:505) and dense cards hide their text;
+  ec-result and story scenes are a small box on dark. meadowfold left column has ~110 px of empty green above the pockets.
+- Tests: build-all --quick scenarios pass for emberclimb (14/17) and lantern-dive (7/10); the 6 failures are only missing visual baselines. meadowfold
+  lessons-test PASS at 402x874 and 1366x768; rules-test.js did not finish within 60 s (untouched engine, not investigated).
+- contact-sheet.js waits 450 ms: lantern-dive's hand is often not painted yet in its cells (timing, not layout).
 ## W735 thornbound HUD diet (shelf/W735-hud-thornbound)
 - tb-story-start failure was NOT the HUD diet: parent commit fails the same. Story now opens the chapter map directly (tutorial = lesson row, scenario lessons); the scenario still waited for the old Skip-tutorial spotlight. Scenario rewritten (scn.js), HUD cuts untouched.
 - Test against a build-all staged build (python3 scripts/build-all.py thornbound --no-check), not games/thornbound (deployed copy).
@@ -314,6 +344,17 @@ Live fix: original-name phrase removed from shelf blurb + sands page (15:2x).
 ## W740 onyx-atelier visual fix (24 Nov)
 Done: tutorial part names now a tidy list inside the guide window, ONE callout on the board for the picked part (no chip cloud); PC (>=1000px) grid layout: board left (cell up to 112px), rival/jewels/you stacked right; guide never sits on the PC board.
 Weak: PC guide window still covers the rival jewel rows on lesson 1; HUD pips and phone start menu not changed. Sheets: onyx-atelier/proof/w740-*-sheet.jpg. Integrator: build.py then copy onyx-atelier.html to games/onyx-atelier/index.html (not in build-all).
+## W752 (sands lessons: card lag fixed)
+- Result: ft/lessons-layout-test.js 66/66 (6.6 s), ft/lessons-test.js pass (17.7 s). Root cause of the "one-tick lag": turbo forces transition-duration .001s on everything, so margin/left/top of #gw, #grid and the card took a frame to land. Fix: board.css `body.lesson .gxst-card,#gw,#grid,#table>*{transition-property:none}` (lesson mode only).
+- Also: shell GXST.place() (opt-in, no change for other games); sands wraps fit() to re-seat the card in the same task, and a ResizeObserver on the board rows re-fits. Test now awaits a painted frame before each check.
+- Phone sheet: no card over board/HUD; the card sits right under the board. Proof: sands-of-qamar/proof/ (phone/pc sheets).
+- Still weak: some phone cells keep a wooden band below the card (strip 214 px reserve vs shorter card); not tightened further.
+## W747 (end screens, perch-and-plume / vale-of-banners / stitchwise)
+Done: headline + score + max 3 highlights + Play again/Menu, stats behind a Details toggle. Scenarios: pp-result, vb-result, sw-result (checks updated). Proof: <game>/proof/endscreen-{phone,pc}.png.
+Still weak: build-all --quick fails on pre-existing issues (11px "Forest" in perch, missing vale/stitchwise baselines). Perch/vale have no winner-portrait art for AI wins beyond seat face/initial; stitchwise lose-case not shot. No lose-variant scenarios yet.
+## W767 stitchwise no-scroll HUD (shelf/W767-stitchwise-hud)
+Done: the dock's long scrolling strip of every upcoming patch (the owner's "scroll up and down") is now one "Next +N" chip that opens All patches, which shows the live sale order (first 3 = for sale, gold). 3 offers fit with no scroll on phone and PC; PC offer cards are compact rows; PC text >= 16px (track head, bar chips, start menu, result tally); closed windows display:none. Gate: stitchwise/noscroll-test.js (402x874, 1366x768, plus 402x720 and 1366x640 browser heights, every phase) PASS. Sheets --strict 0 flags: stitchwise/proof/w767-*-sheet.jpg.
+Integrator: visual baselines title + board diff (expected, layout changed): re-approve with --approve-visual after the owner sees the sheets. Pre-existing fails, also on the parent: scenarios pc menu + sw-zoom (open window covers the dock, settings chips overlap).
 ## W742 crown-city-smash visual (24 Nov 2026) - branch shelf/W742-vis-crown
 Done: dice faces never blank (tumble keeps the face visible; star faces now show a star behind the digit, so no bare white tiles); phone board repacked so the city, round panel, harbor and seats fill the top (about 1.7x larger) instead of an empty sunburst (art.js, phone only).
 NOT done (pc, R14 item 3): dice tray still a full-width green bar with dice at its left, 5 "0 cards" empty slots still shown, left player list still 8-9px. Next worker: board.css/onboard.css at >=1024px, centre dice at 56px+, hide empty card slots, 16px list.
@@ -335,3 +376,21 @@ retire the unreachable GXT tour in ui12.js and its tests (tutor-test.js, learn-t
 - Test now runs in ~30 s for both sizes (was hanging past 60 s). pick, halves, finish PASS. Still failing in lessons-test.js (script-side, not game): shield solve (crab ends hp 1: check which half is tapped), retal wrong/solve, door, coin (turn stays in 'second' ask: play the second half or ENGINE step), hint-twice ring not found, atk glow missing in retal. Only 7 lessons exist, not 10.
 - Run: cd games-src && python3 wickdeep/build.py && DBG=1 PW_DIR=$(npm root -g)/playwright node wickdeep/lessons-test.js
 - Start screenshots removed from the branch; test writes none.
+
+## W755 tidewake HUD diet (shelf/W755-hud-tidewake)
+- skin.css only (no engine/rules/lesson changes): dock no longer shows rival log list, "Since your last move" feed or crew cards; Crews + Log are now top-bar icons (were Menu-only); Crews window table was hidden on phone (head.html .lg2 rule) and now shows; pc drawers start under the bar and scroll (Menu used to run 139 px off the top); pc Crews/Log text 16 px.
+- Leaf items on main screen, start of board: 17 -> 10 (phone and pc); own turn: ~20 -> 16 (3 hand tiles + Turn/Turn/Place count). Proof: games-src/tidewake/proof/w755-hud-{before,after}-{phone,pc}-sheet.jpg, w755-hud-windows-sheet.jpg.
+- Lessons: lessons-test.js PASS 402x874 and 1366x768 (~23 s each). Scenarios (phone, phone-s, pc): 19 pass, 2 fail, both same on the parent commit: phone-s menu (opip pickable marks over column numbers) and pc menu (menuAuditAll: "Lessons" under #setd while panels scroll). Visual baselines missing (expected).
+- Still weak: phone has empty space under the dock (board is width-bound); contact-sheet pc "menu" cell is captured while the bar is still visibility:hidden (loads at ~3 s; fine at 6 s).
+
+## W758 kaiten story Act 4 (shelf/W758-kaiten-story, 24 Nov)
+- No kaiten expansion exists anywhere (src, built site, kaiten branches): nothing to switch on. If the owner meant a
+  specific add-on, it has to be built first (new dish types touch data.js deck size, AI value(), art, rules help).
+- Story: Act 4 "The Late Menu", 5 stages c11-c15 (Kofi's Banner roll-banner 1, Custard Debt custard-head-start 2 at 3p,
+  Four at the Counter sweet-tooth 1.6 at 4p goal 35+, Head Start boss-head-start 6, boss Taro's Rematch long-think 400).
+  Sim, normal player, 40-60 games: 50 / 45 / 43 / 23 / 0 % (c15 easier = normal Taro, as c10).
+- Shell gx-campaign.js validator now allows 3-4 acts and up to 16 chapters with a 4th act (other games unchanged).
+- Scenarios: ?scn=kk-story-map, kk-story-c11..c15 (not yet in games/scenarios.json: add at integration).
+- Proof: game/story-act4-test.js wins all 5 (9-17 s each); sheets in kaiten-kitchen/proof/W758 (phone 0 flags; pc flags
+  are the pre-existing hidden-help "offscreen" flag, also 9/9 on the live build).
+- Left: pc hidden-help offscreen flag (all cells, pre-existing); kaiten skin.css bumps campaign pc text to 16 px locally.
