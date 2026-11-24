@@ -1,0 +1,4 @@
+402x874 {"items":20,"tables":0,"buttons":24,"textNums":11,"labels":"Hint: what should  | Camp: castaways, i | Log | Rules | More: sound, speed | Lessons: learn by  | Day 1 of 12. Camp, | Zoom out the islan | Zoom in on the isl | Centre on camp | Details | Carpenter (1st paw | Carpenter (2nd paw | Cook (1st pawn), n | Cook (2nd pawn), n | Friday, no job yet | Hammer and Nails,  | Dog, no job yet | Plan it for me | Start day ▶"}
+402x874 errors: 0 
+1366x768 {"items":20,"tables":0,"buttons":24,"textNums":11,"labels":"Hint: what should  | Camp: castaways, i | Log | Rules | More: sound, speed | Lessons: learn by  | Day 1 of 12. Camp, | Zoom out the islan | Zoom in on the isl | Centre on camp | Details | Carpenter (1st paw | Carpenter (2nd paw | Cook (1st pawn), n | Cook (2nd pawn), n | Friday, no job yet | Hammer and Nails,  | Dog, no job yet | Plan it for me | Start day ▶"}
+1366x768 errors: 0 
