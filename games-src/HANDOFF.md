@@ -352,3 +352,9 @@ retire the unreachable GXT tour in ui12.js and its tests (tutor-test.js, learn-t
 - Test now runs in ~30 s for both sizes (was hanging past 60 s). pick, halves, finish PASS. Still failing in lessons-test.js (script-side, not game): shield solve (crab ends hp 1: check which half is tapped), retal wrong/solve, door, coin (turn stays in 'second' ask: play the second half or ENGINE step), hint-twice ring not found, atk glow missing in retal. Only 7 lessons exist, not 10.
 - Run: cd games-src && python3 wickdeep/build.py && DBG=1 PW_DIR=$(npm root -g)/playwright node wickdeep/lessons-test.js
 - Start screenshots removed from the branch; test writes none.
+
+## W755 tidewake HUD diet (shelf/W755-hud-tidewake)
+- skin.css only (no engine/rules/lesson changes): dock no longer shows rival log list, "Since your last move" feed or crew cards; Crews + Log are now top-bar icons (were Menu-only); Crews window table was hidden on phone (head.html .lg2 rule) and now shows; pc drawers start under the bar and scroll (Menu used to run 139 px off the top); pc Crews/Log text 16 px.
+- Leaf items on main screen, start of board: 17 -> 10 (phone and pc); own turn: ~20 -> 16 (3 hand tiles + Turn/Turn/Place count). Proof: games-src/tidewake/proof/w755-hud-{before,after}-{phone,pc}-sheet.jpg, w755-hud-windows-sheet.jpg.
+- Lessons: lessons-test.js PASS 402x874 and 1366x768 (~23 s each). Scenarios (phone, phone-s, pc): 19 pass, 2 fail, both same on the parent commit: phone-s menu (opip pickable marks over column numbers) and pc menu (menuAuditAll: "Lessons" under #setd while panels scroll). Visual baselines missing (expected).
+- Still weak: phone has empty space under the dock (board is width-bound); contact-sheet pc "menu" cell is captured while the bar is still visibility:hidden (loads at ~3 s; fine at 6 s).
