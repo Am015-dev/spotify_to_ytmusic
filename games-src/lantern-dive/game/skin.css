@@ -220,3 +220,12 @@ html.sk .gxc-btn.go{color:#3a1604;text-shadow:0 1px 0 rgba(255,255,255,.6);font-
   html body .seat .jc,html body #mine .mjobs .jc{font-size:16px}
   html body #felttxt,html body #lead,html body #lead span{font-size:18px}
 }
+
+/* W748r pc layout (>= 1024 px): the table uses the whole width (was capped at 1180 px with black bars), bigger job card and seats */
+@media (min-width:1024px){
+  html body #bd{width:100%}
+  html body #pool .jcard{min-width:min(420px,40vw);min-height:150px;padding:16px 18px 16px 26px}
+  html body #pool .jcard b{font-size:30px}
+  html body #pool .jcard .dd i{width:18px;height:18px}
+  html body .seat .nm,html body .me .nm{font-size:18px}
+}

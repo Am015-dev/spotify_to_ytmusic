@@ -560,3 +560,12 @@ body,.gx-app{background:#9cc7a4 radial-gradient(ellipse 70% 55% at 50% 48%,#cfe8
   .tbtns{gap:12px}.tbtns .btn,.btn.big{min-height:64px;font-size:21px}
   .opts summary{font-size:17px}
 }
+
+/* W748r pc layout (>= 1100 px wide): info column left (scores, cards, pockets), the valley gets the full height on the right */
+@media (min-width:1100px){
+  #board{grid-template-columns:clamp(440px,34vw,560px) minmax(0,1fr) 96px;grid-template-rows:auto minmax(0,1fr) auto;grid-template-areas:"top map rail" "strip map rail" "tray map rail"}
+  #tray{max-width:none;justify-self:stretch;border-radius:0 18px 0 0}
+  #strip .acard{width:136px}
+  #strip .acard .pat{width:120px;height:58px}
+  #mapw{padding:8px 0}
+}
