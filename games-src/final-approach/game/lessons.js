@@ -177,17 +177,20 @@
     }
     wrapAI();
     // count the player's own placements for par
-    var oc = commit;
-    commit = function (seat, m) { if (L.on && seat === 0 && m && m.t === 'place') L.n++; return oc.apply(this, arguments); };
-    // never save lessons over the real game
-    var os = saveGame;
-    saveGame = function () { if (GXST.active()) return; return os.apply(this, arguments); };
+    window.FALessonHook = function (seat, m) { if (L.on && seat === 0 && m && m.t === 'place') L.n++; };
     var slot = document.createElement('div'); slot.id = 'gxst-slot'; slot.hidden = true; document.body.appendChild(slot);
     window.addEventListener('gxst', function (e) {
       if (e.detail.type === 'close' || e.detail.type === 'picker') L.on = false;
       else if (e.detail.type === 'start' || e.detail.type === 'retry') L.on = true;
     });
-    GXST.init({ game: 'final-approach', scenarios: lessons, qParent: '#gxst-slot', keepClear: ['#pz', '#acts'], settled: settled });
+    // phone: the card lives in the strip between the dice trays and the action bar, so it never covers a die or a slot
+    var phoneSlot = function () {
+      var top = 0, acts = $('#acts'), ar = acts && acts.getBoundingClientRect(), t = document.querySelectorAll('#pz .tray');
+      for (var i = 0; i < t.length; i++) { var r = t[i].getBoundingClientRect(); if (r.height > 4 && r.bottom > top) top = r.bottom; }
+      if (!top || !ar || ar.height < 4) return null;
+      return { left: 4, top: Math.round(top + 4), width: innerWidth - 8, height: Math.round(ar.top - top - 8) };
+    };
+    GXST.init({ game: 'final-approach', scenarios: lessons, qParent: '#gxst-slot', keepClear: ['#pz', '#acts'], settled: settled, phoneSlot: phoneSlot });
     window.FALessons = { open: function () { GXST.picker(); } };
     var m = /[?&]lesson=([^&#]+)/.exec(location.search);
     if (m) GXST.start(decodeURIComponent(m[1]));

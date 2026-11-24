@@ -85,9 +85,14 @@
   function place() {
     if (!W) return;
     // phoneSlot: on narrow screens (<700px) with a visible slot element, sit inside its rect (width clamped to it); saved pos ignored
-    var slot = innerWidth < 700 && typeof C.phoneSlot === 'string' ? vis(find(C.phoneSlot)) : null;
-    if (slot) { W.style.width = ''; var nw = W.offsetWidth; W.style.width = Math.min(nw, Math.round(slot.width)) + 'px'; return put([slot.left, slot.top]); }
-    W.style.width = '';
+    var ps0 = C.phoneSlot, slot = innerWidth < 700 && ps0 ? (typeof ps0 === 'function' ? call(ps0, null) : typeof ps0 === 'string' ? vis(find(ps0)) : null) : null;
+    if (slot && slot.height == null && slot.bottom != null) slot.height = slot.bottom - slot.top;
+    if (slot && slot.width == null && slot.right != null) slot.width = slot.right - slot.left;
+    if (slot && slot.width > 2 && slot.height > 2) {   // phoneSlot (selector or function -> {left,top,width,height}): the card lives inside this rect, compact, body scrolls; never over the game
+      W.classList.add('gxst-inslot'); W.style.width = Math.round(slot.width) + 'px'; W.style.maxHeight = Math.round(slot.height) + 'px';
+      return put([slot.left, slot.top]);
+    }
+    W.classList.remove('gxst-inslot'); W.style.maxHeight = ''; W.style.width = '';
     var vw = innerWidth, vh = innerHeight, bw = W.offsetWidth, bh = W.offsetHeight, t = hintTarget(), av = [];
     (C.keepClear || []).forEach(function (sel) { var a; try { a = D.querySelectorAll(sel); } catch (e) { a = []; } for (var i = 0; i < a.length; i++) { var r = vis(a[i]); if (r) av.push(r); } });
     function clamp(p) { return [Math.max(4, Math.min(vw - bw - 4, p[0])), Math.max(4, Math.min(vh - bh - 4, p[1]))]; }
