@@ -83,3 +83,11 @@ NEXT: owner's play feedback -> route per game (workers: Sonnet specified, Opus d
 ## 15:15 UTC CHEAPAG FIXED
 Env "Alex" setup script installs cheap-agent, writes /root/.config/cheapag/config.json (provider local = api.anthropic.com/v1, claude-haiku-5-5, key env ANT), `claude mcp add -s user cheapag -- cheapag`, `cheapag allow` in the repo. Proven 15:13: delegate OK, test pass, $0.05, 6 turns. Every brief now says: all code via mcp__cheapag__delegate (BRIEF-TEMPLATE.md). Workers launched 14:56 (W698-W702, W704) predate it. Trial B8 session_01RR7mnXzBvG1gr4TqyAmew6 checks a fresh worker loads the tools.
 15:20 UTC: fresh workers get cheapag connected but tools not callable (B8). Fix: games-src/scripts/cag.js calls the cheapag MCP server from Bash; proven OK. Brief rule updated.
+
+## 15:40 UTC ROUND (20 workers, all code via cag.js -> Haiku)
+Integrators: INT15 vale(W704)+doorkick(W700) session_01RR7mnbjrozxC6CR9udNMVw | INT16 crown(W698 dice-row fix)+meadowfold contrast(W703) session_01RR7mnb4wFvpsdQT37Ph9Wf.
+Scenario tutorials: W701 nebula (no cheapag) | W705 shipwreck redo | W706 redline redo | W707 vinegrave | W708 hollowbough | W709 final-approach.
+Conversions to scenarios: W710 wickdeep | W711 perch | W712 wildmark | W713 via-tessera | W714 meadowfold | W715 gloamwar | W716 sands.
+HUD diet (Opus): W717 thornbound | W718 rampart. Chores (Haiku): W719 contrast | W720 stitchwise baselines. Reviewer R13 (Opus): REVIEW-R13.md.
+Branches shelf/W7xx-*. Workers report via create_trigger "[DONE Wxxx]". W699/W702 pushes were denied (work lost) -> redone as W705/W706; briefs now say push per milestone or paste format-patch.
+Next: as branches land, one Sonnet integrator per 2-4 branches (shared gx-scenario-tutor.js changes -> one build-all). Onyx (has story tutorial) not converted.

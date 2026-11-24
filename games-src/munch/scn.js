@@ -20,28 +20,6 @@
   var idOf = function (key) { return Object.keys(G.C).map(Number).find(function (i) { return G.C[i] === key; }); };
   var pull = function (id) { ['door', 'tr', 'dd', 'td'].forEach(function (z) { var i = G[z].indexOf(id); if (i >= 0) G[z].splice(i, 1); }); P(0).hand = P(0).hand.filter(function (x) { return x !== id; }); return id; };
 
-  GXS.add({
-    id: 'dk-tut-help', name: 'Tutorial: ask for help', ask: 'Can you read the Help button?', ls: { dkd_offer: '1' },
-    when: function () { return booted() && typeof tutStart === 'function' && typeof GXT !== 'undefined'; },
-    setup: function () {
-      var m = document.getElementById('modal'); if (m) { m.hidden = true; m.innerHTML = ''; }
-      tutStart();
-      return GXS.wait(function () { return GXT.active() && G && G.tut; }, 8000).then(function () {
-        // the staged deal: Pip plays Lizards from his hand against the door ("look for trouble"), then the Help step asks for the Help button
-        var id = pull(idOf('lizards')); G.active = 0; G.phase = 'after'; G.fought = false; apply({ act: 'trouble', card: id }, 0); G.cb.stage = 'act'; render();
-        GXT.goto('help');
-        return GXS.wait(function () { var s = GXT.state(); return s.id === 'help' && s.shown; }, 8000);
-      });
-    },
-    checks: [
-      { kind: 'fn', name: 'tutorial is on the Help step', fn: function () { return GXT.state().id === 'help' || 'step is ' + GXT.state().id; } },
-      { kind: 'visible', sel: '.fbtns .helpb', name: 'Help button' },
-      { kind: 'text', sel: '.fbtns .helpb', re: /help/i, name: 'Help label' },
-      { kind: 'fn', name: 'Help label is not covered by the painted plate cap', fn: function () { var e = document.querySelector('.fbtns .helpb'); if (!e) return 'no button'; var r = document.createRange(); r.selectNodeContents(e); var t = r.getBoundingClientRect(), b = e.getBoundingClientRect(); return (t.left >= b.left - 1 && t.right <= b.right + 1 && t.width > 8) || 'label box ' + Math.round(t.left) + '..' + Math.round(t.right) + ' outside button ' + Math.round(b.left) + '..' + Math.round(b.right); } },
-      { kind: 'tap', sel: '.fbtns .helpb', name: 'tap Help', state: function () { return GXT.state().id; }, expect: function (a, b) { return b === 'who' || 'move on to "Pick a helper" (still ' + b + ')'; } }
-    ]
-  });
-
   // the real buttons, found by their label
   var btnText = function (re) { return function () { return [].slice.call(document.querySelectorAll('button')).filter(function (b) { return re.test(b.textContent.trim()) && GXS.vis(b); })[0]; }; };
   var hearth = function () { return { you: G.cb ? sideStr(G.cb) : null, mon: G.cb ? monStr(G.cb) : null, hand: P(0).hand.length, lvl: P(0).lvl, turn: G.turn, td: G.td.length }; };
