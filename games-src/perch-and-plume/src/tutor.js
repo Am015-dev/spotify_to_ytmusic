@@ -44,6 +44,10 @@ function tutPrep(Gx) {
   Gx.fx = [];
 }
 function tutStart() {   // the coached first game: 1 round of 4 turns vs Pip, every choice free; Ottilie teaches one action per turn (coach.js)
+  try { GX.close(); } catch (e) { }
+  try { if (typeof GXT !== 'undefined' && GXT.markDone) GXT.markDone('perch-and-plume'); } catch (e) { }
+  try { localStorage.setItem('pp-played', '1'); } catch (e) { }
+  if (window.ppScenarioStart && ppScenarioStart()) return;   // scenario lessons (scenarios.js): real moves toward a goal; the floating lessons below are only a fallback
   TUT.ids = tutPick();
   ['title', 'setup', 'result', 'pass'].forEach(function (id) { $('#' + id).hidden = true; });
   try { if (window.GXC) GXC.close(); } catch (e) { }

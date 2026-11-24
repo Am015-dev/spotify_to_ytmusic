@@ -306,3 +306,9 @@ Live fix: original-name phrase removed from shelf blurb + sands page (15:2x).
 - Content rule finding: doorkick-dungeon (live) copied the original card pool 1:1 (R98). F18 (Opus) redesigning our own 168 cards; then UI fixes; redeploy needs owner yes. COPYAUDIT running over all games.
 - Closest to done: short-fuse (4/5, F3 polish+PC then review), kaiten-kitchen (4/5-ish, F3 polish+PC then review), crown-city-smash (R97 7.4, F2), perch-and-plume (F3), lantern-dive (F2).
 - Pending: approve baselines (sunglaze, rampart: proof/baselines-new) before deploy; hollowbough R96 list after PLAY2; calm-audit doesn't count #coach/#toast.
+
+## W731 perch-and-plume scenario lessons
+- Fixed TypeErrors (two lessons shared one bird id, so a card vanished); eggcost/goal now use any single-cost bird and pay its food.
+- Menu/Rules/title "Tutorial" (tutStart) now opens the 7 scenario lessons; floating window is fallback only. Card folds after retry too.
+- tests/scn-lessons.js passes in ~6 s (5 runs). Old floating-lesson tests (w649-lessons, tutorial-end, tutorial-visible) are now stale: retire.
+- Weak: pc lesson card overlaps the left log text; no deployed contact sheet run (used test shots proof/scn-*-sheet.jpg).
