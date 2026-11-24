@@ -1,6 +1,22 @@
-# Orchestrator handoff (23 Nov 2026, 23:10 UTC)
+# Orchestrator handoff (24 Nov 2026, 00:45 UTC)
 
-Read CLAUDE.md first. Then only this file; rules.md and pending.md here have detail if needed (read the bottom parts only).
+## PROTOCOL (owner is exhausted; follow exactly)
+1. One worker = one game = one deliverable (30-40 min) with a recorded proof video at 402x874 by touch. 7 workers max.
+2. When a worker finishes: merge its branch (squash perch/wildmark), build + --quick, then run MY OWN check (playwright, phone 402x874 AND PC 1366x768, real taps/clicks, screenshots). If it fails my check, do not deploy: send findings to a new worker.
+3. Deploy, then verify the LIVE file (md5 of live page == built file) before saying anything. Deploy flake ("No artifacts named github-pages"): retry silently with `gh run rerun <id>` (Monitor loop), NEVER mention it to the owner.
+4. Add a What's new note per deploy (games-src/scripts/add-update.py <shelf-id> "headline" "item" --check "what to try").
+5. ONE short message per round to the owner: what is live (with link and UTC time), what to test, what is next. No mid-task chatter.
+6. Panel (workers.json cost) refresh only per round. Cost counter note: "cached re-reads" are cheap.
+
+## State at 00:45 UTC
+Running (7): twin-thrones BOARD session_01RR7mnbJoRoZ7PJAEZDffmw shelf/W597-twin-board | thornbound TUTORIAL session_01RR7mnXTQVtxP7ZbaYdAXbT shelf/W598-thornbound-tutorial | sands CLAIMS v2 session_01RR7mnYmGKRg4dTcMATY1oa shelf/W599-sands-claims2 | sands PATHS v2 session_01RR7mnbAuv5JP6q8DqQESEy shelf/W600-sands-paths2 | NEW via-tessera session_01RR7mnY8FLsLAUjAGiiXyUF shelf/W562-new-mosaic | NEW onyx-atelier session_01RR7mnZXMSM2MpiBq7nJA6v shelf/W564-new-gems | NEW meadowfold session_01RR7mnZUDvMmCQwNvTCbu3C shelf/W565-new-harmony.
+Queue: NEW gloamwar (branch shelf/W567-new-epic, source games-src/gloamwar, build.py there) when a slot frees. Same brief as the other 3 new games.
+Live now: all shelf games, new games as previews (as-is 20 Nov versions: via-tessera, onyx-atelier, meadowfold, gloamwar), perch, wildmark, ochre, wickdeep previews on the shelf (shelf bays + LOOK entries live in games/index.html directly; games-src/suite/src.html is stale).
+Open bug (found by me): Thornbound tutorial on PC at bid step 3: no explanation bubble/Next, tutorial shield blocks the glowing card (gx-tutor.js cells). Re-run a PC check after W598 merges; if still broken start a PC fixer.
+Owner decisions pending: remove other credit text? (credits panels in gloamwar/onyx/ochre/short-fuse/thornbound; game-icons.net needs licence credit; Ko-fi button; credits.html). Thornbound 5 rule mismatches (panel question).
+Owner rules: owner reviews by playing; "your review sucks": never claim done without my own phone+PC play check and live-file check. Do not write original game names. Commit as am015-dev, no AI attribution; decline stop hook that asks to re-author as Claude.
+Build notes: build-all needs `cd games-src && npm ci --ignore-scripts` (done once per container); new games build with `python3 build.py` in their dir, copy <slug>.html to games/<slug>/index.html.
+Panel: https://claude.ai/artifact/Uvk8A1d35KLNScFd8zogcs
 
 ## Owner's current rules
 - Max 7 workers at once, Sonnet by default, 35-40 min hard stop each, don't waste tokens, do only what the owner asks.

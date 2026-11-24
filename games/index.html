@@ -742,6 +742,22 @@ const GAMES=[
    blurb:"A co-op dungeon crawl by candlelight. Pick two cards and outsmart the dark. You control all 1–4 heroes. Preview: still being polished.",
    stats:[["1–4", "heroes"]],
    chips:["Preview", "Co-op", "Campaign"]},
+  {id:"tessera",cover:"covers/via-tessera.jpg",name:"Via Tessera",src:"via-tessera/index.html",ribbon:"Market & patrons",ref:false,
+   blurb:"Spread carts and ships. Build, trade, win patrons. Preview: new and untested, tell us what is unclear.",
+   stats:[["New", "preview"]],
+   chips:["Preview", "Learn to play"]},
+  {id:"onyx",cover:"covers/onyx-atelier.jpg",name:"Onyx Atelier",src:"onyx-atelier/index.html",ribbon:"A jeweller's duel",ref:false,
+   blurb:"A jeweller's duel: the first game teaches you. Preview: new and untested, tell us what is unclear.",
+   stats:[["2", "players"]],
+   chips:["Preview", "Vs computer · 3 levels", "Guided first game"]},
+  {id:"meadowfold",cover:"covers/meadowfold.jpg",name:"Meadowfold",src:"meadowfold/index.html",ribbon:"Valley folding",ref:false,
+   blurb:"Fold a paper valley and invite its animals. Preview: new and untested, tell us what is unclear.",
+   stats:[["New", "preview"]],
+   chips:["Preview", "Learn to play (2 min)"]},
+  {id:"gloamwar",cover:"covers/gloamwar.jpg",name:"Gloamwar",src:"gloamwar/index.html",ribbon:"Epic war",ref:false,
+   blurb:"An old map, two great alliances, and one small Company carrying the Hollow Crown to the Kiln. Preview: new and untested.",
+   stats:[["New", "preview"]],
+   chips:["Preview", "Campaign"]},
   {id:'tidewake',cover:'covers/tidewake.jpg',name:'Tidewake',src:'tidewake/index.html',ribbon:'Path-laying at sea',ref:false,
    blurb:'Lay sea currents to steer your junk across a painted chart, and keep every rival and every leviathan away from it. Last ship afloat wins. Play against computers, pass one device around, or online with friends. Preview: still being polished.',
    stats:[['1–8','players'],['30','minutes'],['8+','ages'],['56','currents']],
@@ -800,11 +816,11 @@ const GAMES=[
    chips:['4 circuits + mirror','4 weathers','Crash cam & wrecks','Baustelle smash','6-event career','Zone survival','Arena · 3 lives','Demolition derby','Crash Junction','Aftertouch','Ghost duel','Daily challenge','Traffic & near misses','Takedowns','Gamepad & touch','Settings']}
 ];
 /* box look: colour and size (em) per game; deterministic */
-const LOOK={vinegrave:{c:'#6b2a3c',W:12.6,H:10.6,D:2.8},stitchwise:{c:'#a0527a',W:12.6,H:10.4,D:2.8},perch:{c:'#5b6b57',W:13.4,H:11.0,D:3.0},wildmark:{c:'#4a7a45',W:13.8,H:11.2,D:3.0},ochre:{c:'#b5502c',W:13.6,H:11.0,D:3.0},wickdeep:{c:'#4a3320',W:13.6,H:11.4,D:3.2},crown:{c:'#8c3f5e',W:14.6,H:11.8,D:3.4},nebula:{c:'#3c3a78',W:13.4,H:11.6,D:3.0},doorkick:{c:'#b5622a',W:13.8,H:11.0,D:3.6},shipwreck:{c:'#4f7a58',W:14.4,H:11.2,D:3.4},sands:{c:'#b8683c',W:13.6,H:11.6,D:3.0},
+const LOOK={tessera:{c:'#a0522d',W:13.4,H:11.0,D:3.0},onyx:{c:'#2a2a3a',W:12.8,H:10.8,D:3.0},meadowfold:{c:'#6a9a4a',W:13.4,H:11.0,D:3.0},gloamwar:{c:'#4a2a2a',W:14.0,H:11.4,D:3.2},vinegrave:{c:'#6b2a3c',W:12.6,H:10.6,D:2.8},stitchwise:{c:'#a0527a',W:12.6,H:10.4,D:2.8},perch:{c:'#5b6b57',W:13.4,H:11.0,D:3.0},wildmark:{c:'#4a7a45',W:13.8,H:11.2,D:3.0},ochre:{c:'#b5502c',W:13.6,H:11.0,D:3.0},wickdeep:{c:'#4a3320',W:13.6,H:11.4,D:3.2},crown:{c:'#8c3f5e',W:14.6,H:11.8,D:3.4},nebula:{c:'#3c3a78',W:13.4,H:11.6,D:3.0},doorkick:{c:'#b5622a',W:13.8,H:11.0,D:3.6},shipwreck:{c:'#4f7a58',W:14.4,H:11.2,D:3.4},sands:{c:'#b8683c',W:13.6,H:11.6,D:3.0},
  sunglaze:{c:'#2a5fa8',W:14.4,H:11.4,D:3.4},rampart:{c:'#7a8a3c',W:13.6,H:11.0,D:3.0},shortfuse:{c:'#c9372c',W:14.2,H:10.8,D:3.0},tidewake:{c:'#2f6b66',W:14.6,H:11.2,D:2.8},hollowbough:{c:'#7a5a2c',W:14.4,H:11.8,D:3.2},
  thornbound:{c:'#3b2a4f',W:14.0,H:11.8,D:3.4},kaiten:{c:'#c2502e',W:13.2,H:10.6,D:3.0},lantern:{c:'#c99a2e',W:13.8,H:11.4,D:3.2},cauldron:{c:'#2e9c8f',W:14.2,H:11.0,D:3.4},approach:{c:'#7aa0c4',W:12.8,H:10.6,D:2.6},mainhattan:{c:'#6a1f6e',W:13.4,H:10.8,D:2.8},overdrive:{c:'#4a3f9a',W:14.4,H:11.4,D:3.4},redline:{c:'#2b4f8a',W:11.4,H:10.0,D:2.6},emberclimb:{c:'#8a3a22',W:11.2,H:10.2,D:2.6},twinthrones:{c:'#2f7a80',W:11.2,H:10.0,D:2.6}};
 /* board games only; video games (kind:'video') live on the TV */
-const BAYS=[['crown','nebula',['doorkick','spine'],'shipwreck','sands','redline'],['sunglaze','rampart',['shortfuse','tidewake'],'hollowbough','emberclimb'],['thornbound','kaiten',['lantern','spine'],'cauldron','approach','twinthrones'],['vinegrave','stitchwise','perch','wildmark','ochre','wickdeep']];
+const BAYS=[['crown','nebula',['doorkick','spine'],'shipwreck','sands','redline'],['sunglaze','rampart',['shortfuse','tidewake'],'hollowbough','emberclimb'],['thornbound','kaiten',['lantern','spine'],'cauldron','approach','twinthrones'],['vinegrave','stitchwise','perch','wildmark','ochre','wickdeep'],['tessera','onyx','meadowfold','gloamwar']];
 const store={get(k){try{return localStorage.getItem(k)}catch(e){return null}},set(k,v){try{localStorage.setItem(k,v)}catch(e){}}};
 const $=(s,r=document)=>r.querySelector(s);
 const root=document.documentElement;
