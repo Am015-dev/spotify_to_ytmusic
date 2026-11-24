@@ -1,5 +1,5 @@
 /* Gloamwar page: board-first. Tap a die, pick what it does, then tap the glowing place on the map. The rival's moves play out one at a time. */
-var G = null, AIDELAY = 700, ANIM = true;
+var G = null, AIDELAY = 260, ANIM = true;
 var UI = { side: 'D', level: 'normal', die: null, src: null, split: 0, hold: false, timer: null, fast: /[?&]fast=1/.test(location.search), mode: 'quick', busy: false, lastEv: [] };
 if (UI.fast) AIDELAY = 40;
 var $ = function (s) { return document.querySelector(s); };
@@ -21,7 +21,7 @@ function buzz(ms) { try { if (window.GX && GX.buzz) GX.buzz(ms || 12); } catch (
 // ---------------------------------------------------------------- start
 function startGame(o) {
   o = o || {}; clearTimeout(UI.timer);
-  if (o.mode !== 'tut') { try { if (window.GXT && GXT.active()) GXT.stop(); } catch (e) { } }
+  if (o.mode !== 'tut') { try { if (window.TUT) TUT.stop(); } catch (e) { } }
   UI.side = o.side || UI.side || 'D'; UI.level = o.level || UI.level || 'normal'; UI.mode = o.mode || 'quick'; UI.die = null; UI.src = null; UI.hold = false; UI.ended = false;
   AI.s = (o.seed || Date.now()) & 0xffff;
   G = newGame({ seed: o.seed || (Date.now() & 0x7fffffff), deal: o.deal });
@@ -68,10 +68,10 @@ function apply(m, byAI) {
   try { performMove(G, m); } catch (e) { console.error(e, m); }
   var evs = G.ev.slice(); G.ev = [];
   UI.die = null; UI.src = null; UI.split = 0; UI.sub = null; UI.asFace = null;
-  try { if (window.GXT && GXT.active()) GXT.act({ type: 'event', what: 'move', m: m }); } catch (e) { }
+  try { if (window.TUT && TUT.on) TUT.act({ type: 'event', what: 'move', m: m, evs: evs, side: byAI ? other(UI.side) : UI.side }); } catch (e) { }
   var wait = playEvents(evs, byAI);
   render();
-  later(step, UI.fast ? 20 : Math.max(byAI ? AIDELAY : 120, wait));
+  later(step, UI.fast ? 20 : byAI ? Math.min(Math.max(AIDELAY, wait), 650) : Math.max(120, Math.min(wait, 900)));
 }
 function playEvents(evs, byAI) {
   var wait = 0, said = null;
@@ -104,7 +104,9 @@ function phaseId() { if (!G) return null; if (G.pend) return G.pend.h; return G.
 function render() {
   if (!G) return;
 $('#vD').textContent = vpOf(G, 'D') + '/' + VPWIN.D; $('#vG').textContent = vpOf(G, 'G') + '/' + VPWIN.G;
-  $('#vT').textContent = G.F.taint + '/12';
+  $('#vT').textContent = G.F.taint + '/12'; $('#tBar').style.width = (G.F.taint / 12 * 100).toFixed(0) + '%';
+  ['D', 'G'].forEach(function (sd) { var u = 0, n = 0; Object.keys(G.A).forEach(function (r) { var a = G.A[r]; if (armySide(a) === sd && units(a)) { u += units(a); n++; } }); $('#s' + sd).innerHTML = u + ' troops<br>' + n + ' regions'; $('#c' + sd).classList.toggle('me', sd === UI.side); });
+  phaseBanner();
   var s = sideToAct(G), me = UI.side, ms = human(s) && !UI.hold ? validMoves(G) : [];
   var hl = { regions: [], tokens: [] };
   var acts = [], msg = '';
@@ -140,13 +142,22 @@ function renderActs(acts) {
   var a = $('#acts'); a.innerHTML = '';
   acts.forEach(function (x) { var b = mk('button', 'act' + (x.cls ? ' ' + x.cls : ''), '<b>' + x.t + '</b>' + (x.s ? '<small>' + x.s + '</small>' : '')); b.type = 'button'; if (x.id) b.id = x.id; if (x.dis) b.disabled = true; b.dataset.key = x.key || ''; b.onclick = function () { if (!tutOk({ type: 'tap', what: 'act', key: x.key })) return; sfx('tap'); x.f(); }; a.appendChild(b); });
 }
+function phaseBanner() {
+  var s = sideToAct(G), ph = G.pend ? (G.pend.h === 'battle' ? 'Battle' : 'Action') : { company: 'Company', hunt: 'Hunt', act: 'Action', over: 'Game over' }[G.phase] || 'Action';
+  var who = G.win ? '' : human(s) ? 'Your turn' : sideName(s) + "'s turn", order = ['Company', 'Hunt', 'Action'], cur = ph === 'Battle' ? 2 : order.indexOf(ph);
+  var me = UI.side, used = (G.used[me] || []).filter(Boolean).length, tot = (G.dice[me] || []).length;
+  $('#phT').textContent = 'Turn ' + G.turn + ' · ' + ph + ' phase' + (who ? ' · ' + who : '') + (ph === 'Action' && tot ? ' · ' + (tot - used) + ' dice left' : '');
+  $('#phT').className = human(s) && !UI.hold ? 'mine' : '';
+  $('#phS').innerHTML = order.map(function (o, i) { return '<i class="' + (i < cur ? 'done' : i === cur ? 'on' : '') + '" title="' + o + '"></i>'; }).join('');
+}
 function renderTabs(ms) {
   var n = G.hand[UI.side].length, canPlay = ms.some(function (m) { return m.a === 'card' && (UI.die == null || m.i === UI.die); });
-  $('#tCards').innerHTML = ico('event', '#1f1812', 20) + 'Cards <em>' + n + '</em>';
-  $('#tNat').innerHTML = ico('watch', '#1f1812', 20) + 'Nations';
-  $('#tComp').innerHTML = ico('lantern', '#1f1812', 20) + 'Company';
+  var atWar = NAT_ORDER.filter(function (k) { return NATIONS[k].side === UI.side && G.pol[k].s === 0; }).length;
+  $('#tCards').innerHTML = ico('event', '#fff', 26) + '<em>' + n + '</em>'; $('#tCards').classList.toggle('can', canPlay);
+  $('#tNat').innerHTML = ico('strong', '#fff', 26) + '<em>' + atWar + '</em>'; $('#tNat').title = atWar + ' of your nations at war';
+  $('#tComp').innerHTML = ico('lantern', '#fff', 26) + '<em>' + G.F.taint + '</em>'; $('#tComp').title = 'Company: taint ' + G.F.taint;
 }
-function tutOk(a) { try { if (window.GXT && GXT.active()) return GXT.act(a); } catch (e) { } return true; }
+function tutOk(a) { try { if (window.TUT && TUT.on) TUT.act(a); } catch (e) { } return true; } /* the tutorial never blocks a tap */
 // ---------------------------------------------------------------- phase UIs (return the one-line message)
 function companyUI(ms, hl, acts) {
   var decl = ms.filter(function (m) { return m.t === 'declare'; });
@@ -323,12 +334,14 @@ function effectUI(ms, hl, acts) {
 // ---------------------------------------------------------------- map taps
 function onMapTap(kind, rid, extra, ev, under) {
   if (!G) return;
-  if (kind === 't') kind = 'r';
-  if (kind === 'co') kind = 'r';
+  var orig = kind;
+  if (kind === 'k') { infoKey(rid); return; }
+  if (kind === 't' || kind === 's' || kind === 'co') kind = 'r';
   if (human(sideToAct(G)) && !UI.hold && UI.tap) { if (UI.tap(kind, rid, extra)) return; if (under && under !== rid && UI.tap('r', under)) return; }
-  if (human(sideToAct(G)) && !UI.hold && MV.hl && (MV.hl.regions || []).length) { tip('Not here: tap a glowing red region', ev && ev.clientX != null ? { left: ev.clientX - 14, right: ev.clientX + 14, top: ev.clientY - 14, bottom: ev.clientY + 14 } : MV.rectOf(rid)); return; }
+  var hint = human(sideToAct(G)) && !UI.hold && MV.hl && (MV.hl.regions || []).length ? 'Not a target now: the glowing places are.' : '';
+  try { if (window.TUT && TUT.on) TUT.act({ type: 'tap', what: 'info', kind: orig, rid: rid }); } catch (e) { }
   if (kind === 'c') { charInfo(rid); return; }
-  regionInfo(rid);
+  regionInfo(rid, orig, extra, hint);
 }
 // ---------------------------------------------------------------- battle overlay
 function battleRender(ms) {
@@ -372,8 +385,8 @@ function showResult() {
   [['Play again', function () { startGame({ side: UI.side, level: UI.level }); }, 'pri'], ['Switch sides', function () { startGame({ side: other(UI.side), level: UI.level }); }, ''], ['Title', showTitle, '']].forEach(function (x) { var b = mk('button', 'btn big ' + x[2], x[0]); b.type = 'button'; b.onclick = x[1]; row.appendChild(b); });
   $('#res').classList.add('on'); document.body.classList.add('scr-on');
 }
-function showTitle() { clearTimeout(UI.timer); try { if (window.GXT && GXT.active()) GXT.stop(); } catch (e) { } closeSheet(); battleClose(); $('#res').classList.remove('on'); $('#title').classList.add('on'); document.body.classList.add('scr-on'); tutMenu(); }
-function tutMenu() { try { $('#tutSlot').innerHTML = GXT.menuHTML({ game: 'gloamwar', first: !ls('gw-played'), cls: 'btn', launch: function () { startTutorial(); } }); } catch (e) { } }
+function showTitle() { clearTimeout(UI.timer); try { if (window.TUT) TUT.stop(); } catch (e) { } closeSheet(); battleClose(); $('#res').classList.remove('on'); $('#title').classList.add('on'); document.body.classList.add('scr-on'); tutMenu(); }
+function tutMenu() { $('#tutSlot').innerHTML = '<button class="btn' + (ls('gw-played') ? '' : ' pri') + '" type="button" id="tutB">Learn to play</button>'; $('#tutB').onclick = function () { startTutorial(); }; }
 // ---------------------------------------------------------------- boot
 function crest() {
   var s = '<circle cx="100" cy="100" r="94" fill="#eadbb4" stroke="#1f1812" stroke-width="4"/><circle cx="100" cy="100" r="86" fill="none" stroke="#1f1812" stroke-width="1.5"/><circle cx="100" cy="100" r="58" fill="#1f1812"/>';
@@ -389,10 +402,11 @@ function boot() {
   $('#playD').onclick = function () { ls('gw-played', 1); startGame({ side: 'D', level: UI.level }); };
   $('#playG').onclick = function () { ls('gw-played', 1); startGame({ side: 'G', level: UI.level }); };
   $('#howB').onclick = function () { GXH.rules(); };
-  $('#helpB').onclick = function () { GXH.rules(phaseId() || undefined); };
+  $('#helpB').onclick = function () { helpMenu(); };
   $('#menuB').innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6h18M3 12h18M3 18h18" stroke="#1f1812" stroke-width="2.4" stroke-linecap="round"/></svg>';
   $('#tCards').onclick = function () { openCards(); }; $('#tNat').onclick = openNations; $('#tComp').onclick = openCompany;
-  $('#cT').onclick = openCompany; $('#logB').onclick = openLog;
+  $('#cT').onclick = openCompany; $('#logB').onclick = openLog; $('#logB').innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 4h10l3 3v13H6zM9 9h7M9 13h7M9 17h5" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+  $('#keyB').onclick = function () { openLegend(); };
   $('#zin').onclick = function () { MV.zoomBy(1.4); }; $('#zout').onclick = function () { MV.zoomBy(1 / 1.4); }; $('#cD').onclick = function () { openVP('D'); }; $('#cG').onclick = function () { openVP('G'); };
   $('#scrim').onclick = function (e) { closeSheet(e); };
   document.addEventListener('keydown', function (e) { if (e.key === 'Escape') { closeSheet(); } });
