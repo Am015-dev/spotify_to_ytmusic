@@ -28,7 +28,7 @@ async function run(b, W, H, URL) {
   const phase = w => p.waitForFunction(w => GXST.state().phase === w, w, { timeout: 8000 }).then(() => true, () => false);
   const tapEl = async (sel, nth, txt) => {
     const pt = await p.evaluate(([sel, nth, txt]) => { const a = [...document.querySelectorAll(sel)].filter(e => { const r = e.getBoundingClientRect(); return r.width > 6 && r.height > 6 && (!txt || (e.dataset.id || e.textContent || '').length >= 0); });
-      let e = a[Math.min((nth || 1) - 1, a.length - 1)]; if (txt === 'seed') e = a.find(x => /seed/i.test(x.innerHTML)) || e; if (txt === 'G') e = a.find(x => /grass/i.test(x.innerHTML) && !/forest/i.test(x.className)) || e;
+      let e = a[Math.min((nth || 1) - 1, a.length - 1)]; if (txt === 'seed') e = a.find(x => { const bd = PP.DATA.birds.find(y => (x.getAttribute('aria-label') || '').indexOf(y.n) === 0); return bd && bd.c.indexOf('seed') >= 0; }) || e; if (txt === 'G') e = a.find(x => /grass/i.test(x.innerHTML) && !/forest/i.test(x.className)) || e;
       if (!e) return null; e.scrollIntoView({ block: 'nearest' }); const r = e.getBoundingClientRect(), x = r.left + r.width / 2, y = r.top + r.height / 2, u = document.elementFromPoint(x, y); return { x, y, ok: !!u && (u === e || e.contains(u)) }; }, [sel, nth, txt]);
     if (!pt) return false; if (!pt.ok) note('something covers ' + sel); await p.touchscreen.tap(pt.x, pt.y); await p.evaluate(() => window.__turboAdvance(500)); return true;
   };
@@ -40,13 +40,15 @@ async function run(b, W, H, URL) {
     await tapEl(WRONG[id]); await p.evaluate(() => { const d = document.querySelector('.die[data-legal]'); }); 
     await p.evaluate(() => window.__turboAdvance(600));
     const s0 = await st(); if (id === 'eggcost') { /* needs two wasted actions */ }
-    if (s0.phase === 'play') { for (const sel of ['.die[data-legal]', '.bc[data-a="bird"][data-legal]', '#tray .bc[data-legal]']) { if (await p.evaluate(s => !!document.querySelector(s), sel)) { await tapEl(sel); break; } } if (id === 'eggcost') { await tapEl('.ract[data-h="2"]'); } await p.evaluate(() => window.__turboAdvance(900)); }
-    if (!(await phase('fail'))) note(id + ': wrong move did not fail (phase ' + (await st()).phase + ')'); else { const s = await st(); if (!/\w{6}/.test(s.msg || '')) note(id + ': fail has no message'); }
+    const drain = async () => { for (let k = 0; k < 5 && (await st()).phase === 'play'; k++) { let hit = false; for (const sel of ['.die[data-legal]', '.bc[data-a="bird"][data-legal]', '#tray .bc[data-legal]', '#acts [data-a="mv"]']) { if (await p.evaluate(s => !!document.querySelector(s), sel)) { await tapEl(sel); hit = true; break; } } if (!hit) break; } await p.evaluate(() => window.__turboAdvance(900)); };
+    if (s0.phase === 'play') { await drain(); if (id === 'eggcost' && (await st()).phase === 'play') { await tapEl('.ract[data-h="2"]'); await drain(); } }
+    if (!(await phase('fail'))) note(id + ': wrong move did not fail (phase ' + (await st()).phase + ')'); else { const s = await st(); if (!/\w+\W+\w+\W+\w+\W+\w+/.test(s.msg || '')) note(id + ': fail has no message [' + JSON.stringify(s.msg) + ' ' + s.phase + ']'); }
     await p.evaluate(() => GXST.retry()); await live(id);
     // solve with real taps
     for (const [sel, nth, txt] of SOLVE[id]) { const n = nth || 1; let k = 0;
-      do { if ((await st()).phase !== 'play') break; if (!(await tapEl(sel, 1, txt))) break; k++; } while (k < n && (await p.evaluate(s => !!document.querySelector(s), sel))); }
-    if (!(await phase('win'))) { const s = await st(); note(id + ': solution did not win (phase ' + s.phase + ' ' + (s.msg || '') + ')'); }
+      do { if ((await st()).phase !== 'play') break; for (let w = 0; w < 12 && !(await p.evaluate(s => [...document.querySelectorAll(s)].some(e => e.getBoundingClientRect().width > 6), sel)); w++) await p.evaluate(() => window.__turboAdvance(300));   // let a pending animation/draw clear
+        if (!(await tapEl(sel, 1, txt))) break; k++; } while (k < n && (await p.evaluate(s => !!document.querySelector(s), sel))); }
+    if (!(await phase('win'))) { const s = await st(); note(id + ': solution did not win (phase ' + s.phase + ' ' + (s.msg || '') + ' ' + await p.evaluate(() => JSON.stringify({ q: G.q && G.q.h, cubes: G.pl[0].cubes, n: G.pl[0].board[0].length, busy: UI.busy })) + ')'); }
     else { const s = await st(); if (s.stars < 3 && s.stars !== 3) note(id + ': stars ' + s.stars); }
   }
   // sheet of lesson starts
@@ -58,6 +60,9 @@ async function run(b, W, H, URL) {
   const dimmed = await p.evaluate(() => [...document.querySelectorAll('body > *')].filter(e => /brightness\(0?\.[0-8]/.test(getComputedStyle(e).filter)).length); if (dimmed) note('dimmed');
   await p.evaluate(() => { const b = document.querySelector('#rulesbtn'); b && b.click(); }); await p.evaluate(() => window.__turboAdvance(300));
   if (!(await p.evaluate(() => !!document.querySelector('.gx-drawer.open,.gx-drawer[open],#rulesbtn[aria-expanded="true"],.gx-set.open')))) note('Rules did not open during a lesson');
+  // wiring: every old tutorial entry (tutStart) opens the lesson picker, not the floating window
+  await p.evaluate(() => { GXST.close(); tutStart(); }); await p.evaluate(() => window.__turboAdvance(300));
+  const wired = await p.evaluate(() => [document.querySelectorAll('.gxst-pick').length, !!document.querySelector('#lsn')]); if (wired[0] !== ids.length || wired[1]) note('tutorial entry did not open the scenario picker ' + wired);
   fs.writeFileSync(path.join(PROOF, 'scn-' + tag + '-sheet-meta.json'), JSON.stringify({ ids }));
   shots.forEach((s, i) => fs.writeFileSync(path.join(PROOF, 'scn-' + tag + '-' + ids[i] + '.jpg'), s));
   await ctx.close();
