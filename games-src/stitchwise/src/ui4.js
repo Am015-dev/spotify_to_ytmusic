@@ -140,7 +140,7 @@ function ringStrip() {
   var cs = document.documentElement.classList.contains('sm') ? 8 : 10;
   for (var k = 3; k < L; k++) {
     var pid = G.ring[(G.start + k) % L], p = PATCHES[pid], bb = bbox(p.cells);
-    var c = h('div.offer.up', { 'data-a': 'upnext', 'data-pid': pid, role: 'button', tabindex: '-1', 'aria-label': p.name + ', not for sale yet: ' + p.cost + ' buttons, ' + p.time + ' time, ' + p.inc + ' income' });
+    var c = h('div.offer.up', { 'data-a': 'upnext', 'data-pid': pid, role: 'button', 'aria-disabled': 'true', tabindex: '-1', 'aria-label': p.name + ', not for sale yet: ' + p.cost + ' buttons, ' + p.time + ' time, ' + p.inc + ' income' });
     c.appendChild(patchShape(pid, '', Math.max(6, Math.min(cs, Math.floor(56 / bb[0]), Math.floor(40 / bb[1])))));
     c.appendChild(h('div.upf', { html: '<span class="uc">' + p.cost + '</span><span class="ut">' + p.time + '</span><span class="ui">+' + p.inc + '</span>' }));
     box.appendChild(c);

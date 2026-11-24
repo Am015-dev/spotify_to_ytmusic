@@ -436,7 +436,6 @@ html.ph .gx-bar h1,html.ph .gx-bar .gx-sp{display:none}
 html.ph .gx-bar .gx-ibtn{width:44px;min-width:44px;height:44px;min-height:44px;padding:0;flex:0 0 auto;border-radius:10px}
 html.ph .gx-bar .gx-ibtn span{display:none}
 html.ph .gx-bar .gx-ibtn svg.ic{width:24px;height:24px;stroke:currentColor;fill:none;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
-html.ph .gx-bar [data-gx="campd"]{display:none}
 html.ph.ph-p .gx-board{grid-row:2;grid-column:1}
 html.ph.ph-p #phview{grid-row:3;grid-column:1}
 html.ph.ph-p .gx-dock{grid-row:4;grid-column:1}
@@ -808,6 +807,18 @@ html body .gxc-path .gxc-node .gxc-disc{background:#2b1b0e!important;background-
 html body .gxc-path .gxc-node.locked .gxc-disc{background:#3b3b3b!important;border-color:#bbb!important;color:#fff!important}
 html body .gxc-path .gxc-node .gxc-pt-e,html body .gxc-path .gxc-node .gxc-lock{color:#fff!important;opacity:1!important}
 .hlp-rules-set .gxh-set button,#tutset .gx-ibtn span{background:#1b1208!important;color:#fff4d8!important;opacity:1!important;text-shadow:none!important;border-radius:4px;padding:0 4px}
+/* W674 HUD: status chips (icon + number), round bar buttons, readable pawn names */
+html.bf #bfres{gap:6px;padding:6px 8px;background:linear-gradient(rgba(11,22,32,.92),rgba(11,22,32,.55));border-bottom:0}
+html.bf #bfres>span{display:inline-flex;align-items:center;gap:5px;height:36px;padding:0 11px 0 8px;border-radius:18px;background:rgba(11,22,32,.88);border:2px solid #8a7348;color:#fff4d8;font:700 14px/1 var(--sans)}
+html.bf #bfres>span b{font-size:18px;color:#ffd98a}html.bf #bfres>span small{font:600 13px var(--sans);color:#cdd8e2}
+html.bf #bfres>span .rci{width:20px;height:20px;flex:0 0 20px;color:#ffd98a}
+html.bf #bfres>span.bad{border-color:#ff9a88;background:#4a1d17}html.bf #bfres>span.bad b,html.bf #bfres>span.bad small,html.bf #bfres>span.bad .rci{color:#ffc2b6}
+.gx-bar .gx-ibtn{border-radius:50%}
+html.bf .bfpc{max-width:none;min-width:0}html.ph.bf .bfpc .bfpn{max-width:100%;font-size:13px!important;letter-spacing:-.2px;overflow-wrap:break-word;word-break:normal;white-space:normal;overflow:visible;text-overflow:clip}
+.card .tag{font-size:13px}
+html.ph .gx-bar>[data-gx="cardsd"]{display:none}#moremenu .mcards{display:none}html.ph #moremenu .mcards{display:flex}
+@media (min-width:1024px){html.bf #bfres>span{height:42px;padding:0 14px 0 10px;gap:7px;font-size:16px}html.bf #bfres>span b{font-size:21px}html.bf #bfres>span small{font-size:16px}html.bf #bfres>span .rci{width:24px;height:24px;flex-basis:24px}}
+@media (min-width:1024px){html.bf #phview #phlabel .bfb,.mb>button.btn>span,.gxc-path .gxc-act small,.gxh-bd .gxh-tt,.gxh-bd .gxh-tx{font-size:16px!important}}
 </style>
 <style>
 /* ===== GX skin: painted UI kit over the shared shell + campaign classes. Opt-in: nothing changes until gx-skin.js adds
@@ -1243,6 +1254,7 @@ html body :is(.gxh-ring,.gxt-ring){animation-duration:1.6s}
   <button class="gx-ibtn" data-gx="rulesd" aria-expanded="false" data-ico="book" aria-label="Rules"><span>Rules</span></button>
   <button class="gx-ibtn menub" data-a="menu" aria-expanded="false" aria-controls="moremenu" aria-label="More: sound, speed, graphics, new game" data-ico="menu"></button>
   <div class="more" id="moremenu">
+  <button class="gx-ibtn mcards" data-gx="cardsd" data-ico="cards" aria-label="Card list"><span>Card list</span></button>
   <button class="gx-ibtn" data-a="snd" id="sndbtn" aria-label="Sound">Sound</button>
   <button class="gx-ibtn" data-a="mus" id="musbtn" aria-label="Sea sounds"> On</button>
   <button class="gx-ibtn" data-a="musicopen" id="musicpick" aria-haspopup="dialog">Pick songs</button>
@@ -7854,8 +7866,13 @@ function turnBanner(){const st=PHO.st;if(st==='plan'||st==='plan2')return ['you'
     return ['isl','A new day']}
   return ['isl','The island’s turn']}
 function resStrip(){let o=null;try{withView(()=>{o={f:food(),need:eatersNeed(),w:G.res.wood,low:(()=>{let m=99;for(const c of G.chars){if(c.npc&&G.scen!=='stranded'||c.dead)continue;m=Math.min(m,CHARS[c.k].die-c.w)}return m===99?0:m})(),sh:hasShelter(),mo:G.morale,d:G.round,r:G.rounds}})}catch(e){}if(!o)return '';
-  const c=(bad,t)=>`<span class="${bad?'bad':''}">${t}</span>`;
-  return c(false,`<b>Day ${o.d}</b><small> of ${o.r}</small>`)+c(o.f<o.need,` Food <b>${o.f}</b><small> (eat ${o.need})</small>`)+c(false,` Wood <b>${o.w}</b>`)+c(o.low<=3,`♥ Life <b>${o.low}</b>`)+(o.sh?c(false,' Shelter'):c(true,'No shelter'))}
+  const sv=d=>`<svg class="rci" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">${d}</svg>`;
+  const c=(bad,ic,t,lab)=>`<span class="${bad?'bad':''}" title="${lab}" aria-label="${lab}">${sv(ic)}${t}</span>`;
+  return c(false,'<circle cx="12" cy="12" r="4.2"/><path d="M12 2.5v2.6M12 18.9v2.6M2.5 12h2.6M18.9 12h2.6M5.3 5.3l1.8 1.8M16.9 16.9l1.8 1.8M5.3 18.7l1.8-1.8M16.9 7.1l1.8-1.8"/>',`<b>${o.d}</b><small>/${o.r}</small>`,`Day ${o.d} of ${o.r}`)
+   +c(o.f<o.need,'<path d="M7 9c0-3 2.4-4.6 5-4.6S17 6 17 9c0 3.2-1.2 5.2-2.3 6.3-.5.5-.7 1.1-.7 1.9v1.8h-4v-1.8c0-.8-.2-1.4-.7-1.9C8.2 14.2 7 12.2 7 9z"/><path d="M12 4.400V2.5"/>',`<b>${o.f}</b><small>eat ${o.need}</small>`,`Food ${o.f}, the camp eats ${o.need} a night`)
+   +c(false,'<path d="M4 8c0-1.7 1.3-3 3-3h10c1.7 0 3 1.3 3 3s-1.3 3-3 3H7c-1.7 0-3-1.3-3-3z"/><path d="M4 16c0-1.7 1.3-3 3-3h10c1.7 0 3 1.3 3 3s-1.3 3-3 3H7c-1.7 0-3-1.3-3-3z"/>',`<b>${o.w}</b>`,`Wood ${o.w}`)
+   +c(o.low<=3,'<path d="M12 20.500s-8-4.7-8-10.500C4 7 6.2 5 8.7 5c1.5 0 2.6.7 3.3 1.800C12.7 5.7 13.8 5 15.3 5 17.8 5 20 7 20 10c0 5.8-8 10.5-8 10.500z"/>',`<b>${o.low}</b>`,`Life of the weakest castaway: ${o.low}`)
+   +c(!o.sh,'<path d="M3 20h18M12 4 4.5 20M12 4l7.5 16M9.5 20l2.5-6 2.5 6"/>','',o.sh?'Shelter built':'No shelter: everyone is hurt each night')}
 BF.paint=function(){if(G&&R.dataset.scen!==G.scen)R.dataset.scen=G.scen;const rs=q('#bfres');if(rs&&G){const h=resStrip();if(rs.dataset.h!==h){rs.dataset.h=h;rs.innerHTML=h}}const lb=q('#phlabel');if(!lb||!BF.on)return;const s=BF.status();const bn=turnBanner();const key=bn[0]+'|'+bn[1]+'|'+s;if(lb.dataset.k===key)return;lb.dataset.k=key;
   lb.innerHTML=(bn[1]?`<small class="bfb ${bn[0]}">${E(bn[1])}</small>`:'')+`<span class="bft">${E(s)}</span>`};
 // ---------- the tray: your pawns and one big button ----------
@@ -7868,8 +7885,8 @@ function trayHtml(st){
     const nextL=b.kind==='daysum'&&!last?`Start day ${b.data.round+1} ▶`:last?(G.over?'See how it ended ▶':'Plan the day ▶'):'Continue ▶';
     return `<div class="bf-main"><button class="gx-ibtn bf-s ${UI.auto?'on':''}" data-a="auto" aria-pressed="${!!UI.auto}" aria-label="Play by itself">⏩</button><button class="btn go" data-a="next">${nextL}</button>${i<UI.beats.length-2?'<button class="gx-ibtn bf-s" data-a="skip" aria-label="Skip ahead">⏭</button>':''}</div>`}
   if(st==='plan'||st==='plan2'){const cur=curPawn();const pb=planProblems();
-    if(UI.confirm&&planOpen())return `<div class="bf-main"><button class="gx-ibtn bf-s" data-a="suggest" aria-label="Plan it for me" title="Plan it for me"></button><button class="btn ghost" data-a="goback">Go back</button><button class="btn go" data-a="go" data-force="1">Start anyway ▶</button></div>`;
-    return `<div class="pawnrow bf-pw" aria-label="Your pawns">${(()=>{const bd=badActs();return wizPawns().map(p=>tokHtml(p,cur,bd)).join('')})()}</div><div class="bf-main"><button class="gx-ibtn bf-s" data-a="suggest" aria-label="Plan it for me" title="Plan it for me"></button><button class="btn go ${pb.length?'dim':''}" data-a="go">Start day ▶</button></div>`}
+    if(UI.confirm&&planOpen())return `<div class="bf-main"><button class="gx-ibtn bf-s" data-a="suggest" aria-label="Plan it for me" title="Plan it for me"><svg viewBox="0 0 24 24" width="26" height="26" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 19 16 8M14 6l4 4M19 3v3M17.5 4.500h3M7 4v2.500M5.8 5.200h2.4"/></svg></button><button class="btn ghost" data-a="goback">Go back</button><button class="btn go" data-a="go" data-force="1">Start anyway ▶</button></div>`;
+    return `<div class="pawnrow bf-pw" aria-label="Your pawns">${(()=>{const bd=badActs();return wizPawns().map(p=>tokHtml(p,cur,bd)).join('')})()}</div><div class="bf-main"><button class="gx-ibtn bf-s" data-a="suggest" aria-label="Plan it for me" title="Plan it for me"><svg viewBox="0 0 24 24" width="26" height="26" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 19 16 8M14 6l4 4M19 3v3M17.5 4.500h3M7 4v2.500M5.8 5.200h2.4"/></svg></button><button class="btn go ${pb.length?'dim':''}" data-a="go">Start day ▶</button></div>`}
   if(allAI()&&!G.over)return `<div class="bf-main"><button class="gx-ibtn bf-s" data-a="pause" aria-label="Pause">${UI.pause?'▶':'⏸'}</button><button class="gx-ibtn bf-s" data-a="speed" aria-label="Speed">⏩</button></div>`;
   return ''}
 // ---------- chips on the island: the plan, then the day's jobs ----------

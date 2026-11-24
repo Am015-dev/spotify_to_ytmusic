@@ -113,7 +113,9 @@ function renderMenu() {
   let sp = ''; try { sp = window.PerfHUD && PerfHUD.buttonsHTML ? PerfHUD.buttonsHTML('btn alt') : ''; } catch (e) { }
   row('Info', h('button.btn.alt', { 'data-a': 'rules', type: 'button' }, 'How to play'), h('button.btn.alt', { 'data-a': 'drawer', 'data-v': 'logd', type: 'button' }, 'Log'), h('button.btn.alt', { 'data-a': 'drawer', 'data-v': 'refd', type: 'button' }, 'Chips and cards'), h('span.tinyc', { html: sp }));
   b.appendChild(h('p.sm', 'Cauldron Fair is an original game.'));
+  b.appendChild(h('p.menunote#menunote', { role: 'status' }, UI.menuNote || ''));
 }
+function menuNote(t) { UI.menuNote = t; const n = $('#menunote'); if (n) n.textContent = t; say(t); }   // the toast sits behind an open window, so Save / Load answer inside it
 // ---------- start screens: painted title -> setup (character cards) / online ----------
 const SETCHOICES = [[1, 'Beginner set', 'Easiest to learn. Best for a first game.'], [2, 'Set 2', 'Safe harbour, side pockets, double steps.'], [3, 'Set 3', 'Lucky sevens, pod pushers, roomier pots.'], [4, 'Set 4', 'Ruby treasure, upgrades, stretching roots.'], ['random', 'Random mix', 'Every colour gets a random set 1 to 4.']];
 function optObj() { const o = UI.opt = UI.opt || Object.assign({}, DEF, { seats: DEF.seats.slice(), lvBy: Object.assign({}, DEF.lvBy) }); o.np = o.seats.length + 1; return o; }
@@ -269,8 +271,8 @@ document.addEventListener('click', ev => {
     case 'mprev': musicPreview(d.s); renderMusic(); break;
     case 'mprevx': musicPreviewStop(); renderMusic(); break;
     case 'mmus': UI.prefs.music = UI.prefs.music === false; savePrefs(); try { if (window.GA) GA.setMusic(UI.prefs.music); } catch (x) { } MUS.want = null; sndMusic(); renderMusic(); break;
-    case 'save': say(save() ? 'Game saved.' : 'Could not save.'); break;
-    case 'loadsave': if (!loadSave()) say('No saved game.'); break;
+    case 'save': menuNote(save() ? 'Game saved.' : 'Could not save.'); break;
+    case 'loadsave': UI.menuNote = ''; if (!loadSave()) menuNote('No saved game.'); break;
     case 'speed': AIDELAY = +d.v; savePrefs(); renderMenu(); break;
     case 'sound': UI.prefs.sound = !UI.prefs.sound; savePrefs(); try { if (window.GA) GA.setSfx(UI.prefs.sound); } catch (e) { } renderMenu(); break;
     case 'music': UI.prefs.music = !UI.prefs.music; savePrefs(); try { if (window.GA) GA.setMusic(UI.prefs.music); } catch (e) { } sndMusic(); renderMenu(); break;
