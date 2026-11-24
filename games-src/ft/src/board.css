@@ -478,3 +478,13 @@ html.g3d .own.cam{background-size:44px}
 #clegend{white-space:nowrap;background:rgba(40,24,10,.92);color:#fff6dc;padding:4px 10px;font-weight:700;font-size:13px}
 #cnote.on,#clegend.on{opacity:1;visibility:visible}
 @media (prefers-reduced-motion:reduce){.tile.cflash{animation:none!important}}
+
+/* Claims, phone-clear (owner report 24 Nov): solid owner ribbon on every claimed tile, strong tint + outline, persistent legend with counts */
+.tile.owned{border-width:4px;box-shadow:inset 0 0 0 2px #fff,inset 0 0 0 60px color-mix(in srgb,var(--oc) 42%,transparent),0 0 0 2px var(--oc)}
+.tile .ob{position:absolute;left:0;right:0;top:0;z-index:5;display:block;height:20px;line-height:20px;text-align:center;background:var(--pc);color:#fff;font:900 13px/20px var(--ff-b,system-ui);letter-spacing:.04em;border-bottom:2px solid #fff;white-space:nowrap;overflow:hidden;pointer-events:none;text-shadow:0 1px 1px rgba(0,0,0,.5)}
+.tile .own{width:34px;height:34px}
+#cleg{display:flex;flex-wrap:wrap;gap:4px;justify-content:center;align-items:center;padding:3px 4px;pointer-events:none;font:800 13px/1.2 var(--ff-b,system-ui);color:#2e1a0a}
+#cleg .lc{display:inline-flex;align-items:center;gap:4px;min-height:26px;padding:0 8px;border-radius:13px;background:#fff6dc;border:3px solid var(--pc)}
+#cleg .lc i{font-style:normal;display:inline-grid;place-items:center;width:22px;height:22px;border-radius:50%;background:var(--pc);font-size:13px}
+#cleg .ln{border-color:#8a5a1e;font-weight:700}
+html .tile.owned .tv{top:23px!important;right:3px!important}
