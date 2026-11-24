@@ -123,7 +123,7 @@ function tableGeo() {
   // R5: a short phone table with 3-4 rivals: every rival in one top row and the trick in two rows under them (each card below its player, yours
   // centred beneath), so no seat ever sits on the trick and the cards stay big enough to read
   const line = !side && small && drone < 0 && (k === 3 || k === 4);
-  const wideT = side && W >= 1100, seatW = side ? (wideT ? 190 : 132) : (line ? Math.floor((W - 12 - 6 * (k - 1)) / k) : row3 ? Math.min(300, Math.floor((W - 16 - 12) / 3)) : Math.round(Math.min(100, W * .26))), seatH = side ? (wideT ? 112 : 76) : (line ? Math.max(84, UI.lineSeatH || 0) : row3 ? (ph ? 150 : 118) : (small ? 100 : 116));
+  const wideT = side && W >= 1100, seatW = side ? (wideT ? (W >= 1300 ? 240 : 190) : 132) : (line ? Math.floor((W - 12 - 6 * (k - 1)) / k) : row3 ? Math.min(300, Math.floor((W - 16 - 12) / 3)) : Math.round(Math.min(100, W * .26))), seatH = side ? (wideT ? (W >= 1300 ? 132 : 112) : 76) : (line ? Math.max(84, UI.lineSeatH || 0) : row3 ? (ph ? 150 : 118) : (small ? 100 : 116));
   const y0 = 4 + (boss ? (small || side ? 34 : 40) : 0), bottom = side ? 52 : (line ? 30 : 54);
   const geo = { W, H, k, side, small, compact, seatW, seatH, av, jr, boss, row3, line, seats: [], slots: [] };
   const dw = Math.max(30, Math.min(small ? 38 : (ph ? 46 : 58), Math.floor((side ? Math.min(W * .4, 340) : W - 16) / 7) - 4)), droneW = side ? Math.min(W * .42, 340) : W - 8;
