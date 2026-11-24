@@ -1,4 +1,4 @@
-# INT22 critic gate, 24 Nov 2026, ~18:25 UTC
+# INT22 critic gate, 24 Nov 2026, 18:14 UTC
 Rows R1 Readability / R2 Game-not-spreadsheet / R3 Layout / R4 Finish / R5 First-minute. Gate: every row >= 7 on phone AND pc. Unsure = 6.
 Sheets: games-src/thornbound/proof/int22-*-sheet.jpg, games-src/carc/proof/int22-*-sheet.jpg (flags beside them).
 
