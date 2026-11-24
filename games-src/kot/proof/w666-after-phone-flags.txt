@@ -1,0 +1,2 @@
+menu: Error: GXS.wait timed out: function () { return humanTurn() && G.phase === 'roll 
+cc-art:  clipped "👑"
