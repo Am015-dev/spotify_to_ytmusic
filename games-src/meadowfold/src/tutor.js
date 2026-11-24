@@ -60,7 +60,7 @@ function tutMapDraw() {
     var b = document.createElement('button'); b.type = 'button'; b.className = 'tlab'; b.textContent = t.m[1]; b.dataset.k = t.m[0]; o.appendChild(b);
     var bw = b.offsetWidth, bh = b.offsetHeight, r = t.r, cx = (r.left + r.right) / 2, cy = (r.top + r.bottom) / 2, best = null;
     var big = r.width > W * .45 || r.height > H * .35;
-    var pts = big ? [[cx - bw / 2, cy - bh / 2], [cx - bw / 2, r.top + 8], [r.left + 8, cy - bh / 2], [cx - bw / 2, r.bottom - bh - 8]] : [];
+    var pts = big ? [[cx - bw / 2, r.bottom - bh - 8], [cx - bw / 2, cy - bh / 2], [cx - bw / 2, r.top + 8], [r.left + 8, cy - bh / 2]] : [];   // big targets: label at their bottom edge, leaving the middle free for the lesson window
     for (var d = 10; d <= 150; d += 14) pts.push([cx - bw / 2, r.bottom + d], [cx - bw / 2, r.top - d - bh], [r.left - d - bw, cy - bh / 2], [r.right + d, cy - bh / 2], [r.left - d - bw, r.bottom + d], [r.right + d, r.bottom + d], [r.left - bw, r.top - d - bh], [r.right, r.top - d - bh]);
     pts.forEach(function (p, i) {
       var x = Math.max(4, Math.min(W - bw - 4, p[0])), y = Math.max(4, Math.min(H - bh - 4, p[1])), box = { left: x, top: y, right: x + bw, bottom: y + bh }, sc = i * .01;
