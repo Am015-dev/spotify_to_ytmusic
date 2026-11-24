@@ -314,3 +314,6 @@ Live fix: original-name phrase removed from shelf blurb + sands page (15:2x).
 ## W740 onyx-atelier visual fix (24 Nov)
 Done: tutorial part names now a tidy list inside the guide window, ONE callout on the board for the picked part (no chip cloud); PC (>=1000px) grid layout: board left (cell up to 112px), rival/jewels/you stacked right; guide never sits on the PC board.
 Weak: PC guide window still covers the rival jewel rows on lesson 1; HUD pips and phone start menu not changed. Sheets: onyx-atelier/proof/w740-*-sheet.jpg. Integrator: build.py then copy onyx-atelier.html to games/onyx-atelier/index.html (not in build-all).
+## W747 (end screens, perch-and-plume / vale-of-banners / stitchwise)
+Done: headline + score + max 3 highlights + Play again/Menu, stats behind a Details toggle. Scenarios: pp-result, vb-result, sw-result (checks updated). Proof: <game>/proof/endscreen-{phone,pc}.png.
+Still weak: build-all --quick fails on pre-existing issues (11px "Forest" in perch, missing vale/stitchwise baselines). Perch/vale have no winner-portrait art for AI wins beyond seat face/initial; stitchwise lose-case not shot. No lose-variant scenarios yet.

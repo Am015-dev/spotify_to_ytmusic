@@ -38,6 +38,6 @@
   GXS.add({
     id: 'vb-result', name: 'Result: scores', ask: 'Can you read the final scores?', seed: 3, when: booted,
     setup: function () { begin({ seed: 3 }); UI.forceEnd(); return new Promise(function (r) { setTimeout(r, 400); }); },
-    checks: [{ kind: 'visible', sel: '#again', name: 'Play again' }, { kind: 'visible', sel: '#rs table', name: 'score table' }]
+    checks: [{ kind: 'visible', sel: '#again', name: 'Play again' }, { kind: 'visible', sel: '#rs .hbig', name: 'big score' }, { kind: 'visible', sel: '#rs .hl li', name: 'a highlight' }, { kind: 'visible', sel: '#rs details summary', name: 'Details toggle' }, { kind: 'visible', sel: '#titleB', name: 'Menu' }]
   });
 })();
