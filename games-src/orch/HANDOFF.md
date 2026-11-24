@@ -82,3 +82,4 @@ NEXT: owner's play feedback -> route per game (workers: Sonnet specified, Opus d
 
 ## 15:15 UTC CHEAPAG FIXED
 Env "Alex" setup script installs cheap-agent, writes /root/.config/cheapag/config.json (provider local = api.anthropic.com/v1, claude-haiku-5-5, key env ANT), `claude mcp add -s user cheapag -- cheapag`, `cheapag allow` in the repo. Proven 15:13: delegate OK, test pass, $0.05, 6 turns. Every brief now says: all code via mcp__cheapag__delegate (BRIEF-TEMPLATE.md). Workers launched 14:56 (W698-W702, W704) predate it. Trial B8 session_01RR7mnXzBvG1gr4TqyAmew6 checks a fresh worker loads the tools.
+15:20 UTC: fresh workers get cheapag connected but tools not callable (B8). Fix: games-src/scripts/cag.js calls the cheapag MCP server from Bash; proven OK. Brief rule updated.
