@@ -91,7 +91,9 @@ document.addEventListener('click',e=>{
    case 'savenow':saveGame();toast('Saved. You can continue from the start screen.');try{t.textContent='Saved ✓';t.setAttribute('aria-live','polite');clearTimeout(t._sv);t._sv=setTimeout(()=>{t.textContent='Save now'},2200)}catch(e){}break;
    case 'newgame':GX.close();showStart();break;
    case 'spd':UI.speed=+t.dataset.v;renderMenu();break;
-   case 'logall':UI.logAll=!UI.logAll;renderLog();break;
+    case 'logall':UI.logAll=!UI.logAll;renderLog();break;
+    case 'lessons':if(typeof GX!=='undefined'&&GX.close)GX.close();GXST.picker();break;
+
   }});
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&UI.pop&&!GX.open){closePop();e.preventDefault()}});
 function toast(t){UI.toast=t;const l=$('#live');if(l)l.textContent=t}
@@ -111,7 +113,7 @@ function renderSideLog(){const el=$('#sidelog');if(!el)return;if(!UI.desk||!G||!
 function renderMenu(){const el=$('#setbody');if(!el)return;
   const seg=(a,cur,opts)=>'<div class="seg">'+opts.map(([v,l])=>'<button class="'+(String(cur)===String(v)?'on':'')+'" data-a="'+a+'" data-v="'+v+'">'+l+'</button>').join('')+'</div>';
   el.innerHTML=(NET.on?'<div class="mrow"><button class="btn pri" data-a="netopen">Online lobby</button>'+(isHost()?'<button class="btn" data-a="newgame">Change setup</button>':'')+'<button class="btn" data-a="netleave">Leave the room</button></div>':'<div class="mrow"><button class="btn pri" data-a="newgame">New game / main menu</button><button class="btn" data-a="savenow">Save now</button></div>')+
-   (typeof tutBtn==='function'?'<div class="mrow">'+tutBtn('btn')+'</div>':'')+'<div class="mrow"><span>Hints</span>'+seg('gdset',UI.guide,[['full','On'],['light','Light'],['off','Off']])+'</div>'+
+       (typeof tutBtn==='function'?'<div class="mrow">'+tutBtn('btn')+'</div>':'')+(typeof GXST!=='undefined'?'<div class="mrow"><button class="btn" data-a="lessons">Lessons: learn by playing</button></div>':'')+'<div class="mrow"><span>Hints</span>'+seg('gdset',UI.guide,[['full','On'],['light','Light'],['off','Off']])+'</div>'+
    (typeof hlpInit==='function'&&(hlpInit(),typeof GXH!=='undefined')?GXH.settingsHTML({rowClass:'mrow',btnClass:'btn'}):'')+
    '<div class="mrow"><span>Computer speed</span>'+seg('spd',UI.speed,[[1,'x1'],[2,'x2'],[4,'x4']])+'</div>'+
    '<div class="mrow"><span>Sound</span><button class="btn" data-a="snd" aria-pressed="'+UI.sound+'">'+(UI.sound?'On':'Off')+'</button><span>Music</span><button class="btn" data-a="mus" aria-pressed="'+UI.music+'">'+(UI.music?'On':'Off')+'</button><button class="btn" data-a="music">Pick the songs…</button></div>'+
