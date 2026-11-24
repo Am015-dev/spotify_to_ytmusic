@@ -59,8 +59,8 @@ button:focus-visible, [tabindex]:focus-visible { outline: 3px solid var(--gold);
 .slotn { font: 700 13px var(--sans); fill: var(--grout); text-anchor: middle; dominant-baseline: central; pointer-events: none; }
 .slothit { fill: transparent; }
 .city .disc { stroke: var(--grout); stroke-width: 3; }
-.city .lab { font: 700 13px var(--sans); fill: var(--ink); paint-order: stroke; stroke: rgba(241,233,218,.92); stroke-width: 4px; text-anchor: middle; pointer-events: none; }
-.city .cap { font: 700 16px var(--serif); }
+.city .lab { font: 700 calc(12px * var(--k, 1)) var(--sans); fill: var(--ink); paint-order: stroke; stroke: rgba(241,233,218,.92); stroke-width: calc(4px * var(--k, 1)); text-anchor: middle; pointer-events: none; }
+.city .cap { font: 700 calc(15px * var(--k, 1)) var(--serif); }
 .city.glow .ring { stroke: var(--gold); stroke-width: 5; fill: none; }
 .city.sel .ring { stroke: #fff; stroke-width: 5; fill: none; }
 .city .hit { fill: transparent; }
@@ -68,7 +68,7 @@ button:focus-visible, [tabindex]:focus-visible { outline: 3px solid var(--gold);
 .cost rect { fill: var(--marble); stroke: var(--grout); stroke-width: 2; }
 .cost text { font: 700 13px var(--sans); fill: var(--ink); text-anchor: middle; dominant-baseline: central; }
 .house { stroke: var(--grout); stroke-width: 1.5; }
-.prov .pl { font: 700 14px var(--serif); fill: rgba(43,32,24,.78); text-anchor: middle; letter-spacing: .05em; pointer-events: none; paint-order: stroke; stroke: rgba(241,233,218,.55); stroke-width: 3px; }
+.prov .pl { font: 700 calc(12px * var(--k, 1)) var(--serif); fill: rgba(43,32,24,.78); text-anchor: middle; letter-spacing: .05em; pointer-events: none; paint-order: stroke; stroke: rgba(241,233,218,.55); stroke-width: 3px; }
 .prov .mk { stroke: var(--grout); stroke-width: 2.5; }
 .prov .mkring { fill: none; }
 .prov.glow .mkring { stroke: var(--gold); stroke-width: 5; fill: none; }
@@ -224,6 +224,21 @@ button:focus-visible, [tabindex]:focus-visible { outline: 3px solid var(--gold);
 }
 
 
+/* guide and result bubbles: text sits next to its target with an arrow touching it */
+.bub { position: fixed; z-index: 46; left: 0; top: 0; max-width: 260px; padding: 9px 12px; border-radius: 12px; background: #fff8ec; color: var(--ink); border: 2px solid var(--gold); --bc: var(--gold); font: 700 16px/1.2 var(--sans); box-shadow: 0 4px 14px rgba(0,0,0,.4); pointer-events: none; opacity: 0; visibility: hidden; transition: opacity .15s; }
+.bub.on { opacity: 1; visibility: visible; }
+.bub.res { background: #2b2018; color: #fff8ec; border-color: #f1e9da; --bc: #f1e9da; z-index: 47; font-weight: 600; }
+.bub::after { content: ''; position: absolute; width: 0; height: 0; border: 10px solid transparent; }
+.bub.top::after { left: calc(var(--ax, 20px) - 10px); top: 100%; border-top-color: var(--bc); border-bottom-width: 0; }
+.bub.bottom::after { left: calc(var(--ax, 20px) - 10px); bottom: 100%; border-bottom-color: var(--bc); border-top-width: 0; }
+.bub.left::after { top: calc(var(--ay, 20px) - 10px); left: 100%; border-left-color: var(--bc); border-right-width: 0; }
+.bub.right::after { top: calc(var(--ay, 20px) - 10px); right: 100%; border-right-color: var(--bc); border-left-width: 0; }
+#prompt.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+@media (min-width: 1024px) { .bub { max-width: 320px; font-size: 17px; } }
+.city .ring, .city .disc, .city > use, .city .house { transform: scale(var(--ms, 1)); }
+.bub .sub { font-weight: 400; font-size: 14px; margin-top: 3px; opacity: .85; }
+#map.far .prov .pl { display: none; }
+
 </style>
 </head>
 <body>
@@ -252,6 +267,8 @@ button:focus-visible, [tabindex]:focus-visible { outline: 3px solid var(--gold);
 <div id="drawer" class="ov dr" role="dialog" aria-label="Info" hidden></div>
 <div id="fx" aria-hidden="true"></div>
 <div id="finger" aria-hidden="true"></div>
+<div id="gbub" class="bub" aria-hidden="true"></div>
+<div id="note" class="bub res" aria-hidden="true"></div>
 <svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs id="icondefs"></defs></svg>
 <script>
 /* GX scenarios: "spawn the requirement only". Open any game with  ?scn=<id>  and it skips menus / tutorial offers, seeds the RNG,
@@ -1535,7 +1552,7 @@ function renderMap() {
       var x, y;
       if (col.at.r != null) { x = GEO[col.at.r].mx; y = GEO[col.at.r].my; }
       else { var cc = VT.CITY[col.at.c], n = inCity[col.at.c] = (inCity[col.at.c] || 0) + 1, a = -Math.PI / 2 + n * 1.25; x = cc.x + Math.cos(a) * 30; y = cc.y + Math.sin(a) * 30; }
-      var isT = tg.col[pi + ':' + k], g = el('g', { 'class': 'col' + (isT ? ' glow' : '') + (UI.selCol === k && pi === VT.sideToAct(G) ? ' sel' : ''), transform: 'translate(' + x + ' ' + y + ')' }, L.cols);
+      var isT = tg.col[pi + ':' + k], g = el('g', { 'data-pk': pi + ':' + k, 'class': 'col' + (isT ? ' glow' : '') + (UI.selCol === k && pi === VT.sideToAct(G) ? ' sel' : ''), transform: 'translate(' + x + ' ' + y + ')' }, L.cols);
       el('circle', { 'class': 'halo', r: 15, fill: 'rgba(0,0,0,0)' }, g);
       el('circle', { r: 11.5, fill: PCOL[pi], stroke: '#f1e9da', 'stroke-width': 2.5 }, g);
       el('use', { href: '#i-' + (col.t === 'L' ? 'meeple' : 'ship'), x: -8, y: -8, width: 16, height: 16, fill: '#fff' }, g);
@@ -1584,13 +1601,28 @@ function growHits(k) {
     else { var w = Math.max(96, 62 * k), h = Math.max(64, 50 * k); e.setAttribute('x', (-w / 2).toFixed(1)); e.setAttribute('y', (-38 - (h - 64) / 2).toFixed(1)); e.setAttribute('width', w.toFixed(1)); e.setAttribute('height', h.toFixed(1)); }
   });
 }
+// labels keep a constant size on screen (>= 12px) at every zoom; one that would sit on another label is hidden until you zoom in
+function labelScale(k) {
+  $('#map').style.setProperty('--k', k.toFixed(3));
+  var labs = Array.prototype.slice.call(document.querySelectorAll('#map .city .lab')), box = [];
+  var ms = Math.max(1, Math.min(2.2, k * 0.75)); $('#map').style.setProperty('--ms', ms.toFixed(2));   // city markers grow when the whole map is in view
+  labs.forEach(function (t) { var cap = t.classList.contains('cap'); t.setAttribute('y', ((cap ? 24 : 20) * ms + 3 + (cap ? 15 : 12) * k * 0.85).toFixed(1)); t.style.visibility = ''; });
+  labs.sort(function (a, b) { var ga = a.parentNode.classList.contains('glow') ? 0 : a.classList.contains('cap') ? 1 : 2, gb = b.parentNode.classList.contains('glow') ? 0 : b.classList.contains('cap') ? 1 : 2; return ga - gb; });
+  var discs = Array.prototype.slice.call(document.querySelectorAll('#map .city .ring')).map(function (d) { return { g: d.parentNode, r: d.getBoundingClientRect() }; });
+  $('#map').classList.toggle('far', k > 1.7);   // region names only once zoomed in
+  labs.forEach(function (t) {
+    var r = t.getBoundingClientRect(), hit = box.some(function (q) { return r.left < q.right + 2 && r.right > q.left - 2 && r.top < q.bottom && r.bottom > q.top; }) ||
+      discs.some(function (d) { return d.g !== t.parentNode && r.left < d.r.right && r.right > d.r.left && r.top < d.r.bottom && r.bottom > d.r.top; });
+    if (hit) t.style.visibility = 'hidden'; else box.push(r);
+  });
+}
 function setView(v, anim) {
   var bb = boardBox(), asp = bb.h / bb.w;
-  v.w = Math.max(260, Math.min(1100, v.w)); v.h = v.w * asp;
+  v.w = Math.max(260, Math.min(1200, v.w)); v.h = v.w * asp;
   // keep some of the map in view
   v.x = v.w >= VTART.W ? (VTART.W - v.w) / 2 : Math.max(0, Math.min(VTART.W - v.w, v.x)); v.y = v.h >= VTART.H ? (VTART.H - v.h) / 2 : Math.max(0, Math.min(VTART.H - v.h, v.y));   // the mosaic always fills the board
   UI.view = v;
-  growHits(v.w / bb.w);
+  growHits(v.w / bb.w); labelScale(v.w / bb.w);
   $('#map').setAttribute('viewBox', v.x.toFixed(1) + ' ' + v.y.toFixed(1) + ' ' + v.w.toFixed(1) + ' ' + v.h.toFixed(1));
 }
 function fitPoints(pts, pad, minW) {
@@ -1612,10 +1644,13 @@ function animView(to) {
 }
 function zoomBy(f, cx, cy) {
   var v = UI.view; if (!v) return; cx = cx == null ? v.x + v.w / 2 : cx; cy = cy == null ? v.y + v.h / 2 : cy;
-  var w = Math.max(260, Math.min(1100, v.w * f)), k = w / v.w;
+  var w = Math.max(260, Math.min(1200, v.w * f)), k = w / v.w;
   setView({ x: cx - (cx - v.x) * k, y: cy - (cy - v.y) * k, w: w });
 }
+// first view: the whole map, with a margin so the outer labels stay inside
+function fitMap() { animView({ x: -59, y: 0, w: 1100 }); }
 function homeView() {
+  fitMap(); return;
   var pts = [], p = G.pl[0];
   p.cols.forEach(function (c) { if (c.at) pts.push(c.at.r != null ? { x: GEO[c.at.r].mx, y: GEO[c.at.r].my } : VT.CITY[c.at.c]); });
   p.houses.forEach(function (cid) { pts.push(VT.CITY[cid]); });
@@ -1718,7 +1753,7 @@ function renderPrompt() {
   if (!G) return;
   if (G.phase !== 'play') { say('Game over'); acts([{ t: 'Scores', f: showResult }]); return; }
   var pi = VT.sideToAct(G);
-  if (!isHuman(pi) || UI.busy) { say(G.pl[pi].name + ' is playing…', true); acts([]); return; }
+  if (!isHuman(pi) || UI.busy) { say(G.pl[pi].name + ' is playing…', true); acts([]); UI.hint = null; showFinger(null); return; }
   var p = G.pl[pi], pd = G.pend, me = p.name === 'You' ? '' : p.name + ': ';
   computeHint();
   if (G.drop && G.drop.length) { say(me + 'Storehouse full: pick goods'); acts([]); openTake(); return; }
@@ -1784,20 +1819,21 @@ function onMapTap(e) {
   if (pd && pd.h === 'arch-move') {
     if (slot && UI.selCol != null) { var rid = slot.getAttribute('data-r'), k = UI.selCol; move({ t: 'mv', k: k, r: rid }); return; }
     if (colK != null) { UI.selCol = +colK === UI.selCol ? null : +colK; render(); if (UI.selCol != null) frameTargets(); return; }
-    banner(UI.selCol != null ? 'Tap a glowing stop on a line' : 'Tap your glowing cart or ship'); return;
+    banner(UI.selCol != null ? 'Tap a glowing stop on a line' : 'Tap your glowing cart or ship', UI.selCol != null ? '#map .slothit' : '#map .col.glow .colhit'); return;
   }
   if (pd && pd.h === 'arch-build' && city) { var cid = city.getAttribute('data-c'); if (VT.canBuild(G, pi, cid)) move({ t: 'build', c: cid }); else bump(city); return; }
   if (pd && pd.h === 'pref' && prov) { var p = prov.getAttribute('data-p'); if (G.prov[p].up) { UI.selProv = UI.selProv === p ? null : p; render(); } else bump(prov); return; }
   if (pd && pd.h === 'colo' && city) { var c2 = city.getAttribute('data-c'); var kinds = ['L', 'S'].filter(function (k) { return VT.canPlaceCol(G, pi, c2, k); }); if (!kinds.length) { bump(city); return; } if (kinds.length === 1) move({ t: 'place', c: c2, k: kinds[0] }); else openPlace(c2); return; }
   if (pd && pd.h === 'trib' && city && city.getAttribute('data-c') === D.CAPITAL) return;
-  if (pd && pd.h === 'arch-move' && !slot) { banner('Tap your glowing cart or ship'); return; }
+  if (pd && pd.h === 'arch-move' && !slot) { banner('Tap your glowing cart or ship', '#map .col.glow .colhit'); return; }
   if (city) showCityTip(city.getAttribute('data-c'));
 }
 function bump(node) { node.classList.add('popin'); setTimeout(function () { node.classList.remove('popin'); }, 450); sfx('no'); }
 function showCityTip(cid) {
   var c = VT.CITY[cid], st = G.city[cid];
-  if (cid === D.CAPITAL) { banner('Caput: carts and ships start here'); return; }
-  banner(c.n + ': ' + D.GOOD_NAME[st.g] + (st.h.length ? ', ' + word(st.h.length, 'house', 'houses') : ''));
+  var an = '#map .city[data-c="' + cid + '"] .disc';
+  if (cid === D.CAPITAL) { banner('Caput: carts and ships start here', an); return; }
+  banner(c.n + ': ' + D.GOOD_NAME[st.g] + (st.h.length ? ', ' + word(st.h.length, 'house', 'houses') : ''), an);
 }
 function onHandTap(e) {
   var b = e.target.closest('.cd'); if (!b || b.disabled || !G || G.phase !== 'play' || UI.busy) return;
@@ -1815,10 +1851,13 @@ document.addEventListener('click', function (e) {
 function snap() { return G.pl.map(function (p, i) { return { coins: p.coins, goods: Object.assign({}, p.goods), score: VT.score(G, i).total, houses: p.houses.length, hand: p.hand.length }; }); }
 function move(m) {
   if (!G || G.phase !== 'play') return;
-  var before = snap(), pi = VT.sideToAct(G), wasPend = G.pend && G.pend.h;
+  var before = snap(), pi = VT.sideToAct(G), wasPend = G.pend && G.pend.h, t0 = Date.now();
   try { VT.performMove(G, m); } catch (err) { console.warn(err.message); render(); return; }
   if (m.t !== 'mv') UI.selCol = null;
+  var human = isHuman(pi); if (human) UI.noteAt = noteAnchor(m, pi);
   afterMove(before, pi, m, wasPend);
+  if (human && !(UI._bt >= t0)) { var rt = resultText(m, pi, before); if (rt) banner(rt, UI.noteAt); }
+  UI.noteAt = null;
   if (G.pend && G.pend.h !== 'buy' && G.pend.h !== 'merc') closeSheet();
   if (!G.pend && !(G.drop && G.drop.length)) closeSheet();
   render(); save();
@@ -1826,6 +1865,32 @@ function move(m) {
   if (G.phase === 'end') { setTimeout(showResult, UI.fast ? 50 : 900); return; }
   if (!isHuman(VT.sideToAct(G))) setTimeout(runAI, UI.fast ? 30 : 450);
   else if (UI.mode === 'hot' && VT.sideToAct(G) !== pi) banner(G.pl[VT.sideToAct(G)].name + '’s turn');
+}
+// plain result of the player's own action, shown beside what changed
+function noteAnchor(m, pi) {
+  if (m.t === 'build' || m.t === 'place') return '#map .city[data-c="' + m.c + '"] .disc';
+  if (m.t === 'mv') return '#map .col[data-pk="' + pi + ':' + m.k + '"] circle:not(.halo)';
+  if (m.t === 'prov') return '#map .prov[data-p="' + m.p + '"] .mk';
+  if (m.t === 'play') return '#hand';
+  return '#store';
+}
+function resultText(m, pi, before) {
+  var p = G.pl[pi], after = snap()[pi], b = before[pi], dc = after.coins - b.coins, gs = [];
+  D.GOODS.forEach(function (g) { var d = after.goods[g] - b.goods[g]; if (d > 0) gs.push('+' + d + ' ' + D.GOOD_NAME[g]); });
+  var gain = gs.concat(dc > 0 ? ['+' + dc + ' coins'] : []).join(', ');
+  if (m.t === 'play') { UI.noteAt = '#store'; return 'Played ' + D.CARDS[G.lastPlayed].n + (gain ? ': ' + gain : ''); }
+  if (m.t === 'mv') { var s = G.pend && G.pend.h === 'arch-move' ? G.pend.steps : 0; return 'Moved. ' + (s > 0 ? word(s, 'step', 'steps') + ' left' : 'No steps left: build now'); }
+  if (m.t === 'mdone') { UI.noteAt = '#acts .btn'; return 'Done moving. Now build'; }
+  if (m.t === 'build') return 'House built in ' + VT.CITY[m.c].n + (after.score !== b.score ? ' (' + (after.score - b.score > 0 ? '+' : '') + (after.score - b.score) + ' points)' : '');
+  if (m.t === 'prov') return 'Region ruled' + (gain ? ': ' + gain : '');
+  if (m.t === 'pcoins') return 'Taxes collected' + (dc > 0 ? ': +' + dc + ' coins' : '');
+  if (m.t === 'ccoins') return 'Took ' + dc + ' coins';
+  if (m.t === 'trade') return 'Trade done' + (gain ? ': ' + gain : '');
+  if (m.t === 'take') return 'Stored 1 ' + D.GOOD_NAME[m.g];
+  if (m.t === 'place') return 'Placed in ' + VT.CITY[m.c].n;
+  if (m.t === 'copy') return 'Copied the rival’s card';
+  if (m.t === 'done') { UI.noteAt = '#race'; return 'Turn over'; }
+  return '';
 }
 // visible cause and effect: who got what, flying from where it was earned
 function afterMove(before, pi, m, wasPend) {
@@ -1857,7 +1922,12 @@ function flyTo(html, pi) {
 }
 function pulseScore(i, d) { var b = document.querySelector('[data-engine-score="' + i + '"]'); if (!b) return; b.parentNode.classList.add('popin'); setTimeout(function () { b.parentNode && b.parentNode.classList.remove('popin'); }, 500); }
 var bannerT = null;
-function banner(t) { var b = $('#banner'); b.textContent = t; b.classList.add('on'); clearTimeout(bannerT); bannerT = setTimeout(function () { b.classList.remove('on'); }, UI.fast ? 400 : 2200); }
+function banner(t, anchor) {
+  UI._bt = Date.now(); anchor = anchor || UI.noteAt || '#race';
+  if (anchor) { UI.noteAt = null; setTimeout(function () { if (!showNote(t, anchor)) plainBanner(t); }, 0); return; }
+  plainBanner(t);
+}
+function plainBanner(t) { var b = $('#banner'); b.textContent = t; b.classList.add('on'); clearTimeout(bannerT); bannerT = setTimeout(function () { b.classList.remove('on'); }, UI.fast ? 400 : 2200); }
 
 // ---------- the rival's turn: one step at a time, watchable ----------
 function runAI() {
@@ -1921,11 +1991,11 @@ function openMarket(buying) {
   $('#sheet').querySelectorAll('.mc .cd').forEach(function (b) {
     b.onclick = function () {
       var s = +b.getAttribute('data-s');
-      if (!buying) { banner(D.CARDS[G.disp[s]].n + ': ' + cardWhat(D.CARDS[G.disp[s]])); return; }
-      if (!VT.canBuyCard(G, pi, s, consul) || !G.pend || G.pend.left <= 0) { bump(b); banner('Need ' + needText(pi, s, consul)); return; }
+      if (!buying) { banner(D.CARDS[G.disp[s]].n + ': ' + cardWhat(D.CARDS[G.disp[s]]), b); return; }
+      if (!VT.canBuyCard(G, pi, s, consul) || !G.pend || G.pend.left <= 0) { bump(b); banner('Need ' + needText(pi, s, consul), b); return; }
       var nm = D.CARDS[G.disp[s]].n;
       move({ t: 'buy', s: s });
-      banner('Bought ' + nm + ': it is in your hand');
+      banner('Bought ' + nm + ': it is in your hand', '#hand');
       setTimeout(function () { var hd = $('#hand'); hd.scrollLeft = hd.scrollWidth; }, 60);
       if (G.pend && G.pend.h === 'buy' && isHuman(VT.sideToAct(G))) openMarket(true);
     };
@@ -2030,13 +2100,63 @@ function placeFinger() {
 }
 function showFinger(t) {
   var f = $('#finger');
-  if (!t) { f.classList.remove('on'); return; }
+  if (!t) { f.classList.remove('on'); hideBubble(); return; }
   var sc = t.closest && t.closest('#hand,.mrow'); if (sc) { var tr = t.getBoundingClientRect(), hr = sc.getBoundingClientRect(); if (tr.right > hr.right - 4 || tr.left < hr.left) sc.scrollLeft += tr.left - hr.left - (hr.width - tr.width) / 2; }
-  var r = t.getBoundingClientRect(); if (!r.width) { f.classList.remove('on'); return; }
+  var r = t.getBoundingClientRect(); if (!r.width) { f.classList.remove('on'); hideBubble(); return; }
+  showBubble(t);
   f.innerHTML = '<svg viewBox="0 0 24 24"><path d="M9 11V4.5a1.5 1.5 0 0 1 3 0V10l5.2 1.1c1 .2 1.7 1.2 1.5 2.2l-1 5.2A2 2 0 0 1 15.7 20H11a2 2 0 0 1-1.6-.8L5.5 14a1.4 1.4 0 0 1 2-1.9z" fill="#fff8ec" stroke="#2b2018" stroke-width="1.4" stroke-linejoin="round"/></svg>';
   f.style.left = (r.left + r.width / 2 - 8) + 'px'; f.style.top = (r.top + r.height / 2 - 2) + 'px';
   f.classList.remove('on'); void f.offsetWidth; f.classList.add('on');
 }
+
+// ---------- bubbles: the guide text and the result text sit next to their target, arrow touching it ----------
+function interactiveRects(skip) {
+  var out = [];
+  document.querySelectorAll('#hand .cd, #acts .btn, #sheet .cd, #sheet button, .zoom button, header .tb, #map .city.glow .hit, #map .colhit, #map .slothit, #map .prov.glow .hit').forEach(function (e) {
+    if (e === skip || (skip && (skip.contains(e) || e.contains(skip)))) return;
+    var r = e.getBoundingClientRect(); if (r.width && r.height) out.push(r);
+  });
+  return out;
+}
+function ovl(a, b) { var w = Math.min(a.right, b.right) - Math.max(a.left, b.left), h = Math.min(a.bottom, b.bottom) - Math.max(a.top, b.top); return w > 0 && h > 0 ? w * h : 0; }
+// put bubble b beside target t on the side with room; never over t (or other taps, if avoidable); returns the placed rect
+function placeBubble(b, t, extra) {
+  var W = window.innerWidth, H = window.innerHeight, M = 6, GAP = 8, tr = t.getBoundingClientRect();
+  b.style.left = '0px'; b.style.top = '0px'; b.style.maxWidth = Math.min(b.classList.contains('res') ? 240 : 270, W - 2 * M) + 'px';
+  var bw = b.offsetWidth, bh = b.offsetHeight, others = interactiveRects(t).concat(extra || []), tcx = tr.left + tr.width / 2, tcy = tr.top + tr.height / 2;
+  var cs = [
+    { s: 'top', x: tcx - bw / 2, y: tr.top - GAP - bh }, { s: 'bottom', x: tcx - bw / 2, y: tr.bottom + GAP },
+    { s: 'left', x: tr.left - GAP - bw, y: tcy - bh / 2 }, { s: 'right', x: tr.right + GAP, y: tcy - bh / 2 }];
+  var best = null;
+  cs.forEach(function (c, i) {
+    var x = Math.max(M, Math.min(W - bw - M, c.x)), y = Math.max(M, Math.min(H - bh - M, c.y)), r = { left: x, top: y, right: x + bw, bottom: y + bh };
+    var pen = ovl(r, tr) * 1000 + Math.abs(x - c.x) * (c.s === 'left' || c.s === 'right' ? 5000 : 3) + Math.abs(y - c.y) * (c.s === 'top' || c.s === 'bottom' ? 5000 : 3) + i;
+    others.forEach(function (o) { pen += ovl(r, o) * 4; });
+    if (!best || pen < best.pen) best = { pen: pen, s: c.s, x: x, y: y };
+  });
+  b.className = b.className.replace(/\s*\b(top|bottom|left|right)\b/g, '') + ' ' + best.s;
+  b.style.left = best.x.toFixed(1) + 'px'; b.style.top = best.y.toFixed(1) + 'px';
+  b.style.setProperty('--ax', Math.max(16, Math.min(bw - 16, tcx - best.x)).toFixed(1) + 'px'); b.style.setProperty('--ay', Math.max(16, Math.min(bh - 16, tcy - best.y)).toFixed(1) + 'px');
+  return { left: best.x, top: best.y, right: best.x + bw, bottom: best.y + bh };
+}
+function hideBubble() { var g = $('#gbub'); g.classList.remove('on'); $('#prompt').classList.remove('sr'); }
+function showBubble(t) {
+  var g = $('#gbub'), txt = $('#prompt').textContent;
+  if (!txt || !UI.learn || !UI.hints) { hideBubble(); return; }
+  g.textContent = txt; if (UI.tipFor && G && G.pend && G.pend.h === UI.tipFor.h) { var sp = document.createElement('div'); sp.className = 'sub'; sp.textContent = UI.tipFor.t; g.appendChild(sp); } var n = $('#note'), ex = n.classList.contains('on') ? [n.getBoundingClientRect()] : [];
+  placeBubble(g, t, ex); g.classList.add('on'); $('#prompt').classList.add('sr');
+}
+var noteT = null;
+function showNote(t, anchor) {
+  var n = $('#note'), a = anchor && (typeof anchor === 'string' ? document.querySelector(anchor) : anchor);
+  if (!a || !a.getBoundingClientRect().width) return false;
+  n.textContent = t; n.classList.remove('on'); var g = $('#gbub');
+  placeBubble(n, a, g.classList.contains('on') ? [g.getBoundingClientRect()] : []); n.classList.add('on');
+  clearTimeout(noteT); noteT = setTimeout(function () { n.classList.remove('on'); }, UI.fast ? 400 : 3200);
+  UI.lastNote = t; return true;
+}
+window.addEventListener('resize', function () { if (typeof placeFinger === 'function' && G) setTimeout(placeFinger, 50); });
+['#hand', '#sheet'].forEach(function (s) { var e = document.querySelector(s); if (e) e.addEventListener('scroll', function () { clearTimeout(UI._sct); UI._sct = setTimeout(function () { var t = UI.hints && UI.learn ? hintTarget() : null; if (t) showBubble(t); }, 60); }, true); });
 
 // ---------- sound (WebAudio, generated) ----------
 var AC = null;
@@ -2061,14 +2181,14 @@ function startGame(mode, o) {
   UI.sel = null; UI.selCol = null; UI.selProv = null; UI.busy = false; UI.tipsSeen = {};
   $('#start').hidden = true; $('#result').hidden = true; $('#drawer').hidden = true; closeSheet();
   buildMap(); setView({ x: 0, y: 0, w: VTART.W }); homeView(); render(); save();
-  if (UI.learn) { tip('Goal: most points at the end'); setTimeout(function () { if (G && G.turn < 3) banner('Tap a score to see the points'); }, 5200); }
+  if (UI.learn) { tip('Goal: most points at the end', '#race'); setTimeout(function () { if (G && G.turn < 3) banner('Tap a score to see the points', '#race'); }, 5200); }
   if (!isHuman(VT.sideToAct(G))) setTimeout(runAI, UI.fast ? 30 : 900);
 }
 // learn mode: one short line the first time each action comes up (8 words max)
 var TIPS = { 'arch-move': 'Steps = your carts and ships on the map', 'arch-build': 'Build next to your carts and ships', pref: 'Every house in the region makes one good', merc: 'Sell spare goods, buy what you need', buy: 'Each card adds points at the end', colo: 'More carts and ships, more steps', trib: 'Your played cards come back to hand', dipl: 'Use the rival’s last card as yours' };
-function tip(t) { if (!UI.learn) return; banner(t); }
+function tip(t, a) { if (!UI.learn) return; banner(t, a || '#acts .btn'); }
 var _rp = renderPrompt;
-renderPrompt = function () { _rp(); if (UI.learn && G && G.pend && isHuman(VT.sideToAct(G)) && !UI.busy && TIPS[G.pend.h] && !UI.tipsSeen[G.pend.h]) { UI.tipsSeen[G.pend.h] = 1; tip(TIPS[G.pend.h]); } };
+renderPrompt = function () { _rp(); if (UI.learn && G && G.pend && isHuman(VT.sideToAct(G)) && !UI.busy && TIPS[G.pend.h] && !UI.tipsSeen[G.pend.h]) { UI.tipsSeen[G.pend.h] = 1; UI.tipFor = { h: G.pend.h, t: TIPS[G.pend.h] }; setTimeout(function () { if (typeof placeFinger === 'function') placeFinger(); }, 40); } };
 
 // ---------- title ----------
 function showTitle() {

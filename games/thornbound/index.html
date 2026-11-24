@@ -659,6 +659,9 @@ html.ph.bf-w body #tbturn{flex-wrap:wrap;gap:3px 8px;height:auto;min-height:0;pa
 html.ph.bf-w body #tbturn .tbt-line,html.ph.bf-w body #tbturn .tbt-line.sm,html.ph.bf-w body #tbturn .tbt-line.xs{flex:1 1 100%;order:5;max-height:none;font-size:14px;line-height:1.15}
 html.ph.bf-w body #tbturn .tbt-chip{max-width:none;margin-right:auto}
 html.ph.bf-w body #tbturn .tbt-goal,html.ph.bf-w body #tbturn .tbt-skip2,html.ph.bf-w body #tbturn .tbt-info,html.ph.bf-w body #tbturn .tbt-skip{order:2}
+/* W618 audit B: solid backing behind the quick-rules paragraph and the speed-test button */
+.rules .quick p{background:#2a1838!important;color:#f6ecd2!important;background-image:none!important}
+#setbody [data-perfhud]{background:#3a2a4a;background-image:none;color:#fff}
 /* ===== GX skin: painted UI kit over the shared shell + campaign classes. Opt-in: nothing changes until gx-skin.js adds
    html.sk (after the kit files loaded). Kit files live in the game's media/ (ui-topbar, ui-iconbtn, ui-panel, ui-drawer-head,
    ui-button-cream/go/power, ui-row, ui-bubble, ui-node-*). Extra switches: html.sk-icons (icon-*.webp set), html.sk-map (story-map.webp),
@@ -7119,7 +7122,7 @@ document.addEventListener('click',e=>{
    case 'cback':try{localStorage.setItem('tb_back',t.dataset.v==='court'?'court':'default')}catch(x){}renderMenu();break;
    case 'mus':UI.music=!UI.music;try{localStorage.setItem('tb_mus',UI.music?'1':'0')}catch(x){}if(window.GA)GA.setMusic(UI.music);musicSync();renderMenu();break;
    case 'gfx':UI.lowGfx=!UI.lowGfx;try{localStorage.setItem('tb_gfx',UI.lowGfx?'low':'high')}catch(x){}UI.mapReset=true;renderAll();renderMenu();break;
-   case 'savenow':saveGame();toast('Saved. You can continue from the start screen.');break;
+   case 'savenow':saveGame();toast('Saved. You can continue from the start screen.');try{t.textContent='Saved ✓';t.setAttribute('aria-live','polite');clearTimeout(t._sv);t._sv=setTimeout(()=>{t.textContent='Save now'},2200)}catch(e){}break;
    case 'newgame':GX.close();showStart();break;
    case 'spd':UI.speed=+t.dataset.v;renderMenu();break;
    case 'logall':UI.logAll=!UI.logAll;renderLog();break;
