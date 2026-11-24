@@ -769,6 +769,7 @@ function pvRender() {
       const sp = spec(id), ptg = 'p:meadow:' + id, need = pvNeed(sp.cost, me.res);
       const st = qCard.has(id) ? ['ok', 'Tap to choose'] : okp.has(ptg) ? ['ok', 'Can build'] : need.length ? ['no', 'Need ' + need.join(', ')] : mine && availW(me) >= 0 && HB.cityCount(G, fs) >= 15 ? ['no', 'City is full'] : ['meh', mine ? 'Not now' : 'Affordable'];
       e.setAttribute('data-zoom', 'card:' + id); e.setAttribute('data-id', id); e.appendChild(pvFace(id, { state: st }));
+      if (st[0] === 'no') e.classList.add('cant');   // W763: unaffordable = dimmed card (pc hides the 'Need ...' line so the art shows)
       if (okp.has(ptg)) { e.classList.add('glow'); regTg(ptg, e); }
       else if (qCard.has(id)) { e.classList.add('glow'); regTg('q:' + qCard.get(id), e); qShown.add(qCard.get(id)); }
       else { e.setAttribute('data-a', 't'); e.setAttribute('data-t', 'x:m' + id); }
@@ -781,6 +782,7 @@ function pvRender() {
   mead.addEventListener('scroll', () => { UI.pvMx = mead.scrollLeft; }, { passive: true });
   // ---- city: 15 slots that fill with the cards' art
   const pCi = panel('city', 'My city'), vis = visitList();
+  if (!me.city.length && !vis.length) stage.classList.add('cityempty');   // W763: pc collapses the empty 15-slot grid to one line until the first card
   const city = h('div.strip.city'); pCi.appendChild(city);
   city.appendChild(h('div.pv-ch', h('b', (fs === viewSeat() ? 'My city' : pname(fs) + "'s city")), h('span', HB.cityCount(G, fs) + ' of 15 · ' + score(fs).total + ' points')));
   const grid = h('div.pv-grid.pv-scrolly'); city.appendChild(grid);

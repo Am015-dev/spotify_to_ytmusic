@@ -502,3 +502,22 @@ body:has(.nudge,.gxh-ring,#finger:not([hidden])) #bd.pv .pv-tab.hot::after{displ
 html:has(#bd.pv.tall) .gxst-card:not(.gxst-min){width:calc(100vw - 16px)}
 html:has(#bd.pv.tall) .gxst-card .gxst-say,html:has(#bd.pv.tall) .gxst-card .gxst-goal{margin:6px 12px 2px}
 html:has(#bd.pv.tall) .gxst-card .gxst-ft{padding:4px 10px 8px}
+/* ---- W763 (R15 critic): panels fit their content, icon-only resource piles, pc empty city collapses, readable pc goals ---- */
+#logd,#rivald{height:auto!important;min-height:min(220px,50dvh);bottom:auto;max-height:calc(100dvh - var(--gx-bar-h) - 24px)}
+#logd .gx-drawer-body,#rivald .gx-drawer-body{flex:0 1 auto}
+html.ph #logd,html.ph #rivald{top:auto;bottom:0;max-height:88dvh}
+#logbody .ll{font-size:16px;padding:8px 0}
+#bd.pv .resrow .rs .rsw{display:none}
+#bd.pv .resrow .rs>b,#bd.pv .resrow .pv-wn b{font-size:26px}
+#bd.pv .resrow .rs.zero>b{color:var(--pv-ink);opacity:.85}
+#bd.pv.wide .pv-goals b,#bd.pv.wide .pv-goals .pv-sub,#bd.pv.wide .pv-goals span{font-size:16px!important}
+#bd.pv.wide .pv-stage.cityempty{grid-template-rows:auto minmax(0,1fr)}
+#bd.pv.wide .pv-stage.cityempty .strip.city .pv-grid{display:none}
+#bd.pv.wide .pv-stage.cityempty .strip.city{flex:none}
+#bd.pv.wide .mc.cant .pvc-aff{display:none}
+#bd.pv.wide .mc.cant .pvc{filter:saturate(.7) brightness(.9)}
+#bd.pv.wide .pvc.small .pvc-ci b,#bd.pv.wide .pvc.small .pvc-w,#bd.pv.wide .pvc-pts .pvc-w,#bd.pv.wide .pvc.small .pvc-free{font-size:16px!important}
+html:not(.ph) .gx-bar #prompt{font-size:16px!important}
+html:not(.ph) .gx-bar .gxst-q{font-size:16px}
+html:not(.ph) #acts button,html:not(.ph) #acts button *{font-size:16px!important}
+html.ph .gx-bar .gxst-q{width:0;min-width:0;padding:0;border:0;overflow:hidden}   /* phone: no room in the bar; the shell moves Lessons to a floating pill in a free corner */

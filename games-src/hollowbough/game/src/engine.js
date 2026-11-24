@@ -226,7 +226,7 @@ function newGame(o) {
   const si = []; for (let i = 0; i < DATA.specialEvents.length; i++) si.push(i);
   shuffle(si); for (const i of si.slice(0, 4)) G.sev.push({ k: i, o: -1, tuck: [], hid: false, stock: newRes() });
   if (solo) G.grim = { diff: solo.difficulty, city: [], pts: 0, mb: [], fi: 0, bi: 4, ji: -1 };
-  lg(solo ? 'A solo game against ' + DATA.soloName + ' (' + DATA.soloLevels[solo.difficulty - 1] + ') begins.' : 'A game for ' + np + ' begins. ' + pn(0) + ' goes first.');
+  lg(solo ? 'A solo game against ' + DATA.soloName + ' (' + DATA.soloLevels[solo.difficulty - 1] + ') begins.' : 'A game for ' + np + ' begins. ' + pn(0) + (pn(0) === 'You' ? ' go first.' : ' goes first.'));
   const r = G; G = null; return r;
 }
 function withG(g, fn) { const prev = G; G = g; try { return fn(); } finally { G = prev; } }
