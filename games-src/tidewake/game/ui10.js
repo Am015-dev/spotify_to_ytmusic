@@ -88,6 +88,7 @@ setInterval(()=>{try{const s=TUTG.on&&TUTG.cur;if(!s||typeof GXT==='undefined')r
 // ---------------------------------------------------------------- start / leave
 function tutStart(o){if(NET.on||typeof GXT==='undefined')return;const pro=!!(o&&o.prologue);TUTG.prologue=pro;TUTG.seen=[];
   try{GX.close()}catch(e){}try{localStorage.setItem('tw_offered','1')}catch(e){}
+  if(typeof tutFloat==='function'&&tutFloat())return;
   tutBegin();
   const first=window.CAMPAIGN&&window.CAMPAIGN.chapters&&window.CAMPAIGN.chapters[0];
   GXT.start({game:TUT_GAME,story:false,steps:tutSteps(),live:tutLive,
@@ -101,7 +102,7 @@ function tutBegin(){const s=defaultSetup();s.mode='me';s.np=2;s.variant=null;s.n
   TUTG.base=UI.speed||1;TS.on=true;TUT=tutDice;UI.tut=1;TUTG.on=true;TUTG.starting=1;try{setSeed(TS.seed);setAiSeed(3)}catch(e){}
   try{startGame(s,{tutorial:true,first:TS.co,seed:TS.seed,names:['Vermilion','Cobalt']})}finally{TUTG.starting=0}
   TUTG.freeze=true;UI.guide='light';UI.confirm=null;try{GXH.hide()}catch(e){}render()}
-function tutLeave(){try{TSW.on=false;swRender()}catch(e){}if(TUTG.base){UI.speed=TUTG.base;try{TWKit.setSpeed(UI.speed)}catch(x){}TUTG.base=0}TUTG.on=false;TUTG.cur=null;TUTG.hold=false;TS.on=false;TUT=null;UI.tut=0;TUTG.freeze=false;clearTimeout(UI.tm);UI.gen++;UI.started=false;UI.busy=false;UI.sel=null;UI.sunk=[];UI.mph=null;
+function tutLeave(){try{GXF.close()}catch(e){}try{TSW.on=false;swRender()}catch(e){}if(TUTG.base){UI.speed=TUTG.base;try{TWKit.setSpeed(UI.speed)}catch(x){}TUTG.base=0}TUTG.on=false;TUTG.cur=null;TUTG.hold=false;TS.on=false;TUT=null;UI.tut=0;TUTG.freeze=false;clearTimeout(UI.tm);UI.gen++;UI.started=false;UI.busy=false;UI.sel=null;UI.sunk=[];UI.mph=null;
   try{GXH.hide()}catch(e){}try{kitReset()}catch(e){}try{PH.pop=null;PH.pd=null;PH.cur=null;phAfter()}catch(e){}}
 // Story is preceded by the guided game (the prologue) until it has been finished once
 function storyOpen(){if(typeof GXC==='undefined')return;if(typeof GXT!=='undefined'&&!NET.on&&!GXT.isDone(TUT_GAME))tutStart({prologue:true});else campOpen()}
