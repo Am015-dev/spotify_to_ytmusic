@@ -377,5 +377,25 @@ html body .gx-bar #hintT{padding:4px 8px!important;min-width:44px}
 @media (max-width:640px) and (orientation:portrait) and (max-height:700px){#prompt:has(.starwhy){-webkit-line-clamp:3}}
 html body .gx-sec .gx-row-l,html body .gx-sec .gx-row-l small{background:#f4ecd8!important;color:#1a1208!important;opacity:1!important;text-shadow:none!important}
 #goods .bestq,.och .oh span,.och .oh b{background:#1b1208!important;color:#fff4d8!important;opacity:1!important;text-shadow:none!important;border-radius:4px;padding:0 4px}
+/* W677 HUD: slim bar of round icon buttons + score chips in the bar; #opp is only the phase banner; details live in windows */
+#barstat{display:none}
+html body .gx-bar .gx-ibtn{width:44px;height:44px;min-width:44px;padding:0;border-radius:50%;flex:0 0 44px;justify-content:center}
+html body .gx-bar .gx-ibtn:not(#barchips) span{display:none}
+.gx-bar .gx-ibtn svg{width:24px;height:24px}
+html body .gx-bar #barchips{display:flex;gap:4px;flex:0 1 auto;min-width:0;width:auto;height:auto;border-radius:0;padding:0;background:none;border:0}
+#barchips .och{display:flex;flex-direction:row;align-items:center;min-height:44px;height:44px;padding:0 10px 0 8px;border-radius:22px;background:#1b1208;border:2px solid #8a6a3a;gap:6px}
+#barchips .och.now{border-color:#ffd23a}#barchips .och.lead{background:#4a3d10}
+#barchips .och .oh{display:flex;align-items:center;gap:6px;white-space:nowrap}
+#barchips .och .pts{font-size:18px!important;font-weight:900;background:none!important;padding:0!important}
+#barchips .och .lead{background:none!important;color:#ffd23a!important;padding:0!important;font-size:14px!important}
+#barchips .och .oh>b{font-size:14px!important;background:none!important;padding:0!important;max-width:9ch;overflow:hidden;text-overflow:ellipsis}
+@media (max-width:640px){#barchips .och .oh>b{display:none}#barchips .och{padding:0 8px;gap:4px}}
+@media (min-width:1000px){.gx-bar{gap:8px}}
+#opp{flex-direction:row}#opp #tt{flex:1 1 auto;min-height:40px;font-size:15px;font-weight:700;border-left:5px solid var(--sc,#c9a24a)}
+#opp #tt .ttw{border-left:0;padding-left:0;font-size:16px}
+@media (min-width:1000px){.rules,.rules li,.rules p,.rules b,.gx-row small,.gxc-act small,#opp #tt,#opp #tt span,#barchips .och .oh>b,#barchips .och .lead,.starwhy,.res .rw,#goods .gw,#goods .gn,.note,#prompt .starwhy{font-size:16px!important}}
+@media (min-width:1000px){html body .gx-drawer .gx-row-l small,html body .gxc-path .gxc-act small,html body .gx-drawer small{font-size:16px!important}}
+#barchips .och,#barchips .och .oh>b,#barchips .och .pts{color:#fff4d8!important}
+html body .gx-bar #barchips .och,html body .gx-bar #barchips .oh{display:flex!important}html body .gx-bar #barchips .ban,html body .gx-bar #barchips .pts,html body .gx-bar #barchips .lead{display:inline-block!important}
 </style>
 </head>
