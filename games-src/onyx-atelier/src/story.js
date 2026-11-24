@@ -36,7 +36,7 @@ var OST = (function () {
     UI.newGame(def.opponent.aiLevel, s.seed || ((Math.random() * 1e9) | 0), s.first || 0);
     if (prev != null) UI.LS('oa_level', prev);   // a chapter never changes the quick-game strength
     var G = U().G, i;
-    U().camp = { def: def, mine: 0, kept: 0, favUsed: 0 };
+    U().camp = { def: def, mine: 0, kept: 0, favUsed: 0 }; strip(true);
     for (i = 0; i < (s.favours || 0); i++) E.gainFav(G, 0);
     if (tw && tw.id === 'rival-gems') for (var n = 0, i = 0; i < 25 && n < tw.param; i++) { var t = G.board[i]; if (t && t !== 'o' && t !== 'p') { G.pl[1].t[t]++; G.board[i] = null; n++; } }
     if (tw && tw.id === 'rival-favours') for (i = 0; i < tw.param; i++) E.gainFav(G, 1);
@@ -51,9 +51,17 @@ var OST = (function () {
     return G;
   }
   // ---------- the floating objective card (never takes taps)
+  function strip(on) {   // reserve a strip under the bar for the goal card (inline, so layout() measures it at once)
+    var bar = document.getElementById('bar'); document.documentElement.classList.toggle('camp', on);
+    if (bar) { bar.style.flexBasis = on ? '88px' : ''; bar.style.paddingBottom = on ? '44px' : ''; }
+    var again = function () { if (U().G) UI.layout(); };   // again once any transition on the bar has finished
+    if (bar) bar.addEventListener('transitionend', again, { once: true }); setTimeout(again, 1500);
+  }
   function render() {
     var c = camp(), el = document.getElementById('obj');
-    if (!c || !U().G) { if (el) el.remove(); return; }
+    var root = document.documentElement, want = !!(c && U().G);
+    if (root.classList.contains('camp') !== want) { strip(want); if (U().G) UI.layout(); }
+    if (!want) { if (el) el.remove(); return; }
     if (!el) { el = document.createElement('div'); el.id = 'obj'; el.setAttribute('aria-live', 'polite'); document.body.appendChild(el); }
     var def = c.def, g = def.goal, m = metrics(U().G), n = D.chapters.findIndex(function (x) { return x.id === def.id; }) + 1, prog = '';
     if (g.type === 'custom' && g.key === 'turns') prog = 'Turn ' + Math.min(m.turns + 1, 99) + ' of ' + g.max;
@@ -61,13 +69,12 @@ var OST = (function () {
     else if (g.type === 'custom' && g.key === 'crownWin') prog = 'Crowns ' + m.crowns + ' of 10';
     else prog = 'Turn ' + (m.turns + 1);
     el.innerHTML = '';
-    var h = document.createElement('b'); h.textContent = 'Chapter ' + n + ': ' + def.goal.text; el.appendChild(h);
-    var p = document.createElement('span'); p.textContent = prog + (def.tip && m.turns < 3 ? ' · ' + def.tip : ''); el.appendChild(p);
+    var h = document.createElement('b'); h.textContent = 'Chapter ' + n + ' · ' + def.goal.text; el.appendChild(h);
+    var p = document.createElement('span'); p.textContent = def.tip && m.turns < 3 ? def.tip : prog; el.appendChild(p);
     el.classList.toggle('bad', g.key === 'kept' && m.kept > 0 || g.key === 'turns' && m.turns > g.max);
   }
   function over(G) {
-    var el = document.getElementById('obj'); if (el) el.remove();
-    var c = camp(); U().camp = null;
+    var c = camp(); U().camp = null; render();
     if (!GXC.active()) return UI.showTitle();
     return GXC.finish(G, { turns: c ? c.mine : 0 }).then(cardback);
   }
@@ -96,7 +103,7 @@ var OST = (function () {
     var ns = 'http://www.w3.org/2000/svg', s = document.createElementNS(ns, 'svg');
     s.setAttribute('viewBox', '0 0 40 40'); s.setAttribute('class', 'oa-pt'); s.setAttribute('aria-hidden', 'true');
     s.innerHTML = '<circle cx="20" cy="20" r="19.5" fill="#d8b45a"/><circle cx="20" cy="20" r="17.6" fill="' + col + '"/><circle cx="20" cy="20" r="14.5" fill="none" stroke="#f1d68c" stroke-opacity=".45" stroke-width=".6"/>' +
-      '<text x="20" y="25" text-anchor="middle" font-size="' + (ini.length > 1 ? 12 : 15) + '" fill="#f3ead6" font-family="Limelight,Georgia,serif">' + ini + '</text>';
+      '<text x="20" y="25" text-anchor="middle" font-size="' + (ini.length > 1 ? 12 : 15) + '" fill="#f3ead6" font-weight="700" font-family="Josefin Sans,sans-serif">' + ini + '</text>';
     return s;
   }
   // ---------- rewards: the newest card back unlocked tints every card back
