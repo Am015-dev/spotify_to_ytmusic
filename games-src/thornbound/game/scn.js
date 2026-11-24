@@ -137,7 +137,7 @@
   });
   GXS.add({
     id: 'tb-over', name: 'End card with the 3D crown', ask: 'Is the crown on the end card?', seed: 8, when: booted, group: 'Art',
-    setup: function () { return table(8).then(function () { G.over = { winner: 0, ranking: G.pl.map(function (q) { return q.seat; }), scores: G.pl.map(function (q) { return q.inf; }), bonus: {}, tieBreak: null }; showOver(); renderAll(); return new Promise(function (r) { setTimeout(r, 1200); }); }); },
+    setup: function () { return table(8).then(function () { G.pl.forEach(function (q, i) { q.inf = [31, 26, 22, 18][i]; }); /* W754: a real final score, not a row of zeros */ G.over = { winner: 0, ranking: G.pl.map(function (q) { return q.seat; }), scores: G.pl.map(function (q) { return q.inf; }), bonus: {}, tieBreak: null }; showOver(); renderAll(); return new Promise(function (r) { setTimeout(r, 1200); }); }); },
     checks: [{ kind: 'fn', name: 'the crown is on the end card (3D canvas or the @512 picture)', fn: function () { return !!document.querySelector('.crown3') || 'no crown on the end card'; } }]
   });
 })();
