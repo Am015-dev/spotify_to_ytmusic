@@ -306,3 +306,11 @@ Live fix: original-name phrase removed from shelf blurb + sands page (15:2x).
 - Content rule finding: doorkick-dungeon (live) copied the original card pool 1:1 (R98). F18 (Opus) redesigning our own 168 cards; then UI fixes; redeploy needs owner yes. COPYAUDIT running over all games.
 - Closest to done: short-fuse (4/5, F3 polish+PC then review), kaiten-kitchen (4/5-ish, F3 polish+PC then review), crown-city-smash (R97 7.4, F2), perch-and-plume (F3), lantern-dive (F2).
 - Pending: approve baselines (sunglaze, rampart: proof/baselines-new) before deploy; hollowbough R96 list after PLAY2; calm-audit doesn't count #coach/#toast.
+
+## W751 nebula-aces (shelf/W751-nebula)
+- Gate (build-all --quick): 6/11 -> 8/11. nb-board + nb-art fixed: the Lessons button grew when the painted skin loaded (its min-width rule lost to the shared menu rule). Fixed in xw/skin.css: fixed width, phone shows "Learn" in 44 px, bar gap/padding tightened so the turn chip and its "you" pill no longer sit under the Squads button; PC keeps "Lessons" at 76 px.
+- Still failing, not code: title/menu/board need baseline images (.baselines missing, ui-baselines branch absent).
+- Lessons test: phone 28.4 s, 1366x768 35.5 s, both all-pass.
+- nb-art "empty stat chips": chips do carry text (Skill/Attack/Agility/Hull/Shields). The empty look was the contact sheet capturing at 450 ms before the scenario built the cards; added `--wait <ms>` to scripts/contact-sheet.js. Ship art is still one grey/orange silhouette per side, not per-hull paintings (weak, not fixed).
+- Weak: title screen cells (start, nb-tutorial-play) show dark empty-looking buttons in the sheets; not touched.
+- Proof: xw/proof/w751-phone-sheet.jpg, w751-pc-sheet.jpg (16 cells each, --wait 3000, takes ~2 min real).
