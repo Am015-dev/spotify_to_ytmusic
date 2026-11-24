@@ -125,6 +125,7 @@ function clientToSvg(cx, cy) { var svg = $('board'), pt = svg.createSVGPoint(); 
   svg.addEventListener('dblclick', function (e) { var q = clientToSvg(e.clientX, e.clientY); zoomBy(1.6, q[0], q[1]); });
 })();
 function tapSpace(s) {
+  if (UI.charter) { chTapSpace(s); return; }
   if (!G || UI.busy) return;
   var pend = G.pending && G.pending.h === 'place' && G.pending.p === 0 && OH.sideToAct() === 0 ? G.pending.d : null;
   if (pend && pend.spaces.indexOf(s) >= 0) {

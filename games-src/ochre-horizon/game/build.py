@@ -9,7 +9,7 @@ parts=sorted((f for f in os.listdir(os.path.join(D,'src')) if re.match(r'ui\d+\.
 ui=''.join(rd(os.path.join(D,'src',f)) for f in parts)
 open(os.path.join(D,'ui.js'),'w',encoding='utf-8').write(ui)
 SRC={'gx-scenario.js':os.path.join(SP,'shell','gx-scenario.js'),'scn.js':os.path.join(D,'scn.js'),'gx-viewport.js':os.path.join(SP,'shell','gx-viewport.js'),
- 'map.js':os.path.join(D,'src','map.js'),'data.js':os.path.join(D,'src','data.js'),'engine.js':os.path.join(D,'src','engine.js'),'ai.js':os.path.join(D,'src','ai.js'),'art.js':os.path.join(D,'src','art.js'),'ui.js':os.path.join(D,'ui.js')}
+ 'map.js':os.path.join(D,'src','map.js'),'data.js':os.path.join(D,'src','data.js'),'engine.js':os.path.join(D,'src','engine.js'),'ai.js':os.path.join(D,'src','ai.js'),'charters.js':os.path.join(D,'src','charters.js'),'art.js':os.path.join(D,'src','art.js'),'ui.js':os.path.join(D,'ui.js')}
 def face(fam,f,w):return "@font-face{font-family:'%s';font-weight:%s;font-style:normal;font-display:swap;src:url(data:font/woff2;base64,%s) format('woff2')}"%(fam,w,base64.b64encode(open(os.path.join(OHD,'fonts',f),'rb').read()).decode())
 fonts=face('Righteous','righteous-400.woff2','400')+face('Space Grotesk','space-grotesk.woff2','300 700')
 h=rd(os.path.join(D,'head.html')).replace('/*FONTS*/',fonts)

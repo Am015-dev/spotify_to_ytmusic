@@ -1,7 +1,7 @@
 
 // ===== part 6: guide (what to tap now): one banner, glowing target, wrong-tap nudge =====
 var GD = { on: false, sel: [], line: '', nudgeTm: 0, last: '' };
-function guideEnabled() { return !!G && !UI.scn && !G.over && (UI.tut || (!LS.get('oh_done') && !Q.get('play')) || !!Q.get('guide')); }
+function guideEnabled() { return !!G && !UI.scn && !UI.charter && !G.over && (UI.tut || (!LS.get('oh_done') && !Q.get('play')) || !!Q.get('guide')); }
 var GD_IDEA = {   // first-time teaching line for each idea (shown in gens 1-2 under the instruction)
   corp: 'Your company sets your start. This one is plain: easy to learn.',
   keep: 'Cards are your projects. You get all 10 free with this company.',
