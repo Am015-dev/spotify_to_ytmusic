@@ -36,11 +36,13 @@ var ICON = {
 };
 // a token disc (r = radius) at (x,y); art file when present, else the icon on a coloured disc
 function tokenSvg(a, x, y, r, extra) {
-  var col = a === 'acorn' ? '#b5803f' : WM.ANI_COL[a], st = 'tok-' + a;
+  var col = a === 'acorn' ? '#b5803f' : WM.ANI_COL[a], st = 'tok-' + a, lbl = extra && extra.indexOf(' lbl') >= 0, slot = extra && extra.indexOf(' slot') >= 0;
   var s = '<g class="tk' + (extra || '') + '" transform="translate(' + x.toFixed(1) + ',' + y.toFixed(1) + ')">';
-  s += '<circle r="' + r + '" fill="#f6efdc" stroke="' + col + '" stroke-width="' + (r * 0.16).toFixed(2) + '"/>';
+  if (lbl) s += '<circle r="' + (r * 1.1).toFixed(1) + '" fill="#161d18" stroke="#f6efdc" stroke-width="' + (r * 0.1).toFixed(1) + '"/>';   // READ pass: solid backing ring so a token never melts into a busy tile
+  s += '<circle r="' + r + '" fill="#f6efdc" stroke="' + col + '" stroke-width="' + (r * (lbl ? 0.2 : 0.16)).toFixed(2) + '"/>';
   if (ART.img[st]) s += '<clipPath id="tc' + a + '"><circle r="' + (r * 0.92) + '"/></clipPath>' + artSvg(st, -r, -r, 2 * r, 2 * r, 'tc' + a);
   else s += '<g transform="scale(' + (r / 9).toFixed(3) + ')" fill="' + col + '" stroke="' + col + '">' + ICON[a] + '</g>';
+  if ((lbl || slot) && a !== 'acorn') { var br = r * (lbl ? 0.42 : 0.38); s += '<g transform="translate(' + (r * 0.72).toFixed(1) + ',' + (r * 0.72).toFixed(1) + ')"><circle r="' + br.toFixed(1) + '" fill="' + col + '" stroke="#f6efdc" stroke-width="' + (br * 0.18).toFixed(1) + '"/><text y="' + (br * 0.36).toFixed(1) + '" text-anchor="middle" font-size="' + (br * 1.15).toFixed(1) + '" font-weight="800" font-family="system-ui,sans-serif" fill="#fff">' + WM.ANI_NAME[a].charAt(0) + '</text></g>'; }
   return s + '</g>';
 }
 // terrain textures, one 24x24 cell each: simple pictures a first-time player names at a glance (peaks, pines, wheat rows, reeds, waves)

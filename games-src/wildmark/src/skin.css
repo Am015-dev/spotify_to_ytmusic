@@ -531,3 +531,11 @@ html body :is(.gxh-tt,.gxh-tx,.gxh-bd button,.gxt-say,.gxt-tt){font-size:16px!im
   html body .gx-bar h1{display:none}
 }
 #board.pvon #line{display:none}
+/* W601 read pass: on a tall phone the four market pairs get bigger tiles and animals (>= 44 px targets, tile ~80 px, animal ~60 px) */
+@media (max-width:999px) and (orientation:portrait) and (min-height:760px){
+  html body #mk .mt{height:88px;min-height:44px}html body #mk .mt svg{height:84px}
+  html body #mk .mk svg{width:60px!important;height:60px!important}html body #mk .mk{min-width:64px}html body #mk .mk i{font-size:15px}
+}
+/* W601: the placed-token backing ring + terrain bands are drawn in the tile SVG (ui.js tileSvg, art.js tokenSvg) */
+#map .tband{pointer-events:none}
+#map .tdiv{pointer-events:none}
