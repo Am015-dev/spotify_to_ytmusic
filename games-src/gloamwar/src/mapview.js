@@ -63,7 +63,7 @@ function mapStatic() {
   REGIONS.forEach(function (r) {
     var major = !!r.set || ['whisperwood', 'cinderplain'].indexOf(r.id) >= 0, c = setPos(r), fs = r.set === 'strong' ? 30 : r.set === 'city' ? 28 : major ? 25 : 19;
     var y = r.set ? c[1] + (r.set === 'strong' ? 56 : 48) : r.y + 34;
-    h.push('<text class="lbl' + (major ? '' : ' minor') + '" x="' + (r.set ? c[0] : r.x) + '" y="' + y + '" font-size="' + fs + '" text-anchor="middle">' + r.n + '</text>');
+    h.push('<text class="mlbl' + (major ? '' : ' minor') + '" style="--b:' + fs + '" x="' + (r.set ? c[0] : r.x) + '" y="' + y + '" font-size="' + fs + '" text-anchor="middle">' + r.n + '</text>');
   });
   // cartouche, compass, sea names
   h.push('<g pointer-events="none" font-family="IM Fell English, Georgia, serif" fill="#3b2f1f"><text x="60" y="1075" font-size="30" font-style="italic" transform="rotate(-80 60 1075)">The Pale Sea</text><text x="900" y="530" font-size="18" font-style="italic" text-anchor="middle">Bitter Mere</text></g>');
@@ -95,7 +95,7 @@ function tokenSvg(G, rid, side, a, garrison) {
   var p = tokPos(rid); if (garrison) p = [REG[rid].x + 2, REG[rid].y - 4];
   var u = units(a), l = leaders(a), riders = side === 'G' && a.pt ? a.pt[2] : 0, el = 0; for (var n in a) el += a[n][1];
   var g = side === 'G', fill = g ? '#7c1810' : '#f3e7c6', ink = g ? '#f3e2be' : '#1f1812', r = 31;
-  var s = '<g class="tok" data-tap="t:' + rid + (garrison ? ':in' : '') + '" id="tok-' + rid + (garrison ? '-in' : '') + '-' + side + '" transform="translate(' + p[0] + ',' + p[1] + ')"><circle class="hit" r="64"/>';
+  var s = '<g class="tok" data-tap="t:' + rid + (garrison ? ':in' : '') + '" id="tok-' + rid + (garrison ? '-in' : '') + '-' + side + '" transform="translate(' + p[0] + ',' + p[1] + ')"><circle class="hit" r="64"/><g class="ts">';
   if (u > 0) {
     if (garrison) s += '<rect x="-30" y="-30" width="60" height="60" rx="4" fill="' + fill + '" stroke="#1f1812" stroke-width="4"/><path d="M-30,-30 h12 v-8 h12 v8 h12 v-8 h12 v8 h12" fill="none" stroke="#1f1812" stroke-width="3"/>';
     else s += '<circle r="' + (r + 4) + '" fill="#1f1812"/><circle r="' + r + '" fill="' + fill + '" stroke="' + ink + '" stroke-width="2" stroke-dasharray="4 3"/>';
@@ -104,21 +104,21 @@ function tokenSvg(G, rid, side, a, garrison) {
     if (l - riders > 0) s += '<g transform="translate(26,-24)"><circle r="13" fill="#a8842c" stroke="#1f1812" stroke-width="1.5"/>' + icoPath('leader', 0, 0, 18, '#1f1812') + '</g>';
   }
   if (riders) s += '<g transform="translate(' + (u ? 30 : 0) + ',' + (u ? 22 : 0) + ')"><circle r="' + (u ? 15 : 24) + '" fill="#1f1812" stroke="#9a2117" stroke-width="2"/>' + icoPath('wraith', 0, -1, u ? 22 : 34, '#e9d9b8') + (riders > 1 ? '<text x="' + (u ? 14 : 20) + '" y="' + (u ? 16 : 22) + '" font-size="18" fill="#9a2117" font-family="IM Fell English, Georgia, serif" stroke="#eadbb4" stroke-width="3" paint-order="stroke">' + riders + '</text>' : '') + '</g>';
-  s += '<circle class="tokring" r="40" opacity="0"/></g>';
+  s += '<circle class="tokring" r="40" opacity="0"/></g></g>';
   return s;
 }
 function charBadges(G, rid, list) {
   var r0 = REG[rid], s = ''; list.forEach(function (c, i) { var d = CHARS[c], g = d.side === 'G', x = r0.x + 46 + (i % 3) * 32, y = (r0.set ? r0.y - 46 : r0.y - 26) - Math.floor(i / 3) * 32;
-    s += '<g class="tok ch" data-tap="c:' + c + '" transform="translate(' + x + ',' + y + ')"><circle class="hit" r="30"/><circle r="17" fill="' + (g ? '#7c1810' : '#f3e7c6') + '" stroke="#1f1812" stroke-width="2.5"/>' + icoPath(d.icon, 0, 0, 24, g ? '#f3e2be' : '#1f1812') + '</g>'; });
+    s += '<g class="tok ch" data-tap="c:' + c + '" transform="translate(' + x + ',' + y + ')"><circle class="hit" r="30"/><g class="tc"><circle r="17" fill="' + (g ? '#7c1810' : '#f3e7c6') + '" stroke="#1f1812" stroke-width="2.5"/>' + icoPath(d.icon, 0, 0, 24, g ? '#f3e2be' : '#1f1812') + '</g></g>'; });
   return s;
 }
 function companySvg(G, viewer) {
   var F = G.F, p;
   if (F.road >= 0) p = ROAD_PTS[Math.min(F.road, ROAD_PTS.length - 1)]; else { var r = REG[F.loc]; p = r.set ? [r.x + 50, r.y + 6] : [r.x - 60, r.y - 18]; }
-  var s = '<g class="tok co" id="company" data-tap="co:' + F.loc + '" transform="translate(' + p[0] + ',' + p[1] + ')"><circle class="hit" r="54"/>';
+  var s = '<g class="tok co" id="company" data-tap="co:' + F.loc + '" transform="translate(' + p[0] + ',' + p[1] + ')"><circle class="hit" r="54"/><g class="ts">';
   s += '<circle r="27" fill="' + (F.hid ? '#1f1812' : '#9a2117') + '" stroke="#efe2bd" stroke-width="3"/>' + icoPath('lantern', 0, -1, 34, '#f6dd8a');
   if (F.prog > 0 && F.road < 0) s += '<g transform="translate(24,-22)"><circle r="14" fill="#efe2bd" stroke="#1f1812" stroke-width="2"/><text y="6" text-anchor="middle" font-size="18" fill="#1f1812" font-family="IM Fell English, Georgia, serif">+' + F.prog + '</text></g>';
-  s += '<circle class="tokring" r="38" opacity="0"/></g>';
+  s += '<circle class="tokring" r="38" opacity="0"/></g></g>';
   return s;
 }
 MV.render = function (G, hl, viewer) {
@@ -145,9 +145,18 @@ MV.render = function (G, hl, viewer) {
 };
 MV.flash = function (rid) { var f = document.getElementById('flash'); if (!f || !REG[rid]) return; f.setAttribute('d', polyD(REG[rid].poly)); f.style.opacity = '1'; clearTimeout(MV.ft); MV.ft = setTimeout(function () { f.style.opacity = '0'; }, 700); };
 // ---------------------------------------------------------------- camera
-MV.apply = function () { var m = document.getElementById('map'); if (!m) return; m.style.transform = 'translate(' + MV.tx.toFixed(1) + 'px,' + MV.ty.toFixed(1) + 'px) scale(' + MV.k.toFixed(4) + ')'; var b = document.getElementById('board'); if (b) b.classList.toggle('zoomed-out', MV.k < 0.62); };
+MV.apply = function () { var m = document.getElementById('map'); if (!m) return; m.style.transform = 'translate(' + MV.tx.toFixed(1) + 'px,' + MV.ty.toFixed(1) + 'px) scale(' + MV.k.toFixed(4) + ')'; var b = document.getElementById('board'); if (b) b.classList.toggle('zoomed-out', MV.k < 0.62);
+  var k = MV.k; m.style.setProperty('--ik', (1 / k).toFixed(3)); m.style.setProperty('--lf', (12.5 / k).toFixed(2)); m.style.setProperty('--ts', Math.min(2, Math.max(1, 15 / (31 * k))).toFixed(3)); m.style.setProperty('--tc', Math.min(2.4, Math.max(1, 14 / (17 * k))).toFixed(3));
+  if (window.closeRCard && !MV.keepCard) closeRCard(); };
 MV.clamp = function () { var b = document.getElementById('board'), W = b.clientWidth, H = b.clientHeight; var mw = MAPW * MV.k, mh = MAPH * MV.k; MV.tx = mw <= W ? (W - mw) / 2 : Math.min(0, Math.max(W - mw, MV.tx)); MV.ty = mh <= H ? (H - mh) / 2 : Math.min(0, Math.max(H - mh, MV.ty)); };
-MV.fit = function () { var b = document.getElementById('board'); if (!b || !b.clientWidth) return; var W = b.clientWidth, H = b.clientHeight; MV.minK = Math.min(W / MAPW, H / MAPH) * 0.98; MV.k0 = Math.max(MV.minK, Math.min(W / MAPW, 1.2)); if (!MV.k || MV.k < MV.minK || MV.k > MV.maxK) MV.k = MV.k0; MV.clamp(); MV.apply(); };
+MV.fit = function () { var b = document.getElementById('board'); if (!b || !b.clientWidth) return; var W = b.clientWidth, H = b.clientHeight; MV.minK = Math.min(W / MAPW, H / MAPH) * 0.98; MV.k0 = Math.max(MV.minK, Math.min(W / MAPW, 1.2)); if (W < 700) MV.k0 = Math.max(MV.k0, 0.82); if (!MV.k || MV.k < MV.minK || MV.k > MV.maxK) MV.k = MV.k0; MV.clamp(); MV.apply(); };
+MV.setSel = function (rid) {
+  var sp = document.getElementById('selp'), nb = document.getElementById('nbp'); if (!sp) return;
+  if (!rid || !REG[rid]) { sp.setAttribute('d', ''); nb.innerHTML = ''; return; }
+  sp.setAttribute('d', polyD(REG[rid].poly)); nb.innerHTML = REG[rid].adj.map(function (a) { return REG[a] ? '<path class="rgnb" d="' + polyD(REG[a].poly) + '"/>' : ''; }).join('');
+};
+MV.rectOf = function (rid) { var b = document.getElementById('board'), br = b.getBoundingClientRect(), r = REG[rid], x0 = 1e9, y0 = 1e9, x1 = -1e9, y1 = -1e9; r.poly.forEach(function (p) { x0 = Math.min(x0, p[0]); x1 = Math.max(x1, p[0]); y0 = Math.min(y0, p[1]); y1 = Math.max(y1, p[1]); });
+  var L = br.left + MV.tx + x0 * MV.k, T = br.top + MV.ty + y0 * MV.k; return { left: L, top: T, right: br.left + MV.tx + x1 * MV.k, bottom: br.top + MV.ty + y1 * MV.k }; };
 MV.focus = function (rid, k, smooth) {
   var b = document.getElementById('board'); if (!b || !REG[rid]) return; if (k) MV.k = Math.max(MV.minK, Math.min(MV.maxK, k));
   var p = REG[rid]; MV.tx = b.clientWidth / 2 - p.x * MV.k; MV.ty = b.clientHeight / 2 - p.y * MV.k; MV.clamp();
@@ -157,7 +166,7 @@ MV.focus = function (rid, k, smooth) {
 MV.zoomBy = function (f) { var b = document.getElementById('board'), cx = b.clientWidth / 2, cy = b.clientHeight / 2, k = Math.max(MV.minK, Math.min(MV.maxK, MV.k * f)); MV.tx = cx - (cx - MV.tx) * k / MV.k; MV.ty = cy - (cy - MV.ty) * k / MV.k; MV.k = k; MV.clamp(); MV.apply(); };
 MV.seen = function (rid) { var b = document.getElementById('board'); if (!b || !REG[rid]) return true; var p = REG[rid], x = p.x * MV.k + MV.tx, y = p.y * MV.k + MV.ty; return x > 30 && y > 30 && x < b.clientWidth - 30 && y < b.clientHeight - 30; };
 MV.init = function () {
-  var m = document.getElementById('map'); m.innerHTML = '<svg xmlns="' + SVGNS + '" width="' + MAPW + '" height="' + MAPH + '" viewBox="0 0 ' + MAPW + ' ' + MAPH + '">' + mapStatic() + '<path id="flash" class="rgflash" d=""/><g id="dyn"></g></svg>';
+  var m = document.getElementById('map'); m.innerHTML = '<svg xmlns="' + SVGNS + '" width="' + MAPW + '" height="' + MAPH + '" viewBox="0 0 ' + MAPW + ' ' + MAPH + '">' + mapStatic() + '<path id="flash" class="rgflash" d=""/><g id="nbp"></g><path id="selp" class="rgsel" d=""/><g id="dyn"></g></svg>';
   m.style.width = MAPW + 'px'; m.style.height = MAPH + 'px';
   var b = document.getElementById('board'), P = {}, start = null, moved = false, pinch = null;
   b.addEventListener('scroll', function () { if (b.scrollTop || b.scrollLeft) { b.scrollTop = 0; b.scrollLeft = 0; } });
