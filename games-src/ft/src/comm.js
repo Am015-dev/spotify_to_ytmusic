@@ -106,13 +106,15 @@ function commNew(i){const c=COMMS[i];const keep=DEFSEED;setSeed(6240+i);
   else{G.phase='turn';G.bidQueue=[];G.bids=[];G.order=[{p:0,k:0}].concat(c.rival&&c.rival.plans?[{p:1,k:0}]:[]);G.turnIdx=0;G.nextBid=[];G.turn=0;startTurn()}
   G.log=[];lg(`Commission ${i+1}: ${c.title}.`,'big')}
 // Farid follows the commission's stated plan when it is legal, else plays as the computer does
-function tutAIMove(s){if(!G||!G.comm||s!==1)return null;const c=COMMS[G.commI];const r=c.rival||{};const vm=validMoves(s);
+// the computer's own choices inside a commission use the game's seeded dice, so a commission plays out the same way every time
+function commAI(s){if(G.commAI)return null;G.commAI=1;const mr=Math.random;Math.random=()=>rnd(1e9)/1e9;try{return aiMove(s)}finally{Math.random=mr;G.commAI=0}}
+function tutAIMove(s){if(!G||!G.comm||G.commAI)return null;if(s!==1)return commAI(s);const c=COMMS[G.commI];const r=c.rival||{};const vm=validMoves(s);
   const how=r.bid&&typeof r.bid==='object'?r.bid[G.round]:r.bid;
   if(G.phase==='bid'&&how){const b=vm.filter(m=>m.act==='bid'&&!m.fk);const pr=m=>bidPrice(P(1),m.spot);b.sort((x,y)=>pr(x)-pr(y)||x.spot-y.spot);
     if(how==='first'){const top=Math.max(-1,...G.bids.map(x=>G.track[x.spot].cost));const w=b.find(m=>pr(m)>top);if(w)return w}return b[0]||null}
-  if(G.phase!=='turn')return null;
+  if(G.phase!=='turn')return commAI(s);
   if(G.commQT!==G.turn){G.commQT=G.turn;G.commQ=null;for(const pl of (Array.isArray(r.plans)?r.plans:(r.plans&&r.plans[G.round])||[]))if(vm.some(m=>same(m,pl[0]))){G.commQ=pl.slice();break}}
-  if(G.commQ&&G.commQ.length&&vm.some(m=>same(m,G.commQ[0])))return G.commQ.shift();return null}
+  if(G.commQ&&G.commQ.length&&vm.some(m=>same(m,G.commQ[0])))return G.commQ.shift();return commAI(s)}
 // ---------- the result ----------
 function commResult(){const c=COMMS[G.commI];const s0=scoreOf(G.pl[0]),s1=scoreOf(G.pl[1]);
   const R={me:s0.total,rival:s1.total,coins:G.pl[0].coins,gain:s0.total-G.commStart,pl:G.pl[0],rivalPl:G.pl[1],board:G.board,over:!!G.over,
