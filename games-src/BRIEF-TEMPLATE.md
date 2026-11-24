@@ -61,3 +61,8 @@ Orchestrator notes
   an already-written fix, checks that only report), Sonnet for code/fixes/tests. Never the main model for workers.
 - Put the owner's bug reports first in "Known bugs" and name the function (run `find.sh` yourself, it is cheap).
 - If a worker reports it is out of context, start a new session with this template plus its HANDOFF note.
+
+## Required in EVERY brief (owner, 24 Nov)
+- First line after Goal: `Load Skill karpathy-guidelines (.claude/skills/karpathy-guidelines/SKILL.md) and follow it.`
+- Work as a numbered plan, each step with a verify check; smallest change; every changed line traces to the task.
+- The final report MUST end with one line: `Karpathy: plan=<n steps>, verified=<n>/<n>, untraced changes=<none|list>`. A report without it is rejected by the coordinator.
