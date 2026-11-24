@@ -187,7 +187,9 @@ function tutQueue(fn){clearTimeout(UI._tutQT);try{if(UI._lastPt&&typeof tapRing=
 (function(){const o=bfEvent;bfEvent=function(c){if(UI.cfg&&UI.cfg.tutorial&&c&&c.ev&&c.ev.t==='clash'&&Object.keys(UI.clashRes||{}).length>0&&!tutHold(c)){const a=ANIM;ANIM=0;try{return o.apply(this,arguments)}finally{ANIM=a}}return o.apply(this,arguments)}})();
 // watch steps (a Next button) move on by themselves 2.5 s after they appear; a tap on Next still skips at once
 (function(){let id=null,t0=0;setInterval(()=>{try{if(typeof GXT==='undefined'||!tutOn()){id=null;return}const S=GXT.state();if(!S||!S.active||S.phase!=='show'||!S.shown||S.wait){id=null;return}
-  const k=S.i+':'+S.id;if(k!==id){id=k;t0=Date.now();return}if(Date.now()-t0>=2500/Math.max(1,Math.min(UI.speed||1,4))){id=null;GXT.next()}}catch(e){}},100)})();
+  const k=S.i+':'+S.id;if(k!==id){id=k;t0=Date.now();return}
+  // real reading time, NOT scaled by UI.speed (the tutorial runs at speed 6, which made this 0.6 s and the Next button vanished under a finger): 3 s + 0.4 s per word
+  const nw=String(S.say||'').split(/\s+/).filter(Boolean).length;if(Date.now()-t0>=3000+400*nw){id=null;GXT.next()}}catch(e){}},100)})();
 // F16b: a Next that does nothing never survives. (1) a tap on Next that the tutorial swallowed (it counted as the tail of the previous tap) is repeated 260 ms later if the same step still shows.
 // (2) a step that waits for something that already happened (its action was done another way) is left after 6 s: the tutorial goes to the first later step whose moment has come.
 (function(){document.addEventListener('click',e=>{try{if(!(e.target&&e.target.closest&&e.target.closest('.gxt-next'))||typeof GXT==='undefined')return;const s0=GXT.state();if(!s0||!s0.active)return;const i=s0.i;
