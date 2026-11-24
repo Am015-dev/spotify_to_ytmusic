@@ -561,3 +561,7 @@ html.land .tile.hasmk .tn{display:block}
 .bm .pic{width:88%;height:88%}
 .ti .pic{width:1.5em;height:1.5em;margin:0}
 .st .pic,.pp .pic,.e2 .pic{width:1.3em;height:1.3em}
+
+/* readable bid spots that are shut/free (audit B: contrast) */
+.spot.shut small.ord,.spot.shut .sp-c,.spot .sp-c{color:#4a2a14}
+.spot.shut{opacity:1}
