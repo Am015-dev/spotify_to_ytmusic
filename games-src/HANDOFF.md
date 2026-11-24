@@ -316,3 +316,10 @@ newGame opened the flight story card over the board on pc (closed in setup); the
 dice were invisible in the tray (sprites dropped before the re-render). Proof: final-approach/proof/lessons-{phone,pc}-sheet.jpg (picker + 7 lessons) and full sheets, 0 flags.
 Open: on pc the GXST card (top right) covers the first line of the Cockpit side panel (round and co-pilot chips), 7 cells; fix with a keepClear or
 pcSlot for that panel. Test only checks start, one wrong move (axis, speed) and the win per lesson, not a shot after every single move.
+## W735 thornbound HUD diet (shelf/W735-hud-thornbound)
+- tb-story-start failure was NOT the HUD diet: parent commit fails the same. Story now opens the chapter map directly (tutorial = lesson row, scenario lessons); the scenario still waited for the old Skip-tutorial spotlight. Scenario rewritten (scn.js), HUD cuts untouched.
+- Test against a build-all staged build (python3 scripts/build-all.py thornbound --no-check), not games/thornbound (deployed copy).
+- Still failing, same before and after W717: phone-s tb-board/help/rivals/buttons ("hc glow pl" tap not responding, hint bubble over Purse), pc tb-zoom/tb-art (pp-x Close under drawer), menu (axe contrast on hint bubble). Contact sheets phone+pc NOT run (time).
+## W740 onyx-atelier visual fix (24 Nov)
+Done: tutorial part names now a tidy list inside the guide window, ONE callout on the board for the picked part (no chip cloud); PC (>=1000px) grid layout: board left (cell up to 112px), rival/jewels/you stacked right; guide never sits on the PC board.
+Weak: PC guide window still covers the rival jewel rows on lesson 1; HUD pips and phone start menu not changed. Sheets: onyx-atelier/proof/w740-*-sheet.jpg. Integrator: build.py then copy onyx-atelier.html to games/onyx-atelier/index.html (not in build-all).

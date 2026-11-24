@@ -33,7 +33,7 @@
       { kind: 'fn', name: 'board fills the screen', fn: function () { var r = $('#board').getBoundingClientRect(), f = r.width * r.height / (innerWidth * innerHeight); return f > .55 || 'board only ' + Math.round(f * 100) + '% of the screen'; } },
       { kind: 'visible', sel: '#htile', name: 'your tile (tap to turn)' },
       { kind: 'text', sel: '#status', re: /place/i, name: 'top line' },
-      { kind: 'text', sel: '#seats .nm', re: /\S/, name: 'player name' },
+      { kind: 'text', sel: '#status .tn', re: /\S/, name: 'whose turn (banner)' },
       { kind: 'fn', name: 'a glowing spot is on screen', fn: function () { var g = [].filter.call(document.querySelectorAll('#world .glow'), function (e) { return GXS.vis(e) && inView(e); }); return g.length > 0 || 'no glowing spot visible'; } },
       { kind: 'eq', name: 'your score', a: function () { return GXS.num('#seats .seat[data-i="0"] b'); }, b: function () { return G.pl[0].score; } },
       { kind: 'eq', name: 'rival score', a: function () { return GXS.num('#seats .seat[data-i="1"] b'); }, b: function () { return G.pl[1].score; } },

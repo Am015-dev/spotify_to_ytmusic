@@ -35,7 +35,7 @@ function showTitle() {
   s.hidden = false;
   $('#tlvl').onclick = function () { var L = ['easy', 'normal', 'hard']; UI.lvl = L[(L.indexOf(UI.lvl) + 1) % 3]; LS.set('lvl', UI.lvl); showTitle(); };
   var c = $('#tcont'); if (c) c.onclick = function () { var o = JSON.parse(LS.get('save')); G = o.G; UI.mode = o.mode; UI.lvl = o.lvl; UI.learn = o.learn; UI.tipsSeen = {}; s.hidden = true; buildMap(); setView({ x: 0, y: 0, w: VTART.W }); homeView(); render(); if (!isHuman(VT.sideToAct(G))) setTimeout(runAI, 600); };
-  $('#tlearn').onclick = function () { UI.lvl = 'easy'; startGame('vs', { learn: true, lvl: 'easy' }); };
+  $('#tlearn').onclick = function () { $('#start').hidden = true; GXST.picker(); };
   $('#tvs').onclick = function () { startGame('vs', { lvl: UI.lvl }); };
   $('#thot').onclick = function () { startGame('hot', {}); };
   $('#trules').onclick = function () { showRules(); };
