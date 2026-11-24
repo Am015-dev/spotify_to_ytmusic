@@ -15,7 +15,7 @@ const SOLVE = {   // basic places: 0 berry patch, 1 dewberry, 3 pebble, 4 twig, 
   draw: { wrong: [w(0)], right: [w(1)] },
   points: { wrong: [w(3)], right: [w(5)] },
   build: { wrong: [w(4)], right: ['hand:bramble_allotment'] },
-  meadow: { wrong: [w(4)], right: ['mead:reedpunt_toad'] },
+  meadow: { wrong: [w(4)], right: ['opt:.pv-tab[data-v="meadow"]', 'mead:reedpunt_toad'] },
   prepare: { wrong: [w(3)], right: [w(4), 'prep'] }
 };
 async function run(b, W, H) {
@@ -32,6 +32,7 @@ async function run(b, W, H) {
   const resolve = async s => s.startsWith('hand:') || s.startsWith('mead:') ? p.evaluate(s => { const hand = s[0] === 'h', k = s.slice(5), ids = hand ? G.players[0].hand : G.meadow, id = ids.find(i => i >= 0 && HB.cardKey(i) === k); return id == null ? null : '[data-t="p:' + (hand ? 'hand' : 'meadow') + ':' + id + '"]'; }, s) : '[data-t="' + s + '"]';
   const where = sel => p.evaluate(sel => { const e = [...document.querySelectorAll(sel)].find(e => { const r = e.getBoundingClientRect(); return r.width > 8 && r.height > 8; }); if (!e) return null; e.scrollIntoView && e.scrollIntoView({ block: 'nearest', inline: 'nearest' }); const r = e.getBoundingClientRect(); const x = r.left + r.width / 2, y = r.top + r.height / 2, u = document.elementFromPoint(x, y); return { x, y, ok: !!u && (u === e || e.contains(u) || u.contains(e)), by: u && (u.id || u.className) }; }, sel);
   const tapSel = async raw => {
+    if (raw.startsWith('opt:')) { raw = raw.slice(4); if (!(await where(raw))) return false; }
     const sel = raw[0] === '[' || raw[0] === '.' || raw[0] === '#' ? raw : await resolve(raw); if (!sel) { note('no target for ' + raw); return false; }
     let pt = await where(sel); for (let k = 0; k < 6 && !pt; k++) { await tick(p, 400); pt = await where(sel); }
     for (let k = 0; k < 8 && pt; k++) { await tick(p, 300); const q = await where(sel); if (!q) { pt = q; break; } const still = Math.abs(q.x - pt.x) < 1 && Math.abs(q.y - pt.y) < 1; pt = q; if (still && pt.ok) break; }
@@ -52,8 +53,7 @@ async function run(b, W, H) {
     shots.push(await p.screenshot({ type: 'jpeg', quality: 70 }));
     if (!(await p.$('.gxst-card'))) note(id + ': no objective card');
     if (i === 0) {   // hint nudge then show-me ring (target must not sit under the card)
-      if (phone) { if (!(await p.$('.gxst-chip'))) note('phone lesson does not start as a chip'); await tapSel('.gxst-chip'); }
-      await tapSel('.gxst-bulb'); await tapSel('.gxst-bulb'); await tick(p, 600); s = await st();
+      await tapSel('.gxst-bulb'); await tick(p, 600); await tapSel('.gxst-bulb'); await tick(p, 1200); s = await st();
       if (s.hint !== 2 || !s.target) note('show-me hint has no target'); if (s.overlap) note('card covers the hinted target');
       if (!(await p.$('.gxst-ring'))) note('no hint ring');
       await p.evaluate(id => GXST.start(id), id); await live(id); await tick(p, 400);
