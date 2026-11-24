@@ -1,0 +1,2 @@
+ec-fight-two:  clipped "Cloak Guard" | clipped "Quick Cut" | clipped "Cloak Guard" | clipped "Quick Cut" | clipped "Quick Cut" | clipped "Cloak Guard"
+ec-split-two:  small 12px "Bile Blob" | small 12px "80/80" | small 12px "Mire Slug" | small 12px "40/40" | small 12px "Spine Slug" | small 12px "40/40"

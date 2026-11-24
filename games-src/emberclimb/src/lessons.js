@@ -131,7 +131,7 @@
     if (!(window.UI && UI.render && window.GX && window.GXH)) { setTimeout(go, 200); return; }
     // the old dimming walkthrough is retired: every entry point (title, menu, story Guide) opens the lessons
     UI.tutStart = function () { if (UI.camp && UI.campExit) UI.campExit(); try { GX.close(); } catch (e) { } try { GXT.markDone('emberclimb'); } catch (e) { } GXST.picker(); };
-    GXST.init({ game: 'emberclimb', scenarios: lessons, keepClear: ['.hand', '.en', '#end', '.pots', '.ec-potpop', '.reward'], settled: function () { var g = G(); return !UI.busy && (g.scr !== 'battle' || (g.b && g.b.ph === 'p')); } });
+    GXST.init({ game: 'emberclimb', scenarios: lessons, keepClear: ['.hand', '.en', '#end', '.pots', '.ec-potpop', '.reward', '.gx-bar h1', '#hud', '.w485fl', '#dockt', '#dockmsg'], settled: function () { var g = G(); return !UI.busy && (g.scr !== 'battle' || (g.b && g.b.ph === 'p')); } });
     window.addEventListener('gxst', function (ev) {
       var t = ev.detail && ev.detail.type;
       if (t === 'close' && L.on && UI.mode === 'game') {
