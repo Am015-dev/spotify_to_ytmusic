@@ -43,8 +43,8 @@ function animate(prev){const cur=snapState();if(!ANIM||!prev||document.hidden)re
   if(dj.added&&rows){const cs=rows.querySelectorAll('.drow .dcard:not(.th)');for(let k=Math.max(0,cs.length-dj.added);k<cs.length;k++)cs[k].classList.add('newc')}
   // tokens that appeared: camels, tents, palms, palaces
   for(let i=0;i<cur.tiles.length;i++){const a=prev.tiles[i],b=cur.tiles[i];if(!a)continue;const te=tileEl(i);if(!te)continue;
-    if((b.camel!=null&&a.camel!==b.camel)||(b.tent!=null&&a.tent!==b.tent)){const o=te.querySelector('.own');if(o)o.classList.add('popin')}
-    if(b.palm>a.palm||b.pal>a.pal){for(const o of te.querySelectorAll('.tok'))o.classList.add('popin')}}
+    if((b.camel!=null&&a.camel!==b.camel)||(b.tent!=null&&a.tent!==b.tent)){const o=te.querySelector('.ob .bm');if(o)o.classList.add('popin')}
+    if(b.palm>a.palm||b.pal>a.pal){for(const o of te.querySelectorAll('.bms .bm'))o.classList.add('popin')}}
   // scores pop up where they are earned
   const tf=cur.act&&cur.act.tile!=null?tileEl(cur.act.tile):null;
   cur.tot.forEach((t,i)=>{const d=t-(prev.tot[i]||0);if(!d)return;const se=seatEl(i);if(!se)return;const ss=se.querySelector('.ss');if(ss){ss.classList.add('bump')}

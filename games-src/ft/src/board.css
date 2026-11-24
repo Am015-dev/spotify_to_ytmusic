@@ -488,3 +488,55 @@ html.g3d .own.cam{background-size:44px}
 #cleg .lc i{font-style:normal;display:inline-grid;place-items:center;width:22px;height:22px;border-radius:50%;background:var(--pc);font-size:13px}
 #cleg .ln{border-color:#8a5a1e;font-weight:700}
 html .tile.owned .tv{top:23px!important;right:3px!important}
+
+/* ===== Build marks + djinn inspect (owner, 24 Nov): big owner-ringed marks, legend, readable djinn card ===== */
+.bm{position:relative;display:inline-grid;place-items:center;flex:0 0 auto;width:32px;height:32px;box-sizing:border-box;border-radius:50%;background:var(--pc,#6b5a3a);border:3px solid #fff;box-shadow:0 0 0 2px var(--pc,#6b5a3a),0 2px 5px rgba(0,0,0,.65);font-style:normal;font-size:19px;line-height:1;color:#fff;text-shadow:none}
+.bm small{position:absolute;right:-7px;bottom:-7px;min-width:19px;height:19px;padding:0 3px;box-sizing:border-box;border-radius:10px;background:#2e1a0a;border:2px solid #fff;color:#fff;font:800 13px/15px var(--ff-b,system-ui);text-align:center}
+.tile .bms{position:absolute;left:0;right:0;top:27px;z-index:4;display:flex;justify-content:center;align-items:center;gap:9px;pointer-events:none}
+.tile.hasmk .tv{display:none}
+.tile .ob{display:flex;align-items:center;justify-content:center;gap:3px;height:26px;line-height:26px}
+.tile .ob .bm{width:26px;height:26px;font-size:15px;border-width:2px;box-shadow:0 1px 3px rgba(0,0,0,.6);background:rgba(0,0,0,.28);margin-left:-3px}
+.tile:not(.owned) .bms{top:30px}
+#cleg .lc .bm{width:24px;height:24px;font-size:14px;border-width:2px;box-shadow:none}
+#cleg .lc .bm small{display:none}
+#cleg .lc{padding:0 6px;gap:3px}
+@keyframes mkpop{0%{transform:scale(.2)}70%{transform:scale(1.35)}100%{transform:none}}
+.bm.popin{animation:mkpop .5s ease-out 1}
+@media (prefers-reduced-motion:reduce){.bm.popin{animation:none}}
+.dcard{position:relative}
+.dinfo{position:relative;flex:0 0 auto;display:inline-grid;place-items:center;width:24px;height:24px;border-radius:50%;background:#fff6dc;color:#3b1c0e;font:900 15px/1 Georgia,serif;font-style:italic;box-shadow:0 1px 2px rgba(0,0,0,.5)}
+.dinfo::after{content:'';position:absolute;inset:-10px}
+.dcard{-webkit-touch-callout:none;-webkit-user-select:none;user-select:none}
+.orow{display:flex;flex-wrap:wrap;gap:4px;margin-top:4px}
+.orow .dcard{flex:1 1 90px;min-height:44px}
+.orow .omy{flex:0 0 auto;justify-content:center;background:#2a1a40;min-height:44px;padding:0 10px}
+.orow .odj em{font:700 13px/1 var(--ff-b,system-ui);font-style:normal;background:#ffe9b0;color:#3f2766;border-radius:9px;padding:2px 6px}
+.orow .odj.used{filter:saturate(.45) brightness(.8)}
+html.land .orow{flex-direction:column}html.land .orow .dcard{flex:0 0 auto}
+#dinspect{position:fixed;z-index:70;box-sizing:border-box;overflow:auto;padding:14px 56px 12px 16px;background:#fff6dc;color:#2e1a0a;border:3px solid #8a5a1e;border-radius:14px 14px 0 0;box-shadow:0 -4px 18px rgba(30,15,5,.5);font:600 15px/1.35 var(--ff-b,system-ui)}
+html.land #dinspect{border-radius:14px;box-shadow:0 6px 22px rgba(30,15,5,.5);font-size:16px}
+#dinspect[hidden]{display:none}
+#dinspect h4{margin:0 0 4px;font-size:18px}#dinspect h4 small{font-size:14px;font-weight:700;color:#6b4a1e}
+#dinspect p{margin:3px 0}#dinspect .dx{font-size:16px;font-weight:800}
+#dinspect .ds{padding:4px 8px;border-radius:8px;font-weight:800}#dinspect .ds.ok{background:#cfeec8;color:#1d4a14}#dinspect .ds.no{background:#fde0c8;color:#7a2a08}
+#dinspect .dix{position:absolute;top:4px;right:4px;width:48px;height:48px;border:0;border-radius:50%;background:#e8d3a0;color:#2e1a0a;font:900 26px/1 system-ui;cursor:pointer}
+.mydj{list-style:none;margin:0 0 12px;padding:0}.mydj li{margin:0 0 8px;padding:6px 8px;border:2px solid #8a5a1e;border-radius:10px;background:#fff6dc}
+.mydj .st{font-weight:800;padding:0 6px;border-radius:8px;background:#ffe9b0}
+.tile.hasmk .tn{display:none}
+.tile .bms{top:auto!important;bottom:3px;gap:8px}
+.tile .bms .bm{width:30px;height:30px;font-size:17px}
+.tile.owned .ms{transform:translateY(6px)}
+.tile .ob{z-index:6}
+.tile .bms{z-index:8}.tile .bms .bm{width:28px;height:28px;font-size:16px}
+html.land .tile .bms .bm{width:40px;height:40px;font-size:24px}html.land .tile .bms{gap:14px;bottom:30px}
+html.land .tile.hasmk .tn{display:block}
+.dcard .dinfo{position:absolute;top:-6px;left:-6px;z-index:3;width:24px;height:24px}
+.dcard .dinfo::after{inset:-10px -10px -14px -10px}
+.dcard .dinfo{left:-8px;top:-8px;width:28px;height:28px}
+.dcard .dinfo::after{inset:-12px 0 -12px -16px}
+/* the right 44 px of a djinn card (points + the i) opens the details; the rest buys/summons (marks.js decides by position) */
+.dcard .dinfo{position:absolute;pointer-events:none;left:auto;top:auto;right:9px;bottom:3px;width:18px;height:18px;font-size:13px;margin:0}
+.dcard .dinfo::after{display:none}
+.dcard:not(.th):not(.omy):not(.odj) .dv{position:absolute;top:3px;right:9px;margin:0}
+.dcard:not(.th):not(.omy):not(.odj){padding-right:40px}
+.orow .odj{padding-right:34px}
