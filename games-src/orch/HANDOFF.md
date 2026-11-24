@@ -12,6 +12,8 @@
 
 ## OWNER WEB APP (the one he means by 'the app'/'localhost'): `cd games-src/orch && python3 panel.py` serves 127.0.0.1:8765 (panel, Videos tab = all repo proof videos via mkvideos.py, messages to inbox.jsonl). Owner opens https://claude.ai/code/preview/<THIS session id>/8765 (the old session's link is dead). Keep it alive with a watchdog (/tmp/claude-0/panel-watchdog.sh restarts it; background tasks die after 2h) and call report_preview_port 8765. Refresh data every ~10 min (mkworkers.py, mkvideos.py, panel.json notes).
 
+## OWNER DESIGN RULE (24 Nov 06:30): tutorials must NOT be 'tap the glowing thing' walkthroughs that read out all the rules. He wants a NARRATIVE, real STRATEGIC decisions with consequence feedback (why a move was good/costly), rules taught just-in-time, small scenario puzzles + debrief + retry. Pilot on Onyx Atelier (W620-onyx-story, Opus). Only after he says yes, roll out to the other games. Existing tap tutorials stay until a game gets its story version.
+
 ## State at 00:45 UTC
 Running (7): twin-thrones BOARD session_01RR7mnbJoRoZ7PJAEZDffmw shelf/W597-twin-board | thornbound TUTORIAL session_01RR7mnXTQVtxP7ZbaYdAXbT shelf/W598-thornbound-tutorial | sands CLAIMS v2 session_01RR7mnYmGKRg4dTcMATY1oa shelf/W599-sands-claims2 | sands PATHS v2 session_01RR7mnbAuv5JP6q8DqQESEy shelf/W600-sands-paths2 | NEW via-tessera session_01RR7mnY8FLsLAUjAGiiXyUF shelf/W562-new-mosaic | NEW onyx-atelier session_01RR7mnZXMSM2MpiBq7nJA6v shelf/W564-new-gems | NEW meadowfold session_01RR7mnZUDvMmCQwNvTCbu3C shelf/W565-new-harmony.
 Queue: NEW gloamwar (branch shelf/W567-new-epic, source games-src/gloamwar, build.py there) when a slot frees. Same brief as the other 3 new games.
