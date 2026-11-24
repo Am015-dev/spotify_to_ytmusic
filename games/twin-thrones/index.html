@@ -178,6 +178,39 @@ html.gx,html.gx body{height:100%;margin:0;overflow:hidden;overscroll-behavior:no
 @keyframes gxtDot{0%,100%{opacity:.6;transform:scale(.8)}50%{opacity:1;transform:scale(1.1)}}
 @media (prefers-reduced-motion:reduce){.gxt-pill.gxt-wait i{animation:none;opacity:.8}}
 
+/* gx-scenario-tutor.css: scenario lesson card, picker, result card, hint ring (shell/gx-scenario-tutor.js, docs GXST.md).
+   Never dims, never blocks taps outside the card. Override with --gxst-* variables. */
+:root{--gxst-z:88;--gxst-bg:#fffaf0;--gxst-ink:#2e241c;--gxst-mute:#6b5a48;--gxst-head:#3b2f25;--gxst-on:#fffaf0;--gxst-acc:#e8907e;--gxst-ok:#5d9c58;--gxst-bad:#b5482f;--gxst-star:#e0a41c;--gxst-ring:#ffd36b}
+.gxst-card{position:fixed;left:8px;top:8px;z-index:var(--gxst-z);width:min(320px,calc(100vw - 16px));box-sizing:border-box;background:var(--gxst-bg);color:var(--gxst-ink);border:2px solid var(--gxst-head);border-radius:14px;box-shadow:0 8px 22px rgba(0,0,0,.3);font:15px/1.35 var(--gxh-font,system-ui,sans-serif);touch-action:none}
+.gxst-card.gxst-min{width:auto;background:none;border:0;box-shadow:none}
+.gxst-card.gxst-win{border-color:var(--gxst-ok)}.gxst-card.gxst-fail{border-color:var(--gxst-bad)}
+.gxst-hd{display:flex;align-items:center;padding:0 2px 0 12px;background:var(--gxst-head);color:var(--gxst-on);border-radius:11px 11px 0 0;cursor:move;user-select:none}
+.gxst-card.gxst-win .gxst-hd{background:var(--gxst-ok)}.gxst-card.gxst-fail .gxst-hd{background:var(--gxst-bad)}
+.gxst-hd b{font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.gxst-sp{flex:1}
+.gxst-ib{flex:none;width:44px;height:44px;border:0;background:none;color:var(--gxst-on);font-size:24px;line-height:1;border-radius:8px;cursor:pointer}
+.gxst-say,.gxst-goal{margin:10px 12px 4px;font-weight:700}
+.gxst-goal{font-size:16px}
+.gxst-hint{margin:4px 12px;padding:6px 8px;border-left:4px solid var(--gxst-star);background:rgba(224,164,28,.12);font-size:14px}
+.gxst-msg{margin:4px 12px 6px;font-size:14px}
+.gxst-rule{margin:2px 12px 6px;color:var(--gxst-mute);font-size:14px}
+.gxst-stars{margin:8px 12px 0;font-size:28px;line-height:1;color:var(--gxst-star);letter-spacing:4px}
+.gxst-ft{display:flex;gap:8px;padding:6px 10px 10px}
+.gxst-btn{min-height:44px;padding:0 14px;border-radius:10px;border:2px solid var(--gxst-head);background:transparent;color:var(--gxst-ink);font:700 15px/1 inherit;cursor:pointer}
+.gxst-btn.pri{background:var(--gxst-head);color:var(--gxst-on)}
+.gxst-btn:disabled{opacity:.5;cursor:default}
+.gxst-bulb::before{content:'';display:inline-block;width:10px;height:10px;margin-right:6px;border-radius:50%;background:var(--gxst-star);box-shadow:0 0 6px var(--gxst-star)}
+.gxst-list{margin:4px 8px 8px;padding:0;list-style:none;max-height:min(52vh,420px);overflow:auto}
+.gxst-pick{display:flex;align-items:center;gap:8px;width:100%;min-height:44px;margin:2px 0;padding:4px 8px;border:2px solid transparent;border-radius:10px;background:none;color:var(--gxst-ink);font:600 15px/1.2 inherit;text-align:left;cursor:pointer}
+.gxst-pick.rec{border-color:var(--gxst-acc)}
+.gxst-n{flex:none;width:26px;height:26px;border-radius:50%;background:var(--gxst-head);color:var(--gxst-on);display:grid;place-items:center;font-size:13px}
+.gxst-t{flex:1}.gxst-st{flex:none;color:var(--gxst-star);letter-spacing:1px}
+.gxst-chip{min-height:44px;max-width:calc(100vw - 16px);padding:4px 16px;border-radius:22px;background:var(--gxst-head);color:var(--gxst-on);border:2px solid var(--gxst-on);font:700 15px/1.2 var(--gxh-font,system-ui,sans-serif);box-shadow:0 4px 12px rgba(0,0,0,.3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:pointer}
+.gxst-ring{position:fixed;z-index:calc(var(--gxst-z) - 2);pointer-events:none;border-radius:14px;border:3px solid var(--gxst-ring);box-shadow:0 0 14px 3px var(--gxst-ring);animation:gxst-pulse 1.6s ease-in-out infinite}
+@keyframes gxst-pulse{0%,100%{opacity:.45;transform:scale(1)}50%{opacity:1;transform:scale(1.03)}}
+.gxst-q{min-height:44px;padding:0 12px;font-weight:700;cursor:pointer}
+.gxst-q.gxst-qfix{position:fixed;left:8px;bottom:8px;z-index:var(--gxst-z);border-radius:22px;background:var(--gxst-head);color:var(--gxst-on);border:2px solid var(--gxst-on)}
+@media (prefers-reduced-motion:reduce){.gxst-ring{animation:none;opacity:1}}
+
 /* ===== GX campaign styles: chapter map, story scenes, boss card, result. Theme with the --gxc-* variables. ===== */
 :root{--gxc-bg:#1b1410;--gxc-paper:#efe0bd;--gxc-paper2:#e2cc9b;--gxc-ink:#2a1d10;--gxc-dim:rgba(42,29,16,.68);--gxc-line:rgba(60,38,14,.28);
   --gxc-go:#c9662a;--gxc-go-ink:#fff8ec;--gxc-gold:#f2b93b;--gxc-a1:#4f8a4b;--gxc-a2:#c07a2c;--gxc-a3:#8e3b46;--gxc-road:#b98a52;--gxc-radius:16px;
@@ -2073,6 +2106,156 @@ const GX={key:'gx',open:null,
     index: function () { return S ? S.i : -1; }, goto: function (id) { if (!S) return false; for (var i = 0; i < cfg.steps.length; i++) if (cfg.steps[i].id === id) { clearVisuals(); enter(i); return true; } return false; },   /* test scenarios jump straight to a step (gx-scenario.js) */ state: state, skip: skip, stop: stop, next: next, relayout: relayout, lint: lint,
     status: status, isDone: function (g) { var s = status(g); return s.done || s.skipped; }, markDone: function (g) { mark(g, { done: 1, open: 0, step: 0 }); }, reset: function (g) { save(g, {}); try { localStorage.removeItem(key(g)); } catch (e) {} delete mem[g]; },
     menuHTML: menuHTML, label: label
+  };
+})();
+
+</script>
+<script>
+// gx-scenario-tutor.js: scenario tutorials (owner verdict, Nov 2026: tutorials must be GAMES). Each scenario puts the real board in a
+// small, stacked position with ONE objective; the player makes real moves and learns the rule from the consequence. A floating
+// objective card never dims and never blocks taps. Needs gx-scenario-tutor.css. ES5, no dependencies. Docs: shell/GXST.md.
+// (Global is GXST because GXS is already the ?scn= test registry in gx-scenario.js.)
+//   GXST.init({game, scenarios:[...], storageKey?, settled?:()=>bool, keepClear?:[selectors], qParent?})   GXST.picker() GXST.start(id) GXST.retry()
+//   GXST.next() GXST.hint() GXST.close() GXST.state()      events: window 'gxst' CustomEvent, detail.type =
+//   picker | start | hint | win | fail | retry | close
+//   scenario: {id, title, rule, goal, setup(), success()->bool, fail()->false|'message', par?, moves?()->n, hints:[nudge, {say, target}],
+//              debrief, solve?(api) (tests only)}
+(function () {
+  'use strict';
+  var D = document, C = null, S = null, W = null, R = null, Q = null, tick = 0, drag = null;
+  function $(s) { try { return D.querySelector(s); } catch (e) { return null; } }
+  function mk(tag, cls, txt) { var e = D.createElement(tag); if (cls) e.className = cls; if (txt != null) e.textContent = txt; e.setAttribute('data-help', ''); return e; }
+  function btn(cls, txt, aria, f) { var b = mk('button', cls, txt); b.type = 'button'; if (aria) b.setAttribute('aria-label', aria); b.onclick = function (ev) { ev.stopPropagation(); f(); }; return b; }
+  function emit(type, x) { var d = { type: type, game: C && C.game }; for (var k in x) d[k] = x[k]; var e; try { e = new CustomEvent('gxst', { detail: d }); } catch (er) { e = D.createEvent('CustomEvent'); e.initCustomEvent('gxst', false, false, d); } window.dispatchEvent(e); }
+  function vis(e) { if (!e || !e.getBoundingClientRect) return null; var r = e.getBoundingClientRect(); if (r.width < 2 || r.height < 2) return null; return { left: r.left, top: r.top, right: r.right, bottom: r.bottom, width: r.width, height: r.height }; }
+  function find(t) { if (!t) return null; if (typeof t === 'function') { try { return t(); } catch (e) { return null; } } var a; try { a = D.querySelectorAll(t); } catch (e) { return null; } for (var i = 0; i < a.length; i++) if (vis(a[i])) return a[i]; return null; }
+  function hit(a, b) { return a.left < b.right && a.right > b.left && a.top < b.bottom && a.bottom > b.top; }
+  function call(f, d) { if (typeof f !== 'function') return d; try { return f(); } catch (e) { return d; } }
+  // ------------------------------------------------------------ progress: best stars per scenario, card position
+  function key() { return C.storageKey || 'gxst-' + C.game; }
+  function load() { var o = null; try { o = JSON.parse(localStorage.getItem(key()) || 'null'); } catch (e) { } return o && typeof o === 'object' ? o : {}; }
+  function save() { try { localStorage.setItem(key(), JSON.stringify({ best: S.best, pos: S.pos })); } catch (e) { } }
+  function sc(id) { for (var i = 0; i < C.scenarios.length; i++) if (C.scenarios[i].id === id) return i; return -1; }
+  function cur() { return S.i >= 0 ? C.scenarios[S.i] : null; }
+  function stars() { var s = cur(), n = 3 - S.hint; if (s && s.par && call(s.moves, 0) > s.par) n--; return Math.max(1, n); }
+  function firstOpen() { for (var i = 0; i < C.scenarios.length; i++) if (!S.best[C.scenarios[i].id]) return i; return 0; }
+  function txt(v) { return typeof v === 'function' ? call(v, '') : v; }
+  function starTxt(n) { var t = ''; for (var i = 0; i < 3; i++) t += i < n ? '★' : '☆'; return t; }
+  // ------------------------------------------------------------ Lessons button (reopens the picker)
+  function qBtn() {
+    if (Q && D.body.contains(Q)) return;
+    Q = btn('gxst-q', 'Lessons', 'Lessons: learn by playing', function () { GXST.picker(); });
+    var p = (C.qParent && $(C.qParent)) || $('.gx-bar');
+    if (p) { Q.className = 'gx-ibtn gxst-q'; p.appendChild(Q); } else { Q.className += ' gxst-qfix'; D.body.appendChild(Q); }
+  }
+  // ------------------------------------------------------------ the card: picker | play | win | fail
+  function render() {
+    if (!S.open) { if (W) { W.remove(); W = null; } ring(); return; }
+    if (!W) { W = mk('div', 'gxst-card'); W.setAttribute('role', 'dialog'); W.setAttribute('aria-label', 'Lesson'); D.body.appendChild(W); wireDrag(); }
+    W.innerHTML = ''; W.className = 'gxst-card gxst-' + S.phase + (S.min ? ' gxst-min' : '');
+    var s = cur();
+    if (S.min) { W.appendChild(btn('gxst-chip', s && S.phase === 'play' ? s.title + ': ' + txt(s.goal) : 'Lessons', 'Open lesson card', function () { S.min = false; render(); })); place(); return; }
+    var hd = mk('div', 'gxst-hd');
+    hd.appendChild(mk('b', null, S.phase === 'picker' ? 'Learn by playing' : (S.i + 1) + '/' + C.scenarios.length + ' ' + s.title));
+    hd.appendChild(mk('span', 'gxst-sp'));
+    hd.appendChild(btn('gxst-ib', '–', 'Minimise', function () { S.min = true; render(); }));
+    hd.appendChild(btn('gxst-ib', '×', 'Close', function () { GXST.close(); }));
+    W.appendChild(hd);
+    var ft = mk('div', 'gxst-ft');
+    if (S.phase === 'picker') {
+      W.appendChild(mk('p', 'gxst-say', 'Short games on the real board. Each one teaches one rule.'));
+      var ol = mk('ol', 'gxst-list');
+      C.scenarios.forEach(function (x, i) {
+        var li = mk('li'), b = btn('gxst-pick' + (i === firstOpen() ? ' rec' : ''), null, 'Lesson ' + (i + 1) + ': ' + x.title, function () { GXST.start(x.id); });
+        b.setAttribute('data-id', x.id); b.appendChild(mk('span', 'gxst-n', String(i + 1))); b.appendChild(mk('span', 'gxst-t', x.title)); b.appendChild(mk('span', 'gxst-st', starTxt(S.best[x.id] || 0)));
+        li.appendChild(b); ol.appendChild(li);
+      });
+      W.appendChild(ol);
+    } else if (S.phase === 'play') {
+      W.appendChild(mk('p', 'gxst-goal', txt(s.goal)));
+      if (S.hint) { var h = s.hints[S.hint - 1]; W.appendChild(mk('p', 'gxst-hint', typeof h === 'string' ? h : h.say)); }
+      var hb = btn('gxst-btn gxst-bulb', S.hint ? (S.hint < s.hints.length ? 'Show me' : 'Hint shown') : 'Hint', 'Hint', function () { GXST.hint(); });
+      if (S.hint >= s.hints.length) hb.disabled = true;
+      ft.appendChild(hb); ft.appendChild(mk('span', 'gxst-sp'));
+      ft.appendChild(btn('gxst-btn', 'Restart', null, function () { GXST.retry(); }));
+    } else if (S.phase === 'win') {
+      W.appendChild(mk('p', 'gxst-stars', starTxt(S.stars)));
+      W.appendChild(mk('p', 'gxst-say', s.debrief));
+      W.appendChild(mk('p', 'gxst-rule', 'Rule: ' + s.rule));
+      ft.appendChild(btn('gxst-btn', 'Retry', null, function () { GXST.retry(); })); ft.appendChild(mk('span', 'gxst-sp'));
+      ft.appendChild(btn('gxst-btn pri', S.i < C.scenarios.length - 1 ? 'Next lesson' : 'All lessons', null, function () { GXST.next(); }));
+    } else if (S.phase === 'fail') {
+      W.appendChild(mk('p', 'gxst-say', 'Not quite.'));
+      W.appendChild(mk('p', 'gxst-msg', S.msg));
+      ft.appendChild(btn('gxst-btn', 'Lessons', null, function () { GXST.picker(); })); ft.appendChild(mk('span', 'gxst-sp'));
+      ft.appendChild(btn('gxst-btn pri', 'Retry', null, function () { GXST.retry(); }));
+    }
+    if (ft.children.length) W.appendChild(ft);
+    place();
+  }
+  function hintTarget() { var s = cur(); if (!s || S.phase !== 'play' || S.hint < 2) return null; var h = s.hints[S.hint - 1]; return h && typeof h === 'object' ? vis(find(h.target)) : null; }
+  // keep the card off the hinted target and the keepClear areas; a dragged position is kept unless it covers the hinted target
+  function place() {
+    if (!W) return; var vw = innerWidth, vh = innerHeight, bw = W.offsetWidth, bh = W.offsetHeight, t = hintTarget(), av = [];
+    (C.keepClear || []).forEach(function (sel) { var a; try { a = D.querySelectorAll(sel); } catch (e) { a = []; } for (var i = 0; i < a.length; i++) { var r = vis(a[i]); if (r) av.push(r); } });
+    function clamp(p) { return [Math.max(4, Math.min(vw - bw - 4, p[0])), Math.max(4, Math.min(vh - bh - 4, p[1]))]; }
+    function box(p) { return { left: p[0], top: p[1], right: p[0] + bw, bottom: p[1] + bh }; }
+    function cost(p) { var b = box(p), c = t && hit(b, t) ? 1e6 : 0; av.forEach(function (r) { var x = Math.min(b.right, r.right) - Math.max(b.left, r.left), y = Math.min(b.bottom, r.bottom) - Math.max(b.top, r.top); if (x > 0 && y > 0) c += x * y; }); return c; }
+    if (S.pos) { var q = clamp(S.pos); if (!(t && hit(box(q), t))) return put(q); }
+    var top = 4, bar = $('.gx-bar'); if (bar) { var br = bar.getBoundingClientRect(); if (br.top < 4 && br.height < 90) top = br.bottom + 6; }
+    var sp = [[8, top], [vw - bw - 8, top], [vw - bw - 8, vh - bh - 8], [8, vh - bh - 8]];
+    av.concat(t ? [t] : []).forEach(function (r) { sp.push([8, r.bottom + 6], [vw - bw - 8, r.bottom + 6], [8, r.top - bh - 6], [r.right + 6, r.top]); });
+    var best = null; sp.forEach(function (p, i) { p = clamp(p); var c = cost(p) + i * 0.01; if (!best || c < best.c) best = { p: p, c: c }; });
+    put(best.p);
+  }
+  function put(p) { W.style.left = Math.round(p[0]) + 'px'; W.style.top = Math.round(p[1]) + 'px'; }
+  function wireDrag() {
+    W.addEventListener('pointerdown', function (e) { if (!e.target.closest('.gxst-hd') || e.target.closest('button')) return; var r = W.getBoundingClientRect(); drag = [e.clientX - r.left, e.clientY - r.top, false]; try { W.setPointerCapture(e.pointerId); } catch (x) { } });
+    W.addEventListener('pointermove', function (e) { if (!drag) return; drag[2] = true; S.pos = [e.clientX - drag[0], e.clientY - drag[1]]; put(S.pos); });
+    W.addEventListener('pointerup', function () { if (drag && drag[2]) { save(); place(); } drag = null; });
+  }
+  // ------------------------------------------------------------ the "show me" ring: pointer-events none, never steals a tap
+  function ring() {
+    var t = S && S.open ? hintTarget() : null;
+    if (!t) { if (R) { R.remove(); R = null; } return; }
+    if (!R) { R = mk('div', 'gxst-ring'); D.body.appendChild(R); }
+    R.style.left = (t.left - 4) + 'px'; R.style.top = (t.top - 4) + 'px'; R.style.width = (t.width + 8) + 'px'; R.style.height = (t.height + 8) + 'px';
+  }
+  // ------------------------------------------------------------ judge: success / fail only when the game has settled (animations done)
+  function loop() {
+    if (!S || !S.open) return;
+    var s = cur();
+    if (S.phase === 'play' && S.live && call(C.settled, true)) {
+      if (call(s.success, false)) { S.stars = stars(); if ((S.best[s.id] || 0) < S.stars) S.best[s.id] = S.stars; S.phase = 'win'; S.min = false; save(); render(); emit('win', { id: s.id, stars: S.stars }); return; }
+      var f = call(s.fail, false); if (f) { S.phase = 'fail'; S.msg = String(f); S.min = false; render(); emit('fail', { id: s.id, msg: S.msg }); return; }
+    }
+    if (!drag) place(); ring();
+  }
+  function begin(i, how) {
+    S.i = i; S.phase = 'play'; S.hint = 0; S.msg = ''; S.stars = 0; S.open = true; S.min = false; S.live = false;
+    var s = cur(), tok = ++S.tok; render();
+    var r = null; try { r = s.setup(); } catch (e) { console.error(e); }
+    var go = function () { if (tok === S.tok) { S.live = true; place(); emit(how, { id: s.id, i: i }); } };
+    if (r && typeof r.then === 'function') r.then(go, go); else go();
+  }
+  window.GXST = {
+    init: function (cfg) {
+      C = cfg; var o = load(); S = { open: false, phase: 'picker', i: -1, hint: 0, best: o.best || {}, pos: o.pos || null, min: false, live: false, tok: 0, msg: '', stars: 0 };
+      qBtn(); if (!tick) { tick = setInterval(loop, 250); addEventListener('resize', function () { if (S && S.open) render(); }); }
+      return GXST;
+    },
+    picker: function () { if (!C) return; qBtn(); S.open = true; S.phase = 'picker'; S.min = false; S.tok++; S.live = false; render(); emit('picker', {}); },
+    start: function (id) { var i = typeof id === 'number' ? id : sc(id); if (i < 0) return; begin(i, 'start'); },
+    retry: function () { if (S.i < 0) return; begin(S.i, 'retry'); },
+    next: function () { if (S.i < C.scenarios.length - 1) begin(S.i + 1, 'start'); else GXST.picker(); },
+    hint: function () { var s = cur(); if (!s || S.phase !== 'play' || S.hint >= s.hints.length) return; S.hint++; render(); ring(); emit('hint', { id: s.id, level: S.hint }); },
+    close: function () { if (!S || !S.open) return; S.open = false; S.live = false; S.tok++; render(); emit('close', {}); },
+    active: function () { var s = S && S.open && S.phase !== 'picker' ? cur() : null; return s; },
+    state: function () {
+      if (!S) return null; var s = cur(), wr = W && vis(W), tr = hintTarget();
+      return { open: S.open, phase: S.phase, id: s && S.phase !== 'picker' ? s.id : null, i: S.i, live: S.live, hint: S.hint, stars: S.stars, msg: S.msg,
+        best: JSON.parse(JSON.stringify(S.best)), min: S.min, pos: S.pos, card: wr, target: tr, overlap: !!(wr && tr && hit(wr, tr)), count: C.scenarios.length };
+    }
   };
 })();
 
@@ -4226,7 +4409,7 @@ var TT_TEST = {};
   }
   function sndLabel() { return 'Sound: ' + (SND.isOn() ? 'on' : 'off'); }
   function firstTime() { try { return !localStorage.getItem('tt_seen') && !GXT.isDone('twin-thrones'); } catch (e) { return false; } }
-  function tutBtn() { return window.GXT ? GXT.menuHTML({ game: 'twin-thrones', first: firstTime(), cls: 'btn alt sm', launch: function () { GX.close && GX.close(); if (window.TT_TUTOR) TT_TUTOR.start(); } }) : ''; }
+  function tutBtn() { return window.GXT ? GXT.menuHTML({ game: 'twin-thrones', first: firstTime(), cls: 'btn alt sm', launch: function () { GX.close && GX.close(); if (window.GXST) GXST.picker(); } }) : ''; }
   var FLAVOUR = (window.CAMPAIGN && CAMPAIGN.quick && CAMPAIGN.quick.intro) || ['Two thrones stand empty. Draft your wonders, then out-build the rival.'];
   function newGame(mode, seed, camp) {
     try { localStorage.setItem('tt_seen', '1'); } catch (e) { } U.mode = mode; U.ai = [mode === 'watch', mode !== 'two']; U.G = E.newGame({ seed: seed, first: U.tut ? 0 : undefined }); U.camp = camp || null; U.finished = false; U.logs = []; var tw = camp && camp.twist; if (tw) { if (tw.id === 'extra-coins') U.G.players[1].coins += tw.param; if (tw.id === 'head-start') U.G.mil = -tw.param; } U.sel = null; U.fingerDone = false; U.busy = false; U.seq++; U.narr = false; U.lastSide = null; clearTimeout(U.nt); if (!U.tut) U.rivalName = null;
@@ -4477,122 +4660,167 @@ var TT_TEST = {};
 
 </script>
 <script>
-// Twin Thrones guided first game (W492): one short scripted game that teaches every core rule in play order.
-// Each step = one sentence (12 words or fewer) + ONE highlighted tap (a game action, or Next on a rule you see on the board).
-// The engine applies the real rules; only the deal and the rival's choices are fixed. After the final score: a real game.
+// Twin Thrones scenario lessons (W687): ten short games on the real board (shell/gx-scenario-tutor.js, docs shell/GXST.md).
+// Each lesson hand-builds a tiny position with the game's own engine, gives ONE goal, scripts the rival, and judges the real state.
+// The old dimming guided game (tutor.js) is retired; this file keeps the small TT_TUTOR hooks the UI calls (rival script, cancel).
+// RULE -> LESSON TABLE (rules-notes.md, the rules drawer, engine.js):
+//   wonder draft: you 1, rival 2, last one yours ...... draft     | pyramid: only uncovered cards, a covered card flips ..... take
+//   cards you own pay their resource for free ......... own       | trading: 2 coins + 1 per rival card making it ........... trade
+//   chain symbol makes a linked card free ............. chain     | sell: 2 coins + 1 per yellow card ....................... sell
+//   shields move the pawn, loot at 3 steps ............ war       | science pair: second symbol = progress token ............ pair
+//   wonder: card tucked under, play again ............. wonder    | scoring and the winner after the last card .............. game
+//   NOT a lesson (rules drawer only): 9-step war win, six-symbol science win, 7-wonder cap, who starts the next age, guilds,
+//   the other progress tokens, blue-point tie-break.
 (function () {
-  if (typeof GXT === 'undefined' || !window.TT_UI) return;
-  var UI = TT_UI, U = UI.U, E = UI.E, $ = UI.$, GAME = 'twin-thrones';
-  var T = { active: false, then: null, seen: {} };
-  // ---------------------------------------------------------------- the deal
-  var POOL = ['w-terraced-orchard', 'w-sky-tomb', 'w-bronze-titan', 'w-stone-riddle', 'w-moon-grove', 'w-merchant-road', 'w-archive-of-dust', 'w-thunder-idol'];
-  var DECK = {
-    1: ['a1-weights-hall', 'a1-scribe-room', 'a1-roadside-inn', 'a1-bathhouse', 'a1-stake-fence', 'a1-timber-stand', 'a1-rock-face', 'a1-pony-pen', 'a1-lookout'],
-    2: ['a2-parade-ground', 'a2-measure-hall', 'a2-glassblower', 'a2-horse-yard', 'a2-brewhouse'],
-    3: ['a3-high-fort', 'a3-war-pavilion', 'a3-bastion']
-  };
-  function row(xs, up) { return { xs: xs, up: up }; }
-  var TLAY = { 1: [row([-1, 1], 1), row([-2, 0, 2], 0), row([-3, -1, 1, 3], 1)], 2: [row([-2, 0, 2], 0), row([-1, 1], 1)], 3: [row([0], 0), row([-1, 1], 1)] };
-  var LAY0 = null;
-  function layout(on) {
-    var L = TT.LAYOUT;
-    if (on) { if (!LAY0) LAY0 = { 1: L[1], 2: L[2], 3: L[3] }; L[1] = TLAY[1]; L[2] = TLAY[2]; L[3] = TLAY[3]; }
-    else if (LAY0) { L[1] = LAY0[1]; L[2] = LAY0[2]; L[3] = LAY0[3]; LAY0 = null; }
+  if (!window.GXST || !window.TT_UI) return;
+  var UI = TT_UI, U = UI.U, E = UI.E, $ = UI.$, BY = UI.BY;
+  var L = { on: 0, n: 0, r: 0, last: null, lay0: null, c0: 0 };   // n = my moves, r = rival moves in this lesson
+  var ALLT = ['t-strategy', 't-agriculture', 't-philosophy', 't-urbanism', 't-law', 't-architecture', 't-economy', 't-masonry', 't-mathematics', 't-theology'];
+  var G = function () { return U.G; };
+  var me = function () { return U.G.players[0]; };
+  function rows(a) { return a.map(function (r) { return { xs: r[0], up: r[1], ids: r[2] }; }); }
+  function layout(on, age, rs) {
+    var Ly = TT.LAYOUT;
+    if (on) { if (!L.lay0) L.lay0 = { 1: Ly[1], 2: Ly[2], 3: Ly[3] }; Ly[age] = rs.map(function (r) { return { xs: r.xs, up: r.up }; }); }
+    else if (L.lay0) { Ly[1] = L.lay0[1]; Ly[2] = L.lay0[2]; Ly[3] = L.lay0[3]; L.lay0 = null; }
   }
-  function deal() {
-    var g = U.G; g.draft.pool = POOL.slice(); g.draft.avail = POOL.slice(0, 4);
-    g.tokensUp = ['t-strategy', 't-agriculture', 't-philosophy', 't-urbanism', 't-law'];
-    g.tokensBox = ['t-architecture', 't-economy', 't-masonry', 't-mathematics', 't-theology'];
-    g.decks[1] = DECK[1].slice(); g.decks[2] = DECK[2].slice(); g.decks[3] = DECK[3].slice();
-  }
-  // the rival's fixed choices (the computer opponent makes them through the normal turn flow)
-  var RPICK = ['w-sky-tomb', 'w-bronze-titan', 'w-merchant-road'];
-  var RPLAY = { 'a1-rock-face': 'build', 'a1-lookout': 'build', 'a1-stake-fence': 'build', 'a1-scribe-room': 'build', 'a2-brewhouse': 'build', 'a2-glassblower': 'build', 'a3-bastion': 'discard' };
-  function rivalMove(g) {
-    if (!T.active) return null;
-    var M = E.validMoves(g), pd = g.pend[0];
-    if (pd && pd.type === 'first') return { t: 'first', who: 0 };
-    if (g.phase === 'draft') { for (var k = 0; k < RPICK.length; k++) if (g.draft.avail.indexOf(RPICK[k]) >= 0) return { t: 'pick', w: RPICK[k] }; return null; }
-    var av = E.available(g);
-    for (var j = 0; j < av.length; j++) { var t = RPLAY[av[j].id]; if (t) { var m = { t: t, i: av[j].i }; if (M.some(function (x) { return x.t === m.t && x.i === m.i; })) return m; } }
-    return null;
-  }
-  // ---------------------------------------------------------------- step helpers
-  function G() { return U.G; }
-  function idle() { return !!U.G && !U.busy && !U.narr && !U.G.over && E.sideToAct(U.G) === 0; }
-  function cellOf(id) { var g = G(); if (!g) return null; for (var i = 0; i < g.pyr.length; i++) if (g.pyr[i].id === id) return g.pyr[i]; return null; }
-  function cardEl(id) { var c = cellOf(id); return c ? $('c' + c.i) : null; }
-  function canTake(id) { var c = cellOf(id); return !!c && !c.taken && E.available(G()).some(function (x) { return x.i === c.i; }); }
-  function sel(id) { var c = cellOf(id); return !!c && U.sel === c.i; }
-  function pickStep(id, w, say) { return { id: id, rule: id, say: say, target: function () { return document.querySelector('[data-pick="' + w + '"]'); }, wait: { type: 'tap', match: function (a) { return a.kind === 'pick' && a.id === w; } }, ready: function () { return idle() && G().phase === 'draft' && G().draft.avail.indexOf(w) >= 0; } }; }
-  function cardStep(id, cid, say) { return { id: id, rule: id, say: say, target: function () { return cardEl(cid); }, wait: { type: 'tap', match: function (a) { var c = cellOf(cid); return a.kind === 'card' && c && a.i === c.i; } }, ready: function () { return idle() && !G().pend.length && canTake(cid) && U.sel == null; } }; }
-  function actStep(id, cid, act, say) { return { id: id, rule: id, say: say, target: function () { return document.querySelector('#zoom:not([hidden]) [data-a="' + act + '"]'); }, wait: { type: 'tap', match: function (a) { return a.kind === 'act' && a.a === act; } }, ready: function () { return idle() && sel(cid); } }; }
-  function infoStep(id, say, target, ready) { return { id: id, rule: id, say: say, target: target, wait: null, ready: function () { return idle() && (!ready || ready()); } }; }
-  // a rule shown right after YOUR move: the rival's turn waits until you tap Next
-  function holdStep(id, say, target, ready) { return { id: id, rule: id, hold: 1, say: say, target: target, wait: null, ready: function () { return !!U.G && !U.narr && !U.G.over && (!ready || ready()); } }; }
-  function holdRival() { var st = T.active && GXT.current && GXT.current(); return !!(st && st.hold); }
-  function pawn() { return $('pawn') || document.querySelector('#mil'); }
-  // ---------------------------------------------------------------- the steps, in rule order
-  var STEPS = [
-    infoStep('goal', 'Win: most points, 9 war steps, or 6 science symbols.', function () { return $('instr'); }, function () { return G().phase === 'draft'; }),
-    pickStep('draft', 'w-terraced-orchard', 'First, draft wonders. Tap the glowing wonder to claim it.'),
-    infoStep('draft-last', 'Rival took two. The fourth wonder came to you automatically.', function () { return $('s0') || $('pyr'); }, function () { return G().phase === 'draft' && G().draft.n === 5; }),
-    pickStep('draft-2', 'w-moon-grove', 'Round two: four new wonders. Rival picked first; you take two.'),
-    pickStep('draft-3', 'w-archive-of-dust', 'Take your second one. Rival gets the last wonder.'),
-    cardStep('pyramid', 'a1-timber-stand', 'Only uncovered cards glow. Tap the wood card.'),
-    actStep('build-free', 'a1-timber-stand', 'build', 'It costs nothing. Tap Build to add it to your city.'),
-    infoStep('flip', 'A freed face-down card turns face up.', function () { return cardEl('a1-roadside-inn'); }, function () { var c = cellOf('a1-roadside-inn'); return c && c.up && canTake('a1-roadside-inn'); }),
-    cardStep('resource', 'a1-pony-pen', 'This red card needs 1 wood. Tap it.'),
-    actStep('own-resource', 'a1-pony-pen', 'build', 'Your wood card pays the wood. Build it free.'),
-    holdStep('shield', 'Shields push the war pawn toward your rival.', pawn, function () { return G().mil === 1; }),
-    holdStep('military-win', 'Pushing the pawn 9 steps toward the rival wins at once.', function () { return document.querySelector('.mend.r') || pawn(); }),
-    cardStep('trade-card', 'a1-bathhouse', 'This card needs stone you lack. Tap it.'),
-    actStep('trade', 'a1-bathhouse', 'build', 'Missing stone costs 2 coins, plus 1 for your rival\u2019s stone.'),
-    cardStep('yellow', 'a1-roadside-inn', 'Yellow cards bring coins. Tap the inn.'),
-    actStep('yellow-build', 'a1-roadside-inn', 'build', 'Build it: you get 4 coins now.'),
-    infoStep('depot', 'Depot cards make one resource cost 1 coin. None dealt here.', function () { return $('pyr'); }),
-    cardStep('science', 'a1-weights-hall', 'Green cards carry science symbols. Tap this one.'),
-    actStep('science-build', 'a1-weights-hall', 'build', 'Missing papyrus costs 2 coins. Build it.'),
-    { id: 'next-age', rule: 'next-age', say: 'The pawn is on your side, so you choose who starts.', target: function () { return document.querySelector('[data-first="0"]'); }, wait: { type: 'tap', match: function (a) { return a.kind === 'first' && a.who === 0; } }, ready: function () { var pd = G().pend[0]; return idle() && pd && pd.type === 'first' && G().age === 2; } },
-    infoStep('age2', 'Age Two: new, stronger cards. Same turn rules.', function () { return $('pyr'); }, function () { return G().age === 2 && !G().pend.length; }),
-    cardStep('chain-card', 'a2-horse-yard', 'Your Pony Pen links to this card. Tap it.'),
-    actStep('chain', 'a2-horse-yard', 'build', 'Linked cards are free: a chain. Build it.'),
-    cardStep('wonder-card', 'a2-parade-ground', 'Any card can build a wonder. Tap this one.'),
-    { id: 'wonder', rule: 'wonder', say: 'Tap Wonder: pay its cost, the card goes underneath.', target: function () { return document.querySelector('#zoom:not([hidden]) [data-a="wonder"][data-w="w-terraced-orchard"]'); }, wait: { type: 'tap', match: function (a) { return a.kind === 'act' && a.a === 'wonder' && a.w === 'w-terraced-orchard'; } }, ready: function () { return idle() && sel('a2-parade-ground'); } },
-    infoStep('again', 'This wonder gives 6 coins and another turn now.', function () { return $('s0') || $('pyr'); }, function () { return G().built === 1; }),
-    infoStep('seven', 'Only 7 wonders get built in total. The last one is lost.', function () { return $('s0') || $('pyr'); }),
-    cardStep('pair-card', 'a2-measure-hall', 'A second scale symbol makes a pair. Tap it.'),
-    actStep('pair-build', 'a2-measure-hall', 'build', 'Buy the two glass and build it.'),
-    { id: 'pair', rule: 'pair', say: 'A matching pair earns a token. This one: 6 coins, 4 points.', target: function () { return document.querySelector('[data-token="t-agriculture"]'); }, wait: { type: 'tap', match: function (a) { return a.kind === 'token' && a.id === 't-agriculture'; } }, ready: function () { var pd = G().pend[0]; return idle() && pd && pd.type === 'token'; } },
-    holdStep('science-win', 'Six different science symbols is an instant win.', function () { return $('s0') || $('pyr'); }, function () { return G().players[0].tokens.length === 1; }),
-    infoStep('tie-start', 'Tied shields: the rival took the last card and chose you.', function () { return $('pyr'); }, function () { return G().age === 3 && !G().pend.length; }),
-    infoStep('guild', 'Real games add purple guilds in Age Three, scored by city.', function () { return $('pyr'); }, function () { return G().age === 3 && !G().pend.length; }),
-    cardStep('age3', 'a3-war-pavilion', 'Last age. This red card costs 8 coins. Tap it.'),
-    actStep('loot-build', 'a3-war-pavilion', 'build', 'Build it: three shields push the pawn.'),
-    holdStep('loot', 'Pawn crossed a coin space: the rival lost 2 coins.', pawn, function () { return G().mil >= 3; }),
-    cardStep('sell-card', 'a3-high-fort', 'The last card. Tap it.'),
-    actStep('sell', 'a3-high-fort', 'discard', 'Sell it: 2 coins plus 1 per yellow card.'),
-    { id: 'score', rule: 'score', say: 'Score: cards, wonders, tokens, war track, 1 per 3 coins.', target: function () { return document.querySelector('#res table'); }, wait: null, ready: function () { return !!G() && G().over && !$('res').hidden && !!document.querySelector('#res table'); } },
-    { id: 'tie', rule: 'tie', say: 'Tied on points? More blue card points wins.', target: function () { return document.querySelector('#res table'); }, wait: null, ready: function () { return !!G() && G().over && !$('res').hidden; } }
-  ];
-  // rules every step teaches (the e2e walks the tutorial and checks each appears)
-  var RULES = ['goal', 'draft', 'draft-last', 'draft-2', 'pyramid', 'build-free', 'flip', 'own-resource', 'shield', 'military-win', 'trade', 'yellow-build', 'depot', 'science-build', 'next-age', 'chain', 'wonder', 'again', 'seven', 'pair', 'science-win', 'tie-start', 'guild', 'age3', 'loot', 'sell', 'score', 'tie'];
-  STEPS.forEach(function (s) { var on = s.onEnter; s.onEnter = function () { T.seen[s.id] = 1; if (on) on(); }; });
-  // ---------------------------------------------------------------- start / end
-  function off() { T.active = false; document.body.classList.remove('ttguided'); layout(false); U.tut = false; U.rivalName = null; }
-  function start(o) {
-    T.then = (o && o.then) || null; U.lvl = 'easy'; T.seen = {};
+  // ---- the position: a fresh game, then every piece placed by hand (the engine's own state shape)
+  function stack(sp) {
+    try { GX.close(); } catch (e) { }
+    U.tut = true; U.rivalName = 'Pell'; U.lvl = 'easy'; L.on = 1; L.n = 0; L.r = 0; L.last = null;
+    layout(false); if (sp.rows) layout(true, sp.age, sp.rows);
     $('res').hidden = true; $('start').hidden = true;
-    U.tut = true; U.rivalName = 'Pell'; layout(true); T.active = true; document.body.classList.add('ttguided');
-    UI.newGame('cpu', 5); deal(); U.fingerDone = true; UI.render();
-    GXT.start({ game: GAME, story: false, endTitle: 'You know the rules', endText: 'Now play a real game against the computer.', endButtons: [{ id: 'go', label: 'Play a real game' }],
-      steps: STEPS, setup: function () { },
-      onDone: function () { off(); try { GXT.markDone(GAME); } catch (e) { } $('res').hidden = true; var f = T.then; T.then = null; if (f) f(); else UI.newGame('cpu'); },
-      onExit: function () { off(); if (T.then) { var f = T.then; T.then = null; f(); } else UI.showStart(); } });
+    UI.newGame('cpu', 5);
+    var g = U.G; g.firstSeat = 0;
+    if (sp.draft) { g.draft.pool = sp.draft.slice(); g.draft.avail = sp.draft.slice(0, 4); }
+    else {
+      g.phase = 'play'; g.age = sp.age; g.draft.n = 8; g.draft.avail = []; g.draft.pool = []; g.turn = 0; g.pend = []; g.over = false; g.discard = [];
+      g.mil = sp.mil || 0; g.built = 0; g.loot = [[0, 0], [0, 0]]; g.pyr = []; g.decks[sp.age] = [];
+      var n = 0; sp.rows.forEach(function (r, ri) { r.xs.forEach(function (x, k) { g.pyr.push({ i: n++, r: ri, x: x, id: r.ids[k], up: r.up, taken: 0 }); g.decks[sp.age].push(r.ids[k]); }); });
+      [0, 1].forEach(function (p) {
+        var P = g.players[p]; P.coins = sp.coins[p]; P.cards = (sp.cards[p] || []).slice(); P.tokens = []; P.pairs = [];
+        P.wonders = ((sp.wonders && sp.wonders[p]) || []).map(function (w) { return { id: w, card: null }; });
+      });
+      g.tokensUp = ALLT.slice(0, 5); g.tokensBox = ALLT.slice(5);
+    }
+    L.c0 = g.players[0].coins; L.cards0 = g.players[0].cards.length;
+    U.sel = null; U.busy = false; U.narr = false; U.lastSide = null;
+    UI.render();
+    return new Promise(function (r) { setTimeout(r, 450); });
   }
-  function coverage() { return { all: RULES.slice(), seen: Object.keys(T.seen) }; }
-  Object.defineProperty(window, 'GXCOACH', { configurable: true, get: function () { return { running: !!T.active, explained: Object.keys(T.seen), done: !T.active }; } });
-  window.TT_TUTOR = { start: start, cancel: function () { if (T.active) off(); }, coverage: coverage, rivalMove: rivalMove, holdRival: holdRival, steps: STEPS, rules: RULES, words: function () { return STEPS.map(function (s) { return [s.id, s.say.split(/\s+/).length]; }); } };
+  var card = function (id) { return function () { var g = U.G, i; if (!g) return null; for (i = 0; i < g.pyr.length; i++) if (g.pyr[i].id === id && !g.pyr[i].taken) return $('c' + i); return null; }; };
+  var pick = function (w) { return function () { return document.querySelector('[data-pick="' + w + '"]'); }; };
+  var did = function () { return L.n > 0; };
+  var built = function () { return me().cards.length > L.cards0; };
+  var tokPend = function () { var p = G().pend[0]; return !!p && p.type === 'token'; };
+  var FRONT4 = [-3, -1, 1, 3];
+  var lessons = [
+    { id: 'draft', title: 'Wonder draft', rule: 'Wonders are drafted before play: you take one, your rival takes two, the last one comes to you.',
+      goal: 'Claim the Sky Tomb, the wonder worth 9 points.', par: 1,
+      setup: function () { return stack({ draft: ['w-sky-tomb', 'w-bronze-titan', 'w-moon-grove', 'w-stone-riddle', 'w-terraced-orchard', 'w-merchant-road', 'w-archive-of-dust', 'w-thunder-idol'] }); },
+      success: function () { return did() && me().wonders.some(function (w) { return w.id === 'w-sky-tomb'; }); },
+      fail: function () { return did() ? 'You took another wonder. Pell takes the next two, so the Sky Tomb went to Pell.' : false; },
+      hints: ['Each wonder lists what it is worth. Which is the biggest?', { say: 'Tap the Sky Tomb: it is worth 9 points.', target: pick('w-sky-tomb') }],
+      debrief: 'You pick first, so the best wonder is yours. Pell then takes two.' },
+    { id: 'take', title: 'Take a card', rule: 'Only uncovered cards can be taken. Build one to add it to your city; taking cards flips covered cards face up.',
+      goal: 'Build the card that makes wood.', par: 1,
+      setup: function () { return stack({ age: 1, rows: rows([[[0], 0, ['a1-lookout']], [FRONT4, 1, ['a1-open-stage', 'a1-timber-stand', 'a1-roadside-inn', 'a1-scribe-room']]]), coins: [7, 7], cards: [[], []] }); },
+      success: function () { return me().cards.indexOf('a1-timber-stand') >= 0; },
+      fail: function () { return did() ? (L.last && L.last.t === 'discard' ? 'You sold it for coins. Built, the Timber Stand would give you wood.' : 'That card makes no wood. Look for the wood symbol.') : false; },
+      hints: ['Only the front cards are uncovered. Which one shows a wood icon?', { say: 'Tap the Timber Stand, then Build.', target: card('a1-timber-stand') }],
+      debrief: 'Front cards are free to take. A built wood card now pays wood for you.' },
+    { id: 'own', title: 'Your cards pay', rule: 'A resource card you own pays that resource for free on later cards. Missing resources cost coins.',
+      goal: 'Build a card and keep all 5 coins.', par: 1,
+      setup: function () { return stack({ age: 1, rows: rows([[[0], 0, ['a1-lookout']], [FRONT4, 1, ['a1-pony-pen', 'a1-barrack-yard', 'a1-bathhouse', 'a1-stake-fence']]]), coins: [5, 7], cards: [['a1-timber-stand'], []] }); },
+      success: function () { return built() && me().coins >= L.c0; },
+      fail: function () { return did() ? 'That card cost ' + Math.max(0, L.c0 - me().coins) + ' coins. You only own wood, so only a wood card is free.' : false; },
+      hints: ['You own a wood card. Which card here needs wood?', { say: 'Tap the Pony Pen: its wood is paid by your Timber Stand.', target: card('a1-pony-pen') }],
+      debrief: 'Your Timber Stand paid the wood: the Pony Pen was free.' },
+    { id: 'trade', title: 'Buy a resource', rule: 'A resource you lack costs 2 coins, plus 1 for each card your rival has that makes it.',
+      goal: 'Build a card and keep at least 4 coins.', par: 1,
+      setup: function () { return stack({ age: 1, rows: rows([[[0], 0, ['a1-lookout']], [FRONT4, 1, ['a1-bathhouse', 'a1-barrack-yard', 'a1-timber-depot', 'a1-herb-garden']]]), coins: [6, 7], cards: [[], ['a1-rock-face', 'a1-gravel-pit']] }); },
+      success: function () { return built() && me().coins >= 4; },
+      fail: function () { return did() && !(built() && me().coins >= 4) ? 'You spent ' + Math.max(0, L.c0 - me().coins) + ' coins. Pell makes 2 stone, so stone costs 4. Clay and glass cost 2.' : false; },
+      hints: ['Pell makes stone, so stone is dear. Which cards need something else?', { say: 'The Barrack Yard needs clay, which Pell lacks: only 2 coins.', target: card('a1-barrack-yard') }],
+      debrief: 'Clay: 2 coins. Stone: 2 plus 1 for each of Pell’s stone cards.' },
+    { id: 'chain', title: 'Chain symbols', rule: 'A card with a chain symbol you already own is free to build, even if it costs resources.',
+      goal: 'Build a red card without spending coins.', par: 1,
+      setup: function () { return stack({ age: 2, rows: rows([[[0], 0, ['a2-city-wall']], [FRONT4, 1, ['a2-sawpit', 'a2-horse-yard', 'a2-barracks', 'a2-kiln-yard']]]), coins: [2, 7], cards: [['a1-pony-pen'], []] }); },
+      success: function () { return me().cards.indexOf('a2-horse-yard') >= 0 && me().coins >= L.c0; },
+      fail: function () { return did() ? 'That cost coins. Your Pony Pen has the horse symbol: the Horse Yard links to it and is free.' : false; },
+      hints: ['Your Pony Pen shows a horse symbol. Which red card links to it?', { say: 'Tap the Horse Yard: its chain makes it free.', target: card('a2-horse-yard') }],
+      debrief: 'The horse symbol on your Pony Pen made the Horse Yard free.' },
+    { id: 'sell', title: 'Sell a card', rule: 'Instead of building you can sell a card: 2 coins, plus 1 for each yellow card you own.',
+      goal: 'Reach 7 coins this turn.', par: 1,
+      setup: function () { return stack({ age: 1, rows: rows([[[0], 0, ['a1-lookout']], [FRONT4, 1, ['a1-timber-stand', 'a1-pony-pen', 'a1-open-stage', 'a1-herb-garden']]]), coins: [3, 7], cards: [['a1-roadside-inn', 'a2-brewhouse'], []] }); },
+      success: function () { return me().coins >= 7; },
+      fail: function () { return did() ? 'You have ' + me().coins + ' coins. Building gives none. Selling gives 2 plus 1 per yellow card: 4.' : false; },
+      hints: ['You own two yellow cards. How much does selling pay with them?', { say: 'Tap any card, then Sell: 2 + 2 yellow = 4 coins.', target: card('a1-timber-stand') }],
+      debrief: 'Sold for 2 + 2 yellow cards: 3 + 4 = 7 coins.' },
+    { id: 'war', title: 'War pawn', rule: 'Shields push the pawn toward your rival. Passing 3 steps takes 2 coins from them, 6 steps takes 5, 9 steps wins.',
+      goal: 'Take coins from your rival with the war pawn.', par: 1,
+      setup: function () { return stack({ age: 3, rows: rows([[[0], 0, ['a3-arsenal']], [FRONT4, 1, ['a1-lookout', 'a3-war-pavilion', 'a1-open-stage', 'a1-stake-fence']]]), coins: [8, 7], cards: [[], []] }); },
+      success: function () { return !!G().loot[0][0]; },
+      fail: function () { return did() ? 'The pawn is on step ' + G().mil + '. Reach step 3 and your rival loses 2 coins.' : false; },
+      hints: ['Red cards show shields. Which one has the most?', { say: 'Tap the War Pavilion: 3 shields move the pawn 3 steps.', target: card('a3-war-pavilion') }],
+      debrief: 'Three shields crossed the first coin space: Pell lost 2 coins.' },
+    { id: 'pair', title: 'Science pair', rule: 'A second copy of a science symbol earns a progress token. Six different symbols win at once.',
+      goal: 'Earn a progress token.', par: 2,
+      setup: function () { return stack({ age: 1, rows: rows([[[0], 0, ['a1-lookout']], [FRONT4, 1, ['a2-measure-hall', 'a1-scribe-room', 'a1-remedy-shop', 'a1-open-stage']]]), coins: [6, 7], cards: [['a1-weights-hall', 'a1-timber-stand', 'a1-glass-kiln'], []] }); },
+      success: function () { return me().tokens.length > 0; },
+      fail: function () { return did() && !tokPend() && me().tokens.length === 0 ? 'No token: that card carries a different symbol. You need a second scale.' : false; },
+      hints: ['You own the scale symbol. Which green card shows a scale too?', { say: 'Tap the Measure Hall: a second scale is a pair.', target: card('a2-measure-hall') }],
+      debrief: 'Two scales make a pair: a progress token is yours.' },
+    { id: 'wonder', title: 'Build a wonder', rule: 'Any card can build a wonder: pay its cost and the card goes underneath. Some wonders give another turn.',
+      goal: 'Build your wonder and keep your turn.', par: 1,
+      setup: function () { return stack({ age: 2, rows: rows([[[0], 0, ['a2-city-wall']], [FRONT4, 1, ['a1-lookout', 'a1-open-stage', 'a1-roadside-inn', 'a1-scribe-room']]]), coins: [5, 7], cards: [['a2-sawpit', 'a1-glass-kiln', 'a1-reed-press'], []], wonders: [['w-terraced-orchard', 'w-sky-tomb'], []] }); },
+      success: function () { return G().built > 0 && L.r === 0; },
+      fail: function () { return did() && G().built === 0 ? 'You built a card, not a wonder. Tap a card, then Wonder, to tuck it under.' : false; },
+      hints: ['Tap any card and look for the Wonder button.', { say: 'Pick a card, then tap Wonder: the Orchard gives 6 coins and a turn.', target: card('a1-lookout') }],
+      debrief: 'The Orchard is built and you play again at once.' },
+    { id: 'game', title: 'Short game', rule: 'After the last card, points count: cards, wonders, tokens, war, and 1 per 3 coins. Most points wins.',
+      goal: 'Win a short game against Pell.',
+      setup: function () { return stack({ age: 3, rows: rows([[[0], 0, ['a2-hero-monument']], [[-1, 1], 1, ['a2-judges-hall', 'a2-sun-temple']], [[-2, 0, 2], 1, ['a1-open-stage', 'a1-roadside-inn', 'a2-water-arch']]]), coins: [4, 8], cards: [['a2-sawpit', 'a1-glass-kiln', 'a1-reed-press', 'a1-shrine'], ['a1-lookout', 'a1-stake-fence']] }); },
+      success: function () { return !!G().over && G().winner === 0; },
+      fail: function () { return G().over && G().winner !== 0 ? 'Pell finished with more points. Blue cards score best: build them rather than sell.' : false; },
+      hints: ['Blue cards are worth the most points. Take them before Pell sells them.', 'Build what you can afford; sell only cards you cannot build.'],
+      debrief: 'Cards, coins and wonders added up: you finished ahead.' }
+  ];
+  lessons.forEach(function (s) { s.moves = function () { return L.n; }; });
+  // ---- hooks while a lesson runs: scripted rival, move counts; the old guided game's entry points now open the lessons
+  function junk(g, M) {   // the rival sells the least useful card, so lessons are never decided by its choice
+    var d = M.filter(function (m) { return m.t === 'discard'; }); if (!d.length) return M[0];
+    d.sort(function (a, b) { var va = (BY[g.pyr[a.i].id].vp || 0) + (BY[g.pyr[a.i].id].shields || 0), vb = (BY[g.pyr[b.i].id].vp || 0) + (BY[g.pyr[b.i].id].shields || 0); return va - vb || b.i - a.i; });
+    return d[0];
+  }
+  window.TT_TUTOR = {
+    rivalMove: function (g) {
+      if (!L.on) return null; var M = E.validMoves(g), pd = g.pend[0];
+      if (pd && pd.type === 'first') return { t: 'first', who: 0 };
+      if (g.phase === 'draft') return M.length ? M[0] : null;
+      if (pd) return M[0] || null;
+      return junk(g, M);
+    },
+    holdRival: function () { return false; },
+    cancel: function () { if (L.on && GXST.active()) GXST.close(); },
+    start: function () { GXST.picker(); }
+  };
+  var oa = E.apply;
+  E.apply = function (g, m) { if (L.on && g === U.G && GXST.active() && !g.over) { var p = E.sideToAct(g); if (p === 0) { L.n++; L.last = m; } else if (p === 1) L.r++; } return oa.apply(this, arguments); };
+  addEventListener('gxst', function (e) {
+    if (e.detail.type !== 'close' || !L.on) return;
+    L.on = 0; layout(false); U.tut = false; U.rivalName = null; try { UI.showStart(); } catch (er) { }
+  });
+  setInterval(function () { if (L.on && U.G && U.G.over && $('res') && !$('res').hidden) $('res').hidden = true; }, 200);   // the lesson card, not the result screen, ends a lesson
+  function go() {
+    if (!window.GXST || !document.body) { setTimeout(go, 200); return; }
+    GXST.init({ game: 'twin-thrones', scenarios: lessons, keepClear: ['#pyr .card.av', '#zoom', '[data-pick]', '#instr', '#mil', '#s0', '#s1', '#dock', '.gx-bar', '#tokrow', '[data-token]', '[data-tok]'],
+      settled: function () { var g = U.G; return !!g && (g.over || (!U.busy && !U.narr && E.sideToAct(g) === 0)); } });
+    // the top bar is full on a phone (nothing fits): there the lessons open from Menu > Learn to play, on wider screens from the bar button
+    var st = document.createElement('style'); st.textContent = '@media (max-width:640px){.gxst-q{display:none!important}}'; document.head.appendChild(st);
+    window.TTL = { L: L, lessons: lessons, stack: stack };
+  }
+  setTimeout(go, 300);
 })();
 
 </script>
