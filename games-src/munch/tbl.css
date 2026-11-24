@@ -343,9 +343,10 @@ html:not(.ph) #prompt .acts.main>.muted,html:not(.ph) #prompt .acts .small{color
 /* the hero line is a status strip, not a sum: hide the level+items breakdown, keep text >= 13px */
 html:not(.ph) .mine .top .str .muted{display:none}
 html:not(.ph) .mine .top .you,html:not(.ph) .mine .gear .gl{font-size:13px}
-html:not(.ph) #prompt .acts.main{display:flex;flex-direction:row;align-items:center}
+html:not(.ph) #prompt .acts.main{display:flex!important;flex-direction:row!important;align-items:center;margin-left:auto!important}
 /* a slimmer hand strip so the table (and a fight's Run / Help row) gets the height the dock took */
 html:not(.ph) .mine{--hw:clamp(62px,calc(17cqh/1.42),118px)}
 html:not(.ph) .mine{grid-template-columns:auto minmax(0,1fr);grid-template-areas:"top gear" "hand hand";align-items:center;column-gap:18px}
 html:not(.ph) .mine>.top{grid-area:top}html:not(.ph) .mine>.gear{grid-area:gear}html:not(.ph) .mine>.hand{grid-area:hand}
 html.gx:not(.ph):not(.dk-title) .gx-app.gx-dock-min .gx-dock{visibility:visible}
+html:not(.ph) #prompt:not(.bfq) .acts.main{flex-wrap:nowrap}html:not(.ph) #prompt:not(.bfq) .acts.main .btn{width:auto!important;flex:0 0 auto!important}
