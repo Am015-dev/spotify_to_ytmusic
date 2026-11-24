@@ -89,7 +89,7 @@ function guideDraw(){const st=gdStep();document.querySelectorAll('.gd-hl').forEa
   // only the step's own target may look lit or live: every other glow goes out, every other action button is greyed (R27: 12 dead tutorial taps)
   const own=e=>!!t&&!GD.busy&&(e===t||e.contains(t)||t.contains(e));
   document.querySelectorAll('.glow').forEach(e=>{if(!own(e))e.classList.remove('glow')});
-  document.querySelectorAll('#acts button,#chz button,#mine button').forEach(e=>{const off=!own(e);e.classList.toggle('gd-off',off);if(off)e.setAttribute('aria-disabled','true');else e.removeAttribute('aria-disabled')})}
+  document.querySelectorAll('#acts button,#bidt button,#chz button,#mine button').forEach(e=>{const off=!own(e);e.classList.toggle('gd-off',off);if(off)e.setAttribute('aria-disabled','true');else e.removeAttribute('aria-disabled')})}
 // the bubble's button is Next while the guide runs (captured before the coach's own "Got it")
 function gdHook(){const e=coachEl();if(e.dataset.gd)return;e.dataset.gd='1';
   e.addEventListener('click',ev=>{const st=gdStep();if(!st)return;ev.stopImmediatePropagation();ev.stopPropagation();if(st.who!=='note'||GD.busy||!ev.target.closest('button'))return;

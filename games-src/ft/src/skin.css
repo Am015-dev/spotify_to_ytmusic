@@ -315,6 +315,86 @@ html body #acts .ab.f3x{flex:0 0 48px;min-width:48px;min-height:44px}
 #grid .tile .f3num.f3alt{background:#fff7e4;color:#b8532b;box-shadow:0 0 0 2px #b8532b;left:auto;right:3px;top:auto;bottom:24px;min-width:24px;height:24px;line-height:24px;font-size:14px;opacity:.95}
 #grid .tile.f3end{box-shadow:inset 0 0 0 4px rgba(255,214,90,.98),0 0 0 2px rgba(80,40,0,.7)!important;animation:f3ring 1.2s ease-in-out infinite alternate}
 @keyframes f3ring{to{filter:brightness(1.12)}}
+/* ===== W662 HUD (html.hud2): the board fills the screen. Slim icon bar, two score chips around a phase banner, one prompt line,
+   a dock with only the actions valid now. Players, djinns, goods, turn order, log, rules and the card list are windows. ===== */
+html.sk-icons i[data-ic=basket]{background-image:url(media/icon-basket.webp)}html.sk-icons i[data-ic=star]{background-image:url(media/icon-star.webp)}
+html.hud2 .gx-bar{gap:6px}
+html.hud2 .gx-bar .gx-ibtn{width:46px;min-width:46px;height:46px;min-height:46px;padding:0!important;border-radius:50%!important;justify-content:center;flex-direction:row}
+html.hud2 .gx-bar .gx-ibtn>span{display:none!important}
+html.hud2 .gx-bar .gx-ibtn i[data-ic]{width:30px;height:30px}
+html.hud2 #hintsbtn{display:none}
+@media (max-width:1023px){html.hud2 .gx-bar .nar-hide{display:none!important}html.hud2 .gx-bar h1{display:none}}
+html.hud2 body #bd{display:grid!important;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);grid-template-rows:auto auto auto minmax(0,1fr);grid-template-areas:"you trk riv" "line line line" "trk2 trk2 trk2" "tbl tbl tbl";column-gap:6px;row-gap:4px;align-items:stretch;padding:4px 6px calc(4px + env(safe-area-inset-bottom,0px))}
+html.hud2 body #bd>*{grid-column:1/-1}
+html.hud2 body #bd>#line{grid-area:line}html.hud2 body #bd>#trk2{grid-area:trk2}html.hud2 body #bd>#table{grid-area:tbl}
+html.hud2 body #bd>#trk{grid-area:trk;display:flex!important}
+html.hud2 body #bd>#whatbtn{grid-row:3;justify-self:center}
+html.hud2 body #seats[data-n="2"]{display:contents}
+html.hud2 body #seats[data-n="2"] .sch.me{grid-area:you}html.hud2 body #seats[data-n="2"] .sch:not(.me){grid-area:riv}
+html.hud2 body #seats:not([data-n="2"]){grid-row:1;display:flex;gap:4px}
+html.hud2 body #seats:not([data-n="2"])~#trk{grid-row:2;grid-column:1/-1}
+html.hud2 body #seats:not([data-n="2"])~#line{grid-row:3}
+html.hud2 body #bd .sch{display:grid!important;grid-template-columns:minmax(0,1fr) auto;grid-template-areas:"sn ss" "s2 s2";align-content:center;row-gap:2px;min-height:52px;padding:4px 8px!important;border-radius:14px;border:3px solid var(--pc);background:#fff9ea;cursor:pointer;min-width:0}
+html.hud2 body #bd .sch.actnow{box-shadow:0 0 0 3px #ffd36b,0 2px 6px rgba(0,0,0,.35)}
+html.hud2 body #bd .sch .sn{grid-area:sn;font-size:15px!important;font-weight:800;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#3b1c0e}
+html.hud2 body #bd .sch .ss{grid-area:ss;display:inline-flex;align-items:center;gap:2px;font-size:17px!important;font-weight:900;color:#3b1c0e}
+html.hud2 body #bd .sch .ss .sti{display:inline-block;width:18px;height:18px;background-size:contain;background-repeat:no-repeat;font-size:0}
+html.hud2 body #bd .sch .s2{grid-area:s2;display:flex!important;gap:10px;flex-wrap:nowrap}
+html.hud2 body #bd .sch .st{display:inline-flex;align-items:center;gap:3px;font-size:15px!important;font-weight:800;color:#3b1c0e}
+html.hud2 body #bd .sch .st .e2,html.hud2 body #bd .sch .st .pic{width:20px;height:20px}
+html.hud2 body #bd .sch .s3,html.hud2 body #bd .sch .s4,html.hud2 body #bd .sch .w{display:none!important}
+/* phase banner + progress strip */
+html.hud2 body #bd #trk{flex-direction:column;align-items:center;justify-content:center;gap:3px;min-width:136px;padding:4px 10px;border-radius:14px;background:linear-gradient(#5a2d12,#3b1c0e);color:#fff3d6;border:2px solid #d8a54a;font-size:13px!important}
+html.hud2 body #bd #trk .trk-h{font-size:16px!important;font-weight:900;line-height:1.1;white-space:nowrap;letter-spacing:.2px}
+html.hud2 body #bd #trk .trk-p{display:flex;gap:3px;width:100%}
+html.hud2 body #bd #trk .trk-p i{flex:1 1 0;height:6px;border-radius:3px;background:rgba(255,243,214,.25);font-size:0!important;color:transparent;overflow:hidden;padding:0;min-width:18px}
+html.hud2 body #bd #trk .trk-p i.done{background:#c98a2c}html.hud2 body #bd #trk .trk-p i.on{background:#ffd36b;box-shadow:0 0 6px #ffd36b}
+html.hud2 body #bd #trk .trk-w{font-size:13px!important;font-weight:700;opacity:.9;white-space:nowrap}html.hud2 body #bd #trk .trk-w.me{color:#ffd36b;opacity:1}
+html.hud2 body #bd #trk .trk-r{font-size:13px!important;font-weight:700;opacity:.8;white-space:nowrap}
+html.hud2 body #bd #line{font-size:16px!important;line-height:1.25;min-height:24px;padding:4px 10px;text-align:center;white-space:normal;border-radius:12px;background:rgba(255,249,234,.94);color:#3b1c0e;font-weight:800}
+html.hud2:not(.m-hints) body #bd>#trk2{display:none!important}
+/* the board takes all the room left */
+html.hud2 body #bd #table{display:flex!important;flex-direction:column;gap:4px;min-height:0}
+html.hud2 body #bd #gw{flex:1 1 auto;min-height:0}
+html.hud2 body #bd .tile .tn{font-size:14px!important;font-weight:800}
+html.hud2 body #bd .tile.owned{box-shadow:0 0 0 4px var(--oc),0 2px 6px rgba(0,0,0,.35)}
+/* the dock: only the actions valid now, big */
+html.hud2 body #bd #acts{min-height:0;gap:6px}html.hud2 body #bd #acts.empty{display:none}
+html.hud2 body #bd #acts .arow{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
+html.hud2 body #bd #acts .ab{min-height:48px!important;font-size:16px!important}
+html.hud2 body #bd #acts .ab .pic{width:24px;height:24px;vertical-align:middle}
+/* windows: X >= 44 px, the turn-order window is a short sheet, the goods window holds the market and the sale table */
+html.hud2 .gx-x{min-width:48px!important;min-height:48px!important;font-size:30px}
+html.hud2 .gx-pin{display:none;appearance:none;border:2px solid #c98a2c;background:#fff6dc;border-radius:50%;width:44px;height:44px;margin-left:auto;margin-right:6px;cursor:pointer}
+html.hud2 .gx-pin .pic{width:24px;height:24px;opacity:.45}html.hud2 .gx-pin[aria-pressed=true]{background:#ffd36b}html.hud2 .gx-pin[aria-pressed=true] .pic{opacity:1}
+html.hud2 #bidd{height:auto!important;max-height:62dvh}
+html.hud2 #bidd .bidt{display:grid;grid-template-columns:repeat(auto-fill,minmax(68px,1fr));gap:8px}
+html.hud2 #bidd .spot{min-height:60px}html.hud2 #bidd .spot .sp-b{min-height:56px;width:100%;font-size:17px!important}
+html.hud2 #bidd .spot .ord,html.hud2 #bidd .spot .sp-c{font-size:14px!important}
+html.hud2 body #mktd #mkt .mrow{display:grid!important;grid-template-columns:repeat(auto-fill,minmax(80px,1fr));gap:8px;height:auto;overflow:visible}
+html.hud2 body #mktd #mkt .mcard{min-height:100px;width:auto;height:auto;max-width:none}html.hud2 #mktd .mcard .mn{font-size:14px!important}
+html.hud2 #mktd h3{margin:14px 0 6px;font-size:17px}
+html.hud2 #mktd .mygoods{display:flex;flex-wrap:wrap;gap:6px}html.hud2 #mktd .mcard.mini{min-height:64px;width:72px;display:inline-flex;align-items:flex-end;justify-content:center;background:var(--gi) center/cover,#fff6dc;border-radius:8px;border:2px solid #c98a2c}
+html.hud2 #mktd .mcard.mini .mn{background:#fff6dc;border-radius:6px;padding:0 4px;font-size:13px!important}
+html.hud2 #mktd .svt{display:grid;grid-template-columns:repeat(9,minmax(0,1fr));gap:4px}
+html.hud2 #mktd .sv{display:flex;flex-direction:column;align-items:center;padding:4px 0;border-radius:8px;background:#fff6dc;border:1px solid #c98a2c;font-size:13px}
+html.hud2 #mktd .sv b{font-size:16px}html.hud2 #mktd .sv small{font-size:13px!important}html.hud2 #mktd .sv i{font-style:normal;font-weight:900;font-size:16px;color:#7a3d0c}
+@media (max-width:520px){html.hud2 #mktd .svt{grid-template-columns:repeat(5,minmax(0,1fr))}}
+html.hud2 #djrow .drow{display:grid;grid-template-columns:repeat(auto-fill,minmax(96px,1fr));gap:8px;margin-bottom:10px}
+html.hud2 #djrow .dcard{min-height:120px}
+html.hud2 #plrd #cleg{pointer-events:auto;margin-bottom:8px}
+/* PC: a pinned window docks on the right and the board makes room */
+@media (min-width:1024px){
+ html.hud2 .gx-pin{display:inline-grid;place-items:center}
+ html.hud2 body #bd{grid-template-columns:minmax(0,1fr) minmax(220px,auto) minmax(0,1fr);max-width:1180px;margin:0 auto;left:0;right:0}
+ html.hud2 body #bd .sch{max-width:300px;width:100%}html.hud2 body #bd .sch.me{justify-self:end}html.hud2 body #bd .sch:not(.me){justify-self:start}
+ html.hud2 body #bd #line{max-width:760px;justify-self:center;width:100%}
+ html.hud2 #bidd{top:auto;bottom:8px;right:50%;transform:translateX(50%);width:min(760px,calc(100vw - 16px))}
+ html.hud2 #bidd:not(.on){transform:translateX(50%) translateY(120%)}
+ html.hud2.pinned .gx-main{margin-right:400px}
+ html.hud2 .gx-drawer.pin{width:388px!important;right:6px;box-shadow:none}
+}
+@media (max-width:1023px){html.hud2 body .gx-drawer{top:auto!important;bottom:0!important;left:0!important;right:0!important;width:auto!important;height:78dvh!important;max-height:80dvh!important}html.hud2 body :is(#bidd,#logd,#plrd,#setd,#musicd,#menud){height:auto!important}html.hud2 body .gx-drawer .gx-drawer-body{overflow:auto}}
 /* ---------- the floating tour (tour.js, W655): never dims, never blocks; only the window, chip and labels take taps ---------- */
 .tourw{position:fixed;z-index:70;left:12px;top:60px;max-height:min(60vh,460px);display:flex;flex-direction:column;background:#fff8ec;color:#2a1a0c;border:2px solid #b07a2a;border-radius:14px;box-shadow:0 8px 24px rgba(0,0,0,.35);font-size:14px;line-height:1.35}
 .tourw[hidden],.tourchip[hidden],.tourring[hidden],.tourmap[hidden]{display:none}
@@ -349,3 +429,7 @@ html body #acts .ab.f3x{flex:0 0 48px;min-width:48px;min-height:44px}
 #tourbtn .tq{display:inline-grid;place-items:center;width:24px;height:24px;border-radius:50%;background:#b4501c;color:#fff;font-size:16px;line-height:1}
 #tourbtn.tq-fl{position:fixed;left:6px;top:2px;z-index:40}
 #tourbtn[hidden]{display:none}
+html.hud2 body #bidd{z-index:72}
+
+@media (min-width:1024px){html.hud2.bidopen .gx-main{margin-right:400px}html.hud2 body #bidd{top:calc(var(--gx-bar-h) + 8px)!important;bottom:auto!important;right:6px!important;transform:none!important;width:388px!important;max-height:calc(100dvh - var(--gx-bar-h) - 16px)}html.hud2 body #bidd:not(.on){transform:translateX(120%)!important}}
+@media (max-width:1023px){html.hud2 #bidd .bidt{grid-template-columns:repeat(5,minmax(0,1fr));gap:6px}html.hud2 #bidd .spot{min-height:52px}html.hud2 #bidd .spot .sp-b{min-height:50px}}
