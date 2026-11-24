@@ -37,8 +37,8 @@ VTD.ACTS = {
   spec: { n: 'Maker', icon: 'trowel', what: 'Your cities of one good produce' } };
 VTD.SPEC_NAME = { brick: 'Potter', food: 'Reaper', tool: 'Tinker', wine: 'Presser', cloth: 'Dyer' };
 var C = [], mk = function (act, god, cost, deck, extra) { var c = { id: C.length, act: act, god: god, cost: cost || {}, deck: deck }; for (var k in extra || {}) c[k] = extra[k]; c.n = act === 'spec' ? VTD.SPEC_NAME[c.spec] : VTD.ACTS[act].n; C.push(c); return c.id; };
-// starting hand (each player has these 8; the Settler is made after the market cards so older card ids stay put)
-VTD.START_HAND = [mk('trib', 'shield', {}, 0), mk('arch', 'eagle', {}, 0), mk('pref', 'sickle', {}, 0), mk('pref', 'sickle', {}, 0), mk('merc', 'wing', {}, 0, { coins: 3 }), mk('dipl', 'eagle', {}, 0), mk('sen', 'hearth', {}, 0)];
+// starting hand (each player has these 7: one of each role; the Settler is made after the market cards so older card ids stay put)
+VTD.START_HAND = [mk('trib', 'shield', {}, 0), mk('arch', 'eagle', {}, 0), mk('pref', 'sickle', {}, 0), mk('merc', 'wing', {}, 0, { coins: 3 }), mk('dipl', 'eagle', {}, 0), mk('sen', 'hearth', {}, 0)];
 // market deck I (8) and II (7); decks III-V are only for 3+ players and are not part of this 2-player game
 var I = [mk('arch', 'eagle', { tool: 1 }, 1), mk('pref', 'sickle', { wine: 1 }, 1), mk('merc', 'wing', { wine: 1 }, 1, { coins: 5 }), mk('colo', 'shield', { food: 1 }, 1), mk('dipl', 'sickle', { tool: 1 }, 1),
   mk('spec', 'owl', { food: 1 }, 1, { spec: 'brick' }), mk('spec', 'owl', { food: 1, brick: 1 }, 1, { spec: 'food' }), mk('spec', 'owl', { tool: 1, brick: 1 }, 1, { spec: 'tool' })];

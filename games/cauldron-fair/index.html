@@ -569,6 +569,28 @@ html.ph #risk{display:none}
 .gx-dock{z-index:4}
 html.ph.ph-p .gx-dock{min-height:var(--dockh)}
 .gx-dock-body{-webkit-overflow-scrolling:auto}
+
+/* ---- PC HUD (W675): board fills the screen, round icon bar, one bottom action dock; roster, fortune text, key, stop-now lines live in windows ---- */
+html:not(.ph) .gx-main{grid-template-columns:minmax(0,1fr);grid-template-rows:minmax(0,1fr) auto}
+html:not(.ph) .gx-app.gx-dock-min .gx-main{grid-template-columns:minmax(0,1fr)}
+html:not(.ph) .gx-app.gx-dock-min .gx-dock{visibility:visible}
+html:not(.ph) .gx-dock{border-left:0;border-top:3px solid var(--wood2);max-height:40dvh}
+html:not(.ph) .gx-dock-head,html:not(.ph) .gx-reopen,html:not(.ph) #roster,html:not(.ph) #fort,html:not(.ph) #legend{display:none!important}
+html:not(.ph) .gx-dock-body{flex-direction:row;flex-wrap:wrap;align-items:center;gap:8px 16px;padding:8px 16px}
+html:not(.ph) #promptDock{flex:1 1 300px;min-width:0}
+html:not(.ph) #prompt{min-height:0;font-size:16px}
+html:not(.ph) #acts{flex:1 1 440px;min-width:0}
+html:not(.ph) #qbox,html:not(.ph) #pc,html:not(.ph) #hint{flex:1 1 100%}
+html:not(.ph) #risk{flex:1 1 260px;min-width:0;font-size:14px}
+html:not(.ph) #risk .big~.sm,html:not(.ph) #risk .here,html:not(.ph) #risk .sm.fl{display:none}
+html:not(.ph) #me .st:last-child:not(.gauge):not(.fl){display:none}
+html:not(.ph) #others{position:absolute;top:8px;right:12px;padding:0;min-height:0;z-index:4}
+html:not(.ph) #me{position:absolute;top:8px;left:12px;z-index:4;background:rgba(36,23,48,.78);border-radius:24px;padding:4px 12px 4px 6px}
+html .gx-bar .gx-ibtn{border-radius:50%!important;min-width:44px!important;width:44px!important;height:44px!important;min-height:44px!important;padding:0!important;justify-content:center;flex-direction:row!important;flex:0 0 auto}
+html .gx-bar .gx-ibtn span{display:none}
+html.ph .gx-bar{gap:6px;padding-left:8px;padding-right:8px}
+.menunote{min-height:1.4em;margin:6px 0 0;font-weight:800;color:#2d7a1c}
+@media (min-width:1024px){html:not(.ph) body .tseg .lbl,html:not(.ph) body #setbody .mrow .lbl,html:not(.ph) body .gxc-path .gxc-act small,html:not(.ph) body .brow .btn small.keep{font-size:16px!important}}
 @media (prefers-reduced-motion:reduce){*{animation-duration:.01ms!important;animation-iteration-count:1!important}}
 
 .rubyp{margin:8px 0 4px;padding:6px 8px;border:2px solid rgba(58,36,56,.25);border-radius:12px;background:#fff8e6}
@@ -722,6 +744,7 @@ html.ph #fort:not(.open) .fpic{display:none}html.ph #fort.open .fpic{width:84px;
 .mchips{display:flex;flex-wrap:wrap;gap:8px}
 .mchip{min-height:44px;padding:8px 14px;border-radius:22px;border:2px solid var(--ink);background:#f4ecd2;color:#3a2438;font:inherit;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;gap:6px;text-align:left}
 .mchip.on{background:#3a2438;color:#fff6dc}.mchip.prev{border-style:dashed}
+/*W663 contrast plates*/html body #setbody .mrow .lbl,html body .gxc-path .gxc-lab,html body .bagwrap .bagn,html body i.lc{background:#1b1208!important;color:#fff4d8!important;opacity:1!important;text-shadow:none!important;border-radius:6px;padding:1px 6px;box-shadow:none!important;background-image:none!important}
 </style><style>
 /* ===== GX skin: painted UI kit over the shared shell + campaign classes. Opt-in: nothing changes until gx-skin.js adds
    html.sk (after the kit files loaded). Kit files live in the game's media/ (ui-topbar, ui-iconbtn, ui-panel, ui-drawer-head,
@@ -974,7 +997,7 @@ html:not(.ph) #me,html:not(.ph) #me *:not(svg):not(path){font-size:16px}
 #qbox .opts.g2 .btn:last-child:nth-child(odd){grid-column:1 / -1;justify-content:center}
 #qbox .sug .best,#qbox .best,.btn .best{font-size:12px;background:#2b1a12;color:#ffd774}
 .sug::after,.rt.sug::after{font:900 12px/18px system-ui,sans-serif!important;background:#2b1a12!important;color:#ffd774!important;border:1px solid #ffd774}
-html.ph .gx-bar [data-gx=scored],html.ph .gx-bar [data-gx=rulesd]{display:none!important}html.ph .gx-bar{gap:8px}html.ph .gx-bar .gx-ibtn{min-width:52px}
+html.ph .gx-bar{gap:8px}html.ph .gx-bar .gx-ibtn{min-width:52px}
 .dpick .dpl{display:block;font:800 14px/1.1 system-ui,sans-serif;color:inherit;margin-top:2px}.rsfoot .btn.go:not(.off){background:#c4602a!important;color:#fff7e0!important}
 @media (max-height:760px){.dpick .dpl{display:none}}
 /* W471 round 2: desktop text >= 16px on the title button sublines and the Goal card label */
@@ -8113,7 +8136,7 @@ function renderRisk() {
   const rk = $('#risk'); if (!rk) return; const f = focusSeat(), v = viewSeat(), p = G.players[f];
   rk.innerHTML = ''; rk.hidden = false; rk.removeAttribute('data-priv');
   const sp = p.pot.length ? CF.spaceOf(p) : null, lim = CF.limitOf(G, p), ws = CF.whiteSum(p);
-  const here = sp != null ? h('div.rk', h('span', { html: ico('coin', 16) }), h('b', D.COINS[sp]), ' coins ', h('span', { html: ico('vp', 16) }), h('b', D.VP[sp]), ' points', D.RUBY[sp] ? [h('span', { html: ico('ruby', 16) }), ' ruby'] : null, h('span.sm', ' if you stop now')) : null;
+  const here = sp != null ? h('div.rk.here', h('span', { html: ico('coin', 16) }), h('b', D.COINS[sp]), ' coins ', h('span', { html: ico('vp', 16) }), h('b', D.VP[sp]), ' points', D.RUBY[sp] ? [h('span', { html: ico('ruby', 16) }), ' ruby'] : null, h('span.sm', ' if you stop now')) : null;
   if (f !== v || v < 0 || p.bag.length && !p.bag[0] && p.bagN != null) {
     rk.append(h('div.rk', h('b', p.name + '\'s cauldron'), ' white ', h('b', ws + ' of ' + lim), ' · ' + plural(bagN(p), 'chip') + ' left in the bag'), ...(here ? [here] : []));
     if (p.boom) rk.append(h('div.rk.hi', 'Exploded.'));
@@ -8564,7 +8587,9 @@ function renderMenu() {
   let sp = ''; try { sp = window.PerfHUD && PerfHUD.buttonsHTML ? PerfHUD.buttonsHTML('btn alt') : ''; } catch (e) { }
   row('Info', h('button.btn.alt', { 'data-a': 'rules', type: 'button' }, 'How to play'), h('button.btn.alt', { 'data-a': 'drawer', 'data-v': 'logd', type: 'button' }, 'Log'), h('button.btn.alt', { 'data-a': 'drawer', 'data-v': 'refd', type: 'button' }, 'Chips and cards'), h('span.tinyc', { html: sp }));
   b.appendChild(h('p.sm', 'Cauldron Fair is an original game.'));
+  b.appendChild(h('p.menunote#menunote', { role: 'status' }, UI.menuNote || ''));
 }
+function menuNote(t) { UI.menuNote = t; const n = $('#menunote'); if (n) n.textContent = t; say(t); }   // the toast sits behind an open window, so Save / Load answer inside it
 // ---------- start screens: painted title -> setup (character cards) / online ----------
 const SETCHOICES = [[1, 'Beginner set', 'Easiest to learn. Best for a first game.'], [2, 'Set 2', 'Safe harbour, side pockets, double steps.'], [3, 'Set 3', 'Lucky sevens, pod pushers, roomier pots.'], [4, 'Set 4', 'Ruby treasure, upgrades, stretching roots.'], ['random', 'Random mix', 'Every colour gets a random set 1 to 4.']];
 function optObj() { const o = UI.opt = UI.opt || Object.assign({}, DEF, { seats: DEF.seats.slice(), lvBy: Object.assign({}, DEF.lvBy) }); o.np = o.seats.length + 1; return o; }
@@ -8720,8 +8745,8 @@ document.addEventListener('click', ev => {
     case 'mprev': musicPreview(d.s); renderMusic(); break;
     case 'mprevx': musicPreviewStop(); renderMusic(); break;
     case 'mmus': UI.prefs.music = UI.prefs.music === false; savePrefs(); try { if (window.GA) GA.setMusic(UI.prefs.music); } catch (x) { } MUS.want = null; sndMusic(); renderMusic(); break;
-    case 'save': say(save() ? 'Game saved.' : 'Could not save.'); break;
-    case 'loadsave': if (!loadSave()) say('No saved game.'); break;
+    case 'save': menuNote(save() ? 'Game saved.' : 'Could not save.'); break;
+    case 'loadsave': UI.menuNote = ''; if (!loadSave()) menuNote('No saved game.'); break;
     case 'speed': AIDELAY = +d.v; savePrefs(); renderMenu(); break;
     case 'sound': UI.prefs.sound = !UI.prefs.sound; savePrefs(); try { if (window.GA) GA.setSfx(UI.prefs.sound); } catch (e) { } renderMenu(); break;
     case 'music': UI.prefs.music = !UI.prefs.music; savePrefs(); try { if (window.GA) GA.setMusic(UI.prefs.music); } catch (e) { } sndMusic(); renderMenu(); break;

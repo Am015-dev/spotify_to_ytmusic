@@ -17,6 +17,8 @@ var OAI = (function () {
     var near = opts.map(function (id) { var pr = E.price(P, id); if (pr.why) return 0; return worth(E.card(id)) / (1 + pr.short * 0.9); }).sort(function (a, c) { return c - a; });
     v += (near[0] || 0) * 0.6 + (near[1] || 0) * 0.3;
     v += P.res.length * 0.3;
+    var S = G.sty && G.sty[p];   // story rivals only: a play style as extra weights (quick game has no G.sty)
+    if (S) v += (S.tok || 0) * E.tokens(P) + (S.res || 0) * P.res.length + (S.cr || 0) * cr + (S.pts || 0) * pts + (S.fav || 0) * P.fav + (S.roy || 0) * P.roy.length;
     return v;
   }
   function evalFor(G, p) {

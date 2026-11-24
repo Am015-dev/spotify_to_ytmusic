@@ -202,3 +202,6 @@ html.kkend #beltz{background:#2f1f1a!important;border-top-color:#1c1210!importan
 /* the result card scrolls on short screens (phone landscape) but Play again / Menu stay in reach */
 #rs.kkfin .rsbox.bar .btn{position:sticky;bottom:0;z-index:3;box-shadow:0 -6px 8px -2px #fff3d6}
 @media (max-height:520px){.kkbd{font-size:13px;border-spacing:0 1px}.kkbd th,.kkbd td{padding:1px 4px}.kkbd .cr{display:none}.kkbd tr.tot td{font-size:17px;padding:2px 4px}.kkbd td small{display:none}.kkr1 div{font-size:13px}.kkr1 b{font-size:17px}}
+
+/* QA W659: story Next button label was white on pale art */
+html.sk .gxc-btn.go{color:#3a1604;text-shadow:0 1px 0 rgba(255,255,255,.6);font-weight:800}

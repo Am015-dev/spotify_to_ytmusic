@@ -4,7 +4,9 @@
   var OH = root.OH || require('./engine.js');
   var PV = { mc: 1, steel: 1.8, ti: 2.6, plant: 1.6, energy: 1.4, heat: 0.8 };
   var RV = { mc: 1, steel: 1.8, ti: 2.8, plant: 1.4, energy: 0.9, heat: 0.75 };
-  var FIXGL = 0;
+  var ENV = typeof process !== 'undefined' ? process.env : {}, TRW = +ENV.OH_TRW || 4,   // balance (proof/BALANCE.md): rating weight x4 shortens games to ~14 generations
+      noiseOn = true, FIXGL = 0, NOISE = ENV.OH_NOISE !== undefined ? +ENV.OH_NOISE : 30,   // normal rival misjudges a little (not for hints)
+      BUYT = +ENV.OH_BUYT || 2;
   var CAP = { mc: 30, steel: 10, ti: 8, plant: 9, energy: 6, heat: 9 };
   function gensLeft(G) {
     var left = (OH.TEMP_MAX - G.temp) / 2 + (OH.OXY_MAX - G.oxy) + (OH.OCEAN_MAX - G.oceans);
@@ -13,7 +15,7 @@
   function value(G, p) {
     var P = G.pl[p], gl = FIXGL || gensLeft(G), v = 0;
     var sc = OH.score(p);
-    v += sc.tr * (8 + gl * 0.9);
+    v += sc.tr * (8 + gl * 0.9) * TRW;
     v += (sc.total - sc.tr) * 6;
     for (var r in PV) { var cap = CAP[r], st = P[r]; if (r === 'heat' && G.temp >= OH.TEMP_MAX) cap = 0; v += P.prod[r] * PV[r] * Math.max(0, gl - 0.6) + (Math.min(st, cap) + 0.3 * Math.max(0, st - cap)) * RV[r]; }
     v += Math.min(P.hand.length, 12) * 1.6;
@@ -81,7 +83,7 @@
     var hand = OH.G.pl[p].hand.length;
     var scored = ids.map(function (id) { return { id: id, w: cardWorth(p, id) + (level === 'easy' ? (Math.random() * 16 - 8) : 0) }; }).sort(function (a, b) { return b.w - a.w; });
     var out = [];
-    scored.forEach(function (s) { if (s.w > 2 + Math.max(0, hand + out.length - 8) * 2 && (out.length + 1) * 3 <= budget) out.push(s.id); });
+    scored.forEach(function (s) { if (s.w > BUYT + Math.max(0, hand + out.length - 8) * 2 && (out.length + 1) * 3 <= budget) out.push(s.id); });
     return out;
   }
   function decide(level) {
@@ -130,10 +132,12 @@
     var passV = evalState(G, p) - (level === 'easy' ? 0.5 : AI.PASSOFF);   // value of doing nothing (easy gives up sooner)
     scored.forEach(function (s) { if (s.m.t === 'pass') s.v = passV - 0.01; if (s.m.t === 'end') s.v = passV; });
     if (level === 'easy') { scored = scored.filter(function (s) { return s.m.t !== 'award'; }); scored.forEach(function (s) { s.v += Math.random() * 14; if (s.m.t === 'pass') s.v += 2; }); }
+    if (level === 'normal' && NOISE && noiseOn) scored.forEach(function (s) { if (s.m.t !== 'pass' && s.m.t !== 'end') s.v += Math.random() * NOISE; });
     scored.sort(function (a, b) { return b.v - a.v; });
+    // awards: fund only when clearly ahead (drop every failing award, not just the first)
+    var AWM = +ENV.OH_AWM || 1;
+    scored = scored.filter(function (s) { if (s.m.t !== 'award') return true; var A = OH.MAP.AWARDS.filter(function (a) { return a.k === s.m.k; })[0]; return OH.awardMetric(p, A.m) > OH.awardMetric(1 - p, A.m) + AWM; });
     var top = scored[0].m;
-    // awards: fund only when clearly ahead
-    if (top.t === 'award') { var A = OH.MAP.AWARDS.filter(function (a) { return a.k === top.k; })[0]; if (OH.awardMetric(p, A.m) <= OH.awardMetric(1 - p, A.m) + 1) { scored.shift(); top = scored[0].m; } }
     return top;
   }
   // how good a move is, in words (for the hint): same evaluation as decide()
@@ -141,7 +145,8 @@
   // the lightbulb: normal play, but early on it steers newcomers to income cards (R99: early game felt stuck at 0 credits)
   function incomeOf(id) { var n = 0; (OH.CARDS[id].play || []).forEach(function (o) { if (o.op === 'prod' && o.r === 'mc' && o.n > 0) n += o.n; }); return n; }
   function suggest(p) {
-    var m = decide('normal'), G = OH.G; if (!m) return m;
+    noiseOn = false; var m; try { m = decide('normal'); } finally { noiseOn = true; }
+    var G = OH.G; if (!m) return m;
     if (G.phase !== 'action' || G.pending) return m;
     if (m.t === 'play' && incomeOf(m.id) > 0) { m.why = 'income'; return m; }
     if (G.gen <= 4 && (m.t === 'end' || m.t === 'pass' || m.t === 'std' || m.t === 'sell')) {

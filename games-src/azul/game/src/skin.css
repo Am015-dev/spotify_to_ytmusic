@@ -60,3 +60,6 @@ html.sk .gx-drawer{border-image:url(media/ui-panel-c.webp) 100 fill/18px stretch
 html.sk .gx-bar{background:#f3e3c4}
 html.sk .gx-bar h1 span{background:none;-webkit-background-clip:border-box;background-clip:border-box;color:#3a1a0a;filter:none;text-shadow:none}
 html.sk .gx-drawer-head{background:#f3e3c4}
+
+/* QA W659: story Next label was white on orange */
+html.sk .gxc-btn.go{color:#3a1604;text-shadow:0 1px 0 rgba(255,255,255,.6);font-weight:800}

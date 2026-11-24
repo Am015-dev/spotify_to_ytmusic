@@ -7,7 +7,7 @@
   GXS.add({ id: 'vt-board', name: 'Board: your first turn', ask: 'Can you see map, store and cards?', seed: 3, when: booted,
     setup: function () { return go(3); },
     checks: [{ kind: 'visible', sel: '#map .city[data-c="caput"]', name: 'the capital' }, { kind: 'visible', sel: '#hand .cd', name: 'a hand card' }, { kind: 'visible', sel: '#store .coins', name: 'coins' },
-      { kind: 'fn', name: 'eight cards in hand', fn: function () { return G.pl[0].hand.length === 8 || 'hand ' + G.pl[0].hand.length; } },
+      { kind: 'fn', name: 'seven cards in hand', fn: function () { return G.pl[0].hand.length === 7 || 'hand ' + G.pl[0].hand.length; } },
       { kind: 'play', name: 'play the Builder and move a cart', snap: function () { return { d: G.pl[0].disc.length }; },
         steps: [{ sel: '#hand .cd[data-i="1"]' }, { sel: '#acts .btn' }, { sel: '.colhit.glow' }, { sel: '.slothit.glow' }], idle: function () { return !VTUI.UI.busy; },
         verify: function (b) { return (G.pl[0].disc.length === b.d + 1 && G.pl[0].cols.some(function (c) { return c.at && c.at.r != null; })) || 'no cart moved'; } }],

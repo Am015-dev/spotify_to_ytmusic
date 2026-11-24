@@ -1,0 +1,6 @@
+start:  offscreen "How to play" | offscreen "×" | offscreen "How a turn works" | offscreen "You roll two dice. Each " | offscreen "Take: drag a die onto th" | offscreen "Take"
+menu:  offscreen "How to play" | offscreen "×" | offscreen "How a turn works" | offscreen "You roll two dice. Each " | offscreen "Take: drag a die onto th" | offscreen "Take"
+vb-board:  offscreen "How to play" | offscreen "×" | offscreen "How a turn works" | offscreen "You roll two dice. Each " | offscreen "Take: drag a die onto th" | offscreen "Take"
+vb-chain:  offscreen "How to play" | offscreen "×" | offscreen "How a turn works" | offscreen "You roll two dice. Each " | offscreen "Take: drag a die onto th" | offscreen "Take"
+vb-result:  offscreen "How to play" | offscreen "×" | offscreen "How a turn works" | offscreen "You roll two dice. Each " | offscreen "Take: drag a die onto th" | offscreen "Take"
+story-scene:  offscreen "How to play" | offscreen "×" | offscreen "How a turn works" | offscreen "You roll two dice. Each " | offscreen "Take: drag a die onto th" | offscreen "Take"

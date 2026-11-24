@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en"><head><!-- Copyright (c) 2026 Am015-dev. All rights reserved. Not licensed for copying, modification or redistribution; see LICENSE in the source repository. --><meta name="copyright" content="&copy; 2026 Am015-dev. All rights reserved."><meta charset="utf-8">
+<html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#2b2018">
 <link rel="icon" href="data:,">
@@ -162,6 +162,9 @@ button:focus-visible, [tabindex]:focus-visible { outline: 3px solid var(--gold);
 .rules h3 { font-family: var(--serif); color: var(--terra2); font-size: 16px; margin: 12px 0 4px; }
 .rules p, .rules li { font-size: 15px; line-height: 1.4; }
 .rules ul { padding-left: 18px; margin: 4px 0 8px; }
+.rules ol { padding-left: 22px; margin: 4px 0 8px; } .rules ul.rls { list-style: none; padding-left: 0; }
+.rules .rl { display: flex; gap: 10px; align-items: flex-start; margin: 5px 0; } .rules .ri { flex: none; width: 26px; height: 26px; border-radius: 50%; background: var(--terra2); color: #fff; display: grid; place-items: center; } .rules .ri .ic { width: 16px; height: 16px; }
+.rules .gi { display: inline-block; vertical-align: -4px; } .rules p .ic, .rules li .ic { width: 16px; height: 16px; vertical-align: -3px; }
 .ref { display: flex; gap: 8px; align-items: center; padding: 5px 0; border-bottom: 1px solid var(--vein); font-size: 14px; }
 .ref .cd { transform: scale(.75); margin: -11px -7px; }
 .ref .t { flex: 1; } .ref .t b { display: block; font-size: 15px; }
@@ -772,7 +775,7 @@ button:focus-visible, [tabindex]:focus-visible { outline: 3px solid var(--gold);
   GXS.add({ id: 'vt-board', name: 'Board: your first turn', ask: 'Can you see map, store and cards?', seed: 3, when: booted,
     setup: function () { return go(3); },
     checks: [{ kind: 'visible', sel: '#map .city[data-c="caput"]', name: 'the capital' }, { kind: 'visible', sel: '#hand .cd', name: 'a hand card' }, { kind: 'visible', sel: '#store .coins', name: 'coins' },
-      { kind: 'fn', name: 'eight cards in hand', fn: function () { return G.pl[0].hand.length === 8 || 'hand ' + G.pl[0].hand.length; } },
+      { kind: 'fn', name: 'seven cards in hand', fn: function () { return G.pl[0].hand.length === 7 || 'hand ' + G.pl[0].hand.length; } },
       { kind: 'play', name: 'play the Builder and move a cart', snap: function () { return { d: G.pl[0].disc.length }; },
         steps: [{ sel: '#hand .cd[data-i="1"]' }, { sel: '#acts .btn' }, { sel: '.colhit.glow' }, { sel: '.slothit.glow' }], idle: function () { return !VTUI.UI.busy; },
         verify: function (b) { return (G.pl[0].disc.length === b.d + 1 && G.pl[0].cols.some(function (c) { return c.at && c.at.r != null; })) || 'no cart moved'; } }],
@@ -847,8 +850,8 @@ VTD.ACTS = {
   spec: { n: 'Maker', icon: 'trowel', what: 'Your cities of one good produce' } };
 VTD.SPEC_NAME = { brick: 'Potter', food: 'Reaper', tool: 'Tinker', wine: 'Presser', cloth: 'Dyer' };
 var C = [], mk = function (act, god, cost, deck, extra) { var c = { id: C.length, act: act, god: god, cost: cost || {}, deck: deck }; for (var k in extra || {}) c[k] = extra[k]; c.n = act === 'spec' ? VTD.SPEC_NAME[c.spec] : VTD.ACTS[act].n; C.push(c); return c.id; };
-// starting hand (each player has these 8; the Settler is made after the market cards so older card ids stay put)
-VTD.START_HAND = [mk('trib', 'shield', {}, 0), mk('arch', 'eagle', {}, 0), mk('pref', 'sickle', {}, 0), mk('pref', 'sickle', {}, 0), mk('merc', 'wing', {}, 0, { coins: 3 }), mk('dipl', 'eagle', {}, 0), mk('sen', 'hearth', {}, 0)];
+// starting hand (each player has these 7: one of each role; the Settler is made after the market cards so older card ids stay put)
+VTD.START_HAND = [mk('trib', 'shield', {}, 0), mk('arch', 'eagle', {}, 0), mk('pref', 'sickle', {}, 0), mk('merc', 'wing', {}, 0, { coins: 3 }), mk('dipl', 'eagle', {}, 0), mk('sen', 'hearth', {}, 0)];
 // market deck I (8) and II (7); decks III-V are only for 3+ players and are not part of this 2-player game
 var I = [mk('arch', 'eagle', { tool: 1 }, 1), mk('pref', 'sickle', { wine: 1 }, 1), mk('merc', 'wing', { wine: 1 }, 1, { coins: 5 }), mk('colo', 'shield', { food: 1 }, 1), mk('dipl', 'sickle', { tool: 1 }, 1),
   mk('spec', 'owl', { food: 1 }, 1, { spec: 'brick' }), mk('spec', 'owl', { food: 1, brick: 1 }, 1, { spec: 'food' }), mk('spec', 'owl', { tool: 1, brick: 1 }, 1, { spec: 'tool' })];
@@ -2370,18 +2373,35 @@ function showPlayer(i) {
 }
 function showLog() { drawer('What happened', '<div class="rules">' + (G ? G.log.slice(-30).reverse().map(function (l) { return '<p>' + esc(l) + '</p>'; }).join('') : '') + '</div>'); }
 function showRules() {
+  var G5 = ['brick', 'food', 'tool', 'wine', 'cloth'], gi = function (g) { return '<span class="gi" style="color:' + GOOD_COL[g] + '">' + icon(g) + '</span>'; };
+  var role = function (k, txt) { return '<li class="rl"><span class="ri">' + icon(D.ACTS[k].icon) + '</span><span><b>' + D.ACTS[k].n + ':</b> ' + txt + '</span></li>'; };
+  var god = function (id, txt) { var g = D.GODS.filter(function (x) { return x.id === id; })[0]; return '<li class="rl"><span class="ri">' + icon(g.icon) + '</span><span><b>' + g.n + ':</b> ' + txt + '</span></li>'; };
   drawer('How to play', '<div class="rules">' +
-    '<h3>Goal</h3><p>Most points at the end. Points come from the patron on every card you own.</p>' +
-    '<h3>Your turn</h3><p>Play one card from your hand and do what it says. Played cards stay out until you play the Herald.</p>' +
-    '<h3>Carts and ships</h3><p>Carts use roads, ships use sea lanes. They stop on a line, one per line. A step goes to the next line. You may pass others.</p>' +
-    '<h3>Houses</h3><p>Build in cities at either end of a line you stand on. Cost: 1 brick + 1 of the city’s good (brick cities: just 1 grain), plus coins: brick 1, grain 2, tools 3, wine 4, cloth 5, times the houses there after yours. One house per city each. Never in Caput.</p>' +
-    '<h3>Storehouse</h3><p>12 spaces for goods and waiting carts and ships. If too much arrives, you pick what to keep.</p>' +
-    '<h3>Cards</h3><ul>' + Object.keys(D.ACTS).map(function (k) { return '<li><b>' + D.ACTS[k].n + ':</b> ' + actRule(k) + '</li>'; }).join('') + '</ul>' +
-    '<h3>Market</h3><p>Cards cost the goods printed on them plus an extra for the slot: slots 2–3 one good of your choice, 4–5 one cloth, 6 any + cloth, 7 two cloth. The Censor skips the extra. Gaps close and refill at the end of the turn.</p>' +
-    '<h3>Patrons at the end</h3><ul>' + D.GODS.map(function (g) { return '<li><b>' + g.n + ':</b> ' + g.rule + '. Each card with it counts.</li>'; }).join('') +
-    '<li><b>Owl cards:</b> brick and grain 3, tools 3, wine 4, cloth 5 per house in those cities.</li></ul>' +
-    '<h3>The end</h3><p>When someone buys the last market card or builds their 15th house, they take the Laurel (7 points). The other player gets one last turn.</p>' +
-    '<h3>Grand Governor</h3><p>Starts with the second player. When its holder makes a region produce, they get 2 bonus goods, then pass it on. It also wins ties.</p></div>');
+    '<h3>1. The goal</h3><p>Finish with the most points. You score at the end, and <b>every card you own</b> (in your hand or played) scores for the symbol printed on it. So buy cards that match how you play.</p>' +
+    '<h3>2. Your turn</h3><ol><li><b>Play ONE card</b> from your hand.</li><li><b>Do what it says</b> (see the roles below).</li><li>Your played cards pile up face up. Play the <b>Herald</b> to take them all back.</li></ol>' +
+    '<h3>3. The roles</h3><ul class="rls">' +
+    role('arch', 'moves your ' + icon('meeple') + ' carts and ' + icon('ship') + ' ships, then you build ' + icon('house') + ' houses next to them.') +
+    role('pref', 'a region with its good showing makes goods for every house there, and you get 1 extra. Or collect the coins on flipped regions.') +
+    role('merc', 'take 3 ' + icon('coins') + ' (5 if bought), then buy or sell goods, 2 kinds at most.') +
+    role('sen', 'buy up to 2 cards from the market.') +
+    role('cons', 'buy 1 card, but only pay the goods printed on it.') +
+    role('dipl', 'do the same as the top card of the rival’s pile.') +
+    role('colo', 'add carts or ships (1 ' + gi('food') + ' + 1 ' + gi('tool') + ' each), or take 5 ' + icon('coins') + ' + 1 per cart or ship on the map.') +
+    role('trib', 'take all your played cards back (+1 ' + icon('coins') + ' per card over 3). You may also buy 1 cart or ship.') +
+    role('spec', 'each of your houses in cities of its good makes 1 of that good.') + '</ul>' +
+    '<h3>4. Goods and coins</h3><p>' + G5.map(gi).join('') + ' brick, grain, tools, wine, cloth. Buy and sell price: 3, 4, 5, 6, 7 ' + icon('coins') + '. Your storehouse has 12 spaces. Each holds 1 good <i>or</i> 1 waiting cart or ship. If more arrives than fits, you choose what to keep.</p>' +
+    '<h3>5. Moving and building</h3><ol><li>Carts use roads, ships use sea lanes. You get 1 step per cart or ship on the map.</li><li>First step goes onto a line. Each next step goes through a city onto the next line.</li><li>You may pass a busy line, but never end on one.</li><li>Then build in cities at either end of a line you stand on.</li></ol>' +
+    '<p>A house costs 1 ' + gi('brick') + ' + 1 of the city’s good (brick cities: just 1 ' + gi('food') + '), plus coins: brick 1, grain 2, tools 3, wine 4, cloth 5, times the houses there after yours. One house per city each. Never in the capital (Caput).</p>' +
+    '<h3>6. The market</h3><p>A card costs the goods printed on it plus an extra for its slot: slot 1 none, 2–3 any 1 good, 4–5 1 ' + gi('cloth') + ', 6 any 1 good + 1 ' + gi('cloth') + ', 7 two ' + gi('cloth') + '. Gaps close and the market refills at the end of your turn.</p>' +
+    '<h3>7. The end</h3><ol><li>The game ends when someone <b>buys the last market card</b> or <b>builds their 15th house</b>.</li><li>That player takes the <b>Laurel: 7 points</b>.</li><li>The other player gets one last turn. Then count points.</li></ol>' +
+    '<h3>8. Points, per symbol</h3><p class="small">Work out the value once, then multiply by your cards that show the symbol.</p><ul class="rls">' +
+    god('hearth', '1 point per 10 coins. Your goods count at their price.') +
+    god('eagle', '1 point per house outside brick cities (up to 15).') +
+    god('sickle', '1 point per region where you have a house.') +
+    god('wing', '2 points per kind of good your houses make (up to 10).') +
+    god('shield', '2 points per cart or ship on the map (up to 12).') +
+    god('owl', 'Maker cards only: points per house in cities of its good: brick 3, grain 3, tools 3, wine 4, cloth 5.') + '</ul>' +
+    '<h3>9. Grand Governor</h3><p>Starts with the second player. Whoever makes a region produce while holding it gets 2 bonus goods, then passes it to the other player. It also wins a tie.</p></div>');
 }
 function actRule(k) {
   return { arch: 'move your carts and ships as many steps as you have on the map, then build houses.',
@@ -2433,11 +2453,11 @@ window.VTUI = { hintTarget: function () { return hintTarget(); }, startGame: sta
 var TUT = { on: false, i: 0, done: {}, min: false, pos: null, open: false, note: null, t: 0 };
 var LESSONS = [
   { id: 'hud', t: 'Your table', s: 'This is the whole game screen; tap any label to hear what it does.', why: 'Knowing where things are makes every turn quick.' },
-  { id: 'goal', t: 'The goal', s: 'Most points at the end wins, and points come from the patron on every card you own.', why: 'Each card you buy adds to one patron score.', tg: '#plb', ev: 'points' },
+  { id: 'goal', t: 'The goal', s: 'Most points at the end wins, and every card you own scores for the symbol printed on it.', why: 'Each card you buy adds to one symbol’s score.', tg: '#plb', ev: 'points' },
   { id: 'turn', t: 'Your turn', s: 'Pick one card from your hand, then tap the big check to play it.', why: 'Played cards stay out until a Herald brings them back.', tg: '#hand', ev: 'play' },
   { id: 'arch', t: 'Builder: move', s: 'The Builder gives one step per cart and ship on the map; carts use roads, ships use sea lanes.', why: 'Only one piece may stop on a line, but you may pass others.', card: 'arch', ev: 'play:arch' },
   { id: 'build', t: 'Builder: build', s: 'Then build in cities next to your pieces for 1 brick, 1 of the city’s good and coins.', why: 'Coins rise with every house already there; a brick city costs 1 grain.', tg: '#map .city.glow, #map .col', ev: 'build' },
-  { id: 'store', t: 'Storehouse', s: 'Your 12 spaces hold goods and the carts and ships still waiting.', why: 'When it is full, extra goods stay in the bank.', tg: '#store' },
+  { id: 'store', t: 'Storehouse', s: 'Your 12 spaces hold goods and the carts and ships still waiting.', why: 'If more goods arrive than fit, you choose which to keep.', tg: '#store' },
   { id: 'pref', t: 'Governor: produce', s: 'Pick a region showing its good: every house there makes 1, and you take its bonus good.', why: 'Rival houses there produce too, so pick regions where you have more.', card: 'pref', ev: 'prov' },
   { id: 'tax', t: 'Governor: taxes', s: 'Or collect the coins on every flipped marker and flip them all back.', why: 'Taxes grow while regions wait.', card: 'pref', ev: 'pcoins' },
   { id: 'gg', t: 'Grand Governor', s: 'Its holder gets 2 bonus goods when making a region produce, then passes it on.', why: 'It starts with the second player and also wins ties.', tg: '#race' },
@@ -2460,7 +2480,7 @@ var HUDLAB = [
   ['#race .strip:first-child', 'Rival', 'The rival’s score, houses, carts, ships and coins; tap it for more.'],
   ['#race .strip:last-child', 'You', 'Your score, houses, carts, ships and coins; tap it for more.'],
   ['#mktb', 'Market', 'Cards for sale; the number is how many are left before the end.'],
-  ['#plb', 'Points', 'Live patron points for both players.'],
+  ['#plb', 'Points', 'Live points for both players.'],
   ['#helpb', 'Help', 'Reopens this lesson window and this labelled map.'],
   ['#menub', 'Menu', 'Sound, hints, all rules, every card and a new game.'],
   ['.zoom', 'Zoom', 'Zoom the map; you can also pinch and drag it.'],

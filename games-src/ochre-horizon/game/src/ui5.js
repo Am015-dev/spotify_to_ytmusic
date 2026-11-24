@@ -1,6 +1,6 @@
 // ===== part 5: start screen, menu, rules, coach (learn to play), suggestion, end screen, boot =====
 function menuHTML() {
-  var rows = [['new', 'New game', 'Same level, fresh planet'], ['learn', 'Learn to play', 'Screen tour, then a guided first game'], ['practice', 'Practice puzzles', 'Three short charters: story + strategy'], ['rules', 'How to play', 'All the rules, short'], ['ref', 'All cards', '208 projects, 12 companies, map'], ['log', 'What happened', 'Every move so far'], ['sound', 'Sound: ' + (UI.sound ? 'on' : 'off'), 'Tap to switch'], ['home', 'Title screen', 'Change level or draft'], ['credits', 'Credits', 'Fonts and licences']];
+  var rows = [['new', 'New game', 'Same level, fresh planet'], ['learn', 'Learn to play', '10 short scenarios: learn by playing'], ['practice', 'Practice puzzles', 'Three short charters: story + strategy'], ['rules', 'How to play', 'All the rules, short'], ['ref', 'All cards', '208 projects, 12 companies, map'], ['log', 'What happened', 'Every move so far'], ['sound', 'Sound: ' + (UI.sound ? 'on' : 'off'), 'Tap to switch'], ['home', 'Title screen', 'Change level or draft'], ['credits', 'Credits', 'Fonts and licences']];
   return rows.map(function (r) { return '<div class="row"><div class="rt"><b>' + r[1] + '</b><span>' + r[2] + '</span></div><button data-menu="' + r[0] + '">Open</button></div>'; }).join('');
 }
 function menuDo(k) {
@@ -36,7 +36,7 @@ function showStart() {
   $('start').innerHTML = '<svg class="bg" viewBox="0 0 400 700" preserveAspectRatio="xMidYMid slice" aria-hidden="true">' + A.DEFS + A.backdrop(400, 700) + '<circle cx="200" cy="560" r="230" fill="url(#planet)"/><circle cx="200" cy="560" r="230" fill="url(#ht)" opacity=".7"/><path d="M60 420l40-30 30 20 50-40 40 30" fill="none" stroke="#1c120d" stroke-width="0"/></svg>' +
     '<div class="tt"><h1>OCHRE<br>HORIZON</h1><div class="sub">Terraform a red world. Outscore your rival.</div></div>' +
     '<div class="bt">' + (has ? '<button class="btn" id="stCont">Continue game</button>' : '') +
-    '<button class="btn' + (has ? ' cr' : '') + '" id="stNew">New game</button><button class="btn alt" id="stLearn">Learn to play<small>Screen tour, then a guided first game</small></button>' +
+    '<button class="btn' + (has ? ' cr' : '') + '" id="stNew">New game</button><button class="btn alt" id="stLearn">Learn to play<small>10 short scenarios: learn by playing</small></button>' +
     '<div class="lv">' + ['easy', 'normal', 'hard'].map(function (l) { return '<button data-lv="' + l + '" class="' + (l === lv ? 'on' : '') + '">' + l[0].toUpperCase() + l.slice(1) + '</button>'; }).join('') + '<button data-draft="1" class="' + (UI.draft ? 'on' : '') + '">Draft ' + (UI.draft ? 'on' : 'off') + '</button></div></div>';
   if ($('stCont')) $('stCont').addEventListener('click', function () { loadGame(); });
   $('stNew').addEventListener('click', function () { startGame({ level: UI.level, draft: UI.draft }); });
@@ -46,7 +46,7 @@ function showStart() {
 }
 function hideStart() { $('start').style.display = 'none'; document.body.classList.remove('st'); }
 function startGame(o) {
-  o = o || {}; if (window.chStop && UI.charter) chStop();
+  o = o || {}; if (window.chStop && UI.charter) chStop(); if (UI.scen) scStop();
   UI.level = o.level || UI.level; UI.tut = !!o.tut; UI.draft = !!o.draft; UI.setup = null; UI.research = null; UI.coachDone = {};
   OH.newGame({ seed: o.seed || (o.tut ? 20261120 : (Date.now() % 1e9)), draft: UI.draft, beginner: true });
   UI.evSeen = 0; UI.logSeen = 0;

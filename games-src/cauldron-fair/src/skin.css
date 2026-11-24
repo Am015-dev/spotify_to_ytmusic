@@ -192,7 +192,7 @@ html:not(.ph) #me,html:not(.ph) #me *:not(svg):not(path){font-size:16px}
 #qbox .opts.g2 .btn:last-child:nth-child(odd){grid-column:1 / -1;justify-content:center}
 #qbox .sug .best,#qbox .best,.btn .best{font-size:12px;background:#2b1a12;color:#ffd774}
 .sug::after,.rt.sug::after{font:900 12px/18px system-ui,sans-serif!important;background:#2b1a12!important;color:#ffd774!important;border:1px solid #ffd774}
-html.ph .gx-bar [data-gx=scored],html.ph .gx-bar [data-gx=rulesd]{display:none!important}html.ph .gx-bar{gap:8px}html.ph .gx-bar .gx-ibtn{min-width:52px}
+html.ph .gx-bar{gap:8px}html.ph .gx-bar .gx-ibtn{min-width:52px}
 .dpick .dpl{display:block;font:800 14px/1.1 system-ui,sans-serif;color:inherit;margin-top:2px}.rsfoot .btn.go:not(.off){background:#c4602a!important;color:#fff7e0!important}
 @media (max-height:760px){.dpick .dpl{display:none}}
 /* W471 round 2: desktop text >= 16px on the title button sublines and the Goal card label */

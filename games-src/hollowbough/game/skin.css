@@ -108,3 +108,6 @@ html.sk .gx-drawer-head{padding-left:16px;padding-right:12px}
 .gxc-lab{font-size:14px!important}
 /* every mode: the bulb's ring pulses three times, then holds still */
 .gxh-ring:not(.from){animation-iteration-count:3}
+
+/* QA W659: story Next button label was white on pale art */
+html.sk .gxc-btn.go{color:#3a1604;text-shadow:0 1px 0 rgba(255,255,255,.6);font-weight:800}

@@ -2,7 +2,7 @@
 
 One line per rule or count; each is an `ok(...)` check in `rules-test.js` (run `node rules-test.js`). Source of truth: rules-notes.md.
 
-- [x] 8 starting cards, one is a Settler (fixed 24 Nov from the published rules)
+- [x] 7 starting cards: one of each role, incl. a Settler (setup sheet: 7 per player; fixed 24 Nov)
 - [x] decks I (8) and II (7) for 2 players
 - [x] 2 market Builders, cost 1 tool
 - [x] 2 market Governors, cost 1 wine

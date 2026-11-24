@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en"><head><meta charset="utf-8">
+<html lang="en"><head><!-- Copyright (c) 2026 Am015-dev. All rights reserved. Not licensed for copying, modification or redistribution; see LICENSE in the source repository. --><meta name="copyright" content="&copy; 2026 Am015-dev. All rights reserved."><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
 <meta name="theme-color" content="#0e2f38">
 <title>Ochre Horizon</title>
@@ -433,6 +433,7 @@ body.gl.placing:not(.wide) #strips{opacity:.3;pointer-events:none}
 .twl li button{min-height:24px;padding:2px 7px;border-radius:999px;background:rgba(246,231,200,.08);color:var(--cream);font:11px var(--bd);border:1px solid rgba(246,231,200,.2)}
 .twl li.ok button{background:rgba(87,196,184,.25);border-color:var(--teal2)}.twl li.ok button::before{content:'\2713 ';color:var(--teal2)}
 .twl li.cur button{border-color:var(--gold);color:var(--gold)}
+#tw .sco{font:16px/1.3 var(--hd);color:var(--gold);margin:2px 0 4px}#tw .sch{border-left:3px solid var(--gold);padding-left:8px}#tw .scr{font:20px var(--hd);margin:2px 0 4px}#tw .scr.win{color:#9be38a}#tw .scr.fail{color:#ff9a7a}#tw .scst{letter-spacing:2px;color:var(--gold);margin-left:6px}#tw .scst i{font-style:normal;opacity:.3}#tw .scl{display:block;max-height:46vh;overflow:auto}#tw .scl li{margin:0 0 4px}#tw .scl li button{width:100%;min-height:44px;text-align:left;font:14px var(--bd);border-radius:10px;padding:5px 10px}#tw .scl small{display:block;opacity:.75;font-size:12px}#tw .scl button[disabled]{opacity:.45}
 #twChip{position:fixed;z-index:90;right:12px;top:calc(var(--st) + 60px);display:none;min-width:64px;height:44px;padding:0 14px;border-radius:999px;background:var(--gold);color:var(--ink);font:15px var(--hd);box-shadow:0 4px 14px rgba(0,0,0,.4)}
 #twChip.on{display:block}
 #twRing{position:fixed;z-index:89;pointer-events:none;display:none;border:3px solid var(--gold);border-radius:14px;box-shadow:0 0 0 0 rgba(242,193,78,.6);animation:twr 1.3s ease-out infinite}
@@ -1667,7 +1668,9 @@ body.gl.wide #bHelp{right:8px;top:8px}
   var OH = root.OH || require('./engine.js');
   var PV = { mc: 1, steel: 1.8, ti: 2.6, plant: 1.6, energy: 1.4, heat: 0.8 };
   var RV = { mc: 1, steel: 1.8, ti: 2.8, plant: 1.4, energy: 0.9, heat: 0.75 };
-  var FIXGL = 0;
+  var ENV = typeof process !== 'undefined' ? process.env : {}, TRW = +ENV.OH_TRW || 4,   // balance (proof/BALANCE.md): rating weight x4 shortens games to ~14 generations
+      noiseOn = true, FIXGL = 0, NOISE = ENV.OH_NOISE !== undefined ? +ENV.OH_NOISE : 30,   // normal rival misjudges a little (not for hints)
+      BUYT = +ENV.OH_BUYT || 2;
   var CAP = { mc: 30, steel: 10, ti: 8, plant: 9, energy: 6, heat: 9 };
   function gensLeft(G) {
     var left = (OH.TEMP_MAX - G.temp) / 2 + (OH.OXY_MAX - G.oxy) + (OH.OCEAN_MAX - G.oceans);
@@ -1676,7 +1679,7 @@ body.gl.wide #bHelp{right:8px;top:8px}
   function value(G, p) {
     var P = G.pl[p], gl = FIXGL || gensLeft(G), v = 0;
     var sc = OH.score(p);
-    v += sc.tr * (8 + gl * 0.9);
+    v += sc.tr * (8 + gl * 0.9) * TRW;
     v += (sc.total - sc.tr) * 6;
     for (var r in PV) { var cap = CAP[r], st = P[r]; if (r === 'heat' && G.temp >= OH.TEMP_MAX) cap = 0; v += P.prod[r] * PV[r] * Math.max(0, gl - 0.6) + (Math.min(st, cap) + 0.3 * Math.max(0, st - cap)) * RV[r]; }
     v += Math.min(P.hand.length, 12) * 1.6;
@@ -1744,7 +1747,7 @@ body.gl.wide #bHelp{right:8px;top:8px}
     var hand = OH.G.pl[p].hand.length;
     var scored = ids.map(function (id) { return { id: id, w: cardWorth(p, id) + (level === 'easy' ? (Math.random() * 16 - 8) : 0) }; }).sort(function (a, b) { return b.w - a.w; });
     var out = [];
-    scored.forEach(function (s) { if (s.w > 2 + Math.max(0, hand + out.length - 8) * 2 && (out.length + 1) * 3 <= budget) out.push(s.id); });
+    scored.forEach(function (s) { if (s.w > BUYT + Math.max(0, hand + out.length - 8) * 2 && (out.length + 1) * 3 <= budget) out.push(s.id); });
     return out;
   }
   function decide(level) {
@@ -1793,10 +1796,12 @@ body.gl.wide #bHelp{right:8px;top:8px}
     var passV = evalState(G, p) - (level === 'easy' ? 0.5 : AI.PASSOFF);   // value of doing nothing (easy gives up sooner)
     scored.forEach(function (s) { if (s.m.t === 'pass') s.v = passV - 0.01; if (s.m.t === 'end') s.v = passV; });
     if (level === 'easy') { scored = scored.filter(function (s) { return s.m.t !== 'award'; }); scored.forEach(function (s) { s.v += Math.random() * 14; if (s.m.t === 'pass') s.v += 2; }); }
+    if (level === 'normal' && NOISE && noiseOn) scored.forEach(function (s) { if (s.m.t !== 'pass' && s.m.t !== 'end') s.v += Math.random() * NOISE; });
     scored.sort(function (a, b) { return b.v - a.v; });
+    // awards: fund only when clearly ahead (drop every failing award, not just the first)
+    var AWM = +ENV.OH_AWM || 1;
+    scored = scored.filter(function (s) { if (s.m.t !== 'award') return true; var A = OH.MAP.AWARDS.filter(function (a) { return a.k === s.m.k; })[0]; return OH.awardMetric(p, A.m) > OH.awardMetric(1 - p, A.m) + AWM; });
     var top = scored[0].m;
-    // awards: fund only when clearly ahead
-    if (top.t === 'award') { var A = OH.MAP.AWARDS.filter(function (a) { return a.k === top.k; })[0]; if (OH.awardMetric(p, A.m) <= OH.awardMetric(1 - p, A.m) + 1) { scored.shift(); top = scored[0].m; } }
     return top;
   }
   // how good a move is, in words (for the hint): same evaluation as decide()
@@ -1804,7 +1809,8 @@ body.gl.wide #bHelp{right:8px;top:8px}
   // the lightbulb: normal play, but early on it steers newcomers to income cards (R99: early game felt stuck at 0 credits)
   function incomeOf(id) { var n = 0; (OH.CARDS[id].play || []).forEach(function (o) { if (o.op === 'prod' && o.r === 'mc' && o.n > 0) n += o.n; }); return n; }
   function suggest(p) {
-    var m = decide('normal'), G = OH.G; if (!m) return m;
+    noiseOn = false; var m; try { m = decide('normal'); } finally { noiseOn = true; }
+    var G = OH.G; if (!m) return m;
     if (G.phase !== 'action' || G.pending) return m;
     if (m.t === 'play' && incomeOf(m.id) > 0) { m.why = 'income'; return m; }
     if (G.gen <= 4 && (m.t === 'end' || m.t === 'pass' || m.t === 'std' || m.t === 'sell')) {
@@ -2058,7 +2064,184 @@ body.gl.wide #bHelp{right:8px;top:8px}
   // a whole line for tests: pick(dec) returns the option index
   function play(i, pick) { var R = start(i), n = 0; while (!R.ended && n++ < 60) { advance(R); var d = decision(R); if (d) choose(R, d, pick(d)); } return R; }
 
-  var OHC = root.OHC = { CH: CH, start: start, advance: advance, decision: decision, choose: choose, play: play, YOU: YOU, RIV: RIV };
+  // ---------- SCENARIOS: the tutorial as a game. Each one = a built start position on the REAL engine, one objective, a par,
+  // a fail rule and two hints. The player makes every move with the normal controls; nothing is clicked for them.
+  function hexes(f) { var M = OHx().MAP; return M.order.filter(function (s) { var S = M.spaces[s]; return S && !S.reserved && f(S, s); }); }
+  function landN(s) { var M = OHx().MAP; return M.spaces[s].adj.filter(function (a) { return M.spaces[a] && !M.spaces[a].ocean && !M.spaces[a].reserved; }).length; }
+  function put(s, t, o) { OHx().G.tiles[s] = { t: t, o: t === 'ocean' ? -1 : o }; if (t === 'ocean') OHx().G.oceans++; }
+  function midCity() { var c = hexes(function (S) { return !S.ocean && !S.bonus.length; }).sort(function (a, b) { return landN(b) - landN(a) || (a < b ? -1 : 1); })[0]; put(c, 'city', 0); return c; }
+  function noRival(G) { G.pl[1].passed = true; G.noRival = true; return G; }
+  function adjOcean(s) { var OH = OHx(), G = OH.G; return OH.MAP.spaces[s].adj.filter(function (a) { return G.tiles[a] && G.tiles[a].t === 'ocean'; }).length; }
+  function myCities() { var G = OHx().G, o = []; for (var s in G.tiles) if (G.tiles[s].t === 'city' && G.tiles[s].o === 0 && OHx().MAP.spaces[s]) o.push(s); return o; }
+  function bestSpace(f) { var G = OHx().G; return G.pending.d.spaces.slice().sort(function (a, b) { return f(b) - f(a) || (a < b ? -1 : 1); })[0]; }
+  var SC = [
+    { id: 'tiles', title: 'First greenery', learn: 'Tiles and the board',
+      goal: 'Plant a greenery: +1 oxygen, +1 rating.', acts: 2, par: { acts: 1, mc: 0 },
+      setup: function () { var G = noRival(base(8101, { pl: [{ mc: 6, plant: 8, tr: 20 }, {}], temp: -30 })); G.scCity = midCity(); return G; },
+      win: function (G) { return OHx().greeneries(0) >= 1; },
+      why: 'Your plants turned into a greenery: oxygen +1 raised your rating.',
+      failWhy: 'No greenery yet. The leaf button under your plants turns 8 plants into a tile.',
+      hints: ['Your 8 plants are a greenery waiting to happen. Look at the plants in your resource bar.', 'Tap the plants (8) in the resource bar, then a glowing hex next to your city, then Place here.'],
+      learned: 'Greenery must go next to your own tiles when it can. Each one raises oxygen (+1 rating) and is 1 point.',
+      solve: [{ t: 'green' }, function () { return { t: 'place', s: bestSpace(function (s) { return 0; }) }; }], wrong: [{ t: 'pass' }] },
+    { id: 'stock', title: 'Stock and production', learn: 'Resources',
+      goal: 'Get titanium production: play Cobalt Trawler.', acts: 2, par: { acts: 1 },
+      setup: function () { return noRival(base(8102, { pl: [{ mc: 6, ti: 2, tr: 20, hand: ['p016', 'p031'] }, {}], temp: -30 })); },
+      win: function (G) { return G.pl[0].prod.ti >= 1; },
+      why: 'Titanium paid 6 of the 12: your titanium production is now +1, every round.',
+      failWhy: 'Hot Wire Barrage spent your titanium, so Cobalt Trawler now costs more credits than you have.',
+      fail: function (G) { return G.pl[0].played.indexOf('p031') >= 0 && !OHx().playable(0, 'p016'); },
+      hints: ['Titanium (stock 2) is worth 3 credits each, but only on space cards. Both cards are space cards.', 'Play Cobalt Trawler first: 2 titanium pay 6, your 6 credits pay the rest.'],
+      learned: 'Big number = stock you spend now. Small +N = production you get every round. Steel pays building cards, titanium space cards.',
+      solve: [{ t: 'play', id: 'p016' }], wrong: [{ t: 'play', id: 'p031' }] },
+    { id: 'global', title: 'The bonus dot', learn: 'Raise a global',
+      goal: 'Raise the temperature to -24 °C (bonus dot) in 2 actions.', acts: 2, par: { acts: 2, mc: 9 },
+      setup: function () { return noRival(base(8103, { pl: [{ mc: 16, heat: 5, tr: 20, hand: ['p031'] }, {}], temp: -28 })); },
+      win: function (G) { return G.temp >= -24; },
+      fail: function (G) { return G.pl[0].heat < 8 && G.pl[0].mc < 9; },
+      why: 'You landed on -24 °C: two rating and the dot gave you +1 heat production.',
+      failWhy: 'Out of fuel: under 8 heat and under 9 credits, nothing left can raise the temperature.',
+      hints: ['Each temperature step costs one action. Which two steps are cheapest?', 'Hot Wire Barrage (9) gives a step AND 3 heat: then burn 8 heat for the second step. Cheaper than a comet strike (14).'],
+      learned: 'Every global step is +1 rating. Landing on a dot pays a bonus to whoever lands there.',
+      solve: [{ t: 'play', id: 'p031' }, { t: 'heat' }], wrong: [{ t: 'std', k: 'power' }] },
+    { id: 'route', title: 'Card or project', learn: 'Standard projects vs cards',
+      goal: 'Gain +3 rating with 30 credits, in 2 actions.', acts: 2, par: { acts: 2, mc: 23 },
+      setup: function () { return noRival(base(8104, { pl: [{ mc: 30, tr: 20, prod: { energy: 1 }, hand: ['p039'] }, {}], temp: -20 })); },
+      win: function (G, S) { return G.pl[0].tr >= S.tr0 + 3; },
+      why: 'Mirror Tilt Program gave 2 steps for 9 credits; one comet strike gave the third.',
+      failWhy: 'Two comet strikes cost 28 for +2. The card gives +2 for 9.',
+      hints: ['Projects are always there, but a card can be cheaper per step. Compare credits per rating.', 'Play Mirror Tilt Program (+2 temperature for 9), then Projects > Comet strike (14).'],
+      learned: 'Standard projects are your fallback. A good card usually buys rating cheaper than a project.',
+      solve: [{ t: 'play', id: 'p039' }, { t: 'std', k: 'asteroid' }], wrong: [{ t: 'std', k: 'asteroid' }, { t: 'std', k: 'asteroid' }] },
+    { id: 'adj', title: 'Between two seas', learn: 'Adjacency',
+      goal: 'Build a city that touches 2 oceans (+2 credits each).', acts: 1, par: { acts: 1 },
+      setup: function () {
+        var G = noRival(base(8105, { pl: [{ mc: 27, tr: 20 }, {}], temp: -30 })), M = OHx().MAP;
+        var land = hexes(function (S, s) { return !S.ocean && S.adj.filter(function (a) { return M.spaces[a] && M.spaces[a].ocean; }).length >= 2; })[2];
+        M.spaces[land].adj.filter(function (a) { return M.spaces[a] && M.spaces[a].ocean; }).slice(0, 2).forEach(function (a) { put(a, 'ocean'); });
+        G.scLand = land; return G;
+      },
+      win: function (G) { return myCities().some(function (s) { return adjOcean(s) >= 2; }); },
+      fail: function (G) { return myCities().length > 0 && !myCities().some(function (s) { return adjOcean(s) >= 2; }); },
+      why: 'Your city touches 2 oceans: +4 credits on the spot.',
+      failWhy: 'Your city touches fewer than 2 oceans. Look for land between the two blue ocean tiles.',
+      hints: ['Every tile you place pays 2 credits for each ocean next to it.', 'Projects > City, then pick the land hex that touches BOTH ocean tiles.'],
+      learned: 'Placement is a decision: oceans next to a tile pay 2 credits each, and hex icons pay their bonus.',
+      solve: [{ t: 'std', k: 'city' }, function () { return { t: 'place', s: bestSpace(adjOcean) }; }],
+      wrong: [{ t: 'std', k: 'city' }, function () { return { t: 'place', s: bestSpace(function (s) { return -adjOcean(s); }) }; }] },
+    { id: 'req', title: 'Unlock a card', learn: 'Tags and requirements',
+      goal: 'Play Tray Garden Rows. It needs 2% oxygen; the air has 1%.', acts: 2, par: { acts: 2 },
+      setup: function () { var G = noRival(base(8106, { pl: [{ mc: 12, plant: 8, tr: 20, hand: ['p019'] }, {}], temp: -30, oxy: 1 })); midCity(); return G; },
+      win: function (G) { return G.pl[0].played.indexOf('p019') >= 0; },
+      fail: function (G) { return G.pl[0].mc < 11; },
+      why: 'Your greenery lifted oxygen to 2%, which unlocked the card.',
+      failWhy: 'You spent the credits the card needs (11).',
+      hints: ['A requirement is a gauge level. Can you raise oxygen without spending credits?', 'Plant a greenery with your 8 plants (oxygen 2%), then play the card.'],
+      learned: 'Requirements sit under a card name: meet the gauge or tag count first, then play it.',
+      solve: [{ t: 'green' }, function () { return { t: 'place', s: bestSpace(function () { return 0; }) }; }, { t: 'play', id: 'p019' }], wrong: [{ t: 'std', k: 'power' }] },
+    { id: 'mile', title: 'Milestone race', learn: 'Milestones',
+      goal: 'Claim Quartermaster (5 production kinds) before Greyline.', acts: 2, par: { acts: 2 },
+      setup: function () { var G = base(8107, { pl: [{ mc: 20, tr: 20, prod: { mc: 1, steel: 1, plant: 1, heat: 1 } }, { mc: 20, tr: 20, prod: { mc: 1, steel: 1, ti: 1, plant: 1, heat: 1 } }], temp: -30 }); G.scPlan = 'mile'; return G; },
+      win: function (G) { return G.milestones.quartermaster === 0; },
+      fail: function (G) { return G.milestones.quartermaster === 1; },
+      why: 'Power plant made energy your 5th production kind; you claimed first: 5 points for 8 credits.',
+      failWhy: 'Greyline claimed Quartermaster first. You needed a 5th production kind, then 8 credits to claim.',
+      hints: ['You have 4 production kinds. Which project adds a new one?', 'Projects > Power plant (11) adds energy production. Then Milestones > Quartermaster (8).'],
+      learned: 'Milestones cost 8 and give 5 points, but only the first claimer gets each one.',
+      solve: [{ t: 'std', k: 'power' }, { t: 'mile', k: 'quartermaster' }], wrong: [{ t: 'std', k: 'asteroid' }, { t: 'end' }] },
+    { id: 'gens', title: 'Two seasons ahead', learn: 'Generations',
+      goal: 'Plant a greenery from plants by the end of generation 3.', acts: 0, gens: 3, par: { acts: 2 },
+      setup: function () { return noRival(base(8108, { pl: [{ mc: 14, tr: 10, prod: { plant: 2, energy: 1 }, hand: ['p020'] }, {}], temp: -30, oxy: 4 })); },
+      win: function (G, S) { return S.greens > 0; },
+      why: '+2 plant production in round 1 doubled your harvest: 8 plants by round 3.',
+      failWhy: 'Plants grew too slowly. At +2 a round you reach 4 by round 3; +4 a round reaches 8.',
+      hints: ['Production pays at the end of every round. What makes 8 plants by round 3?', 'Play Hydroponic Spindle now (+2 plant production), pass twice, then plant in round 3.'],
+      learned: 'Production early pays every round after. Count rounds left before you choose engine or rating.',
+      solve: [{ t: 'play', id: 'p020' }, { t: 'pass' }, { t: 'pass' }, { t: 'green' }, function () { return { t: 'place', s: bestSpace(function () { return 0; }) }; }], wrong: [{ t: 'std', k: 'asteroid' }, { t: 'pass' }, { t: 'pass' }, { t: 'pass' }] },
+    { id: 'rival', title: 'The rival', learn: 'The rival',
+      goal: 'Outscore Greyline after 3 generations.', acts: 0, gens: 3, par: { margin: 4 },
+      setup: function () { var G = base(8109, { pl: [{ mc: 30, tr: 20, heat: 5, plant: 8, prod: { energy: 1, mc: 1 }, hand: ['p039', 'p031', 'p001'] }, { mc: 20, tr: 20 }], temp: -30 }); midCity(); G.scPlan = 'comets'; return G; },
+      win: function (G, S) { return S.over && OHx().score(0).total > OHx().score(1).total; },
+      fail: function (G, S) { return S.over && OHx().score(0).total <= OHx().score(1).total; },
+      why: 'You raised more than Greyline each round.',
+      failWhy: 'Greyline bought a comet strike every round while you waited.',
+      hints: ['Greyline buys a comet strike whenever it can. Every step you raise is a point.', 'Play your two temperature cards, burn heat, plant your greenery: 5 rating in round 1.'],
+      learned: 'The rival races for the same rating. Act every round; passing early only helps it.',
+      policy: 'hard', wrong: 'pass' },
+    { id: 'grad', title: 'Graduation', learn: 'A mini game',
+      goal: 'Beat the normal rival in a 5-generation game.', acts: 0, gens: 5, par: { margin: 6 },
+      setup: function () {
+        var G = base(8110, { pl: [{ mc: 40, tr: 22 }, { mc: 40, tr: 22 }], temp: -12, oxy: 6, oceans: 4 });
+        [0, 1].forEach(function (p) { for (var i = 0; i < 6; i++) G.pl[p].hand.push(G.deck.pop()); G.pl[p].prod.mc = 2; G.pl[p].prod.plant = 1; G.pl[p].prod.heat = 1; });
+        G.scPlan = 'ai'; return G;
+      },
+      win: function (G, S) { return S.over && OHx().score(0).total > OHx().score(1).total; },
+      fail: function (G, S) { return S.over && OHx().score(0).total <= OHx().score(1).total; },
+      why: 'You beat a real rival. You are ready for a full game.',
+      failWhy: 'The rival scored more. Count points: rating, tiles, cards, milestones.',
+      hints: ['Use the bulb at the top for a suggested move any time.', 'Raise globals with cheap cards first, claim a milestone if you can, plant every 8 plants.'],
+      learned: 'A full game is this, longer: about 10-12 generations to fill all three gauges.',
+      policy: 'hard', wrong: 'pass' }
+  ];
+  SC.forEach(function (c, i) { c.n = i + 1; });
+  function sStart(i) { var c = SC[i], G = c.setup(); G.scenario = c.id; G.log.push({ p: -1, s: 'Scenario: ' + c.title + '.' }); return { i: i, sc: c, acts: 0, spent: 0, greens: 0, tr0: G.pl[0].tr, ended: false, over: false, result: null }; }
+  // record one of the player's moves (call with the credits before the move)
+  function sNote(S, m, mc0) {
+    var G = OHx().G;
+    if (['pass', 'end', 'place', 'choose', 'pickres', 'buy', 'done'].indexOf(m.t) < 0) S.acts++;
+    if (m.t === 'green') S.greens++;
+    S.spent += Math.max(0, mc0 - G.pl[0].mc);
+  }
+  function stars(S) { var p = S.sc.par, G = OHx().G; if (p.margin !== undefined) { var d = OHx().score(0).total - OHx().score(1).total; return d >= p.margin ? 3 : d >= 2 ? 2 : 1; } return S.acts <= p.acts && (p.mc === undefined || S.spent <= p.mc) ? 3 : S.acts <= p.acts + 1 ? 2 : 1; }
+  // decide win/fail; returns the result once the scenario ended
+  function sCheck(S) {
+    if (S.ended) return S.result;
+    var OH = OHx(), G = OH.G, c = S.sc, gens = c.gens || 1;
+    S.over = G.over || G.phase === 'final' || G.gen > gens;
+    var placing = G.pending && G.pending.p === 0;
+    if (!placing && c.win(G, S)) { S.ended = true; S.result = { ok: true, stars: stars(S), line: c.why }; }
+    else if ((c.fail && c.fail(G, S)) || (c.acts && S.acts >= c.acts && !placing && !G.pending) || S.over) { S.ended = true; S.result = { ok: false, stars: 0, line: c.failWhy }; }
+    return S.result;
+  }
+  function rivalMove(S) {
+    var OH = OHx(), G = OH.G, k = G.scPlan;
+    if (G.noRival || !k) return { t: G.phase === 'final' ? 'done' : G.acts === 1 ? 'end' : 'pass' };
+    if (k === 'mile') return OH.mileOk(1, 'quartermaster') ? { t: 'mile', k: 'quartermaster' } : { t: 'pass' };
+    if (k === 'ai') return (root.OHAI || require('./ai.js')).decide('normal');
+    if (G.phase === 'final') return { t: 'done' };
+    var a = PLANS[k](G).m; return a.t === 'pass' && G.acts === 1 ? { t: 'end' } : a;
+  }
+  // play every move that is not the player's (research, the rival, its placements); returns rival moves made
+  function sAuto(S) {
+    var OH = OHx(), out = [], n = 0;
+    while (n++ < 200) {
+      var G = OH.G; if (sCheck(S) || G.over) break;
+      var p = OH.sideToAct(); if (p < 0) break;
+      if (G.phase === 'research') { OH.performMove({ t: 'buy', ids: [] }); continue; }
+      if (p === 0) break;
+      if (G.pending && G.pending.h === 'place') { OH.performMove({ t: 'place', s: rivalPlace(G, 'rivalNear') }); continue; }
+      if (G.pending) { OH.performMove(G.pending.h === 'choose' ? { t: 'choose', i: G.pending.d.ok[0] } : { t: 'pickres', id: G.pending.d.cards[0] }); continue; }
+      var m = rivalMove(S) || { t: 'pass' };
+      if (!OH.performMove(m)) OH.performMove({ t: G.phase === 'final' ? 'done' : G.acts === 1 ? 'end' : 'pass' });
+      out.push(m);
+    }
+    return out;
+  }
+  // node + tests: run a scenario with a list of moves (or a policy) and return the run state
+  function sRun(i, moves) {
+    var OH = OHx(), S = sStart(i), j = 0, guard = 0; sAuto(S);
+    while (!S.ended && guard++ < 300) {
+      var m;
+      if (moves === 'hard' || moves === 'pass') { var G = OH.G; m = moves === 'pass' ? (G.pending ? OH.validMoves()[0] : { t: G.phase === 'final' ? 'done' : G.acts === 1 ? 'end' : 'pass' }) : (root.OHAI || require('./ai.js')).decide('hard'); }
+      else { if (j >= moves.length) break; m = moves[j++]; if (typeof m === 'function') m = m(); }
+      var mc0 = OH.G.pl[0].mc;
+      if (!OH.performMove(m)) return { S: S, bad: m };
+      sNote(S, m, mc0); sAuto(S);
+    }
+    sCheck(S); return { S: S };
+  }
+
+  var OHC = root.OHC = { SC: SC, sStart: sStart, sNote: sNote, sCheck: sCheck, sAuto: sAuto, sRun: sRun, CH: CH, start: start, advance: advance, decision: decision, choose: choose, play: play, YOU: YOU, RIV: RIV };
   if (isNode) module.exports = OHC;
 })(typeof window !== 'undefined' ? window : globalThis);
 
@@ -2599,7 +2782,7 @@ function playEvents() {
   pls.forEach(function (pl) { var c = OH.card(pl.id); toast('<b>Rival plays ' + esc(c.name) + '</b>' + esc(c.text), false, Math.max(2200, UI.AIDELAY * 2.2), { key: 'rv' + pl.id }); });
   return d;
 }
-function save() { if (!G || UI.scn) return; LS.set('oh_save', JSON.stringify({ G: OH.G, level: UI.level, tut: UI.tut, coach: UI.coachDone })); }
+function save() { if (!G || UI.scn || UI.scen) return; LS.set('oh_save', JSON.stringify({ G: OH.G, level: UI.level, tut: UI.tut, coach: UI.coachDone })); }
 function doMove(m) {
   if (UI.busy && !m.force) return false;
   var ok = OH.performMove(m);
@@ -2615,7 +2798,7 @@ function doMove(m) {
 var aiTimer = 0;
 function pump() {
   if (!G) return;
-  if (UI.charter) { render(); return; }
+  if (UI.charter || (UI.scen && SCN.S && SCN.S.ended)) { render(); return; }
   render();
   if (G.over) { showEnd(); return; }
   var p = OH.sideToAct();
@@ -2899,7 +3082,7 @@ $('res').addEventListener('click', function (e) {
 });
 // ===== part 5: start screen, menu, rules, coach (learn to play), suggestion, end screen, boot =====
 function menuHTML() {
-  var rows = [['new', 'New game', 'Same level, fresh planet'], ['learn', 'Learn to play', 'Screen tour, then a guided first game'], ['practice', 'Practice puzzles', 'Three short charters: story + strategy'], ['rules', 'How to play', 'All the rules, short'], ['ref', 'All cards', '208 projects, 12 companies, map'], ['log', 'What happened', 'Every move so far'], ['sound', 'Sound: ' + (UI.sound ? 'on' : 'off'), 'Tap to switch'], ['home', 'Title screen', 'Change level or draft'], ['credits', 'Credits', 'Fonts and licences']];
+  var rows = [['new', 'New game', 'Same level, fresh planet'], ['learn', 'Learn to play', '10 short scenarios: learn by playing'], ['practice', 'Practice puzzles', 'Three short charters: story + strategy'], ['rules', 'How to play', 'All the rules, short'], ['ref', 'All cards', '208 projects, 12 companies, map'], ['log', 'What happened', 'Every move so far'], ['sound', 'Sound: ' + (UI.sound ? 'on' : 'off'), 'Tap to switch'], ['home', 'Title screen', 'Change level or draft'], ['credits', 'Credits', 'Fonts and licences']];
   return rows.map(function (r) { return '<div class="row"><div class="rt"><b>' + r[1] + '</b><span>' + r[2] + '</span></div><button data-menu="' + r[0] + '">Open</button></div>'; }).join('');
 }
 function menuDo(k) {
@@ -2935,7 +3118,7 @@ function showStart() {
   $('start').innerHTML = '<svg class="bg" viewBox="0 0 400 700" preserveAspectRatio="xMidYMid slice" aria-hidden="true">' + A.DEFS + A.backdrop(400, 700) + '<circle cx="200" cy="560" r="230" fill="url(#planet)"/><circle cx="200" cy="560" r="230" fill="url(#ht)" opacity=".7"/><path d="M60 420l40-30 30 20 50-40 40 30" fill="none" stroke="#1c120d" stroke-width="0"/></svg>' +
     '<div class="tt"><h1>OCHRE<br>HORIZON</h1><div class="sub">Terraform a red world. Outscore your rival.</div></div>' +
     '<div class="bt">' + (has ? '<button class="btn" id="stCont">Continue game</button>' : '') +
-    '<button class="btn' + (has ? ' cr' : '') + '" id="stNew">New game</button><button class="btn alt" id="stLearn">Learn to play<small>Screen tour, then a guided first game</small></button>' +
+    '<button class="btn' + (has ? ' cr' : '') + '" id="stNew">New game</button><button class="btn alt" id="stLearn">Learn to play<small>10 short scenarios: learn by playing</small></button>' +
     '<div class="lv">' + ['easy', 'normal', 'hard'].map(function (l) { return '<button data-lv="' + l + '" class="' + (l === lv ? 'on' : '') + '">' + l[0].toUpperCase() + l.slice(1) + '</button>'; }).join('') + '<button data-draft="1" class="' + (UI.draft ? 'on' : '') + '">Draft ' + (UI.draft ? 'on' : 'off') + '</button></div></div>';
   if ($('stCont')) $('stCont').addEventListener('click', function () { loadGame(); });
   $('stNew').addEventListener('click', function () { startGame({ level: UI.level, draft: UI.draft }); });
@@ -2945,7 +3128,7 @@ function showStart() {
 }
 function hideStart() { $('start').style.display = 'none'; document.body.classList.remove('st'); }
 function startGame(o) {
-  o = o || {}; if (window.chStop && UI.charter) chStop();
+  o = o || {}; if (window.chStop && UI.charter) chStop(); if (UI.scen) scStop();
   UI.level = o.level || UI.level; UI.tut = !!o.tut; UI.draft = !!o.draft; UI.setup = null; UI.research = null; UI.coachDone = {};
   OH.newGame({ seed: o.seed || (o.tut ? 20261120 : (Date.now() % 1e9)), draft: UI.draft, beginner: true });
   UI.evSeen = 0; UI.logSeen = 0;
@@ -3547,7 +3730,7 @@ setInterval(function () { if (UI.charter && CHUI.R && !CHUI.R.ended && Date.now(
 // ===== part 9: Learn to play = Interface tour (labelled HUD map) + floating lessons on a real game; feel (floats, dings, fanfares) =====
 // Owner rules (24 Nov): the tutorial is a small FLOATING window (drag, minimise to a chip, close). It never dims the screen and never
 // blocks a tap: the player can tap anything at any time. A pulse ring marks the suggested target; a step ticks when it is done OR on Next.
-var TW = { on: false, mode: '', min: false, cur: 0, done: {}, tapped: {}, base: null, pos: null, info: '', seen: {} };
+var TW = { on: false, mode: '', min: false, pos: null, info: '', seen: {} };
 // ---------- the HUD map: every element, one plain sentence each ----------
 var HUD = [
   ['bmenu', 'Menu', 'Menu: new game, rules, all cards, sound, this guide. Close it with the X.'],
@@ -3629,40 +3812,42 @@ function hudShow() {
   });
 }
 function hudHide() { $('hg').classList.remove('on'); $('hg').innerHTML = ''; document.body.classList.remove('hgon'); }
-// ---------- lessons: suggestions on the real board, any order ----------
-function myTiles() { var n = 0; for (var s in G.tiles) if (G.tiles[s] && G.tiles[s].p === 0) n++; return n; }
-function rivMoves() { return G.log.filter(function (l) { return l.p === 1; }).length; }
-var LESSONS = [
-  { k: 'goal', t: 'Goal: raise temperature, oxygen and oceans (the gauges). Your score = rating + points. The rival wants the same.', w: 'Why: every step you raise is +1 rating for you, and rating is both points and income.', tgt: function () { return $('glob'); }, tap: 'glob' },
-  { k: 'stock', t: 'Look at your resources: the big number is your stock, the small +N is production.', w: 'Why: production pays you every round, so a little production early adds up.', tgt: function () { return $('res'); }, tap: 'res' },
-  { k: 'inspect', t: 'Open your hand and tap a card. Cost is top left, tags top right, a requirement under the name, the effect below.', w: 'Why: a card can be played only if you can pay it and meet its requirement.', tgt: function () { return $('modal').classList.contains('on') ? null : $('sheet').classList.contains('on') && UI.sheet === 'cards' ? document.querySelector('#shB [data-card]') : $('bCards'); }, done: function () { return !!$('mPlay'); } },
-  { k: 'play', t: 'Play a card you can afford, then watch your production numbers change.', w: 'Why: production cards pay back every round for the rest of the game.', tgt: function () { return $('mPlay') && !$('mPlay').disabled ? $('mPlay') : $('sheet').classList.contains('on') ? document.querySelector('#shB [data-card]') : $('bCards'); }, done: function () { return G.pl[0].played.length > TW.base.played; } },
-  { k: 'std', t: 'Open Projects and buy a standard project. A tile one asks you to tap a glowing hex, then Place here.', w: 'Why: tiles score points and the icons on the hex pay you a bonus.', tgt: function () { return G.pending && G.pending.h === 'place' ? ($('confirm').offsetParent && UI.sel ? $('confirmb') : document.querySelector('#hexes .hex.tgt')) : $('sheet').classList.contains('on') && UI.sheet === 'proj' ? document.querySelector('#shB [data-std]:not([disabled])') : $('bProj'); }, done: function () { return myTiles() > TW.base.tiles || TW.base.std; } },
-  { k: 'pass', t: 'You get 1 or 2 actions per turn. Then tap Done (after 1 action) or Pass (out for this round).', w: 'Why: the rival then moves; passing early saves credits but gives up the round.', tgt: function () { return $('bPass'); }, done: function () { return TW.base.ended; } },
-  { k: 'rival', t: 'The rival’s turn: its tile flashes on the map and a line says what it did. Nothing to tap.', w: 'Why: watch what it races for: the same gauges, milestones and awards.', tgt: function () { return $('sriv'); }, done: function () { return rivMoves() > TW.base.riv; } },
-  { k: 'income', t: 'When both players pass, the round ends: credits = credit production + rating; other resources grow by production.', w: 'Why: energy turns into heat, so production you build now pays every round.', tgt: function () { return $('res'); }, done: function () { return G.gen > TW.base.gen; } },
-  { k: 'goals', t: 'Open Milestones or Awards. Milestone: 8 credits = 5 points. Award: fund it, lead it at the end, get 5.', w: 'Why: only 3 of each exist, and the rival can grab them first.', tgt: function () { return $('tMile'); }, done: function () { return UI.sheet === 'proj' && (UI.tab === 'mile' || UI.tab === 'award'); } },
-  { k: 'end', t: 'The game ends after the round where all three gauges are full. Most points wins.', w: 'Why: points = rating + greenery + cities + cards + milestones + awards; plan for all of them.', tgt: function () { return $('cVP'); }, tap: 'cVP' }
-];
-function lessonDone(L) {   // once done, stays done (latched)
-  if (TW.done[L.k]) return true;
-  var d = L.done ? (function () { try { return !!L.done(); } catch (e) { return false; } })() : !!TW.tapped[L.tap];
-  if (d) TW.done[L.k] = 1; return d;
+// ---------- scenarios: the tutorial is a game (logic + data in src/charters.js). The player makes every move; the card only shows the goal ----------
+var SCN = { S: null, hint: 0, prog: {} };
+try { SCN.prog = JSON.parse(LS.get('oh_scen') || '{}') || {}; } catch (e) { SCN.prog = {}; }
+function scSave() { try { LS.set('oh_scen', JSON.stringify(SCN.prog)); } catch (e) { } }
+function scUnlocked(i) { return i < 3 || [0, 1, 2].every(function (j) { return SCN.prog[OHC.SC[j].id]; }); }
+function scStart(i) {
+  closeModal(); closeSheet(); hideStart(); if (UI.charter) chStop(); clearTimeout(aiTimer);
+  UI.tut = false; UI.scen = true; UI.setup = null; UI.research = null; UI.busy = false; SCN.hint = 0;
+  SCN.S = OHC.sStart(i); OHC.sAuto(SCN.S);
+  UI.evSeen = OH.G.ev.length; UI.logSeen = OH.G.log.length;
+  fitView(); render(); TW.pos = null; TW.dragged = false; twOpen('scen'); pump();
 }
-var twDoMove0 = doMove;
-doMove = function (m) { var r = twDoMove0(m); if (r && TW.base && m) { if (m.t === 'std') TW.base.std = true; if (m.t === 'end' || m.t === 'pass') TW.base.ended = true; } return r; };
-// ---------- start / stop ----------
-function learnStart() {   // Learn to play: a real easy game, beginner company, then the tour, then lessons
-  try { startGame({ level: 'easy', seed: 20261124 }); } catch (e) { }
-  if (G && G.phase === 'setup' && OH.sideToAct() === 0) {
-    var off = G.pl[0].offer.corps, c = off.filter(function (x) { return OH.CORPS && OH.CORPS[x] && OH.CORPS[x].beginner; })[0] || off[0];
-    UI.setup = null; closeModal(); doMove({ t: 'setup', corp: c, buy: [] });
+function scStop() { UI.scen = false; SCN.S = null; if (TW.mode === 'scen') twClose(); }
+var scDoMove0 = doMove;
+doMove = function (m) {
+  var S = SCN.S, me = S && !S.ended && G && OH.sideToAct() === 0, mc0 = G ? G.pl[0].mc : 0;
+  var r = scDoMove0(m);
+  if (r && me && SCN.S === S) {
+    OHC.sNote(S, m, mc0);
+    var riv = OHC.sAuto(S);
+    if (riv.some(function (x) { return x.t !== 'pass' && x.t !== 'end' && x.t !== 'done'; })) { playEvents(); render(); }
+    if (S.ended) scEnd(); else twRender();
   }
-  TW.done = {}; TW.tapped = {}; TW.cur = 0; TW.info = ''; TW.base = null;
-  twOpen('tour');
+  return r;
+};
+function scEnd() {
+  var S = SCN.S, res = S.result; if (!res) return;
+  if (res.ok) { var id = S.sc.id; SCN.prog[id] = Math.max(SCN.prog[id] || 0, res.stars); scSave(); sfx('ding'); } else sfx('bad');
+  TW.min = false; twRender();
 }
-function twOpen(mode) { TW.y = null; TW.x = null; TW.on = true; TW.mode = mode; TW.min = false; TW.info = ''; TW.dragged = false; hudHide(); if (mode === 'lessons' && !TW.base) twBase(); twRender(); if (mode === 'tour') { hudShow(); twRender(); } }
-function twBase() { TW.base = { played: G.pl[0].played.length, tiles: myTiles(), riv: rivMoves(), gen: G.gen, std: false, ended: false }; }
+// ---------- start / stop ----------
+function learnStart() {   // Learn to play = scenario 1 (or the list once scenario 1 is won); the Interface tour is the optional first card of the list
+  if (SCN.prog.tiles) { if (!G) scStart(0); twOpen('pick'); return; }
+  scStart(0);
+}
+function twOpen(mode) { TW.y = null; TW.x = null; TW.on = true; TW.mode = mode; TW.min = false; TW.info = ''; TW.dragged = false; hudHide(); twRender(); if (mode === 'tour') { hudShow(); twRender(); } }
 function twClose() { TW.on = false; hudHide(); $('tw').classList.remove('on'); $('twChip').classList.remove('on'); $('twRing').classList.remove('on'); }
 function twMin(m) { TW.min = m; twRender(); }
 // ---------- the floating window ----------
@@ -3670,30 +3855,40 @@ function twRender() {
   var w = $('tw'); if (!TW.on) return twClose();
   $('twChip').classList.toggle('on', TW.min); w.classList.toggle('on', !TW.min); w.classList.toggle('tour', TW.mode === 'tour');
   if (TW.min) { $('twRing').classList.remove('on'); return; }
-  var h = '<div class="twh" id="twH"><b>' + (TW.mode === 'tour' ? 'Interface tour' : 'Lessons') + '</b><span class="twg">drag</span><button id="twMin" aria-label="Minimise guide">–</button><button id="twX" aria-label="Close guide">×</button></div><div class="twb">';
+  var h = '<div class="twh" id="twH"><b>' + (TW.mode === 'tour' ? 'Interface tour' : TW.mode === 'scen' && SCN.S ? 'Scenario ' + SCN.S.sc.n + ' · ' + esc(SCN.S.sc.title) : 'Scenarios') + '</b><span class="twg">drag</span><button id="twMin" aria-label="Minimise guide">–</button><button id="twX" aria-label="Close guide">×</button></div><div class="twb">';
   if (TW.mode === 'tour') {
     var hit = HUD.filter(function (x) { return x[0] === TW.info; })[0], n = Object.keys(TW.seen).length;
     h += hit ? '<p class="twt"><b>' + esc(hit[1]) + '.</b> ' + esc(hit[2].replace(/^[^:]*: /, '')) + '</p>' : '<p class="twt">This is the real screen. Tap any label to learn what it does. You can tap the game too.</p>';
     h += '<p class="tww">Seen ' + n + ' of ' + HUD.length + '. Panels open with a tap and close with their X or Close.</p>';
-    h += '<div class="twn"><button class="btn alt" id="twHide">' + ($('hg').classList.contains('on') ? 'Hide labels' : 'Show labels') + '</button><button class="btn" id="twNext">Lessons ›</button></div>';
-  } else if (TW.mode === 'lessons') {
-    var all = LESSONS.every(lessonDone), L = LESSONS[TW.cur];
-    if (all) h += '<p class="twt"><b>You know the game.</b> Keep playing this one, or try a practice puzzle.</p><div class="twn"><button class="btn alt" id="twPuz">Practice puzzles</button><button class="btn" id="twEnd">Keep playing</button></div>';
-    else h += '<p class="twt">' + esc(L.t) + '</p><p class="tww">' + esc(L.w) + '</p><div class="twn"><button class="btn alt" id="twTour">Tour</button><button class="btn" id="twNext">Next ›</button></div>';
-    h += '<ol class="twl">' + LESSONS.map(function (x, i) { return '<li class="' + (lessonDone(x) ? 'ok' : '') + (i === TW.cur && !all ? ' cur' : '') + '"><button data-twl="' + i + '">' + esc(x.k === 'goal' ? 'Goal' : x.k === 'stock' ? 'Stock vs production' : x.k === 'inspect' ? 'Read a card' : x.k === 'play' ? 'Play a card' : x.k === 'std' ? 'Project + tile' : x.k === 'pass' ? 'Done / Pass' : x.k === 'rival' ? 'Rival’s turn' : x.k === 'income' ? 'Income' : x.k === 'goals' ? 'Milestones, awards' : 'Game end') + '</button></li>'; }).join('') + '</ol>';
+    h += '<div class="twn"><button class="btn alt" id="twHide">' + ($('hg').classList.contains('on') ? 'Hide labels' : 'Show labels') + '</button><button class="btn" id="twNext">Scenarios ›</button></div>';
+  } else if (TW.mode === 'scen' && SCN.S) {
+    var S = SCN.S, c = S.sc, R = S.result, st = function (n) { return '<span class="scst" aria-label="' + n + ' of 3 stars">' + '★★★'.slice(0, n) + '<i>' + '★★★'.slice(n) + '</i></span>'; };
+    if (!R) {
+      h += '<p class="sco">' + esc(c.goal) + '</p><p class="tww">' + (c.gens ? 'Generation ' + Math.min(G.gen, c.gens) + ' of ' + c.gens : 'Actions ' + S.acts + ' of ' + c.acts) + (c.par.acts !== undefined ? ' · par ' + c.par.acts + ' action' + (c.par.acts > 1 ? 's' : '') : ' · par: win by ' + c.par.margin) + (c.par.mc !== undefined ? ', ' + c.par.mc + ' credits' : '') + '</p>';
+      if (SCN.hint) h += '<p class="twt sch">' + esc(c.hints[Math.min(SCN.hint, c.hints.length) - 1]) + '</p>';
+      h += '<div class="twn"><button class="btn alt" id="scHint" aria-label="Hint">' + (SCN.hint ? (SCN.hint < c.hints.length ? 'Show me' : 'Hint shown') : 'Hint') + '</button><button class="btn alt" id="scRe">Restart</button><button class="btn alt" id="scAll">All</button></div>';
+    } else {
+      var nx = OHC.SC[S.i + 1];
+      h += '<p class="scr ' + (R.ok ? 'win' : 'fail') + '">' + (R.ok ? 'WIN ' + st(R.stars) : 'FAIL') + '</p><p class="twt">' + esc(R.line) + '</p>' + (R.ok ? '<p class="tww"><b>What you learned:</b> ' + esc(c.learned) + '</p>' : '');
+      h += '<div class="twn"><button class="btn' + (R.ok ? ' alt' : '') + '" id="scRe">Retry</button>' + (R.ok ? (nx ? '<button class="btn" id="scNext">Next: ' + esc(nx.title) + '</button>' : '<button class="btn" id="scReal">Start a real game</button>') : '<button class="btn alt" id="scAll">All</button>') + '</div>';
+    }
+  } else if (TW.mode === 'pick' || TW.mode === 'scen') {
+    h += '<ol class="twl scl"><li><button data-sct="1">Interface tour<small>optional: what every button does</small></button></li>' + OHC.SC.map(function (c, i) { var p = SCN.prog[c.id] || 0, lk = !scUnlocked(i); return '<li class="' + (p ? 'ok' : '') + '"><button data-sci="' + i + '"' + (lk ? ' disabled' : '') + '>' + c.n + '. ' + esc(c.title) + '<small>' + esc(c.learn) + (p ? ' · ' + '★★★'.slice(0, p) : lk ? ' · win 1-3 first' : '') + '</small></button></li>'; }).join('') + '</ol>';
   }
   w.innerHTML = h + '</div>';
   var on = function (id, f) { var e = $(id); if (e) e.addEventListener('click', function (ev) { ev.stopPropagation(); f(); }); };
   on('twX', twClose); on('twMin', function () { twMin(true); });
   on('twHide', function () { if ($('hg').classList.contains('on')) hudHide(); else hudShow(); twRender(); });
-  on('twNext', function () { if (TW.mode === 'tour') { twOpen('lessons'); return; } TW.done[LESSONS[TW.cur].k] = 1; twAdvance(); });
-  on('twTour', function () { twOpen('tour'); });
-  on('twPuz', function () { twClose(); chStart(0); });
-  on('twEnd', twClose);
-  w.querySelectorAll('[data-twl]').forEach(function (b) { b.addEventListener('click', function (ev) { ev.stopPropagation(); TW.cur = +b.getAttribute('data-twl'); twRender(); }); });
+  on('twNext', function () { twOpen('pick'); });
+  on('scHint', function () { SCN.hint = Math.min(SCN.hint + 1, SCN.S.sc.hints.length); twRender(); });
+  on('scRe', function () { scStart(SCN.S.i); });
+  on('scAll', function () { TW.mode = 'pick'; twRender(); });
+  on('scNext', function () { scStart(SCN.S.i + 1); });
+  on('scReal', function () { scStop(); startGame({ level: 'normal' }); });
+  w.querySelectorAll('[data-sci]').forEach(function (b) { b.addEventListener('click', function (ev) { ev.stopPropagation(); scStart(+b.getAttribute('data-sci')); }); });
+  w.querySelectorAll('[data-sct]').forEach(function (b) { b.addEventListener('click', function (ev) { ev.stopPropagation(); twOpen('tour'); }); });
   twDrag(); twPlace(); twTick();
 }
-function twAdvance() { var i, n = LESSONS.length; for (i = 1; i <= n; i++) { var j = (TW.cur + i) % n; if (!lessonDone(LESSONS[j])) { TW.cur = j; break; } } twRender(); }
 function twDrag() {
   var hd = $('twH'), w = $('tw'); if (!hd) return;
   hd.onpointerdown = function (e) {
@@ -3727,8 +3922,7 @@ function twPlace() {
 function twTarget() {
   if (!TW.on || TW.min) return null;
   if (TW.mode === 'tour') return TW.info ? hudEl(TW.info) : null;
-  if (LESSONS.every(lessonDone)) return null;
-  try { return LESSONS[TW.cur].tgt(); } catch (e) { return null; }
+  return null;
 }
 function twRingAt(el) {
   var rg = $('twRing'); if (!el || !el.getBoundingClientRect) { rg.classList.remove('on'); return; }
@@ -3738,18 +3932,8 @@ function twRingAt(el) {
 function twTick() {
   if (!TW.on) return;
   $('hg').classList.toggle('pause', $('sheet').classList.contains('on') || $('modal').classList.contains('on'));   // labels describe the main screen: step aside while a panel is open
-  if (TW.mode === 'lessons' && G) {
-    if (!TW.base) twBase();
-    var was = $('tw').querySelectorAll('.twl li.ok').length, now = LESSONS.filter(lessonDone).length;
-    if (now !== was && !TW.min) { if (lessonDone(LESSONS[TW.cur])) { sfx('ding'); twAdvance(); return; } twRender(); return; }
-  }
   twRingAt(twTarget()); twPlace();
 }
-// never blocks: a capture listener only RECORDS which suggested thing was tapped; the tap itself goes through untouched
-document.addEventListener('pointerdown', function (e) {
-  if (!TW.on || !e.target.closest) return;
-  ['glob', 'res', 'cVP'].forEach(function (id) { var el = $(id); if (el && el.contains(e.target)) TW.tapped[id] = 1; });
-}, true);
 setInterval(function () { try { twTick(); } catch (e) { } }, 250);
 try { var twMO = new MutationObserver(function () { try { if (TW.on) { twRingAt(twTarget()); twPlace(); } } catch (e) { } }); twMO.observe($('modal'), { attributes: true, attributeFilter: ['class'], childList: true, subtree: true }); twMO.observe($('sheet'), { attributes: true, attributeFilter: ['class'] }); } catch (e) { }
 window.addEventListener('resize', function () { if (TW.on && $('hg').classList.contains('on')) hudShow(); });
@@ -3820,6 +4004,8 @@ setHint = function (t) { feelHint0(t); if (UI.hintOff && G && UI.hintOff === G.g
   var hb = document.createElement('button'); hb.id = 'bHelp'; hb.textContent = '?'; hb.setAttribute('aria-label', 'Interface tour and lessons'); $('bw').appendChild(hb);
   hb.addEventListener('click', function () { if (TW.on && TW.mode === 'tour' && !TW.min) { twClose(); return; } if (!G || G.phase === 'setup') { learnStart(); return; } twOpen('tour'); });
 })();
+// deep link for tests and contact sheets: ?learn=<n> opens scenario n
+if (Q.get('learn')) setTimeout(function () { try { scStart(Math.max(0, Math.min(OHC.SC.length - 1, (+Q.get('learn') || 1) - 1))); } catch (e) { } }, 30);
 
 </script>
 </body></html>

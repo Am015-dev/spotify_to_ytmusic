@@ -461,5 +461,59 @@ html.ph .tk .tkn{padding:1px 5px}
 html.ph #track::after{content:'\2922';position:absolute;right:4px;top:-12px;width:22px;height:22px;border-radius:50%;background:#1f5f58;color:#fff;font-size:14px;line-height:22px;text-align:center;box-shadow:0 1px 3px #0008;pointer-events:none;z-index:4}
 html body .gx-sec .gx-row-l,html body .gx-sec .gx-row-l small{background:#f4ecd8!important;color:#1a1208!important;opacity:1!important;text-shadow:none!important}
 #track .tkn,.offer .hand i{background:#1b1208!important;color:#fff4d8!important;opacity:1!important;text-shadow:none!important;border-radius:4px;padding:0 4px}
+/*W663 contrast plates*/html body .gx-row-l,html body .gx-row-l small{background:#1b1208!important;color:#fff4d8!important;opacity:1!important;text-shadow:none!important;border-radius:6px;padding:1px 6px;box-shadow:none!important;background-image:none!important}
+/* W676 HUD: round icon bar, status chips in the bar, one phase banner, icon-only offer cards; lists live in windows */
+#barprompt{display:none!important}
+.gx-bar{gap:6px;padding-left:8px;padding-right:8px}
+.gx-bar .gx-ibtn{width:44px;height:44px;min-width:44px;padding:0!important;border-radius:50%;flex:0 0 44px;display:inline-flex;align-items:center;justify-content:center;background:#24344a;border:1px solid rgba(255,255,255,.18)}
+.gx-bar .gx-ibtn>span{display:none}
+.gx-bar .gx-ibtn svg{display:block!important;width:24px;height:24px;stroke-width:2.1}
+.gx-bar #bulbbtn{font-size:22px}
+#barchips{flex:1 1 auto;min-width:0;display:flex;justify-content:center}
+#barchips #pills{width:auto;max-width:100%;flex-direction:row!important;gap:6px}
+#barchips .pstrip{display:inline-flex!important;align-items:center;gap:6px!important;flex:0 0 auto;min-height:40px!important;height:40px;padding:0 10px!important;border-radius:20px;background:#fff8e8;border:2px solid #cdb98f;color:#2a2118;margin:0!important}
+#barchips .pstrip.turn{border-color:var(--gold,#e0a82e);box-shadow:0 0 0 2px #e0a82e88}
+#barchips .pstrip .thumb,#barchips .pstrip canvas,#barchips .pstrip .dot{display:none!important}
+#barchips .pstrip b{font-size:14px!important;font-weight:800;max-width:7ch;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#barchips .pstrip .st{display:inline-flex!important;flex-wrap:nowrap!important;gap:6px!important;margin:0!important;white-space:nowrap}
+#barchips .pstrip .st .bt{display:inline-flex;align-items:center;gap:2px;font-size:16px!important;font-weight:800}
+#barchips .pstrip .st svg,#barchips .pstrip .st img{width:16px;height:16px}
+#barchips .pstrip .bt.emp svg{stroke:#a03;fill:none;stroke-width:2}
+#barchips .pstrip .nb{font-size:16px!important}
+#phase{align-self:center;margin:2px auto 4px;padding:3px 16px;border-radius:16px;background:#2b3b52;color:#f3ead8;font-size:14px;font-weight:800;letter-spacing:.2px;line-height:1.3;border:2px solid rgba(255,255,255,.2)}
+#phase.me{background:var(--gold,#e0a82e);color:#2a1d05;border-color:#fff3c8}
+@media (min-width:1024px){#phase{font-size:16px}.gx-bar .gx-ibtn svg{width:26px;height:26px}#barchips{justify-content:flex-start;margin-left:14px}}
+@media (max-width:420px){#barchips .pstrip{padding:0 7px!important;gap:4px!important}#barchips .pstrip b{max-width:5ch}#barchips #pills{gap:4px}.gx-bar{gap:3px}}
+#offers .offer .ofx{display:grid!important;grid-template-columns:repeat(3,auto)!important;justify-content:center;gap:4px!important;width:100%!important}
+#offers .offer .of{display:inline-flex!important;flex-direction:row!important;align-items:center;justify-content:center!important;gap:2px!important;padding:2px 5px!important;border-radius:12px;background:#f1e5c8;min-width:0}
+#offers .offer .of b{font-size:16px!important;min-width:0;text-align:center}
+#offers .offer .of svg,#offers .offer .of img.ic{width:16px!important;height:16px!important}
+@media (min-width:1024px){#offers .offer .ofx{gap:8px!important}#offers .offer .of{padding:4px 10px!important}#offers .offer .of b{font-size:20px!important}#offers .offer .of svg,#offers .offer .of img.ic{width:22px!important;height:22px!important}}
+.offer.no.cant,.offer.cant{opacity:1!important;background:#e4dcc8!important;border:2px dashed #8d7f66!important;box-shadow:none!important;animation:none!important;color:#3d3326}
+.offer.cant .shape{filter:grayscale(.85);opacity:.7}
+.offer.cant .onm{color:#3d3326}
+.offer.cant::after{color:#7a1022!important;font-weight:800;font-size:14px!important}
+#offers .offer.cant .of{background:#d3c9b1}
+.gx-dock .btn,.gx-dock-head .gx-ibtn{min-height:44px}
+#barchips .pstrip b,#barchips .pstrip .nb,#barchips .pstrip .bt{color:#2a2118!important;text-shadow:none!important;opacity:1!important}
+#barchips .pstrip .bt.emp{color:#8a1020!important}
+.gx-bar #bulbbtn{font-size:0!important;line-height:0;position:relative}
+.gx-bar #bulbbtn>*{display:none!important}
+.gx-bar #bulbbtn::before{content:"";width:26px;height:26px;display:block;background:center/contain no-repeat url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23f6e3b8' stroke-width='2.1' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M9 18h6M10 21h4'/%3E%3Cpath d='M12 3a6 6 0 0 0-3.5 10.9c.6.5 1 1.2 1 2.1h5c0-.9.4-1.6 1-2.1A6 6 0 0 0 12 3z'/%3E%3C/svg%3E")}
+#barchips .pstrip{background:#fff8e8!important;border:2px solid #cdb98f!important;color:#2a2118!important}
+#barchips .pstrip.turn{border-color:#e0a82e!important}
+#barchips .pstrip .bt.emp{display:inline-flex!important}
+#barchips .pstrip .nb{margin:0!important}
+@media (max-width:600px){.gx-bar h1{display:none!important}#barchips .pstrip b{display:none!important}#barchips .pstrip .dot{display:block!important;width:12px;height:12px;border-radius:50%;flex:0 0 12px}#barchips{justify-content:flex-start}}
+#barchips .pstrip .st svg,#barchips .pstrip .st img,#barchips .pstrip .st .ic{width:16px!important;height:16px!important;max-width:16px!important;flex:0 0 16px}
+#barchips .pstrip,#barchips .pstrip .st{gap:4px!important}#barchips .pstrip{padding:0 8px!important}
+#barchips .pstrip{flex:0 0 auto!important;width:auto!important;min-width:0!important}#barchips #pills{flex:0 0 auto}#barchips{flex:0 1 auto}
+@media (max-width:600px){.gx-bar .gx-sp{display:none}#barchips{flex:1 1 auto}}
+.offer .oc b{color:#6b4300!important}.offer .ot b{color:#124a73!important}.offer .oi b{color:#1d561d!important}
+#barchips .pstrip{cursor:pointer}
+/* PC: the action dock keeps Advance / Sew visible; only the offer list scrolls */
+@media (min-width:1024px){.gx-dock{display:flex;flex-direction:column;min-height:0}.gx-dock .gx-dock-body{display:flex;flex-direction:column;min-height:0;flex:1 1 auto;overflow:hidden}
+#offers{flex:1 1 auto!important;min-height:0;overflow-y:auto}#offers .offer{min-height:0}#acts{flex:0 0 auto;padding-top:8px;background:#fbf4e4;border-top:2px solid #e0cfa6}
+#offers .offer .shape{transform-origin:center;zoom:.8}#offers .offer{padding:6px 10px!important;gap:4px!important}#detail:empty{display:none!important}}
 </style>
 </head>
