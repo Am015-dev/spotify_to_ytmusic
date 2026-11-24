@@ -10,7 +10,7 @@ function renderPrompt() {
   if (!G) return;
   if (G.phase !== 'play') { say('Game over'); acts([{ t: 'Scores', f: showResult }]); return; }
   var pi = VT.sideToAct(G);
-  if (!isHuman(pi) || UI.busy) { say(G.pl[pi].name + ' is playing…', true); acts([]); return; }
+  if (!isHuman(pi) || UI.busy) { say(G.pl[pi].name + ' is playing…', true); acts([]); UI.hint = null; showFinger(null); return; }
   var p = G.pl[pi], pd = G.pend, me = p.name === 'You' ? '' : p.name + ': ';
   computeHint();
   if (G.drop && G.drop.length) { say(me + 'Storehouse full: pick goods'); acts([]); openTake(); return; }
@@ -76,20 +76,21 @@ function onMapTap(e) {
   if (pd && pd.h === 'arch-move') {
     if (slot && UI.selCol != null) { var rid = slot.getAttribute('data-r'), k = UI.selCol; move({ t: 'mv', k: k, r: rid }); return; }
     if (colK != null) { UI.selCol = +colK === UI.selCol ? null : +colK; render(); if (UI.selCol != null) frameTargets(); return; }
-    banner(UI.selCol != null ? 'Tap a glowing stop on a line' : 'Tap your glowing cart or ship'); return;
+    banner(UI.selCol != null ? 'Tap a glowing stop on a line' : 'Tap your glowing cart or ship', UI.selCol != null ? '#map .slothit' : '#map .col.glow .colhit'); return;
   }
   if (pd && pd.h === 'arch-build' && city) { var cid = city.getAttribute('data-c'); if (VT.canBuild(G, pi, cid)) move({ t: 'build', c: cid }); else bump(city); return; }
   if (pd && pd.h === 'pref' && prov) { var p = prov.getAttribute('data-p'); if (G.prov[p].up) { UI.selProv = UI.selProv === p ? null : p; render(); } else bump(prov); return; }
   if (pd && pd.h === 'colo' && city) { var c2 = city.getAttribute('data-c'); var kinds = ['L', 'S'].filter(function (k) { return VT.canPlaceCol(G, pi, c2, k); }); if (!kinds.length) { bump(city); return; } if (kinds.length === 1) move({ t: 'place', c: c2, k: kinds[0] }); else openPlace(c2); return; }
   if (pd && pd.h === 'trib' && city && city.getAttribute('data-c') === D.CAPITAL) return;
-  if (pd && pd.h === 'arch-move' && !slot) { banner('Tap your glowing cart or ship'); return; }
+  if (pd && pd.h === 'arch-move' && !slot) { banner('Tap your glowing cart or ship', '#map .col.glow .colhit'); return; }
   if (city) showCityTip(city.getAttribute('data-c'));
 }
 function bump(node) { node.classList.add('popin'); setTimeout(function () { node.classList.remove('popin'); }, 450); sfx('no'); }
 function showCityTip(cid) {
   var c = VT.CITY[cid], st = G.city[cid];
-  if (cid === D.CAPITAL) { banner('Caput: carts and ships start here'); return; }
-  banner(c.n + ': ' + D.GOOD_NAME[st.g] + (st.h.length ? ', ' + word(st.h.length, 'house', 'houses') : ''));
+  var an = '#map .city[data-c="' + cid + '"] .disc';
+  if (cid === D.CAPITAL) { banner('Caput: carts and ships start here', an); return; }
+  banner(c.n + ': ' + D.GOOD_NAME[st.g] + (st.h.length ? ', ' + word(st.h.length, 'house', 'houses') : ''), an);
 }
 function onHandTap(e) {
   var b = e.target.closest('.cd'); if (!b || b.disabled || !G || G.phase !== 'play' || UI.busy) return;
@@ -107,10 +108,13 @@ document.addEventListener('click', function (e) {
 function snap() { return G.pl.map(function (p, i) { return { coins: p.coins, goods: Object.assign({}, p.goods), score: VT.score(G, i).total, houses: p.houses.length, hand: p.hand.length }; }); }
 function move(m) {
   if (!G || G.phase !== 'play') return;
-  var before = snap(), pi = VT.sideToAct(G), wasPend = G.pend && G.pend.h;
+  var before = snap(), pi = VT.sideToAct(G), wasPend = G.pend && G.pend.h, t0 = Date.now();
   try { VT.performMove(G, m); } catch (err) { console.warn(err.message); render(); return; }
   if (m.t !== 'mv') UI.selCol = null;
+  var human = isHuman(pi); if (human) UI.noteAt = noteAnchor(m, pi);
   afterMove(before, pi, m, wasPend);
+  if (human && !(UI._bt >= t0)) { var rt = resultText(m, pi, before); if (rt) banner(rt, UI.noteAt); }
+  UI.noteAt = null;
   if (G.pend && G.pend.h !== 'buy' && G.pend.h !== 'merc') closeSheet();
   if (!G.pend && !(G.drop && G.drop.length)) closeSheet();
   render(); save();
@@ -118,6 +122,32 @@ function move(m) {
   if (G.phase === 'end') { setTimeout(showResult, UI.fast ? 50 : 900); return; }
   if (!isHuman(VT.sideToAct(G))) setTimeout(runAI, UI.fast ? 30 : 450);
   else if (UI.mode === 'hot' && VT.sideToAct(G) !== pi) banner(G.pl[VT.sideToAct(G)].name + '’s turn');
+}
+// plain result of the player's own action, shown beside what changed
+function noteAnchor(m, pi) {
+  if (m.t === 'build' || m.t === 'place') return '#map .city[data-c="' + m.c + '"] .disc';
+  if (m.t === 'mv') return '#map .col[data-pk="' + pi + ':' + m.k + '"] circle:not(.halo)';
+  if (m.t === 'prov') return '#map .prov[data-p="' + m.p + '"] .mk';
+  if (m.t === 'play') return '#hand';
+  return '#store';
+}
+function resultText(m, pi, before) {
+  var p = G.pl[pi], after = snap()[pi], b = before[pi], dc = after.coins - b.coins, gs = [];
+  D.GOODS.forEach(function (g) { var d = after.goods[g] - b.goods[g]; if (d > 0) gs.push('+' + d + ' ' + D.GOOD_NAME[g]); });
+  var gain = gs.concat(dc > 0 ? ['+' + dc + ' coins'] : []).join(', ');
+  if (m.t === 'play') { UI.noteAt = '#store'; return 'Played ' + D.CARDS[G.lastPlayed].n + (gain ? ': ' + gain : ''); }
+  if (m.t === 'mv') { var s = G.pend && G.pend.h === 'arch-move' ? G.pend.steps : 0; return 'Moved. ' + (s > 0 ? word(s, 'step', 'steps') + ' left' : 'No steps left: build now'); }
+  if (m.t === 'mdone') { UI.noteAt = '#acts .btn'; return 'Done moving. Now build'; }
+  if (m.t === 'build') return 'House built in ' + VT.CITY[m.c].n + (after.score !== b.score ? ' (' + (after.score - b.score > 0 ? '+' : '') + (after.score - b.score) + ' points)' : '');
+  if (m.t === 'prov') return 'Region ruled' + (gain ? ': ' + gain : '');
+  if (m.t === 'pcoins') return 'Taxes collected' + (dc > 0 ? ': +' + dc + ' coins' : '');
+  if (m.t === 'ccoins') return 'Took ' + dc + ' coins';
+  if (m.t === 'trade') return 'Trade done' + (gain ? ': ' + gain : '');
+  if (m.t === 'take') return 'Stored 1 ' + D.GOOD_NAME[m.g];
+  if (m.t === 'place') return 'Placed in ' + VT.CITY[m.c].n;
+  if (m.t === 'copy') return 'Copied the rival’s card';
+  if (m.t === 'done') { UI.noteAt = '#race'; return 'Turn over'; }
+  return '';
 }
 // visible cause and effect: who got what, flying from where it was earned
 function afterMove(before, pi, m, wasPend) {
@@ -149,7 +179,12 @@ function flyTo(html, pi) {
 }
 function pulseScore(i, d) { var b = document.querySelector('[data-engine-score="' + i + '"]'); if (!b) return; b.parentNode.classList.add('popin'); setTimeout(function () { b.parentNode && b.parentNode.classList.remove('popin'); }, 500); }
 var bannerT = null;
-function banner(t) { var b = $('#banner'); b.textContent = t; b.classList.add('on'); clearTimeout(bannerT); bannerT = setTimeout(function () { b.classList.remove('on'); }, UI.fast ? 400 : 2200); }
+function banner(t, anchor) {
+  UI._bt = Date.now(); anchor = anchor || UI.noteAt || '#race';
+  if (anchor) { UI.noteAt = null; setTimeout(function () { if (!showNote(t, anchor)) plainBanner(t); }, 0); return; }
+  plainBanner(t);
+}
+function plainBanner(t) { var b = $('#banner'); b.textContent = t; b.classList.add('on'); clearTimeout(bannerT); bannerT = setTimeout(function () { b.classList.remove('on'); }, UI.fast ? 400 : 2200); }
 
 // ---------- the rival's turn: one step at a time, watchable ----------
 function runAI() {
@@ -213,11 +248,11 @@ function openMarket(buying) {
   $('#sheet').querySelectorAll('.mc .cd').forEach(function (b) {
     b.onclick = function () {
       var s = +b.getAttribute('data-s');
-      if (!buying) { banner(D.CARDS[G.disp[s]].n + ': ' + cardWhat(D.CARDS[G.disp[s]])); return; }
-      if (!VT.canBuyCard(G, pi, s, consul) || !G.pend || G.pend.left <= 0) { bump(b); banner('Need ' + needText(pi, s, consul)); return; }
+      if (!buying) { banner(D.CARDS[G.disp[s]].n + ': ' + cardWhat(D.CARDS[G.disp[s]]), b); return; }
+      if (!VT.canBuyCard(G, pi, s, consul) || !G.pend || G.pend.left <= 0) { bump(b); banner('Need ' + needText(pi, s, consul), b); return; }
       var nm = D.CARDS[G.disp[s]].n;
       move({ t: 'buy', s: s });
-      banner('Bought ' + nm + ': it is in your hand');
+      banner('Bought ' + nm + ': it is in your hand', '#hand');
       setTimeout(function () { var hd = $('#hand'); hd.scrollLeft = hd.scrollWidth; }, 60);
       if (G.pend && G.pend.h === 'buy' && isHuman(VT.sideToAct(G))) openMarket(true);
     };
@@ -322,13 +357,63 @@ function placeFinger() {
 }
 function showFinger(t) {
   var f = $('#finger');
-  if (!t) { f.classList.remove('on'); return; }
+  if (!t) { f.classList.remove('on'); hideBubble(); return; }
   var sc = t.closest && t.closest('#hand,.mrow'); if (sc) { var tr = t.getBoundingClientRect(), hr = sc.getBoundingClientRect(); if (tr.right > hr.right - 4 || tr.left < hr.left) sc.scrollLeft += tr.left - hr.left - (hr.width - tr.width) / 2; }
-  var r = t.getBoundingClientRect(); if (!r.width) { f.classList.remove('on'); return; }
+  var r = t.getBoundingClientRect(); if (!r.width) { f.classList.remove('on'); hideBubble(); return; }
+  showBubble(t);
   f.innerHTML = '<svg viewBox="0 0 24 24"><path d="M9 11V4.5a1.5 1.5 0 0 1 3 0V10l5.2 1.1c1 .2 1.7 1.2 1.5 2.2l-1 5.2A2 2 0 0 1 15.7 20H11a2 2 0 0 1-1.6-.8L5.5 14a1.4 1.4 0 0 1 2-1.9z" fill="#fff8ec" stroke="#2b2018" stroke-width="1.4" stroke-linejoin="round"/></svg>';
   f.style.left = (r.left + r.width / 2 - 8) + 'px'; f.style.top = (r.top + r.height / 2 - 2) + 'px';
   f.classList.remove('on'); void f.offsetWidth; f.classList.add('on');
 }
+
+// ---------- bubbles: the guide text and the result text sit next to their target, arrow touching it ----------
+function interactiveRects(skip) {
+  var out = [];
+  document.querySelectorAll('#hand .cd, #acts .btn, #sheet .cd, #sheet button, .zoom button, header .tb, #map .city.glow .hit, #map .colhit, #map .slothit, #map .prov.glow .hit').forEach(function (e) {
+    if (e === skip || (skip && (skip.contains(e) || e.contains(skip)))) return;
+    var r = e.getBoundingClientRect(); if (r.width && r.height) out.push(r);
+  });
+  return out;
+}
+function ovl(a, b) { var w = Math.min(a.right, b.right) - Math.max(a.left, b.left), h = Math.min(a.bottom, b.bottom) - Math.max(a.top, b.top); return w > 0 && h > 0 ? w * h : 0; }
+// put bubble b beside target t on the side with room; never over t (or other taps, if avoidable); returns the placed rect
+function placeBubble(b, t, extra) {
+  var W = window.innerWidth, H = window.innerHeight, M = 6, GAP = 8, tr = t.getBoundingClientRect();
+  b.style.left = '0px'; b.style.top = '0px'; b.style.maxWidth = Math.min(b.classList.contains('res') ? 240 : 270, W - 2 * M) + 'px';
+  var bw = b.offsetWidth, bh = b.offsetHeight, others = interactiveRects(t).concat(extra || []), tcx = tr.left + tr.width / 2, tcy = tr.top + tr.height / 2;
+  var cs = [
+    { s: 'top', x: tcx - bw / 2, y: tr.top - GAP - bh }, { s: 'bottom', x: tcx - bw / 2, y: tr.bottom + GAP },
+    { s: 'left', x: tr.left - GAP - bw, y: tcy - bh / 2 }, { s: 'right', x: tr.right + GAP, y: tcy - bh / 2 }];
+  var best = null;
+  cs.forEach(function (c, i) {
+    var x = Math.max(M, Math.min(W - bw - M, c.x)), y = Math.max(M, Math.min(H - bh - M, c.y)), r = { left: x, top: y, right: x + bw, bottom: y + bh };
+    var pen = ovl(r, tr) * 1000 + Math.abs(x - c.x) * (c.s === 'left' || c.s === 'right' ? 5000 : 3) + Math.abs(y - c.y) * (c.s === 'top' || c.s === 'bottom' ? 5000 : 3) + i;
+    others.forEach(function (o) { pen += ovl(r, o) * 4; });
+    if (!best || pen < best.pen) best = { pen: pen, s: c.s, x: x, y: y };
+  });
+  b.className = b.className.replace(/\s*\b(top|bottom|left|right)\b/g, '') + ' ' + best.s;
+  b.style.left = best.x.toFixed(1) + 'px'; b.style.top = best.y.toFixed(1) + 'px';
+  b.style.setProperty('--ax', Math.max(16, Math.min(bw - 16, tcx - best.x)).toFixed(1) + 'px'); b.style.setProperty('--ay', Math.max(16, Math.min(bh - 16, tcy - best.y)).toFixed(1) + 'px');
+  return { left: best.x, top: best.y, right: best.x + bw, bottom: best.y + bh };
+}
+function hideBubble() { var g = $('#gbub'); g.classList.remove('on'); $('#prompt').classList.remove('sr'); }
+function showBubble(t) {
+  var g = $('#gbub'), txt = $('#prompt').textContent;
+  if (!txt || !UI.learn || !UI.hints) { hideBubble(); return; }
+  g.textContent = txt; if (UI.tipFor && G && G.pend && G.pend.h === UI.tipFor.h) { var sp = document.createElement('div'); sp.className = 'sub'; sp.textContent = UI.tipFor.t; g.appendChild(sp); } var n = $('#note'), ex = n.classList.contains('on') ? [n.getBoundingClientRect()] : [];
+  placeBubble(g, t, ex); g.classList.add('on'); $('#prompt').classList.add('sr');
+}
+var noteT = null;
+function showNote(t, anchor) {
+  var n = $('#note'), a = anchor && (typeof anchor === 'string' ? document.querySelector(anchor) : anchor);
+  if (!a || !a.getBoundingClientRect().width) return false;
+  n.textContent = t; n.classList.remove('on'); var g = $('#gbub');
+  placeBubble(n, a, g.classList.contains('on') ? [g.getBoundingClientRect()] : []); n.classList.add('on');
+  clearTimeout(noteT); noteT = setTimeout(function () { n.classList.remove('on'); }, UI.fast ? 400 : 3200);
+  UI.lastNote = t; return true;
+}
+window.addEventListener('resize', function () { if (typeof placeFinger === 'function' && G) setTimeout(placeFinger, 50); });
+['#hand', '#sheet'].forEach(function (s) { var e = document.querySelector(s); if (e) e.addEventListener('scroll', function () { clearTimeout(UI._sct); UI._sct = setTimeout(function () { var t = UI.hints && UI.learn ? hintTarget() : null; if (t) showBubble(t); }, 60); }, true); });
 
 // ---------- sound (WebAudio, generated) ----------
 var AC = null;
