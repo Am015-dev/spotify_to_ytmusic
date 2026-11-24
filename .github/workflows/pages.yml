@@ -36,19 +36,21 @@ jobs:
       - uses: actions/upload-pages-artifact@v3
         with:
           path: _site
+      - name: Let GitHub register the uploaded site (the first deploy used to fail instantly, costing a 45 s retry)
+        run: sleep 8
       - id: deployment
         uses: actions/deploy-pages@v4
         continue-on-error: true
       - name: Wait before one retry (GitHub sometimes fails to find the uploaded site on the first try)
         if: steps.deployment.outcome == 'failure'
-        run: sleep 45
+        run: sleep 15
       - id: deployment2
         if: steps.deployment.outcome == 'failure'
         uses: actions/deploy-pages@v4
         continue-on-error: true
       - name: Wait before the last retry
         if: steps.deployment.outcome == 'failure' && steps.deployment2.outcome == 'failure'
-        run: sleep 90
+        run: sleep 40
       - id: deployment3
         if: steps.deployment.outcome == 'failure' && steps.deployment2.outcome == 'failure'
         uses: actions/deploy-pages@v4
