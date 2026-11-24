@@ -1,7 +1,7 @@
 /* Gloamwar drawers: cards, nations (political track), the Company and the Hunt, the log, region and character info. Menu and rules (gx-help). */
 function openSheet(kind, html) { UI.sheet = kind; UI.sheetAt = Date.now(); var s = $('#sheet'); s.innerHTML = '<h2>' + html.title + '<button class="ib x" type="button" aria-label="Close" onclick="closeSheet()">✕</button></h2>' + html.body; s.classList.add('on'); $('#scrim').classList.add('on'); var app = $('#app'); app.setAttribute('aria-hidden', 'true'); app.inert = true; if (html.wire) html.wire(s); }
 function closeSheet(ev) { if (ev && ev.type === 'click' && Date.now() - (UI.sheetAt || 0) < 450) return; UI.sheet = null; $('#sheet').classList.remove('on'); $('#scrim').classList.remove('on'); var app = $('#app'); app.removeAttribute('aria-hidden'); app.inert = false; }
-function refreshSheet() { var k = UI.sheet; if (k === 'cards') openCards(UI.discardMode); else if (k === 'nations') openNations(); else if (k === 'company') openCompany(); else if (k === 'log') openLog(); }
+function refreshSheet() { var k = UI.sheet; if (k === 'cards') openCards(UI.discardMode); else if (k === 'nations') openNations(); else if (k === 'company') openCompany(); else if (k === 'log') openLog(); else if (k === 'rival') openRival(); }
 var TYPE_NAME = { C: 'Character', A: 'Army', M: 'Muster' };
 var TYPE_ICON = { C: 'char', A: 'army', M: 'muster' };
 function cardHtml(cid, extra, cls) {
@@ -53,6 +53,25 @@ function openCompany() {
   openSheet('company', { title: 'The Company', body: body });
 }
 function openLog() { var body = '<div style="font-size:.95rem;line-height:1.4">' + G.log.slice(-60).reverse().map(function (l) { return '<div>' + (l.k === 'turn' ? '<b>' + l.x + '</b>' : '<span style="color:' + (l.s === 'G' ? 'var(--red)' : 'var(--ink)') + '">' + l.x + '</span>') + '</div>'; }).join('') + '</div>'; openSheet('log', { title: 'Chronicle', body: body }); }
+
+// ---- Rules popup (always reachable from the ? button and the menu) and Rival popup
+var FLOW = ['Draw one card from each deck (hand limit 6).', 'Dawn: declare the Company, or keep it hidden.', 'Gloam: send dice into the Hunt.', 'Both sides roll. Every Gaze goes to the Hunt.', 'Dawn uses a die first, then you alternate, one die each.', 'End of turn: VP check. On the Ashen Road, standing still costs 1 taint.'];
+function openRules() {
+  var cur = (typeof phaseId === 'function' && phaseId()) || 'act';
+  var body = '<p class="rs-sub">Tap outside or ✕ to close. This stays open while you decide.</p><h3 class="rs-h">Turn order</h3><ol class="rs-flow">' + FLOW.map(function (t) { return '<li>' + t + '</li>'; }).join('') + '</ol>';
+  var mine = RULES.filter(function (r) { var ph = [].concat(r.phase); return ph.indexOf(cur) >= 0; }), rest = RULES.filter(function (r) { return mine.indexOf(r) < 0; });
+  var sec = function (r, hot) { return '<section class="rs' + (hot ? ' hot' : '') + '"><h3 class="rs-h">' + r.title + (hot ? ' <small>· right now</small>' : '') + '</h3>' + (r.pic ? r.pic() : '') + '<p>' + r.text + '</p></section>'; };
+  body += mine.map(function (r) { return sec(r, true); }).join('') + rest.map(function (r) { return sec(r, false); }).join('');
+  body += '<section class="rs"><h3 class="rs-h">Ending a battle</h3><p>After each round the attacker may stop. If not, the defender may retreat to a free neighbour. The winner may advance, and entering an enemy settlement captures it. Stacks hold 10 units, 5 behind walls.</p></section>';
+  openSheet('rules', { title: 'Rules', body: body });
+}
+function openRival() {
+  var me = UI.side, foe = me === 'D' ? 'G' : 'D', fn = foe === 'D' ? 'Dawn League' : 'The Gloam', left = G.dice[foe].filter(function (f, i) { return !G.used[foe][i]; }).length;
+  var goal = foe === 'D' ? 'Needs <b>' + Math.max(0, 4 - vpOf(G, 'D')) + ' more points</b> of Gloam strongholds, or the Company at the Kiln (' + (G.F.road >= 0 ? 'road step ' + G.F.road + ' of 5' : 'not on the road yet') + ').' : 'Needs <b>' + Math.max(0, 10 - vpOf(G, 'G')) + ' more points</b> of Dawn strongholds, or <b>' + Math.max(0, 12 - (G.F ? G.F.taint : 0)) + ' more taint</b>.';
+  var body = '<h3 class="rs-h">' + fn + '</h3><p>' + goal + '</p><ul class="rs-list"><li>Action dice: <b>' + G.dice[foe].length + '</b> (' + left + ' unused this turn)</li><li>Cards in hand: <b>' + G.hand[foe].length + '</b></li><li>Hunt box: <b>' + G.hb.g + ' Gloam</b>, <b>' + G.hb.d + ' Dawn</b> dice</li><li>Lamps: <b>' + G.lamps[foe] + '</b></li><li>Cards on the table: ' + (G.table[foe].length ? G.table[foe].map(function (c) { return CARD[c].n; }).join(', ') : 'none') + '</li></ul>';
+  body += '<h3 class="rs-h">Its latest moves</h3><div style="font-size:.95rem;line-height:1.4">' + G.log.filter(function (l) { return l.s === foe; }).slice(-8).reverse().map(function (l) { return '<div>' + l.x + '</div>'; }).join('') + '</div>';
+  openSheet('rival', { title: 'Rival: ' + fn, body: body });
+}
 function openVP(side) {
   var lst = REGIONS.filter(function (r) { return VP[r.set] && r.nat && natSide(r.nat) !== side; });
   var body = '<p>' + (side === 'D' ? 'The Dawn League wins at <b>4 points</b> of Gloam cities and strongholds.' : 'The Gloam wins at <b>10 points</b> of Dawn cities and strongholds.') + ' Strongholds are 2, cities 1. Checked at the end of each turn.</p>';
@@ -75,7 +94,7 @@ function menuInit() {
     GX.init({ key: 'gw' });
     var b = function (label, f) { var x = mk('button', 'btn', label); x.type = 'button'; x.onclick = function () { GX.close(); f(); }; return x; };
     GX.settings({ id: 'setd', title: 'Menu',
-      game: function (S) { S.appendChild(GX.row('This game', [b('Rules', function () { GXH.rules(); }), b('Tutorial', function () { startTutorial(); }), b('Restart', function () { startGame({ side: UI.side, level: UI.level }); }), b('Title', showTitle)])); },
+      game: function (S) { S.appendChild(GX.row('This game', [b('Rules', openRules), b('Tutorial', function () { startTutorial(); }), b('Restart', function () { startGame({ side: UI.side, level: UI.level }); }), b('Title', showTitle)])); },
       sound: function (S) { S.appendChild(GX.row('Sound effects', GX.onoff(SND.on, function (v) { SND.on = v; ls('gw-snd', v); }))); },
       help: function (S) { try { S.appendChild(GXH.settingsRow()); } catch (e) { } },
       about: { name: 'Gloamwar', version: '1.0', text: 'An original world for the Game Night Shelf. Font: IM Fell English (SIL OFL). Icons: game-icons.net by Lorc and Delapouite, CC BY 3.0. Map and tokens drawn in code.' } });
@@ -109,8 +128,7 @@ function helpInit() {
   try {
     GXH.init({ game: 'gloamwar', defaultOn: true, avoid: '.act,.die.can,#battle .btn',
       steps: { company: { target: function () { return $('#company'); }, title: 'The Company', text: 'Declare it on a glowing region, or keep moving.' },
-        act: { target: function () { return $('#mydice'); }, title: 'Your dice', text: 'Tap a die, then pick what it does.' },
-        battle: { target: function () { return $('#battle'); }, title: 'Battle', text: 'Play a combat card, then fight on or stop.' } },
+        act: { target: function () { return $('#mydice'); }, title: 'Your dice', text: 'Tap a die, then pick what it does.' }, },
       rules: RULES });
     GXH.bulb({ el: '#bulbbtn', suggest: suggest, rulesFor: function () { return phaseId() || 'act'; } });
   } catch (e) { console.warn(e); }
@@ -119,7 +137,7 @@ function helpInit() {
 // ---------------------------------------------------------------- bubbles: a card with an arrow touching its target (UI-BAR rule 10)
 function bubble(html, tr, o) {
   o = o || {}; var el = document.createElement('div'); el.className = 'gwb' + (o.cls ? ' ' + o.cls : ''); el.innerHTML = html + '<i class="gwa"></i>'; el.style.visibility = 'hidden'; document.body.appendChild(el);
-  var br = document.getElementById('board').getBoundingClientRect(), V = { l: 6, t: Math.max(6, br.top + 4), r: innerWidth - 6, b: Math.min(innerHeight - 6, br.bottom - 4) };
+  var br = document.getElementById('board').getBoundingClientRect(), V = { l: 6, t: Math.max(66, br.top + 4), r: innerWidth - 6, b: Math.min(innerHeight - 6, br.bottom - 4) };
   var w = el.offsetWidth, h = el.offsetHeight, A = 12, G2 = 6, cx = (tr.left + tr.right) / 2, cy = (tr.top + tr.bottom) / 2, clampX = function (x) { return Math.max(V.l, Math.min(V.r - w, x)); }, clampY = function (y) { return Math.max(V.t, Math.min(V.b - h, y)); };
   var cand = [
     { side: 'below', room: V.b - tr.bottom, x: clampX(cx - w / 2), y: tr.bottom + A + G2 }, { side: 'above', room: tr.top - V.t, x: clampX(cx - w / 2), y: tr.top - A - G2 - h },

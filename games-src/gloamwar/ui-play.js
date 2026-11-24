@@ -1,6 +1,6 @@
 // Plays the human side through real touch taps only (dice, buttons, map, battle, cards) and reports any move the UI could not express.
 // node ui-play.js [side=D] [turns=4] [url]   -> exit 1 if a move had no UI path or the page threw
-const path = require('path'), { chromium } = require(path.join(__dirname, '..', 'node_modules', 'playwright'));
+const path = require('path'), { chromium } = require('playwright');
 const side = process.argv[2] || 'D', TURNS = +(process.argv[3] || 4), url = process.argv[4] || 'file://' + path.join(__dirname, 'gloamwar.html');
 // proof mode: VIDEO=<dir> records a webm at 375x667, SECS=<n> stops after n seconds, SLOW=1 plays at human pace, SHOTS=<dir> saves screenshots of key moments
 const VIDEO = process.env.VIDEO, SECS = +(process.env.SECS || 0), SLOW = !!process.env.SLOW, SHOTS = process.env.SHOTS, T0 = Date.now(); let shotN = 0; const shotDone = {};

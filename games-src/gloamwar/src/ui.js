@@ -144,7 +144,7 @@ function renderTabs(ms) {
   var n = G.hand[UI.side].length, canPlay = ms.some(function (m) { return m.a === 'card' && (UI.die == null || m.i === UI.die); });
   $('#tCards').innerHTML = ico('event', '#1f1812', 20) + 'Cards <em>' + n + '</em>';
   $('#tNat').innerHTML = ico('watch', '#1f1812', 20) + 'Nations';
-  $('#tComp').innerHTML = ico('lantern', '#1f1812', 20) + 'Company';
+  $('#tComp').innerHTML = ico('lantern', '#1f1812', 20) + 'Company'; $('#tRival').innerHTML = ico('raven', '#1f1812', 20) + 'Rival';
 }
 function tutOk(a) { try { if (window.GXT && GXT.active()) return GXT.act(a); } catch (e) { } return true; }
 // ---------------------------------------------------------------- phase UIs (return the one-line message)
@@ -389,10 +389,10 @@ function boot() {
   $('#playD').onclick = function () { ls('gw-played', 1); startGame({ side: 'D', level: UI.level }); };
   $('#playG').onclick = function () { ls('gw-played', 1); startGame({ side: 'G', level: UI.level }); };
   $('#howB').onclick = function () { GXH.rules(); };
-  $('#helpB').onclick = function () { GXH.rules(phaseId() || undefined); };
+  $('#helpB').onclick = openRules; $('#tRival').onclick = openRival;
   $('#menuB').innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6h18M3 12h18M3 18h18" stroke="#1f1812" stroke-width="2.4" stroke-linecap="round"/></svg>';
   $('#tCards').onclick = function () { openCards(); }; $('#tNat').onclick = openNations; $('#tComp').onclick = openCompany;
-  $('#cT').onclick = openCompany; $('#msg').onclick = openLog;
+  $('#cT').onclick = openCompany; $('#msg').onclick = openLog; $('#logB').onclick = openLog;
   $('#zin').onclick = function () { MV.zoomBy(1.4); }; $('#zout').onclick = function () { MV.zoomBy(1 / 1.4); }; $('#cD').onclick = function () { openVP('D'); }; $('#cG').onclick = function () { openVP('G'); };
   $('#scrim').onclick = function (e) { closeSheet(e); };
   document.addEventListener('keydown', function (e) { if (e.key === 'Escape') { closeSheet(); } });
