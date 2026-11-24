@@ -1,0 +1,5 @@
+# Final Approach scenario lessons: handoff (W709)
+Done: 7 lessons (axis, speed, radio, gear, brakes, coffee, touchdown) in game/lessons.js on shell/gx-scenario-tutor.js; build wired (build.py, body.html); `?lesson=<id>` and `?lessons=1`. Spec: LESSONS-SPEC.md. shell: new GXST option phoneSlot (documented, not yet used).
+Verified: every lesson sets up (phase place, scripted dice, turn 0) at 402x874.
+Open: on the phone the lesson card sits over the dice tray / checklist, so a tap on a die can hit the Hint button. Fix: pass phoneSlot (a strip the game keeps free) or add keepClear for `#pz .tray`, then rerun a win and a wrong-move tap per lesson (SOLVE table is in the worker probe idea: axis die0->ax0, speed die0->en0, radio die0->ra0 then die1->en0, gear 1->lg0 2->lg1 0->lg2, brakes 1->br0 0->br1, coffee 1->co0 then die0 +1 -> br0, touchdown die0->ax0 die1->en0).
+Not done: lessons-test.js, contact sheets under proof/, build-all quick, flaps/reroll/corridor lessons (flaps need the co-pilot seat).

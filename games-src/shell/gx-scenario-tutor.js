@@ -83,7 +83,12 @@
   function hintTarget() { var s = cur(); if (!s || S.phase !== 'play' || S.hint < 2) return null; var h = s.hints[S.hint - 1]; return h && typeof h === 'object' ? vis(find(h.target)) : null; }
   // keep the card off the hinted target and the keepClear areas; a dragged position is kept unless it covers the hinted target
   function place() {
-    if (!W) return; var vw = innerWidth, vh = innerHeight, bw = W.offsetWidth, bh = W.offsetHeight, t = hintTarget(), av = [];
+    if (!W) return;
+    // phoneSlot: on narrow screens (<700px) with a visible slot element, sit inside its rect (width clamped to it); saved pos ignored
+    var slot = innerWidth < 700 && C.phoneSlot ? vis(find(C.phoneSlot)) : null;
+    if (slot) { W.style.width = ''; var nw = W.offsetWidth; W.style.width = Math.min(nw, Math.round(slot.width)) + 'px'; return put([slot.left, slot.top]); }
+    W.style.width = '';
+    var vw = innerWidth, vh = innerHeight, bw = W.offsetWidth, bh = W.offsetHeight, t = hintTarget(), av = [];
     (C.keepClear || []).forEach(function (sel) { var a; try { a = D.querySelectorAll(sel); } catch (e) { a = []; } for (var i = 0; i < a.length; i++) { var r = vis(a[i]); if (r) av.push(r); } });
     function clamp(p) { return [Math.max(4, Math.min(vw - bw - 4, p[0])), Math.max(4, Math.min(vh - bh - 4, p[1]))]; }
     function box(p) { return { left: p[0], top: p[1], right: p[0] + bw, bottom: p[1] + bh }; }
