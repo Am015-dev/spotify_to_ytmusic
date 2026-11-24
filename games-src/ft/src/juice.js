@@ -37,13 +37,13 @@ function juice(prev,cur){if(!G||!prev||!cur)return;juMove(cur);if(!juOk()||G.ove
 // says what happened. The first time only, a legend line tells what the marks on the board mean. Decoration only: never blocks a tap, never changes G.
 function claimNote(f){if(!G||UI.sim||G.over||f.p==null||f.x==null)return;const t=G.board[f.x],p=G.pl[f.p];if(!t||!p)return;const you=p.nm==='You'||(p.human&&G.pl.filter(q=>q.human).length===1);
   const who=you?'You':p.nm,nm=TILEDEF[t.k].n,pl=tileCoord(t.i);let line;
-  if(f.t==='camel')line=f.w==='tent'?`${who} pitched the tent on ${nm} ${pl}: +${t.v} at end`:`🐪 ${who} claimed ${nm} ${pl} with a camel (+${t.v})`;
-  else line=f.w==='pal'?`🏰 ${who} built a palace on ${nm} ${pl}: +5 at end`:`🌴 ${who} planted a palm on ${nm} ${pl}: +3 at end`;
+  if(f.t==='camel')line=f.w==='tent'?`${who} pitched the tent on ${nm} ${pl}: +${t.v} at end`:`${who} claimed ${nm} ${pl} with a camel (+${t.v})`;
+  else line=f.w==='pal'?`${who} built a palace on ${nm} ${pl}: +5 at end`:`${who} planted a palm on ${nm} ${pl}: +3 at end`;
   UI.cflash={i:t.i,until:Date.now()+800};
   let el=document.getElementById('cnote');if(!el){el=document.createElement('div');el.id='cnote';el.setAttribute('role','status');el.setAttribute('data-help','');document.body.appendChild(el)}
   el.style.setProperty('--pc',PCOL[p.i]);el.textContent=line;const g=document.getElementById('grid');if(g){const r=g.getBoundingClientRect();el.style.top=Math.max(4,r.top-40)+'px'}
   el.classList.remove('on');void el.offsetWidth;el.classList.add('on');clearTimeout(UI.cnT);UI.cnT=setTimeout(()=>el.classList.remove('on'),5000);
   let seen=0;try{seen=localStorage.getItem('soq_legend')}catch(e){}
   if(!seen){try{localStorage.setItem('soq_legend','1')}catch(e){}let lg=document.getElementById('clegend');if(!lg){lg=document.createElement('div');lg.id='clegend';lg.setAttribute('data-help','');document.body.appendChild(lg)}
-    lg.innerHTML='Ring colour = owner · 🐪 claimed · 🌴 palm +3 · 🏰 palace +5';const gr=g?g.getBoundingClientRect():null;const mk=document.getElementById('mkt'),mr=mk?mk.getBoundingClientRect():null;let tb=gr?gr.bottom:100;document.querySelectorAll('#grid .tile').forEach(x=>{tb=Math.max(tb,x.getBoundingClientRect().bottom)});lg.style.top=(tb+4)+'px';lg.classList.add('on');setTimeout(()=>lg.classList.remove('on'),5200)}
+    lg.innerHTML='Ring colour = owner · claimed · palm +3 · palace +5';const gr=g?g.getBoundingClientRect():null;const mk=document.getElementById('mkt'),mr=mk?mk.getBoundingClientRect():null;let tb=gr?gr.bottom:100;document.querySelectorAll('#grid .tile').forEach(x=>{tb=Math.max(tb,x.getBoundingClientRect().bottom)});lg.style.top=(tb+4)+'px';lg.classList.add('on');setTimeout(()=>lg.classList.remove('on'),5200)}
   setTimeout(()=>{try{renderGrid()}catch(e){}},0)}

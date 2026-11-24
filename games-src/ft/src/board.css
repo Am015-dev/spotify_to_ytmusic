@@ -556,3 +556,8 @@ html.land .tile.hasmk .tn{display:block}
 .commd-box .cu-k{margin:0;font-size:14px;color:#6b4a1a}.commd-box .cu-why{font-weight:700}
 .commd-box .cu-les b{display:block;font-size:14px;color:#7a3d00}
 .commd-box .cu-acts{display:flex;flex-direction:column;gap:8px;margin-top:14px}
+/* game art instead of emoji inside marks and stats */
+.bm .pic{width:100%;height:100%;margin:0;vertical-align:0;object-fit:contain;filter:drop-shadow(0 1px 1px rgba(0,0,0,.5))}
+.bm .pic{width:88%;height:88%}
+.ti .pic{width:1.5em;height:1.5em;margin:0}
+.st .pic,.pp .pic,.e2 .pic{width:1.3em;height:1.3em}

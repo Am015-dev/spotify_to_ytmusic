@@ -715,6 +715,79 @@ html.g3d .own.cam{background-size:44px}
 #cleg .lc i{font-style:normal;display:inline-grid;place-items:center;width:22px;height:22px;border-radius:50%;background:var(--pc);font-size:13px}
 #cleg .ln{border-color:#8a5a1e;font-weight:700}
 html .tile.owned .tv{top:23px!important;right:3px!important}
+
+/* ===== Build marks + djinn inspect (owner, 24 Nov): big owner-ringed marks, legend, readable djinn card ===== */
+.bm{position:relative;display:inline-grid;place-items:center;flex:0 0 auto;width:32px;height:32px;box-sizing:border-box;border-radius:50%;background:var(--pc,#6b5a3a);border:3px solid #fff;box-shadow:0 0 0 2px var(--pc,#6b5a3a),0 2px 5px rgba(0,0,0,.65);font-style:normal;font-size:19px;line-height:1;color:#fff;text-shadow:none}
+.bm small{position:absolute;right:-7px;bottom:-7px;min-width:19px;height:19px;padding:0 3px;box-sizing:border-box;border-radius:10px;background:#2e1a0a;border:2px solid #fff;color:#fff;font:800 13px/15px var(--ff-b,system-ui);text-align:center}
+.tile .bms{position:absolute;left:0;right:0;top:27px;z-index:4;display:flex;justify-content:center;align-items:center;gap:9px;pointer-events:none}
+.tile.hasmk .tv{display:none}
+.tile .ob{display:flex;align-items:center;justify-content:center;gap:3px;height:26px;line-height:26px}
+.tile .ob .bm{width:26px;height:26px;font-size:15px;border-width:2px;box-shadow:0 1px 3px rgba(0,0,0,.6);background:rgba(0,0,0,.28);margin-left:-3px}
+.tile:not(.owned) .bms{top:30px}
+#cleg .lc .bm{width:24px;height:24px;font-size:14px;border-width:2px;box-shadow:none}
+#cleg .lc .bm small{display:none}
+#cleg .lc{padding:0 6px;gap:3px}
+@keyframes mkpop{0%{transform:scale(.2)}70%{transform:scale(1.35)}100%{transform:none}}
+.bm.popin{animation:mkpop .5s ease-out 1}
+@media (prefers-reduced-motion:reduce){.bm.popin{animation:none}}
+.dcard{position:relative}
+.dinfo{position:relative;flex:0 0 auto;display:inline-grid;place-items:center;width:24px;height:24px;border-radius:50%;background:#fff6dc;color:#3b1c0e;font:900 15px/1 Georgia,serif;font-style:italic;box-shadow:0 1px 2px rgba(0,0,0,.5)}
+.dinfo::after{content:'';position:absolute;inset:-10px}
+.dcard{-webkit-touch-callout:none;-webkit-user-select:none;user-select:none}
+.orow{display:flex;flex-wrap:wrap;gap:4px;margin-top:4px}
+.orow .dcard{flex:1 1 90px;min-height:44px}
+.orow .omy{flex:0 0 auto;justify-content:center;background:#2a1a40;min-height:44px;padding:0 10px}
+.orow .odj em{font:700 13px/1 var(--ff-b,system-ui);font-style:normal;background:#ffe9b0;color:#3f2766;border-radius:9px;padding:2px 6px}
+.orow .odj.used{filter:saturate(.45) brightness(.8)}
+html.land .orow{flex-direction:column}html.land .orow .dcard{flex:0 0 auto}
+#dinspect{position:fixed;z-index:70;box-sizing:border-box;overflow:auto;padding:14px 56px 12px 16px;background:#fff6dc;color:#2e1a0a;border:3px solid #8a5a1e;border-radius:14px 14px 0 0;box-shadow:0 -4px 18px rgba(30,15,5,.5);font:600 15px/1.35 var(--ff-b,system-ui)}
+html.land #dinspect{border-radius:14px;box-shadow:0 6px 22px rgba(30,15,5,.5);font-size:16px}
+#dinspect[hidden]{display:none}
+#dinspect h4{margin:0 0 4px;font-size:18px}#dinspect h4 small{font-size:14px;font-weight:700;color:#6b4a1e}
+#dinspect p{margin:3px 0}#dinspect .dx{font-size:16px;font-weight:800}
+#dinspect .ds{padding:4px 8px;border-radius:8px;font-weight:800}#dinspect .ds.ok{background:#cfeec8;color:#1d4a14}#dinspect .ds.no{background:#fde0c8;color:#7a2a08}
+#dinspect .dix{position:absolute;top:4px;right:4px;width:48px;height:48px;border:0;border-radius:50%;background:#e8d3a0;color:#2e1a0a;font:900 26px/1 system-ui;cursor:pointer}
+.mydj{list-style:none;margin:0 0 12px;padding:0}.mydj li{margin:0 0 8px;padding:6px 8px;border:2px solid #8a5a1e;border-radius:10px;background:#fff6dc}
+.mydj .st{font-weight:800;padding:0 6px;border-radius:8px;background:#ffe9b0}
+.tile.hasmk .tn{display:none}
+.tile .bms{top:auto!important;bottom:3px;gap:8px}
+.tile .bms .bm{width:30px;height:30px;font-size:17px}
+.tile.owned .ms{transform:translateY(6px)}
+.tile .ob{z-index:6}
+.tile .bms{z-index:8}.tile .bms .bm{width:28px;height:28px;font-size:16px}
+html.land .tile .bms .bm{width:40px;height:40px;font-size:24px}html.land .tile .bms{gap:14px;bottom:30px}
+html.land .tile.hasmk .tn{display:block}
+.dcard .dinfo{position:absolute;top:-6px;left:-6px;z-index:3;width:24px;height:24px}
+.dcard .dinfo::after{inset:-10px -10px -14px -10px}
+.dcard .dinfo{left:-8px;top:-8px;width:28px;height:28px}
+.dcard .dinfo::after{inset:-12px 0 -12px -16px}
+/* the right 44 px of a djinn card (points + the i) opens the details; the rest buys/summons (marks.js decides by position) */
+.dcard .dinfo{position:absolute;pointer-events:none;left:auto;top:auto;right:9px;bottom:3px;width:18px;height:18px;font-size:13px;margin:0}
+.dcard .dinfo::after{display:none}
+.dcard:not(.th):not(.omy):not(.odj) .dv{position:absolute;top:3px;right:9px;margin:0}
+.dcard:not(.th):not(.omy):not(.odj){padding-right:40px}
+.orow .odj{padding-right:34px}
+/* W624 commissions: one bubble beside its target (UI-BAR 10), the debrief card */
+.commb{position:fixed;z-index:60;display:flex;gap:10px;align-items:flex-start;padding:14px 16px;background:#fff8ec;color:#2a1a0c;border:2px solid #b07a2a;border-radius:14px;box-shadow:0 8px 24px rgba(0,0,0,.35);font-size:15px;line-height:1.35;pointer-events:none}
+.commb[hidden]{display:none}
+.commb>i{font-style:normal;font-size:24px;line-height:1}
+.commb div{display:flex;flex-direction:column;gap:4px}
+.commb b{font-size:16px}.commb em{font-style:normal;font-weight:700;color:#7a3d00}.commb .cu-did{color:#1d5a2a;font-weight:700}
+.commb .cu-arrow{position:absolute;width:14px;height:14px;background:#fff8ec;border:2px solid #b07a2a;transform:rotate(45deg)}
+.commb[data-side="above"] .cu-arrow{bottom:-9px;border-top:0;border-left:0}
+.commb[data-side="below"] .cu-arrow{top:-9px;border-bottom:0;border-right:0}
+.commb[data-side="none"] .cu-arrow{display:none}
+.commd{position:fixed;inset:0;z-index:80;display:flex;align-items:center;justify-content:center;background:rgba(20,10,0,.55);padding:16px}
+.commd-box{max-width:420px;width:100%;background:#fff8ec;color:#2a1a0c;border-radius:16px;padding:20px;border:3px solid #b07a2a;font-size:16px}
+.commd-box.won{border-color:#2e7d32}.commd-box h2{margin:4px 0 10px;font-size:22px}
+.commd-box .cu-k{margin:0;font-size:14px;color:#6b4a1a}.commd-box .cu-why{font-weight:700}
+.commd-box .cu-les b{display:block;font-size:14px;color:#7a3d00}
+.commd-box .cu-acts{display:flex;flex-direction:column;gap:8px;margin-top:14px}
+/* game art instead of emoji inside marks and stats */
+.bm .pic{width:100%;height:100%;margin:0;vertical-align:0;object-fit:contain;filter:drop-shadow(0 1px 1px rgba(0,0,0,.5))}
+.bm .pic{width:88%;height:88%}
+.ti .pic{width:1.5em;height:1.5em;margin:0}
+.st .pic,.pp .pic,.e2 .pic{width:1.3em;height:1.3em}
 /* ===== GX skin: painted UI kit over the shared shell + campaign classes. Opt-in: nothing changes until gx-skin.js adds
    html.sk (after the kit files loaded). Kit files live in the game's media/ (ui-topbar, ui-iconbtn, ui-panel, ui-drawer-head,
    ui-button-cream/go/power, ui-row, ui-bubble, ui-node-*). Extra switches: html.sk-icons (icon-*.webp set), html.sk-map (story-map.webp),
@@ -5056,7 +5129,7 @@ const NetRoom=(()=>{
 
 </script>
 <script>
-// ---------- Sands of Qamar: components (our own numbers and names) ----------
+// ---------- Sands of Qamar: components (rulebook numbers, our own names) ----------
 const MNAME={vizier:'Advisor',elder:'Sage',merchant:'Trader',builder:'Mason',assassin:'Shadow',artisan:'Crafter'};
 const MPLUR={vizier:'Advisors',elder:'Sages',merchant:'Traders',builder:'Masons',assassin:'Shadows',artisan:'Crafters'};
 const MHELP={vizier:'Keep them. 1 point each, plus 10 per rival you outnumber.',elder:'Keep them. 2 points each; spend them to summon djinns.',
@@ -5074,24 +5147,24 @@ const TILEDEF={
   exchange:{n:'Spice Exchange',blue:false,x:'You may pay 4 coins for any 1 face-up goods card.'},
   ravine:{n:'Ravine',blue:false,x:'Impassable. Nothing may ever stand here.',block:1},
   lake:{n:'Great Lake',blue:true,x:'Impassable. Palms and palaces on tiles touching it score double.',block:1},
-  city:{n:'Wonder City',blue:true,x:'Worth more the more you hold: 6 / 20 / 42 / 72 / 110.'}};
-const TILESET=[['village',5,6],['sacred',6,4],['sacred',10,1],['sacred',12,1],['sacred',15,1],['oasis',8,6],['small',6,7],['large',4,4]];
+  city:{n:'Wonder City',blue:true,x:'Worth more the more you hold: 5 / 20 / 45 / 80 / 125.'}};
+const TILESET=[['village',5,5],['sacred',6,4],['sacred',10,1],['sacred',12,1],['sacred',15,1],['oasis',8,6],['small',6,8],['large',4,4]];
 const TILESET_ART=[['workshop',5,3],['exchange',10,2],['ravine',0,1]];
 const TILESET_WHIM=[['city',5,3,'blue'],['city',5,2,'red'],['lake',0,1]];
 function mkTiles(set,ex){const o=[];for(const [k,v,n,col] of set)for(let i=0;i<n;i++)o.push({k,v,blue:col?col==='blue':TILEDEF[k].blue,ex});return o}
 // goods (54 base): Mystics are the special cards
 const RNAME={ivory:'Ivory',jewels:'Jewels',gold:'Gold',papyrus:'Papyrus',silk:'Silk',spice:'Spice',fish:'Fish',wheat:'Wheat',pottery:'Pottery',fakir:'Mystic'};
-const RICON={ivory:'🦷',jewels:'💎',gold:'🥇',papyrus:'📜',silk:'🧣',spice:'🌶️',fish:'🐟',wheat:'🌾',pottery:'🏺',fakir:'🔮'};
-const RESOURCE_COUNT={ivory:3,jewels:2,gold:1,papyrus:4,silk:4,spice:4,fish:5,wheat:6,pottery:7,fakir:18};
-const SETVP=[0,1,3,6,12,20,29,39,49,60];
+const RICON={ivory:'<img class="pic" src="media/good-ivory.webp" alt="">',jewels:'<img class="pic" src="media/good-jewels.webp" alt="">',gold:'<img class="pic" src="media/good-gold.webp" alt="">',papyrus:'<img class="pic" src="media/good-papyrus.webp" alt="">',silk:'<img class="pic" src="media/good-silk.webp" alt="">',spice:'<img class="pic" src="media/good-spice.webp" alt="">',fish:'<img class="pic" src="media/good-fish.webp" alt="">',wheat:'<img class="pic" src="media/good-wheat.webp" alt="">',pottery:'<img class="pic" src="media/good-pottery.webp" alt="">',fakir:'<img class="pic" src="media/good-fakir.webp" alt="">'};
+const RESOURCE_COUNT={ivory:2,jewels:2,gold:2,papyrus:4,silk:4,spice:4,fish:6,wheat:6,pottery:6,fakir:18};
+const SETVP=[0,1,3,7,13,21,30,40,50,60];
 // turn-order track: cost per spot; several spots may share a cost ("stack" spots: a later bidder goes first)
-const BIDTRACK_STD=[16,11,8,5,3,1,0,0,0];const BIDTRACK_5=[18,12,8,5,5,3,3,1,1,0,0,0];
+const BIDTRACK_STD=[18,12,8,5,3,1,0,0,0];const BIDTRACK_5=[18,12,8,5,5,3,3,1,1,0,0,0];
 const CAMELS={2:11,3:8,4:8,5:8};
 // items (Artisans): 9 precious + 9 magic. The split per kind is an assumption (see rules-notes).
 const ITEMS={
-  gem5:{n:'Silver Bangle',kind:'precious',vp:4,cp:3,x:'Worth 4 points at the end.'},
+  gem5:{n:'Silver Bangle',kind:'precious',vp:5,cp:3,x:'Worth 5 points at the end.'},
   gem7:{n:'Jade Casket',kind:'precious',vp:7,cp:3,x:'Worth 7 points at the end.'},
-  gem9:{n:'Sun Diadem',kind:'precious',vp:10,cp:3,x:'Worth 10 points at the end.'},
+  gem9:{n:'Sun Diadem',kind:'precious',vp:9,cp:3,x:'Worth 9 points at the end.'},
   carpet:{n:'Wind Rug',kind:'magic',cp:2,x:'Your last person may land on any tile of its colour.'},
   lamp:{n:'Brass Lamp',kind:'magic',cp:2,x:'Take one face-up djinn for free.'},
   flute:{n:'Reed Pipe',kind:'magic',cp:2,x:'Before your move, bring up to 5 people from neighbouring tiles onto one tile.'},
@@ -5107,12 +5180,12 @@ const THIEVES={
   elder:{n:'White Cutpurse',x:'Each rival gives up a djinn; you take one of them.'},
   artisan:{n:'Purple Cutpurse',x:'Each rival gives up an item; you take one of them.'}};
 
-const CITYVP=c=>4*c*c+2*c;
+const CITYVP=c=>5*c*c;
 
 </script>
 <script>
 // ---------- djinns: 22 base + 3 promos + 2 Crafters + 1 Cutpurse djinn. Our own names, point values and numbers. ----------
-const DJN={wazira:4,hikma:5,nakhla:4,majlis:4,jawhar:4,sana:3};
+const DJN={wazira:3,hikma:4,nakhla:5,majlis:4,jawhar:4,sana:3};
 // cost: null (always on) | 'EF' (1 Sage or 1 Mystic) | 'EEF' (1 Sage + 1 Sage-or-Mystic) | 'F' (1 Mystic) | 'F+' (1+ Mystics, bidding)
 const DJINNS=[
  {k:'zarifa',n:'Zarifa',vp:6,cost:null,x:'At the end, every 2 Mystics you hold count as 1 good.'},
@@ -5168,7 +5241,7 @@ function djinnTargets(p,k){switch(k){
   default:return[]}}
 function djinnMoves(p){const o=[];if(G.phase!=='turn'||G.q)return o;
   for(const k of p.dj){const d=DJ[k];if(!d.cost||d.cost==='F+'||p.used[k])continue;const tg=djinnTargets(p,k);if(!tg.length)continue;for(const c of costOpts(p,d.cost))for(const t of tg)o.push({act:'djinn',k,t,pay:c})}return o}
-function runDjinn(p,m){const d=DJ[m.k];payCost(p,m.pay);lg(`✨ ${p.nm} calls on ${d.n}.`,'step');fx('djinn',m.k);
+function runDjinn(p,m){const d=DJ[m.k];payCost(p,m.pay);lg(`${p.nm} calls on ${d.n}.`,'step');fx('djinn',m.k);
   switch(m.k){
   case 'tamuz':{const t=G.board[m.t];for(let i=0;i<3&&G.bag.length;i++)t.m.push(G.bag.splice(rnd(G.bag.length),1)[0]);lg(`Three people appear on ${tileName(t)}.`);break}
   case 'nuraya':placePalace(p,m.t,true);break;
@@ -5267,7 +5340,7 @@ function endTurn(){if(G.q){G.pendingEnd=1;return}G.turnIdx++;G.move=null;G.act=n
    // rulebook: the game ends at the end of the TURN (= round) in which the last camel is dropped, after every player has acted; endRound() finishes it
 if(G.turnIdx>=G.order.length)return endRound();startTurn()}
 function endRound(){refillMarket();refillDjinns();if(G.ex.thieves&&!G.thRow.length&&G.thDeck.length)G.thRow.push(G.thDeck.shift());
-  if(G.tut){lg('The tutorial round is over: the game ends.','big');return finish()}
+  if(G.tut&&!(G.commR&&G.round<G.commR)){lg(G.comm?'The commission is over.':'The tutorial round is over: the game ends.','big');return finish()}
   if(G.endTrig){lg('The last camel has been placed: the game ends.','big');return finish()}
   if(G.noMove||!legalStarts().length){lg('No legal move remains on the board: the game ends.','big');return finish()}
   G.round++;G.bidQueue=G.nextBid.slice();G.bids=[];G.phase='bid';lg(`— Round ${G.round}: bid for turn order —`,'round');fx('round')}
@@ -5297,10 +5370,10 @@ function finishMove(e,c){const t=G.board[e];const p=P(G.cur);const n=t.m.filter(
   if(['small','large','exchange'].includes(t.k))trig('market',p.i)}
 // taking control: a camel (or, with Crafters, the tent)
 function claimTile(p,e,how){const t=G.board[e];if(t.camel!=null||t.tent!=null)return;
-  if(how==='auto'&&p.tent&&p.human&&!UI.sim){ask(p.i,`Claim ${tileName(t)} with a camel or your tent?`,[{l:'🐪 A camel',h:'claim',d:{p:p.i,e,how:'camel'}},{l:'⛺ The tent (its tile plus 1 per nearby red tile)',h:'claim',d:{p:p.i,e,how:'tent'}}],{kind:'claim'});return}
+  if(how==='auto'&&p.tent&&p.human&&!UI.sim){ask(p.i,`Claim ${tileName(t)} with a camel or your tent?`,[{l:'A camel',h:'claim',d:{p:p.i,e,how:'camel'}},{l:'The tent (its tile plus 1 per nearby red tile)',h:'claim',d:{p:p.i,e,how:'tent'}}],{kind:'claim'});return}
   if(how==='auto'&&p.tent&&(!p.human||UI.sim)&&aiWantsTent(p,e))how='tent';
-  if(how==='tent'&&p.tent){p.tent=0;t.tent=p.i;lg(`⛺ ${p.nm} pitches the tent on ${tileName(t)}.`,'good');fx('camel',e,p.i,'tent');return}
-  if(p.camels<=0){lg(`${p.nm} has no camels left to claim ${tileName(t)}.`);return}t.camel=p.i;p.camels--;lg(`🐪 ${p.nm} claims ${tileName(t)}.`,'good');fx('camel',e,p.i,'camel');
+  if(how==='tent'&&p.tent){p.tent=0;t.tent=p.i;lg(`${p.nm} pitches the tent on ${tileName(t)}.`,'good');fx('camel',e,p.i,'tent');return}
+  if(p.camels<=0){lg(`${p.nm} has no camels left to claim ${tileName(t)}.`);return}t.camel=p.i;p.camels--;lg(`${p.nm} claims ${tileName(t)}.`,'good');fx('camel',e,p.i,'camel');
   if(p.camels===0&&!G.endTrig){G.endTrig=true;lg(`${p.nm} placed the last camel. The round finishes, then the game ends.`,'big')}}
 QH.claim=d=>claimTile(P(d.p),d.e,d.how);
 function owner(t){return t.camel!=null?t.camel:t.tent!=null?t.tent:null}
@@ -5325,8 +5398,8 @@ function doTribe(m){const a=G.act;const p=P(G.cur);const c=a.color;a.tribeDone=t
 QH.keepItem=d=>{const p=P(d.p);p.items.push(d.drawn[d.keep]);G.itemDisc.push(...d.drawn.filter((x,j)=>j!==d.keep));lg(`${p.nm} keeps an item.`,'good')};
 function gainCard(p,r,quiet){if(r==null)return;if(r==='fakir')p.fk++;else p.res.push(r);if(!quiet)lg(`${p.nm} takes ${RNAME[r]}.`,'good')}
 function killOne(p,k,c){G.stats.kills++;const sirra=hasDj(p,'sirra');
-  if(k.pl!=null){const q=P(k.pl);if(c==='vizier')q.vz--;else if(c==='elder')q.el--;else q.art--;lg(`🗡 ${p.nm}'s Shadow takes one of ${q.nm}'s ${MPLUR[c]}.`,'bad');fx('kill');}
-  else{const t=G.board[k.tile];t.m.splice(t.m.indexOf(c),1);lg(`🗡 ${p.nm}'s Shadow takes a ${MNAME[c]} from ${tileName(t)}.`,'bad');fx('kill',k.tile);if(!t.m.length&&t.camel==null&&t.tent==null)claimTile(p,k.tile,'camel')}
+  if(k.pl!=null){const q=P(k.pl);if(c==='vizier')q.vz--;else if(c==='elder')q.el--;else q.art--;lg(`${p.nm}'s Shadow takes one of ${q.nm}'s ${MPLUR[c]}.`,'bad');fx('kill');}
+  else{const t=G.board[k.tile];t.m.splice(t.m.indexOf(c),1);lg(`${p.nm}'s Shadow takes a ${MNAME[c]} from ${tileName(t)}.`,'bad');fx('kill',k.tile);if(!t.m.length&&t.camel==null&&t.tent==null)claimTile(p,k.tile,'camel')}
   if(sirra){if(c==='merchant'&&G.rdeck.length){gainCard(p,G.rdeck.shift());G.bag.push(c)}else if(c==='builder'&&k.tile!=null){const blues=AROUND(k.tile).filter(i=>G.board[i].blue&&!G.board[i].block).length;p.coins+=blues;lg(`${p.nm} pockets ${blues} coins from the fallen Mason (Sirra).`,'good');G.bag.push(c)}
     else if(c==='vizier'){p.vz++;lg(`${p.nm} keeps the Advisor (Sirra).`,'good')}else if(c==='elder'){p.el++;lg(`${p.nm} keeps the Sage (Sirra).`,'good')}else if(c==='artisan'){p.art++;if(G.items.length)p.items.push(G.items.shift());lg(`${p.nm} keeps the Crafter and draws an item (Sirra).`,'good')}else G.bag.push(c)}
   else G.bag.push(c);trig('kill',p.i)}
@@ -5346,12 +5419,12 @@ function summonPays(p){const o=[];if(p.el>=2)o.push({el:2,fk:0});if(p.el>=1&&p.f
 function doTile(m){const a=G.act;const p=P(G.cur);const t=G.board[a.tile];a.tileDone=true;G.step='sell';if(m.skip)return;
   if(m.place!=null){if(t.k==='village')placePalace(p,m.place);else placePalm(p,m.place);return}
   if(m.dj){payCost(p,m.pay);G.djRow.splice(G.djRow.indexOf(m.dj),1);gainDjinn(p,m.dj);return}
-  if(m.thief){payCost(p,m.pay);G.thRow.splice(G.thRow.indexOf(m.thief),1);p.thieves.push({k:m.thief,turn:G.turn});lg(`🦹 ${p.nm} hires the ${THIEVES[m.thief].n}.`,'big');return}
+  if(m.thief){payCost(p,m.pay);G.thRow.splice(G.thRow.indexOf(m.thief),1);p.thieves.push({k:m.thief,turn:G.turn});lg(`${p.nm} hires the ${THIEVES[m.thief].n}.`,'big');return}
   if(m.take){const cost=t.k==='small'?3:t.k==='large'?6:4;p.coins-=cost;const got=m.take.slice().sort((x,y)=>y-x).map(j=>G.market.splice(j,1)[0]);for(const r of got)gainCard(p,r,1);lg(`${p.nm} buys ${got.map(r=>RNAME[r]).join(' and ')} for ${cost} coins.`,'good');fx('res');return}
   if(m.work){if(m.work==='art'){p.art--;G.bag.push('artisan')}else{p.fk-=2;G.rdisc.push('fakir','fakir')}p.items.push(G.items.shift());lg(`${p.nm} commissions an item at the Workshop.`,'good');return}}
-function placePalace(p,i,viaDj){if(SUP().pal<1){lg('The palace pieces have run out.');return}SUP().pal--;const t=G.board[i];t.pal++;lg(`🏰 ${p.nm} raises a palace on ${tileName(t)}.`,'good');fx('build',i,p.i,'pal');trig('palace',p.i)}
-function placePalm(p,i){if(SUP().palm<1){lg('The palm trees have run out.');return}SUP().palm--;const t=G.board[i];t.palm++;lg(`🌴 ${p.nm} plants a palm on ${tileName(t)}.`,'good');fx('build',i,p.i,'palm')}
-function gainDjinn(p,k){p.dj.push(k);G.stats.djinns++;lg(`✨ ${p.nm} summons ${DJ[k].n}.`,'big');fx('djinn',k);fx('summon',k);if(!UI.sim&&UI.fx.length)UI.fx[UI.fx.length-1].h=p.human?1:0;trig('djinn',p.i,{k})}
+function placePalace(p,i,viaDj){if(SUP().pal<1){lg('The palace pieces have run out.');return}SUP().pal--;const t=G.board[i];t.pal++;lg(`${p.nm} raises a palace on ${tileName(t)}.`,'good');fx('build',i,p.i,'pal');trig('palace',p.i)}
+function placePalm(p,i){if(SUP().palm<1){lg('The palm trees have run out.');return}SUP().palm--;const t=G.board[i];t.palm++;lg(`${p.nm} plants a palm on ${tileName(t)}.`,'good');fx('build',i,p.i,'palm')}
+function gainDjinn(p,k){p.dj.push(k);G.stats.djinns++;lg(`${p.nm} summons ${DJ[k].n}.`,'big');fx('djinn',k);fx('summon',k);if(!UI.sim&&UI.fx.length)UI.fx[UI.fx.length-1].h=p.human?1:0;trig('djinn',p.i,{k})}
 // ---------- goods sale (end of turn, optional) ----------
 function sellValue(n){return SETVP[Math.min(n,9)]}
 function sellMoves(p){const kinds=[...new Set(p.res)];const o=[];// offer selling the n kinds you hold most copies of (the dock also lets you choose kinds)
@@ -5366,7 +5439,7 @@ function itemMoves(p){const o=[];if(p.itemUsed||!p.items.length)return o;const k
     case 'scimitar':if(G.board.some(t=>t.m.length))o.push({act:'item',k});break;
     case 'talisman':{const mine=G.board.filter(t=>t.camel===p.i);const em=G.board.filter(emptyTile);if(mine.length&&em.length)for(const a of mine)for(const b of em)o.push({act:'item',k,from:a.i,to:b.i});break}
     case 'horn':o.push({act:'item',k});break}}return o}
-function useItem(p,m){p.items.splice(p.items.indexOf(m.k),1);G.itemDisc.push(m.k);p.itemUsed=1;const I=ITEMS[m.k];lg(`🪄 ${p.nm} uses the ${I.n}.`,'step');fx('item',m.k);
+function useItem(p,m){p.items.splice(p.items.indexOf(m.k),1);G.itemDisc.push(m.k);p.itemUsed=1;const I=ITEMS[m.k];lg(`${p.nm} uses the ${I.n}.`,'step');fx('item',m.k);
   switch(m.k){
   case 'carpet':G.turnFx.carpet=1;break;
   case 'lamp':G.djRow.splice(G.djRow.indexOf(m.dj),1);gainDjinn(p,m.dj);break;
@@ -5379,7 +5452,7 @@ QH.flute=d=>{const s=G.board[d.j];s.m.splice(s.m.indexOf(d.c),1);G.board[d.t].m.
 function scimStep(p,left){if(!left)return;const opts=[];for(const t of G.board)for(const c of new Set(t.m))opts.push({l:`${MNAME[c]} on ${tileName(t)}`,h:'scim',d:{p:p.i,tile:t.i,c,left}});if(!opts.length)return;ask(p.i,`Ember Blade: remove a meeple (${left} left)`,opts,{kind:'kill'})}
 QH.scim=d=>{const p=P(d.p);killOne(p,{tile:d.tile},d.c);scimStep(p,d.left-1)};
 function thiefMoves(p){if(!G.act||G.act.tribeDone)return[];return p.thieves.filter(t=>t.k===G.act.color&&t.turn!==G.turn&&!G.turnFx.thief).map(t=>({act:'thief',k:t.k}))}
-function useThief(p,m){p.thieves.splice(p.thieves.findIndex(t=>t.k===m.k),1);G.turnFx.thief=1;lg(`🦹 ${p.nm} sends the ${THIEVES[m.k].n} out!`,'big');fx('thief');const pool=[];
+function useThief(p,m){p.thieves.splice(p.thieves.findIndex(t=>t.k===m.k),1);G.turnFx.thief=1;lg(`${p.nm} sends the ${THIEVES[m.k].n} out!`,'big');fx('thief');const pool=[];
   for(const q of G.pl){if(q.i===p.i||hasDj(q,'hafiz'))continue;const give=thiefGive(q,m.k);if(give.length)pool.push(...give)}
   if(!pool.length){lg('Nobody has anything to give up.');return}
   const take=m.k==='merchant'?2:1;thiefClaim(p,m.k,pool,take)}
@@ -5393,7 +5466,7 @@ function thiefGive(q,k){const o=[];switch(k){
   case 'artisan':if(q.items.length){const it=q.items.shift();o.push({kind:'item',k:it});lg(`${q.nm} gives up an item.`,'bad')}break}return o}
 function thiefClaim(p,k,pool,take){if(!take||!pool.length)return;const opts=pool.map((g,j)=>({l:giveLabel(g),h:'thiefTake',d:{p:p.i,k,pool,j,take}}));ask(p.i,`Cutpurse haul: take ${take>1?take+' things':'one'}`,opts,{kind:'thief'})}
 QH.thiefTake=d=>{const p=P(d.p);const g=d.pool[d.j];const rest=d.pool.filter((x,j)=>j!==d.j);
-  if(g.kind==='tile'){if(p.camels>0){G.board[g.i].camel=p.i;p.camels--;lg(`🐪 ${p.nm} claims ${tileName(G.board[g.i])}.`,'good')}}
+  if(g.kind==='tile'){if(p.camels>0){G.board[g.i].camel=p.i;p.camels--;lg(`${p.nm} claims ${tileName(G.board[g.i])}.`,'good')}}
   else if(g.kind==='palm'||g.kind==='pal'){const best=G.board.filter(t=>owner(t)===p.i).sort((a,b)=>b.v-a.v)[0]||G.board.find(t=>!t.block);if(g.kind==='palm')best.palm++;else best.pal++;lg(`${p.nm} places it on ${tileName(best)}.`,'good')}
   else if(g.kind==='card')gainCard(p,g.r);else if(g.kind==='vizier'){p.vz++;lg(`${p.nm} gains an Advisor.`,'good')}else if(g.kind==='dj'){p.dj.push(g.k);lg(`${p.nm} gains ${DJ[g.k].n}.`,'good')}else if(g.kind==='item')p.items.push(g.k);
   // the rest goes to the discards
@@ -5447,7 +5520,7 @@ function goodsScore(res){const c={};for(const r of res)c[r]=(c[r]||0)+1;let tot=
 function goodsBest(p){const w=hasDj(p,'zarifa')?Math.floor(p.fk/2):0;if(!w)return goodsScore(p.res);const kinds=Object.keys(RNAME).filter(k=>k!=='fakir');let best=0;
   const rec=(res,left)=>{if(!left){best=Math.max(best,goodsScore(res));return}for(const k of kinds)rec(res.concat([k]),left-1)};if(w<=3)rec(p.res,w);else{let r=p.res.slice();for(let i=0;i<w;i++){let bk=kinds[0],bv=-1;for(const k of kinds){const v=goodsScore(r.concat([k]));if(v>bv){bv=v;bk=k}}r.push(bk)}best=goodsScore(r)}return best}
 function finish(){if(G.over)return;const sc=G.pl.map(p=>({p,s:scoreOf(p)}));sc.sort((a,b)=>b.s.total-a.s.total);const top=sc[0].s.total;const winners=sc.filter(x=>x.s.total===top).map(x=>x.p);
-  G.over={scores:sc.map(x=>({p:x.p.i,s:x.s})),win:winners.map(w=>w.i)};G.winner=winners.map(w=>w.nm).join(' & ');G.winText=`${G.winner} ${winners.length>1?'share the win':winners[0].nm==='You'?'win':'wins'} with ${top} points.`;G.phase='over';lg('🏆 '+G.winText,'big');fx('win')}
+  G.over={scores:sc.map(x=>({p:x.p.i,s:x.s})),win:winners.map(w=>w.i)};G.winner=winners.map(w=>w.nm).join(' & ');G.winText=`${G.winner} ${winners.length>1?'share the win':winners[0].nm==='You'?'win':'wins'} with ${top} points.`;G.phase='over';lg(''+G.winText,'big');fx('win')}
 // ---------- invariants and test hooks ----------
 function checkInvariants(){const v=[];if(!G)return v;let n=G.bag.length;for(const t of G.board){n+=t.m.length;if(t.block&&t.m.length)v.push('meeple on a blocked tile')}if(G.move)n+=G.move.hand.length;if(G.act&&!G.act.tribeDone)n+=G.act.n;
   for(const p of G.pl){n+=p.vz+p.el+p.art;if(p.coins<0)v.push(p.nm+' coins negative');if(p.fk<0)v.push(p.nm+' mystics negative');if(p.camels<0)v.push('camels negative');if(p.el<0||p.vz<0||p.art<0)v.push('kept meeples negative')}
@@ -5610,6 +5683,131 @@ function tutNew(){const keep=DEFSEED;setSeed(TUT_SEED);
   tutBuild();for(const p of G.pl)p.camels=3;   // three camels each: a coached game is over in a few rounds
   lg('The coached game begins.','big')}
 
+</script><script>
+// ---------- Hadiya's commissions: learn by playing (W624). Six short jobs on the real engine, each a strategic puzzle with a goal ----------
+// Owner, 24 Nov: no narrative, click-tap nonsense, no strategy -> replaced by commissions. Every tap is a real game move (UI-BAR rule 11).
+// Each commission builds ONE state (layout + people + holdings), you play real moves, Farid follows a stated plan, then a debrief.
+// Headless: commNew(i) builds the state; commResult() scores it. Tests: ../comm-test.js (naive line fails, strategic line wins).
+// Board layout (rows A-E, 6 columns): O oasis, b Bazaar Stall, B Grand Bazaar, H Hamlet, S Shrine. index = row*6 + col.
+const COMM_LAYOUT='ObHSbO'+'bSHSBb'+'BSOHSO'+'bBSbOH'+'ObHBSb';
+const COMM_KIND={O:'oasis',b:'small',B:'large',H:'village',S:'sacred'};
+const COMM_SV={3:6,7:6,9:6,13:15,16:12,20:10,28:6};   // shrine values: four at 6, one each at 10, 12, 15
+const CM={a:'vizier',e:'elder',t:'merchant',m:'builder',s:'assassin'};
+const COMM_STORY={who:'Hadiya',face:'🧓',premise:'The Sultan is dead and the bazaar of Qamar is up for grabs. Old Hadiya will vouch for you before the council, but only if you prove you can out-think Farid, the water-boy who wants the throne too. Six commissions. Each one is a real turn of the game.'};
+// tips: just-in-time one-liners, keyed by the moment they matter (shown next to their target, once each)
+const COMMS=[
+ {id:'c1',title:'One coin for the oasis',
+  story:'An oasis has opened at the heart of the bazaar. Farid has a path to it, and so do you. Whoever walks first takes it.',
+  goal:'Claim the Oasis and finish ahead of Farid.',
+  lesson:'Same price? The later bidder goes first. One coin can buy the whole turn.',
+  rules:['bid-track','bid-pay','bid-zero','bid-tie','move-lift','move-drop','move-last','take','camel','advisors','oasis'],
+  turns:'1 bid + 1 turn each',
+  people:{26:'ta',2:'ta',14:'aa',4:'t',5:'t',17:'mm',23:'m'},
+  bid:true,markers:1,
+  rival:{bid:'cheap',plans:[[{act:'start',tile:2},{act:'step',tile:8,c:'merchant'},{act:'step',tile:14,c:'vizier'}]]},
+  key:14,
+  tips:{bid:'Same price: the later bidder plays first. Farid always takes a free spot.',move:'Lift a tile, drop one person per tile. The last lands on its own colour.'},
+  check:R=>R.own(14)===0&&R.me>R.rival,
+  why:R=>R.own(14)===0?(R.me>R.rival?`You walked first and took the Oasis: ${R.me} to ${R.rival}.`:`You took the Oasis but paid too much: ${R.me} to ${R.rival}.`)
+    :R.own(14)===1?'You took a free spot. Farid took one after you, so he played first and took the Oasis.':'The Oasis is still empty. Walk the Advisor onto it.'},
+ {id:'c2',title:'Coins from stone, coins from silk',
+  story:'The council wants to see coin. Masons beside the shrines can earn it from stone. Traders by the stall can earn it from silk.',
+  goal:'End your turn with 68 coins or more.',
+  lesson:'Sets of different goods grow fast: 4 kinds sell for 13, 5 kinds for 21. Sell them together.',
+  rules:['masons','mystic-mason','traders','mystic-card','stall','sell-table','sell-end','sell-mystic','goods-set'],
+  turns:'1 turn',
+  people:{19:'t',25:'ttt',14:'m',20:'mm',4:'e',10:'a'},
+  me:{fk:1},market:['fish','wheat','silk','pottery','fakir','spice','jewels','fish','gold'],
+  key:25,
+  tips:{move:'Masons pay coins for each blue tile around them. Traders bring goods.',tribe:'A Mystic adds one Mason, but it never scores at the end.',tile:'Stall: 3 coins for one of the first 3 goods.',sell:'One set of different kinds: 1, 3, 7, 13, 21 coins for 1 to 5 kinds.'},
+  check:R=>R.coins>=68,
+  why:R=>R.coins>=68?`You end on ${R.coins} coins. The fifth kind turned 13 into 21.`:R.pl.res.length?`You end on ${R.coins} coins. Selling smaller sets, or keeping cards, paid less.`:`You end on ${R.coins} coins. Masons here see only 4 blue tiles: the Traders' set paid more.`},
+ {id:'c3',title:'The price of a djinn',
+  story:'A shrine stands empty and three djinns wait for a summons. You hold one Sage and one Mystic, and your oasis already has two palms.',
+  goal:'Gain 22 points or more this turn.',
+  lesson:'Pay a djinn with a Mystic when you can: a Mystic scores nothing, a Sage scores 2.',
+  rules:['sages','shrine','shrine-pay','djinn-row','djinn-vp','djinn-power','djinn-once'],
+  turns:'1 turn',
+  people:{4:'e',3:'e',10:'t',11:'t',27:'a'},
+  me:{el:1,fk:1},hold:{0:{camel:0,palm:2}},djRow:['wahha','nakhla','hikma'],
+  key:3,
+  tips:{move:'Sages score 2 each and pay for djinns.',tile:'Shrine: summon with 2 Sages, or 1 Sage and 1 Mystic.',djinn:'A djinn scores its own points. Powers work once per turn.'},
+  check:R=>R.gain>=22,
+  why:R=>R.gain>=22?`You gained ${R.gain} points. Nakhla made both palms worth 5, and the Mystic paid instead of a Sage.`:R.pl.dj.length?`You gained ${R.gain} points. Look at which djinn pays most here, and pay with the Mystic.`:`You gained ${R.gain} points. A djinn on this shrine was worth more.`},
+ {id:'c4',title:'A knife in the souk',
+  story:'Farid has three Advisors at court and you have two. Every rival you out-number pays you 10. Your Shadows can strike tonight.',
+  goal:'Finish ahead of Farid.',
+  lesson:'Shadows can remove a rival’s Advisor. Breaking a majority swings 11 points.',
+  rules:['shadows','shadow-range','shadow-mystic','shadow-kept','shadow-claim','advisor-major','advisor-tie'],
+  turns:'1 turn',
+  people:{22:'s',21:'s',15:'e',27:'a',4:'t'},
+  me:{vz:2},rivalSet:{vz:3},hold:{10:{camel:1}},
+  key:21,
+  tips:{move:'Shadows remove one person within as many steps as you have Shadows.',tribe:'Or remove an Advisor or Sage a rival keeps. A tile you empty is yours.'},
+  check:R=>R.me>R.rival,
+  why:R=>R.me>R.rival?`Farid lost his majority: ${R.me} to ${R.rival}.`:R.rivalPl.vz<3?`Close: ${R.me} to ${R.rival}.`:`You took land, but Farid kept 3 Advisors to your 2 and his +10: ${R.me} to ${R.rival}.`},
+ {id:'c5',title:'Whose palace is it?',
+  story:'Farid owns a hamlet near the gate. Advisors gather there, and a palace must rise wherever a walk ends on a hamlet.',
+  goal:'Finish ahead of Farid.',
+  lesson:'A palace or palm scores for whoever holds the tile. Never build one on a rival’s land.',
+  rules:['hamlet','palace-owner','camel-forever','no-claim','bazaar'],
+  turns:'1 turn',
+  people:{1:'a',2:'aa',19:'tt',18:'t',29:'m'},
+  rivalSet:{coins:58},hold:{2:{camel:1}},market:['fish','wheat','silk','pottery','spice','jewels','fakir','gold','papyrus'],
+  key:2,
+  tips:{move:'Ending on a Hamlet means you must build a palace there.',tile:'Grand Bazaar: 6 coins for 2 of the first 6 goods.'},
+  check:R=>R.me>R.rival,
+  why:R=>R.me>R.rival?`You stayed off Farid’s land: ${R.me} to ${R.rival}.`:(R.board[2].pal?`Your palace went up on Farid’s hamlet: 5 points to him. ${R.me} to ${R.rival}.`:`${R.me} to ${R.rival}.`)},
+ {id:'c6',title:'The last camel',
+  story:'One camel left in your stable and the council is watching. When a player places their last camel, the round is finished and the game ends.',
+  goal:'Finish the game ahead of Farid.',
+  lesson:'Your last camel ends the game after this round. End it while you lead.',
+  rules:['end-camel','end-round','end-nomove','score-all','score-tie','refill','order-next','two-markers'],
+  turns:'up to 2 rounds',
+  people:{14:'m',20:'mmt',16:'s',17:'s',4:'t',5:'t',27:'e'},hold:{17:{palm:1}},
+  me:{camels:1,coins:60},rivalSet:{camels:2,coins:50},rounds:2,
+  rival:{bid:{1:'cheap',2:'first'},plans:{1:[[{act:'start',tile:5},{act:'step',tile:4,c:'merchant'}]],2:[[{act:'start',tile:16},{act:'step',tile:17,c:'assassin'}]]}},
+  key:17,
+  tips:{move:'Placing your last camel ends the game after this round.',bid:'Next round you bid in the order you played.'},
+  check:R=>R.over&&R.me>R.rival,
+  why:R=>R.me>R.rival?`You placed your last camel while ahead. The game ended: ${R.me} to ${R.rival}.`:`You waited. Farid got another round and caught you: ${R.me} to ${R.rival}.`}];
+// ---------- build the state ----------
+function commNew(i){const c=COMMS[i];const keep=DEFSEED;setSeed(6240+i);
+  try{newGame({np:2,seats:['human','ai'],lv:['normal','normal'],mode:'x',names:['You','Farid']})}finally{DEFSEED=keep}
+  for(const t of G.board){G.bag.push(...t.m);t.m=[]}
+  G.board=COMM_LAYOUT.split('').map((ch,i)=>{const k=COMM_KIND[ch];return {k,v:k==='sacred'?(COMM_SV[i]||6):({oasis:8,small:6,large:4,village:5})[k],blue:TILEDEF[k].blue,ex:'base',i,m:[],camel:null,tent:null,palm:0,pal:0,block:0}});
+  for(const i in c.people)for(const ch of c.people[i]){const col=CM[ch];const j=G.bag.indexOf(col);G.bag.splice(j,1);G.board[i].m.push(col)}
+  for(const i in (c.hold||{}))Object.assign(G.board[i],c.hold[i]);
+  for(const t of G.board)if(t.camel!=null)G.pl[t.camel].camels--;
+  G.sup.palm-=G.board.reduce((a,t)=>a+t.palm,0);G.sup.pal-=G.board.reduce((a,t)=>a+t.pal,0);
+  const pull=(r)=>{let j=G.rdeck.indexOf(r);if(j>=0)return G.rdeck.splice(j,1)[0];j=G.market.indexOf(r);return G.market.splice(j,1)[0]};
+  if(c.market){const want=c.market.map(pull);G.rdeck=G.market.concat(G.rdeck);G.market=want}
+  const take=(p,o)=>{if(!o)return;if(o.fk){for(let k=0;k<o.fk;k++)pull('fakir');p.fk+=o.fk}if(o.el){p.el+=o.el;for(let k=0;k<o.el;k++)G.bag.splice(G.bag.indexOf('elder'),1)}
+    if(o.vz){p.vz+=o.vz;for(let k=0;k<o.vz;k++)G.bag.splice(G.bag.indexOf('vizier'),1)}if(o.coins!=null)p.coins=o.coins;if(o.camels!=null)p.camels=o.camels};
+  take(G.pl[0],c.me);take(G.pl[1],c.rivalSet);
+  if(c.djRow){G.djDeck=G.djDeck.concat(G.djRow).filter(k=>!c.djRow.includes(k));G.djRow=c.djRow.slice()}
+  G.tut=1;G.comm=c.id;G.commI=i;G.commR=c.rounds||1;G.commStart=scoreOf(G.pl[0]).total;
+  for(const p of G.pl)p.markers=c.markers||1;
+  if(c.bid){G.bidQueue=[{p:0,k:0},{p:1,k:0}];G.bids=[];G.phase='bid'}
+  else{G.phase='turn';G.bidQueue=[];G.bids=[];G.order=[{p:0,k:0}].concat(c.rival&&c.rival.plans?[{p:1,k:0}]:[]);G.turnIdx=0;G.nextBid=[];G.turn=0;startTurn()}
+  G.log=[];lg(`Commission ${i+1}: ${c.title}.`,'big')}
+// Farid follows the commission's stated plan when it is legal, else plays as the computer does
+// the computer's own choices inside a commission use the game's seeded dice, so a commission plays out the same way every time
+function commAI(s){if(G.commAI)return null;G.commAI=1;const mr=Math.random;Math.random=()=>rnd(1e9)/1e9;try{return aiMove(s)}finally{Math.random=mr;G.commAI=0}}
+function tutAIMove(s){if(!G||!G.comm||G.commAI)return null;if(s!==1)return commAI(s);const c=COMMS[G.commI];const r=c.rival||{};const vm=validMoves(s);
+  const how=r.bid&&typeof r.bid==='object'?r.bid[G.round]:r.bid;
+  if(G.phase==='bid'&&how){const b=vm.filter(m=>m.act==='bid'&&!m.fk);const pr=m=>bidPrice(P(1),m.spot);b.sort((x,y)=>pr(x)-pr(y)||x.spot-y.spot);
+    if(how==='first'){const top=Math.max(-1,...G.bids.map(x=>G.track[x.spot].cost));const w=b.find(m=>pr(m)>top);if(w)return w}return b[0]||null}
+  if(G.phase!=='turn')return commAI(s);
+  if(G.commQT!==G.turn){G.commQT=G.turn;G.commQ=null;for(const pl of (Array.isArray(r.plans)?r.plans:(r.plans&&r.plans[G.round])||[]))if(vm.some(m=>same(m,pl[0]))){G.commQ=pl.slice();break}}
+  if(G.commQ&&G.commQ.length&&vm.some(m=>same(m,G.commQ[0])))return G.commQ.shift();return commAI(s)}
+// ---------- the result ----------
+function commResult(){const c=COMMS[G.commI];const s0=scoreOf(G.pl[0]),s1=scoreOf(G.pl[1]);
+  const R={me:s0.total,rival:s1.total,coins:G.pl[0].coins,gain:s0.total-G.commStart,pl:G.pl[0],rivalPl:G.pl[1],board:G.board,over:!!G.over,
+    winner:!!G.over&&s0.total>=s1.total,own:i=>G.board[i].camel};
+  const won=!!c.check(R);return {won,why:c.why(R),lesson:c.lesson,R}}
+// patch: a commission ends after its rounds (engine endRound ends a G.tut game at once)
+
 </script>
 <script>
 // ---------- the rules, in plain words ----------
@@ -5648,9 +5846,26 @@ const RULES_HTML=`<div class="rules">
 <li><b>Bazaar Stall</b>: you may pay 3 coins for one of the first 3 goods. <b>Grand Bazaar</b>: 6 coins for two of the first 6.</li>
 </ul>
 <h3>5. Goods and Mystics</h3>
-<p>Goods score in sets of different kinds: 1, 3, 6, 12, 20, 29, 39, 49 or 60 points for 1 to 9 kinds. Build as many sets as you can. Mystics never score. They boost Masons and Shadows, or replace a Sage.</p>
+<p>Goods score in sets of different kinds: 1, 3, 7, 13, 21, 30, 40, 50 or 60 points for 1 to 9 kinds. Build as many sets as you can. Mystics never score. They boost Masons and Shadows, or replace a Sage.</p>
 <h3>6. The end</h3>
 <p>When someone places their last camel, the round is finished and the game ends. It also ends if no legal move is left on the board. Add up coins, people, tiles, palms, palaces, djinns, goods and extras. Equal scores share the win.</p>
+<h3>Setup by player count</h3>
+<ul><li><b>2 players</b>: 11 camels each and two turn markers each, so you play twice a round.</li><li><b>3 or 4 players</b>: 8 camels and one marker each.</li><li><b>5 players</b>: 8 camels each, a 12-spot track (18, 12, 8, 5, 5, 3, 3, 1, 1, 0, 0, 0) and the Wonder Cities board.</li>
+<li>Everyone starts with 50 coins. 3 people on every tile, 9 goods face up, 3 djinns face up. Track: 18, 12, 8, 5, 3, 1, then three free spots.</li></ul>
+<h3>Small print</h3>
+<ul><li>Only three markers fit on the free spots; after that you must pay.</li><li>Next round you bid in the order you played.</li>
+<li>You must move if you can. You may pass through empty tiles and loop back later, but you may never end on an empty tile.</li>
+<li>A camel never leaves its tile. Empty a tile someone owns and you take the people, not the land. No camels left: no claim.</li>
+<li>Shadows may reach diagonally (2 steps). If your Shadow empties a tile, you claim it too, but only your final tile gives a tile action.</li>
+<li>Palms and palaces score only for the player who holds their tile. When the supply runs out, they are not built.</li>
+<li>Advisor ties give no +10. You may sell several sets in one turn. At the end, goods score as your best sets.</li>
+<li>Goods and djinns refill only after everyone has played. A djinn power works once per turn, from the turn you get it.</li>
+<li>Equal final scores share the win.</li></ul>
+<h3>Learn more: the expansions</h3>
+<ul><li><b>The Crafters</b>: 6×6 board. 3 Workshops (pay 1 Crafter or 2 Mystics for an item), 2 Spice Exchanges (4 coins for any face-up good), 1 Ravine nobody may cross, 2 mountains beside each Workshop. Your tent claims a tile: it scores the tile plus 1 per red tile around it. Precious items score 5, 7 or 9; magic items are one-shot powers.</li>
+<li><b>Wonder Cities</b>: 6×6 board (6×7 with the Crafters). 5 Wonder Cities: holding 1 to 5 scores 5, 20, 45, 80 or 125 on top of the tiles. Palms and palaces beside the Great Lake score double.</li>
+<li><b>Cutpurses</b>: one face-up cutpurse; hire it at a Shrine like a djinn. When you later take its colour, every rival gives something up and you keep the best.</li>
+<li><b>Djinns</b>: 22 in the base game, 3 promos, 2 with the Crafters, 1 with the Cutpurses (28 in all). Each card says its points and power: see Djinns in the top bar.</li></ul>
 <h3>Expansions (switch them on at the start)</h3>
 <ul>
 <li><b>The Crafters</b>: adds purple Crafters, Workshops, Spice Exchanges, a Ravine and a tent each. The player with the most Crafters scores 3 for each, everyone else 2. Precious items score points; magic items are one-shot powers.</li>
@@ -5944,7 +6159,7 @@ window.addEventListener('pagehide',()=>{if(NET.room)try{NET.room.leave()}catch(e
 const $=s=>document.querySelector(s);const esc=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const PCOL=['#2b2b33','#119e98','#ff4fa3','#8b5a2b','#6d7b8d'];const MCSS={vizier:'#f2c230',elder:'#f4f1ea',merchant:'#3fa34d',builder:'#2f6fd6',assassin:'#d23a2e',artisan:'#9a5bd0'};
 const TSHORT={village:'Hamlet',sacred:'Shrine',oasis:'Oasis',small:'Stall',large:'Bazaar',workshop:'Workshop',exchange:'Exchange',ravine:'Ravine',lake:'Lake',city:'City'};
-const TICON={village:'🏘️',sacred:'🕌',oasis:'💧',small:'🧺',large:'🏪',workshop:'🔨',exchange:'🌶️',ravine:'⛰️',lake:'🌊',city:'🏛️'};
+const TICON={village:'<img class="pic" src="media/glyph-village.webp" alt="">',sacred:'<img class="pic" src="media/glyph-sacred.webp" alt="">',oasis:'<img class="pic" src="media/glyph-oasis.webp" alt="">',small:'<img class="pic" src="media/glyph-small.webp" alt="">',large:'<img class="pic" src="media/glyph-large.webp" alt="">',workshop:'<img class="pic" src="media/glyph-workshop.webp" alt="">',exchange:'<img class="pic" src="media/glyph-exchange.webp" alt="">',ravine:'<img class="pic" src="media/tile-ravine.webp" alt="">',lake:'<img class="pic" src="media/glyph-lake.webp" alt="">',city:'<img class="pic" src="media/glyph-city.webp" alt="">'};
 Object.assign(UI,{pendDj:null,pendItem:null,chz:null,mkSel:[],sellSel:[],fxSeen:0,hurry:false,pick:[],pickSeat:[],pickMk:[],pickDj:[],pickSpot:[],snap:null,autoMove:null,autoMs:650,modal:null,moveSnap:null,moveSteps:null});
 function refresh(){if(G&&!G.tut&&!G.coach&&!(typeof NET!=='undefined'&&NET.on)){try{if(!G.over&&!G.pl.every(p=>!p.human))localStorage.setItem(SAVE,JSON.stringify(G));else if(G.over)localStorage.removeItem(SAVE)}catch(e){}}
   if(!G)return;playFx();try{render()}catch(e){console.error(e)}schedule();if(typeof NET!=='undefined'&&NET.on){if(isHost())netPush();netTurnCheck()}}
@@ -5986,7 +6201,7 @@ function lineText(){if(!G)return '';if(G.over){const hs=G.pl.filter(x=>x.human);
   switch(G.step){
   case 'move':if(G.move&&typeof f3Mine==='function'){const f=f3Line();if(f)return f}return !G.move?'Tap a glowing tile to lift people':G.move.hand.length===1?'Last one: land on its colour':'Tap a glowing tile to drop one';
   case 'tribe':return {assassin:'Shadow: remove one person in reach',builder:hp.fk?'Tap Earn to take your coins':'Tap Collect to take your coins',merchant:'Tap Collect to fetch goods',vizier:'Tap Collect: Advisors join you',elder:'Tap Collect: Sages join you',artisan:'Tap Collect: Crafters join you'}[G.act.color]||'';
-  case 'tile':{const t=G.board[G.act.tile];return {village:UI.pick.length>1?'Tap a glowing tile for the palace':'Tap Build here',oasis:UI.pick.length>1?'Tap a glowing tile for the palm':'Tap Plant here',sacred:'Tap a djinn to summon, or Skip',small:'Buy a good for 3🪙',large:(UI.mkSel&&UI.mkSel.length===1?'One chosen. Pick one more good':'Pick two goods for 6🪙'),exchange:'Buy a good for 4🪙',workshop:'Commission an item, or Skip'}[t.k]||'Tap Skip to go on'}
+  case 'tile':{const t=G.board[G.act.tile];return {village:UI.pick.length>1?'Tap a glowing tile for the palace':'Tap Build here',oasis:UI.pick.length>1?'Tap a glowing tile for the palm':'Tap Plant here',sacred:'Tap a djinn to summon, or Skip',small:'Buy a good for 3',large:(UI.mkSel&&UI.mkSel.length===1?'One chosen. Pick one more good':'Pick two goods for 6'),exchange:'Buy a good for 4',workshop:'Commission an item, or Skip'}[t.k]||'Tap Skip to go on'}
   case 'sell':return 'Sell goods for coins, or End turn'}
   return ''}
 // ---------- seats (the score race) ----------
@@ -5995,8 +6210,8 @@ function pip(c,n){return n?`<span class="pp" title="${esc(MPLUR[c])}"><i class="
 function seatHtml(p){const a=sideToAct()===p.i&&!G.over;const kill=UI.pickSeat.includes(p.i);const nm=seatName(p);
   return `<div class="sch ${a?'actnow':''} ${kill?'glow':''}" data-seat="${p.i}" style="--pc:${PCOL[p.i]}" aria-label="${esc(nm)}, score ${shownTotal(p)}">
    <b class="sn">${esc(nm)}${!p.human?'<small>cpu</small>':''}</b><b class="ss"><i class="sti">★</i>${shownTotal(p)}</b>
-   <span class="s2"><span class="st">${E2('🪙','coin')}${p.coins}<em class="w"> coins</em></span><span class="st">${E2('🐪','camel')}${p.camels}<em class="w"> camel${p.camels===1?'':'s'} left</em></span>${p.tent?'<span class="st">⛺</span>':''}${(()=>{const dj=scoreOf(p).djinns;return dj?`<span class="st dje" title="Djinn points, counted at the end">🧞+${dj}<em class="w"> at end</em></span>`:''})()}</span>
-   <span class="s3">${pip('vizier',p.vz)}${pip('elder',p.el)}${G.ex.artisans?pip('artisan',p.art):''}${p.fk?`<span class="pp">🔮${p.fk}</span>`:''}${p.res.length?`<span class="pp">${E2('🧺','basket')}${p.res.length}</span>`:''}${p.dj.length?`<span class="pp">${E2('🧞','djinn')}${p.dj.length}</span>`:''}</span></div>`}
+   <span class="s2"><span class="st">${E2('<img class="pic" src="media/icon-coin.webp" alt="">','coin')}${p.coins}<em class="w"> coins</em></span><span class="st">${E2('<img class="pic" src="media/icon-camel.webp" alt="">','camel')}${p.camels}<em class="w"> camel${p.camels===1?'':'s'} left</em></span>${p.tent?'<span class="st"><img class="pic" src="media/token-tent-0.webp" alt=""></span>':''}${(()=>{const dj=scoreOf(p).djinns;return dj?`<span class="st dje" title="Djinn points, counted at the end">${'<img class="pic" src="media/icon-djinn.webp" alt="">'}+${dj}<em class="w"> at end</em></span>`:''})()}</span>
+   <span class="s3">${pip('vizier',p.vz)}${pip('elder',p.el)}${G.ex.artisans?pip('artisan',p.art):''}${p.fk?`<span class="pp">${p.fk}</span>`:''}${p.res.length?`<span class="pp">${E2('<img class="pic" src="media/icon-basket.webp" alt="">','basket')}${p.res.length}</span>`:''}${p.dj.length?`<span class="pp">${E2('<img class="pic" src="media/icon-djinn.webp" alt="">','djinn')}${p.dj.length}</span>`:''}</span></div>`}
 function renderSeats(){const el=$('#seats');if(!el)return;const h=G.pl.map(seatHtml).join('');el.dataset.n=G.pl.length;el.innerHTML=h}
 // ---------- the bazaar ----------
 function mgHtml(m){const n={};for(const c of m)n[c]=(n[c]||0)+1;return Object.keys(n).map(c=>`<span class="mg" title="${n[c]} ${esc(n[c]>1?MPLUR[c]:MNAME[c])}"><i class="mp" data-c="${c}"></i><b>${n[c]}</b></span>`).join('')}
@@ -6005,19 +6220,19 @@ function tileHtml(t){const d=TILEDEF[t.k],i=t.i;
   if(t.block)return `<div class="tile blk k-${t.k}" data-tile="${i}" aria-label="${esc(d.n)}"><i class="ti">${TICON[t.k]}</i><span class="tn">${TSHORT[t.k]}</span></div>`;
   const mv=G.move,cur=!!mv&&mv.at===i,glow=UI.pick.includes(i),own=owner(t);const hand=cur?mv.hand:[];const n=t.m.length+hand.length;
   const cf=UI.cflash&&UI.cflash.i===i&&UI.cflash.until>Date.now()?UI.cflash.until-Date.now():0;
-  const cls=['tile',t.blue?'blue':'red','k-'+t.k,glow?'glow':'',cur?'cur':'',own!=null?'owned':'',cf?'cflash':''].filter(Boolean).join(' ');
+  const cls=['tile',t.blue?'blue':'red','k-'+t.k,glow?'glow':'',cur?'cur':'',own!=null?'owned':'',(t.palm||t.pal)?'hasmk':'',cf?'cflash':''].filter(Boolean).join(' ');
   return `<div class="${cls}" data-tile="${i}" data-n="${n}" role="button" style="${own!=null?'--oc:'+PCOL[own]+';':''}${cf?'--cf:'+Math.round(cf)+'ms;':''}" aria-label="${esc(tileName(t))}">
    <i class="ti">${TICON[t.k]}</i><span class="tn">${TSHORT[t.k]}</span>${t.v?`<b class="tv">${t.v}</b>`:''}<i class="tc">${tileCoord(i)}</i>
    <div class="ms">${mgHtml(t.m)}${hand.map(c=>mpHtml(c,1)).join('')}</div>
-   ${own!=null?`<b class="ob" style="--pc:${PCOL[own]}">${t.tent!=null?'⛺':'🐪'} ${esc(ownLbl(own))}</b>`:''}<div class="tk">${own!=null?`<b class="own${t.tent!=null?'':' cam'}" data-p="${own}" style="--pc:${PCOL[own]}">${t.tent!=null?'⛺':'🐪'}</b>`:''}${t.palm?`<span class="tok palm" data-n="${Math.min(3,t.palm)}">🌴${t.palm>1?'<small>×'+t.palm+'</small>':''}</span>`:''}${t.pal?`<span class="tok pal" data-n="${Math.min(3,t.pal)}">🏰${t.pal>1?'<small>×'+t.pal+'</small>':''}</span>`:''}</div></div>`}
+   ${own!=null?`<b class="ob" style="--pc:${PCOL[own]}"><i class="bm cam" data-p="${own}" title="Camel: claimed by ${esc(ownLbl(own))}">${t.tent!=null?'<img class="pic" src="media/token-tent-0.webp" alt="">':'<img class="pic" src="media/icon-camel.webp" alt="">'}</i>${esc(ownLbl(own))}</b>`:''}${(t.palm||t.pal)?`<div class="bms" style="--pc:${own!=null?PCOL[own]:'#6b5a3a'}">${t.pal?`<b class="bm pal" title="Palace: +5 at end"><img class="pic" src="media/token-palace.webp" alt="">${t.pal>1?'<small>×'+t.pal+'</small>':''}</b>`:''}${t.palm?`<b class="bm palm" title="Palm: +3 at end"><img class="pic" src="media/token-palm.webp" alt="">${t.palm>1?'<small>×'+t.palm+'</small>':''}</b>`:''}</div>`:''}</div>`}
 function ownLbl(i){const p=G.pl[i];return (p.nm==='You'||(p.human&&G.pl.filter(q=>q.human).length===1)?'YOU':p.nm).toUpperCase().slice(0,6)}
-function renderLegend(){const el=$('#cleg');if(!el)return;const n=G.pl.map(()=>0);G.board.forEach(t=>{const o=owner(t);if(o!=null)n[o]++});el.innerHTML=G.pl.map(p=>`<span class="lc" style="--pc:${PCOL[p.i]}"><i>🐪</i><b>${esc(ownLbl(p.i))}</b> owns ${n[p.i]}</span>`).join('')+'<span class="lc ln">Camel = tile claimed · 🌴+3 · 🏰+5</span>'}
+function renderLegend(){const el=$('#cleg');if(!el)return;const n=G.pl.map(()=>0);G.board.forEach(t=>{const o=owner(t);if(o!=null)n[o]++});el.innerHTML=G.pl.map(p=>`<span class="lc" style="--pc:${PCOL[p.i]}"><i class="bm cam"><img class="pic" src="media/icon-camel.webp" alt=""></i><b>${esc(ownLbl(p.i))}</b> owns ${n[p.i]}</span>`).join('')+'<span class="lc ln" style="--pc:#6b5a3a"><i class="bm cam"><img class="pic" src="media/icon-camel.webp" alt=""></i>claimed</span><span class="lc ln" style="--pc:#6b5a3a"><i class="bm palm"><img class="pic" src="media/token-palm.webp" alt=""></i>palm +3</span><span class="lc ln" style="--pc:#6b5a3a"><i class="bm pal"><img class="pic" src="media/token-palace.webp" alt=""></i>palace +5</span>'}
 function renderGrid(){const g=$('#grid');if(!g)return;renderLegend();g.style.setProperty('--W',G.W);g.style.setProperty('--H',G.H);g.classList.toggle('dim',UI.pick.length>0);g.innerHTML=G.board.map(tileHtml).join('')}
 function renderMarket(){const el=$('#mkt');if(!el)return;const tk=G.step==='tribe'&&G.act&&G.act.color==='merchant'&&G.phase==='turn'?G.act.n:0;
   let h='<div class="mrow" aria-label="Goods market">';for(let j=0;j<9;j++){const r=G.market[j];
     h+=r?`<button class="mcard ${UI.pickMk.includes(j)?'glow':''} ${UI.mkSel.includes(j)?'sel':''} ${j<tk?'mtake':''}" data-mk="${j}" data-r="${r}" style="--gi:url(media/good-${r}.webp)" aria-label="${esc(RNAME[r])}"><span class="mi">${RICON[r]}</span><span class="mn">${esc(RNAME[r])}</span></button>`:'<span class="mcard empty"></span>'}
-  h+='</div><div class="drow" aria-label="Djinns">'+G.djRow.map(k=>`<button class="dcard ${UI.pickDj.includes(k)?'glow':''}" data-dj="${k}" style="--dj:url(media/djinn-${k}.webp)" aria-label="${esc(DJ[k].n)}"><b>${esc(DJ[k].n)}</b><span class="dv">${DJ[k].vp}</span></button>`).join('')
-   +(G.ex.thieves?G.thRow.map(k=>`<button class="dcard th ${UI.pickDj.includes('t:'+k)?'glow':''}" data-th="${k}" aria-label="${esc(THIEVES[k].n)}"><i class="thi" style="--ti:url(media/thief-${k}.webp)">🦹</i><b>${esc(THIEVES[k].n.replace(' Cutpurse',''))}</b></button>`).join(''):'')+'</div>';
+  h+='</div><div class="drow" aria-label="Djinns">'+G.djRow.map(k=>`<button class="dcard ${UI.pickDj.includes(k)?'glow':''}" data-dj="${k}" style="--dj:url(media/djinn-${k}.webp)" aria-label="${esc(DJ[k].n)}"><span class="dinfo" data-info="${k}" aria-label="About ${esc(DJ[k].n)}">i</span><b>${esc(DJ[k].n)}</b><span class="dv">${DJ[k].vp}</span></button>`).join('')
+   +(G.ex.thieves?G.thRow.map(k=>`<button class="dcard th ${UI.pickDj.includes('t:'+k)?'glow':''}" data-th="${k}" aria-label="${esc(THIEVES[k].n)}"><i class="thi" style="--ti:url(media/thief-${k}.webp)"></i><b>${esc(THIEVES[k].n.replace(' Cutpurse',''))}</b></button>`).join(''):'')+'</div>'+(typeof ownedDjHtml==='function'?ownedDjHtml():'');
   if(el.dataset.h!==h){el.innerHTML=h;el.dataset.h=h}}
 // ---------- buttons under the table ----------
 const mvAttr=m=>esc(JSON.stringify(m));
@@ -6028,18 +6243,18 @@ function bidGood(hp,bm){const k=m=>m.spot+':'+(m.fk||0);const g=new Set();let ad
   for(const m of bm){const pr=bidPrice(hp,m.spot,m.fk);if(pr===0||(pr<=Math.max(1,Math.floor(hp.coins*.06))&&adv&&adv.act==='bid'&&adv.spot===m.spot&&(adv.fk||0)===(m.fk||0)))g.add(k(m))}
   if(!g.size){let lo=1e9;for(const m of bm)lo=Math.min(lo,bidPrice(hp,m.spot,m.fk));bm.forEach(m=>{if(bidPrice(hp,m.spot,m.fk)===lo)g.add(k(m))})}return m=>g.has(k(m))}
 function trackHtml(hp,vm){const bm=vm.filter(m=>m.act==='bid');const good=bidGood(hp,bm);
-  const ord=['1st','2nd','3rd','4th','5th','6th','7th','8th','9th','10th','11th','12th'];const cost=c=>c?c+'🪙':'free';
+  const ord=['1st','2nd','3rd','4th','5th','6th','7th','8th','9th','10th','11th','12th'];const cost=c=>c?c+'':'free';
   // F2: every spot is one big button that names its place in the turn order and its price; taken spots name who took them
   return `<div class="bidt${G.track.length>7?' two':''}" aria-label="Turn order: earlier costs more">${G.track.map((t,s)=>{const b=G.bids.find(x=>x.spot===s);const mine=bm.filter(m=>m.spot===s);
     const who=b?esc(seatName(P(b.mk.p))):'';
-    return `<div class="spot ${b?'taken':mine.length?'open':'shut'}" style="${b?'--pc:'+PCOL[b.mk.p]:''}">${mine.map(m=>{const pr=bidPrice(hp,s,m.fk);return `<button class="sp-b ${good(m)?'glow':'dear'} ${m.fk?'fkv':''}" data-mv='${mvAttr(m)}' aria-label="${ord[s]} in turn order, ${pr?pr+' coins':'free'}${m.fk?' with '+m.fk+' Mystic':''}"><small class="ord">${ord[s]}</small><b class="spc">${m.fk?`<i>−${m.fk}🔮</i>`:''}${cost(pr)}</b></button>`}).join('')||`<small class="ord">${ord[s]}</small><span class="sp-c">${b?who:cost(t.cost)}</span>`}${b?'<i class="mk"></i>':''}</div>`}).join('')}</div>`}
+    return `<div class="spot ${b?'taken':mine.length?'open':'shut'}" style="${b?'--pc:'+PCOL[b.mk.p]:''}">${mine.map(m=>{const pr=bidPrice(hp,s,m.fk);return `<button class="sp-b ${good(m)?'glow':'dear'} ${m.fk?'fkv':''}" data-mv='${mvAttr(m)}' aria-label="${ord[s]} in turn order, ${pr?pr+' coins':'free'}${m.fk?' with '+m.fk+' Mystic':''}"><small class="ord">${ord[s]}</small><b class="spc">${m.fk?`<i>−${m.fk}</i>`:''}${cost(pr)}</b></button>`}).join('')||`<small class="ord">${ord[s]}</small><span class="sp-c">${b?who:cost(t.cost)}</span>`}${b?'<i class="mk"></i>':''}</div>`}).join('')}</div>`}
 function powerChips(hp,vm){const pw=[...vm.filter(m=>m.act==='djinn'),...vm.filter(m=>m.act==='item')];if(!pw.length)return '';const seen=new Set();let h='';
   for(const m of pw){if(m.act==='djinn'){const key=m.k+JSON.stringify(m.pay);if(seen.has(key))continue;seen.add(key);const pay='pay '+[m.pay.el?m.pay.el+' Sage'+(m.pay.el>1?'s':''):'',m.pay.fk?m.pay.fk+' Mystic'+(m.pay.fk>1?'s':''):''].filter(Boolean).join(' + ');
-      h+=m.t>=0?`<button class="ab pw${UI.pendDj&&same(UI.pendDj,{k:m.k,pay:m.pay})?' on':''}" data-pw='${mvAttr({k:m.k,pay:m.pay})}'>✨ ${esc(DJ[m.k].n)} <small>${pay}</small></button>`:abtn(m,`✨ ${esc(DJ[m.k].n)} <small>${pay}</small>`,'pw')}
+      h+=m.t>=0?`<button class="ab pw${UI.pendDj&&same(UI.pendDj,{k:m.k,pay:m.pay})?' on':''}" data-pw='${mvAttr({k:m.k,pay:m.pay})}'>${esc(DJ[m.k].n)} <small>${pay}</small></button>`:abtn(m,`${esc(DJ[m.k].n)} <small>${pay}</small>`,'pw')}
     else{const key='i'+m.k+(m.dj||'');if(seen.has(key))continue;seen.add(key);
       if(m.k==='flute'||m.k==='talisman')h+=`<button class="ab pw${UI.pendItem&&UI.pendItem.k===m.k?' on':''}" data-pi="${m.k}">${itemIc(m.k)} ${esc(ITEMS[m.k].n)}</button>`;else h+=abtn(m,`${itemIc(m.k)} ${esc(ITEMS[m.k].n)}${m.dj?' → '+esc(DJ[m.dj].n):''}`,'pw')}}
   const n=seen.size;if(n<2||UI.pendDj||UI.pendItem||(typeof gdStep==='function'&&gdStep()))return `<div class="arow pws">${h}</div>`;   // F3: two or more powers fold into one Djinns (n) drawer
-  return `<div class="arow pws pwd"><button class="ab pw pwtog${UI.pwOpen?' on':''}" data-ui="pwtog" aria-expanded="${!!UI.pwOpen}">✨ Djinns (${n}) ${UI.pwOpen?'▾':'▸'}</button>${UI.pwOpen?h:''}</div>`}
+  return `<div class="arow pws pwd"><button class="ab pw pwtog${UI.pwOpen?' on':''}" data-ui="pwtog" aria-expanded="${!!UI.pwOpen}">Djinns (${n}) ${UI.pwOpen?'▾':'▸'}</button>${UI.pwOpen?h:''}</div>`}
 // builds the button area and sets UI.autoMove when the turn needs no decision from the player
 const gdOn=()=>typeof gdStep==='function'&&!!gdStep();   // the guided game shows a button for every step, never an automatic move
 function buildActs(){UI.autoMove=null;const hp=me();if(!G||G.over||!hp||UI.modal)return '';const vm=validMoves(hp.i);const by=a=>vm.filter(m=>m.act===a);let h='',main='';
@@ -6049,23 +6264,23 @@ function buildActs(){UI.autoMove=null;const hp=me();if(!G||G.over||!hp||UI.modal
   const pw=powerChips(hp,vm);
   switch(G.step){
   case 'move':if(G.move){const u=by('undo')[0];main=u?abtn(u,'↶ Put them back','ghost'):(UI.moveSnap&&G.move.drops.length?'<button class="ab ghost" data-ui="undodrop">↶ Undo last drop</button>':'')}break;
-  case 'tribe':{const tr=by('tribe');const th=by('thief');const a=G.act;main=th.map(m=>abtn(m,`🦹 ${esc(THIEVES[m.k].n.replace(' Cutpurse',''))}`,'pw')).join('');
+  case 'tribe':{const tr=by('tribe');const th=by('thief');const a=G.act;main=th.map(m=>abtn(m,`${esc(THIEVES[m.k].n.replace(' Cutpurse',''))}`,'pw')).join('');
     if(a.color==='assassin'){if(tr[0]&&tr[0].none)main+=abtn(tr[0],'No target: carry on','go')}
     else if(a.color==='builder'&&tr.length>1){const blues=AROUND(a.tile).filter(i=>G.board[i].blue&&!G.board[i].block).length;const mx=Math.max(...tr.map(m=>m.fk||0));const ek=G.turn+'|'+a.tile;if(UI.earnKey!==ek){UI.earnKey=ek;const adv=typeof HPL!=='undefined'&&HPL.m&&HPL.m.act==='tribe'&&typeof hintsOn==='function'&&hintsOn()?HPL.m.fk||0:0;UI.earnFk=adv}   // R34: one row, not a stack that squeezes the bazaar
       UI.earnFk=Math.max(0,Math.min(mx,UI.earnFk||0));const m=tr.find(x=>(x.fk||0)===UI.earnFk)||tr[0];const fk=m.fk||0;
-      main+=`<button class="ab ghost ern-s" data-ui="ernm" aria-label="Spend one Mystic less"${fk?'':' disabled'}>−🔮</button>`+abtn(m,`<b>Earn ${(a.n+fk)*blues*(G.turnFx.qirsh?2:1)}🪙</b><small>${fk?`spend ${fk} of ${mx} Mystic`:`keep your ${mx} Mystic`}</small>`,'ern go')+`<button class="ab ghost ern-s" data-ui="ernp" aria-label="Spend one more Mystic"${fk<mx?'':' disabled'}>+🔮</button>`}
+      main+=`<button class="ab ghost ern-s" data-ui="ernm" aria-label="Spend one Mystic less"${fk?'':' disabled'}>−</button>`+abtn(m,`<b>Earn ${(a.n+fk)*blues*(G.turnFx.qirsh?2:1)}</b><small>${fk?`spend ${fk} of ${mx} Mystic`:`keep your ${mx} Mystic`}</small>`,'ern go')+`<button class="ab ghost ern-s" data-ui="ernp" aria-label="Spend one more Mystic"${fk<mx?'':' disabled'}>+</button>`}
     else if(tr[0]){const extras=vm.filter(m=>m.act!=='tribe').length;if(extras)main+=abtn(tr[0],'Collect ▶','go');else if(gdOn())main+=abtn(tr[0],'Collect ▶','go');else UI.autoMove=tr[0]}
     break}
   case 'tile':{const tm=by('tile');const t=G.board[G.act.tile];const pl=tm.filter(m=>m.place!=null);const skip=tm.find(m=>m.skip);const extras=vm.filter(m=>m.act!=='tile').length;
     if(pl.length===1&&!extras&&!gdOn())UI.autoMove=pl[0];
-    else if(pl.length>1||pl.length===1){/* choose by tapping a glowing tile */ if(pl.length===1)main+=abtn(pl[0],t.k==='village'?'🏰 Build here':'🌴 Plant here','go')}
-    for(const m of tm.filter(m=>m.work))main+=abtn(m,m.work==='art'?'Pay 1 Crafter':'Pay 2 🔮','');
+    else if(pl.length>1||pl.length===1){/* choose by tapping a glowing tile */ if(pl.length===1)main+=abtn(pl[0],t.k==='village'?'Build here':'Plant here','go')}
+    for(const m of tm.filter(m=>m.work))main+=abtn(m,m.work==='art'?'Pay 1 Crafter':'Pay 2 ','');
     if(skip&&!pl.length){if(tm.length===1&&!extras&&!gdOn())UI.autoMove=skip;else main+=abtn(skip,'Skip','ghost')}
     break}
   case 'sell':{const kinds=[...new Set(hp.res)];UI.sellSel=UI.sellSel.filter(k=>kinds.includes(k));const end=by('end')[0];
     if(!kinds.length&&!vm.filter(m=>m.act!=='end').length&&end&&!gdOn()){UI.autoMove=end;break}
-    if(UI.sellSel.length)main+=abtn({act:'sell',kinds:UI.sellSel.slice().sort()},`Sell ${UI.sellSel.length} +${sellValue(UI.sellSel.length)}🪙`,'');
-    else if(kinds.length>1)main+=abtn({act:'sell',kinds:kinds.slice().sort()},`Sell all ${kinds.length} kinds +${sellValue(kinds.length)}🪙`,'');   // F3: one button sells one of each kind
+    if(UI.sellSel.length)main+=abtn({act:'sell',kinds:UI.sellSel.slice().sort()},`Sell ${UI.sellSel.length} +${sellValue(UI.sellSel.length)}`,'');
+    else if(kinds.length>1)main+=abtn({act:'sell',kinds:kinds.slice().sort()},`Sell all ${kinds.length} kinds +${sellValue(kinds.length)}`,'');   // F3: one button sells one of each kind
     main+=abtn(end,'End turn ▶','go');break}}
   if(main)h+=`<div class="arow${main.indexOf('ab ern')>=0?' earn':''}">${main}</div>`;if(G.step==='move'&&typeof f3Mine==='function')h=f3ActsHtml()+h;return h+pw}
 function renderActs(){const el=$('#acts');if(!el)return;const h=buildActs();if(el.dataset.h!==h){el.innerHTML=h;el.dataset.h=h}el.classList.toggle('empty',!h)}
@@ -6210,8 +6425,8 @@ function animate(prev){const cur=snapState();if(!ANIM||!prev||document.hidden)re
   if(dj.added&&rows){const cs=rows.querySelectorAll('.drow .dcard:not(.th)');for(let k=Math.max(0,cs.length-dj.added);k<cs.length;k++)cs[k].classList.add('newc')}
   // tokens that appeared: camels, tents, palms, palaces
   for(let i=0;i<cur.tiles.length;i++){const a=prev.tiles[i],b=cur.tiles[i];if(!a)continue;const te=tileEl(i);if(!te)continue;
-    if((b.camel!=null&&a.camel!==b.camel)||(b.tent!=null&&a.tent!==b.tent)){const o=te.querySelector('.own');if(o)o.classList.add('popin')}
-    if(b.palm>a.palm||b.pal>a.pal){for(const o of te.querySelectorAll('.tok'))o.classList.add('popin')}}
+    if((b.camel!=null&&a.camel!==b.camel)||(b.tent!=null&&a.tent!==b.tent)){const o=te.querySelector('.ob .bm');if(o)o.classList.add('popin')}
+    if(b.palm>a.palm||b.pal>a.pal){for(const o of te.querySelectorAll('.bms .bm'))o.classList.add('popin')}}
   // scores pop up where they are earned
   const tf=cur.act&&cur.act.tile!=null?tileEl(cur.act.tile):null;
   cur.tot.forEach((t,i)=>{const d=t-(prev.tot[i]||0);if(!d)return;const se=seatEl(i);if(!se)return;const ss=se.querySelector('.ss');if(ss){ss.classList.add('bump')}
@@ -6267,10 +6482,10 @@ function pChip(p){return `<span class="pc" style="--pc:${PCOL[p.i]}"><i></i>${es
 function mdot(c,big){return `<span class="md ${big?'big':''}" style="--mc:${MCSS[c]}" title="${MNAME[c]}"></span>`}
 function statusHtml(p){const s=scoreOf(p);const L=(ic,n,lab,t)=>`<span class="st" title="${t||lab}">${ic} <b>${n}</b><small>${lab}</small></span>`;
   return `<div class="stat" style="--pc:${PCOL[p.i]}"><b class="nm">${esc(p.nm)}${online()&&p.i===NET.mySeat?' <small>(you)</small>':''}${p.human?'':p.away?' <small>(left · cpu)</small>':' <small>(cpu)</small>'}</b><span class="tot" title="points so far">★ ${shownTotal(p)}</span>
-   <div class="sts">${L('🪙',p.coins,'coins')}${L('🐪',p.camels,'camels')}${p.tent?L('⛺',1,'tent'):''}${L(mdot('vizier'),p.vz,'Advisors')}${L(mdot('elder'),p.el,'Sages')}${G.ex.artisans?L(mdot('artisan'),p.art,'Crafters'):''}${L('🔮',p.fk,'Mystics','Mystic cards: add power to Masons or Shadows, or stand in for a Sage')}${L('🧺',p.res.length,'goods · set '+goodsBest(p),'goods cards; the set is worth '+goodsBest(p)+' points now')}${p.dj.length?L('🧞',p.dj.length,'djinns'):''}</div></div>`}
-function scoreTable(){const rows=G.over.scores;const keys=['coins','advisors','sages','crafters','djinns','tiles','palms','palaces','goods','items','cities','total'];const nm={coins:'🪙 Coins',advisors:'Advisors',sages:'Sages',crafters:'Crafters',djinns:'Djinns',tiles:'Tiles',palms:'Palms',palaces:'Palaces',goods:'Goods',items:'Items',cities:'Cities',total:'★ Total'};
+   <div class="sts">${L('<img class="pic" src="media/icon-coin.webp" alt="">',p.coins,'coins')}${L('<img class="pic" src="media/icon-camel.webp" alt="">',p.camels,'camels')}${p.tent?L('<img class="pic" src="media/token-tent-0.webp" alt="">',1,'tent'):''}${L(mdot('vizier'),p.vz,'Advisors')}${L(mdot('elder'),p.el,'Sages')}${G.ex.artisans?L(mdot('artisan'),p.art,'Crafters'):''}${L('',p.fk,'Mystics','Mystic cards: add power to Masons or Shadows, or stand in for a Sage')}${L('<img class="pic" src="media/icon-basket.webp" alt="">',p.res.length,'goods · set '+goodsBest(p),'goods cards; the set is worth '+goodsBest(p)+' points now')}${p.dj.length?L('<img class="pic" src="media/icon-djinn.webp" alt="">',p.dj.length,'djinns'):''}</div></div>`}
+function scoreTable(){const rows=G.over.scores;const keys=['coins','advisors','sages','crafters','djinns','tiles','palms','palaces','goods','items','cities','total'];const nm={coins:'Coins',advisors:'Advisors',sages:'Sages',crafters:'Crafters',djinns:'Djinns',tiles:'Tiles',palms:'Palms',palaces:'Palaces',goods:'Goods',items:'Items',cities:'Cities',total:'★ Total'};
   const epi=rows.map(r=>{const best=keys.filter(k=>k!=='total').sort((a,b)=>r.s[b]-r.s[a])[0];return `<li>${pChip(P(r.p))}: most of the points came from <b>${nm[best]}</b> (${r.s[best]}).</li>`}).join('');
-  return `<div class="prompt"><h3>${pIc('ui-trophy.webp','🏆')} ${esc(typeof plName==='function'?plName(G.winText):G.winText)}</h3><ul class="story">${epi}</ul><div class="tw"><table><tr><th></th>${rows.map(r=>`<th>${pChip(P(r.p))}</th>`).join('')}</tr>${keys.filter(k=>k==='total'||rows.some(r=>r.s[k])).map(k=>`<tr class="${k==='total'?'tot':''}"><td>${nm[k]}</td>${rows.map(r=>`<td>${r.s[k]}</td>`).join('')}</tr>`).join('')}</table></div></div>`}
+  return `<div class="prompt"><h3>${pIc('ui-trophy.webp','')} ${esc(typeof plName==='function'?plName(G.winText):G.winText)}</h3><ul class="story">${epi}</ul><div class="tw"><table><tr><th></th>${rows.map(r=>`<th>${pChip(P(r.p))}</th>`).join('')}</tr>${keys.filter(k=>k==='total'||rows.some(r=>r.s[k])).map(k=>`<tr class="${k==='total'?'tot':''}"><td>${nm[k]}</td>${rows.map(r=>`<td>${r.s[k]}</td>`).join('')}</tr>`).join('')}</table></div></div>`}
 function renderPopups(){if(GX.open==='logd'){const lb=$('#logbody');lb.innerHTML=`<ol class="log">${G.log.slice(0,300).reverse().map(l=>`<li class="${l.c}"><small>R${l.r}</small> ${esc(l.t)}</li>`).join('')}</ol>`;lb.scrollTop=lb.scrollHeight}
   if(GX.open==='plrd')$('#plrbody').innerHTML=G.pl.map(p=>playerSheet(p)).join('');
   if(GX.open==='djd'&&$('#djbody').dataset.v!==String(G.logN))renderDjPop()}
@@ -6279,17 +6494,17 @@ function playerSheet(p){const s=scoreOf(p);const hid=online()&&!G.over&&p.i!==NE
   <div><b>Djinns:</b> ${p.dj.length?p.dj.map(k=>`<span class="tag" title="${esc(DJ[k].x)}">${esc(DJ[k].n)} ${DJ[k].vp}</span>`).join(' '):'none'}</div>
   ${G.ex.artisans?`<div><b>Items:</b> ${hid&&p.items.length?`${p.items.length} face down`:p.items.length?p.items.map(k=>`<span class="tag" title="${esc(ITEMS[k].x)}">${itemIc(k)}${esc(ITEMS[k].n)}</span>`).join(' '):'none'}</div>`:''}
   ${G.ex.thieves?`<div><b>Cutpurses:</b> ${p.thieves.length?p.thieves.map(t=>esc(THIEVES[t.k].n)).join(', '):'none'}</div>`:''}
-  <div><b>Tiles held:</b> ${G.board.filter(t=>owner(t)===p.i).map(t=>`${esc(tileName(t))}${t.palm?' 🌴'+t.palm:''}${t.pal?' 🏰'+t.pal:''}`).join(', ')||'none'}</div>
+  <div><b>Tiles held:</b> ${G.board.filter(t=>owner(t)===p.i).map(t=>`${esc(tileName(t))}${t.palm?' '+t.palm:''}${t.pal?' '+t.pal:''}`).join(', ')||'none'}</div>
   <div class="small muted">So far: ${Object.entries(s).filter(([k,v])=>v&&k!=='total'&&!(hid&&k==='items')).map(([k,v])=>k+' '+v).join(' · ')}</div></section>`}
 function renderDjPop(){const b=$('#djbody');b.dataset.v=String(G.logN);const inGame=DJINNS_FOR(G.ex);const where=k=>{if(G.djRow.includes(k))return 'on offer';for(const p of G.pl)if(p.dj.includes(k))return 'owned by '+p.nm;if(G.djDisc.includes(k))return 'discarded';return 'in the deck'};
-  b.innerHTML=`<p class="muted small">Summon djinns at a Shrine: 2 Sages, or 1 Sage and 1 Mystic. Powers with a cost can be used once per turn, paying each time.</p><div class="cgrid">${inGame.map(d=>`<div class="card dj"><h4>${esc(d.n)} <small>${d.vp} pts</small></h4>${cardArt('djinn',d.n,{img:'djinn-'+d.k})}<div class="tag">${d.cost?{EF:'power: 1 Sage or 1 Mystic',EEF:'power: 1 Sage + 1 Sage-or-Mystic',F:'power: 1 Mystic','F+':'power: Mystics when bidding'}[d.cost]:'always on'} · ${where(d.k)}</div><p>${esc(d.x)}</p></div>`).join('')}</div>`}
+  b.innerHTML=(typeof myDjSection==='function'?myDjSection():'')+`<h3>All djinns in this game</h3><p class="muted small">Summon djinns at a Shrine: 2 Sages, or 1 Sage and 1 Mystic. Powers with a cost can be used once per turn, paying each time.</p><div class="cgrid">${inGame.map(d=>`<div class="card dj"><h4>${esc(d.n)} <small>${d.vp} pts</small></h4>${cardArt('djinn',d.n,{img:'djinn-'+d.k})}<div class="tag">${d.cost?{EF:'power: 1 Sage or 1 Mystic',EEF:'power: 1 Sage + 1 Sage-or-Mystic',F:'power: 1 Mystic','F+':'power: Mystics when bidding'}[d.cost]:'always on'} · ${where(d.k)}</div><p>${esc(d.x)}</p></div>`).join('')}</div>`}
 function refHtml(){const sec=(t,items)=>`<h3>${t}</h3><div class="cgrid">${items.map(i=>`<div class="card"><h4>${i.n}${i.c>1?` <small>×${i.c}</small>`:''}</h4>${i.art||(/^[^\x00-\x7f]/.test(i.n)?cardArt('good',i.n,{glyph:i.n.split(' ')[0],hue:30}):'')}${i.tag?`<div class="tag">${esc(i.tag)}</div>`:''}<p>${esc(i.x)}</p></div>`).join('')}</div>`;
   const tiles=[];for(const [k,v,n,col] of TILESET.concat(TILESET_ART,TILESET_WHIM)){const d=TILEDEF[k];tiles.push({art:cardArt('tile',d.n+v,{blue:col?col==='blue':d.blue,v,hue:30,img:['village','sacred','oasis','small','large','workshop','exchange','city'].includes(k)?'glyph-'+k:null,fit:'ct'}),n:d.n,c:n,tag:`${v?v+' points · ':''}${(col?col==='blue':d.blue)?'blue':'red'}${TILESET_ART.some(x=>x[0]===k)?' · Crafters':TILESET_WHIM.some(x=>x[0]===k)?' · Wonder Cities':''}`,x:d.x})}
   return sec('The tribes (and the Crafters)',Object.keys(MNAME).map(c=>({art:cardArt('tribe',c,{col:MCSS[c]||'#888',hue:35,img:'meeple-'+c,fit:'ct'}),n:`${MNAME[c]} (${c==='vizier'?'yellow':c==='elder'?'white':c==='merchant'?'green':c==='builder'?'blue':c==='assassin'?'red':'purple'})`,c:c==='artisan'?15:MEEPLE_COUNT[c],tag:c==='artisan'?'Crafters expansion':'meeples',x:MHELP[c]})))+
    sec('Tiles',tiles)+sec('Goods cards',Object.keys(RESOURCE_COUNT).map(r=>({art:cardArt('good',r,{glyph:RICON[r],img:'good-'+r,fit:'ct'}),n:`${RICON[r]} ${RNAME[r]}`,c:RESOURCE_COUNT[r],tag:r==='fakir'?'special':'goods',x:r==='fakir'?'Adds 1 Mason or 1 Shadow range, pays for a Sage when summoning, pays djinn powers. Never part of a set.':'Collect sets of different kinds: 1, 3, 6, 12, 20, 29, 39, 49 or 60 points for 1–9 different kinds.'})))+
    sec('Djinns',DJINNS.map(d=>({art:cardArt('djinn',d.n,{img:'djinn-'+d.k}),n:d.n,tag:`${d.vp} points · ${d.cost?'power':'always on'}${d.set?' · '+{promos:'promo',artisans:'Crafters',thieves:'Cutpurses'}[d.set]:''}${d.assumed?' · '+d.assumed+' assumed':''}`,x:d.x})))+
    sec('Items (Crafters)',Object.entries(ITEMS).map(([k,i])=>({art:cardArt('item',i.n,{img:'item-'+k,fit:'ct'}),n:i.n,c:i.cp,tag:i.kind,x:i.x})))+sec('Cutpurses',Object.entries(THIEVES).map(([k,t])=>({art:cardArt('thief',t.n,{img:'thief-'+k,fit:'ct'}),n:t.n,tag:'Cutpurses expansion',x:t.x})))+
-   sec('Tokens and pieces',[{n:'🐪 Camels',tag:'11 each with 2 players, 8 with 3–5',x:'Mark the tiles you control. Placing your last camel ends the game at the end of the round.'},{n:'⛺ Tent',tag:'Crafters · 1 each',x:'Claim a tile with it instead of a camel: it scores the tile plus 1 for each red tile around it.'},{n:'🌴 Palm tree',x:'3 points to whoever holds the tile (4 with Nakhla; doubled next to the Great Lake).'},{n:'🏰 Palace',x:'5 points to whoever holds the tile (doubled next to the Great Lake).'},{n:'⛰ Mountains',tag:'Crafters',x:'Block moving between two tiles (not Shadow range).'},{n:'🪙 Coins',x:'1 point each at the end; pay for turn order and bazaar goods.'},{n:'Turn-order track',x:'Costs 0, 0, 0, 1, 3, 5, 8, 12, 18 (5 players: 0, 0, 0, 1, 1, 3, 3, 5, 5, 8, 12, 18).'}])}
+   sec('Tokens and pieces',[{n:'Camels',tag:'11 each with 2 players, 8 with 3–5',x:'Mark the tiles you control. Placing your last camel ends the game at the end of the round.'},{n:'Tent',tag:'Crafters · 1 each',x:'Claim a tile with it instead of a camel: it scores the tile plus 1 for each red tile around it.'},{n:'Palm tree',x:'3 points to whoever holds the tile (4 with Nakhla; doubled next to the Great Lake).'},{n:'Palace',x:'5 points to whoever holds the tile (doubled next to the Great Lake).'},{n:'Mountains',tag:'Crafters',x:'Block moving between two tiles (not Shadow range).'},{n:'Coins',x:'1 point each at the end; pay for turn order and bazaar goods.'},{n:'Turn-order track',x:'Costs 0, 0, 0, 1, 3, 5, 8, 12, 18 (5 players: 0, 0, 0, 1, 1, 3, 3, 5, 5, 8, 12, 18).'}])}
 // ---------- inline SVG icons (consistent line icons instead of emoji in the chrome) ----------
 const ICONS={bulb:'<path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-4 10.5c.8.8 1 1.6 1 2.5h6c0-.9.2-1.7 1-2.5A6 6 0 0 0 12 3z"/>',
  camel:'<path d="M3 19v-5.5C3 11.6 4 10.6 5.6 10.6 6.6 7.8 7.6 7 9 7s2.3 1.6 3.2 3.6h1.6l1.3-3.2c.4-1 1.1-1.4 2-1.4h1.4l1.5 1.7-1.6.6-1 3.9v3.3M6.5 14v5M16.5 14v5M10.5 14.4V19"/>',
@@ -6321,16 +6536,16 @@ UI.setup={np:2,seats:['human','ai','ai','ai','ai'],lv:['normal','easy','easy','e
 function startHtml(){const o=UI.setup;let saved=null;try{saved=localStorage.getItem(SAVE)}catch(e){}
   return `<div class="mbox start"><canvas id="opencv" width="640" height="220" aria-hidden="true"></canvas><h2>Sands of Qamar</h2><p class="lede">Collect tribes. Claim land. Win the bazaar.</p>
    <div class="seg qrow">${[2,3,4,5].map(n=>`<button class="${o.np===n?'on':''}" data-np="${n}">${n} players</button>`).join('')}</div>
-   <div class="acts big">${online()||typeof tutBtn!=='function'?'':tutBtn('btn')}${online()?'':'<button class="btn go big" data-a="start" data-ui="quick">▶ Play vs computer</button>'}${window.CAMPAIGN&&typeof GXC!=='undefined'?'<button class="btn" data-ui="story"><i class="ri" data-r="log">📜</i> Story mode</button>':''}${saved&&!online()?'<button class="btn big" data-ui="continue">Continue saved game</button>':''}</div>
+   <div class="acts big">${online()||typeof tutBtn!=='function'?'':tutBtn('btn')}${online()?'':'<button class="btn go big" data-a="start" data-ui="quick">▶ Play vs computer</button>'}${window.CAMPAIGN&&typeof GXC!=='undefined'?'<button class="btn" data-ui="story"><i class="ri" data-r="log"></i> Story mode</button>':''}${saved&&!online()?'<button class="btn big" data-ui="continue">Continue saved game</button>':''}</div>
    <div class="exd"><button type="button" class="exsum" data-ui="more" aria-expanded="${!!UI.more}"><b>More ways to play</b><span aria-hidden="true">${UI.more?'▴':'▾'}</span></button>${UI.more?`<div class="more">
-   <div class="seats">${Array.from({length:o.np},(_,i)=>`<div class="seatrow" style="--pc:${PCOL[i]}"><i></i><b>${PNAMES[i]}</b><div class="seg" role="group" aria-label="${PNAMES[i]} is a">${[['human','🙂 Person'],['ai','🤖 Computer']].map(([v,l])=>`<button type="button" class="${o.seats[i]===v?'on':''}" data-seatset="${i}" data-v="${v}" aria-pressed="${o.seats[i]===v}">${l}</button>`).join('')}</div>${o.seats[i]==='ai'?`<div class="seg" role="group" aria-label="${PNAMES[i]} level">${['easy','normal','hard'].map(v=>`<button type="button" class="${o.lv[i]===v?'on':''}" data-lv="${i}" data-v="${v}" aria-pressed="${o.lv[i]===v}">${v}</button>`).join('')}</div>`:''}</div>`).join('')}</div>
+   <div class="seats">${Array.from({length:o.np},(_,i)=>`<div class="seatrow" style="--pc:${PCOL[i]}"><i></i><b>${PNAMES[i]}</b><div class="seg" role="group" aria-label="${PNAMES[i]} is a">${[['human','Person'],['ai','Computer']].map(([v,l])=>`<button type="button" class="${o.seats[i]===v?'on':''}" data-seatset="${i}" data-v="${v}" aria-pressed="${o.seats[i]===v}">${l}</button>`).join('')}</div>${o.seats[i]==='ai'?`<div class="seg" role="group" aria-label="${PNAMES[i]} level">${['easy','normal','hard'].map(v=>`<button type="button" class="${o.lv[i]===v?'on':''}" data-lv="${i}" data-v="${v}" aria-pressed="${o.lv[i]===v}">${v}</button>`).join('')}</div>`:''}</div>`).join('')}</div>
    <div class="exs">${[['artisans','The Crafters'],['sultan','Wonder Cities'],['thieves','Cutpurses'],['promos','Promo djinns']].map(([k,n])=>`<label class="chk"><input type="checkbox" data-ex="${k}" ${o.ex[k]||(k==='sultan'&&o.np===5)?'checked':''} ${k==='sultan'&&o.np===5?'disabled':''}> <b>${n}</b></label>`).join('')}</div>
    <div class="acts">${online()?'':'<button class="btn go" data-ui="start">Begin ▶</button>'}</div>${typeof onlineBlock==='function'?onlineBlock():''}</div>`:''}</div></div>`}
 function overHtml(){const mp=viewP();const win=G.over.win;const won=mp&&win.includes(mp.i);
   return `<div class="mbox over"><h2>${mp?(won?(win.length>1?'You share the win':'You win!'):'You lose'):esc(G.winText)}</h2>${scoreTable()}<div class="acts"><button class="btn go" data-ui="again">Play again</button><button class="btn" data-ui="closeover">View the board</button></div></div>`}
 function renderSettings(){const el=$('#setbody');if(!el)return;const seg=(attr,cur,opts)=>`<div class="seg">${opts.map(([v,l])=>`<button ${attr}="${v}" class="${String(cur)===String(v)?'on':''}">${l}</button>`).join('')}</div>`;
   el.innerHTML=`<div class="setrow"><h4>Sound</h4><div class="seg"><button data-a="snd" class="${typeof SND==='undefined'||SND.on?'on':''}">${ICON('snd')} Effects</button><button data-a="mus" class="${typeof SND!=='undefined'&&SND.music?'on':''}">${ICON('mus')} Music</button></div></div>
-   <div class="setrow"><h4>Music</h4><button class="btn" data-gx="musicd">🎼 Choose music</button></div>
+   <div class="setrow"><h4>Music</h4><button class="btn" data-gx="musicd">Choose music</button></div>
    <div class="setrow"><h4>Pictures</h4><div class="seg"><button data-paint="1" class="${typeof PAINT_ON==='undefined'||PAINT_ON?'on':''}">Painted</button><button data-paint="0" class="${typeof PAINT_ON!=='undefined'&&!PAINT_ON?'on':''}">Simple</button></div></div>
    <div class="setrow"><h4>Computer speed</h4>${seg('data-spd',UI.speed||1,[[.5,'Slow'],[1,'Normal'],[3,'Fast']])}</div>`+(typeof GXH!=='undefined'?`<div class="setrow"><h4>Help</h4>${GXH.settingsHTML({rowClass:'',btnClass:''})}</div>`:'')}
 document.addEventListener('click',e=>{const b=e.target.closest('[data-spd]');if(!b)return;UI.speed=+b.dataset.spd;if(G)render();renderSettings()});
@@ -6363,8 +6578,8 @@ const HP={
  tile:(k,t)=>{const d=TILEDEF[k]||{};const b=d.blue?'#2d5f9f':'#b34a2a';return '<svg viewBox="0 0 64 64"><rect x="9" y="7" width="46" height="50" rx="7" fill="#ecc996" stroke="'+b+'" stroke-width="5"/><text x="32" y="40" text-anchor="middle" font-size="26">'+(TICON[k]||'')+'</text>'+(t?'<text x="32" y="53" text-anchor="middle" font-size="11" font-weight="800" fill="'+b+'">'+t+'</text>':'')+'</svg>'},
  coin:n=>'<svg viewBox="0 0 64 64"><circle cx="32" cy="32" r="22" fill="#e8c867" stroke="#8a6a1a" stroke-width="3.5"/><circle cx="32" cy="32" r="15" fill="none" stroke="#8a6a1a" stroke-width="2"/><text x="32" y="39" text-anchor="middle" font-size="20" font-weight="800" fill="#6b4a00" font-family="Georgia,serif">'+(n==null?'':n)+'</text></svg>',
  spot:n=>'<svg viewBox="0 0 64 64"><rect x="8" y="14" width="48" height="36" rx="9" fill="#fbf1de" stroke="#93391a" stroke-width="4"/><text x="32" y="38" text-anchor="middle" font-size="18" font-weight="800" fill="#93391a">'+n+'</text></svg>',
- camel:()=>'<svg viewBox="0 0 64 64"><circle cx="32" cy="32" r="23" fill="#fbf1de" stroke="#119e98" stroke-width="4"/><text x="32" y="43" text-anchor="middle" font-size="28">🐪</text></svg>',
- tent:()=>'<svg viewBox="0 0 64 64"><circle cx="32" cy="32" r="23" fill="#fbf1de" stroke="#d9772b" stroke-width="4"/><text x="32" y="43" text-anchor="middle" font-size="28">⛺</text></svg>',
+ camel:()=>'<svg viewBox="0 0 64 64"><circle cx="32" cy="32" r="23" fill="#fbf1de" stroke="#119e98" stroke-width="4"/><text x="32" y="43" text-anchor="middle" font-size="28"></text></svg>',
+ tent:()=>'<svg viewBox="0 0 64 64"><circle cx="32" cy="32" r="23" fill="#fbf1de" stroke="#d9772b" stroke-width="4"/><text x="32" y="43" text-anchor="middle" font-size="28"></text></svg>',
  icon:(e,c)=>'<svg viewBox="0 0 64 64"><circle cx="32" cy="32" r="23" fill="#fbf1de" stroke="'+(c||'#93391a')+'" stroke-width="4"/><text x="32" y="43" text-anchor="middle" font-size="28">'+e+'</text></svg>',
  goods:r=>'<svg viewBox="0 0 64 64"><rect x="13" y="6" width="38" height="52" rx="6" fill="#fbf1d2" stroke="#8a6a1a" stroke-width="3.5"/><text x="32" y="40" text-anchor="middle" font-size="26">'+(RICON[r]||'')+'</text></svg>',
  djinn:()=>'<svg viewBox="0 0 24 24" fill="none" stroke="#93391a" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">'+ICONS.lamp+'</svg>',
@@ -6379,25 +6594,25 @@ const hq=s=>()=>document.querySelector(s);
 const hfirst=(...sels)=>()=>{for(const s of sels){const e=document.querySelector(s);if(e&&e.getBoundingClientRect().width)return e}return null};
 const hadv=(...sels)=>()=>{try{const e=hlpEl(hlpAdvice());if(e&&e.getBoundingClientRect().width)return e}catch(x){}return hfirst(...sels)()};   // the advised tile when there is one
 const HLP_STEPS={
- bid:{target:hfirst('#acts .sp-b.glow'),title:'Buy turn order',text:'Tap a glowing spot. Pricier spots play earlier.',pic:()=>HP.spot('3🪙')},
+ bid:{target:hfirst('#acts .sp-b.glow'),title:'Buy turn order',text:'Tap a glowing spot. Pricier spots play earlier.',pic:()=>HP.spot('3')},
  lift:{target:hadv('#grid .tile.glow'),title:'Lift a group',text:'Tap a glowing tile to pick up everyone standing on it.',pic:()=>HP.meeple('merchant')},
  drop:{target:hadv('#grid .tile.glow'),title:'Drop one by one',text:'Tap a glowing neighbour to drop one person there.',pic:()=>HP.meeple('builder')},
  collect:{target:hfirst('#acts .ab.go','#acts .ab'),title:'Use your tribe',text:'Tap Collect. Power chips below are optional.',pic:()=>HP.meeple('vizier')},
  mason:{target:hfirst('#acts .ab.go','#acts .ab'),title:'Choose your pay',text:'Masons earn coins for blue tiles around you. A Mystic adds one Mason.',pic:()=>HP.coin('+')},
  shadow:{target:hfirst('#grid .tile.glow','#seats .sch.glow','#acts .ab.go'),title:'Remove a person',text:'Tap a glowing tile or rival to remove someone there.',pic:()=>HP.meeple('assassin')},
- hamlet:{target:hfirst('#grid .tile.glow','#acts .ab.go'),title:'Build a palace',text:'Tap the glowing spot to build. A palace scores 5 points for the tile’s holder.',pic:()=>HP.icon('🏰')},
- oasis:{target:hfirst('#grid .tile.glow','#acts .ab.go'),title:'Plant a palm',text:'Tap the glowing spot to plant. A palm scores 3 points for the tile’s holder.',pic:()=>HP.icon('🌴')},
+ hamlet:{target:hfirst('#grid .tile.glow','#acts .ab.go'),title:'Build a palace',text:'Tap the glowing spot to build. A palace scores 5 points for the tile’s holder.',pic:()=>HP.icon('')},
+ oasis:{target:hfirst('#grid .tile.glow','#acts .ab.go'),title:'Plant a palm',text:'Tap the glowing spot to plant. A palm scores 3 points for the tile’s holder.',pic:()=>HP.icon('')},
  shrine:{target:hfirst('#mkt .dcard.glow'),title:'Summon a djinn',text:'Tap a glowing djinn. It costs 2 Sages, or 1 Sage and 1 Mystic.',pic:()=>HP.djinn()},
  goods:{target:hfirst('#mkt .mcard.glow'),title:'Buy goods',text:'Tap a glowing goods card to buy it. The Grand Bazaar lets you tap two.',pic:()=>HP.goods('gold')},
- workshop:{target:hfirst('#acts .ab.go','#acts .ab'),title:'Commission an item',text:'Tap a pay button to take the top item, or tap Skip.',pic:()=>HP.icon('🔨')},
+ workshop:{target:hfirst('#acts .ab.go','#acts .ab'),title:'Commission an item',text:'Tap a pay button to take the top item, or tap Skip.',pic:()=>HP.icon('')},
  sell:{target:hfirst('#mine .gchip','#acts .ab.go','#acts .ab'),title:'Sell or finish',text:'Tap goods of different kinds, then Sell for coins. Or tap End turn.',pic:()=>HP.coin('+')},
  power:{target:hfirst('#grid .tile.glow'),title:'Aim your power',text:'Tap a glowing tile to use the power there. Tap the chip again to cancel.',pic:()=>HP.djinn()},
  qClaim:{target:hfirst('#acts .ab'),title:'Camel or tent?',text:'Tap a button: a camel, or your tent for extra points from red tiles around.',pic:()=>HP.tent()},
- qItem:{target:hfirst('#acts .ab'),title:'Keep one item',text:'Tap the item you want to keep. The others are discarded.',pic:()=>HP.icon('🪄','#9a5bd0')},
+ qItem:{target:hfirst('#acts .ab'),title:'Keep one item',text:'Tap the item you want to keep. The others are discarded.',pic:()=>HP.icon('','#9a5bd0')},
  qDjinn:{target:hfirst('#acts .ab'),title:'Keep one djinn',text:'Tap the djinn you want to keep. The others are discarded.',pic:()=>HP.djinn()},
- qFlute:{target:hfirst('#grid .tile.glow','#acts .ab'),title:'Pull a person',text:'Tap a glowing neighbour to pull a person from it onto your tile.',pic:()=>HP.icon('🎶')},
+ qFlute:{target:hfirst('#grid .tile.glow','#acts .ab'),title:'Pull a person',text:'Tap a glowing neighbour to pull a person from it onto your tile.',pic:()=>HP.icon('')},
  qKill:{target:hfirst('#grid .tile.glow','#acts .ab'),title:'Remove a person',text:'Tap a glowing tile to remove one person from it.',pic:()=>HP.meeple('assassin')},
- qThief:{target:hfirst('#acts .ab'),title:'Take your prize',text:'Tap the prize you want. Read each button first.',pic:()=>HP.icon('🦹')}
+ qThief:{target:hfirst('#acts .ab'),title:'Take your prize',text:'Tap the prize you want. Read each button first.',pic:()=>HP.icon('')}
 };
 // ---------------------------------------------------------------- the rules cards (<= 20 words each, a picture each)
 const HLP_RULES=[
@@ -6414,7 +6629,7 @@ const HLP_RULES=[
  {phase:'drop',title:'Try another route',text:'Use the undo button to put people back and try again before you finish.',pic:()=>hpics([['meeple','builder'],'>',['tap']])},
  {phase:'collect',title:'Each colour acts',text:'Advisors and Sages are kept. Traders fetch goods. Masons earn coins. Shadows remove people. Crafters make items.',pic:()=>hpics([['meeple','vizier'],['meeple','merchant'],['meeple','builder'],['meeple','assassin']])},
  {phase:'collect',title:'Then the tile',text:'After the tribe, the tile you ended on has its own action: build, plant, summon or buy.',pic:()=>hpics([['meeple','merchant'],'>',['tile','small']])},
- {phase:'collect',title:'Optional powers',text:'Djinn and item chips are optional. Tap one, then a glowing target.',pic:()=>hpics([['chip','✨ Power'],'>',['tap']])},
+ {phase:'collect',title:'Optional powers',text:'Djinn and item chips are optional. Tap one, then a glowing target.',pic:()=>hpics([['chip','Power'],'>',['tap']])},
  {phase:'mason',title:'Blue tiles pay',text:'Each Mason earns 1 coin per blue tile in the 3x3 around the landing tile: diagonals and the landing tile count.',pic:()=>hpics([['meeple','builder','×'],['tile','sacred','blue'],'>',['coin','+']])},
  {phase:'mason',title:'Mystic Mason',text:'Spending a Mystic card adds one Mason to the count, but the card is gone.',pic:()=>hpics([['goods','fakir'],'>',['meeple','builder','+1']])},
  {phase:'shadow',title:'Reach',text:'Shadows remove a nearby person, or a rival’s Advisor or Sage.',pic:()=>hpics([['meeple','assassin'],'>',['meeple','vizier','Rival']])},
@@ -6432,25 +6647,25 @@ const HLP_RULES=[
  {phase:'goods',title:'Goods make sets',text:'Sets of different goods score 1, 3, 6, 12, 20 points.',pic:()=>hpics([['goods','gold'],['goods','silk'],['goods','spice'],'>',['pts',7]])},
  {phase:'goods',title:'What it costs',text:'Stall: 3 coins for one of the first 3. Grand Bazaar: 6 coins for 2 of the first 6. Exchange: 4 coins for any.',pic:()=>hpics([['tile','small','3'],['tile','large','6'],['tile','exchange','4']])},
  {phase:'goods',title:'Mystic cards',text:'Mystic cards boost Masons and Shadows and pay for djinns. They never join a set.',pic:()=>hpics([['goods','fakir']])},
- {phase:'workshop',title:'Items',text:'Pay 1 Crafter or 2 Mystics to take the top item. Items give points or one-off powers.',pic:()=>hpics([['meeple','artisan','×1'],'>',['icon','🪄',null,'#9a5bd0']])},
- {phase:'workshop',title:'Using items',text:'Tap an item chip to use it. You may use one item each turn.',pic:()=>hpics([['chip','🪄 Item'],'>',['tap']])},
+ {phase:'workshop',title:'Items',text:'Pay 1 Crafter or 2 Mystics to take the top item. Items give points or one-off powers.',pic:()=>hpics([['meeple','artisan','×1'],'>',['icon','',null,'#9a5bd0']])},
+ {phase:'workshop',title:'Using items',text:'Tap an item chip to use it. You may use one item each turn.',pic:()=>hpics([['chip','Item'],'>',['tap']])},
  {phase:'sell',title:'Sell a set',text:'Tap goods of different kinds to sell them as a set. Bigger sets pay more coins.',pic:()=>hpics([['goods','gold'],['goods','silk'],'>',['coin',3]])},
  {phase:'sell',title:'Why sell?',text:'Coins buy turn order and bazaar goods, and each coin is worth one point at the end.',pic:()=>hpics([['coin','+'],'>',['spot','1st']])},
  {phase:'sell',title:'Or keep them',text:'Unsold goods still score as sets at the end. Tap End turn when you are done.',pic:()=>hpics([['goods','gold'],'>',['pts','+']])},
- {phase:'power',title:'Aiming a power',text:'You tapped a power chip. Now tap a glowing tile to choose where it works.',pic:()=>hpics([['chip','✨ Power'],'>',['tile','village','Aim']])},
- {phase:'power',title:'Changed your mind?',text:'Tap the same chip again to cancel without using the power.',pic:()=>hpics([['chip','✨ Power'],'>',['pass',null,'Cancel']])},
+ {phase:'power',title:'Aiming a power',text:'You tapped a power chip. Now tap a glowing tile to choose where it works.',pic:()=>hpics([['chip','Power'],'>',['tile','village','Aim']])},
+ {phase:'power',title:'Changed your mind?',text:'Tap the same chip again to cancel without using the power.',pic:()=>hpics([['chip','Power'],'>',['pass',null,'Cancel']])},
  {phase:'power',title:'What it costs',text:'Some powers cost Sages or Mystics. The chip shows the price.',pic:()=>hpics([['meeple','elder','×1'],['goods','fakir','×1']])},
  {phase:'qClaim',title:'Camel',text:'A camel marks the tile as yours. Its value, palaces and palms score for you.',pic:()=>hpics([['camel'],'>',['pts','+']])},
  {phase:'qClaim',title:'Your tent',text:'The tent scores its tile plus 1 for each red tile around it. You have only one.',pic:()=>hpics([['tent'],'>',['tile','village','+red']])},
- {phase:'qItem',title:'Items',text:'Precious items score points at the end. Magic items give a one-off power.',pic:()=>hpics([['icon','💍'],['icon','🪄',null,'#9a5bd0']])},
- {phase:'qItem',title:'Only one',text:'You keep one item and the rest are discarded, so pick what helps you most.',pic:()=>hpics([['icon','🪄',null,'#9a5bd0'],'>',['pass',null,'Others']])},
+ {phase:'qItem',title:'Items',text:'Precious items score points at the end. Magic items give a one-off power.',pic:()=>hpics([['icon',''],['icon','',null,'#9a5bd0']])},
+ {phase:'qItem',title:'Only one',text:'You keep one item and the rest are discarded, so pick what helps you most.',pic:()=>hpics([['icon','',null,'#9a5bd0'],'>',['pass',null,'Others']])},
  {phase:'qDjinn',title:'Djinn cards',text:'Each djinn is worth points and has a power. Read them before you choose.',pic:()=>hpics([['djinn'],'>',['pts','+']])},
  {phase:'qDjinn',title:'Keep one',text:'You keep one of the djinns shown. The rest are discarded.',pic:()=>hpics([['djinn'],'>',['pass',null,'Others']])},
  {phase:'qFlute',title:'The Reed Pipe',text:'It pulls people from neighbouring tiles onto your tile, one at a time, up to five.',pic:()=>hpics([['tile','small'],'>',['meeple','merchant'],['tile','village']])},
  {phase:'qFlute',title:'Stop early',text:'You may stop pulling at any time. Tap the Done button.',pic:()=>hpics([['pass',null,'Done']])},
  {phase:'qKill',title:'The Ember Blade',text:'It removes any 2 people from the board. You do this one person at a time.',pic:()=>hpics([['meeple','assassin','×2']])},
  {phase:'qKill',title:'Empty tiles',text:'You claim any tile this empties with a camel.',pic:()=>hpics([['tile','small','Empty'],'>',['camel']])},
- {phase:'qThief',title:'Cutpurse haul',text:'Your Cutpurse earned a prize. Tap the one you want to take.',pic:()=>hpics([['icon','🦹'],'>',['pts','+']])},
+ {phase:'qThief',title:'Cutpurse haul',text:'Your Cutpurse earned a prize. Tap the one you want to take.',pic:()=>hpics([['icon',''],'>',['pts','+']])},
  {phase:'qThief',title:'Read each button',text:'Each button says what you receive. You get only one.',pic:()=>hpics([['chip','Prize'],'>',['tap']])}
 ];
 // ---------------------------------------------------------------- phases
@@ -6553,8 +6768,9 @@ function tutOffer(next){if(typeof GXT==='undefined'||online())return false;let s
   return false;if(seen||!firstTime())return false;try{localStorage.setItem('soq_tutoffer','1')}catch(e){}UI.offerNext=next;UI.modal='offer';render();return true}
 function offerHtml(){return `<div class="mbox"><h2>New here?</h2><p class="lede">Play one short coached game. Hadiya explains each rule when it matters. About 5 minutes.</p><div class="acts big"><button class="btn go big" data-ui="tutgo">▶ Play a coached game</button><button class="btn big" data-ui="tutplay">Just play</button></div></div>`}
 function storyOpen(){if(typeof GXC==='undefined')return;if(typeof GXT!=='undefined'&&!GXT.isDone(TUT_GAME))tutStart({prologue:true});else GXC.open()}
-function tutStart(o){UI.coachStory=!!(o&&o.prologue);try{GX.close()}catch(e){}clearTimeout(aiTimer);aiTimer=null;clearTimeout(UI.autoT);UI.autoT=0;UI.modal=null;UI.fx.length=0;UI.fxSeen=0;resetScene();tutNew();UI.snap=null;coachBegin();if(typeof guideBegin==='function')guideBegin();COACH.seen.goal=1;refresh();render()}
-function tutLeave(){if(typeof guideEnd==='function')guideEnd();clearTimeout(aiTimer);aiTimer=null;clearTimeout(UI.autoT);UI.autoT=0;coachEnd();G=null;resetScene();UI.modal=null;UI.fx.length=0;UI.fxSeen=0;try{GXH.hide()}catch(e){}try{const f=$('#finger');if(f)f.hidden=true}catch(e){}render()}
+function tutStart(o){if(typeof commStart==='function')return commStart(0);   // W624: Learn to play = Hadiya's commissions (commui.js)
+  UI.coachStory=!!(o&&o.prologue);try{GX.close()}catch(e){}clearTimeout(aiTimer);aiTimer=null;clearTimeout(UI.autoT);UI.autoT=0;UI.modal=null;UI.fx.length=0;UI.fxSeen=0;resetScene();tutNew();UI.snap=null;coachBegin();if(typeof guideBegin==='function')guideBegin();COACH.seen.goal=1;refresh();render()}
+function tutLeave(){if(typeof commLeave==='function')commLeave();if(typeof guideEnd==='function')guideEnd();clearTimeout(aiTimer);aiTimer=null;clearTimeout(UI.autoT);UI.autoT=0;coachEnd();G=null;resetScene();UI.modal=null;UI.fx.length=0;UI.fxSeen=0;try{GXH.hide()}catch(e){}try{const f=$('#finger');if(f)f.hidden=true}catch(e){}render()}
 
 </script>
 <script>
@@ -6582,7 +6798,7 @@ function paintBoot(){GXSK.init({map:true,stars:true,banner:true,icons:['players'
   ['sacred','oasis','small','large','workshop','exchange','lake','city','ravine'].forEach(k=>pimg('tile-'+k));paintApply();sprites3d();artProbe()}
 // painted plates, glyphs, items: html.sk-pl once ui-nameplate has loaded; an <img> in place of an emoji only when painted
 const ITEM_IMG={gem5:'item-gem5.webp',gem7:'item-gem7.webp',gem9:'item-gem9.webp',carpet:'item-carpet.webp',lamp:'item-lamp.webp',flute:'item-flute.webp',scimitar:'item-scimitar.webp',talisman:'item-talisman.webp',horn:'item-horn.webp'};
-function pIc(f,emo){return HR.classList.contains('sk-pl')&&f?`<img class="pic" src="media/${f}" alt="">`:emo}
+function pIc(f,emo){return f?`<img class="pic" src="media/${f}" alt="">`:emo}
 function itemIc(k){return pIc(ITEM_IMG[k],'🪄')}
 function artProbe(){[['sk-dj','djinn-amir'],['sk-gd','good-ivory'],['sk-tk','token-tent-0'],['sk-ic2','icon-coin'],['sk-spot','ui-spot'],['sk-fx','fx-sparkle'],['sk-pl','ui-nameplate']].forEach(([c,f])=>pimg(f,()=>{if(PAINT_ON)HR.classList.add(c)}))}
 // 3D-model sprites (palm, palace, camel, lamp turntable): html.sp3 once the files are there; without them the emoji stay
@@ -7044,7 +7260,7 @@ function scBadgesIn(hn){document.querySelectorAll('#grid .gain').forEach(x=>x.re
 // ---- the score breakdown in the seat chips, the leader marked ----
 function scSeats(){if(!G||G.over||online()){return}const tot=G.pl.map(p=>shownTotal(p));const top=Math.max(...tot);const lead=tot.filter(v=>v===top).length===1?tot.indexOf(top):-1;
   document.querySelectorAll('#seats .sch').forEach(el=>{const i=+el.dataset.seat,p=G.pl[i];if(!p)return;const s=scoreOf(p);el.classList.toggle('lead',i===lead);
-    const sn=el.querySelector('.sn');if(sn&&i===lead&&!sn.querySelector('.crown'))sn.insertAdjacentHTML('afterbegin','<i class="crown" title="Leader" aria-label="leader">👑</i>');
+    const sn=el.querySelector('.sn');if(sn&&i===lead&&!sn.querySelector('.crown'))sn.insertAdjacentHTML('afterbegin','<i class="crown" title="Leader" aria-label="leader"></i>');
     if(!el.querySelector('.s4'))el.insertAdjacentHTML('beforeend','<span class="s4" title="Where the points come from">People '+(s.advisors+s.sages)+' · Goods '+s.goods+(s.djinns?' · Djinns '+s.djinns:'')+'</span>')})}
 // ---- after your turn: why it ended and a one-line rating against the greedy best ----
 function scCard(text,face,name,tries){const cb=document.getElementById('coach');if(((cb&&cb.classList.contains('on'))||(typeof PLQB!=='undefined'&&PLQB))&&(tries||0)<12){setTimeout(()=>scCard(text,face,name,(tries||0)+1),700);return}const e=scEl('turnover','turnover');e.innerHTML='<i>'+face+'</i><span><b>'+esc(name)+'</b>'+esc(text)+'</span><button type="button" aria-label="Got it">Got it</button>';e.querySelector('button').onclick=()=>{e.classList.remove('on');try{fit()}catch(x){}};
@@ -7055,7 +7271,7 @@ function scTurnEnd(){if(!G||G.over||online())return;if(G.tut||(typeof GD!=='unde
     let nOut=0;for(const k in SC.starts)nOut+=((SC.starts[k]||{}).outs||[]).length;if(nOut<=1)return;   // a forced walk (one way to go) gets no praise or blame
     const a=got?got.total:Math.max(0,shownTotal(G.pl[0])-d.tot);const bt=Math.max(best,a);const r=bt<=0||a>=bt-1||a>=bt*.85?'Good':a>=bt*.5?'Okay':'Poor';
     const why=r==='Good'?'that was the best or close to it.':'the best walk was +'+bt+' ('+SC.bestLabel+').';
-    const g=LORE.guide;scCard(r+': '+d.n+' '+(d.n>1?MPLUR[d.c]:MNAME[d.c])+', +'+a+'. '+(r==='Good'?'Best or close.':'Best was +'+bt+'.'),typeof COACH!=='undefined'&&G.coach?g.face:'📋',typeof COACH!=='undefined'&&G.coach?g.name:'Your turn')}
+    const g=LORE.guide;scCard(r+': '+d.n+' '+(d.n>1?MPLUR[d.c]:MNAME[d.c])+', +'+a+'. '+(r==='Good'?'Best or close.':'Best was +'+bt+'.'),typeof COACH!=='undefined'&&G.coach?g.face:'',typeof COACH!=='undefined'&&G.coach?g.name:'Your turn')}
 }
 (function(){const o=render;render=function(){o.apply(this,arguments);try{if(G){const hn=hintsOn();const hh=document.documentElement.classList;hh.toggle('m-play',!G.coach);hh.toggle('m-hints',hn);hh.toggle('m-bid',G.phase==='bid');scModeUI(hn);scTracker();if(hn){scTurnEnd();scPreview()}else{const t2=document.getElementById('trk2');if(t2)t2.hidden=true;SC.pend=null}scBadges(hn);scSeats();if(typeof fit==='function')fit()}else{const t=document.getElementById('trk');if(t)t.hidden=true;const t2=document.getElementById('trk2');if(t2)t2.hidden=true}}catch(e){console.error(e)}}})();
 document.addEventListener('pointerover',e=>{const t=e.target.closest&&e.target.closest('#grid [data-tile]');const i=t?+t.dataset.tile:null;if(i!==SC.hov){SC.hov=i;if(G&&scMine()&&G.move)try{scPreview()}catch(x){}}});
@@ -7236,15 +7452,15 @@ function juice(prev,cur){if(!G||!prev||!cur)return;juMove(cur);if(!juOk()||G.ove
 // says what happened. The first time only, a legend line tells what the marks on the board mean. Decoration only: never blocks a tap, never changes G.
 function claimNote(f){if(!G||UI.sim||G.over||f.p==null||f.x==null)return;const t=G.board[f.x],p=G.pl[f.p];if(!t||!p)return;const you=p.nm==='You'||(p.human&&G.pl.filter(q=>q.human).length===1);
   const who=you?'You':p.nm,nm=TILEDEF[t.k].n,pl=tileCoord(t.i);let line;
-  if(f.t==='camel')line=f.w==='tent'?`${who} pitched the tent on ${nm} ${pl}: +${t.v} at end`:`🐪 ${who} spent a camel: ${you?'claimed':'claimed'} ${nm} ${pl} (+${t.v})`;
-  else line=f.w==='pal'?`${who} raised a palace on ${nm} ${pl}: +5 at end`:`${who} planted a palm on ${nm} ${pl}: +3 at end`;
+  if(f.t==='camel')line=f.w==='tent'?`${who} pitched the tent on ${nm} ${pl}: +${t.v} at end`:`${who} claimed ${nm} ${pl} with a camel (+${t.v})`;
+  else line=f.w==='pal'?`${who} built a palace on ${nm} ${pl}: +5 at end`:`${who} planted a palm on ${nm} ${pl}: +3 at end`;
   UI.cflash={i:t.i,until:Date.now()+800};
   let el=document.getElementById('cnote');if(!el){el=document.createElement('div');el.id='cnote';el.setAttribute('role','status');el.setAttribute('data-help','');document.body.appendChild(el)}
   el.style.setProperty('--pc',PCOL[p.i]);el.textContent=line;const g=document.getElementById('grid');if(g){const r=g.getBoundingClientRect();el.style.top=Math.max(4,r.top-40)+'px'}
-  el.classList.remove('on');void el.offsetWidth;el.classList.add('on');clearTimeout(UI.cnT);UI.cnT=setTimeout(()=>el.classList.remove('on'),3800);
+  el.classList.remove('on');void el.offsetWidth;el.classList.add('on');clearTimeout(UI.cnT);UI.cnT=setTimeout(()=>el.classList.remove('on'),5000);
   let seen=0;try{seen=localStorage.getItem('soq_legend')}catch(e){}
   if(!seen){try{localStorage.setItem('soq_legend','1')}catch(e){}let lg=document.getElementById('clegend');if(!lg){lg=document.createElement('div');lg.id='clegend';lg.setAttribute('data-help','');document.body.appendChild(lg)}
-    lg.innerHTML='🐪 = claimed (owner’s colour) · 🌴 +3 · 🏰 +5';const gr=g?g.getBoundingClientRect():null;const mk=document.getElementById('mkt'),mr=mk?mk.getBoundingClientRect():null;let tb=gr?gr.bottom:100;document.querySelectorAll('#grid .tile').forEach(x=>{tb=Math.max(tb,x.getBoundingClientRect().bottom)});lg.style.top=(tb+4)+'px';lg.classList.add('on');setTimeout(()=>lg.classList.remove('on'),5200)}
+    lg.innerHTML='Ring colour = owner · claimed · palm +3 · palace +5';const gr=g?g.getBoundingClientRect():null;const mk=document.getElementById('mkt'),mr=mk?mk.getBoundingClientRect():null;let tb=gr?gr.bottom:100;document.querySelectorAll('#grid .tile').forEach(x=>{tb=Math.max(tb,x.getBoundingClientRect().bottom)});lg.style.top=(tb+4)+'px';lg.classList.add('on');setTimeout(()=>lg.classList.remove('on'),5200)}
   setTimeout(()=>{try{renderGrid()}catch(e){}},0)}
 
 </script><script>
@@ -7326,6 +7542,129 @@ function f3DockChz(){const el=document.getElementById('chz');if(!el||el.hidden||
   S('left','6px');S('right','6px');S('width','auto');S('top',Math.min(innerHeight-h-2,r.top)+'px');S('padding','2px 6px');S('height',h+'px');S('justify-content','center');S('align-items','center');S('box-sizing','border-box');S('bottom','auto');S('box-shadow','0 0 0 3px #ffd75a')}
 {const pc=placeChz;placeChz=function(){pc.apply(this,arguments);try{f3DockChz()}catch(e){}}}
 function f3After(){try{f3Draw();f3Warn();f3Sold();f3Shadow()}catch(e){console.error(e)}}
+
+</script><script>
+// ===== Djinn inspect (owner, 24 Nov): hold / hover / right-click / the "i" on every djinn card opens a readable card =====
+// Says: what it does, WHEN it works, what it costs, and (market) whether you can buy it NOW and exactly what is missing,
+// or (owned) whether it is ready or used. Plus the "My djinns" row under the market and list in the Djinns panel.
+// Reads G only; never changes it. Rules text is untouched (the one-line effects come from DJ[k].x).
+const DJ_COST={EF:'1 Sage or 1 Mystic',EEF:'1 Sage + 1 Sage-or-Mystic',F:'1 Mystic','F+':'Mystics, while bidding'};
+const DJ_WHEN={zarifa:'Counted once, when the game ends.',nakhla:'Counted once, when the game ends.',wazira:'Counted once, when the game ends.',hikma:'Counted once, when the game ends.',majlis:'Counted once, when the game ends.',jawhar:'Counted once, when the game ends.',sana:'Counted once, when the game ends.',
+  harith:'Automatic, each time any djinn is summoned.',qasra:'Automatic, each time a palace is built.',khanjar:'Automatic, each time Shadows remove a person.',amir:'Automatic, each time Advisors are taken.',tariq:'Automatic, whenever someone drops on a tile you hold.',dukkan:'Automatic, when a rival finishes on a Bazaar.',
+  sadim:'Always on: protects you when rivals use Shadows.',hafiz:'Always on: Cutpurses cannot touch you.',sirra:'Automatic, whenever your Shadows remove a person.',
+  qirsh:'Your turn, before you use the Masons.',ghulam:'Your turn, before you use the Shadows.',burhan:'Your turn, before you finish your move.',rawda:'Your turn, before you finish your move.',dalil:'While bidding for turn order.'};
+function djWhen(d){return DJ_WHEN[d.k]||(d.cost?'Your turn, once per turn.':'Always on.')}
+function djHave(p){return `you have ${p.el} Sage${p.el===1?'':'s'} and ${p.fk} Mystic${p.fk===1?'':'s'}`}
+function djBuy(p,k){
+  if(G.over)return {ok:0,t:'The game is over.'};
+  if(!p)return {ok:0,t:'Summoned at a Shrine: 2 Sages, or 1 Sage and 1 Mystic.'};
+  const enough=p.el>=2||(p.el>=1&&p.fk>=1);
+  if(G.phase==='turn'&&G.step==='tile'&&!G.q&&sideToAct()===p.i&&validMoves(p.i).some(m=>m.act==='tile'&&m.dj===k))return {ok:1,t:'You can buy it NOW: pay 2 Sages, or 1 Sage and 1 Mystic.'};
+  if(!enough){const miss=p.el===0&&p.fk===0?'needs 2 Sages (or 1 Sage and 1 Mystic)':p.el===1&&p.fk===0?'needs 1 more Sage or 1 Mystic':'needs 1 more Sage';
+    return {ok:0,t:`Not yet: ${miss} (${djHave(p)}).`}}
+  if(sideToAct()!==p.i||G.phase!=='turn')return {ok:0,t:'You have enough. Wait for your turn, then end your move on a Shrine.'};
+  return {ok:0,t:'You have enough. End your move on a Shrine to buy it.'}}
+function djOwned(p,k){const d=DJ[k];
+  if(!d.cost)return {ok:1,t:'Always on: nothing to press.'};
+  if(d.cost==='F+')return {ok:1,t:'Ready: spend Mystics when you bid.'};
+  if(p.used&&p.used[k])return {ok:0,t:'Used this turn. It is ready again next turn.'};
+  if(G.over||G.phase!=='turn'||sideToAct()!==p.i)return {ok:1,t:`Ready: use it on your turn (costs ${DJ_COST[d.cost]}).`};
+  if(!costOpts(p,d.cost).length)return {ok:0,t:`Ready, but you cannot pay now: needs ${DJ_COST[d.cost]} (${djHave(p)}).`};
+  if(!djinnTargets(p,k).length)return {ok:0,t:'Ready, but nothing to aim at right now.'};
+  return {ok:1,t:'Ready: use it now from the power buttons.'}}
+function djShort(p,k){const d=DJ[k];if(!d.cost)return 'on';if(d.cost==='F+')return 'ready';return p.used&&p.used[k]?'used':'ready'}
+function ownedDjHtml(){const p=typeof me==='function'?me():null;if(!G||!p||!p.dj.length)return '';
+  return `<div class="orow" aria-label="My djinns"><button class="dcard omy" type="button" data-gx="djd" aria-label="My djinns, open the list"><img class="pic" src="media/icon-djinn.webp" alt=""> My djinns · ${p.dj.length}</button>`+
+    p.dj.map(k=>`<button class="dcard odj ${djShort(p,k)}" type="button" data-odj="${k}" style="--dj:url(media/djinn-${k}.webp)" aria-label="${esc(DJ[k].n)}, ${djShort(p,k)}. Tap to read"><b>${esc(DJ[k].n)}</b><em>${djShort(p,k)}</em><span class="dinfo" data-info="${k}" data-own="1" aria-label="About ${esc(DJ[k].n)}">i</span></button>`).join('')+'</div>'}
+function myDjSection(){const p=typeof me==='function'?me():null;if(!p)return '';
+  return `<h3>My djinns</h3>`+(p.dj.length?`<ul class="mydj">${p.dj.map(k=>{const d=DJ[k],s=djOwned(p,k);return `<li><b>${esc(d.n)}</b> <small>${d.vp} pts</small> <span class="st ${s.ok?'ok':'no'}">${esc(djShort(p,k))}</span><br>${esc(d.x)}</li>`}).join('')}</ul>`:'<p class="muted small">You have no djinns yet. Summon one at a Shrine.</p>')}
+
+(function(){
+  let box=null,openK=null,holdT=0,hoverT=0,supp=0,sx=0,sy=0,byHover=false;
+  const land=()=>document.documentElement.classList.contains('land');
+  function ensure(){if(box)return box;box=document.createElement('div');box.id='dinspect';box.setAttribute('role','dialog');box.setAttribute('aria-label','Djinn details');box.hidden=true;document.body.appendChild(box);
+    box.addEventListener('mouseenter',()=>{clearTimeout(hoverT)});box.addEventListener('mouseleave',()=>{if(byHover)close()});
+    box.addEventListener('click',e=>{if(e.target.closest('.dix'))close()});return box}
+  function close(){clearTimeout(hoverT);if(box)box.hidden=true;openK=null;byHover=false}
+  function open(k,own,anchor,hover){if(!G||!DJ[k])return;const d=DJ[k],p=typeof me==='function'?me():null,b=ensure();const owned=own||(p&&p.dj.includes(k));
+    const st=owned&&p?djOwned(p,k):djBuy(p,k);
+    b.className=owned?'dio':'dim';byHover=!!hover;openK=k;
+    b.innerHTML=`<button class="dix" type="button" aria-label="Close">×</button><h4>${esc(d.n)} <small>${d.vp} point${d.vp===1?'':'s'}</small></h4>
+     <p class="dx">${esc(d.x)}</p>
+     <p><b>When:</b> ${esc(djWhen(d))}</p>
+     <p><b>Cost:</b> ${d.cost&&d.cost!=='F+'?'to use: '+esc(DJ_COST[d.cost]):d.cost?esc(DJ_COST[d.cost]):'nothing, it is always on'}${owned?'':' · to summon: 2 Sages, or 1 Sage and 1 Mystic'}</p>
+     <p class="ds ${st.ok?'ok':'no'}"><b>${owned?'Status:':'Buy:'}</b> ${esc(st.t)}</p>`;
+    b.hidden=false;
+    if(!land()){const g=document.getElementById('grid'),gb=g?Math.max(...[...g.querySelectorAll('.tile')].map(t=>t.getBoundingClientRect().bottom)):innerHeight*.6;
+      b.style.cssText=`left:0;right:0;bottom:0;top:auto;width:auto;max-height:${Math.max(150,Math.round(innerHeight-gb-6))}px`}
+    else{const m=document.getElementById('mkt'),r=(anchor||m||document.body).getBoundingClientRect(),mr=m?m.getBoundingClientRect():r;
+      const w=Math.min(380,Math.max(300,mr.width));let top=r.bottom+14;const h=b.offsetHeight||230;top=Math.max(8,Math.min(top,innerHeight-h-8));
+      b.style.cssText=`left:${Math.max(8,Math.min(mr.left,innerWidth-w-8))}px;top:${top}px;width:${w}px;right:auto;bottom:auto;max-height:none`}}
+  window.djInspect={open,close};
+  const tgt=e=>e.target.closest&&e.target.closest('[data-dj],[data-odj]');
+  const keyOf=el=>el.dataset.odj||el.dataset.dj;
+  document.addEventListener('pointerdown',e=>{
+    if(box&&!box.hidden&&!box.contains(e.target)&&!e.target.closest('.dinfo')&&e.pointerType!=='mouse')close();
+    if(e.pointerType==='mouse'){if(box&&!box.hidden&&!box.contains(e.target)&&!e.target.closest('.dinfo'))close();return}
+    const el=tgt(e);if(!el)return;sx=e.clientX;sy=e.clientY;clearTimeout(holdT);
+    holdT=setTimeout(()=>{holdT=0;supp=Date.now()+900;open(keyOf(el),!!el.dataset.odj,el,false)},400)},true);
+  const cancel=()=>{clearTimeout(holdT);holdT=0};
+  document.addEventListener('pointerup',cancel,true);document.addEventListener('pointercancel',cancel,true);
+  document.addEventListener('pointermove',e=>{if(holdT&&Math.hypot(e.clientX-sx,e.clientY-sy)>10)cancel()},true);
+  document.addEventListener('contextmenu',e=>{const el=tgt(e);if(!el)return;e.preventDefault();open(keyOf(el),!!el.dataset.odj,el,false)},true);
+  document.addEventListener('mouseover',e=>{if(e.pointerType==='touch'||matchMedia('(hover:none)').matches)return;const el=tgt(e);if(!el||el.contains(e.relatedTarget))return;clearTimeout(hoverT);hoverT=setTimeout(()=>open(keyOf(el),!!el.dataset.odj,el,true),380)});
+  document.addEventListener('mouseout',e=>{const el=tgt(e);if(!el||el.contains(e.relatedTarget))return;clearTimeout(hoverT);if(byHover&&box&&!box.contains(e.relatedTarget))hoverT=setTimeout(close,220)});
+  // capture: the long-press must not also summon / the i and owned chips only inspect
+  document.addEventListener('click',e=>{
+    if(supp&&Date.now()<supp&&tgt(e)){supp=0;e.stopImmediatePropagation();e.preventDefault();return}
+    const dc=e.target.closest&&e.target.closest('.dcard[data-dj]:not(.th)');if(dc){const r=dc.getBoundingClientRect();if(e.clientX>r.right-44){e.stopImmediatePropagation();e.preventDefault();open(dc.dataset.dj,false,dc,false);return}}
+    const i=e.target.closest&&e.target.closest('.dinfo');if(i){e.stopImmediatePropagation();e.preventDefault();const c=i.closest('[data-dj],[data-odj]');open(i.dataset.info,!!i.dataset.own,c||i,false);return}
+    const o=e.target.closest&&e.target.closest('[data-odj]');if(o){e.stopImmediatePropagation();e.preventDefault();open(o.dataset.odj,true,o,false);return}
+    if(box&&!box.hidden&&!box.contains(e.target))close()},true);
+  document.addEventListener('keydown',e=>{if(e.key==='Escape')close()});
+})();
+
+</script><script>
+// ---------- Hadiya's commissions: the page side (W624). Learn to play = six commissions (comm.js); every tap is a real move ----------
+// One bubble, always next to what it talks about (UI-BAR rule 10): the brief beside the key tile, a just-in-time rule beside the
+// track / tile / action it explains, and what your last choice did. The debrief names the consequence and the lesson: Try again or Next.
+const CU={i:-1,told:{},lastN:0,said:''};
+function commOn(){return !!(G&&G.comm)}
+function commStart(i){try{GX.close()}catch(e){}clearTimeout(aiTimer);aiTimer=null;clearTimeout(UI.autoT);UI.autoT=0;UI.modal=null;UI.fx.length=0;UI.fxSeen=0;
+  try{guideEnd()}catch(e){}try{coachEnd()}catch(e){}resetScene();commNew(i);CU.i=i;CU.told={};CU.lastN=G.logN;CU.said='';UI.snap=null;document.body.classList.add('comm');refresh();render();schedule()}
+function commLeave(){document.body.classList.remove('comm');const b=document.getElementById('commb');if(b)b.hidden=true;const d=document.getElementById('commd');if(d)d.remove()}
+// the line for this moment: brief first, then the rule the decision needs (once), then what your last choice did
+function commMoment(){const c=COMMS[G.commI];const mine=sideToAct()===0;const ph=G.phase==='bid'?'bid':G.step==='move'?'move':G.step==='tribe'?'tribe':G.step==='tile'?(G.act&&G.board[G.act.tile].k==='sacred'&&c.tips.djinn&&CU.told.tile?'djinn':'tile'):G.step==='sell'?'sell':'';
+  const fresh=G.log.filter(e=>e.i>CU.lastN&&/^You\b/.test(e.t)).map(e=>e.t.replace(/^You (\w+)s\b/,'You $1').replace(/^You's/,'Your'));
+  if(!CU.told.brief)return {k:'brief',el:tileEl(c.key),html:`<b>${esc(c.title)}</b><span>${esc(c.story)}</span><em>Goal: ${esc(c.goal)}</em>`};
+  if(mine&&c.tips[ph]&&!CU.told[ph])return {k:ph,el:commTarget(ph),html:`${fresh.length?`<span class="cu-did">${esc(fresh[fresh.length-1])}</span>`:''}<span>${esc(c.tips[ph])}</span>`};
+  if(fresh.length)return {k:'did'+G.logN,el:commTarget(ph||'move'),html:`<span class="cu-did">${esc(fresh[fresh.length-1])}</span><em>Goal: ${esc(c.goal)}</em>`};
+  return null}
+function commTarget(ph){const q=s=>document.querySelector(s);if(ph==='bid')return q('[data-mv*="\\"bid\\""]')||q('#acts');if(ph==='move'){const c=COMMS[G.commI];return G.move?tileEl(G.move.at!=null?G.move.at:c.key):tileEl(c.key)}return q('#acts button')||q('#acts')}
+function commBubble(m){let b=document.getElementById('commb');if(!b){b=document.createElement('div');b.id='commb';b.className='commb';b.setAttribute('role','status');document.body.appendChild(b)}
+  if(!m){return}b.hidden=false;b.innerHTML=`<i aria-hidden="true">${COMM_STORY.face}</i><div>${m.html}</div><s class="cu-arrow"></s>`;
+  const el=m.el;const W=innerWidth,H=innerHeight;const bw=Math.min(300,W-32);b.style.width=bw+'px';
+  if(!el){b.style.left='16px';b.style.top='72px';b.dataset.side='none';return}
+  const r=el.getBoundingClientRect();const bh=b.offsetHeight;let side=r.top-bh-14>8?'above':(r.bottom+bh+14<H-8?'below':'above');
+  let top=side==='above'?r.top-bh-12:r.bottom+12;top=Math.max(8,Math.min(H-bh-8,top));let left=r.left+r.width/2-bw/2;left=Math.max(16,Math.min(W-bw-16,left));
+  b.style.left=left+'px';b.style.top=top+'px';b.dataset.side=side;const a=b.querySelector('.cu-arrow');a.style.left=Math.max(14,Math.min(bw-28,r.left+r.width/2-left-7))+'px'}
+function commDraw(){if(!commOn()){const b=document.getElementById('commb');if(b)b.hidden=true;return}
+  if(G.over)return commDebrief();
+  const m=commMoment();if(m){CU.cur=m}else if(CU.cur&&CU.cur.k==='brief'){}const show=m||CU.cur;if(show){show.el=show.k==='brief'?tileEl(COMMS[G.commI].key):(m?m.el:commTarget('move'));commBubble(show)}}
+// a real move tells the brief and the rule as read (the tap itself is the lesson's decision)
+function commMoved(){if(!commOn())return;const st=G.phase==='bid'?'bid':G.step;if(CU.cur){CU.told[CU.cur.k==='did'+G.logN?'x':CU.cur.k]=1;CU.told.brief=1}}
+function commDebrief(){const b=document.getElementById('commb');if(b)b.hidden=true;if(document.getElementById('commd'))return;const r=commResult();const i=G.commI,n=COMMS.length;
+  const d=document.createElement('div');d.id='commd';d.className='commd';d.setAttribute('role','dialog');d.setAttribute('aria-label','Commission debrief');
+  d.innerHTML=`<div class="commd-box ${r.won?'won':'lost'}"><p class="cu-k">Commission ${i+1} of ${n}</p><h2>${r.won?'Done. Hadiya nods.':'Not this time.'}</h2>
+  <p class="cu-why">${esc(r.why)}</p><p class="cu-les"><b>Lesson</b> ${esc(r.lesson)}</p>
+  <div class="cu-acts">${r.won?(i+1<n?`<button class="btn go big" data-cu="next">Next: ${esc(COMMS[i+1].title)}</button>`:`<button class="btn go big" data-cu="play">Play a real game</button>`)+`<button class="btn" data-cu="retry">Play it again</button>`
+   :`<button class="btn go big" data-cu="retry">Try again</button>`+(i+1<n?`<button class="btn" data-cu="next">Skip to commission ${i+2}</button>`:'')}<button class="btn" data-cu="quit">Back to menu</button></div></div>`;
+  document.body.appendChild(d);
+  d.addEventListener('click',ev=>{const a=ev.target.closest('[data-cu]');if(!a)return;const k=a.dataset.cu;d.remove();
+    if(k==='retry')commStart(i);else if(k==='next')commStart(i+1);else{commLeave();G=null;resetScene();render();if(k==='play')uiAct('start')}})}
+(function(){const o=render;render=function(){o.apply(this,arguments);try{commDraw()}catch(e){console.error(e)}}})();
+(function(){const og=go;go=function(m){const before=commOn()&&sideToAct()===0;if(before){commMoved();CU.lastN=G.logN}const r=og.apply(this,arguments);return r}})();
+window.GXCOMM={get on(){return commOn()},get i(){return G&&G.comm?G.commI:-1},get over(){return !!(G&&G.over)},result(){return G&&G.comm?commResult():null},start:commStart};
 
 </script>
 <script>

@@ -53,7 +53,7 @@ function scBadgesIn(hn){document.querySelectorAll('#grid .gain').forEach(x=>x.re
 // ---- the score breakdown in the seat chips, the leader marked ----
 function scSeats(){if(!G||G.over||online()){return}const tot=G.pl.map(p=>shownTotal(p));const top=Math.max(...tot);const lead=tot.filter(v=>v===top).length===1?tot.indexOf(top):-1;
   document.querySelectorAll('#seats .sch').forEach(el=>{const i=+el.dataset.seat,p=G.pl[i];if(!p)return;const s=scoreOf(p);el.classList.toggle('lead',i===lead);
-    const sn=el.querySelector('.sn');if(sn&&i===lead&&!sn.querySelector('.crown'))sn.insertAdjacentHTML('afterbegin','<i class="crown" title="Leader" aria-label="leader">👑</i>');
+    const sn=el.querySelector('.sn');if(sn&&i===lead&&!sn.querySelector('.crown'))sn.insertAdjacentHTML('afterbegin','<i class="crown" title="Leader" aria-label="leader"></i>');
     if(!el.querySelector('.s4'))el.insertAdjacentHTML('beforeend','<span class="s4" title="Where the points come from">People '+(s.advisors+s.sages)+' · Goods '+s.goods+(s.djinns?' · Djinns '+s.djinns:'')+'</span>')})}
 // ---- after your turn: why it ended and a one-line rating against the greedy best ----
 function scCard(text,face,name,tries){const cb=document.getElementById('coach');if(((cb&&cb.classList.contains('on'))||(typeof PLQB!=='undefined'&&PLQB))&&(tries||0)<12){setTimeout(()=>scCard(text,face,name,(tries||0)+1),700);return}const e=scEl('turnover','turnover');e.innerHTML='<i>'+face+'</i><span><b>'+esc(name)+'</b>'+esc(text)+'</span><button type="button" aria-label="Got it">Got it</button>';e.querySelector('button').onclick=()=>{e.classList.remove('on');try{fit()}catch(x){}};
@@ -64,7 +64,7 @@ function scTurnEnd(){if(!G||G.over||online())return;if(G.tut||(typeof GD!=='unde
     let nOut=0;for(const k in SC.starts)nOut+=((SC.starts[k]||{}).outs||[]).length;if(nOut<=1)return;   // a forced walk (one way to go) gets no praise or blame
     const a=got?got.total:Math.max(0,shownTotal(G.pl[0])-d.tot);const bt=Math.max(best,a);const r=bt<=0||a>=bt-1||a>=bt*.85?'Good':a>=bt*.5?'Okay':'Poor';
     const why=r==='Good'?'that was the best or close to it.':'the best walk was +'+bt+' ('+SC.bestLabel+').';
-    const g=LORE.guide;scCard(r+': '+d.n+' '+(d.n>1?MPLUR[d.c]:MNAME[d.c])+', +'+a+'. '+(r==='Good'?'Best or close.':'Best was +'+bt+'.'),typeof COACH!=='undefined'&&G.coach?g.face:'📋',typeof COACH!=='undefined'&&G.coach?g.name:'Your turn')}
+    const g=LORE.guide;scCard(r+': '+d.n+' '+(d.n>1?MPLUR[d.c]:MNAME[d.c])+', +'+a+'. '+(r==='Good'?'Best or close.':'Best was +'+bt+'.'),typeof COACH!=='undefined'&&G.coach?g.face:'',typeof COACH!=='undefined'&&G.coach?g.name:'Your turn')}
 }
 (function(){const o=render;render=function(){o.apply(this,arguments);try{if(G){const hn=hintsOn();const hh=document.documentElement.classList;hh.toggle('m-play',!G.coach);hh.toggle('m-hints',hn);hh.toggle('m-bid',G.phase==='bid');scModeUI(hn);scTracker();if(hn){scTurnEnd();scPreview()}else{const t2=document.getElementById('trk2');if(t2)t2.hidden=true;SC.pend=null}scBadges(hn);scSeats();if(typeof fit==='function')fit()}else{const t=document.getElementById('trk');if(t)t.hidden=true;const t2=document.getElementById('trk2');if(t2)t2.hidden=true}}catch(e){console.error(e)}}})();
 document.addEventListener('pointerover',e=>{const t=e.target.closest&&e.target.closest('#grid [data-tile]');const i=t?+t.dataset.tile:null;if(i!==SC.hov){SC.hov=i;if(G&&scMine()&&G.move)try{scPreview()}catch(x){}}});

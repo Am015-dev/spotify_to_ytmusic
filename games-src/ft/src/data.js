@@ -23,7 +23,7 @@ const TILESET_WHIM=[['city',5,3,'blue'],['city',5,2,'red'],['lake',0,1]];
 function mkTiles(set,ex){const o=[];for(const [k,v,n,col] of set)for(let i=0;i<n;i++)o.push({k,v,blue:col?col==='blue':TILEDEF[k].blue,ex});return o}
 // goods (54 base): Mystics are the special cards
 const RNAME={ivory:'Ivory',jewels:'Jewels',gold:'Gold',papyrus:'Papyrus',silk:'Silk',spice:'Spice',fish:'Fish',wheat:'Wheat',pottery:'Pottery',fakir:'Mystic'};
-const RICON={ivory:'🦷',jewels:'💎',gold:'🥇',papyrus:'📜',silk:'🧣',spice:'🌶️',fish:'🐟',wheat:'🌾',pottery:'🏺',fakir:'🔮'};
+const RICON={ivory:'<img class="pic" src="media/good-ivory.webp" alt="">',jewels:'<img class="pic" src="media/good-jewels.webp" alt="">',gold:'<img class="pic" src="media/good-gold.webp" alt="">',papyrus:'<img class="pic" src="media/good-papyrus.webp" alt="">',silk:'<img class="pic" src="media/good-silk.webp" alt="">',spice:'<img class="pic" src="media/good-spice.webp" alt="">',fish:'<img class="pic" src="media/good-fish.webp" alt="">',wheat:'<img class="pic" src="media/good-wheat.webp" alt="">',pottery:'<img class="pic" src="media/good-pottery.webp" alt="">',fakir:'<img class="pic" src="media/good-fakir.webp" alt="">'};
 const RESOURCE_COUNT={ivory:2,jewels:2,gold:2,papyrus:4,silk:4,spice:4,fish:6,wheat:6,pottery:6,fakir:18};
 const SETVP=[0,1,3,7,13,21,30,40,50,60];
 // turn-order track: cost per spot; several spots may share a cost ("stack" spots: a later bidder goes first)

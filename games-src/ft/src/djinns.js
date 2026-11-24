@@ -55,7 +55,7 @@ function djinnTargets(p,k){switch(k){
   default:return[]}}
 function djinnMoves(p){const o=[];if(G.phase!=='turn'||G.q)return o;
   for(const k of p.dj){const d=DJ[k];if(!d.cost||d.cost==='F+'||p.used[k])continue;const tg=djinnTargets(p,k);if(!tg.length)continue;for(const c of costOpts(p,d.cost))for(const t of tg)o.push({act:'djinn',k,t,pay:c})}return o}
-function runDjinn(p,m){const d=DJ[m.k];payCost(p,m.pay);lg(`✨ ${p.nm} calls on ${d.n}.`,'step');fx('djinn',m.k);
+function runDjinn(p,m){const d=DJ[m.k];payCost(p,m.pay);lg(`${p.nm} calls on ${d.n}.`,'step');fx('djinn',m.k);
   switch(m.k){
   case 'tamuz':{const t=G.board[m.t];for(let i=0;i<3&&G.bag.length;i++)t.m.push(G.bag.splice(rnd(G.bag.length),1)[0]);lg(`Three people appear on ${tileName(t)}.`);break}
   case 'nuraya':placePalace(p,m.t,true);break;

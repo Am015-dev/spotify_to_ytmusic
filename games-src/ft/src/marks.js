@@ -28,7 +28,7 @@ function djOwned(p,k){const d=DJ[k];
   return {ok:1,t:'Ready: use it now from the power buttons.'}}
 function djShort(p,k){const d=DJ[k];if(!d.cost)return 'on';if(d.cost==='F+')return 'ready';return p.used&&p.used[k]?'used':'ready'}
 function ownedDjHtml(){const p=typeof me==='function'?me():null;if(!G||!p||!p.dj.length)return '';
-  return `<div class="orow" aria-label="My djinns"><button class="dcard omy" type="button" data-gx="djd" aria-label="My djinns, open the list">🧞 My djinns · ${p.dj.length}</button>`+
+  return `<div class="orow" aria-label="My djinns"><button class="dcard omy" type="button" data-gx="djd" aria-label="My djinns, open the list"><img class="pic" src="media/icon-djinn.webp" alt=""> My djinns · ${p.dj.length}</button>`+
     p.dj.map(k=>`<button class="dcard odj ${djShort(p,k)}" type="button" data-odj="${k}" style="--dj:url(media/djinn-${k}.webp)" aria-label="${esc(DJ[k].n)}, ${djShort(p,k)}. Tap to read"><b>${esc(DJ[k].n)}</b><em>${djShort(p,k)}</em><span class="dinfo" data-info="${k}" data-own="1" aria-label="About ${esc(DJ[k].n)}">i</span></button>`).join('')+'</div>'}
 function myDjSection(){const p=typeof me==='function'?me():null;if(!p)return '';
   return `<h3>My djinns</h3>`+(p.dj.length?`<ul class="mydj">${p.dj.map(k=>{const d=DJ[k],s=djOwned(p,k);return `<li><b>${esc(d.n)}</b> <small>${d.vp} pts</small> <span class="st ${s.ok?'ok':'no'}">${esc(djShort(p,k))}</span><br>${esc(d.x)}</li>`}).join('')}</ul>`:'<p class="muted small">You have no djinns yet. Summon one at a Shrine.</p>')}

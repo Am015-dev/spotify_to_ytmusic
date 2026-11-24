@@ -104,10 +104,10 @@ function finishMove(e,c){const t=G.board[e];const p=P(G.cur);const n=t.m.filter(
   if(['small','large','exchange'].includes(t.k))trig('market',p.i)}
 // taking control: a camel (or, with Crafters, the tent)
 function claimTile(p,e,how){const t=G.board[e];if(t.camel!=null||t.tent!=null)return;
-  if(how==='auto'&&p.tent&&p.human&&!UI.sim){ask(p.i,`Claim ${tileName(t)} with a camel or your tent?`,[{l:'🐪 A camel',h:'claim',d:{p:p.i,e,how:'camel'}},{l:'⛺ The tent (its tile plus 1 per nearby red tile)',h:'claim',d:{p:p.i,e,how:'tent'}}],{kind:'claim'});return}
+  if(how==='auto'&&p.tent&&p.human&&!UI.sim){ask(p.i,`Claim ${tileName(t)} with a camel or your tent?`,[{l:'A camel',h:'claim',d:{p:p.i,e,how:'camel'}},{l:'The tent (its tile plus 1 per nearby red tile)',h:'claim',d:{p:p.i,e,how:'tent'}}],{kind:'claim'});return}
   if(how==='auto'&&p.tent&&(!p.human||UI.sim)&&aiWantsTent(p,e))how='tent';
-  if(how==='tent'&&p.tent){p.tent=0;t.tent=p.i;lg(`⛺ ${p.nm} pitches the tent on ${tileName(t)}.`,'good');fx('camel',e,p.i,'tent');return}
-  if(p.camels<=0){lg(`${p.nm} has no camels left to claim ${tileName(t)}.`);return}t.camel=p.i;p.camels--;lg(`🐪 ${p.nm} claims ${tileName(t)}.`,'good');fx('camel',e,p.i,'camel');
+  if(how==='tent'&&p.tent){p.tent=0;t.tent=p.i;lg(`${p.nm} pitches the tent on ${tileName(t)}.`,'good');fx('camel',e,p.i,'tent');return}
+  if(p.camels<=0){lg(`${p.nm} has no camels left to claim ${tileName(t)}.`);return}t.camel=p.i;p.camels--;lg(`${p.nm} claims ${tileName(t)}.`,'good');fx('camel',e,p.i,'camel');
   if(p.camels===0&&!G.endTrig){G.endTrig=true;lg(`${p.nm} placed the last camel. The round finishes, then the game ends.`,'big')}}
 QH.claim=d=>claimTile(P(d.p),d.e,d.how);
 function owner(t){return t.camel!=null?t.camel:t.tent!=null?t.tent:null}
@@ -132,8 +132,8 @@ function doTribe(m){const a=G.act;const p=P(G.cur);const c=a.color;a.tribeDone=t
 QH.keepItem=d=>{const p=P(d.p);p.items.push(d.drawn[d.keep]);G.itemDisc.push(...d.drawn.filter((x,j)=>j!==d.keep));lg(`${p.nm} keeps an item.`,'good')};
 function gainCard(p,r,quiet){if(r==null)return;if(r==='fakir')p.fk++;else p.res.push(r);if(!quiet)lg(`${p.nm} takes ${RNAME[r]}.`,'good')}
 function killOne(p,k,c){G.stats.kills++;const sirra=hasDj(p,'sirra');
-  if(k.pl!=null){const q=P(k.pl);if(c==='vizier')q.vz--;else if(c==='elder')q.el--;else q.art--;lg(`🗡 ${p.nm}'s Shadow takes one of ${q.nm}'s ${MPLUR[c]}.`,'bad');fx('kill');}
-  else{const t=G.board[k.tile];t.m.splice(t.m.indexOf(c),1);lg(`🗡 ${p.nm}'s Shadow takes a ${MNAME[c]} from ${tileName(t)}.`,'bad');fx('kill',k.tile);if(!t.m.length&&t.camel==null&&t.tent==null)claimTile(p,k.tile,'camel')}
+  if(k.pl!=null){const q=P(k.pl);if(c==='vizier')q.vz--;else if(c==='elder')q.el--;else q.art--;lg(`${p.nm}'s Shadow takes one of ${q.nm}'s ${MPLUR[c]}.`,'bad');fx('kill');}
+  else{const t=G.board[k.tile];t.m.splice(t.m.indexOf(c),1);lg(`${p.nm}'s Shadow takes a ${MNAME[c]} from ${tileName(t)}.`,'bad');fx('kill',k.tile);if(!t.m.length&&t.camel==null&&t.tent==null)claimTile(p,k.tile,'camel')}
   if(sirra){if(c==='merchant'&&G.rdeck.length){gainCard(p,G.rdeck.shift());G.bag.push(c)}else if(c==='builder'&&k.tile!=null){const blues=AROUND(k.tile).filter(i=>G.board[i].blue&&!G.board[i].block).length;p.coins+=blues;lg(`${p.nm} pockets ${blues} coins from the fallen Mason (Sirra).`,'good');G.bag.push(c)}
     else if(c==='vizier'){p.vz++;lg(`${p.nm} keeps the Advisor (Sirra).`,'good')}else if(c==='elder'){p.el++;lg(`${p.nm} keeps the Sage (Sirra).`,'good')}else if(c==='artisan'){p.art++;if(G.items.length)p.items.push(G.items.shift());lg(`${p.nm} keeps the Crafter and draws an item (Sirra).`,'good')}else G.bag.push(c)}
   else G.bag.push(c);trig('kill',p.i)}
@@ -153,12 +153,12 @@ function summonPays(p){const o=[];if(p.el>=2)o.push({el:2,fk:0});if(p.el>=1&&p.f
 function doTile(m){const a=G.act;const p=P(G.cur);const t=G.board[a.tile];a.tileDone=true;G.step='sell';if(m.skip)return;
   if(m.place!=null){if(t.k==='village')placePalace(p,m.place);else placePalm(p,m.place);return}
   if(m.dj){payCost(p,m.pay);G.djRow.splice(G.djRow.indexOf(m.dj),1);gainDjinn(p,m.dj);return}
-  if(m.thief){payCost(p,m.pay);G.thRow.splice(G.thRow.indexOf(m.thief),1);p.thieves.push({k:m.thief,turn:G.turn});lg(`🦹 ${p.nm} hires the ${THIEVES[m.thief].n}.`,'big');return}
+  if(m.thief){payCost(p,m.pay);G.thRow.splice(G.thRow.indexOf(m.thief),1);p.thieves.push({k:m.thief,turn:G.turn});lg(`${p.nm} hires the ${THIEVES[m.thief].n}.`,'big');return}
   if(m.take){const cost=t.k==='small'?3:t.k==='large'?6:4;p.coins-=cost;const got=m.take.slice().sort((x,y)=>y-x).map(j=>G.market.splice(j,1)[0]);for(const r of got)gainCard(p,r,1);lg(`${p.nm} buys ${got.map(r=>RNAME[r]).join(' and ')} for ${cost} coins.`,'good');fx('res');return}
   if(m.work){if(m.work==='art'){p.art--;G.bag.push('artisan')}else{p.fk-=2;G.rdisc.push('fakir','fakir')}p.items.push(G.items.shift());lg(`${p.nm} commissions an item at the Workshop.`,'good');return}}
-function placePalace(p,i,viaDj){if(SUP().pal<1){lg('The palace pieces have run out.');return}SUP().pal--;const t=G.board[i];t.pal++;lg(`🏰 ${p.nm} raises a palace on ${tileName(t)}.`,'good');fx('build',i,p.i,'pal');trig('palace',p.i)}
-function placePalm(p,i){if(SUP().palm<1){lg('The palm trees have run out.');return}SUP().palm--;const t=G.board[i];t.palm++;lg(`🌴 ${p.nm} plants a palm on ${tileName(t)}.`,'good');fx('build',i,p.i,'palm')}
-function gainDjinn(p,k){p.dj.push(k);G.stats.djinns++;lg(`✨ ${p.nm} summons ${DJ[k].n}.`,'big');fx('djinn',k);fx('summon',k);if(!UI.sim&&UI.fx.length)UI.fx[UI.fx.length-1].h=p.human?1:0;trig('djinn',p.i,{k})}
+function placePalace(p,i,viaDj){if(SUP().pal<1){lg('The palace pieces have run out.');return}SUP().pal--;const t=G.board[i];t.pal++;lg(`${p.nm} raises a palace on ${tileName(t)}.`,'good');fx('build',i,p.i,'pal');trig('palace',p.i)}
+function placePalm(p,i){if(SUP().palm<1){lg('The palm trees have run out.');return}SUP().palm--;const t=G.board[i];t.palm++;lg(`${p.nm} plants a palm on ${tileName(t)}.`,'good');fx('build',i,p.i,'palm')}
+function gainDjinn(p,k){p.dj.push(k);G.stats.djinns++;lg(`${p.nm} summons ${DJ[k].n}.`,'big');fx('djinn',k);fx('summon',k);if(!UI.sim&&UI.fx.length)UI.fx[UI.fx.length-1].h=p.human?1:0;trig('djinn',p.i,{k})}
 // ---------- goods sale (end of turn, optional) ----------
 function sellValue(n){return SETVP[Math.min(n,9)]}
 function sellMoves(p){const kinds=[...new Set(p.res)];const o=[];// offer selling the n kinds you hold most copies of (the dock also lets you choose kinds)
@@ -173,7 +173,7 @@ function itemMoves(p){const o=[];if(p.itemUsed||!p.items.length)return o;const k
     case 'scimitar':if(G.board.some(t=>t.m.length))o.push({act:'item',k});break;
     case 'talisman':{const mine=G.board.filter(t=>t.camel===p.i);const em=G.board.filter(emptyTile);if(mine.length&&em.length)for(const a of mine)for(const b of em)o.push({act:'item',k,from:a.i,to:b.i});break}
     case 'horn':o.push({act:'item',k});break}}return o}
-function useItem(p,m){p.items.splice(p.items.indexOf(m.k),1);G.itemDisc.push(m.k);p.itemUsed=1;const I=ITEMS[m.k];lg(`🪄 ${p.nm} uses the ${I.n}.`,'step');fx('item',m.k);
+function useItem(p,m){p.items.splice(p.items.indexOf(m.k),1);G.itemDisc.push(m.k);p.itemUsed=1;const I=ITEMS[m.k];lg(`${p.nm} uses the ${I.n}.`,'step');fx('item',m.k);
   switch(m.k){
   case 'carpet':G.turnFx.carpet=1;break;
   case 'lamp':G.djRow.splice(G.djRow.indexOf(m.dj),1);gainDjinn(p,m.dj);break;
@@ -186,7 +186,7 @@ QH.flute=d=>{const s=G.board[d.j];s.m.splice(s.m.indexOf(d.c),1);G.board[d.t].m.
 function scimStep(p,left){if(!left)return;const opts=[];for(const t of G.board)for(const c of new Set(t.m))opts.push({l:`${MNAME[c]} on ${tileName(t)}`,h:'scim',d:{p:p.i,tile:t.i,c,left}});if(!opts.length)return;ask(p.i,`Ember Blade: remove a meeple (${left} left)`,opts,{kind:'kill'})}
 QH.scim=d=>{const p=P(d.p);killOne(p,{tile:d.tile},d.c);scimStep(p,d.left-1)};
 function thiefMoves(p){if(!G.act||G.act.tribeDone)return[];return p.thieves.filter(t=>t.k===G.act.color&&t.turn!==G.turn&&!G.turnFx.thief).map(t=>({act:'thief',k:t.k}))}
-function useThief(p,m){p.thieves.splice(p.thieves.findIndex(t=>t.k===m.k),1);G.turnFx.thief=1;lg(`🦹 ${p.nm} sends the ${THIEVES[m.k].n} out!`,'big');fx('thief');const pool=[];
+function useThief(p,m){p.thieves.splice(p.thieves.findIndex(t=>t.k===m.k),1);G.turnFx.thief=1;lg(`${p.nm} sends the ${THIEVES[m.k].n} out!`,'big');fx('thief');const pool=[];
   for(const q of G.pl){if(q.i===p.i||hasDj(q,'hafiz'))continue;const give=thiefGive(q,m.k);if(give.length)pool.push(...give)}
   if(!pool.length){lg('Nobody has anything to give up.');return}
   const take=m.k==='merchant'?2:1;thiefClaim(p,m.k,pool,take)}
@@ -200,7 +200,7 @@ function thiefGive(q,k){const o=[];switch(k){
   case 'artisan':if(q.items.length){const it=q.items.shift();o.push({kind:'item',k:it});lg(`${q.nm} gives up an item.`,'bad')}break}return o}
 function thiefClaim(p,k,pool,take){if(!take||!pool.length)return;const opts=pool.map((g,j)=>({l:giveLabel(g),h:'thiefTake',d:{p:p.i,k,pool,j,take}}));ask(p.i,`Cutpurse haul: take ${take>1?take+' things':'one'}`,opts,{kind:'thief'})}
 QH.thiefTake=d=>{const p=P(d.p);const g=d.pool[d.j];const rest=d.pool.filter((x,j)=>j!==d.j);
-  if(g.kind==='tile'){if(p.camels>0){G.board[g.i].camel=p.i;p.camels--;lg(`🐪 ${p.nm} claims ${tileName(G.board[g.i])}.`,'good')}}
+  if(g.kind==='tile'){if(p.camels>0){G.board[g.i].camel=p.i;p.camels--;lg(`${p.nm} claims ${tileName(G.board[g.i])}.`,'good')}}
   else if(g.kind==='palm'||g.kind==='pal'){const best=G.board.filter(t=>owner(t)===p.i).sort((a,b)=>b.v-a.v)[0]||G.board.find(t=>!t.block);if(g.kind==='palm')best.palm++;else best.pal++;lg(`${p.nm} places it on ${tileName(best)}.`,'good')}
   else if(g.kind==='card')gainCard(p,g.r);else if(g.kind==='vizier'){p.vz++;lg(`${p.nm} gains an Advisor.`,'good')}else if(g.kind==='dj'){p.dj.push(g.k);lg(`${p.nm} gains ${DJ[g.k].n}.`,'good')}else if(g.kind==='item')p.items.push(g.k);
   // the rest goes to the discards
@@ -254,7 +254,7 @@ function goodsScore(res){const c={};for(const r of res)c[r]=(c[r]||0)+1;let tot=
 function goodsBest(p){const w=hasDj(p,'zarifa')?Math.floor(p.fk/2):0;if(!w)return goodsScore(p.res);const kinds=Object.keys(RNAME).filter(k=>k!=='fakir');let best=0;
   const rec=(res,left)=>{if(!left){best=Math.max(best,goodsScore(res));return}for(const k of kinds)rec(res.concat([k]),left-1)};if(w<=3)rec(p.res,w);else{let r=p.res.slice();for(let i=0;i<w;i++){let bk=kinds[0],bv=-1;for(const k of kinds){const v=goodsScore(r.concat([k]));if(v>bv){bv=v;bk=k}}r.push(bk)}best=goodsScore(r)}return best}
 function finish(){if(G.over)return;const sc=G.pl.map(p=>({p,s:scoreOf(p)}));sc.sort((a,b)=>b.s.total-a.s.total);const top=sc[0].s.total;const winners=sc.filter(x=>x.s.total===top).map(x=>x.p);
-  G.over={scores:sc.map(x=>({p:x.p.i,s:x.s})),win:winners.map(w=>w.i)};G.winner=winners.map(w=>w.nm).join(' & ');G.winText=`${G.winner} ${winners.length>1?'share the win':winners[0].nm==='You'?'win':'wins'} with ${top} points.`;G.phase='over';lg('🏆 '+G.winText,'big');fx('win')}
+  G.over={scores:sc.map(x=>({p:x.p.i,s:x.s})),win:winners.map(w=>w.i)};G.winner=winners.map(w=>w.nm).join(' & ');G.winText=`${G.winner} ${winners.length>1?'share the win':winners[0].nm==='You'?'win':'wins'} with ${top} points.`;G.phase='over';lg(''+G.winText,'big');fx('win')}
 // ---------- invariants and test hooks ----------
 function checkInvariants(){const v=[];if(!G)return v;let n=G.bag.length;for(const t of G.board){n+=t.m.length;if(t.block&&t.m.length)v.push('meeple on a blocked tile')}if(G.move)n+=G.move.hand.length;if(G.act&&!G.act.tribeDone)n+=G.act.n;
   for(const p of G.pl){n+=p.vz+p.el+p.art;if(p.coins<0)v.push(p.nm+' coins negative');if(p.fk<0)v.push(p.nm+' mystics negative');if(p.camels<0)v.push('camels negative');if(p.el<0||p.vz<0||p.art<0)v.push('kept meeples negative')}

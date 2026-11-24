@@ -22,7 +22,7 @@ function paintBoot(){GXSK.init({map:true,stars:true,banner:true,icons:['players'
   ['sacred','oasis','small','large','workshop','exchange','lake','city','ravine'].forEach(k=>pimg('tile-'+k));paintApply();sprites3d();artProbe()}
 // painted plates, glyphs, items: html.sk-pl once ui-nameplate has loaded; an <img> in place of an emoji only when painted
 const ITEM_IMG={gem5:'item-gem5.webp',gem7:'item-gem7.webp',gem9:'item-gem9.webp',carpet:'item-carpet.webp',lamp:'item-lamp.webp',flute:'item-flute.webp',scimitar:'item-scimitar.webp',talisman:'item-talisman.webp',horn:'item-horn.webp'};
-function pIc(f,emo){return HR.classList.contains('sk-pl')&&f?`<img class="pic" src="media/${f}" alt="">`:emo}
+function pIc(f,emo){return f?`<img class="pic" src="media/${f}" alt="">`:emo}
 function itemIc(k){return pIc(ITEM_IMG[k],'🪄')}
 function artProbe(){[['sk-dj','djinn-amir'],['sk-gd','good-ivory'],['sk-tk','token-tent-0'],['sk-ic2','icon-coin'],['sk-spot','ui-spot'],['sk-fx','fx-sparkle'],['sk-pl','ui-nameplate']].forEach(([c,f])=>pimg(f,()=>{if(PAINT_ON)HR.classList.add(c)}))}
 // 3D-model sprites (palm, palace, camel, lamp turntable): html.sp3 once the files are there; without them the emoji stay
