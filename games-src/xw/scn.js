@@ -24,7 +24,7 @@
   var fonts = function (root, min) { var bad = []; [].forEach.call(document.querySelectorAll(root + ' *'), function (e) { if (e.children.length || !(e.textContent || '').trim() || !GXS.vis(e)) return; var px = parseFloat(getComputedStyle(e).fontSize); if (px < min) bad.push(e.textContent.trim().slice(0, 16) + ' ' + px + 'px'); }); return bad; };
 
   GXS.add({
-    id: 'nb-tutorial-play', name: 'Tutorial: tap your ship', ask: 'Tap the glowing ship', seed: 6, when: booted,
+    id: 'nb-tutorial-play', name: 'Tutorial: tap your ship', ask: 'Tap the glowing ship', seed: 6, when: function () { return booted() && !window.GXST; },   // the staged duel is retired (scenario lessons, lessons.js)
     setup: function () {
       try { GX.close(); } catch (e) { }
       tutStart();   // the same lesson the menu opens, fixed squads and dice
