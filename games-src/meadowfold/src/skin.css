@@ -395,3 +395,23 @@ html[data-pp] #pscrim{opacity:1;pointer-events:auto}
   html[data-pp] #board{right:min(446px,47vw)}
   .pp{right:8px}
 }
+/* floating tutorial: never dims, never blocks; only its own window and labels take taps */
+#twin{position:fixed;z-index:70;width:min(340px,calc(100vw - 16px));box-sizing:border-box;background:#fffaf0;color:#3d3026;border:2px solid #4a3b2e;border-radius:14px;box-shadow:0 8px 22px rgba(60,40,20,.28);font-size:15px;line-height:1.35;touch-action:none}
+#twin.min{width:auto;background:none;border:0;box-shadow:none}
+#twin .tchip{min-height:44px;padding:4px 16px;border-radius:22px;background:#4a3b2e;color:#fffaf0;border:2px solid #fffaf0;font-weight:700;font-size:15px;box-shadow:0 4px 12px rgba(0,0,0,.25)}
+#twin .twh{display:flex;align-items:center;gap:4px;padding:4px 4px 4px 12px;background:#4a3b2e;color:#fffaf0;border-radius:11px 11px 0 0;cursor:move}
+#twin .twh b{font-size:15px}#twin .sp{flex:1}
+#twin .twb{width:44px;height:44px;border:0;background:none;color:#fffaf0;font-size:26px;line-height:1;border-radius:8px}
+#twin .tws{margin:8px 12px 2px;font-weight:700}#twin .twy{margin:2px 12px 6px;color:#6b5a48;font-size:14px}
+#twin .twc{display:flex;flex-wrap:wrap;gap:3px;margin:0 10px 4px;padding:0;list-style:none}
+#twin .twc li{width:12px;height:12px;border-radius:50%;background:#e4d8c4;font-size:0}#twin .twc li.ok{background:#5d9c58}#twin .twc li.cur{outline:2px solid #e8907e;outline-offset:1px}
+#twin .twf{display:flex;gap:8px;padding:4px 10px 10px}#twin .btn{min-height:44px}
+#tmap{position:fixed;inset:0;z-index:65;pointer-events:none}
+#tmap .tml{position:absolute;inset:0}#tmap line{stroke:#4a3b2e;stroke-width:2;stroke-dasharray:4 3}#tmap circle{fill:#e8907e;stroke:#fff;stroke-width:1.5}
+#tmap .tlab{position:absolute;pointer-events:auto;min-height:32px;padding:3px 10px;border-radius:16px;background:#4a3b2e;color:#fffaf0;border:2px solid #fffaf0;font-weight:700;font-size:14px;white-space:nowrap;box-shadow:0 2px 8px rgba(0,0,0,.25)}
+#tmap .tlab.on{background:#e8907e}
+.tsug{animation:tsug 1.6s ease-in-out infinite;border-radius:12px}
+#map .hx.tsug,#map.tsug{animation:none}
+@keyframes tsug{0%,100%{box-shadow:0 0 0 0 rgba(232,144,126,.0)}50%{box-shadow:0 0 0 6px rgba(232,144,126,.75)}}
+@media (prefers-reduced-motion:reduce){.tsug{animation:none;box-shadow:0 0 0 4px rgba(232,144,126,.75)}}
+#tutQ{font-weight:800;font-size:20px;min-width:44px;justify-content:center}
