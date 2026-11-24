@@ -97,7 +97,7 @@ async function run(b, W, H) {
   s = await st(); if (Object.keys(s.best).length !== ids.length) note('progress saved for ' + Object.keys(s.best).length + '/' + ids.length);
   await tapStep({ c: '.gxst-hd .gxst-ib[aria-label="Minimise"]' }); if (!(await st()).min || !(await p.$('.gxst-chip'))) note('minimise gave no chip');
   await tapStep({ c: '.gxst-chip' }); if ((await st()).min) note('chip did not restore');
-  const hd = await p.evaluate(() => { const r = document.querySelector('.gxst-hd b').getBoundingClientRect(); return [r.left + 10, r.top + r.height / 2]; });
+  await tick(p, 1500); const hd = await p.evaluate(() => { const r = document.querySelector('.gxst-hd b').getBoundingClientRect(); return [r.left + 10, r.top + r.height / 2]; });
   const dy = hd[1] > H / 2 ? -60 : 60;
   await p.mouse.move(hd[0], hd[1]); await p.mouse.down(); await p.mouse.move(hd[0] + 4, hd[1] + dy / 2, { steps: 4 }); await p.mouse.move(hd[0] + 8, hd[1] + dy, { steps: 4 });
   const moved = await p.evaluate(y0 => Math.abs(document.querySelector('.gxst-card').getBoundingClientRect().top + 10 - y0) > 20, hd[1]);   // the card follows the finger
