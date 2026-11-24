@@ -379,8 +379,12 @@ function showResult() {
   if (UI.ended) return; UI.ended = true; var w = G.win, me = UI.side, won = w.side === me;
   try { if (window.GXT && GXT.active()) { GXT.act({ type: 'event', what: 'done' }); return; } } catch (e) { }
   sfx(won ? 'win' : 'lose');
-  $('#resH').textContent = won ? 'Victory' : 'Defeat';
-  $('#resP').textContent = { taint: 'The Hollow Crown overcame the Bearers. The Gloam rules the dark.', kiln: 'The Hollow Crown was unmade in the Kiln of Kaldur. Dawn breaks.', vp: w.side === 'G' ? 'The Gloam took ten points of Dawn cities and strongholds.' : 'The Dawn League took four points of Gloam strongholds.' }[w.why] + ' Turn ' + G.turn + '.';
+  $('#resH').textContent = won ? 'Victory' : 'Defeat'; $('#res').className = 'scr' + (won ? ' won' : ' lost');
+  $('#rWho').textContent = (w.side === 'D' ? 'The Dawn League' : 'The Gloam') + (won ? ' prevails' : ' prevails over you');
+  $('#rEmb').className = 'rem ' + w.side.toLowerCase(); $('#rEmb').innerHTML = '<svg viewBox="0 0 64 64" aria-hidden="true"><path d="' + ICONS[w.side === 'D' ? 'lantern' : 'leader'] + '" transform="translate(8,8) scale(.109)" fill="#f6e9c8"/></svg>';
+  $('#resP').textContent = { taint: 'The Hollow Crown overcame the Bearers. The Gloam rules the dark.', kiln: 'The Hollow Crown was unmade in the Kiln of Kaldur. Dawn breaks.', vp: w.side === 'G' ? 'The Gloam took ten points of Dawn cities and strongholds.' : 'The Dawn League took four points of Gloam strongholds.' }[w.why];
+  var reg = { D: 0, G: 0 }; Object.keys(G.A).forEach(function (r) { var a = G.A[r], sd = armySide(a); if (sd && units(a)) reg[sd]++; });
+  $('#rStats').innerHTML = [[G.turn, G.turn === 1 ? 'turn' : 'turns'], [reg[me], 'your regions'], [reg[other(me)], 'rival regions'], [G.stats.battles, 'battles']].map(function (x) { return '<div><b>' + x[0] + '</b><span>' + x[1] + '</span></div>'; }).join('');
   var row = $('#resRow'); row.innerHTML = '';
   [['Play again', function () { startGame({ side: UI.side, level: UI.level }); }, 'pri'], ['Switch sides', function () { startGame({ side: other(UI.side), level: UI.level }); }, ''], ['Title', showTitle, '']].forEach(function (x) { var b = mk('button', 'btn big ' + x[2], x[0]); b.type = 'button'; b.onclick = x[1]; row.appendChild(b); });
   $('#res').classList.add('on'); document.body.classList.add('scr-on');
@@ -397,7 +401,7 @@ function crest() {
 }
 function boot() {
   UI.side = ls('gw-side') || 'D'; UI.level = ls('gw-lv') || 'normal';
-  crest(); if ($('#title').classList.contains('on')) document.body.classList.add('scr-on'); MV.init(); MV.onTap = onMapTap; menuInit(); helpInit();
+  GWART.paint($('#title')); GWART.paint($('#res')); crest(); if ($('#title').classList.contains('on')) document.body.classList.add('scr-on'); MV.init(); MV.onTap = onMapTap; menuInit(); helpInit();
   var seg = $('#segL'); [['easy', 'Easy'], ['normal', 'Normal'], ['hard', 'Hard']].forEach(function (x) { var b = mk('button', UI.level === x[0] ? 'on' : '', x[1]); b.type = 'button'; b.onclick = function () { UI.level = x[0]; ls('gw-lv', x[0]); seg.querySelectorAll('button').forEach(function (y) { y.classList.toggle('on', y === b); }); }; seg.appendChild(b); });
   $('#playD').onclick = function () { ls('gw-played', 1); startGame({ side: 'D', level: UI.level }); };
   $('#playG').onclick = function () { ls('gw-played', 1); startGame({ side: 'G', level: UI.level }); };

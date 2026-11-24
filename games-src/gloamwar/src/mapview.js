@@ -51,7 +51,7 @@ function mapStatic() {
   REGIONS.forEach(function (r) {
     var major = !!r.set || ['whisperwood', 'cinderplain'].indexOf(r.id) >= 0, c = setPos(r), fs = r.set === 'strong' ? 26 : r.set === 'city' ? 24 : major ? 22 : 18;
     var y = r.set ? c[1] + (r.set === 'strong' ? 50 : 44) : r.y + 34;
-    h.push('<text class="mlbl' + (major ? '' : ' minor') + '" style="--b:' + fs + '" x="' + (r.set ? c[0] : r.x) + '" y="' + y + '" font-size="' + fs + '" text-anchor="middle">' + r.n + '</text>');
+    h.push('<text class="mlbl' + (major ? '' : ' minor') + '" style="--b:' + fs + '" data-x="' + (r.set ? c[0] : r.x) + '" x="' + (r.set ? c[0] : r.x) + '" y="' + y + '" font-size="' + fs + '" text-anchor="middle">' + r.n + '</text>');
   });
   h.push('<g pointer-events="none" font-family="Arial, sans-serif" fill="#9cc2dc" opacity=".8"><text x="60" y="1075" font-size="26" font-style="italic" transform="rotate(-80 60 1075)">The Pale Sea</text><text x="912" y="528" font-size="16" font-style="italic" text-anchor="middle">Bitter Mere</text></g>');
   return h.join('');
@@ -122,6 +122,7 @@ MV.render = function (G, hl, viewer) {
   Object.keys(byR).forEach(function (rid) { s.push(charBadges(G, rid, byR[rid])); });
   if (viewer === 'D' || !G.F.hid || G.F.road >= 0 || hl.showCompany) s.push(companySvg(G, viewer)); else s.push(companySvg(G, viewer));
   dyn.innerHTML = s.join('');
+  MV.labels();
   (hl.tokens || []).forEach(function (id) { var e = document.getElementById(id); if (e) { e.classList.add('legal'); var rg = e.querySelector('.tokring'); if (rg) rg.setAttribute('opacity', '1'); } });
   if (hl.selTok) { var e2 = document.getElementById(hl.selTok); if (e2) { e2.classList.add('sel'); var rg2 = e2.querySelector('.tokring'); if (rg2) rg2.setAttribute('opacity', '1'); } }
 };
@@ -129,9 +130,23 @@ MV.flash = function (rid) { var f = document.getElementById('flash'); if (!f || 
 // ---------------------------------------------------------------- camera
 MV.apply = function () { var m = document.getElementById('map'); if (!m) return; m.style.transform = 'translate(' + MV.tx.toFixed(1) + 'px,' + MV.ty.toFixed(1) + 'px) scale(' + MV.k.toFixed(4) + ')'; var b = document.getElementById('board'); if (b) b.classList.toggle('zoomed-out', MV.k < 0.62);
   var k = MV.k; m.style.setProperty('--ik', (1 / k).toFixed(3)); m.style.setProperty('--lf', (12.5 / k).toFixed(2)); m.style.setProperty('--ts', Math.min(2, Math.max(1, 15 / (31 * k))).toFixed(3)); m.style.setProperty('--tc', Math.min(2.4, Math.max(1, 14 / (17 * k))).toFixed(3));
+  if (MV._lk !== MV.k) { MV._lk = MV.k; MV.labels(); }
   if (window.closeRCard && !MV.keepCard) closeRCard(); };
-MV.clamp = function () { var b = document.getElementById('board'), W = b.clientWidth, H = b.clientHeight; var mw = MAPW * MV.k, mh = MAPH * MV.k; MV.tx = mw <= W ? (W - mw) / 2 : Math.min(0, Math.max(W - mw, MV.tx)); MV.ty = mh <= H ? (H - mh) / 2 : Math.min(0, Math.max(H - mh, MV.ty)); };
-MV.fit = function () { var b = document.getElementById('board'); if (!b || !b.clientWidth) return; var W = b.clientWidth, H = b.clientHeight; MV.minK = Math.min(W / MAPW, H / MAPH) * 0.98; MV.k0 = Math.max(MV.minK, Math.min(W / MAPW, 1.2)); if (W < 700) MV.k0 = Math.max(MV.k0, 0.82); if (!MV.k || MV.k < MV.minK || MV.k > MV.maxK) MV.k = MV.k0; MV.clamp(); MV.apply(); };
+// PC (board wider than 900px): top banner (#msg) and bottom pill (#phase) cover the board edges, so the map lives in an inset area
+MV.inset = function (W) { return W > 900 ? { t: 64, b: 56 } : { t: 0, b: 0 }; };
+MV.clamp = function () { var b = document.getElementById('board'), W = b.clientWidth, H = b.clientHeight, ins = MV.inset(W); var mw = MAPW * MV.k, mh = MAPH * MV.k, Hi = H - ins.t - ins.b; MV.tx = mw <= W ? (W - mw) / 2 : Math.min(0, Math.max(W - mw, MV.tx)); MV.ty = mh <= Hi ? ins.t + (Hi - mh) / 2 : Math.min(ins.t, Math.max(H - ins.b - mh, MV.ty)); };
+MV.fit = function () { var b = document.getElementById('board'); if (!b || !b.clientWidth) return; var W = b.clientWidth, H = b.clientHeight, ins = MV.inset(W), Hi = H - ins.t - ins.b; MV.minK = Math.min(W / MAPW, Hi / MAPH) * 0.98; MV.k0 = Math.max(MV.minK, Math.min(W / MAPW, 1.2)); if (W < 700) MV.k0 = Math.max(MV.k0, 0.82); if (!MV.k || MV.k < MV.minK || MV.k > MV.maxK) MV.k = MV.k0; MV.clamp(); MV.apply(); MV.labels(); };
+// region labels: clamp inside the map, and hide any label whose box lies within 64 map units of a token centre
+MV.labels = function () {
+  var svg = document.querySelector('#map svg'); if (!svg) return; var toks = [], dyn = document.getElementById('dyn');
+  if (dyn) dyn.querySelectorAll('.tok').forEach(function (g) { var m = /translate\(\s*([-\d.]+)[\s,]+([-\d.]+)\)/.exec(g.getAttribute('transform') || ''); if (m) toks.push([+m[1], +m[2]]); });
+  svg.querySelectorAll('text.mlbl').forEach(function (t) {
+    var ox = +t.getAttribute('data-x'), bb; t.classList.remove('hid'); t.setAttribute('x', ox); bb = t.getBBox();
+    var sh = bb.x < 2 ? 2 - bb.x : bb.x + bb.width > MAPW - 2 ? MAPW - 2 - (bb.x + bb.width) : 0;
+    if (sh) { t.setAttribute('x', ox + sh); bb = t.getBBox(); }
+    for (var i = 0; i < toks.length; i++) { var dx = Math.max(bb.x - toks[i][0], 0, toks[i][0] - (bb.x + bb.width)), dy = Math.max(bb.y - toks[i][1], 0, toks[i][1] - (bb.y + bb.height)); if (Math.hypot(dx, dy) < 64) { t.classList.add('hid'); break; } }
+  });
+};
 MV.setSel = function (rid) {
   var sp = document.getElementById('selp'), nb = document.getElementById('nbp'); if (!sp) return;
   if (!rid || !REG[rid]) { sp.setAttribute('d', ''); nb.innerHTML = ''; return; }

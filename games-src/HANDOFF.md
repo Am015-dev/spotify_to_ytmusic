@@ -307,6 +307,24 @@ Live fix: original-name phrase removed from shelf blurb + sands page (15:2x).
 - Closest to done: short-fuse (4/5, F3 polish+PC then review), kaiten-kitchen (4/5-ish, F3 polish+PC then review), crown-city-smash (R97 7.4, F2), perch-and-plume (F3), lantern-dive (F2).
 - Pending: approve baselines (sunglaze, rampart: proof/baselines-new) before deploy; hollowbough R96 list after PLAY2; calm-audit doesn't count #coach/#toast.
 
+## W748 pc layout
+- emberclimb: empty potion circles hidden at >= 1024 px (css in src/head.html). Fight stage stays phone-sized in the middle: scaling enemy art overlapped the hero panel, so it was reverted; needs a stage re-layout.
+- lantern-dive: pool job cards and Pass button larger, seat chips 16 px at >= 1024 px (game/skin.css). Trick/felt geometry (tableGeo in src/ui2.js) still leaves the felt mostly empty.
+- meadowfold: start card scaled up at >= 1024 px (src/skin.css). In-game PC board already has strip/map/rail columns; not changed.
+- Phone sheets: flags identical before/after; pixel diffs only on animated water (also differ between two unchanged runs).
+
+## W748r pc layout (real desktop layouts, >= 1024/1100 px only; phone sheets identical apart from image-load timing)
+- emberclimb (src/head.html, end): fights at >= 1024x680 are a grid: hero panel (240 px portrait) left vs enemies right (230 px portraits), hand cards 176 px. Bad pc cells 6 -> 2.
+- lantern-dive (skin.css end, ui2.js tableGeo): table no longer capped at 1180 px (black side bars gone); job card 420x150 / 30 px; seats 240x132 at >= 1300 px. Bad 6 -> 4.
+- meadowfold (src/skin.css end): >= 1100 px puts scores, cards and pockets in a left column; the valley gets the full height (hex board ~490x500 -> ~680x730). Bad 6 -> 1.
+- Dead space (flat backdrop blocks, 1366x768 mean): emberclimb 27 -> 26, lantern-dive 40 -> 35, meadowfold 34 -> 33. The pixel metric counts the side column and
+  painted background as dead, so it barely moves although the boards grew; the 15% target is NOT met by that metric.
+- Still weak: lantern-dive job phase is one card on an empty felt (needs a real design: job row across the felt); emberclimb dock below the deck is empty
+  black, 6+ card hand overlaps at pc although it would fit (dense --cw uses the full viewport width, ui.js:505) and dense cards hide their text;
+  ec-result and story scenes are a small box on dark. meadowfold left column has ~110 px of empty green above the pockets.
+- Tests: build-all --quick scenarios pass for emberclimb (14/17) and lantern-dive (7/10); the 6 failures are only missing visual baselines. meadowfold
+  lessons-test PASS at 402x874 and 1366x768; rules-test.js did not finish within 60 s (untouched engine, not investigated).
+- contact-sheet.js waits 450 ms: lantern-dive's hand is often not painted yet in its cells (timing, not layout).
 ## W735 thornbound HUD diet (shelf/W735-hud-thornbound)
 - tb-story-start failure was NOT the HUD diet: parent commit fails the same. Story now opens the chapter map directly (tutorial = lesson row, scenario lessons); the scenario still waited for the old Skip-tutorial spotlight. Scenario rewritten (scn.js), HUD cuts untouched.
 - Test against a build-all staged build (python3 scripts/build-all.py thornbound --no-check), not games/thornbound (deployed copy).
@@ -314,6 +332,12 @@ Live fix: original-name phrase removed from shelf blurb + sands page (15:2x).
 ## W740 onyx-atelier visual fix (24 Nov)
 Done: tutorial part names now a tidy list inside the guide window, ONE callout on the board for the picked part (no chip cloud); PC (>=1000px) grid layout: board left (cell up to 112px), rival/jewels/you stacked right; guide never sits on the PC board.
 Weak: PC guide window still covers the rival jewel rows on lesson 1; HUD pips and phone start menu not changed. Sheets: onyx-atelier/proof/w740-*-sheet.jpg. Integrator: build.py then copy onyx-atelier.html to games/onyx-atelier/index.html (not in build-all).
+## W747 (end screens, perch-and-plume / vale-of-banners / stitchwise)
+Done: headline + score + max 3 highlights + Play again/Menu, stats behind a Details toggle. Scenarios: pp-result, vb-result, sw-result (checks updated). Proof: <game>/proof/endscreen-{phone,pc}.png.
+Still weak: build-all --quick fails on pre-existing issues (11px "Forest" in perch, missing vale/stitchwise baselines). Perch/vale have no winner-portrait art for AI wins beyond seat face/initial; stitchwise lose-case not shot. No lose-variant scenarios yet.
+## W767 stitchwise no-scroll HUD (shelf/W767-stitchwise-hud)
+Done: the dock's long scrolling strip of every upcoming patch (the owner's "scroll up and down") is now one "Next +N" chip that opens All patches, which shows the live sale order (first 3 = for sale, gold). 3 offers fit with no scroll on phone and PC; PC offer cards are compact rows; PC text >= 16px (track head, bar chips, start menu, result tally); closed windows display:none. Gate: stitchwise/noscroll-test.js (402x874, 1366x768, plus 402x720 and 1366x640 browser heights, every phase) PASS. Sheets --strict 0 flags: stitchwise/proof/w767-*-sheet.jpg.
+Integrator: visual baselines title + board diff (expected, layout changed): re-approve with --approve-visual after the owner sees the sheets. Pre-existing fails, also on the parent: scenarios pc menu + sw-zoom (open window covers the dock, settings chips overlap).
 ## W742 crown-city-smash visual (24 Nov 2026) - branch shelf/W742-vis-crown
 Done: dice faces never blank (tumble keeps the face visible; star faces now show a star behind the digit, so no bare white tiles); phone board repacked so the city, round panel, harbor and seats fill the top (about 1.7x larger) instead of an empty sunburst (art.js, phone only).
 NOT done (pc, R14 item 3): dice tray still a full-width green bar with dice at its left, 5 "0 cards" empty slots still shown, left player list still 8-9px. Next worker: board.css/onboard.css at >=1024px, centre dice at 56px+, hide empty card slots, 16px list.
