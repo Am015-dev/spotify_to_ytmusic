@@ -15,7 +15,6 @@ function buildRules() {
   sec('Special dives', ul(['Captain\'s call (dives 10, 13): the Captain takes all jobs or hands them to a willing diver. If handed over, signal before the first trick.', 'One diver takes all jobs. Dive 6: team vote. Dives 14, 15, 16: volunteer in turn, yes or no. Dive 26: two volunteers.', 'Open briefing (dives 17, 28-31, deep dives): talk about jobs. Never about cards.', 'Some dives add limits. Examples: no holding two more 9s than another diver, or never leading Coral. Each dive shows its rule when it starts.', 'Clock dives (14, 15, 16, 26): beat the clock, or skip it and use the other rule shown. Turn the clock on in setup.']));
   sec('Two divers and the drone', h('p', 'With two divers, a drone joins as a third player. Its 14 cards lie in two rows: 7 face up, 7 face down. The Captain takes its jobs and plays its face-up cards. A face-down card turns up after the card on top is played.'));
   sec('On your phone', ul(['Tap a card to lift it. Tap again, or press Play, to play it. Dim cards are blocked. Tap a diver or job for details.', 'The bottom panel says what to do now. The Hint button suggests a card and why.', 'Hot-seat: a screen hides hands between turns. Online: you see only your own cards. There is no chat, only signals and emotes.']));
-  root.appendChild(h('div', { html: '<section class="credits-audio"><h3>Credits</h3><p>Art and music by Am015-dev. Sounds were trimmed, loudness-normalised and converted for this game. Online play uses Trystero (MIT). The painted table is drawn with PixiJS (MIT). Names, job text and art are original; the paintings are by Am015-dev.</p></section>' }));
   return root;
 }
 // ---- reference drawer: every card, job and dive, with counts ----
@@ -73,7 +72,7 @@ function renderMenu() {
   let sp = ''; try { sp = /[?&]perf=1/.test(location.search) && window.PerfHUD && PerfHUD.buttonsHTML ? PerfHUD.buttonsHTML('btn alt') : ''; } catch (e) { }   // Show speed / Test speed only behind ?perf=1
   row('Info', h('button.btn.alt', { 'data-a': 'rules', type: 'button' }, 'How to play'), h('button.btn.alt', { 'data-a': 'ref', type: 'button' }, 'Cards, jobs, dives'), h('span.tinyc', { html: sp }));
   if (NET.on) row('Emotes (no card talk)', ...['👍', '👋', '👏', '🫧'].map(e => h('button.btn.alt', { 'data-a': 'emote', 'data-v': e, type: 'button', 'aria-label': 'Emote ' + e }, e)));
-  b.appendChild(h('p.sm', 'Lantern Dive is an original co-op card game. Audio credits are in How to play.'));
+  b.appendChild(h('p.sm', 'Lantern Dive is an original co-op card game.'));
 }
 // ---------- start screens: painted title -> setup (dive, crew) / online ----------
 const SEAT_ORDER = [0, 1, 2, 3];

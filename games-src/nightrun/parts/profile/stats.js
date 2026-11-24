@@ -173,7 +173,7 @@ RET.st=(function(on){
      +(typeof FB!=='undefined'&&FB.on?FB.sheet():'')
      +'<h3>ACHIEVEMENTS <span id="stAchN">'+got+'/'+A.length+'</span></h3><div class="stAch">'
      +A.map(a=>{const g=!!D.a[a.id];return '<div class="ac'+(g?' got':'')+'" data-id="'+a.id+'">'+badge(a,g)+'<span><b>'+esc(a.n)+'</b><small>'+(g?'':'🔒 ')+esc(a.d)+(a.skill?' · no Assist':'')+'</small></span></div>';}).join('')+'</div>'
-     +'<h3>CREDITS &amp; PRIVACY</h3><div class="stCred"><p><b>Music</b> original, made for this game</p><p><b>Code and art</b> original, made for this game</p><p><b>Privacy</b> saved only on this device. No data is collected.</p></div>'
+     +'<h3>PRIVACY</h3><div class="stCred"><p><b>Privacy</b> saved only on this device. No data is collected.</p></div>'
      +'<button type="button" class="go dim" id="stReset">RESET STATS</button><button type="button" class="go back" id="stsBack">BACK</button>';}
   let sheet=null,rt=0;
   function shut(){if(sheet)sheet.hidden=true;}
