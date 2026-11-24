@@ -93,7 +93,8 @@ function sealOf(seat){const c=fcol(seat)||'';const m=/^#([0-9a-f]{6})$/i.exec(c)
 function drawOverlay(){const ov=MAP.ov,m=MAP.m;if(!ov||!m)return;const V=UI.V,f=[];
   // location reward coins (+1 / +2) and a favour disc marker
   for(let l=0;l<6;l++){const p=m.locPos(LOCID[l]),inf=DD.LOCS[l][2],k=UI.phone?1.2:1;
-    f.push('<g transform="translate('+(p.x+40*k)+' '+(p.y-40*k)+')"><circle r="'+(UI.phone?19:17)+'" fill="#1b0b10" stroke="#e8c867" stroke-width="2.6"/><text y="8" text-anchor="middle" font-family="'+TBKit.fonts.display+'" font-weight="700" font-size="'+(UI.phone?24:22)+'" fill="#fff0b8">+'+inf+'</text></g>');
+    const bf=Math.max(UI.phone?24:22,Math.ceil((UI.phone?14.5:16.5)*1000/(UI.bs||600))); // W754: influence badge reads >= 14px phone / 16px pc
+    f.push('<g transform="translate('+(p.x+(30+bf*.45)*k)+' '+(p.y-(30+bf*.45)*k)+')"><circle r="'+Math.round(bf*.82)+'" fill="#1b0b10" stroke="#e8c867" stroke-width="3"/><text y="'+Math.round(bf*.35)+'" text-anchor="middle" font-family="'+TBKit.fonts.display+'" font-weight="700" font-size="'+bf+'" fill="#fff0b8">+'+inf+'</text></g>');
     // council marker / favour
     if(l===2){const h=V.fav.h;const col=h>=0?fcol(h):'#e8c867';f.push('<g transform="translate('+(p.x-40*k)+' '+(p.y-40*k)+')"><circle r="'+(UI.phone?18:16)+'" fill="'+col+'" stroke="#fff3c4" stroke-width="2.6"/><path d="M0 -9 L2.6 -2.6 9 -2.6 3.8 1.6 5.8 8 0 4 -5.8 8 -3.8 1.6 -9 -2.6 -2.6 -2.6Z" fill="#fff6d0" stroke="#4a3208" stroke-width="1"/></g>')}
     // Kingdom Cards that sit on a Location
@@ -107,10 +108,10 @@ function drawOverlay(){const ov=MAP.ov,m=MAP.m;if(!ov||!m)return;const V=UI.V,f=
     for(let s=0;s<n;s++){const sp=V.pl[s].supp,cnt=sp.r[r]+sp.x[r];if(!cnt)continue;const c=s%cols,rw=Math.floor(s/cols);const x=S.cx-tw/2+c*(sw+gap)+sw/2,y=S.cy-th/2+rw*(sh+gap)+sh+(UI.phone?10:9);
       f.push('<g transform="translate('+x+' '+y+')"><circle r="'+(UI.phone?11:10)+'" fill="'+fcol(s)+'" stroke="#fff3c4" stroke-width="2"/><text y="5" text-anchor="middle" font-size="14" font-weight="700" fill="#fff" font-family="'+TBKit.fonts.display+'">'+cnt+'</text></g>')}}
   regionChips(f);
-  if(UI.phone&&(UI.bs||0)>=250){ // phones: the kit's banners are hidden, so every location gets a short name tag of its own
-    for(let l=0;l<6;l++){const P=LOCPOS[l],name=LOCN[l],fs=Math.max(36,Math.ceil(14.2*1000/(UI.bs||360))),words=name.split(' ');const lines=name.length*fs*.6+18>330&&words.length>1?[words[0],words.slice(1).join(' ')]:[name];
-      const wd=Math.max(...lines.map(t=>t.length))*fs*.6+18,ht=lines.length*fs+8;const cx=Math.max(wd/2+4,Math.min(996-wd/2,P[0])),top=P[1]+52;
-      f.push('<g class="locname"><rect x="'+Math.round(cx-wd/2)+'" y="'+top+'" width="'+Math.round(wd)+'" height="'+ht+'" rx="10" fill="#1d120b" fill-opacity=".82"/>'+lines.map((t,i)=>'<text x="'+Math.round(cx)+'" y="'+Math.round(top+(i+1)*fs-4)+'" text-anchor="middle" font-family="'+TBKit.fonts.display+'" font-weight="700" font-size="'+fs+'" fill="#f6e6b4">'+esc(t)+'</text>').join('')+'</g>')}}
+  if((UI.bs||0)>=250){ // the kit's banners are hidden (W754: on pc too, they were 13px), so every location gets a solid name tag of its own
+    for(let l=0;l<6;l++){const P=LOCPOS[l],name=LOCN[l],fs=Math.max(UI.phone?36:30,Math.ceil((UI.phone?14.5:16.5)*1000/(UI.bs||360))),words=name.split(' ');const lines=name.length*fs*.6+18>330&&words.length>1?[words[0],words.slice(1).join(' ')]:[name];
+      const wd=Math.max(...lines.map(t=>t.length))*fs*.6+18,ht=lines.length*fs+8;const cx=Math.max(wd/2+56,Math.min(944-wd/2,P[0])),top=P[1]+52; // W754: clear of the score track
+      f.push('<g class="locname"><rect x="'+Math.round(cx-wd/2)+'" y="'+top+'" width="'+Math.round(wd)+'" height="'+ht+'" rx="10" fill="#1d120b" fill-opacity=".9" stroke="#e8c867" stroke-opacity=".55" stroke-width="2"/>'+lines.map((t,i)=>'<text x="'+Math.round(cx)+'" y="'+Math.round(top+(i+1)*fs-4)+'" text-anchor="middle" font-family="'+TBKit.fonts.display+'" font-weight="700" font-size="'+fs+'" fill="#f6e6b4">'+esc(t)+'</text>').join('')+'</g>')}}
   ov.innerHTML=f.join('')}
 function setHl(ids,regs,rec){MAP.hl=ids||[];MAP.hlR=regs||[];MAP.rec=rec||{};applyHl()}
 function applyHl(){const m=MAP.m;if(!m)return;const sel=null;m.highlight(MAP.hl.map(l=>LOCID[l]));m.select(sel);
@@ -118,7 +119,7 @@ function applyHl(){const m=MAP.m;if(!m)return;const sel=null;m.highlight(MAP.hl.
   if(MAP.pan)MAP.pan.querySelectorAll('[data-reg]').forEach(g=>{const r=+g.getAttribute('data-reg');const on=(MAP.hlR||[]).includes(r);g.classList.toggle('rglow',on);g.classList.toggle('rrec',on&&MAP.rec.reg===r)});
   drawSelName()}
 // Phones: the kit's name banners are hidden (they were clipped and overlapped the region labels and reward coins). A tapped location shows its name here instead, in a spot with nothing else: below the circle in the top row and the upper half of the side columns, above it in the lower half.
-function drawSelName(){const g=MAP.sg;if(!g)return;if(UI.phone){g.innerHTML='';return}if(!UI.phone||UI.pop!=='loc'||!UI.popArg||UI.popArg.l==null){g.innerHTML='';return}
+function drawSelName(){const g=MAP.sg;if(!g)return;if(UI.phone||(UI.bs||0)>=250){g.innerHTML='';return} // W754: every location already carries its own name tagif(!UI.phone||UI.pop!=='loc'||!UI.popArg||UI.popArg.l==null){g.innerHTML='';return}
   const l=UI.popArg.l,P=LOCPOS[l],name=LOCN[l],fs=34,words=name.split(' ');let lines=[name];if(name.length>9&&words.length>1){const h=Math.ceil(words.length/2);lines=[words.slice(0,h).join(' '),words.slice(h).join(' ')]}
   const wd=Math.max(...lines.map(t=>t.length))*fs*.66+30,ht=lines.length*(fs+8)+14,below=l<2||l===2||l===4;let cx=P[0];cx=Math.max(wd/2+8,Math.min(1000-wd/2-8,cx));const top=below?P[1]+60:P[1]-60-ht;
   g.innerHTML='<g><rect x="'+Math.round(cx-wd/2)+'" y="'+Math.round(top)+'" width="'+Math.round(wd)+'" height="'+ht+'" rx="14" fill="#1d120b" fill-opacity=".92" stroke="#e8c867" stroke-width="3"/>'+lines.map((t,i)=>'<text x="'+Math.round(cx)+'" y="'+Math.round(top+7+(i+1)*(fs+8)-6)+'" text-anchor="middle" font-family="'+TBKit.fonts.display+'" font-weight="700" font-size="'+fs+'" fill="#f6e6b4">'+esc(t)+'</text>').join('')+'</g>'}
