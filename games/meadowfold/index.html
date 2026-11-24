@@ -514,36 +514,111 @@ button{font:inherit;color:inherit}
 #tbub.arr-l::after{left:-20px;top:var(--ay);margin-top:-10px;border-right-color:#4a3b2e}#tbub.res.arr-l::after{border-right-color:#2f5f3c}
 #tbub.arr-r::after{right:-20px;top:var(--ay);margin-top:-10px;border-left-color:#4a3b2e}#tbub.res.arr-r::after{border-left-color:#2f5f3c}
 
+/* ===== layout v2: the board is the screen; cards, scoring and rules open as panels ===== */
+.gx-main{display:block;position:relative}
+#board{position:absolute;inset:0;display:flex;flex-direction:column;overflow:hidden}
+#rivalp,#seats,#chips{display:none!important}
+#topbar{flex:0 0 auto;display:flex;flex-wrap:wrap;align-items:center;gap:4px 8px;padding:6px 8px 0;grid-area:top}
+#barstat{display:flex;gap:6px;flex:0 0 auto}
+#endw{flex:1 1 100%;margin:0;font-size:13px;padding:3px 10px;order:3}
+#rail{flex:0 0 auto;display:flex;gap:8px;padding:6px 8px 4px;grid-area:rail}
+.rb{position:relative;flex:1 1 0;min-width:0;min-height:56px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;border:2px solid #fff;border-radius:16px;background:#f9f1e3;box-shadow:var(--sh);font:700 13px/1.1 inherit;font-family:inherit;color:var(--ink);cursor:pointer;padding:3px 2px;-webkit-tap-highlight-color:transparent}
+.rb svg{width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.rb.on{background:#fde9c8;box-shadow:0 0 0 3px #e8907e,var(--sh)}
+.rb .bd{position:absolute;top:-7px;right:-3px;min-width:22px;height:22px;border-radius:11px;background:#7d6a58;color:#fff;font-size:13px;font-weight:700;line-height:22px;text-align:center;padding:0 5px;font-style:normal;border:2px solid #fff;box-sizing:content-box}
+.rb .bd.go{background:#7b5aa8}
+.rb .bd[hidden]{display:none}
+#mapw{grid-area:map}
+#tray{flex:0 0 auto;grid-area:tray;padding:0 8px calc(8px + env(safe-area-inset-bottom,0px));background:linear-gradient(180deg,rgba(255,250,240,0),rgba(255,250,240,.85) 30%)}
+#tray #line{padding:2px 6px 4px;font-size:15px;min-height:22px}
+/* panels */
+.pp{position:fixed;z-index:30;left:0;right:0;bottom:0;height:min(64dvh,580px);max-height:none!important;display:flex;flex-direction:column;background:var(--paper);border-radius:22px 22px 0 0;box-shadow:0 -10px 34px rgba(60,40,20,.28);transform:translateY(108%);visibility:hidden;transition:transform .2s ease,visibility 0s .2s;padding-bottom:env(safe-area-inset-bottom,0px)}
+.pp.on{transform:none;visibility:visible;transition:transform .2s ease}
+.pph{flex:0 0 auto;display:flex;align-items:center;gap:8px;padding:6px 8px 6px 18px;border-bottom:2px solid #f0e4cf}
+.pph h2{flex:1;margin:0;font-size:19px}
+.ppx{flex:0 0 auto;min-width:48px;min-height:48px;border:0;border-radius:50%;background:#f2e8d6;color:var(--ink);font-size:30px;line-height:1;cursor:pointer}
+.ppb,#dock .gx-dock-body{flex:1 1 auto;min-height:0;overflow-y:auto;padding:8px 10px 14px;overscroll-behavior:contain}
+#pscrim{position:fixed;inset:0;z-index:29;background:rgba(40,30,20,.22);opacity:0;pointer-events:none;transition:opacity .2s}
+html[data-pp] #pscrim{opacity:1;pointer-events:auto}
+.pp .cards{flex-wrap:wrap;overflow:visible;min-height:0;gap:8px;align-content:flex-start;padding:4px 0}
+.pp .acard{width:calc(33.333% - 6px);min-width:104px;min-height:150px}
+.pp .acard .pat{width:92px;height:64px}
+.pp .tabs{position:sticky;top:0;z-index:2;background:var(--paper);padding-bottom:4px}
+.endbox{background:#fff3c4;border-radius:14px;padding:6px 12px;margin-bottom:8px;font-size:14px}
+.endbox.last{background:#f7c9bd}
+.endbox h3{margin:0 0 2px;font-size:15px}.endbox p{margin:0}
+.sctab{width:100%;border-collapse:collapse}
+.sctab th{font-size:13px;text-align:right;padding:2px 6px;color:var(--soft)}
+.sctab td{padding:6px 4px;border-top:1px solid #efe3cd;vertical-align:top}
+.sctab td.ic svg{width:34px;height:34px}
+.sctab td.n{font-size:22px;font-weight:800;text-align:right;min-width:36px}
+.sctab td.n.foe{color:#2f5f86}
+.sctab .sl{font-size:14px}
+.sctab .sd{font-size:13px;color:var(--soft);margin-top:3px;display:flex;flex-wrap:wrap;gap:4px;align-items:center}
+.sctab .sd em{font-style:normal}
+.lad{display:inline-flex;gap:5px;background:#f3ead8;border-radius:999px;padding:2px 9px;font-size:13px}
+.lad b{font-weight:700;color:var(--soft)}
+.sctab tr.tot td{border-top:2px solid #d9c9ad;font-size:16px}
+@media (min-width:760px){
+  #board{display:grid;grid-template-columns:minmax(0,1fr) 96px;grid-template-rows:auto minmax(0,1fr) auto;grid-template-areas:"top rail" "map rail" "tray rail"}
+  #rail{flex-direction:column;justify-content:center;align-items:center;gap:14px;padding:8px 10px 8px 4px}
+  .rb{flex:0 0 auto;width:76px;min-height:76px;border-radius:50%;padding:0}
+  .rb span{font-size:13px}
+  #endw{flex:1 1 auto;order:0;max-width:420px}
+  #tray{max-width:640px;width:100%;justify-self:center}
+  .pp{left:auto;right:108px;top:calc(var(--gx-bar-h) + 10px);bottom:12px;height:auto;width:min(430px,46vw);border-radius:22px;transform:translateX(120%);box-shadow:0 10px 40px rgba(60,40,20,.3)}
+  .pp.on{transform:none}
+  #pscrim{display:none}
+  .pp .acard{width:calc(50% - 4px)}
+}
+/* phone text floor: nothing under 13px */
+.rdy,.ahead .nm,.slot,.slot i,.tab em,.pouch,.pouch b,.anyo,.htok span,.donec,.hn,.acard .track.sp{font-size:13px!important}
+.htok{width:62px!important}
+.htok span{letter-spacing:-.3px;white-space:nowrap}
+.pouch{line-height:1.1}
+#rail{position:relative;z-index:31}
+#topbar{position:relative;z-index:31}
+@media (min-width:760px){
+  #board{transition:right .2s ease}
+  html[data-pp] #board{right:min(446px,47vw)}
+  .pp{right:8px}
+}
+
 </style>
 </head>
 <body>
 <div class="gx-app">
 <header class="gx-bar">
   <h1><span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M2 20 L9 7 L13 13 L16 9 L22 20Z" fill="#9fcf8f" stroke="#fffaf0" stroke-width="1.4" stroke-linejoin="round"/><circle cx="17" cy="6" r="3" fill="#f2d675" stroke="#fffaf0" stroke-width="1.2"/></svg></span><span class="tt">Meadowfold</span></h1>
-  <span id="barstat"></span>
   <span class="gx-sp"></span>
   <button class="gx-ibtn" id="hintB" type="button" aria-label="Hint" title="Hint"><svg viewBox="0 0 24 24"><path d="M12 3a6 6 0 0 0-3.5 10.9V17h7v-3.1A6 6 0 0 0 12 3zM9.5 20h5"/></svg><span>Hint</span></button>
-  <button class="gx-ibtn" data-gx="scored" aria-expanded="false" aria-label="Scores" title="Scores"><svg viewBox="0 0 24 24"><path d="M5 20V10M12 20V4M19 20v-7"/></svg><span>Scores</span></button>
   <button class="gx-ibtn" data-gx="rulesd" aria-expanded="false" aria-label="How to play" title="How to play"><svg viewBox="0 0 24 24"><path d="M4 5c3-1 6-1 8 1 2-2 5-2 8-1v13c-3-1-6-1-8 1-2-2-5-2-8-1z M12 6v13"/></svg><span>Rules</span></button>
   <button class="gx-ibtn" data-gx="setd" aria-expanded="false" aria-label="Menu" title="Menu"><svg viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></svg><span>Menu</span></button>
 </header>
 <div class="gx-main">
-  <aside class="rivalp" id="rivalp" aria-label="Rival valleys"></aside>
   <main class="gx-board" id="board" aria-label="Your valley" data-board>
-    <div id="central" role="group" aria-label="Token pockets"></div>
-    <div id="seats" role="group" aria-label="Players"></div>
-    <div id="endw" role="status" hidden></div>
-    <div id="vbanner" hidden></div><div id="mapw"><svg id="map" role="img" aria-label="Your valley board"></svg><div id="whyl" aria-live="polite"></div></div>
-    <div id="chips" role="group" aria-label="Score by landscape"></div>
-    <div id="line" aria-live="polite"></div>
+    <div id="topbar"><div id="barstat" role="group" aria-label="Players"></div><div id="endw" role="status" hidden></div></div>
+    <nav id="rail" aria-label="Panels">
+      <button type="button" class="rb" id="railRow" data-pp="row" aria-expanded="false"><svg viewBox="0 0 24 24"><path d="M12 4c-3 0-5 2-5 4 0 3 3 4 3 7h4c0-3 3-4 3-7 0-2-2-4-5-4zM10 19h4M7 11 4 12M17 11l3 1"/></svg><span>Animals</span><i class="bd" id="bdRow"></i></button>
+      <button type="button" class="rb" id="railMine" data-pp="mine" aria-expanded="false"><svg viewBox="0 0 24 24"><rect x="5" y="3" width="14" height="18" rx="2.5"/><path d="M9 9h6M9 13h6"/></svg><span>My cards</span><i class="bd" id="bdMine"></i></button>
+      <button type="button" class="rb" id="railScore" data-pp="score" aria-expanded="false"><svg viewBox="0 0 24 24"><path d="M5 20V10M12 20V4M19 20v-7"/></svg><span>Scoring</span></button>
+      <button type="button" class="rb" id="railTot" data-gx="scored" aria-expanded="false"><svg viewBox="0 0 24 24"><path d="M6 4h12v4a6 6 0 0 1-12 0zM9 20h6M12 14v6"/></svg><span>Totals</span></button>
+    </nav>
+    <div id="vbanner" hidden></div>
+    <div id="mapw"><svg id="map" role="img" aria-label="Your valley board"></svg><div id="whyl" aria-live="polite"></div></div>
+    <div id="tray"><div id="line" aria-live="polite"></div><div id="central" role="group" aria-label="Token pockets and your tokens"></div></div>
+    <div id="seats" hidden></div>
   </main>
-  <aside class="gx-dock" id="dock" aria-label="Your hand and animals">
-    <div class="gx-dock-body" id="dockbody">
-      <div id="hand" role="group" aria-label="Tokens to place"></div>
-      <div id="mycards" role="group" aria-label="Your animal cards"></div>
-      <div id="acts"></div>
-    </div>
+  <div id="pscrim" data-ppx></div>
+  <aside class="gx-dock pp" id="dock" aria-label="Animal cards" role="dialog">
+    <div class="pph"><h2 id="ppt">Animals</h2><button type="button" class="ppx" data-ppx aria-label="Close panel">&times;</button></div>
+    <div class="gx-dock-body" id="dockbody"></div>
   </aside>
+  <aside class="pp" id="scorep" aria-label="How scoring works" role="dialog">
+    <div class="pph"><h2>How you score</h2><button type="button" class="ppx" data-ppx aria-label="Close panel">&times;</button></div>
+    <div class="ppb" id="scorebody"></div>
+  </aside>
+  <aside id="rivalp" hidden></aside>
 </div>
 </div>
 <div id="start" hidden></div>
@@ -2510,7 +2585,7 @@ function act(m, how) {   // a human move
   var s = G.seats[UI.view], gain = G.over ? 0 : E.score(s).total - sc0;
   if (m.t === 'take') { SND.take(); UI.sel = { kind: 'tok', h: 0 }; }
   if (m.t === 'place') { SND.place(); UI.flash = m.k; buzz(8); var T = G.turn; UI.sel = T.hand.length ? { kind: 'tok', h: Math.min(m.h, T.hand.length - 1) } : null; }
-  if (m.t === 'card') { SND.card(); UI.tab = 'mine'; }
+  if (m.t === 'card') { SND.card(); UI.tab = 'mine'; if (UI.pp) { UI.pp = null; document.documentElement.removeAttribute('data-pp'); } }
   if (m.t === 'cube') { SND.animal(); UI.flash = m.k; buzz([10, 40, 10]); UI.sel = null; }
   if (m.t === 'spirit') UI.tab = 'mine';
   render();
@@ -2552,7 +2627,7 @@ function buzz(p) { try { if (GX.buzz) GX.buzz(p); } catch (e) { } }
 // ---------- rendering ----------
 function render() {
   if (!G) return;
-  renderBar(); renderCentral(); renderEnd(); renderMap(); renderChips(); renderRivals(); renderDock(); renderLine();
+  renderBar(); renderCentral(); renderEnd(); renderMap(); renderRail(); renderScorep(); renderDock(); renderLine();
   if (window.tutRender) tutRender();
 }
 function myTurn() { return G && !G.over && !E.seat().ai && UI.view === G.cur && !UI.busy; }
@@ -2563,6 +2638,48 @@ function renderBar() {
     h += '<button type="button" class="pill' + (i === G.cur && !G.over ? ' cur' : '') + (i === UI.view ? ' view' : '') + '" data-seat="' + i + '" aria-label="' + esc(s.name) + ' ' + sc + ' points"><span>' + esc(s.name) + '</span><b data-engine="E.score(G.seats[' + i + ']).total">' + sc + '</b></button>';
   });
   $('#barstat').innerHTML = h;
+}
+
+// ---------- panels: info the player opens, reads while deciding and closes (X, tap outside, Esc). Nothing closes by itself. ----------
+UI.pp = null;
+function openPanel(id, tab) {
+  if (tab) UI.tab = tab;
+  UI.pp = id; if (id === 'dock') renderDock(); if (id === 'scorep') renderScorep();
+  document.documentElement.setAttribute('data-pp', id); syncPanels();
+}
+function closePanel() { if (!UI.pp) return; UI.pp = null; document.documentElement.removeAttribute('data-pp'); syncPanels(); if (G) render(); }
+function syncPanels() {
+  ['dock', 'scorep'].forEach(function (id) { var e = document.getElementById(id); if (e) e.classList.toggle('on', UI.pp === id); });
+  $$('#rail [data-pp]').forEach(function (b) { var on = UI.pp === (b.dataset.pp === 'score' ? 'scorep' : 'dock') && (b.dataset.pp === 'score' || UI.tab === b.dataset.pp); b.classList.toggle('on', on); b.setAttribute('aria-expanded', on ? 'true' : 'false'); });
+  var t = $('#ppt'); if (t) t.textContent = UI.tab === 'mine' ? 'My animal cards' : 'Animals to invite';
+}
+function renderRail() {
+  if (!G) return; var s = G.seats[firstHuman()], act = s.cards.length + (s.spirit && !s.spirit.placed ? 1 : 0), cs = E.seat();
+  var ready = !s.ai && (s.cards.some(function (c) { return Object.keys(E.cubeSpots(s, c.id)).length; }) || (s.spirit && !s.spirit.placed && Object.keys(E.cubeSpots(s, s.spirit.id)).length > 0));
+  var canTake = myTurn() && !G.turn.tookCard && !G.turn.swapped && E.active(cs) < 4;
+  var a = $('#bdRow'), b = $('#bdMine');
+  if (a) { a.textContent = canTake ? '1' : ''; a.hidden = !canTake; }
+  if (b) { var go = ready && myTurn(); b.textContent = go ? '!' : act + '/4'; b.className = 'bd' + (go ? ' go' : ''); b.hidden = !act && !go; }
+  syncPanels();
+}
+function ladder(a) { return a.map(function (x) { return '<span class="lad"><b>' + x[0] + '</b>' + x[1] + '</span>'; }).join(''); }
+function renderScorep() {
+  var b = $('#scorebody'); if (!b || !G || UI.pp !== 'scorep') return;
+  var me = firstHuman(), foe = G.np > 1 ? chipFoe() : -1, A = E.score(G.seats[me]), B = foe >= 0 ? E.score(G.seats[foe]) : null, ei = endInfo();
+  var rows = {
+    trees: ['A tree is leaves on 0-2 trunks.', ladder([['1 high', '1'], ['2 high', '3'], ['3 high', '7']]) + '<em>Bare trunks score 0.</em>'],
+    mounts: ['Grey tokens stack up to 3.', ladder([['1 high', '1'], ['2 high', '3'], ['3 high', '7']]) + '<em>Only when touching another mountain.</em>'],
+    fields: ['Yellow fields never stack.', ladder([['group of 2+', '5']]) + '<em>A lone field scores 0.</em>'],
+    builds: ['A red building sits on one grey, trunk or red.', ladder([['3+ colours touch it', '5']])],
+    water: G.side === 'A' ? ['Blue water: your longest river counts.', ladder([['2', '2'], ['3', '5'], ['4', '8'], ['5', '11'], ['6', '15'], ['+1', '+4']])] : ['Water splits your valley into islands.', ladder([['each island', '5']]) + '<em>Empty hexes count as land.</em>'],
+    animals: ['Each animal card scores its highest number showing.', '<em>Settle animals to uncover bigger numbers.</em>'],
+    spirit: ['Your spirit card scores its own bonus once settled.', '<em>See it under My cards.</em>']
+  };
+  var h = '<div class="endbox ' + (ei && ei.last ? 'last' : '') + '"><h3>When the game ends</h3><p>' + (ei ? esc(ei.t) + ' ' : '') + 'It ends when the pouch cannot refill a pocket, or a player finishes a turn with 2 or fewer empty hexes. The round always finishes, so turns stay equal.</p></div>';
+  h += '<table class="sctab"><tr><th></th><th></th><th class="n">You</th>' + (B ? '<th class="n">' + esc(G.seats[foe].name) + '</th>' : '') + '</tr>';
+  cats().forEach(function (c) { var r = rows[c[0]]; h += '<tr><td class="ic">' + catIcon(c, 'sp' + c[0]) + '</td><td><b>' + c[1] + '</b><div class="sl">' + r[0] + '</div><div class="sd">' + r[1] + '</div></td><td class="n">' + A[c[0]] + '</td>' + (B ? '<td class="n foe">' + B[c[0]] + '</td>' : '') + '</tr>'; });
+  h += '<tr class="tot"><td></td><td><b>Total</b></td><td class="n">' + A.total + '</td>' + (B ? '<td class="n foe">' + B.total + '</td>' : '') + '</tr></table>';
+  b.innerHTML = h;
 }
 function renderCentral() {
   if (myTurn() && G.turn.took >= 0) return renderHand();
@@ -2576,7 +2693,7 @@ function renderCentral() {
   h += '<span class="pouch" title="Tokens left in the pouch"><b>' + E.bagCount() + '</b> left</span>';
   $('#central').innerHTML = h;
 }
-function wide() { return window.innerWidth >= 1000; }
+function wide() { return false; }   // one layout everywhere: the board is the screen, info lives in panels
 // one valley drawing for the big board and the small rival boards. o: glow{k:1|2}, gain{k:n}, ghost, hint, plan{k:label}, marks{k:1}, f (filter id prefix)
 function valleySVG(s, o) {
   o = o || {}; var r = 40, wh = boardWH(r), pad = 12, f = o.f || 'm', glow = o.glow || {}, gain = o.gain || {}, plan = o.plan || {}, hp = o.hint;
@@ -2620,7 +2737,7 @@ function renderMap() {
 }
 // the small boards beside yours on a PC: every rival, live, with its score chips and cards
 function renderRivals() {
-  var p = $('#rivalp'); if (!wide()) { p.innerHTML = ''; return; }
+  var p = $('#rivalp'); if (!p || !wide()) return;
   var h = '';
   G.seats.forEach(function (s, i) {
     if (i === UI.view) return;
@@ -2671,14 +2788,13 @@ function flyGains(s, si, k, ex, svgSel) {
   if (!ANIM || UI.fast) return;
   var p = k ? hexScreen(k, svgSel) : null;
   ex.forEach(function (e, j) {
-    var tgt = $('#chips [data-chip="' + e.c + '"] [data-cs="' + si + '"]') || $('.rv1[data-rv="' + si + '"] [data-chip="' + e.c + '"]');
-    if (wide()) { var t2 = $('.rv1[data-rv="' + si + '"] [data-chip="' + e.c + '"]'); if (t2) tgt = t2; }
+    var tgt = $('.pill[data-seat="' + si + '"] b');
     if (!tgt) return; var tb = tgt.getBoundingClientRect(); if (!tb.width) return;
     var d = document.createElement('div'); d.className = 'flyn' + (e.d < 0 ? ' neg' : '') + (s.ai ? ' rv' : ''); d.textContent = (e.d > 0 ? '+' : '') + e.d;
     var sx = p ? p[0] : tb.left + tb.width / 2, sy = p ? p[1] - 10 : tb.top - 30;
     d.style.left = sx + 'px'; d.style.top = sy + 'px'; d.style.setProperty('--dx', (tb.left + tb.width / 2 - sx) + 'px'); d.style.setProperty('--dy', (tb.top + tb.height / 2 - sy) + 'px'); d.style.animationDelay = (j * 120) + 'ms';
     document.body.appendChild(d);
-    setTimeout(function () { d.remove(); var c2 = $('#chips [data-chip="' + e.c + '"]'); [c2, tgt].forEach(function (x) { if (!x) return; x.classList.remove('bumpc'); void x.offsetWidth; x.classList.add('bumpc'); }); }, 900 + j * 120);
+    setTimeout(function () { d.remove(); var c2 = null; [c2, tgt].forEach(function (x) { if (!x) return; x.classList.remove('bumpc'); void x.offsetWidth; x.classList.add('bumpc'); }); }, 900 + j * 120);
   });
 }
 // ---------- planning: how far a card is from your valley ----------
@@ -2765,7 +2881,7 @@ function renderHand() {
   $('#central').innerHTML = h + '</div>';
 }
 function renderDock() {
-  var T = G.turn, s = G.seats[UI.view], mine = myTurn(), h = '', cs = E.seat(), both = wide();
+  var T = G.turn, s = G.seats[UI.view], mine = myTurn(), h = '', cs = E.seat(), both = false;
   var act = s.cards.length + (s.spirit && !s.spirit.placed ? 1 : 0);
   var canTake = mine && !T.tookCard && !T.swapped && E.active(cs) < 4;
   var rowL = 'Animals to invite' + (canTake ? ' <em>take 1</em>' : ''), mineL = (s.name === 'You' ? 'Your' : esc(s.name) + '\'s') + ' cards <em>' + act + '/4</em>' + (!both && UI.tab === 'row' && mine && s.cards.some(function (c) { return Object.keys(E.cubeSpots(s, c.id)).length; }) ? ' <em class="rd">home ready</em>' : '');
@@ -2821,6 +2937,10 @@ function toast(t) { var e = $('#toast'); e.textContent = t; e.classList.add('on'
 // ---------- input ----------
 function onTap(e) {
   var t = e.target;
+  var xb = t.closest('[data-ppx]'); if (xb) { closePanel(); return; }
+  var rb = t.closest('#rail [data-pp]');
+  if (rb) { if (!G) return; var w = rb.dataset.pp, id = w === 'score' ? 'scorep' : 'dock', same = UI.pp === id && (id === 'scorep' || UI.tab === w); if (same) closePanel(); else openPanel(id, id === 'dock' ? w : null); return; }
+  if (UI.pp && !t.closest('.pp') && !t.closest('.gx-drawer') && !t.closest('#tbub') && !t.closest('[data-k],.pocket,.htok,#endB,#undoB,.pill')) { closePanel(); return; }
   if (UI.dragged && Date.now() - UI.dragged < 400) return;
   if (UI.busy && G && !G.over && E.seat().ai && !UI.skip && !t.closest('.gx-drawer,.gx-bar')) { UI.skip = true; toast('Speeding up the rival.'); return; }
   if (t.closest('#backB')) { UI.view = firstHuman(); UI.sel = null; render(); return; }
@@ -2831,7 +2951,7 @@ function onTap(e) {
   var ht = t.closest('[data-h]'); if (ht && myTurn()) { UI.sel = { kind: 'tok', h: +ht.dataset.h }; SND.card(); render(); return; }
   var tb = t.closest('[data-tab]'); if (tb) { var same = UI.tab === tb.dataset.tab; UI.tab = tb.dataset.tab; render(); if (same) bump('[data-tab="' + UI.tab + '"]'); return; }
   var rw = t.closest('[data-row]'); if (rw) { bigCard(+rw.dataset.row); return; }
-  var ci = t.closest('[data-ci]'); if (ci && myTurn()) { var v = ci.dataset.ci === 'S' ? 'S' : +ci.dataset.ci; UI.sel = (UI.sel && UI.sel.kind === 'card' && UI.sel.ci === v) ? null : { kind: 'card', ci: v }; render(); if (UI.sel && !$$('#map .glow').length) { var pl = planFor(G.seats[UI.view], ci.dataset.ci === 'S' ? G.seats[UI.view].spirit.id : G.seats[UI.view].cards[v].id); toast(pl ? 'Needs ' + planText(pl) + '. See the dashed hexes.' : 'This habitat no longer fits.'); } return; }
+  var ci = t.closest('[data-ci]'); if (ci && myTurn()) { var v = ci.dataset.ci === 'S' ? 'S' : +ci.dataset.ci; UI.sel = (UI.sel && UI.sel.kind === 'card' && UI.sel.ci === v) ? null : { kind: 'card', ci: v }; if (UI.sel && UI.pp === 'dock') { UI.pp = null; document.documentElement.removeAttribute('data-pp'); syncPanels(); } render(); if (UI.sel && !$$('#map .glow').length) { var pl = planFor(G.seats[UI.view], ci.dataset.ci === 'S' ? G.seats[UI.view].spirit.id : G.seats[UI.view].cards[v].id); toast(pl ? 'Needs ' + planText(pl) + '. See the dashed hexes.' : 'This habitat no longer fits.'); } return; }
   if (ci) { var sv = G.seats[UI.view], cid = ci.dataset.ci === 'S' ? sv.spirit.id : (sv.cards[+ci.dataset.ci] || {}).id; if (cid) bigCard(null, cid); return; }
   var hx = t.closest('[data-k]');
   if (hx && myTurn()) {
@@ -3029,6 +3149,7 @@ function boot() {
   } catch (e) { }
   try { UI.prefs = Object.assign(UI.prefs, JSON.parse(localStorage.getItem('mf_prefs') || '{}')); } catch (e) { }
   document.addEventListener('click', onTap); dragInit();
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && UI.pp && !(window.GX && GX.open)) closePanel(); });
   $('#hintB').onclick = hint;
   GX.onResize(function () { });
   if (window.GXV) GXV.watch(function () { });
@@ -3082,10 +3203,10 @@ function tq(sel) { return sel ? document.querySelector(sel) : null; }
 function tHit(a, b) { return a.left < b.right && a.right > b.left && a.top < b.bottom && a.bottom > b.top; }
 function tutTarget(st) {
   var tk = tq('#takeB'); if (tk && getComputedStyle(tk).visibility === 'visible') return { sel: '#takeB', say: 'Tap Invite. The duck joins you.' };
-  if (st.end) return { sel: '#dock .acard', say: st.say, btn: 'Got it' };
+  if (st.end) return { sel: '#railScore', say: st.say + ' Scoring shows how points work.', btn: 'Got it' };
   if (st.pocketHas || TUT.i === 0) return { sel: '.pocket.glow', say: st.say };
-  if (st.card !== undefined) return { sel: '.acard[data-row="0"]', say: st.say };
-  if (TUT.i === 5) return UI.sel && UI.sel.kind === 'card' ? { sel: '#map .hx.glow', say: 'Tap the glowing hex to settle it.' } : { sel: '.acard.ready', say: st.say };
+  if (st.card !== undefined) return UI.pp === 'dock' && UI.tab === 'row' ? { sel: '.acard[data-row="0"]', say: st.say } : { sel: '#railRow', say: 'Tap Animals: see who can move in.' };
+  if (TUT.i === 5) return UI.sel && UI.sel.kind === 'card' ? { sel: '#map .hx.glow', say: 'Tap the glowing hex to settle it.' } : UI.pp === 'dock' && UI.tab === 'mine' ? { sel: '.acard.ready', say: st.say } : { sel: '#railMine', say: 'The duck is ready! Tap My cards.' };
   if (TUT.i === 6) return { sel: '#endB', say: st.say };
   return { sel: '#map .hx.glow', say: st.say };
 }
@@ -3115,8 +3236,8 @@ window.tutBubbleAnchor = function () { var c = document.getElementById('tbub'); 
 window.tutAfter = function (m) {
   var st = tutCur(); if (!st || UI.mode !== 'tut') return;
   var me = G.seats[0], d = E.score(me).total - (TUT.sc0 || 0); TUT.sc0 = E.score(me).total;
-  var r = { take: ['You took 3 tokens: +0 points, ' + G.turn.hand.length + ' left to place', '#hand'], place: ['Placed: +' + d + ' points, ' + G.turn.hand.length + ' left to place', '#map [data-k="' + m.k + '"]'],
-    card: ['You invited it: ' + me.cards.length + ' of 4 cards kept', '#mycards'], cube: ['Animal settled: +' + d + ' points', '#map [data-k="' + m.k + '"]'], end: ['Turn over: the rival plays', '#seats'] }[m.t];
+  var r = { take: ['You took 3 tokens: +0 points, ' + G.turn.hand.length + ' left to place', '#central'], place: ['Placed: +' + d + ' points, ' + G.turn.hand.length + ' left to place', '#map [data-k="' + m.k + '"]'],
+    card: ['You invited it: ' + me.cards.length + ' of 4 cards kept', '#railMine'], cube: ['Animal settled: +' + d + ' points', '#map [data-k="' + m.k + '"]'], end: ['Turn over: the rival plays', '#barstat'] }[m.t];
   if (r) TUT.res = { text: r[0], sel: r[1], until: m.t === 'end' ? Infinity : Date.now() + 1800 };
   if (r && m.t !== 'end') setTimeout(function () { if (TUT) tutShow(); }, 1850);
   if (!st.end) TUT.i++;

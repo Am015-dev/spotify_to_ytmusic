@@ -37,18 +37,18 @@ body{background-color:var(--lac);background-image:
 .ps .nm{font-family:var(--deco);font-size:15px;color:var(--gold2);letter-spacing:.04em}
 .ps.turn .nm::after{content:"";display:inline-block;width:7px;height:7px;margin-left:5px;border-radius:50%;background:var(--gold2);vertical-align:middle;box-shadow:0 0 6px var(--gold)}
 .race{display:flex;gap:5px;align-items:center;flex:1 1 auto;min-width:0;flex-wrap:nowrap}
-.race b{font-size:15px;color:var(--ink)}.race span{display:inline-flex;align-items:center;gap:2px;white-space:nowrap;color:var(--mute);font-size:12px}
+.race b{font-size:15px;color:var(--ink)}.race span{display:inline-flex;align-items:center;gap:2px;white-space:nowrap;color:var(--mute);font-size:13px}
 .race svg{width:15px;height:15px}
 .favs{display:flex;gap:2px;align-items:center}
 .favb{border:0;background:none;padding:0;width:44px;height:44px;display:flex;align-items:center;justify-content:center;border-radius:6px}
-.favb svg{width:24px;height:24px}.favb{position:relative;flex:0 0 auto}.favb .fx{position:absolute;right:-2px;bottom:-2px;font-size:11px;background:var(--gold2);color:#1a1408;border-radius:7px;min-width:14px;line-height:14px;text-align:center}
+.favb svg{width:24px;height:24px}.favb{position:relative;flex:0 0 auto}.favb .fx{position:absolute;right:-2px;bottom:-2px;font-size:13px;background:var(--gold2);color:#1a1408;border-radius:7px;min-width:14px;line-height:14px;text-align:center}
 .race span{flex:0 0 auto}.resb{flex:0 0 auto}
-.resb{border:1px solid var(--gold3);background:var(--lac2);border-radius:6px;height:28px;padding:0 6px;font-size:12px;color:var(--gold2);display:inline-flex;align-items:center;gap:3px;white-space:nowrap}
+.resb{border:1px solid var(--gold3);background:var(--lac2);border-radius:6px;height:28px;padding:0 6px;font-size:13px;color:var(--gold2);display:inline-flex;align-items:center;gap:3px;white-space:nowrap}
 .resb[disabled]{opacity:.55;cursor:default}
 .cols{display:grid;grid-template-columns:repeat(7,1fr);gap:3px}
 .col{position:relative;border:1px solid rgba(216,180,90,.28);background:linear-gradient(180deg,var(--lac3),var(--lac2));border-radius:8px;min-height:44px;padding:2px 0 1px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0}
 #rival .cols{gap:2px}#rival .col{min-height:24px;flex-direction:row;gap:2px;padding:1px 2px;border-radius:6px}
-#rival .col .bn{position:static;font-size:11px}
+#rival .col .bn{position:static;font-size:13px}
 #me .resb{min-height:44px;min-width:44px}#me .top{align-items:center}
 #rival .col.glow::after{content:'';position:absolute;left:0;right:0;top:-10px;bottom:-10px}
 #rival .col .tn{font-size:13px}
@@ -57,9 +57,9 @@ body{background-color:var(--lac);background-image:
 #rival .col .gm{width:15px;height:15px;flex:0 0 auto}
 .col .tn{font-size:15px;font-weight:700;line-height:1}
 .col .tn.z{opacity:.4}
-.col .bn{position:absolute;top:1px;right:2px;font-size:11px;font-weight:700;color:var(--gold2);line-height:1}
+.col .bn{position:absolute;top:1px;right:2px;font-size:13px;font-weight:700;color:var(--gold2);line-height:1}
 .col .bn.z{display:none}
-.col .cp{font-size:11px;color:var(--mute);line-height:1.1}
+.col .cp{font-size:13px;color:var(--mute);line-height:1.1}
 .col.full{border-color:var(--gold)}
 /* board + side */
 #mid{flex:0 0 auto;display:flex;gap:6px;align-items:stretch;justify-content:center;padding:4px 0}
@@ -76,17 +76,17 @@ body{background-color:var(--lac);background-image:
 .cell.dim .gm{opacity:.35}
 .cell.rv::after{content:"";position:absolute;inset:3px;border:2px solid #f08a9a;border-radius:50%}
 #side{display:flex;flex-direction:column;gap:5px;align-items:stretch;justify-content:flex-start;min-width:84px;flex:1 1 0;max-width:130px}
-.sbox{border:1px solid rgba(216,180,90,.35);border-radius:8px;padding:3px 4px;background:rgba(20,18,22,.85);text-align:center;font-size:12px;color:var(--mute)}
+.sbox{border:1px solid rgba(216,180,90,.35);border-radius:8px;padding:3px 4px;background:rgba(20,18,22,.85);text-align:center;font-size:13px;color:var(--mute)}
 .sbox .row{display:flex;justify-content:center;gap:2px;flex-wrap:wrap}
 .sbox svg{width:22px;height:22px}
-.pat{border:0;background:none;padding:0;width:40px;height:40px;position:relative}
-.pat svg{width:40px;height:40px}
+.pat{border:0;background:none;padding:0;width:44px;height:44px;position:relative}
+.pat svg{width:44px;height:44px}
 .pat.gone{opacity:.25}
 .pat.glow{filter:drop-shadow(0 0 6px var(--gold2))}
 .btn{border:1px solid var(--gold);background:linear-gradient(180deg,#2a2416,#15120c);color:var(--gold2);border-radius:8px;min-height:44px;padding:4px 8px;font-weight:700;font-size:14px;letter-spacing:.03em}
 .btn.pri{background:linear-gradient(180deg,var(--gold2),var(--gold) 55%,var(--gold3));color:#1a1408;border-color:var(--gold2)}
 .btn[disabled]{opacity:.45;cursor:default}
-.btn small{display:block;font-weight:400;font-size:11px;letter-spacing:0}
+.btn small{display:block;font-weight:400;font-size:13px;letter-spacing:0}
 #takebtn .pv{display:flex;justify-content:center;gap:1px;margin-top:1px}
 #takebtn .pv svg{width:15px;height:15px}
 /* pyramid */
@@ -104,7 +104,7 @@ body{background-color:var(--lac);background-image:
 .card .bg2{position:absolute;right:calc(min(var(--ch),var(--cw)*1.3)*.22);top:3px;width:calc(min(var(--ch),var(--cw)*1.3)*.34);height:calc(min(var(--ch),var(--cw)*1.3)*.34)}
 .card .ab{position:absolute;left:50%;top:3px;transform:translateX(-50%);width:calc(min(var(--ch),var(--cw)*1.3)*.24);height:calc(min(var(--ch),var(--cw)*1.3)*.24);color:var(--gold2)}
 .card .cost{position:absolute;left:2px;right:2px;bottom:2px;display:flex;flex-wrap:wrap-reverse;gap:1px;justify-content:flex-start}
-.chip{font-style:normal;min-width:16px;height:16px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;line-height:1;padding:0 2px;border:1px solid rgba(0,0,0,.6);box-shadow:inset 0 1px 0 rgba(255,255,255,.35)}
+.chip{font-style:normal;min-width:18px;height:18px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;line-height:1;padding:0 2px;border:1px solid rgba(0,0,0,.6);box-shadow:inset 0 1px 0 rgba(255,255,255,.35)}
 .c-w{background:var(--w);color:#14202c}.c-u{background:var(--u);color:#fff}.c-g{background:var(--g);color:#fff}.c-r{background:var(--r);color:#fff}.c-k{background:#55555f;color:#fff;border-color:#c9c9d4}.c-p{background:var(--p);color:#3a2a20}.c-o{background:var(--o);color:#2a1d00}
 .chip.ok{outline:1px solid rgba(255,255,255,.0)}
 .card.can{box-shadow:inset 0 0 0 2px #0c0b0e,inset 0 0 0 3px var(--gold2),0 0 0 2px var(--gold2),0 0 12px rgba(241,214,140,.55)}
@@ -117,13 +117,13 @@ body{background-color:var(--lac);background-image:
 .card.empty{border:1px dashed rgba(216,180,90,.3);background:none;box-shadow:none}
 .card.back{background:repeating-conic-gradient(from 0deg at 50% 100%,#1b1710 0 6deg,#0d0b08 6deg 12deg);display:flex;align-items:center;justify-content:center;flex-direction:column}
 .card.back .tier{font-family:var(--deco);color:var(--gold2);font-size:calc(min(var(--ch),var(--cw)*1.3)*.32);line-height:1}
-.card.back .left{font-size:11px;color:var(--mute);font-weight:700}
+.card.back .left{font-size:13px;color:var(--mute);font-weight:700}
 .card.back.none{opacity:.3}
 /* sheets and modals */
 #scrim{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:40}
 #sheet{position:fixed;left:0;right:0;bottom:0;z-index:41;max-width:560px;margin:0 auto;background:linear-gradient(180deg,#1c1913,#0c0b0d);border-top:2px solid var(--gold);border-radius:14px 14px 0 0;padding:12px 14px calc(14px + env(safe-area-inset-bottom));box-shadow:0 -10px 30px rgba(0,0,0,.6);animation:up .22s cubic-bezier(.2,.8,.3,1)}
 @keyframes up{from{transform:translateY(40px);opacity:0}}
-#sheet .x,.modal .x{position:absolute;right:6px;top:6px}
+#sheet .x,.modal .x{position:absolute;right:6px;top:6px;width:44px;height:44px;padding:0}
 .zoom{display:flex;gap:12px;align-items:flex-start}
 .zoom .card{--cw:112px;--ch:146px;flex:0 0 auto}
 .zoom .info{flex:1 1 auto;min-width:0;font-size:14px;line-height:1.35;padding-top:2px}
@@ -136,7 +136,7 @@ body{background-color:var(--lac);background-image:
 .modal h3{font-family:var(--deco);font-weight:400;color:var(--gold);margin:12px 0 4px;font-size:16px}
 .modal p,.modal li{margin:0 0 6px}.modal ul{padding-left:18px;margin:0 0 6px}
 .pats{display:flex;justify-content:center;gap:10px;flex-wrap:wrap;margin:8px 0}
-.patc{border:1px solid var(--gold);background:var(--lac2);border-radius:8px;width:94px;padding:6px 4px;text-align:center;font-size:12px;line-height:1.25}
+.patc{border:1px solid var(--gold);background:var(--lac2);border-radius:8px;width:94px;padding:6px 4px;text-align:center;font-size:13px;line-height:1.25}
 .patc svg{width:56px;height:56px;margin:0 auto 2px}
 .patc b{display:block;color:var(--gold2);font-size:13px}
 .ref{display:flex;flex-wrap:wrap;gap:4px}.ref .card{--cw:54px;--ch:70px}
@@ -168,6 +168,21 @@ body{background-color:var(--lac);background-image:
 #coach .btn{min-height:44px;min-width:44px;font-size:13px;padding:2px 10px;background:#1d160a;color:var(--gold2);pointer-events:auto}
 .finger{position:fixed;z-index:36;width:34px;height:34px;pointer-events:none;border-radius:50%;border:3px solid #fff;box-shadow:0 0 12px var(--gold2);animation:fing 1.2s ease-in-out 3}
 @keyframes fing{50%{transform:scale(.7)}}
+
+/* player portraits, panels, log, curved bar (W636) */
+.pbtn{flex:0 0 auto;border:0;background:none;padding:0;min-height:44px;min-width:56px;display:flex;align-items:center}
+.av{position:relative;display:flex;align-items:center;justify-content:center;width:56px;height:44px;border-radius:22px;border:2px solid var(--gold);background:radial-gradient(circle at 35% 30%,#3a3120,#15120c);box-shadow:0 0 0 2px var(--lac),inset 0 0 8px rgba(0,0,0,.6)}
+.av .nm{font-size:13px;letter-spacing:0}.ps.turn .nm::after{display:none}
+.ps.turn .av{border-color:#fff3c4;box-shadow:0 0 10px var(--gold),0 0 0 2px var(--lac)}
+.av .sc{position:absolute;right:-6px;top:-6px;min-width:22px;height:22px;border-radius:11px;background:var(--gold2);color:#1a1408;font-size:14px;line-height:22px;text-align:center;border:2px solid #15120c;padding:0 2px;box-sizing:border-box}
+#me{border-radius:22px 22px 0 0;border-top:2px solid var(--gold3);background:linear-gradient(180deg,rgba(216,180,90,.10),rgba(20,18,22,.9))}
+.infob{border:0;background:none;color:var(--gold2);font-size:13px;min-height:44px;text-decoration:underline;padding:0}
+button.sbox{font-family:inherit;cursor:pointer;min-height:44px}
+.meter{height:8px;border-radius:4px;background:#2a2518;overflow:hidden;margin-top:3px}.meter i{display:block;height:100%;background:var(--gold2)}
+.goals{display:grid;grid-template-columns:1fr;gap:8px;margin:6px 0}.goals div{font-size:14px}.goals span{color:var(--mute)}.goals b{float:right;color:var(--ink)}
+.pcols{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}.pc{border:1px solid rgba(216,180,90,.28);border-radius:8px;padding:4px 2px;text-align:center;background:var(--lac2)}
+.pc .gm{width:26px;height:26px}.pc b{display:block;font-size:16px}.pc span{font-size:13px;color:var(--gold2)}
+.log{margin:0;padding-left:22px;font-size:14px;line-height:1.5}.log li{margin:0 0 3px}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 @media (min-height:760px){.ps .top{font-size:14px}.col{min-height:50px}.col .gm{width:26px;height:26px}}
 </style>
@@ -177,6 +192,7 @@ body{background-color:var(--lac);background-image:
   <header id="bar">
     <button class="ib" id="menubtn" aria-label="Menu"><svg viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg></button>
     <div id="status" aria-live="polite">Onyx Atelier</div>
+    <button class="ib" id="logbtn" aria-label="Game log"><svg viewBox="0 0 24 24"><path d="M5 6h14M5 12h14M5 18h9" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg></button>
     <button class="ib" id="hintbtn" aria-label="Show a hint"><svg viewBox="0 0 24 24"><path d="M12 3a6 6 0 0 0-3.5 10.9V17h7v-3.1A6 6 0 0 0 12 3zM9.5 20h5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
     <button class="ib" id="rulesbtn" aria-label="How to play"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="2"/><path d="M9.6 9.3a2.5 2.5 0 1 1 3.4 2.4c-.7.3-1 .8-1 1.5v.6M12 17h.01" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button>
   </header>
@@ -1135,7 +1151,7 @@ var UI = (function () {
   var ABT = { again: 'Take another turn right after this one.', token: 'Take one more gem of this colour from the board.', priv: 'Gain a Favour scroll.', steal: 'Take one gem or pearl from your rival.' };
   var PAT = [{ n: 'The Impresario' }, { n: 'The Duchess' }, { n: 'The Banker' }, { n: 'The Countess' }];
   var HOW = { points: '20 points', crowns: '10 crowns' };
-  var U = { G: null, sel: [], mode: null, resGold: null, busy: false, level: 'easy', tut: null, snd: true };
+  var U = { G: null, sel: [], mode: null, resGold: null, busy: false, level: 'normal', tut: null, snd: true };
   var LS = function (k, v) { try { if (v === undefined) return localStorage.getItem(k); if (v === null) localStorage.removeItem(k); else localStorage.setItem(k, v); } catch (e) { return null; } };
   function delay(ms) { return new Promise(function (r) { setTimeout(r, ms); }); }
   function aiMs(ms) { return typeof window.AIDELAY === 'number' ? Math.min(ms, window.AIDELAY) : ms; }
@@ -1197,7 +1213,7 @@ var UI = (function () {
   function strip(p) {
     var g = G(), P = g.pl[p], el = $(p ? '#rival' : '#me'), b = E.bonuses(P), bc = E.bestColour(P), q = g.pend, me = p === 0, h = '';
     el.classList.toggle('turn', g.turn === p && !g.over);
-    h += '<div class="top"><span class="nm">' + (me ? 'You' : 'Rival') + '</span><span class="race">' +
+    h += '<div class="top"><button class="pbtn" data-panel="' + p + '" aria-label="' + (me ? 'Your' : 'Rival') + ' panel: gems, bonuses, kept jewels"><span class="av"><span class="nm">' + (me ? 'You' : 'Rival') + '</span><b class="sc">' + E.points(P) + '</b></span></button><span class="race">' +
       '<span title="Points: 20 wins" aria-label="' + E.points(P) + ' of 20 points"><b data-engine="OA_TEST.pts.' + p + '">' + E.points(P) + '</b>/20 pts</span>' +
       '<span title="Crowns: 10 wins" aria-label="' + E.crowns(P) + ' of 10 crowns">' + OART.icon('crown') + '<b>' + E.crowns(P) + '</b>/10</span>' +
       '<span title="Points on jewels of one colour: 10 wins" aria-label="' + bc.v + ' of 10 points on one colour">' + OART.gm(bc.c) + '<b>' + bc.v + '</b>/10</span></span><span class="favs">';
@@ -1248,9 +1264,9 @@ var UI = (function () {
   }
   function side() {
     var g = G(), el = $('#side'), h = '', P = g.pl[0];
-    h += '<div class="sbox" aria-label="Favours left">Favours<div class="row">';
+    h += '<button class="sbox" data-info="fav" aria-label="Favours left in supply: tap to learn">Favours in supply<div class="row">';
     for (var i = 0; i < 3; i++) h += OART.icon(i < g.fav ? 'scroll' : 'scroll0');
-    h += '</div></div>';
+    h += '</div></button>';
     if (U.sel.length && human()) {
       var run = runFor(U.sel), got = U.sel.map(function (s) { return g.board[s]; }), warn = got.length === 3 && got[0] === got[1] && got[1] === got[2] || got.filter(function (x) { return x === 'p'; }).length >= 2;
       h += '<button class="btn pri" id="takebtn"' + (run ? '' : ' disabled') + '>Take ' + got.length + '<span class="pv">' + got.map(function (c) { return OART.gm(c); }).join('') + '</span>' + (warn ? '<small>Rival gets a Favour</small>' : '') + (E.tokens(P) + got.length > 10 ? '<small>Over 10: return ' + (E.tokens(P) + got.length - 10) + '</small>' : '') + '</button>';
@@ -1263,7 +1279,7 @@ var UI = (function () {
       h += '</div></div>';
     }
     var rf = human() && !g.pend && canRefill() && !U.sel.length && !U.mode;
-    h += '<button class="btn' + (rf && onlyRefill() ? ' pri glow' : '') + '" id="refillbtn"' + (rf ? '' : ' disabled') + '>Refill<small>Bag ' + g.bag.length + ' · rival +1 scroll</small></button>';
+    h += '<button class="btn' + (rf && onlyRefill() ? ' pri glow' : '') + '" id="refillbtn"' + (rf ? '' : ' disabled') + '>Refill<small>Bag ' + g.bag.length + ' · rival +1 Favour</small></button>';
     el.innerHTML = h;
   }
   function status() {
@@ -1346,7 +1362,8 @@ var UI = (function () {
     if (g.pend && g.pend.h === 'royal') patronPick();
     render();
   }
-  function act(m) { if (!human() || !legalMove(m)) { SND.bad(); return; } if (U.tut && U.tut.allow && !U.tut.allow(m)) { SND.bad(); return; } closeSheet(); doMove(m); after(); }
+  function act(m) { if (!human() || !legalMove(m)) { SND.bad(); return; } if (U.tut && U.tut.allow && !U.tut.allow(m)) { SND.bad(); return; } closeSheet(); logMove(m, 0); doMove(m); after(); }
+  function logMove(m, p) { try { var g = G(); (U.hist = U.hist || []).push((p ? 'Rival ' : 'You ') + rivalLine(m, g).replace(/^Rival /, '')); if (U.hist.length > 60) U.hist.shift(); } catch (e) { } }
 
   // ---------- the rival ----------
   function rivalLine(m, g) {
@@ -1372,15 +1389,15 @@ var UI = (function () {
   function aiTurn() {
     var run = ++aiRun, lines = []; U.busy = true; U.recap = null; render();
     (async function () {
-      await delay(aiMs(500));
+      await delay(aiMs(250));
       while (run === aiRun && G() && G().turn === 1 && !G().over) {
         var seq = A.pick(G(), U.level);
         if (!seq.length) break;
         for (var i = 0; i < seq.length && run === aiRun; i++) {
-          rivalShow(seq[i]); lines.push(rivalLine(seq[i], G()).replace(/^Rival /, '').replace(/^takes /, 'took ').replace(/^buys /, 'bought ').replace(/^keeps /, 'kept ').replace(/^refills/, 'refilled').replace(/^uses /, 'used ').replace(/^wins /, 'won ').replace(/^returns /, 'returned ').replace(/^matches /, 'matched '));
-          await delay(aiMs(seq[i].t === 'take' || seq[i].t === 'buy' ? 1300 : 1000));
+          logMove(seq[i], 1); rivalShow(seq[i]); lines.push(rivalLine(seq[i], G()).replace(/^Rival /, '').replace(/^takes /, 'took ').replace(/^buys /, 'bought ').replace(/^keeps /, 'kept ').replace(/^refills/, 'refilled').replace(/^uses /, 'used ').replace(/^wins /, 'won ').replace(/^returns /, 'returned ').replace(/^matches /, 'matched '));
+          await delay(aiMs(seq[i].t === 'take' || seq[i].t === 'buy' ? 750 : 550));
           if (run !== aiRun) return;
-          doMove(seq[i]); U.say = null; await delay(aiMs(550));
+          doMove(seq[i]); U.say = null; await delay(aiMs(300));
         }
       }
       if (run !== aiRun) return;
@@ -1421,6 +1438,33 @@ var UI = (function () {
     var r = d.querySelector('[data-res]'); if (r) r.onclick = function () { act(resM); };
   }
   function deckInfo(l) { var g = G(); sheet('<div class="zoom"><div class="card back" style="--cw:90px;--ch:118px"><span class="tier">' + ROMAN[l] + '</span><span class="left">' + g.decks[l].length + '</span></div><div class="info"><h3>' + TIER[l] + ' deck</h3><p>' + g.decks[l].length + ' left.</p><p>Tap a gold coin, then this deck, to keep the top jewel unseen.</p></div></div>'); }
+  function bar(v, max) { return '<div class="meter"><i style="width:' + Math.min(100, v / max * 100) + '%"></i></div>'; }
+  function playerPanel(p) {
+    var g = G(), P = g.pl[p], me = p === 0, b = E.bonuses(P), bc = E.bestColour(P), h = '';
+    h += '<h2>' + (me ? 'You' : 'Rival') + '</h2><div class="goals">' +
+      '<div><span>Points</span><b>' + E.points(P) + '/20</b>' + bar(E.points(P), 20) + '</div>' +
+      '<div><span>Crowns</span><b>' + E.crowns(P) + '/10</b>' + bar(E.crowns(P), 10) + '</div>' +
+      '<div><span>One colour (' + NAME[bc.c] + ')</span><b>' + bc.v + '/10</b>' + bar(bc.v, 10) + '</div></div>' +
+      '<h3>Gems ' + E.tokens(P) + '/10 · Favours ' + P.fav + '</h3><div class="pcols">';
+    E.TOK.forEach(function (c) { h += '<div class="pc">' + OART.gm(c) + '<b>' + P.t[c] + '</b><span>' + (c === 'p' || c === 'o' ? '&nbsp;' : '+' + (b[c] || 0) + ' bonus') + '</span></div>'; });
+    h += '</div><h3>Jewels owned: ' + P.cards.length + '</h3><p>Each jewel gives a permanent discount in its colour.</p>';
+    h += '<h3>Kept jewels ' + P.res.length + '/3</h3>';
+    if (!P.res.length) h += '<p>None.</p>';
+    else if (me) { h += '<div class="pats">'; P.res.forEach(function (id, i) { var c = E.card(id); h += '<button class="card t' + c.lvl + (E.price(P, id).ok && human() ? ' can' : '') + '" style="--cw:70px;--ch:92px" data-r="' + i + '" aria-label="' + esc(cardLabel(id)) + '">' + cardHtml(id) + '</button>'; }); h += '</div><p>Tap a kept jewel to buy it.</p>'; }
+    else h += '<p>The rival keeps ' + P.res.length + ' jewel' + (P.res.length === 1 ? '' : 's') + '.</p>';
+    if (P.roy.length) h += '<h3>Patrons</h3><div class="pats">' + P.roy.map(function (i) { return patHtml(i); }).join('') + '</div>';
+    var d = sheet(h, true);
+    [].forEach.call(d.querySelectorAll('[data-r]'), function (b2) { b2.onclick = function () { zoom({ res: +b2.dataset.r }); }; });
+  }
+  function logPanel() {
+    var L = (U.hist || []).slice(-30).reverse();
+    sheet('<h2>Game log</h2>' + (L.length ? '<ol class="log">' + L.map(function (l) { return '<li>' + esc(l) + '</li>'; }).join('') + '</ol>' : '<p>No moves yet.</p>'), true);
+  }
+  function infoPanel(k) {
+    var T = { fav: '<h2>Favours</h2><p>A Favour lets you take any one gem or pearl (never gold) before your move, and goes back to the supply when used. The second player starts with one.</p><p>You gain one when your rival refills the board, or takes three of one colour or two pearls.</p>',
+      refill: '<h2>Refill</h2><p>Put every token from the bag back on the board. Your rival gains a Favour. Only possible while the bag is not empty, and before you spend a Favour.</p>' };
+    sheet(T[k] || '', true);
+  }
   function reserved() {
     var g = G(), P = g.pl[0]; if (!P.res.length) return;
     var h = '<h2>Kept jewels</h2><p style="text-align:center">Tap one to buy it.</p><div class="pats">';
@@ -1448,7 +1492,7 @@ var UI = (function () {
     var h = '<h2>How to play</h2><h3>How you win</h3><p>' + X.win + '</p>' +
       '<h3>Your turn</h3><p>' + X.order + '</p><ul><li>' + X.fav + '</li><li>' + X.refill + '</li>' +
       '<li>' + X.take + '</li><li>' + X.takeFav + '</li><li>' + X.keep + '</li><li>' + X.buy + '</li><li>' + X.bonus + '</li><li>' + X.limit + '</li>' +
-      '<li>If you can do nothing else, you must refill. Gold only comes from keeping a jewel. A Favour you spend goes back to the supply.</li></ul>' +
+      '<li>The game ends the moment you reach a goal at the end of your own turn, so there are no ties. You can keep at most 3 jewels. If the bag is empty and nothing else is possible you pass.</li><li>If you can do nothing else, you must refill. Gold only comes from keeping a jewel. A Favour you spend goes back to the supply.</li></ul>' +
       '<h3>Jewel powers</h3><p>' + X.power + '</p><ul><li><b>Encore:</b> take another turn.</li><li><b>Polish:</b> take a gem of that colour from the board.</li><li><b>Favour:</b> gain a Favour.</li><li><b>Pinch:</b> take a gem or pearl from your rival.</li><li><b>Matching jewel</b> (rainbow gem): you need a coloured jewel to buy it; it joins one colour you own.</li></ul>' +
       '<h3>Crowns and patrons</h3><p>' + X.crowns + '</p>' +
       '<h3>Everything in the box</h3><p>25 board spaces. 4 each of Diamond, Sapphire, Emerald, Ruby, Onyx. 2 Pearls, 3 Gold. 3 Favours. 4 Patrons. 67 jewels: 30 Rings, 24 Brooches, 13 Tiaras.</p><div class="pats">' + [0, 1, 2, 3].map(function (i) { return patHtml(i); }).join('') + '</div>';
@@ -1485,6 +1529,9 @@ var UI = (function () {
     var g = G(); if (!g) return;
     if (U.recap && t.closest('#board,#pyr,#me,#side')) U.recap = null;
     if (t.id === 'menubtn') return menu();
+    if (t.id === 'logbtn') return logPanel();
+    if (t.closest('[data-panel]')) return playerPanel(+t.closest('[data-panel]').dataset.panel);
+    if (t.dataset.info) return infoPanel(t.dataset.info);
     if (t.id === 'rulesbtn') return rules();
     if (t.id === 'hintbtn') return hint();
     if (t.id === 'resbtn') return reserved();
@@ -1530,7 +1577,7 @@ var UI = (function () {
     $('#title').hidden = true; render(); save();
     if (U.G.turn === 1) aiTurn(); else toast('You start');
   }
-  function resume() { try { var s = JSON.parse(LS('oa_save')); U.G = s.G; U.level = s.level || 'easy'; } catch (e) { return newGame(U.level); } $('#title').hidden = true; render(); after(); }
+  function resume() { try { var s = JSON.parse(LS('oa_save')); U.G = s.G; U.level = s.level || 'normal'; } catch (e) { return newGame(U.level); } $('#title').hidden = true; render(); after(); }
   function startTut() { if (window.OTUT) { $('#title').hidden = true; OTUT.start(); } else newGame('easy'); }
   function showTitle() {
     aiRun++; U.busy = false; closeSheet(); var c = document.getElementById('coach'); if (c) c.remove(); U.tut = null;

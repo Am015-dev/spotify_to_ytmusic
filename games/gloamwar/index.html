@@ -405,12 +405,14 @@ body.tut #bulbbtn{visibility:hidden}
 .tok.sel .tokring{stroke:var(--red);stroke-dasharray:none;stroke-width:7}
 .mv{transition:transform .55s cubic-bezier(.2,.8,.2,1)}
 /* ---------- dock */
-#dock{background:var(--paper);border-top:2px solid var(--ink);padding:6px 8px calc(6px + env(safe-area-inset-bottom,0px));display:flex;flex-direction:column;gap:6px;position:relative;z-index:3}
+#dock{background:var(--paper);border-top:2px solid var(--ink);padding:4px 8px calc(4px + env(safe-area-inset-bottom,0px));display:flex;flex-direction:column;gap:4px;position:relative;z-index:3}
 #dock::before{content:'';position:absolute;left:0;right:0;top:-7px;height:3px;border-bottom:1px solid var(--ink);pointer-events:none}
-#msg{font-family:var(--fell);font-size:1.08rem;line-height:1.25;min-height:2.5em;text-align:center;overflow:hidden;display:flex;align-items:center;justify-content:center;gap:6px}
+#msg{pointer-events:none;position:absolute;left:8px;right:60px;top:8px;z-index:4;font-family:var(--fell);font-size:1.08rem;line-height:1.25;padding:6px 12px;min-height:44px;text-align:center;background:rgba(239,226,191,.96);border:2px solid var(--ink);border-radius:22px;box-shadow:0 3px 10px rgba(31,24,18,.3);display:flex;align-items:center;justify-content:center;gap:6px;cursor:pointer}
+#logB{position:absolute;right:8px;top:8px;z-index:4;width:44px;height:44px;border-radius:50%;border:2px solid var(--ink);background:rgba(239,226,191,.96);font-family:var(--fellsc);font-size:.9rem;padding:0;box-shadow:0 3px 10px rgba(31,24,18,.3)}
 #msg .who{color:var(--red)}
-#drow{display:flex;gap:6px;align-items:center;justify-content:center;flex-wrap:wrap;min-height:48px}
+#drow{display:flex;gap:6px;align-items:center;justify-content:center;flex-wrap:nowrap;min-height:46px}
 #mydice{flex-wrap:wrap;justify-content:center}
+#mydice:empty{display:none}#drow:not(:has(.die)){min-height:0}
 .die{width:46px;height:46px;border-radius:7px;border:2px solid var(--ink);background:var(--dawn);display:inline-flex;align-items:center;justify-content:center;position:relative;flex:0 0 auto;transition:transform .18s ease-out,box-shadow .18s}
 .die svg{width:34px;height:34px}
 .die.g{background:var(--gloam);border-color:#2a0805}
@@ -424,7 +426,7 @@ body.tut #bulbbtn{visibility:hidden}
 #rdice{display:flex;gap:2px;flex-wrap:wrap;justify-content:flex-end}
 #hunt{display:flex;align-items:center;gap:2px;font-family:var(--fell);font-size:1rem;color:var(--red)}
 #hunt svg{width:20px;height:20px}
-#acts{display:flex;flex-wrap:wrap;gap:6px;min-height:50px;max-height:170px;overflow-y:auto;scrollbar-width:thin}
+#acts{display:flex;flex-wrap:wrap;gap:6px;min-height:0;max-height:112px;overflow-y:auto;scrollbar-width:thin}
 #acts::-webkit-scrollbar{display:none}
 .act{flex:1 1 30%;min-height:48px;min-width:96px;max-width:100%;border:1.5px solid var(--ink);border-radius:6px;background:var(--paper2);padding:4px 9px;display:flex;flex-direction:column;align-items:flex-start;justify-content:center;text-align:left;line-height:1.1}
 .act b{font-family:var(--fell);font-weight:400;font-size:1.05rem;line-height:1.05}
@@ -451,7 +453,7 @@ body.tut #bulbbtn{visibility:hidden}
 .card{border:1.5px solid var(--ink);border-radius:6px;background:var(--paper2);padding:8px 10px;margin:0 0 8px;position:relative}
 .card .ct{font-family:var(--fell);font-size:1.15rem;display:flex;gap:6px;align-items:center}
 .card .ct svg{width:22px;height:22px;flex:0 0 auto}
-.card .ctype{font-size:.78rem;text-transform:uppercase;letter-spacing:.07em;color:var(--ink2)}
+.card .ctype{font-size:.9rem;text-transform:uppercase;letter-spacing:.07em;color:var(--ink2)}
 .card .eff{margin:4px 0;line-height:1.3}
 .card .cb{border-top:1px dashed var(--ink3);padding-top:4px;font-size:.9rem;color:var(--ink2)}
 .card .cb b{font-family:var(--fell);font-weight:400;color:var(--red)}
@@ -468,14 +470,14 @@ body.tut #bulbbtn{visibility:hidden}
 .pol{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;margin:6px 0}
 .pol .box{border:1.5px solid var(--ink);border-radius:4px;min-height:70px;padding:4px;display:flex;flex-wrap:wrap;gap:4px;align-content:flex-start;background:var(--paper2)}
 .pol .box.war{background:#e3b9a1;border-color:var(--red2)}
-.pol .lab{font-family:var(--fellsc);font-size:.85rem;grid-column:span 1;text-align:center}
-.ntok{display:inline-flex;align-items:center;gap:3px;border:1.5px solid var(--ink);border-radius:12px;padding:1px 7px 1px 3px;font-size:.85rem;background:var(--paper);white-space:nowrap}
+.pol .lab{font-family:var(--fellsc);font-size:.9rem;grid-column:span 1;text-align:center}
+.ntok{display:inline-flex;align-items:center;gap:3px;border:1.5px solid var(--ink);border-radius:12px;padding:1px 7px 1px 3px;font-size:.9rem;background:var(--paper);white-space:nowrap}
 .ntok i{width:12px;height:12px;border-radius:50%;display:inline-block;border:1px solid var(--ink)}
 .ntok.sleep{border-style:dashed;opacity:.8}
 .ntok.g{background:var(--gloam);color:var(--paper)}
 /* company */
 .track{display:grid;grid-template-columns:repeat(13,1fr);gap:2px;margin:6px 0}
-.track span{border:1px solid var(--ink);height:26px;display:flex;align-items:center;justify-content:center;font-family:var(--fell);font-size:.85rem;background:var(--paper2)}
+.track span{border:1px solid var(--ink);height:26px;display:flex;align-items:center;justify-content:center;font-family:var(--fell);font-size:.9rem;background:var(--paper2)}
 .track span.on{background:var(--red);color:var(--paper)}
 .track span.end{background:var(--ink);color:var(--paper)}
 .comp{display:flex;gap:6px;flex-wrap:wrap}
@@ -497,7 +499,7 @@ body.tut #bulbbtn{visibility:hidden}
 .barmy.g{background:var(--gloam);color:var(--paper)}
 .barmy .nm{font-family:var(--fell);font-size:1.02rem}
 .barmy .u{font-family:var(--fell);font-size:1.5rem;font-variant-numeric:tabular-nums}
-.barmy .s{font-size:.82rem}
+.barmy .s{font-size:.9rem}
 .bvs{font-family:var(--fellsc);align-self:center;font-size:1.1rem}
 .rolls{display:flex;gap:3px;justify-content:center;flex-wrap:wrap;min-height:30px;margin-top:4px}
 .cd6{width:26px;height:26px;border:1.5px solid currentColor;border-radius:5px;display:inline-flex;align-items:center;justify-content:center;font-family:var(--fell);font-size:1rem}
@@ -507,7 +509,7 @@ body.tut #bulbbtn{visibility:hidden}
 .bcards{display:flex;gap:6px;overflow-x:auto;padding-bottom:2px}
 .bcard{flex:0 0 150px;border:1.5px solid var(--ink);border-radius:6px;padding:6px;background:var(--paper2);text-align:left;min-height:64px}
 .bcard b{font-family:var(--fell);font-weight:400;color:var(--red);font-size:1.02rem;display:block}
-.bcard small{font-size:.82rem;line-height:1.2;display:block}
+.bcard small{font-size:.9rem;line-height:1.2;display:block}
 /* title + setup */
 .scr{position:fixed;inset:0;z-index:30;display:none;flex-direction:column;align-items:center;justify-content:center;gap:12px;padding:20px;background:var(--paper);text-align:center;overflow:auto}
 .scr.on{display:flex}
@@ -522,7 +524,8 @@ body.tut #bulbbtn{visibility:hidden}
 .seg button+button{border-left:1.5px solid var(--ink)}
 .seg button.on{background:var(--ink);color:var(--paper)}
 #res .big{font-family:var(--fellsc);font-size:2.2rem;margin:0}
-#toast{position:fixed;left:50%;top:64px;transform:translateX(-50%) translateY(-10px);background:var(--ink);color:var(--paper);font-family:var(--fell);font-size:1.05rem;padding:6px 14px;border-radius:4px;opacity:0;pointer-events:none;z-index:50;transition:opacity .25s,transform .25s;white-space:nowrap;max-width:92vw;overflow:hidden;text-overflow:ellipsis}
+#toast{cursor:pointer;position:fixed;left:50%;top:128px;transform:translateX(-50%) translateY(-10px);background:var(--ink);color:var(--paper);font-family:var(--fell);font-size:1.05rem;padding:6px 14px;border-radius:4px;opacity:0;pointer-events:none;z-index:50;transition:opacity .25s,transform .25s;white-space:normal;text-align:center;max-width:92vw;min-height:44px;display:flex;align-items:center;border-radius:22px}
+#toast.on{pointer-events:auto}
 #toast.on{opacity:1;transform:translateX(-50%)}
 #toast.g{background:var(--red)}
 .pop{position:absolute;font-family:var(--fell);font-size:1.25rem;color:var(--red);pointer-events:none;z-index:20;transition:transform 1s ease-out,opacity 1s;text-shadow:0 0 4px var(--paper),0 0 2px var(--paper)}
@@ -547,9 +550,8 @@ body.tut #bulbbtn{visibility:hidden}
     <button class="ib gx-ibtn gxh-bulb" id="bulbbtn" data-help type="button" aria-label="Hint"></button>
     <button class="ib" id="helpB" type="button" aria-label="Rules">?</button>
   </div>
-  <div class="gx-board" id="board" data-board><div id="map"></div><div id="zoomb"><button type="button" id="zin" aria-label="Zoom in">+</button><button type="button" id="zout" aria-label="Zoom out">−</button></div><div id="rival" aria-label="Rival dice"><span class="rl" id="rlab">Rival dice</span><div id="rdice"></div><div id="hunt" title="Dice in the hunt box"></div></div></div>
+  <div class="gx-board" id="board" data-board><div id="msg" aria-live="polite" role="button" tabindex="0" aria-label="Current prompt"></div><button type="button" id="logB" aria-label="Open the war log">Log</button><div id="map"></div><div id="zoomb"><button type="button" id="zin" aria-label="Zoom in">+</button><button type="button" id="zout" aria-label="Zoom out">−</button></div><div id="rival" aria-label="Rival dice"><span class="rl" id="rlab">Rival dice</span><div id="rdice"></div><div id="hunt" title="Dice in the hunt box"></div></div></div>
   <div id="dock">
-    <div id="msg" aria-live="polite" role="button" tabindex="0" aria-label="Chronicle of the war"></div>
     <div id="drow"><div id="mydice" style="display:flex;gap:6px"></div></div>
     <div id="acts"></div>
     <div id="tabs">
@@ -4164,7 +4166,7 @@ function playEvents(evs, byAI) {
   if (said) UI.say = said;
   return UI.fast ? 20 : wait;
 }
-function toast(t, red) { var e = $('#toast'); e.textContent = t; e.className = 'on' + (red ? ' g' : ''); clearTimeout(UI.tt); UI.tt = setTimeout(function () { e.className = ''; }, UI.fast ? 50 : 1600); }
+function toast(t, red) { var e = $('#toast'); e.textContent = t; e.className = 'on' + (red ? ' g' : ''); clearTimeout(UI.tt); UI.tt = setTimeout(function () { e.className = ''; }, UI.fast ? 50 : 4500); e.onclick = function () { e.className = ''; }; }
 function phaseId() { if (!G) return null; if (G.pend) return G.pend.h; return G.phase; }
 // ---------------------------------------------------------------- render
 function render() {
@@ -4458,7 +4460,7 @@ function boot() {
   $('#helpB').onclick = function () { GXH.rules(phaseId() || undefined); };
   $('#menuB').innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6h18M3 12h18M3 18h18" stroke="#1f1812" stroke-width="2.4" stroke-linecap="round"/></svg>';
   $('#tCards').onclick = function () { openCards(); }; $('#tNat').onclick = openNations; $('#tComp').onclick = openCompany;
-  $('#cT').onclick = openCompany; $('#msg').onclick = openLog;
+  $('#cT').onclick = openCompany; $('#logB').onclick = openLog;
   $('#zin').onclick = function () { MV.zoomBy(1.4); }; $('#zout').onclick = function () { MV.zoomBy(1 / 1.4); }; $('#cD').onclick = function () { openVP('D'); }; $('#cG').onclick = function () { openVP('G'); };
   $('#scrim').onclick = function (e) { closeSheet(e); };
   document.addEventListener('keydown', function (e) { if (e.key === 'Escape') { closeSheet(); } });
@@ -4513,7 +4515,7 @@ function tileHtml(t) { var cls = 'tile' + (t.r ? ' r' : '') + (t.sp ? (HUNT_SPEC
 function openCompany() {
   var F = G.F, me = UI.side, g = guideOf(G), body = '';
   body += '<p>The Company carries the Hollow Crown. Walk it to the Kiln of Kaldur: reach a gate (Blackgate or Wraithpass), then take 5 steps on the Ashen Road. <b>12 taint</b> and the Gloam wins.</p>';
-  body += '<div class="ctype" style="font-size:.85rem;text-transform:uppercase;letter-spacing:.06em">Taint</div><div class="track">'; for (var i = 0; i <= 12; i++) body += '<span class="' + (i === F.taint ? 'on' : i === 12 ? 'end' : '') + '">' + i + '</span>'; body += '</div>';
+  body += '<div class="ctype" style="font-size:.9rem;text-transform:uppercase;letter-spacing:.06em">Taint</div><div class="track">'; for (var i = 0; i <= 12; i++) body += '<span class="' + (i === F.taint ? 'on' : i === 12 ? 'end' : '') + '">' + i + '</span>'; body += '</div>';
   body += '<p>' + (F.road >= 0 ? 'On the Ashen Road: step <b>' + F.road + ' of 5</b>.' : 'Last seen at <b>' + rn(F.loc) + '</b>, ' + gateDist(F.loc) + ' regions from a gate. Moved <b>' + F.prog + '</b> unseen.') + ' The Company is <b>' + (F.hid ? 'hidden' : 'revealed: hide it before it moves') + '</b>.</p>';
   body += '<div class="comp">'; COMPANIONS.concat(['wretch']).forEach(function (c) { var l = G.C[c]; if (c === 'wretch' && l !== 'F') return; body += '<div class="cmp' + (c === g ? ' guide' : '') + (l === 'dead' ? ' dead' : '') + '">' + ico(CHARS[c].icon, '#1f1812', 22) + '<div><b style="font-family:var(--fell);font-weight:400">' + CHARS[c].short + '</b><br><small>' + (l === 'F' ? (c === g ? 'guide · ' : '') + 'level ' + CHARS[c].lv : l === 'dead' ? 'fallen' : rn(l)) + '</small></div></div>'; }); body += '</div>';
   if (g && CHARS[g].guide) body += '<p><b>Guide ' + CHARS[g].short + ':</b> ' + CHARS[g].guide + '</p>';
@@ -4603,7 +4605,7 @@ function bubble(html, tr, o) {
   el.dataset.side = pick.side; el._tr = tr; return el;
 }
 function closeBubble(b) { if (b && b.parentNode) b.parentNode.removeChild(b); }
-function tip(text, tr) { closeBubble(UI.tipEl); UI.tipEl = bubble('<span>' + text + '</span>', tr, { cls: 'tip' }); var e = UI.tipEl; clearTimeout(UI.tipT); UI.tipT = setTimeout(function () { closeBubble(e); }, 2200); }
+function tip(text, tr) { closeBubble(UI.tipEl); UI.tipEl = bubble('<span>' + text + '</span>', tr, { cls: 'tip' }); var e = UI.tipEl; clearTimeout(UI.tipT); UI.tipT = setTimeout(function () { closeBubble(e); }, 7000); if (e) e.onclick = function () { closeBubble(e); }; }
 function closeRCard() { if (UI.rcard) { closeBubble(UI.rcard); UI.rcard = null; try { MV.setSel(null); } catch (e) { } document.removeEventListener('pointerdown', UI.rcardOff, true); } }
 function regionCard(rid, title, body) {
   closeRCard(); MV.setSel(rid);

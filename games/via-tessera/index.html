@@ -24,21 +24,6 @@ button:focus-visible, [tabindex]:focus-visible { outline: 3px solid var(--gold);
 
 #app { position: fixed; inset: 0; display: flex; flex-direction: column; padding: env(safe-area-inset-top) env(safe-area-inset-right) 0 env(safe-area-inset-left); }
 /* top bar: a strip of marble with the race */
-.bar { flex: none; height: 50px; display: flex; align-items: center; gap: 6px; padding: 0 6px; background: linear-gradient(#3b2a1e, #2b2018); color: var(--marble); border-bottom: 3px solid var(--terra2); }
-.brand { display: flex; align-items: center; gap: 6px; background: none; border: 0; padding: 0 4px; height: 44px; min-width: 44px; color: var(--gold); font-family: var(--serif); font-weight: 700; font-size: 15px; letter-spacing: .04em; }
-.brand span { white-space: nowrap; }
-.race { flex: 1; display: flex; gap: 6px; justify-content: center; min-width: 0; }
-.chip { display: flex; align-items: center; gap: 5px; height: 32px; padding: 0 9px 0 5px; border-radius: 16px; background: rgba(241,233,218,.12); font-size: 14px; white-space: nowrap; }
-.chip .dot { width: 18px; height: 18px; border-radius: 4px; border: 2px solid var(--marble); }
-.chip b { font-size: 17px; font-variant-numeric: tabular-nums; }
-.chip.turn { background: rgba(226,180,79,.28); box-shadow: inset 0 0 0 2px var(--gold); }
-.tb { height: 44px; min-width: 44px; display: flex; align-items: center; gap: 4px; padding: 0 8px; border-radius: 8px; border: 1px solid rgba(241,233,218,.35); background: rgba(241,233,218,.08); color: var(--marble); font-size: 14px; position: relative; }
-.tb.sq { width: 44px; justify-content: center; padding: 0; }
-.tb b { position: absolute; top: -5px; right: -5px; min-width: 18px; height: 18px; border-radius: 9px; background: var(--terra); color: #fff; font-size: 12px; line-height: 18px; text-align: center; }
-.tb.glow { box-shadow: 0 0 0 3px var(--gold); }
-.tb.low b { background: #e2b44f; color: var(--ink); animation: pop .5s ease-out 2; }
-@media (max-width: 460px) { .brand span { display: none; } }
-@media (max-width: 380px) { .tb span { display: none; } }
 
 /* board: the mosaic map */
 .board { position: relative; flex: 1 1 auto; min-height: 0; min-width: 0; overflow: hidden; background: #1b467f; touch-action: none; }
@@ -84,12 +69,6 @@ button:focus-visible, [tabindex]:focus-visible { outline: 3px solid var(--gold);
 .prodpop { font: 700 14px var(--sans); fill: #fff; paint-order: stroke; stroke: var(--grout); stroke-width: 4px; text-anchor: middle; pointer-events: none; }
 
 /* dock */
-.dock { flex: none; background: var(--marble); border-top: 3px solid var(--terra2); padding: 4px 6px calc(4px + env(safe-area-inset-bottom)); display: flex; flex-direction: column; gap: 4px;
-  background-image: linear-gradient(115deg, transparent 40%, rgba(211,195,166,.35) 45%, transparent 52%), linear-gradient(var(--marble), var(--marble2)); }
-.prow { display: flex; align-items: center; gap: 6px; min-height: 44px; }
-#prompt { flex: 1; margin: 0; font-size: 16px; font-weight: 700; color: var(--ink); line-height: 1.15; min-width: 0; }
-#prompt.wait { color: var(--ink2); font-weight: 400; }
-#acts { display: flex; gap: 6px; flex: none; }
 .btn { min-height: 44px; min-width: 64px; padding: 0 14px; border-radius: 10px; border: 2px solid var(--grout); background: var(--terra); color: #fff8ec; font-size: 15px; font-weight: 700; box-shadow: 0 3px 0 var(--terra2), 0 4px 8px rgba(0,0,0,.2); }
 .btn.alt { background: var(--marble); color: var(--ink); box-shadow: 0 3px 0 var(--vein), 0 4px 8px rgba(0,0,0,.15); }
 .btn:active { transform: translateY(2px); box-shadow: 0 1px 0 var(--terra2); }
@@ -197,32 +176,12 @@ button:focus-visible, [tabindex]:focus-visible { outline: 3px solid var(--gold);
 @keyframes pop { 0% { transform: scale(.4); } 70% { transform: scale(1.15); } 100% { transform: scale(1); } }
 .popin { animation: pop .45s ease-out; transform-box: fill-box; transform-origin: center; }
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }
-/* small phones */
-@media (max-height: 600px) { #hand { height: 86px; } .cd { height: 80px; } .cd .art { width: 28px; height: 28px; margin-top: 2px; } .bar { height: 42px; } .prow { min-height: 44px; } }
-/* wide screens: a side dock */
-@media (min-width: 900px) and (min-aspect-ratio: 4/3) {
-  #app { display: grid; grid-template-columns: minmax(0, 1fr) 380px; grid-template-rows: 46px minmax(0, 1fr); }
-  .bar { grid-column: 1 / 3; }
-  .board { height: auto; }
-  .dock { height: auto; border-top: 0; border-left: 3px solid var(--terra2); overflow-y: auto; }
-  #hand { flex-wrap: wrap; height: auto; overflow: visible; }
-  .sheet { left: auto; width: 420px; right: 0; }
-}
-/* landscape phones: the dock goes to the right */
+/* landscape phones: tighter panels */
 @media (max-height: 500px) and (min-aspect-ratio: 3/2) {
-  #app { display: grid; grid-template-columns: minmax(0, 1fr) 300px; grid-template-rows: 40px minmax(0, 1fr); }
-  .bar { grid-column: 1 / 3; height: 40px; } .brand, .tb { height: 34px; } .tb.sq { height: 34px; }
-  .board { height: auto; }
-  .dock { height: auto; border-top: 0; border-left: 3px solid var(--terra2); overflow-y: auto; }
-  #hand { flex-wrap: wrap; height: auto; overflow: visible; }
-  .cd { height: 76px; } .cd .art { width: 26px; height: 26px; }
-  .sheet { left: auto; width: 380px; right: 0; max-height: 90%; }
-  .prow { flex-wrap: wrap; } #prompt { flex-basis: 100%; font-size: 15px; }
   .title-art { height: 64px; } .title-art h1 { font-size: 24px; bottom: 6px; }
   .panel .tgrid { display: grid; grid-template-columns: 1fr 1fr; gap: 0 8px; }
   .ov { padding: 8px; } .panel { padding: 10px 12px; } .panel > p { margin-bottom: 4px; }
 }
-
 
 /* guide and result bubbles: text sits next to its target with an arrow touching it */
 .bub { position: fixed; z-index: 46; left: 0; top: 0; max-width: 260px; padding: 9px 12px; border-radius: 12px; background: #fff8ec; color: var(--ink); border: 2px solid var(--gold); --bc: var(--gold); font: 700 16px/1.2 var(--sans); box-shadow: 0 4px 14px rgba(0,0,0,.4); pointer-events: none; opacity: 0; visibility: hidden; transition: opacity .15s; }
@@ -239,26 +198,100 @@ button:focus-visible, [tabindex]:focus-visible { outline: 3px solid var(--gold);
 .bub .sub { font-weight: 400; font-size: 14px; margin-top: 3px; opacity: .85; }
 #map.far .prov .pl { display: none; }
 
+/* ===== screen v2: the map is the screen; everything else floats on it ===== */
+#app { display: block; padding: 0; }
+.board { position: absolute; inset: 0; }
+.strips { position: fixed; z-index: 12; left: calc(6px + env(safe-area-inset-left)); top: calc(6px + env(safe-area-inset-top)); display: flex; flex-direction: column; gap: 5px; width: 168px; }
+.strip { display: grid; grid-template-columns: 22px 1fr auto; align-items: center; gap: 2px 6px; padding: 5px 8px 5px 6px; min-height: 48px; border-radius: 12px; border: 2px solid var(--grout); background: rgba(43,32,24,.9); color: var(--marble); text-align: left; font-size: 14px; box-shadow: 0 3px 8px rgba(0,0,0,.35); }
+.strip .dot { width: 20px; height: 20px; border-radius: 5px; border: 2px solid var(--marble); grid-row: 1; }
+.strip .nm { font-weight: 700; font-size: 15px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.strip b.sc { font-size: 22px; font-family: var(--serif); color: var(--gold); font-variant-numeric: tabular-nums; }
+.strip .cnt { grid-column: 1 / 4; display: flex; gap: 9px; font-size: 13px; color: #e6dac4; white-space: nowrap; }
+.strip .cnt span { display: inline-flex; align-items: center; gap: 2px; }
+.strip .cnt .ic { width: 14px; height: 14px; }
+.strip .rc { grid-column: 1 / 4; font-size: 13px; line-height: 1.2; color: var(--gold); white-space: normal; }
+.strip.turn { box-shadow: 0 0 0 3px var(--gold), 0 3px 8px rgba(0,0,0,.35); }
+.hud-r { position: fixed; z-index: 12; right: calc(6px + env(safe-area-inset-right)); top: calc(6px + env(safe-area-inset-top)); display: flex; gap: 6px; }
+.ib { position: relative; width: 48px; height: 48px; border-radius: 50%; border: 2px solid var(--grout); background: var(--marble); color: var(--ink); display: flex; align-items: center; justify-content: center; font: 700 24px var(--serif); box-shadow: 0 3px 8px rgba(0,0,0,.4); padding: 0; }
+.ib .ic { width: 26px; height: 26px; }
+.ib.sm { width: 44px; height: 44px; font-size: 22px; }
+.ib b { position: absolute; top: -5px; right: -5px; min-width: 20px; height: 20px; border-radius: 10px; background: var(--terra); color: #fff; font: 700 13px/20px var(--sans); text-align: center; }
+.ib.low b { background: var(--gold); color: var(--ink); animation: pop .5s ease-out 2; }
+.ib.glow { box-shadow: 0 0 0 3px var(--gold); }
+.zoom { position: fixed; z-index: 11; right: calc(6px + env(safe-area-inset-right)); top: 66px; display: flex; flex-direction: column; gap: 6px; }
+.ptop { position: fixed; z-index: 12; left: 0; right: 0; top: calc(112px + env(safe-area-inset-top)); display: flex; justify-content: center; gap: 6px; pointer-events: none; padding: 0 64px 0 8px; }
+.ptop > * { pointer-events: auto; }
+#prompt { margin: 0; max-width: 100%; min-height: 44px; display: flex; align-items: center; padding: 6px 16px; border-radius: 22px; background: rgba(251,246,236,.97); border: 2px solid var(--grout); box-shadow: 0 3px 10px rgba(0,0,0,.4); font-size: 16px; font-weight: 700; line-height: 1.15; color: var(--ink); text-align: center; }
+#prompt.wait { color: var(--ink2); font-weight: 600; }
+.dock { position: fixed; z-index: 12; left: 0; right: 0; bottom: 0; padding: 0 6px calc(6px + env(safe-area-inset-bottom)); display: flex; flex-direction: column; gap: 4px; pointer-events: none; }
+.dock > * { pointer-events: auto; }
+.prow { display: flex; justify-content: flex-end; align-items: center; gap: 8px; min-height: 56px; pointer-events: none; }
+.prow > * { pointer-events: auto; }
+#acts { display: flex; gap: 8px; flex-wrap: wrap; justify-content: flex-end; }
+#acts .btn { min-height: 52px; min-width: 52px; padding: 0 20px; border-radius: 26px; font-size: 17px; border-width: 3px; }
+#acts .btn:not(.alt)::before { content: '\2713\00a0'; font-weight: 900; }
+.round { width: 52px; height: 52px; border-radius: 50%; border: 3px solid var(--grout); background: var(--marble); color: var(--ink); display: flex; align-items: center; justify-content: center; box-shadow: 0 3px 8px rgba(0,0,0,.4); padding: 0; }
+.round[hidden] { display: none; }
+.round .ic { width: 26px; height: 26px; }
+#hand { display: flex; align-items: flex-end; height: 128px; overflow-x: auto; overflow-y: hidden; padding: 22px 8px 2px; margin: 0 -6px; scrollbar-width: none; justify-content: center; }
+#hand .cd { width: 70px; height: 100px; margin-left: -14px; transform: translateY(var(--dy, 0)) rotate(var(--rot, 0deg)); transform-origin: 50% 120%; transition: transform .15s; box-shadow: -2px 3px 8px rgba(0,0,0,.4); }
+#hand .cd:first-child { margin-left: 0; }
+#hand .cd .nm { font-size: 13px; }
+#hand .cd .art { width: 38px; height: 38px; }
+#hand .cd.sel { transform: translateY(-22px) rotate(0deg) scale(1.12); z-index: 3; }
+#hand .pile { height: 100px; margin-left: 6px; background: rgba(251,246,236,.9); }
+#store { background: rgba(43,32,24,.92); border: 2px solid var(--grout); border-radius: 16px; padding: 3px 6px; height: 44px; box-shadow: 0 3px 8px rgba(0,0,0,.4); }
+.slots { height: 32px; }
+.sl .ic { width: 18px; height: 18px; }
+.sheet { z-index: 30; }
+#rivalcard { position: fixed; z-index: 11; left: 6px; top: 6px; display: none; }
+@media (max-height: 640px) { .ptop { top: 100px; } #hand { height: 110px; } #hand .cd { width: 62px; height: 88px; } .strip { min-height: 40px; } }
+@media (min-width: 900px) {
+  .strips { width: 230px; } .strip .nm { font-size: 17px; } .strip .cnt { font-size: 14px; }
+  .ptop { top: 8px; padding: 0 330px 0 250px; }
+  .zoom { top: 70px; }
+  .dock { left: 50%; right: auto; transform: translateX(-50%); width: min(920px, 100vw); }
+  #hand { height: 148px; } #hand .cd { width: 84px; height: 120px; margin-left: -10px; } #hand .cd .nm { font-size: 14px; } #hand .cd .art { width: 46px; height: 46px; }
+  #hand .pile { height: 120px; }
+  .sheet { left: 50%; right: auto; transform: translateX(-50%); width: min(720px, 96vw); border-radius: 14px 14px 0 0; }
+  .sheet[hidden] { transform: translate(-50%, 110%); }
+}
+.ptop { top: calc(var(--sh, 120px) + 8px); }
+@media (min-width: 900px) { .ptop { top: 8px; } }
+.pfacts { display: flex; flex-wrap: wrap; gap: 6px 14px; padding: 4px 8px; font-size: 15px; } .pfacts b { font-size: 18px; }
+.pgoods { display: flex; gap: 12px; padding: 4px 8px 8px; font-size: 16px; font-weight: 700; } .pg { display: inline-flex; align-items: center; gap: 4px; }
+.ph { font: 700 15px var(--serif); color: var(--terra2); margin: 10px 8px 4px; }
+.rules p, .rules li { font-size: 15px; } .small { font-size: 13px; }
+.ib.sm { flex: none; min-width: 44px; }
+.storebtn { min-height: 44px; height: 44px; }
+.mc .cd .nm, .ref .cd .nm, .mrow .cd .nm { font-size: 13px; }
+#hand { justify-content: safe center; height: 142px; padding-bottom: 14px; }
+@media (min-width: 900px) { #hand { height: 160px; } }
+@media (max-height: 640px) { #hand { height: 122px; } }
+#hand { pointer-events: none; } #hand .cd, #hand .pile { pointer-events: auto; }
+
 </style>
 </head>
 <body>
 <div class="gx-app" id="app">
-<header class="bar">
-  <button class="brand" id="homeb" type="button" aria-label="Menu"><svg viewBox="0 0 512 512" class="ic"><use href="#i-laurel"/></svg><span>Via Tessera</span></button>
-  <div class="race" id="race" aria-live="polite"></div>
-  <button class="tb" id="mktb" type="button" aria-label="Market"><svg viewBox="0 0 512 512" class="ic"><use href="#i-amphora"/></svg><span>Market</span><b id="mktn"></b></button>
-  <button class="tb sq" id="menub" type="button" aria-label="Menu"><svg viewBox="0 0 24 24" class="ic ln"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
-</header>
 <main class="board gx-board" id="board" data-board aria-label="The map">
   <svg id="map" viewBox="0 0 980 600" preserveAspectRatio="xMidYMid meet" role="group" aria-label="Map"></svg>
-  <div class="zoom"><button type="button" id="zin" aria-label="Zoom in">+</button><button type="button" id="zout" aria-label="Zoom out">&minus;</button></div>
-  <div id="rivalcard" aria-live="polite"></div>
   <div id="banner" aria-live="polite"></div>
 </main>
+<div class="strips" id="race" aria-live="polite"></div>
+<div id="rivalcard" aria-live="polite"></div>
+<nav class="hud-r" aria-label="Game buttons">
+  <button class="ib" id="mktb" type="button" aria-label="Market"><svg viewBox="0 0 512 512" class="ic"><use href="#i-amphora"/></svg><b id="mktn"></b></button>
+  <button class="ib" id="plb" type="button" aria-label="Points"><svg viewBox="0 0 512 512" class="ic"><use href="#i-laurel"/></svg></button>
+  <button class="ib" id="helpb" type="button" aria-label="Rules">?</button>
+  <button class="ib" id="menub" type="button" aria-label="Menu"><svg viewBox="0 0 24 24" class="ic ln"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
+</nav>
+<div class="zoom"><button type="button" id="zin" aria-label="Zoom in">+</button><button type="button" id="zout" aria-label="Zoom out">&minus;</button></div>
+<div class="ptop"><p id="prompt" aria-live="polite"></p><button type="button" class="ib sm" id="promptq" aria-label="What does this card do?" hidden>?</button></div>
 <section class="dock" id="dock" aria-label="Your turn">
-  <div class="prow"><p id="prompt" aria-live="polite"></p><div id="acts"></div></div>
-  <div id="store" aria-label="Your storehouse"></div>
+  <div class="prow"><button type="button" class="round" id="undob" aria-label="Undo" hidden><svg viewBox="0 0 24 24" class="ic ln"><path d="M9 7 4 12l5 5M4 12h10a6 6 0 0 1 0 8"/></svg></button><div id="acts"></div></div>
   <div id="hand" role="group" aria-label="Your cards"></div>
+  <div id="store" aria-label="Your storehouse"></div>
 </section>
 </div>
 <div id="sheet" class="sheet" role="dialog" aria-label="Choice" hidden></div>
@@ -1618,20 +1651,30 @@ function labelScale(k) {
 }
 function setView(v, anim) {
   var bb = boardBox(), asp = bb.h / bb.w;
-  v.w = Math.max(260, Math.min(1200, v.w)); v.h = v.w * asp;
+  v.w = Math.max(260, Math.min(2200, v.w)); v.h = v.w * asp;
   // keep some of the map in view
-  v.x = v.w >= VTART.W ? (VTART.W - v.w) / 2 : Math.max(0, Math.min(VTART.W - v.w, v.x)); v.y = v.h >= VTART.H ? (VTART.H - v.h) / 2 : Math.max(0, Math.min(VTART.H - v.h, v.y));   // the mosaic always fills the board
+  v.x = v.w >= VTART.W ? (VTART.W - v.w) / 2 : Math.max(0, Math.min(VTART.W - v.w, v.x)); var fb = freeBox(), kk = v.w / bb.w; v.y = v.h >= VTART.H + (fb.top + fb.bot) * kk ? (VTART.H - v.h) / 2 - (fb.top - fb.bot) * kk / 2 : Math.max(-fb.top * kk, Math.min(VTART.H - v.h + fb.bot * kk, v.y));   // the mosaic always fills the board
   UI.view = v;
   growHits(v.w / bb.w); labelScale(v.w / bb.w);
   $('#map').setAttribute('viewBox', v.x.toFixed(1) + ' ' + v.y.toFixed(1) + ' ' + v.w.toFixed(1) + ' ' + v.h.toFixed(1));
+}
+// the part of the board not covered by the buttons on top and the dock below
+function freeBox() {
+  var bb = boardBox(), r = $('#board').getBoundingClientRect(), top = 8, bot = 8;
+  var pr = $('#prompt').getBoundingClientRect(), rs = $('#race').getBoundingClientRect(), pw = $('.prow').getBoundingClientRect();
+  if (pr.height) top = Math.max(top, pr.bottom - r.top + 8);
+  if (rs.height && bb.w < 900) top = Math.max(top, rs.bottom - r.top + 8);
+  if (pw.height) bot = Math.max(bot, r.bottom - pw.top + 8);
+  return { w: bb.w, h: bb.h, top: top, bot: bot };
 }
 function fitPoints(pts, pad, minW) {
   if (!pts.length) return;
   var x0 = 1e9, y0 = 1e9, x1 = -1e9, y1 = -1e9;
   pts.forEach(function (p) { x0 = Math.min(x0, p.x); y0 = Math.min(y0, p.y); x1 = Math.max(x1, p.x); y1 = Math.max(y1, p.y); });
   pad = pad == null ? 70 : pad; x0 -= pad; y0 -= pad; x1 += pad; y1 += pad;
-  var bb = boardBox(), asp = bb.h / bb.w, w = Math.max(minW || 360, x1 - x0, (y1 - y0) / asp);
-  animView({ x: (x0 + x1) / 2 - w / 2, y: (y0 + y1) / 2 - w * asp / 2, w: w });
+  var fb = freeBox(), hv = Math.max(160, fb.h - fb.top - fb.bot), asp = fb.h / fb.w, w = Math.max(minW || 360, x1 - x0, (y1 - y0) / (hv / fb.w)), k = w / fb.w;
+  var cy = (y0 + y1) / 2 + ((fb.top + hv / 2) - fb.h / 2) * -k;   // put the middle of the points in the middle of the free area
+  animView({ x: (x0 + x1) / 2 - w / 2, y: cy - w * asp / 2, w: w });
 }
 var camAnim = null;
 function animView(to) {
@@ -1648,7 +1691,11 @@ function zoomBy(f, cx, cy) {
   setView({ x: cx - (cx - v.x) * k, y: cy - (cy - v.y) * k, w: w });
 }
 // first view: the whole map, with a margin so the outer labels stay inside
-function fitMap() { animView({ x: -59, y: 0, w: 1100 }); }
+function fitMap() {
+  var bb = boardBox();
+  if (bb.h / bb.w > 1.15) animView({ x: 170, y: 0, w: 640 });   // phone portrait: big readable map, drag to look around
+  else animView({ x: -135, y: 0, w: Math.max(1250, 600 * bb.w / Math.max(1, bb.h) * 1.12) });
+}
 function homeView() {
   fitMap(); return;
   var pts = [], p = G.pl[0];
@@ -1666,6 +1713,7 @@ function frameTargets() {
   var pi = VT.sideToAct(G);
   if (UI.selCol != null && pi >= 0) { var col = G.pl[pi].cols[UI.selCol]; if (col.at) pts.push(col.at.r != null ? { x: GEO[col.at.r].mx, y: GEO[col.at.r].my } : VT.CITY[col.at.c]); }
   for (var k in t.col) { var a = k.split(':'), cc = G.pl[+a[0]].cols[+a[1]]; if (cc.at) pts.push(cc.at.r != null ? { x: GEO[cc.at.r].mx, y: GEO[cc.at.r].my } : VT.CITY[cc.at.c]); }
+  var hm0 = UI.hint; if (hm0 && hm0.t === 'mv' && GEO[hm0.r]) pts.push({ x: GEO[hm0.r].mx, y: GEO[hm0.r].my });
   if (!pts.length) return;
   // too spread out for a phone: frame the few targets nearest the hint (or the middle of the current view)
   var x0 = Math.min.apply(null, pts.map(function (q) { return q.x; })), x1 = Math.max.apply(null, pts.map(function (q) { return q.x; }));
@@ -1696,7 +1744,7 @@ function wireCamera() {
       setView({ x: v0.x + fx * v0.w - fx * w, y: v0.y + fy * v0.h - fy * w * asp, w: w });
     }
   });
-  var up = function (e) { delete pts[e.pointerId]; start = Object.keys(pts).length ? { v: Object.assign({}, UI.view), pts: JSON.parse(JSON.stringify(pts)) } : null; };
+  var up = function (e) { if (e.type === 'pointerup' && !moved && UI.sheet && UI.sheetX && Object.keys(pts).length === 1) closeSheet(); delete pts[e.pointerId]; start = Object.keys(pts).length ? { v: Object.assign({}, UI.view), pts: JSON.parse(JSON.stringify(pts)) } : null; };
   svg.addEventListener('pointerup', up); svg.addEventListener('pointercancel', up);
   svg.addEventListener('click', function (e) { if (moved) { moved = false; e.stopPropagation(); return; } onMapTap(e); }, true);
   svg.addEventListener('wheel', function (e) { e.preventDefault(); var p = toMap(e.clientX, e.clientY); zoomBy(e.deltaY > 0 ? 1.15 : 1 / 1.15, p.x, p.y); }, { passive: false });
@@ -1707,12 +1755,15 @@ function wireCamera() {
 // ---------- the dock ----------
 function renderRace() {
   if (!G) return;
-  var h = '';
-  G.pl.forEach(function (p, i) {
-    var turn = G.phase === 'play' && VT.sideToAct(G) === i;
-    h += '<span class="chip' + (turn ? ' turn' : '') + '" role="button" tabindex="0" data-score="1" title="' + esc(p.name) + ' points now"><span class="dot" style="background:' + PCOL[i] + '"></span>' + esc(p.name) + ' <b data-engine-score="' + i + '">' + VT.score(G, i).total + '</b></span>';
+  var h = '', order = UI.mode === 'hot' ? [0, 1] : [1, 0], cur = G.phase === 'play' ? VT.sideToAct(G) : -1;
+  order.forEach(function (i) {
+    var p = G.pl[i], turn = cur === i, onmap = VT.onBoard(p), ships = p.cols.filter(function (c) { return c.at && c.t === 'S'; }).length;
+    h += '<button type="button" class="strip' + (turn ? ' turn' : '') + '" data-pl="' + i + '" aria-label="' + esc(p.name) + ': ' + VT.score(G, i).total + ' points. Open details"><span class="dot" style="background:' + PCOL[i] + '"></span><span class="nm">' + esc(p.name) + (turn ? ' ▸' : '') + '</span><b class="sc" data-engine-score="' + i + '">' + VT.score(G, i).total + '</b>' +
+      '<span class="cnt"><span title="Houses">' + icon('house') + p.houses.length + '/15</span><span title="Carts and ships on the map">' + icon('meeple') + onmap + '</span><span title="Coins">' + icon('coins') + p.coins + '</span><span title="Cards in hand">' + icon('amphora') + p.hand.length + '</span></span>' +
+      (i === 1 && UI.mode !== 'hot' && UI.lastRecap ? '<span class="rc">' + esc(UI.lastRecap) + '</span>' : '') + '</button>';
   });
   $('#race').innerHTML = h;
+  document.documentElement.style.setProperty('--sh', Math.round($('#race').getBoundingClientRect().bottom) + 'px');
   var mleft = G.deck.length + G.disp.filter(function (x) { return x != null; }).length;
   $('#mktn').textContent = mleft; $('#mktb').setAttribute('aria-label', 'Market: ' + mleft + ' cards left, the game ends at 0'); $('#mktb').classList.toggle('low', mleft <= 3);
 }
@@ -1728,7 +1779,7 @@ function renderStore() {
 function renderHand() {
   var pi = UI.mode === 'hot' ? Math.max(0, VT.sideToAct(G)) : 0, p = G.pl[pi], t = targets(), h = '';
   var hintI = UI.hint && UI.hint.t === 'play' ? UI.hint.i : -1;
-  p.hand.forEach(function (id, i) { h += cardHTML(id, (t.cards[i] ? 'glow ' : '') + (UI.sel === i ? 'sel ' : '') + (hintI === i ? 'hint' : ''), 'data-i="' + i + '"'); });
+  var n = p.hand.length; p.hand.forEach(function (id, i) { var o = i - (n - 1) / 2; h += cardHTML(id, (t.cards[i] ? 'glow ' : '') + (UI.sel === i ? 'sel ' : '') + (hintI === i ? 'hint' : ''), 'data-i="' + i + '" style="--rot:' + (o * 2.2).toFixed(1) + 'deg;--dy:' + (o * o * 0.9).toFixed(1) + 'px"'); });
   if (p.disc.length) h += '<button type="button" class="pile" id="pileb" aria-label="Played cards"><b>' + p.disc.length + '</b>played</button>';
   $('#hand').innerHTML = h;
 }
@@ -1739,7 +1790,7 @@ function renderRival() {
 function render() {
   setTimeout(function () { if (UI.view) growHits(UI.view.w / boardBox().w); }, 0);
   if (!G) return;
-  renderRace(); renderStore(); renderHand(); renderRival(); renderMap(); renderPrompt();
+  renderRace(); renderStore(); renderHand(); renderRival(); renderMap(); renderPrompt(); syncHud();
 }
 // ui2: the one prompt line and its buttons, taps on the map and the hand, sheets (market, trade, choices), moves, the rival's turn, effects.
 function word(n, one, many) { return n + ' ' + (n === 1 ? one : many); }
@@ -1758,7 +1809,7 @@ function renderPrompt() {
   computeHint();
   if (G.drop && G.drop.length) { say(me + 'Storehouse full: pick goods'); acts([]); openTake(); return; }
   if (!pd) {
-    if (UI.sel == null) { say(me + 'Pick a card to play'); acts([{ t: 'Points', alt: true, f: function () { showScoreNow(); } }, { t: 'Market', alt: true, f: function () { openMarket(false); } }]); }
+    if (UI.sel == null) { say(me + 'Pick a card to play'); acts([]); }
     else { var c = D.CARDS[p.hand[UI.sel]]; say(cardWhat(c)); acts([{ t: 'Play ' + c.n, glow: true, f: function () { playSel(); } }]); }
     return;
   }
@@ -1851,8 +1902,10 @@ document.addEventListener('click', function (e) {
 function snap() { return G.pl.map(function (p, i) { return { coins: p.coins, goods: Object.assign({}, p.goods), score: VT.score(G, i).total, houses: p.houses.length, hand: p.hand.length }; }); }
 function move(m) {
   if (!G || G.phase !== 'play') return;
-  var before = snap(), pi = VT.sideToAct(G), wasPend = G.pend && G.pend.h, t0 = Date.now();
+  var before = snap(), pi = VT.sideToAct(G), wasPend = G.pend && G.pend.h, t0 = Date.now(), pre = isHuman(pi) ? JSON.stringify(G) : null;
   try { VT.performMove(G, m); } catch (err) { console.warn(err.message); render(); return; }
+  if (pre) { UI.undo = UI.undo || []; UI.undo.push(pre); }
+  if (G.phase !== 'play' || VT.sideToAct(G) !== pi) UI.undo = [];
   if (m.t !== 'mv') UI.selCol = null;
   var human = isHuman(pi); if (human) UI.noteAt = noteAnchor(m, pi);
   afterMove(before, pi, m, wasPend);
@@ -1963,7 +2016,7 @@ function runAI() {
 
 // ---------- sheets ----------
 function openSheet(title, html, closable) {
-  var s = $('#sheet'); UI.sheet = title;
+  var s = $('#sheet'); UI.sheet = title; UI.sheetX = closable !== false;
   s.innerHTML = '<div class="sh-head"><h2>' + esc(title) + '</h2>' + (closable !== false ? '<button type="button" class="x" data-x aria-label="Close">×</button>' : '') + '</div>' + html;
   s.hidden = false;
   var x = s.querySelector('[data-x]'); if (x) x.onclick = closeSheet;
@@ -2011,7 +2064,7 @@ function needText(pi, s, consul) {
 // one line after the rival's turn: what they did and what it scored
 function recap(pi, start, list) {
   var now = VT.score(G, pi).total, d = now - start[pi].score, txt = G.pl[pi].name + (d ? (d > 0 ? ' +' : ' ') + d + ': ' : ': ') + (list.length ? list.slice(0, 3).join(', ') : 'passed');
-  UI.lastRecap = txt; banner(txt);
+  UI.lastRecap = txt;
 }
 function openTrade() {
   var pi = VT.sideToAct(G), p = G.pl[pi];
@@ -2169,6 +2222,26 @@ function sfx(k) {
   g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(k === 'build' ? 0.06 : 0.1, t + 0.01); g.gain.exponentialRampToValueAtTime(0.0001, t + f[1]);
   o.start(t); o.stop(t + f[1] + 0.02);
 }
+
+// undo: take back moves inside your own turn (the game state is plain data, so a copy is enough)
+function doUndo() {
+  if (!G || UI.busy || !UI.undo || !UI.undo.length || G.phase !== 'play' || !isHuman(VT.sideToAct(G))) return;
+  G = JSON.parse(UI.undo.pop()); UI.sel = null; UI.selCol = null; UI.selProv = null; UI.mktSel = null; closeSheet(); sfx('tick'); render(); save();
+}
+function ruleKey() {
+  if (!G) return null; var pi = VT.sideToAct(G), pd = G.pend;
+  if (pd) return { 'arch-move': 'arch', 'arch-build': 'arch', pref: 'pref', merc: 'merc', buy: pd.consul ? 'cons' : 'sen', colo: 'colo', trib: 'trib', dipl: 'dipl' }[pd.h] || null;
+  if (UI.sel != null && pi >= 0) { var c = D.CARDS[G.pl[pi].hand[UI.sel]]; return c ? (c.act === 'spec' ? 'spec' : c.act) : null; }
+  return null;
+}
+function showRule(k) {
+  var a = D.ACTS[k]; drawer(k === 'spec' ? 'Maker card' : a.n, '<div class="rules"><p>' + actRule(k) + '</p></div><button type="button" class="btn alt" id="allrules">All the rules</button>');
+  $('#allrules').onclick = showRules;
+}
+function syncHud() {
+  var k = ruleKey(), q = $('#promptq'); q.hidden = !k; q.onclick = function () { showRule(k); };
+  var u = $('#undob'); u.hidden = !(UI.undo && UI.undo.length && !UI.busy && G && G.phase === 'play' && isHuman(VT.sideToAct(G)));
+}
 // ui3: title, starting games, learn mode tips, result, menu (rules, card reference, log, settings, credits), save, boot.
 var LS = { get: function (k) { try { return localStorage.getItem('vt_' + k); } catch (e) { return null; } }, set: function (k, v) { try { localStorage.setItem('vt_' + k, v); } catch (e) { } } };
 function save() { if (!G || GXS.on) return; LS.set('save', JSON.stringify({ G: G, mode: UI.mode, lvl: UI.lvl, learn: UI.learn })); }
@@ -2178,7 +2251,7 @@ function startGame(mode, o) {
   var names = mode === 'hot' ? ['Red', 'Green'] : ['You', 'Rival'];
   G = VT.newGame({ seed: o.seed, names: names, ai: mode === 'hot' ? [null, null] : [null, UI.lvl], first: o.first != null ? o.first : (o.learn ? 0 : null) });
   if (o.first == null && !o.learn && o.seed == null) { /* random start player */ var f = Math.random() < 0.5 ? 0 : 1; G = VT.newGame({ seed: G.seed, names: names, ai: G.pl.map(function (p) { return p.ai; }), first: f }); }
-  UI.sel = null; UI.selCol = null; UI.selProv = null; UI.busy = false; UI.tipsSeen = {};
+  UI.sel = null; UI.selCol = null; UI.selProv = null; UI.busy = false; UI.tipsSeen = {}; UI.undo = []; UI.lastRecap = null;
   $('#start').hidden = true; $('#result').hidden = true; $('#drawer').hidden = true; closeSheet();
   buildMap(); setView({ x: 0, y: 0, w: VTART.W }); homeView(); render(); save();
   if (UI.learn) { tip('Goal: most points at the end', '#race'); setTimeout(function () { if (G && G.turn < 3) banner('Tap a score to see the points', '#race'); }, 5200); }
@@ -2249,12 +2322,18 @@ function showMenu() {
   $('#mrules').onclick = showRules; $('#mcards').onclick = showCards; $('#mlog').onclick = showLog; $('#mcred').onclick = showCredits; $('#mscore').onclick = showScoreNow;
   $('#mnew').onclick = function () { $('#drawer').hidden = true; showTitle(); };
 }
-function showScoreNow() {
-  if (!G) return;
+function showScoreNow() { if (G) drawer('Points so far', scoreTable()); }
+function scoreTable() {
   var sc = G.pl.map(function (p, i) { return VT.score(G, i); });
-  drawer('Score so far', '<table class="sc-table"><thead><tr><th>Patron</th>' + G.pl.map(function (p) { return '<th>' + esc(p.name) + '</th>'; }).join('') + '</tr></thead><tbody>' +
+  return ('<table class="sc-table"><thead><tr><th>Patron</th>' + G.pl.map(function (p) { return '<th>' + esc(p.name) + '</th>'; }).join('') + '</tr></thead><tbody>' +
     D.GODS.map(function (gd) { return '<tr><td><span class="gi">' + icon(gd.icon) + gd.n + '</span><br><span class="small">' + gd.rule + '</span></td>' + sc.map(function (s) { var b = s.by[gd.id]; return '<td>' + b.pts + (b.n ? '<br><span class="small">' + b.n + ' card' + (b.n > 1 ? 's' : '') + (b.each != null ? ' \u00D7 ' + b.each : '') + '</span>' : '') + '</td>'; }).join('') + '</tr>'; }).join('') +
     '<tr class="tot"><td>Total</td>' + sc.map(function (s) { return '<td>' + s.total + '</td>'; }).join('') + '</tr></tbody></table>' + (UI.lastRecap ? '<p class="small">Last rival turn: ' + esc(UI.lastRecap) + '</p>' : '') + '<p class="small">More cards with a patron multiply its points.</p>');
+}
+function showPlayer(i) {
+  var p = G.pl[i], goods = D.GOODS.map(function (g) { return '<span class="pg">' + gIcon(g) + ' ' + p.goods[g] + '</span>'; }).join(''), top = p.disc[p.disc.length - 1];
+  var facts = '<div class="pfacts"><span><b>' + VT.score(G, i).total + '</b> points now</span><span><b>' + p.coins + '</b> coins</span><span><b>' + p.houses.length + '/15</b> houses</span><span><b>' + VT.onBoard(p) + '</b> carts and ships on the map</span><span><b>' + p.hand.length + '</b> cards in hand</span></div><div class="pgoods">' + goods + '</div>';
+  var pile = p.disc.length ? '<h3 class="ph">Played pile (top card is public)</h3><div class="mrow">' + p.disc.slice().reverse().map(function (id) { return cardHTML(id, '', 'tabindex="-1" disabled'); }).join('') + '</div>' : '<p class="small">Nothing played yet.</p>';
+  drawer(p.name, facts + pile + '<h3 class="ph">Points by patron</h3>' + scoreTable());
 }
 function showLog() { drawer('What happened', '<div class="rules">' + (G ? G.log.slice(-30).reverse().map(function (l) { return '<p>' + esc(l) + '</p>'; }).join('') : '') + '</div>'); }
 function showRules() {
@@ -2296,12 +2375,12 @@ function showCredits() {
 // ---------- boot ----------
 function boot() {
   installIcons();
-  UI.hints = LS.get('hints') !== '0'; UI.mute = LS.get('mute') === '1'; UI.lvl = LS.get('lvl') || 'easy';
+  UI.hints = LS.get('hints') !== '0'; UI.mute = LS.get('mute') === '1'; UI.lvl = LS.get('lvl') || 'normal';
   wireCamera();
   $('#hand').addEventListener('click', onHandTap);
-  $('#menub').onclick = showMenu; $('#homeb').onclick = showMenu;
+  $('#menub').onclick = showMenu; $('#helpb').onclick = showRules; $('#plb').onclick = showScoreNow; $('#undob').onclick = doUndo;
   $('#mktb').onclick = function () { if (G) openMarket(!!(G.pend && G.pend.h === 'buy' && isHuman(VT.sideToAct(G)))); };
-  document.addEventListener('click', function (e) { if (e.target.closest('[data-score]') && G) showScoreNow(); });
+  document.addEventListener('click', function (e) { var st = e.target.closest('[data-pl]'); if (st && G) showPlayer(+st.getAttribute('data-pl')); });
   document.addEventListener('click', function (e) { if (e.target.closest('#pileb') && G) { var pp = G.pl[UI.mode === 'hot' ? Math.max(0, VT.sideToAct(G)) : 0]; drawer('Played cards', '<p class="small">They come back with the Herald.</p><div class="mrow">' + pp.disc.slice().reverse().map(function (id) { return cardHTML(id, '', 'tabindex="-1" disabled'); }).join('') + '</div>'); } });
   document.addEventListener('click', function (e) { if (e.target.closest('#storeb') && G) { var p = G.pl[UI.mode === 'hot' ? Math.max(0, VT.sideToAct(G)) : 0]; banner(VT.used(p) + ' of 12 spaces used'); } });
   var rl = function () { if (UI.view) setView(UI.view); placeFinger(); };
