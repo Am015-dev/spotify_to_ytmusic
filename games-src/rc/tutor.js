@@ -107,27 +107,20 @@ function coachStop(){clearInterval(COACH.timer);COACH.timer=0;coachHide();docume
 function coachStart(){COACH.finished=false;COACH.done={};COACH.cur=null;COACH.later=0;COACH.forced={};tutBegin();G.coach=1;coachMark({open:1,done:0,skipped:0});coachSkipEl();clearInterval(COACH.timer);COACH.timer=setInterval(coachTick,600);coachTick()}
 window.COACHX={rules:COACH_RULES.map(r=>r.id),done:()=>Object.keys(COACH.done),state:COACH};
 
-function tutStart(o){COACH.pro=!!(o&&o.prologue);coachStart()}
+function tutStart(o){if(typeof lessonsOpen==='function')lessonsOpen()}   // the dimming tutorial and the coached game are retired: Lessons (lessons.js) are the tutorial now
 // ---------------------------------------------------------------- menus: the title, the in-game menu, the chapter list, the first Play and the first Story tap
-const tutFirst=()=>{try{return typeof GXT!=='undefined'&&!GXT.status(TUT_GAME).seen&&!localStorage.getItem(SAVE)&&!localStorage.getItem('swi_ghost')&&!localStorage.getItem('swi_tutoffer')}catch(e){return false}};
-function tutBlock(pos){if(typeof GXT==='undefined')return '';const f=tutFirst();
-  if(pos==='top')return f?'<div class="mb guided">'+GXT.menuHTML({game:TUT_GAME,first:true,cls:'btn go big',launch:tutStart})+'</div>':'';
-  return f?'':'<div class="mb">'+GXT.menuHTML({game:TUT_GAME,first:false,cls:'btn',launch:tutStart})+'</div>'}
-function tutFillMenu(){const e=document.getElementById('tutset');if(e&&typeof GXT!=='undefined')e.innerHTML=GXT.menuHTML({game:TUT_GAME,first:false,cls:'gx-ibtn',launch:tutStart})}
+const tutFirst=()=>{try{return !localStorage.getItem(SAVE)&&!localStorage.getItem('swi_ghost')&&!localStorage.getItem('gxst-shipwreck-isle')}catch(e){return false}};
+const lessonsBtn=(cls)=>`<button type="button" class="${cls}" data-a="lessons" data-help><b>Lessons</b> <small>learn by playing</small></button>`;
+function tutBlock(pos){const f=tutFirst();
+  if(pos==='top')return f?'<div class="mb guided">'+lessonsBtn('btn go big')+'</div>':'';
+  return f?'':'<div class="mb">'+lessonsBtn('btn')+'</div>'}
+function tutFillMenu(){const e=document.getElementById('tutset');if(e)e.innerHTML=lessonsBtn('gx-ibtn')}
 {const o=toggleMenu;toggleMenu=function(){try{tutFillMenu()}catch(e){}return o.apply(this,arguments)}}
-function tutHeadButtons(){const b=document.createElement('button');b.type='button';b.className='gxc-ib';b.textContent='Tutorial';b.setAttribute('aria-label','Replay the tutorial');
+function tutHeadButtons(){const b=document.createElement('button');b.type='button';b.className='gxc-ib';b.textContent='Lessons';b.setAttribute('aria-label','Lessons: learn by playing');
   b.addEventListener('click',()=>{GXC.close();tutStart()});return [b]}
-// Story: the tutorial runs first (Chapter 0) until it has been finished once
-function tutStoryGate(){if(typeof GXT==='undefined'||GXT.isDone(TUT_GAME))return false;tutStart({prologue:true});return true}
-// a first-time player tapping Play is offered the tutorial once
-function tutOffer(){if(!tutFirst()||document.querySelector('.tutoffer'))return false;
-  const d=document.createElement('div');d.className='gxt-end tutoffer';d.setAttribute('data-help','');d.setAttribute('role','dialog');d.setAttribute('aria-modal','true');d.setAttribute('aria-label','New here?');
-  d.innerHTML='<div class="gxt-endc"><div class="gxt-et">New here?</div><div class="gxt-ex"><b>You win if everyone is alive when the rescue ship comes.</b></div><div class="gxt-ex">Learn by playing: 5 minutes, one tap at a time.</div><div class="gxt-eb"><button type="button" class="gxt-b pri" data-tutoffer="learn">Learn in 5 minutes</button><button type="button" class="gxt-b" data-tutoffer="play">Play anyway</button></div></div>';
-  document.body.appendChild(d);
-  d.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest('[data-tutoffer]');if(!b)return;e.stopPropagation();d.remove();
-    try{localStorage.setItem('swi_tutoffer','1')}catch(err){}
-    if(b.dataset.tutoffer==='learn')tutStart();else{UI.guide.on=false;UI.cmpDef=null;beginGame()}});
-  return true}
+// the tutorial no longer gates the Story or pops up on the first Play: the Lessons button is on the title and in the top bar
+function tutStoryGate(){return false}
+function tutOffer(){return false}
 // Learn to play here is a coached real game (not a gx-tutor step list): GXT.running() also reports it, so shared tools
 // (feel-audit, qa-bot) can tell that Learn to play started. GXT.state() stays null for it, so they play it like a normal game.
 if(typeof GXT!=='undefined'&&GXT.running){const r0=GXT.running;const coachOn=()=>!!(typeof G!=='undefined'&&G&&G.coach&&!G.over);GXT.running=function(){return r0.apply(this,arguments)||coachOn()};

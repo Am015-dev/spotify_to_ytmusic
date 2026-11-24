@@ -250,7 +250,7 @@ document.addEventListener('click',e=>{const pr=e.target.closest&&e.target.closes
   case 'moveask':G.moveAsk=b.checked?1:0;return;
   case 'okreport':UI.report=null;render();return;
   case 'overok':UI.overSeen=true;render();return;
-  case 'new':openStart();return;case 'start':if(typeof tutOffer==='function'&&tutOffer())return;UI.guide.on=false;UI.cmpDef=null;beginGame();return;case 'story':campOpen();return;case 'guided':Object.assign(UI.setup,{scen:'marooned',chars:['carpenter','cook'],ai:{},friday:true,dog:true,items:4,diff:'easy'});UI.guide={on:true,seen:{}};UI.cmpDef=null;beginGame();return;case 'continue':loadSaved();return;
+  case 'new':openStart();return;case 'start':if(typeof tutOffer==='function'&&tutOffer())return;UI.guide.on=false;UI.cmpDef=null;beginGame();return;case 'story':campOpen();return;case 'lessons':if(typeof lessonsOpen==='function')lessonsOpen();return;case 'guided':Object.assign(UI.setup,{scen:'marooned',chars:['carpenter','cook'],ai:{},friday:true,dog:true,items:4,diff:'easy'});UI.guide={on:true,seen:{}};UI.cmpDef=null;beginGame();return;case 'continue':loadSaved();return;
   case 'rulesstart':UI.modal=null;$('#modal').hidden=true;$('#modal').dataset.h='';GX.show('rulesd');UI.backToStart=!G;return;
   case 'cards':GX.show('cardsd');renderCards();return;case 'rules':GX.show('rulesd');return;case 'close':UI.modal=G?null:'start';if(!G)$('#modal').dataset.h='';render();return;
   case 'snd':toggleSound();return;case 'mus':toggleMusic();return;
