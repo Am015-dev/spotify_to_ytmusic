@@ -62,6 +62,19 @@ ok(S([[0, 0, 'hawk'], [1, 0, 'bear'], [2, 0, 'hawk']], 'hawk', 'd') === 4, 'hawk
 ok(S([[0, 0, 'fox'], [1, 0, 'bear'], [-1, 0, 'bear'], [0, 1, 'elk']], 'fox', 'c') === 2, 'fox C most common 2');
 ok(S([[0, 0, 'fox'], [1, 0, 'bear'], [-1, 0, 'bear']], 'fox', 'b') === 3, 'fox B one pair 3');
 // games
+// W650 rules diff (proof/RULES-DIFF.md): one case per rule not covered above
+{ const thr = f => { try { f(); return false; } catch (e) { return true; } };
+  [[1, 43], [2, 43], [3, 63], [4, 83]].forEach(([np, n]) => { const g = W.newGame({ np, seed: 7 }); ok(g.supply.length + 4 === n, 'W650 tile supply ' + np + 'p = ' + n + ' (got ' + (g.supply.length + 4) + ')'); });
+  let seen = 0; for (let sd = 1; sd < 400 && !seen; sd++) { const g = W.newGame({ np: 2, seed: sd }); if (g.wiped4) { seen = 1; ok(new Set(g.market.toks).size > 1, 'W650 setup: four alike at the start are wiped'); } } ok(seen, 'W650 setup wipe case found');
+  const g1 = W.newGame({ np: 2, seed: 5 }); W.apply(g1, { t: 'take', i: 0 }); ok(thr(() => W.apply(g1, { t: 'place', c: W.k(5, 5), rot: 0 })), 'W650 tile must touch the valley');
+  const g2 = W.newGame({ np: 2, seed: 5 }); g2.market.tiles[0] = { id: 998, t: ['forest'], a: ['bear'], key: false }; g2.bag[g2.market.toks[0]]++; g2.bag.elk--; g2.market.toks[0] = 'elk';
+  W.apply(g2, { t: 'take', i: 0 }); const c2 = W.spots(g2.seats[0].env)[0]; W.apply(g2, { t: 'place', c: c2, rot: 0 }); ok(thr(() => W.apply(g2, { t: 'tok', c: c2 })), 'W650 animal only on a tile that shows it');
+  ok(W.moves(g2).some(m => m.t === 'back'), 'W650 the animal may always go back to the bag');
+  const occ = Object.keys(g2.seats[0].env).find(c => c !== c2); g2.seats[0].env[occ].tok = 'elk'; g2.seats[0].env[occ].a = ['elk']; ok(thr(() => W.apply(g2, { t: 'tok', c: occ })), 'W650 one animal per tile');
+  const g3 = W.newGame({ np: 2, seed: 6, acorns: [2, 0] }); W.apply(g3, { t: 'wipe', idx: [0] }); W.apply(g3, { t: 'wipe', idx: [1, 2] }); ok(g3.seats[0].acorns === 0 && g3.stage === 'pick', 'W650 acorn replace may be used again in the same turn');
+  const g4 = W.newGame({ np: 1, seed: 8 }); const before = g4.market.tiles.map(t => t.id); W.apply(g4, { t: 'take', i: 0 }); const c4 = W.spots(g4.seats[0].env)[0]; W.apply(g4, { t: 'place', c: c4, rot: 0 }); W.apply(g4, { t: 'back' });
+  ok(g4.market.tiles.every(t => t && t.id !== before[3]) && g4.market.tiles[0].id === before[1], 'W650 solo: the far tile leaves, the rest slide to the stacks');
+  ok(Object.values(g4.lostToks || {}).reduce((a, b) => a + b, 0) === 1, 'W650 solo: the far animal leaves the game'); }
 const N = +(process.argv[2] || (process.env.QUICK ? 8 : 200)), t0 = Date.now(), tot = {}, wins = {};
 for (let g = 0; g < N; g++) {
   const np = 1 + (g % 4), lv = ['easy', 'normal', 'hard'][g % 3];
