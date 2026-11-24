@@ -365,3 +365,11 @@ body:has(#modal .scrim) .gedges{display:none}
 .card[data-win] .winx{position:absolute;top:6px;right:6px;width:44px;height:44px;border-radius:10px;border:0;background:#281b12;color:#fff3dc;font:700 26px/1 var(--ff);cursor:pointer}
 .card[data-win] h2{padding-right:48px}
 .dlog{margin:0;padding-left:20px;text-align:left;line-height:1.4;font-size:16px}.dlog li{margin:5px 0}
+/*W753 opts: unpressed tiles sit on the cream button art, so their label must be dark (was cream on cream = blank)*/
+html.sk body .card .opts .opt:not([aria-pressed=true]){color:#3a2410!important;background:#f3e3c3!important}
+/*W753 status: never clip the turn line; let it wrap*/
+html.sk #status,html.sk #status .ins{overflow:visible}
+html.sk #status .ins{display:block;-webkit-line-clamp:unset}
+/*W753 story map title: wrap on word boundaries, two clean lines*/
+html.sk .gxc-htitle{overflow-wrap:normal;word-break:normal;font-size:16px}
+html.sk .gxc-htitle b{display:inline;padding:2px 8px;-webkit-box-decoration-break:clone;box-decoration-break:clone;line-height:1.5}
