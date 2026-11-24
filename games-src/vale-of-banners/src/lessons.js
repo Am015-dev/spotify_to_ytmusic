@@ -133,11 +133,12 @@
     var op = promptText; promptText = function () { var t = op.apply(this, arguments); if (!L.on || !GXST.active() || G.over || pend() || (me().used[0] && me().used[1])) return t; return 'Your move. Reach the goal on the lesson card.'; };   /* the dock line never gives the answer away */
     var od = doMove; doMove = function (m) { try { if (L.on && GXST.active() && G && isHuman(VB.actor(G)) && m && m.k !== 'end') L.n++; } catch (e) { } return od.apply(this, arguments); };
     lessons.forEach(function (s) { s.moves = function () { return L.n; }; });
-    GXST.init({ game: 'vale-of-banners', scenarios: lessons, keepClear: ['.gx-bar', '#opp', '#tabs', '#mk', '#es', '#dicerow', '#store', '#goods', '#acts'], settled: function () { return !!G && !UI.busy; }, qParent: '.gx-bar' });
+    GXST.init({ game: 'vale-of-banners', scenarios: lessons, keepClear: ['.gx-bar', '#opp', '#tabs', '#mk', '#es', '#dicerow', '#store', '#goods', '#acts'].concat(innerWidth < 600 ? ['#dock'] : []), settled: function () { return !!G && !UI.busy; }, qParent: '.gx-bar', phoneSlot: { after: '#tabs', before: '#dock', avoid: ['#tabs', '#opp', '#mk > *', '[id^="ec-"]'] } });
     /* phone portrait: the dock and the estate fill the screen, so a lesson starts as the one-line goal chip (tap it for Hint and Restart) */
     addEventListener('gxst', function (e) { var t = e.detail && e.detail.type; if ((t === 'start' || t === 'retry') && innerWidth <= 600 && innerHeight > innerWidth) setTimeout(function () { var b = $('.gxst-card .gxst-ib[aria-label="Minimise"]'); if (b && GXST.state().phase === 'play') b.click(); }, 0); });
     window.VBLESSONS = { open: function () { try { GX.close(); } catch (e) { } try { GXC.close(); } catch (e) { } $('#start').hidden = true; GXST.picker(); } };
     if (/[?&]lessons=1/.test(location.search)) GXST.picker();
+    var lq = /[?&]lesson=(\w+)/.exec(location.search); if (lq) { try { $('#start').hidden = true; } catch (e) { } GXST.start(lq[1]); }   // ?lesson=<id> opens that lesson directly (contact sheets, owner links)
   };
   setTimeout(go, 300);
 })();

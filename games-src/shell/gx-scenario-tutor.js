@@ -2,7 +2,7 @@
 // small, stacked position with ONE objective; the player makes real moves and learns the rule from the consequence. A floating
 // objective card never dims and never blocks taps. Needs gx-scenario-tutor.css. ES5, no dependencies. Docs: shell/GXST.md.
 // (Global is GXST because GXS is already the ?scn= test registry in gx-scenario.js.)
-//   GXST.init({game, scenarios:[...], storageKey?, settled?:()=>bool, keepClear?:[selectors], qParent?})   GXST.picker() GXST.start(id) GXST.retry()
+//   GXST.init({game, scenarios:[...], storageKey?, settled?:()=>bool, keepClear?:[selectors], qParent?, phoneSlot?:{after,before,avoid:[selectors]}})   GXST.picker() GXST.start(id) GXST.retry()
 //   GXST.next() GXST.hint() GXST.close() GXST.state()      events: window 'gxst' CustomEvent, detail.type =
 //   picker | start | hint | win | fail | retry | close
 //   scenario: {id, title, rule, goal, setup(), success()->bool, fail()->false|'message', par?, moves?()->n, hints:[nudge, {say, target}],
@@ -88,11 +88,18 @@
     function clamp(p) { return [Math.max(4, Math.min(vw - bw - 4, p[0])), Math.max(4, Math.min(vh - bh - 4, p[1]))]; }
     function box(p) { return { left: p[0], top: p[1], right: p[0] + bw, bottom: p[1] + bh }; }
     function cost(p) { var b = box(p), c = t && hit(b, t) ? 1e6 : 0; av.forEach(function (r) { var x = Math.min(b.right, r.right) - Math.max(b.left, r.left), y = Math.min(b.bottom, r.bottom) - Math.max(b.top, r.top); if (x > 0 && y > 0) c += x * y; }); return c; }
-    if (S.pos) { var q = clamp(S.pos); if (!(t && hit(box(q), t))) return put(q); }
+    if (S.pos && !(S.min && C.phoneSlot && vw < 600)) { var q = clamp(S.pos); if (!(t && hit(box(q), t))) return put(q); }
     var top = 4, bar = $('.gx-bar'); if (bar) { var br = bar.getBoundingClientRect(); if (br.top < 4 && br.height < 90) top = br.bottom + 6; }
     var sp = [[8, top], [vw - bw - 8, top], [vw - bw - 8, vh - bh - 8], [8, vh - bh - 8]];
     av.concat(t ? [t] : []).forEach(function (r) { sp.push([8, r.bottom + 6], [vw - bw - 8, r.bottom + 6], [8, r.top - bh - 6], [r.right + 6, r.top]); });
     var best = null; sp.forEach(function (p, i) { p = clamp(p); var c = cost(p) + i * 0.01; if (!best || c < best.c) best = { p: p, c: c }; });
+    if (S.min && C.phoneSlot && vw < 600) {   // phone chip: keep the card's own spot when it is clear (no jump on open); else the chip gets a band just under phoneSlot.after or just above phoneSlot.before, never over phoneSlot.avoid items or the dock
+      var ps = C.phoneSlot, an = vis($(ps.after)), bf = vis($(ps.before)), ob = [], cs = [best.p];
+      (ps.avoid || []).forEach(function (sel) { var a; try { a = D.querySelectorAll(sel); } catch (e) { a = []; } for (var i = 0; i < a.length; i++) { var r = vis(a[i]); if (r) ob.push(r); } });
+      if (an) cs.push([8, an.bottom + 4]); if (bf) cs.push([8, bf.top - bh - 6]);
+      var pb = null; cs.forEach(function (c, k) { c = clamp(c); var b = box(c), v = t && hit(b, t) ? 1e6 : 0; ob.forEach(function (r) { if (hit(b, r)) v += 1; }); if (bf && b.bottom > bf.top) v += 1; if (!pb || v < pb.v) pb = { p: c, v: v }; });
+      if (pb && pb.v < 1e6) { W.style.left = '8px'; return put(pb.p); }
+    }
     var cx = W.style.left ? clamp([parseFloat(W.style.left), parseFloat(W.style.top)]) : null;   // stay where you are unless somewhere is clearly better: a card that jumps while you reach for Retry is worse than a small overlap
     if (cx && cost(cx) <= best.c + 0.5) best = { p: cx, c: 0 };
     put(best.p);
