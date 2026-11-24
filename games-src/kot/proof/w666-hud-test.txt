@@ -1,0 +1,41 @@
+ok   phone dr-menu on=true n=1 opens (bar), one window, title "Menu", X 44x44
+ok   phone dr-menu closes on tap outside
+ok   phone dr-menu closes on X
+ok   phone dr-mons on=true n=1 opens (menu), one window, title "Monsters", X 44x44
+ok   phone dr-mons closes on tap outside
+ok   phone dr-market opens the phone shop pop-up
+ok   phone phone shop closes on tap outside
+ok   phone dr-log on=true n=1 opens (menu), one window, title "The Crown City Clarion", X 44x44
+ok   phone dr-log closes on tap outside
+ok   phone dr-rules on=true n=1 opens (menu), one window, title "How to play", X 44x44
+ok   phone dr-rules closes on tap outside
+ok   phone no window opens by itself after closing
+ok   phone help Next advanced: "How a turn works" -> "Win the city"
+ok   phone full game played to a winner: P4
+ok   phone JS errors: 0
+ok   phone real time 18.1 s
+ok   pc dr-mons on=true n=1 opens (bar), one window, title "Monsters", X 44x44
+ok   pc dr-mons closes on tap outside
+ok   pc dr-mons closes on X
+ok   pc dr-market on=true n=1 opens (bar), one window, title "Power cards for sale", X 44x44
+ok   pc dr-market closes on tap outside
+ok   pc dr-market closes on X
+ok   pc dr-log on=true n=1 opens (bar), one window, title "The Crown City Clarion", X 44x44
+ok   pc dr-log closes on tap outside
+ok   pc dr-log closes on X
+ok   pc dr-rules on=true n=1 opens (bar), one window, title "How to play", X 44x44
+ok   pc dr-rules closes on tap outside
+ok   pc dr-rules closes on X
+ok   pc dr-menu on=true n=1 opens (bar), one window, title "Menu", X 44x44
+ok   pc dr-menu closes on tap outside
+ok   pc dr-menu closes on X
+ok   pc no window opens by itself after closing
+ok   pc side panel closed by default, board fills the width
+ok   pc pin opens the side panel and is remembered
+ok   pc phase banner "R1 · Your turn · Roll · 20★ wins" + prompt "Roll 1/3 · Keep dice, then Roll" (16px)
+ok   pc top bar: 7 round icon buttons, all >= 44 px
+ok   pc help Next advanced: "How a turn works" -> "Win the city"
+ok   pc full game played to a winner: P3
+ok   pc JS errors: 0
+ok   pc real time 9.4 s
+HUD TEST: ALL PASS

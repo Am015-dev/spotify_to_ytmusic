@@ -168,3 +168,16 @@ html body .gx-drawer{height:auto;bottom:auto;max-height:calc(100dvh - var(--gx-b
 html body :is(#log li,#log small,.gx-dock .btn,.gx-dock .banner,#banner,#banner *,#youbox,.gx-drawer i,.gx-drawer em){font-size:max(var(--minfs),1em)!important}
 html body .gx-drawer-head{height:56px;box-sizing:border-box}html body .gx-drawer-head .gx-x{font-size:1.5rem;line-height:1}
 .die{min-width:44px;min-height:44px}
+/* W666 HUD (PC): a slim bar of round icon buttons, the board fills the screen, the side panel opens only when pinned */
+html:not(.ph) header.gx-bar .gx-ibtn{width:44px;height:44px;min-width:44px;min-height:44px;padding:0;border-radius:50%;justify-content:center;flex:0 0 auto}
+html:not(.ph) header.gx-bar .gx-ibtn .ico{width:22px;height:22px;margin:0}
+html:not(.ph) .gx-reopen{display:none!important}
+html:not(.ph) .gx-drawer-head .gx-x{min-width:44px;min-height:44px}
+#bpc{display:none}
+html:not(.ph) #bpc{position:absolute;top:10px;left:50%;transform:translateX(-50%);z-index:4;display:flex;flex-direction:column;align-items:center;gap:4px;pointer-events:none;max-width:calc(100% - 24px)}
+html:not(.ph) #bpc[hidden],#bpcln[hidden]{display:none}
+#bpcph{padding:4px 18px;border-radius:999px;background:#1a1320;color:#ffd23f;border:2.5px solid #ffd23f;box-shadow:3px 3px 0 #1a1320;font:400 22px/1.15 Bangers,Impact,sans-serif;letter-spacing:.05em;white-space:nowrap}
+#bpcln{padding:4px 14px;border-radius:999px;background:rgba(26,19,32,.88);color:#fff;font:800 16px/1.2 Nunito,sans-serif;white-space:nowrap}
+/* a question for the player floats over the board as the action card while the panel is closed */
+html:not(.ph) .gx-app.gx-dock-min .gx-dock.choosing{visibility:visible;position:fixed;left:50%;bottom:92px;transform:translateX(-50%);width:min(560px,calc(100vw - 32px));max-height:62vh;z-index:30;border:4px solid #1a1320;border-radius:16px;box-shadow:8px 8px 0 #1a1320;overflow:auto}
+html:not(.ph) .gx-app.gx-dock-min .gx-dock.choosing .gx-dock-head,html:not(.ph) .gx-app.gx-dock-min .gx-dock.choosing #dockbody>:not(#choice){display:none}
