@@ -1,0 +1,32 @@
+{
+ "402x874": [
+  "0",
+  "70",
+  "[btn] #rulesbtn .tbtn How to play",
+  "[btn] #logbtn .tbtn Diary",
+  "[btn] #menubtn Menu",
+  ".ins Turn, then place on a glow.",
+  "[btn] #htile .mine Turn the tile"
+ ],
+ "402x874-wins": [
+  "rulesbtn",
+  "logbtn",
+  "menubtn"
+ ],
+ "402x874-errs": [],
+ "1366x768": [
+  "0",
+  "70",
+  "[btn] #rulesbtn .tbtn How to play",
+  "[btn] #logbtn .tbtn Diary",
+  "[btn] #menubtn Menu",
+  ".ins Turn, then place on a glow.",
+  "[btn] #htile .mine Turn the tile"
+ ],
+ "1366x768-wins": [
+  "rulesbtn",
+  "logbtn",
+  "menubtn"
+ ],
+ "1366x768-errs": []
+}

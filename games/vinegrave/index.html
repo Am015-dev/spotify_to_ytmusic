@@ -455,6 +455,39 @@ html.gx-reduce .gxc *,html.gx-noanim .gxc *{animation:none!important;transition:
 @keyframes gxtDot{0%,100%{opacity:.6;transform:scale(.8)}50%{opacity:1;transform:scale(1.1)}}
 @media (prefers-reduced-motion:reduce){.gxt-pill.gxt-wait i{animation:none;opacity:.8}}
 
+/* gx-scenario-tutor.css: scenario lesson card, picker, result card, hint ring (shell/gx-scenario-tutor.js, docs GXST.md).
+   Never dims, never blocks taps outside the card. Override with --gxst-* variables. */
+:root{--gxst-z:88;--gxst-bg:#fffaf0;--gxst-ink:#2e241c;--gxst-mute:#6b5a48;--gxst-head:#3b2f25;--gxst-on:#fffaf0;--gxst-acc:#e8907e;--gxst-ok:#5d9c58;--gxst-bad:#b5482f;--gxst-star:#e0a41c;--gxst-ring:#ffd36b}
+.gxst-card{position:fixed;left:8px;top:8px;z-index:var(--gxst-z);width:min(320px,calc(100vw - 16px));box-sizing:border-box;background:var(--gxst-bg);color:var(--gxst-ink);border:2px solid var(--gxst-head);border-radius:14px;box-shadow:0 8px 22px rgba(0,0,0,.3);font:15px/1.35 var(--gxh-font,system-ui,sans-serif);touch-action:none}
+.gxst-card.gxst-min{width:auto;background:none;border:0;box-shadow:none}
+.gxst-card.gxst-win{border-color:var(--gxst-ok)}.gxst-card.gxst-fail{border-color:var(--gxst-bad)}
+.gxst-hd{display:flex;align-items:center;padding:0 2px 0 12px;background:var(--gxst-head);color:var(--gxst-on);border-radius:11px 11px 0 0;cursor:move;user-select:none}
+.gxst-card.gxst-win .gxst-hd{background:var(--gxst-ok)}.gxst-card.gxst-fail .gxst-hd{background:var(--gxst-bad)}
+.gxst-hd b{font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.gxst-sp{flex:1}
+.gxst-ib{flex:none;width:44px;height:44px;border:0;background:none;color:var(--gxst-on);font-size:24px;line-height:1;border-radius:8px;cursor:pointer}
+.gxst-say,.gxst-goal{margin:10px 12px 4px;font-weight:700}
+.gxst-goal{font-size:16px}
+.gxst-hint{margin:4px 12px;padding:6px 8px;border-left:4px solid var(--gxst-star);background:rgba(224,164,28,.12);font-size:14px}
+.gxst-msg{margin:4px 12px 6px;font-size:14px}
+.gxst-rule{margin:2px 12px 6px;color:var(--gxst-mute);font-size:14px}
+.gxst-stars{margin:8px 12px 0;font-size:28px;line-height:1;color:var(--gxst-star);letter-spacing:4px}
+.gxst-ft{display:flex;gap:8px;padding:6px 10px 10px}
+.gxst-btn{min-height:44px;padding:0 14px;border-radius:10px;border:2px solid var(--gxst-head);background:transparent;color:var(--gxst-ink);font:700 15px/1 inherit;cursor:pointer}
+.gxst-btn.pri{background:var(--gxst-head);color:var(--gxst-on)}
+.gxst-btn:disabled{opacity:.5;cursor:default}
+.gxst-bulb::before{content:'';display:inline-block;width:10px;height:10px;margin-right:6px;border-radius:50%;background:var(--gxst-star);box-shadow:0 0 6px var(--gxst-star)}
+.gxst-list{margin:4px 8px 8px;padding:0;list-style:none;max-height:min(52vh,420px);overflow:auto}
+.gxst-pick{display:flex;align-items:center;gap:8px;width:100%;min-height:44px;margin:2px 0;padding:4px 8px;border:2px solid transparent;border-radius:10px;background:none;color:var(--gxst-ink);font:600 15px/1.2 inherit;text-align:left;cursor:pointer}
+.gxst-pick.rec{border-color:var(--gxst-acc)}
+.gxst-n{flex:none;width:26px;height:26px;border-radius:50%;background:var(--gxst-head);color:var(--gxst-on);display:grid;place-items:center;font-size:13px}
+.gxst-t{flex:1}.gxst-st{flex:none;color:var(--gxst-star);letter-spacing:1px}
+.gxst-chip{min-height:44px;max-width:calc(100vw - 16px);padding:4px 16px;border-radius:22px;background:var(--gxst-head);color:var(--gxst-on);border:2px solid var(--gxst-on);font:700 15px/1.2 var(--gxh-font,system-ui,sans-serif);box-shadow:0 4px 12px rgba(0,0,0,.3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:pointer}
+.gxst-ring{position:fixed;z-index:calc(var(--gxst-z) - 2);pointer-events:none;border-radius:14px;border:3px solid var(--gxst-ring);box-shadow:0 0 14px 3px var(--gxst-ring);animation:gxst-pulse 1.6s ease-in-out infinite}
+@keyframes gxst-pulse{0%,100%{opacity:.45;transform:scale(1)}50%{opacity:1;transform:scale(1.03)}}
+.gxst-q{min-height:44px;padding:0 12px;font-weight:700;cursor:pointer}
+.gxst-q.gxst-qfix{position:fixed;left:8px;bottom:8px;z-index:var(--gxst-z);border-radius:22px;background:var(--gxst-head);color:var(--gxst-on);border:2px solid var(--gxst-on)}
+@media (prefers-reduced-motion:reduce){.gxst-ring{animation:none;opacity:1}}
+
 /* ===== Vinegrave: a 1920s expedition scrapbook. One board (sites, research, market), your tray below. Phone text >= 14 px, PC >= 16 px. ===== */
 *{box-sizing:border-box}
 :root{--fs:15px;--gx-bg:#13211a;--gx-bar:#0d1812;--gx-panel:#f3ead2;--gx-ink:#22190d;--gx-accent:#e2a63b;--ink:#f4efe0;--mute:#d4ccb2;
@@ -1476,7 +1509,7 @@ const GX={key:'gx',open:null,
   GX.buzz = function (pat) { try { if (P.haptics && root.navigator && typeof root.navigator.vibrate === 'function') return root.navigator.vibrate(pat == null ? 12 : pat); } catch (e) { } return false; };
   GX.canBuzz = function () { try { return !!(root.navigator && typeof root.navigator.vibrate === 'function'); } catch (e) { return false; } };
   // colour-blind hook: one symbol per seat / colour index, shown next to colour-coded pieces when html.cb is on
-  GX.SYMBOLS = ['●', '▲', '■', '◆', '★', '✚', '⬟', '✱'];
+  GX.SYMBOLS = ['●', '▲', '■', '◆', '◆', '✚', '⬟', '✱'];
   GX.mark = function (i) { return GX.SYMBOLS[((i | 0) % GX.SYMBOLS.length + GX.SYMBOLS.length) % GX.SYMBOLS.length]; };
   GX.applyPrefs = function () {
     try {
@@ -2635,6 +2668,165 @@ const GX={key:'gx',open:null,
 
 </script>
 <script>
+// gx-scenario-tutor.js: scenario tutorials (owner verdict, Nov 2026: tutorials must be GAMES). Each scenario puts the real board in a
+// small, stacked position with ONE objective; the player makes real moves and learns the rule from the consequence. A floating
+// objective card never dims and never blocks taps. Needs gx-scenario-tutor.css. ES5, no dependencies. Docs: shell/GXST.md.
+// (Global is GXST because GXS is already the ?scn= test registry in gx-scenario.js.)
+//   GXST.init({game, scenarios:[...], storageKey?, settled?:()=>bool, keepClear?:[selectors], qParent?, phoneSlot?:{after,before,avoid:[selectors]}, keepPlace?:bool})   GXST.picker() GXST.start(id) GXST.retry()
+//   GXST.next() GXST.hint() GXST.close() GXST.state()      events: window 'gxst' CustomEvent, detail.type =
+//   picker | start | hint | win | fail | retry | close
+//   scenario: {id, title, rule, goal, setup(), success()->bool, fail()->false|'message', par?, moves?()->n, hints:[nudge, {say, target}],
+//              debrief, solve?(api) (tests only)}
+(function () {
+  'use strict';
+  var D = document, C = null, S = null, W = null, R = null, Q = null, tick = 0, drag = null;
+  function $(s) { try { return D.querySelector(s); } catch (e) { return null; } }
+  function mk(tag, cls, txt) { var e = D.createElement(tag); if (cls) e.className = cls; if (txt != null) e.textContent = txt; e.setAttribute('data-help', ''); return e; }
+  function btn(cls, txt, aria, f) { var b = mk('button', cls, txt); b.type = 'button'; if (aria) b.setAttribute('aria-label', aria); b.onclick = function (ev) { ev.stopPropagation(); f(); }; return b; }
+  function emit(type, x) { var d = { type: type, game: C && C.game }; for (var k in x) d[k] = x[k]; var e; try { e = new CustomEvent('gxst', { detail: d }); } catch (er) { e = D.createEvent('CustomEvent'); e.initCustomEvent('gxst', false, false, d); } window.dispatchEvent(e); }
+  function vis(e) { if (!e || !e.getBoundingClientRect) return null; var r = e.getBoundingClientRect(); if (r.width < 2 || r.height < 2) return null; return { left: r.left, top: r.top, right: r.right, bottom: r.bottom, width: r.width, height: r.height }; }
+  function find(t) { if (!t) return null; if (typeof t === 'function') { try { return t(); } catch (e) { return null; } } var a; try { a = D.querySelectorAll(t); } catch (e) { return null; } for (var i = 0; i < a.length; i++) if (vis(a[i])) return a[i]; return null; }
+  function hit(a, b) { return a.left < b.right && a.right > b.left && a.top < b.bottom && a.bottom > b.top; }
+  function call(f, d) { if (typeof f !== 'function') return d; try { return f(); } catch (e) { return d; } }
+  // ------------------------------------------------------------ progress: best stars per scenario, card position
+  function key() { return C.storageKey || 'gxst-' + C.game; }
+  function load() { var o = null; try { o = JSON.parse(localStorage.getItem(key()) || 'null'); } catch (e) { } return o && typeof o === 'object' ? o : {}; }
+  function save() { try { localStorage.setItem(key(), JSON.stringify({ best: S.best, pos: S.pos })); } catch (e) { } }
+  function sc(id) { for (var i = 0; i < C.scenarios.length; i++) if (C.scenarios[i].id === id) return i; return -1; }
+  function cur() { return S.i >= 0 ? C.scenarios[S.i] : null; }
+  function stars() { var s = cur(), n = 3 - S.hint; if (s && s.par && call(s.moves, 0) > s.par) n--; return Math.max(1, n); }
+  function firstOpen() { for (var i = 0; i < C.scenarios.length; i++) if (!S.best[C.scenarios[i].id]) return i; return 0; }
+  function txt(v) { return typeof v === 'function' ? call(v, '') : v; }
+  function starTxt(n) { var t = ''; for (var i = 0; i < 3; i++) t += i < n ? '★' : '☆'; return t; }
+  // ------------------------------------------------------------ Lessons button (reopens the picker)
+  function qBtn() {
+    if (Q && D.body.contains(Q)) return;
+    Q = btn('gxst-q', 'Lessons', 'Lessons: learn by playing', function () { GXST.picker(); });
+    var p = (C.qParent && $(C.qParent)) || $('.gx-bar');
+    if (p) { Q.className = 'gx-ibtn gxst-q'; p.appendChild(Q); } else { Q.className += ' gxst-qfix'; D.body.appendChild(Q); }
+  }
+  // ------------------------------------------------------------ the card: picker | play | win | fail
+  function render() {
+    if (!S.open) { if (W) { W.remove(); W = null; } ring(); return; }
+    if (!W) { W = mk('div', 'gxst-card'); W.setAttribute('role', 'dialog'); W.setAttribute('aria-label', 'Lesson'); D.body.appendChild(W); wireDrag(); }
+    W.innerHTML = ''; W.className = 'gxst-card gxst-' + S.phase + (S.min ? ' gxst-min' : '');
+    var s = cur();
+    if (S.min) { W.appendChild(btn('gxst-chip', s && S.phase === 'play' ? s.title + ': ' + txt(s.goal) : 'Lessons', 'Open lesson card', function () { S.min = false; render(); })); place(); return; }
+    var hd = mk('div', 'gxst-hd');
+    hd.appendChild(mk('b', null, S.phase === 'picker' ? 'Learn by playing' : (S.i + 1) + '/' + C.scenarios.length + ' ' + s.title));
+    hd.appendChild(mk('span', 'gxst-sp'));
+    hd.appendChild(btn('gxst-ib', '–', 'Minimise', function () { S.min = true; render(); }));
+    hd.appendChild(btn('gxst-ib', '×', 'Close', function () { GXST.close(); }));
+    W.appendChild(hd);
+    var ft = mk('div', 'gxst-ft');
+    if (S.phase === 'picker') {
+      W.appendChild(mk('p', 'gxst-say', 'Short games on the real board. Each one teaches one rule.'));
+      var ol = mk('ol', 'gxst-list');
+      C.scenarios.forEach(function (x, i) {
+        var li = mk('li'), b = btn('gxst-pick' + (i === firstOpen() ? ' rec' : ''), null, 'Lesson ' + (i + 1) + ': ' + x.title, function () { GXST.start(x.id); });
+        b.setAttribute('data-id', x.id); b.appendChild(mk('span', 'gxst-n', String(i + 1))); b.appendChild(mk('span', 'gxst-t', x.title)); b.appendChild(mk('span', 'gxst-st', starTxt(S.best[x.id] || 0)));
+        li.appendChild(b); ol.appendChild(li);
+      });
+      W.appendChild(ol);
+    } else if (S.phase === 'play') {
+      W.appendChild(mk('p', 'gxst-goal', txt(s.goal)));
+      if (S.hint) { var h = s.hints[S.hint - 1]; W.appendChild(mk('p', 'gxst-hint', typeof h === 'string' ? h : h.say)); }
+      var hb = btn('gxst-btn gxst-bulb', S.hint ? (S.hint < s.hints.length ? 'Show me' : 'Hint shown') : 'Hint', 'Hint', function () { GXST.hint(); });
+      if (S.hint >= s.hints.length) hb.disabled = true;
+      ft.appendChild(hb); ft.appendChild(mk('span', 'gxst-sp'));
+      ft.appendChild(btn('gxst-btn', 'Restart', null, function () { GXST.retry(); }));
+    } else if (S.phase === 'win') {
+      W.appendChild(mk('p', 'gxst-stars', starTxt(S.stars)));
+      W.appendChild(mk('p', 'gxst-say', s.debrief));
+      W.appendChild(mk('p', 'gxst-rule', 'Rule: ' + s.rule));
+      ft.appendChild(btn('gxst-btn', 'Retry', null, function () { GXST.retry(); })); ft.appendChild(mk('span', 'gxst-sp'));
+      ft.appendChild(btn('gxst-btn pri', S.i < C.scenarios.length - 1 ? 'Next lesson' : 'All lessons', null, function () { GXST.next(); }));
+    } else if (S.phase === 'fail') {
+      W.appendChild(mk('p', 'gxst-say', 'Not quite.'));
+      W.appendChild(mk('p', 'gxst-msg', S.msg));
+      ft.appendChild(btn('gxst-btn', 'Lessons', null, function () { GXST.picker(); })); ft.appendChild(mk('span', 'gxst-sp'));
+      ft.appendChild(btn('gxst-btn pri', 'Retry', null, function () { GXST.retry(); }));
+    }
+    if (ft.children.length) W.appendChild(ft);
+    place();
+  }
+  function hintTarget() { var s = cur(); if (!s || S.phase !== 'play' || S.hint < 2) return null; var h = s.hints[S.hint - 1]; return h && typeof h === 'object' ? vis(find(h.target)) : null; }
+  // keep the card off the hinted target and the keepClear areas; a dragged position is kept unless it covers the hinted target
+  function place() {
+    if (!W) return; var vw = innerWidth, vh = innerHeight, bw = W.offsetWidth, bh = W.offsetHeight, t = hintTarget(), av = [];
+    (C.keepClear || []).forEach(function (sel) { var a; try { a = D.querySelectorAll(sel); } catch (e) { a = []; } for (var i = 0; i < a.length; i++) { var r = vis(a[i]); if (r) av.push(r); } });
+    function clamp(p) { return [Math.max(4, Math.min(vw - bw - 4, p[0])), Math.max(4, Math.min(vh - bh - 4, p[1]))]; }
+    function box(p) { return { left: p[0], top: p[1], right: p[0] + bw, bottom: p[1] + bh }; }
+    function cost(p) { var b = box(p), c = t && hit(b, t) ? 1e6 : 0; av.forEach(function (r) { var x = Math.min(b.right, r.right) - Math.max(b.left, r.left), y = Math.min(b.bottom, r.bottom) - Math.max(b.top, r.top); if (x > 0 && y > 0) c += x * y; }); return c; }
+    if (S.pos && !(S.min && C.phoneSlot && vw < 600)) { var q = clamp(S.pos); if (!(t && hit(box(q), t))) return put(q); }
+    var top = 4, bar = $('.gx-bar'); if (bar) { var br = bar.getBoundingClientRect(); if (br.top < 4 && br.height < 90) top = br.bottom + 6; }
+    var sp = [[8, top], [vw - bw - 8, top], [vw - bw - 8, vh - bh - 8], [8, vh - bh - 8]];
+    av.concat(t ? [t] : []).forEach(function (r) { sp.push([8, r.bottom + 6], [vw - bw - 8, r.bottom + 6], [8, r.top - bh - 6], [r.right + 6, r.top]); });
+    var best = null; sp.forEach(function (p, i) { p = clamp(p); var c = cost(p) + i * 0.01; if (!best || c < best.c) best = { p: p, c: c }; });
+    if (S.min && C.phoneSlot && vw < 600) {   // phone chip: keep the card's own spot when it is clear (no jump on open); else the chip gets a band just under phoneSlot.after or just above phoneSlot.before, never over phoneSlot.avoid items or the dock
+      var ps = C.phoneSlot, an = vis($(ps.after)), bf = vis($(ps.before)), ob = [], cs = [best.p];
+      (ps.avoid || []).forEach(function (sel) { var a; try { a = D.querySelectorAll(sel); } catch (e) { a = []; } for (var i = 0; i < a.length; i++) { var r = vis(a[i]); if (r) ob.push(r); } });
+      if (an) cs.push([8, an.bottom + 4]); if (bf) cs.push([8, bf.top - bh - 6]);
+      var pb = null; cs.forEach(function (c, k) { c = clamp(c); var b = box(c), v = t && hit(b, t) ? 1e6 : 0; ob.forEach(function (r) { if (hit(b, r)) v += 1; }); if (bf && b.bottom > bf.top) v += 1; if (!pb || v < pb.v) pb = { p: c, v: v }; });
+      if (pb && pb.v < 1e6) { W.style.left = '8px'; return put(pb.p); }
+    }
+    var cx = C.keepPlace && W.style.left ? clamp([parseFloat(W.style.left), parseFloat(W.style.top)]) : null;   // stay where you are unless somewhere is clearly better: a card that jumps while you reach for Retry is worse than a small overlap (opt-in: keepPlace)
+    if (cx && cost(cx) <= best.c + 0.5) best = { p: cx, c: 0 };
+    put(best.p);
+  }
+  function put(p) { W.style.left = Math.round(p[0]) + 'px'; W.style.top = Math.round(p[1]) + 'px'; }
+  function wireDrag() {
+    W.addEventListener('pointerdown', function (e) { if (!e.target.closest('.gxst-hd') || e.target.closest('button')) return; var r = W.getBoundingClientRect(); drag = [e.clientX - r.left, e.clientY - r.top, false]; try { W.setPointerCapture(e.pointerId); } catch (x) { } });
+    W.addEventListener('pointermove', function (e) { if (!drag) return; drag[2] = true; S.pos = [e.clientX - drag[0], e.clientY - drag[1]]; put(S.pos); });
+    W.addEventListener('pointerup', function () { if (drag && drag[2]) { save(); place(); } drag = null; });
+  }
+  // ------------------------------------------------------------ the "show me" ring: pointer-events none, never steals a tap
+  function ring() {
+    var t = S && S.open ? hintTarget() : null;
+    if (!t) { if (R) { R.remove(); R = null; } return; }
+    if (!R) { R = mk('div', 'gxst-ring'); D.body.appendChild(R); }
+    R.style.left = (t.left - 4) + 'px'; R.style.top = (t.top - 4) + 'px'; R.style.width = (t.width + 8) + 'px'; R.style.height = (t.height + 8) + 'px';
+  }
+  // ------------------------------------------------------------ judge: success / fail only when the game has settled (animations done)
+  function loop() {
+    if (!S || !S.open) return;
+    var s = cur();
+    if (S.phase === 'play' && S.live && call(C.settled, true)) {
+      if (call(s.success, false)) { S.stars = stars(); if ((S.best[s.id] || 0) < S.stars) S.best[s.id] = S.stars; S.phase = 'win'; S.min = false; save(); render(); emit('win', { id: s.id, stars: S.stars }); return; }
+      var f = call(s.fail, false); if (f) { S.phase = 'fail'; S.msg = String(f); S.min = false; render(); emit('fail', { id: s.id, msg: S.msg }); return; }
+    }
+    if (!drag) place(); ring();
+  }
+  function begin(i, how) {
+    S.i = i; S.phase = 'play'; S.hint = 0; S.msg = ''; S.stars = 0; S.open = true; S.min = false; S.live = false;
+    var s = cur(), tok = ++S.tok; render();
+    var r = null; try { r = s.setup(); } catch (e) { console.error(e); }
+    var go = function () { if (tok === S.tok) { S.live = true; place(); emit(how, { id: s.id, i: i }); } };
+    if (r && typeof r.then === 'function') r.then(go, go); else go();
+  }
+  window.GXST = {
+    init: function (cfg) {
+      C = cfg; var o = load(); S = { open: false, phase: 'picker', i: -1, hint: 0, best: o.best || {}, pos: o.pos || null, min: false, live: false, tok: 0, msg: '', stars: 0 };
+      qBtn(); if (!tick) { tick = setInterval(loop, 250); addEventListener('resize', function () { if (S && S.open) render(); }); }
+      return GXST;
+    },
+    picker: function () { if (!C) return; qBtn(); S.open = true; S.phase = 'picker'; S.min = false; S.tok++; S.live = false; render(); emit('picker', {}); },
+    start: function (id) { var i = typeof id === 'number' ? id : sc(id); if (i < 0) return; begin(i, 'start'); },
+    retry: function () { if (S.i < 0) return; begin(S.i, 'retry'); },
+    next: function () { if (S.i < C.scenarios.length - 1) begin(S.i + 1, 'start'); else GXST.picker(); },
+    hint: function () { var s = cur(); if (!s || S.phase !== 'play' || S.hint >= s.hints.length) return; S.hint++; render(); ring(); emit('hint', { id: s.id, level: S.hint }); },
+    close: function () { if (!S || !S.open) return; S.open = false; S.live = false; S.tok++; render(); emit('close', {}); },
+    active: function () { var s = S && S.open && S.phase !== 'picker' ? cur() : null; return s; },
+    state: function () {
+      if (!S) return null; var s = cur(), wr = W && vis(W), tr = hintTarget();
+      return { open: S.open, phase: S.phase, id: s && S.phase !== 'picker' ? s.id : null, i: S.i, live: S.live, hint: S.hint, stars: S.stars, msg: S.msg,
+        best: JSON.parse(JSON.stringify(S.best)), min: S.min, pos: S.pos, card: wr, target: tr, overlap: !!(wr && tr && hit(wr, tr)), count: C.scenarios.length };
+    }
+  };
+})();
+
+</script>
+<script>
 // ===== GX campaign: story chapters, bosses and gradual difficulty (opt-in; see CAMPAIGN.md) =====
 // A new, self-contained module: it does not change shell.js or gx-kit.js, and works with or without them.
 //   GXC.init(opts)        wire a game: {game, data, startChapter, isWon, metrics, starsEarned, portrait, artBase, endArt:{win,lose} (painted result-screen backgrounds), onExit, scores, seats}
@@ -2778,7 +2970,7 @@ const GX={key:'gx',open:null,
   }
   function starRow(n, max, total) {
     var r = el('div', 'gxc-stars'); r.setAttribute('aria-label', n + ' of ' + (total || 3) + ' stars');
-    for (var i = 0; i < (total || 3); i++) r.appendChild(el('i', 'gxc-st' + (i < n ? ' on' : '') + (max != null && i >= max ? ' cap' : ''), '★'));
+    for (var i = 0; i < (total || 3); i++) r.appendChild(el('i', 'gxc-st' + (i < n ? ' on' : '') + (max != null && i >= max ? ' cap' : ''), '◆'));
     return r;
   }
   // twist text without its 'Boss rule:' prefix (the label shows it), first letter upper-case
@@ -2799,7 +2991,7 @@ const GX={key:'gx',open:null,
     head.appendChild(back);
     var tt = el('div', 'gxc-htitle'); tt.appendChild(el('b', null, D.title || 'Story')); head.appendChild(tt);
     var got = 0; list.forEach(function (c) { got += (P.ch[c.id] && P.ch[c.id].stars) || 0; });
-    var sc = btn('gxc-ib gxc-score', '★ ' + got + '/' + list.length * 3, function () { rewards(); });
+    var sc = btn('gxc-ib gxc-score', '◆ ' + got + '/' + list.length * 3, function () { rewards(); });
     sc.setAttribute('aria-label', got + ' stars of ' + list.length * 3 + '. Show rewards'); head.appendChild(sc);
     if (O.headButtons) { try { O.headButtons().forEach(function (b) { head.insertBefore(b, sc); }); } catch (e) {} }
     s.appendChild(head);
@@ -2880,7 +3072,7 @@ const GX={key:'gx',open:null,
     var g = el('div', 'gxc-goal'); g.appendChild(el('b', null, 'Goal')); g.appendChild(el('span', null, c.goal.text)); sh.appendChild(g);
     if (c.twist) { var tw = el('div', 'gxc-twist'); tw.appendChild(el('b', null, c.boss ? 'Boss rule' : 'Special rule')); tw.appendChild(el('span', null, ruleText(c.twist.text))); sh.appendChild(tw); }
     var sl = el('ul', 'gxc-slist');
-    c.stars.forEach(function (s, i) { var li = el('li', i < (st.stars || 0) ? 'on' : ''); li.appendChild(el('i', null, '★')); li.appendChild(el('span', null, s.text)); sl.appendChild(li); });
+    c.stars.forEach(function (s, i) { var li = el('li', i < (st.stars || 0) ? 'on' : ''); li.appendChild(el('i', null, '◆')); li.appendChild(el('span', null, s.text)); sl.appendChild(li); });
     sh.appendChild(sl);
     var row = el('div', 'gxc-row');
     var x = btn('gxc-btn ghost', 'Close', close); x.setAttribute('data-gxc-esc', ''); row.appendChild(x);
@@ -3035,7 +3227,7 @@ const GX={key:'gx',open:null,
       var sr = starRow(r.stars, def.maxStars, 3); sr.classList.add('big'); box.appendChild(sr);
       if (r.won && def.easy) box.appendChild(el('div', 'gxc-dim gxc-small', 'Easier mode: up to ' + def.maxStars + ' stars. Play it normally for 3.'));
       var sl = el('ul', 'gxc-slist');
-      def.stars.forEach(function (st, i) { var li = el('li', i < r.stars ? 'on' : ''); li.appendChild(el('i', null, '★')); li.appendChild(el('span', null, st.text)); sl.appendChild(li); });
+      def.stars.forEach(function (st, i) { var li = el('li', i < r.stars ? 'on' : ''); li.appendChild(el('i', null, '◆')); li.appendChild(el('span', null, st.text)); sl.appendChild(li); });
       box.appendChild(sl);
       var op = def.opponent, line = r.won ? op.praise : op.taunt;
       if (line) {
@@ -5075,6 +5267,211 @@ function boot() {
 }
 window.UI = UI; Object.defineProperty(window, 'G', { get: () => G, configurable: true });
 boot();
+
+</script>
+<script>
+// Vinegrave: scenario lessons on the shared engine (shell/gx-scenario-tutor.js, docs shell/GXST.md).
+// Each lesson stacks a real 2-seat table (the real engine VG), scripts the rival (he always passes), and judges the real state.
+// RULE -> LESSON:
+//   play a card, it does its effect; one main action a turn ............................................. L1 play (Play a card)
+//   each camp has its own reward (tablet, compass, ...); a card you pay with leaves your hand ........ L2 dig (Dig a camp)
+//   each travel icon is paid by one card; Boat cards pay Boat or Boot ................................ L3 travel (Pay the travel)
+//   two coins buy a Plane, and a Plane pays any travel icon .......................................... L4 plane (Buy a Plane)
+(function () {
+  if (!window.GXST) return;
+  var $ = function (s) { return document.querySelector(s); };
+  var L = { on: false, n: 0, bought: null, passed: false, c0: 0 };   // n = my own main actions in this lesson (for par)
+  var me = function () { return G.p[0]; };
+  var site = function (id) { return G.sites.filter(function (s) { return s.id === id; })[0]; };
+  var siteEl = function (id) { var i = G.sites.indexOf(site(id)); return document.querySelectorAll('.site')[i] || null; };
+  var ready = function () { return typeof G !== 'undefined' && typeof startGame === 'function' && typeof VG !== 'undefined' && typeof VAI !== 'undefined' && typeof render === 'function'; };
+  var settled = function () { return !!G && !UI.busy && ((G.phase === 'play' && VG.actor(G) === 0) || G.phase === 'over'); };
+  var handEl = function () { return $('#hand .cd.glow') || $('#hand .cd'); };
+
+  // start a lesson table: seat 0 is me, seat 1 the scripted rival; fix(G) rewrites my hand, res, row and sites
+  function stack(sp) {
+    try { GX.close(); } catch (e) { }
+    try { GXH.setEnabled(false); GXH.hide(); } catch (e) { }
+    L.on = true; L.n = 0; L.bought = null; L.passed = false; L.c0 = 0;
+    UI.fast = true;
+    startGame('vs', { np: 2, lvl: 'easy', seed: sp.seed || 5 });
+    if (sp.fix) sp.fix(G);
+    render();
+    return new Promise(function (r) { setTimeout(r, 400); });
+  }
+
+  var ok1 = function () { return me().res.compass >= 1 + L.c0; };
+  var ok2 = function () { return me().res.tablet >= 1; };
+  var ok3 = function () { var w = site('c-wreck'), c = site('c-cove'); return (!!w && w.occ === 0) || (!!c && c.occ === 0); };
+  var ok4 = function () { var w = site('c-wreck'); return !!w && w.occ === 0; };
+
+  var lessons = [
+    { id: 'play', title: 'Play a card', par: 1, moves: function () { return L.n; },
+      rule: 'A played card does its effect. You get one main action a turn.',
+      goal: 'Gain a compass this turn.',
+      setup: function () { return stack({ fix: function (g) { L.c0 = g.p[0].res.compass; g.p[0].hand = ['dread', 'dread', 'grant', 'trail', 'trail']; } }); },
+      success: ok1,
+      fail: function () {
+        if (ok1()) return false;
+        if (L.passed) return 'Passing ends your round with nothing gained.';
+        if (L.n >= 1) return 'That did not give a compass. Trail Notes give a compass, Patron Letters a coin.';
+        return false;
+      },
+      hints: ['Which card says compass?', { say: 'Tap Trail Notes, then Play.', target: handEl }],
+      debrief: 'A played card does its effect. You get one main action a turn.' },
+
+    { id: 'dig', title: 'Dig a camp', par: 1, moves: function () { return L.n; },
+      rule: 'Each camp has its own reward. A card you pay with leaves your hand.',
+      goal: 'Dig where a tablet is waiting.',
+      setup: function () { return stack({ fix: function (g) { g.p[0].hand = ['dread', 'grant', 'trail', 'dread', 'trail']; } }); },
+      success: ok2,
+      fail: function () {
+        if (ok2()) return false;
+        if (L.n >= 1) return 'That camp gave other goods, not a tablet. Each camp has its own reward.';
+        return false;
+      },
+      hints: ['Read each camp. Which one pays a tablet?', { say: 'Tap Lookout Cliff, then Dig.', target: function () { return siteEl('c-cliff'); } }],
+      debrief: 'Camp rewards differ. A card you pay with leaves your hand.' },
+
+    { id: 'travel', title: 'Pay the travel', par: 1, moves: function () { return L.n; },
+      rule: 'Each travel icon is paid by one card. Boat cards pay Boat or Boot.',
+      goal: 'Dig at a camp that needs a Boat.',
+      setup: function () { return stack({ fix: function (g) { g.p[0].hand = ['lamp', 'dread', 'dread', 'grant', 'trail']; } }); },
+      success: ok3,
+      fail: function () {
+        if (ok3()) return false;
+        if (L.n >= 1) return 'You dug a Boot camp. The goal was a Boat camp, which needs a Boat card.';
+        return false;
+      },
+      hints: ['Which camps sit across water? Look for the ship icon.', { say: 'Dig the Old Wreck.', target: function () { return siteEl('c-wreck'); } }],
+      debrief: 'Each travel icon is paid by one card. Boat cards pay Boat or Boot.' },
+
+    { id: 'plane', title: 'Buy a Plane', par: 1, moves: function () { return L.n; },
+      rule: 'Two coins buy a Plane. A Plane pays any travel icon.',
+      goal: 'Dig the Old Wreck. You hold no Boat card.',
+      setup: function () { return stack({ fix: function (g) { g.p[0].hand = ['dread', 'dread', 'trail', 'grant', 'trail']; g.p[0].res.coin = 2; } }); },
+      success: ok4,
+      fail: function () {
+        if (ok4()) return false;
+        if (L.n >= 1) return 'You did not reach the Old Wreck. Two coins buy a Plane, and a Plane pays any icon.';
+        return false;
+      },
+      hints: ['You hold two coins. What can they buy?', { say: 'Buy a Plane, then dig the Old Wreck.', target: function () { return siteEl('c-wreck'); } }],
+      debrief: '2 coins = a Plane. A Plane pays any travel icon.' },
+
+    { id: 'discover', title: 'Find a ruin', par: 1, moves: function () { return L.n; },
+      rule: 'Three compasses open a hidden ruin. Each ruin gives an idol.',
+      goal: 'Discover a hidden ruin and take its idol.',
+      setup: function () { return stack({ fix: function (g) { g.p[0].hand = ['dread', 'dread', 'grant', 'trail', 'trail']; g.p[0].res.compass = 3; } }); },
+      success: function () { return me().idols.length >= 1; },
+      fail: function () {
+        if (me().idols.length >= 1) return false;
+        if (L.n >= 1) return 'You dug a camp instead. A hidden ruin needs 3 compasses and gives an idol.';
+        return false;
+      },
+      hints: ['Which hidden site is level one? Three compasses open it.', { say: 'Discover the hidden ruin.', target: function () { var s = G.sites.filter(function (x) { return x.lvl === 1 && !x.tile; })[0]; return s ? document.querySelectorAll('.site')[G.sites.indexOf(s)] : null; } }],
+      debrief: 'Three compasses open a ruin: an idol (3 points) and loot. A guardian wakes there.' },
+
+    { id: 'overcome', title: 'Beat a guardian', par: 1, moves: function () { return L.n; },
+      rule: 'A guardian guards a ruin. Pay its cost to overcome it for points and a boon.',
+      goal: 'Overcome the guardian on your ruin.',
+      setup: function () { return stack({ fix: function (g) {
+        var x = g.sites[5]; x.tile = g.s1.pop(); x.guard = g.guards.pop(); x.occ = 0;
+        g.p[0].ex = 1; g.p[0].res = { coin: 5, compass: 5, tablet: 3, arrow: 3, jewel: 3 };
+        g.p[0].hand = ['dread', 'dread', 'grant', 'trail', 'trail'];
+      } }); },
+      success: function () { return me().guards.length >= 1; },
+      fail: function () {
+        if (me().guards.length >= 1) return false;
+        if (L.n >= 1) return 'You left the guardian. Unbeaten, it sends a Dread card home with you at round end.';
+        return false;
+      },
+      hints: ['Its cost is on the ruin card. Can you pay it?', { say: 'Tap the guarded site, then overcome it.', target: function () { return document.querySelector('.site[data-i="5"]'); } }],
+      debrief: 'Pay its cost: 5 points and a boon to use later. Leave it and Dread follows you home.' },
+
+    { id: 'market', title: 'Buy a card', par: 1, moves: function () { return L.n; },
+      rule: 'Items cost coins. Each card shows its points, so check before you buy.',
+      goal: 'Buy the card worth 2 points.',
+      setup: function () { return stack({ fix: function (g) {
+        g.p[0].res.coin = 3;
+        g.row[0] = 'ledger'; g.row[1] = 'journal'; g.row[2] = 'pickaxe'; g.row[3] = 'sextant'; g.row[4] = 'canteen';
+        g.p[0].hand = ['dread', 'dread', 'grant', 'trail', 'trail'];
+      } }); },
+      success: function () { return L.bought === 'journal'; },
+      fail: function () {
+        if (L.bought === 'journal') return false;
+        if (L.bought && L.bought !== 'journal') return 'That card is worth less. Check the points on each card.';
+        return false;
+      },
+      hints: ['Which card in the market is worth two points?', { say: 'Buy the Journal.', target: function () { return document.querySelectorAll('#row .cd')[1] || null; } }],
+      debrief: 'Items cost coins and go to the bottom of your deck. Some are worth end points.' },
+
+    { id: 'research', title: 'Climb the track', par: 1, moves: function () { return L.n; },
+      rule: 'The research track pays rewards at each row. The magnifier row pays the most.',
+      goal: 'Gain 2 compasses from the research track.',
+      setup: function () { return stack({ fix: function (g) {
+        g.p[0].glass = 1; g.p[0].note = 0;
+        g.p[0].res = { coin: 0, compass: 0, tablet: 1, arrow: 1, jewel: 0 };
+        g.p[0].hand = ['dread', 'dread', 'grant', 'trail', 'trail'];
+      } }); },
+      success: function () { return me().glass === 2; },
+      fail: function () {
+        if (me().glass === 2) return false;
+        if (L.n >= 1) return 'The notebook row pays a coin. The magnifier row 2 pays two compasses.';
+        return false;
+      },
+      hints: ['Which track row pays compasses?', { say: 'Advance on the research track.', target: function () { return document.querySelector('#track'); } }],
+      debrief: 'The magnifier leads. The notebook follows but never passes it. Each row pays a bonus.' }
+  ];
+
+  var go = function () {
+    if (!ready()) { setTimeout(go, 200); return; }
+    // the rival is scripted in a lesson: he always passes at once
+    var oc = VAI.choose;
+    VAI.choose = function (Gx, level) {
+      if (L.on && GXST.active()) {
+        var p = VG.moves(Gx).filter(function (m) { return m.t === 'pass'; })[0];
+        if (p) return p;
+      }
+      return oc.apply(this, arguments);
+    };
+    // lessons never overwrite the saved game, and show no goal popup
+    var osv = save; save = function () { if (!GXST.active()) return osv.apply(this, arguments); };
+    var osg = showGoal; showGoal = function () { if (GXST.active()) return; return osg.apply(this, arguments); };
+    // count my own main actions (free moves and answers do not count)
+    var od = doMove; doMove = function (m) {
+      if (L.on && VG.actor(G) === 0 && !m.free && m.t !== 'ans') {
+        L.n++;
+        if (m.t === 'buy') L.bought = G.row[m.r];
+        if (m.t === 'pass') L.passed = true;
+      }
+      return od.apply(this, arguments);
+    };
+    var slot = document.createElement('div'); slot.id = 'gxst-slot'; slot.hidden = true; document.body.appendChild(slot);
+    window.addEventListener('gxst', function (e) {
+      if (e.detail.type === 'close' || e.detail.type === 'picker') L.on = false;
+      else if (e.detail.type === 'start' || e.detail.type === 'retry') L.on = true;
+    });
+    document.addEventListener('click', function (e) {
+      var b = e.target.closest && e.target.closest('[data-lessons-open]');
+      if (b) { try { GX.close(); } catch (x) { } GXST.picker(); }
+    });
+    var KEEP = { play: [], dig: ['#map .site.l0'], travel: ['#map .site.l0'], plane: ['#map .site.l0'], discover: ['#map .site.l1'], overcome: ['#map .site.l1'], market: ['#row'], research: ['#track'] };
+    var KC = ['.gx-bar', '#dock'];   // live list: the card keeps off the dock and only the board area the current lesson uses
+    var setKC = function () { var id = (GXST.state() || {}).id, k = ['.gx-bar', '#dock'].concat(KEEP[id] || []); KC.length = 0; k.forEach(function (x) { KC.push(x); }); };
+    window.addEventListener('gxst', function (e) { if (e.detail.type === 'start' || e.detail.type === 'retry') setKC(); });
+    GXST.init({
+      game: 'vinegrave', scenarios: lessons, qParent: '.gx-bar',
+      keepClear: KC,
+      phoneSlot: { after: '.gx-bar', before: '#dock', avoid: ['#dock', '#row', '#map'] },
+      settled: settled
+    });
+    window.VGLessons = { open: function () { GXST.picker(); } };
+    var q = /[?&]lesson=([^&]+)/.exec(location.search);
+    if (q) GXST.start(decodeURIComponent(q[1]));
+  };
+  setTimeout(go, 300);
+})();
 
 </script>
 <script>window.GXLAB_CSS="/* GX LAB (test mode only; every rule is under #gxlab-* / .gxl-*, so the page is untouched when test mode is off) */\n#gxlab-bar{position:fixed;z-index:2147483640;top:max(2px,env(safe-area-inset-top));left:2px;display:flex;gap:3px;align-items:center;max-width:calc(100vw - 4px);font:700 12px/1 system-ui,-apple-system,sans-serif}\n#gxlab-bar.r{left:auto;right:2px;flex-direction:row-reverse}\n#gxlab-bar button,.gxl-panel button{font:700 12px/1 system-ui,-apple-system,sans-serif;color:#f4ead8;background:rgba(36,24,16,.86);border:1px solid #f0c05a;border-radius:9px;padding:0 8px;min-height:28px;cursor:pointer;touch-action:manipulation;white-space:nowrap}\n#gxlab-bar button.on{background:#f0c05a;color:#2a1b10}\n#gxlab-bar .gxl-r button{min-width:30px;padding:0 4px}\n#gxlab-bar .gxl-r button[aria-pressed=true]{background:#2f7d4f;border-color:#2f7d4f}\n#gxlab-bar .gxl-r button[data-s=bad][aria-pressed=true]{background:#b3382c;border-color:#b3382c}\n#gxlab-bar .gxl-r{display:flex;gap:3px}\n.gxl-panel{position:fixed;z-index:2147483600;left:0;right:0;bottom:0;height:min(78vh,640px);display:flex;flex-direction:column;box-sizing:border-box;background:#241810;color:#f4ead8;border:1.5px solid #f0c05a;border-radius:14px 14px 0 0;box-shadow:0 -8px 30px rgba(0,0,0,.55);font:500 14px/1.35 system-ui,-apple-system,sans-serif;padding-bottom:env(safe-area-inset-bottom,0)}\n.gxl-panel[hidden]{display:none}\n@media (min-width:700px){.gxl-panel{left:auto;top:0;width:380px;height:auto;border-radius:0;border-width:0 0 0 1.5px}}\n.gxl-h{display:flex;gap:6px;align-items:center;padding:8px 8px 6px 12px;border-bottom:1px solid #4a3326;flex:none}\n.gxl-h h2{margin:0;flex:1;min-width:0;font:800 15px/1.2 system-ui,sans-serif;color:#f0c05a;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}\n.gxl-panel button{min-height:40px}\n.gxl-tools{display:flex;gap:6px;flex-wrap:wrap;padding:6px 10px 0;flex:none}\n.gxl-tools button{flex:1 1 auto}\n.gxl-body{overflow:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;padding:6px 10px 14px;flex:1;min-height:0}\n.gxl-g{font:800 11px/1 system-ui,sans-serif;letter-spacing:.08em;text-transform:uppercase;color:#bca78c;margin:12px 0 4px}\n.gxl-row,.gxl-item{border:1px solid #4a3326;border-radius:11px;padding:8px 10px;margin:5px 0;background:rgba(255,255,255,.03)}\n.gxl-row{display:flex;gap:8px;align-items:center}\n.gxl-row .gxl-t{flex:1;min-width:0}\n.gxl-row b,.gxl-item .gxl-p{display:block;font:700 14px/1.25 system-ui,sans-serif;overflow-wrap:anywhere}\n.gxl-row small,.gxl-ask{display:block;color:#9fd6ff;font:600 12px/1.3 system-ui,sans-serif;overflow-wrap:anywhere}\n.gxl-go{border-color:#f0c05a!important;background:rgba(240,192,90,.14)!important;color:#f0c05a!important;font-weight:800!important;min-width:58px}\n.gxl-go.here{background:#f0c05a!important;color:#2a1b10!important}\n.gxl-chip{min-width:44px;font-size:18px!important;padding:0!important;border-color:#4a3326!important;background:transparent!important}\n.gxl-rate{display:flex;gap:6px;margin-top:6px}\n.gxl-rate button{flex:1;padding:0 4px}\n.gxl-rate button[aria-pressed=true][data-s=ok]{background:#2f7d4f;border-color:#2f7d4f}\n.gxl-rate button[aria-pressed=true][data-s=bad]{background:#b3382c;border-color:#b3382c}\n.gxl-rate button[aria-pressed=true][data-s=skip]{background:#6b5a48;border-color:#6b5a48}\n.gxl-item .gxl-top{display:flex;gap:8px;align-items:center;margin-top:5px}\n.gxl-item .gxl-top .gxl-ask{flex:1}\n.gxl-note{display:block;width:100%;box-sizing:border-box;margin-top:6px;min-height:40px;padding:0 10px;border-radius:10px;border:1.5px solid #b3382c;background:#150d08;color:#f4ead8;font:500 16px system-ui,sans-serif}\n.gxl-ed{font:800 12px/1.2 system-ui,sans-serif;color:#bca78c;margin:10px 0 2px}\n.gxl-ed b{color:#f4ead8}\n.gxl-toast{position:fixed;z-index:2147483100;left:50%;bottom:90px;transform:translateX(-50%);background:#2f7d4f;color:#fff;font:700 13px system-ui,sans-serif;padding:8px 14px;border-radius:10px;pointer-events:none}\n.gxl-fb{position:fixed;z-index:2147483200;left:12px;right:12px;bottom:12px;max-width:520px;margin:auto;background:#241810;color:#f4ead8;border:1.5px solid #f0c05a;border-radius:12px;padding:10px;display:grid;gap:8px}\n.gxl-fb textarea{width:100%;min-height:110px;box-sizing:border-box;background:#150d08;color:#f4ead8;border:1px solid #4a3326;border-radius:8px;font:12px system-ui}\n.gxl-fb button{min-height:40px;border-radius:10px;border:1.5px solid #f0c05a;background:transparent;color:#f4ead8;font:700 13px system-ui}\n";</script>

@@ -135,6 +135,7 @@
     var qh = document.createElement('div'); qh.hidden = true; document.body.appendChild(qh);   // the bar is full on a phone: the '?' button opens the picker, so the extra Lessons button goes here (unseen)
     GXST.init({ game: 'wildmark', qParent: qh, scenarios: lessons, keepClear: ['.gx-bar', '#mk', '#acts', '#line', '#cards'], settled: function () { return !!G && G.stage === 'pick' && !UI.aiRun && !UI.ghost; } });
     window.__wmLessons = true;
+    document.addEventListener('keydown', function (e) { if (e.key === 'Escape') { try { var st = GXST.state(); if (st && st.open && st.phase === 'picker') GXST.close(); } catch (x) { } } });   // Esc closes the lesson picker (menu scenario closes surfaces with Esc)
     window.addEventListener('gxst', function (ev) {
       var t = ev.detail && ev.detail.type;
       if ((t === 'start' || t === 'retry') && L.on) setTimeout(function () { try { fitView(true); } catch (e) { } }, 60);
