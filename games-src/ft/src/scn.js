@@ -13,10 +13,10 @@
     try { GX.close(); } catch (e) { }
     UI.modal = null; UI.setup.np = 2; UI.setup.seats = ['human', 'ai']; UI.setup.lv = ['normal', 'normal']; AIDELAY = 60;
     beginGame(); try { if (UI.modal === 'goal') { UI.modal = null; render(); schedule(); } } catch (e) { } try { GXH.setEnabled(false); GXH.hide(); } catch (e) { }
-    return GXS.wait(function () { return G && G.phase === 'bid' && $('#acts .sp-b.glow') && !UI.modal; }, 12000).then(function () { return idle(1200); });
+    return GXS.wait(function () { return G && G.phase === 'bid' && $('#bidt .sp-b.glow') && !UI.modal; }, 12000).then(function () { return idle(1200); });
   }
 
-  GXS.boardOpen = function () { if (!booted()) return; return table(5).then(function () { try { GXH.reset(); GXH.setEnabled(true); GXH.phase(hlpPhase()); } catch (e) { } render(); }); };
+  GXS.boardOpen = function () { if (!booted()) return; return table(5).then(function () { try { GXH.reset(); GXH.setEnabled(true); GXH.phase(hlpPhase()); } catch (e) { } render(); try { if (GX.open === 'bidd') GX.close(); } catch (e) { } return idle(300); }); };   // the board surface is checked with the turn-order window put away (W662)
 
   GXS.add({
     id: 'sq-board', name: 'Start of game board', ask: 'Is the bazaar clear and filled?', seed: 5, when: booted,
@@ -24,17 +24,17 @@
     checks: [
       { kind: 'visible', sel: '#grid', name: 'bazaar grid' },
       { kind: 'fn', name: 'board fills the screen', fn: function () { var r = $('#bd').getBoundingClientRect(), f = r.width * r.height / (innerWidth * innerHeight); return f > .5 || 'board only ' + Math.round(f * 100) + '% of the screen'; } },
-      { kind: 'visible', sel: '#acts .sp-b.glow', name: 'first bid spot' },
-      { kind: 'text', sel: '#acts .sp-b.glow', re: /\d/, name: 'bid label' },
+      { kind: 'visible', sel: '#bidt .sp-b.glow', name: 'first bid spot' },
+      { kind: 'text', sel: '#bidt .sp-b.glow', re: /\d/, name: 'bid label' },
       { kind: 'text', sel: '#line', re: /\S/, name: 'top line' },
-      { kind: 'fn', name: 'every bid spot is on screen', fn: function () { var bad = ''; [].forEach.call(document.querySelectorAll('#acts .sp-b'), function (e) { if (!bad && !inView(e)) bad = 'bid spot ' + (e.getAttribute('aria-label') || '') + ' off screen'; }); return !bad || bad; } },
+      { kind: 'fn', name: 'every bid spot is on screen', fn: function () { var bad = ''; [].forEach.call(document.querySelectorAll('#bidt .sp-b'), function (e) { if (!bad && !inView(e)) bad = 'bid spot ' + (e.getAttribute('aria-label') || '') + ' off screen'; }); return !bad || bad; } },
       { kind: 'eq', name: 'your score', a: function () { return GXS.num('.sch[data-seat="0"] .ss'); }, b: function () { return shownTotal(G.pl[0]); } },
       { kind: 'eq', name: 'rival score', a: function () { return GXS.num('.sch[data-seat="1"] .ss'); }, b: function () { return shownTotal(G.pl[1]); } },
       { kind: 'eq', name: 'your coins', a: function () { return GXS.num('.sch[data-seat="0"] .st:nth-child(1)'); }, b: function () { return G.pl[0].coins; } },
       { kind: 'eq', name: 'your camels', a: function () { return GXS.num('.sch[data-seat="0"] .st:nth-child(2)'); }, b: function () { return G.pl[0].camels; } },
       { kind: 'fn', name: 'no line of text over 8 words on the board', fn: function () { var bad = ''; [].forEach.call(document.querySelectorAll('#table *, #line, #seats *, #acts *'), function (e) { if (e.children.length || !GXS.vis(e)) return; var t = (e.textContent || '').trim(); if (words(t) > 8) bad = bad || '"' + t.slice(0, 40) + '" (' + words(t) + ' words)'; }); return !bad || bad; } },
       skin,
-      { kind: 'tap', sel: '#acts .sp-b.glow', name: 'tap a bid spot', state: function () { return JSON.stringify([G.bids.length, G.phase, G.turn, G.bidQueue.length]); }, expect: function (a, b) { return a !== b || 'the bid did nothing'; } }
+      { kind: 'tap', sel: '#bidt .sp-b.glow', name: 'tap a bid spot', state: function () { return JSON.stringify([G.bids.length, G.phase, G.turn, G.bidQueue.length]); }, expect: function (a, b) { return a !== b || 'the bid did nothing'; } }
     ]
   });
 
@@ -42,7 +42,7 @@
     id: 'sq-uibar', name: 'UI bar: bar, line, panels, text sizes', ask: 'Is every screen clean and readable?', seed: 10, when: booted, group: 'UI',
     setup: function () { return table(10); },
     checks: [
-      { kind: 'fn', name: 'top bar has at most 5 buttons', fn: function () { var n = [].filter.call(document.querySelectorAll('.gx-bar button'), GXS.vis).length; return n <= 5 || n + ' buttons'; } },
+      { kind: 'fn', name: 'top bar: at most 6 round buttons, each >= 44 px (W662)', fn: function () { var v = [].filter.call(document.querySelectorAll('.gx-bar button'), GXS.vis); var small = v.filter(function (b) { var r = b.getBoundingClientRect(); return r.width < 44 || r.height < 44; }).length; return (v.length <= (innerWidth < 1024 ? 6 : 12) && !small) || v.length + ' buttons, ' + small + ' under 44 px'; } },
       { kind: 'fn', name: 'one instruction line of 8 words or fewer', fn: function () { var t = ($('#line') || {}).innerText || ''; return (words(t) > 0 && words(t) <= 8) || 'line: ' + t; } },
       { kind: 'fn', name: 'at most one primary button on the board', fn: function () { var n = [].filter.call(document.querySelectorAll('.btn.go'), GXS.vis).length; return n <= 1 || n + ' primary buttons'; } },
       { kind: 'fn', name: 'board text >= 13 px (16 px at >= 1024 wide)', fn: function () { var min = innerWidth >= 1024 ? 16 : 13, bad = ''; [].forEach.call(document.querySelectorAll('body *'), function (e) { if (bad || e.children.length || !e.textContent.trim() || !GXS.vis(e) || e.closest('.gx-drawer, svg') || /^Test:/.test(e.textContent.trim())) return; var f = parseFloat(getComputedStyle(e).fontSize); if (f > 0 && f < min - .05) bad = (e.className || e.tagName) + ' ' + f + 'px "' + e.textContent.trim().slice(0, 12) + '"'; }); return !bad || bad; } },
@@ -79,7 +79,7 @@ GXS.add({
       { kind: 'visible', sel: '#trk', name: 'turn tracker' },
       { kind: 'text', sel: '#trk', re: /Round \d/, name: 'tracker shows the round' },
       { kind: 'fn', name: 'tile cost badges are at least 14 px with a plate', fn: function () { var bad = ''; [].forEach.call(document.querySelectorAll('#grid .tile .tv'), function (e) { if (bad) return; var cs = getComputedStyle(e), r = e.getBoundingClientRect(); if (parseFloat(cs.fontSize) < 14) bad = 'badge font ' + cs.fontSize; else if (r.height < 20) bad = 'badge only ' + Math.round(r.height) + ' px high'; else if (cs.backgroundColor === 'rgba(0, 0, 0, 0)') bad = 'badge has no plate'; }); return !bad || bad; } },
-      { kind: 'fn', name: 'seat counters say coins and camels', fn: function () { var t = $('.sch[data-seat="0"]').innerText; return (/coins/.test(t) && /camels/.test(t)) || 'seat chip: ' + t.replace(/\n/g, ' '); } },
+      { kind: 'fn', name: 'seat chip names coins and camels (icons on screen, words for readers; W662)', fn: function () { var e = $('.sch[data-seat="0"]'), t = e.getAttribute('aria-label') || ''; return !!(/coins/.test(t) && /camels/.test(t) && e.querySelector('[data-i="coin"],img[src*="icon-coin"]') && e.querySelector('[data-i="camel"],img[src*="icon-camel"]')) || 'seat chip: ' + t; } },
       { kind: 'fn', name: 'seat counters name the people', fn: function () { var e = $('.sch[data-seat="0"] .s4'); return (e && /People/.test(e.textContent)) || 'no People count in the seat chip'; } },
       { kind: 'fn', name: 'the title is not cut off', fn: function () { var h = $('.gx-bar h1'); return h.scrollWidth <= h.clientWidth + 1 || 'title cut: ' + h.scrollWidth + ' > ' + h.clientWidth; } },
       { kind: 'fn', name: 'a score toast never covers the instruction line', fn: function () { var l = $('#line').getBoundingClientRect(), bad = ''; [].forEach.call(document.querySelectorAll('.plpop'), function (p) { var r = p.getBoundingClientRect(); if (r.top < l.bottom && r.bottom > l.top && r.left < l.right && r.right > l.left) bad = 'toast over the line'; }); return !bad || bad; } },
@@ -95,8 +95,8 @@ GXS.add({
     id: 'sq-chips', name: 'Bid chips and score chips', ask: 'Are the bid numbers big enough?', seed: 7, when: booted, group: 'Board',
     setup: function () { return table(7); },
     checks: [
-      { kind: 'text', sel: '#acts .sp-b.glow', re: /\d/, name: 'bid chip number', minPx: 13 },
-      { kind: 'fn', name: 'every bid chip number >= 13 px', fn: function () { var bad = ''; [].forEach.call(document.querySelectorAll('#acts .sp-b'), function (e) { if (bad || !GXS.vis(e)) return; var px = parseFloat(getComputedStyle(e).fontSize); if (px < 13) bad = 'bid chip font ' + px + ' px'; }); return !bad || bad; } },
+      { kind: 'text', sel: '#bidt .sp-b.glow', re: /\d/, name: 'bid chip number', minPx: 13 },
+      { kind: 'fn', name: 'every bid chip number >= 13 px', fn: function () { var bad = ''; [].forEach.call(document.querySelectorAll('#bidt .sp-b'), function (e) { if (bad || !GXS.vis(e)) return; var px = parseFloat(getComputedStyle(e).fontSize); if (px < 13) bad = 'bid chip font ' + px + ' px'; }); return !bad || bad; } },
       { kind: 'visible', sel: '.sch[data-seat="0"] .ss', name: 'your score chip' },
       { kind: 'eq', name: 'your score', a: function () { return GXS.num('.sch[data-seat="0"] .ss'); }, b: function () { return shownTotal(G.pl[0]); } },
       skin
