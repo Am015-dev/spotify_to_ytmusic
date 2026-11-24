@@ -1,0 +1,11 @@
+const { chromium } = require('playwright'); const path = require('path');
+(async () => { const b = await chromium.launch(); const c = await b.newContext({ viewport: { width: 402, height: 874 }, hasTouch: true, isMobile: true });
+  const p = await c.newPage(); const errs = []; p.on('pageerror', e => errs.push(e.message));
+  await p.goto('file://' + path.join(__dirname, '..', 'onyx-atelier.html')); await p.waitForTimeout(500);
+  await p.evaluate(async () => { window.AIDELAY = 0; OA_TEST.newGame('normal', 11, 0); for (let i = 0; i < 14; i++) { const g = OA_TEST.U.G; if (g.over) break; if (g.turn === 0 && !OA_TEST.U.busy && !g.pend) OA_TEST.act(OA_TEST.AI.pick(g, 'hard')[0]); else if (g.pend && g.turn === 0) OA_TEST.act(OA_TEST.E.validMoves(g)[0]); await new Promise(r => setTimeout(r, 60)); } });
+  await p.waitForTimeout(500);
+  const shot = async (sel, n) => { await p.tap(sel); await p.waitForTimeout(300); await p.screenshot({ path: path.join(__dirname, n + '.png') });
+    const x = await p.evaluate(() => { const e = document.querySelector('.modal .x,#sheet .x'); const r = e.getBoundingClientRect(); return [r.width, r.height]; }); console.log(n, 'X', x);
+    await p.mouse.click(5, 440); await p.waitForTimeout(200); console.log('closed by outside tap:', await p.evaluate(() => !document.querySelector('.modal,#sheet'))); };
+  await shot('[data-who="1"]', 'popup-rival'); await shot('[data-who="0"]', 'popup-mine'); await shot('#logbtn', 'popup-log'); await shot('#rulesbtn', 'popup-rules');
+  console.log('errors', errs.length ? errs : 'none'); await b.close(); })();

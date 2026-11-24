@@ -122,7 +122,7 @@ body{background-color:var(--lac);background-image:
 #scrim{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:40}
 #sheet{position:fixed;left:0;right:0;bottom:0;z-index:41;max-width:560px;margin:0 auto;background:linear-gradient(180deg,#1c1913,#0c0b0d);border-top:2px solid var(--gold);border-radius:14px 14px 0 0;padding:12px 14px calc(14px + env(safe-area-inset-bottom));box-shadow:0 -10px 30px rgba(0,0,0,.6);animation:up .22s cubic-bezier(.2,.8,.3,1)}
 @keyframes up{from{transform:translateY(40px);opacity:0}}
-#sheet .x,.modal .x{position:absolute;right:6px;top:6px}
+#sheet .x,.modal .x{position:absolute;right:6px;top:6px;width:44px;height:44px;flex:none}
 .zoom{display:flex;gap:12px;align-items:flex-start}
 .zoom .card{--cw:112px;--ch:146px;flex:0 0 auto}
 .zoom .info{flex:1 1 auto;min-width:0;font-size:14px;line-height:1.35;padding-top:2px}
@@ -169,5 +169,11 @@ body{background-color:var(--lac);background-image:
 @keyframes fing{50%{transform:scale(.7)}}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 @media (min-height:760px){.ps .top{font-size:14px}.col{min-height:50px}.col .gm{width:26px;height:26px}}
+.ps .nm{border:0;background:none;min-height:44px;min-width:44px;padding:0 4px;cursor:pointer}.ps .nm i{font-style:normal;font-size:13px;margin-left:3px;opacity:.7}
+.logl{margin:0;padding-left:22px;font-size:14px}.logl li{padding:3px 0;border-bottom:1px solid rgba(216,180,90,.15)}
+.race2{display:flex;gap:6px;flex-wrap:wrap;justify-content:center;font-size:14px;color:var(--gold2);margin-bottom:6px}
+.colrow{display:flex;flex-wrap:wrap;gap:4px;align-items:center;margin-bottom:6px}.colrow .lab{display:inline-flex;align-items:center;gap:3px;min-width:70px;font-size:14px}.colrow .lab .gm{width:22px;height:22px}
+.chip{font-size:13px!important}.col .bn,.col .cp,.left{font-size:13px!important}.resb,.sbox,.race span,.sbox small,.btn small{font-size:13px!important}
+.pat{width:44px;height:44px}.pat svg{width:44px;height:44px}
 </style>
 </head>

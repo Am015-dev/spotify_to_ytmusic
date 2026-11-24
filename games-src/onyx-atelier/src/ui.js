@@ -7,7 +7,7 @@ var UI = (function () {
   var ABT = { again: 'Take another turn right after this one.', token: 'Take one more gem of this colour from the board.', priv: 'Gain a Favour scroll.', steal: 'Take one gem or pearl from your rival.' };
   var PAT = [{ n: 'The Impresario' }, { n: 'The Duchess' }, { n: 'The Banker' }, { n: 'The Countess' }];
   var HOW = { points: '20 points', crowns: '10 crowns' };
-  var U = { G: null, sel: [], mode: null, resGold: null, busy: false, level: 'easy', tut: null, snd: true };
+  var U = { G: null, sel: [], mode: null, resGold: null, busy: false, level: 'normal', tut: null, snd: true };
   var LS = function (k, v) { try { if (v === undefined) return localStorage.getItem(k); if (v === null) localStorage.removeItem(k); else localStorage.setItem(k, v); } catch (e) { return null; } };
   function delay(ms) { return new Promise(function (r) { setTimeout(r, ms); }); }
   function aiMs(ms) { return typeof window.AIDELAY === 'number' ? Math.min(ms, window.AIDELAY) : ms; }
@@ -69,7 +69,7 @@ var UI = (function () {
   function strip(p) {
     var g = G(), P = g.pl[p], el = $(p ? '#rival' : '#me'), b = E.bonuses(P), bc = E.bestColour(P), q = g.pend, me = p === 0, h = '';
     el.classList.toggle('turn', g.turn === p && !g.over);
-    h += '<div class="top"><span class="nm">' + (me ? 'You' : 'Rival') + '</span><span class="race">' +
+    h += '<div class="top"><button class="nm" data-who="' + p + '" aria-label="' + (me ? 'Your' : 'Rival') + ' collection: jewels and patrons">' + (me ? 'You' : 'Rival') + '<i aria-hidden="true">&#9662;</i></button><span class="race">' +
       '<span title="Points: 20 wins" aria-label="' + E.points(P) + ' of 20 points"><b data-engine="OA_TEST.pts.' + p + '">' + E.points(P) + '</b>/20 pts</span>' +
       '<span title="Crowns: 10 wins" aria-label="' + E.crowns(P) + ' of 10 crowns">' + OART.icon('crown') + '<b>' + E.crowns(P) + '</b>/10</span>' +
       '<span title="Points on jewels of one colour: 10 wins" aria-label="' + bc.v + ' of 10 points on one colour">' + OART.gm(bc.c) + '<b>' + bc.v + '</b>/10</span></span><span class="favs">';
@@ -302,6 +302,40 @@ var UI = (function () {
   }
   function patHtml(i, btn) { var R = OD.ROYALS[i]; return '<' + (btn ? 'button' : 'div') + ' class="patc' + (btn ? ' glow' : '') + '" data-pick="' + i + '"><svg viewBox="0 0 48 48"><use href="#patron"/></svg><b>' + PAT[i].n + '</b>' + R.pts + ' points' + (R.ab ? '<br>' + ABN[R.ab] + ': ' + ABT[R.ab].replace('.', '') : '') + '</' + (btn ? 'button' : 'div') + '>'; }
   function patronInfo() { var g = G(), h = '<h2>Patrons</h2><p>' + OD.TXT.crowns + '</p><div class="pats">'; g.royals.forEach(function (i) { h += patHtml(i); }); sheet(h + '</div>', true); }
+  function logLine(l) {
+    var m = /^(\d) (\w+)\s*(.*)$/.exec(l); if (!m) return esc(l);
+    var who = m[1] === '0' ? 'You' : 'Rival', v = m[2], a = m[3], t;
+    if (v === 'take') t = 'took ' + a.split('').map(function (c) { return NAME[c]; }).join(', ');
+    else if (v === 'fav') t = 'used a Favour for ' + NAME[a];
+    else if (v === 'refill') t = 'refilled the board';
+    else if (v === 'reserve') t = 'kept a jewel (+1 Gold)';
+    else if (v === 'buy') t = 'bought ' + cardLabel(+a);
+    else if (v === 'wins') t = 'won with ' + (HOW[a] || '10 points in one colour');
+    else t = v + ' ' + a;
+    return '<b>' + who + '</b> ' + esc(t);
+  }
+  function logPop() {
+    var g = G(), L = g.log.slice(-30).reverse(), h = '<h2>Move log</h2><ol class="logl">';
+    L.forEach(function (l) { h += '<li>' + logLine(l) + '</li>'; });
+    sheet(h + (L.length ? '' : '<li>No moves yet.</li>') + '</ol>', true);
+  }
+  function collection(p) {
+    var g = G(), P = g.pl[p], me = p === 0, b = E.bonuses(P), bc = E.bestColour(P);
+    var h = '<h2>' + (me ? 'Your collection' : 'Rival collection') + '</h2><div class="race2"><span>' + E.points(P) + '/20 points</span><span>' + E.crowns(P) + '/10 crowns</span><span>' + bc.v + '/10 in ' + NAME[bc.c] + '</span></div>';
+    h += '<h3>Jewels owned (' + P.cards.length + ')</h3>';
+    ['w', 'u', 'g', 'r', 'k', 'x', null].forEach(function (c) {
+      var L = P.cards.filter(function (id) { var k = E.card(id); return c === null ? !k.b : k.b === c; }); if (!L.length) return;
+      h += '<div class="colrow"><span class="lab">' + (c && c !== 'x' ? OART.gm(c) + ' +' + (b[c] || 0) : c === 'x' ? 'Matching' : 'Points only') + '</span>';
+      L.forEach(function (id) { h += '<div class="card t' + E.card(id).lvl + '" style="--cw:46px;--ch:60px" role="img" aria-label="' + esc(cardLabel(id)) + '">' + cardHtml(id) + '</div>'; });
+      h += '</div>';
+    });
+    if (!P.cards.length) h += '<p>No jewels yet. Buy one to start a colour bonus.</p>';
+    h += '<h3>Patrons (' + P.roy.length + ')</h3>';
+    h += P.roy.length ? '<div class="pats">' + P.roy.map(function (i) { return patHtml(i); }).join('') + '</div>' : '<p>None yet. A patron joins you at 3 and 6 crowns.</p>';
+    h += '<h3>Kept jewels: ' + P.res.length + '/3</h3><p>Gems held: ' + E.tokens(P) + '/10. Favours: ' + P.fav + '.</p>';
+    if (me && P.res.length) h += '<button class="btn" data-keptopen>Open kept jewels</button>';
+    var d = sheet(h, true), kb = d.querySelector('[data-keptopen]'); if (kb) kb.onclick = reserved;
+  }
   function patronPick() {
     var g = G(), h = '<h2>Choose a patron</h2><div class="pats">'; g.royals.forEach(function (i) { h += patHtml(i, true); });
     var d = sheet(h + '</div>', true); d.setAttribute('data-lock', '1'); var x = d.querySelector('[data-close]'); if (x) x.remove();
@@ -360,6 +394,8 @@ var UI = (function () {
     if (t.id === 'rulesbtn') return rules();
     if (t.id === 'hintbtn') return hint();
     if (t.id === 'resbtn') return reserved();
+    if (t.id === 'logbtn') return logPop();
+    if (t.dataset.who !== undefined) return collection(+t.dataset.who);
     if (t.dataset.pat !== undefined) return patronInfo();
     if (t.dataset.deck !== undefined) { if (U.mode === 'res' && human()) return act({ t: 'reserve', gold: U.resGold, l: +t.dataset.deck, deck: true }); return deckInfo(+t.dataset.deck); }
     if (t.dataset.l !== undefined && t.classList.contains('card')) { var l = +t.dataset.l, i = +t.dataset.i; if (U.mode === 'res' && human()) return act({ t: 'reserve', gold: U.resGold, l: l, i: i }); return zoom({ l: l, i: i }); }
@@ -418,7 +454,7 @@ var UI = (function () {
       var a = b.dataset.t; if (a === 'cont') resume(); else if (a === 'play') { if (!seen) startTut(); else newGame(U.level); } else if (a === 'learn') startTut(); else if (a === 'rules') rules(); };
   }
   function boot() {
-    OART.mount(); U.level = LS('oa_level') || 'easy'; U.snd = LS('oa_snd') !== '0';
+    OART.mount(); U.level = LS('oa_level') || 'normal'; U.snd = LS('oa_snd') !== '0';
     document.addEventListener('click', onTap);
     document.addEventListener('keydown', function (e) { if (e.key === 'Escape') { var m = document.querySelector('.modal[data-lock]'); if (!m) closeSheet(); } });
     window.addEventListener('resize', function () { if (U.G) layout(); });
