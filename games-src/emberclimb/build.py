@@ -10,9 +10,9 @@ SP = os.path.abspath(os.path.join(D, '..'))
 gxs = rd(os.path.join(SP, 'shell', 'gx-scenario.js'))
 sh = lambda *p: rd(os.path.join(SP, *p))
 # shared kits inlined (no local copies): viewport + tutor (+ their css), audio helper and music slots
-gxs += '\n' + '\n'.join([sh('shell', 'shell.js'), sh('shell', 'gx-kit.js'), sh('shell', 'gx-viewport.js'), sh('shell', 'gx-help.js'), sh('shell', 'gx-tutor.js'), sh('shell', 'gx-campaign.js'), sh('audio', 'gameaudio.js'), sh('shell', 'gx-music.js')])
-shellcss = sh('shell', 'shell.css') + '\n' + sh('shell', 'gx-kit.css') + '\n' + sh('shell', 'gx-help.css') + '\n' + sh('shell', 'gx-tutor.css') + '\n' + sh('shell', 'gx-campaign.css')
-sound = rd(os.path.join(S, 'sound.js')); tutor = rd(os.path.join(S, 'tutor.js')); camp = rd(os.path.join(S, 'camp.js'))
+gxs += '\n' + '\n'.join([sh('shell', 'shell.js'), sh('shell', 'gx-kit.js'), sh('shell', 'gx-viewport.js'), sh('shell', 'gx-help.js'), sh('shell', 'gx-tutor.js'), sh('shell', 'gx-scenario-tutor.js'), sh('shell', 'gx-campaign.js'), sh('audio', 'gameaudio.js'), sh('shell', 'gx-music.js')])
+shellcss = sh('shell', 'shell.css') + '\n' + sh('shell', 'gx-kit.css') + '\n' + sh('shell', 'gx-help.css') + '\n' + sh('shell', 'gx-tutor.css') + '\n' + sh('shell', 'gx-scenario-tutor.css') + '\n' + sh('shell', 'gx-campaign.css')
+sound = rd(os.path.join(S, 'sound.js')); tutor = rd(os.path.join(S, 'tutor.js')) + '\n' + rd(os.path.join(S, 'lessons.js')); camp = rd(os.path.join(S, 'camp.js'))
 scn = rd(os.path.join(S, 'scn.js'))
 # stems that have a picture file right now (games/emberclimb/media or a local media/ folder): the page only requests those, so a missing file never causes a 404
 present = set()
