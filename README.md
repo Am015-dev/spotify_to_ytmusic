@@ -251,6 +251,31 @@ PYTHONPATH=. pytest -q
 
 If everything is set up properly you should see `5 passed`.
 
+### Command-Line Example with Conda
+
+For users that prefer working directly from a terminal, the `scripts/conda_transfer_example.sh`
+script demonstrates the full workflow for migrating playlists using conda and the
+`spotify2ytmusic` CLI.  It performs the following actions:
+
+1. Creates and activates a conda environment named `spotify_to_youtube`.
+2. Installs Python and the `spotify2ytmusic` package.
+3. Generates YouTube Music credentials via `ytmusicapi oauth`.
+4. Downloads your Spotify playlists with `spotify-backup.py`.
+5. Loads the liked songs into YouTube Music using `s2yt_load_liked`.
+
+Run the script with:
+
+```bash
+bash scripts/conda_transfer_example.sh
+```
+
+### Interactive Notebook Example
+
+For an executable walkthrough of these steps, open the Jupyter
+notebook located at `notebooks/spotify_to_youtube.ipynb`. Each
+cell contains one of the commands from the workflow so you can run
+them interactively in a terminal-enabled environment.
+
 ### Searching for YTMusic Tracks
 
 This is mostly for debugging, but there is a command to search for tracks in YTMusic:
